@@ -1,0 +1,95 @@
+﻿TODO:
+　処理の高速化
+  グラフタブのデザインの作成
+
+修正案：
+　日付登録で↑↓で日付変更できるようにする - 自作する？
+　帳簿項目リストで複数選択に対応する(特に削除時) - 難しい？
+　登録、追加した帳簿項目が選択されるようにする - 実装済
+　　DataGridViewにフォーカスを当てる
+　複数の日付と金額をまとめて入力できるようにする
+
+凡例：＋追加 －変更 ×削除 ↑バグ修正 
+
+記録以前
+  記帳風月からのインポート
+  帳簿項目追加、編集
+  合計項目表示
+2016/12/29
+　MainWindow.xaml.cs
+　　＋削除時に移動も削除されるようにした(2017/01/01確認)
+　　↑移動操作可能の判定が「帳簿」ではなく「帳簿項目」になっていたのを修正
+　　↑項目編集処理のグループ種別判定処理のSQLを修正
+　　↑NumericUpDown.ValueのModeをTwoWayに修正 - Editしたテキストが取得できなかったため
+    ↑NumericUpDown内のTextboxのUpdateSourceTriggerをPropertyChangedに修正 - Editしたテキストが取得できなかったため
+  ActionRegistrationWindow.xaml.cs
+    ↑登録完了時にDialogResult=trueとなるように修正
+	↑グループ内帳簿項目洗い出し時に日付昇順になるように修正
+	↑「店舗」、「備考」のBind先をSelectedItemsからTextに変更(合わせてUpdateSourceTriggerをPropertyChangedに修正) - Editしたテキストが取得できなかったため
+	＋グループに属する項目が1つになったときにグループを削除するようにした
+  その他
+    －hst_remark.used_timeの型をtime with time zone→timestamp without time zoneに修正
+2016/12/30
+  ActionRegistrationWindow.xaml.cs
+    ＋「店舗」、「備考」の最終使用時刻の更新、レコードの追加が行われるようにした
+	－「店舗」、「備考」の表示順序を降順に変更
+	－「店舗」、「備考」欄の記載が、収支、カテゴリや項目を変更しても変わらないように変更
+2016/12/31
+  MoveRegistrationWindow.xaml.cs
+  　＋「移動」の表示(追加、編集)ができるようにした
+2017/01/01
+  MainWindow.xaml.cs
+    ↑手数料を含む移動の場合に、記帳風月からの取込時に繰り返しと見做されていたのを修正
+  MoveRegistrationWindow.xaml.cs
+    ＋「移動」の追加、編集ができるようにした
+2017/01/02
+  MainWindow.xaml.cs
+  　＋表示データごとにタブ化した
+    ＋タブの選択をメニューから行えるようにした
+2017/01/08
+  App.xaml.cs
+	＋DB接続できない場合にソフトを終了するようにした
+    ＋DBのバックアップを10件まで保存するようにした
+  MainWindow.xaml.cs
+    ＋ウィンドウサイズ、位置を保存するようにした
+	＋年間一覧が表示されるようにした
+	＋年間一覧の表示年度と帳簿の表示月が連動するようにした
+	＋終了時に選択していた帳簿を保存するようにした
+  ActionRegistrationWindow.xaml.cs
+    ＋ウィンドウサイズ、位置を保存するようにした
+  MoveRegistrationWindow.xaml.cs
+    ＋ウィンドウサイズ、位置を保存するようにした
+2017/01/14
+  App.xaml.cs
+    －バックアップをソフト起動時ではなく終了時に行うようにした
+2017/01/15
+  NumericUpDown.xaml.cs
+    ＋テキストボックスフォーカス時、数値入力用ウィンドウを表示するようにした
+  ActionRegistrationWindow.xaml.cs
+　　－金額登録で未入力を初期値にした
+    ＋追加時、Enterキー入力で「続けて入力」、Shift+Enterキー入力で「登録」するようにした
+    ＋編集時、Enterキー入力で「登録」するようにした
+  MoveRegistrationWindow.xaml.cs
+　　－金額登録で未入力を初期値にした
+    ＋Enterキー入力で「登録」するようにした
+2017/01/21
+　MainWindow.xaml.cs
+　　＋帳簿項目追加/変更時及び移動追加/変更時、画面更新をコールバックで実行するように変更した
+　ActionRegistrationWindow.xaml.cs
+　　＋帳簿項目追加/変更時に、ウィンドウを閉じる場合でも登録時イベントを呼ぶように変更した
+　　＋登録時イベントで追加/変更した帳簿項目IDを渡すようにした
+　MoveRegistrationWindow.xaml.cs
+　　＋移動追加/変更時に、ウィンドウを閉じる場合でも登録時イベントを呼ぶように変更した
+　　＋登録時イベントで追加/変更した帳簿項目IDを渡すようにした
+2017/01/22
+  MainWindow.xaml.cs
+    ＋コンストラクタで設定を読み込むように変更した
+    ＋カスタム形式ファイルへのエクスポートができるようにした
+    ＋カスタム形式ファイルからのインポートができるようにした
+  ActionRegistrationWindow.xaml.cs
+    ＋コンストラクタで設定を読み込むように変更した
+  MoveRegistrationWindow.xaml.cs
+    ＋コンストラクタで設定を読み込むように変更した
+2017/02/03
+  App.xaml.cs
+	＋DB設定を初回起動時/接続失敗時に指定できるようにした

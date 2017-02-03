@@ -1,0 +1,114 @@
+﻿<Window x:Class="HouseholdAccountBook.Windows.ActionRegistrationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HouseholdAccountBook.Windows"
+        xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
+        xmlns:converter="clr-namespace:HouseholdAccountBook.Converter"
+        mc:Ignorable="d"
+        Title="追加" Height="Auto" Width="350" ShowInTaskbar="False"
+        Loaded="ActionRegistrationWindow_Loaded"
+        Closing="ActionRegistrationWindow_Closing"
+        KeyDown="ActionRegistrationWindow_KeyDown">
+
+    <Window.Resources>
+        <!-- 登録コマンド -->
+        <RoutedCommand x:Key="ContinueToRegisterCommand"/>
+        <RoutedCommand x:Key="RegisterCommand"/>
+        <RoutedCommand x:Key="CancelCommand"/>
+
+        <!-- コンバータ -->
+        <converter:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
+        <converter:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
+        <converter:DateTimeToActTimeConverter x:Key="DateTimeToActTimeConverter"/>
+        <converter:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
+    </Window.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource ContinueToRegisterCommand}" 
+                        CanExecute="ContinueToRegisterCommand_CanExecute" Executed="ContinueToRegisterCommand_Executed"/>
+        <CommandBinding Command="{StaticResource RegisterCommand}" 
+                        CanExecute="RegisterCommand_CanExecute" Executed="RegisterCommand_Executed"/>
+        <CommandBinding Command="{StaticResource CancelCommand}" 
+                        Executed="CancelCommand_Executed"/>
+    </Window.CommandBindings>
+
+    <Window.DataContext>
+        <local:ActionRegistrationWindowViewModel x:Name="ActionRegistrationWindowVM"/>
+    </Window.DataContext>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="0.5*"/>
+                <RowDefinition Height="0.5*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="0.25*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
+                       Text="帳簿" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" 
+                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="BookName"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
+                       Text="日付" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <DatePicker Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" 
+                        SelectedDateFormat="Long" SelectedDate="{Binding SelectedDate}"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
+                       Text="収支" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" 
+                      ItemsSource="{Binding BalanceKindVMList}" SelectedItem="{Binding SelectedBalanceKindVM}" DisplayMemberPath="BalanceKindName"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
+                       Text="分類" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <ListBox Grid.Row="3" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" 
+                     ItemsSource="{Binding CategoryVMList}" SelectedItem="{Binding SelectedCategoryVM}" DisplayMemberPath="CategoryName"/>
+            <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
+                       Text="項目" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <ListBox Grid.Row="4" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" 
+                     ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="ItemName"/>
+            <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
+                       Text="金額" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <controls:NumericUpDown Grid.Row="5" Grid.Column="1" Margin="5" Value="{Binding Value, Mode=TwoWay}" Minimum="1"/>
+            <TextBlock Grid.Row="5" Grid.Column="2" Margin="5" 
+                       Text="回数" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <controls:NumericUpDown Grid.Row="5" Grid.Column="3" Margin="5" 
+                                    Value="{Binding Count, Mode=TwoWay}" Minimum="1"/>
+            <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" 
+                       Text="店舗" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <ComboBox Grid.Row="6" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" IsEditable="True"
+                      ItemsSource="{Binding ShopNameList}" Text="{Binding SelectedShopName, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
+                       Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <ComboBox Grid.Row="7" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" IsEditable="True"
+                      ItemsSource="{Binding RemarkList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.3*"/>
+                <ColumnDefinition Width="0.3*"/>
+                <ColumnDefinition Width="0.3*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="続けて入力" Command="{StaticResource ContinueToRegisterCommand}"/>
+            <Button Grid.Column="1" Content="登録" Command="{StaticResource RegisterCommand}"/>
+            <Button Grid.Column="2" Content="キャンセル" Command="{StaticResource CancelCommand}"/>
+        </Grid>
+    </Grid>
+</Window>
