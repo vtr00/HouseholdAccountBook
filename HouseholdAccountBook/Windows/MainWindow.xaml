@@ -21,6 +21,7 @@
         <!-- 帳簿項目操作コマンド -->
         <RoutedCommand x:Key="MoveToBookCommand"/>
         <RoutedCommand x:Key="AddActionToBookCommand"/>
+        <RoutedCommand x:Key="AddActionListToBookCommand"/>
         <RoutedCommand x:Key="EditActionCommand"/>
         <RoutedCommand x:Key="DeleteActionCommand"/>
 
@@ -72,6 +73,7 @@
         <CommandBinding Command="{StaticResource MoveToBookCommand}" CanExecute="MoveToBookCommand_CanExecute" Executed="MoveToBookCommand_Executed"/>
         <CommandBinding Command="{StaticResource AddActionToBookCommand}" CanExecute="AddActionToBookCommand_CanExecute" Executed="AddActionToBookCommand_Executed"/>
         <CommandBinding Command="{StaticResource EditActionCommand}" CanExecute="EditActionCommand_CanExecute" Executed="EditActionCommand_Executed"/>
+        <CommandBinding Command="{StaticResource AddActionListToBookCommand}" CanExecute="AddActionListToBookCommand_CanExecute" Executed="AddActionListToBookCommand_Executed"/>
         <CommandBinding Command="{StaticResource DeleteActionCommand}" CanExecute="DeleteActionCommand_CanExecute" Executed="DeleteActionCommand_Executed"/>
         
         <!-- タブ表示操作コマンド -->
@@ -125,6 +127,7 @@
                 <MenuItem Header="移動(_T)" Command="{StaticResource MoveToBookCommand}"/>
                 <Separator/>
                 <MenuItem Header="追加(_A)" Command="{StaticResource AddActionToBookCommand}"/>
+                <MenuItem Header="まとめて追加(_W)" Command="{StaticResource AddActionListToBookCommand}"/>
                 <MenuItem Header="変更(_E)" Command="{StaticResource EditActionCommand}"/>
                 <MenuItem Header="削除(_D)" Command="{StaticResource DeleteActionCommand}"/>
             </MenuItem>
@@ -147,17 +150,16 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="1.0*"/>
                     </Grid.RowDefinitions>
-
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1.0*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
 
                     <!-- 中央メニュー -->
                     <Grid Grid.Row="0" Grid.Column="0" Background="LightGray">
-                        <StackPanel Orientation="Horizontal">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.0*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
                             <Button Content="◀" Width="20" Command="{StaticResource GoToLastMonthCommand}"/>
                             <Button Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}}" Width="120"/>
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextMonthCommand}"/>
@@ -166,16 +168,17 @@
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="BookName" 
                                       SelectionChanged="BookComboBox_SelectionChanged"/>
                         </StackPanel>
+                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                            <Button Content="移動" Width="50" Command="{StaticResource MoveToBookCommand}"/>
+                            <Button Content="追加" Width="50" Command="{StaticResource AddActionToBookCommand}"/>
+                            <Button Content="まとめて追加" Width="80" Command="{StaticResource AddActionListToBookCommand}"/>
+                            <Button Content="変更" Width="50" Command="{StaticResource EditActionCommand}"/>
+                            <Button Content="削除" Width="50" Command="{StaticResource DeleteActionCommand}"/>
+                        </StackPanel>
                     </Grid>
-                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
-                        <Button Content="移動" Width="50" Command="{StaticResource MoveToBookCommand}"/>
-                        <Button Content="追加" Width="50" Command="{StaticResource AddActionToBookCommand}"/>
-                        <Button Content="変更" Width="50" Command="{StaticResource EditActionCommand}"/>
-                        <Button Content="削除" Width="50" Command="{StaticResource DeleteActionCommand}"/>
-                    </StackPanel>
 
                     <!-- データリスト -->
-                    <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                    <Grid Grid.Row="1" Grid.Column="0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1.0*"/>
                             <ColumnDefinition Width="Auto"/>

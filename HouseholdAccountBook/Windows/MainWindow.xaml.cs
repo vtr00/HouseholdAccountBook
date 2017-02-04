@@ -468,6 +468,33 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         }
 
         /// <summary>
+        /// 項目まとめて追加可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddActionListToBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            // 帳簿タブを選択していて、選択されている帳簿が存在する
+            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BookTab && this.MainWindowVM.SelectedBookVM != null;
+        }
+
+        /// <summary>
+        /// 項目まとめて追加処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddActionListToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(builder,
+                this.MainWindowVM.SelectedBookVM.BookId, this.MainWindowVM.SelectedActionVM?.ActTime);
+            alrw.Registrated += (sender2, e2) => {
+                UpdateBookData(e2.Id);
+                actionDataGrid.Focus();
+            };
+            alrw.ShowDialog();
+        }
+
+        /// <summary>
         /// 項目編集可能か
         /// </summary>
         /// <param name="sender"></param>

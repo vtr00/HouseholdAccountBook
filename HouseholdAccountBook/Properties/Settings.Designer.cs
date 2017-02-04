@@ -358,5 +358,53 @@ namespace HouseholdAccountBook.Properties {
                 this["App_Postgres_Role"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double ActionListRegistrationWindow_Width {
+            get {
+                return ((double)(this["ActionListRegistrationWindow_Width"]));
+            }
+            set {
+                this["ActionListRegistrationWindow_Width"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double ActionListRegistrationWindow_Top {
+            get {
+                return ((double)(this["ActionListRegistrationWindow_Top"]));
+            }
+            set {
+                this["ActionListRegistrationWindow_Top"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double ActionListRegistrationWindow_Left {
+            get {
+                return ((double)(this["ActionListRegistrationWindow_Left"]));
+            }
+            set {
+                this["ActionListRegistrationWindow_Left"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double ActionListRegistrationWindow_Height {
+            get {
+                return ((double)(this["ActionListRegistrationWindow_Height"]));
+            }
+            set {
+                this["ActionListRegistrationWindow_Height"] = value;
+            }
+        }
     }
 }

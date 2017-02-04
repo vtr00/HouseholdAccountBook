@@ -95,6 +95,9 @@
       <DependentUpon>NumericUpDown.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dao\DaoBuilder.cs" />
+    <Compile Include="Windows\ActionListRegistrationWindow.xaml.cs">
+      <DependentUpon>ActionListRegistrationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\DbSettingWindow.xaml.cs">
       <DependentUpon>DbSettingWindow.xaml</DependentUpon>
     </Compile>
@@ -107,6 +110,10 @@
     <Page Include="UserControls\NumericUpDown.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\ActionListRegistrationWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\ActionRegistrationWindow.xaml">
       <SubType>Designer</SubType>

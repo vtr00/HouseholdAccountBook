@@ -288,7 +288,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
         }
 
         /// <summary>
-        /// キー押下時の処理(Escキーでフォームを閉じる)
+        /// キー押下時の処理(Shift+Enterキーで登録、Enterキーで登録(編集時)/続けて登録(追加時)、Escキーでキャンセル)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -723,7 +723,7 @@ WHERE item_id = @{2} AND remark = @{3};", actTime, Updater, itemId, remark);
     /// <summary>
     /// 収支種別
     /// </summary>
-    public class BalanceKindViewModel
+    public partial class BalanceKindViewModel
     {
         /// <summary>
         /// 収支種別
@@ -738,7 +738,7 @@ WHERE item_id = @{2} AND remark = @{3};", actTime, Updater, itemId, remark);
     /// <summary>
     /// カテゴリVM
     /// </summary>
-    public class CategoryViewModel
+    public partial class CategoryViewModel
     {
         /// <summary>
         /// カテゴリID
