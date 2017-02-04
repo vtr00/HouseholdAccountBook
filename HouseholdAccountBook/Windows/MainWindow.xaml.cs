@@ -435,6 +435,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 this.MainWindowVM.SelectedBookVM.BookId, this.MainWindowVM.SelectedActionVM?.ActTime);
             mrw.Registrated += (sender2, e2) => {
                 UpdateBookData(e2.Id);
+                actionDataGrid.Focus();
             };
             mrw.ShowDialog();
         }
@@ -461,6 +462,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 this.MainWindowVM.SelectedBookVM.BookId, this.MainWindowVM.SelectedActionVM?.ActTime);
             arw.Registrated += (sender2, e2)=> {
                 UpdateBookData(e2.Id);
+                actionDataGrid.Focus();
             };
             arw.ShowDialog();
         }
@@ -500,6 +502,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
                 ActionRegistrationWindow arw = new ActionRegistrationWindow(builder, this.MainWindowVM.SelectedActionVM.ActionId);
                 arw.Registrated += (sender2, e2) => {
                     UpdateBookData(e2.Id);
+                    actionDataGrid.Focus();
                 };
                 arw.ShowDialog();
             }
@@ -508,6 +511,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
                 MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder, this.MainWindowVM.SelectedBookVM.BookId, this.MainWindowVM.SelectedActionVM.GroupId.Value);
                 mrw.Registrated += (sender2, e2) => {
                     UpdateBookData(e2.Id);
+                    actionDataGrid.Focus();
                 };
                 mrw.ShowDialog();
             }
@@ -1212,6 +1216,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
             DateTime startTime = new DateTime(year.Year, Properties.Settings.Default.App_StartMonth, 1);
             DateTime endTime = startTime.AddMonths(1).AddMilliseconds(-1);
 
+            // 開始月までの収支を取得する
             int balance = 0;
             using(DaoBase dao = builder.Build()) {
                 DaoReader reader;
@@ -1242,7 +1247,9 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 BalanceKind = -1, CategoryId = -1, CategoryName = String.Empty,
                 ItemId = -1, ItemName = "残高", Values = new List<int>() });
 
-            // 最初の月の分を取得
+            int averageCount = 0; // 平均値計算に使用する月数(先月まで)
+
+            // 最初の月の分を取得する
             ObservableCollection<SummaryViewModel> summaryVMList = this.LoadSummaryViewModelList(bookId, startTime, endTime);
             balance = balance + summaryVMList[0].Summary;
             vmList[0].Values.Add(balance); // 残高
@@ -1250,9 +1257,18 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 int value = summaryVM.Summary;
                 SummaryWithinYearViewModel vm = new SummaryWithinYearViewModel() {
                     BalanceKind = summaryVM.BalanceKind, CategoryId = summaryVM.CategoryId, CategoryName = summaryVM.CategoryName,
-                    ItemId = summaryVM.ItemId, ItemName = summaryVM.ItemName, Values = new List<int>(), Average = value, Summary = value };
+                    ItemId = summaryVM.ItemId, ItemName = summaryVM.ItemName, Values = new List<int>(), Summary = value };
+                if (endTime < DateTime.Now) {
+                    vm.Average = value;
+                }
+                else {
+                    vm.Average = 0;
+                }
                 vm.Values.Add(value);
                 vmList.Add(vm);
+            }
+            if (endTime < DateTime.Now) {
+                ++averageCount;
             }
 
             // 最初以外の月の分を取得
@@ -1273,11 +1289,14 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                     }
                     vmList[j + 1].Summary += value;
                 }
+                if (endTime < DateTime.Now) {
+                    ++averageCount;
+                }
             }
 
             foreach(SummaryWithinYearViewModel vm in vmList) {
                 if (vm.Average != null) {
-                    vm.Average /= 12;
+                    vm.Average /= averageCount;
                 }
             }
 

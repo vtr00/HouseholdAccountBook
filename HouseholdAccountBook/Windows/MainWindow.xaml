@@ -182,13 +182,14 @@
                         </Grid.ColumnDefinitions>
 
                         <!-- 中央リスト -->
-                        <DataGrid Grid.Column="0" ItemsSource="{Binding ActionVMList}" SelectedItem="{Binding SelectedActionVM}" IsReadOnly="True" SelectionUnit="FullRow"
+                        <DataGrid x:Name="actionDataGrid" Grid.Column="0" 
+                                  ItemsSource="{Binding ActionVMList}" SelectedItem="{Binding SelectedActionVM}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
                                   HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo"
                                   MouseDoubleClick="ActionDataGrid_MouseDoubleClick" PreviewKeyDown="ActionDataGrid_PreviewKeyDown">
                             <DataGrid.Columns>
-                                <DataGridTextColumn x:Name="ActionId" Header="アクションID" Binding="{Binding ActionId}"/>
+                                <DataGridTextColumn x:Name="actionIdColumn" Header="アクションID" Binding="{Binding ActionId}"/>
                                 <DataGridTextColumn Header="日付" Binding="{Binding ActTime, Converter={StaticResource DateTimeToActTimeConverter}}"/>
                                 <DataGridTextColumn Header="曜日" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}}"/>
                                 <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
@@ -200,7 +201,7 @@
                                         ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                                 <DataGridTextColumn Header="店名" Binding="{Binding ShopName}"/>
                                 <DataGridTextColumn Header="備考" Binding="{Binding Remark}"/>
-                                <DataGridTextColumn x:Name="GroupId" Header="グループID" Binding="{Binding GroupId}"/>
+                                <DataGridTextColumn x:Name="groupIdColumn" Header="グループID" Binding="{Binding GroupId}"/>
                             </DataGrid.Columns>
 
                             <DataGrid.RowStyle>
