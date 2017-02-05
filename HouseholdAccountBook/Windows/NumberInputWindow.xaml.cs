@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Windows
     public partial class NumberInputWindow : Window
     {
         /// <summary>
-        /// 數字ボタンがクリックされたときに発生します。
+        /// 数字ボタンがクリックされたときに発生します。
         /// </summary>
         public event EventHandler<ValueInputEventArgs> NumberInput;
 

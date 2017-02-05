@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HouseholdAccountBook.Windows"
+        xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         mc:Ignorable="d"
         Title="Household Account Book" Height="300" Width="400">
 
@@ -29,7 +30,7 @@
     </Window.CommandBindings>
     
     <Window.DataContext>
-        <local:DbSettingWindowViewModel x:Name="DbSettingWindowVM"/>
+        <viewmodels:DbSettingWindowViewModel x:Name="DbSettingWindowVM"/>
     </Window.DataContext>
 
     <Grid Margin="10">

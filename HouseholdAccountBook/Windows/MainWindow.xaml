@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HouseholdAccountBook.Windows"
+        xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:converter="clr-namespace:HouseholdAccountBook.Converter"
         mc:Ignorable="d"
@@ -94,7 +95,7 @@
     </Window.CommandBindings>
     
     <Window.DataContext>
-        <local:MainWindowViewModel x:Name="MainWindowVM"/>
+        <viewmodels:MainWindowViewModel x:Name="MainWindowVM"/>
     </Window.DataContext>
     
     <Grid>

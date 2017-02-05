@@ -6,17 +6,18 @@ namespace HouseholdAccountBook.Dao
     /// <summary>
     /// Data Access Object
     /// </summary>
-    public abstract class DaoBase : IDisposable {
+    public abstract class DaoBase : IDisposable
+    {
         /// <summary>
         /// 接続情報
         /// </summary>
         public abstract class ConnectInfo { }
-        
+
         /// <summary>
         /// DB接続
         /// </summary>
         protected DbConnection connection;
-        
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -31,9 +32,10 @@ namespace HouseholdAccountBook.Dao
         /// 接続を開始する
         /// </summary>
         /// <returns>接続結果</returns>
-        private bool Open() {
+        private bool Open()
+        {
             connection.Open();
-            while (connection.State == System.Data.ConnectionState.Connecting) { ; }
+            while (connection.State == System.Data.ConnectionState.Connecting) {; }
 
             return connection.State == System.Data.ConnectionState.Open;
         }
@@ -50,7 +52,8 @@ namespace HouseholdAccountBook.Dao
         /// <summary>
         /// 接続を終了する
         /// </summary>
-        public void Dispose() {
+        public void Dispose()
+        {
             if (connection != null) {
                 connection.Close();
                 connection.Dispose();
@@ -82,19 +85,22 @@ namespace HouseholdAccountBook.Dao
         /// トランザクション処理
         /// </summary>
         /// <param name="transaction">トランザクション内の処理</param>
-        public void ExecTransaction(Transaction transaction) {
+        public void ExecTransaction(Transaction transaction)
+        {
             DbTransaction dbTransaction = null;
             try {
                 dbTransaction = connection.BeginTransaction();
-                
+
                 transaction();
 
                 dbTransaction.Commit();
-            } catch (DbException e) {
+            }
+            catch (DbException e) {
                 Console.WriteLine(e.Message);
                 dbTransaction.Rollback();
                 throw;
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 Console.WriteLine(e.Message);
                 dbTransaction.Rollback();
                 throw;

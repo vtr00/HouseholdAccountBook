@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HouseholdAccountBook.Dao
+﻿namespace HouseholdAccountBook.Dao
 {
     /// <summary>
     /// DAOビルダ
@@ -34,25 +28,25 @@ namespace HouseholdAccountBook.Dao
         /// DAOビルダ
         /// </summary>
         /// <param name="info">接続情報</param>
-        public DaoBuilder (DaoBase.ConnectInfo info)
+        public DaoBuilder(DaoBase.ConnectInfo info)
         {
             this.target = Target.Undefined;
             this.info = null;
 
             DaoNpgsql.ConnectInfo npgsqlInfo = info as DaoNpgsql.ConnectInfo;
-            if(npgsqlInfo != null) {
+            if (npgsqlInfo != null) {
                 this.target = Target.PostgreSQL;
                 this.info = info;
                 return;
             }
             DaoOle.ConnectInfo oleInfo = info as DaoOle.ConnectInfo;
-            if(oleInfo != null) {
+            if (oleInfo != null) {
                 this.target = Target.OleDb;
                 this.info = info;
                 return;
             }
             DaoSQLite.ConnectInfo sqliteInfo = info as DaoSQLite.ConnectInfo;
-            if(sqliteInfo != null) {
+            if (sqliteInfo != null) {
                 this.target = Target.SQLite;
                 this.info = info;
                 return;

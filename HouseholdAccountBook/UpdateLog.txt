@@ -99,6 +99,9 @@
   ActionListRegistrationWindow.xaml.cs
     ＋帳簿項目をまとめて登録できるようにした
 2017/02/05
+  全般
+    －ViewModelを別ファイルにした
+    －usingの整理をした
   App.xaml.cs
     －デバッグビルド時、接続するDBをデバッグ用に変更した
     －バックアップファイルの形式をカスタム形式に変更した

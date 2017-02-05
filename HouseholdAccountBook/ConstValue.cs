@@ -73,7 +73,7 @@ namespace HouseholdAccountBook.ConstValue
             ToBook = 1
         }
         /// <summary>
-        /// 収支種別文字列
+        /// 手数料種別文字列
         /// </summary>
         public static Dictionary<CommissionKind, string> CommissionStr = new Dictionary<CommissionKind, string>() {
             { CommissionKind.FromBook, "支払元" }, { CommissionKind.ToBook, "支払先" }

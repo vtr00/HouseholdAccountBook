@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace HouseholdAccountBook.Dao {
+namespace HouseholdAccountBook.Dao
+{
     /// <summary>
     /// クエリ実行結果の処理
     /// </summary>
-    public class DaoReader {
+    public class DaoReader
+    {
         /// <summary>
         /// 実行されたSQL(デバッグ用)
         /// </summary>
@@ -33,7 +32,8 @@ namespace HouseholdAccountBook.Dao {
         /// </summary>
         /// <param name="sql">実行SQL</param>
         /// <param name="resultSet">実行結果</param>
-        public DaoReader(String sql, LinkedList<Dictionary<String, Object>> resultSet) {
+        public DaoReader(String sql, LinkedList<Dictionary<String, Object>> resultSet)
+        {
             this.sql = sql;
             this.resultSet = resultSet;
             enumerator = resultSet.GetEnumerator();
@@ -47,27 +47,27 @@ namespace HouseholdAccountBook.Dao {
         public Record this[int index]
         {
             get {
-                if ( index < 0 || Count <= index) {
+                if (index < 0 || Count <= index) {
                     throw new IndexOutOfRangeException();
                 }
 
                 LinkedListNode<Dictionary<String, object>> node;
                 if (index < Count / 2) { // 前半の場合
-                    node = resultSet.First; 
-                    for(int i = 0; i != index; ++i) {
+                    node = resultSet.First;
+                    for (int i = 0; i != index; ++i) {
                         node = node.Next;
                     }
                 }
                 else { // 後半の場合
                     node = resultSet.Last;
-                    for(int i = Count - 1; i != index; --i) {
+                    for (int i = Count - 1; i != index; --i) {
                         node = node.Previous;
                     }
                 }
 
                 return new Record(node.Value);
             }
-            private set { ; }
+            private set {; }
         }
 
         /// <summary>
@@ -79,11 +79,13 @@ namespace HouseholdAccountBook.Dao {
         /// 1レコードだけ読み込む
         /// </summary>
         /// <param name="exection">レコードの処理</param>
-        public void ExecARow(ExectionARow exection) {
+        public void ExecARow(ExectionARow exection)
+        {
             enumerator.MoveNext();
             if (enumerator.Current != null) {
                 exection(new Record(enumerator.Current));
-            } else {
+            }
+            else {
                 throw new InvalidOperationException("有効なレコードがありません。");
             }
         }
@@ -98,7 +100,8 @@ namespace HouseholdAccountBook.Dao {
         /// 複数レコードを読み込む
         /// </summary>
         /// <param name="exection">レコードの処理</param>
-        public void ExecWholeRow(ExectionWholeRow exection) {
+        public void ExecWholeRow(ExectionWholeRow exection)
+        {
             int count = 0;
             while (enumerator.MoveNext()) {
                 exection(count, new Record(enumerator.Current));
@@ -129,15 +132,13 @@ namespace HouseholdAccountBook.Dao {
             /// </summary>
             /// <param name="key"></param>
             /// <returns></returns>
-            public String this[String key] {
-                get
-                {
-                    if (this._record.ContainsKey(key))
-                    {
+            public String this[String key]
+            {
+                get {
+                    if (this._record.ContainsKey(key)) {
                         return this._record[key].ToString();
                     }
-                    else
-                    {
+                    else {
                         throw new KeyNotFoundException();
                     }
                 }
@@ -150,13 +151,11 @@ namespace HouseholdAccountBook.Dao {
             /// <returns></returns>
             public int ToInt(String key)
             {
-                if (this._record.ContainsKey(key))
-                {
+                if (this._record.ContainsKey(key)) {
                     Object tmp = this._record[key];
                     return Int32.Parse(tmp.ToString());
                 }
-                else
-                {
+                else {
                     throw new KeyNotFoundException();
                 }
             }
@@ -166,14 +165,13 @@ namespace HouseholdAccountBook.Dao {
             /// </summary>
             /// <param name="key"></param>
             /// <returns></returns>
-            public int? ToNumerableInt(String key){
-                if (this._record.ContainsKey(key))
-                {
+            public int? ToNumerableInt(String key)
+            {
+                if (this._record.ContainsKey(key)) {
                     Object tmp = this._record[key];
                     return tmp == DBNull.Value ? (int?)null : (int?)tmp;
                 }
-                else
-                {
+                else {
                     throw new KeyNotFoundException();
                 }
             }
