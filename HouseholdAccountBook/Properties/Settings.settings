@@ -98,5 +98,8 @@
     <Setting Name="ActionListRegistrationWindow_Height" Type="System.Double" Scope="User">
       <Value Profile="(Default)">-1</Value>
     </Setting>
+    <Setting Name="App_Postgres_DatabaseName_Debug" Type="System.String" Scope="User">
+      <Value Profile="(Default)">account_book_debug</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

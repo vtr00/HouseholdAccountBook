@@ -51,8 +51,8 @@ namespace HouseholdAccountBook.Windows
             LoadSetting();
 
 #if !DEBUG
-            ActionId.Visibility = Visibility.Collapsed;
-            GroupId.Visibility = Visibility.Collapsed; 
+            actionIdColumn.Visibility = Visibility.Collapsed;
+            groupIdColumn.Visibility = Visibility.Collapsed;
 #endif
         }
 
@@ -329,9 +329,14 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                     Properties.Settings.Default.App_Postgres_Host,
                     Properties.Settings.Default.App_Postgres_Port,
                     Properties.Settings.Default.App_Postgres_UserName,
-                    Properties.Settings.Default.App_Postgres_UserName,
+                    Properties.Settings.Default.App_Postgres_Role,
                     ofd.FileName,
-                    Properties.Settings.Default.App_Postgres_DatabaseName);
+#if DEBUG
+                    Properties.Settings.Default.App_Postgres_DatabaseName_Debug
+#else
+                    Properties.Settings.Default.App_Postgres_DatabaseName
+#endif
+                    );
             info.WindowStyle = ProcessWindowStyle.Hidden;
 
             // リストアする
@@ -390,13 +395,18 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             ProcessStartInfo info = new ProcessStartInfo();
             info.FileName = Properties.Settings.Default.App_Postgres_DumpExePath;
             info.Arguments = string.Format(
-                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password  --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
+                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
                     Properties.Settings.Default.App_Postgres_Host,
                     Properties.Settings.Default.App_Postgres_Port,
                     Properties.Settings.Default.App_Postgres_UserName,
-                    Properties.Settings.Default.App_Postgres_UserName, 
-                    sfd.FileName, 
-                    Properties.Settings.Default.App_Postgres_DatabaseName);
+                    Properties.Settings.Default.App_Postgres_Role, 
+                    sfd.FileName,
+#if DEBUG
+                    Properties.Settings.Default.App_Postgres_DatabaseName_Debug
+#else
+                    Properties.Settings.Default.App_Postgres_DatabaseName
+#endif
+                    );
             info.WindowStyle = ProcessWindowStyle.Hidden;
 
             // バックアップする
@@ -410,7 +420,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 MessageBox.Show(Message.FoultToExport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
-        #endregion
+#endregion
 
         #region 帳簿項目の操作
         /// <summary>

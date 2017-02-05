@@ -49,7 +49,11 @@ namespace HouseholdAccountBook
                 Port = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_Port,
                 UserName = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_UserName,
                 Password = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_Password,
+#if DEBUG
+                DatabaseName = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_DatabaseName_Debug,
+#else
                 DatabaseName = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_DatabaseName,
+#endif
                 Role = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_Role
             };
 
@@ -123,8 +127,9 @@ namespace HouseholdAccountBook
             ProcessStartInfo info = new ProcessStartInfo();
             info.FileName = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_DumpExePath;
             info.Arguments = string.Format(
-                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password  --format plain --data-only --verbose --file \"{4}\" \"{5}\"",
-                    connectInfo.Host, connectInfo.Port, connectInfo.UserName, connectInfo.Role, string.Format(@"{0}/{1}.backup", backUpFolderPath, DateTime.Now.ToString("yyyyMMddHHmmss")), connectInfo.DatabaseName);
+                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
+                    connectInfo.Host, connectInfo.Port, connectInfo.UserName, connectInfo.Role, 
+                    string.Format(@"{0}/{1}.backup", backUpFolderPath, DateTime.Now.ToString("yyyyMMddHHmmss")), connectInfo.DatabaseName);
             info.WindowStyle = ProcessWindowStyle.Hidden;
 
             // バックアップする

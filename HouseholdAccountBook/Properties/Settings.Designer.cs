@@ -406,5 +406,17 @@ namespace HouseholdAccountBook.Properties {
                 this["ActionListRegistrationWindow_Height"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("account_book_debug")]
+        public string App_Postgres_DatabaseName_Debug {
+            get {
+                return ((string)(this["App_Postgres_DatabaseName_Debug"]));
+            }
+            set {
+                this["App_Postgres_DatabaseName_Debug"] = value;
+            }
+        }
     }
 }

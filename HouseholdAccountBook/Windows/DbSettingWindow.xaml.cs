@@ -28,7 +28,11 @@ namespace HouseholdAccountBook.Windows
             this.DbSettingWindowVM.Port = Properties.Settings.Default.App_Postgres_Port;
             this.DbSettingWindowVM.UserName = Properties.Settings.Default.App_Postgres_UserName;
             this.passwordBox.Password = Properties.Settings.Default.App_Postgres_Password;
+#if DEBUG
+            this.DbSettingWindowVM.DatabaseName = Properties.Settings.Default.App_Postgres_DatabaseName_Debug;
+#else
             this.DbSettingWindowVM.DatabaseName = Properties.Settings.Default.App_Postgres_DatabaseName;
+#endif
             this.DbSettingWindowVM.Role = Properties.Settings.Default.App_Postgres_Role;
             this.DbSettingWindowVM.DumpExePath = Properties.Settings.Default.App_Postgres_DumpExePath;
             this.DbSettingWindowVM.RestoreExePath = Properties.Settings.Default.App_Postgres_RestoreExePath;
