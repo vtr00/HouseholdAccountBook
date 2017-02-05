@@ -1,0 +1,498 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.4.5
+-- Dumped by pg_dump version 9.4.5
+-- Started on 2016-12-27 17:31:14
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- TOC entry 2087 (class 1262 OID 16393)
+-- Name: account_book; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE account_book WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'Japanese_Japan.932' LC_CTYPE = 'Japanese_Japan.932';
+
+
+ALTER DATABASE account_book OWNER TO postgres;
+
+\connect account_book
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- TOC entry 185 (class 3079 OID 11855)
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- TOC entry 2090 (class 0 OID 0)
+-- Dependencies: 185
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- TOC entry 184 (class 1259 OID 16829)
+-- Name: hst_action; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE hst_action (
+    action_id integer NOT NULL,
+    book_id integer NOT NULL,
+    item_id integer NOT NULL,
+    act_time timestamp without time zone NOT NULL,
+    act_value integer NOT NULL,
+    shop_name text,
+    group_id integer,
+    remark text,
+    del_flg integer NOT NULL,
+    update_time timestamp without time zone NOT NULL,
+    updater text NOT NULL,
+    insert_time timestamp without time zone NOT NULL,
+    inserter text NOT NULL,
+    CONSTRAINT hst_action_act_value_check CHECK ((act_value <> 0)),
+    CONSTRAINT hst_action_action_id_check CHECK ((action_id >= 0)),
+    CONSTRAINT hst_action_book_id_check CHECK ((book_id >= 0)),
+    CONSTRAINT hst_action_del_flg_check CHECK (((del_flg = 0) OR (del_flg = 1))),
+    CONSTRAINT hst_action_group_id_check CHECK ((group_id >= 0)),
+    CONSTRAINT hst_action_item_id_check CHECK ((item_id >= 0))
+);
+
+
+ALTER TABLE hst_action OWNER TO postgres;
+
+--
+-- TOC entry 183 (class 1259 OID 16827)
+-- Name: hst_action_action_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE hst_action_action_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE hst_action_action_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 2091 (class 0 OID 0)
+-- Dependencies: 183
+-- Name: hst_action_action_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE hst_action_action_id_seq OWNED BY hst_action.action_id;
+
+
+--
+-- TOC entry 173 (class 1259 OID 16711)
+-- Name: hst_group; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE hst_group (
+    group_id integer NOT NULL,
+    group_kind integer NOT NULL,
+    remark text,
+    del_flg integer NOT NULL,
+    update_time timestamp without time zone NOT NULL,
+    updater text NOT NULL,
+    insert_time timestamp without time zone NOT NULL,
+    inserter text NOT NULL,
+    CONSTRAINT hst_group_del_flg_check CHECK (((del_flg = 0) OR (del_flg = 1))),
+    CONSTRAINT hst_group_group_id_check CHECK ((group_id >= 0))
+);
+
+
+ALTER TABLE hst_group OWNER TO postgres;
+
+--
+-- TOC entry 172 (class 1259 OID 16709)
+-- Name: hst_group_group_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE hst_group_group_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE hst_group_group_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 2092 (class 0 OID 0)
+-- Dependencies: 172
+-- Name: hst_group_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE hst_group_group_id_seq OWNED BY hst_group.group_id;
+
+
+--
+-- TOC entry 174 (class 1259 OID 16722)
+-- Name: hst_remark; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE hst_remark (
+    item_id integer NOT NULL,
+    remark text NOT NULL,
+    remark_kind integer NOT NULL,
+    del_flg integer NOT NULL,
+    update_time timestamp without time zone NOT NULL,
+    updater text NOT NULL,
+    insert_time timestamp without time zone NOT NULL,
+    inserter text NOT NULL,
+    used_time time with time zone NOT NULL,
+    CONSTRAINT hst_remark_del_flg_check CHECK (((del_flg = 0) OR (del_flg = 1))),
+    CONSTRAINT hst_remark_item_id_check CHECK ((item_id >= 0))
+);
+
+
+ALTER TABLE hst_remark OWNER TO postgres;
+
+--
+-- TOC entry 182 (class 1259 OID 16816)
+-- Name: hst_shop; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE hst_shop (
+    item_id integer NOT NULL,
+    shop_name text NOT NULL,
+    used_time timestamp without time zone NOT NULL,
+    del_flg integer NOT NULL,
+    update_time timestamp without time zone NOT NULL,
+    updater text NOT NULL,
+    insert_time timestamp without time zone NOT NULL,
+    inserter text NOT NULL,
+    CONSTRAINT mst_shop_del_flg_check CHECK (((del_flg = 0) OR (del_flg = 1))),
+    CONSTRAINT mst_shop_shop_id_check CHECK ((item_id >= 0))
+);
+
+
+ALTER TABLE hst_shop OWNER TO postgres;
+
+--
+-- TOC entry 176 (class 1259 OID 16734)
+-- Name: mst_book; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mst_book (
+    book_id integer NOT NULL,
+    book_name text NOT NULL,
+    book_kind integer NOT NULL,
+    pay_day integer,
+    sort_order integer NOT NULL,
+    del_flg integer NOT NULL,
+    update_time timestamp without time zone NOT NULL,
+    updater text NOT NULL,
+    insert_time timestamp without time zone NOT NULL,
+    inserter text NOT NULL,
+    initial_value integer NOT NULL,
+    CONSTRAINT mst_book_book_id_check CHECK ((book_id >= 0)),
+    CONSTRAINT mst_book_del_flg_check CHECK (((del_flg = 0) OR (del_flg = 1))),
+    CONSTRAINT mst_book_pay_day_check CHECK (((pay_day >= 1) AND (pay_day <= 31))),
+    CONSTRAINT mst_book_sort_order_check CHECK ((sort_order >= 0))
+);
+
+
+ALTER TABLE mst_book OWNER TO postgres;
+
+--
+-- TOC entry 175 (class 1259 OID 16732)
+-- Name: mst_book_book_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mst_book_book_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mst_book_book_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 2093 (class 0 OID 0)
+-- Dependencies: 175
+-- Name: mst_book_book_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mst_book_book_id_seq OWNED BY mst_book.book_id;
+
+
+--
+-- TOC entry 178 (class 1259 OID 16750)
+-- Name: mst_category; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mst_category (
+    category_id integer NOT NULL,
+    category_name text NOT NULL,
+    balance_kind integer NOT NULL,
+    sort_order integer NOT NULL,
+    del_flg integer NOT NULL,
+    update_time timestamp without time zone NOT NULL,
+    updater text NOT NULL,
+    insert_time timestamp without time zone NOT NULL,
+    inserter text NOT NULL,
+    CONSTRAINT mst_category_barance_kind_check CHECK (((balance_kind = 0) OR (balance_kind = 1))),
+    CONSTRAINT mst_category_category_id_check CHECK ((category_id >= 0)),
+    CONSTRAINT mst_category_del_flg_check CHECK (((del_flg = 0) OR (del_flg = 1))),
+    CONSTRAINT mst_category_sort_order_check CHECK ((sort_order >= 0))
+);
+
+
+ALTER TABLE mst_category OWNER TO postgres;
+
+--
+-- TOC entry 177 (class 1259 OID 16748)
+-- Name: mst_category_category_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mst_category_category_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mst_category_category_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 2094 (class 0 OID 0)
+-- Dependencies: 177
+-- Name: mst_category_category_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mst_category_category_id_seq OWNED BY mst_category.category_id;
+
+
+--
+-- TOC entry 180 (class 1259 OID 16766)
+-- Name: mst_item; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE mst_item (
+    item_id integer NOT NULL,
+    item_name text NOT NULL,
+    category_id integer NOT NULL,
+    advance_flg integer NOT NULL,
+    sort_order integer NOT NULL,
+    del_flg integer NOT NULL,
+    update_time timestamp without time zone NOT NULL,
+    updater text NOT NULL,
+    insert_time timestamp without time zone NOT NULL,
+    inserter text NOT NULL,
+    move_flg integer DEFAULT 0 NOT NULL,
+    CONSTRAINT mst_item_advance_flg_check CHECK (((advance_flg = 0) OR (advance_flg = 1))),
+    CONSTRAINT mst_item_category_id_check CHECK ((category_id >= 0)),
+    CONSTRAINT mst_item_del_flg_check CHECK (((del_flg = 0) OR (del_flg = 1))),
+    CONSTRAINT mst_item_item_id_check CHECK ((item_id >= 0)),
+    CONSTRAINT mst_item_move_flg_check CHECK (((move_flg = 0) OR (move_flg = 1))),
+    CONSTRAINT mst_item_sort_order_check CHECK ((sort_order >= 0))
+);
+
+
+ALTER TABLE mst_item OWNER TO postgres;
+
+--
+-- TOC entry 179 (class 1259 OID 16764)
+-- Name: mst_item_item_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE mst_item_item_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE mst_item_item_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 2095 (class 0 OID 0)
+-- Dependencies: 179
+-- Name: mst_item_item_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE mst_item_item_id_seq OWNED BY mst_item.item_id;
+
+
+--
+-- TOC entry 181 (class 1259 OID 16780)
+-- Name: rel_book_item; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE rel_book_item (
+    book_id integer NOT NULL,
+    item_id integer NOT NULL,
+    del_flg integer NOT NULL,
+    update_time timestamp without time zone NOT NULL,
+    updater text NOT NULL,
+    insert_time timestamp without time zone NOT NULL,
+    inserter text NOT NULL,
+    CONSTRAINT rel_book_item_del_flg_check CHECK (((del_flg = 0) OR (del_flg = 1)))
+);
+
+
+ALTER TABLE rel_book_item OWNER TO postgres;
+
+--
+-- TOC entry 1951 (class 2604 OID 16832)
+-- Name: action_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY hst_action ALTER COLUMN action_id SET DEFAULT nextval('hst_action_action_id_seq'::regclass);
+
+
+--
+-- TOC entry 1925 (class 2604 OID 16714)
+-- Name: group_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY hst_group ALTER COLUMN group_id SET DEFAULT nextval('hst_group_group_id_seq'::regclass);
+
+
+--
+-- TOC entry 1930 (class 2604 OID 16737)
+-- Name: book_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mst_book ALTER COLUMN book_id SET DEFAULT nextval('mst_book_book_id_seq'::regclass);
+
+
+--
+-- TOC entry 1935 (class 2604 OID 16753)
+-- Name: category_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mst_category ALTER COLUMN category_id SET DEFAULT nextval('mst_category_category_id_seq'::regclass);
+
+
+--
+-- TOC entry 1940 (class 2604 OID 16769)
+-- Name: item_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY mst_item ALTER COLUMN item_id SET DEFAULT nextval('mst_item_item_id_seq'::regclass);
+
+
+--
+-- TOC entry 1973 (class 2606 OID 16843)
+-- Name: hst_action_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY hst_action
+    ADD CONSTRAINT hst_action_pkey PRIMARY KEY (action_id);
+
+
+--
+-- TOC entry 1959 (class 2606 OID 16721)
+-- Name: hst_group_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY hst_group
+    ADD CONSTRAINT hst_group_pkey PRIMARY KEY (group_id);
+
+
+--
+-- TOC entry 1961 (class 2606 OID 16731)
+-- Name: hst_remark_ukey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY hst_remark
+    ADD CONSTRAINT hst_remark_ukey UNIQUE (item_id, remark);
+
+
+--
+-- TOC entry 1963 (class 2606 OID 16746)
+-- Name: mst_book_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mst_book
+    ADD CONSTRAINT mst_book_pkey PRIMARY KEY (book_id);
+
+
+--
+-- TOC entry 1965 (class 2606 OID 16763)
+-- Name: mst_category_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mst_category
+    ADD CONSTRAINT mst_category_pkey PRIMARY KEY (category_id);
+
+
+--
+-- TOC entry 1967 (class 2606 OID 16779)
+-- Name: mst_item_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY mst_item
+    ADD CONSTRAINT mst_item_pkey PRIMARY KEY (item_id);
+
+
+--
+-- TOC entry 1971 (class 2606 OID 16825)
+-- Name: mst_shop_ukey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY hst_shop
+    ADD CONSTRAINT mst_shop_ukey PRIMARY KEY (item_id, shop_name);
+
+
+--
+-- TOC entry 1969 (class 2606 OID 16788)
+-- Name: rel_book_item_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY rel_book_item
+    ADD CONSTRAINT rel_book_item_pkey PRIMARY KEY (book_id, item_id);
+
+
+--
+-- TOC entry 2089 (class 0 OID 0)
+-- Dependencies: 5
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+-- Completed on 2016-12-27 17:31:15
+
+--
+-- PostgreSQL database dump complete
+--
+
