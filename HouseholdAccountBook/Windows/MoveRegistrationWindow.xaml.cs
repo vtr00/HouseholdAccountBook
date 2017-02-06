@@ -56,7 +56,7 @@ namespace HouseholdAccountBook.Windows
         public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, DateTime? selectedDateTime)
         {
             InitializeComponent();
-            Title = "追加";
+            Title = "移動(追加)";
 
             this.builder = builder;
             this.selectedBookId = selectedBookId;
@@ -117,7 +117,7 @@ namespace HouseholdAccountBook.Windows
         public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, int groupId)
         {
             InitializeComponent();
-            Title = "編集";
+            Title = "移動(編集)";
 
             this.builder = builder;
             this.selectedBookId = selectedBookId;
@@ -391,7 +391,7 @@ ORDER BY used_time DESC;", this.MoveRegistrationWindowVM.SelectedItemVM.ItemId);
             int actValue = this.MoveRegistrationWindowVM.Value.Value;
             CommissionKind commissionKind = this.MoveRegistrationWindowVM.SelectedCommissionKindVM.CommissionKind;
             int commissionItemId = this.MoveRegistrationWindowVM.SelectedItemVM.ItemId;
-            int commission = (int)this.MoveRegistrationWindowVM.Commission;
+            int commission = this.MoveRegistrationWindowVM.Commission ?? 0;
             string remark = this.MoveRegistrationWindowVM.SelectedRemark;
 
             int? resActionId = null;

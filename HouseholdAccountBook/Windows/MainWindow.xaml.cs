@@ -447,6 +447,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 UpdateBookData(e2.Id);
                 actionDataGrid.Focus();
             };
+            mrw.Owner = this;
             mrw.ShowDialog();
         }
 
@@ -474,6 +475,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 UpdateBookData(e2.Id);
                 actionDataGrid.Focus();
             };
+            arw.Owner = this;
             arw.ShowDialog();
         }
 
@@ -501,6 +503,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 UpdateBookData(e2.Id);
                 actionDataGrid.Focus();
             };
+            alrw.Owner = this;
             alrw.ShowDialog();
         }
 
