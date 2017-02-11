@@ -73,7 +73,7 @@ namespace HouseholdAccountBook.Windows
 
         #region イベントハンドラ
         /// <summary>
-        /// 
+        /// キー入力時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
