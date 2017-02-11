@@ -11,6 +11,7 @@ namespace HouseholdAccountBook.Windows
     /// </summary>
     public partial class NumberInputWindow : Window
     {
+        #region イベントハンドラ
         /// <summary>
         /// 数字ボタンがクリックされたときに発生します。
         /// </summary>
@@ -25,6 +26,7 @@ namespace HouseholdAccountBook.Windows
         /// Clearボタンがクリックされたときに発生します。
         /// </summary>
         public event EventHandler Clear;
+        #endregion
 
         /// <summary>
         /// コンストラクタ
@@ -34,6 +36,7 @@ namespace HouseholdAccountBook.Windows
             InitializeComponent();
         }
 
+        #region コマンド
         /// <summary>
         /// NumberInputイベントを呼び出す
         /// </summary>
@@ -66,5 +69,46 @@ namespace HouseholdAccountBook.Windows
         {
             Clear?.Invoke(this, new EventArgs());
         }
+        #endregion
+
+        #region イベントハンドラ
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key) {
+                case Key.D0:
+                case Key.D1:
+                case Key.D2:
+                case Key.D3:
+                case Key.D4:
+                case Key.D5:
+                case Key.D6:
+                case Key.D7:
+                case Key.D8:
+                case Key.D9:
+                    NumberInput?.Invoke(this, new ValueInputEventArgs(e.Key - Key.D0));
+                    break;
+                case Key.NumPad0:
+                case Key.NumPad1:
+                case Key.NumPad2:
+                case Key.NumPad3:
+                case Key.NumPad4:
+                case Key.NumPad5:
+                case Key.NumPad6:
+                case Key.NumPad7:
+                case Key.NumPad8:
+                case Key.NumPad9:
+                    NumberInput?.Invoke(this, new ValueInputEventArgs(e.Key - Key.NumPad0));
+                    break;
+                case Key.Back:
+                    BackSpaceInput?.Invoke(this, new EventArgs());
+                    break;
+            }
+        }
+        #endregion
     }
 }

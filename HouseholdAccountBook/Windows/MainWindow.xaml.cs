@@ -1335,8 +1335,11 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             }
 
             foreach(SummaryWithinYearViewModel vm in vmList) {
-                if (vm.Average != null) {
+                if (vm.Average != null && averageCount != 0) {
                     vm.Average /= averageCount;
+                }
+                else {
+                    vm.Average = 0;
                 }
             }
 

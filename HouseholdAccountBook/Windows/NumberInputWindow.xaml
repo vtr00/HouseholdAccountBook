@@ -7,7 +7,8 @@
         xmlns:control="clr-namespace:HouseholdAccountBook.UserControls"
         mc:Ignorable="d"
         Title="NumberInputWindow" Height="50" Width="150"
-        WindowStyle="None" AllowsTransparency="True" ShowInTaskbar="False">
+        WindowStyle="None" AllowsTransparency="True" ShowInTaskbar="False"
+        KeyDown="Window_KeyDown">
 
     <Window.Resources>
         <RoutedCommand x:Key="NumberInputCommand"/>
