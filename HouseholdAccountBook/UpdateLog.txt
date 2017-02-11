@@ -117,6 +117,8 @@
   MoveRegistrationWindow.xaml.cs
     ↑手数料が空文字のときに例外が発生していたのを修正した
 2017/02/11
+  全般
+    ＋Extended WPF Toolkitを追加
   NumberInputWindow.xaml.cs
     ＋表示時にテンキー/数字キーで入力できるようにした
   MainWindow.xaml.cs
