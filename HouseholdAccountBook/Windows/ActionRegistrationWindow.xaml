@@ -67,8 +67,8 @@
                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="BookName"/>
             <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                        Text="日付" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <DatePicker Grid.Row="1" Grid.Column="1" Margin="5"
-                        SelectedDateFormat="Long" SelectedDate="{Binding SelectedDate}"/>
+            <controls:DateTimePicker Grid.Row="1" Grid.Column="1" Margin="5" 
+                         DateFormat="yyyy/MM/dd" SelectedDate="{Binding SelectedDate}"/>
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                        Text="収支" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" 

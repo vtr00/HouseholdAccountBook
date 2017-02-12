@@ -54,6 +54,7 @@
             <Setter Property="TextAlignment" Value="Right"/>
         </Style>
 
+        <!-- 設定 -->
         <properties:Settings x:Key="Settings"/>
 
         <!-- プロキシ要素 -->

@@ -96,7 +96,9 @@ namespace HouseholdAccountBook
         private void Application_Exit(object sender, ExitEventArgs e)
         {
             if(connectInfo != null) { 
+#if !DEBUG
                 CreateBackUpFile();
+#endif
             }
         }
 

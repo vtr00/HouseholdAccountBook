@@ -11,8 +11,6 @@ namespace HouseholdAccountBook.UserControls
     /// </summary>
     public partial class NumericUpDown : UserControl
     {
-        private NumberInputWindow niw = null;
-
         #region 依存プロパティ
         /// <summary>
         /// 値プロパティ
@@ -112,55 +110,107 @@ namespace HouseholdAccountBook.UserControls
             InitializeComponent();
         }
 
-        #region イベントハンドラ
+        #region コマンド
         /// <summary>
-        /// 数値入力用ウィンドウを表示する
+        /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void UserControl_GotFocus(object sender, RoutedEventArgs e)
+        private void IncreaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            if (niw != null) {
-                niw.Close();
+            e.CanExecute = this.Value == null ? (this.NullValue + this.Stride) <= this.Maximum : (this.Value + this.Stride) <= this.Maximum;
+        }
+
+        /// <summary>
+        /// ▲ボタン押下時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void IncreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (this.Value == null) {
+                this.Value = this.NullValue;
             }
-            niw = new NumberInputWindow();
-            Point position = this.PointToScreen(new Point(0, this.ActualHeight));
-            niw.Left = position.X;
-            niw.Top = position.Y;
-            niw.NumberInput += (sender2, e2) => {
-                if (this.Value == null) {
-                    this.Value = e2.Value;
-                }
-                else {
-                    this.Value = this.Value * 10 + e2.Value;
-                }
-            };
-            niw.BackSpaceInput += (sender2, e2) => {
-                if (this.Value != null) {
-                    this.Value /= 10;
-                }
-                if(this.Value == 0) {
-                    this.Value = null;
-                }
-            };
-            niw.Clear += (sender2, e2) => {
+            else {
+                this.Value += this.Stride;
+            }
+            e.Handled = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DecreaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.Value == null ? (this.NullValue - this.Stride) >= this.Minimum : (this.Value - this.Stride) >= this.Minimum;
+        }
+
+        /// <summary>
+        /// ▼ボタン押下時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DecreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (this.Value == null) {
+                this.Value = this.NullValue;
+            }
+            else {
+                this.Value -= this.Stride;
+            }
+            e.Handled = true;
+        }
+
+        /// <summary>
+        /// 数字ボタン押下時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NumberInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ContentControl control = e.OriginalSource as ContentControl;
+            int value = Int32.Parse(control.Content.ToString());
+
+            if (this.Value == null) {
+                this.Value = value;
+            }
+            else {
+                this.Value = this.Value * 10 + value;
+            }
+            e.Handled = true;
+        }
+
+        /// <summary>
+        /// BackSpaceボタン押下時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BackSpaceInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (this.Value != null) {
+                this.Value /= 10;
+            }
+            if (this.Value == 0) {
                 this.Value = null;
-            };
-            niw.Show();
+            }
+            e.Handled = true;
         }
 
         /// <summary>
-        /// 数値入力用ウィンドウを非表示にする
+        /// Clearボタン押下時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void UserControl_LostFocus(object sender, RoutedEventArgs e)
+        private void ClearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if(niw != null) {
-                niw.Close();
-            }
+            this.Value = null;
+            e.Handled = true;
         }
+        #endregion
 
+        #region イベントハンドラ
         /// <summary>
         /// 入力された値を表示前にチェックする
         /// </summary>
@@ -226,56 +276,16 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// 
+        /// Popupを表示する
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IncreaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            e.CanExecute = this.Value == null ? (this.NullValue + this.Stride) <= this.Maximum : (this.Value + this.Stride) <= this.Maximum;
-        }
-
-        /// <summary>
-        /// ▲ボタン押下時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void IncreaseCommand_Execute(object sender, ExecutedRoutedEventArgs e)
-        {
-            if (this.Value == null) {
-                this.Value = this.NullValue;
-            }
-            else {
-                this.Value += this.Stride;
-            }
-            e.Handled = false;
-        }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DecreaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.Value == null ? (this.NullValue - this.Stride) >= this.Minimum : (this.Value - this.Stride) >= this.Minimum;
-        }
-
-        /// <summary>
-        /// ▼ボタン押下時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DecreaseCommand_Execute(object sender, ExecutedRoutedEventArgs e)
-        {
-            if (this.Value == null) {
-                this.Value = this.NullValue;
-            }
-            else {
-                this.Value -= this.Stride;
-            }
-            e.Handled = false;
+            _popup.IsOpen = true;
+            _popup.Focus();
         }
         #endregion
+
     }
 }

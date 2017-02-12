@@ -56,8 +56,8 @@
 
             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                        Text="日付" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <DatePicker Grid.Row="0" Grid.Column="1" Margin="5"  Grid.ColumnSpan="3"
-                        SelectedDateFormat="Long" SelectedDate="{Binding SelectedDate}"/>
+            <controls:DateTimePicker Grid.Row="0" Grid.Column="1" Margin="5"  Grid.ColumnSpan="3"
+                        DateFormat="yyyy/MM/dd" SelectedDate="{Binding SelectedDate}"/>
             <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                        Text="移動元" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"  Grid.ColumnSpan="3"
@@ -69,7 +69,7 @@
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                        Text="金額" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" 
-                                    Value="{Binding Value, Mode=TwoWay, TargetNullValue=''}" Minimum="1"/>
+                       Value="{Binding Value, Mode=TwoWay, TargetNullValue=''}" Minimum="1"/>
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="5"
                        Text="手数料負担" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="4" Grid.Column="1" Margin="5" Grid.ColumnSpan="3"

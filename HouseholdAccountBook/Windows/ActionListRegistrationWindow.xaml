@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HouseholdAccountBook.Windows"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
+        xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         xmlns:converter="clr-namespace:HouseholdAccountBook.Converter"
         mc:Ignorable="d"
@@ -23,6 +24,14 @@
         <converter:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
         <converter:DateTimeToActTimeConverter x:Key="DateTimeToActTimeConverter"/>
         <converter:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
+        
+        <!-- スタイル -->
+        <Style x:Key="TextAlignRight" TargetType="TextBlock">
+            <Setter Property="TextAlignment" Value="Right"/>
+        </Style>
+
+        <!-- 設定 -->
+        <properties:Settings x:Key="Settings"/>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -82,7 +91,7 @@
                       HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo"
                       AddingNewItem="DataGrid_AddingNewItem">
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="日付">
+                    <DataGridTemplateColumn Header="日付" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding ActDate, StringFormat=\{0:yyyy\/MM\/dd\}}"/>
@@ -90,11 +99,12 @@
                         </DataGridTemplateColumn.CellTemplate>
                         <DataGridTemplateColumn.CellEditingTemplate>
                             <DataTemplate>
-                                <DatePicker SelectedDateFormat="Long" SelectedDate="{Binding ActDate, Mode=TwoWay}"/>
+                                <controls:DateTimePicker DateFormat="yyyy/MM/dd" SelectedDate="{Binding ActDate, Mode=TwoWay}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="金額" Binding="{Binding ActValue, TargetNullValue=''}"/>
+                    <DataGridTextColumn Header="金額" Binding="{Binding ActValue, TargetNullValue=''}"
+                                        Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                 </DataGrid.Columns>
             </DataGrid>
             <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 

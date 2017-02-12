@@ -1,6 +1,4 @@
 ﻿TODO:
-　日付登録で↑↓で日付変更できるようにする
-　　DatePickerの日付表示がカスタマイズできないので、自作する
 　処理の高速化
   グラフタブのデザインの作成
   記帳風月よりも新しいデータがあった場合に警告する
@@ -123,3 +121,21 @@
     ＋表示時にテンキー/数字キーで入力できるようにした
   MainWindow.xaml.cs
     ↑今年度以降の年間一覧の表示時にゼロ割例外が発生していたのを修正した
+2017/02/12
+  全般
+    ＋Extended WPF Toolkitを削除
+  App.xaml.cs
+    －デバッグビルドでバックアップファイルを作成しないように変更した
+  NumericUpDown.xaml.cs
+    －マウスでの数字の入力をPopupコントロールに変更した(NumberInputWindowからマージ)
+  NumberInputWindow.xaml.cs
+    ×ウィンドウを削除した
+  DateTimePicker.cs
+    ＋DatePickerからForms.DateTimePickerに似た挙動になるように作成した
+  ActionRegistrationWindow.xaml.cs
+    －DatePickerをDateTimePickerに変更した
+  ActionListRegistrationWindow.xaml.cs
+    －日付表示の列幅を設定した
+    －DatePickerをDateTimePickerに変更した
+  MoveRegistrationWindow.xaml.cs
+    －DatePickerをDateTimePickerに変更した
