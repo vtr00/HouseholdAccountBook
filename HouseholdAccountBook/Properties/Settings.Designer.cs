@@ -418,5 +418,17 @@ namespace HouseholdAccountBook.Properties {
                 this["App_Postgres_DatabaseName_Debug"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string App_Version {
+            get {
+                return ((string)(this["App_Version"]));
+            }
+            set {
+                this["App_Version"] = value;
+            }
+        }
     }
 }

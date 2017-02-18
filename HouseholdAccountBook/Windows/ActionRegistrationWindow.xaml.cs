@@ -684,17 +684,19 @@ WHERE item_id = @{2} AND remark = @{3};", actTime, Updater, itemId, remark);
         /// </summary>
         private void LoadSetting()
         {
-            if (Properties.Settings.Default.ActionRegistrationWindow_Left != -1) {
-                Left = Properties.Settings.Default.ActionRegistrationWindow_Left;
+            Properties.Settings settings = Properties.Settings.Default;
+
+            if (settings.ActionRegistrationWindow_Left != -1) {
+                Left = settings.ActionRegistrationWindow_Left;
             }
-            if (Properties.Settings.Default.ActionRegistrationWindow_Top != -1) {
-                Top = Properties.Settings.Default.ActionRegistrationWindow_Top;
+            if (settings.ActionRegistrationWindow_Top != -1) {
+                Top = settings.ActionRegistrationWindow_Top;
             }
-            if (Properties.Settings.Default.ActionRegistrationWindow_Width != -1) {
-                Width = Properties.Settings.Default.ActionRegistrationWindow_Width;
+            if (settings.ActionRegistrationWindow_Width != -1) {
+                Width = settings.ActionRegistrationWindow_Width;
             }
-            if (Properties.Settings.Default.ActionRegistrationWindow_Height != -1) {
-                Height = Properties.Settings.Default.ActionRegistrationWindow_Height;
+            if (settings.ActionRegistrationWindow_Height != -1) {
+                Height = settings.ActionRegistrationWindow_Height;
             }
         }
 
@@ -703,12 +705,14 @@ WHERE item_id = @{2} AND remark = @{3};", actTime, Updater, itemId, remark);
         /// </summary>
         private void SaveSetting()
         {
+            Properties.Settings settings = Properties.Settings.Default;
+
             if (this.WindowState == WindowState.Normal) {
-                Properties.Settings.Default.ActionRegistrationWindow_Left = Left;
-                Properties.Settings.Default.ActionRegistrationWindow_Top = Top;
-                Properties.Settings.Default.ActionRegistrationWindow_Width = Width;
-                Properties.Settings.Default.ActionRegistrationWindow_Height = Height;
-                Properties.Settings.Default.Save();
+                settings.ActionRegistrationWindow_Left = Left;
+                settings.ActionRegistrationWindow_Top = Top;
+                settings.ActionRegistrationWindow_Width = Width;
+                settings.ActionRegistrationWindow_Height = Height;
+                settings.Save();
             }
         }
         #endregion

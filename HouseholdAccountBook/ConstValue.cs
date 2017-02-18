@@ -7,8 +7,13 @@ namespace HouseholdAccountBook.ConstValue
     /// </summary>
     public static class ConstValue
     {
+        /// <summary>
+        /// 更新者
+        /// </summary>
         public static string Updater = "";
-
+        /// <summary>
+        /// 挿入者
+        /// </summary>
         public static string Inserter = "";
 
         /// <summary>
@@ -16,9 +21,21 @@ namespace HouseholdAccountBook.ConstValue
         /// </summary>
         public enum Tab
         {
+            /// <summary>
+            /// 帳簿タブ
+            /// </summary>
             BookTab = 0,
+            /// <summary>
+            /// 年間一覧タブ
+            /// </summary>
             ListTab = 1,
+            /// <summary>
+            /// グラフタブ
+            /// </summary>
             GraphTab = 2,
+            /// <summary>
+            /// 設定タブ
+            /// </summary>
             SettingTab = 3
         }
 

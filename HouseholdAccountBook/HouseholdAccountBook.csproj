@@ -142,6 +142,9 @@
     <Compile Include="Windows\MoveRegistrationWindow.xaml.cs">
       <DependentUpon>MoveRegistrationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\OnBackUpWindow.xaml.cs">
+      <DependentUpon>OnBackUpWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="UserControls\NumericUpDown.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -187,6 +190,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Windows\MoveRegistrationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\OnBackUpWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -24,11 +24,21 @@ namespace HouseholdAccountBook
         /// </summary>
         public App()
         {
+            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
+
             // DB設定ダイアログ終了時に閉じないように設定する
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
+            // 前バージョンからのUpgradeを実行していないときはUpgradeを実施する
+            Version assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            Version preVersion;
+            if (!Version.TryParse(settings.App_Version, out preVersion) || preVersion < assemblyVersion) {
+                // Upgradeを実行する
+                settings.Upgrade();
+            }
+
             // 初回起動時
-            if (HouseholdAccountBook.Properties.Settings.Default.App_InitFlag) {
+            if (settings.App_InitFlag) {
                 // データベース接続を設定する
                 DbSettingWindow dsw = new DbSettingWindow("DB接続設定を入力してください。");
                 bool? result = dsw.ShowDialog();
@@ -39,22 +49,22 @@ namespace HouseholdAccountBook
                     return;
                 }
 
-                HouseholdAccountBook.Properties.Settings.Default.App_InitFlag = false;
-                HouseholdAccountBook.Properties.Settings.Default.Save();
+                settings.App_InitFlag = false;
+                settings.Save();
             }
 
             // 接続設定を読み込む
             connectInfo = new DaoNpgsql.ConnectInfo() {
-                Host = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_Host,
-                Port = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_Port,
-                UserName = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_UserName,
-                Password = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_Password,
+                Host = settings.App_Postgres_Host,
+                Port = settings.App_Postgres_Port,
+                UserName = settings.App_Postgres_UserName,
+                Password = settings.App_Postgres_Password,
 #if DEBUG
-                DatabaseName = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_DatabaseName_Debug,
+                DatabaseName = settings.App_Postgres_DatabaseName_Debug,
 #else
-                DatabaseName = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_DatabaseName,
+                DatabaseName = settings.App_Postgres_DatabaseName,
 #endif
-                Role = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_Role
+                Role = settings.App_Postgres_Role
             };
 
             DaoBuilder builder = new DaoBuilder(connectInfo);
@@ -84,6 +94,24 @@ namespace HouseholdAccountBook
             // 接続できる場合だけメインウィンドウを開く
             MainWindow mw = new MainWindow(builder);
             this.MainWindow = mw;
+#if !DEBUG
+            mw.Closing += (sender, e) => {
+                if (connectInfo != null) {
+                    settings.Reload();
+                    mw.Hide();
+
+                    if (settings.App_Postgres_DumpExePath != string.Empty && settings.App_BackUpFolderPath != string.Empty && settings.App_BackUpNum > 0) {
+                        OnBackUpWindow obuw = new OnBackUpWindow();
+                        obuw.Top = settings.MainWindow_Top + settings.MainWindow_Height / 2 - obuw.Height / 2;
+                        obuw.Left = settings.MainWindow_Left + settings.MainWindow_Width / 2 - obuw.Width / 2;
+                        obuw.Topmost = true;
+                        obuw.Show();
+                        CreateBackUpFile(settings.App_Postgres_DumpExePath, settings.App_BackUpNum, settings.App_BackUpFolderPath);
+                        obuw.Close();
+                    }
+                }
+            };
+#endif
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             mw.Show();
         }
@@ -93,23 +121,16 @@ namespace HouseholdAccountBook
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Application_Exit(object sender, ExitEventArgs e)
-        {
-            if(connectInfo != null) { 
-#if !DEBUG
-                CreateBackUpFile();
-#endif
-            }
-        }
+        private void Application_Exit(object sender, ExitEventArgs e) { }
 
         /// <summary>
         /// バックアップファイルを作成する
         /// </summary>
-        private void CreateBackUpFile()
+        /// <param name="dumpExePath">pg_dump.exeパス</param>
+        /// <param name="backUpNum">バックアップ数</param>
+        /// <param name="backUpFolderPath">バックアップ用フォルダパス</param>
+        private void CreateBackUpFile(string dumpExePath, int backUpNum, string backUpFolderPath)
         {
-            int backUpNum = HouseholdAccountBook.Properties.Settings.Default.App_BackUpNum;
-            string backUpFolderPath = HouseholdAccountBook.Properties.Settings.Default.App_BackUpFolderPath;
-
             if (!Directory.Exists(backUpFolderPath)) {
                 Directory.CreateDirectory(backUpFolderPath);
             }
@@ -125,18 +146,20 @@ namespace HouseholdAccountBook
                 }
             }
 
-            // 起動情報を設定する
-            ProcessStartInfo info = new ProcessStartInfo();
-            info.FileName = HouseholdAccountBook.Properties.Settings.Default.App_Postgres_DumpExePath;
-            info.Arguments = string.Format(
-                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
-                    connectInfo.Host, connectInfo.Port, connectInfo.UserName, connectInfo.Role, 
-                    string.Format(@"{0}/{1}.backup", backUpFolderPath, DateTime.Now.ToString("yyyyMMddHHmmss")), connectInfo.DatabaseName);
-            info.WindowStyle = ProcessWindowStyle.Hidden;
+            if(backUpNum > 0) { 
+                // 起動情報を設定する
+                ProcessStartInfo info = new ProcessStartInfo();
+                info.FileName = dumpExePath;
+                info.Arguments = string.Format(
+                        "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
+                        connectInfo.Host, connectInfo.Port, connectInfo.UserName, connectInfo.Role, 
+                        string.Format(@"{0}/{1}.backup", backUpFolderPath, DateTime.Now.ToString("yyyyMMddHHmmss")), connectInfo.DatabaseName);
+                info.WindowStyle = ProcessWindowStyle.Hidden;
 
-            // バックアップする
-            Process process = Process.Start(info);
-            process.WaitForExit(10 * 1000);
+                // バックアップする
+                Process process = Process.Start(info);
+                process.WaitForExit(10 * 1000);
+            }
         }
     }
 }

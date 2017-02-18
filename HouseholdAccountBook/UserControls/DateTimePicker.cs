@@ -186,31 +186,6 @@ namespace HouseholdAccountBook.UserControls
                     }
                     break;
                 case Key.Up: {
-                        // 選択している箇所の数字をデクリメントする
-                        textBox.SelectionChanged -= TextBox_SelectionChanged;
-                        int start = textBox.SelectionStart;
-                        int length = textBox.SelectionLength;
-                        Kind kind = GetKindOfSelection(textBox, dateTimePicker);
-                        switch (kind) {
-                            case Kind.Year:
-                                dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddYears(-1);
-                                break;
-                            case Kind.Month:
-                                dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddMonths(-1);
-                                break;
-                            case Kind.Day:
-                                dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddDays(-1);
-                                break;
-                        }
-                        string formatStr = dateTimePicker.DateFormat;
-                        textBox.Text = DatePickerDateTimeConverter.DateTimeToString(formatStr, dateTimePicker.SelectedDate);
-                        textBox.SelectionStart = start;
-                        textBox.SelectionLength = length;
-                        textBox.SelectionChanged += TextBox_SelectionChanged;
-                        e.Handled = true;
-                    }
-                    break;
-                case Key.Down: {
                         // 選択している箇所の数字をインクリメントする
                         textBox.SelectionChanged -= TextBox_SelectionChanged;
                         int start = textBox.SelectionStart;
@@ -225,6 +200,31 @@ namespace HouseholdAccountBook.UserControls
                                 break;
                             case Kind.Day:
                                 dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddDays(1);
+                                break;
+                        }
+                        string formatStr = dateTimePicker.DateFormat;
+                        textBox.Text = DatePickerDateTimeConverter.DateTimeToString(formatStr, dateTimePicker.SelectedDate);
+                        textBox.SelectionStart = start;
+                        textBox.SelectionLength = length;
+                        textBox.SelectionChanged += TextBox_SelectionChanged;
+                        e.Handled = true;
+                    }
+                    break;
+                case Key.Down: {
+                        // 選択している箇所の数字をデクリメントする
+                        textBox.SelectionChanged -= TextBox_SelectionChanged;
+                        int start = textBox.SelectionStart;
+                        int length = textBox.SelectionLength;
+                        Kind kind = GetKindOfSelection(textBox, dateTimePicker);
+                        switch (kind) {
+                            case Kind.Year:
+                                dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddYears(-1);
+                                break;
+                            case Kind.Month:
+                                dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddMonths(-1);
+                                break;
+                            case Kind.Day:
+                                dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddDays(-1);
                                 break;
                         }
                         string formatStr = dateTimePicker.DateFormat;

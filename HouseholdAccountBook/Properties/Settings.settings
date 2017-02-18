@@ -101,5 +101,8 @@
     <Setting Name="App_Postgres_DatabaseName_Debug" Type="System.String" Scope="User">
       <Value Profile="(Default)">account_book_debug</Value>
     </Setting>
+    <Setting Name="App_Version" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

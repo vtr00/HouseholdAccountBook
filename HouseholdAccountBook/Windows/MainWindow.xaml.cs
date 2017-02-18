@@ -275,6 +275,16 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         }
 
         /// <summary>
+        /// カスタムファイル形式入力可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ImportCustomFileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Properties.Settings.Default.App_Postgres_RestoreExePath != string.Empty;
+        }
+
+        /// <summary>
         /// カスタム形式ファイルを取り込む
         /// </summary>
         /// <param name="sender"></param>
@@ -360,6 +370,16 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         }
 
         /// <summary>
+        /// カスタム形式ファイル出力可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExportCustomFileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Properties.Settings.Default.App_Postgres_DumpExePath != string.Empty;
+        }
+
+        /// <summary>
         /// カスタム形式ファイルに吐き出す
         /// </summary>
         /// <param name="sender"></param>
@@ -420,7 +440,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 MessageBox.Show(Message.FoultToExport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
-#endregion
+        #endregion
 
         #region 帳簿項目の操作
         /// <summary>
@@ -514,7 +534,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void EditActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択していて、選択されている帳簿が存在していて、選択している帳簿項目のIDが0より大きい
+            // 帳簿タブを選択していて、選択されている帳簿項目が存在していて、選択している帳簿項目のIDが0より大きい
             e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BookTab && this.MainWindowVM.SelectedActionVM != null && this.MainWindowVM.SelectedActionVM.ActionId > 0;
         }
 
@@ -564,7 +584,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
         /// <param name="e"></param>
         private void DeleteActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択していて、選択している帳簿が存在していて、選択している帳簿項目のIDが0より大きい
+            // 帳簿タブを選択していて、選択している帳簿項目が存在していて、選択している帳簿項目のIDが0より大きい
             e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BookTab && this.MainWindowVM.SelectedActionVM != null && this.MainWindowVM.SelectedActionVM.ActionId > 0;
         }
 
@@ -1353,17 +1373,19 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// </summary>
         private void LoadSetting()
         {
+            Properties.Settings settings = Properties.Settings.Default;
+
             if (Properties.Settings.Default.MainWindow_Left != -1) {
-                Left = Properties.Settings.Default.MainWindow_Left;
+                Left = settings.MainWindow_Left;
             }
             if (Properties.Settings.Default.MainWindow_Top != -1) {
-                Top = Properties.Settings.Default.MainWindow_Top;
+                Top = settings.MainWindow_Top;
             }
             if (Properties.Settings.Default.MainWindow_Width != -1) {
-                Width = Properties.Settings.Default.MainWindow_Width;
+                Width = settings.MainWindow_Width;
             }
             if (Properties.Settings.Default.MainWindow_Height != -1) {
-                Height = Properties.Settings.Default.MainWindow_Height;
+                Height = settings.MainWindow_Height;
             }
         }
 
@@ -1372,13 +1394,15 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// </summary>
         private void SaveSetting()
         {
+            Properties.Settings settings = Properties.Settings.Default;
+
             if (this.WindowState == WindowState.Normal) {
-                Properties.Settings.Default.MainWindow_Left = Left;
-                Properties.Settings.Default.MainWindow_Top = Top;
-                Properties.Settings.Default.MainWindow_Width = Width;
-                Properties.Settings.Default.MainWindow_Height = Height;
-                Properties.Settings.Default.MainWindow_SelectedBookId = this.MainWindowVM.SelectedBookVM.BookId.HasValue ? this.MainWindowVM.SelectedBookVM.BookId.Value : -1;
-                Properties.Settings.Default.Save();
+                settings.MainWindow_Left = Left;
+                settings.MainWindow_Top = Top;
+                settings.MainWindow_Width = Width;
+                settings.MainWindow_Height = Height;
+                settings.MainWindow_SelectedBookId = this.MainWindowVM.SelectedBookVM.BookId.HasValue ? this.MainWindowVM.SelectedBookVM.BookId.Value : -1;
+                settings.Save();
             }
         }
         #endregion

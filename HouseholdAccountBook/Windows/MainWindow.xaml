@@ -67,9 +67,9 @@
 
         <!-- ファイル操作コマンド -->
         <CommandBinding Command="{StaticResource ImportKichoHugetsuDbCommand}" Executed="ImportKichoHugetsuDbCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ImportCustomFileCommand}" Executed="ImportCustomFileCommand_Excuted"/>
+        <CommandBinding Command="{StaticResource ImportCustomFileCommand}" CanExecute="ImportCustomFileCommand_CanExecute" Executed="ImportCustomFileCommand_Excuted"/>
         <CommandBinding Command="{StaticResource ExportExcelFileCommand}"/>
-        <CommandBinding Command="{StaticResource ExportCustomFileCommand}" Executed="ExportCustomFileCommand_Excuted"/>
+        <CommandBinding Command="{StaticResource ExportCustomFileCommand}" CanExecute="ExportCustomFileCommand_CanExecute" Executed="ExportCustomFileCommand_Excuted"/>
 
         <!-- 帳簿項目操作コマンド -->
         <CommandBinding Command="{StaticResource MoveToBookCommand}" CanExecute="MoveToBookCommand_CanExecute" Executed="MoveToBookCommand_Executed"/>

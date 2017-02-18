@@ -524,17 +524,19 @@ WHERE item_id = @{2} AND remark = @{3};", actTime, Updater, commissionItemId, re
         /// </summary>
         private void LoadSetting()
         {
-            if (Properties.Settings.Default.MoveRegistrationWindow_Left != -1) {
-                Left = Properties.Settings.Default.MoveRegistrationWindow_Left;
+            Properties.Settings settings = Properties.Settings.Default;
+
+            if (settings.MoveRegistrationWindow_Left != -1) {
+                Left = settings.MoveRegistrationWindow_Left;
             }
-            if (Properties.Settings.Default.MoveRegistrationWindow_Top != -1) {
-                Top = Properties.Settings.Default.MoveRegistrationWindow_Top;
+            if (settings.MoveRegistrationWindow_Top != -1) {
+                Top = settings.MoveRegistrationWindow_Top;
             }
-            if (Properties.Settings.Default.MoveRegistrationWindow_Width != -1) {
-                Width = Properties.Settings.Default.MoveRegistrationWindow_Width;
+            if (settings.MoveRegistrationWindow_Width != -1) {
+                Width = settings.MoveRegistrationWindow_Width;
             }
-            if (Properties.Settings.Default.MoveRegistrationWindow_Height != -1) {
-                Height = Properties.Settings.Default.MoveRegistrationWindow_Height;
+            if (settings.MoveRegistrationWindow_Height != -1) {
+                Height = settings.MoveRegistrationWindow_Height;
             }
         }
 
@@ -543,12 +545,14 @@ WHERE item_id = @{2} AND remark = @{3};", actTime, Updater, commissionItemId, re
         /// </summary>
         private void SaveSetting()
         {
+            Properties.Settings settings = Properties.Settings.Default;
+
             if (this.WindowState == WindowState.Normal) {
-                Properties.Settings.Default.MoveRegistrationWindow_Left = Left;
-                Properties.Settings.Default.MoveRegistrationWindow_Top = Top;
-                Properties.Settings.Default.MoveRegistrationWindow_Width = Width;
-                Properties.Settings.Default.MoveRegistrationWindow_Height = Height;
-                Properties.Settings.Default.Save();
+                settings.MoveRegistrationWindow_Left = Left;
+                settings.MoveRegistrationWindow_Top = Top;
+                settings.MoveRegistrationWindow_Width = Width;
+                settings.MoveRegistrationWindow_Height = Height;
+                settings.Save();
             }
         }
         #endregion
