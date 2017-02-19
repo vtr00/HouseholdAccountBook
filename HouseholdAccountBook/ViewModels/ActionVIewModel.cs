@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
 
 namespace HouseholdAccountBook.ViewModels
 {
@@ -50,15 +45,11 @@ namespace HouseholdAccountBook.ViewModels
         public int? GroupId { get; set; }
 
         /// <summary>
-        /// 文字色
+        /// 将来の日付か
         /// </summary>
-        public SolidColorBrush ColorBrush
-        {
+        public bool IsFuture {
             get {
-                if (ActTime <= DateTime.Now) {
-                    return new SolidColorBrush(Colors.Black);
-                }
-                return new SolidColorBrush(Colors.Gray);
+                return ActTime > DateTime.Now;
             }
         }
     }

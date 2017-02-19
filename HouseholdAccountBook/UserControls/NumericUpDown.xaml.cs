@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.Windows;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -68,8 +67,8 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// 最大値プロパティ
         /// </summary>
-        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register(
-                PropertyName<NumericUpDown>.Get(x => x.Maximum),
+        public static readonly DependencyProperty MaxValueProperty = DependencyProperty.Register(
+                PropertyName<NumericUpDown>.Get(x => x.MaxValue),
                 typeof(int),
                 typeof(NumericUpDown),
                 new PropertyMetadata(int.MaxValue)
@@ -77,17 +76,17 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// 最大値
         /// </summary>
-        public int Maximum
+        public int MaxValue
         {
-            get { return (int)GetValue(MaximumProperty); }
-            set { SetValue(MaximumProperty, value); }
+            get { return (int)GetValue(MaxValueProperty); }
+            set { SetValue(MaxValueProperty, value); }
         }
 
         /// <summary>
         /// 最小値プロパティ
         /// </summary>
-        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register(
-                PropertyName<NumericUpDown>.Get(x => x.Minimum),
+        public static readonly DependencyProperty MinValueProperty = DependencyProperty.Register(
+                PropertyName<NumericUpDown>.Get(x => x.MinValue),
                 typeof(int),
                 typeof(NumericUpDown),
                 new PropertyMetadata(int.MinValue)
@@ -95,10 +94,10 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// 最小値
         /// </summary>
-        public int Minimum
+        public int MinValue
         {
-            get { return (int)GetValue(MinimumProperty); }
-            set { SetValue(MinimumProperty, value); }
+            get { return (int)GetValue(MinValueProperty); }
+            set { SetValue(MinValueProperty, value); }
         }
         #endregion
 
@@ -118,7 +117,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void IncreaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.Value == null ? (this.NullValue + this.Stride) <= this.Maximum : (this.Value + this.Stride) <= this.Maximum;
+            e.CanExecute = this.Value == null ? (this.NullValue + this.Stride) <= this.MaxValue : (this.Value + this.Stride) <= this.MaxValue;
         }
 
         /// <summary>
@@ -129,7 +128,7 @@ namespace HouseholdAccountBook.UserControls
         private void IncreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (this.Value == null) {
-                this.Value = this.NullValue;
+                this.Value = this.MinValue;
             }
             else {
                 this.Value += this.Stride;
@@ -144,7 +143,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void DecreaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.Value == null ? (this.NullValue - this.Stride) >= this.Minimum : (this.Value - this.Stride) >= this.Minimum;
+            e.CanExecute = this.Value == null ? (this.NullValue - this.Stride) >= this.MinValue : (this.Value - this.Stride) >= this.MinValue;
         }
 
         /// <summary>
@@ -155,7 +154,7 @@ namespace HouseholdAccountBook.UserControls
         private void DecreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (this.Value == null) {
-                this.Value = this.NullValue;
+                this.Value = this.MaxValue;
             }
             else {
                 this.Value -= this.Stride;
@@ -233,7 +232,7 @@ namespace HouseholdAccountBook.UserControls
 
                         // 範囲内かどうかチェック
                         if (yes_parse) {
-                            if (xx < this.Minimum || this.Maximum < xx) {
+                            if (xx < this.MinValue || this.MaxValue < xx) {
                                 yes_parse = false;
                             }
                         }
@@ -254,19 +253,25 @@ namespace HouseholdAccountBook.UserControls
             switch (e.Key) {
                 case Key.Up:
                     if (this.Value == null) {
-                        this.Value = 0;
+                        this.Value = this.MinValue;
                     }
-                    else if ((this.Value + this.Stride) <= this.Maximum) {
+                    else if ((this.Value + this.Stride) <= this.MaxValue) {
                         this.Value += this.Stride;
+                    }
+                    else {
+                        this.Value = this.MaxValue;
                     }
                     e.Handled = true;
                     break;
                 case Key.Down:
                     if (this.Value == null) {
-                        this.Value = 0;
+                        this.Value = this.MaxValue;
                     }
-                    else if ((this.Value - this.Stride) >= this.Minimum) {
+                    else if ((this.Value - this.Stride) >= this.MinValue) {
                         this.Value -= this.Stride;
+                    }
+                    else {
+                        this.Value = this.MinValue;
                     }
                     e.Handled = true;
                     break;
@@ -286,6 +291,5 @@ namespace HouseholdAccountBook.UserControls
             _popup.Focus();
         }
         #endregion
-
     }
 }

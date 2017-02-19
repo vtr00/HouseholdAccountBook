@@ -42,7 +42,7 @@
         <Grid Grid.Column="0" Height="Auto">
             <TextBox x:Name="_textBox" Text="{Binding Value, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:NumericUpDown}}, 
                      UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" 
-                     TextAlignment="Right"
+                     TextAlignment="Right" InputMethod.IsInputMethodEnabled="False"
                      PreviewTextInput="TextBox_PreviewTextInput" PreviewKeyDown="TextBox_PreviewKeyDown"
                      GotFocus="TextBox_GotFocus"/>
             <Popup x:Name="_popup"

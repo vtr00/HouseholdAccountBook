@@ -19,6 +19,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// タブ
         /// </summary>
+        /// <remarks>数字はタブのインデックスと対応付けること</remarks>
         public enum Tab
         {
             /// <summary>
@@ -51,7 +52,11 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// 支出
             /// </summary>
-            Outgo = 1
+            Outgo = 1,
+            /// <summary>
+            /// その他(残高、差引損益)
+            /// </summary>
+            Others = -1
         }
         /// <summary>
         /// 収支種別文字列

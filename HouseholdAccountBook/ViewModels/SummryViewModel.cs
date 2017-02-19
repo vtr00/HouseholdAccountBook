@@ -36,24 +36,5 @@ namespace HouseholdAccountBook.ViewModels
         /// 合計
         /// </summary>
         public int Summary { get; set; }
-
-        /// <summary>
-        /// 背景色
-        /// </summary>
-        public SolidColorBrush ColorBrush
-        {
-            get {
-                if (BalanceKind == -1) {
-                    return new SolidColorBrush(Color.FromRgb(0xFF, 0xB0, 0xB0));
-                }
-                if (CategoryId == -1) {
-                    return new SolidColorBrush(Color.FromRgb(0xB0, 0xFF, 0xB0));
-                }
-                if (ItemId == -1) {
-                    return new SolidColorBrush(Color.FromRgb(0xFF, 0xFF, 0xB0));
-                }
-                return new SolidColorBrush(Color.FromRgb(0xEE, 0xE3, 0xFB));
-            }
-        }
     }
 }

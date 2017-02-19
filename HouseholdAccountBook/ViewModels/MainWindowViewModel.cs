@@ -14,7 +14,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 更新中か
         /// </summary>
-        bool onUpdate = false;
+        private bool onUpdate = false;
 
         /// <summary>
         /// 選択されたタブインデックス
@@ -251,6 +251,20 @@ namespace HouseholdAccountBook.ViewModels
         internal static readonly string _nameSummaryWithinYearVMList = PropertyName<MainWindowViewModel>.Get(x => x.SummaryWithinYearVMList);
         #endregion
         #endregion
+        
+        /// <summary>
+        /// デバッグビルドか
+        /// </summary>
+        public bool IsDebug
+        {
+            get {
+#if DEBUG
+                return true;
+#else
+                return false;
+#endif
+            }
+        }
 
         /// <summary>
         /// プロパティ変更イベントハンドラ

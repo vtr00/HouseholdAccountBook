@@ -110,6 +110,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BindingProxy.cs" />
     <Compile Include="Converter\DateTimeToDisplayedYearConverter.cs" />
     <Compile Include="UserControls\DateTimePicker.cs" />
     <Compile Include="UserEventArgs\RegistrateEventArgs.cs" />

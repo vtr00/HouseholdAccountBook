@@ -49,11 +49,6 @@ namespace HouseholdAccountBook.Windows
             UpdateYearsListData();
 
             LoadSetting();
-
-#if !DEBUG
-            actionIdColumn.Visibility = Visibility.Collapsed;
-            groupIdColumn.Visibility = Visibility.Collapsed;
-#endif
         }
 
         #region コマンド
@@ -923,6 +918,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             
             UpdateBookData();
             UpdateYearsListData();
+            UpdateGraphData();
 
             Cursor = cCursor;
         }
@@ -1066,6 +1062,16 @@ ORDER BY sort_order;");
                     this.MainWindowVM.DisplayedMonths.Add(string.Format("{0}月", (i - 1) % 12 + 1));
                 }
                 this.MainWindowVM.SummaryWithinYearVMList = LoadSummaryWithinYearViewModelList(this.MainWindowVM.SelectedBookVM.BookId, this.MainWindowVM.DisplayedYear);
+            }
+        }
+
+        /// <summary>
+        /// グラフタブに表示するデータを更新する
+        /// </summary>
+        private void UpdateGraphData()
+        {
+            if(this.MainWindowVM.SelectedTab == Tab.GraphTab) {
+                throw new NotImplementedException();
             }
         }
 
@@ -1236,13 +1242,15 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
             List<SummaryViewModel> totalAsBalanceKind = new List<SummaryViewModel>();
             // カテゴリ小計
             List<SummaryViewModel> totalAsCategory = new List<SummaryViewModel>();
-
+            
             foreach (IGrouping<int, SummaryViewModel> g1 in summaryVMList.GroupBy(obj => obj.BalanceKind)) {
+                // 収入/支出の小計を計算する
                 totalAsBalanceKind.Add(new SummaryViewModel() {
                     BalanceKind = g1.Key, CategoryId = -1, CategoryName = String.Empty,
                     ItemId = -1, ItemName = BalanceStr[(BalanceKind)g1.Key],
                     Summary = g1.Sum(obj => obj.Summary)
                 });
+                // カテゴリ別の小計を計算する
                 foreach (IGrouping<int, SummaryViewModel> g2 in g1.GroupBy(obj => obj.CategoryId)) {
                     totalAsCategory.Add(new SummaryViewModel() {
                         BalanceKind = g1.Key, CategoryId = g2.Key, CategoryName = String.Empty,
@@ -1252,12 +1260,15 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                 }
             }
             
+            // 差引損益を追加する
             summaryVMList.Insert(0, new SummaryViewModel() {
                 BalanceKind = -1, CategoryId = -1, CategoryName = String.Empty,
                 ItemId = -1, ItemName = "差引損益", Summary = total });
+            // 収入/支出の小計を追加する
             foreach(SummaryViewModel svm in totalAsBalanceKind) {
                 summaryVMList.Insert(summaryVMList.IndexOf(summaryVMList.First(obj => obj.BalanceKind == svm.BalanceKind)), svm);
             }
+            // カテゴリ別の小計を追加する
             foreach(SummaryViewModel svm in totalAsCategory) {
                 summaryVMList.Insert(summaryVMList.IndexOf(summaryVMList.First(obj => obj.CategoryId == svm.CategoryId)), svm);
             }
@@ -1331,7 +1342,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 ++averageCount;
             }
 
-            // 最初以外の月の分を取得
+            // 最初以外の月の分を取得する
             for (int i = 1; i < 12; ++i) {
                 startTime = startTime.AddMonths(1);
                 endTime = startTime.AddMonths(1).AddMilliseconds(-1);
@@ -1354,12 +1365,15 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 }
             }
 
+            // 平均値を計算する
             foreach(SummaryWithinYearViewModel vm in vmList) {
-                if (vm.Average != null && averageCount != 0) {
-                    vm.Average /= averageCount;
-                }
-                else {
-                    vm.Average = 0;
+                if (vm.Average != null) {
+                    if (averageCount != 0) {
+                        vm.Average /= averageCount;
+                    }
+                    else {
+                        vm.Average = 0;
+                    }
                 }
             }
 

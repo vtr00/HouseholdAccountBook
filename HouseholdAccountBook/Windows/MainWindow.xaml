@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:project="clr-namespace:HouseholdAccountBook"
         xmlns:local="clr-namespace:HouseholdAccountBook.Windows"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
@@ -48,17 +49,52 @@
         <converter:DateTimeToDisplayedYearConverter x:Key="DateTimeToThisYearConverter"/>
         <converter:DateTimeToActTimeConverter x:Key="DateTimeToActTimeConverter"/>
         <converter:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolVisibilityConverter"/>
 
         <!-- スタイル -->
         <Style x:Key="TextAlignRight" TargetType="TextBlock">
             <Setter Property="TextAlignment" Value="Right"/>
         </Style>
 
+        <Style x:Key="SummaryStyle" TargetType="DataGridRow">
+            <Setter Property="Background" Value="#FFEEE3FB"/>
+            <Style.Triggers>
+                <!-- カテゴリ小計 -->
+                <DataTrigger Binding="{Binding ItemId}" Value="-1">
+                    <Setter Property="Background" Value="#FFFFFFB0"/>
+                </DataTrigger>
+                <!-- 収支小計 -->
+                <DataTrigger Binding="{Binding CategoryId}" Value="-1">
+                    <Setter Property="Background" Value="#FFB0FFB0"/>
+                </DataTrigger>
+                <!-- 差引損益 -->
+                <DataTrigger Binding="{Binding BalanceKind}" Value="-1">
+                    <Setter Property="Background" Value="#FFFFB0B0"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DayOfWeekStyle" TargetType="DataGridCell">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}}" Value="土">
+                    <Setter Property="Foreground" Value="Blue"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}}" Value="日">
+                    <Setter Property="Foreground" Value="Red"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="FutureStyle" TargetType="DataGridRow">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsFuture}" Value="True">
+                    <Setter Property="Foreground" Value="Gray"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <!-- 設定 -->
         <properties:Settings x:Key="Settings"/>
-
-        <!-- プロキシ要素 -->
-        <FrameworkElement x:Key="ProxyElement"/>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -104,12 +140,10 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1.0*"/>
         </Grid.ColumnDefinitions>
-        <!-- プロキシ用 -->
-        <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
 
         <!-- メニュー -->
         <Menu Grid.Row="0" Grid.Column="0">
@@ -192,11 +226,17 @@
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
                                   HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo"
-                                  MouseDoubleClick="ActionDataGrid_MouseDoubleClick" PreviewKeyDown="ActionDataGrid_PreviewKeyDown">
+                                  MouseDoubleClick="ActionDataGrid_MouseDoubleClick" PreviewKeyDown="ActionDataGrid_PreviewKeyDown"
+                                  ItemContainerStyle="{StaticResource FutureStyle}">
+                            <DataGrid.Resources>
+                                <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
+                            </DataGrid.Resources>
                             <DataGrid.Columns>
-                                <DataGridTextColumn x:Name="actionIdColumn" Header="アクションID" Binding="{Binding ActionId}"/>
+                                <DataGridTextColumn Header="アクションID" Binding="{Binding ActionId}"
+                                                    Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                 <DataGridTextColumn Header="日付" Binding="{Binding ActTime, Converter={StaticResource DateTimeToActTimeConverter}}"/>
-                                <DataGridTextColumn Header="曜日" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}}"/>
+                                <DataGridTextColumn Header="曜日" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}}"
+                                                    CellStyle="{StaticResource DayOfWeekStyle}"/>
                                 <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
                                 <DataGridTextColumn Header="収入" Binding="{Binding Income, Converter={StaticResource IntToMoneyDisplayConverter}}" 
                                         ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
@@ -206,15 +246,9 @@
                                         ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                                 <DataGridTextColumn Header="店名" Binding="{Binding ShopName}"/>
                                 <DataGridTextColumn Header="備考" Binding="{Binding Remark}"/>
-                                <DataGridTextColumn x:Name="groupIdColumn" Header="グループID" Binding="{Binding GroupId}"/>
+                                <DataGridTextColumn Header="グループID" Binding="{Binding GroupId}" 
+                                                    Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}"/>
                             </DataGrid.Columns>
-
-                            <DataGrid.RowStyle>
-                                <Style TargetType="DataGridRow">
-                                    <!-- 日付に応じて、文字色を変更 -->
-                                    <Setter Property="Foreground" Value="{Binding ColorBrush}"/>
-                                </Style>
-                            </DataGrid.RowStyle>
                         </DataGrid>
 
                         <GridSplitter Grid.Column="0" Width="5" ResizeDirection="Columns" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
@@ -223,19 +257,13 @@
                         <DataGrid Grid.Column="1" ItemsSource="{Binding SummaryVMList}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
-                                  HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo">
+                                  HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
+                                  ItemContainerStyle="{StaticResource SummaryStyle}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
                                 <DataGridTextColumn Header="合計" Binding="{Binding Summary, Converter={StaticResource IntToMoneyDisplayConverter}}" 
                                         ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                             </DataGrid.Columns>
-
-                            <DataGrid.RowStyle>
-                                <Style TargetType="DataGridRow">
-                                    <!-- 行の種類に応じて、背景色を変更 -->
-                                    <Setter Property="Background" Value="{Binding ColorBrush}"/>
-                                </Style>
-                            </DataGrid.RowStyle>
                         </DataGrid>
                     </Grid>
                 </Grid>
@@ -265,44 +293,48 @@
                         <DataGrid Grid.Column="1" ItemsSource="{Binding SummaryWithinYearVMList}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
-                                  HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo">
+                                  HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
+                                  ItemContainerStyle="{StaticResource SummaryStyle}">
+                            <DataGrid.Resources>
+                                <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
+                            </DataGrid.Resources>
                             <DataGrid.Columns>
                                 <!-- 参考：http://oita.oika.me/2014/05/31/binding-datagridcolumn/ -->
                                 <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[0], Source={StaticResource ProxyElement}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[0], Source={StaticResource Proxy}}" 
                                                     Binding="{Binding Values[0], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[1], Source={StaticResource ProxyElement}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[1], Source={StaticResource Proxy}}" 
                                                     Binding="{Binding Values[1], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[2], Source={StaticResource ProxyElement}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[2], Source={StaticResource Proxy}}" 
                                                     Binding="{Binding Values[2], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[3], Source={StaticResource ProxyElement}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[3], Source={StaticResource Proxy}}" 
                                                     Binding="{Binding Values[3], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[4], Source={StaticResource ProxyElement}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[4], Source={StaticResource Proxy}}" 
                                                     Binding="{Binding Values[4], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[5], Source={StaticResource ProxyElement}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[5], Source={StaticResource Proxy}}" 
                                                     Binding="{Binding Values[5], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[6], Source={StaticResource ProxyElement}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[6], Source={StaticResource Proxy}}" 
                                                     Binding="{Binding Values[6], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[7], Source={StaticResource ProxyElement}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[7], Source={StaticResource Proxy}}" 
                                                     Binding="{Binding Values[7], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[8], Source={StaticResource ProxyElement}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[8], Source={StaticResource Proxy}}" 
                                                     Binding="{Binding Values[8], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[9], Source={StaticResource ProxyElement}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[9], Source={StaticResource Proxy}}" 
                                                     Binding="{Binding Values[9], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[10], Source={StaticResource ProxyElement}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[10], Source={StaticResource Proxy}}" 
                                                     Binding="{Binding Values[10], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[11], Source={StaticResource ProxyElement}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[11], Source={StaticResource Proxy}}" 
                                                     Binding="{Binding Values[11], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                                 <DataGridTextColumn Header="平均" Binding="{Binding Average, Converter={StaticResource IntToMoneyDisplayConverter}}"
@@ -310,22 +342,40 @@
                                 <DataGridTextColumn Header="合計" Binding="{Binding Summary, Converter={StaticResource IntToMoneyDisplayConverter}}" 
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                             </DataGrid.Columns>
-
-                            <DataGrid.RowStyle>
-                                <Style TargetType="DataGridRow">
-                                    <!-- 行の種類に応じて、背景色を変更 -->
-                                    <Setter Property="Background" Value="{Binding ColorBrush}"/>
-                                </Style>
-                            </DataGrid.RowStyle>
                         </DataGrid>
                     </Grid>
                 </Grid>
             </TabItem>
             <TabItem Header="グラフ" IsEnabled="False">
-                <!-- 開発中 -->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 中央メニュー -->
+                    <Grid Grid.Row="0" Background="LightGray">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="◀" Width="20" Command="{StaticResource GoToLastYearCommand}"/>
+                            <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToThisYearConverter}}" Width="120"/>
+                            <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
+                            <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" 
+                                              ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="BookName" 
+                                              SelectionChanged="BookComboBox_SelectionChanged"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- データリスト -->
+                    <Grid Grid.Row="1" Background="White">
+                        <!-- 開発中 -->
+                    </Grid>
+                </Grid>
             </TabItem>
             <TabItem Header="設定" IsEnabled="False">
-                <!-- 開発中 -->
+                <Grid Grid.Row="1" Background="White">
+                    <!-- 開発中 -->
+                </Grid>
             </TabItem>
         </TabControl>
     </Grid>
