@@ -223,7 +223,7 @@
                         <!-- 中央リスト -->
                         <DataGrid x:Name="actionDataGrid" Grid.Column="0" 
                                   ItemsSource="{Binding ActionVMList}" SelectedItem="{Binding SelectedActionVM}" IsReadOnly="True" SelectionUnit="FullRow"
-                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
+                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="3"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
                                   HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo"
                                   MouseDoubleClick="ActionDataGrid_MouseDoubleClick" PreviewKeyDown="ActionDataGrid_PreviewKeyDown"
@@ -291,7 +291,7 @@
                     <!-- データリスト -->
                     <Grid Grid.Row="1" Background="White">
                         <DataGrid Grid.Column="1" ItemsSource="{Binding SummaryWithinYearVMList}" IsReadOnly="True" SelectionUnit="FullRow"
-                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
+                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
                                   HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
                                   ItemContainerStyle="{StaticResource SummaryStyle}">
