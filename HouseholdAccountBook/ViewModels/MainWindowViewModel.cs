@@ -12,9 +12,9 @@ namespace HouseholdAccountBook.ViewModels
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         /// <summary>
-        /// 更新中か
+        /// 表示日付の更新中か
         /// </summary>
-        private bool onUpdate = false;
+        private bool OnUpdateDisplayedDate = false;
 
         /// <summary>
         /// 選択されたタブインデックス
@@ -103,11 +103,11 @@ namespace HouseholdAccountBook.ViewModels
                     _DisplayedMonth = value;
                     PropertyChanged?.Raise(this, _nameDisplayedMonth);
 
-                    if (!onUpdate) {
-                        onUpdate = true;
+                    if (!OnUpdateDisplayedDate) {
+                        OnUpdateDisplayedDate = true;
                         // 表示月の年度の最初の月を表示年とする
                         DisplayedYear = value.FirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
-                        onUpdate = false;
+                        OnUpdateDisplayedDate = false;
                     }
                 }
             }
@@ -202,11 +202,11 @@ namespace HouseholdAccountBook.ViewModels
                     _DisplayedYear = value;
                     PropertyChanged?.Raise(this, _nameDisplayedYear);
 
-                    if (!onUpdate) {
-                        onUpdate = true;
+                    if (!OnUpdateDisplayedDate) {
+                        OnUpdateDisplayedDate = true;
                         // 表示年の差分を表示月に反映する
                         DisplayedMonth = DisplayedMonth.AddYears(yearDiff);
-                        onUpdate = false;
+                        OnUpdateDisplayedDate = false;
                     }
                 }
             }

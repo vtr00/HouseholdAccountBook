@@ -20,20 +20,21 @@ namespace HouseholdAccountBook.Windows
         {
             InitializeComponent();
 
+            Properties.Settings settings = Properties.Settings.Default;
             this.DbSettingWindowVM.Message = message;
 
-            this.DbSettingWindowVM.Host = Properties.Settings.Default.App_Postgres_Host;
-            this.DbSettingWindowVM.Port = Properties.Settings.Default.App_Postgres_Port;
-            this.DbSettingWindowVM.UserName = Properties.Settings.Default.App_Postgres_UserName;
-            this.passwordBox.Password = Properties.Settings.Default.App_Postgres_Password;
+            this.DbSettingWindowVM.Host = settings.App_Postgres_Host;
+            this.DbSettingWindowVM.Port = settings.App_Postgres_Port;
+            this.DbSettingWindowVM.UserName = settings.App_Postgres_UserName;
+            this.passwordBox.Password = settings.App_Postgres_Password;
 #if DEBUG
-            this.DbSettingWindowVM.DatabaseName = Properties.Settings.Default.App_Postgres_DatabaseName_Debug;
+            this.DbSettingWindowVM.DatabaseName = settings.App_Postgres_DatabaseName_Debug;
 #else
-            this.DbSettingWindowVM.DatabaseName = Properties.Settings.Default.App_Postgres_DatabaseName;
+            this.DbSettingWindowVM.DatabaseName = settings.App_Postgres_DatabaseName;
 #endif
-            this.DbSettingWindowVM.Role = Properties.Settings.Default.App_Postgres_Role;
-            this.DbSettingWindowVM.DumpExePath = Properties.Settings.Default.App_Postgres_DumpExePath;
-            this.DbSettingWindowVM.RestoreExePath = Properties.Settings.Default.App_Postgres_RestoreExePath;
+            this.DbSettingWindowVM.Role = settings.App_Postgres_Role;
+            this.DbSettingWindowVM.DumpExePath = settings.App_Postgres_DumpExePath;
+            this.DbSettingWindowVM.RestoreExePath = settings.App_Postgres_RestoreExePath;
         }
 
         #region コマンド

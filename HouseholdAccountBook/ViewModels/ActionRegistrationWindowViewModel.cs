@@ -6,7 +6,6 @@ using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.ViewModels
 {
-
     /// <summary>
     /// 帳簿項目登録ウィンドウVM
     /// </summary>

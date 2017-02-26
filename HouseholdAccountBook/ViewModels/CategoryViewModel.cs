@@ -8,10 +8,10 @@
         /// <summary>
         /// カテゴリID
         /// </summary>
-        public int CategoryId { get; set; }
+        public int Id { get; set; }
         /// <summary>
         /// カテゴリ名
         /// </summary>
-        public string CategoryName { get; set; }
+        public string Name { get; set; }
     }
 }

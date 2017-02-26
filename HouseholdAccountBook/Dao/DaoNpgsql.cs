@@ -102,6 +102,9 @@ namespace HouseholdAccountBook.Dao
                 }
                 return new DaoReader(sql, resultSet);
             }
+            catch (NpgsqlException e) {
+                throw e;
+            }
             catch (Exception e) {
                 throw e;
             }

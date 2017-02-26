@@ -55,9 +55,9 @@ namespace HouseholdAccountBook.Windows
             using (DaoBase dao = builder.Build()) {
                 DaoReader reader = dao.ExecQuery("SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
                 reader.ExecWholeRow((count, record) => {
-                    BookViewModel vm = new BookViewModel() { BookId = record.ToInt("book_id"), BookName = record["book_name"] };
+                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                     bookVMList.Add(vm);
-                    if(selectedBookVM == null || bookId == vm.BookId) {
+                    if(selectedBookVM == null || bookId == vm.Id) {
                         selectedBookVM = vm;
                     }
                 });
@@ -130,16 +130,16 @@ WHERE del_flg = 0 AND action_id = @{0};", actionId);
                     itemId = record.ToInt("item_id");
                     actDate = DateTime.Parse(record["act_time"]);
                     actValue = record.ToInt("act_value");
-                    groupId = record.ToNumerableInt("group_id");
+                    groupId = record.ToNullableInt("group_id");
                     shopName = record["shop_name"];
                     remark = record["remark"];
 
                     reader = dao.ExecQuery(@"
 SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
                     reader.ExecWholeRow((count2, record2) => {
-                        BookViewModel vm = new BookViewModel() { BookId = record2.ToInt("book_id"), BookName = record2["book_name"] };
+                        BookViewModel vm = new BookViewModel() { Id = record2.ToInt("book_id"), Name = record2["book_name"] };
                         bookVMList.Add(vm);
-                        if (selectedBookVM == null || bookId == vm.BookId) {
+                        if (selectedBookVM == null || bookId == vm.Id) {
                             selectedBookVM = vm;
                         }
                     });
@@ -337,7 +337,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
         private void UpdateCategoryList(int? categoryId = null)
         {
             ObservableCollection<CategoryViewModel> categoryVMList = new ObservableCollection<CategoryViewModel>() {
-                new CategoryViewModel() { CategoryId = -1, CategoryName = "(指定なし)" }
+                new CategoryViewModel() { Id = -1, Name = "(指定なし)" }
             };
             CategoryViewModel selectedCategoryVM = categoryVMList[0];
             using (DaoBase dao = builder.Build()) {
@@ -345,11 +345,11 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
 SELECT category_id, category_name FROM mst_category C 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM mst_item I WHERE I.category_id = C.category_id AND balance_kind = @{0} AND del_flg = 0 
   AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{1} AND RBI.item_id = I.item_id)) 
-ORDER BY sort_order;", (int)this.ActionRegistrationWindowVM.SelectedBalanceKindVM.BalanceKind, this.ActionRegistrationWindowVM.SelectedBookVM.BookId);
+ORDER BY sort_order;", (int)this.ActionRegistrationWindowVM.SelectedBalanceKindVM.BalanceKind, this.ActionRegistrationWindowVM.SelectedBookVM.Id);
                 reader.ExecWholeRow((count, record) => {
-                    CategoryViewModel vm = new CategoryViewModel() { CategoryId = record.ToInt("category_id"), CategoryName = record["category_name"] };
+                    CategoryViewModel vm = new CategoryViewModel() { Id = record.ToInt("category_id"), Name = record["category_name"] };
                     categoryVMList.Add(vm);
-                    if(vm.CategoryId == categoryId) {
+                    if(vm.Id == categoryId) {
                         selectedCategoryVM = vm;
                     }
                 });
@@ -368,24 +368,24 @@ ORDER BY sort_order;", (int)this.ActionRegistrationWindowVM.SelectedBalanceKindV
             ItemViewModel selectedItemVM = null;
             using (DaoBase dao = builder.Build()) {
                 DaoReader reader;
-                if (this.ActionRegistrationWindowVM.SelectedCategoryVM.CategoryId == -1) {
+                if (this.ActionRegistrationWindowVM.SelectedCategoryVM.Id == -1) {
                     reader = dao.ExecQuery(@"
 SELECT item_id, item_name FROM mst_item I 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{0} AND RBI.item_id = I.item_id AND del_flg = 0)
   AND EXISTS (SELECT * FROM mst_category C WHERE C.category_id = I.category_id AND balance_kind = @{1} AND del_flg = 0)
-ORDER BY sort_order;", this.ActionRegistrationWindowVM.SelectedBookVM.BookId, (int)this.ActionRegistrationWindowVM.SelectedBalanceKindVM.BalanceKind);
+ORDER BY sort_order;", this.ActionRegistrationWindowVM.SelectedBookVM.Id, (int)this.ActionRegistrationWindowVM.SelectedBalanceKindVM.BalanceKind);
                 }
                 else {
                     reader = dao.ExecQuery(@"
 SELECT item_id, item_name FROM mst_item I 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{0} AND RBI.item_id = I.item_id AND del_flg = 0)
   AND category_id = @{1}
-ORDER BY sort_order;", this.ActionRegistrationWindowVM.SelectedBookVM.BookId, (int)this.ActionRegistrationWindowVM.SelectedCategoryVM.CategoryId);
+ORDER BY sort_order;", this.ActionRegistrationWindowVM.SelectedBookVM.Id, (int)this.ActionRegistrationWindowVM.SelectedCategoryVM.Id);
                 }
                 reader.ExecWholeRow((count, record) => {
-                    ItemViewModel vm = new ItemViewModel() { ItemId = record.ToInt("item_id"), ItemName = record["item_name"] };
+                    ItemViewModel vm = new ItemViewModel() { Id = record.ToInt("item_id"), Name = record["item_name"] };
                     itemVMList.Add(vm);
-                    if (selectedItemVM == null || vm.ItemId == itemId) {
+                    if (selectedItemVM == null || vm.Id == itemId) {
                         selectedItemVM = vm;
                     }
                 });
@@ -408,7 +408,7 @@ ORDER BY sort_order;", this.ActionRegistrationWindowVM.SelectedBookVM.BookId, (i
                 DaoReader reader = dao.ExecQuery(@"
 SELECT shop_name FROM hst_shop 
 WHERE del_flg = 0 AND item_id = @{0} 
-ORDER BY used_time DESC;", this.ActionRegistrationWindowVM.SelectedItemVM.ItemId);
+ORDER BY used_time DESC;", this.ActionRegistrationWindowVM.SelectedItemVM.Id);
                 reader.ExecWholeRow((count, record) => {
                     string tmp = record["shop_name"];
                     shopNameVMList.Add(tmp);
@@ -433,7 +433,7 @@ ORDER BY used_time DESC;", this.ActionRegistrationWindowVM.SelectedItemVM.ItemId
                 DaoReader reader = dao.ExecQuery(@"
 SELECT remark FROM hst_remark 
 WHERE del_flg = 0 AND item_id = @{0} 
-ORDER BY used_time DESC;", this.ActionRegistrationWindowVM.SelectedItemVM.ItemId);
+ORDER BY used_time DESC;", this.ActionRegistrationWindowVM.SelectedItemVM.Id);
                 reader.ExecWholeRow((count, record) => {
                     string tmp = record["remark"];
                     remarkVMList.Add(tmp);
@@ -457,8 +457,8 @@ ORDER BY used_time DESC;", this.ActionRegistrationWindowVM.SelectedItemVM.ItemId
             }
 
             BalanceKind balanceKind = ActionRegistrationWindowVM.SelectedBalanceKindVM.BalanceKind; // 収支種別
-            int bookId = ActionRegistrationWindowVM.SelectedBookVM.BookId.Value; // 帳簿ID
-            int itemId = ActionRegistrationWindowVM.SelectedItemVM.ItemId; // 帳簿項目ID
+            int bookId = ActionRegistrationWindowVM.SelectedBookVM.Id.Value; // 帳簿ID
+            int itemId = ActionRegistrationWindowVM.SelectedItemVM.Id; // 帳簿項目ID
             DateTime actTime = ActionRegistrationWindowVM.SelectedDate; // 日付
             int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * ActionRegistrationWindowVM.Value.Value; // 値
             string shopName = ActionRegistrationWindowVM.SelectedShopName; // 店舗名

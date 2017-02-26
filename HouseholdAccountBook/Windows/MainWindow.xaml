@@ -6,6 +6,7 @@
         xmlns:project="clr-namespace:HouseholdAccountBook"
         xmlns:local="clr-namespace:HouseholdAccountBook.Windows"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
+        xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:converter="clr-namespace:HouseholdAccountBook.Converter"
         mc:Ignorable="d"
@@ -42,6 +43,21 @@
         <RoutedCommand x:Key="GoToLastYearCommand"/>
         <RoutedCommand x:Key="GoToThisYearCommand"/>
         <RoutedCommand x:Key="GoToNextYearCommand"/>
+        
+        <!-- 設定操作コマンド -->
+        <RoutedCommand x:Key="AddCategoryCommand"/>
+        <RoutedCommand x:Key="AddItemCommand"/>
+        <RoutedCommand x:Key="DeleteItemCommand"/>
+        <RoutedCommand x:Key="RaiseItemSortOrderCommand"/>
+        <RoutedCommand x:Key="DropItemSortOrderCommand"/>
+
+        <RoutedCommand x:Key="AddBookCommand"/>
+        <RoutedCommand x:Key="DeleteBookCommand"/>
+        <RoutedCommand x:Key="RaiseBookSortOrderCommand"/>
+        <RoutedCommand x:Key="DropBookSortOrderCommand"/>
+
+        <RoutedCommand x:Key="RegisterSettingCommand"/>
+        <RoutedCommand x:Key="CancelSettingCommand"/>
 
         <!-- コンバータ -->
         <converter:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
@@ -129,6 +145,18 @@
         <CommandBinding Command="{StaticResource GoToLastYearCommand}" CanExecute="GoToLastYearCommand_CanExecute" Executed="GoToLastYearCommand_Executed"/>
         <CommandBinding Command="{StaticResource GoToThisYearCommand}" CanExecute="GoToThisYearCommand_CanExecute" Executed="GoToThisYearCommand_Executed"/>
         <CommandBinding Command="{StaticResource GoToNextYearCommand}" CanExecute="GoToNextYearCommand_CanExecute" Executed="GoToNextYearCommand_Executed"/>
+        
+        <!-- 設定操作コマンド -->
+        <CommandBinding Command="{StaticResource AddCategoryCommand}"/>
+        <CommandBinding Command="{StaticResource AddItemCommand}"/>
+        <CommandBinding Command="{StaticResource DeleteItemCommand}"/>
+        <CommandBinding Command="{StaticResource RaiseItemSortOrderCommand}"/>
+        <CommandBinding Command="{StaticResource DropItemSortOrderCommand}"/>
+
+        <CommandBinding Command="{StaticResource AddBookCommand}"/>
+        <CommandBinding Command="{StaticResource DeleteBookCommand}"/>
+        <CommandBinding Command="{StaticResource RaiseBookSortOrderCommand}"/>
+        <CommandBinding Command="{StaticResource DropBookSortOrderCommand}"/>
     </Window.CommandBindings>
     
     <Window.DataContext>
@@ -195,13 +223,14 @@
                             <ColumnDefinition Width="1.0*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
+                        
                         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
                             <Button Content="◀" Width="20" Command="{StaticResource GoToLastMonthCommand}"/>
                             <Button Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}}" Width="120"/>
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextMonthCommand}"/>
                             <Button Content="今月" Width="40" Command="{StaticResource GoToThisMonthCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0" 
-                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="BookName" 
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
                                       SelectionChanged="BookComboBox_SelectionChanged"/>
                         </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
@@ -372,9 +401,135 @@
                     </Grid>
                 </Grid>
             </TabItem>
-            <TabItem Header="設定" IsEnabled="False">
-                <Grid Grid.Row="1" Background="White">
-                    <!-- 開発中 -->
+            <TabItem Header="設定">
+                <TabItem.DataContext>
+                    <viewmodels:SettingsViewModel x:Name="SettingsVM"/>
+                </TabItem.DataContext>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TabControl Grid.Row="0" TabStripPlacement="Left">
+                        <TabItem Header="項目設定">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" Background="LightGray">
+                                    <Button Content="分類追加" Width="75" Command="{StaticResource AddCategoryCommand}"/>
+                                    <Button Content="項目追加" Width="75" Command="{StaticResource AddItemCommand}"/>
+                                    <Button Content="削除" Width="50" Command="{StaticResource DeleteItemCommand}"/>
+                                    <Button Content="↑" Width="25" Command="{StaticResource RaiseItemSortOrderCommand}"/>
+                                    <Button Content="↓" Width="25" Command="{StaticResource DropItemSortOrderCommand}"/>
+                                </StackPanel>
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.3*"/>
+                                        <ColumnDefinition Width="0.6*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TreeView Grid.Column="0" ItemsSource="{Binding HierachicalItemVMList}" SelectedItemChanged="TreeView_SelectedItemChanged">
+                                        <TreeView.Resources>
+                                            <Style TargetType="TreeViewItem">
+                                                <Setter Property="IsExpanded" Value="True"/>
+                                            </Style>
+                                        </TreeView.Resources>
+                                        <TreeView.ItemTemplate>
+                                            <HierarchicalDataTemplate DataType="viewmodels:SettingsViewModel.HierachicalItemViewModel" ItemsSource="{Binding ChildrenVMList}">
+                                                <TextBlock Text="{Binding Name}" />
+                                            </HierarchicalDataTemplate>
+                                        </TreeView.ItemTemplate>
+                                    </TreeView>
+                                    <Grid Grid.Column="1" Margin="10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="1.0*"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Text="関連付け："/>
+                                        <ListBox Grid.Row="1" ItemsSource="{Binding SelectedItemVM.RelationVMList}">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <CheckBox IsChecked="{Binding IsRelated}" Content="{Binding Name}"/>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="帳簿設定">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" Background="LightGray">
+                                    <Button Content="追加" Width="50" Command="{StaticResource AddBookCommand}"/>
+                                    <Button Content="削除" Width="50" Command="{StaticResource DeleteBookCommand}"/>
+                                    <Button Content="↑" Width="25" Command="{StaticResource RaiseBookSortOrderCommand}"/>
+                                    <Button Content="↓" Width="25" Command="{StaticResource DropBookSortOrderCommand}"/>
+                                </StackPanel>
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.3*"/>
+                                        <ColumnDefinition Width="0.6*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <ListBox Grid.Column="0" ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
+
+                                    <Grid Grid.Column="1" Margin="10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="1.0*"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="0.5*"/>
+                                            <ColumnDefinition Width="0.5*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="初期残高："/>
+                                        <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Value="{Binding SelectedBookVM.InitialValue}"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="支払日："/>
+                                        <controls:NumericUpDown Grid.Row="1" Grid.Column="1" MinValue="1" MaxValue="31" Value="{Binding SelectedBookVM.PayDay}"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="関連付け："/>
+                                        <ListBox Grid.Row="3" Grid.ColumnSpan="2" ItemsSource="{Binding SelectedBookVM.RelationVMList}">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <CheckBox IsChecked="{Binding IsRelated}" Content="{Binding Name}"/>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="その他">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.3*"/>
+                                    <ColumnDefinition Width="0.6*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+                        <Button Content="OK" Width="100" Command="{StaticResource RegisterSettingCommand}"/>
+                        <Button Content="キャンセル" Width="100" Command="{StaticResource CancelSettingCommand}"/>
+                    </StackPanel>
                 </Grid>
             </TabItem>
         </TabControl>

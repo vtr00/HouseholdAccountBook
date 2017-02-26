@@ -131,7 +131,9 @@
     <Compile Include="ViewModels\DbSettingWindowViewModel.cs" />
     <Compile Include="ViewModels\ItemViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\MasterDataViewModel.cs" />
     <Compile Include="ViewModels\MoveRegistrationWindowViewModel.cs" />
+    <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\SummryViewModel.cs" />
     <Compile Include="ViewModels\SummryWithinYearViewModel.cs" />
     <Compile Include="Windows\ActionListRegistrationWindow.xaml.cs">

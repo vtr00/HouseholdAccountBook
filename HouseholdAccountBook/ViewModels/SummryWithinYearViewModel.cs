@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Media;
 
 namespace HouseholdAccountBook.ViewModels
 {
@@ -41,5 +40,4 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public int? Summary { get; set; }
     }
-
 }

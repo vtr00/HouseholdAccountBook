@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HouseholdAccountBook.ViewModels
+﻿namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
     /// 帳簿VM
@@ -10,10 +8,11 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 帳簿ID
         /// </summary>
-        public int? BookId { get; set; }
+        public int? Id { get; set; }
+        
         /// <summary>
         /// 帳簿名
         /// </summary>
-        public String BookName { get; set; }
+        public string Name { get; set; }
     }
 }

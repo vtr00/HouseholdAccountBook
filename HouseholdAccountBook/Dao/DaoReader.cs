@@ -135,6 +135,7 @@ namespace HouseholdAccountBook.Dao
             public String this[String key]
             {
                 get {
+                    key = key.ToLower();
                     if (this._record.ContainsKey(key)) {
                         return this._record[key].ToString();
                     }
@@ -151,6 +152,7 @@ namespace HouseholdAccountBook.Dao
             /// <returns></returns>
             public int ToInt(String key)
             {
+                key = key.ToLower();
                 if (this._record.ContainsKey(key)) {
                     Object tmp = this._record[key];
                     return Int32.Parse(tmp.ToString());
@@ -165,11 +167,12 @@ namespace HouseholdAccountBook.Dao
             /// </summary>
             /// <param name="key"></param>
             /// <returns></returns>
-            public int? ToNumerableInt(String key)
+            public int? ToNullableInt(String key)
             {
+                key = key.ToLower();
                 if (this._record.ContainsKey(key)) {
                     Object tmp = this._record[key];
-                    return tmp == DBNull.Value ? (int?)null : (int?)tmp;
+                    return tmp == DBNull.Value ? null : (int?)tmp;
                 }
                 else {
                     throw new KeyNotFoundException();
@@ -183,6 +186,7 @@ namespace HouseholdAccountBook.Dao
             /// <returns></returns>
             public bool ToBoolean(String key)
             {
+                key = key.ToLower();
                 if (this._record.ContainsKey(key)) {
                     try {
                         return (bool)this._record[key];

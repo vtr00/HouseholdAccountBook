@@ -8,10 +8,10 @@
         /// <summary>
         /// 項目ID
         /// </summary>
-        public int ItemId { get; set; }
+        public int Id { get; set; }
         /// <summary>
         /// 項目名
         /// </summary>
-        public string ItemName { get; set; }
+        public string Name { get; set; }
     }
 }

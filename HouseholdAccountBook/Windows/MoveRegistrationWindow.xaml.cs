@@ -70,9 +70,9 @@ namespace HouseholdAccountBook.Windows
             using (DaoBase dao = builder.Build()) {
                 DaoReader reader = dao.ExecQuery("SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
                 reader.ExecWholeRow((count, record) => {
-                    BookViewModel vm = new BookViewModel() { BookId = record.ToInt("book_id"), BookName = record["book_name"] };
+                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                     bookVMList.Add(vm);
-                    if (selectedBookVM == null || selectedBookId == vm.BookId) {
+                    if (selectedBookVM == null || selectedBookId == vm.Id) {
                         selectedBookVM = vm;
                     }
                 });
@@ -178,12 +178,12 @@ ORDER BY move_flg DESC;", groupId);
                 reader = dao.ExecQuery(@"
 SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
                 reader.ExecWholeRow((count, record) => {
-                    BookViewModel vm = new BookViewModel() { BookId = record.ToInt("book_id"), BookName = record["book_name"] };
+                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                     bookVMList.Add(vm);
-                    if (selectedFromBookVM == null || fromBookId == vm.BookId) {
+                    if (selectedFromBookVM == null || fromBookId == vm.Id) {
                         selectedFromBookVM = vm;
                     }
-                    if (selectedToBookVM == null || toBookId == vm.BookId) {
+                    if (selectedToBookVM == null || toBookId == vm.Id) {
                         selectedToBookVM = vm;
                     }
                 });
@@ -320,10 +320,10 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
                 int bookId = -1;
                 switch (this.MoveRegistrationWindowVM.SelectedCommissionKindVM.CommissionKind) {
                     case CommissionKind.FromBook:
-                        bookId = this.MoveRegistrationWindowVM.SelectedFromBookVM.BookId.Value;
+                        bookId = this.MoveRegistrationWindowVM.SelectedFromBookVM.Id.Value;
                         break;
                     case CommissionKind.ToBook:
-                        bookId = this.MoveRegistrationWindowVM.SelectedToBookVM.BookId.Value;
+                        bookId = this.MoveRegistrationWindowVM.SelectedToBookVM.Id.Value;
                         break;
                 }
                 DaoReader reader = dao.ExecQuery(@"
@@ -333,9 +333,9 @@ WHERE del_flg = 0 AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{
 ORDER BY sort_order;", bookId, (int)BalanceKind.Outgo);
 
                 reader.ExecWholeRow((count, record) => {
-                    ItemViewModel vm = new ItemViewModel() { ItemId = record.ToInt("item_id"), ItemName = record["item_name"] };
+                    ItemViewModel vm = new ItemViewModel() { Id = record.ToInt("item_id"), Name = record["item_name"] };
                     itemVMList.Add(vm);
-                    if (selectedItemVM == null || vm.ItemId == itemId) {
+                    if (selectedItemVM == null || vm.Id == itemId) {
                         selectedItemVM = vm;
                     }
                 });
@@ -358,7 +358,7 @@ ORDER BY sort_order;", bookId, (int)BalanceKind.Outgo);
                 DaoReader reader = dao.ExecQuery(@"
 SELECT remark FROM hst_remark 
 WHERE del_flg = 0 AND item_id = @{0} 
-ORDER BY used_time DESC;", this.MoveRegistrationWindowVM.SelectedItemVM.ItemId);
+ORDER BY used_time DESC;", this.MoveRegistrationWindowVM.SelectedItemVM.Id);
                 reader.ExecWholeRow((count, record) => {
                     string tmp = record["remark"];
                     remarkVMList.Add(tmp);
@@ -386,11 +386,11 @@ ORDER BY used_time DESC;", this.MoveRegistrationWindowVM.SelectedItemVM.ItemId);
             }
 
             DateTime actTime = this.MoveRegistrationWindowVM.SelectedDate;
-            int fromBookId = this.MoveRegistrationWindowVM.SelectedFromBookVM.BookId.Value;
-            int toBookId = this.MoveRegistrationWindowVM.SelectedToBookVM.BookId.Value;
+            int fromBookId = this.MoveRegistrationWindowVM.SelectedFromBookVM.Id.Value;
+            int toBookId = this.MoveRegistrationWindowVM.SelectedToBookVM.Id.Value;
             int actValue = this.MoveRegistrationWindowVM.Value.Value;
             CommissionKind commissionKind = this.MoveRegistrationWindowVM.SelectedCommissionKindVM.CommissionKind;
-            int commissionItemId = this.MoveRegistrationWindowVM.SelectedItemVM.ItemId;
+            int commissionItemId = this.MoveRegistrationWindowVM.SelectedItemVM.Id;
             int commission = this.MoveRegistrationWindowVM.Commission ?? 0;
             string remark = this.MoveRegistrationWindowVM.SelectedRemark;
 

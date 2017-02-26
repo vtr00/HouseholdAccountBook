@@ -69,7 +69,7 @@
             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                        Text="帳簿" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="BookName"/>
+                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
             <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                        Text="収支" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" 
@@ -77,11 +77,11 @@
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                        Text="分類" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="2" Grid.Column="1" Margin="5" 
-                     ItemsSource="{Binding CategoryVMList}" SelectedItem="{Binding SelectedCategoryVM}" DisplayMemberPath="CategoryName"/>
+                     ItemsSource="{Binding CategoryVMList}" SelectedItem="{Binding SelectedCategoryVM}" DisplayMemberPath="Name"/>
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                        Text="項目" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="3" Grid.Column="1" Margin="5" 
-                     ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="ItemName"/>
+                     ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="Name"/>
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                        Text="日付/金額" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <DataGrid Grid.Row="4" Grid.Column="1" Margin="5"

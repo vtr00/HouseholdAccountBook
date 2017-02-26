@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.ViewModels.SettingsViewModel;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -47,6 +48,8 @@ namespace HouseholdAccountBook.Windows
             UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
             UpdateBookData();
             UpdateYearsListData();
+            UpdateGraphData();
+            UpdateSettingData();
 
             LoadSetting();
         }
@@ -457,7 +460,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void MoveToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder,
-                this.MainWindowVM.SelectedBookVM.BookId, this.MainWindowVM.SelectedActionVM?.ActTime);
+                this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
             mrw.Registrated += (sender2, e2) => {
                 UpdateBookData(e2.Id);
                 actionDataGrid.Focus();
@@ -485,7 +488,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void AddActionToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ActionRegistrationWindow arw = new ActionRegistrationWindow(builder,
-                this.MainWindowVM.SelectedBookVM.BookId, this.MainWindowVM.SelectedActionVM?.ActTime);
+                this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
             arw.Registrated += (sender2, e2)=> {
                 UpdateBookData(e2.Id);
                 actionDataGrid.Focus();
@@ -513,7 +516,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void AddActionListToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(builder,
-                this.MainWindowVM.SelectedBookVM.BookId, this.MainWindowVM.SelectedActionVM?.ActTime);
+                this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
             alrw.Registrated += (sender2, e2) => {
                 UpdateBookData(e2.Id);
                 actionDataGrid.Focus();
@@ -549,7 +552,7 @@ LEFT JOIN (SELECT * FROM hst_group WHERE del_flg = 0) G ON G.group_id = A.group_
 WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM.ActionId);
 
                 reader.ExecARow((record) => {
-                    groupKind = record.ToNumerableInt("group_kind");
+                    groupKind = record.ToNullableInt("group_kind");
                 });
             }
 
@@ -563,7 +566,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
             }
             else {
                 // 移動時の処理
-                MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder, this.MainWindowVM.SelectedBookVM.BookId, this.MainWindowVM.SelectedActionVM.GroupId.Value);
+                MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder, this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM.GroupId.Value);
                 mrw.Registrated += (sender2, e2) => {
                     UpdateBookData(e2.Id);
                     actionDataGrid.Focus();
@@ -988,13 +991,26 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                         UpdateYearsListData();
                         break;
                     case Tab.GraphTab:
+                        UpdateGraphData();
                         break;
                     case Tab.SettingTab:
+                        UpdateSettingData();
                         break;
                 }
                 Cursor = cCursor;
             }
             oldSelectedTab = this.MainWindowVM.SelectedTab;
+        }
+
+        /// <summary>
+        /// 項目設定で一覧の選択を変更した時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            TreeView treeView = sender as TreeView;
+            SettingsVM.SelectedItemVM = treeView.SelectedItem as HierarchicalItemViewModel;
         }
         #endregion
 
@@ -1006,7 +1022,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         private void UpdateBookList(int? bookId = null)
         {
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>() {
-                new BookViewModel() { BookId = null, BookName = "一覧" }
+                new BookViewModel() { Id = null, Name = "一覧" }
             };
             BookViewModel selectedBookVM = bookVMList[0];
             using (DaoBase dao = builder.Build()) {
@@ -1016,10 +1032,10 @@ FROM mst_book
 WHERE del_flg = 0 
 ORDER BY sort_order;");
                 reader.ExecWholeRow((count, record) => {
-                    BookViewModel vm = new BookViewModel() { BookId = record.ToInt("book_id"), BookName = record["book_name"] };
+                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                     bookVMList.Add(vm);
 
-                    if(vm.BookId == bookId) {
+                    if(vm.Id == bookId) {
                         selectedBookVM = vm;
                     }
                 });
@@ -1036,45 +1052,18 @@ ORDER BY sort_order;");
         {
             if (this.MainWindowVM.SelectedTab == Tab.BookTab) {
                 this.MainWindowVM.ActionVMList = LoadActionViewModelList(
-                    this.MainWindowVM.SelectedBookVM?.BookId, this.MainWindowVM.DisplayedMonth.FirstDateOfMonth(),
+                    this.MainWindowVM.SelectedBookVM?.Id, this.MainWindowVM.DisplayedMonth.FirstDateOfMonth(),
                     this.MainWindowVM.DisplayedMonth.FirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
 
                 this.MainWindowVM.SummaryVMList = LoadSummaryViewModelList(
-                    this.MainWindowVM.SelectedBookVM?.BookId, this.MainWindowVM.DisplayedMonth.FirstDateOfMonth(),
+                    this.MainWindowVM.SelectedBookVM?.Id, this.MainWindowVM.DisplayedMonth.FirstDateOfMonth(),
                     this.MainWindowVM.DisplayedMonth.FirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
 
                 IEnumerable<ActionViewModel> query = this.MainWindowVM.ActionVMList.Where((avm) => { return avm.ActionId == actionId; });
                 this.MainWindowVM.SelectedActionVM = query.Count() == 0 ? null : query.First();
             }
         }
-
-        /// <summary>
-        /// 年間一覧タブに表示するデータを更新する
-        /// </summary>
-        private void UpdateYearsListData()
-        {
-            if (this.MainWindowVM.SelectedTab == Tab.ListTab) {
-                int startMonth = Properties.Settings.Default.App_StartMonth;
-
-                // 表示する月の文字列を作成する
-                this.MainWindowVM.DisplayedMonths = new ObservableCollection<string>();
-                for (int i = startMonth; i < startMonth + 12; ++i) {
-                    this.MainWindowVM.DisplayedMonths.Add(string.Format("{0}月", (i - 1) % 12 + 1));
-                }
-                this.MainWindowVM.SummaryWithinYearVMList = LoadSummaryWithinYearViewModelList(this.MainWindowVM.SelectedBookVM.BookId, this.MainWindowVM.DisplayedYear);
-            }
-        }
-
-        /// <summary>
-        /// グラフタブに表示するデータを更新する
-        /// </summary>
-        private void UpdateGraphData()
-        {
-            if(this.MainWindowVM.SelectedTab == Tab.GraphTab) {
-                throw new NotImplementedException();
-            }
-        }
-
+        
         /// <summary>
         /// 帳簿項目VMリストを取得する
         /// </summary>
@@ -1148,7 +1137,7 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
                         ItemName = record["item_name"],
                         Balance = record.ToInt("balance"),
                         ShopName = record["shop_name"],
-                        GroupId = record.ToNumerableInt("group_id"),
+                        GroupId = record.ToNullableInt("group_id"),
                         Remark = record["remark"]
                     };
                     int actValue = record.ToInt("act_value");
@@ -1235,41 +1224,52 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                     });
                 });
             }
-            
+
             // 差引損益
             int total = summaryVMList.Sum(obj => obj.Summary);
             // 収入/支出
             List<SummaryViewModel> totalAsBalanceKind = new List<SummaryViewModel>();
             // カテゴリ小計
             List<SummaryViewModel> totalAsCategory = new List<SummaryViewModel>();
-            
+
             foreach (IGrouping<int, SummaryViewModel> g1 in summaryVMList.GroupBy(obj => obj.BalanceKind)) {
                 // 収入/支出の小計を計算する
                 totalAsBalanceKind.Add(new SummaryViewModel() {
-                    BalanceKind = g1.Key, CategoryId = -1, CategoryName = String.Empty,
-                    ItemId = -1, ItemName = BalanceStr[(BalanceKind)g1.Key],
+                    BalanceKind = g1.Key,
+                    CategoryId = -1,
+                    CategoryName = String.Empty,
+                    ItemId = -1,
+                    ItemName = BalanceStr[(BalanceKind)g1.Key],
                     Summary = g1.Sum(obj => obj.Summary)
                 });
                 // カテゴリ別の小計を計算する
                 foreach (IGrouping<int, SummaryViewModel> g2 in g1.GroupBy(obj => obj.CategoryId)) {
                     totalAsCategory.Add(new SummaryViewModel() {
-                        BalanceKind = g1.Key, CategoryId = g2.Key, CategoryName = String.Empty,
-                        ItemId = -1, ItemName = g2.First().CategoryName,
+                        BalanceKind = g1.Key,
+                        CategoryId = g2.Key,
+                        CategoryName = String.Empty,
+                        ItemId = -1,
+                        ItemName = g2.First().CategoryName,
                         Summary = g2.Sum(obj => obj.Summary)
                     });
                 }
             }
-            
+
             // 差引損益を追加する
             summaryVMList.Insert(0, new SummaryViewModel() {
-                BalanceKind = -1, CategoryId = -1, CategoryName = String.Empty,
-                ItemId = -1, ItemName = "差引損益", Summary = total });
+                BalanceKind = -1,
+                CategoryId = -1,
+                CategoryName = String.Empty,
+                ItemId = -1,
+                ItemName = "差引損益",
+                Summary = total
+            });
             // 収入/支出の小計を追加する
-            foreach(SummaryViewModel svm in totalAsBalanceKind) {
+            foreach (SummaryViewModel svm in totalAsBalanceKind) {
                 summaryVMList.Insert(summaryVMList.IndexOf(summaryVMList.First(obj => obj.BalanceKind == svm.BalanceKind)), svm);
             }
             // カテゴリ別の小計を追加する
-            foreach(SummaryViewModel svm in totalAsCategory) {
+            foreach (SummaryViewModel svm in totalAsCategory) {
                 summaryVMList.Insert(summaryVMList.IndexOf(summaryVMList.First(obj => obj.CategoryId == svm.CategoryId)), svm);
             }
 
@@ -1277,11 +1277,28 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         }
 
         /// <summary>
+        /// 年間一覧タブに表示するデータを更新する
+        /// </summary>
+        private void UpdateYearsListData()
+        {
+            if (this.MainWindowVM.SelectedTab == Tab.ListTab) {
+                int startMonth = Properties.Settings.Default.App_StartMonth;
+
+                // 表示する月の文字列を作成する
+                this.MainWindowVM.DisplayedMonths = new ObservableCollection<string>();
+                for (int i = startMonth; i < startMonth + 12; ++i) {
+                    this.MainWindowVM.DisplayedMonths.Add(string.Format("{0}月", (i - 1) % 12 + 1));
+                }
+                this.MainWindowVM.SummaryWithinYearVMList = LoadSummaryWithinYearViewModelList(this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.DisplayedYear);
+            }
+        }
+
+        /// <summary>
         /// 年度内合計項目VMリストを取得する
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="year">表示年</param>
-        /// <returns></returns>
+        /// <returns>年度内合計項目VMリスト</returns>
         private ObservableCollection<SummaryWithinYearViewModel> LoadSummaryWithinYearViewModelList(int? bookId, DateTime year)
         {
             DateTime startTime = new DateTime(year.Year, Properties.Settings.Default.App_StartMonth, 1);
@@ -1289,7 +1306,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
 
             // 開始月までの収支を取得する
             int balance = 0;
-            using(DaoBase dao = builder.Build()) {
+            using (DaoBase dao = builder.Build()) {
                 DaoReader reader;
                 if (bookId == null) {
                     // 全帳簿
@@ -1315,8 +1332,13 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             ObservableCollection<SummaryWithinYearViewModel> vmList = new ObservableCollection<SummaryWithinYearViewModel>();
             vmList.Add(new SummaryWithinYearViewModel() {
-                BalanceKind = -1, CategoryId = -1, CategoryName = String.Empty,
-                ItemId = -1, ItemName = "残高", Values = new List<int>() });
+                BalanceKind = -1,
+                CategoryId = -1,
+                CategoryName = String.Empty,
+                ItemId = -1,
+                ItemName = "残高",
+                Values = new List<int>()
+            });
 
             int averageCount = 0; // 平均値計算に使用する月数(先月まで)
 
@@ -1327,8 +1349,14 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             foreach (SummaryViewModel summaryVM in summaryVMList) {
                 int value = summaryVM.Summary;
                 SummaryWithinYearViewModel vm = new SummaryWithinYearViewModel() {
-                    BalanceKind = summaryVM.BalanceKind, CategoryId = summaryVM.CategoryId, CategoryName = summaryVM.CategoryName,
-                    ItemId = summaryVM.ItemId, ItemName = summaryVM.ItemName, Values = new List<int>(), Summary = value };
+                    BalanceKind = summaryVM.BalanceKind,
+                    CategoryId = summaryVM.CategoryId,
+                    CategoryName = summaryVM.CategoryName,
+                    ItemId = summaryVM.ItemId,
+                    ItemName = summaryVM.ItemName,
+                    Values = new List<int>(),
+                    Summary = value
+                };
                 if (endTime < DateTime.Now) {
                     vm.Average = value;
                 }
@@ -1354,7 +1382,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                     int value = summaryVMList[j].Summary;
 
                     vmList[j + 1].Values.Add(value);
-                    
+
                     if (endTime < DateTime.Now) {
                         vmList[j + 1].Average += value;
                     }
@@ -1366,13 +1394,185 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             }
 
             // 平均値を計算する
-            foreach(SummaryWithinYearViewModel vm in vmList) {
+            foreach (SummaryWithinYearViewModel vm in vmList) {
                 if (vm.Average != null) {
                     if (averageCount != 0) {
                         vm.Average /= averageCount;
                     }
                     else {
                         vm.Average = 0;
+                    }
+                }
+            }
+
+            return vmList;
+        }
+
+        /// <summary>
+        /// グラフタブに表示するデータを更新する
+        /// </summary>
+        private void UpdateGraphData()
+        {
+            if(this.MainWindowVM.SelectedTab == Tab.GraphTab) {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// 設定タブに表示するデータを更新する
+        /// </summary>
+        private void UpdateSettingData() {
+            if(this.MainWindowVM.SelectedTab == Tab.SettingTab) {
+                this.SettingsVM.HierachicalItemVMList = LoadItemViewModelList();
+                this.SettingsVM.BookVMList = LoadBookSettingViewModelList();
+            }
+        }
+
+        /// <summary>
+        /// 帳簿VM(設定用)リストを取得する
+        /// </summary>
+        /// <returns>帳簿VM(設定用)リスト</returns>
+        private ObservableCollection<BookSettingViewModel> LoadBookSettingViewModelList() {
+            ObservableCollection<BookSettingViewModel> vmList = new ObservableCollection<BookSettingViewModel>();
+
+            using(DaoBase dao = builder.Build()) {
+                // 帳簿一覧を取得する
+                DaoReader reader = dao.ExecQuery(@"
+SELECT book_id, book_name, pay_day, initial_value
+FROM mst_book
+WHERE del_flg = 0
+ORDER BY sort_order;");
+
+                reader.ExecWholeRow((count, record) => {
+                    int bookId = record.ToInt("book_id");
+                    string bookName = record["book_name"];
+                    int initialValue = record.ToInt("initial_value");
+                    int? payDay = record.ToNullableInt("pay_day");
+
+                    vmList.Add(new BookSettingViewModel() {
+                        Id = bookId,
+                        Name = bookName,
+                        InitialValue = initialValue,
+                        PayDay = payDay
+                    });
+                });
+
+                // 項目との関係の一覧を取得する(移動を除く)
+                foreach(BookSettingViewModel vm in vmList) {
+                    reader = dao.ExecQuery(@"
+SELECT I.item_id AS ItemId, I.item_name, C.category_name, RBI.item_id IS NULL AS IsNotRelated
+FROM mst_item I
+INNER JOIN (SELECT category_id, category_name FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
+LEFT JOIN (SELECT item_id FROM rel_book_item WHERE del_flg = 0 AND book_id = @{0}) RBI ON RBI.item_id = I.item_id
+WHERE del_flg = 0 AND move_flg = 0
+ORDER BY I.sort_order;", vm.Id);
+
+                    vm.RelationVMList = new ObservableCollection<RelationViewModel>();
+                    reader.ExecWholeRow((count, record) => {
+                        int itemId = record.ToInt("ItemId");
+                        string name = string.Format(@"{0} - {1}", record["category_name"], record["item_name"]);
+                        bool isRelated = !record.ToBoolean("IsNotRelated");
+
+                        vm.RelationVMList.Add(new RelationViewModel() {
+                            Id = itemId,
+                            Name = name,
+                            IsRelated = isRelated
+                        });
+                    });
+                }
+            }
+
+            return vmList;
+        }
+
+        /// <summary>
+        /// 階層構造項目VMリストを取得する
+        /// </summary>
+        /// <returns>階層構造項目VMリスト</returns>
+        private ObservableCollection<HierarchicalItemViewModel> LoadItemViewModelList()
+        {
+            ObservableCollection<HierarchicalItemViewModel> vmList = new ObservableCollection<HierarchicalItemViewModel>();
+            HierarchicalItemViewModel incomeVM = new HierarchicalItemViewModel() {
+                Kind = HierarchicalKind.Balance,
+                Id = (int)BalanceKind.Income,
+                Name = "収入項目",
+                ParentVM = null,
+                RelationVMList = null,
+                ChildrenVMList = new ObservableCollection<HierarchicalItemViewModel>()
+            };
+            vmList.Add(incomeVM);
+
+            HierarchicalItemViewModel outgoVM = new HierarchicalItemViewModel() {
+                Kind = HierarchicalKind.Balance,
+                Id = (int)BalanceKind.Outgo,
+                Name = "支出項目",
+                ParentVM = null,
+                RelationVMList = null,
+                ChildrenVMList = new ObservableCollection<HierarchicalItemViewModel>()
+            };
+            vmList.Add(outgoVM);
+
+            foreach (HierarchicalItemViewModel vm in vmList) {
+                using (DaoBase dao = builder.Build()) {
+                    DaoReader reader = dao.ExecQuery(@"
+SELECT category_id, category_name 
+FROM mst_category
+WHERE balance_kind = @{0} AND del_flg = 0 AND sort_order <> 0
+ORDER BY sort_order;", vm.Id);
+
+                    reader.ExecWholeRow((count, record) => {
+                        int categoryId = record.ToInt("category_id");
+                        string categoryName = record["category_name"];
+
+                        vm.ChildrenVMList.Add(new HierarchicalItemViewModel() {
+                            Kind = HierarchicalKind.Category,
+                            Id = categoryId,
+                            Name = categoryName,
+                            ParentVM = vm,
+                            RelationVMList = null,
+                            ChildrenVMList = new ObservableCollection<HierarchicalItemViewModel>()
+                        });
+                    });
+
+                    foreach (HierarchicalItemViewModel childVM in vm.ChildrenVMList) {
+                        reader = dao.ExecQuery(@"
+SELECT item_id, item_name
+FROM mst_item
+WHERE category_id = @{0} AND del_flg = 0
+ORDER BY sort_order;", childVM.Id);
+
+                        reader.ExecWholeRow((count, record) => {
+                            int itemId = record.ToInt("item_id");
+                            string itemName = record["item_name"];
+
+                            childVM.ChildrenVMList.Add(new HierarchicalItemViewModel() {
+                                Kind = HierarchicalKind.Item,
+                                Id = itemId,
+                                Name = itemName,
+                                ParentVM = childVM,
+                                RelationVMList = new ObservableCollection<RelationViewModel>()
+                            });
+                        });
+
+                        foreach (HierarchicalItemViewModel vm2 in childVM.ChildrenVMList) {
+                            reader = dao.ExecQuery(@"
+SELECT B.book_id AS BookId, B.book_name, RBI.book_id IS NULL AS IsNotRelated
+FROM mst_book B
+LEFT JOIN (SELECT book_id FROM rel_book_item WHERE del_flg = 0 AND item_id = @{0}) RBI ON RBI.book_id = B.book_id
+ORDER BY B.sort_order;", vm2.Id);
+
+                            reader.ExecWholeRow((count2, record2) => {
+                                int bookId = record2.ToInt("BookId");
+                                string bookName = record2["book_name"];
+                                bool isRelated = !record2.ToBoolean("IsNotRelated");
+
+                                vm2.RelationVMList.Add(new RelationViewModel() {
+                                    Id = bookId,
+                                    Name = bookName,
+                                    IsRelated = isRelated
+                                });
+                            });
+                        }
                     }
                 }
             }
@@ -1415,7 +1615,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 settings.MainWindow_Top = Top;
                 settings.MainWindow_Width = Width;
                 settings.MainWindow_Height = Height;
-                settings.MainWindow_SelectedBookId = this.MainWindowVM.SelectedBookVM.BookId.HasValue ? this.MainWindowVM.SelectedBookVM.BookId.Value : -1;
+                settings.MainWindow_SelectedBookId = this.MainWindowVM.SelectedBookVM.Id.HasValue ? this.MainWindowVM.SelectedBookVM.Id.Value : -1;
                 settings.Save();
             }
         }
