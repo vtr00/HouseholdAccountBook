@@ -117,7 +117,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void IncreaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.Value == null ? (this.NullValue + this.Stride) <= this.MaxValue : (this.Value + this.Stride) <= this.MaxValue;
+            e.CanExecute = this.Value == null ? this.NullValue < this.MaxValue : this.Value < this.MaxValue;
         }
 
         /// <summary>
@@ -127,12 +127,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void IncreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (this.Value == null) {
-                this.Value = this.MinValue;
-            }
-            else {
-                this.Value += this.Stride;
-            }
+            IncrementNumber();
             e.Handled = true;
         }
 
@@ -143,7 +138,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void DecreaseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.Value == null ? (this.NullValue - this.Stride) >= this.MinValue : (this.Value - this.Stride) >= this.MinValue;
+            e.CanExecute = this.Value == null ? this.NullValue > this.MinValue : this.Value > this.MinValue;
         }
 
         /// <summary>
@@ -153,12 +148,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void DecreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (this.Value == null) {
-                this.Value = this.MaxValue;
-            }
-            else {
-                this.Value -= this.Stride;
-            }
+            DecrementNumber();
             e.Handled = true;
         }
 
@@ -252,27 +242,11 @@ namespace HouseholdAccountBook.UserControls
         {
             switch (e.Key) {
                 case Key.Up:
-                    if (this.Value == null) {
-                        this.Value = this.MinValue;
-                    }
-                    else if ((this.Value + this.Stride) <= this.MaxValue) {
-                        this.Value += this.Stride;
-                    }
-                    else {
-                        this.Value = this.MaxValue;
-                    }
+                    IncrementNumber();
                     e.Handled = true;
                     break;
                 case Key.Down:
-                    if (this.Value == null) {
-                        this.Value = this.MaxValue;
-                    }
-                    else if ((this.Value - this.Stride) >= this.MinValue) {
-                        this.Value -= this.Stride;
-                    }
-                    else {
-                        this.Value = this.MinValue;
-                    }
+                    DecrementNumber();
                     e.Handled = true;
                     break;
                 default:
@@ -290,6 +264,52 @@ namespace HouseholdAccountBook.UserControls
             _popup.IsOpen = true;
             _popup.Focus();
         }
+
+        /// <summary>
+        /// ホイールの回転方向に合わせて数字を増減する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TextBox_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0) {
+                IncrementNumber();
+            }
+            else if (e.Delta < 0) {
+                DecrementNumber();
+            }
+        }
         #endregion
+
+        /// <summary>
+        /// 数値をインクリメントする
+        /// </summary>
+        private void IncrementNumber() {
+            if (this.Value == null) {
+                this.Value = this.MinValue;
+            }
+            else if ((this.Value + this.Stride) <= this.MaxValue) {
+                this.Value += this.Stride;
+            }
+            else {
+                this.Value = this.MaxValue;
+            }
+        }
+
+        /// <summary>
+        /// 数値をデクリメントする
+        /// </summary>
+        private void DecrementNumber()
+        {
+            if (this.Value == null) {
+                this.Value = this.MaxValue;
+            }
+            else if ((this.Value - this.Stride) >= this.MinValue) {
+                this.Value -= this.Stride;
+            }
+            else {
+                this.Value = this.MinValue;
+            }
+        }
     }
 }

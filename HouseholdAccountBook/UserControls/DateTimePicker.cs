@@ -51,6 +51,7 @@ namespace HouseholdAccountBook.UserControls
                 textBox.SetValue(InputMethod.IsInputMethodEnabledProperty, false);
                 textBox.SelectionChanged += TextBox_SelectionChanged;
                 textBox.PreviewKeyDown += TextBox_OnPreviewKeyDown;
+                textBox.MouseWheel += TextBox_MouseWheel;
             };
             this.CalendarOpened += DateTimePicker_OnCalendarOpened;
             this.CalendarClosed += DateTimePicker_OnCalendarClosed;
@@ -190,51 +191,13 @@ namespace HouseholdAccountBook.UserControls
                     break;
                 case Key.Up: {
                         // 選択している箇所の数字をインクリメントする
-                        textBox.SelectionChanged -= TextBox_SelectionChanged;
-                        int start = textBox.SelectionStart;
-                        int length = textBox.SelectionLength;
-                        Kind kind = GetKindOfSelection(textBox, dateTimePicker);
-                        switch (kind) {
-                            case Kind.Year:
-                                dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddYears(1);
-                                break;
-                            case Kind.Month:
-                                dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddMonths(1);
-                                break;
-                            case Kind.Day:
-                                dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddDays(1);
-                                break;
-                        }
-                        string formatStr = dateTimePicker.DateFormat;
-                        textBox.Text = DatePickerDateTimeConverter.DateTimeToString(formatStr, dateTimePicker.SelectedDate);
-                        textBox.SelectionStart = start;
-                        textBox.SelectionLength = length;
-                        textBox.SelectionChanged += TextBox_SelectionChanged;
+                        IncrementSelectedNumber(textBox, dateTimePicker);
                         e.Handled = true;
                     }
                     break;
                 case Key.Down: {
                         // 選択している箇所の数字をデクリメントする
-                        textBox.SelectionChanged -= TextBox_SelectionChanged;
-                        int start = textBox.SelectionStart;
-                        int length = textBox.SelectionLength;
-                        Kind kind = GetKindOfSelection(textBox, dateTimePicker);
-                        switch (kind) {
-                            case Kind.Year:
-                                dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddYears(-1);
-                                break;
-                            case Kind.Month:
-                                dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddMonths(-1);
-                                break;
-                            case Kind.Day:
-                                dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddDays(-1);
-                                break;
-                        }
-                        string formatStr = dateTimePicker.DateFormat;
-                        textBox.Text = DatePickerDateTimeConverter.DateTimeToString(formatStr, dateTimePicker.SelectedDate);
-                        textBox.SelectionStart = start;
-                        textBox.SelectionLength = length;
-                        textBox.SelectionChanged += TextBox_SelectionChanged;
+                        DecrementSelectedNumber(textBox, dateTimePicker);
                         e.Handled = true;
                     }
                     break;
@@ -267,6 +230,81 @@ namespace HouseholdAccountBook.UserControls
             TextBox textBox = sender as TextBox;
             textBox.SelectionChanged -= TextBox_SelectionChanged;
             SelectAsRange(textBox);
+            textBox.SelectionChanged += TextBox_SelectionChanged;
+        }
+        
+        /// <summary>
+        /// ホイールの回転方向に合わせて選択している数字を増減する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TextBox_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+
+            if (e.Delta < 0) {
+                DecrementSelectedNumber(textBox, this);
+            }
+            else if (e.Delta > 0) {
+                IncrementSelectedNumber(textBox, this);
+            }
+        }
+
+        /// <summary>
+        /// 選択している数字をインクリメントする
+        /// </summary>
+        /// <param name="textBox">テキストボックス</param>
+        /// <param name="dateTimePicker">デートタイムピッカー</param>
+        private void IncrementSelectedNumber(TextBox textBox, DateTimePicker dateTimePicker)
+        {
+            textBox.SelectionChanged -= TextBox_SelectionChanged;
+            int start = textBox.SelectionStart;
+            int length = textBox.SelectionLength;
+            Kind kind = GetKindOfSelection(textBox, dateTimePicker);
+            switch (kind) {
+                case Kind.Year:
+                    dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddYears(1);
+                    break;
+                case Kind.Month:
+                    dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddMonths(1);
+                    break;
+                case Kind.Day:
+                    dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddDays(1);
+                    break;
+            }
+            string formatStr = dateTimePicker.DateFormat;
+            textBox.Text = DatePickerDateTimeConverter.DateTimeToString(formatStr, dateTimePicker.SelectedDate);
+            textBox.SelectionStart = start;
+            textBox.SelectionLength = length;
+            textBox.SelectionChanged += TextBox_SelectionChanged;
+        }
+
+        /// <summary>
+        /// 選択している数字をデクリメントする
+        /// </summary>
+        /// <param name="textBox">テキストボックス</param>
+        /// <param name="dateTimePicker">デートタイムピッカー</param>
+        private void DecrementSelectedNumber(TextBox textBox, DateTimePicker dateTimePicker)
+        {
+            textBox.SelectionChanged -= TextBox_SelectionChanged;
+            int start = textBox.SelectionStart;
+            int length = textBox.SelectionLength;
+            Kind kind = GetKindOfSelection(textBox, dateTimePicker);
+            switch (kind) {
+                case Kind.Year:
+                    dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddYears(-1);
+                    break;
+                case Kind.Month:
+                    dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddMonths(-1);
+                    break;
+                case Kind.Day:
+                    dateTimePicker.SelectedDate = dateTimePicker.SelectedDate.Value.AddDays(-1);
+                    break;
+            }
+            string formatStr = dateTimePicker.DateFormat;
+            textBox.Text = DatePickerDateTimeConverter.DateTimeToString(formatStr, dateTimePicker.SelectedDate);
+            textBox.SelectionStart = start;
+            textBox.SelectionLength = length;
             textBox.SelectionChanged += TextBox_SelectionChanged;
         }
 
@@ -339,7 +377,7 @@ namespace HouseholdAccountBook.UserControls
                 switch (kind) {
                     case Kind.Year:
                         try {
-                            dateTimePicker.SelectedDate = new DateTime(dt.Year * 10 + number, dt.Month, dt.Day);
+                            dateTimePicker.SelectedDate = new DateTime(dt.Year % 10 + number, dt.Month, dt.Day);
                         }
                         catch (ArgumentOutOfRangeException) {
                             dateTimePicker.SelectedDate = new DateTime(number, dt.Month, dt.Day);
@@ -347,7 +385,7 @@ namespace HouseholdAccountBook.UserControls
                         break;
                     case Kind.Month:
                         try {
-                            dateTimePicker.SelectedDate = new DateTime(dt.Year, dt.Month * 10 + number, dt.Day);
+                            dateTimePicker.SelectedDate = new DateTime(dt.Year, dt.Month % 10 + number, dt.Day);
                         }
                         catch (ArgumentOutOfRangeException) {
                             dateTimePicker.SelectedDate = new DateTime(dt.Year, number, dt.Day);
@@ -355,7 +393,7 @@ namespace HouseholdAccountBook.UserControls
                         break;
                     case Kind.Day:
                         try {
-                            dateTimePicker.SelectedDate = new DateTime(dt.Year, dt.Month, dt.Day * 10 + number);
+                            dateTimePicker.SelectedDate = new DateTime(dt.Year, dt.Month, dt.Day % 10 + number);
                         }
                         catch (ArgumentOutOfRangeException) {
                             dateTimePicker.SelectedDate = new DateTime(dt.Year, dt.Month, number);
@@ -385,7 +423,7 @@ namespace HouseholdAccountBook.UserControls
              * its text will be the result of its internal date parsing until its TextBox is focused and another
              * date is selected. A workaround is to set this string when it is opened. */
             
-            var dateTimePicker = (DateTimePicker)sender;
+            var dateTimePicker = sender as DateTimePicker;
             var textBox = GetTemplateTextBox(dateTimePicker);
             var formatStr = dateTimePicker.DateFormat;
             selectedPositionBeforeCalendarOpened = textBox.SelectionStart;

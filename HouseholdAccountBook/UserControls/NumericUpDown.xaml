@@ -44,6 +44,7 @@
                      UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" 
                      TextAlignment="Right" InputMethod.IsInputMethodEnabled="False"
                      PreviewTextInput="TextBox_PreviewTextInput" PreviewKeyDown="TextBox_PreviewKeyDown"
+                     MouseWheel="TextBox_MouseWheel"
                      GotFocus="TextBox_GotFocus"/>
             <Popup x:Name="_popup"
                 StaysOpen="{Binding IsKeyboardFocused, ElementName=_textBox}" PlacementTarget="{Binding ElementName=_textBox}">

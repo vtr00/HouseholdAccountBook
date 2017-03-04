@@ -116,12 +116,15 @@ namespace HouseholdAccountBook.Dao
         /// </summary>
         public class Record
         {
+            /// <summary>
+            /// レコード
+            /// </summary>
             private Dictionary<String, Object> _record;
 
             /// <summary>
             /// コンストラクタ
             /// </summary>
-            /// <param name="record"></param>
+            /// <param name="record">レコード</param>
             public Record(Dictionary<String, Object> record)
             {
                 this._record = record;
@@ -130,9 +133,9 @@ namespace HouseholdAccountBook.Dao
             /// <summary>
             /// string型で取得する
             /// </summary>
-            /// <param name="key"></param>
+            /// <param name="key">カラム名</param>
             /// <returns></returns>
-            public String this[String key]
+            public string this[String key]
             {
                 get {
                     key = key.ToLower();
@@ -148,7 +151,7 @@ namespace HouseholdAccountBook.Dao
             /// <summary>
             /// Int型で取得する
             /// </summary>
-            /// <param name="key"></param>
+            /// <param name="key">カラム名</param>
             /// <returns></returns>
             public int ToInt(String key)
             {
@@ -165,7 +168,7 @@ namespace HouseholdAccountBook.Dao
             /// <summary>
             /// Int?型で取得する
             /// </summary>
-            /// <param name="key"></param>
+            /// <param name="key">カラム名</param>
             /// <returns></returns>
             public int? ToNullableInt(String key)
             {
@@ -182,7 +185,7 @@ namespace HouseholdAccountBook.Dao
             /// <summary>
             /// bool型で取得する
             /// </summary>
-            /// <param name="key"></param>
+            /// <param name="key">カラム名</param>
             /// <returns></returns>
             public bool ToBoolean(String key)
             {

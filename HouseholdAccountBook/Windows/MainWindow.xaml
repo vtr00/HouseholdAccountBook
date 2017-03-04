@@ -312,7 +312,7 @@
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
                             <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0" 
-                                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="BookName" 
+                                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
                                           SelectionChanged="BookComboBox_SelectionChanged"/>
                         </StackPanel>
                     </Grid>

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HouseholdAccountBook.Windows"
         mc:Ignorable="d"
-        Title="OnBackUpWindow" Height="150" Width="300"
+        Title="OnBackUpWindow" Height="75" Width="150" Opacity="0.5"
         WindowStyle="None" AllowsTransparency="True" ShowInTaskbar="False">
     <Grid>
         <Grid.RowDefinitions>
