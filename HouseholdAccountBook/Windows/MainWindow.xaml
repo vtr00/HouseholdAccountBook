@@ -147,16 +147,16 @@
         <CommandBinding Command="{StaticResource GoToNextYearCommand}" CanExecute="GoToNextYearCommand_CanExecute" Executed="GoToNextYearCommand_Executed"/>
         
         <!-- 設定操作コマンド -->
-        <CommandBinding Command="{StaticResource AddCategoryCommand}"/>
-        <CommandBinding Command="{StaticResource AddItemCommand}"/>
-        <CommandBinding Command="{StaticResource DeleteItemCommand}"/>
-        <CommandBinding Command="{StaticResource RaiseItemSortOrderCommand}"/>
-        <CommandBinding Command="{StaticResource DropItemSortOrderCommand}"/>
+        <CommandBinding Command="{StaticResource AddCategoryCommand}" CanExecute="AddCategoryCommand_CanExecute" Executed="AddCategoryCommand_Executed"/>
+        <CommandBinding Command="{StaticResource AddItemCommand}" CanExecute="AddItemCommand_CanExecute" Executed="AddItemCommand_Executed"/>
+        <CommandBinding Command="{StaticResource DeleteItemCommand}" CanExecute="DeleteItemCommand_CanExecute" Executed="DeleteItemCommand_Executed"/>
+        <CommandBinding Command="{StaticResource RaiseItemSortOrderCommand}" CanExecute="RaiseItemSortOrderCommand_CanExecute" Executed="RaiseItemSortOrderCommand_Executed"/>
+        <CommandBinding Command="{StaticResource DropItemSortOrderCommand}" CanExecute="DropItemSortOrderCommand_CanExecuted" Executed="DropItemSortOrderCommand_Executed"/>
 
-        <CommandBinding Command="{StaticResource AddBookCommand}"/>
-        <CommandBinding Command="{StaticResource DeleteBookCommand}"/>
-        <CommandBinding Command="{StaticResource RaiseBookSortOrderCommand}"/>
-        <CommandBinding Command="{StaticResource DropBookSortOrderCommand}"/>
+        <CommandBinding Command="{StaticResource AddBookCommand}" Executed="AddBookCommand_Executed"/>
+        <CommandBinding Command="{StaticResource DeleteBookCommand}" CanExecute="DeleteBookCommand_CanExecute" Executed="DeleteBookCommand_Executed"/>
+        <CommandBinding Command="{StaticResource RaiseBookSortOrderCommand}" CanExecute="RaiseBookSortOrderCommand_CanExecute" Executed="RaiseBookSortOrderCommand_Executed"/>
+        <CommandBinding Command="{StaticResource DropBookSortOrderCommand}" CanExecute="DropBookSortOrderCommand_CanExecute" Executed="DropBookSortOrderCommand_Executed"/>
     </Window.CommandBindings>
     
     <Window.DataContext>

@@ -886,6 +886,214 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor = cCursor;
         }
         #endregion
+
+        #region 設定の操作
+        /// <summary>
+        /// カテゴリを追加可能か判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddCategoryCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Item;
+        }
+
+        /// <summary>
+        /// カテゴリを追加する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddCategoryCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 項目を追加可能か判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Balance;
+        }
+
+        /// <summary>
+        /// 項目を追加する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 分類/項目を削除可能か判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Balance;
+        }
+
+        /// <summary>
+        /// 分類/項目を削除する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 分類/項目の表示順を上げれるか判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RaiseItemSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.ParentVM != null;
+            if (e.CanExecute) {
+                // 同じ階層で、よりソート順序が上の分類/項目がある場合trueになる
+                var parentVM = this.SettingsVM.SelectedItemVM.ParentVM;
+                int index = parentVM.ChildrenVMList.IndexOf(this.SettingsVM.SelectedItemVM);
+                e.CanExecute = 0 < index;
+
+                // 選択された対象が項目で分類内の最も上位にいる場合
+                if (!e.CanExecute && parentVM.ParentVM != null) {
+                    // 項目の属する分類について、同じ階層内によりソート順序が上の分類がある場合trueになる
+                    var grandparentVM = parentVM.ParentVM;
+                    int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
+                    e.CanExecute = 0 < index2;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 分類/項目の表示順を上げる
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RaiseItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 分類/項目の表示順を下げれるか判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DropItemSortOrderCommand_CanExecuted(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.ParentVM != null;
+            if (e.CanExecute) {
+                // 同じ階層で、よりソート順序が下の分類/項目がある場合trueになる
+                var parentVM = this.SettingsVM.SelectedItemVM.ParentVM;
+                int index = parentVM.ChildrenVMList.IndexOf(this.SettingsVM.SelectedItemVM);
+                e.CanExecute = parentVM.ChildrenVMList.Count - 1 > index;
+
+                // 選択された対象が項目で分類内の最も上位にいる場合
+                if (!e.CanExecute && parentVM.ParentVM != null) {
+                    // 項目の属する分類について、同じ階層内によりソート順序が下の分類がある場合trueになる
+                    var grandparentVM = parentVM.ParentVM;
+                    int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
+                    e.CanExecute = grandparentVM.ChildrenVMList.Count - 1 > index2;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 分類/項目の表示順を下げる
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DropItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 帳簿を追加する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 帳簿を削除可能か判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedBookVM != null;
+        }
+
+        /// <summary>
+        /// 帳簿を削除する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 帳簿の表示順を上げれるか判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RaiseBookSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.BookVMList != null;
+            if (e.CanExecute) {
+                int index = this.SettingsVM.BookVMList.IndexOf(this.SettingsVM.SelectedBookVM);
+                e.CanExecute = index > 0;
+            }
+        }
+
+        /// <summary>
+        /// 帳簿の表示順を上げる
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RaiseBookSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 帳簿の表示順を下げれるか判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DropBookSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.BookVMList != null;
+            if (e.CanExecute) {
+                int index = this.SettingsVM.BookVMList.IndexOf(this.SettingsVM.SelectedBookVM);
+                e.CanExecute = index != -1 && index < this.SettingsVM.BookVMList.Count - 1;
+            }
+        }
+
+        /// <summary>
+        /// 帳簿の表示順を下げる
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DropBookSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+        #endregion
         #endregion
 
         #region イベントハンドラ
