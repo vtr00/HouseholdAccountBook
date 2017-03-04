@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.ConstValue
         /// タブ
         /// </summary>
         /// <remarks>数字はタブのインデックスと対応付けること</remarks>
-        public enum Tab
+        public enum Tab 
         {
             /// <summary>
             /// 帳簿タブ
@@ -41,9 +41,43 @@ namespace HouseholdAccountBook.ConstValue
         }
 
         /// <summary>
+        /// 帳簿種別
+        /// </summary>
+        public enum BookKind 
+        {
+            /// <summary>
+            /// 未分類
+            /// </summary>
+            Uncategorized = 0,
+            /// <summary>
+            /// 財布
+            /// </summary>
+            Wallet = 1,
+            /// <summary>
+            /// 銀行口座
+            /// </summary>
+            BankAccount = 2,
+            /// <summary>
+            /// クレジットカード
+            /// </summary>
+            CreditCard = 3,
+            /// <summary>
+            /// 株式
+            /// </summary>
+            Stock = 4
+        }
+        /// <summary>
+        /// 帳簿種別文字列
+        /// </summary>
+        public static Dictionary<BookKind, string> BookKindStr = new Dictionary<BookKind, string>() {
+            { BookKind.Uncategorized, "未分類" }, { BookKind.Wallet, "財布" }, { BookKind.BankAccount, "銀行口座" },
+            { BookKind.CreditCard, "クレジットカード" }, {BookKind.Stock, "株式" }
+        };
+
+        /// <summary>
         /// 収支種別
         /// </summary>
-        public enum BalanceKind
+        public enum BalanceKind 
         {
             /// <summary>
             /// 収入
@@ -68,7 +102,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// グループ種別
         /// </summary>
-        public enum GroupKind
+        public enum GroupKind 
         {
             /// <summary>
             /// 移動
@@ -83,7 +117,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 手数料種別
         /// </summary>
-        public enum CommissionKind
+        public enum CommissionKind 
         {
             /// <summary>
             /// 支払元負担
@@ -104,7 +138,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// メッセージタイトルテキスト
         /// </summary>
-        public static class MessageTitle
+        public static class MessageTitle 
         {
             /// <summary>
             /// 情報
@@ -123,7 +157,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// メッセージテキスト
         /// </summary>
-        public static class Message
+        public static class Message 
         {
             /// <summary>
             /// 接続に失敗しました。

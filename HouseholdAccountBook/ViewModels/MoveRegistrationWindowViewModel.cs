@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.ViewModels
@@ -44,6 +45,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (_SelectedDate != value) {
                     _SelectedDate = value;
                     PropertyChanged?.Raise(this, _nameSelectedDate);
+                    CommandManager.InvalidateRequerySuggested();
                 }
             }
         }
@@ -126,6 +128,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (_Value != value) {
                     _Value = value;
                     PropertyChanged?.Raise(this, _nameValue);
+                    CommandManager.InvalidateRequerySuggested();
                 }
             }
         }
@@ -229,6 +232,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (_Commission != value) {
                     _Commission = value;
                     PropertyChanged?.Raise(this, _nameCommission);
+                    CommandManager.InvalidateRequerySuggested();
                 }
             }
         }

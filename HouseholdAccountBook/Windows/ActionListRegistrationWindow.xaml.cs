@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.ViewModels.ActionListRegistrationWindowViewModel;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -43,7 +44,7 @@ namespace HouseholdAccountBook.Windows
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
             BookViewModel selectedBookVM = null;
             using (DaoBase dao = builder.Build()) {
-                DaoReader reader = dao.ExecQuery("SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
+                DaoReader reader = dao.ExecQuery(@"SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
                 reader.ExecWholeRow((count, record) => {
                     BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                     bookVMList.Add(vm);
@@ -98,6 +99,10 @@ namespace HouseholdAccountBook.Windows
         private void RegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = this.ActionListRegistrationWindowVM.DateValueVMList.Count >= 1;
+            foreach (DateValueViewModel vm in this.ActionListRegistrationWindowVM.DateValueVMList) {
+                if(!e.CanExecute) { break; }
+                e.CanExecute &= vm.ActValue.HasValue;
+            }
         }
 
         /// <summary>

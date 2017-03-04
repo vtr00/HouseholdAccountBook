@@ -98,7 +98,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 階層種別
         /// </summary>
-        public enum HierarchicalKind
+        public enum HierarchicalKind 
         {
             /// <summary>
             /// 帳簿
@@ -193,6 +193,24 @@ namespace HouseholdAccountBook.ViewModels
             #endregion
 
             /// <summary>
+            /// 変更があったか
+            /// </summary>
+            #region IsChanged
+            public bool IsChanged
+            {
+                get { return _IsChanged; }
+                set {
+                    if (_IsChanged != value) {
+                        _IsChanged = value;
+                        PropertyChanged.Raise(this, _nameIsChanged);
+                    }
+                }
+            }
+            private bool _IsChanged = default(bool);
+            internal static readonly string _nameIsChanged = PropertyName<HierarchicalItemViewModel>.Get(x => x.IsChanged);
+            #endregion
+
+            /// <summary>
             /// プロパティ変更イベントハンドラ
             /// </summary>
             public event PropertyChangedEventHandler PropertyChanged;
@@ -279,7 +297,25 @@ namespace HouseholdAccountBook.ViewModels
             private ObservableCollection<RelationViewModel> _RelationVMList = default(ObservableCollection<RelationViewModel>);
             internal static readonly string _nameRelationVMList = PropertyName<BookSettingViewModel>.Get(x => x.RelationVMList);
             #endregion
-            
+
+            /// <summary>
+            /// 変更があったか
+            /// </summary>
+            #region IsChanged
+            public bool IsChanged
+            {
+                get { return _IsChanged; }
+                set {
+                    if (_IsChanged != value) {
+                        _IsChanged = value;
+                        PropertyChanged.Raise(this, _nameIsChanged);
+                    }
+                }
+            }
+            private bool _IsChanged = default(bool);
+            internal static readonly string _nameIsChanged = PropertyName<BookSettingViewModel>.Get(x => x.IsChanged);
+            #endregion
+
             /// <summary>
             /// プロパティ変更イベントハンドラ
             /// </summary>
@@ -318,6 +354,24 @@ namespace HouseholdAccountBook.ViewModels
             /// 表示名
             /// </summary>
             public string Name { get; set; }
+
+            /// <summary>
+            /// 変更があったか
+            /// </summary>
+            #region IsChanged
+            public bool IsChanged
+            {
+                get { return _IsChanged; }
+                set {
+                    if (_IsChanged != value) {
+                        _IsChanged = value;
+                        PropertyChanged.Raise(this, _nameIsChanged);
+                    }
+                }
+            }
+            private bool _IsChanged = default(bool);
+            internal static readonly string _nameIsChanged = PropertyName<RelationViewModel>.Get(x => x.IsChanged);
+            #endregion
             
             /// <summary>
             /// プロパティ変更イベントハンドラ

@@ -14,6 +14,8 @@
         KeyDown="ActionRegistrationWindow_KeyDown">
 
     <Window.Resources>
+        <RoutedCommand x:Key="TodayCommand"/>
+
         <!-- 登録コマンド -->
         <RoutedCommand x:Key="ContinueToRegisterCommand"/>
         <RoutedCommand x:Key="RegisterCommand"/>
@@ -27,10 +29,15 @@
     </Window.Resources>
 
     <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource TodayCommand}"
+                        CanExecute="TodayCommand_CanExecute"
+                        Executed="TodayCommand_Executed"/>
         <CommandBinding Command="{StaticResource ContinueToRegisterCommand}" 
-                        CanExecute="ContinueToRegisterCommand_CanExecute" Executed="ContinueToRegisterCommand_Executed"/>
+                        CanExecute="ContinueToRegisterCommand_CanExecute" 
+                        Executed="ContinueToRegisterCommand_Executed"/>
         <CommandBinding Command="{StaticResource RegisterCommand}" 
-                        CanExecute="RegisterCommand_CanExecute" Executed="RegisterCommand_Executed"/>
+                        CanExecute="RegisterCommand_CanExecute" 
+                        Executed="RegisterCommand_Executed"/>
         <CommandBinding Command="{StaticResource CancelCommand}" 
                         Executed="CancelCommand_Executed"/>
     </Window.CommandBindings>
@@ -58,52 +65,46 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.25*"/>
-                <ColumnDefinition Width="0.75*"/>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="0.25*"/>
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                        Text="帳簿" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
+            <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" Grid.ColumnSpan="3"
                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
             <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                        Text="日付" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <controls:DateTimePicker Grid.Row="1" Grid.Column="1" Margin="5" 
+            <controls:DateTimePicker Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
                          DateFormat="yyyy/MM/dd" SelectedDate="{Binding SelectedDate}"/>
+            <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="今日" Command="{StaticResource TodayCommand}"/>
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                        Text="収支" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" 
+            <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="3"
                       ItemsSource="{Binding BalanceKindVMList}" SelectedItem="{Binding SelectedBalanceKindVM}" DisplayMemberPath="BalanceKindName"/>
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                        Text="分類" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ListBox Grid.Row="3" Grid.Column="1" Margin="5" 
+            <ListBox Grid.Row="3" Grid.Column="1" Margin="5" Grid.ColumnSpan="3"
                      ItemsSource="{Binding CategoryVMList}" SelectedItem="{Binding SelectedCategoryVM}" DisplayMemberPath="Name"/>
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                        Text="項目" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ListBox Grid.Row="4" Grid.Column="1" Margin="5" 
+            <ListBox Grid.Row="4" Grid.Column="1" Margin="5" Grid.ColumnSpan="3"
                      ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="Name"/>
-            <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.25*"/>
-                    <ColumnDefinition Width="0.25*"/>
-                    <ColumnDefinition Width="0.25*"/>
-                    <ColumnDefinition Width="0.25*"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
+            <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
                            Text="金額" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding Value, Mode=TwoWay}" MinValue="1"/>
-                <TextBlock Grid.Row="0" Grid.Column="2" Margin="5" 
+            <controls:NumericUpDown Grid.Row="5" Grid.Column="1" Margin="5" Value="{Binding Value, Mode=TwoWay}" MinValue="1"/>
+            <TextBlock Grid.Row="5" Grid.Column="2" Margin="5" 
                            Text="回数" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <controls:NumericUpDown Grid.Row="0" Grid.Column="3" Margin="5" 
+            <controls:NumericUpDown Grid.Row="5" Grid.Column="3" Margin="5" 
                                         Value="{Binding Count, Mode=TwoWay}" MinValue="1"/>
-            </Grid>
-            <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" 
+            <TextBlock Grid.Row="6" Grid.Column="0" Margin="5"
                        Text="店舗" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="6" Grid.Column="1" Margin="5" IsEditable="True"
+            <ComboBox Grid.Row="6" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="3"
                       ItemsSource="{Binding ShopNameList}" Text="{Binding SelectedShopName, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="5"
                        Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="7" Grid.Column="1" Margin="5" IsEditable="True"
+            <ComboBox Grid.Row="7" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="3"
                       ItemsSource="{Binding RemarkList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
 

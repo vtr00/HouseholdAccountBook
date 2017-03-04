@@ -222,6 +222,26 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
 
         #region コマンド
         /// <summary>
+        /// 今日コマンド判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TodayCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.MoveRegistrationWindowVM.SelectedDate != DateTime.Today;
+        }
+
+        /// <summary>
+        /// 今日コマンド
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TodayCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.MoveRegistrationWindowVM.SelectedDate = DateTime.Today;
+        }
+
+        /// <summary>
         /// 登録コマンド判定
         /// </summary>
         /// <param name="sender"></param>

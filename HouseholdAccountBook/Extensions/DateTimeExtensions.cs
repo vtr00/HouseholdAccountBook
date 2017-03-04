@@ -3,7 +3,7 @@
 namespace HouseholdAccountBook.Extentions
 {
     /// <summary>
-    /// DateTime拡張
+    /// <see cref="DateTime"/> 拡張
     /// </summary>
     public static partial class DateTimeExtensions
     {
@@ -32,9 +32,9 @@ namespace HouseholdAccountBook.Extentions
         /// <summary>
         /// 会計年度初めを取得する
         /// </summary>
-        /// <param name="dateTime"></param>
-        /// <param name="yearsFirstMonth"></param>
-        /// <returns></returns>
+        /// <param name="dateTime">対象の日付</param>
+        /// <param name="yearsFirstMonth">初め月</param>
+        /// <returns>会計年度初め</returns>
         public static DateTime FirstDateOfFiscalYear(this DateTime dateTime, int firstMonthOfFiscalYear)
         {
             DateTime ans = dateTime.AddMonths(-(firstMonthOfFiscalYear - 1));

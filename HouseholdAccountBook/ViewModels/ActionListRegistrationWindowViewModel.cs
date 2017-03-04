@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.ViewModels
@@ -293,5 +294,41 @@ namespace HouseholdAccountBook.ViewModels
         /// プロパティ変更イベントハンドラ
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
+
+        #region 内部クラス定義
+        /// <summary>
+        /// 日付金額VM
+        /// </summary>
+        public class DateValueViewModel : INotifyPropertyChanged
+        {
+            /// <summary>
+            /// 日付
+            /// </summary>
+            public DateTime ActDate { get; set; } = DateTime.Now;
+            /// <summary>
+            /// 金額
+            /// </summary>
+            #region ActValue
+            public int? ActValue
+            {
+                get { return _ActValue; }
+                set {
+                    if (_ActValue != value) {
+                        _ActValue = value;
+                        PropertyChanged.Raise(this, _nameActValue);
+                        CommandManager.InvalidateRequerySuggested();
+                    }
+                }
+            }
+            private int? _ActValue = default(int?);
+            internal static readonly string _nameActValue = PropertyName<DateValueViewModel>.Get(x => x.ActValue);
+            #endregion
+
+            /// <summary>
+            /// プロパティ変更イベントハンドラ
+            /// </summary>
+            public event PropertyChangedEventHandler PropertyChanged;
+        }
+        #endregion
     }
 }

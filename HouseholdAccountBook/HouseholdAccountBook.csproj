@@ -127,7 +127,6 @@
     <Compile Include="ViewModels\BookViewModel.cs" />
     <Compile Include="ViewModels\CategoryViewModel.cs" />
     <Compile Include="ViewModels\CommissionKindViewModel.cs" />
-    <Compile Include="ViewModels\DateValueViewModel.cs" />
     <Compile Include="ViewModels\DbSettingWindowViewModel.cs" />
     <Compile Include="ViewModels\ItemViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
