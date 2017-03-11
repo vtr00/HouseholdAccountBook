@@ -365,7 +365,7 @@ VALUES (@{0}, @{1}, @{2}, 0, 'now', @{3}, 'now', @{4});", itemId, shopName, last
                             dao.ExecNonQuery(@"
 UPDATE hst_shop
 SET used_time = @{0}, del_flg = 0, update_time = 'now', updater = @{1}
-WHERE item_id = @{2} AND shop_name = @{3};", lastActTime, Updater, itemId, shopName);
+WHERE item_id = @{2} AND shop_name = @{3} AND used_time < @{0};", lastActTime, Updater, itemId, shopName);
                         }
                     });
                     #endregion
@@ -387,7 +387,7 @@ VALUES (@{0}, @{1}, 0, @{2}, 0, 'now', @{3}, 'now', @{4});", itemId, remark, las
                             dao.ExecNonQuery(@"
 UPDATE hst_remark
 SET used_time = @{0}, del_flg = 0, update_time = 'now', updater = @{1}
-WHERE item_id = @{2} AND remark = @{3};", lastActTime, Updater, itemId, remark);
+WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", lastActTime, Updater, itemId, remark);
                         }
                     });
                     #endregion

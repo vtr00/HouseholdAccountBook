@@ -12,6 +12,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 using static HouseholdAccountBook.ViewModels.SettingsViewModel;
 
@@ -596,7 +597,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
             int actionId = this.MainWindowVM.SelectedActionVM.ActionId;
             int? groupId = this.MainWindowVM.SelectedActionVM.GroupId;
 
-            if (MessageBox.Show("選択した項目を削除しますか？", this.Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+            if (MessageBox.Show(Message.DeleteNotification, this.Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
                 using (DaoBase dao = builder.Build()) {
                     dao.ExecTransaction(() => {
                         dao.ExecNonQuery(@"
@@ -1135,6 +1136,37 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         }
 
         /// <summary>
+        /// 選択中のタブを変更した時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (oldSelectedTab != this.MainWindowVM.SelectedTab) {
+                Cursor cCursor = Cursor;
+                Cursor = Cursors.Wait;
+
+                switch (this.MainWindowVM.SelectedTab) {
+                    case Tab.BookTab:
+                        UpdateBookData();
+                        break;
+                    case Tab.ListTab:
+                        UpdateYearsListData();
+                        break;
+                    case Tab.GraphTab:
+                        UpdateGraphData();
+                        break;
+                    case Tab.SettingTab:
+                        UpdateSettingData();
+                        break;
+                }
+                Cursor = cCursor;
+            }
+            oldSelectedTab = this.MainWindowVM.SelectedTab;
+        }
+
+        #region 帳簿項目操作
+        /// <summary>
         /// 帳簿項目をダブルクリックした時
         /// </summary>
         /// <param name="sender"></param>
@@ -1179,37 +1211,9 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                     break;
             }
         }
+        #endregion
 
-        /// <summary>
-        /// 選択中のタブを変更した時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (oldSelectedTab != this.MainWindowVM.SelectedTab) {
-                Cursor cCursor = Cursor;
-                Cursor = Cursors.Wait;
-
-                switch (this.MainWindowVM.SelectedTab) {
-                    case Tab.BookTab:
-                        UpdateBookData();
-                        break;
-                    case Tab.ListTab:
-                        UpdateYearsListData();
-                        break;
-                    case Tab.GraphTab:
-                        UpdateGraphData();
-                        break;
-                    case Tab.SettingTab:
-                        UpdateSettingData();
-                        break;
-                }
-                Cursor = cCursor;
-            }
-            oldSelectedTab = this.MainWindowVM.SelectedTab;
-        }
-
+        #region 設定操作
         /// <summary>
         /// 項目設定で一覧の選択を変更した時
         /// </summary>
@@ -1220,6 +1224,83 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             TreeView treeView = sender as TreeView;
             SettingsVM.SelectedItemVM = treeView.SelectedItem as HierarchicalItemViewModel;
         }
+
+        /// <summary>
+        /// 項目設定の店舗名リストでキー入力した時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShopNameListBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key) {
+                case Key.Delete: {
+                        if(MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+                            Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                            using(DaoBase dao = builder.Build()) {
+                                dao.ExecQuery(@"
+UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
+WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedShopName, this.SettingsVM.SelectedItemVM.Id);
+                            }
+
+                            using (DaoBase dao = builder.Build()) {
+                                DaoReader reader = dao.ExecQuery(@"
+SELECT shop_name
+FROM hst_shop
+WHERE del_flg = 0 AND item_id = @{0}
+ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
+
+                                this.SettingsVM.SelectedItemVM.ShopNameList.Clear();
+                                reader.ExecWholeRow((count2, record2) => {
+                                    string shopName = record2["shop_name"];
+
+                                    this.SettingsVM.SelectedItemVM.ShopNameList.Add(shopName);
+                                });
+                            }
+                        }
+                        e.Handled = true;
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 項目設定の備考リストでキー入力した時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RemarkListBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key) {
+                case Key.Delete: {
+                        if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+                            Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                            using (DaoBase dao = builder.Build()) {
+                                dao.ExecQuery(@"
+UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
+WHERE remark = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedRemark, this.SettingsVM.SelectedItemVM.Id);
+                            }
+                        }
+
+                        using (DaoBase dao = builder.Build()) {
+                            DaoReader reader = dao.ExecQuery(@"
+SELECT remark
+FROM hst_remark
+WHERE del_flg = 0 AND item_id = @{0}
+ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
+
+                            this.SettingsVM.SelectedItemVM.RemarkList.Clear();
+                            reader.ExecWholeRow((count2, record2) => {
+                                string remark = record2["remark"];
+
+                                this.SettingsVM.SelectedItemVM.RemarkList.Add(remark);
+                            });
+                        }
+                        e.Handled = true;
+                    }
+                    break;
+            }
+        }
+        #endregion
         #endregion
 
         #region 画面更新用の関数
@@ -1269,6 +1350,23 @@ ORDER BY sort_order;");
 
                 IEnumerable<ActionViewModel> query = this.MainWindowVM.ActionVMList.Where((avm) => { return avm.ActionId == actionId; });
                 this.MainWindowVM.SelectedActionVM = query.Count() == 0 ? null : query.First();
+
+                if (this.actionDataGrid.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.actionDataGrid) > 0) {
+                    var border = VisualTreeHelper.GetChild(this.actionDataGrid, 0) as Decorator;
+                    if (border != null) {
+                        var scroll = border.Child as ScrollViewer;
+                        if (scroll != null) {
+                            if (this.MainWindowVM.DisplayedMonth.FirstDateOfMonth() < DateTime.Today && DateTime.Today < this.MainWindowVM.DisplayedMonth.FirstDateOfMonth().AddMonths(1).AddMilliseconds(-1)) {
+                                // 今月の場合は、末尾が表示されるようにする
+                                scroll.ScrollToBottom();
+                            }
+                            else {
+                                // 今月でない場合は、先頭が表示されるようにする
+                                scroll.ScrollToTop();
+                            }
+                        }
+                    }
+                }
             }
         }
         
@@ -1493,10 +1591,11 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                 int startMonth = Properties.Settings.Default.App_StartMonth;
 
                 // 表示する月の文字列を作成する
-                this.MainWindowVM.DisplayedMonths = new ObservableCollection<string>();
+                ObservableCollection<string> displayedMonths = new ObservableCollection<string>();
                 for (int i = startMonth; i < startMonth + 12; ++i) {
-                    this.MainWindowVM.DisplayedMonths.Add(string.Format("{0}月", (i - 1) % 12 + 1));
+                    displayedMonths.Add(string.Format("{0}月", (i - 1) % 12 + 1));
                 }
+                this.MainWindowVM.DisplayedMonths = displayedMonths;
                 this.MainWindowVM.SummaryWithinYearVMList = LoadSummaryWithinYearViewModelList(this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.DisplayedYear);
             }
         }
@@ -1758,7 +1857,9 @@ ORDER BY sort_order;", childVM.Id);
                                 Id = itemId,
                                 Name = itemName,
                                 ParentVM = childVM,
-                                RelationVMList = new ObservableCollection<RelationViewModel>()
+                                RelationVMList = new ObservableCollection<RelationViewModel>(),
+                                ShopNameList = new ObservableCollection<string>(),
+                                RemarkList = new ObservableCollection<string>()
                             });
                         });
 
@@ -1779,6 +1880,30 @@ ORDER BY B.sort_order;", vm2.Id);
                                     Name = bookName,
                                     IsRelated = isRelated
                                 });
+                            });
+
+                            reader = dao.ExecQuery(@"
+SELECT shop_name
+FROM hst_shop
+WHERE del_flg = 0 AND item_id = @{0}
+ORDER BY used_time;", vm2.Id);
+
+                            reader.ExecWholeRow((count2, record2) => {
+                                string shopName = record2["shop_name"];
+
+                                vm2.ShopNameList.Add(shopName);
+                            });
+
+                            reader = dao.ExecQuery(@"
+SELECT remark
+FROM hst_remark
+WHERE del_flg = 0 AND item_id = @{0}
+ORDER BY used_time;", vm2.Id);
+
+                            reader.ExecWholeRow((count2, record2) => {
+                                string remark = record2["remark"];
+
+                                vm2.RemarkList.Add(remark);
                             });
                         }
                     }

@@ -56,9 +56,6 @@
         <RoutedCommand x:Key="RaiseBookSortOrderCommand"/>
         <RoutedCommand x:Key="DropBookSortOrderCommand"/>
 
-        <RoutedCommand x:Key="RegisterSettingCommand"/>
-        <RoutedCommand x:Key="CancelSettingCommand"/>
-
         <!-- コンバータ -->
         <converter:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
         <converter:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
@@ -448,8 +445,12 @@
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="1.0*"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="1.0*"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="1.0*"/>
                                         </Grid.RowDefinitions>
-                                        <TextBlock Grid.Row="0" Text="関連付け："/>
+                                        <TextBlock Grid.Row="0" Text="関連付け"/>
                                         <ListBox Grid.Row="1" ItemsSource="{Binding SelectedItemVM.RelationVMList}">
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate>
@@ -457,6 +458,12 @@
                                                 </DataTemplate>
                                             </ListBox.ItemTemplate>
                                         </ListBox>
+                                        <TextBlock Grid.Row="2" Text="店舗"/>
+                                        <ListBox Grid.Row="3" ItemsSource="{Binding SelectedItemVM.ShopNameList}" SelectedItem="{Binding SelectedItemVM.SelectedShopName}"
+                                             KeyDown="ShopNameListBox_KeyDown"/>
+                                        <TextBlock Grid.Row="4" Text="備考"/>
+                                        <ListBox Grid.Row="5" ItemsSource="{Binding SelectedItemVM.RemarkList}" SelectedItem="{Binding SelectedItemVM.SelectedRemark}"
+                                             KeyDown="RemarkListBox_KeyDown"/>
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -512,24 +519,48 @@
                                 </Grid>
                             </Grid>
                         </TabItem>
-                        <TabItem Header="その他">
-                            <Grid>
-                                <Grid.RowDefinitions>
+                        <TabItem Header="店舗備考設定">
+                            <ScrollViewer>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="0.5*"/>
+                                        <RowDefinition Height="0.5*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.3*"/>
+                                        <ColumnDefinition Width="0.6*"/>
+                                    </Grid.ColumnDefinitions>
+
                                     
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="0.3*"/>
-                                    <ColumnDefinition Width="0.6*"/>
-                                </Grid.ColumnDefinitions>
-                                
-                                
-                            </Grid>
+                                </Grid>
+                            </ScrollViewer>
+                        </TabItem>
+                        <TabItem Header="その他">
+                            <ScrollViewer>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.3*"/>
+                                        <ColumnDefinition Width="0.6*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    
+                                </Grid>
+                            </ScrollViewer>
                         </TabItem>
                     </TabControl>
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-                        <Button Content="OK" Width="100" Command="{StaticResource RegisterSettingCommand}"/>
-                        <Button Content="キャンセル" Width="100" Command="{StaticResource CancelSettingCommand}"/>
-                    </StackPanel>
                 </Grid>
             </TabItem>
         </TabControl>

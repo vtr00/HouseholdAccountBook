@@ -84,7 +84,7 @@ namespace HouseholdAccountBook.ViewModels
         internal static readonly string _nameSelectedBookVM = PropertyName<SettingsViewModel>.Get(x => x.SelectedBookVM);
         #endregion
         #endregion
-
+        
         #region その他
 
         #endregion
@@ -190,6 +190,76 @@ namespace HouseholdAccountBook.ViewModels
             }
             private ObservableCollection<RelationViewModel> _RelationVMList = default(ObservableCollection<RelationViewModel>);
             internal static readonly string _nameRelationVMList = PropertyName<HierarchicalItemViewModel>.Get(x => x.RelationVMList);
+            #endregion
+
+            /// <summary>
+            /// 店舗名リスト
+            /// </summary>
+            #region ShopNameList
+            public ObservableCollection<string> ShopNameList
+            {
+                get { return _ShopNameList; }
+                set {
+                    if (_ShopNameList != value) {
+                        _ShopNameList = value;
+                        PropertyChanged.Raise(this, _nameShopNameList);
+                    }
+                }
+            }
+            private ObservableCollection<string> _ShopNameList = default(ObservableCollection<string>);
+            internal static readonly string _nameShopNameList = PropertyName<HierarchicalItemViewModel>.Get(x => x.ShopNameList);
+            #endregion
+            /// <summary>
+            /// 選択された店舗名
+            /// </summary>
+            #region SelectedShopName
+            public string SelectedShopName
+            {
+                get { return _SelectedShopName; }
+                set {
+                    if (_SelectedShopName != value) {
+                        _SelectedShopName = value;
+                        PropertyChanged?.Raise(this, _nameSelectedShopName);
+                    }
+                }
+            }
+            private string _SelectedShopName = default(string);
+            internal static readonly string _nameSelectedShopName = PropertyName<HierarchicalItemViewModel>.Get(x => x.SelectedShopName);
+            #endregion
+
+            /// <summary>
+            /// 備考リスト
+            /// </summary>
+            #region RemarkList
+            public ObservableCollection<string> RemarkList
+            {
+                get { return _RemarkList; }
+                set {
+                    if (_RemarkList != value) {
+                        _RemarkList = value;
+                        PropertyChanged.Raise(this, _nameRemarkList);
+                    }
+                }
+            }
+            private ObservableCollection<string> _RemarkList = default(ObservableCollection<string>);
+            internal static readonly string _nameRemarkList = PropertyName<HierarchicalItemViewModel>.Get(x => x.RemarkList);
+            #endregion
+            /// <summary>
+            /// 選択された備考
+            /// </summary>
+            #region SelectedRemark
+            public string SelectedRemark
+            {
+                get { return _SelectedRemark; }
+                set {
+                    if (_SelectedRemark != value) {
+                        _SelectedRemark = value;
+                        PropertyChanged?.Raise(this, _nameSelectedRemark);
+                    }
+                }
+            }
+            private string _SelectedRemark = default(string);
+            internal static readonly string _nameSelectedRemark = PropertyName<HierarchicalItemViewModel>.Get(x => x.SelectedRemark);
             #endregion
 
             /// <summary>

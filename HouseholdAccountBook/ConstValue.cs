@@ -187,6 +187,10 @@ namespace HouseholdAccountBook.ConstValue
             /// エクスポートに失敗しました。
             /// </summary>
             public static string FoultToExport = "エクスポートに失敗しました。";
+            /// <summary>
+            /// 選択した項目を削除しますか？
+            /// </summary>
+            public static string DeleteNotification = "選択した項目を削除しますか？";
         }
     }
 }
