@@ -708,7 +708,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void IndicateSettingCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.MainWindowVM.SelectedTab != Tab.SettingTab && false;
+            e.CanExecute = this.MainWindowVM.SelectedTab != Tab.SettingTab;
         }
 
         /// <summary>
@@ -757,8 +757,9 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void GoToThisMonthCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択している
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BookTab;
+            DateTime thisMonth = DateTime.Today.GetFirstDateOfMonth();
+            // 帳簿タブを選択している かつ 今月が表示されていない
+            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BookTab && !(thisMonth <= this.MainWindowVM.DisplayedMonth && this.MainWindowVM.DisplayedYear < thisMonth.AddMonths(1));
         }
 
         /// <summary>
@@ -771,7 +772,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = Cursor;
             Cursor = Cursors.Wait;
 
-            this.MainWindowVM.DisplayedMonth = DateTime.Now.FirstDateOfMonth();
+            this.MainWindowVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
             UpdateBookData();
 
             Cursor = cCursor;
@@ -840,8 +841,9 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void GoToThisYearCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択している
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.ListTab;
+            DateTime thisYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
+            // 帳簿タブを選択している かつ 今年が表示されていない
+            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.ListTab && !(thisYear <= this.MainWindowVM.DisplayedYear && this.MainWindowVM.DisplayedYear < thisYear.AddYears(1));
         }
 
         /// <summary>
@@ -854,7 +856,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = Cursor;
             Cursor = Cursors.Wait;
 
-            this.MainWindowVM.DisplayedYear = DateTime.Now.FirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
+            this.MainWindowVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             UpdateYearsListData();
 
             Cursor = cCursor;
@@ -1223,6 +1225,21 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         {
             TreeView treeView = sender as TreeView;
             SettingsVM.SelectedItemVM = treeView.SelectedItem as HierarchicalItemViewModel;
+
+            if (this.shopNameListBox.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.shopNameListBox) > 0) {
+                if (VisualTreeHelper.GetChild(this.shopNameListBox, 0) is Decorator border) {
+                    if (border.Child is ScrollViewer scroll) {
+                        scroll.ScrollToTop();
+                    }
+                }
+            }
+            if (this.remarkListBox.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.remarkListBox) > 0) {
+                if (VisualTreeHelper.GetChild(this.remarkListBox, 0) is Decorator border) {
+                    if (border.Child is ScrollViewer scroll) {
+                        scroll.ScrollToTop();
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -1234,30 +1251,32 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         {
             switch (e.Key) {
                 case Key.Delete: {
-                        if(MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
-                            Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
-                            using(DaoBase dao = builder.Build()) {
-                                dao.ExecQuery(@"
+                        if (this.SettingsVM.SelectedItemVM?.SelectedShopName != null) {
+                            if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+                                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                                using (DaoBase dao = builder.Build()) {
+                                    dao.ExecQuery(@"
 UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedShopName, this.SettingsVM.SelectedItemVM.Id);
-                            }
+                                }
 
-                            using (DaoBase dao = builder.Build()) {
-                                DaoReader reader = dao.ExecQuery(@"
+                                using (DaoBase dao = builder.Build()) {
+                                    DaoReader reader = dao.ExecQuery(@"
 SELECT shop_name
 FROM hst_shop
 WHERE del_flg = 0 AND item_id = @{0}
 ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
 
-                                this.SettingsVM.SelectedItemVM.ShopNameList.Clear();
-                                reader.ExecWholeRow((count2, record2) => {
-                                    string shopName = record2["shop_name"];
+                                    this.SettingsVM.SelectedItemVM.ShopNameList.Clear();
+                                    reader.ExecWholeRow((count2, record2) => {
+                                        string shopName = record2["shop_name"];
 
-                                    this.SettingsVM.SelectedItemVM.ShopNameList.Add(shopName);
-                                });
+                                        this.SettingsVM.SelectedItemVM.ShopNameList.Add(shopName);
+                                    });
+                                }
                             }
+                            e.Handled = true;
                         }
-                        e.Handled = true;
                     }
                     break;
             }
@@ -1272,30 +1291,32 @@ ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
         {
             switch (e.Key) {
                 case Key.Delete: {
-                        if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
-                            Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
-                            using (DaoBase dao = builder.Build()) {
-                                dao.ExecQuery(@"
+                        if (this.SettingsVM.SelectedItemVM?.SelectedRemark != null) {
+                            if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+                                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                                using (DaoBase dao = builder.Build()) {
+                                    dao.ExecQuery(@"
 UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE remark = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedRemark, this.SettingsVM.SelectedItemVM.Id);
+                                }
                             }
-                        }
 
-                        using (DaoBase dao = builder.Build()) {
-                            DaoReader reader = dao.ExecQuery(@"
+                            using (DaoBase dao = builder.Build()) {
+                                DaoReader reader = dao.ExecQuery(@"
 SELECT remark
 FROM hst_remark
 WHERE del_flg = 0 AND item_id = @{0}
 ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
 
-                            this.SettingsVM.SelectedItemVM.RemarkList.Clear();
-                            reader.ExecWholeRow((count2, record2) => {
-                                string remark = record2["remark"];
+                                this.SettingsVM.SelectedItemVM.RemarkList.Clear();
+                                reader.ExecWholeRow((count2, record2) => {
+                                    string remark = record2["remark"];
 
-                                this.SettingsVM.SelectedItemVM.RemarkList.Add(remark);
-                            });
+                                    this.SettingsVM.SelectedItemVM.RemarkList.Add(remark);
+                                });
+                            }
+                            e.Handled = true;
                         }
-                        e.Handled = true;
                     }
                     break;
             }
@@ -1341,22 +1362,20 @@ ORDER BY sort_order;");
         {
             if (this.MainWindowVM.SelectedTab == Tab.BookTab) {
                 this.MainWindowVM.ActionVMList = LoadActionViewModelList(
-                    this.MainWindowVM.SelectedBookVM?.Id, this.MainWindowVM.DisplayedMonth.FirstDateOfMonth(),
-                    this.MainWindowVM.DisplayedMonth.FirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
+                    this.MainWindowVM.SelectedBookVM?.Id, this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth(),
+                    this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
 
                 this.MainWindowVM.SummaryVMList = LoadSummaryViewModelList(
-                    this.MainWindowVM.SelectedBookVM?.Id, this.MainWindowVM.DisplayedMonth.FirstDateOfMonth(),
-                    this.MainWindowVM.DisplayedMonth.FirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
+                    this.MainWindowVM.SelectedBookVM?.Id, this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth(),
+                    this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
 
                 IEnumerable<ActionViewModel> query = this.MainWindowVM.ActionVMList.Where((avm) => { return avm.ActionId == actionId; });
                 this.MainWindowVM.SelectedActionVM = query.Count() == 0 ? null : query.First();
 
                 if (this.actionDataGrid.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.actionDataGrid) > 0) {
-                    var border = VisualTreeHelper.GetChild(this.actionDataGrid, 0) as Decorator;
-                    if (border != null) {
-                        var scroll = border.Child as ScrollViewer;
-                        if (scroll != null) {
-                            if (this.MainWindowVM.DisplayedMonth.FirstDateOfMonth() < DateTime.Today && DateTime.Today < this.MainWindowVM.DisplayedMonth.FirstDateOfMonth().AddMonths(1).AddMilliseconds(-1)) {
+                    if (VisualTreeHelper.GetChild(this.actionDataGrid, 0) is Decorator border) {
+                        if (border.Child is ScrollViewer scroll) {
+                            if (this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth() < DateTime.Today && DateTime.Today < this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1)) {
                                 // 今月の場合は、末尾が表示されるようにする
                                 scroll.ScrollToBottom();
                             }
@@ -1736,63 +1755,6 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         }
 
         /// <summary>
-        /// 帳簿VM(設定用)リストを取得する
-        /// </summary>
-        /// <returns>帳簿VM(設定用)リスト</returns>
-        private ObservableCollection<BookSettingViewModel> LoadBookSettingViewModelList() {
-            ObservableCollection<BookSettingViewModel> vmList = new ObservableCollection<BookSettingViewModel>();
-
-            using(DaoBase dao = builder.Build()) {
-                // 帳簿一覧を取得する
-                DaoReader reader = dao.ExecQuery(@"
-SELECT book_id, book_name, pay_day, initial_value
-FROM mst_book
-WHERE del_flg = 0
-ORDER BY sort_order;");
-
-                reader.ExecWholeRow((count, record) => {
-                    int bookId = record.ToInt("book_id");
-                    string bookName = record["book_name"];
-                    int initialValue = record.ToInt("initial_value");
-                    int? payDay = record.ToNullableInt("pay_day");
-
-                    vmList.Add(new BookSettingViewModel() {
-                        Id = bookId,
-                        Name = bookName,
-                        InitialValue = initialValue,
-                        PayDay = payDay
-                    });
-                });
-
-                // 項目との関係の一覧を取得する(移動を除く)
-                foreach(BookSettingViewModel vm in vmList) {
-                    reader = dao.ExecQuery(@"
-SELECT I.item_id AS ItemId, I.item_name, C.category_name, RBI.item_id IS NULL AS IsNotRelated
-FROM mst_item I
-INNER JOIN (SELECT category_id, category_name FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
-LEFT JOIN (SELECT item_id FROM rel_book_item WHERE del_flg = 0 AND book_id = @{0}) RBI ON RBI.item_id = I.item_id
-WHERE del_flg = 0 AND move_flg = 0
-ORDER BY I.sort_order;", vm.Id);
-
-                    vm.RelationVMList = new ObservableCollection<RelationViewModel>();
-                    reader.ExecWholeRow((count, record) => {
-                        int itemId = record.ToInt("ItemId");
-                        string name = string.Format(@"{0} - {1}", record["category_name"], record["item_name"]);
-                        bool isRelated = !record.ToBoolean("IsNotRelated");
-
-                        vm.RelationVMList.Add(new RelationViewModel() {
-                            Id = itemId,
-                            Name = name,
-                            IsRelated = isRelated
-                        });
-                    });
-                }
-            }
-
-            return vmList;
-        }
-
-        /// <summary>
         /// 階層構造項目VMリストを取得する
         /// </summary>
         /// <returns>階層構造項目VMリスト</returns>
@@ -1882,11 +1844,12 @@ ORDER BY B.sort_order;", vm2.Id);
                                 });
                             });
 
+                            // 店舗名の一覧を取得する
                             reader = dao.ExecQuery(@"
 SELECT shop_name
 FROM hst_shop
 WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time;", vm2.Id);
+ORDER BY used_time DESC;", vm2.Id);
 
                             reader.ExecWholeRow((count2, record2) => {
                                 string shopName = record2["shop_name"];
@@ -1894,11 +1857,12 @@ ORDER BY used_time;", vm2.Id);
                                 vm2.ShopNameList.Add(shopName);
                             });
 
+                            // 備考の一覧を取得する
                             reader = dao.ExecQuery(@"
 SELECT remark
 FROM hst_remark
 WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time;", vm2.Id);
+ORDER BY used_time DESC;", vm2.Id);
 
                             reader.ExecWholeRow((count2, record2) => {
                                 string remark = record2["remark"];
@@ -1907,6 +1871,63 @@ ORDER BY used_time;", vm2.Id);
                             });
                         }
                     }
+                }
+            }
+
+            return vmList;
+        }
+
+        /// <summary>
+        /// 帳簿VM(設定用)リストを取得する
+        /// </summary>
+        /// <returns>帳簿VM(設定用)リスト</returns>
+        private ObservableCollection<BookSettingViewModel> LoadBookSettingViewModelList() {
+            ObservableCollection<BookSettingViewModel> vmList = new ObservableCollection<BookSettingViewModel>();
+
+            using(DaoBase dao = builder.Build()) {
+                // 帳簿一覧を取得する
+                DaoReader reader = dao.ExecQuery(@"
+SELECT book_id, book_name, pay_day, initial_value
+FROM mst_book
+WHERE del_flg = 0
+ORDER BY sort_order;");
+
+                reader.ExecWholeRow((count, record) => {
+                    int bookId = record.ToInt("book_id");
+                    string bookName = record["book_name"];
+                    int initialValue = record.ToInt("initial_value");
+                    int? payDay = record.ToNullableInt("pay_day");
+
+                    vmList.Add(new BookSettingViewModel() {
+                        Id = bookId,
+                        Name = bookName,
+                        InitialValue = initialValue,
+                        PayDay = payDay
+                    });
+                });
+
+                // 項目との関係の一覧を取得する(移動を除く)
+                foreach(BookSettingViewModel vm in vmList) {
+                    reader = dao.ExecQuery(@"
+SELECT I.item_id AS ItemId, I.item_name, C.category_name, RBI.item_id IS NULL AS IsNotRelated
+FROM mst_item I
+INNER JOIN (SELECT category_id, category_name FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
+LEFT JOIN (SELECT item_id FROM rel_book_item WHERE del_flg = 0 AND book_id = @{0}) RBI ON RBI.item_id = I.item_id
+WHERE del_flg = 0 AND move_flg = 0
+ORDER BY I.sort_order;", vm.Id);
+
+                    vm.RelationVMList = new ObservableCollection<RelationViewModel>();
+                    reader.ExecWholeRow((count, record) => {
+                        int itemId = record.ToInt("ItemId");
+                        string name = string.Format(@"{0} - {1}", record["category_name"], record["item_name"]);
+                        bool isRelated = !record.ToBoolean("IsNotRelated");
+
+                        vm.RelationVMList.Add(new RelationViewModel() {
+                            Id = itemId,
+                            Name = name,
+                            IsRelated = isRelated
+                        });
+                    });
                 }
             }
 

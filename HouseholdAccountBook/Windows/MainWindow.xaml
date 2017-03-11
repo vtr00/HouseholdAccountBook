@@ -459,10 +459,10 @@
                                             </ListBox.ItemTemplate>
                                         </ListBox>
                                         <TextBlock Grid.Row="2" Text="店舗"/>
-                                        <ListBox Grid.Row="3" ItemsSource="{Binding SelectedItemVM.ShopNameList}" SelectedItem="{Binding SelectedItemVM.SelectedShopName}"
+                                        <ListBox x:Name="shopNameListBox" Grid.Row="3" ItemsSource="{Binding SelectedItemVM.ShopNameList}" SelectedItem="{Binding SelectedItemVM.SelectedShopName}"
                                              KeyDown="ShopNameListBox_KeyDown"/>
                                         <TextBlock Grid.Row="4" Text="備考"/>
-                                        <ListBox Grid.Row="5" ItemsSource="{Binding SelectedItemVM.RemarkList}" SelectedItem="{Binding SelectedItemVM.SelectedRemark}"
+                                        <ListBox x:Name="remarkListBox" Grid.Row="5" ItemsSource="{Binding SelectedItemVM.RemarkList}" SelectedItem="{Binding SelectedItemVM.SelectedRemark}"
                                              KeyDown="RemarkListBox_KeyDown"/>
                                     </Grid>
                                 </Grid>
@@ -518,22 +518,6 @@
                                     </Grid>
                                 </Grid>
                             </Grid>
-                        </TabItem>
-                        <TabItem Header="店舗備考設定">
-                            <ScrollViewer>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="0.5*"/>
-                                        <RowDefinition Height="0.5*"/>
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="0.3*"/>
-                                        <ColumnDefinition Width="0.6*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    
-                                </Grid>
-                            </ScrollViewer>
                         </TabItem>
                         <TabItem Header="その他">
                             <ScrollViewer>

@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Extentions
         /// </summary>
         /// <param name="dateTime">対象の日付</param>
         /// <returns>月初め</returns>
-        public static DateTime FirstDateOfMonth (this DateTime dateTime)
+        public static DateTime GetFirstDateOfMonth (this DateTime dateTime)
         {
             DateTime ans = new DateTime(dateTime.Year, dateTime.Month, 1);
             return ans;
@@ -23,7 +23,7 @@ namespace HouseholdAccountBook.Extentions
         /// </summary>
         /// <param name="dateTime">対象の日付</param>
         /// <returns>年初め</returns>
-        public static DateTime FirstDateOfYear (this DateTime dateTime)
+        public static DateTime GetFirstDateOfYear (this DateTime dateTime)
         {
             DateTime ans = new DateTime(dateTime.Year, 1, 1);
             return ans;
@@ -35,7 +35,7 @@ namespace HouseholdAccountBook.Extentions
         /// <param name="dateTime">対象の日付</param>
         /// <param name="yearsFirstMonth">初め月</param>
         /// <returns>会計年度初め</returns>
-        public static DateTime FirstDateOfFiscalYear(this DateTime dateTime, int firstMonthOfFiscalYear)
+        public static DateTime GetFirstDateOfFiscalYear(this DateTime dateTime, int firstMonthOfFiscalYear)
         {
             DateTime ans = dateTime.AddMonths(-(firstMonthOfFiscalYear - 1));
             ans = new DateTime(ans.Year, firstMonthOfFiscalYear, 1);

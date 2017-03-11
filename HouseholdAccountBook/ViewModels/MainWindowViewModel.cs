@@ -106,7 +106,7 @@ namespace HouseholdAccountBook.ViewModels
                     if (!OnUpdateDisplayedDate) {
                         OnUpdateDisplayedDate = true;
                         // 表示月の年度の最初の月を表示年とする
-                        DisplayedYear = value.FirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
+                        DisplayedYear = value.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
                         OnUpdateDisplayedDate = false;
                     }
                 }
