@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Extentions;
+using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.ViewModels
@@ -9,7 +9,7 @@ namespace HouseholdAccountBook.ViewModels
     /// <summary>
     /// メインウィンドウVM
     /// </summary>
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : BindableBase
     {
         /// <summary>
         /// 表示日付の更新中か
@@ -24,16 +24,12 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return _SelectedTabIndex; }
             set {
-                if (_SelectedTabIndex != value) {
-                    _SelectedTabIndex = value;
-                    PropertyChanged?.Raise(this, _nameSelectedTabIndex);
-
+                if (SetProperty(ref _SelectedTabIndex, value)) {
                     SelectedTab = (Tab)value;
                 }
             }
         }
-        private int _SelectedTabIndex;
-        internal static readonly string _nameSelectedTabIndex = PropertyName<MainWindowViewModel>.Get(x => x.SelectedTabIndex);
+        private int _SelectedTabIndex = default(int);
         #endregion
         /// <summary>
         /// 選択されたタブ種別
@@ -42,17 +38,9 @@ namespace HouseholdAccountBook.ViewModels
         public Tab SelectedTab
         {
             get { return _SelectedTab; }
-            set {
-                if (_SelectedTab != value) {
-                    _SelectedTab = value;
-                    PropertyChanged?.Raise(this, _nameSelectedTab);
-
-                    SelectedTabIndex = (int)value;
-                }
-            }
+            set { SetProperty(ref _SelectedTab, value); }
         }
         private Tab _SelectedTab = default(Tab);
-        internal static readonly string _nameSelectedTab = PropertyName<MainWindowViewModel>.Get(x => x.SelectedTab);
         #endregion
 
         /// <summary>
@@ -62,15 +50,9 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<BookViewModel> BookVMList
         {
             get { return _BookVMList; }
-            set {
-                if (_BookVMList != value) {
-                    _BookVMList = value;
-                    PropertyChanged?.Raise(this, _nameBookVMList);
-                }
-            }
+            set { SetProperty(ref _BookVMList, value); }
         }
         private ObservableCollection<BookViewModel> _BookVMList;
-        internal static readonly string _nameBookVMList = PropertyName<MainWindowViewModel>.Get(x => x.BookVMList);
         #endregion
         /// <summary>
         /// 選択された帳簿VM
@@ -79,15 +61,9 @@ namespace HouseholdAccountBook.ViewModels
         public BookViewModel SelectedBookVM
         {
             get { return _SelectedBookVM; }
-            set {
-                if (_SelectedBookVM != value) {
-                    _SelectedBookVM = value;
-                    PropertyChanged?.Raise(this, _nameSelectedBookVM);
-                }
-            }
+            set { SetProperty(ref _SelectedBookVM, value); }
         }
         private BookViewModel _SelectedBookVM;
-        internal static readonly string _nameSelectedBookVM = PropertyName<MainWindowViewModel>.Get(x => x.SelectedBookVM);
         #endregion
 
         #region 帳簿タブ
@@ -99,10 +75,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return _DisplayedMonth; }
             set {
-                if (_DisplayedMonth != value) {
-                    _DisplayedMonth = value;
-                    PropertyChanged?.Raise(this, _nameDisplayedMonth);
-
+                if (SetProperty(ref _DisplayedMonth, value)) {
                     if (!OnUpdateDisplayedDate) {
                         OnUpdateDisplayedDate = true;
                         // 表示月の年度の最初の月を表示年とする
@@ -113,7 +86,6 @@ namespace HouseholdAccountBook.ViewModels
             }
         }
         private DateTime _DisplayedMonth;
-        internal static readonly string _nameDisplayedMonth = PropertyName<MainWindowViewModel>.Get(x => x.DisplayedMonth);
         #endregion
 
         /// <summary>
@@ -123,15 +95,9 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<ActionViewModel> ActionVMList
         {
             get { return _ActionVMList; }
-            set {
-                if (_ActionVMList != value) {
-                    _ActionVMList = value;
-                    PropertyChanged?.Raise(this, _nameActionVMList);
-                }
-            }
+            set { SetProperty(ref _ActionVMList, value); }
         }
         private ObservableCollection<ActionViewModel> _ActionVMList;
-        internal static readonly string _nameActionVMList = PropertyName<MainWindowViewModel>.Get(x => x.ActionVMList);
         #endregion
         /// <summary>
         /// 選択された帳簿項目VM
@@ -140,15 +106,9 @@ namespace HouseholdAccountBook.ViewModels
         public ActionViewModel SelectedActionVM
         {
             get { return _SelectedActionVM; }
-            set {
-                if (_SelectedActionVM != value) {
-                    _SelectedActionVM = value;
-                    PropertyChanged?.Raise(this, _nameSelectedActionVM);
-                }
-            }
+            set { SetProperty(ref _SelectedActionVM, value); }
         }
         private ActionViewModel _SelectedActionVM = default(ActionViewModel);
-        internal static readonly string _nameSelectedActionVM = PropertyName<MainWindowViewModel>.Get(x => x.SelectedActionVM);
         #endregion
 
         /// <summary>
@@ -158,15 +118,9 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<SummaryViewModel> SummaryVMList
         {
             get { return _SummaryVMList; }
-            set {
-                if (_SummaryVMList != value) {
-                    _SummaryVMList = value;
-                    PropertyChanged?.Raise(this, _nameSummaryVMList);
-                }
-            }
+            set { SetProperty(ref _SummaryVMList, value); }
         }
         private ObservableCollection<SummaryViewModel> _SummaryVMList;
-        internal static readonly string _nameSummaryVMList = PropertyName<MainWindowViewModel>.Get(x => x.SummaryVMList);
         #endregion
         /// <summary>
         /// 選択された合計項目VM
@@ -175,15 +129,9 @@ namespace HouseholdAccountBook.ViewModels
         public SummaryViewModel SelectedSummaryVM
         {
             get { return _SelectedSummaryVM; }
-            set {
-                if (_SelectedSummaryVM != value) {
-                    _SelectedSummaryVM = value;
-                    PropertyChanged?.Raise(this, _nameSelectedSummaryVM);
-                }
-            }
+            set { SetProperty(ref _SelectedSummaryVM, value); }
         }
         private SummaryViewModel _SelectedSummaryVM = default(SummaryViewModel);
-        internal static readonly string _nameSelectedSummaryVM = PropertyName<MainWindowViewModel>.Get(x => x.SelectedSummaryVM);
         #endregion
         #endregion
 
@@ -196,12 +144,8 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return _DisplayedYear; }
             set {
-                if (_DisplayedYear != value) {
+                if (SetProperty(ref _DisplayedYear, value)) {
                     int yearDiff = value.Year - _DisplayedYear.Year;
-
-                    _DisplayedYear = value;
-                    PropertyChanged?.Raise(this, _nameDisplayedYear);
-
                     if (!OnUpdateDisplayedDate) {
                         OnUpdateDisplayedDate = true;
                         // 表示年の差分を表示月に反映する
@@ -211,8 +155,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private DateTime _DisplayedYear;
-        internal static readonly string _nameDisplayedYear = PropertyName<MainWindowViewModel>.Get(x => x.DisplayedYear);
+        private DateTime _DisplayedYear = default(DateTime);
         #endregion
 
         /// <summary>
@@ -222,15 +165,9 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<string> DisplayedMonths
         {
             get { return _DisplayedMonths; }
-            set {
-                if (_DisplayedMonths != value) {
-                    _DisplayedMonths = value;
-                    PropertyChanged?.Raise(this, _nameDisplayedMonths);
-                }
-            }
+            set { SetProperty(ref _DisplayedMonths, value); }
         }
         private ObservableCollection<string> _DisplayedMonths = default(ObservableCollection<string>);
-        internal static readonly string _nameDisplayedMonths = PropertyName<MainWindowViewModel>.Get(x => x.DisplayedMonths);
         #endregion
 
         /// <summary>
@@ -240,15 +177,9 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<SummaryWithinYearViewModel> SummaryWithinYearVMList
         {
             get { return _SummaryWithinYearVMList; }
-            set {
-                if (_SummaryWithinYearVMList != value) {
-                    _SummaryWithinYearVMList = value;
-                    PropertyChanged?.Raise(this, _nameSummaryWithinYearVMList);
-                }
-            }
+            set { SetProperty(ref _SummaryWithinYearVMList, value); }
         }
         private ObservableCollection<SummaryWithinYearViewModel> _SummaryWithinYearVMList = default(ObservableCollection<SummaryWithinYearViewModel>);
-        internal static readonly string _nameSummaryWithinYearVMList = PropertyName<MainWindowViewModel>.Get(x => x.SummaryWithinYearVMList);
         #endregion
         #endregion
         
@@ -265,10 +196,5 @@ namespace HouseholdAccountBook.ViewModels
 #endif
             }
         }
-
-        /// <summary>
-        /// プロパティ変更イベントハンドラ
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

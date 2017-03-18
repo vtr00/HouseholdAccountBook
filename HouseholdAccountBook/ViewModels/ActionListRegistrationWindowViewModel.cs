@@ -1,7 +1,6 @@
-﻿using HouseholdAccountBook.Extentions;
+﻿using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
@@ -10,7 +9,7 @@ namespace HouseholdAccountBook.ViewModels
     /// <summary>
     /// 帳簿項目リスト登録ウィンドウVM
     /// </summary>
-    public class ActionListRegistrationWindowViewModel : INotifyPropertyChanged
+    public class ActionListRegistrationWindowViewModel : BindableBase
     {
         /// <summary>
         /// 変更時処理重複防止用フラグ
@@ -41,15 +40,9 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<BookViewModel> BookVMList
         {
             get { return _BookVMList; }
-            set {
-                if (_BookVMList != value) {
-                    _BookVMList = value;
-                    PropertyChanged?.Raise(this, _nameBookVMList);
-                }
-            }
+            set { SetProperty(ref _BookVMList, value); }
         }
         private ObservableCollection<BookViewModel> _BookVMList = default(ObservableCollection<BookViewModel>);
-        internal static readonly string _nameBookVMList = PropertyName<ActionListRegistrationWindowViewModel>.Get(x => x.BookVMList);
         #endregion
         /// <summary>
         /// 選択された帳簿VM
@@ -59,10 +52,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return _SelectedBookVM; }
             set {
-                if (_SelectedBookVM != value) {
-                    _SelectedBookVM = value;
-                    PropertyChanged?.Raise(this, _nameSelectedBookVM);
-
+                if (SetProperty(ref _SelectedBookVM, value)) {
                     if (!UpdateOnChanged) {
                         UpdateOnChanged = true;
                         OnBookChanged?.Invoke();
@@ -73,7 +63,6 @@ namespace HouseholdAccountBook.ViewModels
         }
 
         private BookViewModel _SelectedBookVM = default(BookViewModel);
-        internal static readonly string _nameSelectedBookVM = PropertyName<ActionListRegistrationWindowViewModel>.Get(x => x.SelectedBookVM);
         #endregion
 
         /// <summary>
@@ -83,18 +72,12 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<BalanceKindViewModel> BalanceKindVMList
         {
             get { return _BalanceKindVMList; }
-            set {
-                if (_BalanceKindVMList != value) {
-                    _BalanceKindVMList = value;
-                    PropertyChanged?.Raise(this, _nameBalanceKindVMList);
-                }
-            }
+            set { SetProperty(ref _BalanceKindVMList, value); }
         }
         private ObservableCollection<BalanceKindViewModel> _BalanceKindVMList = new ObservableCollection<BalanceKindViewModel>() {
             new BalanceKindViewModel() { BalanceKind = BalanceKind.Income, BalanceKindName = BalanceStr[BalanceKind.Income]}, // 収入
             new BalanceKindViewModel() { BalanceKind = BalanceKind.Outgo, BalanceKindName = BalanceStr[BalanceKind.Outgo]}, // 支出
         };
-        internal static readonly string _nameBalanceKindVMList = PropertyName<ActionListRegistrationWindowViewModel>.Get(x => x.BalanceKindVMList);
         #endregion
         /// <summary>
         /// 選択された収支VM
@@ -104,10 +87,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return _SelectedBalanceKindVM; }
             set {
-                if (_SelectedBalanceKindVM != value) {
-                    _SelectedBalanceKindVM = value;
-                    PropertyChanged?.Raise(this, _nameSelectedBalanceKindVM);
-
+                if (SetProperty(ref _SelectedBalanceKindVM, value)) {
                     if (!UpdateOnChanged) {
                         UpdateOnChanged = true;
                         OnBalanceKindChanged?.Invoke();
@@ -117,7 +97,6 @@ namespace HouseholdAccountBook.ViewModels
             }
         }
         private BalanceKindViewModel _SelectedBalanceKindVM = default(BalanceKindViewModel);
-        internal static readonly string _nameSelectedBalanceKindVM = PropertyName<ActionListRegistrationWindowViewModel>.Get(x => x.SelectedBalanceKindVM);
         #endregion
 
         /// <summary>
@@ -127,15 +106,9 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<CategoryViewModel> CategoryVMList
         {
             get { return _CategoryVMList; }
-            set {
-                if (_CategoryVMList != value) {
-                    _CategoryVMList = value;
-                    PropertyChanged?.Raise(this, _nameCategoryVMList);
-                }
-            }
+            set { SetProperty(ref _CategoryVMList, value); }
         }
         private ObservableCollection<CategoryViewModel> _CategoryVMList = default(ObservableCollection<CategoryViewModel>);
-        internal static readonly string _nameCategoryVMList = PropertyName<ActionListRegistrationWindowViewModel>.Get(x => x.CategoryVMList);
         #endregion
         /// <summary>
         /// 選択されたカテゴリVM
@@ -145,10 +118,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return _SelectedCategoryVM; }
             set {
-                if (_SelectedCategoryVM != value) {
-                    _SelectedCategoryVM = value;
-                    PropertyChanged?.Raise(this, _nameSelectedCategoryVM);
-
+                if (SetProperty(ref _SelectedCategoryVM, value)) {
                     if (!UpdateOnChanged) {
                         UpdateOnChanged = true;
                         OnCategoryChanged?.Invoke();
@@ -158,7 +128,6 @@ namespace HouseholdAccountBook.ViewModels
             }
         }
         private CategoryViewModel _SelectedCategoryVM = default(CategoryViewModel);
-        internal static readonly string _nameSelectedCategoryVM = PropertyName<ActionListRegistrationWindowViewModel>.Get(x => x.SelectedCategoryVM);
         #endregion
 
         /// <summary>
@@ -168,15 +137,9 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<ItemViewModel> ItemVMList
         {
             get { return _ItemVMList; }
-            set {
-                if (_ItemVMList != value) {
-                    _ItemVMList = value;
-                    PropertyChanged?.Raise(this, _nameItemVMList);
-                }
-            }
+            set { SetProperty(ref _ItemVMList, value); }
         }
         private ObservableCollection<ItemViewModel> _ItemVMList = default(ObservableCollection<ItemViewModel>);
-        internal static readonly string _nameItemVMList = PropertyName<ActionListRegistrationWindowViewModel>.Get(x => x.ItemVMList);
         #endregion
         /// <summary>
         /// 選択された項目VM
@@ -186,10 +149,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return _SelectedItemVM; }
             set {
-                if (_SelectedItemVM != value) {
-                    _SelectedItemVM = value;
-                    PropertyChanged?.Raise(this, _nameSelectedItemVM);
-
+                if (SetProperty(ref _SelectedItemVM, value)) {
                     if (!UpdateOnChanged) {
                         UpdateOnChanged = true;
                         OnItemChanged?.Invoke();
@@ -199,7 +159,6 @@ namespace HouseholdAccountBook.ViewModels
             }
         }
         private ItemViewModel _SelectedItemVM = default(ItemViewModel);
-        internal static readonly string _nameSelectedItemVM = PropertyName<ActionListRegistrationWindowViewModel>.Get(x => x.SelectedItemVM);
         #endregion
 
         /// <summary>
@@ -209,15 +168,9 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<DateValueViewModel> DateValueVMList
         {
             get { return _DateValueVMList; }
-            set {
-                if (_DateValueVMList != value) {
-                    _DateValueVMList = value;
-                    PropertyChanged.Raise(this, _nameDateValueVMList);
-                }
-            }
+            set { SetProperty(ref _DateValueVMList, value); }
         }
         private ObservableCollection<DateValueViewModel> _DateValueVMList = new ObservableCollection<DateValueViewModel>();
-        internal static readonly string _nameDateValueVMList = PropertyName<ActionListRegistrationWindowViewModel>.Get(x => x.DateValueVMList);
         #endregion
 
         /// <summary>
@@ -227,15 +180,9 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<String> ShopNameList
         {
             get { return _ShopNameList; }
-            set {
-                if (_ShopNameList != value) {
-                    _ShopNameList = value;
-                    PropertyChanged?.Raise(this, _nameShopNameList);
-                }
-            }
+            set { SetProperty(ref _ShopNameList, value); }
         }
         private ObservableCollection<String> _ShopNameList = default(ObservableCollection<String>);
-        internal static readonly string _nameShopNameList = PropertyName<ActionListRegistrationWindowViewModel>.Get(x => x.ShopNameList);
         #endregion
         /// <summary>
         /// 選択された店舗名
@@ -244,15 +191,9 @@ namespace HouseholdAccountBook.ViewModels
         public String SelectedShopName
         {
             get { return _SelectedShopName; }
-            set {
-                if (_SelectedShopName != value) {
-                    _SelectedShopName = value;
-                    PropertyChanged?.Raise(this, _nameSelectedShopName);
-                }
-            }
+            set { SetProperty(ref _SelectedShopName, value); }
         }
         private String _SelectedShopName = default(String);
-        internal static readonly string _nameSelectedShopName = PropertyName<ActionListRegistrationWindowViewModel>.Get(x => x.SelectedShopName);
         #endregion
 
         /// <summary>
@@ -262,15 +203,9 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<String> RemarkList
         {
             get { return _RemarkList; }
-            set {
-                if (_RemarkList != value) {
-                    _RemarkList = value;
-                    PropertyChanged?.Raise(this, _nameRemarkList);
-                }
-            }
+            set { SetProperty(ref _RemarkList, value); }
         }
         private ObservableCollection<String> _RemarkList = default(ObservableCollection<String>);
-        internal static readonly string _nameRemarkList = PropertyName<ActionListRegistrationWindowViewModel>.Get(x => x.RemarkList);
         #endregion
         /// <summary>
         /// 選択された備考
@@ -279,27 +214,16 @@ namespace HouseholdAccountBook.ViewModels
         public String SelectedRemark
         {
             get { return _SelectedRemark; }
-            set {
-                if (_SelectedRemark != value) {
-                    _SelectedRemark = value;
-                    PropertyChanged?.Raise(this, _nameSelectedRemark);
-                }
-            }
+            set { SetProperty(ref _SelectedRemark, value); }
         }
         private String _SelectedRemark = default(String);
-        internal static readonly string _nameSelectedRemark = PropertyName<ActionListRegistrationWindowViewModel>.Get(x => x.SelectedRemark);
         #endregion
-
-        /// <summary>
-        /// プロパティ変更イベントハンドラ
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
-
+        
         #region 内部クラス定義
         /// <summary>
         /// 日付金額VM
         /// </summary>
-        public class DateValueViewModel : INotifyPropertyChanged
+        public class DateValueViewModel : BindableBase
         {
             /// <summary>
             /// 日付
@@ -313,21 +237,13 @@ namespace HouseholdAccountBook.ViewModels
             {
                 get { return _ActValue; }
                 set {
-                    if (_ActValue != value) {
-                        _ActValue = value;
-                        PropertyChanged.Raise(this, _nameActValue);
+                    if (SetProperty(ref _ActValue, value)) {
                         CommandManager.InvalidateRequerySuggested();
                     }
                 }
             }
             private int? _ActValue = default(int?);
-            internal static readonly string _nameActValue = PropertyName<DateValueViewModel>.Get(x => x.ActValue);
             #endregion
-
-            /// <summary>
-            /// プロパティ変更イベントハンドラ
-            /// </summary>
-            public event PropertyChangedEventHandler PropertyChanged;
         }
         #endregion
     }

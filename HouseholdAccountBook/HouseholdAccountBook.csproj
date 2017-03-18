@@ -130,6 +130,7 @@
     </ApplicationDefinition>
     <Compile Include="BindingProxy.cs" />
     <Compile Include="Converter\DateTimeToDisplayedYearConverter.cs" />
+    <Compile Include="PropertyName.cs" />
     <Compile Include="UserControls\DateTimePicker.cs" />
     <Compile Include="UserEventArgs\RegistrateEventArgs.cs" />
     <Compile Include="UserEventArgs\ValueInputEventArgs.cs" />
@@ -199,8 +200,6 @@
     <Compile Include="Dao\DaoReader.cs" />
     <Compile Include="Dao\DaoSQLite.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
-    <Compile Include="Extensions\PropertyChangedEventHandleExtensions.cs" />
-    <Compile Include="PropertyName.cs" />
     <Compile Include="Windows\ActionRegistrationWindow.xaml.cs">
       <DependentUpon>ActionRegistrationWindow.xaml</DependentUpon>
     </Compile>

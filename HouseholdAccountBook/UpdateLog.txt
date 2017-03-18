@@ -210,7 +210,7 @@
     ＋アイコンを設定した(http://icon-rainbow.com/%E3%83%AC%E3%82%B7%E3%83%BC%E3%83%88%E3%81%AE%E7%84%A1%E6%96%99%E3%82%A2%E3%82%A4%E3%82%B3%E3%83%B3%E7%B4%A0%E6%9D%90/)
 2017/03/18
   全般
-    ＋Prism導入の準備をした
+    ＋SetProperty関数を使用してプロパティの変更を通知するようにした
     －各種Nuget Packagesを更新した
   MainWindow.xaml.cs
     ↑表示時にバックグラウンドでBindingExceptionが多発していたのを修正した
