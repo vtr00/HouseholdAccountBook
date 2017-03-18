@@ -959,54 +959,6 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             }
             oldSelectedTab = this.MainWindowVM.SelectedTab;
         }
-
-        #region 帳簿項目操作
-        /// <summary>
-        /// 帳簿項目をダブルクリックした時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ActionDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            RoutedCommand command = this.Resources["EditActionCommand"] as RoutedCommand;
-
-            if (command != null && command.CanExecute(null, sender as IInputElement)) {
-                command.Execute(null, sender as IInputElement);
-            }
-            e.Handled = true;
-        }
-
-        /// <summary>
-        /// 帳簿項目選択中にキー入力した時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ActionDataGrid_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key) {
-                case Key.Enter: {
-                        RoutedCommand command = this.Resources["EditActionCommand"] as RoutedCommand;
-
-                        if (command != null && command.CanExecute(null, sender as IInputElement)) {
-                            command.Execute(null, sender as IInputElement);
-                        }
-                        e.Handled = true;
-                    }
-                    break;
-                case Key.Delete: {
-                        RoutedCommand command = this.Resources["DeleteActionCommand"] as RoutedCommand;
-
-                        if (command != null && command.CanExecute(null, sender as IInputElement)) {
-                            command.Execute(null, sender as IInputElement);
-                        }
-                        e.Handled = true;
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-        #endregion
         #endregion
 
         #region 画面更新用の関数
@@ -1624,7 +1576,91 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <param name="e"></param>
         private void DropItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            
+        }
 
+        /// <summary>
+        /// 店名を削除できるか判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteShopNameCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedItemVM?.SelectedShopName != null;
+        }
+
+        /// <summary>
+        /// 店名を削除する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteShopNameCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                using (DaoBase dao = builder.Build()) {
+                    dao.ExecQuery(@"
+UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
+WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedShopName, this.SettingsVM.SelectedItemVM.Id);
+                }
+
+                using (DaoBase dao = builder.Build()) {
+                    DaoReader reader = dao.ExecQuery(@"
+SELECT shop_name
+FROM hst_shop
+WHERE del_flg = 0 AND item_id = @{0}
+ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
+
+                    this.SettingsVM.SelectedItemVM.ShopNameList.Clear();
+                    reader.ExecWholeRow((count2, record2) => {
+                        string shopName = record2["shop_name"];
+
+                        this.SettingsVM.SelectedItemVM.ShopNameList.Add(shopName);
+                    });
+                }
+            }
+        }
+
+        /// <summary>
+        /// 備考を削除できるか判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteRemarkCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedItemVM?.SelectedRemark != null;
+        }
+
+        /// <summary>
+        /// 備考を削除する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteRemarkCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                using (DaoBase dao = builder.Build()) {
+                    dao.ExecQuery(@"
+UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
+WHERE remark = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedRemark, this.SettingsVM.SelectedItemVM.Id);
+                }
+            }
+
+            using (DaoBase dao = builder.Build()) {
+                DaoReader reader = dao.ExecQuery(@"
+SELECT remark
+FROM hst_remark
+WHERE del_flg = 0 AND item_id = @{0}
+ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
+
+                this.SettingsVM.SelectedItemVM.RemarkList.Clear();
+                reader.ExecWholeRow((count2, record2) => {
+                    string remark = record2["remark"];
+
+                    this.SettingsVM.SelectedItemVM.RemarkList.Add(remark);
+                });
+            }
         }
         #endregion
 
@@ -1639,8 +1675,8 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             int bookId = -1;
             using(DaoBase dao = builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
-INSERT INTO mst_book (book_name, book_kind, pay_day, initial_value, del_flg, update_time, updater, insert_time, inserter)
-VALUES ('(no name)', 0, null, 0, 0, 'now', @{0}, 'now', @{1})
+INSERT INTO mst_book (book_name, book_kind, pay_day, initial_value, sort_order, del_flg, update_time, updater, insert_time, inserter)
+VALUES ('(no name)', 0, null, 0, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), 0, 'now', @{0}, 'now', @{1})
 RETURNING book_id;", Updater, Inserter);
 
                 reader.ExecARow((record) => {
@@ -1670,15 +1706,18 @@ RETURNING book_id;", Updater, Inserter);
         {
             using(DaoBase dao = builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
-SELECT * FROM mst_book
+SELECT * FROM hst_action
 WHERE book_id = @{0} AND del_flg = 0;", this.SettingsVM.SelectedBookVM.Id);
 
-                if (reader.Count == 0) {
-                    dao.ExecNonQuery(@"
+                if (reader.Count != 0) {
+                    MessageBox.Show("帳簿項目が存在するので削除できません。"); // TODO
+                    return;
+                }
+                
+                dao.ExecNonQuery(@"
 UPDATE mst_book
 SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE book_id = @{1};", Updater, this.SettingsVM.SelectedBookVM.Id);
-                }
             }
 
             UpdateBookSettingTabData();
@@ -1839,86 +1878,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
                     }
                 }
             }
-        }
-        
-        /// <summary>
-        /// 項目設定の店舗名リストでキー入力した時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ShopNameListBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key) {
-                case Key.Delete: {
-                        if (this.SettingsVM.SelectedItemVM?.SelectedShopName != null) {
-                            if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
-                                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
-                                using (DaoBase dao = builder.Build()) {
-                                    dao.ExecQuery(@"
-UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedShopName, this.SettingsVM.SelectedItemVM.Id);
-                                }
-
-                                using (DaoBase dao = builder.Build()) {
-                                    DaoReader reader = dao.ExecQuery(@"
-SELECT shop_name
-FROM hst_shop
-WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
-
-                                    this.SettingsVM.SelectedItemVM.ShopNameList.Clear();
-                                    reader.ExecWholeRow((count2, record2) => {
-                                        string shopName = record2["shop_name"];
-
-                                        this.SettingsVM.SelectedItemVM.ShopNameList.Add(shopName);
-                                    });
-                                }
-                            }
-                            e.Handled = true;
-                        }
-                    }
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// 項目設定の備考リストでキー入力した時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RemarkListBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key) {
-                case Key.Delete: {
-                        if (this.SettingsVM.SelectedItemVM?.SelectedRemark != null) {
-                            if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
-                                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
-                                using (DaoBase dao = builder.Build()) {
-                                    dao.ExecQuery(@"
-UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE remark = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedRemark, this.SettingsVM.SelectedItemVM.Id);
-                                }
-                            }
-
-                            using (DaoBase dao = builder.Build()) {
-                                DaoReader reader = dao.ExecQuery(@"
-SELECT remark
-FROM hst_remark
-WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
-
-                                this.SettingsVM.SelectedItemVM.RemarkList.Clear();
-                                reader.ExecWholeRow((count2, record2) => {
-                                    string remark = record2["remark"];
-
-                                    this.SettingsVM.SelectedItemVM.RemarkList.Add(remark);
-                                });
-                            }
-                            e.Handled = true;
-                        }
-                    }
-                    break;
-            }
+            e.Handled = true;
         }
         #endregion
         #endregion
@@ -2077,6 +2037,7 @@ ORDER BY sort_order;", childVM.Id);
 SELECT B.book_id AS BookId, B.book_name, RBI.book_id IS NULL AS IsNotRelated
 FROM mst_book B
 LEFT JOIN (SELECT book_id FROM rel_book_item WHERE del_flg = 0 AND item_id = @{0}) RBI ON RBI.book_id = B.book_id
+WHERE del_flg = 0
 ORDER BY B.sort_order;", vm2.Id);
 
                             reader.ExecWholeRow((count2, record2) => {

@@ -3,10 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:HouseholdAccountBook.Windows"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         mc:Ignorable="d"
         Title="Household Account Book" Height="300" Width="400">
+    
+    <Window.DataContext>
+        <viewmodels:DbSettingWindowViewModel x:Name="DbSettingWindowVM"/>
+    </Window.DataContext>
 
     <Window.Resources>
         <!-- パス入力コマンド -->
@@ -18,6 +21,11 @@
         <RoutedCommand x:Key="CancelCommand"/>
     </Window.Resources>
 
+    <Window.InputBindings>
+        <KeyBinding Gesture="Enter" Command="{StaticResource OKCommand}"/>
+        <KeyBinding Gesture="Esc" Command="{StaticResource CancelCommand}"/>
+    </Window.InputBindings>
+
     <Window.CommandBindings>
         <CommandBinding Command="{StaticResource DumpExePathDialogCommand}"
                         Executed="DumpExePathDialogCommand_Executed"/>
@@ -28,19 +36,15 @@
         <CommandBinding Command="{StaticResource CancelCommand}" 
                         Executed="CancelCommand_Executed"/>
     </Window.CommandBindings>
-    
-    <Window.DataContext>
-        <viewmodels:DbSettingWindowViewModel x:Name="DbSettingWindowVM"/>
-    </Window.DataContext>
 
-    <Grid Margin="10">
+    <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="1" VerticalAlignment="Center"
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" VerticalAlignment="Center"
                        Text="{Binding Message}"/>
         
         <Grid Grid.Row="1">
@@ -61,42 +65,42 @@
                 <RowDefinition Height="0.1*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="ホスト:" Margin="1" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="ホスト" Margin="5" VerticalAlignment="Center"/>
             <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding Host}"/>
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="ポート:" Margin="1" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="ポート" Margin="5" VerticalAlignment="Center"/>
             <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding Port}" 
                      PreviewTextInput="TextBox_PreviewTextInput"/>
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="ユーザ名:" Margin="1" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="ユーザ名" Margin="1" VerticalAlignment="Center"/>
             <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding UserName}"/>
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="パスワード:" Margin="1" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="パスワード" Margin="5" VerticalAlignment="Center"/>
             <PasswordBox x:Name="passwordBox" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="1"/>
 
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="DB名:" Margin="1" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="DB名" Margin="5" VerticalAlignment="Center"/>
             <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding DatabaseName}"/>
 
-            <TextBlock Grid.Row="5" Grid.Column="0" Text="ロール:" Margin="1" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="ロール" Margin="5" VerticalAlignment="Center"/>
             <TextBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding Role}"/>
         
-            <TextBlock Grid.Row="6" Grid.Column="0" Text="pg_dump.exe:" Margin="1" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
             <TextBox Grid.Row="6" Grid.Column="1" Margin="1" Text="{Binding DumpExePath}" IsReadOnly="True"/>
             <Button Grid.Row="6" Grid.Column="2" Margin="1" Content="..." Command="{StaticResource DumpExePathDialogCommand}"/>
         
-            <TextBlock Grid.Row="7" Grid.Column="0" Text="pg_restore.exe:" Margin="1" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
             <TextBox Grid.Row="7" Grid.Column="1" Margin="1" Text="{Binding RestoreExePath}" IsReadOnly="True"/>
             <Button Grid.Row="7" Grid.Column="2" Margin="1" Content="..." Command="{StaticResource RestoreExePathDialogCommand}"/>
         </Grid>
         
-        <Grid Grid.Row="2" Margin="0,10,0,0">
+        <Grid Grid.Row="2" Margin="0,5,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.5*"/>
                 <ColumnDefinition Width="0.5*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="OK" Command="{StaticResource OKCommand}"/>
-            <Button Grid.Column="1" Content="キャンセル" Command="{StaticResource CancelCommand}"/>
+            <Button Grid.Column="0" Margin="5" Content="OK" Command="{StaticResource OKCommand}"/>
+            <Button Grid.Column="1" Margin="5" Content="キャンセル" Command="{StaticResource CancelCommand}"/>
         </Grid>
     </Grid>
 </Window>

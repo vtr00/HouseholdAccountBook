@@ -43,9 +43,13 @@
             <TextBox x:Name="_textBox" Text="{Binding Value, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:NumericUpDown}}, 
                      UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" 
                      TextAlignment="Right" InputMethod.IsInputMethodEnabled="False"
-                     PreviewTextInput="TextBox_PreviewTextInput" PreviewKeyDown="TextBox_PreviewKeyDown"
-                     MouseWheel="TextBox_MouseWheel"
-                     GotFocus="TextBox_GotFocus"/>
+                     PreviewTextInput="TextBox_PreviewTextInput" MouseWheel="TextBox_MouseWheel"
+                     GotFocus="TextBox_GotFocus">
+                <TextBox.InputBindings>
+                    <KeyBinding Gesture="Up" Command="{StaticResource IncreaseCommand}"/>
+                    <KeyBinding Gesture="Down" Command="{StaticResource DecreaseCommand}"/>
+                </TextBox.InputBindings>
+            </TextBox>
             <Popup x:Name="_popup"
                 StaysOpen="{Binding IsKeyboardFocused, ElementName=_textBox}" PlacementTarget="{Binding ElementName=_textBox}">
                 <Grid Height="50" Width="150">

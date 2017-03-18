@@ -234,27 +234,6 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// 矢印キーで数値を操作する
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key) {
-                case Key.Up:
-                    IncrementNumber();
-                    e.Handled = true;
-                    break;
-                case Key.Down:
-                    DecrementNumber();
-                    e.Handled = true;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        /// <summary>
         /// Popupを表示する
         /// </summary>
         /// <param name="sender"></param>

@@ -7,6 +7,7 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class DbSettingWindowViewModel : BindableBase
     {
+        #region プロパティ
         /// <summary>
         /// 表示メッセージ
         /// </summary>
@@ -113,6 +114,7 @@ namespace HouseholdAccountBook.ViewModels
             set { SetProperty(ref _RestoreExePath, value); }
         }
         private string _RestoreExePath = default(string);
+        #endregion
         #endregion
     }
 }

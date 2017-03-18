@@ -95,15 +95,16 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void OKCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Properties.Settings.Default.App_Postgres_Host = this.DbSettingWindowVM.Host;
-            Properties.Settings.Default.App_Postgres_Port = this.DbSettingWindowVM.Port;
-            Properties.Settings.Default.App_Postgres_UserName = this.DbSettingWindowVM.UserName;
-            Properties.Settings.Default.App_Postgres_Password = this.passwordBox.Password;
-            Properties.Settings.Default.App_Postgres_DatabaseName = this.DbSettingWindowVM.DatabaseName;
-            Properties.Settings.Default.App_Postgres_Role = this.DbSettingWindowVM.Role;
-            Properties.Settings.Default.App_Postgres_DumpExePath = this.DbSettingWindowVM.DumpExePath;
-            Properties.Settings.Default.App_Postgres_RestoreExePath = this.DbSettingWindowVM.RestoreExePath;
-            Properties.Settings.Default.Save();
+            Properties.Settings settings = Properties.Settings.Default;
+            settings.App_Postgres_Host = this.DbSettingWindowVM.Host;
+            settings.App_Postgres_Port = this.DbSettingWindowVM.Port;
+            settings.App_Postgres_UserName = this.DbSettingWindowVM.UserName;
+            settings.App_Postgres_Password = this.passwordBox.Password;
+            settings.App_Postgres_DatabaseName = this.DbSettingWindowVM.DatabaseName;
+            settings.App_Postgres_Role = this.DbSettingWindowVM.Role;
+            settings.App_Postgres_DumpExePath = this.DbSettingWindowVM.DumpExePath;
+            settings.App_Postgres_RestoreExePath = this.DbSettingWindowVM.RestoreExePath;
+            settings.Save();
 
             DialogResult = true;
             this.Close();

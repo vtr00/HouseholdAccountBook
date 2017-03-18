@@ -247,6 +247,26 @@ namespace HouseholdAccountBook.ViewModels
             }
             private string _SelectedRemark = default(string);
             #endregion
+
+            /// <summary>
+            /// リネーム不可能か
+            /// </summary>
+            #region CantRename
+            public bool CantRename
+            {
+                get { return Kind == HierarchicalKind.Balance; }
+            }
+            #endregion
+
+            /// <summary>
+            /// 設定可能か
+            /// </summary>
+            #region IsEnabled
+            public bool IsEnabled
+            {
+                get { return Kind == HierarchicalKind.Item; }
+            }
+            #endregion
         }
         
         /// <summary>
