@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Extentions;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.ViewModels
 {
@@ -9,6 +10,45 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class SettingsViewModel : INotifyPropertyChanged
     {
+        /// <summary>
+        /// 選択された設定タブインデックス
+        /// </summary>
+        #region SelectedTabIndex
+        public int SelectedTabIndex
+        {
+            get { return _SelectedTabIndex; }
+            set {
+                if (_SelectedTabIndex != value) {
+                    _SelectedTabIndex = value;
+                    PropertyChanged?.Raise(this, _nameSelectedTabIndex);
+
+                    SelectedTab = (SettingsTab)value;
+                }
+            }
+        }
+        private int _SelectedTabIndex;
+        internal static readonly string _nameSelectedTabIndex = PropertyName<MainWindowViewModel>.Get(x => x.SelectedTabIndex);
+        #endregion
+        /// <summary>
+        /// 選択された設定タブ種別
+        /// </summary>
+        #region SelectedTab
+        public SettingsTab SelectedTab
+        {
+            get { return _SelectedTab; }
+            set {
+                if (_SelectedTab != value) {
+                    _SelectedTab = value;
+                    PropertyChanged?.Raise(this, _nameSelectedTab);
+
+                    SelectedTabIndex = (int)value;
+                }
+            }
+        }
+        private SettingsTab _SelectedTab = default(SettingsTab);
+        internal static readonly string _nameSelectedTab = PropertyName<MainWindowViewModel>.Get(x => x.SelectedTab);
+        #endregion
+        
         #region 項目設定
         /// <summary>
         /// 階層構造項目VMリスト
@@ -31,14 +71,24 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 選択された項目VM
         /// </summary>
+        /// <remarks>Not Binded</remarks>
         #region SelectedItemVM
         public HierarchicalItemViewModel SelectedItemVM
         {
             get { return _SelectedItemVM; }
             set {
                 if (_SelectedItemVM != value) {
+                    if(value == null && _SelectedItemVM != null) {
+                        _SelectedItemVM.IsSelected = false;
+                    }
+
                     _SelectedItemVM = value;
                     PropertyChanged.Raise(this, _nameSelectedItemVM);
+
+                    // 選択状態を更新する(_SelectedItemVMより後で更新)
+                    if(value != null && !value.IsSelected) {
+                        value.IsSelected = true;
+                    }
                 }
             }
         }
@@ -157,6 +207,24 @@ namespace HouseholdAccountBook.ViewModels
             #endregion
 
             /// <summary>
+            /// 選択されているか
+            /// </summary>
+            #region IsSelected
+            public bool IsSelected
+            {
+                get { return _IsSelected; }
+                set {
+                    if (_IsSelected != value) {
+                        _IsSelected = value;
+                        PropertyChanged.Raise(this, _nameIsSelected);
+                    }
+                }
+            }
+            private bool _IsSelected = default(bool);
+            internal static readonly string _nameIsSelected = PropertyName<HierarchicalItemViewModel>.Get(x => x.IsSelected);
+            #endregion
+
+            /// <summary>
             /// 子要素VMリスト
             /// </summary>
             #region ChildrenVMList
@@ -261,25 +329,7 @@ namespace HouseholdAccountBook.ViewModels
             private string _SelectedRemark = default(string);
             internal static readonly string _nameSelectedRemark = PropertyName<HierarchicalItemViewModel>.Get(x => x.SelectedRemark);
             #endregion
-
-            /// <summary>
-            /// 変更があったか
-            /// </summary>
-            #region IsChanged
-            public bool IsChanged
-            {
-                get { return _IsChanged; }
-                set {
-                    if (_IsChanged != value) {
-                        _IsChanged = value;
-                        PropertyChanged.Raise(this, _nameIsChanged);
-                    }
-                }
-            }
-            private bool _IsChanged = default(bool);
-            internal static readonly string _nameIsChanged = PropertyName<HierarchicalItemViewModel>.Get(x => x.IsChanged);
-            #endregion
-
+            
             /// <summary>
             /// プロパティ変更イベントハンドラ
             /// </summary>
@@ -302,16 +352,16 @@ namespace HouseholdAccountBook.ViewModels
             #region Name
             public string Name
             {
-                get { return _BookName; }
+                get { return _Name; }
                 set {
-                    if (_BookName != value) {
-                        _BookName = value;
-                        PropertyChanged.Raise(this, _nameBookName);
+                    if (_Name != value) {
+                        _Name = value;
+                        PropertyChanged.Raise(this, _nameName);
                     }
                 }
             }
-            private string _BookName = default(string);
-            internal static readonly string _nameBookName = PropertyName<BookSettingViewModel>.Get(x => x.Name);
+            private string _Name = default(string);
+            internal static readonly string _nameName = PropertyName<BookSettingViewModel>.Get(x => x.Name);
             #endregion
 
             /// <summary>
@@ -367,25 +417,7 @@ namespace HouseholdAccountBook.ViewModels
             private ObservableCollection<RelationViewModel> _RelationVMList = default(ObservableCollection<RelationViewModel>);
             internal static readonly string _nameRelationVMList = PropertyName<BookSettingViewModel>.Get(x => x.RelationVMList);
             #endregion
-
-            /// <summary>
-            /// 変更があったか
-            /// </summary>
-            #region IsChanged
-            public bool IsChanged
-            {
-                get { return _IsChanged; }
-                set {
-                    if (_IsChanged != value) {
-                        _IsChanged = value;
-                        PropertyChanged.Raise(this, _nameIsChanged);
-                    }
-                }
-            }
-            private bool _IsChanged = default(bool);
-            internal static readonly string _nameIsChanged = PropertyName<BookSettingViewModel>.Get(x => x.IsChanged);
-            #endregion
-
+            
             /// <summary>
             /// プロパティ変更イベントハンドラ
             /// </summary>
@@ -424,24 +456,6 @@ namespace HouseholdAccountBook.ViewModels
             /// 表示名
             /// </summary>
             public string Name { get; set; }
-
-            /// <summary>
-            /// 変更があったか
-            /// </summary>
-            #region IsChanged
-            public bool IsChanged
-            {
-                get { return _IsChanged; }
-                set {
-                    if (_IsChanged != value) {
-                        _IsChanged = value;
-                        PropertyChanged.Raise(this, _nameIsChanged);
-                    }
-                }
-            }
-            private bool _IsChanged = default(bool);
-            internal static readonly string _nameIsChanged = PropertyName<RelationViewModel>.Get(x => x.IsChanged);
-            #endregion
             
             /// <summary>
             /// プロパティ変更イベントハンドラ

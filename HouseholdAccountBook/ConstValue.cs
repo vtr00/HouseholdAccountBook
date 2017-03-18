@@ -25,7 +25,7 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// 帳簿タブ
             /// </summary>
-            BookTab = 0,
+            BooksTab = 0,
             /// <summary>
             /// 年間一覧タブ
             /// </summary>
@@ -37,7 +37,27 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// 設定タブ
             /// </summary>
-            SettingTab = 3
+            SettingsTab = 3
+        }
+
+        /// <summary>
+        /// 設定タブ
+        /// </summary>
+        /// <remarks>数字は設定タブのインデックスと対応付けること</remarks>
+        public enum SettingsTab 
+        {
+            /// <summary>
+            /// 項目設定タブ
+            /// </summary>
+            ItemSettingsTab = 0,
+            /// <summary>
+            /// 帳簿設定タブ
+            /// </summary>
+            BookSettingsTab = 1,
+            /// <summary>
+            /// その他タブ
+            /// </summary>
+            OtherSettingsTab = 2
         }
 
         /// <summary>

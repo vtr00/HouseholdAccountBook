@@ -19,7 +19,7 @@ using static HouseholdAccountBook.ViewModels.SettingsViewModel;
 namespace HouseholdAccountBook.Windows
 {
     /// <summary>
-    /// MainWindow.xaml の相互作用ロジック
+    /// MainWindow.xaml の相互作用ロジック(設定以外)
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -31,7 +31,7 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// 前回選択していたタブ
         /// </summary>
-        private Tab oldSelectedTab = Tab.BookTab;
+        private Tab oldSelectedTab = Tab.BooksTab;
         #endregion
 
         /// <summary>
@@ -47,10 +47,11 @@ namespace HouseholdAccountBook.Windows
             this.MainWindowVM.DisplayedMonth = DateTime.Now;
 
             UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
-            UpdateBookData();
-            UpdateYearsListData();
-            UpdateGraphData();
-            UpdateSettingData();
+            UpdateBookTabData();
+            UpdateListTabData();
+            UpdateGraphTabData();
+
+            InitSettingsTab();
 
             LoadSetting();
         }
@@ -260,8 +261,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
             if (isOpen) {
                 UpdateBookList();
-                UpdateBookData();
-                UpdateYearsListData();
+                UpdateBookTabData();
+                UpdateListTabData();
 
                 Cursor = cCursor;
 
@@ -354,8 +355,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
             if (process.ExitCode == 0) {
                 UpdateBookList();
-                UpdateBookData();
-                UpdateYearsListData();
+                UpdateBookTabData();
+                UpdateListTabData();
 
                 Cursor = cCursor;
 
@@ -450,7 +451,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void MoveToBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、帳簿が2つ以上存在していて、選択されている帳簿が存在する
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BookTab && this.MainWindowVM.BookVMList?.Count >= 2 && this.MainWindowVM.SelectedBookVM != null;
+            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.BookVMList?.Count >= 2 && this.MainWindowVM.SelectedBookVM != null;
         }
 
         /// <summary>
@@ -463,7 +464,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder,
                 this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
             mrw.Registrated += (sender2, e2) => {
-                UpdateBookData(e2.Id);
+                UpdateBookTabData(e2.Id);
                 actionDataGrid.Focus();
             };
             mrw.Owner = this;
@@ -478,7 +479,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void AddActionToBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択されている帳簿が存在する
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BookTab && this.MainWindowVM.SelectedBookVM != null;
+            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.SelectedBookVM != null;
         }
 
         /// <summary>
@@ -491,7 +492,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             ActionRegistrationWindow arw = new ActionRegistrationWindow(builder,
                 this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
             arw.Registrated += (sender2, e2)=> {
-                UpdateBookData(e2.Id);
+                UpdateBookTabData(e2.Id);
                 actionDataGrid.Focus();
             };
             arw.Owner = this;
@@ -506,7 +507,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void AddActionListToBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択されている帳簿が存在する
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BookTab && this.MainWindowVM.SelectedBookVM != null;
+            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.SelectedBookVM != null;
         }
 
         /// <summary>
@@ -519,7 +520,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(builder,
                 this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
             alrw.Registrated += (sender2, e2) => {
-                UpdateBookData(e2.Id);
+                UpdateBookTabData(e2.Id);
                 actionDataGrid.Focus();
             };
             alrw.Owner = this;
@@ -534,7 +535,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void EditActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択されている帳簿項目が存在していて、選択している帳簿項目のIDが0より大きい
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BookTab && this.MainWindowVM.SelectedActionVM != null && this.MainWindowVM.SelectedActionVM.ActionId > 0;
+            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.SelectedActionVM != null && this.MainWindowVM.SelectedActionVM.ActionId > 0;
         }
 
         /// <summary>
@@ -560,7 +561,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
             if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
                 ActionRegistrationWindow arw = new ActionRegistrationWindow(builder, this.MainWindowVM.SelectedActionVM.ActionId);
                 arw.Registrated += (sender2, e2) => {
-                    UpdateBookData(e2.Id);
+                    UpdateBookTabData(e2.Id);
                     actionDataGrid.Focus();
                 };
                 arw.ShowDialog();
@@ -569,7 +570,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
                 // 移動時の処理
                 MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder, this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM.GroupId.Value);
                 mrw.Registrated += (sender2, e2) => {
-                    UpdateBookData(e2.Id);
+                    UpdateBookTabData(e2.Id);
                     actionDataGrid.Focus();
                 };
                 mrw.ShowDialog();
@@ -584,7 +585,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
         private void DeleteActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択している帳簿項目が存在していて、選択している帳簿項目のIDが0より大きい
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BookTab && this.MainWindowVM.SelectedActionVM != null && this.MainWindowVM.SelectedActionVM.ActionId > 0;
+            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.SelectedActionVM != null && this.MainWindowVM.SelectedActionVM.ActionId > 0;
         }
 
         /// <summary>
@@ -635,7 +636,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                     
                 }
 
-                UpdateBookData();
+                UpdateBookTabData();
             }
         }
         #endregion
@@ -648,7 +649,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void IndicateBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.MainWindowVM.SelectedTab != Tab.BookTab;
+            e.CanExecute = this.MainWindowVM.SelectedTab != Tab.BooksTab;
         }
 
         /// <summary>
@@ -658,7 +659,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void IndicateBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.MainWindowVM.SelectedTab = Tab.BookTab;
+            this.MainWindowVM.SelectedTab = Tab.BooksTab;
         }
 
         /// <summary>
@@ -708,7 +709,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void IndicateSettingCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.MainWindowVM.SelectedTab != Tab.SettingTab;
+            e.CanExecute = this.MainWindowVM.SelectedTab != Tab.SettingsTab;
         }
 
         /// <summary>
@@ -718,7 +719,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void IndicateSettingCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.MainWindowVM.SelectedTab = Tab.SettingTab;
+            this.MainWindowVM.SelectedTab = Tab.SettingsTab;
         }
         #endregion
 
@@ -731,7 +732,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         private void GoToLastMonthCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択している
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BookTab;
+            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab;
         }
 
         /// <summary>
@@ -745,7 +746,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor = Cursors.Wait;
 
             this.MainWindowVM.DisplayedMonth = this.MainWindowVM.DisplayedMonth.AddMonths(-1);
-            UpdateBookData();
+            UpdateBookTabData();
 
             Cursor = cCursor;
         }
@@ -759,7 +760,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         {
             DateTime thisMonth = DateTime.Today.GetFirstDateOfMonth();
             // 帳簿タブを選択している かつ 今月が表示されていない
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BookTab && !(thisMonth <= this.MainWindowVM.DisplayedMonth && this.MainWindowVM.DisplayedYear < thisMonth.AddMonths(1));
+            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && !(thisMonth <= this.MainWindowVM.DisplayedMonth && this.MainWindowVM.DisplayedYear < thisMonth.AddMonths(1));
         }
 
         /// <summary>
@@ -773,7 +774,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor = Cursors.Wait;
 
             this.MainWindowVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
-            UpdateBookData();
+            UpdateBookTabData();
 
             Cursor = cCursor;
         }
@@ -786,7 +787,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         private void GoToNextMonthCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択している
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BookTab;
+            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab;
         }
 
         /// <summary>
@@ -800,7 +801,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor = Cursors.Wait;
 
             this.MainWindowVM.DisplayedMonth = this.MainWindowVM.DisplayedMonth.AddMonths(1);
-            UpdateBookData();
+            UpdateBookTabData();
 
             Cursor = cCursor;
         }
@@ -829,7 +830,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor = Cursors.Wait;
 
             this.MainWindowVM.DisplayedYear = this.MainWindowVM.DisplayedYear.AddYears(-1);
-            UpdateYearsListData();
+            UpdateListTabData();
 
             Cursor = cCursor;
         }
@@ -857,7 +858,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor = Cursors.Wait;
 
             this.MainWindowVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
-            UpdateYearsListData();
+            UpdateListTabData();
 
             Cursor = cCursor;
         }
@@ -884,217 +885,9 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor = Cursors.Wait;
 
             this.MainWindowVM.DisplayedYear = this.MainWindowVM.DisplayedYear.AddYears(1);
-            UpdateYearsListData();
+            UpdateListTabData();
 
             Cursor = cCursor;
-        }
-        #endregion
-
-        #region 設定の操作
-        /// <summary>
-        /// カテゴリを追加可能か判定
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AddCategoryCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Item;
-        }
-
-        /// <summary>
-        /// カテゴリを追加する
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AddCategoryCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
-        }
-
-        /// <summary>
-        /// 項目を追加可能か判定
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AddItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Balance;
-        }
-
-        /// <summary>
-        /// 項目を追加する
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AddItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
-        }
-
-        /// <summary>
-        /// 分類/項目を削除可能か判定
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DeleteItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Balance;
-        }
-
-        /// <summary>
-        /// 分類/項目を削除する
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DeleteItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
-        }
-
-        /// <summary>
-        /// 分類/項目の表示順を上げれるか判定
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RaiseItemSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.ParentVM != null;
-            if (e.CanExecute) {
-                // 同じ階層で、よりソート順序が上の分類/項目がある場合trueになる
-                var parentVM = this.SettingsVM.SelectedItemVM.ParentVM;
-                int index = parentVM.ChildrenVMList.IndexOf(this.SettingsVM.SelectedItemVM);
-                e.CanExecute = 0 < index;
-
-                // 選択された対象が項目で分類内の最も上位にいる場合
-                if (!e.CanExecute && parentVM.ParentVM != null) {
-                    // 項目の属する分類について、同じ階層内によりソート順序が上の分類がある場合trueになる
-                    var grandparentVM = parentVM.ParentVM;
-                    int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
-                    e.CanExecute = 0 < index2;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 分類/項目の表示順を上げる
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RaiseItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
-        }
-
-        /// <summary>
-        /// 分類/項目の表示順を下げれるか判定
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DropItemSortOrderCommand_CanExecuted(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.ParentVM != null;
-            if (e.CanExecute) {
-                // 同じ階層で、よりソート順序が下の分類/項目がある場合trueになる
-                var parentVM = this.SettingsVM.SelectedItemVM.ParentVM;
-                int index = parentVM.ChildrenVMList.IndexOf(this.SettingsVM.SelectedItemVM);
-                e.CanExecute = parentVM.ChildrenVMList.Count - 1 > index;
-
-                // 選択された対象が項目で分類内の最も上位にいる場合
-                if (!e.CanExecute && parentVM.ParentVM != null) {
-                    // 項目の属する分類について、同じ階層内によりソート順序が下の分類がある場合trueになる
-                    var grandparentVM = parentVM.ParentVM;
-                    int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
-                    e.CanExecute = grandparentVM.ChildrenVMList.Count - 1 > index2;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 分類/項目の表示順を下げる
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DropItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
-        }
-
-        /// <summary>
-        /// 帳簿を追加する
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AddBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
-        }
-
-        /// <summary>
-        /// 帳簿を削除可能か判定
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DeleteBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.SettingsVM.SelectedBookVM != null;
-        }
-
-        /// <summary>
-        /// 帳簿を削除する
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DeleteBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
-        }
-
-        /// <summary>
-        /// 帳簿の表示順を上げれるか判定
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RaiseBookSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.SettingsVM.BookVMList != null;
-            if (e.CanExecute) {
-                int index = this.SettingsVM.BookVMList.IndexOf(this.SettingsVM.SelectedBookVM);
-                e.CanExecute = index > 0;
-            }
-        }
-
-        /// <summary>
-        /// 帳簿の表示順を上げる
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RaiseBookSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
-        }
-
-        /// <summary>
-        /// 帳簿の表示順を下げれるか判定
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DropBookSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.SettingsVM.BookVMList != null;
-            if (e.CanExecute) {
-                int index = this.SettingsVM.BookVMList.IndexOf(this.SettingsVM.SelectedBookVM);
-                e.CanExecute = index != -1 && index < this.SettingsVM.BookVMList.Count - 1;
-            }
-        }
-
-        /// <summary>
-        /// 帳簿の表示順を下げる
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DropBookSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-
         }
         #endregion
         #endregion
@@ -1130,9 +923,9 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = Cursor;
             Cursor = Cursors.Wait;
             
-            UpdateBookData();
-            UpdateYearsListData();
-            UpdateGraphData();
+            UpdateBookTabData();
+            UpdateListTabData();
+            UpdateGraphTabData();
 
             Cursor = cCursor;
         }
@@ -1149,17 +942,17 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 Cursor = Cursors.Wait;
 
                 switch (this.MainWindowVM.SelectedTab) {
-                    case Tab.BookTab:
-                        UpdateBookData();
+                    case Tab.BooksTab:
+                        UpdateBookTabData();
                         break;
                     case Tab.ListTab:
-                        UpdateYearsListData();
+                        UpdateListTabData();
                         break;
                     case Tab.GraphTab:
-                        UpdateGraphData();
+                        UpdateGraphTabData();
                         break;
-                    case Tab.SettingTab:
-                        UpdateSettingData();
+                    case Tab.SettingsTab:
+                        UpdateSettingTabData();
                         break;
                 }
                 Cursor = cCursor;
@@ -1214,114 +1007,6 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             }
         }
         #endregion
-
-        #region 設定操作
-        /// <summary>
-        /// 項目設定で一覧の選択を変更した時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            TreeView treeView = sender as TreeView;
-            SettingsVM.SelectedItemVM = treeView.SelectedItem as HierarchicalItemViewModel;
-
-            if (this.shopNameListBox.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.shopNameListBox) > 0) {
-                if (VisualTreeHelper.GetChild(this.shopNameListBox, 0) is Decorator border) {
-                    if (border.Child is ScrollViewer scroll) {
-                        scroll.ScrollToTop();
-                    }
-                }
-            }
-            if (this.remarkListBox.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.remarkListBox) > 0) {
-                if (VisualTreeHelper.GetChild(this.remarkListBox, 0) is Decorator border) {
-                    if (border.Child is ScrollViewer scroll) {
-                        scroll.ScrollToTop();
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// 項目設定の店舗名リストでキー入力した時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ShopNameListBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key) {
-                case Key.Delete: {
-                        if (this.SettingsVM.SelectedItemVM?.SelectedShopName != null) {
-                            if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
-                                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
-                                using (DaoBase dao = builder.Build()) {
-                                    dao.ExecQuery(@"
-UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedShopName, this.SettingsVM.SelectedItemVM.Id);
-                                }
-
-                                using (DaoBase dao = builder.Build()) {
-                                    DaoReader reader = dao.ExecQuery(@"
-SELECT shop_name
-FROM hst_shop
-WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
-
-                                    this.SettingsVM.SelectedItemVM.ShopNameList.Clear();
-                                    reader.ExecWholeRow((count2, record2) => {
-                                        string shopName = record2["shop_name"];
-
-                                        this.SettingsVM.SelectedItemVM.ShopNameList.Add(shopName);
-                                    });
-                                }
-                            }
-                            e.Handled = true;
-                        }
-                    }
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// 項目設定の備考リストでキー入力した時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RemarkListBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key) {
-                case Key.Delete: {
-                        if (this.SettingsVM.SelectedItemVM?.SelectedRemark != null) {
-                            if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
-                                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
-                                using (DaoBase dao = builder.Build()) {
-                                    dao.ExecQuery(@"
-UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE remark = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedRemark, this.SettingsVM.SelectedItemVM.Id);
-                                }
-                            }
-
-                            using (DaoBase dao = builder.Build()) {
-                                DaoReader reader = dao.ExecQuery(@"
-SELECT remark
-FROM hst_remark
-WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
-
-                                this.SettingsVM.SelectedItemVM.RemarkList.Clear();
-                                reader.ExecWholeRow((count2, record2) => {
-                                    string remark = record2["remark"];
-
-                                    this.SettingsVM.SelectedItemVM.RemarkList.Add(remark);
-                                });
-                            }
-                            e.Handled = true;
-                        }
-                    }
-                    break;
-            }
-        }
-        #endregion
         #endregion
 
         #region 画面更新用の関数
@@ -1354,13 +1039,14 @@ ORDER BY sort_order;");
             this.MainWindowVM.SelectedBookVM = selectedBookVM;
         }
 
+        #region 帳簿タブ更新用の関数
         /// <summary>
         /// 帳簿タブに表示するデータを更新する
         /// </summary>
         /// <param name="actionId">選択対象の帳簿項目ID</param>
-        private void UpdateBookData(int? actionId = null)
+        private void UpdateBookTabData(int? actionId = null)
         {
-            if (this.MainWindowVM.SelectedTab == Tab.BookTab) {
+            if (this.MainWindowVM.SelectedTab == Tab.BooksTab) {
                 this.MainWindowVM.ActionVMList = LoadActionViewModelList(
                     this.MainWindowVM.SelectedBookVM?.Id, this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth(),
                     this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
@@ -1600,11 +1286,13 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
 
             return summaryVMList;
         }
+        #endregion
 
+        #region 年間一覧タブ更新用の関数
         /// <summary>
         /// 年間一覧タブに表示するデータを更新する
         /// </summary>
-        private void UpdateYearsListData()
+        private void UpdateListTabData()
         {
             if (this.MainWindowVM.SelectedTab == Tab.ListTab) {
                 int startMonth = Properties.Settings.Default.App_StartMonth;
@@ -1733,26 +1421,585 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             return vmList;
         }
+        #endregion
 
+        #region グラフタブ更新用の関数
         /// <summary>
         /// グラフタブに表示するデータを更新する
         /// </summary>
-        private void UpdateGraphData()
+        private void UpdateGraphTabData()
         {
             if(this.MainWindowVM.SelectedTab == Tab.GraphTab) {
                 throw new NotImplementedException();
             }
         }
+        #endregion
+        #endregion
 
+        #region 設定反映用の関数
+        /// <summary>
+        /// 設定を読み込む
+        /// </summary>
+        private void LoadSetting()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            if (Properties.Settings.Default.MainWindow_Left != -1) {
+                Left = settings.MainWindow_Left;
+            }
+            if (Properties.Settings.Default.MainWindow_Top != -1) {
+                Top = settings.MainWindow_Top;
+            }
+            if (Properties.Settings.Default.MainWindow_Width != -1) {
+                Width = settings.MainWindow_Width;
+            }
+            if (Properties.Settings.Default.MainWindow_Height != -1) {
+                Height = settings.MainWindow_Height;
+            }
+        }
+
+        /// <summary>
+        /// 設定を保存する
+        /// </summary>
+        private void SaveSetting()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            if (this.WindowState == WindowState.Normal) {
+                settings.MainWindow_Left = Left;
+                settings.MainWindow_Top = Top;
+                settings.MainWindow_Width = Width;
+                settings.MainWindow_Height = Height;
+                settings.MainWindow_SelectedBookId = this.MainWindowVM.SelectedBookVM.Id.HasValue ? this.MainWindowVM.SelectedBookVM.Id.Value : -1;
+                settings.Save();
+            }
+        }
+        #endregion
+    }
+
+    /// <summary>
+    /// MainWindow.xaml の相互作用ロジック(設定)
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        #region フィールド
+        /// <summary>
+        /// 前回選択していた設定タブ
+        /// </summary>
+        private SettingsTab oldSelectedSettingsTab = SettingsTab.ItemSettingsTab;
+        #endregion
+
+        /// <summary>
+        /// 設定タブを初期化する
+        /// </summary>
+        public void InitSettingsTab()
+        {
+            UpdateSettingTabData();
+        }
+
+        #region コマンド
+        #region 項目設定の操作
+        /// <summary>
+        /// カテゴリを追加可能か判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddCategoryCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Item;
+        }
+
+        /// <summary>
+        /// カテゴリを追加する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddCategoryCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 項目を追加可能か判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Balance;
+        }
+
+        /// <summary>
+        /// 項目を追加する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 分類/項目を削除可能か判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Balance;
+        }
+
+        /// <summary>
+        /// 分類/項目を削除する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 分類/項目の表示順を上げれるか判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RaiseItemSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.ParentVM != null;
+            if (e.CanExecute) {
+                // 同じ階層で、よりソート順序が上の分類/項目がある場合trueになる
+                var parentVM = this.SettingsVM.SelectedItemVM.ParentVM;
+                int index = parentVM.ChildrenVMList.IndexOf(this.SettingsVM.SelectedItemVM);
+                e.CanExecute = 0 < index;
+
+                // 選択された対象が項目で分類内の最も上位にいる場合
+                if (!e.CanExecute && parentVM.ParentVM != null) {
+                    // 項目の属する分類について、同じ階層内によりソート順序が上の分類がある場合trueになる
+                    var grandparentVM = parentVM.ParentVM;
+                    int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
+                    e.CanExecute = 0 < index2;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 分類/項目の表示順を上げる
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RaiseItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 分類/項目の表示順を下げれるか判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DropItemSortOrderCommand_CanExecuted(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.ParentVM != null;
+            if (e.CanExecute) {
+                // 同じ階層で、よりソート順序が下の分類/項目がある場合trueになる
+                var parentVM = this.SettingsVM.SelectedItemVM.ParentVM;
+                int index = parentVM.ChildrenVMList.IndexOf(this.SettingsVM.SelectedItemVM);
+                e.CanExecute = parentVM.ChildrenVMList.Count - 1 > index;
+
+                // 選択された対象が項目で分類内の最も上位にいる場合
+                if (!e.CanExecute && parentVM.ParentVM != null) {
+                    // 項目の属する分類について、同じ階層内によりソート順序が下の分類がある場合trueになる
+                    var grandparentVM = parentVM.ParentVM;
+                    int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
+                    e.CanExecute = grandparentVM.ChildrenVMList.Count - 1 > index2;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 分類/項目の表示順を下げる
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DropItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+        #endregion
+
+        #region 帳簿設定の操作
+        /// <summary>
+        /// 帳簿を追加する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            int bookId = -1;
+            using(DaoBase dao = builder.Build()) {
+                DaoReader reader = dao.ExecQuery(@"
+INSERT INTO mst_book (book_name, book_kind, pay_day, initial_value, del_flg, update_time, updater, insert_time, inserter)
+VALUES ('(no name)', 0, null, 0, 0, 'now', @{0}, 'now', @{1})
+RETURNING book_id;", Updater, Inserter);
+
+                reader.ExecARow((record) => {
+                    bookId = record.ToInt("book_id");
+                });
+            }
+
+            UpdateBookSettingTabData(bookId);
+        }
+
+        /// <summary>
+        /// 帳簿を削除可能か判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedBookVM != null;
+        }
+
+        /// <summary>
+        /// 帳簿を削除する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            using(DaoBase dao = builder.Build()) {
+                DaoReader reader = dao.ExecQuery(@"
+SELECT * FROM mst_book
+WHERE book_id = @{0} AND del_flg = 0;", this.SettingsVM.SelectedBookVM.Id);
+
+                if (reader.Count == 0) {
+                    dao.ExecNonQuery(@"
+UPDATE mst_book
+SET del_flg = 1, update_time = 'now', updater = @{0}
+WHERE book_id = @{1};", Updater, this.SettingsVM.SelectedBookVM.Id);
+                }
+            }
+
+            UpdateBookSettingTabData();
+        }
+
+        /// <summary>
+        /// 帳簿の表示順を上げれるか判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RaiseBookSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.BookVMList != null;
+            if (e.CanExecute) {
+                int index = this.SettingsVM.BookVMList.IndexOf(this.SettingsVM.SelectedBookVM);
+                e.CanExecute = index > 0;
+            }
+        }
+
+        /// <summary>
+        /// 帳簿の表示順を上げる
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RaiseBookSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            int index = this.SettingsVM.BookVMList.IndexOf(this.SettingsVM.SelectedBookVM);
+            int changedId = this.SettingsVM.BookVMList[index - 1].Id.Value;
+            int changingId = this.SettingsVM.BookVMList[index].Id.Value;
+
+            using (DaoBase dao = builder.Build()) {
+                DaoReader reader = dao.ExecQuery(@"
+SELECT sort_order
+FROM mst_book
+WHERE book_id = @{0};", changedId);
+
+                int tmpOrder = -1;
+                reader.ExecARow((record) => {
+                    tmpOrder = record.ToInt("sort_order");
+                });
+
+                dao.ExecNonQuery(@"
+UPDATE mst_book
+SET sort_order = (SELECT sort_order FROM mst_book WHERE book_id = @{0}), update_time = 'now', updater = @{1}
+WHERE book_id = @{2};", changingId, Updater, changedId);
+
+                dao.ExecNonQuery(@"
+UPDATE mst_book
+SET sort_order = @{0}, update_time = 'now', updater = @{1}
+WHERE book_id = @{2};", tmpOrder, Updater, changingId);
+            }
+
+            UpdateBookSettingTabData(changingId);
+        }
+
+        /// <summary>
+        /// 帳簿の表示順を下げれるか判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DropBookSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.BookVMList != null;
+            if (e.CanExecute) {
+                int index = this.SettingsVM.BookVMList.IndexOf(this.SettingsVM.SelectedBookVM);
+                e.CanExecute = index != -1 && index < this.SettingsVM.BookVMList.Count - 1;
+            }
+        }
+
+        /// <summary>
+        /// 帳簿の表示順を下げる
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DropBookSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            int index = this.SettingsVM.BookVMList.IndexOf(this.SettingsVM.SelectedBookVM);
+            int changedId = this.SettingsVM.BookVMList[index + 1].Id.Value;
+            int changingId = this.SettingsVM.BookVMList[index].Id.Value;
+
+            using (DaoBase dao = builder.Build()) {
+                DaoReader reader = dao.ExecQuery(@"
+SELECT sort_order
+FROM mst_book
+WHERE book_id = @{0};", changedId);
+
+                int tmpOrder = -1;
+                reader.ExecARow((record) => {
+                    tmpOrder = record.ToInt("sort_order");
+                });
+
+                dao.ExecNonQuery(@"
+UPDATE mst_book
+SET sort_order = (SELECT sort_order FROM mst_book WHERE book_id = @{0}), update_time = 'now', updater = @{1}
+WHERE book_id = @{2};", changingId, Updater, changedId);
+
+                dao.ExecNonQuery(@"
+UPDATE mst_book
+SET sort_order = @{0}, update_time = 'now', updater = @{1}
+WHERE book_id = @{2};", tmpOrder, Updater, changingId);
+            }
+
+            UpdateBookSettingTabData(changingId);
+        }
+        #endregion
+        #endregion
+
+        #region イベントハンドラ
+        /// <summary>
+        /// 選択中の設定タブを変更した時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SettingsTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (oldSelectedSettingsTab != this.SettingsVM.SelectedTab) {
+                Cursor cCursor = Cursor;
+                Cursor = Cursors.Wait;
+
+                switch (this.SettingsVM.SelectedTab) {
+                    case SettingsTab.ItemSettingsTab:
+                        UpdateItemSettingsTabData();
+                        break;
+                    case SettingsTab.BookSettingsTab:
+                        UpdateBookSettingTabData();
+                        break;
+                    case SettingsTab.OtherSettingsTab:
+                        UpdateOtherSettingTabData();
+                        break;
+                }
+                Cursor = cCursor;
+            }
+            oldSelectedSettingsTab = this.SettingsVM.SelectedTab;
+        }
+        
+        #region 項目設定操作
+        /// <summary>
+        /// 項目設定で一覧の選択を変更した時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            TreeView treeView = sender as TreeView;
+            SettingsVM.SelectedItemVM = treeView.SelectedItem as HierarchicalItemViewModel;
+
+            if (this.shopNameListBox.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.shopNameListBox) > 0) {
+                if (VisualTreeHelper.GetChild(this.shopNameListBox, 0) is Decorator border) {
+                    if (border.Child is ScrollViewer scroll) {
+                        scroll.ScrollToTop();
+                    }
+                }
+            }
+            if (this.remarkListBox.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.remarkListBox) > 0) {
+                if (VisualTreeHelper.GetChild(this.remarkListBox, 0) is Decorator border) {
+                    if (border.Child is ScrollViewer scroll) {
+                        scroll.ScrollToTop();
+                    }
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 項目設定の店舗名リストでキー入力した時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShopNameListBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key) {
+                case Key.Delete: {
+                        if (this.SettingsVM.SelectedItemVM?.SelectedShopName != null) {
+                            if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+                                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                                using (DaoBase dao = builder.Build()) {
+                                    dao.ExecQuery(@"
+UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
+WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedShopName, this.SettingsVM.SelectedItemVM.Id);
+                                }
+
+                                using (DaoBase dao = builder.Build()) {
+                                    DaoReader reader = dao.ExecQuery(@"
+SELECT shop_name
+FROM hst_shop
+WHERE del_flg = 0 AND item_id = @{0}
+ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
+
+                                    this.SettingsVM.SelectedItemVM.ShopNameList.Clear();
+                                    reader.ExecWholeRow((count2, record2) => {
+                                        string shopName = record2["shop_name"];
+
+                                        this.SettingsVM.SelectedItemVM.ShopNameList.Add(shopName);
+                                    });
+                                }
+                            }
+                            e.Handled = true;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 項目設定の備考リストでキー入力した時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RemarkListBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key) {
+                case Key.Delete: {
+                        if (this.SettingsVM.SelectedItemVM?.SelectedRemark != null) {
+                            if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+                                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                                using (DaoBase dao = builder.Build()) {
+                                    dao.ExecQuery(@"
+UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
+WHERE remark = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedRemark, this.SettingsVM.SelectedItemVM.Id);
+                                }
+                            }
+
+                            using (DaoBase dao = builder.Build()) {
+                                DaoReader reader = dao.ExecQuery(@"
+SELECT remark
+FROM hst_remark
+WHERE del_flg = 0 AND item_id = @{0}
+ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
+
+                                this.SettingsVM.SelectedItemVM.RemarkList.Clear();
+                                reader.ExecWholeRow((count2, record2) => {
+                                    string remark = record2["remark"];
+
+                                    this.SettingsVM.SelectedItemVM.RemarkList.Add(remark);
+                                });
+                            }
+                            e.Handled = true;
+                        }
+                    }
+                    break;
+            }
+        }
+        #endregion
+        #endregion
+
+        #region 画面更新用の関数
         /// <summary>
         /// 設定タブに表示するデータを更新する
         /// </summary>
-        private void UpdateSettingData() {
-            if(this.MainWindowVM.SelectedTab == Tab.SettingTab) {
-                this.SettingsVM.HierachicalItemVMList = LoadItemViewModelList();
-                this.SettingsVM.BookVMList = LoadBookSettingViewModelList();
+        /// <param name="kind">選択対象の階層種別</param>
+        /// <param name="id">選択対象のID</param>
+        /// <param name="bookId">選択対象の帳簿ID</param>
+        private void UpdateSettingTabData(HierarchicalKind? kind = null, int? id = null, int? bookId = null)
+        {
+            if (this.MainWindowVM.SelectedTab == Tab.SettingsTab) {
+                UpdateItemSettingsTabData(kind, id);
+                UpdateBookSettingTabData(bookId);
             }
         }
+
+        /// <summary>
+        /// 設定->項目設定タブに表示するデータを更新する
+        /// </summary>
+        /// <param name="kind">選択対象の階層種別</param>
+        /// <param name="id">選択対象のID</param>
+        private void UpdateItemSettingsTabData(HierarchicalKind? kind = null, int? id = null)
+        {
+            if (this.SettingsVM.SelectedTab == SettingsTab.ItemSettingsTab) {
+                this.SettingsVM.HierachicalItemVMList = LoadItemViewModelList();
+
+                if (kind == null || id == null) {
+                    this.SettingsVM.SelectedItemVM = null;
+                }
+                else {
+                    // 収支から探す
+                    IEnumerable<HierarchicalItemViewModel> query = this.SettingsVM.HierachicalItemVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
+                    if (query == null) {
+                        // カテゴリから探す
+                        foreach (HierarchicalItemViewModel tmpVM in this.SettingsVM.HierachicalItemVMList) {
+                            query = tmpVM.ChildrenVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
+                            if (query.Count() != 0) { break; }
+                        }
+
+                        if (query.Count() == 0) {
+                            // 項目から探す
+                            foreach (HierarchicalItemViewModel tmpVM in this.SettingsVM.HierachicalItemVMList) {
+                                foreach (HierarchicalItemViewModel tmpVM2 in this.SettingsVM.HierachicalItemVMList) {
+                                    query = tmpVM2.ChildrenVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
+                                    if (query.Count() != 0) { break; }
+                                }
+                            }
+                        }
+                    }
+
+                    this.SettingsVM.SelectedItemVM = query.Count() == 0 ? null : query.First();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 設定->帳簿設定タブに表示するデータを更新する
+        /// </summary>
+        /// <param name="bookId">選択対象の帳簿ID</param>
+        private void UpdateBookSettingTabData(int? bookId = null)
+        {
+            if (this.SettingsVM.SelectedTab == SettingsTab.BookSettingsTab) {
+                this.SettingsVM.BookVMList = LoadBookSettingViewModelList();
+
+                if (bookId == null) {
+                    this.SettingsVM.SelectedBookVM = null;
+                }
+                else {
+                    IEnumerable<BookSettingViewModel> query = this.SettingsVM.BookVMList.Where((vm) => { return vm.Id == bookId; });
+                    this.SettingsVM.SelectedBookVM = query.Count() == 0 ? null : query.First();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 設定->その他タブに表示するデータを更新する
+        /// </summary>
+        private void UpdateOtherSettingTabData() { }
 
         /// <summary>
         /// 階層構造項目VMリストを取得する
@@ -1881,10 +2128,11 @@ ORDER BY used_time DESC;", vm2.Id);
         /// 帳簿VM(設定用)リストを取得する
         /// </summary>
         /// <returns>帳簿VM(設定用)リスト</returns>
-        private ObservableCollection<BookSettingViewModel> LoadBookSettingViewModelList() {
+        private ObservableCollection<BookSettingViewModel> LoadBookSettingViewModelList()
+        {
             ObservableCollection<BookSettingViewModel> vmList = new ObservableCollection<BookSettingViewModel>();
 
-            using(DaoBase dao = builder.Build()) {
+            using (DaoBase dao = builder.Build()) {
                 // 帳簿一覧を取得する
                 DaoReader reader = dao.ExecQuery(@"
 SELECT book_id, book_name, pay_day, initial_value
@@ -1907,7 +2155,7 @@ ORDER BY sort_order;");
                 });
 
                 // 項目との関係の一覧を取得する(移動を除く)
-                foreach(BookSettingViewModel vm in vmList) {
+                foreach (BookSettingViewModel vm in vmList) {
                     reader = dao.ExecQuery(@"
 SELECT I.item_id AS ItemId, I.item_name, C.category_name, RBI.item_id IS NULL AS IsNotRelated
 FROM mst_item I
@@ -1932,46 +2180,6 @@ ORDER BY I.sort_order;", vm.Id);
             }
 
             return vmList;
-        }
-        #endregion
-
-        #region 設定反映用の関数
-        /// <summary>
-        /// 設定を読み込む
-        /// </summary>
-        private void LoadSetting()
-        {
-            Properties.Settings settings = Properties.Settings.Default;
-
-            if (Properties.Settings.Default.MainWindow_Left != -1) {
-                Left = settings.MainWindow_Left;
-            }
-            if (Properties.Settings.Default.MainWindow_Top != -1) {
-                Top = settings.MainWindow_Top;
-            }
-            if (Properties.Settings.Default.MainWindow_Width != -1) {
-                Width = settings.MainWindow_Width;
-            }
-            if (Properties.Settings.Default.MainWindow_Height != -1) {
-                Height = settings.MainWindow_Height;
-            }
-        }
-
-        /// <summary>
-        /// 設定を保存する
-        /// </summary>
-        private void SaveSetting()
-        {
-            Properties.Settings settings = Properties.Settings.Default;
-
-            if (this.WindowState == WindowState.Normal) {
-                settings.MainWindow_Left = Left;
-                settings.MainWindow_Top = Top;
-                settings.MainWindow_Width = Width;
-                settings.MainWindow_Height = Height;
-                settings.MainWindow_SelectedBookId = this.MainWindowVM.SelectedBookVM.Id.HasValue ? this.MainWindowVM.SelectedBookVM.Id.Value : -1;
-                settings.Save();
-            }
         }
         #endregion
     }
