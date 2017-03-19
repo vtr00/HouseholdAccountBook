@@ -1396,17 +1396,20 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (Properties.Settings.Default.MainWindow_Left != -1) {
+            if (settings.MainWindow_Left != -1) {
                 Left = settings.MainWindow_Left;
             }
-            if (Properties.Settings.Default.MainWindow_Top != -1) {
+            if (settings.MainWindow_Top != -1) {
                 Top = settings.MainWindow_Top;
             }
-            if (Properties.Settings.Default.MainWindow_Width != -1) {
+            if (settings.MainWindow_Width != -1) {
                 Width = settings.MainWindow_Width;
             }
-            if (Properties.Settings.Default.MainWindow_Height != -1) {
+            if (settings.MainWindow_Height != -1) {
                 Height = settings.MainWindow_Height;
+            }
+            if (settings.MainWindow_WindowState != -1) {
+                WindowState = (WindowState)settings.MainWindow_WindowState;
             }
         }
 
@@ -1416,15 +1419,15 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         private void SaveSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
-
-            if (this.WindowState == WindowState.Normal) {
-                settings.MainWindow_Left = Left;
-                settings.MainWindow_Top = Top;
-                settings.MainWindow_Width = Width;
-                settings.MainWindow_Height = Height;
-                settings.MainWindow_SelectedBookId = this.MainWindowVM.SelectedBookVM.Id.HasValue ? this.MainWindowVM.SelectedBookVM.Id.Value : -1;
-                settings.Save();
+            if (WindowState != WindowState.Minimized) { 
+                settings.MainWindow_WindowState = (int)WindowState;
             }
+            settings.MainWindow_SelectedBookId = this.MainWindowVM.SelectedBookVM.Id.HasValue ? this.MainWindowVM.SelectedBookVM.Id.Value : -1;
+            settings.MainWindow_Left = Left;
+            settings.MainWindow_Top = Top;
+            settings.MainWindow_Width = Width;
+            settings.MainWindow_Height = Height;
+            settings.Save();
         }
         #endregion
     }
@@ -1550,7 +1553,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DropItemSortOrderCommand_CanExecuted(object sender, CanExecuteRoutedEventArgs e)
+        private void DropItemSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.ParentVM != null;
             if (e.CanExecute) {
@@ -1577,6 +1580,37 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         private void DropItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             
+        }
+
+        /// <summary>
+        /// 項目の情報を保存できるか判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveItemInfoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Balance &&
+                !string.IsNullOrWhiteSpace(this.SettingsVM.SelectedItemVM.Name);
+        }
+
+        /// <summary>
+        /// 項目の情報を保存する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveItemInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 項目-帳簿の関係を変更する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ChangeItemRelationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
         }
 
         /// <summary>
@@ -1710,7 +1744,7 @@ SELECT * FROM hst_action
 WHERE book_id = @{0} AND del_flg = 0;", this.SettingsVM.SelectedBookVM.Id);
 
                 if (reader.Count != 0) {
-                    MessageBox.Show("帳簿項目が存在するので削除できません。"); // TODO
+                    MessageBox.Show("帳簿内に帳簿項目が存在するので削除できません。"); // TODO
                     return;
                 }
                 
@@ -1821,6 +1855,75 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             }
 
             UpdateBookSettingTabData(changingId);
+        }
+
+        /// <summary>
+        /// 帳簿の情報を保存できるか判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveBookInfoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.SettingsVM.SelectedBookVM != null && !string.IsNullOrWhiteSpace(this.SettingsVM.SelectedBookVM.Name);
+        }
+
+        /// <summary>
+        /// 帳簿の情報を保存する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveBookInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            using (DaoBase dao = builder.Build()) {
+                BookSettingViewModel vm = this.SettingsVM.SelectedBookVM;
+                dao.ExecNonQuery(@"
+UPDATE mst_book
+SET book_name = @{0}, initial_value = @{1}, pay_day = @{2}, update_time = 'now', updater = @{3}
+WHERE book_id = @{4};", vm.Name, vm.InitialValue, vm.PayDay, Updater, vm.Id);
+            }
+        }
+
+        /// <summary>
+        /// 帳簿-項目の関係を変更する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ChangeBookRelationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            BookSettingViewModel vm = this.SettingsVM.SelectedBookVM;
+            vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
+            vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
+
+            using (DaoBase dao = builder.Build()) {
+                DaoReader reader = dao.ExecQuery(@"
+SELECT *
+FROM rel_book_item
+WHERE book_id = @{0} AND item_id = @{1};", vm.Id, vm.SelectedRelationVM.Id);
+
+                if(reader.Count == 0) {
+                    dao.ExecNonQuery(@"
+INSERT INTO rel_book_item (book_id, item_id, del_flg, insert_time, inserter, update_time, updater)
+VALUES (@{0}, @{1}, 0, 'now', @{2}, 'now', @{3});", vm.Id, vm.SelectedRelationVM.Id, Inserter, Updater);
+                }
+                else {
+                    reader = dao.ExecQuery(@"
+SELECT *
+FROM hst_action
+WHERE book_id = @{0} AND item_id = @{1} AND del_flg = 0;", vm.Id, vm.SelectedRelationVM.Id);
+
+                    if (reader.Count != 0) {
+                        MessageBox.Show("帳簿内の該当する項目に帳簿項目が存在するので削除できません。"); // TODO
+                        e.Handled = true;
+                        return;
+                    }
+
+                    vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
+                    dao.ExecNonQuery(@"
+UPDATE rel_book_item
+SET del_flg = @{0}, update_time = 'now', updater = @{1}
+WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 : 1, Updater, vm.Id, vm.SelectedRelationVM.Id);
+                }
+            }
         }
         #endregion
         #endregion

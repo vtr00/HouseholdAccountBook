@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PoliteMusic")]
 [assembly: AssemblyProduct("HouseholdAccountBook")]
-[assembly: AssemblyCopyright("Copyright © 2016 toresebu")]
+[assembly: AssemblyCopyright("Copyright © 2017 toresebu")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

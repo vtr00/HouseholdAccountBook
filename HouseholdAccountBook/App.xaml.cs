@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
@@ -18,13 +19,33 @@ namespace HouseholdAccountBook
         /// 接続情報
         /// </summary>
         private DaoNpgsql.ConnectInfo connectInfo = null;
-        
+
+        private static Mutex mutex = null;
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
         public App()
         {
+            
+        }
+
+        /// <summary>
+        /// アプリケーション開始時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
+            
+            // 多重起動を抑止する
+            mutex = new Mutex(false, this.GetType().Assembly.GetName().Name);
+            if (!mutex.WaitOne(TimeSpan.Zero, false)) {
+                mutex.Close();
+                this.Shutdown();
+                return;
+            }
 
             // DB設定ダイアログ終了時に閉じないように設定する
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
@@ -121,7 +142,12 @@ namespace HouseholdAccountBook
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Application_Exit(object sender, ExitEventArgs e) { }
+        private void Application_Exit(object sender, ExitEventArgs e) {
+            if (mutex != null) {
+                mutex.ReleaseMutex();
+                mutex.Close();
+            }
+        }
 
         /// <summary>
         /// バックアップファイルを作成する

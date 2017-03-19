@@ -201,7 +201,18 @@ namespace HouseholdAccountBook.ViewModels
             }
             private ObservableCollection<RelationViewModel> _RelationVMList = default(ObservableCollection<RelationViewModel>);
             #endregion
-
+            /// <summary>
+            /// 選択された関係性VM
+            /// </summary>
+            #region SelectedRelationVM
+            public RelationViewModel SelectedRelationVM
+            {
+                get { return _SelectedRelationVM; }
+                set { SetProperty(ref _SelectedRelationVM, value); }
+            }
+            private RelationViewModel _SelectedRelationVM = default(RelationViewModel);
+            #endregion
+            
             /// <summary>
             /// 店舗名リスト
             /// </summary>
@@ -325,6 +336,17 @@ namespace HouseholdAccountBook.ViewModels
                 set { SetProperty(ref _RelationVMList, value); }
             }
             private ObservableCollection<RelationViewModel> _RelationVMList = default(ObservableCollection<RelationViewModel>);
+            #endregion
+            /// <summary>
+            /// 選択された関係性VM
+            /// </summary>
+            #region SelectedRelationVM
+            public RelationViewModel SelectedRelationVM
+            {
+                get { return _SelectedRelationVM; }
+                set { SetProperty(ref _SelectedRelationVM, value); }
+            }
+            private RelationViewModel _SelectedRelationVM = default(RelationViewModel);
             #endregion
         }
 
