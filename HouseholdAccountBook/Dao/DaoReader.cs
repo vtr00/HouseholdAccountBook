@@ -21,18 +21,18 @@ namespace HouseholdAccountBook.Dao
         /// <summary>
         /// 実行結果
         /// </summary>
-        private LinkedList<Dictionary<String, Object>> resultSet;
+        private LinkedList<Dictionary<string, object>> resultSet;
         /// <summary>
         /// エヌメレータ
         /// </summary>
-        private LinkedList<Dictionary<String, Object>>.Enumerator enumerator;
+        private LinkedList<Dictionary<string, object>>.Enumerator enumerator;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="sql">実行SQL</param>
         /// <param name="resultSet">実行結果</param>
-        public DaoReader(String sql, LinkedList<Dictionary<String, Object>> resultSet)
+        public DaoReader(string sql, LinkedList<Dictionary<string, object>> resultSet)
         {
             this.sql = sql;
             this.resultSet = resultSet;
@@ -51,7 +51,7 @@ namespace HouseholdAccountBook.Dao
                     throw new IndexOutOfRangeException();
                 }
 
-                LinkedListNode<Dictionary<String, object>> node;
+                LinkedListNode<Dictionary<string, object>> node;
                 if (index < Count / 2) { // 前半の場合
                     node = resultSet.First;
                     for (int i = 0; i != index; ++i) {
@@ -119,13 +119,13 @@ namespace HouseholdAccountBook.Dao
             /// <summary>
             /// レコード
             /// </summary>
-            private Dictionary<String, Object> _record;
+            private Dictionary<string, object> _record;
 
             /// <summary>
             /// コンストラクタ
             /// </summary>
             /// <param name="record">レコード</param>
-            public Record(Dictionary<String, Object> record)
+            public Record(Dictionary<string, object> record)
             {
                 this._record = record;
             }
@@ -135,7 +135,7 @@ namespace HouseholdAccountBook.Dao
             /// </summary>
             /// <param name="key">カラム名</param>
             /// <returns></returns>
-            public string this[String key]
+            public string this[string key]
             {
                 get {
                     key = key.ToLower();
@@ -153,11 +153,11 @@ namespace HouseholdAccountBook.Dao
             /// </summary>
             /// <param name="key">カラム名</param>
             /// <returns></returns>
-            public int ToInt(String key)
+            public int ToInt(string key)
             {
                 key = key.ToLower();
                 if (this._record.ContainsKey(key)) {
-                    Object tmp = this._record[key];
+                    object tmp = this._record[key];
                     return Int32.Parse(tmp.ToString());
                 }
                 else {
@@ -170,11 +170,11 @@ namespace HouseholdAccountBook.Dao
             /// </summary>
             /// <param name="key">カラム名</param>
             /// <returns></returns>
-            public int? ToNullableInt(String key)
+            public int? ToNullableInt(string key)
             {
                 key = key.ToLower();
                 if (this._record.ContainsKey(key)) {
-                    Object tmp = this._record[key];
+                    object tmp = this._record[key];
                     return tmp == DBNull.Value ? null : (int?)tmp;
                 }
                 else {
@@ -187,7 +187,7 @@ namespace HouseholdAccountBook.Dao
             /// </summary>
             /// <param name="key">カラム名</param>
             /// <returns></returns>
-            public bool ToBoolean(String key)
+            public bool ToBoolean(string key)
             {
                 key = key.ToLower();
                 if (this._record.ContainsKey(key)) {

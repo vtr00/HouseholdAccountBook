@@ -67,7 +67,7 @@ namespace HouseholdAccountBook.Dao
         /// <param name="sql">SQL</param>
         /// <param name="objects">引数リスト</param>
         /// <returns>更新レコード数</returns>
-        public abstract int ExecNonQuery(String sql, params Object[] objects);
+        public abstract int ExecNonQuery(string sql, params object[] objects);
 
         /// <summary>
         /// クエリを実行する
@@ -75,7 +75,7 @@ namespace HouseholdAccountBook.Dao
         /// <param name="sql">SQL</param>
         /// <param name="objects">引数リスト</param>
         /// <returns>リーダー</returns>
-        public abstract DaoReader ExecQuery(String sql, params Object[] objects);
+        public abstract DaoReader ExecQuery(string sql, params object[] objects);
 
         /// <summary>
         /// トランザクション内の処理

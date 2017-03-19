@@ -29,28 +29,28 @@ namespace HouseholdAccountBook.Dao
         /// コンストラクタ
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
-        public DaoOle(String filePath) : base(new OleDbConnection(String.Format(DaoStringFormat, filePath))) { }
+        public DaoOle(string filePath) : base(new OleDbConnection(string.Format(DaoStringFormat, filePath))) { }
 
-        public override int ExecNonQuery(string sql, params Object[] objects)
+        public override int ExecNonQuery(string sql, params object[] objects)
         {
             return CreateCommand(sql, objects).ExecuteNonQuery();
         }
 
-        public override DaoReader ExecQuery(String sql, params Object[] objects)
+        public override DaoReader ExecQuery(string sql, params object[] objects)
         {
-            LinkedList<Dictionary<String, Object>> resultSet = new LinkedList<Dictionary<String, Object>>();
+            LinkedList<Dictionary<string, object>> resultSet = new LinkedList<Dictionary<string, object>>();
 
             OleDbCommand command = CreateCommand(sql, objects);
             using (OleDbDataReader reader = command.ExecuteReader()) {
                 // フィールド名の取得
-                List<String> fieldList = new List<String>();
+                List<string> fieldList = new List<string>();
                 for (int i = 0; i < reader.FieldCount; ++i) {
                     fieldList.Add(reader.GetName(i));
                 }
 
                 // レコードの取得
                 while (reader.Read()) {
-                    Dictionary<String, Object> result = new Dictionary<String, Object>();
+                    Dictionary<string, object> result = new Dictionary<string, object>();
                     for (int i = 0; i < fieldList.Count; ++i) {
                         result.Add(fieldList[i], reader[fieldList[i]]);
                     }
@@ -66,7 +66,7 @@ namespace HouseholdAccountBook.Dao
         /// <param name="sql">SQL</param>
         /// <param name="objects">引数リスト</param>
         /// <returns>SQLコマンド</returns>
-        private OleDbCommand CreateCommand(String sql, params Object[] objects)
+        private OleDbCommand CreateCommand(string sql, params object[] objects)
         {
             OleDbCommand command = ((OleDbConnection)connection).CreateCommand();
 
@@ -74,7 +74,7 @@ namespace HouseholdAccountBook.Dao
             command.CommandText = sql;
 
             int cnt = 0;
-            foreach (Object obj in objects) {
+            foreach (object obj in objects) {
                 command.Parameters.AddWithValue("@_" + cnt + "_", obj);
                 ++cnt;
             }

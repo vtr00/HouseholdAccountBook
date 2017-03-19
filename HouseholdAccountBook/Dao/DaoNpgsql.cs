@@ -6,7 +6,7 @@ namespace HouseholdAccountBook.Dao
 {
     public class DaoNpgsql : DaoBase
     {
-        private const String daoStringFormat = @"Server={0};Port={1};User Id={2};Password={3};Database={4}";
+        private const string daoStringFormat = @"Server={0};Port={1};User Id={2};Password={3};Database={4}";
 
         /// <summary>
         /// 接続情報
@@ -16,7 +16,7 @@ namespace HouseholdAccountBook.Dao
             /// <summary>
             /// URI
             /// </summary>
-            public String Host { get; set; }
+            public string Host { get; set; }
             /// <summary>
             /// ポート番号
             /// </summary>
@@ -24,19 +24,19 @@ namespace HouseholdAccountBook.Dao
             /// <summary>
             /// ユーザー名
             /// </summary>
-            public String UserName { get; set; }
+            public string UserName { get; set; }
             /// <summary>
             /// パスワード
             /// </summary>
-            public String Password { get; set; }
+            public string Password { get; set; }
             /// <summary>
             /// データベース名
             /// </summary>
-            public String DatabaseName { get; set; }
+            public string DatabaseName { get; set; }
             /// <summary>
             /// ロール名
             /// </summary>
-            public String Role { get; set; }
+            public string Role { get; set; }
         }
 
         /// <summary>
@@ -53,8 +53,8 @@ namespace HouseholdAccountBook.Dao
         /// <param name="userName">ユーザー名</param>
         /// <param name="password">パスワード</param>
         /// <param name="databaseName">データベース名</param>
-        public DaoNpgsql(String uri, int port, String userName, String password, String databaseName)
-            : base(new NpgsqlConnection(String.Format(daoStringFormat, uri, port, userName, password, databaseName))) { }
+        public DaoNpgsql(string uri, int port, string userName, string password, string databaseName)
+            : base(new NpgsqlConnection(string.Format(daoStringFormat, uri, port, userName, password, databaseName))) { }
         
         /// <summary>
         /// 非クエリの実行
@@ -81,19 +81,19 @@ namespace HouseholdAccountBook.Dao
         public override DaoReader ExecQuery(string sql, params object[] objects)
         {
             try {
-                LinkedList<Dictionary<String, Object>> resultSet = new LinkedList<Dictionary<String, Object>>();
+                LinkedList<Dictionary<string, object>> resultSet = new LinkedList<Dictionary<string, object>>();
 
                 NpgsqlCommand command = CreateCommand(sql, objects);
                 using (NpgsqlDataReader reader = command.ExecuteReader()) {
                     // フィールド名の取得
-                    List<String> fieldList = new List<String>();
+                    List<string> fieldList = new List<string>();
                     for (int i = 0; i < reader.FieldCount; ++i) {
                         fieldList.Add(reader.GetName(i));
                     }
 
                     // レコードの取得
                     while (reader.Read()) {
-                        Dictionary<String, Object> result = new Dictionary<String, Object>();
+                        Dictionary<string, object> result = new Dictionary<string, object>();
                         for (int i = 0; i < fieldList.Count; ++i) {
                             result.Add(fieldList[i], reader[fieldList[i]]);
                         }
@@ -116,7 +116,7 @@ namespace HouseholdAccountBook.Dao
         /// <param name="sql">SQL</param>
         /// <param name="objects">SQLパラメータ</param>
         /// <returns>SQLコマンド</returns>
-        private NpgsqlCommand CreateCommand(String sql, params Object[] objects)
+        private NpgsqlCommand CreateCommand(string sql, params object[] objects)
         {
             NpgsqlCommand command = ((NpgsqlConnection)connection).CreateCommand();
 
@@ -124,8 +124,8 @@ namespace HouseholdAccountBook.Dao
             command.CommandText = sql;
 
             int cnt = 0;
-            foreach (Object obj in objects) {
-                Object tmpObj = obj;
+            foreach (object obj in objects) {
+                object tmpObj = obj;
                 if (tmpObj == null) tmpObj = DBNull.Value;
 
                 command.Parameters.AddWithValue("@_" + cnt + "_", tmpObj);

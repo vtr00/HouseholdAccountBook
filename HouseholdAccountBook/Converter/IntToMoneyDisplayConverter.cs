@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.Converter
                 return string.Format("{0:#,0}", Math.Abs((int)value));
             }
             else {
-                return String.Format("{0:#,0}", (int)value);
+                return string.Format("{0:#,0}", (int)value);
             }
         }
 

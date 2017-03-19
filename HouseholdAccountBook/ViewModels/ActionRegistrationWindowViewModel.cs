@@ -213,46 +213,46 @@ namespace HouseholdAccountBook.ViewModels
         /// 店舗名リスト
         /// </summary>
         #region ShopNameList
-        public ObservableCollection<String> ShopNameList
+        public ObservableCollection<string> ShopNameList
         {
             get { return _ShopNameList; }
             set { SetProperty(ref _ShopNameList, value); }
         }
-        private ObservableCollection<String> _ShopNameList = default(ObservableCollection<String>);
+        private ObservableCollection<string> _ShopNameList = default(ObservableCollection<string>);
         #endregion
         /// <summary>
         /// 選択された店舗名
         /// </summary>
         #region SelectedShopName
-        public String SelectedShopName
+        public string SelectedShopName
         {
             get { return _SelectedShopName; }
             set { SetProperty(ref _SelectedShopName, value); }
         }
-        private String _SelectedShopName = default(String);
+        private string _SelectedShopName = default(string);
         #endregion
 
         /// <summary>
         /// 備考リスト
         /// </summary>
         #region RemarkList
-        public ObservableCollection<String> RemarkList
+        public ObservableCollection<string> RemarkList
         {
             get { return _RemarkList; }
             set { SetProperty(ref _RemarkList, value); }
         }
-        private ObservableCollection<String> _RemarkList = default(ObservableCollection<String>);
+        private ObservableCollection<string> _RemarkList = default(ObservableCollection<string>);
         #endregion
         /// <summary>
         /// 選択された備考
         /// </summary>
         #region SelectedRemark
-        public String SelectedRemark
+        public string SelectedRemark
         {
             get { return _SelectedRemark; }
             set { SetProperty(ref _SelectedRemark, value); }
         }
-        private String _SelectedRemark = default(String);
+        private string _SelectedRemark = default(string);
         #endregion
     }
 }

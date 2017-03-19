@@ -1182,7 +1182,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                         CategoryId = categoryId,
                         CategoryName = categoryName,
                         ItemId = itemId,
-                        ItemName = String.Format("  {0}", itemName),
+                        ItemName = string.Format("  {0}", itemName),
                         Summary = summary
                     });
                 });
@@ -1200,7 +1200,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                 totalAsBalanceKind.Add(new SummaryViewModel() {
                     BalanceKind = g1.Key,
                     CategoryId = -1,
-                    CategoryName = String.Empty,
+                    CategoryName = string.Empty,
                     ItemId = -1,
                     ItemName = BalanceStr[(BalanceKind)g1.Key],
                     Summary = g1.Sum(obj => obj.Summary)
@@ -1210,7 +1210,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                     totalAsCategory.Add(new SummaryViewModel() {
                         BalanceKind = g1.Key,
                         CategoryId = g2.Key,
-                        CategoryName = String.Empty,
+                        CategoryName = string.Empty,
                         ItemId = -1,
                         ItemName = g2.First().CategoryName,
                         Summary = g2.Sum(obj => obj.Summary)
@@ -1222,7 +1222,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
             summaryVMList.Insert(0, new SummaryViewModel() {
                 BalanceKind = -1,
                 CategoryId = -1,
-                CategoryName = String.Empty,
+                CategoryName = string.Empty,
                 ItemId = -1,
                 ItemName = "差引損益",
                 Summary = total
@@ -1300,7 +1300,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             vmList.Add(new SummaryWithinYearViewModel() {
                 BalanceKind = -1,
                 CategoryId = -1,
-                CategoryName = String.Empty,
+                CategoryName = string.Empty,
                 ItemId = -1,
                 ItemName = "残高",
                 Values = new List<int>()
