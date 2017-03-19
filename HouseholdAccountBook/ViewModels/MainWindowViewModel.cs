@@ -38,7 +38,11 @@ namespace HouseholdAccountBook.ViewModels
         public Tab SelectedTab
         {
             get { return _SelectedTab; }
-            set { SetProperty(ref _SelectedTab, value); }
+            set {
+                if (SetProperty(ref _SelectedTab, value)) {
+                    SelectedTabIndex = (int)value;
+                }
+            }
         }
         private Tab _SelectedTab = default(Tab);
         #endregion

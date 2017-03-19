@@ -416,11 +416,11 @@ ORDER BY used_time DESC;", this.MoveRegistrationWindowVM.SelectedItemVM.Id);
 
             int? resActionId = null;
 
+            int tmpGroupId = -1; // ローカル用
             using (DaoBase dao = builder.Build()) {
                 dao.ExecTransaction(() => {
                     if (groupId == null) { // 追加
                         #region 帳簿項目を追加する
-                        int tmpGroupId = -1;
                         // グループIDを取得する
                         DaoReader reader = dao.ExecQuery(@"
 INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
@@ -462,6 +462,7 @@ VALUES (@{0}, (
                     }
                     else { // 編集
                         #region 帳簿項目を編集する
+                        tmpGroupId = groupId.Value;
                         dao.ExecNonQuery(@"
 -- 移動元
 UPDATE hst_action
@@ -502,7 +503,7 @@ WHERE action_id = @{6};", bookId, commissionItemId, actTime, - commission, remar
                         else {
                             dao.ExecNonQuery(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7});", bookId, commissionItemId, actTime, - commission, groupId, remark, Updater, Inserter);
+VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7});", bookId, commissionItemId, actTime, - commission, tmpGroupId, remark, Updater, Inserter);
                         }
                         #endregion
                     }
