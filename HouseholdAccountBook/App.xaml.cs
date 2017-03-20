@@ -116,7 +116,7 @@ namespace HouseholdAccountBook
             MainWindow mw = new MainWindow(builder);
             this.MainWindow = mw;
 #if !DEBUG
-            mw.Closing += (sender, e) => {
+            mw.Closing += (sender2, e2) => {
                 if (connectInfo != null) {
                     settings.Reload();
                     mw.Hide();

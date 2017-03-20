@@ -1471,7 +1471,24 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <param name="e"></param>
         private void AddCategoryCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            HierarchicalItemViewModel vm = this.SettingsVM.SelectedItemVM;
+            while(vm.Kind != HierarchicalKind.Balance) {
+                vm = vm.ParentVM;
+            }
+            BalanceKind kind = (BalanceKind)vm.Id;
 
+            int categoryId = -1;
+            using (DaoBase dao = builder.Build()) {
+                DaoReader reader = dao.ExecQuery(@"
+INSERT INTO mst_category (category_name, balance_kind, sort_order, del_flg, update_time, updater, insert_time, inserter)
+VALUES ('(no name)', @{0}, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_category), 0, 'now', @{1}, 'now', @{2})
+RETURNING category_id;", (int)kind, Updater, Inserter);
+
+                reader.ExecARow((record) => {
+                    categoryId = record.ToInt("category_id");
+                });
+            }
+            UpdateItemSettingsTabData(HierarchicalKind.Category, categoryId);
         }
 
         /// <summary>
@@ -1491,7 +1508,24 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <param name="e"></param>
         private void AddItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            HierarchicalItemViewModel vm = this.SettingsVM.SelectedItemVM;
+            while(vm.Kind != HierarchicalKind.Category) {
+                vm = vm.ParentVM;
+            }
+            int categoryId = vm.Id;
 
+            int itemId = -1;
+            using (DaoBase dao = builder.Build()) {
+                DaoReader reader = dao.ExecQuery(@"
+INSERT INTO mst_item (item_name, category_id, advance_flg, sort_order, del_flg, update_time, updater, insert_time, inserter)
+VALUES ('(no name)', @{0}, 0, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), 0, 'now', @{1}, 'now', @{2})
+RETURNING item_id;", categoryId, Updater, Inserter);
+
+                reader.ExecARow((record) => {
+                    itemId = record.ToInt("item_id");
+                });
+            }
+            UpdateItemSettingsTabData(HierarchicalKind.Item, itemId);
         }
 
         /// <summary>
@@ -1511,7 +1545,53 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <param name="e"></param>
         private void DeleteItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            HierarchicalKind kind = this.SettingsVM.SelectedItemVM.Kind;
+            int id = this.SettingsVM.SelectedItemVM.Id;
 
+            using (DaoBase dao = builder.Build()) {
+                switch (kind) {
+                    case HierarchicalKind.Category: {
+                            dao.ExecTransaction(() => {
+                                DaoReader reader = dao.ExecQuery(@"
+SELECT 1
+FROM hst_action A
+INNER JOIN (SELECT item_id FROM mst_item WHERE del_flg = 0 AND category_id = @{0}) I ON A.item_id = I.item_id
+WHERE A.del_flg = 0;", id);
+
+                                if (reader.Count != 0) {
+                                    MessageBox.Show("分類内に帳簿項目が存在するので削除できません。"); // TODO
+                                    return;
+                                }
+
+                                dao.ExecNonQuery(@"
+UPDATE mst_category
+SET del_flg = 1, update_time = 'now', updater = @{0}
+WHERE category_id = @{1};", Updater, id);
+                            });
+                        }
+                        break;
+                    case HierarchicalKind.Item: {
+                            dao.ExecTransaction(() => {
+                                DaoReader reader = dao.ExecQuery(@"
+SELECT *
+FROM hst_action
+WHERE del_flg = 0 AND item_id = @{0};", id);
+
+                                if (reader.Count != 0) {
+                                    MessageBox.Show("項目内に帳簿項目が存在するので削除できません。"); // TODO
+                                    return;
+                                }
+
+                                dao.ExecNonQuery(@"
+UPDATE mst_item
+SET del_flg = 1, update_time = 'now', updater = @{0}
+WHERE item_id = @{1};", Updater, id);
+                            });
+                        }
+                        break;
+                }
+            }
+            UpdateItemSettingsTabData(this.SettingsVM.SelectedItemVM.ParentVM.Kind, this.SettingsVM.SelectedItemVM.ParentVM.Id);
         }
 
         /// <summary>
@@ -1545,7 +1625,80 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <param name="e"></param>
         private void RaiseItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            var parentVM = this.SettingsVM.SelectedItemVM.ParentVM;
+            int index = parentVM.ChildrenVMList.IndexOf(this.SettingsVM.SelectedItemVM);
+            int changingId = parentVM.ChildrenVMList[index].Id;
+            if(0 < index) {
+                int changedId = parentVM.ChildrenVMList[index - 1].Id;
 
+                using (DaoBase dao = builder.Build()) {
+                    switch (this.SettingsVM.SelectedItemVM.Kind) {
+                        case HierarchicalKind.Category: {
+                                dao.ExecTransaction(() => {
+                                    DaoReader reader = dao.ExecQuery(@"
+SELECT sort_order
+FROM mst_category
+WHERE category_id = @{0};", changedId);
+
+                                    int tmpOrder = -1;
+                                    reader.ExecARow((record) => {
+                                        tmpOrder = record.ToInt("sort_order");
+                                    });
+
+                                    dao.ExecNonQuery(@"
+UPDATE mst_category
+SET sort_order = (SELECT sort_order FROM mst_category WHERE category_id = @{0}), update_time = 'now', updater = @{1}
+WHERE category_id = @{2};", changingId, Updater, changedId);
+
+                                    dao.ExecNonQuery(@"
+UPDATE mst_category
+SET sort_order = @{0}, update_time = 'now', updater = @{1}
+WHERE category_id = @{2};", tmpOrder, Updater, changingId);
+                                });
+                            }
+                            break;
+                        case HierarchicalKind.Item: {
+                                dao.ExecTransaction(() => {
+                                    DaoReader reader = dao.ExecQuery(@"
+SELECT sort_order
+FROM mst_item
+WHERE item_id = @{0};", changedId);
+
+                                    int tmpOrder = -1;
+                                    reader.ExecARow((record) => {
+                                        tmpOrder = record.ToInt("sort_order");
+                                    });
+
+                                    dao.ExecNonQuery(@"
+UPDATE mst_item
+SET sort_order = (SELECT sort_order FROM mst_item WHERE item_id = @{0}), update_time = 'now', updater = @{1}
+WHERE item_id = @{2};", changingId, Updater, changedId);
+
+                                    dao.ExecNonQuery(@"
+UPDATE mst_item
+SET sort_order = @{0}, update_time = 'now', updater = @{1}
+WHERE item_id = @{2};", tmpOrder, Updater, changingId);
+                                });
+                            }
+                            break;
+                    }
+                }
+            }
+            else { // 分類を跨いで項目の表示順を変更するとき
+                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                var grandparentVM = parentVM.ParentVM;
+                int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
+                int toCategoryId = grandparentVM.ChildrenVMList[index2 - 1].Id;
+
+                using(DaoBase dao = builder.Build()) {
+                    dao.ExecNonQuery(@"
+UPDATE mst_item
+SET category_id = @{0}, sort_order = (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), update_time = 'now', updater = @{1}
+WHERE item_id = @{2};", toCategoryId, Updater, changingId);
+                }
+            }
+
+            UpdateItemSettingsTabData(this.SettingsVM.SelectedItemVM.Kind, this.SettingsVM.SelectedItemVM.Id);
         }
 
         /// <summary>
@@ -1579,7 +1732,111 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <param name="e"></param>
         private void DropItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            
+            var parentVM = this.SettingsVM.SelectedItemVM.ParentVM;
+            int index = parentVM.ChildrenVMList.IndexOf(this.SettingsVM.SelectedItemVM);
+            int changingId = parentVM.ChildrenVMList[index].Id;
+            if (parentVM.ChildrenVMList.Count - 1 > index) {
+                int changedId = parentVM.ChildrenVMList[index + 1].Id;
+
+                using (DaoBase dao = builder.Build()) {
+                    switch (this.SettingsVM.SelectedItemVM.Kind) {
+                        case HierarchicalKind.Category: {
+                                dao.ExecTransaction(() => {
+                                    DaoReader reader = dao.ExecQuery(@"
+SELECT sort_order
+FROM mst_category
+WHERE category_id = @{0};", changedId);
+
+                                    int tmpOrder = -1;
+                                    reader.ExecARow((record) => {
+                                        tmpOrder = record.ToInt("sort_order");
+                                    });
+
+                                    dao.ExecNonQuery(@"
+UPDATE mst_category
+SET sort_order = (SELECT sort_order FROM mst_category WHERE category_id = @{0}), update_time = 'now', updater = @{1}
+WHERE category_id = @{2};", changingId, Updater, changedId);
+
+                                    dao.ExecNonQuery(@"
+UPDATE mst_category
+SET sort_order = @{0}, update_time = 'now', updater = @{1}
+WHERE category_id = @{2};", tmpOrder, Updater, changingId);
+                                });
+                            }
+                            break;
+                        case HierarchicalKind.Item: {
+                                dao.ExecTransaction(() => {
+                                    DaoReader reader = dao.ExecQuery(@"
+SELECT sort_order
+FROM mst_item
+WHERE item_id = @{0};", changedId);
+
+                                    int tmpOrder = -1;
+                                    reader.ExecARow((record) => {
+                                        tmpOrder = record.ToInt("sort_order");
+                                    });
+
+                                    dao.ExecNonQuery(@"
+UPDATE mst_item
+SET sort_order = (SELECT sort_order FROM mst_item WHERE item_id = @{0}), update_time = 'now', updater = @{1}
+WHERE item_id = @{2};", changingId, Updater, changedId);
+
+                                    dao.ExecNonQuery(@"
+UPDATE mst_item
+SET sort_order = @{0}, update_time = 'now', updater = @{1}
+WHERE item_id = @{2};", tmpOrder, Updater, changingId);
+                                });
+                            }
+                            break;
+                    }
+                }
+            }
+            else { // 分類を跨いで項目の表示順を変更するとき
+                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                var grandparentVM = parentVM.ParentVM;
+                int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
+                int toCategoryId = grandparentVM.ChildrenVMList[index2 + 1].Id;
+                
+                using (DaoBase dao = builder.Build()) {
+                    dao.ExecTransaction(() => {
+                        // 種別IDを更新する
+                        dao.ExecNonQuery(@"
+UPDATE mst_item
+SET category_id = @{0}, update_time = 'now', updater = @{1}
+WHERE item_id = @{2};", toCategoryId, Updater, changingId);
+
+                        // 移動対象のソート順を取得する
+                        int tmpOrder = -1;
+                        DaoReader reader = dao.ExecQuery(@"
+SELECT sort_order
+FROM mst_item
+WHERE item_id = @{0};", changingId);
+                        reader.ExecARow((record) => {
+                            tmpOrder = record.ToInt("sort_order");
+                        });
+                        foreach (var vm in grandparentVM.ChildrenVMList[index2 + 1].ChildrenVMList) {
+                            int changedId = vm.Id;
+
+                            // ソート順が若ければ、移動対象のソート順を移動先のソート順に変更する
+                            int num = dao.ExecNonQuery(@"
+UPDATE mst_item
+SET sort_order = (SELECT sort_order FROM mst_item WHERE item_id = @{0}), update_time = 'now', updater = @{1}
+WHERE item_id = @{2} AND (SELECT sort_order FROM mst_item WHERE item_id = @{0}) < @{3};", changedId, Updater, changingId, tmpOrder);
+
+                            if (num == 0) { break; }
+
+                            // 移動先のソート順を移動対象のソート順に変更する
+                            dao.ExecNonQuery(@"
+UPDATE mst_item
+SET sort_order = @{0}, update_time = 'now', updater = @{1}
+WHERE item_id = @{2};", tmpOrder, Updater, changedId);
+                            changingId = changedId;
+                        }
+                    });
+                }
+            }
+
+            UpdateItemSettingsTabData(this.SettingsVM.SelectedItemVM.Kind, this.SettingsVM.SelectedItemVM.Id);
         }
 
         /// <summary>
@@ -1600,7 +1857,27 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <param name="e"></param>
         private void SaveItemInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            HierarchicalKind kind = this.SettingsVM.SelectedItemVM.Kind;
+            int id = this.SettingsVM.SelectedItemVM.Id;
 
+            using (DaoBase dao = builder.Build()) {
+                switch (kind) {
+                    case HierarchicalKind.Category: {
+                            dao.ExecNonQuery(@"
+UPDATE mst_category
+SET category_name = @{0}, update_time = 'now', updater = @{1}
+WHERE category_id = @{2};", this.SettingsVM.SelectedItemVM.Name, Updater, id);
+                        }
+                        break;
+                    case HierarchicalKind.Item: {
+                            dao.ExecNonQuery(@"
+UPDATE mst_item
+SET item_name = @{0}, update_time = 'now', updater = @{1}
+WHERE item_id = @{2};", this.SettingsVM.SelectedItemVM.Name, Updater, id);
+                        }
+                        break;
+                }
+            }
         }
 
         /// <summary>
@@ -1610,7 +1887,45 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <param name="e"></param>
         private void ChangeItemRelationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
 
+            HierarchicalItemViewModel vm = this.SettingsVM.SelectedItemVM;
+            vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
+            vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
+
+            using (DaoBase dao = builder.Build()) {
+                dao.ExecTransaction(() => {
+                    DaoReader reader = dao.ExecQuery(@"
+SELECT *
+FROM rel_book_item
+WHERE item_id = @{0} AND book_id = @{1};", vm.Id, vm.SelectedRelationVM.Id);
+
+                    if (reader.Count == 0) {
+                        dao.ExecNonQuery(@"
+INSERT INTO rel_book_item (book_id, item_id, del_flg, insert_time, inserter, update_time, updater)
+VALUES (@{0}, @{1}, 0, 'now', @{2}, 'now', @{3});", vm.SelectedRelationVM.Id, vm.Id, Inserter, Updater);
+                        vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
+                    }
+                    else {
+                        reader = dao.ExecQuery(@"
+SELECT *
+FROM hst_action
+WHERE book_id = @{0} AND item_id = @{1} AND del_flg = 0;", vm.SelectedRelationVM.Id, vm.Id);
+
+                        if (reader.Count != 0) {
+                            MessageBox.Show("帳簿内の該当する項目に帳簿項目が存在するので削除できません。"); // TODO
+                            e.Handled = true;
+                            return;
+                        }
+
+                        vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
+                        dao.ExecNonQuery(@"
+UPDATE rel_book_item
+SET del_flg = @{0}, update_time = 'now', updater = @{1}
+WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 : 1, Updater, vm.Id, vm.SelectedRelationVM.Id);
+                    }
+                });
+            }
         }
 
         /// <summary>
@@ -1636,9 +1951,8 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                     dao.ExecQuery(@"
 UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedShopName, this.SettingsVM.SelectedItemVM.Id);
-                }
 
-                using (DaoBase dao = builder.Build()) {
+                    // 店舗名を更新する
                     DaoReader reader = dao.ExecQuery(@"
 SELECT shop_name
 FROM hst_shop
@@ -1678,22 +1992,21 @@ ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
                     dao.ExecQuery(@"
 UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE remark = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedRemark, this.SettingsVM.SelectedItemVM.Id);
-                }
-            }
 
-            using (DaoBase dao = builder.Build()) {
-                DaoReader reader = dao.ExecQuery(@"
+                    // 備考欄の表示を更新する
+                    DaoReader reader = dao.ExecQuery(@"
 SELECT remark
 FROM hst_remark
 WHERE del_flg = 0 AND item_id = @{0}
 ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
 
-                this.SettingsVM.SelectedItemVM.RemarkList.Clear();
-                reader.ExecWholeRow((count2, record2) => {
-                    string remark = record2["remark"];
+                    this.SettingsVM.SelectedItemVM.RemarkList.Clear();
+                    reader.ExecWholeRow((count2, record2) => {
+                        string remark = record2["remark"];
 
-                    this.SettingsVM.SelectedItemVM.RemarkList.Add(remark);
-                });
+                        this.SettingsVM.SelectedItemVM.RemarkList.Add(remark);
+                    });
+                }
             }
         }
         #endregion
@@ -1739,19 +2052,21 @@ RETURNING book_id;", Updater, Inserter);
         private void DeleteBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             using(DaoBase dao = builder.Build()) {
-                DaoReader reader = dao.ExecQuery(@"
+                dao.ExecTransaction(() => {
+                    DaoReader reader = dao.ExecQuery(@"
 SELECT * FROM hst_action
 WHERE book_id = @{0} AND del_flg = 0;", this.SettingsVM.SelectedBookVM.Id);
 
-                if (reader.Count != 0) {
-                    MessageBox.Show("帳簿内に帳簿項目が存在するので削除できません。"); // TODO
-                    return;
-                }
-                
-                dao.ExecNonQuery(@"
+                    if (reader.Count != 0) {
+                        MessageBox.Show("帳簿内に帳簿項目が存在するので削除できません。"); // TODO
+                        return;
+                    }
+
+                    dao.ExecNonQuery(@"
 UPDATE mst_book
 SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE book_id = @{1};", Updater, this.SettingsVM.SelectedBookVM.Id);
+                });
             }
 
             UpdateBookSettingTabData();
@@ -1783,25 +2098,27 @@ WHERE book_id = @{1};", Updater, this.SettingsVM.SelectedBookVM.Id);
             int changingId = this.SettingsVM.BookVMList[index].Id.Value;
 
             using (DaoBase dao = builder.Build()) {
-                DaoReader reader = dao.ExecQuery(@"
+                dao.ExecTransaction(() => {
+                    DaoReader reader = dao.ExecQuery(@"
 SELECT sort_order
 FROM mst_book
 WHERE book_id = @{0};", changedId);
 
-                int tmpOrder = -1;
-                reader.ExecARow((record) => {
-                    tmpOrder = record.ToInt("sort_order");
-                });
+                    int tmpOrder = -1;
+                    reader.ExecARow((record) => {
+                        tmpOrder = record.ToInt("sort_order");
+                    });
 
-                dao.ExecNonQuery(@"
+                    dao.ExecNonQuery(@"
 UPDATE mst_book
 SET sort_order = (SELECT sort_order FROM mst_book WHERE book_id = @{0}), update_time = 'now', updater = @{1}
 WHERE book_id = @{2};", changingId, Updater, changedId);
 
-                dao.ExecNonQuery(@"
+                    dao.ExecNonQuery(@"
 UPDATE mst_book
 SET sort_order = @{0}, update_time = 'now', updater = @{1}
 WHERE book_id = @{2};", tmpOrder, Updater, changingId);
+                });
             }
 
             UpdateBookSettingTabData(changingId);
@@ -1833,25 +2150,27 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             int changingId = this.SettingsVM.BookVMList[index].Id.Value;
 
             using (DaoBase dao = builder.Build()) {
-                DaoReader reader = dao.ExecQuery(@"
+                dao.ExecTransaction(() => {
+                    DaoReader reader = dao.ExecQuery(@"
 SELECT sort_order
 FROM mst_book
 WHERE book_id = @{0};", changedId);
 
-                int tmpOrder = -1;
-                reader.ExecARow((record) => {
-                    tmpOrder = record.ToInt("sort_order");
-                });
+                    int tmpOrder = -1;
+                    reader.ExecARow((record) => {
+                        tmpOrder = record.ToInt("sort_order");
+                    });
 
-                dao.ExecNonQuery(@"
+                    dao.ExecNonQuery(@"
 UPDATE mst_book
 SET sort_order = (SELECT sort_order FROM mst_book WHERE book_id = @{0}), update_time = 'now', updater = @{1}
 WHERE book_id = @{2};", changingId, Updater, changedId);
 
-                dao.ExecNonQuery(@"
+                    dao.ExecNonQuery(@"
 UPDATE mst_book
 SET sort_order = @{0}, update_time = 'now', updater = @{1}
 WHERE book_id = @{2};", tmpOrder, Updater, changingId);
+                });
             }
 
             UpdateBookSettingTabData(changingId);
@@ -1895,34 +2214,37 @@ WHERE book_id = @{4};", vm.Name, vm.InitialValue, vm.PayDay, Updater, vm.Id);
             vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
 
             using (DaoBase dao = builder.Build()) {
-                DaoReader reader = dao.ExecQuery(@"
+                dao.ExecTransaction(() => {
+                    DaoReader reader = dao.ExecQuery(@"
 SELECT *
 FROM rel_book_item
 WHERE book_id = @{0} AND item_id = @{1};", vm.Id, vm.SelectedRelationVM.Id);
 
-                if(reader.Count == 0) {
-                    dao.ExecNonQuery(@"
+                    if (reader.Count == 0) {
+                        dao.ExecNonQuery(@"
 INSERT INTO rel_book_item (book_id, item_id, del_flg, insert_time, inserter, update_time, updater)
 VALUES (@{0}, @{1}, 0, 'now', @{2}, 'now', @{3});", vm.Id, vm.SelectedRelationVM.Id, Inserter, Updater);
-                }
-                else {
-                    reader = dao.ExecQuery(@"
+                        vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
+                    }
+                    else {
+                        reader = dao.ExecQuery(@"
 SELECT *
 FROM hst_action
 WHERE book_id = @{0} AND item_id = @{1} AND del_flg = 0;", vm.Id, vm.SelectedRelationVM.Id);
 
-                    if (reader.Count != 0) {
-                        MessageBox.Show("帳簿内の該当する項目に帳簿項目が存在するので削除できません。"); // TODO
-                        e.Handled = true;
-                        return;
-                    }
+                        if (reader.Count != 0) {
+                            MessageBox.Show("帳簿内の該当する項目に帳簿項目が存在するので削除できません。"); // TODO
+                            e.Handled = true;
+                            return;
+                        }
 
-                    vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
-                    dao.ExecNonQuery(@"
+                        vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
+                        dao.ExecNonQuery(@"
 UPDATE rel_book_item
 SET del_flg = @{0}, update_time = 'now', updater = @{1}
 WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 : 1, Updater, vm.Id, vm.SelectedRelationVM.Id);
-                }
+                    }
+                });
             }
         }
         #endregion
@@ -2017,7 +2339,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 else {
                     // 収支から探す
                     IEnumerable<HierarchicalItemViewModel> query = this.SettingsVM.HierachicalItemVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
-                    if (query == null) {
+                    if (query.Count() == 0) {
                         // カテゴリから探す
                         foreach (HierarchicalItemViewModel tmpVM in this.SettingsVM.HierachicalItemVMList) {
                             query = tmpVM.ChildrenVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
@@ -2027,10 +2349,11 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                         if (query.Count() == 0) {
                             // 項目から探す
                             foreach (HierarchicalItemViewModel tmpVM in this.SettingsVM.HierachicalItemVMList) {
-                                foreach (HierarchicalItemViewModel tmpVM2 in this.SettingsVM.HierachicalItemVMList) {
+                                foreach (HierarchicalItemViewModel tmpVM2 in tmpVM.ChildrenVMList) {
                                     query = tmpVM2.ChildrenVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
                                     if (query.Count() != 0) { break; }
                                 }
+                                if (query.Count() != 0) { break; }
                             }
                         }
                     }
