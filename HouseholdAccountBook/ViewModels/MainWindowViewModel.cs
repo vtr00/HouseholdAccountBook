@@ -2,6 +2,8 @@
 using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.ViewModels
@@ -56,8 +58,9 @@ namespace HouseholdAccountBook.ViewModels
             get { return _BookVMList; }
             set { SetProperty(ref _BookVMList, value); }
         }
-        private ObservableCollection<BookViewModel> _BookVMList;
+        private ObservableCollection<BookViewModel> _BookVMList = default(ObservableCollection<BookViewModel>);
         #endregion
+
         /// <summary>
         /// 選択された帳簿VM
         /// </summary>
@@ -99,12 +102,27 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<ActionViewModel> ActionVMList
         {
             get { return _ActionVMList; }
-            set { SetProperty(ref _ActionVMList, value); }
+            set {
+                SetProperty(ref _ActionVMList, value);
+                UpdateDisplayedActionVMList();
+            }
         }
-        private ObservableCollection<ActionViewModel> _ActionVMList;
+        private ObservableCollection<ActionViewModel> _ActionVMList = default(ObservableCollection<ActionViewModel>);
         #endregion
         /// <summary>
-        /// 選択された帳簿項目VM
+        /// 表示対象の帳簿項目VMリスト
+        /// </summary>
+        #region DisplayedActionVMList
+        public ObservableCollection<ActionViewModel> DisplayedActionVMList
+        {
+            get { return _DisplayedActionVMList; }
+            set { SetProperty(ref _DisplayedActionVMList, value); }
+        }
+        private ObservableCollection<ActionViewModel> _DisplayedActionVMList = default(ObservableCollection<ActionViewModel>);
+        #endregion
+
+        /// <summary>
+        /// 選択された帳簿項目VM(先頭)
         /// </summary>
         #region SelectedActionVM
         public ActionViewModel SelectedActionVM
@@ -114,6 +132,17 @@ namespace HouseholdAccountBook.ViewModels
         }
         private ActionViewModel _SelectedActionVM = default(ActionViewModel);
         #endregion
+        /// <summary>
+        /// 選択された帳簿項目VMリスト
+        /// </summary>
+        #region SelectedActionVMList
+        public ObservableCollection<ActionViewModel> SelectedActionVMList
+        {
+            get { return _SelectedActionVMList; }
+            set { SetProperty(ref _SelectedActionVMList, value); }
+        }
+        private ObservableCollection<ActionViewModel> _SelectedActionVMList = new ObservableCollection<ActionViewModel>();
+        #endregion
 
         /// <summary>
         /// 合計項目VMリスト
@@ -122,7 +151,10 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<SummaryViewModel> SummaryVMList
         {
             get { return _SummaryVMList; }
-            set { SetProperty(ref _SummaryVMList, value); }
+            set {
+                SetProperty(ref _SummaryVMList, value);
+                UpdateDisplayedActionVMList();
+            }
         }
         private ObservableCollection<SummaryViewModel> _SummaryVMList;
         #endregion
@@ -133,7 +165,10 @@ namespace HouseholdAccountBook.ViewModels
         public SummaryViewModel SelectedSummaryVM
         {
             get { return _SelectedSummaryVM; }
-            set { SetProperty(ref _SelectedSummaryVM, value); }
+            set {
+                SetProperty(ref _SelectedSummaryVM, value);
+                UpdateDisplayedActionVMList();
+            }
         }
         private SummaryViewModel _SelectedSummaryVM = default(SummaryViewModel);
         #endregion
@@ -198,6 +233,28 @@ namespace HouseholdAccountBook.ViewModels
 #else
                 return false;
 #endif
+            }
+        }
+
+        /// <summary>
+        /// 表示する帳簿項目VMリストを更新する
+        /// </summary>
+        private void UpdateDisplayedActionVMList()
+        {
+            if(_SelectedSummaryVM == null || (BalanceKind)_SelectedSummaryVM.BalanceKind == BalanceKind.Others) {
+                DisplayedActionVMList = _ActionVMList;
+            }
+            else {
+                if(_SelectedSummaryVM.ItemId != -1) {
+                    DisplayedActionVMList = new ObservableCollection<ActionViewModel>( _ActionVMList.Where((vm) => { return vm.ItemId == _SelectedSummaryVM.ItemId; }));
+                }
+                else if (_SelectedSummaryVM.CategoryId != -1) {
+                    DisplayedActionVMList = new ObservableCollection<ActionViewModel>( _ActionVMList.Where((vm) => { return vm.CategoryId == _SelectedSummaryVM.CategoryId; }));
+                }
+                else if((BalanceKind)_SelectedSummaryVM.BalanceKind != BalanceKind.Others) {
+                    DisplayedActionVMList = new ObservableCollection<ActionViewModel>( _ActionVMList.Where((vm) => { return vm.BalanceKind == (BalanceKind)_SelectedSummaryVM.BalanceKind; }));
+                }
+                Debug.Assert(true);
             }
         }
     }

@@ -57,8 +57,15 @@ namespace HouseholdAccountBook.UserControls
             this.CalendarOpened += DateTimePicker_OnCalendarOpened;
             this.CalendarClosed += DateTimePicker_OnCalendarClosed;
         }
-
-        #region 依存プロパティ
+        
+        #region 依存関係プロパティ
+        /// <summary>
+        /// 表示フォーマット(yyyy,MM,ddのみ。順序、デリミタには縛りなし)
+        /// </summary>
+        public string DateFormat {
+            get { return (string)this.GetValue(DateFormatProperty); }
+            set { this.SetValue(DateFormatProperty, value); }
+        }
         /// <summary>
         /// <see cref="DateFormat">DateFormat</see> 依存関係プロパティを識別します。
         /// </summary>
@@ -68,18 +75,6 @@ namespace HouseholdAccountBook.UserControls
                 typeof(string), 
                 typeof(DateTimePicker),
                 new PropertyMetadata(OnDateFormatChanged));
-
-        /// <summary>
-        /// 表示フォーマット(yyyy,MM,ddのみ。順序、デリミタには縛りなし)
-        /// </summary>
-        public string DateFormat {
-            get {
-                return (string)this.GetValue(DateFormatProperty);
-            }
-            set {
-                this.SetValue(DateFormatProperty, value);
-            }
-        }
         #endregion
 
         #region イベントハンドラ

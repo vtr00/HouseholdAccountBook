@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using HouseholdAccountBook.Interfaces;
+using Prism.Mvvm;
 using System.Collections.ObjectModel;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
@@ -52,7 +53,6 @@ namespace HouseholdAccountBook.ViewModels
         }
         private ObservableCollection<HierarchicalItemViewModel> _HierachicalItemVMList = default(ObservableCollection<HierarchicalItemViewModel>);
         #endregion
-
         /// <summary>
         /// 選択された項目VM
         /// </summary>
@@ -61,20 +61,7 @@ namespace HouseholdAccountBook.ViewModels
         public HierarchicalItemViewModel SelectedItemVM
         {
             get { return _SelectedItemVM; }
-            set {
-                if (_SelectedItemVM != value) {
-                    if(value == null && _SelectedItemVM != null) {
-                        _SelectedItemVM.IsSelected = false;
-                    }
-
-                    SetProperty(ref _SelectedItemVM, value);
-
-                    // 選択状態を更新する(_SelectedItemVMより後で更新)
-                    if (value != null && !value.IsSelected) {
-                        value.IsSelected = true;
-                    }
-                }
-            }
+            set { SetProperty(ref _SelectedItemVM, value); }
         }
         private HierarchicalItemViewModel _SelectedItemVM = default(HierarchicalItemViewModel);
         #endregion
@@ -137,7 +124,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 階層構造項目VM
         /// </summary>
-        public class HierarchicalItemViewModel : BindableBase
+        public class HierarchicalItemViewModel : BindableBase, IMultiSelectable
         {
             /// <summary>
             /// 種類

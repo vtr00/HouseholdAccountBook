@@ -1,11 +1,14 @@
-﻿using System;
+﻿using HouseholdAccountBook.Interfaces;
+using Prism.Mvvm;
+using System;
+using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
     /// 帳簿項目VM
     /// </summary>
-    public class ActionViewModel
+    public class ActionViewModel : BindableBase, IMultiSelectable
     {
         /// <summary>
         /// 帳簿項目ID
@@ -15,6 +18,18 @@ namespace HouseholdAccountBook.ViewModels
         /// 時刻
         /// </summary>
         public DateTime ActTime { get; set; }
+        /// <summary>
+        /// 収支種別
+        /// </summary>
+        public BalanceKind BalanceKind { get; set; }
+        /// <summary>
+        /// カテゴリID
+        /// </summary>
+        public int CategoryId { get; set; }
+        /// <summary>
+        /// 項目ID
+        /// </summary>
+        public int ItemId { get; set; }
         /// <summary>
         /// 項目名
         /// </summary>
@@ -43,6 +58,18 @@ namespace HouseholdAccountBook.ViewModels
         /// グループID
         /// </summary>
         public int? GroupId { get; set; }
+
+        /// <summary>
+        /// 選択されているか
+        /// </summary>
+        #region IsSelected
+        public bool IsSelected
+        {
+            get { return _IsSelected; }
+            set { SetProperty(ref _IsSelected, value); }
+        }
+        private bool _IsSelected = default(bool);
+        #endregion
 
         /// <summary>
         /// 将来の日付か

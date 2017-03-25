@@ -534,8 +534,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void EditActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択していて、選択されている帳簿項目が存在していて、選択している帳簿項目のIDが0より大きい
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.SelectedActionVM != null && this.MainWindowVM.SelectedActionVM.ActionId > 0;
+            // 帳簿タブを選択していて、選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが0より大きい
+            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.SelectedActionVMList.Count == 1 && this.MainWindowVM.SelectedActionVM.ActionId > 0;
         }
 
         /// <summary>
@@ -567,7 +567,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
                 arw.ShowDialog();
             }
             else {
-                // 移動時の処理
+                // 移動の編集時の処理
                 MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder, this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM.GroupId.Value);
                 mrw.Registrated += (sender2, e2) => {
                     UpdateBookTabData(e2.Id);
@@ -585,7 +585,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
         private void DeleteActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択している帳簿項目が存在していて、選択している帳簿項目のIDが0より大きい
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.SelectedActionVM != null && this.MainWindowVM.SelectedActionVM.ActionId > 0;
+            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0;
         }
 
         /// <summary>
@@ -595,45 +595,46 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
         /// <param name="e"></param>
         private void DeleteActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            int actionId = this.MainWindowVM.SelectedActionVM.ActionId;
-            int? groupId = this.MainWindowVM.SelectedActionVM.GroupId;
-
             if (MessageBox.Show(Message.DeleteNotification, this.Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
-                using (DaoBase dao = builder.Build()) {
-                    dao.ExecTransaction(() => {
-                        dao.ExecNonQuery(@"
+                foreach(ActionViewModel vm in this.MainWindowVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; })) {
+                    int actionId = vm.ActionId;
+                    int? groupId = vm.GroupId;
+
+                    using (DaoBase dao = builder.Build()) {
+                        dao.ExecTransaction(() => {
+                            dao.ExecNonQuery(@"
 UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{1} 
 WHERE action_id = @{0};", actionId, Updater);
 
-                        // 削除項目の日時以降の同じグループIDを持つ帳簿項目を削除する(日付の等号は「移動」削除用)
-                        if (groupId != null) {
-                            dao.ExecNonQuery(@"
+                            // 削除項目の日時以降の同じグループIDを持つ帳簿項目を削除する(日付の等号は「移動」削除用)
+                            if (groupId != null) {
+                                dao.ExecNonQuery(@"
 UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{1}
 WHERE group_id = @{2} AND act_time >= (SELECT act_time FROM hst_action WHERE action_id = @{0});", actionId, Updater, groupId);
 
-                            DaoReader reader = dao.ExecQuery(@"
+                                DaoReader reader = dao.ExecQuery(@"
 SELECT action_id FROM hst_action
 WHERE group_id = @{0} AND del_flg = 0;", groupId);
 
-                            if(reader.Count == 1) {
-                                // 同じグループIDを持つ帳簿項目が1つだけの場合にグループIDをクリアする
-                                reader.ExecARow((record) => {
-                                    dao.ExecNonQuery(@"
+                                if (reader.Count == 1) {
+                                    // 同じグループIDを持つ帳簿項目が1つだけの場合にグループIDをクリアする
+                                    reader.ExecARow((record) => {
+                                        dao.ExecNonQuery(@"
 UPDATE hst_action SET group_id = null, update_time = 'now', updater = @{1}
 WHERE group_id = @{0} AND del_flg = 0;", groupId, Updater);
-                                });
-                            }
+                                    });
+                                }
 
-                            if(reader.Count <= 1) {
-                                // グループを削除する
-                                dao.ExecNonQuery(@"
+                                if (reader.Count <= 1) {
+                                    // グループを削除する
+                                    dao.ExecNonQuery(@"
 UPDATE hst_group
 SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
+                                }
                             }
-                        }
-                    });
-                    
+                        });
+                    }
                 }
 
                 UpdateBookTabData();
@@ -1044,7 +1045,7 @@ ORDER BY sort_order;");
                     // 全帳簿
                     reader = dao.ExecQuery(@"
 -- 繰越残高
-SELECT -1 AS action_id, @{1} AS act_time, '繰越残高' AS item_name, 0 AS act_value, (
+SELECT -1 AS action_id, @{1} AS act_time, -1 AS category_id, -1 AS item_id, '繰越残高' AS item_name, 0 AS act_value, (
   SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0)
   FROM hst_action AA
   INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -1052,7 +1053,7 @@ SELECT -1 AS action_id, @{1} AS act_time, '繰越残高' AS item_name, 0 AS act_
 ) AS balance, NULL AS shop_name, NULL AS group_id, NULL AS remark
 UNION
 -- 各帳簿項目
-SELECT A.action_id AS action_id, A.act_time AS act_time, I.item_name AS item_name, A.act_value AS act_value, (
+SELECT A.action_id AS action_id, A.act_time AS act_time, C.category_id AS category_id, I.item_id AS item_id, I.item_name AS item_name, A.act_value AS act_value, (
   SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0)
   FROM hst_action AA 
   INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -1066,6 +1067,7 @@ INNER JOIN (SELECT * FROM mst_item WHERE item_id IN (
   INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) B ON B.book_id = RBI.book_id
   WHERE RBI.del_flg = 0
 ) AND del_flg = 0) I ON I.item_id = A.item_id
+INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON I.category_id = C.category_id
 WHERE A.del_flg = 0 AND @{1} <= A.act_time AND A.act_time <= @{2}
 ORDER BY act_time, action_id;", null, startTime, endTime);
                 }
@@ -1073,7 +1075,7 @@ ORDER BY act_time, action_id;", null, startTime, endTime);
                     // 各帳簿
                     reader = dao.ExecQuery(@"
 -- 繰越残高
-SELECT -1 AS action_id, @{1} AS act_time, '繰越残高' AS item_name, 0 AS act_value, (
+SELECT -1 AS action_id, @{1} AS act_time, -1 AS category_id, -1 AS item_id, '繰越残高' AS item_name, 0 AS act_value, (
   SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0})
   FROM hst_action AA
   INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -1081,7 +1083,7 @@ SELECT -1 AS action_id, @{1} AS act_time, '繰越残高' AS item_name, 0 AS act_
 ) AS balance, NULL AS shop_name, NULL AS group_id, NULL AS remark
 UNION
 -- 各帳簿項目
-SELECT A.action_id AS action_id, A.act_time AS act_time, I.item_name AS item_name, A.act_value AS act_value, (
+SELECT A.action_id AS action_id, A.act_time AS act_time, C.category_id AS category_id, I.item_id AS item_id, I.item_name AS item_name, A.act_value AS act_value, (
   SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0})
   FROM hst_action AA 
   WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND (AA.act_time < A.act_time OR (AA.act_time = A.act_time AND AA.action_id <= A.action_id) )
@@ -1090,6 +1092,7 @@ FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE (move_flg = 1 OR item_id IN (
   SELECT item_id FROM rel_book_item WHERE book_id = @{0} AND del_flg = 0
 )) AND del_flg = 0) I ON I.item_id = A.item_id
+INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON I.category_id = C.category_id
 WHERE A.book_id = @{0} AND A.del_flg = 0 AND @{1} <= A.act_time AND A.act_time <= @{2}
 ORDER BY act_time, action_id;", bookId, startTime, endTime);
                 }
@@ -1097,24 +1100,34 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
                     ActionViewModel avm = new ActionViewModel() {
                         ActionId = record.ToInt("action_id"),
                         ActTime = DateTime.Parse(record["act_time"]),
+                        CategoryId = record.ToInt("category_id"),
+                        ItemId = record.ToInt("item_id"),
                         ItemName = record["item_name"],
                         Balance = record.ToInt("balance"),
                         ShopName = record["shop_name"],
                         GroupId = record.ToNullableInt("group_id"),
                         Remark = record["remark"]
                     };
+
                     int actValue = record.ToInt("act_value");
                     if (actValue == 0) {
+                        avm.BalanceKind = BalanceKind.Others;
                         avm.Income = null;
                         avm.Outgo = null;
                     }
                     else if (actValue < 0) {
+                        avm.BalanceKind = BalanceKind.Outgo;
                         avm.Income = null;
                         avm.Outgo = -actValue;
                     }
                     else {
+                        avm.BalanceKind = BalanceKind.Income;
                         avm.Income = actValue;
                         avm.Outgo = null;
+                    }
+
+                    if(avm.ActionId == -1) {
+                        avm.BalanceKind = BalanceKind.Others;
                     }
 
                     actionVMList.Add(avm);
@@ -2286,9 +2299,6 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            TreeView treeView = sender as TreeView;
-            SettingsVM.SelectedItemVM = treeView.SelectedItem as HierarchicalItemViewModel;
-
             if (this.shopNameListBox.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.shopNameListBox) > 0) {
                 if (VisualTreeHelper.GetChild(this.shopNameListBox, 0) is Decorator border) {
                     if (border.Child is ScrollViewer scroll) {
@@ -2303,7 +2313,6 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                     }
                 }
             }
-            e.Handled = true;
         }
         #endregion
         #endregion

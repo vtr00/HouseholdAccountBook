@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Windows;
 
 namespace HouseholdAccountBook
 {
     /// <summary>
-    /// x => x.X みたいな Expression から "X" というプロパティ名を取り出すためのヘルパークラス。
-    /// INotifyPropertyChanged の実装補助に使う。
+    /// x => x.X みたいな <see cref="Expression"/> から "X" というプロパティ名を取り出すためのヘルパークラス。
+    /// <see cref="DependencyProperty"/> の実装補助に使う。
     /// </summary>
-    /// <typeparam name="TInstance">インスタンスの型。</typeparam>
+    /// <typeparam name="TInstance">インスタンスの型</typeparam>
     public static class PropertyName<TInstance>
     {
         /// <summary>
-        /// Expression からプロパティ名を取り出す。
+        /// <see cref="Expression"/> からプロパティ名を取り出す。
         /// </summary>
         /// <typeparam name="TMember">プロパティの型。</typeparam>
         /// <param name="propertyExpression">取り出し元の式木。</param>
