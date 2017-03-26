@@ -8,7 +8,7 @@
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
-        xmlns:converter="clr-namespace:HouseholdAccountBook.Converter"
+        xmlns:converters="clr-namespace:HouseholdAccountBook.Converters"
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Behaviors"
         mc:Ignorable="d"
         Title="Hausehold Account Book" Height="700" Width="1050"
@@ -46,11 +46,11 @@
         <RoutedCommand x:Key="GoToNextYearCommand"/>
 
         <!-- コンバータ -->
-        <converter:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
-        <converter:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
-        <converter:DateTimeToDisplayedYearConverter x:Key="DateTimeToThisYearConverter"/>
-        <converter:DateTimeToActTimeConverter x:Key="DateTimeToActTimeConverter"/>
-        <converter:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
+        <converters:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
+        <converters:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
+        <converters:DateTimeToDisplayedYearConverter x:Key="DateTimeToThisYearConverter"/>
+        <converters:DateTimeToActTimeConverter x:Key="DateTimeToActTimeConverter"/>
+        <converters:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
         <BooleanToVisibilityConverter x:Key="BoolVisibilityConverter"/>
 
         <!-- スタイル -->

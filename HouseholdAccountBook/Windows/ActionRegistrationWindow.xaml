@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
-        xmlns:converter="clr-namespace:HouseholdAccountBook.Converter"
+        xmlns:converters="clr-namespace:HouseholdAccountBook.Converters"
         mc:Ignorable="d"
         Title="追加" Height="Auto" Width="350" ShowInTaskbar="False"
         Loaded="ActionRegistrationWindow_Loaded"
@@ -21,10 +21,10 @@
         <RoutedCommand x:Key="CancelCommand"/>
 
         <!-- コンバータ -->
-        <converter:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
-        <converter:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
-        <converter:DateTimeToActTimeConverter x:Key="DateTimeToActTimeConverter"/>
-        <converter:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
+        <converters:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
+        <converters:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
+        <converters:DateTimeToActTimeConverter x:Key="DateTimeToActTimeConverter"/>
+        <converters:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
     </Window.Resources>
 
     <Window.CommandBindings>

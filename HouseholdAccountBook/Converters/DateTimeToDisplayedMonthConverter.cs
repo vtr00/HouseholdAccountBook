@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace HouseholdAccountBook.Converter
+namespace HouseholdAccountBook.Converters
 {
     /// <summary>
     /// DateTime->表示月変換

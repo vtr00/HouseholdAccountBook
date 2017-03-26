@@ -462,9 +462,8 @@ namespace HouseholdAccountBook.UserControls
 
             public static DateTime? StringToDateTime(DateTimePicker dateTimePicker, string formatStr, string dateStr)
             {
-                DateTime date;
                 var canParse = DateTime.TryParseExact(dateStr, formatStr, CultureInfo.CurrentCulture,
-                                                      DateTimeStyles.None, out date);
+                                      DateTimeStyles.None, out DateTime date);
 
                 if (!canParse) {
                     canParse = DateTime.TryParse(dateStr, CultureInfo.CurrentCulture, DateTimeStyles.None, out date);
