@@ -115,7 +115,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 収支種別文字列
         /// </summary>
-        public static Dictionary<BalanceKind, string> BalanceStr = new Dictionary<BalanceKind, string>() {
+        public static Dictionary<BalanceKind, string> BalanceKindStr = new Dictionary<BalanceKind, string>() {
             { BalanceKind.Income, "収入" }, { BalanceKind.Outgo, "支出" }
         };
 
@@ -151,7 +151,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 手数料種別文字列
         /// </summary>
-        public static Dictionary<CommissionKind, string> CommissionStr = new Dictionary<CommissionKind, string>() {
+        public static Dictionary<CommissionKind, string> CommissionKindStr = new Dictionary<CommissionKind, string>() {
             { CommissionKind.FromBook, "支払元" }, { CommissionKind.ToBook, "支払先" }
         };
 
@@ -177,7 +177,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// メッセージテキスト
         /// </summary>
-        public static class Message 
+        public static class MessageText 
         {
             /// <summary>
             /// 接続に失敗しました。
@@ -191,6 +191,10 @@ namespace HouseholdAccountBook.ConstValue
             /// 金額が不正です。
             /// </summary>
             public static string IllegalValue = "金額が不正です。";
+            /// <summary>
+            /// インポートが完了しました。
+            /// </summary>
+            public static string FinishToSave = "保存が完了しました。";
             /// <summary>
             /// インポートが完了しました。
             /// </summary>

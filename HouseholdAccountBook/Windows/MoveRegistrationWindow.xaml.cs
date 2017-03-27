@@ -7,6 +7,8 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
+using System.Linq;
+using HouseholdAccountBook.Extentions;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -65,24 +67,32 @@ namespace HouseholdAccountBook.Windows
             this.commissionActionId = null;
             this.groupId = null;
 
+            int? debitBookId = null;
+            int? payDay = null;
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
             BookViewModel selectedBookVM = null;
             using (DaoBase dao = builder.Build()) {
-                DaoReader reader = dao.ExecQuery("SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
+                DaoReader reader = dao.ExecQuery("SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE del_flg = 0;");
                 reader.ExecWholeRow((count, record) => {
                     BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                     bookVMList.Add(vm);
+
                     if (selectedBookVM == null || selectedBookId == vm.Id) {
                         selectedBookVM = vm;
+
+                        if(record.ToInt("book_kind") == (int)BookKind.CreditCard) {
+                            debitBookId = record.ToNullableInt("debit_book_id");
+                            payDay = record.ToNullableInt("pay_day");
+                        }
                     }
                 });
             }
 
-            this.MoveRegistrationWindowVM.SelectedDate = selectedDateTime != null ? selectedDateTime.Value : DateTime.Today;
             this.MoveRegistrationWindowVM.BookVMList = bookVMList;
-            this.MoveRegistrationWindowVM.SelectedFromBookVM = selectedBookVM;
+            this.MoveRegistrationWindowVM.SelectedDate = selectedDateTime != null ? (payDay != null ? selectedDateTime.Value.GetDateInMonth(payDay.Value) : selectedDateTime.Value) : DateTime.Today;
+            this.MoveRegistrationWindowVM.SelectedFromBookVM = debitBookId != null ? bookVMList.FirstOrDefault((vm)=> { return vm.Id == debitBookId; }) : selectedBookVM;
             this.MoveRegistrationWindowVM.SelectedToBookVM = selectedBookVM;
-            this.MoveRegistrationWindowVM.SelectedCommissionKindVM = this.MoveRegistrationWindowVM.CommissionKindVMList[0];
+            this.MoveRegistrationWindowVM.SelectedCommissionKind = CommissionKind.FromBook;
 
             UpdateItemList();
             UpdateRemarkList();
@@ -130,7 +140,7 @@ namespace HouseholdAccountBook.Windows
             BookViewModel selectedToBookVM = null;
             DateTime actDate = DateTime.Now;
             int moveValue = -1;
-            int commissionKindIndex = 0;
+            CommissionKind commissionKind = CommissionKind.FromBook;
             int? commissionItemId = null;
             int commissionValue = 0;
             string commissionRemark = null;
@@ -163,10 +173,10 @@ ORDER BY move_flg DESC;", groupId);
                     }
                     else {
                         if (bookId == fromBookId) { // 移動元負担
-                            commissionKindIndex = 0;
+                            commissionKind = CommissionKind.FromBook;
                         }
                         else if (bookId == toBookId) { // 移動先負担
-                            commissionKindIndex = 1;
+                            commissionKind = CommissionKind.ToBook;
                         }
                         commissionActionId = actionId;
                         commissionItemId = itemId;
@@ -193,7 +203,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
             this.MoveRegistrationWindowVM.SelectedFromBookVM = selectedFromBookVM;
             this.MoveRegistrationWindowVM.SelectedToBookVM = selectedToBookVM;
             this.MoveRegistrationWindowVM.Value = moveValue;
-            this.MoveRegistrationWindowVM.SelectedCommissionKindVM = this.MoveRegistrationWindowVM.CommissionKindVMList[commissionKindIndex];
+            this.MoveRegistrationWindowVM.SelectedCommissionKind = commissionKind;
             this.MoveRegistrationWindowVM.Commission = commissionValue;
 
             UpdateItemList(commissionItemId);
@@ -338,7 +348,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
             ItemViewModel selectedItemVM = null;
             using (DaoBase dao = builder.Build()) {
                 int bookId = -1;
-                switch (this.MoveRegistrationWindowVM.SelectedCommissionKindVM.CommissionKind) {
+                switch (this.MoveRegistrationWindowVM.SelectedCommissionKind) {
                     case CommissionKind.FromBook:
                         bookId = this.MoveRegistrationWindowVM.SelectedFromBookVM.Id.Value;
                         break;
@@ -397,11 +407,11 @@ ORDER BY used_time DESC;", this.MoveRegistrationWindowVM.SelectedItemVM.Id);
         private int? RegisterToDb()
         {
             if(this.MoveRegistrationWindowVM.SelectedFromBookVM == this.MoveRegistrationWindowVM.SelectedToBookVM) {
-                MessageBox.Show(this, Message.IllegalSameBook, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show(this, MessageText.IllegalSameBook, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return null;
             }
             if(!this.MoveRegistrationWindowVM.Value.HasValue && this.MoveRegistrationWindowVM.Value <= 0) {
-                MessageBox.Show(this, Message.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return null;
             }
 
@@ -409,7 +419,7 @@ ORDER BY used_time DESC;", this.MoveRegistrationWindowVM.SelectedItemVM.Id);
             int fromBookId = this.MoveRegistrationWindowVM.SelectedFromBookVM.Id.Value;
             int toBookId = this.MoveRegistrationWindowVM.SelectedToBookVM.Id.Value;
             int actValue = this.MoveRegistrationWindowVM.Value.Value;
-            CommissionKind commissionKind = this.MoveRegistrationWindowVM.SelectedCommissionKindVM.CommissionKind;
+            CommissionKind commissionKind = this.MoveRegistrationWindowVM.SelectedCommissionKind;
             int commissionItemId = this.MoveRegistrationWindowVM.SelectedItemVM.Id;
             int commission = this.MoveRegistrationWindowVM.Commission ?? 0;
             string remark = this.MoveRegistrationWindowVM.SelectedRemark;

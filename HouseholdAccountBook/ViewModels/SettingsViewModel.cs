@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Interfaces;
 using Prism.Mvvm;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
@@ -290,6 +291,25 @@ namespace HouseholdAccountBook.ViewModels
             #endregion
 
             /// <summary>
+            /// 帳簿種別辞書
+            /// </summary>
+            public Dictionary<BookKind, string> BookKindDic { get; } = BookKindStr;
+            /// <summary>
+            /// 選択された帳簿種別
+            /// </summary>
+            #region SelectedBookKind
+            public BookKind SelectedBookKind
+            {
+                get { return _SelectedBookKind; }
+                set {
+                    SetProperty(ref _SelectedBookKind, value);
+                    UpdateNeedToPay();
+                }
+            }
+            private BookKind _SelectedBookKind = BookKind.Uncategorized;
+            #endregion
+
+            /// <summary>
             /// 初期値
             /// </summary>
             #region InitialValue
@@ -302,6 +322,41 @@ namespace HouseholdAccountBook.ViewModels
             #endregion
 
             /// <summary>
+            /// 支払の必要があるか
+            /// </summary>
+            #region NeedToPay
+            public bool NeedToPay
+            {
+                get { return _NeedToPay; }
+                private set { SetProperty(ref _NeedToPay, value); }
+            }
+            private bool _NeedToPay = default(bool);
+            #endregion
+
+            /// <summary>
+            /// 支払元帳簿VMリスト
+            /// </summary>
+            #region DebitBookVMList
+            public ObservableCollection<BookViewModel> DebitBookVMList
+            {
+                get { return _DebitBookVMList; }
+                set { SetProperty(ref _DebitBookVMList, value); }
+            }
+            private ObservableCollection<BookViewModel> _DebitBookVMList = default(ObservableCollection<BookViewModel>);
+            #endregion
+            /// <summary>
+            /// 選択された支払元帳簿VM
+            /// </summary>
+            #region SelectedDebitBookVM
+            public BookViewModel SelectedDebitBookVM
+            {
+                get { return _SelectedDebitBookVM; }
+                set { SetProperty(ref _SelectedDebitBookVM, value); }
+            }
+            private BookViewModel _SelectedDebitBookVM = default(BookViewModel);
+            #endregion
+            
+            /// <summary>
             /// 支払日
             /// </summary>
             #region PayDay
@@ -313,18 +368,6 @@ namespace HouseholdAccountBook.ViewModels
             private int? _PayDay = default(int?);
             #endregion
 
-            /// <summary>
-            /// 帳簿種別
-            /// </summary>
-            #region BookKind
-            public BookKind BookKind
-            {
-                get { return _BookKind; }
-                set { SetProperty(ref _BookKind, value); }
-            }
-            private BookKind _BookKind = default(BookKind);
-            #endregion
-            
             /// <summary>
             /// 関係性VMリスト
             /// </summary>
@@ -347,6 +390,14 @@ namespace HouseholdAccountBook.ViewModels
             }
             private RelationViewModel _SelectedRelationVM = default(RelationViewModel);
             #endregion
+
+            /// <summary>
+            /// 支払いの必要の有無を更新する
+            /// </summary>
+            private void UpdateNeedToPay()
+            {
+                NeedToPay = SelectedBookKind == BookKind.CreditCard;
+            }
         }
 
         /// <summary>

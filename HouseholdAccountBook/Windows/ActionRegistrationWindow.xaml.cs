@@ -66,7 +66,7 @@ namespace HouseholdAccountBook.Windows
             this.ActionRegistrationWindowVM.BookVMList = bookVMList;
             this.ActionRegistrationWindowVM.SelectedBookVM = selectedBookVM;
             this.ActionRegistrationWindowVM.SelectedDate = selectedDateTime != null ? selectedDateTime.Value : DateTime.Today;
-            this.ActionRegistrationWindowVM.SelectedBalanceKindVM = this.ActionRegistrationWindowVM.BalanceKindVMList[1];
+            this.ActionRegistrationWindowVM.SelectedBalanceKind =BalanceKind.Outgo;
 
             UpdateCategoryList();
             UpdateItemList();
@@ -148,8 +148,8 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
             this.ActionRegistrationWindowVM.BookVMList = bookVMList;
             this.ActionRegistrationWindowVM.SelectedBookVM = selectedBookVM;
             this.ActionRegistrationWindowVM.SelectedDate = actDate;
-            int balanceKindIndex = Math.Sign(actValue) > 0 ? 0 : 1; // 収入 / 支出
-            this.ActionRegistrationWindowVM.SelectedBalanceKindVM = this.ActionRegistrationWindowVM.BalanceKindVMList[balanceKindIndex];
+            BalanceKind balanceKind = Math.Sign(actValue) > 0 ? BalanceKind.Income : BalanceKind.Outgo; // 収入 / 支出
+            this.ActionRegistrationWindowVM.SelectedBalanceKind = balanceKind;
             this.ActionRegistrationWindowVM.Value = Math.Abs(actValue);
 
             // 回数の表示
@@ -365,7 +365,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
 SELECT category_id, category_name FROM mst_category C 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM mst_item I WHERE I.category_id = C.category_id AND balance_kind = @{0} AND del_flg = 0 
   AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{1} AND RBI.item_id = I.item_id)) 
-ORDER BY sort_order;", (int)this.ActionRegistrationWindowVM.SelectedBalanceKindVM.BalanceKind, this.ActionRegistrationWindowVM.SelectedBookVM.Id);
+ORDER BY sort_order;", (int)this.ActionRegistrationWindowVM.SelectedBalanceKind, this.ActionRegistrationWindowVM.SelectedBookVM.Id);
                 reader.ExecWholeRow((count, record) => {
                     CategoryViewModel vm = new CategoryViewModel() { Id = record.ToInt("category_id"), Name = record["category_name"] };
                     categoryVMList.Add(vm);
@@ -393,7 +393,7 @@ ORDER BY sort_order;", (int)this.ActionRegistrationWindowVM.SelectedBalanceKindV
 SELECT item_id, item_name FROM mst_item I 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{0} AND RBI.item_id = I.item_id AND del_flg = 0)
   AND EXISTS (SELECT * FROM mst_category C WHERE C.category_id = I.category_id AND balance_kind = @{1} AND del_flg = 0)
-ORDER BY sort_order;", this.ActionRegistrationWindowVM.SelectedBookVM.Id, (int)this.ActionRegistrationWindowVM.SelectedBalanceKindVM.BalanceKind);
+ORDER BY sort_order;", this.ActionRegistrationWindowVM.SelectedBookVM.Id, (int)this.ActionRegistrationWindowVM.SelectedBalanceKind);
                 }
                 else {
                     reader = dao.ExecQuery(@"
@@ -472,11 +472,11 @@ ORDER BY used_time DESC;", this.ActionRegistrationWindowVM.SelectedItemVM.Id);
         private int? RegisterToDb()
         {
             if(!ActionRegistrationWindowVM.Value.HasValue || ActionRegistrationWindowVM.Value <= 0) {
-                MessageBox.Show(this, Message.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return null;
             }
 
-            BalanceKind balanceKind = ActionRegistrationWindowVM.SelectedBalanceKindVM.BalanceKind; // 収支種別
+            BalanceKind balanceKind = ActionRegistrationWindowVM.SelectedBalanceKind; // 収支種別
             int bookId = ActionRegistrationWindowVM.SelectedBookVM.Id.Value; // 帳簿ID
             int itemId = ActionRegistrationWindowVM.SelectedItemVM.Id; // 帳簿項目ID
             DateTime actTime = ActionRegistrationWindowVM.SelectedDate; // 日付

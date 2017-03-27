@@ -136,12 +136,31 @@ namespace HouseholdAccountBook.ViewModels
         /// 選択された帳簿項目VMリスト
         /// </summary>
         #region SelectedActionVMList
-        public ObservableCollection<ActionViewModel> SelectedActionVMList
+        public ObservableCollection<ActionViewModel> SelectedActionVMList { get; } = new ObservableCollection<ActionViewModel>();
+        #endregion
+
+        /// <summary>
+        /// 合計値
+        /// </summary>
+        #region SumValue
+        public int? SumValue
         {
-            get { return _SelectedActionVMList; }
-            set { SetProperty(ref _SelectedActionVMList, value); }
+            get { return _SumValue; }
+            private set { SetProperty(ref _SumValue, value); }
         }
-        private ObservableCollection<ActionViewModel> _SelectedActionVMList = new ObservableCollection<ActionViewModel>();
+        private int? _SumValue = default(int?);
+        #endregion
+
+        /// <summary>
+        /// 平均値
+        /// </summary>
+        #region AverageValue
+        public int? AverageValue
+        {
+            get { return _AverageValue; }
+            private set { SetProperty(ref _AverageValue, value); }
+        }
+        private int? _AverageValue = default(int?);
         #endregion
 
         /// <summary>
@@ -172,6 +191,40 @@ namespace HouseholdAccountBook.ViewModels
         }
         private SummaryViewModel _SelectedSummaryVM = default(SummaryViewModel);
         #endregion
+
+        /// <summary>
+        /// 表示する帳簿項目VMリストを更新する
+        /// </summary>
+        private void UpdateDisplayedActionVMList()
+        {
+            if(_SelectedSummaryVM == null || (BalanceKind)_SelectedSummaryVM.BalanceKind == BalanceKind.Others) {
+                DisplayedActionVMList = _ActionVMList;
+            }
+            else {
+                if(_SelectedSummaryVM.ItemId != -1) {
+                    DisplayedActionVMList = new ObservableCollection<ActionViewModel>( _ActionVMList.Where((vm) => { return vm.ItemId == _SelectedSummaryVM.ItemId; }));
+                }
+                else if (_SelectedSummaryVM.CategoryId != -1) {
+                    DisplayedActionVMList = new ObservableCollection<ActionViewModel>( _ActionVMList.Where((vm) => { return vm.CategoryId == _SelectedSummaryVM.CategoryId; }));
+                }
+                else if((BalanceKind)_SelectedSummaryVM.BalanceKind != BalanceKind.Others) {
+                    DisplayedActionVMList = new ObservableCollection<ActionViewModel>( _ActionVMList.Where((vm) => { return vm.BalanceKind == (BalanceKind)_SelectedSummaryVM.BalanceKind; }));
+                }
+                Debug.Assert(true);
+            }
+        }
+        /// <summary>
+        /// 統計値を更新する
+        /// </summary>
+        private void UpdateStatisticsValue()
+        {
+            int? sum = SelectedActionVMList.Count != 0 ? (int?)0 : null;
+            foreach (ActionViewModel vm in SelectedActionVMList) {
+                sum += vm.Income ?? 0 + vm.Outgo ?? 0;
+            }
+            SumValue = sum;
+            AverageValue = SelectedActionVMList.Count != 0 ? sum / SelectedActionVMList.Count : null;
+        }
         #endregion
 
         #region 年間一覧タブ
@@ -237,25 +290,11 @@ namespace HouseholdAccountBook.ViewModels
         }
 
         /// <summary>
-        /// 表示する帳簿項目VMリストを更新する
+        /// 
         /// </summary>
-        private void UpdateDisplayedActionVMList()
+        public MainWindowViewModel()
         {
-            if(_SelectedSummaryVM == null || (BalanceKind)_SelectedSummaryVM.BalanceKind == BalanceKind.Others) {
-                DisplayedActionVMList = _ActionVMList;
-            }
-            else {
-                if(_SelectedSummaryVM.ItemId != -1) {
-                    DisplayedActionVMList = new ObservableCollection<ActionViewModel>( _ActionVMList.Where((vm) => { return vm.ItemId == _SelectedSummaryVM.ItemId; }));
-                }
-                else if (_SelectedSummaryVM.CategoryId != -1) {
-                    DisplayedActionVMList = new ObservableCollection<ActionViewModel>( _ActionVMList.Where((vm) => { return vm.CategoryId == _SelectedSummaryVM.CategoryId; }));
-                }
-                else if((BalanceKind)_SelectedSummaryVM.BalanceKind != BalanceKind.Others) {
-                    DisplayedActionVMList = new ObservableCollection<ActionViewModel>( _ActionVMList.Where((vm) => { return vm.BalanceKind == (BalanceKind)_SelectedSummaryVM.BalanceKind; }));
-                }
-                Debug.Assert(true);
-            }
+            SelectedActionVMList.CollectionChanged += (sender, e) => UpdateStatisticsValue();
         }
     }
 }

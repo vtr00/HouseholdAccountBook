@@ -1,5 +1,6 @@
 ﻿using Prism.Mvvm;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
@@ -116,28 +117,20 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 手数料種別VMリスト
+        /// 手数料種別辞書
         /// </summary>
-        #region CommissionKindVMList
-        public ObservableCollection<CommissionKindViewModel> CommissionKindVMList
-        {
-            get { return _CommissionKindVMList; }
-            set { SetProperty(ref _CommissionKindVMList, value); }
-        }
-        private ObservableCollection<CommissionKindViewModel> _CommissionKindVMList = new ObservableCollection<CommissionKindViewModel> {
-            new CommissionKindViewModel() { CommissionKind = CommissionKind.FromBook, CommissionKindName = CommissionStr[CommissionKind.FromBook] },
-            new CommissionKindViewModel() { CommissionKind = CommissionKind.ToBook, CommissionKindName = CommissionStr[CommissionKind.ToBook] }
-        };
+        #region CommissionKindDic
+        public Dictionary<CommissionKind, string> CommissionKindDic { get; } = CommissionKindStr;
         #endregion
         /// <summary>
-        /// 選択された手数料種別VM
+        /// 選択された手数料種別
         /// </summary>
-        #region SelectedCommissionKindVM
-        public CommissionKindViewModel SelectedCommissionKindVM
+        #region SelectedCommissionKind
+        public CommissionKind SelectedCommissionKind
         {
-            get { return _SelectedCommissionKindVM; }
+            get { return _SelectedCommissionKind; }
             set {
-                if (SetProperty(ref _SelectedCommissionKindVM, value)) {
+                if (SetProperty(ref _SelectedCommissionKind, value)) {
                     if (!UpdateOnChanged) {
                         UpdateOnChanged = true;
                         OnCommissionKindChanged?.Invoke();
@@ -146,7 +139,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private CommissionKindViewModel _SelectedCommissionKindVM = default(CommissionKindViewModel);
+        private CommissionKind _SelectedCommissionKind = default(CommissionKind);
         #endregion
 
         /// <summary>

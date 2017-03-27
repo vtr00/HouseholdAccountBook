@@ -81,7 +81,7 @@
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                        Text="収支" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="3"
-                      ItemsSource="{Binding BalanceKindVMList}" SelectedItem="{Binding SelectedBalanceKindVM}" DisplayMemberPath="BalanceKindName"/>
+                      ItemsSource="{Binding BalanceKindDic}" SelectedValue="{Binding SelectedBalanceKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                        Text="分類" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="3" Grid.Column="1" Margin="5" Grid.ColumnSpan="3"

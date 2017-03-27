@@ -266,11 +266,11 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
                 Cursor = cCursor;
 
-                MessageBox.Show(Message.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                MessageBox.Show(MessageText.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
                 Cursor = cCursor;
-                MessageBox.Show(Message.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
 
@@ -360,12 +360,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
                 Cursor = cCursor;
 
-                MessageBox.Show(Message.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                MessageBox.Show(MessageText.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
                 Cursor = cCursor;
 
-                MessageBox.Show(Message.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
 
@@ -435,9 +435,9 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             Cursor = cCursor;
 
             if (process.ExitCode == 0) {
-                MessageBox.Show(Message.FinishToExport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                MessageBox.Show(MessageText.FinishToExport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }else {
-                MessageBox.Show(Message.FoultToExport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                MessageBox.Show(MessageText.FoultToExport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
         #endregion
@@ -595,7 +595,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
         /// <param name="e"></param>
         private void DeleteActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(Message.DeleteNotification, this.Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+            if (MessageBox.Show(MessageText.DeleteNotification, this.Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
                 foreach(ActionViewModel vm in this.MainWindowVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; })) {
                     int actionId = vm.ActionId;
                     int? groupId = vm.GroupId;
@@ -1215,7 +1215,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                     CategoryId = -1,
                     CategoryName = string.Empty,
                     ItemId = -1,
-                    ItemName = BalanceStr[(BalanceKind)g1.Key],
+                    ItemName = BalanceKindStr[(BalanceKind)g1.Key],
                     Summary = g1.Sum(obj => obj.Summary)
                 });
                 // カテゴリ別の小計を計算する
@@ -1891,6 +1891,8 @@ WHERE item_id = @{2};", this.SettingsVM.SelectedItemVM.Name, Updater, id);
                         break;
                 }
             }
+
+            MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         /// <summary>
@@ -1958,7 +1960,7 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void DeleteShopNameCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
                 Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
                 using (DaoBase dao = builder.Build()) {
                     dao.ExecQuery(@"
@@ -1999,7 +2001,7 @@ ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
         /// <param name="e"></param>
         private void DeleteRemarkCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(Message.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
                 Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
                 using (DaoBase dao = builder.Build()) {
                     dao.ExecQuery(@"
@@ -2210,9 +2212,11 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
                 BookSettingViewModel vm = this.SettingsVM.SelectedBookVM;
                 dao.ExecNonQuery(@"
 UPDATE mst_book
-SET book_name = @{0}, initial_value = @{1}, pay_day = @{2}, update_time = 'now', updater = @{3}
-WHERE book_id = @{4};", vm.Name, vm.InitialValue, vm.PayDay, Updater, vm.Id);
+SET book_name = @{0}, book_kind = @{1}, initial_value = @{2}, debit_book_id = @{3}, pay_day = @{4}, update_time = 'now', updater = @{5}
+WHERE book_id = @{6};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.SelectedDebitBookVM.Id == -1 ? null : vm.SelectedDebitBookVM.Id, vm.PayDay, Updater, vm.Id);
             }
+
+            MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         /// <summary>
@@ -2526,12 +2530,15 @@ ORDER BY used_time DESC;", vm2.Id);
         /// <returns>帳簿VM(設定用)リスト</returns>
         private ObservableCollection<BookSettingViewModel> LoadBookSettingViewModelList()
         {
-            ObservableCollection<BookSettingViewModel> vmList = new ObservableCollection<BookSettingViewModel>();
+            ObservableCollection<BookSettingViewModel> settingVMList = new ObservableCollection<BookSettingViewModel>();
+            ObservableCollection<BookViewModel> vmList = new ObservableCollection<BookViewModel>() {
+                new BookViewModel(){ Id = -1, Name = "なし" }
+            };
 
             using (DaoBase dao = builder.Build()) {
                 // 帳簿一覧を取得する
                 DaoReader reader = dao.ExecQuery(@"
-SELECT book_id, book_name, pay_day, initial_value
+SELECT book_id, book_name
 FROM mst_book
 WHERE del_flg = 0
 ORDER BY sort_order;");
@@ -2539,19 +2546,43 @@ ORDER BY sort_order;");
                 reader.ExecWholeRow((count, record) => {
                     int bookId = record.ToInt("book_id");
                     string bookName = record["book_name"];
-                    int initialValue = record.ToInt("initial_value");
-                    int? payDay = record.ToNullableInt("pay_day");
 
-                    vmList.Add(new BookSettingViewModel() {
+                    vmList.Add(new BookViewModel() {
                         Id = bookId,
-                        Name = bookName,
-                        InitialValue = initialValue,
-                        PayDay = payDay
+                        Name = bookName
                     });
                 });
 
+                // 帳簿一覧を取得する
+                reader = dao.ExecQuery(@"
+SELECT book_id, book_name, book_kind, debit_book_id, pay_day, initial_value
+FROM mst_book
+WHERE del_flg = 0
+ORDER BY sort_order;");
+
+                reader.ExecWholeRow((count, record) => {
+                    int bookId = record.ToInt("book_id");
+                    string bookName = record["book_name"];
+                    BookKind bookKind = (BookKind)record.ToInt("book_kind");
+                    int initialValue = record.ToInt("initial_value");
+                    int? debitBookId = record.ToNullableInt("debit_book_id");
+                    int? payDay = record.ToNullableInt("pay_day");
+
+                    BookSettingViewModel tmpVM = new BookSettingViewModel() {
+                        Id = bookId,
+                        Name = bookName,
+                        SelectedBookKind = bookKind,
+                        InitialValue = initialValue,
+                        DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((vm) => { return vm.Id != bookId; })),
+                        PayDay = payDay,
+                    };
+                    tmpVM.SelectedDebitBookVM = tmpVM.DebitBookVMList.FirstOrDefault((vm) => { return vm.Id == debitBookId; }) ?? tmpVM.DebitBookVMList[0];
+
+                    settingVMList.Add(tmpVM);
+                });
+
                 // 項目との関係の一覧を取得する(移動を除く)
-                foreach (BookSettingViewModel vm in vmList) {
+                foreach (BookSettingViewModel vm in settingVMList) {
                     reader = dao.ExecQuery(@"
 SELECT I.item_id AS ItemId, I.item_name, C.category_name, RBI.item_id IS NULL AS IsNotRelated
 FROM mst_item I
@@ -2575,7 +2606,7 @@ ORDER BY I.sort_order;", vm.Id);
                 }
             }
 
-            return vmList;
+            return settingVMList;
         }
         #endregion
     }

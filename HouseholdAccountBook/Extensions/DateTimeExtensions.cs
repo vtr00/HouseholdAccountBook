@@ -41,5 +41,18 @@ namespace HouseholdAccountBook.Extentions
             ans = new DateTime(ans.Year, firstMonthOfFiscalYear, 1);
             return ans;
         }
+
+        /// <summary>
+        /// 月内の指定した日を取得する(日数を上回れば丸める)
+        /// </summary>
+        /// <param name="dateTime">対象の日付</param>
+        /// <param name="day">指定する日</param>
+        /// <returns>月内の指定された日</returns>
+        public static DateTime GetDateInMonth(this DateTime dateTime, int day)
+        {
+            day = Math.Min(day, DateTime.DaysInMonth(dateTime.Year, dateTime.Month));
+            DateTime ans = new DateTime(dateTime.Year, dateTime.Month, day);
+            return ans;
+        }
     }
 }

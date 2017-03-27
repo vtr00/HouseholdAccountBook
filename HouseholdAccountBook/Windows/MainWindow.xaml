@@ -208,6 +208,12 @@
                                       SelectionChanged="BookComboBox_SelectionChanged"/>
                         </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                            <TextBlock Text="合計："/>
+                            <TextBlock Text="{Binding SumValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
+                            <TextBlock Text=" / "/>
+                            <TextBlock Text="平均："/>
+                            <TextBlock Text="{Binding AverageValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
+                            <Rectangle Margin="10"/>
                             <Button Content="移動" Width="50" Command="{StaticResource MoveToBookCommand}"/>
                             <Button Content="追加" Width="50" Command="{StaticResource AddActionToBookCommand}"/>
                             <Button Content="まとめて追加" Width="80" Command="{StaticResource AddActionListToBookCommand}"/>
@@ -244,7 +250,7 @@
                                 <MouseBinding Gesture="LeftDoubleClick" Command="{StaticResource EditActionCommand}"/>
                             </DataGrid.InputBindings>
                             <i:Interaction.Behaviors>
-                                <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding SelectedActionVMList}"/>
+                                <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding SelectedActionVMList, Mode=OneWay}"/>
                             </i:Interaction.Behaviors>
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="アクションID" Binding="{Binding ActionId}"
@@ -608,6 +614,8 @@
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="0.5*"/>
@@ -617,14 +625,22 @@
                                                 <TextBox Grid.Row="0" Grid.Column="1" Margin="5" 
                                                          Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="初期残高"/>
-                                                <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" 
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="帳簿種別"/>
+                                                <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" 
+                                                          ItemsSource="{Binding BookKindDic}" SelectedValue="{Binding SelectedBookKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="初期残高"/>
+                                                <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" 
                                                                         Value="{Binding InitialValue}"/>
 
-                                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="支払日"/>
-                                                <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" MinValue="1" MaxValue="31" 
-                                                                        Value="{Binding PayDay, TargetNullValue=''}"/>
-                                                <Button Grid.Row="3" Grid.Column="1" Margin="5,0" Content="確定" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
+                                                <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Text="支払元帳簿"/>
+                                                <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" IsEnabled="{Binding NeedToPay}" 
+                                                          ItemsSource="{Binding DebitBookVMList}" SelectedItem="{Binding SelectedDebitBookVM}" DisplayMemberPath="Name"/>
+
+                                                <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" Text="支払日"/>
+                                                <controls:NumericUpDown Grid.Row="4" Grid.Column="1" Margin="5" MinValue="1" MaxValue="31" 
+                                                                        Value="{Binding PayDay, TargetNullValue=''}" IsEnabled="{Binding NeedToPay}"/>
+                                                <Button Grid.Row="5" Grid.Column="1" Margin="5,0" Content="確定" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
                                             </Grid>
                                         </GroupBox>
                                         

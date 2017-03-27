@@ -1,5 +1,6 @@
 ﻿using Prism.Mvvm;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
@@ -64,30 +65,22 @@ namespace HouseholdAccountBook.ViewModels
 
         private BookViewModel _SelectedBookVM = default(BookViewModel);
         #endregion
-
+        
         /// <summary>
-        /// 収支VMリスト
+        /// 収支種別辞書
         /// </summary>
-        #region BalanceKindVMList
-        public ObservableCollection<BalanceKindViewModel> BalanceKindVMList
-        {
-            get { return _BalanceKindVMList; }
-            set { SetProperty(ref _BalanceKindVMList, value); }
-        }
-        private ObservableCollection<BalanceKindViewModel> _BalanceKindVMList = new ObservableCollection<BalanceKindViewModel>() {
-            new BalanceKindViewModel() { BalanceKind = BalanceKind.Income, BalanceKindName = BalanceStr[BalanceKind.Income]}, // 収入
-            new BalanceKindViewModel() { BalanceKind = BalanceKind.Outgo, BalanceKindName = BalanceStr[BalanceKind.Outgo]}, // 支出
-        };
+        #region BalanceKindDic
+        public Dictionary<BalanceKind, string> BalanceKindDic { get; } = BalanceKindStr;
         #endregion
         /// <summary>
-        /// 選択された収支VM
+        /// 選択された収支種別
         /// </summary>
-        #region SelectedBalanceKindVM
-        public BalanceKindViewModel SelectedBalanceKindVM
+        #region SelectedBalanceKind
+        public BalanceKind SelectedBalanceKind
         {
-            get { return _SelectedBalanceKindVM; }
+            get { return _SelectedBalanceKind; }
             set {
-                if (SetProperty(ref _SelectedBalanceKindVM, value)) {
+                if (SetProperty(ref _SelectedBalanceKind, value)) {
                     if (!UpdateOnChanged) {
                         UpdateOnChanged = true;
                         OnBalanceKindChanged?.Invoke();
@@ -96,7 +89,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private BalanceKindViewModel _SelectedBalanceKindVM = default(BalanceKindViewModel);
+        private BalanceKind _SelectedBalanceKind = default(BalanceKind);
         #endregion
 
         /// <summary>

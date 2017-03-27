@@ -56,7 +56,7 @@ namespace HouseholdAccountBook.Windows
 
             this.ActionListRegistrationWindowVM.BookVMList = bookVMList;
             this.ActionListRegistrationWindowVM.SelectedBookVM = selectedBookVM;
-            this.ActionListRegistrationWindowVM.SelectedBalanceKindVM = this.ActionListRegistrationWindowVM.BalanceKindVMList[1];
+            this.ActionListRegistrationWindowVM.SelectedBalanceKind = BalanceKind.Outgo;
 
             UpdateCategoryList();
             UpdateItemList();
@@ -217,7 +217,7 @@ namespace HouseholdAccountBook.Windows
 SELECT category_id, category_name FROM mst_category C 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM mst_item I WHERE I.category_id = C.category_id AND balance_kind = @{0} AND del_flg = 0 
   AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{1} AND RBI.item_id = I.item_id)) 
-ORDER BY sort_order;", (int)this.ActionListRegistrationWindowVM.SelectedBalanceKindVM.BalanceKind, this.ActionListRegistrationWindowVM.SelectedBookVM.Id);
+ORDER BY sort_order;", (int)this.ActionListRegistrationWindowVM.SelectedBalanceKind, this.ActionListRegistrationWindowVM.SelectedBookVM.Id);
                 reader.ExecWholeRow((count, record) => {
                     CategoryViewModel vm = new CategoryViewModel() { Id = record.ToInt("category_id"), Name = record["category_name"] };
                     categoryVMList.Add(vm);
@@ -245,7 +245,7 @@ ORDER BY sort_order;", (int)this.ActionListRegistrationWindowVM.SelectedBalanceK
 SELECT item_id, item_name FROM mst_item I 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{0} AND RBI.item_id = I.item_id AND del_flg = 0)
   AND EXISTS (SELECT * FROM mst_category C WHERE C.category_id = I.category_id AND balance_kind = @{1} AND del_flg = 0)
-ORDER BY sort_order;", this.ActionListRegistrationWindowVM.SelectedBookVM.Id, (int)this.ActionListRegistrationWindowVM.SelectedBalanceKindVM.BalanceKind);
+ORDER BY sort_order;", this.ActionListRegistrationWindowVM.SelectedBookVM.Id, (int)this.ActionListRegistrationWindowVM.SelectedBalanceKind);
                 }
                 else {
                     reader = dao.ExecQuery(@"
@@ -324,11 +324,11 @@ ORDER BY used_time DESC;", this.ActionListRegistrationWindowVM.SelectedItemVM.Id
         private int? RegisterToDb()
         {
             if(this.ActionListRegistrationWindowVM.DateValueVMList.Count < 1) {
-                MessageBox.Show(this, Message.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return null;
             }
 
-            BalanceKind balanceKind = this.ActionListRegistrationWindowVM.SelectedBalanceKindVM.BalanceKind; // 収支種別
+            BalanceKind balanceKind = this.ActionListRegistrationWindowVM.SelectedBalanceKind; // 収支種別
             int bookId = this.ActionListRegistrationWindowVM.SelectedBookVM.Id.Value; // 帳簿ID
             int itemId = this.ActionListRegistrationWindowVM.SelectedItemVM.Id; // 帳簿項目ID
             string shopName = this.ActionListRegistrationWindowVM.SelectedShopName; // 店舗名
