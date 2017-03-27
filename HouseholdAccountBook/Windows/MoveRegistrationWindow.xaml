@@ -74,7 +74,7 @@
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                        Text="金額" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" 
-                       Value="{Binding Value, Mode=TwoWay, TargetNullValue=''}" MinValue="1"/>
+                       Value="{Binding Value, TargetNullValue=''}" MinValue="1"/>
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="5"
                        Text="手数料負担" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="4" Grid.Column="1" Margin="5" Grid.ColumnSpan="3"
@@ -86,7 +86,7 @@
             <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" 
                        Text="手数料" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <controls:NumericUpDown Grid.Row="6" Grid.Column="1" Margin="5" 
-                                    Value="{Binding Commission, Mode=TwoWay, TargetNullValue=''}" MinValue="0"/>
+                                    Value="{Binding Commission, TargetNullValue=''}" MinValue="0"/>
             <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
                        Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="7" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" IsEditable="True"

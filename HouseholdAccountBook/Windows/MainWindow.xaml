@@ -623,7 +623,7 @@
 
                                                 <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="支払日"/>
                                                 <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" MinValue="1" MaxValue="31" 
-                                                                        Value="{Binding PayDay}"/>
+                                                                        Value="{Binding PayDay, TargetNullValue=''}"/>
                                                 <Button Grid.Row="3" Grid.Column="1" Margin="5,0" Content="確定" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
                                             </Grid>
                                         </GroupBox>

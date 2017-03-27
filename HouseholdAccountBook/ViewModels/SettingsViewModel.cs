@@ -312,6 +312,18 @@ namespace HouseholdAccountBook.ViewModels
             }
             private int? _PayDay = default(int?);
             #endregion
+
+            /// <summary>
+            /// 帳簿種別
+            /// </summary>
+            #region BookKind
+            public BookKind BookKind
+            {
+                get { return _BookKind; }
+                set { SetProperty(ref _BookKind, value); }
+            }
+            private BookKind _BookKind = default(BookKind);
+            #endregion
             
             /// <summary>
             /// 関係性VMリスト

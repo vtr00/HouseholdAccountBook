@@ -18,7 +18,7 @@ namespace HouseholdAccountBook.UserControls
                 PropertyName<NumericUpDown>.Get(x => x.Value),
                 typeof(int?),
                 typeof(NumericUpDown),
-                new PropertyMetadata(null)
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
             );
         /// <summary>
         /// 値
