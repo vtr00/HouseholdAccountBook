@@ -220,7 +220,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             int? sum = SelectedActionVMList.Count != 0 ? (int?)0 : null;
             foreach (ActionViewModel vm in SelectedActionVMList) {
-                sum += vm.Income ?? 0 + vm.Outgo ?? 0;
+                sum += vm.Income ?? 0 - vm.Outgo ?? 0;
             }
             SumValue = sum;
             AverageValue = SelectedActionVMList.Count != 0 ? sum / SelectedActionVMList.Count : null;

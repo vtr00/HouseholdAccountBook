@@ -465,6 +465,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
             mrw.Registrated += (sender2, e2) => {
                 UpdateBookTabData(e2.Id);
+                FocusManager.SetFocusedElement(this, actionDataGrid);
                 actionDataGrid.Focus();
             };
             mrw.Owner = this;
@@ -493,6 +494,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
             arw.Registrated += (sender2, e2)=> {
                 UpdateBookTabData(e2.Id);
+                FocusManager.SetFocusedElement(this, actionDataGrid);
                 actionDataGrid.Focus();
             };
             arw.Owner = this;
@@ -521,6 +523,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
             alrw.Registrated += (sender2, e2) => {
                 UpdateBookTabData(e2.Id);
+                FocusManager.SetFocusedElement(this, actionDataGrid);
                 actionDataGrid.Focus();
             };
             alrw.Owner = this;
@@ -562,6 +565,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
                 ActionRegistrationWindow arw = new ActionRegistrationWindow(builder, this.MainWindowVM.SelectedActionVM.ActionId);
                 arw.Registrated += (sender2, e2) => {
                     UpdateBookTabData(e2.Id);
+                    FocusManager.SetFocusedElement(this, actionDataGrid);
                     actionDataGrid.Focus();
                 };
                 arw.ShowDialog();
@@ -571,6 +575,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
                 MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder, this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM.GroupId.Value);
                 mrw.Registrated += (sender2, e2) => {
                     UpdateBookTabData(e2.Id);
+                    FocusManager.SetFocusedElement(this, actionDataGrid);
                     actionDataGrid.Focus();
                 };
                 mrw.ShowDialog();
@@ -969,6 +974,8 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="bookId">選択対象の帳簿ID</param>
         private void UpdateBookList(int? bookId = null)
         {
+            int? tmpBookId = bookId ?? this.MainWindowVM.SelectedBookVM?.Id;
+
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>() {
                 new BookViewModel() { Id = null, Name = "一覧" }
             };
@@ -983,7 +990,7 @@ ORDER BY sort_order;");
                     BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                     bookVMList.Add(vm);
 
-                    if(vm.Id == bookId) {
+                    if(vm.Id == tmpBookId) {
                         selectedBookVM = vm;
                     }
                 });
@@ -1000,6 +1007,9 @@ ORDER BY sort_order;");
         private void UpdateBookTabData(int? actionId = null)
         {
             if (this.MainWindowVM.SelectedTab == Tab.BooksTab) {
+                int? tmpActionId = actionId ?? this.MainWindowVM.SelectedActionVM?.ActionId;
+                SummaryViewModel tmpSvm = this.MainWindowVM.SelectedSummaryVM;
+
                 this.MainWindowVM.ActionVMList = LoadActionViewModelList(
                     this.MainWindowVM.SelectedBookVM?.Id, this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth(),
                     this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
@@ -1008,8 +1018,12 @@ ORDER BY sort_order;");
                     this.MainWindowVM.SelectedBookVM?.Id, this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth(),
                     this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
 
-                IEnumerable<ActionViewModel> query = this.MainWindowVM.ActionVMList.Where((avm) => { return avm.ActionId == actionId; });
+                IEnumerable<ActionViewModel> query = this.MainWindowVM.ActionVMList.Where((avm) => { return avm.ActionId == tmpActionId; });
                 this.MainWindowVM.SelectedActionVM = query.Count() == 0 ? null : query.First();
+
+                // 更新前のサマリーの選択を維持する
+                IEnumerable<SummaryViewModel> query2 = this.MainWindowVM.SummaryVMList.Where((svm) => { return svm.BalanceKind == tmpSvm?.BalanceKind && svm.CategoryId == tmpSvm?.CategoryId && svm.ItemId == tmpSvm?.ItemId; });
+                this.MainWindowVM.SelectedSummaryVM = query2.Count() == 0 ? null : query2.First();
 
                 if (this.actionDataGrid.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.actionDataGrid) > 0) {
                     if (VisualTreeHelper.GetChild(this.actionDataGrid, 0) is Decorator border) {
@@ -1034,7 +1048,6 @@ ORDER BY sort_order;");
         /// <param name="bookId">帳簿ID</param>
         /// <param name="startTime">開始日</param>
         /// <param name="endTime">終了日</param>
-        /// <param name="actionId">選択対象の帳簿項目ID</param>
         /// <returns>帳簿項目VMリスト</returns>
         private ObservableCollection<ActionViewModel> LoadActionViewModelList(int? bookId, DateTime startTime, DateTime endTime)
         {
@@ -2047,6 +2060,7 @@ RETURNING book_id;", Updater, Inserter);
             }
 
             UpdateBookSettingTabData(bookId);
+            UpdateBookList();
         }
 
         /// <summary>
@@ -2085,6 +2099,7 @@ WHERE book_id = @{1};", Updater, this.SettingsVM.SelectedBookVM.Id);
             }
 
             UpdateBookSettingTabData();
+            UpdateBookList();
         }
 
         /// <summary>
@@ -2137,6 +2152,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             }
 
             UpdateBookSettingTabData(changingId);
+            UpdateBookList();
         }
 
         /// <summary>
@@ -2189,6 +2205,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             }
 
             UpdateBookSettingTabData(changingId);
+            UpdateBookList();
         }
 
         /// <summary>
@@ -2215,6 +2232,7 @@ UPDATE mst_book
 SET book_name = @{0}, book_kind = @{1}, initial_value = @{2}, debit_book_id = @{3}, pay_day = @{4}, update_time = 'now', updater = @{5}
 WHERE book_id = @{6};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.SelectedDebitBookVM.Id == -1 ? null : vm.SelectedDebitBookVM.Id, vm.PayDay, Updater, vm.Id);
             }
+            UpdateBookList();
 
             MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
         }
