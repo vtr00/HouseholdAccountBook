@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Windows;
-using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook
 {
@@ -19,7 +18,9 @@ namespace HouseholdAccountBook
         /// 接続情報
         /// </summary>
         private DaoNpgsql.ConnectInfo connectInfo = null;
-
+        /// <summary>
+        /// 多重起動抑止用Mutex
+        /// </summary>
         private static Mutex mutex = null;
 
         /// <summary>
@@ -52,8 +53,7 @@ namespace HouseholdAccountBook
 
             // 前バージョンからのUpgradeを実行していないときはUpgradeを実施する
             Version assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            Version preVersion;
-            if (!Version.TryParse(settings.App_Version, out preVersion) || preVersion < assemblyVersion) {
+            if (!Version.TryParse(settings.App_Version, out Version preVersion) || preVersion < assemblyVersion) {
                 // Upgradeを実行する
                 settings.Upgrade();
             }

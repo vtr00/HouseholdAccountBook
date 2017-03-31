@@ -14,7 +14,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using static HouseholdAccountBook.ConstValue.ConstValue;
-using static HouseholdAccountBook.ViewModels.SettingsViewModel;
+using static HouseholdAccountBook.ViewModels.HierarchicalItemViewModel;
 
 namespace HouseholdAccountBook.Windows
 {

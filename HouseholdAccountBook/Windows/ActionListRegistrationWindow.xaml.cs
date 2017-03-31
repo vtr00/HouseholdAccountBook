@@ -37,9 +37,9 @@ namespace HouseholdAccountBook.Windows
         /// <param name="selectedDateTime">選択された日時</param>
         public ActionListRegistrationWindow(DaoBuilder builder, int? bookId, DateTime? selectedDateTime)
         {
-            InitializeComponent();
-
             this.builder = builder;
+
+            InitializeComponent();
 
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
             BookViewModel selectedBookVM = null;
@@ -153,37 +153,6 @@ namespace HouseholdAccountBook.Windows
         private void ActionListRegistrationWindow_Closing(object sender, CancelEventArgs e)
         {
             SaveSetting();
-        }
-
-        /// <summary>
-        /// キー押下時の処理(Escキーでキャンセル)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ActionListRegistrationWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key) {
-                case Key.Enter: {
-                        RoutedCommand command = this.Resources["RegisterCommand"] as RoutedCommand;
-
-                        if (command != null && command.CanExecute(null, sender as IInputElement)) {
-                            command.Execute(null, sender as IInputElement);
-                        }
-                        e.Handled = true;
-                    }
-                    break;
-                case Key.Escape: {
-                        RoutedCommand command = this.Resources["CancelCommand"] as RoutedCommand;
-
-                        if (command != null && command.CanExecute(null, sender as IInputElement)) {
-                            command.Execute(null, sender as IInputElement);
-                        }
-                        e.Handled = true;
-                    }
-                    break;
-                default:
-                    break;
-            }
         }
 
         /// <summary>

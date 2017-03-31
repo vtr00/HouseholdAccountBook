@@ -12,11 +12,14 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class MoveRegistrationWindowViewModel : BindableBase
     {
+        #region フィールド
         /// <summary>
         /// 変更時処理重複防止用フラグ
         /// </summary>
         private bool UpdateOnChanged = false;
+        #endregion
 
+        #region イベントハンドラ
         /// <summary>
         /// 移動元帳簿変更時イベント
         /// </summary>
@@ -33,7 +36,9 @@ namespace HouseholdAccountBook.ViewModels
         /// 項目変更時イベント
         /// </summary>
         public event Action OnItemChanged = default(Action);
+        #endregion
 
+        #region プロパティ
         /// <summary>
         /// 選択された日時
         /// </summary>
@@ -210,6 +215,7 @@ namespace HouseholdAccountBook.ViewModels
             set { SetProperty(ref _SelectedRemark, value); }
         }
         private string _SelectedRemark = default(string);
+        #endregion
         #endregion
     }
 }

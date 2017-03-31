@@ -44,10 +44,11 @@ namespace HouseholdAccountBook.Windows
         /// <param name="selectedDateTime">選択された日時</param>
         public ActionRegistrationWindow(DaoBuilder builder, int? bookId, DateTime? selectedDateTime)
         {
+            this.builder = builder;
+
             InitializeComponent();
             Title = "追加";
 
-            this.builder = builder;
             this.actionId = null;
 
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
@@ -107,10 +108,11 @@ namespace HouseholdAccountBook.Windows
         /// <param name="actionId">帳簿項目ID</param>
         public ActionRegistrationWindow(DaoBuilder builder, int actionId)
         {
+            this.builder = builder;
+
             InitializeComponent();
             Title = "編集";
 
-            this.builder = builder;
             this.actionId = actionId;
             
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
@@ -305,47 +307,6 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
         private void ActionRegistrationWindow_Closing(object sender, CancelEventArgs e)
         {
             SaveSetting();
-        }
-
-        /// <summary>
-        /// キー押下時の処理(Shift+Enterキーで登録、Enterキーで登録(編集時)/続けて登録(追加時)、Escキーでキャンセル)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ActionRegistrationWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key) {
-                case Key.Enter:
-                    if((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.None || actionId != null) {
-                        RoutedCommand command = this.Resources["RegisterCommand"] as RoutedCommand;
-
-                        if (command != null && command.CanExecute(null, sender as IInputElement)) {
-                            command.Execute(null, sender as IInputElement);
-                        }
-                        e.Handled = true;
-                    }
-                    else {
-                        RoutedCommand command = this.Resources["ContinueToRegisterCommand"] as RoutedCommand;
-
-                        if (command != null && command.CanExecute(null, sender as IInputElement)) {
-                            command.Execute(null, sender as IInputElement);
-                        }
-                        e.Handled = true;
-                    }
-                    break;
-                case Key.Escape: {
-                        RoutedCommand command = this.Resources["CancelCommand"] as RoutedCommand;
-
-                        if (command != null && command.CanExecute(null, sender as IInputElement)) {
-                            command.Execute(null, sender as IInputElement);
-                        }
-                        e.Handled = true;
-                    }
-                    
-                    break;
-                default:
-                    break;
-            }
         }
         #endregion
 

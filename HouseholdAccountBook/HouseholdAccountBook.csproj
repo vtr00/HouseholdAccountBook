@@ -147,13 +147,16 @@
     <Compile Include="ViewModels\ActionListRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\ActionRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\ActionViewModel.cs" />
+    <Compile Include="ViewModels\BookSettingViewModel.cs" />
     <Compile Include="ViewModels\BookViewModel.cs" />
     <Compile Include="ViewModels\CategoryViewModel.cs" />
     <Compile Include="ViewModels\CommissionKindViewModel.cs" />
     <Compile Include="ViewModels\DbSettingWindowViewModel.cs" />
+    <Compile Include="ViewModels\HierarchicalItemViewModel.cs" />
     <Compile Include="ViewModels\ItemViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\MoveRegistrationWindowViewModel.cs" />
+    <Compile Include="ViewModels\RelationViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\SummryViewModel.cs" />
     <Compile Include="ViewModels\SummryWithinYearViewModel.cs" />

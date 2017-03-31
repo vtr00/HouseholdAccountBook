@@ -309,32 +309,6 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
         {
             SaveSetting();
         }
-
-        /// <summary>
-        /// キー押下時の処理(Escキーでフォームを閉じる)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MoveRegistrationWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.Key) {
-                case Key.Enter:
-                    if (!this.MoveRegistrationWindowVM.Value.HasValue) break;
-
-                    // DB登録
-                    RegisterToDb();
-                    
-                    this.DialogResult = true;
-                    this.Close();
-                    break;
-                case Key.Escape:
-                    this.DialogResult = false;
-                    this.Close();
-                    break;
-                default:
-                    break;
-            }
-        }
         #endregion
 
         #region 画面更新用の関数

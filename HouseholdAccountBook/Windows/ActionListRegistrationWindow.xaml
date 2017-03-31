@@ -10,8 +10,7 @@
         mc:Ignorable="d"
         Title="まとめて追加" Height="Auto" Width="350" ShowInTaskbar="False"
         Loaded="ActionListRegistrationWindow_Loaded"
-        Closing="ActionListRegistrationWindow_Closing"
-        KeyDown="ActionListRegistrationWindow_KeyDown">
+        Closing="ActionListRegistrationWindow_Closing">
 
     <Window.Resources>
         <!-- 登録コマンド -->
@@ -40,6 +39,11 @@
                         Executed="CancelCommand_Executed"/>
     </Window.CommandBindings>
 
+    <Window.InputBindings>
+        <KeyBinding Gesture="Enter" Command="{StaticResource RegisterCommand}"/>
+        <KeyBinding Gesture="Esc" Command="{StaticResource CancelCommand}"/>
+    </Window.InputBindings>
+    
     <Window.DataContext>
         <viewmodels:ActionListRegistrationWindowViewModel x:Name="ActionListRegistrationWindowVM"/>
     </Window.DataContext>
