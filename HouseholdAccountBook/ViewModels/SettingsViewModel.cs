@@ -10,6 +10,16 @@ namespace HouseholdAccountBook.ViewModels
     public class SettingsViewModel : BindableBase
     {
         /// <summary>
+        /// 設定
+        /// </summary>
+        Properties.Settings settings;
+
+        /// <summary>
+        /// 設定を保存するか
+        /// </summary>
+        public bool WithSave { get; set; } = true;
+
+        /// <summary>
         /// 選択された設定タブインデックス
         /// </summary>
         #region SelectedTabIndex
@@ -91,9 +101,114 @@ namespace HouseholdAccountBook.ViewModels
         private BookSettingViewModel _SelectedBookVM = default(BookSettingViewModel);
         #endregion
         #endregion
-        
-        #region その他
 
+        #region その他
+        /// <summary>
+        /// pg_dump.exeパス
+        /// </summary>
+        #region DumpExePath
+        public string DumpExePath
+        {
+            get { return _DumpExePath; }
+            set {
+                if (SetProperty(ref _DumpExePath, value) && WithSave) {
+                    settings.App_Postgres_DumpExePath = value;
+                    settings.Save();
+                }
+            }
+        }
+        private string _DumpExePath = default(string);
         #endregion
+
+        /// <summary>
+        /// pg_restore.exeパス
+        /// </summary>
+        #region RestoreExePath
+        public string RestoreExePath
+        {
+            get { return _RestoreExePath; }
+            set {
+                if (SetProperty(ref _RestoreExePath, value) && WithSave) {
+                    settings.App_Postgres_RestoreExePath = value;
+                    settings.Save();
+                }
+            }
+        }
+        private string _RestoreExePath = default(string);
+        #endregion
+
+        /// <summary>
+        /// バックアップ数
+        /// </summary>
+        #region BackUpNum
+        public int BackUpNum
+        {
+            get { return _BackUpNum; }
+            set {
+                if (SetProperty(ref _BackUpNum, value) && WithSave) {
+                    settings.App_BackUpNum = value;
+                    settings.Save();
+                }
+            }
+        }
+        private int _BackUpNum = default(int);
+        #endregion
+
+        /// <summary>
+        /// バックアップ先フォルダ
+        /// </summary>
+        #region BackUpFolderPath
+        public string BackUpFolderPath
+        {
+            get { return _BackUpFolderPath; }
+            set {
+                if (SetProperty(ref _BackUpFolderPath, value) && WithSave) {
+                    settings.App_BackUpFolderPath = value;
+                    settings.Save();
+                }
+            }
+        }
+        private string _BackUpFolderPath = default(string);
+        #endregion
+
+        /// <summary>
+        /// 開始月
+        /// </summary>
+        #region StartMonth
+        public int StartMonth
+        {
+            get { return _StartMonth; }
+            set {
+                if (SetProperty(ref _StartMonth, value) && WithSave) {
+                    settings.App_StartMonth = value;
+                    settings.Save();
+                }
+            }
+        }
+        private int _StartMonth = default(int);
+        #endregion
+        #endregion
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public SettingsViewModel()
+        {
+            settings = Properties.Settings.Default;
+        }
+
+        /// <summary>
+        /// 設定を読み込む
+        /// </summary>
+        public void LoadSettings()
+        {
+            this.WithSave = false;
+            DumpExePath = settings.App_Postgres_DumpExePath;
+            RestoreExePath = settings.App_Postgres_RestoreExePath;
+            BackUpNum = settings.App_BackUpNum;
+            BackUpFolderPath = settings.App_BackUpFolderPath;
+            StartMonth = settings.App_StartMonth;
+            this.WithSave = true;
+        }
     }
 }

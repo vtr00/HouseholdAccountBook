@@ -138,7 +138,29 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedActionVMList
         public ObservableCollection<ActionViewModel> SelectedActionVMList { get; } = new ObservableCollection<ActionViewModel>();
         #endregion
-
+        
+        /// <summary>
+        /// 平均値
+        /// </summary>
+        #region AverageValue
+        public double? AverageValue
+        {
+            get { return _AverageValue; }
+            private set { SetProperty(ref _AverageValue, value); }
+        }
+        private double? _AverageValue = default(double?);
+        #endregion
+        /// <summary>
+        /// データの個数
+        /// </summary>
+        #region Amount
+        public int Amount
+        {
+            get { return _Amount; }
+            set { SetProperty(ref _Amount, value); }
+        }
+        private int _Amount = default(int);
+        #endregion
         /// <summary>
         /// 合計値
         /// </summary>
@@ -149,18 +171,6 @@ namespace HouseholdAccountBook.ViewModels
             private set { SetProperty(ref _SumValue, value); }
         }
         private int? _SumValue = default(int?);
-        #endregion
-
-        /// <summary>
-        /// 平均値
-        /// </summary>
-        #region AverageValue
-        public int? AverageValue
-        {
-            get { return _AverageValue; }
-            private set { SetProperty(ref _AverageValue, value); }
-        }
-        private int? _AverageValue = default(int?);
         #endregion
 
         /// <summary>
@@ -223,7 +233,8 @@ namespace HouseholdAccountBook.ViewModels
                 sum += vm.Income ?? 0 - vm.Outgo ?? 0;
             }
             SumValue = sum;
-            AverageValue = SelectedActionVMList.Count != 0 ? sum / SelectedActionVMList.Count : null;
+            Amount = SelectedActionVMList.Count((vm) => { return vm.Income != null || vm.Outgo != null; });
+            AverageValue = SelectedActionVMList.Count != 0 ? (double?)sum / SelectedActionVMList.Count : null;
         }
         #endregion
 
@@ -290,7 +301,7 @@ namespace HouseholdAccountBook.ViewModels
         }
 
         /// <summary>
-        /// 
+        /// コンストラクタ
         /// </summary>
         public MainWindowViewModel()
         {

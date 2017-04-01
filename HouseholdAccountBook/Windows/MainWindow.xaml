@@ -184,43 +184,47 @@
 
         <TabControl Grid.Row="1" Grid.Column="0" Width="Auto" Height="Auto" TabStripPlacement="Left"
                     SelectedIndex="{Binding SelectedTabIndex}" SelectionChanged="TabControl_SelectionChanged">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter Property="Height" Value="100"/>
+                </Style>
+            </TabControl.ItemContainerStyle>
             <TabItem Header="帳簿">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="1.0*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0" Grid.Column="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1.0*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        
-                        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
-                            <Button Content="◀" Width="20" Command="{StaticResource GoToLastMonthCommand}"/>
-                            <Button Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}}" Width="120"/>
-                            <Button Content="▶" Width="20" Command="{StaticResource GoToNextMonthCommand}"/>
-                            <Button Content="今月" Width="40" Command="{StaticResource GoToThisMonthCommand}"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
-                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
-                                      SelectionChanged="BookComboBox_SelectionChanged"/>
-                        </StackPanel>
-                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
-                            <TextBlock Text="合計："/>
-                            <TextBlock Text="{Binding SumValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
-                            <TextBlock Text=" / "/>
-                            <TextBlock Text="平均："/>
-                            <TextBlock Text="{Binding AverageValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
-                            <Rectangle Margin="10"/>
-                            <Button Content="移動" Width="50" Command="{StaticResource MoveToBookCommand}"/>
-                            <Button Content="追加" Width="50" Command="{StaticResource AddActionToBookCommand}"/>
-                            <Button Content="まとめて追加" Width="80" Command="{StaticResource AddActionListToBookCommand}"/>
-                            <Button Content="変更" Width="50" Command="{StaticResource EditActionCommand}"/>
-                            <Button Content="削除" Width="50" Command="{StaticResource DeleteActionCommand}"/>
-                        </StackPanel>
-                    </Grid>
+                    <ScrollViewer Grid.Row="0" Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="1.0*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                <Button Content="◀" Width="20" Command="{StaticResource GoToLastMonthCommand}"/>
+                                <Button Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}}" Width="120"/>
+                                <Button Content="▶" Width="20" Command="{StaticResource GoToNextMonthCommand}"/>
+                                <Button Content="今月" Width="40" Command="{StaticResource GoToThisMonthCommand}"/>
+                                <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
+                                            ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
+                                            SelectionChanged="BookComboBox_SelectionChanged"/>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                <Button Content="移動" Width="50" Command="{StaticResource MoveToBookCommand}"/>
+                                <Button Content="追加" Width="50" Command="{StaticResource AddActionToBookCommand}"/>
+                                <Button Content="まとめて追加" Width="80" Command="{StaticResource AddActionListToBookCommand}"/>
+                                <Button Content="変更" Width="50" Command="{StaticResource EditActionCommand}"/>
+                                <Button Content="削除" Width="50" Command="{StaticResource DeleteActionCommand}"/>
+                            </StackPanel>
+                        </Grid>
+                    </ScrollViewer>
 
                     <!-- データリスト -->
                     <Grid Grid.Row="1" Grid.Column="0">
@@ -288,9 +292,25 @@
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
+
+                    <!-- ステータスバー -->
+                    <StatusBar Grid.Row="2" Grid.Column="0">
+                        <StatusBarItem>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <TextBlock>
+                                    平均：
+                                    <TextBlock Text="{Binding AverageValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
+                                    データの個数：
+                                    <TextBlock Text="{Binding Amount, TargetNullValue='--'}"/>
+                                    合計： 
+                                    <TextBlock Text="{Binding SumValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </StatusBarItem>
+                    </StatusBar>
                 </Grid>
             </TabItem>
-            <TabItem Header="年間一覧">
+            <TabItem Header="年間&#10;一覧">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -667,28 +687,86 @@
                             </Grid>
                         </TabItem>
                         <TabItem Header="その他">
+                            <TabItem.Resources>
+                                <RoutedCommand x:Key="DumpExePathDialogCommand"/>
+                                <RoutedCommand x:Key="RestoreExePathDialogCommand"/>
+                                <RoutedCommand x:Key="RestartForDbSettingCommand"/>
+                                <RoutedCommand x:Key="BackUpFolderPathDialogCommand"/>
+                            </TabItem.Resources>
+                            <TabItem.CommandBindings>
+                                <CommandBinding Command="{StaticResource DumpExePathDialogCommand}"
+                                                Executed="DumpExePathDialogCommand_Executed"/>
+                                <CommandBinding Command="{StaticResource RestoreExePathDialogCommand}"
+                                                Executed="RestorePathDialogCommand_Executed"/>
+                                <CommandBinding Command="{StaticResource RestartForDbSettingCommand}"
+                                                Executed="RestartForDbSettingCommand_Executed"/>
+                                <CommandBinding Command="{StaticResource BackUpFolderPathDialogCommand}"
+                                                Executed="BackUpFolderPathDialogCommand_Executed"/>
+                            </TabItem.CommandBindings>
                             <ScrollViewer>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="0.3*"/>
-                                        <ColumnDefinition Width="0.6*"/>
-                                    </Grid.ColumnDefinitions>
+                                <StackPanel Grid.IsSharedSizeScope="True">
+                                    <GroupBox Header="データベース">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="30" SharedSizeGroup="Button"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding DumpExePath}" IsReadOnly="True"/>
+                                            <Button Grid.Row="0" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource DumpExePathDialogCommand}"/>
 
-                                    
-                                </Grid>
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
+                                            <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding RestoreExePath}" IsReadOnly="True"/>
+                                            <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource RestoreExePathDialogCommand}"/>
+
+                                            <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Content="データベース通信設定を再登録する(再起動)"
+                                                    Command="{StaticResource RestartForDbSettingCommand}"/>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Header="バックアップ">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="Header"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition SharedSizeGroup="Button"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="バックアップの個数" Margin="5" VerticalAlignment="Center"/>
+                                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" MinValue="0" MaxValue="100" Value="{Binding BackUpNum}"/>
+
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="バックアップ先フォルダ" Margin="5" VerticalAlignment="Center"/>
+                                            <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding BackUpFolderPath}" IsReadOnly="True"/>
+                                            <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource BackUpFolderPathDialogCommand}"/>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Header="カレンダー">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="Header"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition SharedSizeGroup="Button"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="開始月" Margin="5" VerticalAlignment="Center"/>
+                                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" MinValue="1" MaxValue="12" Value="{Binding StartMonth}"/>
+                                        </Grid>
+                                    </GroupBox>
+                                </StackPanel>
                             </ScrollViewer>
                         </TabItem>
                     </TabControl>

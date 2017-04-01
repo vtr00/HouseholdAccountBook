@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Extentions;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -2283,6 +2284,110 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
             }
         }
         #endregion
+
+        #region その他の設定の操作
+        /// <summary>
+        /// pg_dump.exeを指定するダイアログを表示する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DumpExePathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            string directory = string.Empty;
+            string fileName = string.Empty;
+            if (this.SettingsVM.DumpExePath != string.Empty) {
+                directory = Path.GetDirectoryName(this.SettingsVM.DumpExePath);
+                fileName = Path.GetFileName(this.SettingsVM.DumpExePath);
+            }
+
+            OpenFileDialog ofd = new OpenFileDialog() {
+                CheckFileExists = true,
+                InitialDirectory = directory,
+                FileName = fileName,
+                Title = "ファイル選択",
+                Filter = "pg_dump.exe|pg_dump.exe"
+            };
+
+            if (ofd.ShowDialog() == true) {
+                this.SettingsVM.DumpExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            }
+        }
+
+        /// <summary>
+        /// pg_restore.exeを指定するダイアログを表示する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RestorePathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            string directory = string.Empty;
+            string fileName = string.Empty;
+            if (this.SettingsVM.RestoreExePath != string.Empty) {
+                directory = Path.GetDirectoryName(this.SettingsVM.RestoreExePath);
+                fileName = Path.GetFileName(this.SettingsVM.RestoreExePath);
+            }
+
+            OpenFileDialog ofd = new OpenFileDialog() {
+                CheckFileExists = true,
+                InitialDirectory = directory,
+                FileName = fileName,
+                Title = "ファイル選択",
+                Filter = "pg_restore.exe|pg_restore.exe"
+            };
+
+            if (ofd.ShowDialog() == true) {
+                this.SettingsVM.RestoreExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            }
+        }
+
+        /// <summary>
+        /// データベース設定を行うために再起動する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RestartForDbSettingCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if(MessageBox.Show("再起動します。よろしいですか？") == MessageBoxResult.Yes) { 
+                Properties.Settings.Default.App_InitFlag = true;
+                Properties.Settings.Default.Save();
+
+                Process.Start(Application.ResourceAssembly.Location);
+                Application.Current.Shutdown();
+            }
+        }
+
+        /// <summary>
+        /// バックアップフォルダを指定するダイアログを表示する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BackUpFolderPathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            string directory = Path.GetDirectoryName(Application.ResourceAssembly.Location);
+            string fileName = string.Empty;
+            if (this.SettingsVM.BackUpFolderPath != string.Empty) {
+                directory = Path.GetDirectoryName(this.SettingsVM.BackUpFolderPath);
+                fileName = Path.GetFileName(this.SettingsVM.BackUpFolderPath);
+            }
+
+            CommonOpenFileDialog ofd = new CommonOpenFileDialog() {
+                EnsureFileExists = true,
+                IsFolderPicker = true,
+                InitialDirectory = directory,
+                DefaultFileName = fileName,
+                Title = "バックアップフォルダ選択"
+            };
+
+            if (ofd.ShowDialog() == CommonFileDialogResult.Ok) {
+                if (directory.CompareTo(ofd.InitialDirectory) == 0) {
+                    this.SettingsVM.BackUpFolderPath = Path.GetFileName(ofd.FileName);
+                }
+                else {
+                    this.SettingsVM.BackUpFolderPath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                }
+            }
+        }
+        #endregion
         #endregion
 
         #region イベントハンドラ
@@ -2351,6 +2456,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
             if (this.MainWindowVM.SelectedTab == Tab.SettingsTab) {
                 UpdateItemSettingsTabData(kind, id);
                 UpdateBookSettingTabData(bookId);
+                UpdateOtherSettingTabData();
             }
         }
 
@@ -2416,7 +2522,9 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <summary>
         /// 設定->その他タブに表示するデータを更新する
         /// </summary>
-        private void UpdateOtherSettingTabData() { }
+        private void UpdateOtherSettingTabData() {
+            this.SettingsVM.LoadSettings();
+        }
 
         /// <summary>
         /// 階層構造項目VMリストを取得する

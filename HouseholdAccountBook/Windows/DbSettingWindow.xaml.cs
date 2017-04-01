@@ -39,16 +39,23 @@ namespace HouseholdAccountBook.Windows
 
         #region コマンド
         /// <summary>
-        /// 
+        /// pg_dump.exeを指定するダイアログを表示する
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void DumpExePathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            string directory = string.Empty;
+            string fileName = string.Empty;
+            if (this.DbSettingWindowVM.DumpExePath != string.Empty) {
+                directory = Path.GetDirectoryName(this.DbSettingWindowVM.DumpExePath);
+                fileName = Path.GetFileName(this.DbSettingWindowVM.DumpExePath);
+            }
+
             OpenFileDialog ofd = new OpenFileDialog() {
                 CheckFileExists = true,
-                InitialDirectory = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop),
-                FileName = "pg_dump.exe",
+                InitialDirectory = directory,
+                FileName = fileName,
                 Title = "ファイル選択",
                 Filter = "pg_dump.exe|pg_dump.exe"
             };
@@ -59,16 +66,23 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// 
+        /// pg_restore.exeを指定するダイアログを表示する
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void RestorePathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            string directory = string.Empty;
+            string fileName = string.Empty;
+            if (this.DbSettingWindowVM.RestoreExePath != string.Empty) {
+                directory = Path.GetDirectoryName(this.DbSettingWindowVM.RestoreExePath);
+                fileName = Path.GetFileName(this.DbSettingWindowVM.RestoreExePath);
+            }
+
             OpenFileDialog ofd = new OpenFileDialog() {
                 CheckFileExists = true,
-                InitialDirectory = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop),
-                FileName = "pg_restore.exe",
+                InitialDirectory = directory,
+                FileName = fileName,
                 Title = "ファイル選択",
                 Filter = "pg_restore.exe|pg_restore.exe"
             };

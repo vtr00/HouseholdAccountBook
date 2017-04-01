@@ -39,7 +39,7 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Column="0" Height="Auto">
-            <TextBox x:Name="_textBox" Text="{Binding Value, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:NumericUpDown}}, 
+            <TextBox x:Name="_textBox" Height="Auto" Text="{Binding Value, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:NumericUpDown}}, 
                      UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" 
                      TextAlignment="Right" InputMethod.IsInputMethodEnabled="False"
                      PreviewTextInput="TextBox_PreviewTextInput" MouseWheel="TextBox_MouseWheel"
@@ -51,34 +51,66 @@
             </TextBox>
             <Popup x:Name="_popup"
                 StaysOpen="{Binding IsKeyboardFocused, ElementName=_textBox}" PlacementTarget="{Binding ElementName=_textBox}">
-                <Grid Height="50" Width="150">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="0.5*"/>
-                        <RowDefinition Height="0.5*"/>
-                    </Grid.RowDefinitions>
+                <Grid>
+                    <Grid Height="50" Width="150">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.5*"/>
+                            <RowDefinition Height="0.5*"/>
+                        </Grid.RowDefinitions>
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.2*"/>
-                        <ColumnDefinition Width="0.2*"/>
-                        <ColumnDefinition Width="0.2*"/>
-                        <ColumnDefinition Width="0.2*"/>
-                        <ColumnDefinition Width="0.2*"/>
-                        <ColumnDefinition Width="0.2*"/>
-                    </Grid.ColumnDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.2*"/>
+                            <ColumnDefinition Width="0.2*"/>
+                            <ColumnDefinition Width="0.2*"/>
+                            <ColumnDefinition Width="0.2*"/>
+                            <ColumnDefinition Width="0.2*"/>
+                            <ColumnDefinition Width="0.2*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <Button Grid.Row="0" Grid.Column="0" Content="1" Command="{StaticResource NumberInputCommand}"/>
-                    <Button Grid.Row="0" Grid.Column="1" Content="2" Command="{StaticResource NumberInputCommand}"/>
-                    <Button Grid.Row="0" Grid.Column="2" Content="3" Command="{StaticResource NumberInputCommand}"/>
-                    <Button Grid.Row="0" Grid.Column="3" Content="4" Command="{StaticResource NumberInputCommand}"/>
-                    <Button Grid.Row="0" Grid.Column="4" Content="5" Command="{StaticResource NumberInputCommand}"/>
-                    <Button Grid.Row="0" Grid.Column="5" Content="BS" Command="{StaticResource BackSpaceInputCommand}"/>
+                        <Button Grid.Row="0" Grid.Column="0" Content="1" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="0" Grid.Column="1" Content="2" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="0" Grid.Column="2" Content="3" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="0" Grid.Column="3" Content="4" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="0" Grid.Column="4" Content="5" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="0" Grid.Column="5" Content="BS" Command="{StaticResource BackSpaceInputCommand}"/>
 
-                    <Button Grid.Row="1" Grid.Column="0" Content="6" Command="{StaticResource NumberInputCommand}"/>
-                    <Button Grid.Row="1" Grid.Column="1" Content="7" Command="{StaticResource NumberInputCommand}"/>
-                    <Button Grid.Row="1" Grid.Column="2" Content="8" Command="{StaticResource NumberInputCommand}"/>
-                    <Button Grid.Row="1" Grid.Column="3" Content="9" Command="{StaticResource NumberInputCommand}"/>
-                    <Button Grid.Row="1" Grid.Column="4" Content="0" Command="{StaticResource NumberInputCommand}"/>
-                    <Button Grid.Row="1" Grid.Column="5" Content="C" Command="{StaticResource ClearCommand}"/>
+                        <Button Grid.Row="1" Grid.Column="0" Content="6" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="1" Grid.Column="1" Content="7" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="1" Grid.Column="2" Content="8" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="1" Grid.Column="3" Content="9" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="1" Grid.Column="4" Content="0" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="1" Grid.Column="5" Content="C" Command="{StaticResource ClearCommand}"/>
+                    </Grid>
+                    <Grid Height="100" Width="75" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.5*"/>
+                            <RowDefinition Height="0.5*"/>
+                            <RowDefinition Height="0.5*"/>
+                            <RowDefinition Height="0.5*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.3*"/>
+                            <ColumnDefinition Width="0.3*"/>
+                            <ColumnDefinition Width="0.3*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Button Grid.Row="0" Grid.Column="0" Content="7" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="0" Grid.Column="1" Content="8" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="0" Grid.Column="2" Content="9" Command="{StaticResource NumberInputCommand}"/>
+
+                        <Button Grid.Row="1" Grid.Column="0" Content="4" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="1" Grid.Column="1" Content="5" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="1" Grid.Column="2" Content="6" Command="{StaticResource NumberInputCommand}"/>
+                        
+                        <Button Grid.Row="2" Grid.Column="0" Content="1" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="2" Grid.Column="1" Content="2" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="2" Grid.Column="2" Content="3" Command="{StaticResource NumberInputCommand}"/>
+
+                        <Button Grid.Row="3" Grid.Column="0" Content="BS" Command="{StaticResource BackSpaceInputCommand}"/>
+                        <Button Grid.Row="3" Grid.Column="1" Content="0" Command="{StaticResource NumberInputCommand}"/>
+                        <Button Grid.Row="3" Grid.Column="2" Content="C" Command="{StaticResource ClearCommand}"/>
+                    </Grid>
                 </Grid>
             </Popup>
         </Grid>
@@ -89,8 +121,8 @@
                 <RowDefinition Height="0.5*"/>
             </Grid.RowDefinitions>
             
-            <Button Grid.Row="0" FontSize="7" Content="▲" IsTabStop="False" Command="{StaticResource IncreaseCommand}"/>
-            <Button Grid.Row="1" FontSize="7" Content="▼" IsTabStop="False" Command="{StaticResource DecreaseCommand}"/>
+            <Button Grid.Row="0" FontSize="5" Content="&#8963;" IsTabStop="False" Command="{StaticResource IncreaseCommand}"/>
+            <Button Grid.Row="1" FontSize="5" Content="&#8964;" IsTabStop="False" Command="{StaticResource DecreaseCommand}"/>
         </Grid>
 
     </Grid>

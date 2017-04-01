@@ -15,12 +15,25 @@ namespace HouseholdAccountBook.Converters
 
             string param = parameter as string;
 
-            if (param == "abs") {
-                return string.Format("{0:#,0}", Math.Abs((int)value));
+            if (value is int tmp) {
+                if (param == "abs") {
+                    return string.Format("{0:#,0}", Math.Abs(tmp));
+                }
+                else {
+                    return string.Format("{0:#,0}", tmp);
+                }
             }
-            else {
-                return string.Format("{0:#,0}", (int)value);
+
+            if (value is double tmp2) {
+                if (param == "abs") {
+                    return string.Format("{0:#,0.###}", Math.Abs(tmp2));
+                }
+                else {
+                    return string.Format("{0:#,0.###}", tmp2);
+                }
             }
+
+            throw new NotImplementedException();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
