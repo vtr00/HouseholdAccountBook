@@ -58,6 +58,10 @@ namespace HouseholdAccountBook.ViewModels
         /// グループID
         /// </summary>
         public int? GroupId { get; set; }
+        /// <summary>
+        /// CSVと一致したか
+        /// </summary>
+        public bool IsMatch { get; set; }
 
         /// <summary>
         /// 選択されているか

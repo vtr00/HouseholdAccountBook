@@ -58,6 +58,9 @@
     <ApplicationIcon>resheet.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CsvHelper, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.2.16.3.0\lib\net45\CsvHelper.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
@@ -157,17 +160,22 @@
     <Compile Include="ViewModels\BookViewModel.cs" />
     <Compile Include="ViewModels\CategoryViewModel.cs" />
     <Compile Include="ViewModels\CommissionKindViewModel.cs" />
+    <Compile Include="ViewModels\CsvComparisonViewModel.cs" />
+    <Compile Include="ViewModels\CsvComparisonWindowViewModel.cs" />
     <Compile Include="ViewModels\DbSettingWindowViewModel.cs" />
     <Compile Include="ViewModels\HierarchicalItemViewModel.cs" />
     <Compile Include="ViewModels\ItemViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\MoveRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\RelationViewModel.cs" />
-    <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\SettingsWindowViewModel.cs" />
     <Compile Include="ViewModels\SummryViewModel.cs" />
     <Compile Include="ViewModels\SummryWithinYearViewModel.cs" />
     <Compile Include="Windows\ActionListRegistrationWindow.xaml.cs">
       <DependentUpon>ActionListRegistrationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\CsvComparisonWindow.xaml.cs">
+      <DependentUpon>CsvComparisonWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\DbSettingWindow.xaml.cs">
       <DependentUpon>DbSettingWindow.xaml</DependentUpon>
@@ -178,6 +186,9 @@
     <Compile Include="Windows\OnBackUpWindow.xaml.cs">
       <DependentUpon>OnBackUpWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="UserControls\NumericUpDown.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -187,6 +198,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\ActionRegistrationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\CsvComparisonWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -203,7 +218,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ConstValue.cs" />
-    <Compile Include="Converters\DateTimeToActTimeConverter.cs" />
     <Compile Include="Converters\DateTimeToDayOfWeekConverter.cs" />
     <Compile Include="Converters\DateTimeToDisplayedMonthConverter.cs" />
     <Compile Include="Converters\IntToMoneyDisplayConverter.cs" />
@@ -225,6 +239,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\OnBackUpWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

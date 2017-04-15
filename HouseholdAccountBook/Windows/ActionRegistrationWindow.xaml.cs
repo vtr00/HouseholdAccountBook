@@ -61,6 +61,7 @@ namespace HouseholdAccountBook.Windows
                     if(selectedBookVM == null || bookId == vm.Id) {
                         selectedBookVM = vm;
                     }
+                    return true;
                 });
             }
 
@@ -144,6 +145,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
                         if (selectedBookVM == null || bookId == vm.Id) {
                             selectedBookVM = vm;
                         }
+                        return true;
                     });
                 });
             }
@@ -333,6 +335,7 @@ ORDER BY sort_order;", (int)this.ActionRegistrationWindowVM.SelectedBalanceKind,
                     if(vm.Id == categoryId) {
                         selectedCategoryVM = vm;
                     }
+                    return true;
                 });
             }
             this.ActionRegistrationWindowVM.CategoryVMList = categoryVMList;
@@ -369,6 +372,7 @@ ORDER BY sort_order;", this.ActionRegistrationWindowVM.SelectedBookVM.Id, (int)t
                     if (selectedItemVM == null || vm.Id == itemId) {
                         selectedItemVM = vm;
                     }
+                    return true;
                 });
             }
             this.ActionRegistrationWindowVM.ItemVMList = itemVMList;
@@ -393,6 +397,7 @@ ORDER BY used_time DESC;", this.ActionRegistrationWindowVM.SelectedItemVM.Id);
                 reader.ExecWholeRow((count, record) => {
                     string tmp = record["shop_name"];
                     shopNameVMList.Add(tmp);
+                    return true;
                 });
             }
 
@@ -418,6 +423,7 @@ ORDER BY used_time DESC;", this.ActionRegistrationWindowVM.SelectedItemVM.Id);
                 reader.ExecWholeRow((count, record) => {
                     string tmp = record["remark"];
                     remarkVMList.Add(tmp);
+                    return true;
                 });
             }
             
@@ -573,6 +579,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
 ORDER BY act_time ASC;", groupId, actionId);
                                 reader.ExecWholeRow((recCount, record) => {
                                     actionIdList.Add(record.ToInt("action_id"));
+                                    return true;
                                 });
                                 #endregion
                             }

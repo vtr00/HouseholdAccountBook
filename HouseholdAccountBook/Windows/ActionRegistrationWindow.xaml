@@ -22,7 +22,6 @@
         <!-- コンバータ -->
         <converters:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
         <converters:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
-        <converters:DateTimeToActTimeConverter x:Key="DateTimeToActTimeConverter"/>
         <converters:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
     </Window.Resources>
 

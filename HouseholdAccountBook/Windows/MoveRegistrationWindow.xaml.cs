@@ -85,6 +85,7 @@ namespace HouseholdAccountBook.Windows
                             payDay = record.ToNullableInt("pay_day");
                         }
                     }
+                    return true;
                 });
             }
 
@@ -183,6 +184,7 @@ ORDER BY move_flg DESC;", groupId);
                         commissionValue = Math.Abs(actValue);
                         commissionRemark = remark;
                     }
+                    return true;
                 });
 
                 reader = dao.ExecQuery(@"
@@ -196,6 +198,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
                     if (selectedToBookVM == null || toBookId == vm.Id) {
                         selectedToBookVM = vm;
                     }
+                    return true;
                 });
             }
             this.MoveRegistrationWindowVM.SelectedDate = actDate;
@@ -342,6 +345,7 @@ ORDER BY sort_order;", bookId, (int)BalanceKind.Outgo);
                     if (selectedItemVM == null || vm.Id == itemId) {
                         selectedItemVM = vm;
                     }
+                    return true;
                 });
             }
             this.MoveRegistrationWindowVM.ItemVMList = itemVMList;
@@ -366,6 +370,7 @@ ORDER BY used_time DESC;", this.MoveRegistrationWindowVM.SelectedItemVM.Id);
                 reader.ExecWholeRow((count, record) => {
                     string tmp = record["remark"];
                     remarkVMList.Add(tmp);
+                    return true;
                 });
             }
 

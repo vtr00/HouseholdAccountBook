@@ -5,9 +5,9 @@ using static HouseholdAccountBook.ConstValue.ConstValue;
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
-    /// 設定VM
+    /// 設定ウィンドウVM
     /// </summary>
-    public class SettingsViewModel : BindableBase
+    public class SettingsWindowViewModel : BindableBase
     {
         /// <summary>
         /// 設定
@@ -192,7 +192,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public SettingsViewModel()
+        public SettingsWindowViewModel()
         {
             settings = Properties.Settings.Default;
         }

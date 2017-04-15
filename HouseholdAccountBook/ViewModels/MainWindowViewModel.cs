@@ -60,7 +60,6 @@ namespace HouseholdAccountBook.ViewModels
         }
         private ObservableCollection<BookViewModel> _BookVMList = default(ObservableCollection<BookViewModel>);
         #endregion
-
         /// <summary>
         /// 選択された帳簿VM
         /// </summary>

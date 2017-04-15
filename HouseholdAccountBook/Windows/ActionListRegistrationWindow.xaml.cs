@@ -51,6 +51,7 @@ namespace HouseholdAccountBook.Windows
                     if(selectedBookVM == null || bookId == vm.Id) {
                         selectedBookVM = vm;
                     }
+                    return true;
                 });
             }
 
@@ -193,6 +194,7 @@ ORDER BY sort_order;", (int)this.ActionListRegistrationWindowVM.SelectedBalanceK
                     if(vm.Id == categoryId) {
                         selectedCategoryVM = vm;
                     }
+                    return true;
                 });
             }
             this.ActionListRegistrationWindowVM.CategoryVMList = categoryVMList;
@@ -229,6 +231,7 @@ ORDER BY sort_order;", this.ActionListRegistrationWindowVM.SelectedBookVM.Id, (i
                     if (selectedItemVM == null || vm.Id == itemId) {
                         selectedItemVM = vm;
                     }
+                    return true;
                 });
             }
             this.ActionListRegistrationWindowVM.ItemVMList = itemVMList;
@@ -253,6 +256,7 @@ ORDER BY used_time DESC;", this.ActionListRegistrationWindowVM.SelectedItemVM.Id
                 reader.ExecWholeRow((count, record) => {
                     string tmp = record["shop_name"];
                     shopNameVMList.Add(tmp);
+                    return true;
                 });
             }
 
@@ -278,6 +282,7 @@ ORDER BY used_time DESC;", this.ActionListRegistrationWindowVM.SelectedItemVM.Id
                 reader.ExecWholeRow((count, record) => {
                     string tmp = record["remark"];
                     remarkVMList.Add(tmp);
+                    return true;
                 });
             }
             

@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.0.1.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.1.0.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -440,6 +440,114 @@ namespace HouseholdAccountBook.Properties {
             }
             set {
                 this["MainWindow_WindowState"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double SettingsWindow_Height {
+            get {
+                return ((double)(this["SettingsWindow_Height"]));
+            }
+            set {
+                this["SettingsWindow_Height"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double SettingsWindow_Left {
+            get {
+                return ((double)(this["SettingsWindow_Left"]));
+            }
+            set {
+                this["SettingsWindow_Left"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double SettingsWindow_Top {
+            get {
+                return ((double)(this["SettingsWindow_Top"]));
+            }
+            set {
+                this["SettingsWindow_Top"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double SettingsWindow_Width {
+            get {
+                return ((double)(this["SettingsWindow_Width"]));
+            }
+            set {
+                this["SettingsWindow_Width"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double CsvComparisonWindow_Height {
+            get {
+                return ((double)(this["CsvComparisonWindow_Height"]));
+            }
+            set {
+                this["CsvComparisonWindow_Height"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double CsvComparisonWindow_Left {
+            get {
+                return ((double)(this["CsvComparisonWindow_Left"]));
+            }
+            set {
+                this["CsvComparisonWindow_Left"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double CsvComparisonWindow_Top {
+            get {
+                return ((double)(this["CsvComparisonWindow_Top"]));
+            }
+            set {
+                this["CsvComparisonWindow_Top"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double CsvComparisonWindow_Width {
+            get {
+                return ((double)(this["CsvComparisonWindow_Width"]));
+            }
+            set {
+                this["CsvComparisonWindow_Width"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string App_CsvFilePath {
+            get {
+                return ((string)(this["App_CsvFilePath"]));
+            }
+            set {
+                this["App_CsvFilePath"] = value;
             }
         }
     }

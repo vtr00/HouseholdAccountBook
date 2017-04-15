@@ -33,11 +33,7 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// グラフタブ
             /// </summary>
-            GraphTab = 2,
-            /// <summary>
-            /// 設定タブ
-            /// </summary>
-            SettingsTab = 3
+            GraphTab = 2
         }
 
         /// <summary>

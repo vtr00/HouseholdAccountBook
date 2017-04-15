@@ -95,7 +95,8 @@ namespace HouseholdAccountBook.Dao
         /// </summary>
         /// <param name="count">現在の行数</param>
         /// <param name="record">レコード</param>
-        public delegate void ExectionWholeRow(int count, Record record);
+        /// <returns>継続の有無</returns>
+        public delegate bool ExectionWholeRow(int count, Record record);
         /// <summary>
         /// 複数レコードを読み込む
         /// </summary>
@@ -104,7 +105,7 @@ namespace HouseholdAccountBook.Dao
         {
             int count = 0;
             while (enumerator.MoveNext()) {
-                exection(count, new Record(enumerator.Current));
+                if(!exection(count, new Record(enumerator.Current))) { break; }
                 count++;
             }
             // 初期位置に戻す
