@@ -5,10 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
-        xmlns:converters="clr-namespace:HouseholdAccountBook.Converters"
         mc:Ignorable="d"
         Title="追加" Height="Auto" Width="350" ShowInTaskbar="False"
-        Loaded="ActionRegistrationWindow_Loaded"
         Closing="ActionRegistrationWindow_Closing">
 
     <Window.Resources>
@@ -18,11 +16,6 @@
         <RoutedCommand x:Key="ContinueToRegisterCommand"/>
         <RoutedCommand x:Key="RegisterCommand"/>
         <RoutedCommand x:Key="CancelCommand"/>
-
-        <!-- コンバータ -->
-        <converters:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
-        <converters:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
-        <converters:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -62,6 +55,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="0.5*"/>
                 <RowDefinition Height="0.5*"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -109,6 +103,19 @@
                        Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="7" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="3"
                       ItemsSource="{Binding RemarkList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="5"
+                       Text="一致" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <CheckBox Grid.Row="8" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" IsChecked="{Binding IsMatch}">
+                <CheckBox.Style>
+                    <Style TargetType="CheckBox">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsMatch}" Value="{x:Null}">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </CheckBox.Style>
+            </CheckBox>
         </Grid>
 
         <Grid Grid.Row="1" Margin="0,10,0,0">

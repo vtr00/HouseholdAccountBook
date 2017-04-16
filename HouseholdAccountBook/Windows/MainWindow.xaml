@@ -6,36 +6,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:project="clr-namespace:HouseholdAccountBook"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
-        xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
-        xmlns:converters="clr-namespace:HouseholdAccountBook.Converters"
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Behaviors"
         mc:Ignorable="d"
         Title="Hausehold Account Book" Height="700" Width="1050"
         Closing="MainWindow_Closing">
 
     <Window.Resources>
-        <!-- ファイル操作コマンド -->
+        <!-- ファイルコマンド -->
         <RoutedCommand x:Key="ImportKichoHugetsuDbCommand"/>
         <RoutedCommand x:Key="ImportCustomFileCommand"/>
         <RoutedCommand x:Key="ExportExcelFileCommand"/>
         <RoutedCommand x:Key="ExportCustomFileCommand"/>
 
-        <!-- 帳簿項目操作コマンド -->
+        <!-- 編集コマンド -->
         <RoutedCommand x:Key="MoveToBookCommand"/>
         <RoutedCommand x:Key="AddActionToBookCommand"/>
         <RoutedCommand x:Key="AddActionListToBookCommand"/>
         <RoutedCommand x:Key="EditActionCommand"/>
         <RoutedCommand x:Key="DeleteActionCommand"/>
 
-        <!-- タブ表示操作コマンド -->
+        <!-- 表示コマンド -->
         <RoutedCommand x:Key="IndicateBookCommand"/>
         <RoutedCommand x:Key="IndicateListCommand"/>
         <RoutedCommand x:Key="IndicateGraphCommand"/>
+        <RoutedCommand x:Key="UpdateCommand"/>
         
-        <!-- ツール表示操作コマンド -->
-        <RoutedCommand x:Key="OpenSettingsWindowCommand"/>
-        <RoutedCommand x:Key="OpenCsvComparisonWindowCommand"/>
-
         <!-- 帳簿表示操作コマンド -->
         <RoutedCommand x:Key="GoToLastMonthCommand"/>
         <RoutedCommand x:Key="GoToThisMonthCommand"/>
@@ -46,18 +41,11 @@
         <RoutedCommand x:Key="GoToThisYearCommand"/>
         <RoutedCommand x:Key="GoToNextYearCommand"/>
 
-        <!-- コンバータ -->
-        <converters:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
-        <converters:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
-        <converters:DateTimeToDisplayedYearConverter x:Key="DateTimeToThisYearConverter"/>
-        <converters:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
-        <BooleanToVisibilityConverter x:Key="BoolVisibilityConverter"/>
+        <!-- ツールコマンド -->
+        <RoutedCommand x:Key="OpenSettingsWindowCommand"/>
+        <RoutedCommand x:Key="OpenCsvComparisonWindowCommand"/>
 
         <!-- スタイル -->
-        <Style x:Key="TextAlignRight" TargetType="TextBlock">
-            <Setter Property="TextAlignment" Value="Right"/>
-        </Style>
-
         <Style x:Key="SummaryStyle" TargetType="DataGridRow">
             <Setter Property="Background" Value="#FFEEE3FB"/>
             <Style.Triggers>
@@ -97,47 +85,47 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-
-        <!-- 設定 -->
-        <properties:Settings x:Key="Settings"/>
     </Window.Resources>
 
     <Window.CommandBindings>
-        <!-- ウィンドウ操作コマンド -->
+        <!-- ファイルコマンド -->
         <CommandBinding Command="{x:Static ApplicationCommands.Close}" Executed="CloseWindowCommand_Executed"/>
-
-        <!-- ファイル操作コマンド -->
         <CommandBinding Command="{StaticResource ImportKichoHugetsuDbCommand}" Executed="ImportKichoHugetsuDbCommand_Executed"/>
         <CommandBinding Command="{StaticResource ImportCustomFileCommand}" CanExecute="ImportCustomFileCommand_CanExecute" Executed="ImportCustomFileCommand_Excuted"/>
         <CommandBinding Command="{StaticResource ExportExcelFileCommand}"/>
         <CommandBinding Command="{StaticResource ExportCustomFileCommand}" CanExecute="ExportCustomFileCommand_CanExecute" Executed="ExportCustomFileCommand_Excuted"/>
 
-        <!-- 帳簿項目操作コマンド -->
+        <!-- 操作コマンド -->
         <CommandBinding Command="{StaticResource MoveToBookCommand}" CanExecute="MoveToBookCommand_CanExecute" Executed="MoveToBookCommand_Executed"/>
         <CommandBinding Command="{StaticResource AddActionToBookCommand}" CanExecute="AddActionToBookCommand_CanExecute" Executed="AddActionToBookCommand_Executed"/>
         <CommandBinding Command="{StaticResource EditActionCommand}" CanExecute="EditActionCommand_CanExecute" Executed="EditActionCommand_Executed"/>
         <CommandBinding Command="{StaticResource AddActionListToBookCommand}" CanExecute="AddActionListToBookCommand_CanExecute" Executed="AddActionListToBookCommand_Executed"/>
         <CommandBinding Command="{StaticResource DeleteActionCommand}" CanExecute="DeleteActionCommand_CanExecute" Executed="DeleteActionCommand_Executed"/>
         
-        <!-- タブ表示操作コマンド -->
+        <!-- 表示コマンド -->
         <CommandBinding Command="{StaticResource IndicateBookCommand}" CanExecute="IndicateBookCommand_CanExecute" Executed="IndicateBookCommand_Executed"/>
         <CommandBinding Command="{StaticResource IndicateListCommand}" CanExecute="IndicateListCommand_CanExecute" Executed="IndicateListCommand_Executed"/>
         <CommandBinding Command="{StaticResource IndicateGraphCommand}" CanExecute="IndicateGraphCommand_CanExecute" Executed="IndicateGraphCommand_Executed"/>
+        <CommandBinding Command="{StaticResource UpdateCommand}" Executed="UpdateCommand_Executed"/>
         
-        <!-- ツール表示操作コマンド -->
-        <CommandBinding Command="{StaticResource OpenSettingsWindowCommand}" Executed="OpenSettingsWindwCommand_Executed"/>
-        <CommandBinding Command="{StaticResource OpenCsvComparisonWindowCommand}" Executed="OpenCsvComparisonWindowCommand_Executed"/>
-
-        <!-- 帳簿表示操作コマンド -->
+        <!-- 帳簿表示コマンド -->
         <CommandBinding Command="{StaticResource GoToLastMonthCommand}" CanExecute="GoToLastMonthCommand_CanExecute" Executed="GoToLastMonthCommand_Executed"/>
         <CommandBinding Command="{StaticResource GoToThisMonthCommand}" CanExecute="GoToThisMonthCommand_CanExecute" Executed="GoToThisMonthCommand_Executed"/>
         <CommandBinding Command="{StaticResource GoToNextMonthCommand}" CanExecute="GoToNextMonthCommand_CanExecute" Executed="GoToNextMonthCommand_Executed"/>
 
-        <!-- 年間一覧表示操作コマンド -->
+        <!-- 年間一覧表示コマンド -->
         <CommandBinding Command="{StaticResource GoToLastYearCommand}" CanExecute="GoToLastYearCommand_CanExecute" Executed="GoToLastYearCommand_Executed"/>
         <CommandBinding Command="{StaticResource GoToThisYearCommand}" CanExecute="GoToThisYearCommand_CanExecute" Executed="GoToThisYearCommand_Executed"/>
         <CommandBinding Command="{StaticResource GoToNextYearCommand}" CanExecute="GoToNextYearCommand_CanExecute" Executed="GoToNextYearCommand_Executed"/>
+        
+        <!-- ツールコマンド -->
+        <CommandBinding Command="{StaticResource OpenSettingsWindowCommand}" Executed="OpenSettingsWindwCommand_Executed"/>
+        <CommandBinding Command="{StaticResource OpenCsvComparisonWindowCommand}" Executed="OpenCsvComparisonWindowCommand_Executed"/>
     </Window.CommandBindings>
+
+    <Window.InputBindings>
+        <KeyBinding Gesture="Alt+F4" Command="{x:Static ApplicationCommands.Close}"/>
+    </Window.InputBindings>
     
     <Window.DataContext>
         <viewmodels:MainWindowViewModel x:Name="MainWindowVM"/>
@@ -157,36 +145,46 @@
         <Menu Grid.Row="0" Grid.Column="0">
             <MenuItem Header="ファイル(_F)">
                 <MenuItem Header="インポート(_I)">
-                    <MenuItem Header="記帳風月からインポート(_K)" Command="{StaticResource ImportKichoHugetsuDbCommand}"/>
-                    <MenuItem Header="カスタム形式ファイルからインポート(_S)" Command="{StaticResource ImportCustomFileCommand}"/>
+                    <MenuItem Header="記帳風月からインポート(_K)..." Command="{StaticResource ImportKichoHugetsuDbCommand}"/>
+                    <MenuItem Header="カスタム形式ファイルからインポート(_S)..." Command="{StaticResource ImportCustomFileCommand}"/>
                 </MenuItem>
                 <MenuItem Header="エクスポート(_E)">
-                    <MenuItem Header="カスタム形式ファイルにエクスポート(_S)" Command="{StaticResource ExportCustomFileCommand}"/>
-                    <MenuItem Header="Excelにエクスポート(_E)" Command="{StaticResource ExportExcelFileCommand}" IsEnabled="False"/>
+                    <MenuItem Header="カスタム形式ファイルにエクスポート(_S)..." Command="{StaticResource ExportCustomFileCommand}"/>
+                    <MenuItem Header="Excelにエクスポート(_E)..." Command="{StaticResource ExportExcelFileCommand}" IsEnabled="False"/>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="終了(_X)" Command="{x:Static ApplicationCommands.Close}"/>
+                <MenuItem Header="終了(_X)" Command="{x:Static ApplicationCommands.Close}" InputGestureText="Alt+F4"/>
             </MenuItem>
             <MenuItem Header="編集(_E)">
-                <MenuItem Header="移動(_T)" Command="{StaticResource MoveToBookCommand}"/>
+                <MenuItem Header="移動(_T)..." Command="{StaticResource MoveToBookCommand}" InputGestureText="Ctrl+M"/>
                 <Separator/>
-                <MenuItem Header="追加(_A)" Command="{StaticResource AddActionToBookCommand}"/>
-                <MenuItem Header="まとめて追加(_W)" Command="{StaticResource AddActionListToBookCommand}"/>
-                <MenuItem Header="変更(_E)" Command="{StaticResource EditActionCommand}"/>
-                <MenuItem Header="削除(_D)" Command="{StaticResource DeleteActionCommand}"/>
+                <MenuItem Header="追加(_A)..." Command="{StaticResource AddActionToBookCommand}" InputGestureText="Ctrl++"/>
+                <MenuItem Header="まとめて追加(_W)..." Command="{StaticResource AddActionListToBookCommand}" InputGestureText="Ctrl+Shift++"/>
+                <MenuItem Header="変更(_E)..." Command="{StaticResource EditActionCommand}" InputGestureText="F2"/>
+                <MenuItem Header="削除(_D)" Command="{StaticResource DeleteActionCommand}" InputGestureText="Del"/>
             </MenuItem>
             <MenuItem Header="表示(_V)">
-                <MenuItem Header="帳簿(_B)" Command="{StaticResource IndicateBookCommand}"/>
-                <MenuItem Header="年間一覧(_L)" Command="{StaticResource IndicateListCommand}"/>
+                <MenuItem Header="帳簿(_B)" Command="{StaticResource IndicateBookCommand}">
+                    <MenuItem Header="先月(_L)" Command="{StaticResource GoToLastMonthCommand}" InputGestureText="Ctrl+←"/>
+                    <MenuItem Header="今月(_T)" Command="{StaticResource GoToThisMonthCommand}" InputGestureText="Ctrl+↓"/>
+                    <MenuItem Header="来月(_N)" Command="{StaticResource GoToNextMonthCommand}" InputGestureText="Ctrl+→"/>
+                </MenuItem>
+                <MenuItem Header="年間一覧(_L)" Command="{StaticResource IndicateListCommand}">
+                    <MenuItem Header="去年(_L)" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Ctrl+←"/>
+                    <MenuItem Header="今年(_T)" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Ctrl+↓"/>
+                    <MenuItem Header="来年(_N)" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Ctrl+→"/>
+                </MenuItem>
                 <MenuItem Header="グラフ(_G)" Command="{StaticResource IndicateGraphCommand}"/>
+                <Separator/>
+                <MenuItem Header="更新(_U)" Command="{StaticResource UpdateCommand}" InputGestureText="F5"/>
             </MenuItem>
             <MenuItem Header="ツール(_T)">
-                <MenuItem Header="CSV比較(_C)" Command="{StaticResource OpenCsvComparisonWindowCommand}"/>
+                <MenuItem Header="CSV比較(_C)..." Command="{StaticResource OpenCsvComparisonWindowCommand}"/>
                 <Separator/>
-                <MenuItem Header="設定(_S)" Command="{StaticResource OpenSettingsWindowCommand}"/>
+                <MenuItem Header="設定(_S)..." Command="{StaticResource OpenSettingsWindowCommand}"/>
             </MenuItem>
             <MenuItem Header="ヘルプ(_H)">
-                <MenuItem Header="バージョン情報(_V)"/>
+                <MenuItem Header="バージョン情報(_V)..." InputGestureText="F1" IsEnabled="False"/>
             </MenuItem>
         </Menu>
 
@@ -198,6 +196,13 @@
                 </Style>
             </TabControl.ItemContainerStyle>
             <TabItem Header="帳簿">
+                <TabItem.InputBindings>
+                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Up" Command="{StaticResource IndicateListCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisMonthCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastMonthCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextMonthCommand}"/>
+                </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -216,7 +221,8 @@
 
                             <StackPanel Grid.Column="0" Orientation="Horizontal">
                                 <Button Content="◀" Width="20" Command="{StaticResource GoToLastMonthCommand}"/>
-                                <Button Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}}" Width="120"/>
+                                <Button Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}}" Width="120"
+                                        Command="{StaticResource UpdateCommand}"/>
                                 <Button Content="▶" Width="20" Command="{StaticResource GoToNextMonthCommand}"/>
                                 <Button Content="今月" Width="40" Command="{StaticResource GoToThisMonthCommand}"/>
                                 <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
@@ -239,6 +245,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1.0*"/>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
                         <!-- 帳簿項目リスト -->
@@ -252,6 +259,7 @@
                                 <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
                             </DataGrid.Resources>
                             <DataGrid.InputBindings>
+                                <KeyBinding Gesture="F2" Command="{StaticResource EditActionCommand}"/>
                                 <KeyBinding Gesture="Enter" Command="{StaticResource EditActionCommand}"/>
                                 <KeyBinding Gesture="Delete" Command="{StaticResource DeleteActionCommand}"/>
                                 <KeyBinding Gesture="Ctrl+OEMPlus" Command="{StaticResource AddActionToBookCommand}"/>
@@ -284,10 +292,10 @@
                             </DataGrid.Columns>
                         </DataGrid>
 
-                        <GridSplitter Grid.Column="0" Width="5" ResizeDirection="Columns" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                        <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns" VerticalAlignment="Stretch"/>
 
                         <!-- サマリーリスト -->
-                        <DataGrid Grid.Column="1" ItemsSource="{Binding SummaryVMList}" SelectedItem="{Binding SelectedSummaryVM}" 
+                        <DataGrid Grid.Column="2" ItemsSource="{Binding SummaryVMList}" SelectedItem="{Binding SelectedSummaryVM}" 
                                   IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
@@ -319,6 +327,12 @@
                 </Grid>
             </TabItem>
             <TabItem Header="年間&#10;一覧">
+                <TabItem.InputBindings>
+                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextYearCommand}"/>
+                </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -329,7 +343,8 @@
                     <Grid Grid.Row="0">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="◀" Width="20" Command="{StaticResource GoToLastYearCommand}"/>
-                            <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToThisYearConverter}}" Width="120"/>
+                            <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToThisYearConverter}}" Width="120"
+                                    Command="{StaticResource UpdateCommand}"/>
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
                             <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"

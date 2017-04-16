@@ -2,6 +2,24 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:HouseholdAccountBook"
+             xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
+             xmlns:converters="clr-namespace:HouseholdAccountBook.Converters"
              Startup="Application_Startup" Exit="Application_Exit">
-    <Application.Resources/>
+
+    <Application.Resources>
+        <!-- コンバータ -->
+        <converters:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
+        <converters:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
+        <converters:DateTimeToDisplayedYearConverter x:Key="DateTimeToThisYearConverter"/>
+        <converters:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolVisibilityConverter"/>
+
+        <!-- スタイル -->
+        <Style x:Key="TextAlignRight" TargetType="TextBlock">
+            <Setter Property="TextAlignment" Value="Right"/>
+        </Style>
+
+        <!-- 設定 -->
+        <properties:Settings x:Key="Settings"/>
+    </Application.Resources>
 </Application>

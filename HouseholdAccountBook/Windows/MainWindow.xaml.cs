@@ -46,7 +46,7 @@ namespace HouseholdAccountBook.Windows
             this.MainWindowVM.DisplayedMonth = DateTime.Now;
 
             UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
-            UpdateBookTabData();
+            UpdateBookTabData(true);
             UpdateListTabData();
             UpdateGraphTabData();
 
@@ -54,7 +54,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         #region コマンド
-        #region ウィンドウの操作
+        #region ウィンドウ
         /// <summary>
         /// ウィンドウを閉じる
         /// </summary>
@@ -66,7 +66,7 @@ namespace HouseholdAccountBook.Windows
         }
         #endregion
 
-        #region ファイルの操作
+        #region ファイル
         /// <summary>
         /// 記帳風月のDBを取り込む
         /// </summary>
@@ -91,7 +91,7 @@ namespace HouseholdAccountBook.Windows
 
             if (ofd.ShowDialog() == false) return;
 
-            if (MessageBox.Show("既存のデータを削除します。よろしいですか？", this.Title,
+            if (MessageBox.Show(MessageText.DeleteOldDataNotification, this.Title,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
                 return;
             }
@@ -265,7 +265,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
             if (isOpen) {
                 UpdateBookList();
-                UpdateBookTabData();
+                UpdateBookTabData(true);
                 UpdateListTabData();
 
                 Cursor = cCursor;
@@ -313,7 +313,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
             if (ofd.ShowDialog() == false) return;
 
-            if (MessageBox.Show("既存のデータを削除します。よろしいですか？", this.Title,
+            if (MessageBox.Show(MessageText.DeleteOldDataNotification, this.Title,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
                 return;
             }
@@ -336,9 +336,9 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             }
 
             // 起動情報を設定する
-            ProcessStartInfo info = new ProcessStartInfo();
-            info.FileName = Properties.Settings.Default.App_Postgres_RestoreExePath;
-            info.Arguments = string.Format(
+            ProcessStartInfo info = new ProcessStartInfo() {
+                FileName = Properties.Settings.Default.App_Postgres_RestoreExePath,
+                Arguments = string.Format(
                     "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --data-only --verbose --dbname \"{5}\" \"{4}\"",
                     Properties.Settings.Default.App_Postgres_Host,
                     Properties.Settings.Default.App_Postgres_Port,
@@ -350,8 +350,9 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 #else
                     Properties.Settings.Default.App_Postgres_DatabaseName
 #endif
-                    );
-            info.WindowStyle = ProcessWindowStyle.Hidden;
+                    ),
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
 
             // リストアする
             Process process = Process.Start(info);
@@ -359,7 +360,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
             if (process.ExitCode == 0) {
                 UpdateBookList();
-                UpdateBookTabData();
+                UpdateBookTabData(true);
                 UpdateListTabData();
 
                 Cursor = cCursor;
@@ -399,7 +400,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             else {
                 directory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
             }
-            
+
             SaveFileDialog sfd = new SaveFileDialog() {
                 InitialDirectory = directory,
                 FileName = fileName,
@@ -416,22 +417,23 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             Cursor = Cursors.Wait;
 
             // 起動情報を設定する
-            ProcessStartInfo info = new ProcessStartInfo();
-            info.FileName = Properties.Settings.Default.App_Postgres_DumpExePath;
-            info.Arguments = string.Format(
+            ProcessStartInfo info = new ProcessStartInfo() {
+                FileName = Properties.Settings.Default.App_Postgres_DumpExePath,
+                Arguments = string.Format(
                     "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
                     Properties.Settings.Default.App_Postgres_Host,
                     Properties.Settings.Default.App_Postgres_Port,
                     Properties.Settings.Default.App_Postgres_UserName,
-                    Properties.Settings.Default.App_Postgres_Role, 
+                    Properties.Settings.Default.App_Postgres_Role,
                     sfd.FileName,
 #if DEBUG
                     Properties.Settings.Default.App_Postgres_DatabaseName_Debug
 #else
                     Properties.Settings.Default.App_Postgres_DatabaseName
 #endif
-                    );
-            info.WindowStyle = ProcessWindowStyle.Hidden;
+                    ),
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
 
             // バックアップする
             Process process = Process.Start(info);
@@ -446,7 +448,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         }
         #endregion
 
-        #region 帳簿項目の操作
+        #region 編集
         /// <summary>
         /// 移動操作可能か
         /// </summary>
@@ -468,7 +470,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder,
                 this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
             mrw.Registrated += (sender2, e2) => {
-                UpdateBookTabData(e2.Id);
+                UpdateBookTabData(e2.Value);
                 FocusManager.SetFocusedElement(this, actionDataGrid);
                 actionDataGrid.Focus();
             };
@@ -497,7 +499,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             ActionRegistrationWindow arw = new ActionRegistrationWindow(builder,
                 this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
             arw.Registrated += (sender2, e2)=> {
-                UpdateBookTabData(e2.Id);
+                UpdateBookTabData(e2.Value);
                 FocusManager.SetFocusedElement(this, actionDataGrid);
                 actionDataGrid.Focus();
             };
@@ -526,7 +528,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(builder,
                 this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
             alrw.Registrated += (sender2, e2) => {
-                UpdateBookTabData(e2.Id);
+                UpdateBookTabData(e2.Value);
                 FocusManager.SetFocusedElement(this, actionDataGrid);
                 actionDataGrid.Focus();
             };
@@ -568,7 +570,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
             if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
                 ActionRegistrationWindow arw = new ActionRegistrationWindow(builder, this.MainWindowVM.SelectedActionVM.ActionId);
                 arw.Registrated += (sender2, e2) => {
-                    UpdateBookTabData(e2.Id);
+                    UpdateBookTabData(e2.Value);
                     FocusManager.SetFocusedElement(this, actionDataGrid);
                     actionDataGrid.Focus();
                 };
@@ -578,7 +580,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
                 // 移動の編集時の処理
                 MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder, this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM.GroupId.Value);
                 mrw.Registrated += (sender2, e2) => {
-                    UpdateBookTabData(e2.Id);
+                    UpdateBookTabData(e2.Value);
                     FocusManager.SetFocusedElement(this, actionDataGrid);
                     actionDataGrid.Focus();
                 };
@@ -604,7 +606,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
         /// <param name="e"></param>
         private void DeleteActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.DeleteNotification, this.Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+            if (MessageBox.Show(MessageText.DeleteNotification, this.Title, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 foreach(ActionViewModel vm in this.MainWindowVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; })) {
                     int actionId = vm.ActionId;
                     int? groupId = vm.GroupId;
@@ -651,7 +653,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         }
         #endregion
 
-        #region タブ表示の操作
+        #region 表示
         /// <summary>
         /// 帳簿タブ表示可能か
         /// </summary>
@@ -711,41 +713,20 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         {
             this.MainWindowVM.SelectedTab = Tab.GraphTab;
         }
-        #endregion
 
-        #region ツール表示の操作
         /// <summary>
-        /// 設定ウィンドウを開く
+        /// 画面表示を更新する
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OpenSettingsWindwCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            SettingsWindow sw = new SettingsWindow(builder);
-            if (sw.ShowDialog() == true) {
-                UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
-                UpdateBookTabData();
-                UpdateListTabData();
-                UpdateGraphTabData();
-            }
+            UpdateBookTabData(false);
+            UpdateListTabData();
+            UpdateGraphTabData();
         }
 
-        /// <summary>
-        /// CSV比較ウィンドウを開く
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OpenCsvComparisonWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            CsvComparisonWindow ccw = new CsvComparisonWindow(builder, this.MainWindowVM.SelectedBookVM.Id);
-            ccw.Closed += (sender2, e2) => {
-                UpdateBookTabData();
-            };
-            ccw.Show();
-        }
-        #endregion
-
-        #region 帳簿表示の操作
+        #region 帳簿表示
         /// <summary>
         /// 先月を表示可能か
         /// </summary>
@@ -768,7 +749,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor = Cursors.Wait;
 
             this.MainWindowVM.DisplayedMonth = this.MainWindowVM.DisplayedMonth.AddMonths(-1);
-            UpdateBookTabData();
+            UpdateBookTabData(true);
 
             Cursor = cCursor;
         }
@@ -796,7 +777,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor = Cursors.Wait;
 
             this.MainWindowVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
-            UpdateBookTabData();
+            UpdateBookTabData(true);
 
             Cursor = cCursor;
         }
@@ -823,13 +804,13 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor = Cursors.Wait;
 
             this.MainWindowVM.DisplayedMonth = this.MainWindowVM.DisplayedMonth.AddMonths(1);
-            UpdateBookTabData();
+            UpdateBookTabData(true);
 
             Cursor = cCursor;
         }
         #endregion
 
-        #region 年間一覧表示の操作
+        #region 一覧表示
         /// <summary>
         /// 前年を表示可能か
         /// </summary>
@@ -914,6 +895,53 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         #endregion
         #endregion
 
+        #region ツール
+        /// <summary>
+        /// 設定ウィンドウを開く
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OpenSettingsWindwCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            SettingsWindow sw = new SettingsWindow(builder);
+            if (sw.ShowDialog() == true) {
+                UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
+                UpdateBookTabData();
+                UpdateListTabData();
+                UpdateGraphTabData();
+            }
+        }
+
+        /// <summary>
+        /// CSV比較ウィンドウを開く
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OpenCsvComparisonWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            CsvComparisonWindow ccw = new CsvComparisonWindow(builder, this.MainWindowVM.SelectedBookVM.Id);
+            ccw.ChangedIsMatch += (sender2, e2) => {
+                ActionViewModel vm = this.MainWindowVM.ActionVMList.FirstOrDefault((tmpVM) => { return tmpVM.ActionId == e2.Value; });
+                if(vm != null) {
+                    using (DaoBase dao = builder.Build()) {
+                        DaoReader reader = dao.ExecQuery(@"
+SELECT is_match
+FROM hst_action
+WHERE action_id = @{0};", vm.ActionId);
+
+                        bool isMatch = false;
+                        reader.ExecARow((record) => {
+                            isMatch = record.ToInt("is_match") == 1;
+                        });
+                        vm.IsMatch = isMatch;
+                    }
+                }
+            };
+            ccw.Show();
+        }
+        #endregion
+        #endregion
+
         #region イベントハンドラ
         /// <summary>
         /// フォーム終了時
@@ -935,7 +963,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = Cursor;
             Cursor = Cursors.Wait;
             
-            UpdateBookTabData();
+            UpdateBookTabData(true);
             UpdateListTabData();
             UpdateGraphTabData();
 
@@ -955,7 +983,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
 
                 switch (this.MainWindowVM.SelectedTab) {
                     case Tab.BooksTab:
-                        UpdateBookTabData();
+                        UpdateBookTabData(true);
                         break;
                     case Tab.ListTab:
                         UpdateListTabData();
@@ -1005,10 +1033,20 @@ ORDER BY sort_order;");
 
         #region 帳簿タブ更新用の関数
         /// <summary>
-        /// 帳簿タブに表示するデータを更新する
+        /// 帳簿タブに表示するデータを更新する(スクロールなし)
         /// </summary>
         /// <param name="actionId">選択対象の帳簿項目ID</param>
-        private void UpdateBookTabData(int? actionId = null)
+        private void UpdateBookTabData(int? actionId)
+        {
+            UpdateBookTabData(false, actionId);
+        }
+
+        /// <summary>
+        /// 帳簿タブに表示するデータを更新する
+        /// </summary>
+        /// <param name="isScroll">スクロールするか</param>
+        /// <param name="actionId">選択対象の帳簿項目ID</param>
+        private void UpdateBookTabData(bool isScroll = false, int? actionId = null)
         {
             if (this.MainWindowVM.SelectedTab == Tab.BooksTab) {
                 int? tmpActionId = actionId ?? this.MainWindowVM.SelectedActionVM?.ActionId;
@@ -1029,7 +1067,7 @@ ORDER BY sort_order;");
                 IEnumerable<SummaryViewModel> query2 = this.MainWindowVM.SummaryVMList.Where((svm) => { return svm.BalanceKind == tmpSvm?.BalanceKind && svm.CategoryId == tmpSvm?.CategoryId && svm.ItemId == tmpSvm?.ItemId; });
                 this.MainWindowVM.SelectedSummaryVM = query2.Count() == 0 ? null : query2.First();
 
-                if (this.actionDataGrid.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.actionDataGrid) > 0) {
+                if (isScroll && this.actionDataGrid.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.actionDataGrid) > 0) {
                     if (VisualTreeHelper.GetChild(this.actionDataGrid, 0) is Decorator border) {
                         if (border.Child is ScrollViewer scroll) {
                             if (this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth() < DateTime.Today && DateTime.Today < this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1)) {

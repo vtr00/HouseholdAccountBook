@@ -8,8 +8,69 @@
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Behaviors"
         mc:Ignorable="d"
-        Title="設定" Height="700" Width="1050"
+        Title="設定 - Household Account Book" Height="700" Width="1050" ShowInTaskbar="False"
         Closing="SettingsWindow_Closing">
+
+    <Window.Resources>
+        <!-- 設定操作コマンド -->
+        <RoutedCommand x:Key="AddCategoryCommand"/>
+        <RoutedCommand x:Key="AddItemCommand"/>
+        <RoutedCommand x:Key="DeleteItemCommand"/>
+        <RoutedCommand x:Key="RaiseItemSortOrderCommand"/>
+        <RoutedCommand x:Key="DropItemSortOrderCommand"/>
+        <RoutedCommand x:Key="SaveItemInfoCommand"/>
+        <RoutedCommand x:Key="ChangeItemRelationCommand"/>
+        <RoutedCommand x:Key="DeleteShopNameCommand"/>
+        <RoutedCommand x:Key="DeleteRemarkCommand"/>
+        
+        <!-- 帳簿設定操作コマンド -->
+        <RoutedCommand x:Key="AddBookCommand"/>
+        <RoutedCommand x:Key="DeleteBookCommand"/>
+        <RoutedCommand x:Key="RaiseBookSortOrderCommand"/>
+        <RoutedCommand x:Key="DropBookSortOrderCommand"/>
+        <RoutedCommand x:Key="SaveBookInfoCommand"/>
+        <RoutedCommand x:Key="ChangeBookRelationCommand"/>
+
+        <!-- その他設定操作コマンド -->
+        <RoutedCommand x:Key="DumpExePathDialogCommand"/>
+        <RoutedCommand x:Key="RestoreExePathDialogCommand"/>
+        <RoutedCommand x:Key="RestartForDbSettingCommand"/>
+        <RoutedCommand x:Key="BackUpFolderPathDialogCommand"/>
+    </Window.Resources>
+
+    <Window.CommandBindings>
+        <!-- ファイルコマンド -->
+        <CommandBinding Command="{x:Static ApplicationCommands.Close}" Executed="CloseWindowCommand_Executed"/>
+
+        <!-- 項目設定操作コマンド -->
+        <CommandBinding Command="{StaticResource AddCategoryCommand}" CanExecute="AddCategoryCommand_CanExecute" Executed="AddCategoryCommand_Executed"/>
+        <CommandBinding Command="{StaticResource AddItemCommand}" CanExecute="AddItemCommand_CanExecute" Executed="AddItemCommand_Executed"/>
+        <CommandBinding Command="{StaticResource DeleteItemCommand}" CanExecute="DeleteItemCommand_CanExecute" Executed="DeleteItemCommand_Executed"/>
+        <CommandBinding Command="{StaticResource RaiseItemSortOrderCommand}" CanExecute="RaiseItemSortOrderCommand_CanExecute" Executed="RaiseItemSortOrderCommand_Executed"/>
+        <CommandBinding Command="{StaticResource DropItemSortOrderCommand}" CanExecute="DropItemSortOrderCommand_CanExecute" Executed="DropItemSortOrderCommand_Executed"/>
+        <CommandBinding Command="{StaticResource SaveItemInfoCommand}" CanExecute="SaveItemInfoCommand_CanExecute" Executed="SaveItemInfoCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ChangeItemRelationCommand}" Executed="ChangeItemRelationCommand_Executed"/>
+        <CommandBinding Command="{StaticResource DeleteShopNameCommand}" CanExecute="DeleteShopNameCommand_CanExecute" Executed="DeleteShopNameCommand_Executed"/>
+        <CommandBinding Command="{StaticResource DeleteRemarkCommand}" CanExecute="DeleteRemarkCommand_CanExecute" Executed="DeleteRemarkCommand_Executed"/>
+
+        <!-- 帳簿設定操作コマンド -->
+        <CommandBinding Command="{StaticResource AddBookCommand}" Executed="AddBookCommand_Executed"/>
+        <CommandBinding Command="{StaticResource DeleteBookCommand}" CanExecute="DeleteBookCommand_CanExecute" Executed="DeleteBookCommand_Executed"/>
+        <CommandBinding Command="{StaticResource RaiseBookSortOrderCommand}" CanExecute="RaiseBookSortOrderCommand_CanExecute" Executed="RaiseBookSortOrderCommand_Executed"/>
+        <CommandBinding Command="{StaticResource DropBookSortOrderCommand}" CanExecute="DropBookSortOrderCommand_CanExecute" Executed="DropBookSortOrderCommand_Executed"/>
+        <CommandBinding Command="{StaticResource SaveBookInfoCommand}" CanExecute="SaveBookInfoCommand_CanExecute" Executed="SaveBookInfoCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ChangeBookRelationCommand}" Executed="ChangeBookRelationCommand_Executed"/>
+
+        <!-- その他設定操作コマンド -->
+        <CommandBinding Command="{StaticResource DumpExePathDialogCommand}" Executed="DumpExePathDialogCommand_Executed"/>
+        <CommandBinding Command="{StaticResource RestoreExePathDialogCommand}" Executed="RestorePathDialogCommand_Executed"/>
+        <CommandBinding Command="{StaticResource RestartForDbSettingCommand}" Executed="RestartForDbSettingCommand_Executed"/>
+        <CommandBinding Command="{StaticResource BackUpFolderPathDialogCommand}" Executed="BackUpFolderPathDialogCommand_Executed"/>
+    </Window.CommandBindings>
+    
+    <Window.InputBindings>
+        <KeyBinding Gesture="Alt+F4" Command="{x:Static ApplicationCommands.Close}"/>
+    </Window.InputBindings>
     
     <Window.DataContext>
         <viewmodels:SettingsWindowViewModel x:Name="SettingsVM"/>
@@ -17,87 +78,75 @@
     
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TabControl Grid.Row="0" TabStripPlacement="Left"
+        <Menu Grid.Row="0">
+            <MenuItem Header="ファイル(_F)">
+                <MenuItem Header="終了(_X)" Command="{x:Static ApplicationCommands.Close}" InputGestureText="Alt+F4"/>
+            </MenuItem>
+        </Menu>
+        
+        <TabControl Grid.Row="1" TabStripPlacement="Left"
                     SelectedIndex="{Binding SelectedTabIndex}" SelectionChanged="SettingsTabControl_SelectionChanged">
             <TabItem Header="項目設定">
-                <TabItem.Resources>
-                    <!-- 設定操作コマンド -->
-                    <RoutedCommand x:Key="AddCategoryCommand"/>
-                    <RoutedCommand x:Key="AddItemCommand"/>
-                    <RoutedCommand x:Key="DeleteItemCommand"/>
-                    <RoutedCommand x:Key="RaiseItemSortOrderCommand"/>
-                    <RoutedCommand x:Key="DropItemSortOrderCommand"/>
-                    <RoutedCommand x:Key="SaveItemInfoCommand"/>
-                    <RoutedCommand x:Key="ChangeItemRelationCommand"/>
-                    <RoutedCommand x:Key="DeleteShopNameCommand"/>
-                    <RoutedCommand x:Key="DeleteRemarkCommand"/>
-                </TabItem.Resources>
-                <TabItem.CommandBindings>
-                    <!-- 項目設定操作コマンド -->
-                    <CommandBinding Command="{StaticResource AddCategoryCommand}" CanExecute="AddCategoryCommand_CanExecute" Executed="AddCategoryCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource AddItemCommand}" CanExecute="AddItemCommand_CanExecute" Executed="AddItemCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource DeleteItemCommand}" CanExecute="DeleteItemCommand_CanExecute" Executed="DeleteItemCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource RaiseItemSortOrderCommand}" CanExecute="RaiseItemSortOrderCommand_CanExecute" Executed="RaiseItemSortOrderCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource DropItemSortOrderCommand}" CanExecute="DropItemSortOrderCommand_CanExecute" Executed="DropItemSortOrderCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource SaveItemInfoCommand}" CanExecute="SaveItemInfoCommand_CanExecute" Executed="SaveItemInfoCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource ChangeItemRelationCommand}" Executed="ChangeItemRelationCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource DeleteShopNameCommand}" CanExecute="DeleteShopNameCommand_CanExecute" Executed="DeleteShopNameCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource DeleteRemarkCommand}" CanExecute="DeleteRemarkCommand_CanExecute" Executed="DeleteRemarkCommand_Executed"/>
-                </TabItem.CommandBindings>
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.3*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="0.6*"/>
+                    </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Row="0" Orientation="Horizontal">
-                        <Button Content="分類追加" Width="75" Command="{StaticResource AddCategoryCommand}" ToolTip="Shift+Ctrl++"/>
-                        <Button Content="項目追加" Width="75" Command="{StaticResource AddItemCommand}" ToolTip="Ctrl++"/>
-                        <Button Content="削除" Width="50" Command="{StaticResource DeleteItemCommand}" ToolTip="Delete"/>
-                        <Button Content="↑" Width="25" Command="{StaticResource RaiseItemSortOrderCommand}" ToolTip="Ctrl+↑"/>
-                        <Button Content="↓" Width="25" Command="{StaticResource DropItemSortOrderCommand}" ToolTip="Ctrl+↓"/>
-                    </StackPanel>
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="0.3*"/>
-                            <ColumnDefinition Width="0.6*"/>
-                        </Grid.ColumnDefinitions>
+                    <GroupBox Grid.Column="0" Header="項目一覧">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-                        <GroupBox Header="項目一覧">
-                            <TreeView x:Name="hierachicalTreeView" Grid.Column="0" Margin="5" ItemsSource="{Binding HierachicalItemVMList}"
-                                                  SelectedItemChanged="TreeView_SelectedItemChanged">
-                                <TreeView.InputBindings>
-                                    <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{StaticResource AddCategoryCommand}"/>
-                                    <KeyBinding Gesture="Shift+Ctrl+Add" Command="{StaticResource AddCategoryCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{StaticResource AddItemCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+Add" Command="{StaticResource AddItemCommand}"/>
-                                    <KeyBinding Gesture="Delete" Command="{StaticResource DeleteItemCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+Up" Command="{StaticResource RaiseItemSortOrderCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+Down" Command="{StaticResource DropItemSortOrderCommand}"/>
-                                </TreeView.InputBindings>
-                                <TreeView.ItemContainerStyle>
-                                    <Style TargetType="TreeViewItem">
-                                        <Setter Property="IsExpanded" Value="True"/>
-                                        <Setter Property="IsSelected" Value="{Binding IsSelected}" />
-                                    </Style>
-                                </TreeView.ItemContainerStyle>
-                                <i:Interaction.Behaviors>
-                                    <behaviors:BindSelectedItemToTreeViewBehavior SelectedItem="{Binding SelectedItemVM}"/>
-                                </i:Interaction.Behaviors>
-                                <TreeView.ItemTemplate>
-                                    <HierarchicalDataTemplate DataType="viewmodels:SettingsViewModel.HierachicalItemViewModel" 
-                                                                          ItemsSource="{Binding ChildrenVMList}">
-                                        <TextBlock Text="{Binding Name}" />
-                                    </HierarchicalDataTemplate>
-                                </TreeView.ItemTemplate>
-                            </TreeView>
-                        </GroupBox>
+                            <StackPanel Grid.Row="0" Margin="5" Orientation="Horizontal">
+                                <Button Content="分類追加" Width="75" Command="{StaticResource AddCategoryCommand}" ToolTip="Shift+Ctrl++"/>
+                                <Button Content="項目追加" Width="75" Command="{StaticResource AddItemCommand}" ToolTip="Ctrl++"/>
+                                <Button Content="削除" Width="50" Command="{StaticResource DeleteItemCommand}" ToolTip="Delete"/>
+                                <Button Content="↑" Width="25" Command="{StaticResource RaiseItemSortOrderCommand}" ToolTip="Ctrl+↑"/>
+                                <Button Content="↓" Width="25" Command="{StaticResource DropItemSortOrderCommand}" ToolTip="Ctrl+↓"/>
+                            </StackPanel>
 
-                        <Grid Grid.Column="1" DataContext="{Binding SelectedItemVM}">
+                            <TreeView x:Name="hierachicalTreeView" Grid.Row="1" Margin="5" ItemsSource="{Binding HierachicalItemVMList}"
+                                                SelectedItemChanged="TreeView_SelectedItemChanged">
+                            <TreeView.InputBindings>
+                                <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{StaticResource AddCategoryCommand}"/>
+                                <KeyBinding Gesture="Shift+Ctrl+Add" Command="{StaticResource AddCategoryCommand}"/>
+                                <KeyBinding Gesture="Ctrl+OEMPlus" Command="{StaticResource AddItemCommand}"/>
+                                <KeyBinding Gesture="Ctrl+Add" Command="{StaticResource AddItemCommand}"/>
+                                <KeyBinding Gesture="Delete" Command="{StaticResource DeleteItemCommand}"/>
+                                <KeyBinding Gesture="Ctrl+Up" Command="{StaticResource RaiseItemSortOrderCommand}"/>
+                                <KeyBinding Gesture="Ctrl+Down" Command="{StaticResource DropItemSortOrderCommand}"/>
+                            </TreeView.InputBindings>
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="TreeViewItem">
+                                    <Setter Property="IsExpanded" Value="True"/>
+                                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                            <i:Interaction.Behaviors>
+                                <behaviors:BindSelectedItemToTreeViewBehavior SelectedItem="{Binding SelectedItemVM}"/>
+                            </i:Interaction.Behaviors>
+                            <TreeView.ItemTemplate>
+                                <HierarchicalDataTemplate DataType="viewmodels:SettingsViewModel.HierachicalItemViewModel" 
+                                                            ItemsSource="{Binding ChildrenVMList}">
+                                    <TextBlock Text="{Binding Name}" />
+                                </HierarchicalDataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+
+                        </Grid>
+                    </GroupBox>
+
+                    <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns" VerticalAlignment="Stretch"/>
+
+                    <Grid Grid.Column="2" DataContext="{Binding SelectedItemVM}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="0.3*"/>
@@ -161,49 +210,32 @@
                                 </ListBox>
                             </GroupBox>
                         </Grid>
-                    </Grid>
                 </Grid>
             </TabItem>
             <TabItem Header="帳簿設定">
-                <TabItem.Resources>
-                    <!-- 帳簿設定操作コマンド -->
-                    <RoutedCommand x:Key="AddBookCommand"/>
-                    <RoutedCommand x:Key="DeleteBookCommand"/>
-                    <RoutedCommand x:Key="RaiseBookSortOrderCommand"/>
-                    <RoutedCommand x:Key="DropBookSortOrderCommand"/>
-                    <RoutedCommand x:Key="SaveBookInfoCommand"/>
-                    <RoutedCommand x:Key="ChangeBookRelationCommand"/>
-                </TabItem.Resources>
-                <TabItem.CommandBindings>
-                    <!-- 帳簿設定操作コマンド -->
-                    <CommandBinding Command="{StaticResource AddBookCommand}" Executed="AddBookCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource DeleteBookCommand}" CanExecute="DeleteBookCommand_CanExecute" Executed="DeleteBookCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource RaiseBookSortOrderCommand}" CanExecute="RaiseBookSortOrderCommand_CanExecute" Executed="RaiseBookSortOrderCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource DropBookSortOrderCommand}" CanExecute="DropBookSortOrderCommand_CanExecute" Executed="DropBookSortOrderCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource SaveBookInfoCommand}" CanExecute="SaveBookInfoCommand_CanExecute" Executed="SaveBookInfoCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource ChangeBookRelationCommand}" Executed="ChangeBookRelationCommand_Executed"/>
-                </TabItem.CommandBindings>
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.3*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="0.6*"/>
+                    </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Row="0" Orientation="Horizontal">
-                        <Button Content="追加" Width="50" Command="{StaticResource AddBookCommand}" ToolTip="Ctrl++"/>
-                        <Button Content="削除" Width="50" Command="{StaticResource DeleteBookCommand}" ToolTip="Delete"/>
-                        <Button Content="↑" Width="25" Command="{StaticResource RaiseBookSortOrderCommand}" ToolTip="Ctrl+↑"/>
-                        <Button Content="↓" Width="25" Command="{StaticResource DropBookSortOrderCommand}" ToolTip="Ctrl+↓"/>
-                    </StackPanel>
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="0.3*"/>
-                            <ColumnDefinition Width="0.6*"/>
-                        </Grid.ColumnDefinitions>
+                    <GroupBox Grid.Column="0" Header="帳簿一覧">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-                        <GroupBox Header="帳簿一覧">
-                            <ListBox Grid.Column="0" Margin="5" 
-                                             ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name">
+                            <StackPanel Grid.Row="0" Margin="5" Orientation="Horizontal">
+                                <Button Content="追加" Width="50" Command="{StaticResource AddBookCommand}" ToolTip="Ctrl++"/>
+                                <Button Content="削除" Width="50" Command="{StaticResource DeleteBookCommand}" ToolTip="Del"/>
+                                <Button Content="↑" Width="25" Command="{StaticResource RaiseBookSortOrderCommand}" ToolTip="Ctrl+↑"/>
+                                <Button Content="↓" Width="25" Command="{StaticResource DropBookSortOrderCommand}" ToolTip="Ctrl+↓"/>
+                            </StackPanel>
+
+                            <ListBox Grid.Row="1" Margin="5" 
+                                        ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name">
                                 <ListBox.InputBindings>
                                     <KeyBinding Gesture="Ctrl+OEMPlus" Command="{StaticResource AddBookCommand}"/>
                                     <KeyBinding Gesture="Ctrl+Add" Command="{StaticResource AddBookCommand}"/>
@@ -212,94 +244,80 @@
                                     <KeyBinding Gesture="Ctrl+Down" Command="{StaticResource DropBookSortOrderCommand}"/>
                                 </ListBox.InputBindings>
                             </ListBox>
+                        </Grid>
+                    </GroupBox>
+                        
+                    <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns" VerticalAlignment="Stretch"/>
+
+                    <Grid Grid.Column="2" DataContext="{Binding SelectedBookVM}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="1.0*"/>
+                        </Grid.RowDefinitions>
+
+                        <GroupBox Grid.Row="0" Header="帳簿情報">
+                            <GroupBox.InputBindings>
+                                <KeyBinding Gesture="Ctrl+S" Command="{StaticResource SaveBookInfoCommand}"/>
+                            </GroupBox.InputBindings>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.5*"/>
+                                    <ColumnDefinition Width="0.5*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="帳簿名"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" Margin="5" 
+                                                        Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="帳簿種別"/>
+                                <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" 
+                                                        ItemsSource="{Binding BookKindDic}" SelectedValue="{Binding SelectedBookKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="初期残高"/>
+                                <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" 
+                                                                    Value="{Binding InitialValue}"/>
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Text="支払元帳簿"/>
+                                <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" IsEnabled="{Binding NeedToPay}" 
+                                                        ItemsSource="{Binding DebitBookVMList}" SelectedItem="{Binding SelectedDebitBookVM}" DisplayMemberPath="Name"/>
+
+                                <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" Text="支払日"/>
+                                <controls:NumericUpDown Grid.Row="4" Grid.Column="1" Margin="5" MinValue="1" MaxValue="31" 
+                                                                    Value="{Binding PayDay, TargetNullValue=''}" IsEnabled="{Binding NeedToPay}"/>
+                                <Button Grid.Row="5" Grid.Column="1" Margin="5,0" Content="確定" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
+                            </Grid>
                         </GroupBox>
 
-                        <Grid Grid.Column="1" DataContext="{Binding SelectedBookVM}">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="1.0*"/>
-                            </Grid.RowDefinitions>
-
-                            <GroupBox Header="帳簿情報">
-                                <GroupBox.InputBindings>
-                                    <KeyBinding Gesture="Ctrl+S" Command="{StaticResource SaveBookInfoCommand}"/>
-                                </GroupBox.InputBindings>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="0.5*"/>
-                                        <ColumnDefinition Width="0.5*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="帳簿名"/>
-                                    <TextBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                                                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
-
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="帳簿種別"/>
-                                    <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" 
-                                                          ItemsSource="{Binding BookKindDic}" SelectedValue="{Binding SelectedBookKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
-
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="初期残高"/>
-                                    <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" 
-                                                                        Value="{Binding InitialValue}"/>
-
-                                    <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Text="支払元帳簿"/>
-                                    <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" IsEnabled="{Binding NeedToPay}" 
-                                                          ItemsSource="{Binding DebitBookVMList}" SelectedItem="{Binding SelectedDebitBookVM}" DisplayMemberPath="Name"/>
-
-                                    <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" Text="支払日"/>
-                                    <controls:NumericUpDown Grid.Row="4" Grid.Column="1" Margin="5" MinValue="1" MaxValue="31" 
-                                                                        Value="{Binding PayDay, TargetNullValue=''}" IsEnabled="{Binding NeedToPay}"/>
-                                    <Button Grid.Row="5" Grid.Column="1" Margin="5,0" Content="確定" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
-                                </Grid>
-                            </GroupBox>
-
-                            <GroupBox Grid.Row="1" Header="関連付け">
-                                <Grid>
-                                    <ListBox Margin="5" ItemsSource="{Binding RelationVMList}" SelectedItem="{Binding SelectedRelationVM}">
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <CheckBox Grid.Column="0" IsChecked="{Binding IsRelated}" Command="{StaticResource ChangeBookRelationCommand}"/>
-                                                    <TextBlock Grid.Column="1" Text="{Binding Name}"/>
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                    </ListBox>
-                                </Grid>
-                            </GroupBox>
-                        </Grid>
+                        <GroupBox Grid.Row="1" Header="関連付け">
+                            <Grid>
+                                <ListBox Margin="5" ItemsSource="{Binding RelationVMList}" SelectedItem="{Binding SelectedRelationVM}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <CheckBox Grid.Column="0" IsChecked="{Binding IsRelated}" Command="{StaticResource ChangeBookRelationCommand}"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding Name}"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
+                        </GroupBox>
                     </Grid>
                 </Grid>
             </TabItem>
             <TabItem Header="その他">
-                <TabItem.Resources>
-                    <RoutedCommand x:Key="DumpExePathDialogCommand"/>
-                    <RoutedCommand x:Key="RestoreExePathDialogCommand"/>
-                    <RoutedCommand x:Key="RestartForDbSettingCommand"/>
-                    <RoutedCommand x:Key="BackUpFolderPathDialogCommand"/>
-                </TabItem.Resources>
-                <TabItem.CommandBindings>
-                    <CommandBinding Command="{StaticResource DumpExePathDialogCommand}"
-                                                Executed="DumpExePathDialogCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource RestoreExePathDialogCommand}"
-                                                Executed="RestorePathDialogCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource RestartForDbSettingCommand}"
-                                                Executed="RestartForDbSettingCommand_Executed"/>
-                    <CommandBinding Command="{StaticResource BackUpFolderPathDialogCommand}"
-                                                Executed="BackUpFolderPathDialogCommand_Executed"/>
-                </TabItem.CommandBindings>
                 <ScrollViewer>
                     <StackPanel Grid.IsSharedSizeScope="True">
                         <GroupBox Header="データベース">

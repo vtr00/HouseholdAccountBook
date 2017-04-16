@@ -7,7 +7,6 @@
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         mc:Ignorable="d"
         Title="移動" Height="Auto" Width="350" ShowInTaskbar="False"
-        Loaded="MoveRegistrationWindow_Loaded"
         Closing="MoveRegistrationWindow_Closing">
 
     <Window.Resources>

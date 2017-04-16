@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
+using System.Diagnostics;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -31,10 +32,12 @@ namespace HouseholdAccountBook.Windows
         private int? groupId = null;
         #endregion
 
+        #region イベントハンドラ
         /// <summary>
         /// 登録時のイベント
         /// </summary>
-        public event EventHandler<RegistrateEventArgs> Registrated = null;
+        public event EventHandler<EventArgs<int?>> Registrated = null;
+        #endregion
 
         /// <summary>
         /// 帳簿項目追加ウィンドウ
@@ -68,7 +71,8 @@ namespace HouseholdAccountBook.Windows
             this.ActionRegistrationWindowVM.BookVMList = bookVMList;
             this.ActionRegistrationWindowVM.SelectedBookVM = selectedBookVM;
             this.ActionRegistrationWindowVM.SelectedDate = selectedDateTime != null ? selectedDateTime.Value : DateTime.Today;
-            this.ActionRegistrationWindowVM.SelectedBalanceKind =BalanceKind.Outgo;
+            this.ActionRegistrationWindowVM.SelectedBalanceKind = BalanceKind.Outgo;
+            this.ActionRegistrationWindowVM.IsMatch = null;
 
             UpdateCategoryList();
             UpdateItemList();
@@ -123,9 +127,10 @@ namespace HouseholdAccountBook.Windows
             int actValue = -1;
             string shopName = string.Empty;
             string remark = string.Empty;
+            bool? isMatch = null;
             using(DaoBase dao = builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
-SELECT book_id, item_id, act_time, act_value, group_id, shop_name, remark 
+SELECT book_id, item_id, act_time, act_value, group_id, shop_name, remark, is_match
 FROM hst_action 
 WHERE del_flg = 0 AND action_id = @{0};", actionId);
                 reader.ExecARow((record) => {
@@ -136,6 +141,7 @@ WHERE del_flg = 0 AND action_id = @{0};", actionId);
                     groupId = record.ToNullableInt("group_id");
                     shopName = record["shop_name"];
                     remark = record["remark"];
+                    isMatch = record.ToInt("is_match") == 1;
 
                     reader = dao.ExecQuery(@"
 SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
@@ -169,6 +175,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
                 }
             }
             this.ActionRegistrationWindowVM.Count = count;
+            this.ActionRegistrationWindowVM.IsMatch = isMatch;
 
             UpdateCategoryList();
             UpdateItemList(itemId);
@@ -244,7 +251,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
             int? id = RegisterToDb();
 
             // MainWindow更新
-            Registrated?.Invoke(this, new RegistrateEventArgs(id));
+            Registrated?.Invoke(this, new EventArgs<int?>(id));
 
             // 表示クリア
             this.ActionRegistrationWindowVM.Value = null;
@@ -272,7 +279,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
             int? id = RegisterToDb();
 
             // MainWindow更新
-            Registrated?.Invoke(this, new RegistrateEventArgs(id));
+            Registrated?.Invoke(this, new EventArgs<int?>(id));
 
             this.DialogResult = true;
             this.Close();
@@ -291,16 +298,6 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
         #endregion
 
         #region イベントハンドラ
-        /// <summary>
-        /// 読込完了時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ActionRegistrationWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            // 処理なし
-        }
-
         /// <summary>
         /// フォーム終了時
         /// </summary>
@@ -443,14 +440,15 @@ ORDER BY used_time DESC;", this.ActionRegistrationWindowVM.SelectedItemVM.Id);
                 return null;
             }
 
-            BalanceKind balanceKind = ActionRegistrationWindowVM.SelectedBalanceKind; // 収支種別
-            int bookId = ActionRegistrationWindowVM.SelectedBookVM.Id.Value; // 帳簿ID
-            int itemId = ActionRegistrationWindowVM.SelectedItemVM.Id; // 帳簿項目ID
-            DateTime actTime = ActionRegistrationWindowVM.SelectedDate; // 日付
-            int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * ActionRegistrationWindowVM.Value.Value; // 値
-            string shopName = ActionRegistrationWindowVM.SelectedShopName; // 店舗名
-            int count = ActionRegistrationWindowVM.Count; // 繰返し回数
-            string remark = ActionRegistrationWindowVM.SelectedRemark; // 備考
+            BalanceKind balanceKind = this.ActionRegistrationWindowVM.SelectedBalanceKind; // 収支種別
+            int bookId = this.ActionRegistrationWindowVM.SelectedBookVM.Id.Value; // 帳簿ID
+            int itemId = this.ActionRegistrationWindowVM.SelectedItemVM.Id; // 帳簿項目ID
+            DateTime actTime = this.ActionRegistrationWindowVM.SelectedDate; // 日付
+            int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * this.ActionRegistrationWindowVM.Value.Value; // 値
+            string shopName = this.ActionRegistrationWindowVM.SelectedShopName; // 店舗名
+            int count = this.ActionRegistrationWindowVM.Count; // 繰返し回数
+            string remark = this.ActionRegistrationWindowVM.SelectedRemark; // 備考
+            int isMatch = this.ActionRegistrationWindowVM.IsMatch == true ? 1 : 0;
 
             int? resActionId = null;
 
@@ -459,8 +457,8 @@ ORDER BY used_time DESC;", this.ActionRegistrationWindowVM.SelectedItemVM.Id);
                     #region 帳簿項目を追加する
                     if (count == 1) { // 繰返し回数が1回(繰返しなし)
                         DaoReader reader = dao.ExecQuery(@"
-INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7}) RETURNING action_id;",
+INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 0, 'now', @{6}, 'now', @{7}) RETURNING action_id;",
                             bookId, itemId, actTime, actValue, shopName, remark, Updater, Inserter);
 
                         reader.ExecARow((record) => {
@@ -481,8 +479,8 @@ VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.
                             DateTime tmpActTime = actTime;
                             for (int i = 0; i < count; ++i) {
                                 reader = dao.ExecQuery(@"
-INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 'now', @{7}, 'now', @{8}) RETURNING action_id;",
+INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8}) RETURNING action_id;",
                                     bookId, itemId, tmpActTime, actValue, shopName, tmpGroupId, remark, Updater, Inserter);
                                 
                                 // 繰り返しの最初の1回を選択するようにする
@@ -506,14 +504,14 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 'now', @{7}, 'now', @{8}) R
                             #region グループに属していない
                             dao.ExecNonQuery(@"
 UPDATE hst_action
-SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, update_time = 'now', updater = @{6}
-WHERE action_id = @{7};", bookId, itemId, actTime, actValue, shopName, remark, Updater, actionId);
+SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
+WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, actionId);
                             #endregion
                         }
                         else {
                             #region グループに属している
                             dao.ExecTransaction(() => {
-                                // 以降の繰返し分のレコードを削除する
+                                // この帳簿項目以降の繰返し分のレコードを削除する
                                 dao.ExecNonQuery(@"
 UPDATE hst_action
 SET del_flg = 1, update_time = 'now', updater = @{0}
@@ -526,11 +524,11 @@ WHERE del_flg = 0 AND group_id = @{0};", groupId);
 
                                 if (reader.Count <= 1) {
                                     #region グループに属する項目が1項目以下
-                                    // グループをクリアする
+                                    // この帳簿項目のグループIDをクリアする
                                     dao.ExecNonQuery(@"
 UPDATE hst_action
-SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = null, remark = @{5}, update_time = 'now', updater = @{6}
-WHERE action_id = @{7};", bookId, itemId, actTime, actValue, shopName, remark, Updater, actionId);
+SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = null, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
+WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, actionId);
 
                                     // グループを削除する
                                     dao.ExecNonQuery(@"
@@ -541,10 +539,11 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                                 }
                                 else {
                                     #region グループに属する項目が2項目以上
+                                    // この帳簿項目のグループIDをクリアせずに残す
                                     dao.ExecNonQuery(@"
 UPDATE hst_action
-SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, update_time = 'now', updater = @{6}
-WHERE action_id = @{7};", bookId, itemId, actTime, actValue, shopName, remark, Updater, actionId);
+SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
+WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, actionId);
                                     #endregion
                                 }
                             });
@@ -585,9 +584,17 @@ ORDER BY act_time ASC;", groupId, actionId);
                             }
 
                             DateTime tmpActTime = actTime;
-                            for (int i = 0; i < actionIdList.Count; ++i) {
-                                int targetActionId = actionIdList[i];
 
+                            // この帳簿項目にだけis_matchを反映する
+                            Debug.Assert(actionIdList[0] == actionId);
+                            dao.ExecNonQuery(@"
+UPDATE hst_action
+SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = @{5}, remark = @{6}, is_match = @{7}, update_time = 'now', updater = @{8}
+WHERE action_id = @{9};", bookId, itemId, tmpActTime, actValue, shopName, groupId, remark, isMatch, Updater, actionId);
+                            tmpActTime = actTime.AddMonths(1);
+
+                            for (int i = 1; i < actionIdList.Count; ++i) {
+                                int targetActionId = actionIdList[i];
                                 if (i < count) { // 繰返し回数の範囲内のレコードを更新する
                                     dao.ExecNonQuery(@"
 UPDATE hst_action
@@ -605,8 +612,8 @@ WHERE action_id = @{1};", Updater, targetActionId);
                             // 繰返し回数が帳簿項目数を越えていた場合に、新規レコードを追加する
                             for (int i = actionIdList.Count; i < count; ++i) {
                                 dao.ExecNonQuery(@"
-INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 'now', @{7}, 'now', @{8});", bookId, itemId, tmpActTime, actValue, shopName, groupId, remark, Updater, Inserter);
+INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8});", bookId, itemId, tmpActTime, actValue, shopName, groupId, remark, Updater, Inserter);
 
                                 tmpActTime = actTime.AddMonths(i + 1);
                             }

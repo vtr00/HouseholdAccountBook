@@ -8,21 +8,21 @@
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:project="clr-namespace:HouseholdAccountBook"
         mc:Ignorable="d"
-        Title="CSV比較" Height="300" Width="600"
+        Title="CSV比較 - Household Account Book" Height="450" Width="600" ShowInTaskbar="False"
         Closing="CsvComparisonWindow_Closing">
 
     <Window.Resources>
+        <!-- ファイルコマンド -->
+        <RoutedCommand x:Key="OpenCsvFileCommand"/>
+
+        <!-- 編集コマンド -->
+        <RoutedCommand x:Key="EditActionCommand"/>
+        <RoutedCommand x:Key="UpdateCommand"/>
+        
+        <!-- その他コマンド -->
         <RoutedCommand x:Key="ChangeIsMatchCommand"/>
 
-        <!-- コンバータ -->
-        <converters:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
-        <BooleanToVisibilityConverter x:Key="BoolVisibilityConverter"/>
-        <converters:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
-
         <!-- スタイル -->
-        <Style x:Key="TextAlignRight" TargetType="TextBlock">
-            <Setter Property="TextAlignment" Value="Right"/>
-        </Style>
         <Style x:Key="DayOfWeekStyle" TargetType="DataGridCell">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Record.Date, Converter={StaticResource DateTimeToDayOfWeekConverter}}" Value="土">
@@ -33,20 +33,26 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        
-        <!-- 設定 -->
-        <properties:Settings x:Key="Settings"/>
     </Window.Resources>
 
     <Window.CommandBindings>
-        <!-- ウィンドウ操作コマンド -->
+        <!-- ファイルコマンド -->
         <CommandBinding Command="{x:Static ApplicationCommands.Close}" Executed="CloseWindowCommand_Executed"/>
-        
-        <!-- ファイル操作コマンド -->
-        <CommandBinding Command="{x:Static ApplicationCommands.Open}" Executed="OpenCsvFileCommand_Executed"/>
+        <CommandBinding Command="{StaticResource OpenCsvFileCommand}" Executed="OpenCsvFileCommand_Executed"/>
 
+        <!-- 編集コマンド -->
+        <CommandBinding Command="{StaticResource EditActionCommand}" CanExecute="EditActionCommand_CanExecute" Executed="EditActionCommand_Executed"/>
+        
+        <!-- 表示コマンド -->
+        <CommandBinding Command="{StaticResource UpdateCommand}" CanExecute="UpdateCommand_CanExecute" Executed="UpdateCommand_Executed"/>
+        
+        <!-- その他コマンド -->
         <CommandBinding Command="{StaticResource ChangeIsMatchCommand}" Executed="ChangeIsMatchCommand_Executed"/>
     </Window.CommandBindings>
+
+    <Window.InputBindings>
+        <KeyBinding Gesture="Alt+F4" Command="{x:Static ApplicationCommands.Close}"/>
+    </Window.InputBindings>
 
     <Window.DataContext>
         <viewmodels:CsvComparisonWindowViewModel x:Name="CsvComparisonWindowVM"/>
@@ -60,9 +66,15 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="ファイル(_F)">
-                <MenuItem Header="開く(_O)" Command="{x:Static ApplicationCommands.Open}"/>
+                <MenuItem Header="開く(_O)..." Command="{StaticResource OpenCsvFileCommand}" InputGestureText="Ctrl+O"/>
                 <Separator/>
-                <MenuItem Header="閉じる(_X)" Command="{x:Static ApplicationCommands.Close}"/>
+                <MenuItem Header="閉じる(_X)" Command="{x:Static ApplicationCommands.Close}" InputGestureText="Alt+F4"/>
+            </MenuItem>
+            <MenuItem Header="編集(_E)">
+                <MenuItem Header="変更(_E)..." Command="{StaticResource EditActionCommand}" InputGestureText="F2"/>
+            </MenuItem>
+            <MenuItem Header="表示(_V)">
+                <MenuItem Header="更新(_U)" Command="{StaticResource UpdateCommand}" InputGestureText="F5"/>
             </MenuItem>
         </Menu>
 
@@ -72,11 +84,22 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="比較対象："/>
-                <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
+            <Grid Grid.Row="0" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Grid.Column="0" Margin="5" Text="CSVファイル："/>
+                <TextBlock Grid.Column="1" Margin="5" Text="{Binding CsvFileName, TargetNullValue='--'}"/>
+                <TextBlock Grid.Column="2" Margin="5" Text="帳簿："/>
+                <ComboBox Grid.Column="3" HorizontalAlignment="Stretch" Margin="5" MinWidth="100"
                           ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
-            </StackPanel>
+                <Button Grid.Column="4" Margin="5" Width="50" Content="更新" Command="{StaticResource UpdateCommand}"/>
+            </Grid>
 
             <DataGrid Grid.Row="1"
                     ItemsSource="{Binding CsvComparisonVMList}" SelectedItem="{Binding SelectedCsvComparisonVM}" SelectionUnit="FullRow" IsReadOnly="True"
@@ -86,6 +109,11 @@
                 <DataGrid.Resources>
                     <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
                 </DataGrid.Resources>
+                <DataGrid.InputBindings>
+                    <KeyBinding Gesture="F2" Command="{StaticResource EditActionCommand}"/>
+                    <KeyBinding Gesture="Enter" Command="{StaticResource EditActionCommand}"/>
+                    <MouseBinding Gesture="LeftDoubleClick" Command="{StaticResource EditActionCommand}"/>
+                </DataGrid.InputBindings>
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="一致">
                         <DataGridTemplateColumn.CellTemplate>

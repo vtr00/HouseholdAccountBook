@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Linq;
 using System.Windows.Controls;
 using static HouseholdAccountBook.ConstValue.ConstValue;
+using HouseholdAccountBook.UserEventArgs;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -27,6 +28,13 @@ namespace HouseholdAccountBook.Windows
         /// DAOビルダ
         /// </summary>
         private DaoBuilder builder;
+        #endregion
+
+        #region イベントハンドラ
+        /// <summary>
+        /// 比較結果が変更された時
+        /// </summary>
+        public event EventHandler<EventArgs<int>> ChangedIsMatch;
         #endregion
 
         /// <summary>
@@ -81,6 +89,8 @@ namespace HouseholdAccountBook.Windows
 
             if (ofd.ShowDialog() == false) return;
 
+            this.CsvComparisonWindowVM.CsvFileName = Path.GetFileName(ofd.FileName);
+
             // 開いたCSVファイルのパスを設定として保存する
             settings.App_CsvFilePath = ofd.FileName;
             settings.Save();
@@ -91,7 +101,7 @@ namespace HouseholdAccountBook.Windows
                 WillThrowOnMissingField = false
             };
             using (CsvReader reader = new CsvReader(new StreamReader(ofd.FileName, Encoding.GetEncoding(932)), config)) { 
-                ObservableCollection<CsvComparisonViewModel> list = new ObservableCollection<CsvComparisonViewModel>();
+                List<CsvComparisonViewModel> tmpList = new List<CsvComparisonViewModel>();
                 while (reader.Read()) {
                     try {
                         int dateIndex = 0; // このインデックスは設定で指定するようにする
@@ -99,44 +109,61 @@ namespace HouseholdAccountBook.Windows
                         int valueIndex = 5;
                         
                         if(reader.TryGetField<DateTime>(dateIndex, out DateTime date) && reader.TryGetField<string>(nameIndex, out string name) && reader.TryGetField<int>(valueIndex, out int value)) {
-                            list.Add(new CsvComparisonViewModel() { Record = new CsvComparisonViewModel.CsvRecord() { Date = date, Name = name, Value = value } });
+                            tmpList.Add(new CsvComparisonViewModel() { Record = new CsvComparisonViewModel.CsvRecord() { Date = date, Name = name, Value = value } });
                         }
                     }
                     catch (Exception) { }
                 }
-                this.CsvComparisonWindowVM.CsvComparisonVMList = list;
+                this.CsvComparisonWindowVM.CsvComparisonVMList?.Clear();
+                this.CsvComparisonWindowVM.CsvComparisonVMList = new ObservableCollection<CsvComparisonViewModel>(tmpList);
             }
 
-            // 指定された帳簿内で、日付、金額が一致する帳簿項目を探す
-            using(DaoBase dao = builder.Build()) {
-                foreach(CsvComparisonViewModel vm in this.CsvComparisonWindowVM.CsvComparisonVMList) {
-                    DaoReader reader = dao.ExecQuery(@"
-SELECT A.action_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match
-FROM hst_action A
-INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
-WHERE A.act_time = @{0} AND A.act_value = -@{1} AND book_id = @{2} AND A.del_flg = 0;", vm.Record.Date, vm.Record.Value, this.CsvComparisonWindowVM.SelectedBookVM.Id);
+            UpdateComparisonInfo();
+        }
 
-                    reader.ExecWholeRow((count, record) => {
-                        int actionId = record.ToInt("action_id");
-                        string itemName = record["item_name"];
-                        int outgo = Math.Abs(record.ToInt("act_value"));
-                        string shopName = record["shop_name"];
-                        string remark = record["remark"];
-                        bool isMatch = record.ToInt("is_match") == 1;
+        /// <summary>
+        /// 項目編集可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void EditActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            // 選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが値を持つ
+            e.CanExecute = this.CsvComparisonWindowVM.SelectedCsvComparisonVM != null && this.CsvComparisonWindowVM.SelectedCsvComparisonVM.ActionId.HasValue;
+        }
 
-                        // 帳簿項目IDが使用済なら次のレコードを調べるようにする
-                        bool ans = this.CsvComparisonWindowVM.CsvComparisonVMList.Where((tmpVM) => { return tmpVM.ActionId == actionId; }).Count() != 0;
-                        if(!ans) {
-                            vm.ActionId = actionId;
-                            vm.ItemName = itemName;
-                            vm.ShopName = shopName;
-                            vm.Remark = remark;
-                            vm.IsMatch = isMatch;
-                        }
-                        return ans;
-                    });
-                }
-            }
+        /// <summary>
+        /// 項目編集処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void EditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ActionRegistrationWindow arw = new ActionRegistrationWindow(builder, this.CsvComparisonWindowVM.SelectedCsvComparisonVM.ActionId.Value);
+            arw.Registrated += (sender2, e2) => {
+                UpdateComparisonInfo();
+            };
+            arw.ShowDialog();
+        }
+
+        /// <summary>
+        /// 比較情報を更新可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpdateCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.CsvComparisonWindowVM.CsvFileName != default(string) && this.CsvComparisonWindowVM.SelectedBookVM != null;
+        }
+
+        /// <summary>
+        /// 比較情報を更新する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            UpdateComparisonInfo();
         }
 
         /// <summary>
@@ -147,11 +174,8 @@ WHERE A.act_time = @{0} AND A.act_value = -@{1} AND book_id = @{2} AND A.del_flg
         private void ChangeIsMatchCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             CsvComparisonViewModel vm = (this.CsvComparisonWindowVM.SelectedCsvComparisonVM = (e.OriginalSource as CheckBox)?.DataContext as CsvComparisonViewModel);
-            using (DaoBase dao = builder.Build()) {
-                dao.ExecNonQuery(@"
-UPDATE hst_action
-SET is_match = @{0}, update_time = 'now', updater = @{1}
-WHERE action_id = @{2};", vm.IsMatch ? 1 : 0, Updater, vm.ActionId);
+            if (vm.ActionId.HasValue) {
+                ChangeIsMatch(vm.ActionId.Value, vm.IsMatch);
             }
         }
         #endregion
@@ -168,14 +192,21 @@ WHERE action_id = @{2};", vm.IsMatch ? 1 : 0, Updater, vm.ActionId);
         }
 
         /// <summary>
-        /// 
+        /// マウスのホーバーでチェックを入れる
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void CheckBox_MouseEnter(object sender, MouseEventArgs e)
         {
-            CheckBox checkBox = sender as CheckBox;
-            checkBox.IsChecked = !checkBox.IsChecked;
+            if((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control) { 
+                CheckBox checkBox = sender as CheckBox;
+                checkBox.IsChecked = !checkBox.IsChecked;
+
+                CsvComparisonViewModel vm = (this.CsvComparisonWindowVM.SelectedCsvComparisonVM = checkBox?.DataContext as CsvComparisonViewModel);
+                if (vm.ActionId.HasValue) {
+                    ChangeIsMatch(vm.ActionId.Value, vm.IsMatch);
+                }
+            }
         }
         #endregion
 
@@ -208,6 +239,54 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
             }
             this.CsvComparisonWindowVM.BookVMList = bookVMList;
             this.CsvComparisonWindowVM.SelectedBookVM = selectedBookVM ?? bookVMList[0];
+        }
+        
+        /// <summary>
+        /// 比較情報を更新する
+        /// </summary>
+        private void UpdateComparisonInfo()
+        {
+            // 指定された帳簿内で、日付、金額が一致する帳簿項目を探す
+            using (DaoBase dao = builder.Build()) {
+                foreach (CsvComparisonViewModel vm in this.CsvComparisonWindowVM.CsvComparisonVMList) {
+                    // 前回の結果をクリアする
+                    vm.ClearActionInfo();
+
+                    DaoReader reader = dao.ExecQuery(@"
+SELECT A.action_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match
+FROM hst_action A
+INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
+WHERE A.act_time = @{0} AND A.act_value = -@{1} AND book_id = @{2} AND A.del_flg = 0;", vm.Record.Date, vm.Record.Value, this.CsvComparisonWindowVM.SelectedBookVM.Id);
+
+                    reader.ExecWholeRow((count, record) => {
+                        int actionId = record.ToInt("action_id");
+                        string itemName = record["item_name"];
+                        int outgo = Math.Abs(record.ToInt("act_value"));
+                        string shopName = record["shop_name"];
+                        string remark = record["remark"];
+                        bool isMatch = record.ToInt("is_match") == 1;
+
+                        // 帳簿項目IDが使用済なら次のレコードを調べるようにする
+                        bool ans = this.CsvComparisonWindowVM.CsvComparisonVMList.Where((tmpVM) => { return tmpVM.ActionId == actionId; }).Count() != 0;
+                        if (!ans) {
+                            vm.ActionId = actionId;
+                            vm.ItemName = itemName;
+                            vm.ShopName = shopName;
+                            vm.Remark = remark;
+                            vm.IsMatch = isMatch;
+                        }
+                        return ans;
+                    });
+                }
+            }
+            
+            List<CsvComparisonViewModel> list = this.CsvComparisonWindowVM.CsvComparisonVMList.ToList();
+            list.Sort((vm1, vm2) => {
+                int rslt = (int)((vm1.Record.Date - vm2.Record.Date).TotalDays);
+                if (rslt == 0) { rslt = (vm1.ActionId ?? 0) - (vm2.ActionId ?? 0); }
+                return rslt;
+            });
+            this.CsvComparisonWindowVM.CsvComparisonVMList = new ObservableCollection<CsvComparisonViewModel>(list);
         }
         #endregion
 
@@ -246,5 +325,22 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
             settings.Save();
         }
         #endregion
+
+        /// <summary>
+        /// 一致フラグを更新する
+        /// </summary>
+        /// <param name="actionId">帳簿項目ID</param>
+        /// <param name="isMatch">一致フラグ</param>
+        private void ChangeIsMatch(int actionId, bool isMatch)
+        {
+            using (DaoBase dao = builder.Build()) {
+                dao.ExecNonQuery(@"
+UPDATE hst_action
+SET is_match = @{0}, update_time = 'now', updater = @{1}
+WHERE action_id = @{2};", isMatch ? 1 : 0, Updater, actionId);
+            }
+
+            ChangedIsMatch?.Invoke(this, new EventArgs<int>(actionId));
+        }
     }
 }

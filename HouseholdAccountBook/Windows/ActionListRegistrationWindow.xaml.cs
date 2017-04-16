@@ -27,7 +27,7 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// 登録時のイベント
         /// </summary>
-        public event EventHandler<RegistrateEventArgs> Registrated = null;
+        public event EventHandler<EventArgs<int?>> Registrated = null;
 
         /// <summary>
         /// 帳簿項目まとめて追加ウィンドウ
@@ -117,7 +117,7 @@ namespace HouseholdAccountBook.Windows
             int? id = RegisterToDb();
 
             // MainWindow更新
-            Registrated?.Invoke(this, new RegistrateEventArgs(id));
+            Registrated?.Invoke(this, new EventArgs<int?>(id));
 
             this.DialogResult = true;
             this.Close();
@@ -136,16 +136,6 @@ namespace HouseholdAccountBook.Windows
         #endregion
 
         #region イベントハンドラ
-        /// <summary>
-        /// 読込完了時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ActionListRegistrationWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            // 処理なし
-        }
-
         /// <summary>
         /// フォーム終了時
         /// </summary>

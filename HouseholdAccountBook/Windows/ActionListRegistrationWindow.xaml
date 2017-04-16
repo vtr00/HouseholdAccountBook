@@ -4,31 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
-        xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
-        xmlns:converters="clr-namespace:HouseholdAccountBook.Converters"
         mc:Ignorable="d"
         Title="まとめて追加" Height="Auto" Width="350" ShowInTaskbar="False"
-        Loaded="ActionListRegistrationWindow_Loaded"
         Closing="ActionListRegistrationWindow_Closing">
 
     <Window.Resources>
         <!-- 登録コマンド -->
         <RoutedCommand x:Key="RegisterCommand"/>
         <RoutedCommand x:Key="CancelCommand"/>
-
-        <!-- コンバータ -->
-        <converters:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
-        <converters:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
-        <converters:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
-        
-        <!-- スタイル -->
-        <Style x:Key="TextAlignRight" TargetType="TextBlock">
-            <Setter Property="TextAlignment" Value="Right"/>
-        </Style>
-
-        <!-- 設定 -->
-        <properties:Settings x:Key="Settings"/>
     </Window.Resources>
 
     <Window.CommandBindings>

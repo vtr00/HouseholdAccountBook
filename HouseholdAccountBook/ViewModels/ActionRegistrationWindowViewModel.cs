@@ -247,5 +247,17 @@ namespace HouseholdAccountBook.ViewModels
         }
         private string _SelectedRemark = default(string);
         #endregion
+
+        /// <summary>
+        /// 一致フラグ
+        /// </summary>
+        #region IsMatch
+        public bool? IsMatch
+        {
+            get { return _IsMatch; }
+            set { SetProperty(ref _IsMatch, value); }
+        }
+        private bool? _IsMatch = default(bool?);
+        #endregion
     }
 }

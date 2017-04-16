@@ -44,10 +44,12 @@ namespace HouseholdAccountBook.Windows
         private int? groupId = null;
         #endregion
 
+        #region イベントハンドラ
         /// <summary>
         /// 登録時のイベント
         /// </summary>
-        public event EventHandler<RegistrateEventArgs> Registrated = null;
+        public event EventHandler<EventArgs<int?>> Registrated = null;
+        #endregion
 
         /// <summary>
         /// 帳簿項目追加ウィンドウ(移動)
@@ -57,10 +59,11 @@ namespace HouseholdAccountBook.Windows
         /// <param name="selectedDateTime">選択された日時</param>
         public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, DateTime? selectedDateTime)
         {
+            this.builder = builder;
+
             InitializeComponent();
             Title = "移動(追加)";
 
-            this.builder = builder;
             this.selectedBookId = selectedBookId;
             this.fromActionId = null;
             this.toActionId = null;
@@ -127,10 +130,11 @@ namespace HouseholdAccountBook.Windows
         /// <param name="groupId">グループID</param>
         public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, int groupId)
         {
+            this.builder = builder;
+
             InitializeComponent();
             Title = "移動(編集)";
 
-            this.builder = builder;
             this.selectedBookId = selectedBookId;
             this.groupId = groupId;
 
@@ -274,7 +278,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
             // DB登録
             int? id = RegisterToDb();
 
-            Registrated?.Invoke(this, new RegistrateEventArgs(id));
+            Registrated?.Invoke(this, new EventArgs<int?>(id));
 
             this.DialogResult = true;
             this.Close();
@@ -293,16 +297,6 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
         #endregion
 
         #region イベントハンドラ
-        /// <summary>
-        /// 読込完了時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MoveRegistrationWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            // 処理なし
-        }
-
         /// <summary>
         /// フォーム終了時
         /// </summary>

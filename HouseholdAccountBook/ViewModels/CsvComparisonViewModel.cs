@@ -81,6 +81,18 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// 帳簿項目情報をクリアする
+        /// </summary>
+        public void ClearActionInfo()
+        {
+            this.ActionId = default(int?);
+            this.ItemName = default(string);
+            this.ShopName = default(string);
+            this.Remark = default(string);
+            this.IsMatch = default(bool);
+        }
+
+        /// <summary>
         /// CSVレコード
         /// </summary>
         public class CsvRecord : BindableBase

@@ -49,6 +49,18 @@ namespace HouseholdAccountBook.Windows
         }
 
         #region コマンド
+        #region ウィンドウ
+        /// <summary>
+        /// ウィンドウを閉じる
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CloseWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.Close();
+        }
+        #endregion
+
         #region 項目設定の操作
         /// <summary>
         /// カテゴリを追加可能か判定
@@ -543,7 +555,7 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void DeleteShopNameCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
                 using (DaoBase dao = builder.Build()) {
                     dao.ExecQuery(@"
@@ -585,7 +597,7 @@ ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
         /// <param name="e"></param>
         private void DeleteRemarkCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
                 using (DaoBase dao = builder.Build()) {
                     dao.ExecQuery(@"
@@ -913,7 +925,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void RestartForDbSettingCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show("再起動します。よろしいですか？", this.Title, MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK) {
+            if (MessageBox.Show(MessageText.RestartNotification, this.Title, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Properties.Settings.Default.App_InitFlag = true;
                 Properties.Settings.Default.Save();
 

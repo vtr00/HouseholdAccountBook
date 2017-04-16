@@ -9,6 +9,18 @@ namespace HouseholdAccountBook.ViewModels
     public class CsvComparisonWindowViewModel : BindableBase
     {
         /// <summary>
+        /// CSVファイル名
+        /// </summary>
+        #region CsvFileName
+        public string CsvFileName
+        {
+            get { return _CsvFileName; }
+            set { SetProperty(ref _CsvFileName, value); }
+        }
+        private string _CsvFileName = default(string);
+        #endregion
+        
+        /// <summary>
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList

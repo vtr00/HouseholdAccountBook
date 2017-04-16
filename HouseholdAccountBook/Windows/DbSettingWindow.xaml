@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         mc:Ignorable="d"
-        Title="Household Account Book" Height="300" Width="400">
+        Title="初期設定 - Household Account Book" Height="300" Width="400">
     
     <Window.DataContext>
         <viewmodels:DbSettingWindowViewModel x:Name="DbSettingWindowVM"/>

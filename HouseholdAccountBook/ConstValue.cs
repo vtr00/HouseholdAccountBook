@@ -210,7 +210,15 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// 選択した項目を削除しますか？
             /// </summary>
-            public static string DeleteNotification = "選択した項目を削除しますか？";
+            public static string DeleteNotification = "選択した項目を削除します。よろしいですか？";
+            /// <summary>
+            /// 既存のデータを削除します。よろしいですか？
+            /// </summary>
+            public static string DeleteOldDataNotification = "既存のデータを削除します。よろしいですか？";
+            /// <summary>
+            /// 再起動します。よろしいですか？
+            /// </summary>
+            public static string RestartNotification = "再起動します。よろしいですか？";
         }
     }
 }
