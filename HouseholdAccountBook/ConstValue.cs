@@ -152,6 +152,17 @@ namespace HouseholdAccountBook.ConstValue
         };
 
         /// <summary>
+        /// 登録モード
+        /// </summary>
+        public enum RegistrationMode
+        {
+            // 追加
+            Add,
+            // 編集
+            Edit
+        }
+
+        /// <summary>
         /// メッセージタイトルテキスト
         /// </summary>
         public static class MessageTitle 

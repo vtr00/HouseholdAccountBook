@@ -164,12 +164,16 @@
                 <MenuItem Header="削除(_D)" Command="{StaticResource DeleteActionCommand}" InputGestureText="Del"/>
             </MenuItem>
             <MenuItem Header="表示(_V)">
-                <MenuItem Header="帳簿(_B)" Command="{StaticResource IndicateBookCommand}">
+                <MenuItem Header="帳簿(_B)">
+                    <MenuItem Header="切替(_D)" Command="{StaticResource IndicateBookCommand}"/>
+                    <Separator/>
                     <MenuItem Header="先月(_L)" Command="{StaticResource GoToLastMonthCommand}" InputGestureText="Ctrl+←"/>
                     <MenuItem Header="今月(_T)" Command="{StaticResource GoToThisMonthCommand}" InputGestureText="Ctrl+↓"/>
                     <MenuItem Header="来月(_N)" Command="{StaticResource GoToNextMonthCommand}" InputGestureText="Ctrl+→"/>
                 </MenuItem>
-                <MenuItem Header="年間一覧(_L)" Command="{StaticResource IndicateListCommand}">
+                <MenuItem Header="年間一覧(_L)">
+                    <MenuItem Header="切替(_D)" Command="{StaticResource IndicateListCommand}"/>
+                    <Separator/>
                     <MenuItem Header="去年(_L)" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Ctrl+←"/>
                     <MenuItem Header="今年(_T)" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Ctrl+↓"/>
                     <MenuItem Header="来年(_N)" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Ctrl+→"/>

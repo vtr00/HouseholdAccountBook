@@ -59,6 +59,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.25*"/>
@@ -91,10 +92,6 @@
             <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
                            Text="金額" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <controls:NumericUpDown Grid.Row="5" Grid.Column="1" Margin="5" Value="{Binding Value}" MinValue="1"/>
-            <TextBlock Grid.Row="5" Grid.Column="2" Margin="5" 
-                           Text="回数" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <controls:NumericUpDown Grid.Row="5" Grid.Column="3" Margin="5" 
-                                        Value="{Binding Count}" MinValue="1"/>
             <TextBlock Grid.Row="6" Grid.Column="0" Margin="5"
                        Text="店舗" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="6" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="3"
@@ -103,13 +100,33 @@
                        Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="7" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="3"
                       ItemsSource="{Binding RemarkList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Grid.Row="8" Grid.Column="0" Margin="5"
-                       Text="一致" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <CheckBox Grid.Row="8" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" IsChecked="{Binding IsMatch}">
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="5" 
+                           Text="回数" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <controls:NumericUpDown Grid.Row="8" Grid.Column="1" Margin="5" 
+                                        Value="{Binding Count}" MinValue="1"/>
+            <TextBlock Grid.Row="8" Grid.Column="2" Margin="5"
+                       Text="連動して編集" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <CheckBox Grid.Row="8" Grid.Column="3" Margin="5" VerticalAlignment="Center" IsChecked="{Binding IsLink}">
                 <CheckBox.Style>
                     <Style TargetType="CheckBox">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsMatch}" Value="{x:Null}">
+                            <DataTrigger Binding="{Binding RegMode}" Value="Add">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Count}" Value="1">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </CheckBox.Style>
+            </CheckBox>
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="5"
+                       Text="チェック済" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <CheckBox Grid.Row="9" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" IsChecked="{Binding IsMatch}">
+                <CheckBox.Style>
+                    <Style TargetType="CheckBox">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding RegMode}" Value="Add">
                                 <Setter Property="IsEnabled" Value="False"/>
                             </DataTrigger>
                         </Style.Triggers>

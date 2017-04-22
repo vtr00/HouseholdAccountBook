@@ -63,6 +63,7 @@ namespace HouseholdAccountBook.Windows
 
             InitializeComponent();
             Title = "移動(追加)";
+            this.MoveRegistrationWindowVM.RegMode = RegistrationMode.Add;
 
             this.selectedBookId = selectedBookId;
             this.fromActionId = null;
@@ -134,6 +135,7 @@ namespace HouseholdAccountBook.Windows
 
             InitializeComponent();
             Title = "移動(編集)";
+            this.MoveRegistrationWindowVM.RegMode = RegistrationMode.Edit;
 
             this.selectedBookId = selectedBookId;
             this.groupId = groupId;

@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Dao;
+using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Extentions;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
@@ -12,7 +13,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.Windows
@@ -1066,20 +1066,14 @@ ORDER BY sort_order;");
                 // 更新前のサマリーの選択を維持する
                 IEnumerable<SummaryViewModel> query2 = this.MainWindowVM.SummaryVMList.Where((svm) => { return svm.BalanceKind == tmpSvm?.BalanceKind && svm.CategoryId == tmpSvm?.CategoryId && svm.ItemId == tmpSvm?.ItemId; });
                 this.MainWindowVM.SelectedSummaryVM = query2.Count() == 0 ? null : query2.First();
-
-                if (isScroll && this.actionDataGrid.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.actionDataGrid) > 0) {
-                    if (VisualTreeHelper.GetChild(this.actionDataGrid, 0) is Decorator border) {
-                        if (border.Child is ScrollViewer scroll) {
-                            if (this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth() < DateTime.Today && DateTime.Today < this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1)) {
-                                // 今月の場合は、末尾が表示されるようにする
-                                scroll.ScrollToBottom();
-                            }
-                            else {
-                                // 今月でない場合は、先頭が表示されるようにする
-                                scroll.ScrollToTop();
-                            }
-                        }
-                    }
+                
+                if (this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth() < DateTime.Today && DateTime.Today < this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1)) {
+                    // 今月の場合は、末尾が表示されるようにする
+                    this.actionDataGrid.ScrollToButtom();
+                }
+                else {
+                    // 今月でない場合は、先頭が表示されるようにする
+                    this.actionDataGrid.ScrollToTop();
                 }
             }
         }

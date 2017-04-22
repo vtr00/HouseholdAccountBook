@@ -140,6 +140,7 @@
     <Compile Include="Behaviors\BindSelectedItemToTreeViewBehavior.cs" />
     <Compile Include="BindingProxy.cs" />
     <Compile Include="Converters\DateTimeToDisplayedYearConverter.cs" />
+    <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Interfaces\IMultiSelectable.cs" />
     <Compile Include="PropertyName.cs" />
     <Compile Include="UserControls\DateTimePicker.cs" />

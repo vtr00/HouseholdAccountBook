@@ -15,6 +15,7 @@ using System.Linq;
 using System.Windows.Controls;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 using HouseholdAccountBook.UserEventArgs;
+using HouseholdAccountBook.Extensions;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -100,8 +101,8 @@ namespace HouseholdAccountBook.Windows
                 HasHeaderRecord = true,
                 WillThrowOnMissingField = false
             };
+            List<CsvComparisonViewModel> tmpList = new List<CsvComparisonViewModel>();
             using (CsvReader reader = new CsvReader(new StreamReader(ofd.FileName, Encoding.GetEncoding(932)), config)) { 
-                List<CsvComparisonViewModel> tmpList = new List<CsvComparisonViewModel>();
                 while (reader.Read()) {
                     try {
                         int dateIndex = 0; // このインデックスは設定で指定するようにする
@@ -114,9 +115,9 @@ namespace HouseholdAccountBook.Windows
                     }
                     catch (Exception) { }
                 }
-                this.CsvComparisonWindowVM.CsvComparisonVMList?.Clear();
-                this.CsvComparisonWindowVM.CsvComparisonVMList = new ObservableCollection<CsvComparisonViewModel>(tmpList);
             }
+            this.CsvComparisonWindowVM.CsvComparisonVMList = new ObservableCollection<CsvComparisonViewModel>(tmpList);
+            this.csvCompDataGrid.ScrollToTop();
 
             UpdateComparisonInfo();
         }
@@ -144,6 +145,48 @@ namespace HouseholdAccountBook.Windows
                 UpdateComparisonInfo();
             };
             arw.ShowDialog();
+        }
+
+        /// <summary>
+        /// 一括チェック可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BulkCheckCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (this.CsvComparisonWindowVM.CsvComparisonVMList != null) {
+                foreach (CsvComparisonViewModel vm in this.CsvComparisonWindowVM.CsvComparisonVMList) {
+                    e.CanExecute |= vm.ActionId.HasValue;
+                    if (e.CanExecute) { break; }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 一括チェック処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BulkCheckCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Cursor cursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
+
+            using (DaoBase dao = builder.Build()) {
+                dao.ExecTransaction(() => {
+                    foreach (CsvComparisonViewModel vm in this.CsvComparisonWindowVM.CsvComparisonVMList) {
+                        if (vm.ActionId.HasValue) {
+                            dao.ExecNonQuery(@"
+UPDATE hst_action
+SET is_match = 1, update_time = 'now', updater = @{1}
+WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
+                        }
+                    }
+                });
+            }
+            UpdateComparisonInfo();
+
+            this.Cursor = cursor;
         }
 
         /// <summary>

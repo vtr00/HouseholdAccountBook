@@ -5,7 +5,7 @@ namespace HouseholdAccountBook.Extentions
     /// <summary>
     /// <see cref="DateTime"/> 拡張
     /// </summary>
-    public static partial class DateTimeExtensions
+    public static class DateTimeExtensions
     {
         /// <summary>
         /// 月初めを取得する

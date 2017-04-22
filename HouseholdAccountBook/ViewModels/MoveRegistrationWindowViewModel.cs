@@ -40,6 +40,18 @@ namespace HouseholdAccountBook.ViewModels
 
         #region プロパティ
         /// <summary>
+        /// 登録モード
+        /// </summary>
+        #region RegMode
+        public RegistrationMode RegMode
+        {
+            get { return _RegMode; }
+            set { SetProperty(ref _RegMode, value); }
+        }
+        private RegistrationMode _RegMode = default(RegistrationMode);
+        #endregion
+        
+        /// <summary>
         /// 選択された日時
         /// </summary>
         #region SelectedDate

@@ -51,6 +51,7 @@ namespace HouseholdAccountBook.Windows
 
             InitializeComponent();
             Title = "追加";
+            this.ActionRegistrationWindowVM.RegMode = RegistrationMode.Add;
 
             this.actionId = null;
 
@@ -72,7 +73,6 @@ namespace HouseholdAccountBook.Windows
             this.ActionRegistrationWindowVM.SelectedBookVM = selectedBookVM;
             this.ActionRegistrationWindowVM.SelectedDate = selectedDateTime != null ? selectedDateTime.Value : DateTime.Today;
             this.ActionRegistrationWindowVM.SelectedBalanceKind = BalanceKind.Outgo;
-            this.ActionRegistrationWindowVM.IsMatch = null;
 
             UpdateCategoryList();
             UpdateItemList();
@@ -117,6 +117,7 @@ namespace HouseholdAccountBook.Windows
 
             InitializeComponent();
             Title = "編集";
+            this.ActionRegistrationWindowVM.RegMode = RegistrationMode.Edit;
 
             this.actionId = actionId;
             
@@ -127,7 +128,7 @@ namespace HouseholdAccountBook.Windows
             int actValue = -1;
             string shopName = string.Empty;
             string remark = string.Empty;
-            bool? isMatch = null;
+            bool isMatch = false;
             using(DaoBase dao = builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT book_id, item_id, act_time, act_value, group_id, shop_name, remark, is_match
@@ -446,8 +447,9 @@ ORDER BY used_time DESC;", this.ActionRegistrationWindowVM.SelectedItemVM.Id);
             DateTime actTime = this.ActionRegistrationWindowVM.SelectedDate; // 日付
             int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * this.ActionRegistrationWindowVM.Value.Value; // 値
             string shopName = this.ActionRegistrationWindowVM.SelectedShopName; // 店舗名
-            int count = this.ActionRegistrationWindowVM.Count; // 繰返し回数
             string remark = this.ActionRegistrationWindowVM.SelectedRemark; // 備考
+            int count = this.ActionRegistrationWindowVM.Count; // 繰返し回数
+            bool isLink = this.ActionRegistrationWindowVM.IsLink;
             int isMatch = this.ActionRegistrationWindowVM.IsMatch == true ? 1 : 0;
 
             int? resActionId = null;
@@ -596,10 +598,12 @@ WHERE action_id = @{9};", bookId, itemId, tmpActTime, actValue, shopName, groupI
                             for (int i = 1; i < actionIdList.Count; ++i) {
                                 int targetActionId = actionIdList[i];
                                 if (i < count) { // 繰返し回数の範囲内のレコードを更新する
-                                    dao.ExecNonQuery(@"
+                                    if (isLink) {
+                                        dao.ExecNonQuery(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = @{5}, remark = @{6}, update_time = 'now', updater = @{7}
 WHERE action_id = @{8};", bookId, itemId, tmpActTime, actValue, shopName, groupId, remark, Updater, targetActionId);
+                                    }
                                 }
                                 else { // 繰返し回数が帳簿項目数を下回っていた場合に、越えたレコードを削除する
                                     dao.ExecNonQuery(@"

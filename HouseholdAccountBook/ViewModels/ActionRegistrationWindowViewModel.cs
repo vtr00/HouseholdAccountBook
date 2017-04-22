@@ -12,11 +12,14 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class ActionRegistrationWindowViewModel : BindableBase
     {
+        #region フィールド
         /// <summary>
         /// 変更時処理重複防止用フラグ
         /// </summary>
         private bool UpdateOnChanged = false;
+        #endregion
 
+        #region イベントハンドラ
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
@@ -33,7 +36,21 @@ namespace HouseholdAccountBook.ViewModels
         /// 項目変更時イベント
         /// </summary>
         public event Action OnItemChanged = default(Action);
+        #endregion
 
+        #region プロパティ
+        /// <summary>
+        /// 登録モード
+        /// </summary>
+        #region RegMode
+        public RegistrationMode RegMode
+        {
+            get { return _RegMode; }
+            set { SetProperty(ref _RegMode, value); }
+        }
+        private RegistrationMode _RegMode = default(RegistrationMode);
+        #endregion
+        
         /// <summary>
         /// 帳簿VMリスト
         /// </summary>
@@ -187,22 +204,6 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 回数
-        /// </summary>
-        #region Count
-        public int Count
-        {
-            get { return _Count; }
-            set {
-                if (SetProperty(ref _Count, value)) {
-                    CommandManager.InvalidateRequerySuggested();
-                }
-            }
-        }
-        private int _Count = 1;
-        #endregion
-
-        /// <summary>
         /// 店舗名リスト
         /// </summary>
         #region ShopNameList
@@ -249,15 +250,43 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// 回数
+        /// </summary>
+        #region Count
+        public int Count
+        {
+            get { return _Count; }
+            set {
+                if (SetProperty(ref _Count, value)) {
+                    CommandManager.InvalidateRequerySuggested();
+                }
+            }
+        }
+        private int _Count = 1;
+        #endregion
+        /// <summary>
+        /// 連動して編集
+        /// </summary>
+        #region IsLink
+        public bool IsLink
+        {
+            get { return _IsLink; }
+            set { SetProperty(ref _IsLink, value); }
+        }
+        private bool _IsLink = default(bool);
+        #endregion
+        
+        /// <summary>
         /// 一致フラグ
         /// </summary>
         #region IsMatch
-        public bool? IsMatch
+        public bool IsMatch
         {
             get { return _IsMatch; }
             set { SetProperty(ref _IsMatch, value); }
         }
-        private bool? _IsMatch = default(bool?);
+        private bool _IsMatch = default(bool);
+        #endregion
         #endregion
     }
 }
