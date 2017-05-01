@@ -39,7 +39,7 @@
     </Window.InputBindings>
     
     <Window.DataContext>
-        <viewmodels:ActionRegistrationWindowViewModel x:Name="ActionRegistrationWindowVM"/>
+        <viewmodels:ActionRegistrationWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
 
     <Grid Margin="10">

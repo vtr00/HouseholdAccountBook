@@ -43,7 +43,7 @@ namespace HouseholdAccountBook.Windows
 
             InitializeComponent();
             
-            this.MainWindowVM.DisplayedMonth = DateTime.Now;
+            this.WVM.DisplayedMonth = DateTime.Now;
 
             UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
             UpdateBookTabData(true);
@@ -465,7 +465,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void MoveToBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、帳簿が2つ以上存在していて、選択されている帳簿が存在する
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.BookVMList?.Count >= 2 && this.MainWindowVM.SelectedBookVM != null;
+            e.CanExecute = this.WVM.SelectedTab == Tab.BooksTab && this.WVM.BookVMList?.Count >= 2 && this.WVM.SelectedBookVM != null;
         }
 
         /// <summary>
@@ -476,7 +476,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void MoveToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder,
-                this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
+                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime);
             mrw.Registrated += (sender2, e2) => {
                 UpdateBookTabData(e2.Value);
                 FocusManager.SetFocusedElement(this, actionDataGrid);
@@ -494,7 +494,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void AddActionToBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択されている帳簿が存在する
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.SelectedBookVM != null;
+            e.CanExecute = this.WVM.SelectedTab == Tab.BooksTab && this.WVM.SelectedBookVM != null;
         }
 
         /// <summary>
@@ -505,7 +505,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void AddActionToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ActionRegistrationWindow arw = new ActionRegistrationWindow(builder,
-                this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
+                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime);
             arw.Registrated += (sender2, e2)=> {
                 UpdateBookTabData(e2.Value);
                 FocusManager.SetFocusedElement(this, actionDataGrid);
@@ -523,7 +523,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void AddActionListToBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択されている帳簿が存在する
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.SelectedBookVM != null;
+            e.CanExecute = this.WVM.SelectedTab == Tab.BooksTab && this.WVM.SelectedBookVM != null;
         }
 
         /// <summary>
@@ -534,7 +534,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void AddActionListToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(builder,
-                this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM?.ActTime);
+                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime);
             alrw.Registrated += (sender2, e2) => {
                 UpdateBookTabData(e2.Value);
                 FocusManager.SetFocusedElement(this, actionDataGrid);
@@ -552,7 +552,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void EditActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが0より大きい
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.SelectedActionVMList.Count == 1 && this.MainWindowVM.SelectedActionVM.ActionId > 0;
+            e.CanExecute = this.WVM.SelectedTab == Tab.BooksTab && this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVM.ActionId > 0;
         }
 
         /// <summary>
@@ -568,7 +568,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 SELECT A.group_id, G.group_kind
 FROM hst_action A
 LEFT JOIN (SELECT * FROM hst_group WHERE del_flg = 0) G ON G.group_id = A.group_id
-WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM.ActionId);
+WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId);
 
                 reader.ExecARow((record) => {
                     groupKind = record.ToNullableInt("group_kind");
@@ -576,7 +576,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
             }
 
             if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
-                ActionRegistrationWindow arw = new ActionRegistrationWindow(builder, this.MainWindowVM.SelectedActionVM.ActionId);
+                ActionRegistrationWindow arw = new ActionRegistrationWindow(builder, this.WVM.SelectedActionVM.ActionId);
                 arw.Registrated += (sender2, e2) => {
                     UpdateBookTabData(e2.Value);
                     FocusManager.SetFocusedElement(this, actionDataGrid);
@@ -586,7 +586,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
             }
             else {
                 // 移動の編集時の処理
-                MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder, this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.SelectedActionVM.GroupId.Value);
+                MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value);
                 mrw.Registrated += (sender2, e2) => {
                     UpdateBookTabData(e2.Value);
                     FocusManager.SetFocusedElement(this, actionDataGrid);
@@ -604,7 +604,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
         private void DeleteActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択している帳簿項目が存在していて、選択している帳簿項目のIDが0より大きい
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && this.MainWindowVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0;
+            e.CanExecute = this.WVM.SelectedTab == Tab.BooksTab && this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0;
         }
 
         /// <summary>
@@ -615,7 +615,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.MainWindowVM.SelectedActionVM
         private void DeleteActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (MessageBox.Show(MessageText.DeleteNotification, this.Title, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                foreach(ActionViewModel vm in this.MainWindowVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; })) {
+                foreach(ActionViewModel vm in this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; })) {
                     int actionId = vm.ActionId;
                     int? groupId = vm.GroupId;
 
@@ -669,7 +669,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void IndicateBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.MainWindowVM.SelectedTab != Tab.BooksTab;
+            e.CanExecute = this.WVM.SelectedTab != Tab.BooksTab;
         }
 
         /// <summary>
@@ -679,7 +679,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void IndicateBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.MainWindowVM.SelectedTab = Tab.BooksTab;
+            this.WVM.SelectedTab = Tab.BooksTab;
         }
 
         /// <summary>
@@ -689,7 +689,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void IndicateListCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.MainWindowVM.SelectedTab != Tab.ListTab;
+            e.CanExecute = this.WVM.SelectedTab != Tab.ListTab;
         }
 
         /// <summary>
@@ -699,7 +699,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void IndicateListCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.MainWindowVM.SelectedTab = Tab.ListTab;
+            this.WVM.SelectedTab = Tab.ListTab;
         }
 
         /// <summary>
@@ -709,7 +709,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void IndicateGraphCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.MainWindowVM.SelectedTab != Tab.GraphTab && false;
+            e.CanExecute = this.WVM.SelectedTab != Tab.GraphTab && false;
         }
 
         /// <summary>
@@ -719,7 +719,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void IndicateGraphCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.MainWindowVM.SelectedTab = Tab.GraphTab;
+            this.WVM.SelectedTab = Tab.GraphTab;
         }
 
         /// <summary>
@@ -743,7 +743,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         private void GoToLastMonthCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択している
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab;
+            e.CanExecute = this.WVM.SelectedTab == Tab.BooksTab;
         }
 
         /// <summary>
@@ -756,7 +756,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = Cursor;
             Cursor = Cursors.Wait;
 
-            this.MainWindowVM.DisplayedMonth = this.MainWindowVM.DisplayedMonth.AddMonths(-1);
+            this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.AddMonths(-1);
             UpdateBookTabData(true);
 
             Cursor = cCursor;
@@ -771,7 +771,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         {
             DateTime thisMonth = DateTime.Today.GetFirstDateOfMonth();
             // 帳簿タブを選択している かつ 今月が表示されていない
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab && !(thisMonth <= this.MainWindowVM.DisplayedMonth && this.MainWindowVM.DisplayedYear < thisMonth.AddMonths(1));
+            e.CanExecute = this.WVM.SelectedTab == Tab.BooksTab && !(thisMonth <= this.WVM.DisplayedMonth && this.WVM.DisplayedYear < thisMonth.AddMonths(1));
         }
 
         /// <summary>
@@ -784,7 +784,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = Cursor;
             Cursor = Cursors.Wait;
 
-            this.MainWindowVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
+            this.WVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
             UpdateBookTabData(true);
 
             Cursor = cCursor;
@@ -798,7 +798,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         private void GoToNextMonthCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択している
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.BooksTab;
+            e.CanExecute = this.WVM.SelectedTab == Tab.BooksTab;
         }
 
         /// <summary>
@@ -811,7 +811,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = Cursor;
             Cursor = Cursors.Wait;
 
-            this.MainWindowVM.DisplayedMonth = this.MainWindowVM.DisplayedMonth.AddMonths(1);
+            this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.AddMonths(1);
             UpdateBookTabData(true);
 
             Cursor = cCursor;
@@ -827,7 +827,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         private void GoToLastYearCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択している
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.ListTab;
+            e.CanExecute = this.WVM.SelectedTab == Tab.ListTab;
         }
 
         /// <summary>
@@ -840,7 +840,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = Cursor;
             Cursor = Cursors.Wait;
 
-            this.MainWindowVM.DisplayedYear = this.MainWindowVM.DisplayedYear.AddYears(-1);
+            this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(-1);
             UpdateListTabData();
 
             Cursor = cCursor;
@@ -855,7 +855,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         {
             DateTime thisYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             // 帳簿タブを選択している かつ 今年が表示されていない
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.ListTab && !(thisYear <= this.MainWindowVM.DisplayedYear && this.MainWindowVM.DisplayedYear < thisYear.AddYears(1));
+            e.CanExecute = this.WVM.SelectedTab == Tab.ListTab && !(thisYear <= this.WVM.DisplayedYear && this.WVM.DisplayedYear < thisYear.AddYears(1));
         }
 
         /// <summary>
@@ -868,7 +868,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = Cursor;
             Cursor = Cursors.Wait;
 
-            this.MainWindowVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
+            this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             UpdateListTabData();
 
             Cursor = cCursor;
@@ -882,7 +882,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         private void GoToNextYearCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択している
-            e.CanExecute = this.MainWindowVM.SelectedTab == Tab.ListTab;
+            e.CanExecute = this.WVM.SelectedTab == Tab.ListTab;
         }
 
         /// <summary>
@@ -895,7 +895,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = Cursor;
             Cursor = Cursors.Wait;
 
-            this.MainWindowVM.DisplayedYear = this.MainWindowVM.DisplayedYear.AddYears(1);
+            this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(1);
             UpdateListTabData();
 
             Cursor = cCursor;
@@ -927,9 +927,9 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void OpenCsvComparisonWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            CsvComparisonWindow ccw = new CsvComparisonWindow(builder, this.MainWindowVM.SelectedBookVM.Id);
+            CsvComparisonWindow ccw = new CsvComparisonWindow(builder, this.WVM.SelectedBookVM.Id);
             ccw.ChangedIsMatch += (sender2, e2) => {
-                ActionViewModel vm = this.MainWindowVM.ActionVMList.FirstOrDefault((tmpVM) => { return tmpVM.ActionId == e2.Value; });
+                ActionViewModel vm = this.WVM.ActionVMList.FirstOrDefault((tmpVM) => { return tmpVM.ActionId == e2.Value; });
                 if(vm != null) {
                     using (DaoBase dao = builder.Build()) {
                         DaoReader reader = dao.ExecQuery(@"
@@ -985,11 +985,11 @@ WHERE action_id = @{0};", vm.ActionId);
         /// <param name="e"></param>
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (oldSelectedTab != this.MainWindowVM.SelectedTab) {
+            if (oldSelectedTab != this.WVM.SelectedTab) {
                 Cursor cCursor = Cursor;
                 Cursor = Cursors.Wait;
 
-                switch (this.MainWindowVM.SelectedTab) {
+                switch (this.WVM.SelectedTab) {
                     case Tab.BooksTab:
                         UpdateBookTabData(true);
                         break;
@@ -1002,7 +1002,7 @@ WHERE action_id = @{0};", vm.ActionId);
                 }
                 Cursor = cCursor;
             }
-            oldSelectedTab = this.MainWindowVM.SelectedTab;
+            oldSelectedTab = this.WVM.SelectedTab;
         }
         #endregion
 
@@ -1013,7 +1013,7 @@ WHERE action_id = @{0};", vm.ActionId);
         /// <param name="bookId">選択対象の帳簿ID</param>
         private void UpdateBookList(int? bookId = null)
         {
-            int? tmpBookId = bookId ?? this.MainWindowVM.SelectedBookVM?.Id;
+            int? tmpBookId = bookId ?? this.WVM.SelectedBookVM?.Id;
 
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>() {
                 new BookViewModel() { Id = null, Name = "一覧" }
@@ -1035,8 +1035,8 @@ ORDER BY sort_order;");
                     return true;
                 });
             }
-            this.MainWindowVM.BookVMList = bookVMList;
-            this.MainWindowVM.SelectedBookVM = selectedBookVM;
+            this.WVM.BookVMList = bookVMList;
+            this.WVM.SelectedBookVM = selectedBookVM;
         }
 
         #region 帳簿タブ更新用の関数
@@ -1056,27 +1056,27 @@ ORDER BY sort_order;");
         /// <param name="actionId">選択対象の帳簿項目ID</param>
         private void UpdateBookTabData(bool isScroll = false, int? actionId = null)
         {
-            if (this.MainWindowVM.SelectedTab == Tab.BooksTab) {
-                int? tmpActionId = actionId ?? this.MainWindowVM.SelectedActionVM?.ActionId;
-                SummaryViewModel tmpSvm = this.MainWindowVM.SelectedSummaryVM;
+            if (this.WVM.SelectedTab == Tab.BooksTab) {
+                int? tmpActionId = actionId ?? this.WVM.SelectedActionVM?.ActionId;
+                SummaryViewModel tmpSvm = this.WVM.SelectedSummaryVM;
 
-                this.MainWindowVM.ActionVMList = LoadActionViewModelList(
-                    this.MainWindowVM.SelectedBookVM?.Id, this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth(),
-                    this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
+                this.WVM.ActionVMList = LoadActionViewModelList(
+                    this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.GetFirstDateOfMonth(),
+                    this.WVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
 
-                this.MainWindowVM.SummaryVMList = LoadSummaryViewModelList(
-                    this.MainWindowVM.SelectedBookVM?.Id, this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth(),
-                    this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
+                this.WVM.SummaryVMList = LoadSummaryViewModelList(
+                    this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.GetFirstDateOfMonth(),
+                    this.WVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
 
-                IEnumerable<ActionViewModel> query = this.MainWindowVM.ActionVMList.Where((avm) => { return avm.ActionId == tmpActionId; });
-                this.MainWindowVM.SelectedActionVM = query.Count() == 0 ? null : query.First();
+                IEnumerable<ActionViewModel> query = this.WVM.ActionVMList.Where((avm) => { return avm.ActionId == tmpActionId; });
+                this.WVM.SelectedActionVM = query.Count() == 0 ? null : query.First();
 
                 // 更新前のサマリーの選択を維持する
-                IEnumerable<SummaryViewModel> query2 = this.MainWindowVM.SummaryVMList.Where((svm) => { return svm.BalanceKind == tmpSvm?.BalanceKind && svm.CategoryId == tmpSvm?.CategoryId && svm.ItemId == tmpSvm?.ItemId; });
-                this.MainWindowVM.SelectedSummaryVM = query2.Count() == 0 ? null : query2.First();
+                IEnumerable<SummaryViewModel> query2 = this.WVM.SummaryVMList.Where((svm) => { return svm.BalanceKind == tmpSvm?.BalanceKind && svm.CategoryId == tmpSvm?.CategoryId && svm.ItemId == tmpSvm?.ItemId; });
+                this.WVM.SelectedSummaryVM = query2.Count() == 0 ? null : query2.First();
 
                 if (isScroll) {
-                    if (this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth() < DateTime.Today && DateTime.Today < this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1)) {
+                    if (this.WVM.DisplayedMonth.GetFirstDateOfMonth() < DateTime.Today && DateTime.Today < this.WVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1)) {
                         // 今月の場合は、末尾が表示されるようにする
                         this.actionDataGrid.ScrollToButtom();
                     }
@@ -1321,7 +1321,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         /// </summary>
         private void UpdateListTabData()
         {
-            if (this.MainWindowVM.SelectedTab == Tab.ListTab) {
+            if (this.WVM.SelectedTab == Tab.ListTab) {
                 int startMonth = Properties.Settings.Default.App_StartMonth;
 
                 // 表示する月の文字列を作成する
@@ -1329,8 +1329,8 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                 for (int i = startMonth; i < startMonth + 12; ++i) {
                     displayedMonths.Add(string.Format("{0}月", (i - 1) % 12 + 1));
                 }
-                this.MainWindowVM.DisplayedMonths = displayedMonths;
-                this.MainWindowVM.SummaryWithinYearVMList = LoadSummaryWithinYearViewModelList(this.MainWindowVM.SelectedBookVM.Id, this.MainWindowVM.DisplayedYear);
+                this.WVM.DisplayedMonths = displayedMonths;
+                this.WVM.SummaryWithinYearVMList = LoadSummaryWithinYearViewModelList(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
             }
         }
 
@@ -1456,7 +1456,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// </summary>
         private void UpdateGraphTabData()
         {
-            if(this.MainWindowVM.SelectedTab == Tab.GraphTab) {
+            if(this.WVM.SelectedTab == Tab.GraphTab) {
                 throw new NotImplementedException();
             }
         }
@@ -1497,7 +1497,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             if (WindowState != WindowState.Minimized) { 
                 settings.MainWindow_WindowState = (int)WindowState;
             }
-            settings.MainWindow_SelectedBookId = this.MainWindowVM.SelectedBookVM.Id.HasValue ? this.MainWindowVM.SelectedBookVM.Id.Value : -1;
+            settings.MainWindow_SelectedBookId = this.WVM.SelectedBookVM.Id.HasValue ? this.WVM.SelectedBookVM.Id.Value : -1;
             settings.MainWindow_Left = Left;
             settings.MainWindow_Top = Top;
             settings.MainWindow_Width = Width;

@@ -8,7 +8,7 @@
         Title="初期設定 - Household Account Book" Height="300" Width="400">
     
     <Window.DataContext>
-        <viewmodels:DbSettingWindowViewModel x:Name="DbSettingWindowVM"/>
+        <viewmodels:DbSettingWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
 
     <Window.Resources>

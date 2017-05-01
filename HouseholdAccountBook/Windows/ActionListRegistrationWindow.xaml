@@ -28,7 +28,7 @@
     </Window.InputBindings>
     
     <Window.DataContext>
-        <viewmodels:ActionListRegistrationWindowViewModel x:Name="ActionListRegistrationWindowVM"/>
+        <viewmodels:ActionListRegistrationWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
 
     <Grid Margin="10">

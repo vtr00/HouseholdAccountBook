@@ -128,7 +128,7 @@
     </Window.InputBindings>
     
     <Window.DataContext>
-        <viewmodels:MainWindowViewModel x:Name="MainWindowVM"/>
+        <viewmodels:MainWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
     
     <Grid>

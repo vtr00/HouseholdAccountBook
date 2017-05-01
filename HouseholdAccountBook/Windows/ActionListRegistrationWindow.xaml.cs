@@ -55,9 +55,9 @@ namespace HouseholdAccountBook.Windows
                 });
             }
 
-            this.ActionListRegistrationWindowVM.BookVMList = bookVMList;
-            this.ActionListRegistrationWindowVM.SelectedBookVM = selectedBookVM;
-            this.ActionListRegistrationWindowVM.SelectedBalanceKind = BalanceKind.Outgo;
+            this.WVM.BookVMList = bookVMList;
+            this.WVM.SelectedBookVM = selectedBookVM;
+            this.WVM.SelectedBalanceKind = BalanceKind.Outgo;
 
             UpdateCategoryList();
             UpdateItemList();
@@ -67,24 +67,24 @@ namespace HouseholdAccountBook.Windows
             LoadSetting();
 
             #region イベントハンドラの設定
-            this.ActionListRegistrationWindowVM.OnBookChanged += () => {
+            this.WVM.OnBookChanged += () => {
                 UpdateCategoryList();
                 UpdateItemList();
                 UpdateShopList();
                 UpdateRemarkList();
             };
-            this.ActionListRegistrationWindowVM.OnBalanceKindChanged += () => {
+            this.WVM.OnBalanceKindChanged += () => {
                 UpdateCategoryList();
                 UpdateItemList();
                 UpdateShopList();
                 UpdateRemarkList();
             };
-            this.ActionListRegistrationWindowVM.OnCategoryChanged += () => {
+            this.WVM.OnCategoryChanged += () => {
                 UpdateItemList();
                 UpdateShopList();
                 UpdateRemarkList();
             };
-            this.ActionListRegistrationWindowVM.OnItemChanged += () => {
+            this.WVM.OnItemChanged += () => {
                 UpdateShopList();
                 UpdateRemarkList();
             };
@@ -99,8 +99,8 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void RegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.ActionListRegistrationWindowVM.DateValueVMList.Count >= 1;
-            foreach (DateValueViewModel vm in this.ActionListRegistrationWindowVM.DateValueVMList) {
+            e.CanExecute = this.WVM.DateValueVMList.Count >= 1;
+            foreach (DateValueViewModel vm in this.WVM.DateValueVMList) {
                 if(!e.CanExecute) { break; }
                 e.CanExecute &= vm.ActValue.HasValue;
             }
@@ -153,9 +153,9 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void DataGrid_AddingNewItem(object sender, AddingNewItemEventArgs e)
         {
-            if(this.ActionListRegistrationWindowVM.DateValueVMList.Count > 0) {
+            if(this.WVM.DateValueVMList.Count > 0) {
                 // リストに入力済の末尾のデータの日付を追加時に採用する
-                DateValueViewModel lastVM = this.ActionListRegistrationWindowVM.DateValueVMList[this.ActionListRegistrationWindowVM.DateValueVMList.Count - 1];
+                DateValueViewModel lastVM = this.WVM.DateValueVMList[this.WVM.DateValueVMList.Count - 1];
                 e.NewItem = new DateValueViewModel() { ActDate = lastVM.ActDate, ActValue = null };
             }
         }
@@ -177,7 +177,7 @@ namespace HouseholdAccountBook.Windows
 SELECT category_id, category_name FROM mst_category C 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM mst_item I WHERE I.category_id = C.category_id AND balance_kind = @{0} AND del_flg = 0 
   AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{1} AND RBI.item_id = I.item_id)) 
-ORDER BY sort_order;", (int)this.ActionListRegistrationWindowVM.SelectedBalanceKind, this.ActionListRegistrationWindowVM.SelectedBookVM.Id);
+ORDER BY sort_order;", (int)this.WVM.SelectedBalanceKind, this.WVM.SelectedBookVM.Id);
                 reader.ExecWholeRow((count, record) => {
                     CategoryViewModel vm = new CategoryViewModel() { Id = record.ToInt("category_id"), Name = record["category_name"] };
                     categoryVMList.Add(vm);
@@ -187,8 +187,8 @@ ORDER BY sort_order;", (int)this.ActionListRegistrationWindowVM.SelectedBalanceK
                     return true;
                 });
             }
-            this.ActionListRegistrationWindowVM.CategoryVMList = categoryVMList;
-            this.ActionListRegistrationWindowVM.SelectedCategoryVM = selectedCategoryVM;
+            this.WVM.CategoryVMList = categoryVMList;
+            this.WVM.SelectedCategoryVM = selectedCategoryVM;
         }
 
         /// <summary>
@@ -201,19 +201,19 @@ ORDER BY sort_order;", (int)this.ActionListRegistrationWindowVM.SelectedBalanceK
             ItemViewModel selectedItemVM = null;
             using (DaoBase dao = builder.Build()) {
                 DaoReader reader;
-                if (this.ActionListRegistrationWindowVM.SelectedCategoryVM.Id == -1) {
+                if (this.WVM.SelectedCategoryVM.Id == -1) {
                     reader = dao.ExecQuery(@"
 SELECT item_id, item_name FROM mst_item I 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{0} AND RBI.item_id = I.item_id AND del_flg = 0)
   AND EXISTS (SELECT * FROM mst_category C WHERE C.category_id = I.category_id AND balance_kind = @{1} AND del_flg = 0)
-ORDER BY sort_order;", this.ActionListRegistrationWindowVM.SelectedBookVM.Id, (int)this.ActionListRegistrationWindowVM.SelectedBalanceKind);
+ORDER BY sort_order;", this.WVM.SelectedBookVM.Id, (int)this.WVM.SelectedBalanceKind);
                 }
                 else {
                     reader = dao.ExecQuery(@"
 SELECT item_id, item_name FROM mst_item I 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{0} AND RBI.item_id = I.item_id AND del_flg = 0)
   AND category_id = @{1}
-ORDER BY sort_order;", this.ActionListRegistrationWindowVM.SelectedBookVM.Id, (int)this.ActionListRegistrationWindowVM.SelectedCategoryVM.Id);
+ORDER BY sort_order;", this.WVM.SelectedBookVM.Id, (int)this.WVM.SelectedCategoryVM.Id);
                 }
                 reader.ExecWholeRow((count, record) => {
                     ItemViewModel vm = new ItemViewModel() { Id = record.ToInt("item_id"), Name = record["item_name"] };
@@ -224,8 +224,8 @@ ORDER BY sort_order;", this.ActionListRegistrationWindowVM.SelectedBookVM.Id, (i
                     return true;
                 });
             }
-            this.ActionListRegistrationWindowVM.ItemVMList = itemVMList;
-            this.ActionListRegistrationWindowVM.SelectedItemVM = selectedItemVM;
+            this.WVM.ItemVMList = itemVMList;
+            this.WVM.SelectedItemVM = selectedItemVM;
         }
 
         /// <summary>
@@ -237,12 +237,12 @@ ORDER BY sort_order;", this.ActionListRegistrationWindowVM.SelectedBookVM.Id, (i
             ObservableCollection<string> shopNameVMList = new ObservableCollection<string>() {
                     string.Empty
             };
-            string selectedShopName = shopName ?? this.ActionListRegistrationWindowVM.SelectedShopName ?? shopNameVMList[0];
+            string selectedShopName = shopName ?? this.WVM.SelectedShopName ?? shopNameVMList[0];
             using (DaoBase dao = builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT shop_name FROM hst_shop 
 WHERE del_flg = 0 AND item_id = @{0} 
-ORDER BY used_time DESC;", this.ActionListRegistrationWindowVM.SelectedItemVM.Id);
+ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
                 reader.ExecWholeRow((count, record) => {
                     string tmp = record["shop_name"];
                     shopNameVMList.Add(tmp);
@@ -250,8 +250,8 @@ ORDER BY used_time DESC;", this.ActionListRegistrationWindowVM.SelectedItemVM.Id
                 });
             }
 
-            this.ActionListRegistrationWindowVM.ShopNameList = shopNameVMList;
-            this.ActionListRegistrationWindowVM.SelectedShopName = selectedShopName;
+            this.WVM.ShopNameList = shopNameVMList;
+            this.WVM.SelectedShopName = selectedShopName;
         }
 
         /// <summary>
@@ -263,12 +263,12 @@ ORDER BY used_time DESC;", this.ActionListRegistrationWindowVM.SelectedItemVM.Id
             ObservableCollection<string> remarkVMList = new ObservableCollection<string>() {
                     string.Empty
             };
-            string selectedRemark = remark ?? this.ActionListRegistrationWindowVM.SelectedRemark ?? remarkVMList[0];
+            string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0];
             using (DaoBase dao = builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT remark FROM hst_remark 
 WHERE del_flg = 0 AND item_id = @{0} 
-ORDER BY used_time DESC;", this.ActionListRegistrationWindowVM.SelectedItemVM.Id);
+ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
                 reader.ExecWholeRow((count, record) => {
                     string tmp = record["remark"];
                     remarkVMList.Add(tmp);
@@ -276,8 +276,8 @@ ORDER BY used_time DESC;", this.ActionListRegistrationWindowVM.SelectedItemVM.Id
                 });
             }
             
-            this.ActionListRegistrationWindowVM.RemarkList = remarkVMList;
-            this.ActionListRegistrationWindowVM.SelectedRemark = selectedRemark;
+            this.WVM.RemarkList = remarkVMList;
+            this.WVM.SelectedRemark = selectedRemark;
         }
         #endregion
 
@@ -287,21 +287,21 @@ ORDER BY used_time DESC;", this.ActionListRegistrationWindowVM.SelectedItemVM.Id
         /// <returns>登録された帳簿項目ID</returns>
         private int? RegisterToDb()
         {
-            if(this.ActionListRegistrationWindowVM.DateValueVMList.Count < 1) {
+            if(this.WVM.DateValueVMList.Count < 1) {
                 MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return null;
             }
 
-            BalanceKind balanceKind = this.ActionListRegistrationWindowVM.SelectedBalanceKind; // 収支種別
-            int bookId = this.ActionListRegistrationWindowVM.SelectedBookVM.Id.Value; // 帳簿ID
-            int itemId = this.ActionListRegistrationWindowVM.SelectedItemVM.Id; // 帳簿項目ID
-            string shopName = this.ActionListRegistrationWindowVM.SelectedShopName; // 店舗名
-            string remark = this.ActionListRegistrationWindowVM.SelectedRemark; // 備考
+            BalanceKind balanceKind = this.WVM.SelectedBalanceKind; // 収支種別
+            int bookId = this.WVM.SelectedBookVM.Id.Value; // 帳簿ID
+            int itemId = this.WVM.SelectedItemVM.Id; // 帳簿項目ID
+            string shopName = this.WVM.SelectedShopName; // 店舗名
+            string remark = this.WVM.SelectedRemark; // 備考
 
-            DateTime lastActTime = this.ActionListRegistrationWindowVM.DateValueVMList[0].ActDate;
+            DateTime lastActTime = this.WVM.DateValueVMList[0].ActDate;
             using (DaoBase dao = builder.Build()) {
                 #region 帳簿項目を追加する
-                foreach(DateValueViewModel vm in this.ActionListRegistrationWindowVM.DateValueVMList) {
+                foreach(DateValueViewModel vm in this.WVM.DateValueVMList) {
                     if (vm.ActValue.HasValue) {
                         DateTime actTime = vm.ActDate; // 日付
                         int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value; // 金額

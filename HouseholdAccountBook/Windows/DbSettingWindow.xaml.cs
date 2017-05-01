@@ -21,20 +21,20 @@ namespace HouseholdAccountBook.Windows
             InitializeComponent();
 
             Properties.Settings settings = Properties.Settings.Default;
-            this.DbSettingWindowVM.Message = message;
+            this.WVM.Message = message;
 
-            this.DbSettingWindowVM.Host = settings.App_Postgres_Host;
-            this.DbSettingWindowVM.Port = settings.App_Postgres_Port;
-            this.DbSettingWindowVM.UserName = settings.App_Postgres_UserName;
+            this.WVM.Host = settings.App_Postgres_Host;
+            this.WVM.Port = settings.App_Postgres_Port;
+            this.WVM.UserName = settings.App_Postgres_UserName;
             this.passwordBox.Password = settings.App_Postgres_Password;
 #if DEBUG
-            this.DbSettingWindowVM.DatabaseName = settings.App_Postgres_DatabaseName_Debug;
+            this.WVM.DatabaseName = settings.App_Postgres_DatabaseName_Debug;
 #else
             this.DbSettingWindowVM.DatabaseName = settings.App_Postgres_DatabaseName;
 #endif
-            this.DbSettingWindowVM.Role = settings.App_Postgres_Role;
-            this.DbSettingWindowVM.DumpExePath = settings.App_Postgres_DumpExePath;
-            this.DbSettingWindowVM.RestoreExePath = settings.App_Postgres_RestoreExePath;
+            this.WVM.Role = settings.App_Postgres_Role;
+            this.WVM.DumpExePath = settings.App_Postgres_DumpExePath;
+            this.WVM.RestoreExePath = settings.App_Postgres_RestoreExePath;
         }
 
         #region コマンド
@@ -47,9 +47,9 @@ namespace HouseholdAccountBook.Windows
         {
             string directory = string.Empty;
             string fileName = string.Empty;
-            if (this.DbSettingWindowVM.DumpExePath != string.Empty) {
-                directory = Path.GetDirectoryName(this.DbSettingWindowVM.DumpExePath);
-                fileName = Path.GetFileName(this.DbSettingWindowVM.DumpExePath);
+            if (this.WVM.DumpExePath != string.Empty) {
+                directory = Path.GetDirectoryName(this.WVM.DumpExePath);
+                fileName = Path.GetFileName(this.WVM.DumpExePath);
             }
 
             OpenFileDialog ofd = new OpenFileDialog() {
@@ -61,7 +61,7 @@ namespace HouseholdAccountBook.Windows
             };
 
             if (ofd.ShowDialog() == true) {
-                this.DbSettingWindowVM.DumpExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                this.WVM.DumpExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             }
         }
 
@@ -74,9 +74,9 @@ namespace HouseholdAccountBook.Windows
         {
             string directory = string.Empty;
             string fileName = string.Empty;
-            if (this.DbSettingWindowVM.RestoreExePath != string.Empty) {
-                directory = Path.GetDirectoryName(this.DbSettingWindowVM.RestoreExePath);
-                fileName = Path.GetFileName(this.DbSettingWindowVM.RestoreExePath);
+            if (this.WVM.RestoreExePath != string.Empty) {
+                directory = Path.GetDirectoryName(this.WVM.RestoreExePath);
+                fileName = Path.GetFileName(this.WVM.RestoreExePath);
             }
 
             OpenFileDialog ofd = new OpenFileDialog() {
@@ -88,7 +88,7 @@ namespace HouseholdAccountBook.Windows
             };
 
             if (ofd.ShowDialog() == true) {
-                this.DbSettingWindowVM.RestoreExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                this.WVM.RestoreExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             }
         }
 
@@ -110,14 +110,14 @@ namespace HouseholdAccountBook.Windows
         private void OKCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Properties.Settings settings = Properties.Settings.Default;
-            settings.App_Postgres_Host = this.DbSettingWindowVM.Host;
-            settings.App_Postgres_Port = this.DbSettingWindowVM.Port;
-            settings.App_Postgres_UserName = this.DbSettingWindowVM.UserName;
+            settings.App_Postgres_Host = this.WVM.Host;
+            settings.App_Postgres_Port = this.WVM.Port;
+            settings.App_Postgres_UserName = this.WVM.UserName;
             settings.App_Postgres_Password = this.passwordBox.Password;
-            settings.App_Postgres_DatabaseName = this.DbSettingWindowVM.DatabaseName;
-            settings.App_Postgres_Role = this.DbSettingWindowVM.Role;
-            settings.App_Postgres_DumpExePath = this.DbSettingWindowVM.DumpExePath;
-            settings.App_Postgres_RestoreExePath = this.DbSettingWindowVM.RestoreExePath;
+            settings.App_Postgres_DatabaseName = this.WVM.DatabaseName;
+            settings.App_Postgres_Role = this.WVM.Role;
+            settings.App_Postgres_DumpExePath = this.WVM.DumpExePath;
+            settings.App_Postgres_RestoreExePath = this.WVM.RestoreExePath;
             settings.Save();
 
             DialogResult = true;

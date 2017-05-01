@@ -69,7 +69,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void AddCategoryCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Item;
+            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.SelectedItemVM.Kind != HierarchicalKind.Item;
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void AddCategoryCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            HierarchicalItemViewModel vm = this.SettingsVM.SelectedItemVM;
+            HierarchicalItemViewModel vm = this.WVM.SelectedItemVM;
             while (vm.Kind != HierarchicalKind.Balance) {
                 vm = vm.ParentVM;
             }
@@ -106,7 +106,7 @@ RETURNING category_id;", (int)kind, Updater, Inserter);
         /// <param name="e"></param>
         private void AddItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Balance;
+            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.SelectedItemVM.Kind != HierarchicalKind.Balance;
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ RETURNING category_id;", (int)kind, Updater, Inserter);
         /// <param name="e"></param>
         private void AddItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            HierarchicalItemViewModel vm = this.SettingsVM.SelectedItemVM;
+            HierarchicalItemViewModel vm = this.WVM.SelectedItemVM;
             while (vm.Kind != HierarchicalKind.Category) {
                 vm = vm.ParentVM;
             }
@@ -143,7 +143,7 @@ RETURNING item_id;", categoryId, Updater, Inserter);
         /// <param name="e"></param>
         private void DeleteItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Balance;
+            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.SelectedItemVM.Kind != HierarchicalKind.Balance;
         }
 
         /// <summary>
@@ -153,8 +153,8 @@ RETURNING item_id;", categoryId, Updater, Inserter);
         /// <param name="e"></param>
         private void DeleteItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            HierarchicalKind kind = this.SettingsVM.SelectedItemVM.Kind;
-            int id = this.SettingsVM.SelectedItemVM.Id;
+            HierarchicalKind kind = this.WVM.SelectedItemVM.Kind;
+            int id = this.WVM.SelectedItemVM.Id;
 
             using (DaoBase dao = builder.Build()) {
                 switch (kind) {
@@ -199,7 +199,7 @@ WHERE item_id = @{1};", Updater, id);
                         break;
                 }
             }
-            UpdateItemSettingsTabData(this.SettingsVM.SelectedItemVM.ParentVM.Kind, this.SettingsVM.SelectedItemVM.ParentVM.Id);
+            UpdateItemSettingsTabData(this.WVM.SelectedItemVM.ParentVM.Kind, this.WVM.SelectedItemVM.ParentVM.Id);
         }
 
         /// <summary>
@@ -209,11 +209,11 @@ WHERE item_id = @{1};", Updater, id);
         /// <param name="e"></param>
         private void RaiseItemSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.ParentVM != null;
+            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.SelectedItemVM.ParentVM != null;
             if (e.CanExecute) {
                 // 同じ階層で、よりソート順序が上の分類/項目がある場合trueになる
-                var parentVM = this.SettingsVM.SelectedItemVM.ParentVM;
-                int index = parentVM.ChildrenVMList.IndexOf(this.SettingsVM.SelectedItemVM);
+                var parentVM = this.WVM.SelectedItemVM.ParentVM;
+                int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
                 e.CanExecute = 0 < index;
 
                 // 選択された対象が項目で分類内の最も上位にいる場合
@@ -233,14 +233,14 @@ WHERE item_id = @{1};", Updater, id);
         /// <param name="e"></param>
         private void RaiseItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var parentVM = this.SettingsVM.SelectedItemVM.ParentVM;
-            int index = parentVM.ChildrenVMList.IndexOf(this.SettingsVM.SelectedItemVM);
+            var parentVM = this.WVM.SelectedItemVM.ParentVM;
+            int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
             int changingId = parentVM.ChildrenVMList[index].Id;
             if (0 < index) {
                 int changedId = parentVM.ChildrenVMList[index - 1].Id;
 
                 using (DaoBase dao = builder.Build()) {
-                    switch (this.SettingsVM.SelectedItemVM.Kind) {
+                    switch (this.WVM.SelectedItemVM.Kind) {
                         case HierarchicalKind.Category: {
                                 dao.ExecTransaction(() => {
                                     DaoReader reader = dao.ExecQuery(@"
@@ -293,7 +293,7 @@ WHERE item_id = @{2};", tmpOrder, Updater, changingId);
                 }
             }
             else { // 分類を跨いで項目の表示順を変更するとき
-                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
                 var grandparentVM = parentVM.ParentVM;
                 int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                 int toCategoryId = grandparentVM.ChildrenVMList[index2 - 1].Id;
@@ -306,7 +306,7 @@ WHERE item_id = @{2};", toCategoryId, Updater, changingId);
                 }
             }
 
-            UpdateItemSettingsTabData(this.SettingsVM.SelectedItemVM.Kind, this.SettingsVM.SelectedItemVM.Id);
+            UpdateItemSettingsTabData(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
         }
 
         /// <summary>
@@ -316,11 +316,11 @@ WHERE item_id = @{2};", toCategoryId, Updater, changingId);
         /// <param name="e"></param>
         private void DropItemSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.ParentVM != null;
+            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.SelectedItemVM.ParentVM != null;
             if (e.CanExecute) {
                 // 同じ階層で、よりソート順序が下の分類/項目がある場合trueになる
-                var parentVM = this.SettingsVM.SelectedItemVM.ParentVM;
-                int index = parentVM.ChildrenVMList.IndexOf(this.SettingsVM.SelectedItemVM);
+                var parentVM = this.WVM.SelectedItemVM.ParentVM;
+                int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
                 e.CanExecute = parentVM.ChildrenVMList.Count - 1 > index;
 
                 // 選択された対象が項目で分類内の最も上位にいる場合
@@ -340,14 +340,14 @@ WHERE item_id = @{2};", toCategoryId, Updater, changingId);
         /// <param name="e"></param>
         private void DropItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var parentVM = this.SettingsVM.SelectedItemVM.ParentVM;
-            int index = parentVM.ChildrenVMList.IndexOf(this.SettingsVM.SelectedItemVM);
+            var parentVM = this.WVM.SelectedItemVM.ParentVM;
+            int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
             int changingId = parentVM.ChildrenVMList[index].Id;
             if (parentVM.ChildrenVMList.Count - 1 > index) {
                 int changedId = parentVM.ChildrenVMList[index + 1].Id;
 
                 using (DaoBase dao = builder.Build()) {
-                    switch (this.SettingsVM.SelectedItemVM.Kind) {
+                    switch (this.WVM.SelectedItemVM.Kind) {
                         case HierarchicalKind.Category: {
                                 dao.ExecTransaction(() => {
                                     DaoReader reader = dao.ExecQuery(@"
@@ -400,7 +400,7 @@ WHERE item_id = @{2};", tmpOrder, Updater, changingId);
                 }
             }
             else { // 分類を跨いで項目の表示順を変更するとき
-                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
                 var grandparentVM = parentVM.ParentVM;
                 int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                 int toCategoryId = grandparentVM.ChildrenVMList[index2 + 1].Id;
@@ -444,7 +444,7 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
                 }
             }
 
-            UpdateItemSettingsTabData(this.SettingsVM.SelectedItemVM.Kind, this.SettingsVM.SelectedItemVM.Id);
+            UpdateItemSettingsTabData(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
         }
 
         /// <summary>
@@ -454,8 +454,8 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
         /// <param name="e"></param>
         private void SaveItemInfoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.SettingsVM.SelectedItemVM != null && this.SettingsVM.SelectedItemVM.Kind != HierarchicalKind.Balance &&
-                !string.IsNullOrWhiteSpace(this.SettingsVM.SelectedItemVM.Name);
+            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.SelectedItemVM.Kind != HierarchicalKind.Balance &&
+                !string.IsNullOrWhiteSpace(this.WVM.SelectedItemVM.Name);
         }
 
         /// <summary>
@@ -465,8 +465,8 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
         /// <param name="e"></param>
         private void SaveItemInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            HierarchicalKind kind = this.SettingsVM.SelectedItemVM.Kind;
-            int id = this.SettingsVM.SelectedItemVM.Id;
+            HierarchicalKind kind = this.WVM.SelectedItemVM.Kind;
+            int id = this.WVM.SelectedItemVM.Id;
 
             using (DaoBase dao = builder.Build()) {
                 switch (kind) {
@@ -474,14 +474,14 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
                             dao.ExecNonQuery(@"
 UPDATE mst_category
 SET category_name = @{0}, update_time = 'now', updater = @{1}
-WHERE category_id = @{2};", this.SettingsVM.SelectedItemVM.Name, Updater, id);
+WHERE category_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
                         }
                         break;
                     case HierarchicalKind.Item: {
                             dao.ExecNonQuery(@"
 UPDATE mst_item
 SET item_name = @{0}, update_time = 'now', updater = @{1}
-WHERE item_id = @{2};", this.SettingsVM.SelectedItemVM.Name, Updater, id);
+WHERE item_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
                         }
                         break;
                 }
@@ -497,9 +497,9 @@ WHERE item_id = @{2};", this.SettingsVM.SelectedItemVM.Name, Updater, id);
         /// <param name="e"></param>
         private void ChangeItemRelationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+            Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
 
-            HierarchicalItemViewModel vm = this.SettingsVM.SelectedItemVM;
+            HierarchicalItemViewModel vm = this.WVM.SelectedItemVM;
             vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
             vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
 
@@ -545,7 +545,7 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void DeleteShopNameCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.SettingsVM.SelectedItemVM?.SelectedShopName != null;
+            e.CanExecute = this.WVM.SelectedItemVM?.SelectedShopName != null;
         }
 
         /// <summary>
@@ -556,24 +556,24 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         private void DeleteShopNameCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
                 using (DaoBase dao = builder.Build()) {
                     dao.ExecQuery(@"
 UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedShopName, this.SettingsVM.SelectedItemVM.Id);
+WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedShopName, this.WVM.SelectedItemVM.Id);
 
                     // 店舗名を更新する
                     DaoReader reader = dao.ExecQuery(@"
 SELECT shop_name
 FROM hst_shop
 WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
+ORDER BY used_time;", this.WVM.SelectedItemVM.Id);
 
-                    this.SettingsVM.SelectedItemVM.ShopNameList.Clear();
+                    this.WVM.SelectedItemVM.ShopNameList.Clear();
                     reader.ExecWholeRow((count2, record2) => {
                         string shopName = record2["shop_name"];
 
-                        this.SettingsVM.SelectedItemVM.ShopNameList.Add(shopName);
+                        this.WVM.SelectedItemVM.ShopNameList.Add(shopName);
                         return true;
                     });
                 }
@@ -587,7 +587,7 @@ ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
         /// <param name="e"></param>
         private void DeleteRemarkCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.SettingsVM.SelectedItemVM?.SelectedRemark != null;
+            e.CanExecute = this.WVM.SelectedItemVM?.SelectedRemark != null;
         }
 
         /// <summary>
@@ -598,24 +598,24 @@ ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
         private void DeleteRemarkCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                Debug.Assert(this.SettingsVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
                 using (DaoBase dao = builder.Build()) {
                     dao.ExecQuery(@"
 UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE remark = @{1} AND item_id = @{2};", Updater, this.SettingsVM.SelectedItemVM.SelectedRemark, this.SettingsVM.SelectedItemVM.Id);
+WHERE remark = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedRemark, this.WVM.SelectedItemVM.Id);
 
                     // 備考欄の表示を更新する
                     DaoReader reader = dao.ExecQuery(@"
 SELECT remark
 FROM hst_remark
 WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time;", this.SettingsVM.SelectedItemVM.Id);
+ORDER BY used_time;", this.WVM.SelectedItemVM.Id);
 
-                    this.SettingsVM.SelectedItemVM.RemarkList.Clear();
+                    this.WVM.SelectedItemVM.RemarkList.Clear();
                     reader.ExecWholeRow((count2, record2) => {
                         string remark = record2["remark"];
 
-                        this.SettingsVM.SelectedItemVM.RemarkList.Add(remark);
+                        this.WVM.SelectedItemVM.RemarkList.Add(remark);
                         return true;
                     });
                 }
@@ -653,7 +653,7 @@ RETURNING book_id;", Updater, Inserter);
         /// <param name="e"></param>
         private void DeleteBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.SettingsVM.SelectedBookVM != null;
+            e.CanExecute = this.WVM.SelectedBookVM != null;
         }
 
         /// <summary>
@@ -667,7 +667,7 @@ RETURNING book_id;", Updater, Inserter);
                 dao.ExecTransaction(() => {
                     DaoReader reader = dao.ExecQuery(@"
 SELECT * FROM hst_action
-WHERE book_id = @{0} AND del_flg = 0;", this.SettingsVM.SelectedBookVM.Id);
+WHERE book_id = @{0} AND del_flg = 0;", this.WVM.SelectedBookVM.Id);
 
                     if (reader.Count != 0) {
                         MessageBox.Show("帳簿内に帳簿項目が存在するので削除できません。"); // TODO
@@ -677,7 +677,7 @@ WHERE book_id = @{0} AND del_flg = 0;", this.SettingsVM.SelectedBookVM.Id);
                     dao.ExecNonQuery(@"
 UPDATE mst_book
 SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE book_id = @{1};", Updater, this.SettingsVM.SelectedBookVM.Id);
+WHERE book_id = @{1};", Updater, this.WVM.SelectedBookVM.Id);
                 });
             }
 
@@ -691,9 +691,9 @@ WHERE book_id = @{1};", Updater, this.SettingsVM.SelectedBookVM.Id);
         /// <param name="e"></param>
         private void RaiseBookSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.SettingsVM.BookVMList != null;
+            e.CanExecute = this.WVM.BookVMList != null;
             if (e.CanExecute) {
-                int index = this.SettingsVM.BookVMList.IndexOf(this.SettingsVM.SelectedBookVM);
+                int index = this.WVM.BookVMList.IndexOf(this.WVM.SelectedBookVM);
                 e.CanExecute = index > 0;
             }
         }
@@ -705,9 +705,9 @@ WHERE book_id = @{1};", Updater, this.SettingsVM.SelectedBookVM.Id);
         /// <param name="e"></param>
         private void RaiseBookSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            int index = this.SettingsVM.BookVMList.IndexOf(this.SettingsVM.SelectedBookVM);
-            int changedId = this.SettingsVM.BookVMList[index - 1].Id.Value;
-            int changingId = this.SettingsVM.BookVMList[index].Id.Value;
+            int index = this.WVM.BookVMList.IndexOf(this.WVM.SelectedBookVM);
+            int changedId = this.WVM.BookVMList[index - 1].Id.Value;
+            int changingId = this.WVM.BookVMList[index].Id.Value;
 
             using (DaoBase dao = builder.Build()) {
                 dao.ExecTransaction(() => {
@@ -743,10 +743,10 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
         /// <param name="e"></param>
         private void DropBookSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.SettingsVM.BookVMList != null;
+            e.CanExecute = this.WVM.BookVMList != null;
             if (e.CanExecute) {
-                int index = this.SettingsVM.BookVMList.IndexOf(this.SettingsVM.SelectedBookVM);
-                e.CanExecute = index != -1 && index < this.SettingsVM.BookVMList.Count - 1;
+                int index = this.WVM.BookVMList.IndexOf(this.WVM.SelectedBookVM);
+                e.CanExecute = index != -1 && index < this.WVM.BookVMList.Count - 1;
             }
         }
 
@@ -757,9 +757,9 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
         /// <param name="e"></param>
         private void DropBookSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            int index = this.SettingsVM.BookVMList.IndexOf(this.SettingsVM.SelectedBookVM);
-            int changedId = this.SettingsVM.BookVMList[index + 1].Id.Value;
-            int changingId = this.SettingsVM.BookVMList[index].Id.Value;
+            int index = this.WVM.BookVMList.IndexOf(this.WVM.SelectedBookVM);
+            int changedId = this.WVM.BookVMList[index + 1].Id.Value;
+            int changingId = this.WVM.BookVMList[index].Id.Value;
 
             using (DaoBase dao = builder.Build()) {
                 dao.ExecTransaction(() => {
@@ -795,7 +795,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
         /// <param name="e"></param>
         private void SaveBookInfoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.SettingsVM.SelectedBookVM != null && !string.IsNullOrWhiteSpace(this.SettingsVM.SelectedBookVM.Name);
+            e.CanExecute = this.WVM.SelectedBookVM != null && !string.IsNullOrWhiteSpace(this.WVM.SelectedBookVM.Name);
         }
 
         /// <summary>
@@ -806,7 +806,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
         private void SaveBookInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             using (DaoBase dao = builder.Build()) {
-                BookSettingViewModel vm = this.SettingsVM.SelectedBookVM;
+                BookSettingViewModel vm = this.WVM.SelectedBookVM;
                 dao.ExecNonQuery(@"
 UPDATE mst_book
 SET book_name = @{0}, book_kind = @{1}, initial_value = @{2}, debit_book_id = @{3}, pay_day = @{4}, update_time = 'now', updater = @{5}
@@ -823,7 +823,7 @@ WHERE book_id = @{6};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.S
         /// <param name="e"></param>
         private void ChangeBookRelationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            BookSettingViewModel vm = this.SettingsVM.SelectedBookVM;
+            BookSettingViewModel vm = this.WVM.SelectedBookVM;
             vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
             vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
 
@@ -873,9 +873,9 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         {
             string directory = string.Empty;
             string fileName = string.Empty;
-            if (this.SettingsVM.DumpExePath != string.Empty) {
-                directory = Path.GetDirectoryName(this.SettingsVM.DumpExePath);
-                fileName = Path.GetFileName(this.SettingsVM.DumpExePath);
+            if (this.WVM.DumpExePath != string.Empty) {
+                directory = Path.GetDirectoryName(this.WVM.DumpExePath);
+                fileName = Path.GetFileName(this.WVM.DumpExePath);
             }
 
             OpenFileDialog ofd = new OpenFileDialog() {
@@ -887,7 +887,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
             };
 
             if (ofd.ShowDialog() == true) {
-                this.SettingsVM.DumpExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                this.WVM.DumpExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             }
         }
 
@@ -900,9 +900,9 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         {
             string directory = string.Empty;
             string fileName = string.Empty;
-            if (this.SettingsVM.RestoreExePath != string.Empty) {
-                directory = Path.GetDirectoryName(this.SettingsVM.RestoreExePath);
-                fileName = Path.GetFileName(this.SettingsVM.RestoreExePath);
+            if (this.WVM.RestoreExePath != string.Empty) {
+                directory = Path.GetDirectoryName(this.WVM.RestoreExePath);
+                fileName = Path.GetFileName(this.WVM.RestoreExePath);
             }
 
             OpenFileDialog ofd = new OpenFileDialog() {
@@ -914,7 +914,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
             };
 
             if (ofd.ShowDialog() == true) {
-                this.SettingsVM.RestoreExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                this.WVM.RestoreExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             }
         }
 
@@ -943,9 +943,9 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         {
             string directory = Path.GetDirectoryName(Application.ResourceAssembly.Location);
             string fileName = string.Empty;
-            if (this.SettingsVM.BackUpFolderPath != string.Empty) {
-                directory = Path.GetDirectoryName(this.SettingsVM.BackUpFolderPath);
-                fileName = Path.GetFileName(this.SettingsVM.BackUpFolderPath);
+            if (this.WVM.BackUpFolderPath != string.Empty) {
+                directory = Path.GetDirectoryName(this.WVM.BackUpFolderPath);
+                fileName = Path.GetFileName(this.WVM.BackUpFolderPath);
             }
 
             CommonOpenFileDialog ofd = new CommonOpenFileDialog() {
@@ -958,10 +958,10 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
 
             if (ofd.ShowDialog() == CommonFileDialogResult.Ok) {
                 if (directory.CompareTo(ofd.InitialDirectory) == 0) {
-                    this.SettingsVM.BackUpFolderPath = Path.GetFileName(ofd.FileName);
+                    this.WVM.BackUpFolderPath = Path.GetFileName(ofd.FileName);
                 }
                 else {
-                    this.SettingsVM.BackUpFolderPath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                    this.WVM.BackUpFolderPath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
                 }
             }
         }
@@ -986,11 +986,11 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void SettingsTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (oldSelectedSettingsTab != this.SettingsVM.SelectedTab) {
+            if (oldSelectedSettingsTab != this.WVM.SelectedTab) {
                 Cursor cCursor = Cursor;
                 Cursor = Cursors.Wait;
 
-                switch (this.SettingsVM.SelectedTab) {
+                switch (this.WVM.SelectedTab) {
                     case SettingsTab.ItemSettingsTab:
                         UpdateItemSettingsTabData();
                         break;
@@ -1003,7 +1003,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 }
                 Cursor = cCursor;
             }
-            oldSelectedSettingsTab = this.SettingsVM.SelectedTab;
+            oldSelectedSettingsTab = this.WVM.SelectedTab;
         }
 
         #region 項目設定操作
@@ -1053,25 +1053,25 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="id">選択対象のID</param>
         private void UpdateItemSettingsTabData(HierarchicalKind? kind = null, int? id = null)
         {
-            if (this.SettingsVM.SelectedTab == SettingsTab.ItemSettingsTab) {
-                this.SettingsVM.HierachicalItemVMList = LoadItemViewModelList();
+            if (this.WVM.SelectedTab == SettingsTab.ItemSettingsTab) {
+                this.WVM.HierachicalItemVMList = LoadItemViewModelList();
 
                 if (kind == null || id == null) {
-                    this.SettingsVM.SelectedItemVM = null;
+                    this.WVM.SelectedItemVM = null;
                 }
                 else {
                     // 収支から探す
-                    IEnumerable<HierarchicalItemViewModel> query = this.SettingsVM.HierachicalItemVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
+                    IEnumerable<HierarchicalItemViewModel> query = this.WVM.HierachicalItemVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
                     if (query.Count() == 0) {
                         // カテゴリから探す
-                        foreach (HierarchicalItemViewModel tmpVM in this.SettingsVM.HierachicalItemVMList) {
+                        foreach (HierarchicalItemViewModel tmpVM in this.WVM.HierachicalItemVMList) {
                             query = tmpVM.ChildrenVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
                             if (query.Count() != 0) { break; }
                         }
 
                         if (query.Count() == 0) {
                             // 項目から探す
-                            foreach (HierarchicalItemViewModel tmpVM in this.SettingsVM.HierachicalItemVMList) {
+                            foreach (HierarchicalItemViewModel tmpVM in this.WVM.HierachicalItemVMList) {
                                 foreach (HierarchicalItemViewModel tmpVM2 in tmpVM.ChildrenVMList) {
                                     query = tmpVM2.ChildrenVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
                                     if (query.Count() != 0) { break; }
@@ -1081,7 +1081,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                         }
                     }
 
-                    this.SettingsVM.SelectedItemVM = query.Count() == 0 ? null : query.First();
+                    this.WVM.SelectedItemVM = query.Count() == 0 ? null : query.First();
                 }
             }
         }
@@ -1092,15 +1092,15 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="bookId">選択対象の帳簿ID</param>
         private void UpdateBookSettingTabData(int? bookId = null)
         {
-            if (this.SettingsVM.SelectedTab == SettingsTab.BookSettingsTab) {
-                this.SettingsVM.BookVMList = LoadBookSettingViewModelList();
+            if (this.WVM.SelectedTab == SettingsTab.BookSettingsTab) {
+                this.WVM.BookVMList = LoadBookSettingViewModelList();
 
                 if (bookId == null) {
-                    this.SettingsVM.SelectedBookVM = null;
+                    this.WVM.SelectedBookVM = null;
                 }
                 else {
-                    IEnumerable<BookSettingViewModel> query = this.SettingsVM.BookVMList.Where((vm) => { return vm.Id == bookId; });
-                    this.SettingsVM.SelectedBookVM = query.Count() == 0 ? null : query.First();
+                    IEnumerable<BookSettingViewModel> query = this.WVM.BookVMList.Where((vm) => { return vm.Id == bookId; });
+                    this.WVM.SelectedBookVM = query.Count() == 0 ? null : query.First();
                 }
             }
         }
@@ -1110,8 +1110,8 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// </summary>
         private void UpdateOtherSettingTabData()
         {
-            if(this.SettingsVM.SelectedTab == SettingsTab.OtherSettingsTab) {
-                this.SettingsVM.LoadSettings();
+            if(this.WVM.SelectedTab == SettingsTab.OtherSettingsTab) {
+                this.WVM.LoadSettings();
             }
         }
 

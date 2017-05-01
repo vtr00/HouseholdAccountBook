@@ -63,7 +63,7 @@ namespace HouseholdAccountBook.Windows
 
             InitializeComponent();
             Title = "移動(追加)";
-            this.MoveRegistrationWindowVM.RegMode = RegistrationMode.Add;
+            this.WVM.RegMode = RegistrationMode.Add;
 
             this.selectedBookId = selectedBookId;
             this.fromActionId = null;
@@ -93,11 +93,11 @@ namespace HouseholdAccountBook.Windows
                 });
             }
 
-            this.MoveRegistrationWindowVM.BookVMList = bookVMList;
-            this.MoveRegistrationWindowVM.SelectedDate = selectedDateTime != null ? (payDay != null ? selectedDateTime.Value.GetDateInMonth(payDay.Value) : selectedDateTime.Value) : DateTime.Today;
-            this.MoveRegistrationWindowVM.SelectedFromBookVM = debitBookId != null ? bookVMList.FirstOrDefault((vm)=> { return vm.Id == debitBookId; }) : selectedBookVM;
-            this.MoveRegistrationWindowVM.SelectedToBookVM = selectedBookVM;
-            this.MoveRegistrationWindowVM.SelectedCommissionKind = CommissionKind.FromBook;
+            this.WVM.BookVMList = bookVMList;
+            this.WVM.SelectedDate = selectedDateTime != null ? (payDay != null ? selectedDateTime.Value.GetDateInMonth(payDay.Value) : selectedDateTime.Value) : DateTime.Today;
+            this.WVM.SelectedFromBookVM = debitBookId != null ? bookVMList.FirstOrDefault((vm)=> { return vm.Id == debitBookId; }) : selectedBookVM;
+            this.WVM.SelectedToBookVM = selectedBookVM;
+            this.WVM.SelectedCommissionKind = CommissionKind.FromBook;
 
             UpdateItemList();
             UpdateRemarkList();
@@ -105,19 +105,19 @@ namespace HouseholdAccountBook.Windows
             LoadSetting();
 
             #region イベントハンドラの設定
-            this.MoveRegistrationWindowVM.OnFromBookChanged += () => {
+            this.WVM.OnFromBookChanged += () => {
                 UpdateItemList();
                 UpdateRemarkList();
             };
-            this.MoveRegistrationWindowVM.OnToBookChanged += () => {
+            this.WVM.OnToBookChanged += () => {
                 UpdateItemList();
                 UpdateRemarkList();
             };
-            this.MoveRegistrationWindowVM.OnCommissionKindChanged += () => {
+            this.WVM.OnCommissionKindChanged += () => {
                 UpdateItemList();
                 UpdateRemarkList();
             };
-            this.MoveRegistrationWindowVM.OnItemChanged += () => {
+            this.WVM.OnItemChanged += () => {
                 UpdateRemarkList();
             };
             #endregion
@@ -135,7 +135,7 @@ namespace HouseholdAccountBook.Windows
 
             InitializeComponent();
             Title = "移動(編集)";
-            this.MoveRegistrationWindowVM.RegMode = RegistrationMode.Edit;
+            this.WVM.RegMode = RegistrationMode.Edit;
 
             this.selectedBookId = selectedBookId;
             this.groupId = groupId;
@@ -207,13 +207,13 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
                     return true;
                 });
             }
-            this.MoveRegistrationWindowVM.SelectedDate = actDate;
-            this.MoveRegistrationWindowVM.BookVMList = bookVMList;
-            this.MoveRegistrationWindowVM.SelectedFromBookVM = selectedFromBookVM;
-            this.MoveRegistrationWindowVM.SelectedToBookVM = selectedToBookVM;
-            this.MoveRegistrationWindowVM.Value = moveValue;
-            this.MoveRegistrationWindowVM.SelectedCommissionKind = commissionKind;
-            this.MoveRegistrationWindowVM.Commission = commissionValue;
+            this.WVM.SelectedDate = actDate;
+            this.WVM.BookVMList = bookVMList;
+            this.WVM.SelectedFromBookVM = selectedFromBookVM;
+            this.WVM.SelectedToBookVM = selectedToBookVM;
+            this.WVM.Value = moveValue;
+            this.WVM.SelectedCommissionKind = commissionKind;
+            this.WVM.Commission = commissionValue;
 
             UpdateItemList(commissionItemId);
             UpdateRemarkList(commissionRemark);
@@ -221,19 +221,19 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
             LoadSetting();
 
             #region イベントハンドラの設定
-            this.MoveRegistrationWindowVM.OnFromBookChanged += () => {
+            this.WVM.OnFromBookChanged += () => {
                 UpdateItemList();
                 UpdateRemarkList();
             };
-            this.MoveRegistrationWindowVM.OnToBookChanged += () => {
+            this.WVM.OnToBookChanged += () => {
                 UpdateItemList();
                 UpdateRemarkList();
             };
-            this.MoveRegistrationWindowVM.OnCommissionKindChanged += () => {
+            this.WVM.OnCommissionKindChanged += () => {
                 UpdateItemList();
                 UpdateRemarkList();
             };
-            this.MoveRegistrationWindowVM.OnItemChanged += () => {
+            this.WVM.OnItemChanged += () => {
                 UpdateRemarkList();
             };
             #endregion
@@ -247,7 +247,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
         /// <param name="e"></param>
         private void TodayCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.MoveRegistrationWindowVM.SelectedDate != DateTime.Today;
+            e.CanExecute = this.WVM.SelectedDate != DateTime.Today;
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
         /// <param name="e"></param>
         private void TodayCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.MoveRegistrationWindowVM.SelectedDate = DateTime.Today;
+            this.WVM.SelectedDate = DateTime.Today;
         }
 
         /// <summary>
@@ -267,7 +267,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
         /// <param name="e"></param>
         private void RegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.MoveRegistrationWindowVM.Value.HasValue;
+            e.CanExecute = this.WVM.Value.HasValue;
         }
 
         /// <summary>
@@ -321,12 +321,12 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
             ItemViewModel selectedItemVM = null;
             using (DaoBase dao = builder.Build()) {
                 int bookId = -1;
-                switch (this.MoveRegistrationWindowVM.SelectedCommissionKind) {
+                switch (this.WVM.SelectedCommissionKind) {
                     case CommissionKind.FromBook:
-                        bookId = this.MoveRegistrationWindowVM.SelectedFromBookVM.Id.Value;
+                        bookId = this.WVM.SelectedFromBookVM.Id.Value;
                         break;
                     case CommissionKind.ToBook:
-                        bookId = this.MoveRegistrationWindowVM.SelectedToBookVM.Id.Value;
+                        bookId = this.WVM.SelectedToBookVM.Id.Value;
                         break;
                 }
                 DaoReader reader = dao.ExecQuery(@"
@@ -344,8 +344,8 @@ ORDER BY sort_order;", bookId, (int)BalanceKind.Outgo);
                     return true;
                 });
             }
-            this.MoveRegistrationWindowVM.ItemVMList = itemVMList;
-            this.MoveRegistrationWindowVM.SelectedItemVM = selectedItemVM;
+            this.WVM.ItemVMList = itemVMList;
+            this.WVM.SelectedItemVM = selectedItemVM;
         }
 
         /// <summary>
@@ -357,12 +357,12 @@ ORDER BY sort_order;", bookId, (int)BalanceKind.Outgo);
             ObservableCollection<string> remarkVMList = new ObservableCollection<string>() {
                     string.Empty
             };
-            string selectedRemark = remark ?? this.MoveRegistrationWindowVM.SelectedRemark ?? remarkVMList[0];
+            string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0];
             using (DaoBase dao = builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT remark FROM hst_remark 
 WHERE del_flg = 0 AND item_id = @{0} 
-ORDER BY used_time DESC;", this.MoveRegistrationWindowVM.SelectedItemVM.Id);
+ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
                 reader.ExecWholeRow((count, record) => {
                     string tmp = record["remark"];
                     remarkVMList.Add(tmp);
@@ -370,8 +370,8 @@ ORDER BY used_time DESC;", this.MoveRegistrationWindowVM.SelectedItemVM.Id);
                 });
             }
 
-            this.MoveRegistrationWindowVM.RemarkList = remarkVMList;
-            this.MoveRegistrationWindowVM.SelectedRemark = selectedRemark;
+            this.WVM.RemarkList = remarkVMList;
+            this.WVM.SelectedRemark = selectedRemark;
         }
         #endregion
 
@@ -381,23 +381,23 @@ ORDER BY used_time DESC;", this.MoveRegistrationWindowVM.SelectedItemVM.Id);
         /// <returns>登録された帳簿項目ID</returns>
         private int? RegisterToDb()
         {
-            if(this.MoveRegistrationWindowVM.SelectedFromBookVM == this.MoveRegistrationWindowVM.SelectedToBookVM) {
+            if(this.WVM.SelectedFromBookVM == this.WVM.SelectedToBookVM) {
                 MessageBox.Show(this, MessageText.IllegalSameBook, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return null;
             }
-            if(!this.MoveRegistrationWindowVM.Value.HasValue && this.MoveRegistrationWindowVM.Value <= 0) {
+            if(!this.WVM.Value.HasValue && this.WVM.Value <= 0) {
                 MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return null;
             }
 
-            DateTime actTime = this.MoveRegistrationWindowVM.SelectedDate;
-            int fromBookId = this.MoveRegistrationWindowVM.SelectedFromBookVM.Id.Value;
-            int toBookId = this.MoveRegistrationWindowVM.SelectedToBookVM.Id.Value;
-            int actValue = this.MoveRegistrationWindowVM.Value.Value;
-            CommissionKind commissionKind = this.MoveRegistrationWindowVM.SelectedCommissionKind;
-            int commissionItemId = this.MoveRegistrationWindowVM.SelectedItemVM.Id;
-            int commission = this.MoveRegistrationWindowVM.Commission ?? 0;
-            string remark = this.MoveRegistrationWindowVM.SelectedRemark;
+            DateTime actTime = this.WVM.SelectedDate;
+            int fromBookId = this.WVM.SelectedFromBookVM.Id.Value;
+            int toBookId = this.WVM.SelectedToBookVM.Id.Value;
+            int actValue = this.WVM.Value.Value;
+            CommissionKind commissionKind = this.WVM.SelectedCommissionKind;
+            int commissionItemId = this.WVM.SelectedItemVM.Id;
+            int commission = this.WVM.Commission ?? 0;
+            string remark = this.WVM.SelectedRemark;
 
             int? resActionId = null;
 
