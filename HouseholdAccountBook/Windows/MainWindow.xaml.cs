@@ -1,8 +1,12 @@
 ﻿using HouseholdAccountBook.Dao;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Extentions;
+using HouseholdAccountBook.UserControls;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
+using OxyPlot;
+using OxyPlot.Axes;
+using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -709,7 +713,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void IndicateGraphCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.SelectedTab != Tab.GraphTab && false;
+            e.CanExecute = this.WVM.SelectedTab != Tab.GraphTab;
         }
 
         /// <summary>
@@ -826,8 +830,8 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void GoToLastYearCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択している
-            e.CanExecute = this.WVM.SelectedTab == Tab.ListTab;
+            // 帳簿/グラフタブを選択している
+            e.CanExecute = this.WVM.SelectedTab == Tab.ListTab || this.WVM.SelectedTab == Tab.GraphTab;
         }
 
         /// <summary>
@@ -842,6 +846,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(-1);
             UpdateListTabData();
+            UpdateGraphTabData();
 
             Cursor = cCursor;
         }
@@ -854,8 +859,8 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         private void GoToThisYearCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             DateTime thisYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
-            // 帳簿タブを選択している かつ 今年が表示されていない
-            e.CanExecute = this.WVM.SelectedTab == Tab.ListTab && !(thisYear <= this.WVM.DisplayedYear && this.WVM.DisplayedYear < thisYear.AddYears(1));
+            // 帳簿/グラフタブを選択している かつ 今年が表示されていない
+            e.CanExecute = (this.WVM.SelectedTab == Tab.ListTab || this.WVM.SelectedTab == Tab.GraphTab) && !(thisYear <= this.WVM.DisplayedYear && this.WVM.DisplayedYear < thisYear.AddYears(1));
         }
 
         /// <summary>
@@ -870,6 +875,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
 
             this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             UpdateListTabData();
+            UpdateGraphTabData();
 
             Cursor = cCursor;
         }
@@ -881,8 +887,8 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void GoToNextYearCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択している
-            e.CanExecute = this.WVM.SelectedTab == Tab.ListTab;
+            // 帳簿/グラフタブを選択している
+            e.CanExecute = this.WVM.SelectedTab == Tab.ListTab || this.WVM.SelectedTab == Tab.GraphTab;
         }
 
         /// <summary>
@@ -897,6 +903,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(1);
             UpdateListTabData();
+            UpdateGraphTabData();
 
             Cursor = cCursor;
         }
@@ -1342,7 +1349,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         /// <returns>年度内合計項目VMリスト</returns>
         private ObservableCollection<SummaryWithinYearViewModel> LoadSummaryWithinYearViewModelList(int? bookId, DateTime year)
         {
-            DateTime startTime = new DateTime(year.Year, Properties.Settings.Default.App_StartMonth, 1);
+            DateTime startTime = this.WVM.DisplayedYear.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             DateTime endTime = startTime.AddMonths(1).AddMilliseconds(-1);
 
             // 開始月までの収支を取得する
@@ -1457,7 +1464,39 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         private void UpdateGraphTabData()
         {
             if(this.WVM.SelectedTab == Tab.GraphTab) {
-                throw new NotImplementedException();
+                this.WVM.WholeItemGraphModel.Axes.Clear();
+                CategoryAxis cAxis = new CategoryAxis() { Title = "月", Position = AxisPosition.Bottom };
+                cAxis.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+                int startMonth = Properties.Settings.Default.App_StartMonth;
+                // 表示する月の文字列を作成する
+                for (int i = startMonth; i < startMonth + 12; ++i) {
+                    cAxis.Labels.Add(string.Format("{0}月", (i - 1) % 12 + 1));
+                }
+                this.WVM.WholeItemGraphModel.Axes.Add(cAxis);
+                LinearAxis lAxis = new LinearAxis() {
+                    Title = "収支", Unit = "円",
+                    Position = AxisPosition.Left, MajorGridlineStyle = LineStyle.Solid, MinorGridlineStyle = LineStyle.Dot, StringFormat = "#,0"
+                };
+                this.WVM.WholeItemGraphModel.Axes.Add(lAxis);
+
+                this.WVM.WholeItemGraphModel.Series.Clear();
+                ObservableCollection<SummaryWithinYearViewModel> vmList = LoadSummaryWithinYearViewModelList(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                foreach(SummaryWithinYearViewModel vm in vmList) {
+                    if(vm.ItemId == -1) { continue; }
+
+                    CustomColumnSeries cSeries = new CustomColumnSeries() { IsStacked = true, Title = vm.ItemName };
+                    foreach(int value in vm.Values) {
+                        cSeries.Items.Add(new ColumnItem(value));
+                    }
+                    cSeries.TrackerHitResultChanged += (sender, e) => {
+                        // TODO: 選択された情報に応じて他のグラフを描画する
+                    };
+                    this.WVM.WholeItemGraphModel.Series.Add(cSeries);
+                }
+                this.WVM.WholeItemGraphModel.InvalidatePlot(true);
+
+                this.WVM.Controller = new PlotController();
+                this.WVM.Controller.BindMouseEnter(PlotCommands.HoverPointsOnlyTrack);
             }
         }
         #endregion

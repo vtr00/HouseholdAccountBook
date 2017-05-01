@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Extentions;
+using OxyPlot;
 using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
@@ -291,7 +292,39 @@ namespace HouseholdAccountBook.ViewModels
         private ObservableCollection<SummaryWithinYearViewModel> _SummaryWithinYearVMList = default(ObservableCollection<SummaryWithinYearViewModel>);
         #endregion
         #endregion
-        
+
+        #region グラフタブ
+        /// <summary>
+        /// 全項目プロットモデル
+        /// </summary>
+        #region WholeItemGraphModel
+        public PlotModel WholeItemGraphModel
+        {
+            get { return _WholeItemGraphModel; }
+            set { SetProperty(ref _WholeItemGraphModel, value); }
+        }
+        private PlotModel _WholeItemGraphModel = new PlotModel() {
+            Title = "年間推移",
+            LegendOrientation = LegendOrientation.Horizontal,
+            LegendPlacement = LegendPlacement.Outside,
+            LegendPosition = LegendPosition.RightTop,
+            LegendTitle = "凡例"
+        };
+        #endregion
+
+        /// <summary>
+        /// コントローラ
+        /// </summary>
+        #region Controller
+        public PlotController Controller
+        {
+            get { return _Controller; }
+            set { SetProperty(ref _Controller, value); }
+        }
+        private PlotController _Controller = default(PlotController);
+        #endregion
+        #endregion
+
         /// <summary>
         /// デバッグビルドか
         /// </summary>

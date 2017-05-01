@@ -7,6 +7,7 @@
         xmlns:project="clr-namespace:HouseholdAccountBook"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Behaviors"
+        xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
         mc:Ignorable="d"
         Title="Hausehold Account Book" Height="700" Width="1050"
         Closing="MainWindow_Closing">
@@ -178,7 +179,13 @@
                     <MenuItem Header="今年(_T)" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Ctrl+↓"/>
                     <MenuItem Header="来年(_N)" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Ctrl+→"/>
                 </MenuItem>
-                <MenuItem Header="グラフ(_G)" Command="{StaticResource IndicateGraphCommand}"/>
+                <MenuItem Header="グラフ(_G)">
+                    <MenuItem Header="切替(_D)" Command="{StaticResource IndicateGraphCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="去年(_L)" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Ctrl+←"/>
+                    <MenuItem Header="今年(_T)" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Ctrl+↓"/>
+                    <MenuItem Header="来年(_N)" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Ctrl+→"/>
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="更新(_U)" Command="{StaticResource UpdateCommand}" InputGestureText="F5"/>
             </MenuItem>
@@ -415,7 +422,7 @@
                     </Grid>
                 </Grid>
             </TabItem>
-            <TabItem Header="グラフ" IsEnabled="False">
+            <TabItem Header="グラフ">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -429,15 +436,14 @@
                             <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToThisYearConverter}}" Width="120"/>
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
                             <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" 
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
                                               ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
                                               SelectionChanged="BookComboBox_SelectionChanged"/>
                         </StackPanel>
                     </Grid>
 
-                    <!-- データリスト -->
                     <Grid Grid.Row="1" Background="White">
-                        <!-- 開発中 -->
+                        <oxy:PlotView Model="{Binding WholeItemGraphModel}" Controller="{Binding Controller}"/>
                     </Grid>
                 </Grid>
             </TabItem>
