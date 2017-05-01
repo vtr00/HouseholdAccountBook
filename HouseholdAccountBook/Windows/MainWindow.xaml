@@ -318,11 +318,11 @@
                         <StatusBarItem>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <TextBlock>
-                                    平均：
-                                    <TextBlock Text="{Binding AverageValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
-                                    データの個数：
+                                    データの個数 
                                     <TextBlock Text="{Binding Amount, TargetNullValue='--'}"/>
-                                    合計： 
+                                    平均 
+                                    <TextBlock Text="{Binding AverageValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
+                                    合計 
                                     <TextBlock Text="{Binding SumValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
                                 </TextBlock>
                             </StackPanel>

@@ -246,12 +246,19 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return _DisplayedYear; }
             set {
+                DateTime oldDisplayedYear = _DisplayedYear;
                 if (SetProperty(ref _DisplayedYear, value)) {
-                    int yearDiff = value.Year - _DisplayedYear.Year;
                     if (!OnUpdateDisplayedDate) {
+                        int startMonth = Properties.Settings.Default.App_StartMonth;
+                        int yearDiff = value.GetFirstDateOfFiscalYear(startMonth).Year - oldDisplayedYear.GetFirstDateOfFiscalYear(startMonth).Year;
                         OnUpdateDisplayedDate = true;
                         // 表示年の差分を表示月に反映する
                         DisplayedMonth = DisplayedMonth.AddYears(yearDiff);
+                        // 同年度中の未来の月の場合には、表示月を今日にする
+                        if(DisplayedMonth > DateTime.Now && 
+                            DisplayedMonth.GetFirstDateOfFiscalYear(startMonth).Year == DateTime.Now.GetFirstDateOfFiscalYear(startMonth).Year ) {
+                            DisplayedMonth = DateTime.Now;
+                        }
                         OnUpdateDisplayedDate = false;
                     }
                 }

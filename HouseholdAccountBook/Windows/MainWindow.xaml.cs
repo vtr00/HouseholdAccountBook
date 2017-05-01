@@ -115,6 +115,7 @@ namespace HouseholdAccountBook.Windows
                             dao.ExecNonQuery(@"DELETE FROM mst_item;");
                             dao.ExecNonQuery(@"DELETE FROM hst_action;");
                             dao.ExecNonQuery(@"DELETE FROM hst_group;");
+                            dao.ExecNonQuery(@"DELETE FROM hst_shop;");
                             dao.ExecNonQuery(@"DELETE FROM hst_remark;");
                             dao.ExecNonQuery(@"DELETE FROM rel_book_item;");
 
@@ -331,6 +332,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 dao.ExecNonQuery(@"DELETE FROM mst_item;");
                 dao.ExecNonQuery(@"DELETE FROM hst_action;");
                 dao.ExecNonQuery(@"DELETE FROM hst_group;");
+                dao.ExecNonQuery(@"DELETE FROM hst_shop;");
                 dao.ExecNonQuery(@"DELETE FROM hst_remark;");
                 dao.ExecNonQuery(@"DELETE FROM rel_book_item;");
             }
@@ -353,6 +355,9 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                     ),
                 WindowStyle = ProcessWindowStyle.Hidden
             };
+#if DEBUG
+            Console.WriteLine(string.Format("リストア：\"{0}\" {1}", info.FileName, info.Arguments));
+#endif
 
             // リストアする
             Process process = Process.Start(info);
@@ -434,6 +439,9 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                     ),
                 WindowStyle = ProcessWindowStyle.Hidden
             };
+#if DEBUG
+            Console.WriteLine(string.Format("ダンプ：\"{0}\" {1}", info.FileName, info.Arguments));
+#endif
 
             // バックアップする
             Process process = Process.Start(info);
@@ -1066,14 +1074,16 @@ ORDER BY sort_order;");
                 // 更新前のサマリーの選択を維持する
                 IEnumerable<SummaryViewModel> query2 = this.MainWindowVM.SummaryVMList.Where((svm) => { return svm.BalanceKind == tmpSvm?.BalanceKind && svm.CategoryId == tmpSvm?.CategoryId && svm.ItemId == tmpSvm?.ItemId; });
                 this.MainWindowVM.SelectedSummaryVM = query2.Count() == 0 ? null : query2.First();
-                
-                if (this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth() < DateTime.Today && DateTime.Today < this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1)) {
-                    // 今月の場合は、末尾が表示されるようにする
-                    this.actionDataGrid.ScrollToButtom();
-                }
-                else {
-                    // 今月でない場合は、先頭が表示されるようにする
-                    this.actionDataGrid.ScrollToTop();
+
+                if (isScroll) {
+                    if (this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth() < DateTime.Today && DateTime.Today < this.MainWindowVM.DisplayedMonth.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1)) {
+                        // 今月の場合は、末尾が表示されるようにする
+                        this.actionDataGrid.ScrollToButtom();
+                    }
+                    else {
+                        // 今月でない場合は、先頭が表示されるようにする
+                        this.actionDataGrid.ScrollToTop();
+                    }
                 }
             }
         }
