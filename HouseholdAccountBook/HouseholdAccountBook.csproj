@@ -143,6 +143,7 @@
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Interfaces\IMultiSelectable.cs" />
     <Compile Include="PropertyName.cs" />
+    <Compile Include="UserControls\DataGridEditableTemplateColumn.cs" />
     <Compile Include="UserControls\DateTimePicker.cs" />
     <Compile Include="UserEventArgs\EventArgs.cs" />
     <Compile Include="Settings.cs" />

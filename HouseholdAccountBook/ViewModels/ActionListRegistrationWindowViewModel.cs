@@ -238,7 +238,7 @@ namespace HouseholdAccountBook.ViewModels
             /// <summary>
             /// 日付
             /// </summary>
-            public DateTime ActDate { get; set; } = DateTime.Now;
+            public DateTime ActDate { get; set; }
             /// <summary>
             /// 金額
             /// </summary>

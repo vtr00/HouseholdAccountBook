@@ -22,6 +22,10 @@ namespace HouseholdAccountBook.Windows
         /// DAOビルダ
         /// </summary>
         private DaoBuilder builder;
+        /// <summary>
+        /// MainWindowで選択された帳簿項目の日付
+        /// </summary>
+        private DateTime? selectedDateTime;
         #endregion
 
         /// <summary>
@@ -38,6 +42,7 @@ namespace HouseholdAccountBook.Windows
         public ActionListRegistrationWindow(DaoBuilder builder, int? bookId, DateTime? selectedDateTime)
         {
             this.builder = builder;
+            this.selectedDateTime = selectedDateTime;
 
             InitializeComponent();
 
@@ -153,7 +158,10 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void DataGrid_AddingNewItem(object sender, AddingNewItemEventArgs e)
         {
-            if(this.WVM.DateValueVMList.Count > 0) {
+            if (this.WVM.DateValueVMList.Count == 0) {
+                e.NewItem = new DateValueViewModel() { ActDate = selectedDateTime ?? DateTime.Now, ActValue = null };
+            }
+            else {
                 // リストに入力済の末尾のデータの日付を追加時に採用する
                 DateValueViewModel lastVM = this.WVM.DateValueVMList[this.WVM.DateValueVMList.Count - 1];
                 e.NewItem = new DateValueViewModel() { ActDate = lastVM.ActDate, ActValue = null };
