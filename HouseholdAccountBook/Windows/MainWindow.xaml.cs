@@ -52,6 +52,7 @@ namespace HouseholdAccountBook.Windows
             UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
             UpdateBookTabData(true);
             UpdateListTabData();
+            InitializeGraphTabData();
             UpdateGraphTabData();
 
             LoadSetting();
@@ -735,6 +736,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         {
             UpdateBookTabData(false);
             UpdateListTabData();
+            InitializeGraphTabData();
             UpdateGraphTabData();
         }
 
@@ -923,6 +925,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
                 UpdateBookTabData();
                 UpdateListTabData();
+                InitializeGraphTabData();
                 UpdateGraphTabData();
             }
         }
@@ -1004,6 +1007,7 @@ WHERE action_id = @{0};", vm.ActionId);
                         UpdateListTabData();
                         break;
                     case Tab.GraphTab:
+                        InitializeGraphTabData();
                         UpdateGraphTabData();
                         break;
                 }
@@ -1459,44 +1463,112 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
         #region グラフタブ更新用の関数
         /// <summary>
-        /// グラフタブに表示するデータを更新する
+        /// グラフタブに表示するデータを初期化する
         /// </summary>
-        private void UpdateGraphTabData()
+        private void InitializeGraphTabData()
         {
-            if(this.WVM.SelectedTab == Tab.GraphTab) {
+            if (this.WVM.SelectedTab == Tab.GraphTab) {
+                int startMonth = Properties.Settings.Default.App_StartMonth;
                 this.WVM.WholeItemGraphModel.Axes.Clear();
+                this.WVM.WholeItemGraphModel.Series.Clear();
+
                 CategoryAxis cAxis = new CategoryAxis() { Title = "月", Position = AxisPosition.Bottom };
                 cAxis.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
-                int startMonth = Properties.Settings.Default.App_StartMonth;
                 // 表示する月の文字列を作成する
                 for (int i = startMonth; i < startMonth + 12; ++i) {
                     cAxis.Labels.Add(string.Format("{0}月", (i - 1) % 12 + 1));
                 }
                 this.WVM.WholeItemGraphModel.Axes.Add(cAxis);
+
                 LinearAxis lAxis = new LinearAxis() {
-                    Title = "収支", Unit = "円",
-                    Position = AxisPosition.Left, MajorGridlineStyle = LineStyle.Solid, MinorGridlineStyle = LineStyle.Dot, StringFormat = "#,0"
+                    Title = "収支",
+                    Unit = "円",
+                    Position = AxisPosition.Left,
+                    MajorGridlineStyle = LineStyle.Solid,
+                    MinorGridlineStyle = LineStyle.Dot,
+                    StringFormat = "#,0"
                 };
                 this.WVM.WholeItemGraphModel.Axes.Add(lAxis);
+                
+                this.WVM.WholeItemGraphModel.InvalidatePlot(true);
 
+                this.WVM.SelectedItemGraphModel.Axes.Clear();
+                this.WVM.SelectedItemGraphModel.Series.Clear();
+
+                CategoryAxis cAxis2 = new CategoryAxis() { Title = "月", Position = AxisPosition.Bottom };
+                cAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+                // 表示する月の文字列を作成する
+                for (int i = startMonth; i < startMonth + 12; ++i) {
+                    cAxis2.Labels.Add(string.Format("{0}月", (i - 1) % 12 + 1));
+                }
+                this.WVM.SelectedItemGraphModel.Axes.Add(cAxis2);
+
+                LinearAxis lAxis2 = new LinearAxis() {
+                    Title = "収支",
+                    Unit = "円",
+                    Position = AxisPosition.Left,
+                    MajorGridlineStyle = LineStyle.Solid,
+                    MinorGridlineStyle = LineStyle.Dot,
+                    StringFormat = "#,0"
+                };
+                this.WVM.SelectedItemGraphModel.Axes.Add(lAxis2);
+
+                this.WVM.SelectedItemGraphModel.InvalidatePlot(true);
+            }
+        }
+
+        /// <summary>
+        /// グラフタブに表示するデータを更新する
+        /// </summary>
+        private void UpdateGraphTabData()
+        {
+            if(this.WVM.SelectedTab == Tab.GraphTab) {
+                int startMonth = Properties.Settings.Default.App_StartMonth;
                 this.WVM.WholeItemGraphModel.Series.Clear();
-                ObservableCollection<SummaryWithinYearViewModel> vmList = LoadSummaryWithinYearViewModelList(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
-                foreach(SummaryWithinYearViewModel vm in vmList) {
-                    if(vm.ItemId == -1) { continue; }
 
-                    CustomColumnSeries cSeries = new CustomColumnSeries() { IsStacked = true, Title = vm.ItemName };
-                    foreach(int value in vm.Values) {
-                        cSeries.Items.Add(new ColumnItem(value));
-                    }
+                ObservableCollection<SummaryWithinYearViewModel> vmList = LoadSummaryWithinYearViewModelList(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                foreach (SummaryWithinYearViewModel tmpVM in vmList) {
+                    if (tmpVM.ItemId == -1) { continue; }
+
+                    CustomColumnSeries cSeries = new CustomColumnSeries() {
+                        IsStacked = true,
+                        Title = tmpVM.ItemName,
+                        ItemsSource = tmpVM.Values.Select((value, index) => new SeriesItemViewModel {
+                            Value = value,
+                            Month = index + startMonth,
+                            ItemId = tmpVM.ItemId,
+                            CategoryId = tmpVM.CategoryId
+                        }),
+                        ValueField = "Value"
+                    };
                     cSeries.TrackerHitResultChanged += (sender, e) => {
-                        // TODO: 選択された情報に応じて他のグラフを描画する
+                        if (e.Value == null) return;
+
+                        SeriesItemViewModel itemVM = e.Value.Item as SeriesItemViewModel;
+                        SummaryWithinYearViewModel vm = vmList.FirstOrDefault((tmp) => tmp.ItemId == itemVM.ItemId);
+
+                        this.WVM.SelectedItemGraphModel.Series.Clear();
+
+                        CustomColumnSeries cSeries2 = new CustomColumnSeries() {
+                            IsStacked = true,
+                            Title = vm.ItemName,
+                            FillColor = (e.Value.Series as CustomColumnSeries).ActualFillColor,
+                            ItemsSource = vm.Values.Select((value, index) => new SeriesItemViewModel {
+                                Value = value,
+                                Month = index + startMonth,
+                                ItemId = vm.ItemId,
+                                CategoryId = vm.CategoryId
+                            }),
+                            ValueField = "Value"
+                        };
+                        this.WVM.SelectedItemGraphModel.Series.Add(cSeries2);
+
+                        this.WVM.SelectedItemGraphModel.InvalidatePlot(true);
                     };
                     this.WVM.WholeItemGraphModel.Series.Add(cSeries);
                 }
-                this.WVM.WholeItemGraphModel.InvalidatePlot(true);
 
-                this.WVM.Controller = new PlotController();
-                this.WVM.Controller.BindMouseEnter(PlotCommands.HoverPointsOnlyTrack);
+                this.WVM.WholeItemGraphModel.InvalidatePlot(true);
             }
         }
         #endregion

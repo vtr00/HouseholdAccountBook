@@ -308,7 +308,27 @@ namespace HouseholdAccountBook.ViewModels
             LegendOrientation = LegendOrientation.Horizontal,
             LegendPlacement = LegendPlacement.Outside,
             LegendPosition = LegendPosition.RightTop,
-            LegendTitle = "凡例"
+            LegendTitle = "凡例",
+            LegendFontSize = 10.5
+        };
+        #endregion
+
+        /// <summary>
+        /// 選択項目プロットモデル
+        /// </summary>
+        #region SelectedItemGraphModel
+        public PlotModel SelectedItemGraphModel
+        {
+            get { return _SelectedItemGraphModel; }
+            set { SetProperty(ref _SelectedItemGraphModel, value); }
+        }
+        private PlotModel _SelectedItemGraphModel = new PlotModel() {
+            Title = "個別推移",
+            LegendOrientation = LegendOrientation.Horizontal,
+            LegendPlacement = LegendPlacement.Outside,
+            LegendPosition = LegendPosition.RightTop,
+            LegendTitle = "凡例",
+            LegendFontSize = 10.5
         };
         #endregion
 
@@ -321,7 +341,7 @@ namespace HouseholdAccountBook.ViewModels
             get { return _Controller; }
             set { SetProperty(ref _Controller, value); }
         }
-        private PlotController _Controller = default(PlotController);
+        private PlotController _Controller = new PlotController();
         #endregion
         #endregion
 
@@ -345,6 +365,7 @@ namespace HouseholdAccountBook.ViewModels
         public MainWindowViewModel()
         {
             SelectedActionVMList.CollectionChanged += (sender, e) => UpdateStatisticsValue();
+            Controller.BindMouseEnter(PlotCommands.HoverPointsOnlyTrack);
         }
     }
 }

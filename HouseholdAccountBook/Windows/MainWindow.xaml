@@ -443,7 +443,13 @@
                     </Grid>
 
                     <Grid Grid.Row="1" Background="White">
-                        <oxy:PlotView Model="{Binding WholeItemGraphModel}" Controller="{Binding Controller}"/>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.7*"/>
+                            <RowDefinition Height="0.3*"/>
+                        </Grid.RowDefinitions>
+
+                        <oxy:PlotView Grid.Row="0" Model="{Binding WholeItemGraphModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemGraphModel}" Controller="{Binding Controller}"/>
                     </Grid>
                 </Grid>
             </TabItem>

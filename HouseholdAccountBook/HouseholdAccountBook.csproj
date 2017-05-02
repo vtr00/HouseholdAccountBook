@@ -173,6 +173,7 @@
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\MoveRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\RelationViewModel.cs" />
+    <Compile Include="ViewModels\SeriesItemViewModel.cs" />
     <Compile Include="ViewModels\SettingsWindowViewModel.cs" />
     <Compile Include="ViewModels\SummryViewModel.cs" />
     <Compile Include="ViewModels\SummryWithinYearViewModel.cs" />
