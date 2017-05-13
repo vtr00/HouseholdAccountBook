@@ -1,6 +1,8 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using HouseholdAccountBook.Dao;
+using HouseholdAccountBook.Extensions;
+using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
 using System;
@@ -8,14 +10,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows;
-using System.Windows.Input;
-using System.Linq;
 using System.Windows.Controls;
+using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
-using HouseholdAccountBook.UserEventArgs;
-using HouseholdAccountBook.Extensions;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -299,7 +299,7 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
 SELECT A.action_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
-WHERE A.act_time = @{0} AND A.act_value = -@{1} AND book_id = @{2} AND A.del_flg = 0;", vm.Record.Date, vm.Record.Value, this.WVM.SelectedBookVM.Id);
+WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_value = -@{1} AND book_id = @{2} AND A.del_flg = 0;", vm.Record.Date, vm.Record.Value, this.WVM.SelectedBookVM.Id);
 
                     reader.ExecWholeRow((count, record) => {
                         int actionId = record.ToInt("action_id");

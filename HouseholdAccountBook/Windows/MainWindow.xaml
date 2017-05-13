@@ -430,7 +430,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0" Background="LightGray">
+                    <Grid Grid.Row="0">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="◀" Width="20" Command="{StaticResource GoToLastYearCommand}"/>
                             <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToThisYearConverter}}" Width="120"/>

@@ -30,7 +30,7 @@ namespace HouseholdAccountBook.Windows
 #if DEBUG
             this.WVM.DatabaseName = settings.App_Postgres_DatabaseName_Debug;
 #else
-            this.DbSettingWindowVM.DatabaseName = settings.App_Postgres_DatabaseName;
+            this.WVM.DatabaseName = settings.App_Postgres_DatabaseName;
 #endif
             this.WVM.Role = settings.App_Postgres_Role;
             this.WVM.DumpExePath = settings.App_Postgres_DumpExePath;
