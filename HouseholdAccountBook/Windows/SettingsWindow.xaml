@@ -267,7 +267,6 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="0.5*"/>
@@ -285,13 +284,51 @@
                                 <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" 
                                                                     Value="{Binding InitialValue}"/>
 
-                                <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Text="支払元帳簿"/>
-                                <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" IsEnabled="{Binding NeedToPay}" 
-                                                        ItemsSource="{Binding DebitBookVMList}" SelectedItem="{Binding SelectedDebitBookVM}" DisplayMemberPath="Name"/>
+                                <GroupBox Grid.Row="3" Grid.ColumnSpan="2" Header="支払情報" IsEnabled="{Binding NeedToPay}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="0.5*"/>
+                                            <ColumnDefinition Width="0.5*"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="支払元帳簿"/>
+                                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
+                                                                ItemsSource="{Binding DebitBookVMList}" SelectedItem="{Binding SelectedDebitBookVM}" DisplayMemberPath="Name"/>
 
-                                <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" Text="支払日"/>
-                                <controls:NumericUpDown Grid.Row="4" Grid.Column="1" Margin="5" MinValue="1" MaxValue="31" 
-                                                                    Value="{Binding PayDay, TargetNullValue=''}" IsEnabled="{Binding NeedToPay}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="支払日"/>
+                                        <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" 
+                                                                MinValue="1" MaxValue="31" Value="{Binding PayDay, TargetNullValue=''}"/>
+                                    </Grid>
+                                </GroupBox>
+
+                                <GroupBox Grid.Row="4" Grid.ColumnSpan="2" Header="CSV情報" IsEnabled="{Binding CsvDataExists}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="0.5*"/>
+                                            <ColumnDefinition Width="0.5*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="日付位置"/>
+                                        <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="0"
+                                                                            Value="{Binding ActDateIndex, TargetNullValue=''}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="支出位置"/>
+                                        <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" MinValue="0"
+                                                                            Value="{Binding OutgoIndex, TargetNullValue=''}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="項目名位置"/>
+                                        <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" MinValue="0"
+                                                                            Value="{Binding ItemNameIndex, TargetNullValue=''}"/>
+                                        
+                                    </Grid>
+                                </GroupBox>
                                 <Button Grid.Row="5" Grid.Column="1" Margin="5,0" Content="確定" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
                             </Grid>
                         </GroupBox>

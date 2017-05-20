@@ -207,9 +207,12 @@ CREATE TABLE mst_book (
     book_id integer NOT NULL,
     book_name text NOT NULL,
     book_kind integer NOT NULL,
-    pay_day integer,
     initial_value integer NOT NULL,
+    pay_day integer,
     debit_book_id integer,
+    csv_act_time_index integer,
+    csv_outgo_index integer,
+    csv_item_name_index integer,
     sort_order integer NOT NULL,
     del_flg integer NOT NULL,
     update_time timestamp without time zone NOT NULL,
@@ -217,9 +220,13 @@ CREATE TABLE mst_book (
     insert_time timestamp without time zone NOT NULL,
     inserter text NOT NULL,
     CONSTRAINT mst_book_book_id_check CHECK ((book_id >= 0)),
-    CONSTRAINT mst_book_del_flg_check CHECK (((del_flg = 0) OR (del_flg = 1))),
-    CONSTRAINT mst_book_pay_day_check CHECK (((pay_day >= 1) AND (pay_day <= 31))),
-    CONSTRAINT mst_book_sort_order_check CHECK ((sort_order >= 0))
+    CONSTRAINT mst_book_csv_act_time_index_check CHECK (csv_act_time_index >= 0),
+    CONSTRAINT mst_book_csv_item_name_index_check CHECK (csv_item_name_index >= 0),
+    CONSTRAINT mst_book_csv_outgo_index_check CHECK (csv_outgo_index >= 0),
+    CONSTRAINT mst_book_del_flg_check CHECK (del_flg = 0 OR del_flg = 1),
+    CONSTRAINT mst_book_pay_day_check CHECK (pay_day >= 1 AND pay_day <= 31),
+    CONSTRAINT mst_book_sort_order_check CHECK (sort_order >= 0),
+    CONSTRAINT mst_debit_book_id_check CHECK (debit_book_id >= 0)
 );
 
 

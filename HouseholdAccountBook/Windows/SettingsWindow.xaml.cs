@@ -809,8 +809,8 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
                 BookSettingViewModel vm = this.WVM.SelectedBookVM;
                 dao.ExecNonQuery(@"
 UPDATE mst_book
-SET book_name = @{0}, book_kind = @{1}, initial_value = @{2}, debit_book_id = @{3}, pay_day = @{4}, update_time = 'now', updater = @{5}
-WHERE book_id = @{6};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.SelectedDebitBookVM.Id == -1 ? null : vm.SelectedDebitBookVM.Id, vm.PayDay, Updater, vm.Id);
+SET book_name = @{0}, book_kind = @{1}, initial_value = @{2}, debit_book_id = @{3}, pay_day = @{4}, csv_act_time_index = @{5}, csv_outgo_index = @{6}, csv_item_name_index = @{7}, update_time = 'now', updater = @{8}
+WHERE book_id = @{9};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.SelectedDebitBookVM.Id == -1 ? null : vm.SelectedDebitBookVM.Id, vm.PayDay, vm.ActDateIndex, vm.OutgoIndex, vm.ItemNameIndex, Updater, vm.Id);
             }
 
             MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
@@ -1047,7 +1047,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         }
 
         /// <summary>
-        /// 設定->項目設定タブに表示するデータを更新する
+        /// 項目設定タブに表示するデータを更新する
         /// </summary>
         /// <param name="kind">選択対象の階層種別</param>
         /// <param name="id">選択対象のID</param>
@@ -1087,7 +1087,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         }
 
         /// <summary>
-        /// 設定->帳簿設定タブに表示するデータを更新する
+        /// 帳簿設定タブに表示するデータを更新する
         /// </summary>
         /// <param name="bookId">選択対象の帳簿ID</param>
         private void UpdateBookSettingTabData(int? bookId = null)
@@ -1106,7 +1106,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         }
 
         /// <summary>
-        /// 設定->その他タブに表示するデータを更新する
+        /// その他タブに表示するデータを更新する
         /// </summary>
         private void UpdateOtherSettingTabData()
         {
@@ -1254,7 +1254,7 @@ ORDER BY used_time DESC;", vm2.Id);
             };
 
             using (DaoBase dao = builder.Build()) {
-                // 帳簿一覧を取得する
+                // 帳簿一覧を取得する(支払元選択用)
                 DaoReader reader = dao.ExecQuery(@"
 SELECT book_id, book_name
 FROM mst_book
@@ -1274,7 +1274,7 @@ ORDER BY sort_order;");
 
                 // 帳簿一覧を取得する
                 reader = dao.ExecQuery(@"
-SELECT book_id, book_name, book_kind, debit_book_id, pay_day, initial_value
+SELECT book_id, book_name, book_kind, debit_book_id, pay_day, initial_value, csv_act_time_index, csv_outgo_index, csv_item_name_index
 FROM mst_book
 WHERE del_flg = 0
 ORDER BY sort_order;");
@@ -1286,6 +1286,9 @@ ORDER BY sort_order;");
                     int initialValue = record.ToInt("initial_value");
                     int? debitBookId = record.ToNullableInt("debit_book_id");
                     int? payDay = record.ToNullableInt("pay_day");
+                    int? actDateIndex = record.ToNullableInt("csv_act_time_index");
+                    int? outgoIndex = record.ToNullableInt("csv_outgo_index");
+                    int? itemNameIndex = record.ToNullableInt("csv_item_name_index");
 
                     BookSettingViewModel tmpVM = new BookSettingViewModel() {
                         Id = bookId,
@@ -1294,6 +1297,9 @@ ORDER BY sort_order;");
                         InitialValue = initialValue,
                         DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((vm) => { return vm.Id != bookId; })),
                         PayDay = payDay,
+                        ActDateIndex = actDateIndex,
+                        OutgoIndex = outgoIndex,
+                        ItemNameIndex = itemNameIndex,
                     };
                     tmpVM.SelectedDebitBookVM = tmpVM.DebitBookVMList.FirstOrDefault((vm) => { return vm.Id == debitBookId; }) ?? tmpVM.DebitBookVMList[0];
 

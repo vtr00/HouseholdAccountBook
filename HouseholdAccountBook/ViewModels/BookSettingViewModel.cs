@@ -41,6 +41,7 @@ namespace HouseholdAccountBook.ViewModels
             set {
                 SetProperty(ref _SelectedBookKind, value);
                 UpdateNeedToPay();
+                UpdateCsvDataExists();
             }
         }
         private BookKind _SelectedBookKind = BookKind.Uncategorized;
@@ -58,6 +59,7 @@ namespace HouseholdAccountBook.ViewModels
         private int _InitialValue = 0;
         #endregion
 
+        #region 支払情報
         /// <summary>
         /// 支払の必要があるか
         /// </summary>
@@ -106,6 +108,73 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// 支払いの必要の有無を更新する
+        /// </summary>
+        private void UpdateNeedToPay()
+        {
+            NeedToPay = SelectedBookKind == BookKind.CreditCard;
+        }
+        #endregion
+
+        #region CSV情報
+        /// <summary>
+        /// CSVデータがあるか
+        /// </summary>
+        #region CsvDataExists
+        public bool CsvDataExists
+        {
+            get { return _CsvDataExists; }
+            private set { SetProperty(ref _CsvDataExists, value); }
+        }
+        private bool _CsvDataExists = default(bool);
+        #endregion
+        
+        /// <summary>
+        /// 日付インデックス
+        /// </summary>
+        #region ActDateIndex
+        public int? ActDateIndex
+        {
+            get { return _ActDateIndex; }
+            set { SetProperty(ref _ActDateIndex, value); }
+        }
+        private int? _ActDateIndex = default(int?);
+        #endregion
+
+        /// <summary>
+        /// 支出インデックス
+        /// </summary>
+        #region OutgoIndex
+        public int? OutgoIndex
+        {
+            get { return _OutgoIndex; }
+            set { SetProperty(ref _OutgoIndex, value); }
+        }
+        private int? _OutgoIndex = default(int?);
+        #endregion
+
+        /// <summary>
+        /// 項目名インデックス
+        /// </summary>
+        #region ItemNameIndex
+        public int? ItemNameIndex
+        {
+            get { return _ItemNameIndex; }
+            set { SetProperty(ref _ItemNameIndex, value); }
+        }
+        private int? _ItemNameIndex = default(int?);
+        #endregion
+
+        /// <summary>
+        /// CSVデータの有無を更新する
+        /// </summary>
+        private void UpdateCsvDataExists()
+        {
+            CsvDataExists = SelectedBookKind != BookKind.Wallet;
+        }
+        #endregion
+
+        /// <summary>
         /// 関係性VMリスト
         /// </summary>
         #region RelationVMList
@@ -128,12 +197,5 @@ namespace HouseholdAccountBook.ViewModels
         private RelationViewModel _SelectedRelationVM = default(RelationViewModel);
         #endregion
 
-        /// <summary>
-        /// 支払いの必要の有無を更新する
-        /// </summary>
-        private void UpdateNeedToPay()
-        {
-            NeedToPay = SelectedBookKind == BookKind.CreditCard;
-        }
     }
 }

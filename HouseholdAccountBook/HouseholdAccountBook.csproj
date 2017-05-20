@@ -162,6 +162,7 @@
     <Compile Include="ViewModels\ActionRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\ActionViewModel.cs" />
     <Compile Include="ViewModels\BookSettingViewModel.cs" />
+    <Compile Include="ViewModels\BookComparisonViewModel.cs" />
     <Compile Include="ViewModels\BookViewModel.cs" />
     <Compile Include="ViewModels\CategoryViewModel.cs" />
     <Compile Include="ViewModels\CommissionKindViewModel.cs" />

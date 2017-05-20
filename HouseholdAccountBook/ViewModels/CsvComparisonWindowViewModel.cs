@@ -24,23 +24,23 @@ namespace HouseholdAccountBook.ViewModels
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
-        public ObservableCollection<BookViewModel> BookVMList
+        public ObservableCollection<BookComparisonViewModel> BookVMList
         {
             get { return _BookVMList; }
             set { SetProperty(ref _BookVMList, value); }
         }
-        private ObservableCollection<BookViewModel> _BookVMList = default(ObservableCollection<BookViewModel>);
+        private ObservableCollection<BookComparisonViewModel> _BookVMList = default(ObservableCollection<BookComparisonViewModel>);
         #endregion
         /// <summary>
         /// 選択された帳簿VM
         /// </summary>
         #region SelectedBookVM
-        public BookViewModel SelectedBookVM
+        public BookComparisonViewModel SelectedBookVM
         {
             get { return _SelectedBookVM; }
             set { SetProperty(ref _SelectedBookVM, value); }
         }
-        private BookViewModel _SelectedBookVM;
+        private BookComparisonViewModel _SelectedBookVM;
         #endregion
 
         /// <summary>

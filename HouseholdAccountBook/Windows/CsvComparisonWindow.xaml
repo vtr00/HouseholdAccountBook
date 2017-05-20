@@ -3,8 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
-        xmlns:converters="clr-namespace:HouseholdAccountBook.Converters"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:project="clr-namespace:HouseholdAccountBook"
         mc:Ignorable="d"
@@ -101,7 +99,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Button Grid.Column="0" Margin="5" Width="100" Content="一括チェック" Command="{StaticResource BulkCheckCommand}"/>
-                <TextBlock Grid.Column="2" Margin="5" Text="帳簿："/>
+                <TextBlock Grid.Column="2" Margin="5" VerticalAlignment="Center" Text="帳簿："/>
                 <ComboBox Grid.Column="3" HorizontalAlignment="Stretch" Margin="5" MinWidth="100"
                           ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                 <Button Grid.Column="4" Margin="5" Width="50" Content="更新" Command="{StaticResource UpdateCommand}"/>
@@ -156,8 +154,16 @@
         </Grid>
 
         <StatusBar Grid.Row="2">
-            <TextBlock Margin="5" Text="CSVファイル："/>
-            <TextBlock Margin="5" Text="{Binding CsvFileName, TargetNullValue='--'}"/>
+            <TextBlock Margin="5" VerticalAlignment="Center">
+                CSVファイル：
+                <TextBlock Text="{Binding CsvFileName, TargetNullValue='--'}"/>
+                日付：
+                <TextBlock Text="{Binding SelectedBookVM.ActDateIndex}"/> 列目
+                支出：
+                <TextBlock Text="{Binding SelectedBookVM.OutgoIndex}"/> 列目
+                項目名：
+                <TextBlock Text="{Binding SelectedBookVM.ItemNameIndex}"/> 列目
+            </TextBlock>
         </StatusBar>
     </Grid>
 </Window>

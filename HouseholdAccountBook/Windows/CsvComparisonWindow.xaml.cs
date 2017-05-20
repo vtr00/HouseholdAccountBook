@@ -105,11 +105,11 @@ namespace HouseholdAccountBook.Windows
             using (CsvReader reader = new CsvReader(new StreamReader(ofd.FileName, Encoding.GetEncoding(932)), config)) { 
                 while (reader.Read()) {
                     try {
-                        int dateIndex = 0; // このインデックスは設定で指定するようにする
-                        int nameIndex = 3;
-                        int valueIndex = 5;
+                        int actDateIndex = this.WVM.SelectedBookVM.ActDateIndex;
+                        int itemNameIndex = this.WVM.SelectedBookVM.ItemNameIndex;
+                        int outgoIndex = this.WVM.SelectedBookVM.OutgoIndex;
                         
-                        if(reader.TryGetField<DateTime>(dateIndex, out DateTime date) && reader.TryGetField<string>(nameIndex, out string name) && reader.TryGetField<int>(valueIndex, out int value)) {
+                        if(reader.TryGetField<DateTime>(actDateIndex, out DateTime date) && reader.TryGetField<string>(itemNameIndex, out string name) && reader.TryGetField<int>(outgoIndex, out int value)) {
                             tmpList.Add(new CsvComparisonViewModel() { Record = new CsvComparisonViewModel.CsvRecord() { Date = date, Name = name, Value = value } });
                         }
                     }
@@ -262,8 +262,8 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         {
             int? tmpBookId = bookId ?? this.WVM.SelectedBookVM?.Id;
 
-            ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
-            BookViewModel selectedBookVM = null;
+            ObservableCollection<BookComparisonViewModel> bookCompVMList = new ObservableCollection<BookComparisonViewModel>();
+            BookComparisonViewModel selectedBookCompVM = null;
             using (DaoBase dao = builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT * 
@@ -271,17 +271,23 @@ FROM mst_book
 WHERE del_flg = 0 AND book_kind <> @{0}
 ORDER BY sort_order;", (int)BookKind.Wallet);
                 reader.ExecWholeRow((count, record) => {
-                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
-                    bookVMList.Add(vm);
+                    BookComparisonViewModel vm = new BookComparisonViewModel() {
+                        Id = record.ToInt("book_id"),
+                        Name = record["book_name"],
+                        ActDateIndex = record.ToNullableInt("csv_act_time_index") ?? 0,
+                        OutgoIndex = record.ToNullableInt("csv_outgo_index") ?? 0,
+                        ItemNameIndex = record.ToNullableInt("csv_item_name_index") ?? 0
+                    };
+                    bookCompVMList.Add(vm);
 
                     if (vm.Id == tmpBookId) {
-                        selectedBookVM = vm;
+                        selectedBookCompVM = vm;
                     }
                     return true;
                 });
             }
-            this.WVM.BookVMList = bookVMList;
-            this.WVM.SelectedBookVM = selectedBookVM ?? bookVMList[0];
+            this.WVM.BookVMList = bookCompVMList;
+            this.WVM.SelectedBookVM = selectedBookCompVM ?? bookCompVMList[0];
         }
         
         /// <summary>
@@ -324,6 +330,7 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
             }
             
             List<CsvComparisonViewModel> list = this.WVM.CsvComparisonVMList.ToList();
+            // 日付と帳簿項目IDでソートする
             list.Sort((vm1, vm2) => {
                 int rslt = (int)((vm1.Record.Date - vm2.Record.Date).TotalDays);
                 if (rslt == 0) { rslt = (vm1.ActionId ?? 0) - (vm2.ActionId ?? 0); }
