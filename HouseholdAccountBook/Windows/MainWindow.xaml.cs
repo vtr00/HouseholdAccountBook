@@ -6,7 +6,6 @@ using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
 using OxyPlot;
 using OxyPlot.Axes;
-using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

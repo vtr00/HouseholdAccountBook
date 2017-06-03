@@ -39,7 +39,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="builder">DAOビルダ</param>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="selectedDateTime">選択された日時</param>
-        public ActionListRegistrationWindow(DaoBuilder builder, int? bookId, DateTime? selectedDateTime)
+        public ActionListRegistrationWindow(DaoBuilder builder, int? bookId, DateTime? selectedDateTime = null)
         {
             this.builder = builder;
             this.selectedDateTime = selectedDateTime;
@@ -63,6 +63,10 @@ namespace HouseholdAccountBook.Windows
             this.WVM.BookVMList = bookVMList;
             this.WVM.SelectedBookVM = selectedBookVM;
             this.WVM.SelectedBalanceKind = BalanceKind.Outgo;
+
+            DateTime dateTime = selectedDateTime ?? DateTime.Today;
+            this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = dateTime });
+            this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = dateTime });
 
             UpdateCategoryList();
             UpdateItemList();

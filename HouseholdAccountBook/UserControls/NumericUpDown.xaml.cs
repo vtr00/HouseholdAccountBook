@@ -111,7 +111,7 @@ namespace HouseholdAccountBook.UserControls
 
         #region コマンド
         /// <summary>
-        /// 
+        /// ▲ボタン押下可能か
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -132,7 +132,7 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// 
+        /// ▼ボタン押下可能か
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -160,13 +160,22 @@ namespace HouseholdAccountBook.UserControls
         private void NumberInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ContentControl control = e.OriginalSource as ContentControl;
-            int value = Int32.Parse(control.Content.ToString());
+            int value = Int32.Parse(control.Content.ToString()); // 入力値
 
+            TextBox textBox = _textBox;
             if (this.Value == null) {
                 this.Value = value;
+                textBox.SelectionStart = 1;
             }
             else {
-                this.Value = this.Value * 10 + value;
+                int selectionStart = textBox.SelectionStart;
+                int selectionEnd = selectionStart + textBox.SelectionLength;
+                string forwardText = textBox.Text.Substring(0, selectionStart);
+                string selectedText = textBox.SelectedText;
+                string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
+
+                this.Value = int.Parse(string.Format("{0}{1}{2}", forwardText, value, backwardText));
+                textBox.SelectionStart = selectionStart + 1;
             }
             e.Handled = true;
         }
@@ -178,11 +187,26 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void BackSpaceInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (this.Value != null) {
-                this.Value /= 10;
-            }
             if (this.Value == 0) {
                 this.Value = null;
+            }
+            else {
+                TextBox textBox = _textBox;
+                int selectionStart = textBox.SelectionStart;
+                int selectionLength = textBox.SelectionLength;
+                int selectionEnd = selectionStart + textBox.SelectionLength;
+                string forwardText = textBox.Text.Substring(0, selectionStart);
+                string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
+
+                if (selectionLength != 0) {
+                    this.Value = int.Parse(string.Format("{0}{1}", forwardText, backwardText));
+                    textBox.SelectionStart = selectionStart;
+                }
+                else if (selectionStart != 0) {
+                    string newText = string.Format("{0}{1}", forwardText.Substring(0, selectionStart - 1), backwardText);
+                    this.Value = string.Empty == newText ? (int?)null : int.Parse(newText);
+                    textBox.SelectionStart = selectionStart - 1;
+                }
             }
             e.Handled = true;
         }
@@ -278,7 +302,7 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// 数値をデクリメントする
         /// </summary>
-        private void DecrementNumber()
+        private void DecrementNumber() 
         {
             if (this.Value == null) {
                 this.Value = this.MaxValue;
