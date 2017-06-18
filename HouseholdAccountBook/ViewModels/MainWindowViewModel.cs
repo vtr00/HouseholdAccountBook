@@ -28,7 +28,7 @@ namespace HouseholdAccountBook.ViewModels
             get { return _SelectedTabIndex; }
             set {
                 if (SetProperty(ref _SelectedTabIndex, value)) {
-                    SelectedTab = (Tab)value;
+                    SelectedTab = (Tabs)value;
                 }
             }
         }
@@ -38,7 +38,7 @@ namespace HouseholdAccountBook.ViewModels
         /// 選択されたタブ種別
         /// </summary>
         #region SelectedTab
-        public Tab SelectedTab
+        public Tabs SelectedTab
         {
             get { return _SelectedTab; }
             set {
@@ -47,7 +47,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private Tab _SelectedTab = default(Tab);
+        private Tabs _SelectedTab = default(Tabs);
         #endregion
 
         /// <summary>
@@ -284,26 +284,64 @@ namespace HouseholdAccountBook.ViewModels
         /// 年内合計項目VMリスト
         /// </summary>
         #region SummaryWithinYearVMList
-        public ObservableCollection<SummaryWithinYearViewModel> SummaryWithinYearVMList
+        public ObservableCollection<SeriesViewModel> SummaryWithinYearVMList
         {
             get { return _SummaryWithinYearVMList; }
             set { SetProperty(ref _SummaryWithinYearVMList, value); }
         }
-        private ObservableCollection<SummaryWithinYearViewModel> _SummaryWithinYearVMList = default(ObservableCollection<SummaryWithinYearViewModel>);
+        private ObservableCollection<SeriesViewModel> _SummaryWithinYearVMList = default(ObservableCollection<SeriesViewModel>);
         #endregion
         #endregion
 
         #region グラフタブ
         /// <summary>
-        /// 全項目プロットモデル
+        /// 全項目月間グラフプロットモデル
         /// </summary>
-        #region WholeItemGraphModel
-        public PlotModel WholeItemGraphModel
+        #region WholeItemDailyGraphModel
+        public PlotModel WholeItemDailyGraphModel
         {
-            get { return _WholeItemGraphModel; }
-            set { SetProperty(ref _WholeItemGraphModel, value); }
+            get { return _WholeItemDailyGraphModel; }
+            set { SetProperty(ref _WholeItemDailyGraphModel, value); }
         }
-        private PlotModel _WholeItemGraphModel = new PlotModel() {
+        private PlotModel _WholeItemDailyGraphModel = new PlotModel() {
+            Title = "月間推移",
+            LegendOrientation = LegendOrientation.Horizontal,
+            LegendPlacement = LegendPlacement.Outside,
+            LegendPosition = LegendPosition.RightTop,
+            LegendTitle = "凡例",
+            LegendFontSize = 10.5
+        };
+        #endregion
+
+        /// <summary>
+        /// 選択項目月間グラフプロットモデル
+        /// </summary>
+        #region SelectedItemDailyGraphModel
+        public PlotModel SelectedItemDailyGraphModel
+        {
+            get { return _SelectedItemDailyGraphModel; }
+            set { SetProperty(ref _SelectedItemDailyGraphModel, value); }
+        }
+        private PlotModel _SelectedItemDailyGraphModel = new PlotModel() {
+            Title = "個別推移",
+            LegendOrientation = LegendOrientation.Horizontal,
+            LegendPlacement = LegendPlacement.Outside,
+            LegendPosition = LegendPosition.RightTop,
+            LegendTitle = "凡例",
+            LegendFontSize = 10.5
+        };
+        #endregion
+
+        /// <summary>
+        /// 全項目年間グラフプロットモデル
+        /// </summary>
+        #region WholeItemMonthlyGraphModel
+        public PlotModel WholeItemMonthlyGraphModel
+        {
+            get { return _WholeItemMonthlyGraphModel; }
+            set { SetProperty(ref _WholeItemMonthlyGraphModel, value); }
+        }
+        private PlotModel _WholeItemMonthlyGraphModel = new PlotModel() {
             Title = "年間推移",
             LegendOrientation = LegendOrientation.Horizontal,
             LegendPlacement = LegendPlacement.Outside,
@@ -314,15 +352,15 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 選択項目プロットモデル
+        /// 選択項目年間グラフプロットモデル
         /// </summary>
-        #region SelectedItemGraphModel
-        public PlotModel SelectedItemGraphModel
+        #region SelectedItemMonthlyGraphModel
+        public PlotModel SelectedItemMonthlyGraphModel
         {
-            get { return _SelectedItemGraphModel; }
-            set { SetProperty(ref _SelectedItemGraphModel, value); }
+            get { return _SelectedItemMonthlyGraphModel; }
+            set { SetProperty(ref _SelectedItemMonthlyGraphModel, value); }
         }
-        private PlotModel _SelectedItemGraphModel = new PlotModel() {
+        private PlotModel _SelectedItemMonthlyGraphModel = new PlotModel() {
             Title = "個別推移",
             LegendOrientation = LegendOrientation.Horizontal,
             LegendPlacement = LegendPlacement.Outside,

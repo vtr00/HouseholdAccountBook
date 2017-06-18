@@ -28,7 +28,7 @@ namespace HouseholdAccountBook.ViewModels
             get { return _SelectedTabIndex; }
             set {
                 if (SetProperty(ref _SelectedTabIndex, value)) {
-                    SelectedTab = (SettingsTab)value;
+                    SelectedTab = (SettingsTabs)value;
                 }
             }
         }
@@ -38,7 +38,7 @@ namespace HouseholdAccountBook.ViewModels
         /// 選択された設定タブ種別
         /// </summary>
         #region SelectedTab
-        public SettingsTab SelectedTab
+        public SettingsTabs SelectedTab
         {
             get { return _SelectedTab; }
             set {
@@ -47,7 +47,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private SettingsTab _SelectedTab = default(SettingsTab);
+        private SettingsTabs _SelectedTab = default(SettingsTabs);
         #endregion
         
         #region 項目設定

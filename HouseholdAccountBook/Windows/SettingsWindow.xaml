@@ -317,13 +317,13 @@
                                             <ColumnDefinition Width="0.5*"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="日付位置"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="日付位置(0開始)"/>
                                         <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="0"
                                                                             Value="{Binding ActDateIndex, TargetNullValue=''}"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="支出位置"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="支出位置(0開始)"/>
                                         <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" MinValue="0"
                                                                             Value="{Binding OutgoIndex, TargetNullValue=''}"/>
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="項目名位置"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="項目名位置(0開始)"/>
                                         <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" MinValue="0"
                                                                             Value="{Binding ItemNameIndex, TargetNullValue=''}"/>
                                         

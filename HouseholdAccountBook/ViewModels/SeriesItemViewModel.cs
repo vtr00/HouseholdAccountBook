@@ -20,15 +20,15 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 月
+        /// 番号(月/日)
         /// </summary>
-        #region Month
-        public int Month
+        #region Number
+        public int Number
         {
-            get { return _Month; }
-            set { SetProperty(ref _Month, value); }
+            get { return _Number; }
+            set { SetProperty(ref _Number, value); }
         }
-        private int _Month = default(int);
+        private int _Number = default(int);
         #endregion
 
         /// <summary>

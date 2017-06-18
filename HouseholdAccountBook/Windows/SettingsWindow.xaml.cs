@@ -30,7 +30,7 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// 前回選択していた設定タブ
         /// </summary>
-        private SettingsTab oldSelectedSettingsTab = SettingsTab.ItemSettingsTab;
+        private SettingsTabs oldSelectedSettingsTab = SettingsTabs.ItemSettingsTab;
         #endregion
 
         /// <summary>
@@ -991,13 +991,13 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 Cursor = Cursors.Wait;
 
                 switch (this.WVM.SelectedTab) {
-                    case SettingsTab.ItemSettingsTab:
+                    case SettingsTabs.ItemSettingsTab:
                         UpdateItemSettingsTabData();
                         break;
-                    case SettingsTab.BookSettingsTab:
+                    case SettingsTabs.BookSettingsTab:
                         UpdateBookSettingTabData();
                         break;
-                    case SettingsTab.OtherSettingsTab:
+                    case SettingsTabs.OtherSettingsTab:
                         UpdateOtherSettingTabData();
                         break;
                 }
@@ -1053,7 +1053,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="id">選択対象のID</param>
         private void UpdateItemSettingsTabData(HierarchicalKind? kind = null, int? id = null)
         {
-            if (this.WVM.SelectedTab == SettingsTab.ItemSettingsTab) {
+            if (this.WVM.SelectedTab == SettingsTabs.ItemSettingsTab) {
                 this.WVM.HierachicalItemVMList = LoadItemViewModelList();
 
                 if (kind == null || id == null) {
@@ -1092,7 +1092,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="bookId">選択対象の帳簿ID</param>
         private void UpdateBookSettingTabData(int? bookId = null)
         {
-            if (this.WVM.SelectedTab == SettingsTab.BookSettingsTab) {
+            if (this.WVM.SelectedTab == SettingsTabs.BookSettingsTab) {
                 this.WVM.BookVMList = LoadBookSettingViewModelList();
 
                 if (bookId == null) {
@@ -1110,7 +1110,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// </summary>
         private void UpdateOtherSettingTabData()
         {
-            if(this.WVM.SelectedTab == SettingsTab.OtherSettingsTab) {
+            if(this.WVM.SelectedTab == SettingsTabs.OtherSettingsTab) {
                 this.WVM.LoadSettings();
             }
         }

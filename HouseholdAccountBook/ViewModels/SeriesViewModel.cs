@@ -3,9 +3,9 @@
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
-    /// 年内合計VM
+    /// 系列VM
     /// </summary>
-    public class SummaryWithinYearViewModel
+    public class SeriesViewModel
     {
         /// <summary>
         /// 収支種別

@@ -20,27 +20,31 @@ namespace HouseholdAccountBook.ConstValue
         /// タブ
         /// </summary>
         /// <remarks>数字はタブのインデックスと対応付けること</remarks>
-        public enum Tab 
+        public enum Tabs 
         {
             /// <summary>
             /// 帳簿タブ
             /// </summary>
             BooksTab = 0,
             /// <summary>
+            /// 月間グラフタブ
+            /// </summary>
+            DailyGraphWithinMonthTab = 1,
+            /// <summary>
             /// 年間一覧タブ
             /// </summary>
-            ListTab = 1,
+            MonthlyListWithinYearTab = 2,
             /// <summary>
-            /// グラフタブ
+            /// 年間グラフタブ
             /// </summary>
-            GraphTab = 2
+            MonthlyGraphWithinYearTab = 3,
         }
 
         /// <summary>
         /// 設定タブ
         /// </summary>
         /// <remarks>数字は設定タブのインデックスと対応付けること</remarks>
-        public enum SettingsTab 
+        public enum SettingsTabs 
         {
             /// <summary>
             /// 項目設定タブ
@@ -154,7 +158,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 登録モード
         /// </summary>
-        public enum RegistrationMode
+        public enum RegistrationMode 
         {
             // 追加
             Add,

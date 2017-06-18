@@ -27,9 +27,10 @@
         <RoutedCommand x:Key="DeleteActionCommand"/>
 
         <!-- 表示コマンド -->
-        <RoutedCommand x:Key="IndicateBookCommand"/>
-        <RoutedCommand x:Key="IndicateListCommand"/>
-        <RoutedCommand x:Key="IndicateGraphCommand"/>
+        <RoutedCommand x:Key="IndicateBookTabCommand"/>
+        <RoutedCommand x:Key="IndicateDailyGraphWithinMonthTabCommand"/>
+        <RoutedCommand x:Key="IndicateMonthlyListWithinYearTabCommand"/>
+        <RoutedCommand x:Key="IndicateMonthlyGraphWithinYearTabCommand"/>
         <RoutedCommand x:Key="UpdateCommand"/>
         
         <!-- 帳簿表示操作コマンド -->
@@ -104,9 +105,10 @@
         <CommandBinding Command="{StaticResource DeleteActionCommand}" CanExecute="DeleteActionCommand_CanExecute" Executed="DeleteActionCommand_Executed"/>
         
         <!-- 表示コマンド -->
-        <CommandBinding Command="{StaticResource IndicateBookCommand}" CanExecute="IndicateBookCommand_CanExecute" Executed="IndicateBookCommand_Executed"/>
-        <CommandBinding Command="{StaticResource IndicateListCommand}" CanExecute="IndicateListCommand_CanExecute" Executed="IndicateListCommand_Executed"/>
-        <CommandBinding Command="{StaticResource IndicateGraphCommand}" CanExecute="IndicateGraphCommand_CanExecute" Executed="IndicateGraphCommand_Executed"/>
+        <CommandBinding Command="{StaticResource IndicateBookTabCommand}" CanExecute="IndicateBookTabCommand_CanExecute" Executed="IndicateBookTabCommand_Executed"/>
+        <CommandBinding Command="{StaticResource IndicateDailyGraphWithinMonthTabCommand}" CanExecute="IndicateDailyGraphWithinMonthTabCommand_CanExecute" Executed="IndicateDailyGraphWithinMonthTabCommand_Executed"/>
+        <CommandBinding Command="{StaticResource IndicateMonthlyListWithinYearTabCommand}" CanExecute="IndicateMonthlyListWithinYearTabCommand_CanExecute" Executed="IndicateMonthlyListWithinYearTabCommand_Executed"/>
+        <CommandBinding Command="{StaticResource IndicateMonthlyGraphWithinYearTabCommand}" CanExecute="IndicateMonthlyGraphWithinYearTabCommand_CanExecute" Executed="IndicateMonthlyGraphWithinYearTabCommand_Executed"/>
         <CommandBinding Command="{StaticResource UpdateCommand}" Executed="UpdateCommand_Executed"/>
         
         <!-- 帳簿表示コマンド -->
@@ -166,21 +168,28 @@
             </MenuItem>
             <MenuItem Header="表示(_V)">
                 <MenuItem Header="帳簿(_B)">
-                    <MenuItem Header="切替(_D)" Command="{StaticResource IndicateBookCommand}"/>
+                    <MenuItem Header="切替(_D)" Command="{StaticResource IndicateBookTabCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="先月(_L)" Command="{StaticResource GoToLastMonthCommand}" InputGestureText="Ctrl+←"/>
+                    <MenuItem Header="今月(_T)" Command="{StaticResource GoToThisMonthCommand}" InputGestureText="Ctrl+↓"/>
+                    <MenuItem Header="来月(_N)" Command="{StaticResource GoToNextMonthCommand}" InputGestureText="Ctrl+→"/>
+                </MenuItem>
+                <MenuItem Header="月間グラフ(_G)">
+                    <MenuItem Header="切替(_D)" Command="{StaticResource IndicateDailyGraphWithinMonthTabCommand}"/>
                     <Separator/>
                     <MenuItem Header="先月(_L)" Command="{StaticResource GoToLastMonthCommand}" InputGestureText="Ctrl+←"/>
                     <MenuItem Header="今月(_T)" Command="{StaticResource GoToThisMonthCommand}" InputGestureText="Ctrl+↓"/>
                     <MenuItem Header="来月(_N)" Command="{StaticResource GoToNextMonthCommand}" InputGestureText="Ctrl+→"/>
                 </MenuItem>
                 <MenuItem Header="年間一覧(_L)">
-                    <MenuItem Header="切替(_D)" Command="{StaticResource IndicateListCommand}"/>
+                    <MenuItem Header="切替(_D)" Command="{StaticResource IndicateMonthlyListWithinYearTabCommand}"/>
                     <Separator/>
                     <MenuItem Header="去年(_L)" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Ctrl+←"/>
                     <MenuItem Header="今年(_T)" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Ctrl+↓"/>
                     <MenuItem Header="来年(_N)" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Ctrl+→"/>
                 </MenuItem>
-                <MenuItem Header="グラフ(_G)">
-                    <MenuItem Header="切替(_D)" Command="{StaticResource IndicateGraphCommand}"/>
+                <MenuItem Header="年間グラフ(_G)">
+                    <MenuItem Header="切替(_D)" Command="{StaticResource IndicateMonthlyGraphWithinYearTabCommand}"/>
                     <Separator/>
                     <MenuItem Header="去年(_L)" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Ctrl+←"/>
                     <MenuItem Header="今年(_T)" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Ctrl+↓"/>
@@ -209,7 +218,7 @@
             <TabItem Header="帳簿">
                 <TabItem.InputBindings>
                     <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
-                    <KeyBinding Gesture="Alt+Up" Command="{StaticResource IndicateListCommand}"/>
+                    <KeyBinding Gesture="Alt+Up" Command="{StaticResource IndicateMonthlyListWithinYearTabCommand}"/>
                     <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisMonthCommand}"/>
                     <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastMonthCommand}"/>
                     <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextMonthCommand}"/>
@@ -337,6 +346,38 @@
                     </StatusBar>
                 </Grid>
             </TabItem>
+            <TabItem Header="月間&#10;グラフ">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 中央メニュー -->
+                    <Grid Grid.Row="0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="◀" Width="20" Command="{StaticResource GoToLastMonthCommand}"/>
+                            <Button Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}}" Width="120"/>
+                            <Button Content="▶" Width="20" Command="{StaticResource GoToNextMonthCommand}"/>
+                            <Button Content="今月" Width="40" Command="{StaticResource GoToThisMonthCommand}"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
+                                              ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
+                                              SelectionChanged="BookComboBox_SelectionChanged"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="1" Background="White">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.7*"/>
+                            <RowDefinition Height="0.3*"/>
+                        </Grid.RowDefinitions>
+
+                        <oxy:PlotView Grid.Row="0" Model="{Binding WholeItemDailyGraphModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemDailyGraphModel}" Controller="{Binding Controller}"/>
+                    </Grid>
+                </Grid>
+                
+            </TabItem>
             <TabItem Header="年間&#10;一覧">
                 <TabItem.InputBindings>
                     <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
@@ -422,7 +463,7 @@
                     </Grid>
                 </Grid>
             </TabItem>
-            <TabItem Header="グラフ">
+            <TabItem Header="年間&#10;グラフ">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -448,8 +489,8 @@
                             <RowDefinition Height="0.3*"/>
                         </Grid.RowDefinitions>
 
-                        <oxy:PlotView Grid.Row="0" Model="{Binding WholeItemGraphModel}" Controller="{Binding Controller}"/>
-                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemGraphModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="0" Model="{Binding WholeItemMonthlyGraphModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemMonthlyGraphModel}" Controller="{Binding Controller}"/>
                     </Grid>
                 </Grid>
             </TabItem>
