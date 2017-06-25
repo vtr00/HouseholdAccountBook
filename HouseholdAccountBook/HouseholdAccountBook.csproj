@@ -16,6 +16,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -28,7 +29,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -157,8 +157,8 @@
       <DependentUpon>NumericUpDown.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dao\DaoBuilder.cs" />
-    <Compile Include="ViewModels\ActionListRegistrationWindowViewModel.cs" />
-    <Compile Include="ViewModels\ActionRegistrationWindowViewModel.cs" />
+    <Compile Include="ViewModels\WindowViewModel\ActionListRegistrationWindowViewModel.cs" />
+    <Compile Include="ViewModels\WindowViewModel\ActionRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\ActionViewModel.cs" />
     <Compile Include="ViewModels\BookSettingViewModel.cs" />
     <Compile Include="ViewModels\BookComparisonViewModel.cs" />
@@ -166,15 +166,15 @@
     <Compile Include="ViewModels\CategoryViewModel.cs" />
     <Compile Include="ViewModels\CommissionKindViewModel.cs" />
     <Compile Include="ViewModels\CsvComparisonViewModel.cs" />
-    <Compile Include="ViewModels\CsvComparisonWindowViewModel.cs" />
-    <Compile Include="ViewModels\DbSettingWindowViewModel.cs" />
+    <Compile Include="ViewModels\WindowViewModel\CsvComparisonWindowViewModel.cs" />
+    <Compile Include="ViewModels\WindowViewModel\DbSettingWindowViewModel.cs" />
     <Compile Include="ViewModels\HierarchicalItemViewModel.cs" />
     <Compile Include="ViewModels\ItemViewModel.cs" />
-    <Compile Include="ViewModels\MainWindowViewModel.cs" />
-    <Compile Include="ViewModels\MoveRegistrationWindowViewModel.cs" />
+    <Compile Include="ViewModels\WindowViewModel\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\WindowViewModel\MoveRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\RelationViewModel.cs" />
     <Compile Include="ViewModels\SeriesItemViewModel.cs" />
-    <Compile Include="ViewModels\SettingsWindowViewModel.cs" />
+    <Compile Include="ViewModels\WindowViewModel\SettingsWindowViewModel.cs" />
     <Compile Include="ViewModels\SummaryViewModel.cs" />
     <Compile Include="ViewModels\SeriesViewModel.cs" />
     <Compile Include="Windows\ActionListRegistrationWindow.xaml.cs">
