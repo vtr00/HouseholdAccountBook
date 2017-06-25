@@ -75,8 +75,8 @@
     <Window.DataContext>
         <viewmodels:SettingsWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
-    
-    <Grid>
+
+    <Grid Background="WhiteSmoke">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -84,7 +84,7 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="ファイル(_F)">
-                <MenuItem Header="終了(_X)" Command="{x:Static ApplicationCommands.Close}" InputGestureText="Alt+F4"/>
+                <MenuItem Header="閉じる(_X)" Command="{x:Static ApplicationCommands.Close}" InputGestureText="Alt+F4"/>
             </MenuItem>
         </Menu>
         

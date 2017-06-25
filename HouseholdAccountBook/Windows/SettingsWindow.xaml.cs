@@ -567,7 +567,7 @@ WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.Se
 SELECT shop_name
 FROM hst_shop
 WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time;", this.WVM.SelectedItemVM.Id);
+ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
 
                     this.WVM.SelectedItemVM.ShopNameList.Clear();
                     reader.ExecWholeRow((count2, record2) => {
@@ -609,7 +609,7 @@ WHERE remark = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.Selec
 SELECT remark
 FROM hst_remark
 WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time;", this.WVM.SelectedItemVM.Id);
+ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
 
                     this.WVM.SelectedItemVM.RemarkList.Clear();
                     reader.ExecWholeRow((count2, record2) => {
