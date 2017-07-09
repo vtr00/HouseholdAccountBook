@@ -129,16 +129,25 @@ namespace HouseholdAccountBook.Windows
         /// <param name="builder">DAOビルダ</param>
         /// <param name="selectedBookId">帳簿ID</param>
         /// <param name="groupId">グループID</param>
-        public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, int groupId)
+        /// <param name="mode">登録モード</param>
+        public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, int groupId, RegistrationMode mode = RegistrationMode.Edit)
         {
             this.builder = builder;
 
             InitializeComponent();
-            Title = "移動(編集)";
-            this.WVM.RegMode = RegistrationMode.Edit;
-
+            this.WVM.RegMode = mode;
             this.selectedBookId = selectedBookId;
-            this.groupId = groupId;
+
+            switch (this.WVM.RegMode) {
+                case RegistrationMode.Edit:
+                    Title = "移動(編集)";
+                    this.groupId = groupId;
+                    break;
+                case RegistrationMode.Copy:
+                    Title = "移動(追加)";
+                    this.groupId = null;
+                    break;
+            }
 
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
             int fromBookId = -1;
@@ -170,11 +179,11 @@ ORDER BY move_flg DESC;", groupId);
                     if (moveFlg == 1) {
                         if(actValue < 0) {
                             fromBookId = bookId;
-                            fromActionId = actionId;
+                            this.fromActionId = actionId;
                         }
                         else {
                             toBookId = bookId;
-                            toActionId = actionId;
+                            this.toActionId = actionId;
                             moveValue = actValue;
                         }
                     }
@@ -185,7 +194,7 @@ ORDER BY move_flg DESC;", groupId);
                         else if (bookId == toBookId) { // 移動先負担
                             commissionKind = CommissionKind.ToBook;
                         }
-                        commissionActionId = actionId;
+                        this.commissionActionId = actionId;
                         commissionItemId = itemId;
                         commissionValue = Math.Abs(actValue);
                         commissionRemark = remark;
@@ -452,18 +461,18 @@ VALUES (@{0}, (
 -- 移動元
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
-WHERE action_id = @{4};", fromBookId, actTime, - actValue, Updater, fromActionId);
+WHERE action_id = @{4};", fromBookId, actTime, - actValue, Updater, this.fromActionId);
                         if(selectedBookId == fromBookId) {
-                            resActionId = fromActionId;
+                            resActionId = this.fromActionId;
                         }
 
                         dao.ExecNonQuery(@"
 -- 移動先
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
-WHERE action_id = @{4};", toBookId, actTime, actValue, Updater, toActionId);
+WHERE action_id = @{4};", toBookId, actTime, actValue, Updater, this.toActionId);
                         if(selectedBookId == toBookId) {
-                            resActionId = toActionId;
+                            resActionId = this.toActionId;
                         }
                         #endregion
                     }

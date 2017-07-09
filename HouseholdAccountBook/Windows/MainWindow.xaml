@@ -24,6 +24,7 @@
         <RoutedCommand x:Key="AddActionToBookCommand"/>
         <RoutedCommand x:Key="AddActionListToBookCommand"/>
         <RoutedCommand x:Key="EditActionCommand"/>
+        <RoutedCommand x:Key="CopyActionCommand"/>
         <RoutedCommand x:Key="DeleteActionCommand"/>
 
         <!-- 表示コマンド -->
@@ -102,6 +103,7 @@
         <CommandBinding Command="{StaticResource AddActionToBookCommand}" CanExecute="AddActionToBookCommand_CanExecute" Executed="AddActionToBookCommand_Executed"/>
         <CommandBinding Command="{StaticResource EditActionCommand}" CanExecute="EditActionCommand_CanExecute" Executed="EditActionCommand_Executed"/>
         <CommandBinding Command="{StaticResource AddActionListToBookCommand}" CanExecute="AddActionListToBookCommand_CanExecute" Executed="AddActionListToBookCommand_Executed"/>
+        <CommandBinding Command="{StaticResource CopyActionCommand}" CanExecute="CopyActionCommand_CanExecute" Executed="CopyActionCommand_Executed"/>
         <CommandBinding Command="{StaticResource DeleteActionCommand}" CanExecute="DeleteActionCommand_CanExecute" Executed="DeleteActionCommand_Executed"/>
         
         <!-- 表示コマンド -->
@@ -164,6 +166,7 @@
                 <MenuItem Header="追加(_A)..." Command="{StaticResource AddActionToBookCommand}" InputGestureText="Ctrl++"/>
                 <MenuItem Header="まとめて追加(_W)..." Command="{StaticResource AddActionListToBookCommand}" InputGestureText="Ctrl+Shift++"/>
                 <MenuItem Header="変更(_E)..." Command="{StaticResource EditActionCommand}" InputGestureText="F2"/>
+                <MenuItem Header="複製(_C)..." Command="{StaticResource CopyActionCommand}" InputGestureText="Ctrl+Shift+C"/>
                 <MenuItem Header="削除(_D)" Command="{StaticResource DeleteActionCommand}" InputGestureText="Del"/>
             </MenuItem>
             <MenuItem Header="表示(_V)">
@@ -231,7 +234,8 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <ScrollViewer Grid.Row="0" Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden">
+                    <ScrollViewer Grid.Row="0" Grid.Column="0" Margin="2,2,2,1"
+                                  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -255,13 +259,14 @@
                                 <Button Content="追加" Width="50" Command="{StaticResource AddActionToBookCommand}"/>
                                 <Button Content="まとめて追加" Width="80" Command="{StaticResource AddActionListToBookCommand}"/>
                                 <Button Content="変更" Width="50" Command="{StaticResource EditActionCommand}"/>
+                                <Button Content="複製" Width="50" Command="{StaticResource CopyActionCommand}"/>
                                 <Button Content="削除" Width="50" Command="{StaticResource DeleteActionCommand}"/>
                             </StackPanel>
                         </Grid>
                     </ScrollViewer>
 
                     <!-- データリスト -->
-                    <Grid Grid.Row="1" Grid.Column="0">
+                    <Grid Grid.Row="1" Grid.Column="0" Margin="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1.0*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -279,14 +284,15 @@
                                 <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
                             </DataGrid.Resources>
                             <DataGrid.InputBindings>
-                                <KeyBinding Gesture="F2" Command="{StaticResource EditActionCommand}"/>
-                                <KeyBinding Gesture="Enter" Command="{StaticResource EditActionCommand}"/>
-                                <KeyBinding Gesture="Delete" Command="{StaticResource DeleteActionCommand}"/>
+                                <KeyBinding Gesture="Ctrl+M" Command="{StaticResource MoveToBookCommand}"/>
                                 <KeyBinding Gesture="Ctrl+OEMPlus" Command="{StaticResource AddActionToBookCommand}"/>
                                 <KeyBinding Gesture="Ctrl+Add" Command="{StaticResource AddActionToBookCommand}"/>
                                 <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{StaticResource AddActionListToBookCommand}"/>
                                 <KeyBinding Gesture="Shift+Ctrl+Add" Command="{StaticResource AddActionListToBookCommand}"/>
-                                <KeyBinding Gesture="Ctrl+M" Command="{StaticResource MoveToBookCommand}"/>
+                                <KeyBinding Gesture="F2" Command="{StaticResource EditActionCommand}"/>
+                                <KeyBinding Gesture="Enter" Command="{StaticResource EditActionCommand}"/>
+                                <KeyBinding Gesture="Ctrl+Shift+C" Command="{StaticResource CopyActionCommand}"/>
+                                <KeyBinding Gesture="Delete" Command="{StaticResource DeleteActionCommand}"/>
                                 <MouseBinding Gesture="LeftDoubleClick" Command="{StaticResource EditActionCommand}"/>
                             </DataGrid.InputBindings>
                             <i:Interaction.Behaviors>
@@ -354,7 +360,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0">
+                    <Grid Grid.Row="0" Margin="2,2,2,1">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="◀" Width="20" Command="{StaticResource GoToLastMonthCommand}"/>
                             <Button Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}}" Width="120"/>
@@ -366,7 +372,7 @@
                         </StackPanel>
                     </Grid>
 
-                    <Grid Grid.Row="1" Background="White">
+                    <Grid Grid.Row="1" Margin="2" Background="White">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="0.7*"/>
                             <RowDefinition Height="0.3*"/>
@@ -392,7 +398,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0">
+                    <Grid Grid.Row="0" Margin="2,2,2,1">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="◀" Width="20" Command="{StaticResource GoToLastYearCommand}"/>
                             <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToThisYearConverter}}" Width="120"
@@ -406,7 +412,7 @@
                     </Grid>
 
                     <!-- データリスト -->
-                    <Grid Grid.Row="1" Background="White">
+                    <Grid Grid.Row="1" Margin="2" Background="White">
                         <DataGrid Grid.Column="1" ItemsSource="{Binding SummaryWithinYearVMList}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
@@ -471,7 +477,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0">
+                    <Grid Grid.Row="0" Margin="2,2,2,1">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="◀" Width="20" Command="{StaticResource GoToLastYearCommand}"/>
                             <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToThisYearConverter}}" Width="120"/>
@@ -483,7 +489,7 @@
                         </StackPanel>
                     </Grid>
 
-                    <Grid Grid.Row="1" Background="White">
+                    <Grid Grid.Row="1" Margin="2" Background="White">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="0.7*"/>
                             <RowDefinition Height="0.3*"/>

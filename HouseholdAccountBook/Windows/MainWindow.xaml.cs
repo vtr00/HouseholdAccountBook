@@ -609,6 +609,58 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         }
 
         /// <summary>
+        /// 項目複製可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CopyActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            // 帳簿タブを選択していて、選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが0より大きい
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVM.ActionId > 0;
+        }
+
+        /// <summary>
+        /// 項目複製処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CopyActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            int? groupKind = null;
+            using (DaoBase dao = builder.Build()) {
+                DaoReader reader = dao.ExecQuery(@"
+SELECT A.group_id, G.group_kind
+FROM hst_action A
+LEFT JOIN (SELECT * FROM hst_group WHERE del_flg = 0) G ON G.group_id = A.group_id
+WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId);
+
+                reader.ExecARow((record) => {
+                    groupKind = record.ToNullableInt("group_kind");
+                });
+            }
+
+            if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
+                ActionRegistrationWindow arw = new ActionRegistrationWindow(builder, this.WVM.SelectedActionVM.ActionId, RegistrationMode.Copy);
+                arw.Registrated += (sender2, e2) => {
+                    UpdateBookTabData(e2.Value);
+                    FocusManager.SetFocusedElement(this, actionDataGrid);
+                    actionDataGrid.Focus();
+                };
+                arw.ShowDialog();
+            }
+            else {
+                // 移動の複製時の処理
+                MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationMode.Copy);
+                mrw.Registrated += (sender2, e2) => {
+                    UpdateBookTabData(e2.Value);
+                    FocusManager.SetFocusedElement(this, actionDataGrid);
+                    actionDataGrid.Focus();
+                };
+                mrw.ShowDialog();
+            }
+        }
+
+        /// <summary>
         /// 項目削除可能か
         /// </summary>
         /// <param name="sender"></param>

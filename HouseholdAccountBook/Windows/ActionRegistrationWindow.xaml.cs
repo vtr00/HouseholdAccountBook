@@ -1,14 +1,14 @@
 ﻿using HouseholdAccountBook.Dao;
-using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.UserEventArgs;
+using HouseholdAccountBook.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
-using System.Diagnostics;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -107,19 +107,28 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// 帳簿項目編集ウィンドウ
+        /// 帳簿項目編集(複製)ウィンドウ
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         /// <param name="actionId">帳簿項目ID</param>
-        public ActionRegistrationWindow(DaoBuilder builder, int actionId)
+        /// <param name="mode">登録モード</param>
+        public ActionRegistrationWindow(DaoBuilder builder, int actionId, RegistrationMode mode = RegistrationMode.Edit)
         {
             this.builder = builder;
 
             InitializeComponent();
-            Title = "編集";
-            this.WVM.RegMode = RegistrationMode.Edit;
+            this.WVM.RegMode = mode;
 
-            this.actionId = actionId;
+            switch (this.WVM.RegMode) {
+                case RegistrationMode.Edit:
+                    Title = "編集";
+                    this.actionId = actionId;
+                    break;
+                case RegistrationMode.Copy:
+                    Title = "追加";
+                    this.actionId = null;
+                    break;
+            }
             
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
             BookViewModel selectedBookVM = null;

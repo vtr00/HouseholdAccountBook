@@ -163,7 +163,9 @@ namespace HouseholdAccountBook.ConstValue
             // 追加
             Add,
             // 編集
-            Edit
+            Edit,
+            // 複製
+            Copy,
         }
 
         /// <summary>
