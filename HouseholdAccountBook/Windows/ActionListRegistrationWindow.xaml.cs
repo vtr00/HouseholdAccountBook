@@ -66,7 +66,6 @@ namespace HouseholdAccountBook.Windows
 
             DateTime dateTime = selectedDateTime ?? DateTime.Today;
             this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = dateTime });
-            this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = dateTime });
 
             UpdateCategoryList();
             UpdateItemList();

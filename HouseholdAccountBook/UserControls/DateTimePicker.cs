@@ -209,6 +209,8 @@ namespace HouseholdAccountBook.UserControls
                 IncrementSelectedNumber(textBox, this);
             }
             textBox.TextChanged += TextBox_TextChanged;
+
+            e.Handled = true;
         }
 
         /// <summary>
