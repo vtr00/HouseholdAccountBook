@@ -2,8 +2,6 @@
 using System.Windows.Controls;
 using System.Windows;
 using System.Collections;
-using System;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using HouseholdAccountBook.Interfaces;
 
@@ -88,7 +86,6 @@ namespace HouseholdAccountBook.Behaviors
                     if (oldItem is IMultiSelectable oldV) {
                         oldV.IsSelected = false;
                     }
-
                 }
                 foreach (object newItem in e.OldItems) {
                     if (newItem is IMultiSelectable newV) {

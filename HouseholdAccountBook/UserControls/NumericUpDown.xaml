@@ -120,10 +120,9 @@
                 <RowDefinition Height="0.5*"/>
                 <RowDefinition Height="0.5*"/>
             </Grid.RowDefinitions>
-            
+
             <Button Grid.Row="0" FontSize="5" Content="&#8963;" IsTabStop="False" Command="{StaticResource IncreaseCommand}"/>
             <Button Grid.Row="1" FontSize="5" Content="&#8964;" IsTabStop="False" Command="{StaticResource DecreaseCommand}"/>
         </Grid>
-
     </Grid>
 </UserControl>

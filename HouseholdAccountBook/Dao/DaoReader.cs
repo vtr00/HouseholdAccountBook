@@ -14,11 +14,6 @@ namespace HouseholdAccountBook.Dao
         private string sql;
 
         /// <summary>
-        /// レコード数
-        /// </summary>
-        public int Count { get { return resultSet.Count; } }
-
-        /// <summary>
         /// 実行結果
         /// </summary>
         private LinkedList<Dictionary<string, object>> resultSet;
@@ -26,6 +21,11 @@ namespace HouseholdAccountBook.Dao
         /// エヌメレータ
         /// </summary>
         private LinkedList<Dictionary<string, object>>.Enumerator enumerator;
+
+        /// <summary>
+        /// レコード数
+        /// </summary>
+        public int Count { get { return resultSet.Count; } }
 
         /// <summary>
         /// コンストラクタ

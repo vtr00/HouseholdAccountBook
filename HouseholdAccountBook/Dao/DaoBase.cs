@@ -35,7 +35,7 @@ namespace HouseholdAccountBook.Dao
         private bool Open()
         {
             connection.Open();
-            while (connection.State == System.Data.ConnectionState.Connecting) {; }
+            while (connection.State == System.Data.ConnectionState.Connecting) { ; }
 
             return connection.State == System.Data.ConnectionState.Open;
         }
@@ -97,12 +97,12 @@ namespace HouseholdAccountBook.Dao
             }
             catch (DbException e) {
                 Console.WriteLine(e.Message);
-                dbTransaction.Rollback();
+                dbTransaction?.Rollback();
                 throw;
             }
             catch (Exception e) {
                 Console.WriteLine(e.Message);
-                dbTransaction.Rollback();
+                dbTransaction?.Rollback();
                 throw;
             }
         }
