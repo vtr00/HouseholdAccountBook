@@ -151,12 +151,16 @@
     <Compile Include="UserControls\CustomColumnSeries.cs" />
     <Compile Include="UserControls\DataGridEditableTemplateColumn.cs" />
     <Compile Include="UserControls\DateTimePicker.cs" />
+    <Compile Include="UserControls\NumericInputButton.xaml.cs">
+      <DependentUpon>NumericInputButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserEventArgs\EventArgs.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="UserControls\NumericUpDown.xaml.cs">
       <DependentUpon>NumericUpDown.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dao\DaoBuilder.cs" />
+    <Compile Include="ViewModels\NumericUpDownViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel\ActionListRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel\ActionRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\ActionViewModel.cs" />
@@ -195,6 +199,10 @@
     <Compile Include="Windows\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="UserControls\NumericInputButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\NumericUpDown.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

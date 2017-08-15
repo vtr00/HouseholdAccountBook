@@ -104,7 +104,7 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public NumericUpDown()
+        public NumericUpDown() 
         {
             InitializeComponent();
         }
@@ -153,72 +153,59 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// 数字ボタン押下時
+        /// 数字入力ボタン押下時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void NumberInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void ButtonInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ContentControl control = e.OriginalSource as ContentControl;
-            int value = Int32.Parse(control.Content.ToString()); // 入力値
-
             TextBox textBox = _textBox;
-            if (this.Value == null) {
-                this.Value = value;
-                textBox.SelectionStart = 1;
-            }
-            else {
-                int selectionStart = textBox.SelectionStart;
-                int selectionEnd = selectionStart + textBox.SelectionLength;
-                string forwardText = textBox.Text.Substring(0, selectionStart);
-                string selectedText = textBox.SelectedText;
-                string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
 
-                this.Value = int.Parse(string.Format("{0}{1}{2}", forwardText, value, backwardText));
-                textBox.SelectionStart = selectionStart + 1;
-            }
-            e.Handled = true;
-        }
+            switch (this.UVM.InputedKind) {
+                case NumericInputButton.InputKind.Number:
+                    int value = this.UVM.InputedValue.Value;
+                    if (this.Value == null) {
+                        this.Value = value;
+                        textBox.SelectionStart = 1;
+                    }
+                    else {
+                        int selectionStart = textBox.SelectionStart;
+                        int selectionEnd = selectionStart + textBox.SelectionLength;
+                        string forwardText = textBox.Text.Substring(0, selectionStart);
+                        string selectedText = textBox.SelectedText;
+                        string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
 
-        /// <summary>
-        /// BackSpaceボタン押下時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void BackSpaceInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            if (this.Value == 0) {
-                this.Value = null;
-            }
-            else {
-                TextBox textBox = _textBox;
-                int selectionStart = textBox.SelectionStart;
-                int selectionLength = textBox.SelectionLength;
-                int selectionEnd = selectionStart + textBox.SelectionLength;
-                string forwardText = textBox.Text.Substring(0, selectionStart);
-                string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
+                        this.Value = int.Parse(string.Format("{0}{1}{2}", forwardText, value, backwardText));
+                        textBox.SelectionStart = selectionStart + 1;
+                    }
+                    break;
+                case NumericInputButton.InputKind.BackSpace:
+                    if (this.Value == 0) {
+                        this.Value = null;
+                    }
+                    else {
+                        int selectionStart = textBox.SelectionStart;
+                        int selectionLength = textBox.SelectionLength;
+                        int selectionEnd = selectionStart + textBox.SelectionLength;
+                        string forwardText = textBox.Text.Substring(0, selectionStart);
+                        string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
 
-                if (selectionLength != 0) {
-                    this.Value = int.Parse(string.Format("{0}{1}", forwardText, backwardText));
-                    textBox.SelectionStart = selectionStart;
-                }
-                else if (selectionStart != 0) {
-                    string newText = string.Format("{0}{1}", forwardText.Substring(0, selectionStart - 1), backwardText);
-                    this.Value = string.Empty == newText ? (int?)null : int.Parse(newText);
-                    textBox.SelectionStart = selectionStart - 1;
-                }
+                        if (selectionLength != 0) {
+                            this.Value = int.Parse(string.Format("{0}{1}", forwardText, backwardText));
+                            textBox.SelectionStart = selectionStart;
+                        }
+                        else if (selectionStart != 0) {
+                            string newText = string.Format("{0}{1}", forwardText.Substring(0, selectionStart - 1), backwardText);
+                            this.Value = string.Empty == newText ? (int?)null : int.Parse(newText);
+                            textBox.SelectionStart = selectionStart - 1;
+                        }
+                    }
+                    break;
+                case NumericInputButton.InputKind.Clear:
+                    this.Value = null;
+                    break;
             }
-            e.Handled = true;
-        }
 
-        /// <summary>
-        /// Clearボタン押下時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ClearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            this.Value = null;
             e.Handled = true;
         }
         #endregion
@@ -236,13 +223,12 @@ namespace HouseholdAccountBook.UserControls
             if (sender != null) {
                 // 既存のテキストボックス文字列に、新規に一文字追加された時、その文字列が数値として意味があるかどうかをチェック
                 {
-                    int xx;
                     string tmp = textBox.Text + e.Text;
                     if (tmp == string.Empty) {
                         yes_parse = true;
                     }
                     else {
-                        yes_parse = Int32.TryParse(tmp, out xx);
+                        yes_parse = Int32.TryParse(tmp, out int xx);
 
                         // 範囲内かどうかチェック
                         if (yes_parse) {

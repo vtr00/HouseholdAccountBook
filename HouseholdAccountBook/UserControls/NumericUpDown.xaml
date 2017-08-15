@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
              xmlns:local="clr-namespace:HouseholdAccountBook.UserControls"
              mc:Ignorable="d" 
              d:DesignWidth="150">
@@ -10,9 +11,7 @@
     <UserControl.Resources>
         <RoutedCommand x:Key="IncreaseCommand"/>
         <RoutedCommand x:Key="DecreaseCommand"/>
-        <RoutedCommand x:Key="NumberInputCommand"/>
-        <RoutedCommand x:Key="BackSpaceInputCommand"/>
-        <RoutedCommand x:Key="ClearCommand"/>
+        <RoutedCommand x:Key="ButtonInputCommand"/>
     </UserControl.Resources>
 
     <UserControl.CommandBindings>
@@ -20,14 +19,14 @@
                         CanExecute="IncreaseCommand_CanExecute" Executed="IncreaseCommand_Executed"/>
         <CommandBinding Command="{StaticResource DecreaseCommand}" 
                         CanExecute="DecreaseCommand_CanExecute" Executed="DecreaseCommand_Executed"/>
-        <CommandBinding Command="{StaticResource NumberInputCommand}" 
-                        Executed="NumberInputCommand_Executed"/>
-        <CommandBinding Command="{StaticResource BackSpaceInputCommand}" 
-                        Executed="BackSpaceInputCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ClearCommand}" 
-                        Executed="ClearCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ButtonInputCommand}" 
+                        Executed="ButtonInputCommand_Executed"/>
     </UserControl.CommandBindings>
-    
+
+    <UserControl.DataContext>
+        <viewmodels:NumericUpDownViewModel x:Name="UVM"/>
+    </UserControl.DataContext>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -51,67 +50,9 @@
             </TextBox>
             <Popup x:Name="_popup"
                 StaysOpen="{Binding IsKeyboardFocused, ElementName=_textBox}" PlacementTarget="{Binding ElementName=_textBox}">
-                <Grid>
-                    <Grid Height="50" Width="150">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="0.5*"/>
-                            <RowDefinition Height="0.5*"/>
-                        </Grid.RowDefinitions>
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="0.2*"/>
-                            <ColumnDefinition Width="0.2*"/>
-                            <ColumnDefinition Width="0.2*"/>
-                            <ColumnDefinition Width="0.2*"/>
-                            <ColumnDefinition Width="0.2*"/>
-                            <ColumnDefinition Width="0.2*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Button Grid.Row="0" Grid.Column="0" Content="1" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="0" Grid.Column="1" Content="2" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="0" Grid.Column="2" Content="3" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="0" Grid.Column="3" Content="4" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="0" Grid.Column="4" Content="5" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="0" Grid.Column="5" Content="BS" Command="{StaticResource BackSpaceInputCommand}"/>
-
-                        <Button Grid.Row="1" Grid.Column="0" Content="6" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="1" Grid.Column="1" Content="7" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="1" Grid.Column="2" Content="8" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="1" Grid.Column="3" Content="9" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="1" Grid.Column="4" Content="0" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="1" Grid.Column="5" Content="C" Command="{StaticResource ClearCommand}"/>
-                    </Grid>
-                    <Grid Height="100" Width="75" Visibility="Collapsed">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="0.5*"/>
-                            <RowDefinition Height="0.5*"/>
-                            <RowDefinition Height="0.5*"/>
-                            <RowDefinition Height="0.5*"/>
-                        </Grid.RowDefinitions>
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="0.3*"/>
-                            <ColumnDefinition Width="0.3*"/>
-                            <ColumnDefinition Width="0.3*"/>
-                        </Grid.ColumnDefinitions>
-                        
-                        <Button Grid.Row="0" Grid.Column="0" Content="7" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="0" Grid.Column="1" Content="8" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="0" Grid.Column="2" Content="9" Command="{StaticResource NumberInputCommand}"/>
-
-                        <Button Grid.Row="1" Grid.Column="0" Content="4" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="1" Grid.Column="1" Content="5" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="1" Grid.Column="2" Content="6" Command="{StaticResource NumberInputCommand}"/>
-                        
-                        <Button Grid.Row="2" Grid.Column="0" Content="1" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="2" Grid.Column="1" Content="2" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="2" Grid.Column="2" Content="3" Command="{StaticResource NumberInputCommand}"/>
-
-                        <Button Grid.Row="3" Grid.Column="0" Content="BS" Command="{StaticResource BackSpaceInputCommand}"/>
-                        <Button Grid.Row="3" Grid.Column="1" Content="0" Command="{StaticResource NumberInputCommand}"/>
-                        <Button Grid.Row="3" Grid.Column="2" Content="C" Command="{StaticResource ClearCommand}"/>
-                    </Grid>
-                </Grid>
+                <local:NumericInputButton InputedValue="{Binding InputedValue, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:NumericUpDown}}}"
+                                          InputedKind="{Binding InputedKind, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:NumericUpDown}}}"
+                                          Command="{StaticResource ButtonInputCommand}"/>
             </Popup>
         </Grid>
 
