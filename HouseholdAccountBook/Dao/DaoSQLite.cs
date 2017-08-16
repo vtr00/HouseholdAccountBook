@@ -7,26 +7,21 @@ namespace HouseholdAccountBook.Dao
     /// <summary>
     /// SQLite Data Access Object
     /// </summary>
-    public class DaoSQLite : DaoBase
+    public partial class DaoSQLite : DaoBase
     {
+        /// <summary>
+        /// 接続文字列
+        /// </summary>
         private const string DaoStringFormat = @"Data Source={0}";
 
         /// <summary>
-        /// 接続情報
-        /// </summary>
-        public new class ConnectInfo : DaoBase.ConnectInfo
-        {
-            public string filePath { get; set; }
-        }
-
-        /// <summary>
-        /// コンストラクタ
+        /// <see cref="DaoSQLite"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public DaoSQLite(ConnectInfo info) : this(info.filePath) { }
+        public DaoSQLite(ConnectInfo info) : this(info.FilePath) { }
 
         /// <summary>
-        /// コンストラクタ
+        /// <see cref="DaoSQLite"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
         public DaoSQLite(string filePath) : base(new SQLiteConnection(string.Format(DaoStringFormat, filePath))) { }

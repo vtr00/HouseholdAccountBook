@@ -14,6 +14,7 @@ namespace HouseholdAccountBook
     /// </summary>
     public partial class App : Application
     {
+        #region フィールド
         /// <summary>
         /// 接続情報
         /// </summary>
@@ -22,14 +23,12 @@ namespace HouseholdAccountBook
         /// 多重起動抑止用Mutex
         /// </summary>
         private static Mutex mutex = null;
+        #endregion
 
         /// <summary>
-        /// コンストラクタ
+        /// <see cref="App"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        public App()
-        {
-            
-        }
+        public App() { }
 
         /// <summary>
         /// アプリケーション開始時
@@ -41,7 +40,7 @@ namespace HouseholdAccountBook
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
             
             // 多重起動を抑止する
-            mutex = new Mutex(false, this.GetType().Assembly.GetName().Name);
+            App.mutex = new Mutex(false, this.GetType().Assembly.GetName().Name);
             if (!mutex.WaitOne(TimeSpan.Zero, false)) {
                 mutex.Close();
                 this.Shutdown();
@@ -75,7 +74,7 @@ namespace HouseholdAccountBook
             }
 
             // 接続設定を読み込む
-            connectInfo = new DaoNpgsql.ConnectInfo() {
+            this.connectInfo = new DaoNpgsql.ConnectInfo() {
                 Host = settings.App_Postgres_Host,
                 Port = settings.App_Postgres_Port,
                 UserName = settings.App_Postgres_UserName,
@@ -88,7 +87,7 @@ namespace HouseholdAccountBook
                 Role = settings.App_Postgres_Role
             };
 
-            DaoBuilder builder = new DaoBuilder(connectInfo);
+            DaoBuilder builder = new DaoBuilder(this.connectInfo);
             while (true) {
                 // 接続を試行する
                 bool isOpen = false;
@@ -172,15 +171,16 @@ namespace HouseholdAccountBook
                 }
             }
 
-            if(backUpNum > 0) { 
+            if(backUpNum > 0) {
                 // 起動情報を設定する
-                ProcessStartInfo info = new ProcessStartInfo();
-                info.FileName = dumpExePath;
-                info.Arguments = string.Format(
+                ProcessStartInfo info = new ProcessStartInfo() {
+                    FileName = dumpExePath,
+                    Arguments = string.Format(
                         "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
-                        connectInfo.Host, connectInfo.Port, connectInfo.UserName, connectInfo.Role, 
-                        string.Format(@"{0}/{1}.backup", backUpFolderPath, DateTime.Now.ToString("yyyyMMddHHmmss")), connectInfo.DatabaseName);
-                info.WindowStyle = ProcessWindowStyle.Hidden;
+                        connectInfo.Host, connectInfo.Port, connectInfo.UserName, connectInfo.Role,
+                        string.Format(@"{0}/{1}.backup", backUpFolderPath, DateTime.Now.ToString("yyyyMMddHHmmss")), connectInfo.DatabaseName),
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
 
                 // バックアップする
                 Process process = Process.Start(info);

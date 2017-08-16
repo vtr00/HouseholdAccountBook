@@ -31,7 +31,7 @@ namespace HouseholdAccountBook.Windows
         private DaoBuilder builder;
         #endregion
 
-        #region イベントハンドラ
+        #region イベント
         /// <summary>
         /// 比較結果が変更された時
         /// </summary>
@@ -39,7 +39,7 @@ namespace HouseholdAccountBook.Windows
         #endregion
 
         /// <summary>
-        /// CSV比較ウィンドウ
+        /// <see cref="CsvComparisonWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         /// <param name="bookId">帳簿ID</param>
@@ -53,6 +53,7 @@ namespace HouseholdAccountBook.Windows
             LoadSetting();
         }
 
+        #region イベントハンドラ
         #region コマンド
         /// <summary>
         /// ウィンドウを閉じる
@@ -223,7 +224,6 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         }
         #endregion
 
-        #region イベントハンドラ
         /// <summary>
         /// フォーム終了時
         /// </summary>

@@ -32,7 +32,7 @@ namespace HouseholdAccountBook.Windows
         private int? groupId = null;
         #endregion
 
-        #region イベントハンドラ
+        #region イベント
         /// <summary>
         /// 登録時のイベント
         /// </summary>
@@ -40,7 +40,7 @@ namespace HouseholdAccountBook.Windows
         #endregion
 
         /// <summary>
-        /// 帳簿項目追加ウィンドウ
+        /// 帳簿項目の新規登録のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         /// <param name="bookId">帳簿ID</param>
@@ -82,24 +82,24 @@ namespace HouseholdAccountBook.Windows
             LoadSetting();
 
             #region イベントハンドラの設定
-            this.WVM.OnBookChanged += () => {
+            this.WVM.BookChanged += () => {
                 UpdateCategoryList();
                 UpdateItemList();
                 UpdateShopList();
                 UpdateRemarkList();
             };
-            this.WVM.OnBalanceKindChanged += () => {
+            this.WVM.BalanceKindChanged += () => {
                 UpdateCategoryList();
                 UpdateItemList();
                 UpdateShopList();
                 UpdateRemarkList();
             };
-            this.WVM.OnCategoryChanged += () => {
+            this.WVM.CategoryChanged += () => {
                 UpdateItemList();
                 UpdateShopList();
                 UpdateRemarkList();
             };
-            this.WVM.OnItemChanged += () => {
+            this.WVM.ItemChanged += () => {
                 UpdateShopList();
                 UpdateRemarkList();
             };
@@ -107,7 +107,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// 帳簿項目編集(複製)ウィンドウ
+        /// 帳簿項目の編集(複製)のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         /// <param name="actionId">帳簿項目ID</param>
@@ -195,30 +195,31 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
             LoadSetting();
 
             #region イベントハンドラの設定
-            this.WVM.OnBookChanged += () => {
+            this.WVM.BookChanged += () => {
                 UpdateCategoryList();
                 UpdateItemList();
                 UpdateShopList();
                 UpdateRemarkList();
             };
-            this.WVM.OnBalanceKindChanged += () => {
+            this.WVM.BalanceKindChanged += () => {
                 UpdateCategoryList();
                 UpdateItemList();
                 UpdateShopList();
                 UpdateRemarkList();
             };
-            this.WVM.OnCategoryChanged += () => {
+            this.WVM.CategoryChanged += () => {
                 UpdateItemList();
                 UpdateShopList();
                 UpdateRemarkList();
             };
-            this.WVM.OnItemChanged += () => {
+            this.WVM.ItemChanged += () => {
                 UpdateShopList();
                 UpdateRemarkList();
             };
             #endregion
         }
 
+        #region イベントハンドラ
         #region コマンド
         /// <summary>
         /// 今日コマンド判定
@@ -307,7 +308,6 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
         }
         #endregion
 
-        #region イベントハンドラ
         /// <summary>
         /// フォーム終了時
         /// </summary>

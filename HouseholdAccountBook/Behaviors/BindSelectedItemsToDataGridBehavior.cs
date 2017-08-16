@@ -56,7 +56,9 @@ namespace HouseholdAccountBook.Behaviors
                 typeof(IList), 
                 typeof(BindSelectedItemsToDataGridBehavior), 
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, SelectedItemsChanged));
+        #endregion
 
+        #region イベントハンドラ
         /// <summary>
         /// <see cref="SelectedItems"/> が変更されたときに <see cref="CollectionChanged(object, NotifyCollectionChangedEventArgs)"/> を設定します。
         /// </summary>
@@ -94,12 +96,11 @@ namespace HouseholdAccountBook.Behaviors
                 }
             }
         }
-        #endregion
 
         /// <summary>
-        /// <see cref="SelectedItems"/> を選択されたアイテムの変更に応じて更新する
+        /// <see cref="SelectedItems"/> を選択されたアイテムの変更に応じて更新します。
         /// </summary>
-        void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        protected void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //新たに選択されたアイテムをリストに追加する
             foreach (object addedItem in e.AddedItems) {
@@ -111,5 +112,6 @@ namespace HouseholdAccountBook.Behaviors
                 SelectedItems.Remove(removedItem);
             }
         }
+        #endregion
     }
 }

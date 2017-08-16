@@ -7,6 +7,7 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class SeriesViewModel
     {
+        #region プロパティ
         /// <summary>
         /// 収支種別
         /// </summary>
@@ -39,5 +40,6 @@ namespace HouseholdAccountBook.ViewModels
         /// 合計
         /// </summary>
         public int? Summary { get; set; }
+        #endregion
     }
 }

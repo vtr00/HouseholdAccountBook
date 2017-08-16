@@ -10,6 +10,7 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class BookSettingViewModel : BindableBase
     {
+        #region プロパティ
         /// <summary>
         /// 帳簿ID
         /// </summary>
@@ -106,14 +107,6 @@ namespace HouseholdAccountBook.ViewModels
         }
         private int? _PayDay = default(int?);
         #endregion
-
-        /// <summary>
-        /// 支払いの必要の有無を更新する
-        /// </summary>
-        private void UpdateNeedToPay()
-        {
-            NeedToPay = SelectedBookKind == BookKind.CreditCard;
-        }
         #endregion
 
         #region CSV情報
@@ -164,14 +157,6 @@ namespace HouseholdAccountBook.ViewModels
         }
         private int? _ItemNameIndex = default(int?);
         #endregion
-
-        /// <summary>
-        /// CSVデータの有無を更新する
-        /// </summary>
-        private void UpdateCsvDataExists()
-        {
-            CsvDataExists = SelectedBookKind != BookKind.Wallet;
-        }
         #endregion
 
         /// <summary>
@@ -196,6 +181,22 @@ namespace HouseholdAccountBook.ViewModels
         }
         private RelationViewModel _SelectedRelationVM = default(RelationViewModel);
         #endregion
+        #endregion
 
+        /// <summary>
+        /// 支払いの必要の有無を更新する
+        /// </summary>
+        private void UpdateNeedToPay()
+        {
+            this.NeedToPay = this.SelectedBookKind == BookKind.CreditCard;
+        }
+
+        /// <summary>
+        /// CSVデータの有無を更新する
+        /// </summary>
+        private void UpdateCsvDataExists()
+        {
+            this.CsvDataExists = this.SelectedBookKind != BookKind.Wallet;
+        }
     }
 }

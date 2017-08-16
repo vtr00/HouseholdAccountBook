@@ -16,26 +16,26 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 変更時処理重複防止用フラグ
         /// </summary>
-        private bool UpdateOnChanged = false;
+        private bool isUpdateOnChanged = false;
         #endregion
 
-        #region イベントハンドラ
+        #region イベント
         /// <summary>
         /// 移動元帳簿変更時イベント
         /// </summary>
-        public event Action OnFromBookChanged = default(Action);
+        public event Action FromBookChanged = default(Action);
         /// <summary>
         /// 移動先帳簿変更時イベント
         /// </summary>
-        public event Action OnToBookChanged = default(Action);
+        public event Action ToBookChanged = default(Action);
         /// <summary>
         /// 手数料種別変更時イベント
         /// </summary>
-        public event Action OnCommissionKindChanged = default(Action);
+        public event Action CommissionKindChanged = default(Action);
         /// <summary>
         /// 項目変更時イベント
         /// </summary>
-        public event Action OnItemChanged = default(Action);
+        public event Action ItemChanged = default(Action);
         #endregion
 
         #region プロパティ
@@ -87,10 +87,10 @@ namespace HouseholdAccountBook.ViewModels
             get { return _SelectedFromBookVM; }
             set {
                 if (SetProperty(ref _SelectedFromBookVM, value)) {
-                    if (!UpdateOnChanged) {
-                        UpdateOnChanged = true;
-                        OnFromBookChanged?.Invoke();
-                        UpdateOnChanged = false;
+                    if (!isUpdateOnChanged) {
+                        isUpdateOnChanged = true;
+                        FromBookChanged?.Invoke();
+                        isUpdateOnChanged = false;
                     }
                 }
             }
@@ -106,10 +106,10 @@ namespace HouseholdAccountBook.ViewModels
             get { return _SelectedToBookVM; }
             set {
                 if (SetProperty(ref _SelectedToBookVM, value)) {
-                    if (!UpdateOnChanged) {
-                        UpdateOnChanged = true;
-                        OnToBookChanged?.Invoke();
-                        UpdateOnChanged = false;
+                    if (!isUpdateOnChanged) {
+                        isUpdateOnChanged = true;
+                        ToBookChanged?.Invoke();
+                        isUpdateOnChanged = false;
                     }
                 }
             }
@@ -148,10 +148,10 @@ namespace HouseholdAccountBook.ViewModels
             get { return _SelectedCommissionKind; }
             set {
                 if (SetProperty(ref _SelectedCommissionKind, value)) {
-                    if (!UpdateOnChanged) {
-                        UpdateOnChanged = true;
-                        OnCommissionKindChanged?.Invoke();
-                        UpdateOnChanged = false;
+                    if (!isUpdateOnChanged) {
+                        isUpdateOnChanged = true;
+                        CommissionKindChanged?.Invoke();
+                        isUpdateOnChanged = false;
                     }
                 }
             }
@@ -179,10 +179,10 @@ namespace HouseholdAccountBook.ViewModels
             get { return _SelectedItemVM; }
             set {
                 if (SetProperty(ref _SelectedItemVM, value)) {
-                    if (!UpdateOnChanged) {
-                        UpdateOnChanged = true;
-                        OnItemChanged?.Invoke();
-                        UpdateOnChanged = false;
+                    if (!isUpdateOnChanged) {
+                        isUpdateOnChanged = true;
+                        ItemChanged?.Invoke();
+                        isUpdateOnChanged = false;
                     }
                 }
             }

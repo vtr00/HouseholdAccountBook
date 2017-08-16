@@ -5,6 +5,7 @@
     /// </summary>
     public partial class ItemViewModel
     {
+        #region プロパティ
         /// <summary>
         /// 項目ID
         /// </summary>
@@ -13,5 +14,6 @@
         /// 項目名
         /// </summary>
         public string Name { get; set; }
+        #endregion
     }
 }

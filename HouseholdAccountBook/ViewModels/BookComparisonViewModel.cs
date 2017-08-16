@@ -5,6 +5,7 @@
     /// </summary>
     public class BookComparisonViewModel
     {
+        #region プロパティ
         /// <summary>
         /// 帳簿ID
         /// </summary>
@@ -29,5 +30,6 @@
         /// 項目名インデックス
         /// </summary>
         public int ItemNameIndex { get; set; }
+        #endregion
     }
 }

@@ -37,7 +37,7 @@ namespace HouseholdAccountBook.Windows
         #endregion
 
         /// <summary>
-        /// コンストラクタ
+        /// <see cref="MainWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         public MainWindow(DaoBuilder builder)
@@ -61,6 +61,7 @@ namespace HouseholdAccountBook.Windows
             LoadSetting();
         }
 
+        #region イベントハンドラ
         #region コマンド
         #region ウィンドウ
         /// <summary>
@@ -1051,7 +1052,6 @@ WHERE action_id = @{0};", vm.ActionId);
         #endregion
         #endregion
 
-        #region イベントハンドラ
         /// <summary>
         /// フォーム終了時
         /// </summary>
@@ -1444,16 +1444,16 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 });
             }
 
-            ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel>();
-            vmList.Add(new SeriesViewModel() {
-                BalanceKind = -1,
-                CategoryId = -1,
-                CategoryName = string.Empty,
-                ItemId = -1,
-                ItemName = "残高",
-                Values = new List<int>()
-            });
-
+            ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel> {
+                new SeriesViewModel() {
+                    BalanceKind = -1,
+                    CategoryId = -1,
+                    CategoryName = string.Empty,
+                    ItemId = -1,
+                    ItemName = "残高",
+                    Values = new List<int>()
+                }
+            };
             int averageCount = 0; // 平均値計算に使用する月数(先月まで)
 
             // 最初の日の分を取得する
@@ -1559,16 +1559,16 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 });
             }
 
-            ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel>();
-            vmList.Add(new SeriesViewModel() {
-                BalanceKind = -1,
-                CategoryId = -1,
-                CategoryName = string.Empty,
-                ItemId = -1,
-                ItemName = "残高",
-                Values = new List<int>()
-            });
-
+            ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel> {
+                new SeriesViewModel() {
+                    BalanceKind = -1,
+                    CategoryId = -1,
+                    CategoryName = string.Empty,
+                    ItemId = -1,
+                    ItemName = "残高",
+                    Values = new List<int>()
+                }
+            };
             int averageCount = 0; // 平均値計算に使用する月数(先月まで)
 
             // 最初の月の分を取得する

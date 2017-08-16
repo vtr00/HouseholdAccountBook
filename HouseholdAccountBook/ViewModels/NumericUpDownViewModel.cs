@@ -7,6 +7,7 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     class NumericUpDownViewModel
     {
+        #region プロパティ
         /// <summary>
         /// 数値入力ボタンの入力値
         /// </summary>
@@ -15,5 +16,6 @@ namespace HouseholdAccountBook.ViewModels
         /// 数値入力ボタンの入力種別
         /// </summary>
         public NumericInputButton.InputKind InputedKind { get; set; }
+        #endregion
     }
 }

@@ -6,26 +6,21 @@ namespace HouseholdAccountBook.Dao
     /// <summary>
     /// Data Access Object
     /// </summary>
-    public abstract class DaoBase : IDisposable
+    public abstract partial class DaoBase : IDisposable
     {
-        /// <summary>
-        /// 接続情報
-        /// </summary>
-        public abstract class ConnectInfo { }
-
         /// <summary>
         /// DB接続
         /// </summary>
         protected DbConnection connection;
 
         /// <summary>
-        /// コンストラクタ
+        /// <see cref="DaoBase"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="connection">DB接続</param>
         public DaoBase(DbConnection connection)
         {
             this.connection = connection;
-            Open();
+            this.Open();
         }
 
         /// <summary>

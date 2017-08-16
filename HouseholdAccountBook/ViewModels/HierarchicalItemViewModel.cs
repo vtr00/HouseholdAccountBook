@@ -7,31 +7,9 @@ namespace HouseholdAccountBook.ViewModels
     /// <summary>
     /// 階層構造項目VM
     /// </summary>
-    public class HierarchicalItemViewModel : BindableBase, IMultiSelectable
+    public partial class HierarchicalItemViewModel : BindableBase, IMultiSelectable
     {
-        /// <summary>
-        /// 階層種別
-        /// </summary>
-        public enum HierarchicalKind
-        {
-            /// <summary>
-            /// 帳簿
-            /// </summary>
-            Book,
-            /// <summary>
-            /// 収支
-            /// </summary>
-            Balance,
-            /// <summary>
-            /// 種別
-            /// </summary>
-            Category,
-            /// <summary>
-            /// 項目
-            /// </summary>
-            Item
-        }
-
+        #region プロパティ
         /// <summary>
         /// 種類
         /// </summary>
@@ -171,6 +149,6 @@ namespace HouseholdAccountBook.ViewModels
             get { return Kind == HierarchicalKind.Item; }
         }
         #endregion
+        #endregion
     }
-
 }

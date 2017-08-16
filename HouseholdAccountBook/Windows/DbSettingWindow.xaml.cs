@@ -13,7 +13,7 @@ namespace HouseholdAccountBook.Windows
     public partial class DbSettingWindow : Window
     {
         /// <summary>
-        /// コンストラクタ
+        /// <see cref="DbSettingWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="message">表示メッセージ</param>
         public DbSettingWindow(string message)
@@ -37,6 +37,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.RestoreExePath = settings.App_Postgres_RestoreExePath;
         }
 
+        #region イベントハンドラ
         #region コマンド
         /// <summary>
         /// pg_dump.exeを指定するダイアログを表示する
@@ -136,7 +137,6 @@ namespace HouseholdAccountBook.Windows
         }
         #endregion
 
-        #region イベントハンドラ
         /// <summary>
         /// 入力された値を表示前にチェックする
         /// </summary>
@@ -149,13 +149,12 @@ namespace HouseholdAccountBook.Windows
             if (sender != null) {
                 // 既存のテキストボックス文字列に、新規に一文字追加された時、その文字列が数値として意味があるかどうかをチェック
                 {
-                    int xx;
                     string tmp = textBox.Text + e.Text;
                     if (tmp == string.Empty) {
                         yes_parse = true;
                     }
                     else {
-                        yes_parse = Int32.TryParse(tmp, out xx);
+                        yes_parse = Int32.TryParse(tmp, out int xx);
 
                         // 範囲内かどうかチェック
                         if (yes_parse) {

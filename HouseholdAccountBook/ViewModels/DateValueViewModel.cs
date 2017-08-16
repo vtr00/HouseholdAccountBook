@@ -9,6 +9,7 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class DateValueViewModel : BindableBase
     {
+        #region プロパティ
         /// <summary>
         /// 日付
         /// </summary>
@@ -28,6 +29,7 @@ namespace HouseholdAccountBook.ViewModels
             }
         }
         private int? _ActValue = default(int?);
+        #endregion
         #endregion
     }
 }

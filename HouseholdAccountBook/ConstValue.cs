@@ -10,11 +10,11 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 更新者
         /// </summary>
-        public static string Updater = "";
+        public static string Updater { get; } = "";
         /// <summary>
         /// 挿入者
         /// </summary>
-        public static string Inserter = "";
+        public static string Inserter { get; } = "";
 
         /// <summary>
         /// タブ
@@ -89,7 +89,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 帳簿種別文字列
         /// </summary>
-        public static Dictionary<BookKind, string> BookKindStr = new Dictionary<BookKind, string>() {
+        public static Dictionary<BookKind, string> BookKindStr { get; } = new Dictionary<BookKind, string>() {
             { BookKind.Uncategorized, "未分類" }, { BookKind.Wallet, "財布" }, { BookKind.BankAccount, "銀行口座" },
             { BookKind.CreditCard, "クレジットカード" }, {BookKind.Stock, "株式" }
         };
@@ -115,7 +115,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 収支種別文字列
         /// </summary>
-        public static Dictionary<BalanceKind, string> BalanceKindStr = new Dictionary<BalanceKind, string>() {
+        public static Dictionary<BalanceKind, string> BalanceKindStr { get; } = new Dictionary<BalanceKind, string>() {
             { BalanceKind.Income, "収入" }, { BalanceKind.Outgo, "支出" }
         };
 
@@ -151,7 +151,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 手数料種別文字列
         /// </summary>
-        public static Dictionary<CommissionKind, string> CommissionKindStr = new Dictionary<CommissionKind, string>() {
+        public static Dictionary<CommissionKind, string> CommissionKindStr { get; } = new Dictionary<CommissionKind, string>() {
             { CommissionKind.FromBook, "支払元" }, { CommissionKind.ToBook, "支払先" }
         };
 
@@ -160,11 +160,17 @@ namespace HouseholdAccountBook.ConstValue
         /// </summary>
         public enum RegistrationMode 
         {
-            // 追加
+            /// <summary>
+            /// 追加
+            /// </summary>
             Add,
-            // 編集
+            /// <summary>
+            /// 編集
+            /// </summary>
             Edit,
-            // 複製
+            /// <summary>
+            /// 複製
+            /// </summary>
             Copy,
         }
 
@@ -176,15 +182,15 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// 情報
             /// </summary>
-            public static string Information = "情報";
+            public static string Information { get; } = "情報";
             /// <summary>
             /// 警告
             /// </summary>
-            public static string Exclamation = "警告";
+            public static string Exclamation { get; } = "警告";
             /// <summary>
             /// エラー
             /// </summary>
-            public static string Error = "エラー";
+            public static string Error { get; } = "エラー";
         }
 
         /// <summary>
@@ -195,47 +201,47 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// 接続に失敗しました。
             /// </summary>
-            public static string ConnectionError = "接続に失敗しました。";
+            public static string ConnectionError { get; } = "接続に失敗しました。";
             /// <summary>
             /// 移動元と移動先の帳簿が同じです。
             /// </summary>
-            public static string IllegalSameBook = "移動元と移動先の帳簿が同じです。";
+            public static string IllegalSameBook { get; } = "移動元と移動先の帳簿が同じです。";
             /// <summary>
             /// 金額が不正です。
             /// </summary>
-            public static string IllegalValue = "金額が不正です。";
+            public static string IllegalValue { get; } = "金額が不正です。";
             /// <summary>
             /// インポートが完了しました。
             /// </summary>
-            public static string FinishToSave = "保存が完了しました。";
+            public static string FinishToSave { get; } = "保存が完了しました。";
             /// <summary>
             /// インポートが完了しました。
             /// </summary>
-            public static string FinishToImport = "インポートが完了しました。";
+            public static string FinishToImport { get; } = "インポートが完了しました。";
             /// <summary>
             /// インポートに失敗しました。
             /// </summary>
-            public static string FoultToImport = "インポートに失敗しました。";
+            public static string FoultToImport { get; } = "インポートに失敗しました。";
             /// <summary>
             /// エクスポートが完了しました。
             /// </summary>
-            public static string FinishToExport = "エクスポートが完了しました。";
+            public static string FinishToExport { get; } = "エクスポートが完了しました。";
             /// <summary>
             /// エクスポートに失敗しました。
             /// </summary>
-            public static string FoultToExport = "エクスポートに失敗しました。";
+            public static string FoultToExport { get; } = "エクスポートに失敗しました。";
             /// <summary>
             /// 選択した項目を削除しますか？
             /// </summary>
-            public static string DeleteNotification = "選択した項目を削除します。よろしいですか？";
+            public static string DeleteNotification { get; } = "選択した項目を削除します。よろしいですか？";
             /// <summary>
             /// 既存のデータを削除します。よろしいですか？
             /// </summary>
-            public static string DeleteOldDataNotification = "既存のデータを削除します。よろしいですか？";
+            public static string DeleteOldDataNotification { get; } = "既存のデータを削除します。よろしいですか？";
             /// <summary>
             /// 再起動します。よろしいですか？
             /// </summary>
-            public static string RestartNotification = "再起動します。よろしいですか？";
+            public static string RestartNotification { get; } = "再起動します。よろしいですか？";
         }
     }
 }

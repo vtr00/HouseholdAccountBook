@@ -31,6 +31,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -85,8 +86,8 @@
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
-    <Reference Include="Npgsql, Version=3.2.3.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Npgsql.3.2.3\lib\net451\Npgsql.dll</HintPath>
+    <Reference Include="Npgsql, Version=3.2.5.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Npgsql.3.2.5\lib\net451\Npgsql.dll</HintPath>
     </Reference>
     <Reference Include="OxyPlot, Version=1.0.0.0, Culture=neutral, PublicKeyToken=638079a8f0bd61e9, processorArchitecture=MSIL">
       <HintPath>..\packages\OxyPlot.Core.1.0.0\lib\net45\OxyPlot.dll</HintPath>
@@ -117,9 +118,8 @@
       <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.4.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -146,12 +146,20 @@
     <Compile Include="BindingProxy.cs" />
     <Compile Include="Converters\DateTimeToDisplayedYearConverter.cs" />
     <Compile Include="Converters\NegationConverter.cs" />
+    <Compile Include="Dao\DaoBase.ConnectInfo.cs" />
+    <Compile Include="Dao\DaoBuilder.Target.cs" />
+    <Compile Include="Dao\DaoNpgsql.ConnectInfo.cs" />
+    <Compile Include="Dao\DaoOle.ConnectInfo.cs" />
+    <Compile Include="Dao\DaoSQLite.ConnectInfo.cs" />
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Interfaces\IMultiSelectable.cs" />
     <Compile Include="PropertyName.cs" />
     <Compile Include="UserControls\CustomColumnSeries.cs" />
     <Compile Include="UserControls\DataGridEditableTemplateColumn.cs" />
     <Compile Include="UserControls\DateTimePicker.cs" />
+    <Compile Include="UserControls\DateTimePicker.DateKind.cs" />
+    <Compile Include="UserControls\DateTimePicker.DatePickerDateTimeConverter.cs" />
+    <Compile Include="UserControls\NumericInputButton.InputKind.cs" />
     <Compile Include="UserControls\NumericInputButton.xaml.cs">
       <DependentUpon>NumericInputButton.xaml</DependentUpon>
     </Compile>
@@ -161,7 +169,9 @@
       <DependentUpon>NumericUpDown.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dao\DaoBuilder.cs" />
+    <Compile Include="ViewModels\CsvComparisonViewModel.CsvRecord.cs" />
     <Compile Include="ViewModels\DateValueViewModel.cs" />
+    <Compile Include="ViewModels\HierarchicalItemViewModel.HierarchicalKind.cs" />
     <Compile Include="ViewModels\NumericUpDownViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel\ActionListRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel\ActionRegistrationWindowViewModel.cs" />
@@ -317,7 +327,9 @@
       <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('..\packages\NETStandard.Library.2.0.0\build\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NETStandard.Library.2.0.0\build\NETStandard.Library.targets'))" />
   </Target>
+  <Import Project="..\packages\NETStandard.Library.2.0.0\build\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.0\build\NETStandard.Library.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

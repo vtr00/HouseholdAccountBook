@@ -11,32 +11,9 @@ namespace HouseholdAccountBook.UserControls
     /// </summary>
     public partial class NumericInputButton : UserControl, ICommandSource
     {
-        /// <summary>
-        /// 入力種別
-        /// </summary>
-        public enum InputKind 
-        {
-            /// <summary>
-            /// 未入力
-            /// </summary>
-            Unputed,
-            /// <summary>
-            /// 数値
-            /// </summary>
-            Number,
-            /// <summary>
-            /// バックスペース
-            /// </summary>
-            BackSpace,
-            /// <summary>
-            /// クリア
-            /// </summary>
-            Clear
-        }       
-
         #region 依存関係プロパティ
         /// <summary>
-        /// 入力値プロパティ
+        /// <see cref="InputedValue"/> 依存関係プロパティを識別します。
         /// </summary>
         public static readonly DependencyProperty InputedValueProperty = DependencyProperty.Register(
                 PropertyName<NumericInputButton>.Get(x => x.InputedValue),
@@ -54,7 +31,7 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// 入力種別プロパティ
+        /// <see cref="InputedKind"/> 依存関係プロパティを識別します。
         /// </summary>
         public static readonly DependencyProperty InputedKindProperty = DependencyProperty.Register(
                 PropertyName<NumericInputButton>.Get(x => x.InputedKind),
@@ -72,7 +49,7 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// コマンドプロパティ
+        /// <see cref="Command"/> 依存関係プロパティを識別します。
         /// </summary>
         public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(
                 PropertyName<NumericInputButton>.Get(x => x.Command),
@@ -90,7 +67,7 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// コマンドパラメータプロパティ
+        /// <see cref="CommandParameter"/> 依存関係プロパティを識別します。
         /// </summary>
         public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(
                 PropertyName<NumericInputButton>.Get(x => x.CommandParameter),
@@ -108,7 +85,7 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// コマンドターゲットプロパティ
+        /// <see cref="CommandTarget"/> 依存関係プロパティを識別します。
         /// </summary>
         public static readonly DependencyProperty CommandTargetProperty = DependencyProperty.Register(
                 PropertyName<NumericInputButton>.Get(x => x.CommandTarget),
@@ -127,66 +104,15 @@ namespace HouseholdAccountBook.UserControls
         #endregion
 
         /// <summary>
-        /// コンストラクタ
+        /// <see cref="NumericInputButton"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         public NumericInputButton()
         {
             InitializeComponent();
         }
 
-        /// <summary>
-        /// コマンドプロパティ変更時イベント
-        /// </summary>
-        /// <param name="d"></param>
-        /// <param name="e"></param>
-        private static void CommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            NumericInputButton nib = (NumericInputButton)d;
-            nib.HookUpCommand((ICommand)e.OldValue, (ICommand)e.NewValue);
-        }
-
-        /// <summary>
-        /// コマンドプロパティ変更時処理
-        /// </summary>
-        /// <param name="oldCommand">変更前のコマンド</param>
-        /// <param name="newCommand">変更後のコマンド</param>
-        private void HookUpCommand (ICommand oldCommand, ICommand newCommand)
-        {
-            if(oldCommand != null) {
-                oldCommand.CanExecuteChanged -= CanExecuteChanged;
-            }
-            if(newCommand != null) {
-                newCommand.CanExecuteChanged += CanExecuteChanged;
-            }
-        }
-
-        /// <summary>
-        /// 実行の可不可が変更になったときにコントロールを無効にする
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CanExecuteChanged (object sender, EventArgs e)
-        {
-            if(this.Command != null) {
-                if (this.Command is RoutedCommand command) {
-                    if (command.CanExecute(CommandParameter, CommandTarget)) {
-                        this.IsEnabled = true;
-                    }
-                    else {
-                        this.IsEnabled = false;
-                    }
-                }
-                else {
-                    if (Command.CanExecute(CommandParameter)) {
-                        this.IsEnabled = true;
-                    }
-                    else {
-                        this.IsEnabled = false;
-                    }
-                }
-            }
-        }
-
+        #region イベントハンドラ
+        #region コマンド
         /// <summary>
         /// 数字ボタン押下時
         /// </summary>
@@ -229,11 +155,66 @@ namespace HouseholdAccountBook.UserControls
 
             e.Handled = true;
         }
+        #endregion
+
+        /// <summary>
+        /// コマンドプロパティ変更時イベント
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="e"></param>
+        private static void CommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            NumericInputButton nib = (NumericInputButton)d;
+            nib.HookUpCommand((ICommand)e.OldValue, (ICommand)e.NewValue);
+        }
+
+        /// <summary>
+        /// 実行の可不可が変更になったときにコントロールを無効にする
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnCanExecuteChanged (object sender, EventArgs e)
+        {
+            if(this.Command != null) {
+                if (this.Command is RoutedCommand command) {
+                    if (command.CanExecute(CommandParameter, CommandTarget)) {
+                        this.IsEnabled = true;
+                    }
+                    else {
+                        this.IsEnabled = false;
+                    }
+                }
+                else {
+                    if (Command.CanExecute(CommandParameter)) {
+                        this.IsEnabled = true;
+                    }
+                    else {
+                        this.IsEnabled = false;
+                    }
+                }
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// コマンドプロパティ変更時処理
+        /// </summary>
+        /// <param name="oldCommand">変更前のコマンド</param>
+        /// <param name="newCommand">変更後のコマンド</param>
+        private void HookUpCommand (ICommand oldCommand, ICommand newCommand)
+        {
+            if(oldCommand != null) {
+                oldCommand.CanExecuteChanged -= OnCanExecuteChanged;
+            }
+            if(newCommand != null) {
+                newCommand.CanExecuteChanged += OnCanExecuteChanged;
+            }
+        }
 
         /// <summary>
         /// 入力があったときにコマンドを実行する
         /// </summary>
-        protected void CallCommandToExecute()
+        private void CallCommandToExecute()
         {
             if(this.Command != null) {
                 if(this.Command is RoutedCommand command) {

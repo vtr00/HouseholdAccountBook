@@ -1,0 +1,26 @@
+﻿using System.Windows.Controls;
+
+namespace HouseholdAccountBook.UserControls
+{
+    public partial class DateTimePicker : DatePicker
+    {
+        /// <summary>
+        /// 種別
+        /// </summary>
+        private enum DateKind 
+        {
+            /// <summary>
+            /// 年
+            /// </summary>
+            Year,
+            /// <summary>
+            /// 月
+            /// </summary>
+            Month,
+            /// <summary>
+            /// 日
+            /// </summary>
+            Day
+        }
+    }
+}

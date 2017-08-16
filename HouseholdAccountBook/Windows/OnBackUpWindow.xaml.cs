@@ -7,6 +7,9 @@ namespace HouseholdAccountBook.Windows
     /// </summary>
     public partial class OnBackUpWindow : Window
     {
+        /// <summary>
+        /// <see cref="OnBackUpWindow"/> クラスの新しいインスタンスを初期化します。
+        /// </summary>
         public OnBackUpWindow()
         {
             InitializeComponent();

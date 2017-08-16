@@ -7,6 +7,7 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class SeriesItemViewModel : BindableBase
     {
+        #region プロパティ
         /// <summary>
         /// 値
         /// </summary>
@@ -20,7 +21,7 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 番号(月/日)
+        /// 番号(月 or 日)
         /// </summary>
         #region Number
         public int Number
@@ -53,6 +54,7 @@ namespace HouseholdAccountBook.ViewModels
             set { SetProperty(ref _CategoryId, value); }
         }
         private int _CategoryId = default(int);
+        #endregion
         #endregion
     }
 }

@@ -5,6 +5,7 @@
     /// </summary>
     public partial class CategoryViewModel
     {
+        #region プロパティ
         /// <summary>
         /// カテゴリID
         /// </summary>
@@ -13,5 +14,6 @@
         /// カテゴリ名
         /// </summary>
         public string Name { get; set; }
+        #endregion
     }
 }

@@ -8,6 +8,7 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class CsvComparisonWindowViewModel : BindableBase
     {
+        #region プロパティ
         /// <summary>
         /// CSVファイル名
         /// </summary>
@@ -79,5 +80,6 @@ namespace HouseholdAccountBook.ViewModels
 #endif
             }
         }
+        #endregion
     }
 }

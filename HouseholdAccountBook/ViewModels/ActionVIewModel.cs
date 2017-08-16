@@ -10,6 +10,7 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class ActionViewModel : BindableBase, IMultiSelectable
     {
+        #region プロパティ
         /// <summary>
         /// 帳簿項目ID
         /// </summary>
@@ -91,5 +92,6 @@ namespace HouseholdAccountBook.ViewModels
                 return ActTime > DateTime.Now;
             }
         }
+        #endregion
     }
 }

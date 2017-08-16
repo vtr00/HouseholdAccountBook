@@ -14,6 +14,7 @@ namespace HouseholdAccountBook.UserControls
         /// 前回の <see cref="GetNearestPoint(ScreenPoint, bool)"/> 呼び出し時の <see cref="TrackerHitResult"/>
         /// </summary>
         private TrackerHitResult oldResult = null;
+
         /// <summary>
         /// <see cref="TrackerHitResult"/> の表示テキストが変化したことを示すイベント
         /// </summary>
@@ -22,6 +23,7 @@ namespace HouseholdAccountBook.UserControls
         override public TrackerHitResult GetNearestPoint(ScreenPoint point, bool interpolate)
         {
             TrackerHitResult result = base.GetNearestPoint(point, interpolate);
+
             // いずれかがnullではないとき
             if(oldResult != null || result != null) {
                 // TrackerHitResult が変化していたとき
@@ -31,6 +33,7 @@ namespace HouseholdAccountBook.UserControls
                 }
             }
             this.oldResult = result;
+
             return result;
         }
     }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -15,31 +14,12 @@ namespace HouseholdAccountBook.UserControls
     /// http://stackoverflow.com/questions/1798513/wpf-toolkit-datepicker-month-year-only
     /// http://qiita.com/st450/items/294ae366ca698e7627a5
     /// </remarks>
-    public class DateTimePicker : DatePicker
+    public partial class DateTimePicker : DatePicker
     {
         /// <summary>
         /// カレンダーが開く前に選択されていたテキストボックス内の位置
         /// </summary>
         private int selectedPositionBeforeCalendarOpened;
-
-        /// <summary>
-        /// 種別
-        /// </summary>
-        private enum DateKind 
-        {
-            /// <summary>
-            /// 年
-            /// </summary>
-            Year,
-            /// <summary>
-            /// 月
-            /// </summary>
-            Month,
-            /// <summary>
-            /// 日
-            /// </summary>
-            Day
-        }
 
         /// <summary>
         /// <see cref="DateTimePicker"/> クラスの新しいインスタンスを初期化します。
@@ -51,11 +31,11 @@ namespace HouseholdAccountBook.UserControls
                 textBox.SetValue(InputMethod.IsInputMethodEnabledProperty, false);
                 textBox.TextChanged += TextBox_TextChanged;
                 textBox.SelectionChanged += TextBox_SelectionChanged;
-                textBox.PreviewKeyDown += TextBox_OnPreviewKeyDown;
+                textBox.PreviewKeyDown += TextBox_PreviewKeyDown;
                 textBox.MouseWheel += TextBox_MouseWheel;
             };
-            this.CalendarOpened += DateTimePicker_OnCalendarOpened;
-            this.CalendarClosed += DateTimePicker_OnCalendarClosed;
+            this.CalendarOpened += DateTimePicker_CalendarOpened;
+            this.CalendarClosed += DateTimePicker_CalendarClosed;
         }
         
         #region 依存関係プロパティ
@@ -73,7 +53,7 @@ namespace HouseholdAccountBook.UserControls
                 PropertyName<DateTimePicker>.Get(x => x.DateFormat), 
                 typeof(string), 
                 typeof(DateTimePicker),
-                new PropertyMetadata(OnDateFormatChanged));
+                new PropertyMetadata(DateFormatChanged));
         #endregion
 
         #region イベントハンドラ
@@ -93,7 +73,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TextBox_OnPreviewKeyDown(object sender, KeyEventArgs e)
+        private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             TextBox textBox = (TextBox)sender;
             DateTimePicker dateTimePicker = (DateTimePicker)textBox.TemplatedParent;
@@ -158,7 +138,7 @@ namespace HouseholdAccountBook.UserControls
                 case Key.Up: {
                         // 選択している箇所の数字をインクリメントする
                         textBox.TextChanged -= TextBox_TextChanged;
-                        IncrementSelectedNumber(textBox, dateTimePicker);
+                        IncreaceSelectedNumber(textBox, dateTimePicker);
                         textBox.TextChanged += TextBox_TextChanged;
                         e.Handled = true;
                     }
@@ -166,7 +146,7 @@ namespace HouseholdAccountBook.UserControls
                 case Key.Down: {
                         // 選択している箇所の数字をデクリメントする
                         textBox.TextChanged -= TextBox_TextChanged;
-                        DecrementSelectedNumber(textBox, dateTimePicker);
+                        DecreaceSelectedNumber(textBox, dateTimePicker);
                         textBox.TextChanged += TextBox_TextChanged;
                         e.Handled = true;
                     }
@@ -202,10 +182,10 @@ namespace HouseholdAccountBook.UserControls
 
             textBox.TextChanged -= TextBox_TextChanged;
             if (e.Delta < 0) {
-                DecrementSelectedNumber(textBox, this);
+                DecreaceSelectedNumber(textBox, this);
             }
             else if (e.Delta > 0) {
-                IncrementSelectedNumber(textBox, this);
+                IncreaceSelectedNumber(textBox, this);
             }
             textBox.TextChanged += TextBox_TextChanged;
 
@@ -217,7 +197,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DateTimePicker_OnCalendarOpened(object sender, RoutedEventArgs e)
+        private void DateTimePicker_CalendarOpened(object sender, RoutedEventArgs e)
         {
             var dateTimePicker = sender as DateTimePicker;
             var textBox = GetTemplateTextBox(dateTimePicker);
@@ -229,7 +209,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DateTimePicker_OnCalendarClosed(object sender, RoutedEventArgs e)
+        private void DateTimePicker_CalendarClosed(object sender, RoutedEventArgs e)
         {
             var dateTimePicker = (DateTimePicker)sender;
             var textBox = GetTemplateTextBox(dateTimePicker);
@@ -241,7 +221,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         /// <param name="dobj"></param>
         /// <param name="e"></param>
-        private static void OnDateFormatChanged(DependencyObject dobj, DependencyPropertyChangedEventArgs e)
+        private static void DateFormatChanged(DependencyObject dobj, DependencyPropertyChangedEventArgs e)
         {
             DateTimePicker dateTimePicker = (DateTimePicker)dobj;
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action<DateTimePicker>(ApplyDateFormat), dateTimePicker);
@@ -280,7 +260,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         /// <param name="textBox">テキストボックス</param>
         /// <param name="dateTimePicker">デートタイムピッカー</param>
-        private void IncrementSelectedNumber(TextBox textBox, DateTimePicker dateTimePicker)
+        private void IncreaceSelectedNumber(TextBox textBox, DateTimePicker dateTimePicker)
         {
             textBox.SelectionChanged -= TextBox_SelectionChanged;
             int start = textBox.SelectionStart;
@@ -309,7 +289,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         /// <param name="textBox">テキストボックス</param>
         /// <param name="dateTimePicker">デートタイムピッカー</param>
-        private void DecrementSelectedNumber(TextBox textBox, DateTimePicker dateTimePicker)
+        private void DecreaceSelectedNumber(TextBox textBox, DateTimePicker dateTimePicker)
         {
             textBox.SelectionChanged -= TextBox_SelectionChanged;
             int start = textBox.SelectionStart;
@@ -435,43 +415,6 @@ namespace HouseholdAccountBook.UserControls
 
             textBox.SelectionChanged += TextBox_SelectionChanged;
             return ans;
-        }
-
-        /// <summary>
-        /// コンバータ
-        /// </summary>
-        private class DatePickerDateTimeConverter : IValueConverter
-        {
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                var formatStr = ((Tuple<DateTimePicker, string>)parameter).Item2;
-                var selectedDate = (DateTime?)value;
-                return DateTimeToString(formatStr, selectedDate);
-            }
-
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                var tupleParam = ((Tuple<DateTimePicker, string>)parameter);
-                var dateStr = (string)value;
-                return StringToDateTime(tupleParam.Item1, tupleParam.Item2, dateStr);
-            }
-
-            public static string DateTimeToString(string formatStr, DateTime? selectedDate)
-            {
-                return selectedDate.HasValue ? selectedDate.Value.ToString(formatStr) : null;
-            }
-
-            public static DateTime? StringToDateTime(DateTimePicker dateTimePicker, string formatStr, string dateStr)
-            {
-                var canParse = DateTime.TryParseExact(dateStr, formatStr, CultureInfo.CurrentCulture,
-                                      DateTimeStyles.None, out DateTime date);
-
-                if (!canParse) {
-                    canParse = DateTime.TryParse(dateStr, CultureInfo.CurrentCulture, DateTimeStyles.None, out date);
-                }
-
-                return canParse ? date : dateTimePicker.SelectedDate;
-            }
         }
     }
 }

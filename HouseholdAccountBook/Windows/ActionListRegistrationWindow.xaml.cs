@@ -34,13 +34,15 @@ namespace HouseholdAccountBook.Windows
         private DataGridCell lastDataGridCell;
         #endregion
 
+        #region イベント
         /// <summary>
         /// 登録時のイベント
         /// </summary>
         public event EventHandler<EventArgs<int?>> Registrated = null;
+        #endregion
 
         /// <summary>
-        /// 帳簿項目まとめて追加ウィンドウ
+        /// 複数の帳簿項目の新規登録のために <see cref="ActionListRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         /// <param name="bookId">帳簿ID</param>
@@ -81,30 +83,31 @@ namespace HouseholdAccountBook.Windows
             LoadSetting();
 
             #region イベントハンドラの設定
-            this.WVM.OnBookChanged += () => {
+            this.WVM.BookChanged += () => {
                 UpdateCategoryList();
                 UpdateItemList();
                 UpdateShopList();
                 UpdateRemarkList();
             };
-            this.WVM.OnBalanceKindChanged += () => {
+            this.WVM.BalanceKindChanged += () => {
                 UpdateCategoryList();
                 UpdateItemList();
                 UpdateShopList();
                 UpdateRemarkList();
             };
-            this.WVM.OnCategoryChanged += () => {
+            this.WVM.CategoryChanged += () => {
                 UpdateItemList();
                 UpdateShopList();
                 UpdateRemarkList();
             };
-            this.WVM.OnItemChanged += () => {
+            this.WVM.ItemChanged += () => {
                 UpdateShopList();
                 UpdateRemarkList();
             };
             #endregion
         }
 
+        #region イベントハンドラ
         #region コマンド
         /// <summary>
         /// 登録コマンド判定
@@ -172,8 +175,10 @@ namespace HouseholdAccountBook.Windows
                         string selectedText = textBox.SelectedText;
                         string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
 
-                        vm.ActValue = int.Parse(string.Format("{0}{1}{2}", forwardText, value, backwardText));
-                        textBox.SelectionStart = selectionStart + 1;
+                        if(int.TryParse(string.Format("{0}{1}{2}", forwardText, value, backwardText), out int outValue)) {
+                            vm.ActValue = outValue;
+                            textBox.SelectionStart = selectionStart + 1;
+                        }
                     }
                     break;
                 case NumericInputButton.InputKind.BackSpace:
@@ -188,13 +193,17 @@ namespace HouseholdAccountBook.Windows
                         string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
 
                         if (selectionLength != 0) {
-                            vm.ActValue = int.Parse(string.Format("{0}{1}", forwardText, backwardText));
-                            textBox.SelectionStart = selectionStart;
+                            if(int.TryParse(string.Format("{0}{1}", forwardText, backwardText), out int outValue)) {
+                                vm.ActValue = outValue;
+                                textBox.SelectionStart = selectionStart;
+                            }
                         }
                         else if (selectionStart != 0) {
                             string newText = string.Format("{0}{1}", forwardText.Substring(0, selectionStart - 1), backwardText);
-                            vm.ActValue = string.Empty == newText ? (int?)null : int.Parse(newText);
-                            textBox.SelectionStart = selectionStart - 1;
+                            if(string.Empty == newText || int.TryParse(newText, out int outValue)) {
+                                vm.ActValue = string.Empty == newText ? (int?)null : int.Parse(newText);
+                                textBox.SelectionStart = selectionStart - 1;
+                            }
                         }
                     }
                     break;
@@ -212,7 +221,6 @@ namespace HouseholdAccountBook.Windows
         }
         #endregion
 
-        #region イベントハンドラ
         /// <summary>
         /// フォーム終了時
         /// </summary>
@@ -289,7 +297,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// 
+        /// 選択された金額列のセルを記録する
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

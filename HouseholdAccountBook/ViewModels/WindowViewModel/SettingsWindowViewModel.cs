@@ -12,8 +12,9 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 設定
         /// </summary>
-        Properties.Settings settings;
+        private Properties.Settings settings;
 
+        #region プロパティ
         /// <summary>
         /// 設定を保存するか
         /// </summary>
@@ -188,9 +189,10 @@ namespace HouseholdAccountBook.ViewModels
         private int _StartMonth = default(int);
         #endregion
         #endregion
+        #endregion
 
         /// <summary>
-        /// コンストラクタ
+        /// <see cref="SettingsWindowViewModel"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         public SettingsWindowViewModel()
         {
@@ -203,11 +205,11 @@ namespace HouseholdAccountBook.ViewModels
         public void LoadSettings()
         {
             this.WithSave = false;
-            DumpExePath = settings.App_Postgres_DumpExePath;
-            RestoreExePath = settings.App_Postgres_RestoreExePath;
-            BackUpNum = settings.App_BackUpNum;
-            BackUpFolderPath = settings.App_BackUpFolderPath;
-            StartMonth = settings.App_StartMonth;
+            this.DumpExePath = settings.App_Postgres_DumpExePath;
+            this.RestoreExePath = settings.App_Postgres_RestoreExePath;
+            this.BackUpNum = settings.App_BackUpNum;
+            this.BackUpFolderPath = settings.App_BackUpFolderPath;
+            this.StartMonth = settings.App_StartMonth;
             this.WithSave = true;
         }
     }

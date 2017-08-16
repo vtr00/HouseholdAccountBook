@@ -17,8 +17,9 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 表示日付の更新中か
         /// </summary>
-        private bool OnUpdateDisplayedDate = false;
+        private bool onUpdateDisplayedDate = false;
 
+        #region プロパティ(共通)
         /// <summary>
         /// 選択されたタブインデックス
         /// </summary>
@@ -72,8 +73,10 @@ namespace HouseholdAccountBook.ViewModels
         }
         private BookViewModel _SelectedBookVM;
         #endregion
+        #endregion
 
         #region 帳簿タブ
+        #region プロパティ
         /// <summary>
         /// 表示月
         /// </summary>
@@ -83,11 +86,11 @@ namespace HouseholdAccountBook.ViewModels
             get { return _DisplayedMonth; }
             set {
                 if (SetProperty(ref _DisplayedMonth, value)) {
-                    if (!OnUpdateDisplayedDate) {
-                        OnUpdateDisplayedDate = true;
+                    if (!onUpdateDisplayedDate) {
+                        onUpdateDisplayedDate = true;
                         // 表示月の年度の最初の月を表示年とする
                         DisplayedYear = value.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
-                        OnUpdateDisplayedDate = false;
+                        onUpdateDisplayedDate = false;
                     }
                 }
             }
@@ -201,9 +204,10 @@ namespace HouseholdAccountBook.ViewModels
         }
         private SummaryViewModel _SelectedSummaryVM = default(SummaryViewModel);
         #endregion
+        #endregion
 
         /// <summary>
-        /// 表示する帳簿項目VMリストを更新する
+        /// <see cref="DisplayedActionVMList"/> を更新する
         /// </summary>
         private void UpdateDisplayedActionVMList()
         {
@@ -239,6 +243,7 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         #region 年間一覧タブ
+        #region プロパティ
         /// <summary>
         /// 表示年
         /// </summary>
@@ -249,10 +254,10 @@ namespace HouseholdAccountBook.ViewModels
             set {
                 DateTime oldDisplayedYear = _DisplayedYear;
                 if (SetProperty(ref _DisplayedYear, value)) {
-                    if (!OnUpdateDisplayedDate) {
+                    if (!onUpdateDisplayedDate) {
                         int startMonth = Properties.Settings.Default.App_StartMonth;
                         int yearDiff = value.GetFirstDateOfFiscalYear(startMonth).Year - oldDisplayedYear.GetFirstDateOfFiscalYear(startMonth).Year;
-                        OnUpdateDisplayedDate = true;
+                        onUpdateDisplayedDate = true;
                         // 表示年の差分を表示月に反映する
                         DisplayedMonth = DisplayedMonth.AddYears(yearDiff);
                         // 同年度中の未来の月の場合には、表示月を今日にする
@@ -260,7 +265,7 @@ namespace HouseholdAccountBook.ViewModels
                             DisplayedMonth.GetFirstDateOfFiscalYear(startMonth).Year == DateTime.Now.GetFirstDateOfFiscalYear(startMonth).Year ) {
                             DisplayedMonth = DateTime.Now;
                         }
-                        OnUpdateDisplayedDate = false;
+                        onUpdateDisplayedDate = false;
                     }
                 }
             }
@@ -292,8 +297,10 @@ namespace HouseholdAccountBook.ViewModels
         private ObservableCollection<SeriesViewModel> _SummaryWithinYearVMList = default(ObservableCollection<SeriesViewModel>);
         #endregion
         #endregion
+        #endregion
 
         #region グラフタブ
+        #region プロパティ
         /// <summary>
         /// 全項目月間グラフプロットモデル
         /// </summary>
@@ -382,6 +389,7 @@ namespace HouseholdAccountBook.ViewModels
         private PlotController _Controller = new PlotController();
         #endregion
         #endregion
+        #endregion
 
         /// <summary>
         /// デバッグビルドか
@@ -398,7 +406,7 @@ namespace HouseholdAccountBook.ViewModels
         }
 
         /// <summary>
-        /// コンストラクタ
+        /// <see cref="MainWindowViewModel"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         public MainWindowViewModel()
         {

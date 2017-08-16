@@ -5,6 +5,7 @@
     /// </summary>
     public class BookViewModel
     {
+        #region プロパティ
         /// <summary>
         /// 帳簿ID
         /// </summary>
@@ -14,5 +15,6 @@
         /// 帳簿名
         /// </summary>
         public string Name { get; set; }
+        #endregion
     }
 }

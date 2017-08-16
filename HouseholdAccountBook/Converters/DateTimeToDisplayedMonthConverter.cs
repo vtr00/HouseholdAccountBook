@@ -11,11 +11,14 @@ namespace HouseholdAccountBook.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value is DateTime dateTime) {
 #if DEBUG
-            return ((DateTime)value).ToString("yyyy/MM/dd HH:mm:ss");
+                return dateTime.ToString("yyyy/MM/dd HH:mm:ss");
 #else
-            return ((DateTime)value).ToString("yyyy/MM");
+                return dateTime.ToString("yyyy/MM");
 #endif
+            }
+            throw new NotImplementedException();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

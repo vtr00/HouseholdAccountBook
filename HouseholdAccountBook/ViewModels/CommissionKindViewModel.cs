@@ -7,6 +7,7 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class CommissionKindViewModel
     {
+        #region プロパティ
         /// <summary>
         /// 手数料種別
         /// </summary>
@@ -15,5 +16,6 @@ namespace HouseholdAccountBook.ViewModels
         /// 手数料種別名
         /// </summary>
         public string CommissionKindName { get; set; }
+        #endregion
     }
 }

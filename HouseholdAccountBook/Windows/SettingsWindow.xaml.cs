@@ -34,7 +34,7 @@ namespace HouseholdAccountBook.Windows
         #endregion
 
         /// <summary>
-        /// 設定ウィンドウ
+        /// <see cref="SettingsWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         public SettingsWindow(DaoBuilder builder)
@@ -48,6 +48,7 @@ namespace HouseholdAccountBook.Windows
             LoadSetting();
         }
 
+        #region イベントハンドラ
         #region コマンド
         #region ウィンドウ
         /// <summary>
@@ -968,7 +969,6 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         #endregion
         #endregion
 
-        #region イベントハンドラ
         /// <summary>
         /// フォーム終了時
         /// </summary>

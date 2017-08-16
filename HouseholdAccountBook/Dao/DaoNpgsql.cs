@@ -4,49 +4,21 @@ using Npgsql;
 
 namespace HouseholdAccountBook.Dao
 {
-    public class DaoNpgsql : DaoBase
+    public partial class DaoNpgsql : DaoBase
     {
+        /// <summary>
+        /// 接続文字列
+        /// </summary>
         private const string daoStringFormat = @"Server={0};Port={1};User Id={2};Password={3};Database={4}";
 
         /// <summary>
-        /// 接続情報
-        /// </summary>
-        public new class ConnectInfo : DaoBase.ConnectInfo
-        {
-            /// <summary>
-            /// URI
-            /// </summary>
-            public string Host { get; set; }
-            /// <summary>
-            /// ポート番号
-            /// </summary>
-            public int Port { get; set; }
-            /// <summary>
-            /// ユーザー名
-            /// </summary>
-            public string UserName { get; set; }
-            /// <summary>
-            /// パスワード
-            /// </summary>
-            public string Password { get; set; }
-            /// <summary>
-            /// データベース名
-            /// </summary>
-            public string DatabaseName { get; set; }
-            /// <summary>
-            /// ロール名
-            /// </summary>
-            public string Role { get; set; }
-        }
-
-        /// <summary>
-        /// コンストラクタ
+        /// <see cref="DaoNpgsql"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
         public DaoNpgsql(ConnectInfo info) : this(info.Host, info.Port, info.UserName, info.Password, info.DatabaseName) { }
 
         /// <summary>
-        /// コンストラクタ
+        /// <see cref="DaoNpgsql"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="uri">URI</param>
         /// <param name="port">ポート番号</param>

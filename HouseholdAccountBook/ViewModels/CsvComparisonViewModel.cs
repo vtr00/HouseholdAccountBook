@@ -1,13 +1,13 @@
 ﻿using Prism.Mvvm;
-using System;
 
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
     /// CSV比較VM
     /// </summary>
-    public class CsvComparisonViewModel : BindableBase
+    public partial class CsvComparisonViewModel : BindableBase
     {
+        #region プロパティ
         /// <summary>
         /// 帳簿項目ID
         /// </summary>
@@ -79,6 +79,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private CsvRecord _Record = default(CsvRecord);
         #endregion
+        #endregion
 
         /// <summary>
         /// 帳簿項目情報をクリアする
@@ -90,48 +91,6 @@ namespace HouseholdAccountBook.ViewModels
             this.ShopName = default(string);
             this.Remark = default(string);
             this.IsMatch = default(bool);
-        }
-
-        /// <summary>
-        /// CSVレコード
-        /// </summary>
-        public class CsvRecord : BindableBase
-        {
-            /// <summary>
-            /// 日付
-            /// </summary>
-            #region Date
-            public DateTime Date
-            {
-                get { return _Date; }
-                set { SetProperty(ref _Date, value); }
-            }
-            private DateTime _Date = default(DateTime);
-            #endregion
-
-            /// <summary>
-            /// 値
-            /// </summary>
-            #region Value
-            public int Value
-            {
-                get { return _Value; }
-                set { SetProperty(ref _Value, value); }
-            }
-            private int _Value = default(int);
-            #endregion
-
-            /// <summary>
-            /// 名称
-            /// </summary>
-            #region Name
-            public string Name
-            {
-                get { return _Name; }
-                set { SetProperty(ref _Name, value); }
-            }
-            private string _Name = default(string);
-            #endregion
         }
     }
 }

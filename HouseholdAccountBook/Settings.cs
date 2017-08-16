@@ -1,8 +1,6 @@
 ﻿using System;
 
 namespace HouseholdAccountBook.Properties {
-    
-    
     // このクラスでは設定クラスでの特定のイベントを処理することができます:
     //  SettingChanging イベントは、設定値が変更される前に発生します。
     //  PropertyChanged イベントは、設定値が変更された後に発生します。
@@ -36,8 +34,7 @@ namespace HouseholdAccountBook.Properties {
             try {
                 // 前回保存時のバージョンを取得する
                 string versionText = (string)GetPreviousVersion("App_Version");
-                Version preVer;
-                if (!Version.TryParse(versionText, out preVer)) {
+                if (!Version.TryParse(versionText, out Version preVer)) {
                     // 初回起動時、またはバージョン番号保存以前の場合
                 }
                 else {

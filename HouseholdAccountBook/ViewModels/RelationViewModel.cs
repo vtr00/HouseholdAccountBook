@@ -7,6 +7,7 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class RelationViewModel : BindableBase
     {
+        #region プロパティ
         /// <summary>
         /// 関係があるか
         /// </summary>
@@ -28,5 +29,6 @@ namespace HouseholdAccountBook.ViewModels
         /// 表示名
         /// </summary>
         public string Name { get; set; }
+        #endregion
     }
 }

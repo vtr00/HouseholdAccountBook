@@ -5,6 +5,7 @@
     /// </summary>
     public class SummaryViewModel
     {
+        #region プロパティ
         /// <summary>
         /// 収支種別
         /// </summary>
@@ -29,5 +30,6 @@
         /// 合計
         /// </summary>
         public int Summary { get; set; }
+        #endregion
     }
 }

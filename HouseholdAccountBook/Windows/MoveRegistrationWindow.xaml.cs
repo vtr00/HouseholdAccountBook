@@ -44,7 +44,7 @@ namespace HouseholdAccountBook.Windows
         private int? groupId = null;
         #endregion
 
-        #region イベントハンドラ
+        #region イベント
         /// <summary>
         /// 登録時のイベント
         /// </summary>
@@ -52,7 +52,7 @@ namespace HouseholdAccountBook.Windows
         #endregion
 
         /// <summary>
-        /// 帳簿項目追加ウィンドウ(移動)
+        /// 帳簿項目(移動)の新規登録のために <see cref="MoveRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         /// <param name="selectedBookId">帳簿ID</param>
@@ -105,26 +105,26 @@ namespace HouseholdAccountBook.Windows
             LoadSetting();
 
             #region イベントハンドラの設定
-            this.WVM.OnFromBookChanged += () => {
+            this.WVM.FromBookChanged += () => {
                 UpdateItemList();
                 UpdateRemarkList();
             };
-            this.WVM.OnToBookChanged += () => {
+            this.WVM.ToBookChanged += () => {
                 UpdateItemList();
                 UpdateRemarkList();
             };
-            this.WVM.OnCommissionKindChanged += () => {
+            this.WVM.CommissionKindChanged += () => {
                 UpdateItemList();
                 UpdateRemarkList();
             };
-            this.WVM.OnItemChanged += () => {
+            this.WVM.ItemChanged += () => {
                 UpdateRemarkList();
             };
             #endregion
         }
 
         /// <summary>
-        /// 帳簿項目編集ウィンドウ(移動)
+        /// 帳簿項目(移動)の編集(複製)のために <see cref="MoveRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         /// <param name="selectedBookId">帳簿ID</param>
@@ -230,24 +230,25 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
             LoadSetting();
 
             #region イベントハンドラの設定
-            this.WVM.OnFromBookChanged += () => {
+            this.WVM.FromBookChanged += () => {
                 UpdateItemList();
                 UpdateRemarkList();
             };
-            this.WVM.OnToBookChanged += () => {
+            this.WVM.ToBookChanged += () => {
                 UpdateItemList();
                 UpdateRemarkList();
             };
-            this.WVM.OnCommissionKindChanged += () => {
+            this.WVM.CommissionKindChanged += () => {
                 UpdateItemList();
                 UpdateRemarkList();
             };
-            this.WVM.OnItemChanged += () => {
+            this.WVM.ItemChanged += () => {
                 UpdateRemarkList();
             };
             #endregion
         }
 
+        #region イベントハンドラ
         #region コマンド
         /// <summary>
         /// 今日コマンド判定
@@ -307,7 +308,6 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
         }
         #endregion
 
-        #region イベントハンドラ
         /// <summary>
         /// フォーム終了時
         /// </summary>

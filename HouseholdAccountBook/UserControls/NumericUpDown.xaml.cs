@@ -10,9 +10,9 @@ namespace HouseholdAccountBook.UserControls
     /// </summary>
     public partial class NumericUpDown : UserControl
     {
-        #region 依存プロパティ
+        #region 依存関係プロパティ
         /// <summary>
-        /// 値プロパティ
+        /// <see cref="Value"/> 依存関係プロパティを識別します。
         /// </summary>
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(
                 PropertyName<NumericUpDown>.Get(x => x.Value),
@@ -30,7 +30,7 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// 刻み幅プロパティ
+        /// <see cref="Stride"/> 依存関係プロパティを識別します。
         /// </summary>
         public static readonly DependencyProperty StrideProperty = DependencyProperty.Register(
                 PropertyName<NumericUpDown>.Get(x => x.Stride),
@@ -48,7 +48,7 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// NULL値プロパティ
+        /// <see cref="NullValue"/> 依存関係プロパティを識別します。
         /// </summary>
         public static readonly DependencyProperty NullValueProperty = DependencyProperty.Register(
             PropertyName<NumericUpDown>.Get(x => x.NullValue), 
@@ -65,7 +65,7 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// 最大値プロパティ
+        /// <see cref="MaxValue"/> 依存関係プロパティを識別します。
         /// </summary>
         public static readonly DependencyProperty MaxValueProperty = DependencyProperty.Register(
                 PropertyName<NumericUpDown>.Get(x => x.MaxValue),
@@ -83,7 +83,7 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// 最小値プロパティ
+        /// <see cref="MinValue"/> 依存関係プロパティを識別します。
         /// </summary>
         public static readonly DependencyProperty MinValueProperty = DependencyProperty.Register(
                 PropertyName<NumericUpDown>.Get(x => x.MinValue),
@@ -102,13 +102,14 @@ namespace HouseholdAccountBook.UserControls
         #endregion
 
         /// <summary>
-        /// コンストラクタ
+        /// <see cref="NumericUpDown"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         public NumericUpDown() 
         {
             InitializeComponent();
         }
 
+        #region イベントハンドラ
         #region コマンド
         /// <summary>
         /// ▲ボタン押下可能か
@@ -127,7 +128,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void IncreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            IncrementNumber();
+            IncreaceNumber();
             e.Handled = true;
         }
 
@@ -148,7 +149,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void DecreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            DecrementNumber();
+            DecreaceNumber();
             e.Handled = true;
         }
 
@@ -211,7 +212,6 @@ namespace HouseholdAccountBook.UserControls
         }
         #endregion
 
-        #region イベントハンドラ
         /// <summary>
         /// 入力された値を表示前にチェックする
         /// </summary>
@@ -263,10 +263,10 @@ namespace HouseholdAccountBook.UserControls
         private void TextBox_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0) {
-                IncrementNumber();
+                IncreaceNumber();
             }
             else if (e.Delta < 0) {
-                DecrementNumber();
+                DecreaceNumber();
             }
         }
         #endregion
@@ -274,7 +274,7 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// 数値をインクリメントする
         /// </summary>
-        private void IncrementNumber() {
+        private void IncreaceNumber() {
             if (this.Value == null) {
                 this.Value = this.MinValue;
             }
@@ -289,7 +289,7 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// 数値をデクリメントする
         /// </summary>
-        private void DecrementNumber() 
+        private void DecreaceNumber() 
         {
             if (this.Value == null) {
                 this.Value = this.MaxValue;

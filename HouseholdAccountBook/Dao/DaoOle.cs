@@ -7,26 +7,21 @@ namespace HouseholdAccountBook.Dao
     /// <summary>
     /// Ole Db Data Access Object
     /// </summary>
-    public class DaoOle : DaoBase
+    public partial class DaoOle : DaoBase
     {
+        /// <summary>
+        /// 接続文字列
+        /// </summary>
         private const string DaoStringFormat = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0}";
 
         /// <summary>
-        /// 接続情報
-        /// </summary>
-        public new class ConnectInfo : DaoBase.ConnectInfo
-        {
-            public string filePath { get; set; }
-        }
-
-        /// <summary>
-        /// コンストラクタ
+        /// <see cref="DaoOle"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public DaoOle(ConnectInfo info) : this(info.filePath) { }
+        public DaoOle(ConnectInfo info) : this(info.FilePath) { }
 
         /// <summary>
-        /// コンストラクタ
+        /// <see cref="DaoOle"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
         public DaoOle(string filePath) : base(new OleDbConnection(string.Format(DaoStringFormat, filePath))) { }

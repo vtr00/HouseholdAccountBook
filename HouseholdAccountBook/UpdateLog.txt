@@ -357,7 +357,7 @@
     ↑マウスホイールイベントがハンドルしていなかったのを修正した
 2017/08/15
   NumericUpDown.xaml.cs
-    －数値入力部分を別コントロールに変更した
+    －数値入力部分を別コントロール(NumericInputButton.xaml.cs)に変更した
 2017/08/16
   ActionListRegistrationWindow.xaml.cs
     ＋金額を数値入力ボタンで入力できる機能を追加した

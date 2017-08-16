@@ -53,7 +53,9 @@ namespace HouseholdAccountBook.Behaviors
                 typeof(object),
                 typeof(BindSelectedItemToTreeViewBehavior),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, SelectedItemChanged));
+        #endregion
 
+        #region イベントハンドラ
         /// <summary>
         /// <see cref="SelectedItem"/> が変更されたときに <see cref="IMultiSelectable.IsSelected"/> を更新します。
         /// </summary>
@@ -71,8 +73,6 @@ namespace HouseholdAccountBook.Behaviors
                 }
             }
         }
-        #endregion
-
         /// <summary>
         /// <see cref="TreeView.SelectedItem"/> 変更時に <see cref="SelectedItem"/> を変更します。
         /// </summary>
@@ -84,5 +84,6 @@ namespace HouseholdAccountBook.Behaviors
                 this.SelectedItem = (sender as TreeView)?.SelectedItem;
             }
         }
+        #endregion
     }
 }

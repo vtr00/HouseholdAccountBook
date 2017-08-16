@@ -3,18 +3,8 @@
     /// <summary>
     /// DAOビルダ
     /// </summary>
-    public class DaoBuilder
+    public partial class DaoBuilder
     {
-        /// <summary>
-        /// 接続対象
-        /// </summary>
-        private enum Target
-        {
-            SQLite,
-            PostgreSQL,
-            OleDb,
-            Undefined
-        }
         /// <summary>
         /// 接続対象
         /// </summary>
@@ -25,7 +15,7 @@
         private DaoBase.ConnectInfo info;
 
         /// <summary>
-        /// DAOビルダ
+        /// <see cref="DaoBuilder"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
         public DaoBuilder(DaoBase.ConnectInfo info)
@@ -33,20 +23,17 @@
             this.target = Target.Undefined;
             this.info = null;
 
-            DaoNpgsql.ConnectInfo npgsqlInfo = info as DaoNpgsql.ConnectInfo;
-            if (npgsqlInfo != null) {
+            if (info is DaoNpgsql.ConnectInfo npgsqlInfo) {
                 this.target = Target.PostgreSQL;
                 this.info = info;
                 return;
             }
-            DaoOle.ConnectInfo oleInfo = info as DaoOle.ConnectInfo;
-            if (oleInfo != null) {
+            if (info is DaoOle.ConnectInfo oleInfo) {
                 this.target = Target.OleDb;
                 this.info = info;
                 return;
             }
-            DaoSQLite.ConnectInfo sqliteInfo = info as DaoSQLite.ConnectInfo;
-            if (sqliteInfo != null) {
+            if (info is DaoSQLite.ConnectInfo sqliteInfo) {
                 this.target = Target.SQLite;
                 this.info = info;
                 return;
