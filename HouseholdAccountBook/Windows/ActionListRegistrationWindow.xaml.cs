@@ -1,14 +1,16 @@
 ﻿using HouseholdAccountBook.Dao;
-using HouseholdAccountBook.ViewModels;
+using HouseholdAccountBook.UserControls;
 using HouseholdAccountBook.UserEventArgs;
+using HouseholdAccountBook.ViewModels;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
-using static HouseholdAccountBook.ViewModels.ActionListRegistrationWindowViewModel;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -26,6 +28,10 @@ namespace HouseholdAccountBook.Windows
         /// MainWindowで選択された帳簿項目の日付
         /// </summary>
         private DateTime? selectedDateTime;
+        /// <summary>
+        /// 金額列の最後に選択したセル
+        /// </summary>
+        private DataGridCell lastDataGridCell;
         #endregion
 
         /// <summary>
@@ -141,6 +147,69 @@ namespace HouseholdAccountBook.Windows
             this.DialogResult = false;
             this.Close();
         }
+
+        /// <summary>
+        /// 数値入力ボタン押下コマンド
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ButtonInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            TextBox textBox = _popup.PlacementTarget as TextBox;
+            DateValueViewModel vm = textBox.DataContext as DateValueViewModel;
+
+            switch (this.WVM.InputedKind) {
+                case NumericInputButton.InputKind.Number:
+                    int value = this.WVM.InputedValue.Value;
+                    if (vm.ActValue == null) {
+                        vm.ActValue = value;
+                        textBox.SelectionStart = 1;
+                    }
+                    else {
+                        int selectionStart = textBox.SelectionStart;
+                        int selectionEnd = selectionStart + textBox.SelectionLength;
+                        string forwardText = textBox.Text.Substring(0, selectionStart);
+                        string selectedText = textBox.SelectedText;
+                        string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
+
+                        vm.ActValue = int.Parse(string.Format("{0}{1}{2}", forwardText, value, backwardText));
+                        textBox.SelectionStart = selectionStart + 1;
+                    }
+                    break;
+                case NumericInputButton.InputKind.BackSpace:
+                    if (vm.ActValue == 0) {
+                        vm.ActValue = null;
+                    }
+                    else {
+                        int selectionStart = textBox.SelectionStart;
+                        int selectionLength = textBox.SelectionLength;
+                        int selectionEnd = selectionStart + textBox.SelectionLength;
+                        string forwardText = textBox.Text.Substring(0, selectionStart);
+                        string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
+
+                        if (selectionLength != 0) {
+                            vm.ActValue = int.Parse(string.Format("{0}{1}", forwardText, backwardText));
+                            textBox.SelectionStart = selectionStart;
+                        }
+                        else if (selectionStart != 0) {
+                            string newText = string.Format("{0}{1}", forwardText.Substring(0, selectionStart - 1), backwardText);
+                            vm.ActValue = string.Empty == newText ? (int?)null : int.Parse(newText);
+                            textBox.SelectionStart = selectionStart - 1;
+                        }
+                    }
+                    break;
+                case NumericInputButton.InputKind.Clear:
+                    vm.ActValue = null;
+                    break;
+            }
+            // 外れたフォーカスを元に戻す
+            lastDataGridCell.IsEditing = true; // セルを編集モードにする - 画面がちらつくがやむを得ない？
+            textBox.Focus();
+            lastDataGridCell.Focus(); // Enterキーでの入力完了を有効にする
+            //Keyboard.Focus(textBox); // キーでの数値入力を有効にする - 意図した動作にならない
+
+            e.Handled = true;
+        }
         #endregion
 
         #region イベントハンドラ
@@ -169,6 +238,70 @@ namespace HouseholdAccountBook.Windows
                 DateValueViewModel lastVM = this.WVM.DateValueVMList[this.WVM.DateValueVMList.Count - 1];
                 e.NewItem = new DateValueViewModel() { ActDate = lastVM.ActDate, ActValue = null };
             }
+        }
+        
+        /// <summary>
+        /// 入力された値を表示前にチェックする
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            bool yes_parse = false;
+            if (sender != null) {
+                // 既存のテキストボックス文字列に、新規に一文字追加された時、その文字列が数値として意味があるかどうかをチェック
+                {
+                    string tmp = textBox.Text + e.Text;
+                    if (tmp == string.Empty) {
+                        yes_parse = true;
+                    }
+                    else {
+                        yes_parse = Int32.TryParse(tmp, out int xx);
+
+                        // 範囲内かどうかチェック
+                        if (yes_parse) {
+                            if (xx < 0) {
+                                yes_parse = false;
+                            }
+                        }
+                    }
+                }
+            }
+            // 更新したい場合は false, 更新したくない場合は true
+            e.Handled = !yes_parse;
+        }
+
+        /// <summary>
+        /// Popupを表示する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (!this.WVM.IsEditing) { 
+                TextBox textBox = sender as TextBox;
+                _popup.SetBinding(Popup.StaysOpenProperty, new Binding(TextBox.IsKeyboardFocusedProperty.Name) { Source = textBox });
+                _popup.PlacementTarget = textBox;
+                this.WVM.IsEditing = true;
+            }
+            e.Handled = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DataGridCell_GotFocus(object sender, RoutedEventArgs e)
+        {
+            DataGridCell dataGridCell = sender as DataGridCell;
+            
+            // 新しいセルに移動していたら数値入力ボタンを非表示にする
+            if (dataGridCell != lastDataGridCell) {
+                this.WVM.IsEditing = false;
+            }
+            lastDataGridCell = dataGridCell;
         }
         #endregion
 

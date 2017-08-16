@@ -42,7 +42,7 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// <see cref="DateTimePicker">DateTimePicker</see> クラスの新しいインスタンスを初期化します。
+        /// <see cref="DateTimePicker"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         public DateTimePicker() : base()
         {
@@ -67,10 +67,9 @@ namespace HouseholdAccountBook.UserControls
             set { this.SetValue(DateFormatProperty, value); }
         }
         /// <summary>
-        /// <see cref="DateFormat">DateFormat</see> 依存関係プロパティを識別します。
+        /// <see cref="DateFormat"/> 依存関係プロパティを識別します。
         /// </summary>
-        public static readonly DependencyProperty DateFormatProperty =
-            DependencyProperty.RegisterAttached(
+        public static readonly DependencyProperty DateFormatProperty = DependencyProperty.RegisterAttached (
                 PropertyName<DateTimePicker>.Get(x => x.DateFormat), 
                 typeof(string), 
                 typeof(DateTimePicker),
@@ -236,7 +235,6 @@ namespace HouseholdAccountBook.UserControls
             var textBox = GetTemplateTextBox(dateTimePicker);
             textBox.SelectionStart = selectedPositionBeforeCalendarOpened;
         }
-        #endregion
 
         /// <summary>
         /// 表示フォーマット変更時処理
@@ -248,6 +246,7 @@ namespace HouseholdAccountBook.UserControls
             DateTimePicker dateTimePicker = (DateTimePicker)dobj;
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action<DateTimePicker>(ApplyDateFormat), dateTimePicker);
         }
+        #endregion
 
         /// <summary>
         /// 表示フォーマット変更を適用する

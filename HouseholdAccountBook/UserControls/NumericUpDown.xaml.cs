@@ -205,6 +205,7 @@ namespace HouseholdAccountBook.UserControls
                     this.Value = null;
                     break;
             }
+            textBox.Focus();
 
             e.Handled = true;
         }

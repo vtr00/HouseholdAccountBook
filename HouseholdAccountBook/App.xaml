@@ -12,6 +12,7 @@
         <converters:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
         <converters:DateTimeToDisplayedYearConverter x:Key="DateTimeToThisYearConverter"/>
         <converters:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
+        <converters:NegationConverter x:Key="NegationConverter"/>
         <BooleanToVisibilityConverter x:Key="BoolVisibilityConverter"/>
 
         <!-- スタイル -->

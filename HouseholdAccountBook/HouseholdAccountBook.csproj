@@ -145,6 +145,7 @@
     <Compile Include="Behaviors\BindSelectedItemToTreeViewBehavior.cs" />
     <Compile Include="BindingProxy.cs" />
     <Compile Include="Converters\DateTimeToDisplayedYearConverter.cs" />
+    <Compile Include="Converters\NegationConverter.cs" />
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Interfaces\IMultiSelectable.cs" />
     <Compile Include="PropertyName.cs" />
@@ -160,6 +161,7 @@
       <DependentUpon>NumericUpDown.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dao\DaoBuilder.cs" />
+    <Compile Include="ViewModels\DateValueViewModel.cs" />
     <Compile Include="ViewModels\NumericUpDownViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel\ActionListRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel\ActionRegistrationWindowViewModel.cs" />

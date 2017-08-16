@@ -1,8 +1,8 @@
-﻿using Prism.Mvvm;
+﻿using HouseholdAccountBook.UserControls;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.ViewModels
@@ -183,6 +183,18 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// 編集中か
+        /// </summary>
+        #region IsEditing
+        public bool IsEditing
+        {
+            get { return _IsEditing; }
+            set { SetProperty(ref _IsEditing, value); }
+        }
+        private bool _IsEditing = default(bool);
+        #endregion
+        
+        /// <summary>
         /// 店舗名リスト
         /// </summary>
         #region ShopNameList
@@ -227,34 +239,15 @@ namespace HouseholdAccountBook.ViewModels
         }
         private string _SelectedRemark = default(string);
         #endregion
-        #endregion
 
-        #region 内部クラス定義
         /// <summary>
-        /// 日付金額VM
+        /// 数値入力ボタンの入力値
         /// </summary>
-        public class DateValueViewModel : BindableBase
-        {
-            /// <summary>
-            /// 日付
-            /// </summary>
-            public DateTime ActDate { get; set; }
-            /// <summary>
-            /// 金額
-            /// </summary>
-            #region ActValue
-            public int? ActValue
-            {
-                get { return _ActValue; }
-                set {
-                    if (SetProperty(ref _ActValue, value)) {
-                        CommandManager.InvalidateRequerySuggested();
-                    }
-                }
-            }
-            private int? _ActValue = default(int?);
-            #endregion
-        }
+        public int? InputedValue { get; set; }
+        /// <summary>
+        /// 数値入力ボタンの入力種別
+        /// </summary>
+        public NumericInputButton.InputKind InputedKind { get; set; }
         #endregion
     }
 }

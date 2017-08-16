@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
+        xmlns:project="clr-namespace:HouseholdAccountBook"
         mc:Ignorable="d"
         Title="まとめて追加" Height="Auto" Width="350" ShowInTaskbar="False"
         Closing="ActionListRegistrationWindow_Closing">
@@ -13,6 +14,7 @@
         <!-- 登録コマンド -->
         <RoutedCommand x:Key="RegisterCommand"/>
         <RoutedCommand x:Key="CancelCommand"/>
+        <RoutedCommand x:Key="ButtonInputCommand"/>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -20,6 +22,8 @@
                         CanExecute="RegisterCommand_CanExecute" Executed="RegisterCommand_Executed"/>
         <CommandBinding Command="{StaticResource CancelCommand}" 
                         Executed="CancelCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ButtonInputCommand}"
+                        Executed="ButtonInputCommand_Executed"/>
     </Window.CommandBindings>
 
     <Window.InputBindings>
@@ -76,6 +80,9 @@
                       AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
                       HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo"
                       AddingNewItem="DataGrid_AddingNewItem">
+                <DataGrid.Resources>
+                    <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
+                </DataGrid.Resources>
                 <DataGrid.Columns>
                     <controls:DataGridEditableTemplateColumn Header="日付" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
@@ -89,8 +96,26 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>
                     </controls:DataGridEditableTemplateColumn>
-                    <DataGridTextColumn Header="金額" Binding="{Binding ActValue, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
-                                        Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+
+                    <controls:DataGridEditableTemplateColumn Header="金額" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}">
+                        <DataGridTemplateColumn.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}">
+                                <EventSetter Event="GotFocus" Handler="DataGridCell_GotFocus"/>
+                            </Style>
+                        </DataGridTemplateColumn.CellStyle>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ActValue, Converter={StaticResource IntToMoneyDisplayConverter}, TargetNullValue=''}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding ActValue, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                         TextAlignment="Right" InputMethod.IsInputMethodEnabled="False"
+                                         PreviewTextInput="TextBox_PreviewTextInput" GotFocus="TextBox_GotFocus"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </controls:DataGridEditableTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
             <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
@@ -101,6 +126,11 @@
                        Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="6" Grid.Column="1" Margin="5" IsEditable="True"
                       ItemsSource="{Binding RemarkList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}"/>
+            
+            <Popup x:Name="_popup" IsOpen="{Binding IsEditing, Mode=TwoWay}">
+                <controls:NumericInputButton InputedValue="{Binding InputedValue}" InputedKind="{Binding InputedKind}"
+                                             Command="{StaticResource ButtonInputCommand}"/>
+            </Popup>
         </Grid>
 
         <Grid Grid.Row="1" Margin="0,10,0,0">

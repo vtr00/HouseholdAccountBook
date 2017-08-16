@@ -34,7 +34,7 @@ namespace HouseholdAccountBook.UserControls
             Clear
         }       
 
-        #region 依存プロパティ
+        #region 依存関係プロパティ
         /// <summary>
         /// 入力値プロパティ
         /// </summary>
@@ -88,16 +88,6 @@ namespace HouseholdAccountBook.UserControls
             get { return (ICommand)GetValue(CommandProperty); }
             set { SetValue(CommandProperty, value); }
         }
-        /// <summary>
-        /// コマンドプロパティ変更時イベント
-        /// </summary>
-        /// <param name="d"></param>
-        /// <param name="e"></param>
-        private static void CommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            NumericInputButton nib = (NumericInputButton)d;
-            nib.HookUpCommand((ICommand)e.OldValue, (ICommand)e.NewValue);
-        }
 
         /// <summary>
         /// コマンドパラメータプロパティ
@@ -142,6 +132,17 @@ namespace HouseholdAccountBook.UserControls
         public NumericInputButton()
         {
             InitializeComponent();
+        }
+
+        /// <summary>
+        /// コマンドプロパティ変更時イベント
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="e"></param>
+        private static void CommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            NumericInputButton nib = (NumericInputButton)d;
+            nib.HookUpCommand((ICommand)e.OldValue, (ICommand)e.NewValue);
         }
 
         /// <summary>
@@ -198,7 +199,7 @@ namespace HouseholdAccountBook.UserControls
 
             this.InputedValue = value;
             this.InputedKind = InputKind.Number;
-            OnInputed();
+            CallCommandToExecute();
 
             e.Handled = true;
         }
@@ -211,7 +212,7 @@ namespace HouseholdAccountBook.UserControls
         private void BackSpaceInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.InputedKind = InputKind.BackSpace;
-            OnInputed();
+            CallCommandToExecute();
 
             e.Handled = true;
         }
@@ -224,7 +225,7 @@ namespace HouseholdAccountBook.UserControls
         private void ClearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.InputedKind = InputKind.Clear;
-            OnInputed();
+            CallCommandToExecute();
 
             e.Handled = true;
         }
@@ -232,7 +233,7 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// 入力があったときにコマンドを実行する
         /// </summary>
-        protected void OnInputed()
+        protected void CallCommandToExecute()
         {
             if(this.Command != null) {
                 if(this.Command is RoutedCommand command) {
