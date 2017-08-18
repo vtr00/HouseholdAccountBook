@@ -8,8 +8,11 @@
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Behaviors"
         mc:Ignorable="d"
-        Title="設定 - Household Account Book" Height="700" Width="1050" ShowInTaskbar="False"
+        Title="設定" Height="700" Width="1050" ShowInTaskbar="False"
         Closing="SettingsWindow_Closing">
+    <Window.DataContext>
+        <viewmodels:SettingsWindowViewModel x:Name="WVM"/>
+    </Window.DataContext>
 
     <Window.Resources>
         <!-- 設定操作コマンド -->
@@ -71,10 +74,6 @@
     <Window.InputBindings>
         <KeyBinding Gesture="Alt+F4" Command="{x:Static ApplicationCommands.Close}"/>
     </Window.InputBindings>
-    
-    <Window.DataContext>
-        <viewmodels:SettingsWindowViewModel x:Name="WVM"/>
-    </Window.DataContext>
 
     <Grid Background="WhiteSmoke">
         <Grid.RowDefinitions>

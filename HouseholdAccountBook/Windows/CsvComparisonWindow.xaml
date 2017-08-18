@@ -8,6 +8,9 @@
         mc:Ignorable="d"
         Title="CSV比較 - Household Account Book" Height="450" Width="600" ShowInTaskbar="False"
         Closing="CsvComparisonWindow_Closing">
+    <Window.DataContext>
+        <viewmodels:CsvComparisonWindowViewModel x:Name="WVM"/>
+    </Window.DataContext>
 
     <Window.Resources>
         <!-- ファイルコマンド -->
@@ -55,10 +58,6 @@
     <Window.InputBindings>
         <KeyBinding Gesture="Alt+F4" Command="{x:Static ApplicationCommands.Close}"/>
     </Window.InputBindings>
-
-    <Window.DataContext>
-        <viewmodels:CsvComparisonWindowViewModel x:Name="WVM"/>
-    </Window.DataContext>
 
     <Grid>
         <Grid.RowDefinitions>

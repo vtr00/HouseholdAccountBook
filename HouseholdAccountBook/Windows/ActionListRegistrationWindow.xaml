@@ -127,7 +127,7 @@
             <ComboBox Grid.Row="6" Grid.Column="1" Margin="5" IsEditable="True"
                       ItemsSource="{Binding RemarkList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}"/>
             
-            <Popup x:Name="_popup" IsOpen="{Binding IsEditing, Mode=TwoWay}">
+            <Popup x:Name="_popup" IsOpen="{Binding IsEditing, Mode=TwoWay}" Placement="Right">
                 <controls:NumericInputButton InputedValue="{Binding InputedValue}" InputedKind="{Binding InputedKind}"
                                              Command="{StaticResource ButtonInputCommand}"/>
             </Popup>

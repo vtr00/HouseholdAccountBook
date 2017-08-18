@@ -1,14 +1,14 @@
 ﻿using HouseholdAccountBook.Dao;
-using HouseholdAccountBook.ViewModels;
+using HouseholdAccountBook.Extentions;
 using HouseholdAccountBook.UserEventArgs;
+using HouseholdAccountBook.ViewModels;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
-using System.Linq;
-using HouseholdAccountBook.Extentions;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -62,7 +62,6 @@ namespace HouseholdAccountBook.Windows
             this.builder = builder;
 
             InitializeComponent();
-            Title = "移動(追加)";
             this.WVM.RegMode = RegistrationMode.Add;
 
             this.selectedBookId = selectedBookId;
@@ -140,11 +139,9 @@ namespace HouseholdAccountBook.Windows
 
             switch (this.WVM.RegMode) {
                 case RegistrationMode.Edit:
-                    Title = "移動(編集)";
                     this.groupId = groupId;
                     break;
                 case RegistrationMode.Copy:
-                    Title = "移動(追加)";
                     this.groupId = null;
                     break;
             }

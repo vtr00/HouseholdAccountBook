@@ -175,9 +175,11 @@ namespace HouseholdAccountBook.UserControls
                         string forwardText = textBox.Text.Substring(0, selectionStart);
                         string selectedText = textBox.SelectedText;
                         string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
-
-                        this.Value = int.Parse(string.Format("{0}{1}{2}", forwardText, value, backwardText));
-                        textBox.SelectionStart = selectionStart + 1;
+                        
+                        if (int.TryParse(string.Format("{0}{1}{2}", forwardText, value, backwardText), out int outValue)) {
+                            this.Value = outValue;
+                            textBox.SelectionStart = selectionStart + 1;
+                        }
                     }
                     break;
                 case NumericInputButton.InputKind.BackSpace:
@@ -192,13 +194,17 @@ namespace HouseholdAccountBook.UserControls
                         string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
 
                         if (selectionLength != 0) {
-                            this.Value = int.Parse(string.Format("{0}{1}", forwardText, backwardText));
-                            textBox.SelectionStart = selectionStart;
+                            if (int.TryParse(string.Format("{0}{1}", forwardText, backwardText), out int outValue)) {
+                                this.Value = outValue;
+                                textBox.SelectionStart = selectionStart;
+                            }
                         }
                         else if (selectionStart != 0) {
                             string newText = string.Format("{0}{1}", forwardText.Substring(0, selectionStart - 1), backwardText);
-                            this.Value = string.Empty == newText ? (int?)null : int.Parse(newText);
-                            textBox.SelectionStart = selectionStart - 1;
+                            if (string.Empty == newText || int.TryParse(newText, out int outValue)) {
+                                this.Value = string.Empty == newText ? (int?)null : int.Parse(newText);
+                                textBox.SelectionStart = selectionStart - 1;
+                            }
                         }
                     }
                     break;
@@ -251,8 +257,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            _popup.IsOpen = true;
-            _popup.Focus();
+            this._popup.IsOpen = true;
         }
 
         /// <summary>
@@ -268,6 +273,46 @@ namespace HouseholdAccountBook.UserControls
             else if (e.Delta < 0) {
                 DecreaceNumber();
             }
+        }
+        
+        /// <summary>
+        /// コントロールからフォーカスが外れたとき
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NumericUpDown_LostFocus(object sender, RoutedEventArgs e)
+        {
+            this.UVM.NumericUpDownFocused = false;
+        }
+
+        /// <summary>
+        /// コントロールがフォーカスを得たとき
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NumericUpDown_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.UVM.NumericUpDownFocused = true;
+        }
+
+        /// <summary>
+        /// Popupからフォーカスが外れたとき
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Popup_LostFocus(object sender, RoutedEventArgs e)
+        {
+            this.UVM.PopupFocused = false;
+        }
+
+        /// <summary>
+        /// Popupがフォーカスを得たとき
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Popup_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.UVM.PopupFocused = true;
         }
         #endregion
 
@@ -301,5 +346,6 @@ namespace HouseholdAccountBook.UserControls
                 this.Value = this.MinValue;
             }
         }
+
     }
 }

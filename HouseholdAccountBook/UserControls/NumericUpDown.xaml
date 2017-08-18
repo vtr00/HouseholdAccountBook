@@ -6,7 +6,9 @@
              xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
              xmlns:local="clr-namespace:HouseholdAccountBook.UserControls"
              mc:Ignorable="d" 
-             d:DesignWidth="150">
+             d:DesignWidth="150"
+             GotFocus="NumericUpDown_GotFocus"
+             LostFocus="NumericUpDown_LostFocus">
 
     <UserControl.Resources>
         <RoutedCommand x:Key="IncreaseCommand"/>
@@ -23,11 +25,13 @@
                         Executed="ButtonInputCommand_Executed"/>
     </UserControl.CommandBindings>
 
-    <UserControl.DataContext>
-        <viewmodels:NumericUpDownViewModel x:Name="UVM"/>
-    </UserControl.DataContext>
+    <!-- UserControl.DataContextは外部から設定される -->
 
-    <Grid>
+    <Grid x:Name="_topGrid">
+        <Grid.DataContext>
+            <viewmodels:NumericUpDownViewModel x:Name="UVM"/>
+        </Grid.DataContext>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
@@ -48,10 +52,9 @@
                     <KeyBinding Gesture="Down" Command="{StaticResource DecreaseCommand}"/>
                 </TextBox.InputBindings>
             </TextBox>
-            <Popup x:Name="_popup"
-                StaysOpen="{Binding IsKeyboardFocused, ElementName=_textBox}" PlacementTarget="{Binding ElementName=_textBox}">
-                <local:NumericInputButton InputedValue="{Binding InputedValue, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:NumericUpDown}}}"
-                                          InputedKind="{Binding InputedKind, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:NumericUpDown}}}"
+            <Popup x:Name="_popup" IsOpen="{Binding IsOpen}" PlacementTarget="{Binding ElementName=_topGrid}" Placement="Right"
+                   GotFocus="Popup_GotFocus" LostFocus="Popup_LostFocus">
+                <local:NumericInputButton InputedValue="{Binding InputedValue}" InputedKind="{Binding InputedKind}"
                                           Command="{StaticResource ButtonInputCommand}"/>
             </Popup>
         </Grid>

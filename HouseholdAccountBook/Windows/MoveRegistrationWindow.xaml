@@ -6,8 +6,11 @@
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         mc:Ignorable="d"
-        Title="移動" Height="Auto" Width="350" ShowInTaskbar="False"
+        Height="Auto" Width="350" ShowInTaskbar="False"
         Closing="MoveRegistrationWindow_Closing">
+    <Window.DataContext>
+        <viewmodels:MoveRegistrationWindowViewModel x:Name="WVM"/>
+    </Window.DataContext>
 
     <Window.Resources>
         <RoutedCommand x:Key="TodayCommand"/>
@@ -32,11 +35,23 @@
         <KeyBinding Gesture="Enter" Command="{StaticResource RegisterCommand}"/>
         <KeyBinding Gesture="Esc" Command="{StaticResource CancelCommand}"/>
     </Window.InputBindings>
-    
-    <Window.DataContext>
-        <viewmodels:MoveRegistrationWindowViewModel x:Name="WVM"/>
-    </Window.DataContext>
-    
+
+    <Window.Style>
+        <Style TargetType="Window">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RegMode}" Value="Add">
+                    <Setter Property="Title" Value="移動(追加)"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RegMode}" Value="Edit">
+                    <Setter Property="Title" Value="移動(編集)"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RegMode}" Value="Copy">
+                    <Setter Property="Title" Value="移動(追加)"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>

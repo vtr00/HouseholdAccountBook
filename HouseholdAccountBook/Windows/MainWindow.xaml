@@ -11,6 +11,9 @@
         mc:Ignorable="d"
         Title="Hausehold Account Book" Height="700" Width="1050"
         Closing="MainWindow_Closing">
+    <Window.DataContext>
+        <viewmodels:MainWindowViewModel x:Name="WVM"/>
+    </Window.DataContext>
 
     <Window.Resources>
         <!-- ファイルコマンド -->
@@ -132,10 +135,6 @@
         <KeyBinding Gesture="Alt+F4" Command="{x:Static ApplicationCommands.Close}"/>
     </Window.InputBindings>
     
-    <Window.DataContext>
-        <viewmodels:MainWindowViewModel x:Name="WVM"/>
-    </Window.DataContext>
-    
     <Grid Background="WhiteSmoke">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -165,7 +164,7 @@
                 <Separator/>
                 <MenuItem Header="追加(_A)..." Command="{StaticResource AddActionToBookCommand}" InputGestureText="Ctrl++"/>
                 <MenuItem Header="まとめて追加(_W)..." Command="{StaticResource AddActionListToBookCommand}" InputGestureText="Ctrl+Shift++"/>
-                <MenuItem Header="変更(_E)..." Command="{StaticResource EditActionCommand}" InputGestureText="F2"/>
+                <MenuItem Header="編集(_E)..." Command="{StaticResource EditActionCommand}" InputGestureText="F2"/>
                 <MenuItem Header="複製(_C)..." Command="{StaticResource CopyActionCommand}" InputGestureText="Ctrl+Shift+C"/>
                 <MenuItem Header="削除(_D)" Command="{StaticResource DeleteActionCommand}" InputGestureText="Del"/>
             </MenuItem>
@@ -258,7 +257,7 @@
                                 <Button Content="移動" Width="50" Command="{StaticResource MoveToBookCommand}"/>
                                 <Button Content="追加" Width="50" Command="{StaticResource AddActionToBookCommand}"/>
                                 <Button Content="まとめて追加" Width="80" Command="{StaticResource AddActionListToBookCommand}"/>
-                                <Button Content="変更" Width="50" Command="{StaticResource EditActionCommand}"/>
+                                <Button Content="編集" Width="50" Command="{StaticResource EditActionCommand}"/>
                                 <Button Content="複製" Width="50" Command="{StaticResource CopyActionCommand}"/>
                                 <Button Content="削除" Width="50" Command="{StaticResource DeleteActionCommand}"/>
                             </StackPanel>

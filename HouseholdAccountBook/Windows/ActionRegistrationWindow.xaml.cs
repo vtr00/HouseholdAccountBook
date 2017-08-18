@@ -50,7 +50,6 @@ namespace HouseholdAccountBook.Windows
             this.builder = builder;
 
             InitializeComponent();
-            Title = "追加";
             this.WVM.RegMode = RegistrationMode.Add;
 
             this.actionId = null;
@@ -121,11 +120,9 @@ namespace HouseholdAccountBook.Windows
 
             switch (this.WVM.RegMode) {
                 case RegistrationMode.Edit:
-                    Title = "編集";
                     this.actionId = actionId;
                     break;
                 case RegistrationMode.Copy:
-                    Title = "追加";
                     this.actionId = null;
                     break;
             }
@@ -248,7 +245,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
         /// <param name="e"></param>
         private void ContinueToRegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (actionId == null) && this.WVM.Value .HasValue;
+            e.CanExecute = this.WVM.RegMode != RegistrationMode.Edit && this.WVM.Value.HasValue;
         }
 
         /// <summary>
