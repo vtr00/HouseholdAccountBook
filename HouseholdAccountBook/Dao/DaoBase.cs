@@ -29,10 +29,10 @@ namespace HouseholdAccountBook.Dao
         /// <returns>接続結果</returns>
         private bool Open()
         {
-            connection.Open();
-            while (connection.State == System.Data.ConnectionState.Connecting) { ; }
+            this.connection.Open();
+            while (this.connection.State == System.Data.ConnectionState.Connecting) { ; }
 
-            return connection.State == System.Data.ConnectionState.Open;
+            return this.connection.State == System.Data.ConnectionState.Open;
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.Dao
         /// <returns>接続状態</returns>
         public bool IsOpen()
         {
-            return connection != null && connection.State == System.Data.ConnectionState.Open;
+            return this.connection != null && this.connection.State == System.Data.ConnectionState.Open;
         }
 
         /// <summary>
@@ -49,11 +49,11 @@ namespace HouseholdAccountBook.Dao
         /// </summary>
         public void Dispose()
         {
-            if (connection != null) {
-                connection.Close();
-                connection.Dispose();
+            if (this.connection != null) {
+                this.connection.Close();
+                this.connection.Dispose();
             }
-            connection = null;
+            this.connection = null;
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace HouseholdAccountBook.Dao
         {
             DbTransaction dbTransaction = null;
             try {
-                dbTransaction = connection.BeginTransaction();
+                dbTransaction = this.connection.BeginTransaction();
 
                 transaction();
 

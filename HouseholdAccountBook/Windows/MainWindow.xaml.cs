@@ -6,6 +6,7 @@ using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
 using OxyPlot;
 using OxyPlot.Axes;
+using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -108,15 +109,15 @@ namespace HouseholdAccountBook.Windows
             Properties.Settings.Default.App_KichoDBFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             Properties.Settings.Default.Save();
 
-            Cursor cCursor = Cursor;
-            Cursor = Cursors.Wait;
+            Cursor cCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
 
             bool isOpen = false;
             using (DaoOle daoOle = new DaoOle(ofd.FileName)) {
                 isOpen = daoOle.IsOpen();
 
                 if (isOpen) {
-                    using (DaoBase dao = builder.Build()) {
+                    using (DaoBase dao = this.builder.Build()) {
                         dao.ExecTransaction(() => {
                             // 既存のデータの削除
                             dao.ExecNonQuery(@"DELETE FROM mst_book;");
@@ -280,12 +281,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 UpdateMonthlyListWithinYearTabData();
                 UpdateMonthlyGraphWithinYearTabData();
 
-                Cursor = cCursor;
+                this.Cursor = cCursor;
 
                 MessageBox.Show(MessageText.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                Cursor = cCursor;
+                this.Cursor = cCursor;
                 MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
@@ -333,10 +334,10 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             Properties.Settings.Default.App_CustomFormatFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             Properties.Settings.Default.Save();
 
-            Cursor cCursor = Cursor;
-            Cursor = Cursors.Wait;
+            Cursor cCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
 
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 // 既存のデータの削除
                 dao.ExecNonQuery(@"DELETE FROM mst_book;");
                 dao.ExecNonQuery(@"DELETE FROM mst_category;");
@@ -381,12 +382,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 UpdateMonthlyListWithinYearTabData();
                 UpdateMonthlyGraphWithinYearTabData();
 
-                Cursor = cCursor;
+                this.Cursor = cCursor;
 
                 MessageBox.Show(MessageText.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                Cursor = cCursor;
+                this.Cursor = cCursor;
 
                 MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
@@ -431,8 +432,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             Properties.Settings.Default.App_CustomFormatFilePath = Path.Combine(sfd.InitialDirectory, sfd.FileName);
             Properties.Settings.Default.Save();
 
-            Cursor cCursor = Cursor;
-            Cursor = Cursors.Wait;
+            Cursor cCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
 
             // 起動情報を設定する
             ProcessStartInfo info = new ProcessStartInfo() {
@@ -459,7 +460,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             // バックアップする
             Process process = Process.Start(info);
             process.WaitForExit(10 * 1000);
-            Cursor = cCursor;
+            this.Cursor = cCursor;
 
             if (process.ExitCode == 0) {
                 MessageBox.Show(MessageText.FinishToExport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
@@ -488,12 +489,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void MoveToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder,
+            MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder,
                 this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime);
             mrw.Registrated += (sender2, e2) => {
                 UpdateBookTabData(e2.Value);
-                FocusManager.SetFocusedElement(this, actionDataGrid);
-                actionDataGrid.Focus();
+                FocusManager.SetFocusedElement(this, this.actionDataGrid);
+                this.actionDataGrid.Focus();
             };
             mrw.Owner = this;
             mrw.ShowDialog();
@@ -517,12 +518,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void AddActionToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ActionRegistrationWindow arw = new ActionRegistrationWindow(builder,
+            ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder,
                 this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime);
             arw.Registrated += (sender2, e2)=> {
                 UpdateBookTabData(e2.Value);
-                FocusManager.SetFocusedElement(this, actionDataGrid);
-                actionDataGrid.Focus();
+                FocusManager.SetFocusedElement(this, this.actionDataGrid);
+                this.actionDataGrid.Focus();
             };
             arw.Owner = this;
             arw.ShowDialog();
@@ -546,12 +547,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void AddActionListToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(builder,
+            ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder,
                 this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime);
             alrw.Registrated += (sender2, e2) => {
                 UpdateBookTabData(e2.Value);
-                FocusManager.SetFocusedElement(this, actionDataGrid);
-                actionDataGrid.Focus();
+                FocusManager.SetFocusedElement(this, this.actionDataGrid);
+                this.actionDataGrid.Focus();
             };
             alrw.Owner = this;
             alrw.ShowDialog();
@@ -576,7 +577,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void EditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             int? groupKind = null;
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT A.group_id, G.group_kind
 FROM hst_action A
@@ -589,21 +590,21 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
             }
 
             if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
-                ActionRegistrationWindow arw = new ActionRegistrationWindow(builder, this.WVM.SelectedActionVM.ActionId);
+                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId);
                 arw.Registrated += (sender2, e2) => {
                     UpdateBookTabData(e2.Value);
-                    FocusManager.SetFocusedElement(this, actionDataGrid);
-                    actionDataGrid.Focus();
+                    FocusManager.SetFocusedElement(this, this.actionDataGrid);
+                    this.actionDataGrid.Focus();
                 };
                 arw.ShowDialog();
             }
             else {
                 // 移動の編集時の処理
-                MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value);
+                MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value);
                 mrw.Registrated += (sender2, e2) => {
                     UpdateBookTabData(e2.Value);
-                    FocusManager.SetFocusedElement(this, actionDataGrid);
-                    actionDataGrid.Focus();
+                    FocusManager.SetFocusedElement(this, this.actionDataGrid);
+                    this.actionDataGrid.Focus();
                 };
                 mrw.ShowDialog();
             }
@@ -628,7 +629,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         private void CopyActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             int? groupKind = null;
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT A.group_id, G.group_kind
 FROM hst_action A
@@ -641,21 +642,21 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
             }
 
             if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
-                ActionRegistrationWindow arw = new ActionRegistrationWindow(builder, this.WVM.SelectedActionVM.ActionId, RegistrationMode.Copy);
+                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId, RegistrationMode.Copy);
                 arw.Registrated += (sender2, e2) => {
                     UpdateBookTabData(e2.Value);
-                    FocusManager.SetFocusedElement(this, actionDataGrid);
-                    actionDataGrid.Focus();
+                    FocusManager.SetFocusedElement(this, this.actionDataGrid);
+                    this.actionDataGrid.Focus();
                 };
                 arw.ShowDialog();
             }
             else {
                 // 移動の複製時の処理
-                MoveRegistrationWindow mrw = new MoveRegistrationWindow(builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationMode.Copy);
+                MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationMode.Copy);
                 mrw.Registrated += (sender2, e2) => {
                     UpdateBookTabData(e2.Value);
-                    FocusManager.SetFocusedElement(this, actionDataGrid);
-                    actionDataGrid.Focus();
+                    FocusManager.SetFocusedElement(this, this.actionDataGrid);
+                    this.actionDataGrid.Focus();
                 };
                 mrw.ShowDialog();
             }
@@ -684,7 +685,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                     int actionId = vm.ActionId;
                     int? groupId = vm.GroupId;
 
-                    using (DaoBase dao = builder.Build()) {
+                    using (DaoBase dao = this.builder.Build()) {
                         dao.ExecTransaction(() => {
                             dao.ExecNonQuery(@"
 UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{1} 
@@ -842,14 +843,14 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void GoToLastMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = Cursor;
-            Cursor = Cursors.Wait;
+            Cursor cCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.AddMonths(-1);
             UpdateBookTabData(true);
             UpdateDailyGraphWithinMonthTabData();
 
-            Cursor = cCursor;
+            this.Cursor = cCursor;
         }
 
         /// <summary>
@@ -862,7 +863,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             DateTime thisMonth = DateTime.Today.GetFirstDateOfMonth();
             // 帳簿/月間一覧タブを選択している かつ 今月が表示されていない
             e.CanExecute = (this.WVM.SelectedTab == Tabs.BooksTab || this.WVM.SelectedTab == Tabs.DailyGraphWithinMonthTab) &&
-                !(thisMonth <= this.WVM.DisplayedMonth && this.WVM.DisplayedYear < thisMonth.AddMonths(1));
+                !(thisMonth <= this.WVM.DisplayedMonth && this.WVM.DisplayedMonth < thisMonth.AddMonths(1));
         }
 
         /// <summary>
@@ -872,18 +873,18 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void GoToThisMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = Cursor;
-            Cursor = Cursors.Wait;
+            Cursor cCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
             UpdateBookTabData(true);
             UpdateDailyGraphWithinMonthTabData();
 
-            Cursor = cCursor;
+            this.Cursor = cCursor;
         }
 
         /// <summary>
-        /// 来月を表示可能か
+        /// 翌月を表示可能か
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -900,14 +901,14 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void GoToNextMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = Cursor;
-            Cursor = Cursors.Wait;
+            Cursor cCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.AddMonths(1);
             UpdateBookTabData(true);
             UpdateDailyGraphWithinMonthTabData();
 
-            Cursor = cCursor;
+            this.Cursor = cCursor;
         }
         #endregion
 
@@ -930,14 +931,14 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void GoToLastYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = Cursor;
-            Cursor = Cursors.Wait;
+            Cursor cCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(-1);
             UpdateMonthlyListWithinYearTabData();
             UpdateMonthlyGraphWithinYearTabData();
 
-            Cursor = cCursor;
+            this.Cursor = cCursor;
         }
 
         /// <summary>
@@ -960,14 +961,14 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void GoToThisYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = Cursor;
-            Cursor = Cursors.Wait;
+            Cursor cCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             UpdateMonthlyListWithinYearTabData();
             UpdateMonthlyGraphWithinYearTabData();
 
-            Cursor = cCursor;
+            this.Cursor = cCursor;
         }
 
         /// <summary>
@@ -988,14 +989,14 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void GoToNextYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = Cursor;
-            Cursor = Cursors.Wait;
+            Cursor cCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(1);
             UpdateMonthlyListWithinYearTabData();
             UpdateMonthlyGraphWithinYearTabData();
 
-            Cursor = cCursor;
+            this.Cursor = cCursor;
         }
         #endregion
         #endregion
@@ -1008,7 +1009,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void OpenSettingsWindwCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            SettingsWindow sw = new SettingsWindow(builder);
+            SettingsWindow sw = new SettingsWindow(this.builder);
             if (sw.ShowDialog() == true) {
                 UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
 
@@ -1029,11 +1030,11 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void OpenCsvComparisonWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            CsvComparisonWindow ccw = new CsvComparisonWindow(builder, this.WVM.SelectedBookVM.Id);
+            CsvComparisonWindow ccw = new CsvComparisonWindow(this.builder, this.WVM.SelectedBookVM.Id);
             ccw.ChangedIsMatch += (sender2, e2) => {
                 ActionViewModel vm = this.WVM.ActionVMList.FirstOrDefault((tmpVM) => { return tmpVM.ActionId == e2.Value; });
                 if(vm != null) {
-                    using (DaoBase dao = builder.Build()) {
+                    using (DaoBase dao = this.builder.Build()) {
                         DaoReader reader = dao.ExecQuery(@"
 SELECT is_match
 FROM hst_action
@@ -1063,34 +1064,15 @@ WHERE action_id = @{0};", vm.ActionId);
         }
 
         /// <summary>
-        /// 選択中の帳簿を変更した時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void BookComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            Cursor cCursor = Cursor;
-            Cursor = Cursors.Wait;
-            
-            UpdateBookTabData(true);
-            UpdateDailyGraphWithinMonthTabData();
-
-            UpdateMonthlyListWithinYearTabData();
-            UpdateMonthlyGraphWithinYearTabData();
-
-            Cursor = cCursor;
-        }
-
-        /// <summary>
         /// 選択中のタブを変更した時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (oldSelectedTab != this.WVM.SelectedTab) {
-                Cursor cCursor = Cursor;
-                Cursor = Cursors.Wait;
+            if (this.oldSelectedTab != this.WVM.SelectedTab) {
+                Cursor cCursor = this.Cursor;
+                this.Cursor = Cursors.Wait;
 
                 switch (this.WVM.SelectedTab) {
                     case Tabs.BooksTab:
@@ -1108,9 +1090,47 @@ WHERE action_id = @{0};", vm.ActionId);
                         UpdateMonthlyGraphWithinYearTabData();
                         break;
                 }
-                Cursor = cCursor;
+                this.Cursor = cCursor;
             }
-            oldSelectedTab = this.WVM.SelectedTab;
+            this.oldSelectedTab = this.WVM.SelectedTab;
+        }
+
+        /// <summary>
+        /// 選択中の帳簿を変更した時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BookComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Cursor cCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
+            
+            UpdateBookTabData(true);
+            UpdateDailyGraphWithinMonthTabData();
+
+            UpdateMonthlyListWithinYearTabData();
+            UpdateMonthlyGraphWithinYearTabData();
+
+            this.Cursor = cCursor;
+        }
+
+        /// <summary>
+        /// 選択中のグラフを変更した時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GraphKindComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Cursor cCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
+
+            InitializeDailyGraphWithinMonthTabData();
+            UpdateDailyGraphWithinMonthTabData();
+
+            InitializeMonthlyGraphWithinYearTabData();
+            UpdateMonthlyGraphWithinYearTabData();
+
+            this.Cursor = cCursor;
         }
         #endregion
 
@@ -1127,7 +1147,7 @@ WHERE action_id = @{0};", vm.ActionId);
                 new BookViewModel() { Id = null, Name = "一覧" }
             };
             BookViewModel selectedBookVM = bookVMList[0];
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT * 
 FROM mst_book 
@@ -1155,7 +1175,8 @@ ORDER BY sort_order;");
         /// <returns>帳簿項目VMリスト</returns>
         private ObservableCollection<ActionViewModel> LoadActionViewModelListWithinMonth(int? bookId, DateTime includedTime)
         {
-            return LoadActionViewModelList(bookId, includedTime.GetFirstDateOfMonth(), includedTime.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
+            DateTime dateTime = includedTime.GetFirstDateOfMonth();
+            return LoadActionViewModelList(bookId, dateTime, dateTime.AddMonths(1).AddMilliseconds(-1));
         }
 
         /// <summary>
@@ -1168,7 +1189,7 @@ ORDER BY sort_order;");
         private ObservableCollection<ActionViewModel> LoadActionViewModelList(int? bookId, DateTime startTime, DateTime endTime)
         {
             ObservableCollection<ActionViewModel> actionVMList = new ObservableCollection<ActionViewModel>();
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader;
                 if (bookId == null) {
                     // 全帳簿
@@ -1288,7 +1309,8 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
         /// <returns>合計項目VMリスト</returns>
         private ObservableCollection<SummaryViewModel> LoadSummaryViewModelListWithinMonth(int? bookId, DateTime includedTime)
         {
-            return LoadSummaryViewModelList(bookId, includedTime.GetFirstDateOfMonth(), includedTime.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1));
+            DateTime dateTime = includedTime.GetFirstDateOfMonth();
+            return LoadSummaryViewModelList(bookId, dateTime, dateTime.AddMonths(1).AddMilliseconds(-1));
         }
 
         /// <summary>
@@ -1302,7 +1324,7 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
         {
             ObservableCollection<SummaryViewModel> summaryVMList = new ObservableCollection<SummaryViewModel>();
 
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader;
 
                 if (bookId == null) {
@@ -1412,7 +1434,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">月内の時間</param>
-        /// <returns>年度内合計項目VMリスト</returns>
+        /// <returns>月内合計項目VMリスト</returns>
         private ObservableCollection<SeriesViewModel> LoadDailySummaryViewModelListWithinMonth(int? bookId, DateTime includedTime)
         {
             DateTime startTime = includedTime.GetFirstDateOfMonth();
@@ -1420,7 +1442,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
 
             // 開始日までの収支を取得する
             int balance = 0;
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader;
                 if (bookId == null) {
                     // 全帳簿
@@ -1484,7 +1506,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 ++averageCount;
             }
 
-            // 最初以外の月の分を取得する
+            // 最初以外の日の分を取得する
             for (int i = 1; i < DateTime.DaysInMonth(includedTime.Year, includedTime.Month); ++i) {
                 startTime = startTime.AddDays(1);
                 endTime = startTime.AddDays(1).AddMilliseconds(-1);
@@ -1535,7 +1557,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             // 開始月までの収支を取得する
             int balance = 0;
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader;
                 if (bookId == null) {
                     // 全帳簿
@@ -1690,32 +1712,46 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         private void InitializeDailyGraphWithinMonthTabData()
         {
             if (this.WVM.SelectedTab == Tabs.DailyGraphWithinMonthTab) {
+                // 全項目
                 this.WVM.WholeItemDailyGraphModel.Axes.Clear();
                 this.WVM.WholeItemDailyGraphModel.Series.Clear();
 
-                CategoryAxis cAxis = new CategoryAxis() { Title = "日", Position = AxisPosition.Bottom };
-                cAxis.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+                // 横軸 - 日軸
+                CategoryAxis cAxis1 = new CategoryAxis() { Title = "日", Position = AxisPosition.Bottom };
+                cAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
                 // 表示する日の文字列を作成する
                 for (int i = 1; i <= 31; ++i) { // 31日で固定
-                    cAxis.Labels.Add(string.Format("{0}日", i));
+                    cAxis1.Labels.Add(string.Format("{0}日", i));
                 }
-                this.WVM.WholeItemDailyGraphModel.Axes.Add(cAxis);
+                this.WVM.WholeItemDailyGraphModel.Axes.Add(cAxis1);
 
-                LinearAxis lAxis = new LinearAxis() {
-                    Title = "収支",
+                // 縦軸 - 線形軸
+                LinearAxis lAxis1 = new LinearAxis() {
                     Unit = "円",
                     Position = AxisPosition.Left,
                     MajorGridlineStyle = LineStyle.Solid,
                     MinorGridlineStyle = LineStyle.Dot,
                     StringFormat = "#,0"
                 };
-                this.WVM.WholeItemDailyGraphModel.Axes.Add(lAxis);
+                switch (this.WVM.SelectedGraphKind) {
+                    case GraphKind.IncomeAndOutgo: {
+                            lAxis1.Title = "収支";
+                        }
+                        break;
+                    case GraphKind.Balance: {
+                            lAxis1.Title = "残高";
+                        }
+                        break;
+                }
+                this.WVM.WholeItemDailyGraphModel.Axes.Add(lAxis1);
 
                 this.WVM.WholeItemDailyGraphModel.InvalidatePlot(true);
-
+                
+                // 選択項目
                 this.WVM.SelectedItemDailyGraphModel.Axes.Clear();
                 this.WVM.SelectedItemDailyGraphModel.Series.Clear();
 
+                // 横軸 - 日軸
                 CategoryAxis cAxis2 = new CategoryAxis() { Title = "日", Position = AxisPosition.Bottom };
                 cAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
                 // 表示する日の文字列を作成する
@@ -1724,14 +1760,24 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 }
                 this.WVM.SelectedItemDailyGraphModel.Axes.Add(cAxis2);
 
+                // 縦軸 - 線形軸
                 LinearAxis lAxis2 = new LinearAxis() {
-                    Title = "収支",
                     Unit = "円",
                     Position = AxisPosition.Left,
                     MajorGridlineStyle = LineStyle.Solid,
                     MinorGridlineStyle = LineStyle.Dot,
                     StringFormat = "#,0"
                 };
+                switch (this.WVM.SelectedGraphKind) {
+                    case GraphKind.IncomeAndOutgo: {
+                            lAxis2.Title = "収支";
+                        }
+                        break;
+                    case GraphKind.Balance: {
+                            lAxis2.Title = "残高";
+                        }
+                        break;
+                }
                 this.WVM.SelectedItemDailyGraphModel.Axes.Add(lAxis2);
 
                 this.WVM.SelectedItemDailyGraphModel.InvalidatePlot(true);
@@ -1746,49 +1792,68 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             if (this.WVM.SelectedTab == Tabs.DailyGraphWithinMonthTab) {
                 this.WVM.WholeItemDailyGraphModel.Series.Clear();
 
-                ObservableCollection<SeriesViewModel> vmList = LoadDailySummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth);
-                foreach (SeriesViewModel tmpVM in vmList) {
-                    if (tmpVM.ItemId == -1) { continue; }
+                switch (this.WVM.SelectedGraphKind) {
+                    case GraphKind.IncomeAndOutgo: {
+                            ObservableCollection<SeriesViewModel> vmList = LoadDailySummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth);
+                            foreach (SeriesViewModel tmpVM in vmList) {
+                                if (tmpVM.ItemId == -1) { continue; }
+                                
+                                CustomColumnSeries cSeries1 = new CustomColumnSeries() {
+                                    IsStacked = true,
+                                    Title = tmpVM.ItemName,
+                                    ItemsSource = tmpVM.Values.Select((value, index) => new SeriesItemViewModel {
+                                        Value = value,
+                                        Number = index,
+                                        ItemId = tmpVM.ItemId,
+                                        CategoryId = tmpVM.CategoryId
+                                    }),
+                                    ValueField = "Value"
+                                };
+                                // 全項目月間グラフの項目を選択した時のイベントを登録する
+                                cSeries1.TrackerHitResultChanged += (sender, e) => {
+                                    if (e.Value == null) return;
 
-                    CustomColumnSeries cSeries = new CustomColumnSeries() {
-                        IsStacked = true,
-                        Title = tmpVM.ItemName,
-                        ItemsSource = tmpVM.Values.Select((value, index) => new SeriesItemViewModel {
-                            Value = value,
-                            Number = index,
-                            ItemId = tmpVM.ItemId,
-                            CategoryId = tmpVM.CategoryId
-                        }),
-                        ValueField = "Value"
-                    };
-                    cSeries.TrackerHitResultChanged += (sender, e) => {
-                        if (e.Value == null) return;
+                                    SeriesItemViewModel itemVM = e.Value.Item as SeriesItemViewModel;
+                                    SeriesViewModel vm = vmList.FirstOrDefault((tmp) => tmp.ItemId == itemVM.ItemId);
 
-                        SeriesItemViewModel itemVM = e.Value.Item as SeriesItemViewModel;
-                        SeriesViewModel vm = vmList.FirstOrDefault((tmp) => tmp.ItemId == itemVM.ItemId);
+                                    this.WVM.SelectedItemDailyGraphModel.Series.Clear();
 
-                        this.WVM.SelectedItemDailyGraphModel.Series.Clear();
+                                    CustomColumnSeries cSeries2 = new CustomColumnSeries() {
+                                        IsStacked = true,
+                                        Title = vm.ItemName,
+                                        FillColor = (e.Value.Series as CustomColumnSeries).ActualFillColor,
+                                        ItemsSource = vm.Values.Select((value, index) => new SeriesItemViewModel {
+                                            Value = value,
+                                            Number = index,
+                                            ItemId = vm.ItemId,
+                                            CategoryId = vm.CategoryId
+                                        }),
+                                        ValueField = "Value"
+                                    };
+                                    this.WVM.SelectedItemDailyGraphModel.Series.Add(cSeries2);
 
-                        CustomColumnSeries cSeries2 = new CustomColumnSeries() {
-                            IsStacked = true,
-                            Title = vm.ItemName,
-                            FillColor = (e.Value.Series as CustomColumnSeries).ActualFillColor,
-                            ItemsSource = vm.Values.Select((value, index) => new SeriesItemViewModel {
-                                Value = value,
-                                Number = index,
-                                ItemId = vm.ItemId,
-                                CategoryId = vm.CategoryId
-                            }),
-                            ValueField = "Value"
-                        };
-                        this.WVM.SelectedItemDailyGraphModel.Series.Add(cSeries2);
+                                    this.WVM.SelectedItemDailyGraphModel.InvalidatePlot(true);
+                                };
+                                this.WVM.WholeItemDailyGraphModel.Series.Add(cSeries1);
+                            }
+                        }
+                        break;
+                    case GraphKind.Balance: {
+                            LineSeries cSeries = new LineSeries() {
+                                Title = "残高"
+                            };
+                            ObservableCollection<SeriesViewModel> vmList = LoadDailySummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth);
+                            cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
 
-                        this.WVM.SelectedItemDailyGraphModel.InvalidatePlot(true);
-                    };
-                    this.WVM.WholeItemDailyGraphModel.Series.Add(cSeries);
+                            this.WVM.WholeItemDailyGraphModel.Series.Add(cSeries);
+                        }
+                        break;
                 }
 
                 this.WVM.WholeItemDailyGraphModel.InvalidatePlot(true);
+
+                this.WVM.SelectedItemDailyGraphModel.Series.Clear();
+                this.WVM.SelectedItemDailyGraphModel.InvalidatePlot(true);
             }
         }
         #endregion
@@ -1821,32 +1886,46 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         {
             if (this.WVM.SelectedTab == Tabs.MonthlyGraphWithinYearTab) {
                 int startMonth = Properties.Settings.Default.App_StartMonth;
+                // 全項目
                 this.WVM.WholeItemMonthlyGraphModel.Axes.Clear();
                 this.WVM.WholeItemMonthlyGraphModel.Series.Clear();
 
-                CategoryAxis cAxis = new CategoryAxis() { Title = "月", Position = AxisPosition.Bottom };
-                cAxis.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+                // 横軸 - 月軸
+                CategoryAxis cAxis1 = new CategoryAxis() { Title = "月", Position = AxisPosition.Bottom };
+                cAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
                 // 表示する月の文字列を作成する
                 for (int i = startMonth; i < startMonth + 12; ++i) {
-                    cAxis.Labels.Add(string.Format("{0}月", (i - 1) % 12 + 1));
+                    cAxis1.Labels.Add(string.Format("{0}月", (i - 1) % 12 + 1));
                 }
-                this.WVM.WholeItemMonthlyGraphModel.Axes.Add(cAxis);
+                this.WVM.WholeItemMonthlyGraphModel.Axes.Add(cAxis1);
 
-                LinearAxis lAxis = new LinearAxis() {
-                    Title = "収支",
+                // 縦軸 - 線形軸
+                LinearAxis lAxis1 = new LinearAxis() {
                     Unit = "円",
                     Position = AxisPosition.Left,
                     MajorGridlineStyle = LineStyle.Solid,
                     MinorGridlineStyle = LineStyle.Dot,
                     StringFormat = "#,0"
                 };
-                this.WVM.WholeItemMonthlyGraphModel.Axes.Add(lAxis);
-                
+                switch (this.WVM.SelectedGraphKind) {
+                    case GraphKind.IncomeAndOutgo: {
+                            lAxis1.Title = "収支";
+                        }
+                        break;
+                    case GraphKind.Balance: {
+                            lAxis1.Title = "残高";
+                        }
+                        break;
+                }
+                this.WVM.WholeItemMonthlyGraphModel.Axes.Add(lAxis1);
+
                 this.WVM.WholeItemMonthlyGraphModel.InvalidatePlot(true);
 
+                // 選択項目
                 this.WVM.SelectedItemMonthlyGraphModel.Axes.Clear();
                 this.WVM.SelectedItemMonthlyGraphModel.Series.Clear();
 
+                // 横軸 - 月軸
                 CategoryAxis cAxis2 = new CategoryAxis() { Title = "月", Position = AxisPosition.Bottom };
                 cAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
                 // 表示する月の文字列を作成する
@@ -1855,14 +1934,24 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 }
                 this.WVM.SelectedItemMonthlyGraphModel.Axes.Add(cAxis2);
 
+                // 縦軸 - 線形軸
                 LinearAxis lAxis2 = new LinearAxis() {
-                    Title = "収支",
                     Unit = "円",
                     Position = AxisPosition.Left,
                     MajorGridlineStyle = LineStyle.Solid,
                     MinorGridlineStyle = LineStyle.Dot,
                     StringFormat = "#,0"
                 };
+                switch (this.WVM.SelectedGraphKind) {
+                    case GraphKind.IncomeAndOutgo: {
+                            lAxis2.Title = "収支";
+                        }
+                        break;
+                    case GraphKind.Balance: {
+                            lAxis2.Title = "残高";
+                        }
+                        break;
+                }
                 this.WVM.SelectedItemMonthlyGraphModel.Axes.Add(lAxis2);
 
                 this.WVM.SelectedItemMonthlyGraphModel.InvalidatePlot(true);
@@ -1878,49 +1967,67 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 int startMonth = Properties.Settings.Default.App_StartMonth;
                 this.WVM.WholeItemMonthlyGraphModel.Series.Clear();
 
-                ObservableCollection<SeriesViewModel> vmList = LoadMonthlySummaryViewModelListWithinYear(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
-                foreach (SeriesViewModel tmpVM in vmList) {
-                    if (tmpVM.ItemId == -1) { continue; }
+                switch (this.WVM.SelectedGraphKind) {
+                    case GraphKind.IncomeAndOutgo: {
+                            ObservableCollection<SeriesViewModel> vmList = LoadMonthlySummaryViewModelListWithinYear(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                            foreach (SeriesViewModel tmpVM in vmList) {
+                                if (tmpVM.ItemId == -1) { continue; }
 
-                    CustomColumnSeries cSeries = new CustomColumnSeries() {
-                        IsStacked = true,
-                        Title = tmpVM.ItemName,
-                        ItemsSource = tmpVM.Values.Select((value, index) => new SeriesItemViewModel {
-                            Value = value,
-                            Number = index + startMonth,
-                            ItemId = tmpVM.ItemId,
-                            CategoryId = tmpVM.CategoryId
-                        }),
-                        ValueField = "Value"
-                    };
-                    cSeries.TrackerHitResultChanged += (sender, e) => {
-                        if (e.Value == null) return;
+                                CustomColumnSeries cSeries1 = new CustomColumnSeries() {
+                                    IsStacked = true,
+                                    Title = tmpVM.ItemName,
+                                    ItemsSource = tmpVM.Values.Select((value, index) => new SeriesItemViewModel {
+                                        Value = value,
+                                        Number = index + startMonth,
+                                        ItemId = tmpVM.ItemId,
+                                        CategoryId = tmpVM.CategoryId
+                                    }),
+                                    ValueField = "Value"
+                                };
+                                cSeries1.TrackerHitResultChanged += (sender, e) => {
+                                    if (e.Value == null) return;
 
-                        SeriesItemViewModel itemVM = e.Value.Item as SeriesItemViewModel;
-                        SeriesViewModel vm = vmList.FirstOrDefault((tmp) => tmp.ItemId == itemVM.ItemId);
+                                    SeriesItemViewModel itemVM = e.Value.Item as SeriesItemViewModel;
+                                    SeriesViewModel vm = vmList.FirstOrDefault((tmp) => tmp.ItemId == itemVM.ItemId);
 
-                        this.WVM.SelectedItemMonthlyGraphModel.Series.Clear();
+                                    this.WVM.SelectedItemMonthlyGraphModel.Series.Clear();
 
-                        CustomColumnSeries cSeries2 = new CustomColumnSeries() {
-                            IsStacked = true,
-                            Title = vm.ItemName,
-                            FillColor = (e.Value.Series as CustomColumnSeries).ActualFillColor,
-                            ItemsSource = vm.Values.Select((value, index) => new SeriesItemViewModel {
-                                Value = value,
-                                Number = index + startMonth,
-                                ItemId = vm.ItemId,
-                                CategoryId = vm.CategoryId
-                            }),
-                            ValueField = "Value"
-                        };
-                        this.WVM.SelectedItemMonthlyGraphModel.Series.Add(cSeries2);
+                                    CustomColumnSeries cSeries2 = new CustomColumnSeries() {
+                                        IsStacked = true,
+                                        Title = vm.ItemName,
+                                        FillColor = (e.Value.Series as CustomColumnSeries).ActualFillColor,
+                                        ItemsSource = vm.Values.Select((value, index) => new SeriesItemViewModel {
+                                            Value = value,
+                                            Number = index + startMonth,
+                                            ItemId = vm.ItemId,
+                                            CategoryId = vm.CategoryId
+                                        }),
+                                        ValueField = "Value"
+                                    };
+                                    this.WVM.SelectedItemMonthlyGraphModel.Series.Add(cSeries2);
 
-                        this.WVM.SelectedItemMonthlyGraphModel.InvalidatePlot(true);
-                    };
-                    this.WVM.WholeItemMonthlyGraphModel.Series.Add(cSeries);
+                                    this.WVM.SelectedItemMonthlyGraphModel.InvalidatePlot(true);
+                                };
+                                this.WVM.WholeItemMonthlyGraphModel.Series.Add(cSeries1);
+                            }
+                        }
+                        break;
+                    case GraphKind.Balance: {
+                            DateTime dateTime = this.WVM.DisplayedYear.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth); // 開始日
+                            LineSeries cSeries = new LineSeries() {
+                                Title = "残高"
+                            };
+                            ObservableCollection<SeriesViewModel> vmList = LoadMonthlySummaryViewModelListWithinYear(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                            cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
+
+                            this.WVM.WholeItemMonthlyGraphModel.Series.Add(cSeries);
+                        }
+                        break;
                 }
-
                 this.WVM.WholeItemMonthlyGraphModel.InvalidatePlot(true);
+
+                this.WVM.SelectedItemMonthlyGraphModel.Series.Clear();
+                this.WVM.SelectedItemMonthlyGraphModel.InvalidatePlot(true);
             }
         }
         #endregion
@@ -1935,19 +2042,19 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             Properties.Settings settings = Properties.Settings.Default;
 
             if (settings.MainWindow_Left != -1) {
-                Left = settings.MainWindow_Left;
+                this.Left = settings.MainWindow_Left;
             }
             if (settings.MainWindow_Top != -1) {
-                Top = settings.MainWindow_Top;
+                this.Top = settings.MainWindow_Top;
             }
             if (settings.MainWindow_Width != -1) {
-                Width = settings.MainWindow_Width;
+                this.Width = settings.MainWindow_Width;
             }
             if (settings.MainWindow_Height != -1) {
-                Height = settings.MainWindow_Height;
+                this.Height = settings.MainWindow_Height;
             }
             if (settings.MainWindow_WindowState != -1) {
-                WindowState = (WindowState)settings.MainWindow_WindowState;
+                this.WindowState = (WindowState)settings.MainWindow_WindowState;
             }
         }
 
@@ -1957,14 +2064,14 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         private void SaveSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            if (WindowState != WindowState.Minimized) { 
-                settings.MainWindow_WindowState = (int)WindowState;
+            if (this.WindowState != WindowState.Minimized) { 
+                settings.MainWindow_WindowState = (int)this.WindowState;
             }
             settings.MainWindow_SelectedBookId = this.WVM.SelectedBookVM.Id ?? -1;
-            settings.MainWindow_Left = Left;
-            settings.MainWindow_Top = Top;
-            settings.MainWindow_Width = Width;
-            settings.MainWindow_Height = Height;
+            settings.MainWindow_Left = this.Left;
+            settings.MainWindow_Top = this.Top;
+            settings.MainWindow_Width = this.Width;
+            settings.MainWindow_Height = this.Height;
             settings.Save();
         }
         #endregion

@@ -66,8 +66,8 @@ namespace HouseholdAccountBook.ViewModels
         #region IsMatch
         public bool IsMatch
         {
-            get { return _IsMatch; }
-            set { SetProperty(ref _IsMatch, value); }
+            get { return this._IsMatch; }
+            set { SetProperty(ref this._IsMatch, value); }
         }
         private bool _IsMatch = default(bool);
         #endregion
@@ -78,8 +78,8 @@ namespace HouseholdAccountBook.ViewModels
         #region IsSelected
         public bool IsSelected
         {
-            get { return _IsSelected; }
-            set { SetProperty(ref _IsSelected, value); }
+            get { return this._IsSelected; }
+            set { SetProperty(ref this._IsSelected, value); }
         }
         private bool _IsSelected = default(bool);
         #endregion
@@ -89,7 +89,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public bool IsFuture {
             get {
-                return ActTime > DateTime.Now;
+                return this.ActTime > DateTime.Now;
             }
         }
         #endregion

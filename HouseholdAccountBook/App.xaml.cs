@@ -42,7 +42,6 @@ namespace HouseholdAccountBook
             // 多重起動を抑止する
             App.mutex = new Mutex(false, this.GetType().Assembly.GetName().Name);
             if (!mutex.WaitOne(TimeSpan.Zero, false)) {
-                mutex.Close();
                 this.Shutdown();
                 return;
             }
@@ -64,7 +63,7 @@ namespace HouseholdAccountBook
                 bool? result = dsw.ShowDialog();
 
                 if (result != true) {
-                    connectInfo = null;
+                    this.connectInfo = null;
                     this.Shutdown();
                     return;
                 }
@@ -104,7 +103,7 @@ namespace HouseholdAccountBook
                     bool? result = dsw.ShowDialog();
 
                     if (result != true) {
-                        connectInfo = null;
+                        this.connectInfo = null;
                         this.Shutdown();
                         return;
                     }
@@ -177,8 +176,8 @@ namespace HouseholdAccountBook
                     FileName = dumpExePath,
                     Arguments = string.Format(
                         "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
-                        connectInfo.Host, connectInfo.Port, connectInfo.UserName, connectInfo.Role,
-                        string.Format(@"{0}/{1}.backup", backUpFolderPath, DateTime.Now.ToString("yyyyMMddHHmmss")), connectInfo.DatabaseName),
+                        this.connectInfo.Host, this.connectInfo.Port, this.connectInfo.UserName, this.connectInfo.Role,
+                        string.Format(@"{0}/{1}.backup", backUpFolderPath, DateTime.Now.ToString("yyyyMMddHHmmss")), this.connectInfo.DatabaseName),
                     WindowStyle = ProcessWindowStyle.Hidden
                 };
 

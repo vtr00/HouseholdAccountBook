@@ -104,12 +104,12 @@ namespace HouseholdAccountBook.Behaviors
         {
             //新たに選択されたアイテムをリストに追加する
             foreach (object addedItem in e.AddedItems) {
-                SelectedItems.Add(addedItem);
+                this.SelectedItems.Add(addedItem);
             }
 
             //選択解除されたアイテムをリストから削除する
             foreach (object removedItem in e.RemovedItems) {
-                SelectedItems.Remove(removedItem);
+                this.SelectedItems.Remove(removedItem);
             }
         }
         #endregion

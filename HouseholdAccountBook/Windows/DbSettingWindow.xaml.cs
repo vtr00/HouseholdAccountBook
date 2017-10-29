@@ -121,7 +121,7 @@ namespace HouseholdAccountBook.Windows
             settings.App_Postgres_RestoreExePath = this.WVM.RestoreExePath;
             settings.Save();
 
-            DialogResult = true;
+            this.DialogResult = true;
             this.Close();
         }
 
@@ -132,7 +132,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void CancelCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            DialogResult = false;
+            this.DialogResult = false;
             this.Close();
         }
         #endregion

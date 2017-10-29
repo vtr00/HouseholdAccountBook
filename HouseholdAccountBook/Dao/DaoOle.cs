@@ -63,7 +63,7 @@ namespace HouseholdAccountBook.Dao
         /// <returns>SQLコマンド</returns>
         private OleDbCommand CreateCommand(string sql, params object[] objects)
         {
-            OleDbCommand command = ((OleDbConnection)connection).CreateCommand();
+            OleDbCommand command = ((OleDbConnection)this.connection).CreateCommand();
 
             sql = sql.Replace("{", "_").Replace("}", "_");
             command.CommandText = sql;

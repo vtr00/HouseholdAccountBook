@@ -87,7 +87,7 @@ namespace HouseholdAccountBook.Windows
             BalanceKind kind = (BalanceKind)vm.Id;
 
             int categoryId = -1;
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 INSERT INTO mst_category (category_name, balance_kind, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES ('(no name)', @{0}, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_category), 0, 'now', @{1}, 'now', @{2})
@@ -124,7 +124,7 @@ RETURNING category_id;", (int)kind, Updater, Inserter);
             int categoryId = vm.Id;
 
             int itemId = -1;
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 INSERT INTO mst_item (item_name, category_id, advance_flg, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES ('(no name)', @{0}, 0, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), 0, 'now', @{1}, 'now', @{2})
@@ -157,7 +157,7 @@ RETURNING item_id;", categoryId, Updater, Inserter);
             HierarchicalKind kind = this.WVM.SelectedItemVM.Kind;
             int id = this.WVM.SelectedItemVM.Id;
 
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 switch (kind) {
                     case HierarchicalKind.Category: {
                             dao.ExecTransaction(() => {
@@ -240,7 +240,7 @@ WHERE item_id = @{1};", Updater, id);
             if (0 < index) {
                 int changedId = parentVM.ChildrenVMList[index - 1].Id;
 
-                using (DaoBase dao = builder.Build()) {
+                using (DaoBase dao = this.builder.Build()) {
                     switch (this.WVM.SelectedItemVM.Kind) {
                         case HierarchicalKind.Category: {
                                 dao.ExecTransaction(() => {
@@ -299,7 +299,7 @@ WHERE item_id = @{2};", tmpOrder, Updater, changingId);
                 int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                 int toCategoryId = grandparentVM.ChildrenVMList[index2 - 1].Id;
 
-                using (DaoBase dao = builder.Build()) {
+                using (DaoBase dao = this.builder.Build()) {
                     dao.ExecNonQuery(@"
 UPDATE mst_item
 SET category_id = @{0}, sort_order = (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), update_time = 'now', updater = @{1}
@@ -347,7 +347,7 @@ WHERE item_id = @{2};", toCategoryId, Updater, changingId);
             if (parentVM.ChildrenVMList.Count - 1 > index) {
                 int changedId = parentVM.ChildrenVMList[index + 1].Id;
 
-                using (DaoBase dao = builder.Build()) {
+                using (DaoBase dao = this.builder.Build()) {
                     switch (this.WVM.SelectedItemVM.Kind) {
                         case HierarchicalKind.Category: {
                                 dao.ExecTransaction(() => {
@@ -406,7 +406,7 @@ WHERE item_id = @{2};", tmpOrder, Updater, changingId);
                 int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                 int toCategoryId = grandparentVM.ChildrenVMList[index2 + 1].Id;
 
-                using (DaoBase dao = builder.Build()) {
+                using (DaoBase dao = this.builder.Build()) {
                     dao.ExecTransaction(() => {
                         // 種別IDを更新する
                         dao.ExecNonQuery(@"
@@ -469,7 +469,7 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
             HierarchicalKind kind = this.WVM.SelectedItemVM.Kind;
             int id = this.WVM.SelectedItemVM.Id;
 
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 switch (kind) {
                     case HierarchicalKind.Category: {
                             dao.ExecNonQuery(@"
@@ -504,7 +504,7 @@ WHERE item_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
             vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
             vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
 
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 dao.ExecTransaction(() => {
                     DaoReader reader = dao.ExecQuery(@"
 SELECT *
@@ -558,7 +558,7 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         {
             if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
-                using (DaoBase dao = builder.Build()) {
+                using (DaoBase dao = this.builder.Build()) {
                     dao.ExecQuery(@"
 UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedShopName, this.WVM.SelectedItemVM.Id);
@@ -571,8 +571,8 @@ WHERE del_flg = 0 AND item_id = @{0}
 ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
 
                     this.WVM.SelectedItemVM.ShopNameList.Clear();
-                    reader.ExecWholeRow((count2, record2) => {
-                        string shopName = record2["shop_name"];
+                    reader.ExecWholeRow((count, record) => {
+                        string shopName = record["shop_name"];
 
                         this.WVM.SelectedItemVM.ShopNameList.Add(shopName);
                         return true;
@@ -600,7 +600,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         {
             if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
-                using (DaoBase dao = builder.Build()) {
+                using (DaoBase dao = this.builder.Build()) {
                     dao.ExecQuery(@"
 UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE remark = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedRemark, this.WVM.SelectedItemVM.Id);
@@ -613,8 +613,8 @@ WHERE del_flg = 0 AND item_id = @{0}
 ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
 
                     this.WVM.SelectedItemVM.RemarkList.Clear();
-                    reader.ExecWholeRow((count2, record2) => {
-                        string remark = record2["remark"];
+                    reader.ExecWholeRow((count, record) => {
+                        string remark = record["remark"];
 
                         this.WVM.SelectedItemVM.RemarkList.Add(remark);
                         return true;
@@ -633,7 +633,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         private void AddBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             int bookId = -1;
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 INSERT INTO mst_book (book_name, book_kind, pay_day, initial_value, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES ('(no name)', 0, null, 0, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), 0, 'now', @{0}, 'now', @{1})
@@ -664,7 +664,7 @@ RETURNING book_id;", Updater, Inserter);
         /// <param name="e"></param>
         private void DeleteBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 dao.ExecTransaction(() => {
                     DaoReader reader = dao.ExecQuery(@"
 SELECT * FROM hst_action
@@ -710,7 +710,7 @@ WHERE book_id = @{1};", Updater, this.WVM.SelectedBookVM.Id);
             int changedId = this.WVM.BookVMList[index - 1].Id.Value;
             int changingId = this.WVM.BookVMList[index].Id.Value;
 
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 dao.ExecTransaction(() => {
                     DaoReader reader = dao.ExecQuery(@"
 SELECT sort_order
@@ -762,7 +762,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             int changedId = this.WVM.BookVMList[index + 1].Id.Value;
             int changingId = this.WVM.BookVMList[index].Id.Value;
 
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 dao.ExecTransaction(() => {
                     DaoReader reader = dao.ExecQuery(@"
 SELECT sort_order
@@ -806,7 +806,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
         /// <param name="e"></param>
         private void SaveBookInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 BookSettingViewModel vm = this.WVM.SelectedBookVM;
                 dao.ExecNonQuery(@"
 UPDATE mst_book
@@ -828,7 +828,7 @@ WHERE book_id = @{9};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.S
             vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
             vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
 
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 dao.ExecTransaction(() => {
                     DaoReader reader = dao.ExecQuery(@"
 SELECT *
@@ -986,9 +986,9 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void SettingsTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (oldSelectedSettingsTab != this.WVM.SelectedTab) {
-                Cursor cCursor = Cursor;
-                Cursor = Cursors.Wait;
+            if (this.oldSelectedSettingsTab != this.WVM.SelectedTab) {
+                Cursor cCursor = this.Cursor;
+                this.Cursor = Cursors.Wait;
 
                 switch (this.WVM.SelectedTab) {
                     case SettingsTabs.ItemSettingsTab:
@@ -1001,9 +1001,9 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                         UpdateOtherSettingTabData();
                         break;
                 }
-                Cursor = cCursor;
+                this.Cursor = cCursor;
             }
-            oldSelectedSettingsTab = this.WVM.SelectedTab;
+            this.oldSelectedSettingsTab = this.WVM.SelectedTab;
         }
 
         #region 項目設定操作
@@ -1143,7 +1143,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
             vmList.Add(outgoVM);
 
             foreach (HierarchicalItemViewModel vm in vmList) {
-                using (DaoBase dao = builder.Build()) {
+                using (DaoBase dao = this.builder.Build()) {
                     DaoReader reader = dao.ExecQuery(@"
 SELECT category_id, category_name 
 FROM mst_category
@@ -1253,7 +1253,7 @@ ORDER BY used_time DESC;", vm2.Id);
                 new BookViewModel(){ Id = -1, Name = "なし" }
             };
 
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 // 帳簿一覧を取得する(支払元選択用)
                 DaoReader reader = dao.ExecQuery(@"
 SELECT book_id, book_name
@@ -1346,16 +1346,16 @@ ORDER BY I.sort_order;", vm.Id);
             Properties.Settings settings = Properties.Settings.Default;
 
             if (settings.SettingsWindow_Left != -1) {
-                Left = settings.SettingsWindow_Left;
+                this.Left = settings.SettingsWindow_Left;
             }
             if (settings.SettingsWindow_Top != -1) {
-                Top = settings.SettingsWindow_Top;
+                this.Top = settings.SettingsWindow_Top;
             }
             if (settings.SettingsWindow_Width != -1) {
-                Width = settings.SettingsWindow_Width;
+                this.Width = settings.SettingsWindow_Width;
             }
             if (settings.SettingsWindow_Height != -1) {
-                Height = settings.SettingsWindow_Height;
+                this.Height = settings.SettingsWindow_Height;
             }
         }
 
@@ -1365,10 +1365,10 @@ ORDER BY I.sort_order;", vm.Id);
         private void SaveSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            settings.SettingsWindow_Left = Left;
-            settings.SettingsWindow_Top = Top;
-            settings.SettingsWindow_Width = Width;
-            settings.SettingsWindow_Height = Height;
+            settings.SettingsWindow_Left = this.Left;
+            settings.SettingsWindow_Top = this.Top;
+            settings.SettingsWindow_Width = this.Width;
+            settings.SettingsWindow_Height = this.Height;
             settings.Save();
         }
         #endregion

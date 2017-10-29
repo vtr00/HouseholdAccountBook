@@ -29,13 +29,13 @@ namespace HouseholdAccountBook.UserControls
             this.Loaded += (sender, e) => {
                 TextBox textBox = GetTemplateTextBox(this);
                 textBox.SetValue(InputMethod.IsInputMethodEnabledProperty, false);
-                textBox.TextChanged += TextBox_TextChanged;
-                textBox.SelectionChanged += TextBox_SelectionChanged;
-                textBox.PreviewKeyDown += TextBox_PreviewKeyDown;
-                textBox.MouseWheel += TextBox_MouseWheel;
+                textBox.TextChanged += this.TextBox_TextChanged;
+                textBox.SelectionChanged += this.TextBox_SelectionChanged;
+                textBox.PreviewKeyDown += this.TextBox_PreviewKeyDown;
+                textBox.MouseWheel += this.TextBox_MouseWheel;
             };
-            this.CalendarOpened += DateTimePicker_CalendarOpened;
-            this.CalendarClosed += DateTimePicker_CalendarClosed;
+            this.CalendarOpened += this.DateTimePicker_CalendarOpened;
+            this.CalendarClosed += this.DateTimePicker_CalendarClosed;
         }
         
         #region 依存関係プロパティ
@@ -90,9 +90,9 @@ namespace HouseholdAccountBook.UserControls
                 case Key.NumPad8:
                 case Key.NumPad9: {
                         int input = e.Key - Key.NumPad0;
-                        textBox.TextChanged -= TextBox_TextChanged;
+                        textBox.TextChanged -= this.TextBox_TextChanged;
                         TryToInputNumber(textBox, dateTimePicker, input);
-                        textBox.TextChanged += TextBox_TextChanged;
+                        textBox.TextChanged += this.TextBox_TextChanged;
                         e.Handled = true;
                     }
                     break;
@@ -107,47 +107,47 @@ namespace HouseholdAccountBook.UserControls
                 case Key.D8:
                 case Key.D9: {
                         int input = e.Key - Key.D0;
-                        textBox.TextChanged -= TextBox_TextChanged;
+                        textBox.TextChanged -= this.TextBox_TextChanged;
                         TryToInputNumber(textBox, dateTimePicker, input);
-                        textBox.TextChanged += TextBox_TextChanged;
+                        textBox.TextChanged += this.TextBox_TextChanged;
                         e.Handled = true;
                     }
                     break;
                 case Key.Right: {
                         // 選択を右に移動する
-                        textBox.SelectionChanged -= TextBox_SelectionChanged;
+                        textBox.SelectionChanged -= this.TextBox_SelectionChanged;
                         if (textBox.SelectionStart + textBox.SelectionLength != textBox.Text.Length) {
                             textBox.SelectionStart = textBox.SelectionStart + textBox.SelectionLength + 2;
                         }
                         SelectAsRange(textBox);
-                        textBox.SelectionChanged += TextBox_SelectionChanged;
+                        textBox.SelectionChanged += this.TextBox_SelectionChanged;
                         e.Handled = true;
                     }
                     break;
                 case Key.Left: {
                         // 選択を左に移動する
-                        textBox.SelectionChanged -= TextBox_SelectionChanged;
+                        textBox.SelectionChanged -= this.TextBox_SelectionChanged;
                         if (textBox.SelectionStart != 0) {
                             textBox.SelectionStart -= 2;
                         }
                         SelectAsRange(textBox);
-                        textBox.SelectionChanged += TextBox_SelectionChanged;
+                        textBox.SelectionChanged += this.TextBox_SelectionChanged;
                         e.Handled = true;
                     }
                     break;
                 case Key.Up: {
                         // 選択している箇所の数字をインクリメントする
-                        textBox.TextChanged -= TextBox_TextChanged;
+                        textBox.TextChanged -= this.TextBox_TextChanged;
                         IncreaceSelectedNumber(textBox, dateTimePicker);
-                        textBox.TextChanged += TextBox_TextChanged;
+                        textBox.TextChanged += this.TextBox_TextChanged;
                         e.Handled = true;
                     }
                     break;
                 case Key.Down: {
                         // 選択している箇所の数字をデクリメントする
-                        textBox.TextChanged -= TextBox_TextChanged;
+                        textBox.TextChanged -= this.TextBox_TextChanged;
                         DecreaceSelectedNumber(textBox, dateTimePicker);
-                        textBox.TextChanged += TextBox_TextChanged;
+                        textBox.TextChanged += this.TextBox_TextChanged;
                         e.Handled = true;
                     }
                     break;
@@ -166,9 +166,9 @@ namespace HouseholdAccountBook.UserControls
         private void TextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
-            textBox.SelectionChanged -= TextBox_SelectionChanged;
+            textBox.SelectionChanged -= this.TextBox_SelectionChanged;
             SelectAsRange(textBox);
-            textBox.SelectionChanged += TextBox_SelectionChanged;
+            textBox.SelectionChanged += this.TextBox_SelectionChanged;
         }
         
         /// <summary>
@@ -180,14 +180,14 @@ namespace HouseholdAccountBook.UserControls
         {
             TextBox textBox = sender as TextBox;
 
-            textBox.TextChanged -= TextBox_TextChanged;
+            textBox.TextChanged -= this.TextBox_TextChanged;
             if (e.Delta < 0) {
                 DecreaceSelectedNumber(textBox, this);
             }
             else if (e.Delta > 0) {
                 IncreaceSelectedNumber(textBox, this);
             }
-            textBox.TextChanged += TextBox_TextChanged;
+            textBox.TextChanged += this.TextBox_TextChanged;
 
             e.Handled = true;
         }
@@ -201,7 +201,7 @@ namespace HouseholdAccountBook.UserControls
         {
             var dateTimePicker = sender as DateTimePicker;
             var textBox = GetTemplateTextBox(dateTimePicker);
-            selectedPositionBeforeCalendarOpened = textBox.SelectionStart;
+            this.selectedPositionBeforeCalendarOpened = textBox.SelectionStart;
         }
 
         /// <summary>
@@ -213,7 +213,7 @@ namespace HouseholdAccountBook.UserControls
         {
             var dateTimePicker = (DateTimePicker)sender;
             var textBox = GetTemplateTextBox(dateTimePicker);
-            textBox.SelectionStart = selectedPositionBeforeCalendarOpened;
+            textBox.SelectionStart = this.selectedPositionBeforeCalendarOpened;
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="dateTimePicker">デートタイムピッカー</param>
         private void IncreaceSelectedNumber(TextBox textBox, DateTimePicker dateTimePicker)
         {
-            textBox.SelectionChanged -= TextBox_SelectionChanged;
+            textBox.SelectionChanged -= this.TextBox_SelectionChanged;
             int start = textBox.SelectionStart;
             int length = textBox.SelectionLength;
             DateKind kind = GetKindOfSelection(textBox, dateTimePicker);
@@ -281,7 +281,7 @@ namespace HouseholdAccountBook.UserControls
             textBox.Text = DatePickerDateTimeConverter.DateTimeToString(formatStr, dateTimePicker.SelectedDate);
             textBox.SelectionStart = start;
             textBox.SelectionLength = length;
-            textBox.SelectionChanged += TextBox_SelectionChanged;
+            textBox.SelectionChanged += this.TextBox_SelectionChanged;
         }
 
         /// <summary>
@@ -291,7 +291,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="dateTimePicker">デートタイムピッカー</param>
         private void DecreaceSelectedNumber(TextBox textBox, DateTimePicker dateTimePicker)
         {
-            textBox.SelectionChanged -= TextBox_SelectionChanged;
+            textBox.SelectionChanged -= this.TextBox_SelectionChanged;
             int start = textBox.SelectionStart;
             int length = textBox.SelectionLength;
             DateKind kind = GetKindOfSelection(textBox, dateTimePicker);
@@ -310,7 +310,7 @@ namespace HouseholdAccountBook.UserControls
             textBox.Text = DatePickerDateTimeConverter.DateTimeToString(formatStr, dateTimePicker.SelectedDate);
             textBox.SelectionStart = start;
             textBox.SelectionLength = length;
-            textBox.SelectionChanged += TextBox_SelectionChanged;
+            textBox.SelectionChanged += this.TextBox_SelectionChanged;
         }
 
         /// <summary>
@@ -371,7 +371,7 @@ namespace HouseholdAccountBook.UserControls
         /// <returns>入力に成功したか</returns>
         private bool TryToInputNumber(TextBox textBox, DateTimePicker dateTimePicker, int number)
         {
-            textBox.SelectionChanged -= TextBox_SelectionChanged;
+            textBox.SelectionChanged -= this.TextBox_SelectionChanged;
             bool ans = false;
 
             try {
@@ -413,7 +413,7 @@ namespace HouseholdAccountBook.UserControls
             }
             catch (ArgumentOutOfRangeException) { }
 
-            textBox.SelectionChanged += TextBox_SelectionChanged;
+            textBox.SelectionChanged += this.TextBox_SelectionChanged;
             return ans;
         }
     }

@@ -156,6 +156,27 @@ namespace HouseholdAccountBook.ConstValue
         };
 
         /// <summary>
+        /// グラフ種別
+        /// </summary>
+        public enum GraphKind 
+        {
+            /// <summary>
+            /// 収支
+            /// </summary>
+            IncomeAndOutgo = 0,
+            /// <summary>
+            /// 残高
+            /// </summary>
+            Balance = 1
+        }
+        /// <summary>
+        /// グループ種別文字列
+        /// </summary>
+        public static Dictionary<GraphKind, string> GraphKindStr { get; } = new Dictionary<GraphKind, string>() {
+            { GraphKind.IncomeAndOutgo, "収支グラフ" }, { GraphKind.Balance, "残高グラフ" }
+        };
+
+        /// <summary>
         /// 登録モード
         /// </summary>
         public enum RegistrationMode 

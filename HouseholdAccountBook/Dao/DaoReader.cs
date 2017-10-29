@@ -6,7 +6,7 @@ namespace HouseholdAccountBook.Dao
     /// <summary>
     /// クエリ実行結果の処理
     /// </summary>
-    public class DaoReader
+    public partial class DaoReader
     {
         /// <summary>
         /// 実行されたSQL(デバッグ用)
@@ -25,7 +25,7 @@ namespace HouseholdAccountBook.Dao
         /// <summary>
         /// レコード数
         /// </summary>
-        public int Count { get { return resultSet.Count; } }
+        public int Count { get { return this.resultSet.Count; } }
 
         /// <summary>
         /// コンストラクタ
@@ -36,7 +36,7 @@ namespace HouseholdAccountBook.Dao
         {
             this.sql = sql;
             this.resultSet = resultSet;
-            enumerator = resultSet.GetEnumerator();
+            this.enumerator = resultSet.GetEnumerator();
         }
 
         /// <summary>
@@ -47,20 +47,20 @@ namespace HouseholdAccountBook.Dao
         public Record this[int index]
         {
             get {
-                if (index < 0 || Count <= index) {
+                if (index < 0 || this.Count <= index) {
                     throw new IndexOutOfRangeException();
                 }
 
                 LinkedListNode<Dictionary<string, object>> node;
-                if (index < Count / 2) { // 前半の場合
-                    node = resultSet.First;
+                if (index < this.Count / 2) { // 前半の場合
+                    node = this.resultSet.First;
                     for (int i = 0; i != index; ++i) {
                         node = node.Next;
                     }
                 }
                 else { // 後半の場合
-                    node = resultSet.Last;
-                    for (int i = Count - 1; i != index; --i) {
+                    node = this.resultSet.Last;
+                    for (int i = this.Count - 1; i != index; --i) {
                         node = node.Previous;
                     }
                 }
@@ -81,9 +81,9 @@ namespace HouseholdAccountBook.Dao
         /// <param name="exection">レコードの処理</param>
         public void ExecARow(ExectionARow exection)
         {
-            enumerator.MoveNext();
-            if (enumerator.Current != null) {
-                exection(new Record(enumerator.Current));
+            this.enumerator.MoveNext();
+            if (this.enumerator.Current != null) {
+                exection(new Record(this.enumerator.Current));
             }
             else {
                 throw new InvalidOperationException("有効なレコードがありません。");
@@ -104,106 +104,12 @@ namespace HouseholdAccountBook.Dao
         public void ExecWholeRow(ExectionWholeRow exection)
         {
             int count = 0;
-            while (enumerator.MoveNext()) {
-                if(!exection(count, new Record(enumerator.Current))) { break; }
+            while (this.enumerator.MoveNext()) {
+                if(!exection(count, new Record(this.enumerator.Current))) { break; }
                 count++;
             }
             // 初期位置に戻す
-            enumerator = resultSet.GetEnumerator();
-        }
-
-        /// <summary>
-        /// 取得レコード
-        /// </summary>
-        public class Record
-        {
-            /// <summary>
-            /// レコード
-            /// </summary>
-            private Dictionary<string, object> _record;
-
-            /// <summary>
-            /// コンストラクタ
-            /// </summary>
-            /// <param name="record">レコード</param>
-            public Record(Dictionary<string, object> record)
-            {
-                this._record = record;
-            }
-
-            /// <summary>
-            /// string型で取得する
-            /// </summary>
-            /// <param name="key">カラム名</param>
-            /// <returns></returns>
-            public string this[string key]
-            {
-                get {
-                    key = key.ToLower();
-                    if (this._record.ContainsKey(key)) {
-                        return this._record[key].ToString();
-                    }
-                    else {
-                        throw new KeyNotFoundException();
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Int型で取得する
-            /// </summary>
-            /// <param name="key">カラム名</param>
-            /// <returns></returns>
-            public int ToInt(string key)
-            {
-                key = key.ToLower();
-                if (this._record.ContainsKey(key)) {
-                    object tmp = this._record[key];
-                    return Int32.Parse(tmp.ToString());
-                }
-                else {
-                    throw new KeyNotFoundException();
-                }
-            }
-
-            /// <summary>
-            /// Int?型で取得する
-            /// </summary>
-            /// <param name="key">カラム名</param>
-            /// <returns></returns>
-            public int? ToNullableInt(string key)
-            {
-                key = key.ToLower();
-                if (this._record.ContainsKey(key)) {
-                    object tmp = this._record[key];
-                    return tmp == DBNull.Value ? null : (int?)tmp;
-                }
-                else {
-                    throw new KeyNotFoundException();
-                }
-            }
-
-            /// <summary>
-            /// bool型で取得する
-            /// </summary>
-            /// <param name="key">カラム名</param>
-            /// <returns></returns>
-            public bool ToBoolean(string key)
-            {
-                key = key.ToLower();
-                if (this._record.ContainsKey(key)) {
-                    try {
-                        return (bool)this._record[key];
-                    }
-                    catch (InvalidCastException) {
-                        string tmp = this._record[key] as string;
-                        return (tmp == "True" || tmp == "true") ? true : false;
-                    }
-                }
-                else {
-                    throw new KeyNotFoundException();
-                }
-            }
+            this.enumerator = this.resultSet.GetEnumerator();
         }
     }
 }

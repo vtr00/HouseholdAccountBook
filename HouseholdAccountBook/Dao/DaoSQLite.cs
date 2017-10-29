@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SQLite;
 
 namespace HouseholdAccountBook.Dao
@@ -63,7 +62,7 @@ namespace HouseholdAccountBook.Dao
         /// <returns>SQLコマンド</returns>
         private SQLiteCommand CreateCommand(string sql, params object[] objects)
         {
-            SQLiteCommand command = ((SQLiteConnection)connection).CreateCommand();
+            SQLiteCommand command = ((SQLiteConnection)this.connection).CreateCommand();
 
             sql = sql.Replace("{", "_").Replace("}", "_");
             command.CommandText = sql;
