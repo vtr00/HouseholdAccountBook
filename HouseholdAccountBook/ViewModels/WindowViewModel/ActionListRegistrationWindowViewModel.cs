@@ -45,7 +45,7 @@ namespace HouseholdAccountBook.ViewModels
         #region RegMode
         public RegistrationMode RegMode
         {
-            get { return _RegMode; }
+            get { return this._RegMode; }
         }
         private RegistrationMode _RegMode = RegistrationMode.Add;
         #endregion
@@ -56,8 +56,8 @@ namespace HouseholdAccountBook.ViewModels
         #region BookVMList
         public ObservableCollection<BookViewModel> BookVMList
         {
-            get { return _BookVMList; }
-            set { SetProperty(ref _BookVMList, value); }
+            get { return this._BookVMList; }
+            set { SetProperty(ref this._BookVMList, value); }
         }
         private ObservableCollection<BookViewModel> _BookVMList = default(ObservableCollection<BookViewModel>);
         #endregion
@@ -67,13 +67,13 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedBookVM
         public BookViewModel SelectedBookVM
         {
-            get { return _SelectedBookVM; }
+            get { return this._SelectedBookVM; }
             set {
-                if (SetProperty(ref _SelectedBookVM, value)) {
-                    if (!isUpdateOnChanged) {
-                        isUpdateOnChanged = true;
+                if (SetProperty(ref this._SelectedBookVM, value)) {
+                    if (!this.isUpdateOnChanged) {
+                        this.isUpdateOnChanged = true;
                         BookChanged?.Invoke();
-                        isUpdateOnChanged = false;
+                        this.isUpdateOnChanged = false;
                     }
                 }
             }
@@ -94,13 +94,13 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedBalanceKind
         public BalanceKind SelectedBalanceKind
         {
-            get { return _SelectedBalanceKind; }
+            get { return this._SelectedBalanceKind; }
             set {
-                if (SetProperty(ref _SelectedBalanceKind, value)) {
-                    if (!isUpdateOnChanged) {
-                        isUpdateOnChanged = true;
+                if (SetProperty(ref this._SelectedBalanceKind, value)) {
+                    if (!this.isUpdateOnChanged) {
+                        this.isUpdateOnChanged = true;
                         BalanceKindChanged?.Invoke();
-                        isUpdateOnChanged = false;
+                        this.isUpdateOnChanged = false;
                     }
                 }
             }
@@ -114,8 +114,8 @@ namespace HouseholdAccountBook.ViewModels
         #region CategoryVMList
         public ObservableCollection<CategoryViewModel> CategoryVMList
         {
-            get { return _CategoryVMList; }
-            set { SetProperty(ref _CategoryVMList, value); }
+            get { return this._CategoryVMList; }
+            set { SetProperty(ref this._CategoryVMList, value); }
         }
         private ObservableCollection<CategoryViewModel> _CategoryVMList = default(ObservableCollection<CategoryViewModel>);
         #endregion
@@ -125,13 +125,13 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedCategoryVM
         public CategoryViewModel SelectedCategoryVM
         {
-            get { return _SelectedCategoryVM; }
+            get { return this._SelectedCategoryVM; }
             set {
-                if (SetProperty(ref _SelectedCategoryVM, value)) {
-                    if (!isUpdateOnChanged) {
-                        isUpdateOnChanged = true;
+                if (SetProperty(ref this._SelectedCategoryVM, value)) {
+                    if (!this.isUpdateOnChanged) {
+                        this.isUpdateOnChanged = true;
                         CategoryChanged?.Invoke();
-                        isUpdateOnChanged = false;
+                        this.isUpdateOnChanged = false;
                     }
                 }
             }
@@ -145,8 +145,8 @@ namespace HouseholdAccountBook.ViewModels
         #region ItemVMList
         public ObservableCollection<ItemViewModel> ItemVMList
         {
-            get { return _ItemVMList; }
-            set { SetProperty(ref _ItemVMList, value); }
+            get { return this._ItemVMList; }
+            set { SetProperty(ref this._ItemVMList, value); }
         }
         private ObservableCollection<ItemViewModel> _ItemVMList = default(ObservableCollection<ItemViewModel>);
         #endregion
@@ -156,13 +156,13 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedItemVM
         public ItemViewModel SelectedItemVM
         {
-            get { return _SelectedItemVM; }
+            get { return this._SelectedItemVM; }
             set {
-                if (SetProperty(ref _SelectedItemVM, value)) {
-                    if (!isUpdateOnChanged) {
-                        isUpdateOnChanged = true;
+                if (SetProperty(ref this._SelectedItemVM, value)) {
+                    if (!this.isUpdateOnChanged) {
+                        this.isUpdateOnChanged = true;
                         ItemChanged?.Invoke();
-                        isUpdateOnChanged = false;
+                        this.isUpdateOnChanged = false;
                     }
                 }
             }
@@ -176,8 +176,8 @@ namespace HouseholdAccountBook.ViewModels
         #region DateValueVMList
         public ObservableCollection<DateValueViewModel> DateValueVMList
         {
-            get { return _DateValueVMList; }
-            set { SetProperty(ref _DateValueVMList, value); }
+            get { return this._DateValueVMList; }
+            set { SetProperty(ref this._DateValueVMList, value); }
         }
         private ObservableCollection<DateValueViewModel> _DateValueVMList = new ObservableCollection<DateValueViewModel>();
         #endregion
@@ -188,8 +188,8 @@ namespace HouseholdAccountBook.ViewModels
         #region IsEditing
         public bool IsEditing
         {
-            get { return _IsEditing; }
-            set { SetProperty(ref _IsEditing, value); }
+            get { return this._IsEditing; }
+            set { SetProperty(ref this._IsEditing, value); }
         }
         private bool _IsEditing = default(bool);
         #endregion
@@ -200,8 +200,8 @@ namespace HouseholdAccountBook.ViewModels
         #region ShopNameList
         public ObservableCollection<string> ShopNameList
         {
-            get { return _ShopNameList; }
-            set { SetProperty(ref _ShopNameList, value); }
+            get { return this._ShopNameList; }
+            set { SetProperty(ref this._ShopNameList, value); }
         }
         private ObservableCollection<string> _ShopNameList = default(ObservableCollection<string>);
         #endregion
@@ -211,8 +211,8 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedShopName
         public string SelectedShopName
         {
-            get { return _SelectedShopName; }
-            set { SetProperty(ref _SelectedShopName, value); }
+            get { return this._SelectedShopName; }
+            set { SetProperty(ref this._SelectedShopName, value); }
         }
         private string _SelectedShopName = default(string);
         #endregion
@@ -223,8 +223,8 @@ namespace HouseholdAccountBook.ViewModels
         #region RemarkList
         public ObservableCollection<string> RemarkList
         {
-            get { return _RemarkList; }
-            set { SetProperty(ref _RemarkList, value); }
+            get { return this._RemarkList; }
+            set { SetProperty(ref this._RemarkList, value); }
         }
         private ObservableCollection<string> _RemarkList = default(ObservableCollection<string>);
         #endregion
@@ -234,8 +234,8 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedRemark
         public string SelectedRemark
         {
-            get { return _SelectedRemark; }
-            set { SetProperty(ref _SelectedRemark, value); }
+            get { return this._SelectedRemark; }
+            set { SetProperty(ref this._SelectedRemark, value); }
         }
         private string _SelectedRemark = default(string);
         #endregion

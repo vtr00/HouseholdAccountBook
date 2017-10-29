@@ -366,8 +366,11 @@
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextMonthCommand}"/>
                             <Button Content="今月" Width="40" Command="{StaticResource GoToThisMonthCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
-                                              ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
-                                              SelectionChanged="BookComboBox_SelectionChanged"/>
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
+                                      SelectionChanged="BookComboBox_SelectionChanged"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
+                                      ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"
+                                      SelectionChanged="GraphKindComboBox_SelectionChanged"/>
                         </StackPanel>
                     </Grid>
 
@@ -483,8 +486,11 @@
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
                             <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
-                                              ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
-                                              SelectionChanged="BookComboBox_SelectionChanged"/>
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
+                                      SelectionChanged="BookComboBox_SelectionChanged"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
+                                      ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"
+                                      SelectionChanged="GraphKindComboBox_SelectionChanged"/>
                         </StackPanel>
                     </Grid>
 

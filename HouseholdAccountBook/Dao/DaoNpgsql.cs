@@ -90,7 +90,7 @@ namespace HouseholdAccountBook.Dao
         /// <returns>SQLコマンド</returns>
         private NpgsqlCommand CreateCommand(string sql, params object[] objects)
         {
-            NpgsqlCommand command = ((NpgsqlConnection)connection).CreateCommand();
+            NpgsqlCommand command = ((NpgsqlConnection)this.connection).CreateCommand();
 
             sql = sql.Replace("{", "_").Replace("}", "_");
             command.CommandText = sql;

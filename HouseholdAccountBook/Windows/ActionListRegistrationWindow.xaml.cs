@@ -158,7 +158,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void ButtonInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            TextBox textBox = _popup.PlacementTarget as TextBox;
+            TextBox textBox = this._popup.PlacementTarget as TextBox;
             DateValueViewModel vm = textBox.DataContext as DateValueViewModel;
 
             switch (this.WVM.InputedKind) {
@@ -212,9 +212,9 @@ namespace HouseholdAccountBook.Windows
                     break;
             }
             // 外れたフォーカスを元に戻す
-            lastDataGridCell.IsEditing = true; // セルを編集モードにする - 画面がちらつくがやむを得ない？
+            this.lastDataGridCell.IsEditing = true; // セルを編集モードにする - 画面がちらつくがやむを得ない？
             textBox.Focus();
-            lastDataGridCell.Focus(); // Enterキーでの入力完了を有効にする
+            this.lastDataGridCell.Focus(); // Enterキーでの入力完了を有効にする
             //Keyboard.Focus(textBox); // キーでの数値入力を有効にする - 意図した動作にならない
 
             e.Handled = true;
@@ -239,7 +239,7 @@ namespace HouseholdAccountBook.Windows
         private void DataGrid_AddingNewItem(object sender, AddingNewItemEventArgs e)
         {
             if (this.WVM.DateValueVMList.Count == 0) {
-                e.NewItem = new DateValueViewModel() { ActDate = selectedDateTime ?? DateTime.Now, ActValue = null };
+                e.NewItem = new DateValueViewModel() { ActDate = this.selectedDateTime ?? DateTime.Now, ActValue = null };
             }
             else {
                 // リストに入力済の末尾のデータの日付を追加時に採用する
@@ -289,8 +289,8 @@ namespace HouseholdAccountBook.Windows
         {
             if (!this.WVM.IsEditing) { 
                 TextBox textBox = sender as TextBox;
-                _popup.SetBinding(Popup.StaysOpenProperty, new Binding(TextBox.IsKeyboardFocusedProperty.Name) { Source = textBox });
-                _popup.PlacementTarget = textBox;
+                this._popup.SetBinding(Popup.StaysOpenProperty, new Binding(TextBox.IsKeyboardFocusedProperty.Name) { Source = textBox });
+                this._popup.PlacementTarget = textBox;
                 this.WVM.IsEditing = true;
             }
             e.Handled = true;
@@ -306,10 +306,10 @@ namespace HouseholdAccountBook.Windows
             DataGridCell dataGridCell = sender as DataGridCell;
             
             // 新しいセルに移動していたら数値入力ボタンを非表示にする
-            if (dataGridCell != lastDataGridCell) {
+            if (dataGridCell != this.lastDataGridCell) {
                 this.WVM.IsEditing = false;
             }
-            lastDataGridCell = dataGridCell;
+            this.lastDataGridCell = dataGridCell;
         }
         #endregion
 
@@ -324,7 +324,7 @@ namespace HouseholdAccountBook.Windows
                 new CategoryViewModel() { Id = -1, Name = "(指定なし)" }
             };
             CategoryViewModel selectedCategoryVM = categoryVMList[0];
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT category_id, category_name FROM mst_category C 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM mst_item I WHERE I.category_id = C.category_id AND balance_kind = @{0} AND del_flg = 0 
@@ -351,7 +351,7 @@ ORDER BY sort_order;", (int)this.WVM.SelectedBalanceKind, this.WVM.SelectedBookV
         {
             ObservableCollection<ItemViewModel> itemVMList = new ObservableCollection<ItemViewModel>();
             ItemViewModel selectedItemVM = null;
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader;
                 if (this.WVM.SelectedCategoryVM.Id == -1) {
                     reader = dao.ExecQuery(@"
@@ -390,7 +390,7 @@ ORDER BY sort_order;", this.WVM.SelectedBookVM.Id, (int)this.WVM.SelectedCategor
                     string.Empty
             };
             string selectedShopName = shopName ?? this.WVM.SelectedShopName ?? shopNameVMList[0];
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT shop_name FROM hst_shop 
 WHERE del_flg = 0 AND item_id = @{0} 
@@ -416,7 +416,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
                     string.Empty
             };
             string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0];
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT remark FROM hst_remark 
 WHERE del_flg = 0 AND item_id = @{0} 
@@ -451,7 +451,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
             string remark = this.WVM.SelectedRemark; // 備考
 
             DateTime lastActTime = this.WVM.DateValueVMList[0].ActDate;
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 #region 帳簿項目を追加する
                 foreach(DateValueViewModel vm in this.WVM.DateValueVMList) {
                     if (vm.ActValue.HasValue) {
@@ -522,16 +522,16 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", lastActTime, Upda
             Properties.Settings settings = Properties.Settings.Default;
 
             if (settings.ActionListRegistrationWindow_Left != -1) {
-                Left = settings.ActionListRegistrationWindow_Left;
+                this.Left = settings.ActionListRegistrationWindow_Left;
             }
             if (settings.ActionListRegistrationWindow_Top != -1) {
-                Top = settings.ActionListRegistrationWindow_Top;
+                this.Top = settings.ActionListRegistrationWindow_Top;
             }
             if (settings.ActionListRegistrationWindow_Width != -1) {
-                Width = settings.ActionListRegistrationWindow_Width;
+                this.Width = settings.ActionListRegistrationWindow_Width;
             }
             if (settings.ActionListRegistrationWindow_Height != -1) {
-                Height = settings.ActionListRegistrationWindow_Height;
+                this.Height = settings.ActionListRegistrationWindow_Height;
             }
         }
 
@@ -543,10 +543,10 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", lastActTime, Upda
             Properties.Settings settings = Properties.Settings.Default;
 
             if (this.WindowState == WindowState.Normal) {
-                settings.ActionListRegistrationWindow_Left = Left;
-                settings.ActionListRegistrationWindow_Top = Top;
-                settings.ActionListRegistrationWindow_Width = Width;
-                settings.ActionListRegistrationWindow_Height = Height;
+                settings.ActionListRegistrationWindow_Left = this.Left;
+                settings.ActionListRegistrationWindow_Top = this.Top;
+                settings.ActionListRegistrationWindow_Width = this.Width;
+                settings.ActionListRegistrationWindow_Height = this.Height;
                 settings.Save();
             }
         }

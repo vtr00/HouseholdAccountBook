@@ -160,7 +160,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void ButtonInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            TextBox textBox = _textBox;
+            TextBox textBox = this._textBox;
 
             switch (this.UVM.InputedKind) {
                 case NumericInputButton.InputKind.Number:

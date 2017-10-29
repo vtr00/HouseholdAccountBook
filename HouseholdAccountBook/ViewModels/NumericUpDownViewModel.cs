@@ -22,8 +22,8 @@ namespace HouseholdAccountBook.ViewModels
         #region InputedValue
         public int? InputedValue
         {
-            get { return _InputedValue; }
-            set { SetProperty(ref _InputedValue, value); }
+            get { return this._InputedValue; }
+            set { SetProperty(ref this._InputedValue, value); }
         }
         private int? _InputedValue = default(int?);
         #endregion
@@ -34,8 +34,8 @@ namespace HouseholdAccountBook.ViewModels
         #region InputedKind
         public NumericInputButton.InputKind InputedKind
         {
-            get { return _InputedKind; }
-            set { SetProperty(ref _InputedKind, value); }
+            get { return this._InputedKind; }
+            set { SetProperty(ref this._InputedKind, value); }
         }
         private NumericInputButton.InputKind _InputedKind = default(NumericInputButton.InputKind);
         #endregion
@@ -46,8 +46,8 @@ namespace HouseholdAccountBook.ViewModels
         #region IsOpen
         public bool IsOpen
         {
-            get { return _IsOpen; }
-            set { SetProperty(ref _IsOpen, value); }
+            get { return this._IsOpen; }
+            set { SetProperty(ref this._IsOpen, value); }
         }
         private bool _IsOpen = default(bool);
         #endregion
@@ -58,9 +58,9 @@ namespace HouseholdAccountBook.ViewModels
         #region NumericUpDownFocused
         public bool NumericUpDownFocused
         {
-            get { return _NumericUpDownFocused; }
+            get { return this._NumericUpDownFocused; }
             set {
-                _NumericUpDownFocused = value;
+                this._NumericUpDownFocused = value;
                 SetIsOpen();
             }
         }
@@ -73,9 +73,9 @@ namespace HouseholdAccountBook.ViewModels
         #region PopupFocused
         public bool PopupFocused
         {
-            get { return _PopupFocused; }
+            get { return this._PopupFocused; }
             set {
-                _PopupFocused = value;
+                this._PopupFocused = value;
                 SetIsOpen();
             }
         }

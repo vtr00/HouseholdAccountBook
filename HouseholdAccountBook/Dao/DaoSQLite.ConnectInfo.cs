@@ -7,6 +7,9 @@
         /// </summary>
         public new class ConnectInfo : DaoBase.ConnectInfo
         {
+            /// <summary>
+            /// ファイルパス
+            /// </summary>
             public string FilePath { get; set; }
         }
     }

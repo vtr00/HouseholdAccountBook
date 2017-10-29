@@ -25,9 +25,9 @@ namespace HouseholdAccountBook.UserControls
             TrackerHitResult result = base.GetNearestPoint(point, interpolate);
 
             // いずれかがnullではないとき
-            if(oldResult != null || result != null) {
+            if (this.oldResult != null || result != null) {
                 // TrackerHitResult が変化していたとき
-                if((oldResult == null && result != null) || (oldResult != null && result == null)) {
+                if ((this.oldResult == null && result != null) || (this.oldResult != null && result == null)) {
                     // 通知する
                     TrackerHitResultChanged?.Invoke(this, new EventArgs<TrackerHitResult>(result));
                 }

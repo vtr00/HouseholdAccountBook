@@ -47,7 +47,7 @@
         public DaoBase Build()
         {
             DaoBase daoBase;
-            switch (target) {
+            switch (this.target) {
                 case Target.SQLite:
                     daoBase = new DaoSQLite(this.info as DaoSQLite.ConnectInfo);
                     break;

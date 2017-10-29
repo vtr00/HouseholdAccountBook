@@ -98,9 +98,8 @@ namespace HouseholdAccountBook.Windows
             settings.Save();
 
             // CSVファイルをマッピングする
-            CsvConfiguration config = new CsvConfiguration() {
-                HasHeaderRecord = true,
-                WillThrowOnMissingField = false
+            Configuration config = new Configuration() {
+                HasHeaderRecord = true,  MissingFieldFound = (handlerName, index, contexts) => { }
             };
             List<CsvComparisonViewModel> tmpList = new List<CsvComparisonViewModel>();
             using (CsvReader reader = new CsvReader(new StreamReader(ofd.FileName, Encoding.GetEncoding(932)), config)) { 
@@ -141,7 +140,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void EditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ActionRegistrationWindow arw = new ActionRegistrationWindow(builder, this.WVM.SelectedCsvComparisonVM.ActionId.Value);
+            ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedCsvComparisonVM.ActionId.Value);
             arw.Registrated += (sender2, e2) => {
                 UpdateComparisonInfo();
             };
@@ -173,7 +172,7 @@ namespace HouseholdAccountBook.Windows
             Cursor cursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 dao.ExecTransaction(() => {
                     foreach (CsvComparisonViewModel vm in this.WVM.CsvComparisonVMList) {
                         if (vm.ActionId.HasValue) {
@@ -264,7 +263,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
 
             ObservableCollection<BookComparisonViewModel> bookCompVMList = new ObservableCollection<BookComparisonViewModel>();
             BookComparisonViewModel selectedBookCompVM = null;
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT * 
 FROM mst_book 
@@ -296,7 +295,7 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
         private void UpdateComparisonInfo()
         {
             // 指定された帳簿内で、日付、金額が一致する帳簿項目を探す
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 foreach (CsvComparisonViewModel vm in this.WVM.CsvComparisonVMList) {
                     // 前回の結果をクリアする
                     vm.ClearActionInfo();
@@ -349,16 +348,16 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
             Properties.Settings settings = Properties.Settings.Default;
 
             if (settings.CsvComparisonWindow_Left != -1) {
-                Left = settings.CsvComparisonWindow_Left;
+                this.Left = settings.CsvComparisonWindow_Left;
             }
             if (settings.CsvComparisonWindow_Top != -1) {
-                Top = settings.CsvComparisonWindow_Top;
+                this.Top = settings.CsvComparisonWindow_Top;
             }
             if (settings.CsvComparisonWindow_Width != -1) {
-                Width = settings.CsvComparisonWindow_Width;
+                this.Width = settings.CsvComparisonWindow_Width;
             }
             if (settings.CsvComparisonWindow_Height != -1) {
-                Height = settings.CsvComparisonWindow_Height;
+                this.Height = settings.CsvComparisonWindow_Height;
             }
         }
 
@@ -368,10 +367,10 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         private void SaveSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            settings.CsvComparisonWindow_Left = Left;
-            settings.CsvComparisonWindow_Top = Top;
-            settings.CsvComparisonWindow_Width = Width;
-            settings.CsvComparisonWindow_Height = Height;
+            settings.CsvComparisonWindow_Left = this.Left;
+            settings.CsvComparisonWindow_Top = this.Top;
+            settings.CsvComparisonWindow_Width = this.Width;
+            settings.CsvComparisonWindow_Height = this.Height;
             settings.Save();
         }
         #endregion
@@ -383,7 +382,7 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         /// <param name="isMatch">一致フラグ</param>
         private void ChangeIsMatch(int actionId, bool isMatch)
         {
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 dao.ExecNonQuery(@"
 UPDATE hst_action
 SET is_match = @{0}, update_time = 'now', updater = @{1}

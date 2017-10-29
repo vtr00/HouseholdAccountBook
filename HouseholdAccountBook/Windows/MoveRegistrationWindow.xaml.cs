@@ -325,7 +325,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
         {
             ObservableCollection<ItemViewModel> itemVMList = new ObservableCollection<ItemViewModel>();
             ItemViewModel selectedItemVM = null;
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 int bookId = -1;
                 switch (this.WVM.SelectedCommissionKind) {
                     case CommissionKind.FromBook:
@@ -364,7 +364,7 @@ ORDER BY sort_order;", bookId, (int)BalanceKind.Outgo);
                     string.Empty
             };
             string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0];
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT remark FROM hst_remark 
 WHERE del_flg = 0 AND item_id = @{0} 
@@ -408,9 +408,9 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
             int? resActionId = null;
 
             int tmpGroupId = -1; // ローカル用
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 dao.ExecTransaction(() => {
-                    if (groupId == null) { // 追加
+                    if (this.groupId == null) { // 追加
                         #region 帳簿項目を追加する
                         // グループIDを取得する
                         DaoReader reader = dao.ExecQuery(@"
@@ -429,7 +429,7 @@ VALUES (@{0}, (
   WHERE move_flg = 1
 ), @{1}, @{2}, @{3}, 0, 'now', @{4}, 'now', @{5}) RETURNING action_id;",
                             fromBookId, actTime, - actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Outgo);
-                        if(selectedBookId == fromBookId) {
+                        if(this.selectedBookId == fromBookId) {
                             reader.ExecARow((record) => {
                                 resActionId = record.ToInt("action_id");
                             });
@@ -444,7 +444,7 @@ VALUES (@{0}, (
   WHERE move_flg = 1
 ), @{1}, @{2}, @{3}, 0, 'now', @{4}, 'now', @{5}) RETURNING action_id;",
                             toBookId, actTime, actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Income);
-                        if (selectedBookId == toBookId) {
+                        if (this.selectedBookId == toBookId) {
                             reader.ExecARow((record) => {
                                 resActionId = record.ToInt("action_id");
                             });
@@ -453,13 +453,13 @@ VALUES (@{0}, (
                     }
                     else { // 編集
                         #region 帳簿項目を編集する
-                        tmpGroupId = groupId.Value;
+                        tmpGroupId = this.groupId.Value;
                         dao.ExecNonQuery(@"
 -- 移動元
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
 WHERE action_id = @{4};", fromBookId, actTime, - actValue, Updater, this.fromActionId);
-                        if(selectedBookId == fromBookId) {
+                        if(this.selectedBookId == fromBookId) {
                             resActionId = this.fromActionId;
                         }
 
@@ -468,7 +468,7 @@ WHERE action_id = @{4};", fromBookId, actTime, - actValue, Updater, this.fromAct
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
 WHERE action_id = @{4};", toBookId, actTime, actValue, Updater, this.toActionId);
-                        if(selectedBookId == toBookId) {
+                        if(this.selectedBookId == toBookId) {
                             resActionId = this.toActionId;
                         }
                         #endregion
@@ -485,11 +485,11 @@ WHERE action_id = @{4};", toBookId, actTime, actValue, Updater, this.toActionId)
                                 bookId = toBookId;
                                 break;
                         }
-                        if (commissionActionId != null) {
+                        if (this.commissionActionId != null) {
                             dao.ExecNonQuery(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, remark = @{4}, update_time = 'now', updater = @{5}
-WHERE action_id = @{6};", bookId, commissionItemId, actTime, - commission, remark, Updater, commissionActionId);
+WHERE action_id = @{6};", bookId, commissionItemId, actTime, - commission, remark, Updater, this.commissionActionId);
                         }
                         else {
                             dao.ExecNonQuery(@"
@@ -500,11 +500,11 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7});", book
                     }
                     else {
                         #region 手数料なし
-                        if (commissionActionId != null) {
+                        if (this.commissionActionId != null) {
                             dao.ExecNonQuery(@"
 UPDATE hst_action
 SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE action_id = @{1};", Updater, commissionActionId);
+WHERE action_id = @{1};", Updater, this.commissionActionId);
                         }
                         #endregion
                     }
@@ -543,16 +543,16 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", actTime, Updater,
             Properties.Settings settings = Properties.Settings.Default;
 
             if (settings.MoveRegistrationWindow_Left != -1) {
-                Left = settings.MoveRegistrationWindow_Left;
+                this.Left = settings.MoveRegistrationWindow_Left;
             }
             if (settings.MoveRegistrationWindow_Top != -1) {
-                Top = settings.MoveRegistrationWindow_Top;
+                this.Top = settings.MoveRegistrationWindow_Top;
             }
             if (settings.MoveRegistrationWindow_Width != -1) {
-                Width = settings.MoveRegistrationWindow_Width;
+                this.Width = settings.MoveRegistrationWindow_Width;
             }
             if (settings.MoveRegistrationWindow_Height != -1) {
-                Height = settings.MoveRegistrationWindow_Height;
+                this.Height = settings.MoveRegistrationWindow_Height;
             }
         }
 
@@ -564,10 +564,10 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", actTime, Updater,
             Properties.Settings settings = Properties.Settings.Default;
 
             if (this.WindowState == WindowState.Normal) {
-                settings.MoveRegistrationWindow_Left = Left;
-                settings.MoveRegistrationWindow_Top = Top;
-                settings.MoveRegistrationWindow_Width = Width;
-                settings.MoveRegistrationWindow_Height = Height;
+                settings.MoveRegistrationWindow_Left = this.Left;
+                settings.MoveRegistrationWindow_Top = this.Top;
+                settings.MoveRegistrationWindow_Width = this.Width;
+                settings.MoveRegistrationWindow_Height = this.Height;
                 settings.Save();
             }
         }

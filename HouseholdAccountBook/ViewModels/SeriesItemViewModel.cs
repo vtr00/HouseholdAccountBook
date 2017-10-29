@@ -14,8 +14,8 @@ namespace HouseholdAccountBook.ViewModels
         #region Value
         public int Value
         {
-            get { return _Value; }
-            set { SetProperty(ref _Value, value); }
+            get { return this._Value; }
+            set { SetProperty(ref this._Value, value); }
         }
         private int _Value = default(int);
         #endregion
@@ -26,8 +26,8 @@ namespace HouseholdAccountBook.ViewModels
         #region Number
         public int Number
         {
-            get { return _Number; }
-            set { SetProperty(ref _Number, value); }
+            get { return this._Number; }
+            set { SetProperty(ref this._Number, value); }
         }
         private int _Number = default(int);
         #endregion
@@ -38,8 +38,8 @@ namespace HouseholdAccountBook.ViewModels
         #region ItemId
         public int ItemId
         {
-            get { return _ItemId; }
-            set { SetProperty(ref _ItemId, value); }
+            get { return this._ItemId; }
+            set { SetProperty(ref this._ItemId, value); }
         }
         private int _ItemId = default(int);
         #endregion
@@ -50,8 +50,8 @@ namespace HouseholdAccountBook.ViewModels
         #region CategoryId
         public int CategoryId
         {
-            get { return _CategoryId; }
-            set { SetProperty(ref _CategoryId, value); }
+            get { return this._CategoryId; }
+            set { SetProperty(ref this._CategoryId, value); }
         }
         private int _CategoryId = default(int);
         #endregion

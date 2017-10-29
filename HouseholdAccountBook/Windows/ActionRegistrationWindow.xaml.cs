@@ -145,7 +145,7 @@ WHERE del_flg = 0 AND action_id = @{0};", actionId);
                     itemId = record.ToInt("item_id");
                     actDate = DateTime.Parse(record["act_time"]);
                     actValue = record.ToInt("act_value");
-                    groupId = record.ToNullableInt("group_id");
+                    this.groupId = record.ToNullableInt("group_id");
                     shopName = record["shop_name"];
                     remark = record["remark"];
                     isMatch = record.ToInt("is_match") == 1;
@@ -171,11 +171,11 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
 
             // 回数の表示
             int count = 1;
-            if (groupId != null) {
+            if (this.groupId != null) {
                 using (DaoBase dao = builder.Build()) {
                     DaoReader reader = dao.ExecQuery(@"
 SELECT COUNT(action_id) count FROM hst_action 
-WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_action WHERE action_id = @{1});", groupId, actionId);
+WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_action WHERE action_id = @{1});", this.groupId, actionId);
                     reader.ExecARow((record) => {
                         count = record.ToInt("count");
                     });
@@ -327,7 +327,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
                 new CategoryViewModel() { Id = -1, Name = "(指定なし)" }
             };
             CategoryViewModel selectedCategoryVM = categoryVMList[0];
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT category_id, category_name FROM mst_category C 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM mst_item I WHERE I.category_id = C.category_id AND balance_kind = @{0} AND del_flg = 0 
@@ -354,7 +354,7 @@ ORDER BY sort_order;", (int)this.WVM.SelectedBalanceKind, this.WVM.SelectedBookV
         {
             ObservableCollection<ItemViewModel> itemVMList = new ObservableCollection<ItemViewModel>();
             ItemViewModel selectedItemVM = null;
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader;
                 if (this.WVM.SelectedCategoryVM.Id == -1) {
                     reader = dao.ExecQuery(@"
@@ -393,7 +393,7 @@ ORDER BY sort_order;", this.WVM.SelectedBookVM.Id, (int)this.WVM.SelectedCategor
                     string.Empty
             };
             string selectedShopName = shopName ?? this.WVM.SelectedShopName ?? shopNameVMList[0];
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT shop_name FROM hst_shop 
 WHERE del_flg = 0 AND item_id = @{0} 
@@ -419,7 +419,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
                     string.Empty
             };
             string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0];
-            using (DaoBase dao = builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT remark FROM hst_remark 
 WHERE del_flg = 0 AND item_id = @{0} 
@@ -442,7 +442,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         /// <returns>登録された帳簿項目ID</returns>
         private int? RegisterToDb()
         {
-            if(!WVM.Value.HasValue || WVM.Value <= 0) {
+            if(!this.WVM.Value.HasValue || this.WVM.Value <= 0) {
                 MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return null;
             }
@@ -460,8 +460,8 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
 
             int? resActionId = null;
 
-            using(DaoBase dao = builder.Build()) {
-                if (actionId == null) {
+            using(DaoBase dao = this.builder.Build()) {
+                if (this.actionId == null) {
                     #region 帳簿項目を追加する
                     if (count == 1) { // 繰返し回数が1回(繰返しなし)
                         DaoReader reader = dao.ExecQuery(@"
@@ -508,12 +508,12 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8}
                     #region 帳簿項目を編集する
                     if (count == 1) {
                         #region 繰返し回数が1回
-                        if (groupId == null) {
+                        if (this.groupId == null) {
                             #region グループに属していない
                             dao.ExecNonQuery(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
-WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, actionId);
+WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, this.actionId);
                             #endregion
                         }
                         else {
@@ -523,12 +523,12 @@ WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, i
                                 dao.ExecNonQuery(@"
 UPDATE hst_action
 SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE del_flg = 0 AND group_id = @{1} AND act_time > (SELECT act_time FROM hst_action WHERE action_id = @{2});", Updater, groupId, actionId);
+WHERE del_flg = 0 AND group_id = @{1} AND act_time > (SELECT act_time FROM hst_action WHERE action_id = @{2});", Updater, this.groupId, this.actionId);
 
                                 // グループに属する項目の個数を調べる
                                 DaoReader reader = dao.ExecQuery(@"
 SELECT action_id FROM hst_action
-WHERE del_flg = 0 AND group_id = @{0};", groupId);
+WHERE del_flg = 0 AND group_id = @{0};", this.groupId);
 
                                 if (reader.Count <= 1) {
                                     #region グループに属する項目が1項目以下
@@ -536,13 +536,13 @@ WHERE del_flg = 0 AND group_id = @{0};", groupId);
                                     dao.ExecNonQuery(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = null, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
-WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, actionId);
+WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, this.actionId);
 
                                     // グループを削除する
                                     dao.ExecNonQuery(@"
 UPDATE hst_group
 SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
+WHERE del_flg = 0 AND group_id = @{1};", Updater, this.groupId);
                                     #endregion
                                 }
                                 else {
@@ -551,7 +551,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                                     dao.ExecNonQuery(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
-WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, actionId);
+WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, this.actionId);
                                     #endregion
                                 }
                             });
@@ -565,16 +565,16 @@ WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, i
                             List<int> actionIdList = new List<int>();
 
                             DaoReader reader;
-                            if (groupId == null) {
+                            if (this.groupId == null) {
                                 #region グループIDが未割当て
                                 // グループIDを取得する
                                 reader = dao.ExecQuery(@"
 INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.Repeat, Updater, Inserter);
                                 reader.ExecARow((record) => {
-                                    groupId = record.ToInt("group_id");
+                                    this.groupId = record.ToInt("group_id");
                                 });
-                                actionIdList.Add(actionId.Value);
+                                actionIdList.Add(this.actionId.Value);
                                 #endregion
                             }
                             else {
@@ -583,7 +583,7 @@ VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.
                                 reader = dao.ExecQuery(@"
 SELECT action_id FROM hst_action 
 WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_action WHERE action_id = @{1})
-ORDER BY act_time ASC;", groupId, actionId);
+ORDER BY act_time ASC;", this.groupId, this.actionId);
                                 reader.ExecWholeRow((recCount, record) => {
                                     actionIdList.Add(record.ToInt("action_id"));
                                     return true;
@@ -594,11 +594,11 @@ ORDER BY act_time ASC;", groupId, actionId);
                             DateTime tmpActTime = actTime;
 
                             // この帳簿項目にだけis_matchを反映する
-                            Debug.Assert(actionIdList[0] == actionId);
+                            Debug.Assert(actionIdList[0] == this.actionId);
                             dao.ExecNonQuery(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = @{5}, remark = @{6}, is_match = @{7}, update_time = 'now', updater = @{8}
-WHERE action_id = @{9};", bookId, itemId, tmpActTime, actValue, shopName, groupId, remark, isMatch, Updater, actionId);
+WHERE action_id = @{9};", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, isMatch, Updater, this.actionId);
                             tmpActTime = actTime.AddMonths(1);
 
                             for (int i = 1; i < actionIdList.Count; ++i) {
@@ -608,7 +608,7 @@ WHERE action_id = @{9};", bookId, itemId, tmpActTime, actValue, shopName, groupI
                                         dao.ExecNonQuery(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = @{5}, remark = @{6}, update_time = 'now', updater = @{7}
-WHERE action_id = @{8};", bookId, itemId, tmpActTime, actValue, shopName, groupId, remark, Updater, targetActionId);
+WHERE action_id = @{8};", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, Updater, targetActionId);
                                     }
                                 }
                                 else { // 繰返し回数が帳簿項目数を下回っていた場合に、越えたレコードを削除する
@@ -623,7 +623,7 @@ WHERE action_id = @{1};", Updater, targetActionId);
                             for (int i = actionIdList.Count; i < count; ++i) {
                                 dao.ExecNonQuery(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8});", bookId, itemId, tmpActTime, actValue, shopName, groupId, remark, Updater, Inserter);
+VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8});", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, Updater, Inserter);
 
                                 tmpActTime = actTime.AddMonths(i + 1);
                             }
@@ -631,7 +631,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8}
                         #endregion
                     }
 
-                    resActionId = actionId;
+                    resActionId = this.actionId;
                     #endregion
                 }
 
@@ -692,16 +692,16 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", actTime, Updater,
             Properties.Settings settings = Properties.Settings.Default;
 
             if (settings.ActionRegistrationWindow_Left != -1) {
-                Left = settings.ActionRegistrationWindow_Left;
+                this.Left = settings.ActionRegistrationWindow_Left;
             }
             if (settings.ActionRegistrationWindow_Top != -1) {
-                Top = settings.ActionRegistrationWindow_Top;
+                this.Top = settings.ActionRegistrationWindow_Top;
             }
             if (settings.ActionRegistrationWindow_Width != -1) {
-                Width = settings.ActionRegistrationWindow_Width;
+                this.Width = settings.ActionRegistrationWindow_Width;
             }
             if (settings.ActionRegistrationWindow_Height != -1) {
-                Height = settings.ActionRegistrationWindow_Height;
+                this.Height = settings.ActionRegistrationWindow_Height;
             }
         }
 
@@ -713,10 +713,10 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", actTime, Updater,
             Properties.Settings settings = Properties.Settings.Default;
 
             if (this.WindowState == WindowState.Normal) {
-                settings.ActionRegistrationWindow_Left = Left;
-                settings.ActionRegistrationWindow_Top = Top;
-                settings.ActionRegistrationWindow_Width = Width;
-                settings.ActionRegistrationWindow_Height = Height;
+                settings.ActionRegistrationWindow_Left = this.Left;
+                settings.ActionRegistrationWindow_Top = this.Top;
+                settings.ActionRegistrationWindow_Width = this.Width;
+                settings.ActionRegistrationWindow_Height = this.Height;
                 settings.Save();
             }
         }

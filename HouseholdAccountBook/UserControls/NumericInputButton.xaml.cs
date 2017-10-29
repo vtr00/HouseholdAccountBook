@@ -176,7 +176,7 @@ namespace HouseholdAccountBook.UserControls
         {
             if(this.Command != null) {
                 if (this.Command is RoutedCommand command) {
-                    if (command.CanExecute(CommandParameter, CommandTarget)) {
+                    if (command.CanExecute(this.CommandParameter, this.CommandTarget)) {
                         this.IsEnabled = true;
                     }
                     else {
@@ -184,7 +184,7 @@ namespace HouseholdAccountBook.UserControls
                     }
                 }
                 else {
-                    if (Command.CanExecute(CommandParameter)) {
+                    if (this.Command.CanExecute(this.CommandParameter)) {
                         this.IsEnabled = true;
                     }
                     else {
@@ -203,10 +203,10 @@ namespace HouseholdAccountBook.UserControls
         private void HookUpCommand (ICommand oldCommand, ICommand newCommand)
         {
             if(oldCommand != null) {
-                oldCommand.CanExecuteChanged -= OnCanExecuteChanged;
+                oldCommand.CanExecuteChanged -= this.OnCanExecuteChanged;
             }
             if(newCommand != null) {
-                newCommand.CanExecuteChanged += OnCanExecuteChanged;
+                newCommand.CanExecuteChanged += this.OnCanExecuteChanged;
             }
         }
 
@@ -217,10 +217,10 @@ namespace HouseholdAccountBook.UserControls
         {
             if(this.Command != null) {
                 if(this.Command is RoutedCommand command) {
-                    command.Execute(CommandParameter, CommandTarget);
+                    command.Execute(this.CommandParameter, this.CommandTarget);
                 }
                 else {
-                    this.Command.Execute(CommandParameter);
+                    this.Command.Execute(this.CommandParameter);
                 }
             }
         }
