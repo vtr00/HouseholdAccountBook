@@ -96,7 +96,7 @@
     <Window.CommandBindings>
         <!-- ファイルコマンド -->
         <CommandBinding Command="{x:Static ApplicationCommands.Close}" Executed="CloseWindowCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ImportKichoHugetsuDbCommand}" Executed="ImportKichoHugetsuDbCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ImportKichoHugetsuDbCommand}" CanExecute="ImportKichoHugetsuDbCommand_CanExecute" Executed="ImportKichoHugetsuDbCommand_Executed"/>
         <CommandBinding Command="{StaticResource ImportCustomFileCommand}" CanExecute="ImportCustomFileCommand_CanExecute" Executed="ImportCustomFileCommand_Excuted"/>
         <CommandBinding Command="{StaticResource ExportExcelFileCommand}"/>
         <CommandBinding Command="{StaticResource ExportCustomFileCommand}" CanExecute="ExportCustomFileCommand_CanExecute" Executed="ExportCustomFileCommand_Excuted"/>

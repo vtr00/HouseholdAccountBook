@@ -153,6 +153,7 @@
     <Compile Include="Dao\DaoReader.Record.cs" />
     <Compile Include="Dao\DaoSQLite.ConnectInfo.cs" />
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
+    <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Interfaces\IMultiSelectable.cs" />
     <Compile Include="PropertyName.cs" />
     <Compile Include="UserControls\CustomColumnSeries.cs" />

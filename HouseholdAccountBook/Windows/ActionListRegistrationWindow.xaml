@@ -105,7 +105,8 @@
                         </DataGridTemplateColumn.CellStyle>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ActValue, Converter={StaticResource IntToMoneyDisplayConverter}, TargetNullValue=''}"/>
+                                <TextBlock Text="{Binding ActValue, TargetNullValue=''}" Margin="3,1"
+                                           TextAlignment="Right"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                         <DataGridTemplateColumn.CellEditingTemplate>
