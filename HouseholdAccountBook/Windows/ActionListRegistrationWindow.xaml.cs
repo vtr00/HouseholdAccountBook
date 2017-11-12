@@ -226,7 +226,7 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ActionListRegistrationWindow_Closing(object sender, CancelEventArgs e)
+        private void ActionListRegistrationWindow_Closed(object sender, EventArgs e)
         {
             SaveSetting();
         }

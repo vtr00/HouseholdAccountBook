@@ -6,8 +6,8 @@
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:project="clr-namespace:HouseholdAccountBook"
         mc:Ignorable="d"
-        Title="CSV比較 - Household Account Book" Height="450" Width="600" ShowInTaskbar="False"
-        Closing="CsvComparisonWindow_Closing">
+        Title="CSV比較 - Household Account Book" Height="450" Width="600" ShowInTaskbar="False" WindowStyle="ToolWindow"
+        Closed="CsvComparisonWindow_Closed">
     <Window.DataContext>
         <viewmodels:CsvComparisonWindowViewModel x:Name="WVM"/>
     </Window.DataContext>

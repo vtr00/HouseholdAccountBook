@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         mc:Ignorable="d"
-        Title="初期設定 - Household Account Book" Height="300" Width="400">
+        Title="初期設定 - Household Account Book" Height="300" Width="400" WindowStyle="ToolWindow">
     <Window.DataContext>
         <viewmodels:DbSettingWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
@@ -36,7 +36,7 @@
                         Executed="CancelCommand_Executed"/>
     </Window.CommandBindings>
 
-    <Grid Margin="5">
+    <Grid Margin="5" Background="WhiteSmoke">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>

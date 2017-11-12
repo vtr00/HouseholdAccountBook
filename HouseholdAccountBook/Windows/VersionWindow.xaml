@@ -1,0 +1,45 @@
+﻿<Window x:Class="HouseholdAccountBook.Windows.VersionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="バージョン情報 - Household Account Book" Height="150" Width="400" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize">
+
+    <Window.Resources>
+        <RoutedCommand x:Key="CloseWindowCommand"/>
+    </Window.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource CloseWindowCommand}" 
+                        Executed="CloseWindowCommand_Executed"/>
+    </Window.CommandBindings>
+    
+    <Grid Background="WhiteSmoke" Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Household Account Book" FontSize="18" FontWeight="Bold"/>
+        <TextBlock Grid.Row="0" TextAlignment="Right" VerticalAlignment="Center">
+            Ver.
+            <TextBlock Text="{Binding App_Version, Source={StaticResource Settings}}"/>
+        </TextBlock>
+        
+        <TextBlock Grid.Row="1" Text="Copyright (c) toresebu 2017 All rights reserved." HorizontalAlignment="Right" VerticalAlignment="Center"/>
+
+        <TextBlock Grid.Row="2">
+            サポート: <Hyperlink NavigateUri="http://hp.vector.co.jp/authors/VA043062/" ToolTip="{Binding NavigateUri}" RequestNavigate="Hyperlink_RequestNavigate">http://hp.vector.co.jp/authors/VA043062/</Hyperlink>
+        </TextBlock>
+        
+        <TextBlock Grid.Row="3">
+            Twitter: <Hyperlink NavigateUri="https://twitter.com/toresebu" ToolTip="{Binding NavigateUri}" RequestNavigate="Hyperlink_RequestNavigate">@toresebu</Hyperlink>
+        </TextBlock>
+
+        <Button Grid.Row="4" HorizontalAlignment="Right" Margin="5" Width="100" Content="閉じる" Command="{StaticResource CloseWindowCommand}"/>
+    </Grid>
+</Window>

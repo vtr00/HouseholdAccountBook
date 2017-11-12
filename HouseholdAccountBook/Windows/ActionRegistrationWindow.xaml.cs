@@ -310,7 +310,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ActionRegistrationWindow_Closing(object sender, CancelEventArgs e)
+        private void ActionRegistrationWindow_Closed(object sender, EventArgs e)
         {
             SaveSetting();
         }

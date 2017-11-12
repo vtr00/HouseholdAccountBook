@@ -4,7 +4,6 @@ using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -310,7 +309,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MoveRegistrationWindow_Closing(object sender, CancelEventArgs e)
+        private void MoveRegistrationWindow_Closed(object sender, EventArgs e)
         {
             SaveSetting();
         }

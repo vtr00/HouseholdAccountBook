@@ -2,6 +2,7 @@
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -974,7 +975,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void SettingsWindow_Closing(object sender, CancelEventArgs e)
+        private void SettingsWindow_Closed(object sender, EventArgs e)
         {
             SaveSetting();
         }

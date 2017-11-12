@@ -10,7 +10,7 @@
         xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
         mc:Ignorable="d"
         Title="Hausehold Account Book" Height="700" Width="1050"
-        Closing="MainWindow_Closing">
+        Closed="MainWindow_Closed">
     <Window.DataContext>
         <viewmodels:MainWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
@@ -50,6 +50,9 @@
         <!-- ツールコマンド -->
         <RoutedCommand x:Key="OpenSettingsWindowCommand"/>
         <RoutedCommand x:Key="OpenCsvComparisonWindowCommand"/>
+        
+        <!-- ヘルプコマンド -->
+        <RoutedCommand x:Key="OpenVersionWindowCommand"/>
 
         <!-- スタイル -->
         <Style x:Key="SummaryStyle" TargetType="DataGridRow">
@@ -127,8 +130,11 @@
         <CommandBinding Command="{StaticResource GoToNextYearCommand}" CanExecute="GoToNextYearCommand_CanExecute" Executed="GoToNextYearCommand_Executed"/>
         
         <!-- ツールコマンド -->
-        <CommandBinding Command="{StaticResource OpenSettingsWindowCommand}" Executed="OpenSettingsWindwCommand_Executed"/>
+        <CommandBinding Command="{StaticResource OpenSettingsWindowCommand}" Executed="OpenSettingsWindowCommand_Executed"/>
         <CommandBinding Command="{StaticResource OpenCsvComparisonWindowCommand}" Executed="OpenCsvComparisonWindowCommand_Executed"/>
+        
+        <!-- ヘルプコマンド -->
+        <CommandBinding Command="{StaticResource OpenVersionWindowCommand}" Executed="OpenVersionWindowCommand_Executed"/>
     </Window.CommandBindings>
 
     <Window.InputBindings>
@@ -206,7 +212,7 @@
                 <MenuItem Header="設定(_S)..." Command="{StaticResource OpenSettingsWindowCommand}"/>
             </MenuItem>
             <MenuItem Header="ヘルプ(_H)">
-                <MenuItem Header="バージョン情報(_V)..." InputGestureText="F1" IsEnabled="False"/>
+                <MenuItem Header="バージョン情報(_V)..." Command="{StaticResource OpenVersionWindowCommand}" InputGestureText="F1"/>
             </MenuItem>
         </Menu>
 
@@ -365,10 +371,10 @@
                             <Button Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}}" Width="120"/>
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextMonthCommand}"/>
                             <Button Content="今月" Width="40" Command="{StaticResource GoToThisMonthCommand}"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
                                       SelectionChanged="BookComboBox_SelectionChanged"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
                                       ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"
                                       SelectionChanged="GraphKindComboBox_SelectionChanged"/>
                         </StackPanel>
@@ -485,10 +491,10 @@
                             <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToThisYearConverter}}" Width="120"/>
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
                             <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
                                       SelectionChanged="BookComboBox_SelectionChanged"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
                                       ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"
                                       SelectionChanged="GraphKindComboBox_SelectionChanged"/>
                         </StackPanel>

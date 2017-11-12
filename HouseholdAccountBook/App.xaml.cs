@@ -46,6 +46,8 @@ namespace HouseholdAccountBook
                 return;
             }
 
+            this.Exit += this.Application_Exit;
+
             // DB設定ダイアログ終了時に閉じないように設定する
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 

@@ -228,7 +228,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void CsvComparisonWindow_Closing(object sender, CancelEventArgs e)
+        private void CsvComparisonWindow_Closed(object sender, EventArgs e)
         {
             SaveSetting();
         }

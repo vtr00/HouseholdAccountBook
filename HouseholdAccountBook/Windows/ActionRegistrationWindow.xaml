@@ -6,8 +6,8 @@
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         mc:Ignorable="d"
-        Height="Auto" Width="350" ShowInTaskbar="False"
-        Closing="ActionRegistrationWindow_Closing">
+        Height="Auto" Width="350" ShowInTaskbar="False" WindowStyle="ToolWindow"
+        Closed="ActionRegistrationWindow_Closed">
     <Window.DataContext>
         <viewmodels:ActionRegistrationWindowViewModel x:Name="WVM"/>
     </Window.DataContext>

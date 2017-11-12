@@ -1064,7 +1064,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OpenSettingsWindwCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void OpenSettingsWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             SettingsWindow sw = new SettingsWindow(this.builder);
             if (sw.ShowDialog() == true) {
@@ -1109,6 +1109,19 @@ WHERE action_id = @{0};", vm.ActionId);
             ccw.Show();
         }
         #endregion
+
+        #region ヘルプ
+        /// <summary>
+        /// バージョンウィンドウを開く
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OpenVersionWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            VersionWindow vw = new VersionWindow();
+            vw.ShowDialog();
+        }
+        #endregion
         #endregion
 
         /// <summary>
@@ -1116,7 +1129,7 @@ WHERE action_id = @{0};", vm.ActionId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MainWindow_Closing(object sender, CancelEventArgs e)
+        private void MainWindow_Closed(object sender, EventArgs e)
         {
             SaveSetting();
         }
@@ -2207,11 +2220,16 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             // 0を表示範囲に含める
             if (isDisplayZero && !(minValue < 0 && 0 < maxValue)) {
-                if(Math.Abs(minValue) <= Math.Abs(maxValue)) minValue = 0;
+                if(Math.Abs(minValue - 1) < Math.Abs(maxValue + 1)) minValue = 0;
                 else maxValue = 0;
             }
-            double tmpMin = (minValue == 0 || minValue == 1) ? -1 : minValue - 1;
-            double tmpMax = (maxValue == -1 || maxValue == 0) ? 1 : maxValue + 1;
+
+            // マージンを設ける
+            double tmpMin = minValue * (minValue < 0 ? 1.05 : 0.95);
+            double tmpMax = maxValue * (0 < maxValue ? 1.05 : 0.95);
+            // 0はログが計算できないので近い値に置き換える
+            tmpMin = (tmpMin == 0 || tmpMin == 1) ? -1 : tmpMin - 1;
+            tmpMax = (tmpMax == -1 || tmpMax == 0) ? 1 : tmpMax + 1;
 
             double minDigit = Math.Floor(Math.Log10(Math.Abs(tmpMin))); // 最小値 の桁数
             double maxDigit = Math.Floor(Math.Log10(Math.Abs(tmpMax))); // 最大値 の桁数
@@ -2219,14 +2237,15 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             int minimum = (int)Math.Round(MathExtensions.Floor(tmpMin, Math.Pow(10, diffDigit) * unit)); // 軸の最小値
             int maximum = (int)Math.Round(MathExtensions.Ceiling(tmpMax, Math.Pow(10, diffDigit) * unit)); // 軸の最大値
-            if (minValue == 0) minimum = 0;
-            if (maxValue == 0) maximum = 0;
+            if(!(minValue == 0 && maxValue == 0)) {
+                if (minValue == 0) minimum = 0;
+                if (maxValue == 0) maximum = 0;
+            }
             axis.Minimum = minimum;
             axis.Maximum = maximum;
             int majorStepBase = (int)(Math.Pow(10, diffDigit) * unit);
-            int majorStep = (int)MathExtensions.Ceiling((double)(maximum - minimum) / divNum, majorStepBase);
-            axis.MajorStep = majorStep;
-            axis.MinorStep = majorStep / 5;
+            axis.MajorStep = Math.Max((int)MathExtensions.Ceiling((double)(maximum - minimum) / divNum, majorStepBase), 1);
+            axis.MinorStep = Math.Max(axis.MajorStep / 5, 1);
         }
         #endregion
 
