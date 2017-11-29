@@ -74,7 +74,8 @@ namespace HouseholdAccountBook.Windows
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
             BookViewModel selectedBookVM = null;
             using (DaoBase dao = builder.Build()) {
-                DaoReader reader = dao.ExecQuery("SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE del_flg = 0;");
+                DaoReader reader = dao.ExecQuery(@"
+SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
                 reader.ExecWholeRow((count, record) => {
                     BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                     bookVMList.Add(vm);
@@ -199,7 +200,7 @@ ORDER BY move_flg DESC;", groupId);
                 });
 
                 reader = dao.ExecQuery(@"
-SELECT book_id, book_name FROM mst_book WHERE del_flg = 0;");
+SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
                 reader.ExecWholeRow((count, record) => {
                     BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                     bookVMList.Add(vm);
