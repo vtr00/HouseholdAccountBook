@@ -21,6 +21,7 @@
         <RoutedCommand x:Key="ImportCustomFileCommand"/>
         <RoutedCommand x:Key="ExportExcelFileCommand"/>
         <RoutedCommand x:Key="ExportCustomFileCommand"/>
+        <RoutedCommand x:Key="BackUpCommand"/>
 
         <!-- 編集コマンド -->
         <RoutedCommand x:Key="MoveToBookCommand"/>
@@ -103,6 +104,7 @@
         <CommandBinding Command="{StaticResource ImportCustomFileCommand}" CanExecute="ImportCustomFileCommand_CanExecute" Executed="ImportCustomFileCommand_Excuted"/>
         <CommandBinding Command="{StaticResource ExportExcelFileCommand}"/>
         <CommandBinding Command="{StaticResource ExportCustomFileCommand}" CanExecute="ExportCustomFileCommand_CanExecute" Executed="ExportCustomFileCommand_Excuted"/>
+        <CommandBinding Command="{StaticResource BackUpCommand}" Executed="BackUpCommand_Executed"/>
 
         <!-- 操作コマンド -->
         <CommandBinding Command="{StaticResource MoveToBookCommand}" CanExecute="MoveToBookCommand_CanExecute" Executed="MoveToBookCommand_Executed"/>
@@ -162,6 +164,8 @@
                     <MenuItem Header="カスタム形式ファイルにエクスポート(_S)..." Command="{StaticResource ExportCustomFileCommand}"/>
                     <MenuItem Header="Excelにエクスポート(_E)..." Command="{StaticResource ExportExcelFileCommand}" IsEnabled="False"/>
                 </MenuItem>
+                <Separator/>
+                <MenuItem Header="手動バックアップ(_B)" Command="{StaticResource BackUpCommand}"/>
                 <Separator/>
                 <MenuItem Header="終了(_X)" Command="{x:Static ApplicationCommands.Close}" InputGestureText="Alt+F4"/>
             </MenuItem>

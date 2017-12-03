@@ -63,7 +63,7 @@
       <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="App_ColumnWidth_Value" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">75</Value>
+      <Value Profile="(Default)">70</Value>
     </Setting>
     <Setting Name="MainWindow_SelectedBookId" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">-1</Value>

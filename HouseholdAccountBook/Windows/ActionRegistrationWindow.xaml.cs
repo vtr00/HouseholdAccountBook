@@ -327,6 +327,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
             ObservableCollection<CategoryViewModel> categoryVMList = new ObservableCollection<CategoryViewModel>() {
                 new CategoryViewModel() { Id = -1, Name = "(指定なし)" }
             };
+            int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryVM?.Id ?? categoryVMList[0].Id;
             CategoryViewModel selectedCategoryVM = categoryVMList[0];
             using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
@@ -354,6 +355,7 @@ ORDER BY sort_order;", (int)this.WVM.SelectedBalanceKind, this.WVM.SelectedBookV
         private void UpdateItemList(int? itemId = null)
         {
             ObservableCollection<ItemViewModel> itemVMList = new ObservableCollection<ItemViewModel>();
+            int? tmpItemId = itemId ?? this.WVM.SelectedItemVM?.Id;
             ItemViewModel selectedItemVM = null;
             using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader;
@@ -374,7 +376,7 @@ ORDER BY sort_order;", this.WVM.SelectedBookVM.Id, (int)this.WVM.SelectedCategor
                 reader.ExecWholeRow((count, record) => {
                     ItemViewModel vm = new ItemViewModel() { Id = record.ToInt("item_id"), Name = record["item_name"] };
                     itemVMList.Add(vm);
-                    if (selectedItemVM == null || vm.Id == itemId) {
+                    if (selectedItemVM == null || vm.Id == tmpItemId) {
                         selectedItemVM = vm;
                     }
                     return true;
@@ -391,7 +393,7 @@ ORDER BY sort_order;", this.WVM.SelectedBookVM.Id, (int)this.WVM.SelectedCategor
         private void UpdateShopList(string shopName = null)
         {
             ObservableCollection<string> shopNameVMList = new ObservableCollection<string>() {
-                    string.Empty
+                string.Empty
             };
             string selectedShopName = shopName ?? this.WVM.SelectedShopName ?? shopNameVMList[0];
             using (DaoBase dao = this.builder.Build()) {

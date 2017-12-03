@@ -505,6 +505,24 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 MessageBox.Show(MessageText.FoultToExport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
+        
+        /// <summary>
+        /// 手動バックアップを行う
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BackUpCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Cursor crrCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
+
+            App app = Application.Current as App;
+            app?.CreateBackUpFile(backUpNum: Math.Max(HouseholdAccountBook.Properties.Settings.Default.App_BackUpNum, 1));
+
+            this.Cursor = crrCursor;
+
+            MessageBox.Show(MessageText.FinishToBackUp, MessageTitle.Information);
+        }
         #endregion
 
         #region 編集

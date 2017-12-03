@@ -252,6 +252,10 @@ namespace HouseholdAccountBook.ConstValue
             /// </summary>
             public static string FoultToExport { get; } = "エクスポートに失敗しました。";
             /// <summary>
+            /// バックアップが完了しました。
+            /// </summary>
+            public static string FinishToBackUp { get; } = "バックアップが完了しました。";
+            /// <summary>
             /// 選択した項目を削除しますか？
             /// </summary>
             public static string DeleteNotification { get; } = "選択した項目を削除します。よろしいですか？";
