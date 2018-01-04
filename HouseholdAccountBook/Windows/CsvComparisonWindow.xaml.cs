@@ -70,7 +70,7 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OpenCsvFileCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void OpenCsvFilesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -86,10 +86,14 @@ namespace HouseholdAccountBook.Windows
                 InitialDirectory = directory,
                 FileName = fileName,
                 Title = "ファイル選択",
-                Filter = "CSVファイル|*.csv"
+                Filter = "CSVファイル|*.csv",
+                Multiselect = true
             };
 
             if (ofd.ShowDialog() == false) return;
+
+            Cursor cCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
 
             this.WVM.CsvFileName = Path.GetFileName(ofd.FileName);
 
@@ -102,24 +106,30 @@ namespace HouseholdAccountBook.Windows
                 HasHeaderRecord = true,  MissingFieldFound = (handlerName, index, contexts) => { }
             };
             List<CsvComparisonViewModel> tmpList = new List<CsvComparisonViewModel>();
-            using (CsvReader reader = new CsvReader(new StreamReader(ofd.FileName, Encoding.GetEncoding(932)), config)) { 
-                while (reader.Read()) {
-                    try {
-                        int actDateIndex = this.WVM.SelectedBookVM.ActDateIndex;
-                        int itemNameIndex = this.WVM.SelectedBookVM.ItemNameIndex;
-                        int outgoIndex = this.WVM.SelectedBookVM.OutgoIndex;
+            foreach(string tmpFileName in ofd.FileNames) {
+                using (CsvReader reader = new CsvReader(new StreamReader(tmpFileName, Encoding.GetEncoding(932)), config)) { 
+                    while (reader.Read()) {
+                        try {
+                            int actDateIndex = this.WVM.SelectedBookVM.ActDateIndex;
+                            int itemNameIndex = this.WVM.SelectedBookVM.ItemNameIndex;
+                            int outgoIndex = this.WVM.SelectedBookVM.OutgoIndex;
                         
-                        if(reader.TryGetField<DateTime>(actDateIndex, out DateTime date) && reader.TryGetField<string>(itemNameIndex, out string name) && reader.TryGetField<int>(outgoIndex, out int value)) {
-                            tmpList.Add(new CsvComparisonViewModel() { Record = new CsvComparisonViewModel.CsvRecord() { Date = date, Name = name, Value = value } });
+                            if(reader.TryGetField<DateTime>(actDateIndex, out DateTime date) && reader.TryGetField<string>(itemNameIndex, out string name) && reader.TryGetField<int>(outgoIndex, out int value)) {
+                                tmpList.Add(new CsvComparisonViewModel() { Record = new CsvComparisonViewModel.CsvRecord() { Date = date, Name = name, Value = value } });
+                            }
                         }
+                        catch (Exception) { }
                     }
-                    catch (Exception) { }
                 }
             }
-            this.WVM.CsvComparisonVMList = new ObservableCollection<CsvComparisonViewModel>(tmpList);
+            foreach(CsvComparisonViewModel vm in tmpList) {
+                this.WVM.CsvComparisonVMList.Add(vm);
+            }
             this.csvCompDataGrid.ScrollToTop();
 
             UpdateComparisonInfo();
+
+            this.Cursor = cCursor;
         }
 
         /// <summary>
@@ -206,7 +216,32 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         /// <param name="e"></param>
         private void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Cursor cCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
+
             UpdateComparisonInfo();
+
+            this.Cursor = cCursor;
+        }
+
+        /// <summary>
+        /// リストをクリア可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ClearListCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.WVM.CsvComparisonVMList.Count > 0;
+        }
+
+        /// <summary>
+        /// リストをクリアする
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ClearListCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.WVM.CsvComparisonVMList.Clear();
         }
 
         /// <summary>

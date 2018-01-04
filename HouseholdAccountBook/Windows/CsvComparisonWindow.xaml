@@ -14,7 +14,7 @@
 
     <Window.Resources>
         <!-- ファイルコマンド -->
-        <RoutedCommand x:Key="OpenCsvFileCommand"/>
+        <RoutedCommand x:Key="OpenCsvFilesCommand"/>
 
         <!-- 編集コマンド -->
         <RoutedCommand x:Key="EditActionCommand"/>
@@ -22,6 +22,7 @@
 
         <!-- 表示コマンド -->
         <RoutedCommand x:Key="UpdateCommand"/>
+        <RoutedCommand x:Key="ClearListCommand"/>
         
         <!-- その他コマンド -->
         <RoutedCommand x:Key="ChangeIsMatchCommand"/>
@@ -42,7 +43,7 @@
     <Window.CommandBindings>
         <!-- ファイルコマンド -->
         <CommandBinding Command="{x:Static ApplicationCommands.Close}" Executed="CloseWindowCommand_Executed"/>
-        <CommandBinding Command="{StaticResource OpenCsvFileCommand}" Executed="OpenCsvFileCommand_Executed"/>
+        <CommandBinding Command="{StaticResource OpenCsvFilesCommand}" Executed="OpenCsvFilesCommand_Executed"/>
 
         <!-- 編集コマンド -->
         <CommandBinding Command="{StaticResource EditActionCommand}" CanExecute="EditActionCommand_CanExecute" Executed="EditActionCommand_Executed"/>
@@ -50,6 +51,7 @@
 
         <!-- 表示コマンド -->
         <CommandBinding Command="{StaticResource UpdateCommand}" CanExecute="UpdateCommand_CanExecute" Executed="UpdateCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ClearListCommand}" CanExecute="ClearListCommand_CanExecute" Executed="ClearListCommand_Executed"/>
         
         <!-- その他コマンド -->
         <CommandBinding Command="{StaticResource ChangeIsMatchCommand}" Executed="ChangeIsMatchCommand_Executed"/>
@@ -68,16 +70,19 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="ファイル(_F)">
-                <MenuItem Header="開く(_O)..." Command="{StaticResource OpenCsvFileCommand}" InputGestureText="Ctrl+O"/>
+                <MenuItem Header="開く(_O)..." Command="{StaticResource OpenCsvFilesCommand}" InputGestureText="Ctrl+O"/>
                 <Separator/>
                 <MenuItem Header="閉じる(_X)" Command="{x:Static ApplicationCommands.Close}" InputGestureText="Alt+F4"/>
             </MenuItem>
             <MenuItem Header="編集(_E)">
                 <MenuItem Header="変更(_E)..." Command="{StaticResource EditActionCommand}" InputGestureText="F2"/>
+                <Separator/>
                 <MenuItem Header="一括チェック(_B)" Command="{StaticResource BulkCheckCommand}" InputGestureText="Ctrl+B"/>
             </MenuItem>
             <MenuItem Header="表示(_V)">
                 <MenuItem Header="更新(_U)" Command="{StaticResource UpdateCommand}" InputGestureText="F5"/>
+                <Separator/>
+                <MenuItem Header="リストをクリア(_L)" Command="{StaticResource ClearListCommand}" InputGestureText="Ctrl+L"/>
             </MenuItem>
         </Menu>
 

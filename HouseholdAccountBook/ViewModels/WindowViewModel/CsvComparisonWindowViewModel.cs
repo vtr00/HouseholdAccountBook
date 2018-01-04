@@ -53,7 +53,7 @@ namespace HouseholdAccountBook.ViewModels
             get { return this._CsvComparisonVMList; }
             set { SetProperty(ref this._CsvComparisonVMList, value); }
         }
-        private ObservableCollection<CsvComparisonViewModel> _CsvComparisonVMList = default(ObservableCollection<CsvComparisonViewModel>);
+        private ObservableCollection<CsvComparisonViewModel> _CsvComparisonVMList = new ObservableCollection<CsvComparisonViewModel>();
         #endregion
         /// <summary>
         /// 選択されたCSV比較VM
