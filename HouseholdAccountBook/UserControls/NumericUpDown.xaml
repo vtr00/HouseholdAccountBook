@@ -42,8 +42,7 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Column="0" Height="Auto">
-            <TextBox x:Name="_textBox" Height="Auto" Text="{Binding Value, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:NumericUpDown}}, 
-                     UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" 
+            <TextBox x:Name="_textBox" Height="Auto" Text="{Binding Value, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:NumericUpDown}}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" 
                      TextAlignment="Right" InputMethod.IsInputMethodEnabled="False"
                      PreviewTextInput="TextBox_PreviewTextInput" MouseWheel="TextBox_MouseWheel"
                      GotFocus="TextBox_GotFocus">

@@ -27,17 +27,17 @@ namespace HouseholdAccountBook.ConstValue
             /// </summary>
             BooksTab = 0,
             /// <summary>
-            /// 月間グラフタブ
+            /// 日別グラフタブ
             /// </summary>
-            DailyGraphWithinMonthTab = 1,
+            DailyGraphTab = 1,
             /// <summary>
-            /// 年間一覧タブ
+            /// 月別一覧タブ
             /// </summary>
-            MonthlyListWithinYearTab = 2,
+            MonthlyListTab = 2,
             /// <summary>
-            /// 年間グラフタブ
+            /// 月別グラフタブ
             /// </summary>
-            MonthlyGraphWithinYearTab = 3,
+            MonthlyGraphTab = 3,
         }
 
         /// <summary>
@@ -93,6 +93,21 @@ namespace HouseholdAccountBook.ConstValue
             { BookKind.Uncategorized, "未分類" }, { BookKind.Wallet, "財布" }, { BookKind.BankAccount, "銀行口座" },
             { BookKind.CreditCard, "クレジットカード" }, {BookKind.Stock, "株式" }
         };
+
+        /// <summary>
+        /// 日別区間種別
+        /// </summary>
+        public enum DailyTermKind 
+        {
+            /// <summary>
+            /// 月
+            /// </summary>
+            Monthly,
+            /// <summary>
+            /// 選択
+            /// </summary>
+            Selected,
+        }
 
         /// <summary>
         /// 収支種別

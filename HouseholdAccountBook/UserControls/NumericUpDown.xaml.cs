@@ -14,91 +14,111 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// <see cref="Value"/> 依存関係プロパティを識別します。
         /// </summary>
+        #region ValueProperty
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(
                 PropertyName<NumericUpDown>.Get(x => x.Value),
                 typeof(int?),
                 typeof(NumericUpDown),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
             );
+        #endregion
         /// <summary>
         /// 値
         /// </summary>
+        #region Value
         public int? Value
         {
             get { return (int?)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
         }
+        #endregion
 
         /// <summary>
         /// <see cref="Stride"/> 依存関係プロパティを識別します。
         /// </summary>
+        #region StrideProperty
         public static readonly DependencyProperty StrideProperty = DependencyProperty.Register(
                 PropertyName<NumericUpDown>.Get(x => x.Stride),
                 typeof(int),
                 typeof(NumericUpDown),
                 new PropertyMetadata(1)
             );
+        #endregion
         /// <summary>
         /// 刻み幅
         /// </summary>
+        #region Stride
         public int Stride
         {
             get { return (int)GetValue(StrideProperty); }
             set { SetValue(StrideProperty, value); }
         }
+        #endregion
 
         /// <summary>
         /// <see cref="NullValue"/> 依存関係プロパティを識別します。
         /// </summary>
+        #region NullValueProperty
         public static readonly DependencyProperty NullValueProperty = DependencyProperty.Register(
             PropertyName<NumericUpDown>.Get(x => x.NullValue), 
             typeof(int), 
             typeof(NumericUpDown), 
             new PropertyMetadata(0));
+        #endregion
         /// <summary>
         /// NULL値
         /// </summary>
+        #region NullValue
         public int NullValue
         {
             get { return (int)GetValue(NullValueProperty); }
             set { SetValue(NullValueProperty, value); }
         }
+        #endregion
 
         /// <summary>
         /// <see cref="MaxValue"/> 依存関係プロパティを識別します。
         /// </summary>
+        #region MaxValueProperty
         public static readonly DependencyProperty MaxValueProperty = DependencyProperty.Register(
                 PropertyName<NumericUpDown>.Get(x => x.MaxValue),
                 typeof(int),
                 typeof(NumericUpDown),
                 new PropertyMetadata(int.MaxValue)
             );
+        #endregion
         /// <summary>
         /// 最大値
         /// </summary>
+        #region MaxValue
         public int MaxValue
         {
             get { return (int)GetValue(MaxValueProperty); }
             set { SetValue(MaxValueProperty, value); }
         }
+        #endregion
 
         /// <summary>
         /// <see cref="MinValue"/> 依存関係プロパティを識別します。
         /// </summary>
+        #region MinValueProperty
         public static readonly DependencyProperty MinValueProperty = DependencyProperty.Register(
                 PropertyName<NumericUpDown>.Get(x => x.MinValue),
                 typeof(int),
                 typeof(NumericUpDown),
                 new PropertyMetadata(int.MinValue)
             );
+        #endregion
         /// <summary>
         /// 最小値
         /// </summary>
+        #region MinValue
         public int MinValue
         {
             get { return (int)GetValue(MinValueProperty); }
             set { SetValue(MinValueProperty, value); }
         }
+        #endregion
         #endregion
 
         /// <summary>
@@ -257,7 +277,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            this._popup.IsOpen = true;
+            this.UVM.IsOpen = true;
         }
 
         /// <summary>

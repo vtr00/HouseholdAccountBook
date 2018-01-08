@@ -1,0 +1,62 @@
+﻿<Window x:Class="HouseholdAccountBook.Windows.SelectingDailyTermWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
+        xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
+        mc:Ignorable="d" 
+        Height="150" Width="300" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize"
+        Title="期間選択 - Household Account Book">
+    
+    <Window.DataContext>
+        <viewmodels:SelectingTermWindowViewModel x:Name="WVM"/>
+    </Window.DataContext>
+    
+    <Window.Resources>
+        <RoutedCommand x:Key="OKCommand"/>
+        <RoutedCommand x:Key="CancelCommand"/>
+    </Window.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource OKCommand}" Executed="OKCommand_Executed"/>
+        <CommandBinding Command="{StaticResource CancelCommand}" Executed="CancelCommand_Executed"/>
+    </Window.CommandBindings>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="0.25*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="開始：" VerticalAlignment="Center"/>
+            <controls:DateTimePicker Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" DateFormat="yyyy/MM/dd" 
+                                              SelectedDate="{Binding StartDate}"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="終了：" VerticalAlignment="Center"/>
+            <controls:DateTimePicker Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" DateFormat="yyyy/MM/dd" 
+                                              SelectedDate="{Binding EndDate}"/>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.5*"/>
+                <ColumnDefinition Width="0.5*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Margin="5" Content="OK" Command="{StaticResource OKCommand}"/>
+            <Button Grid.Column="1" Margin="5" Content="キャンセル" Command="{StaticResource CancelCommand}"/>
+
+        </Grid>
+    </Grid>
+</Window>

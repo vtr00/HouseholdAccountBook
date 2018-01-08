@@ -41,6 +41,10 @@ namespace HouseholdAccountBook
         {
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
 
+#if DEBUG
+            Debug.Listeners.Add(new ConsoleTraceListener());
+#endif
+
 #if !DEBUG
             // 多重起動を抑止する
             App.mutex = new Mutex(false, this.GetType().Assembly.GetName().Name);

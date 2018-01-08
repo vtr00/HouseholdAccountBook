@@ -7,7 +7,7 @@
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         xmlns:project="clr-namespace:HouseholdAccountBook"
         mc:Ignorable="d"
-        Title="まとめて追加" Height="Auto" Width="350" ShowInTaskbar="False" WindowStyle="ToolWindow"
+        Title="リスト追加" Height="Auto" Width="350" ShowInTaskbar="False" WindowStyle="ToolWindow"
         Closed="ActionListRegistrationWindow_Closed">
 
     <Window.Resources>
