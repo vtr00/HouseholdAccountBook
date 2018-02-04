@@ -29,10 +29,17 @@ namespace HouseholdAccountBook.Dao
         /// <returns>接続結果</returns>
         private bool Open()
         {
-            this.connection.Open();
-            while (this.connection.State == System.Data.ConnectionState.Connecting) { ; }
+            try
+            {
+                this.connection.Open();
+                while (this.connection.State == System.Data.ConnectionState.Connecting) {; }
 
-            return this.connection.State == System.Data.ConnectionState.Open;
+                return this.connection.State == System.Data.ConnectionState.Open;
+            }
+            catch (System.Net.Sockets.SocketException)
+            {
+                return false;
+            }
         }
 
         /// <summary>

@@ -49,6 +49,7 @@ namespace HouseholdAccountBook
             // 多重起動を抑止する
             App.mutex = new Mutex(false, this.GetType().Assembly.GetName().Name);
             if (!mutex.WaitOne(TimeSpan.Zero, false)) {
+                MessageBox.Show("同時に複数起動することはできません。");
                 this.Shutdown();
                 return;
             }
@@ -82,22 +83,25 @@ namespace HouseholdAccountBook
                 settings.Save();
             }
 
-            // 接続設定を読み込む
-            this.connectInfo = new DaoNpgsql.ConnectInfo() {
-                Host = settings.App_Postgres_Host,
-                Port = settings.App_Postgres_Port,
-                UserName = settings.App_Postgres_UserName,
-                Password = settings.App_Postgres_Password,
+            DaoBuilder builder = null;
+            while (true)
+            {
+                // 接続設定を読み込む
+                this.connectInfo = new DaoNpgsql.ConnectInfo()
+                {
+                    Host = settings.App_Postgres_Host,
+                    Port = settings.App_Postgres_Port,
+                    UserName = settings.App_Postgres_UserName,
+                    Password = settings.App_Postgres_Password,
 #if DEBUG
-                DatabaseName = settings.App_Postgres_DatabaseName_Debug,
+                    DatabaseName = settings.App_Postgres_DatabaseName_Debug,
 #else
-                DatabaseName = settings.App_Postgres_DatabaseName,
+                    DatabaseName = settings.App_Postgres_DatabaseName,
 #endif
-                Role = settings.App_Postgres_Role
-            };
+                    Role = settings.App_Postgres_Role
+                };
+                builder = new DaoBuilder(this.connectInfo);
 
-            DaoBuilder builder = new DaoBuilder(this.connectInfo);
-            while (true) {
                 // 接続を試行する
                 bool isOpen = false;
                 using (DaoBase dao = builder.Build()) {
@@ -149,10 +153,19 @@ namespace HouseholdAccountBook
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void Application_Exit(object sender, ExitEventArgs e) {
+            ReleaseMutex();
+        }
+
+        /// <summary>
+        /// 多重起動防止用のMutexを開放する
+        /// </summary>
+        public void ReleaseMutex()
+        {
 #if !DEBUG
             if (mutex != null) {
                 mutex.ReleaseMutex();
                 mutex.Close();
+                mutex = null;
             }
 #endif
         }

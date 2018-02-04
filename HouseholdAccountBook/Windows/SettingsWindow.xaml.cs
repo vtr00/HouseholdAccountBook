@@ -931,6 +931,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 Properties.Settings.Default.App_InitFlag = true;
                 Properties.Settings.Default.Save();
 
+                ((App)Application.Current).ReleaseMutex();
                 Process.Start(Application.ResourceAssembly.Location);
                 Application.Current.Shutdown();
             }
