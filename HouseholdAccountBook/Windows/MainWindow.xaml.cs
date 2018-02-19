@@ -928,6 +928,8 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 case DailyTermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
                     UpdateBookTabData(true);
+
+                    InitializeDailyGraphTabData();
                     UpdateDailyGraphTabData();
                     break;
             }
@@ -960,6 +962,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
 
             this.WVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
             UpdateBookTabData(true);
+
             InitializeDailyGraphTabData();
             UpdateDailyGraphTabData();
 
@@ -991,6 +994,8 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 case DailyTermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
                     UpdateBookTabData(true);
+
+                    InitializeDailyGraphTabData();
                     UpdateDailyGraphTabData();
                     break;
             }
@@ -1015,6 +1020,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 this.WVM.EndDate = stw.WVM.EndDate;
                 
                 UpdateBookTabData(true);
+
                 InitializeDailyGraphTabData();
                 UpdateDailyGraphTabData();
 
@@ -1674,7 +1680,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             }
 
             // 最初以外の日の分を取得する
-            int days = (endTime - startTime).Days;
+            int days = (endTime - startTime.AddDays(-1)).Days;
             for (int i = 1; i < days; ++i) {
                 tmpStartTime = tmpStartTime.AddDays(1);
                 tmpEndTime = tmpStartTime.AddDays(1).AddMilliseconds(-1);

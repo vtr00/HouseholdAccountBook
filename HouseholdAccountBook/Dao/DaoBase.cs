@@ -36,6 +36,10 @@ namespace HouseholdAccountBook.Dao
 
                 return this.connection.State == System.Data.ConnectionState.Open;
             }
+            catch (Npgsql.PostgresException)
+            {
+                return false;
+            }
             catch (System.Net.Sockets.SocketException)
             {
                 return false;
