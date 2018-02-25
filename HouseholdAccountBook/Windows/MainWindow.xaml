@@ -10,7 +10,7 @@
         xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
         mc:Ignorable="d"
         Title="Hausehold Account Book" Height="700" Width="1050"
-        Closed="MainWindow_Closed">
+        Closed="MainWindow_Closed" StateChanged="MainWindow_StateChanegd">
     
     <Window.DataContext>
         <viewmodels:MainWindowViewModel x:Name="WVM"/>
@@ -185,34 +185,34 @@
                 <MenuItem Header="帳簿(_B)">
                     <MenuItem Header="切替(_I)" Command="{StaticResource IndicateBookTabCommand}"/>
                     <Separator/>
-                    <MenuItem Header="先月(_L)" Command="{StaticResource GoToLastMonthCommand}" InputGestureText="Ctrl+←"/>
-                    <MenuItem Header="今月(_T)" Command="{StaticResource GoToThisMonthCommand}" InputGestureText="Ctrl+↓"/>
-                    <MenuItem Header="来月(_N)" Command="{StaticResource GoToNextMonthCommand}" InputGestureText="Ctrl+→"/>
+                    <MenuItem Header="先月(_L)" Command="{StaticResource GoToLastMonthCommand}" InputGestureText="Alt+←"/>
+                    <MenuItem Header="今月(_T)" Command="{StaticResource GoToThisMonthCommand}" InputGestureText="Alt+↓"/>
+                    <MenuItem Header="来月(_N)" Command="{StaticResource GoToNextMonthCommand}" InputGestureText="Alt+→"/>
                     <Separator/>
                     <MenuItem Header="期間指定...(_S)" Command="{StaticResource OpenSelectingDailyTermWindowCommand}"/>
                 </MenuItem>
                 <MenuItem Header="日別グラフ(_G)">
                     <MenuItem Header="切替(_I)" Command="{StaticResource IndicateDailyGraphTabCommand}"/>
                     <Separator/>
-                    <MenuItem Header="先月(_L)" Command="{StaticResource GoToLastMonthCommand}" InputGestureText="Ctrl+←"/>
-                    <MenuItem Header="今月(_T)" Command="{StaticResource GoToThisMonthCommand}" InputGestureText="Ctrl+↓"/>
-                    <MenuItem Header="来月(_N)" Command="{StaticResource GoToNextMonthCommand}" InputGestureText="Ctrl+→"/>
+                    <MenuItem Header="先月(_L)" Command="{StaticResource GoToLastMonthCommand}" InputGestureText="Alt+←"/>
+                    <MenuItem Header="今月(_T)" Command="{StaticResource GoToThisMonthCommand}" InputGestureText="Alt+↓"/>
+                    <MenuItem Header="来月(_N)" Command="{StaticResource GoToNextMonthCommand}" InputGestureText="Alt+→"/>
                     <Separator/>
                     <MenuItem Header="期間指定...(_S)" Command="{StaticResource OpenSelectingDailyTermWindowCommand}"/>
                 </MenuItem>
                 <MenuItem Header="月別一覧(_L)">
                     <MenuItem Header="切替(_I)" Command="{StaticResource IndicateMonthlyListTabCommand}"/>
                     <Separator/>
-                    <MenuItem Header="去年(_L)" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Ctrl+←"/>
-                    <MenuItem Header="今年(_T)" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Ctrl+↓"/>
-                    <MenuItem Header="来年(_N)" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Ctrl+→"/>
+                    <MenuItem Header="去年(_L)" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                    <MenuItem Header="今年(_T)" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                    <MenuItem Header="来年(_N)" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Alt+→"/>
                 </MenuItem>
                 <MenuItem Header="月別グラフ(_G)">
                     <MenuItem Header="切替(_I)" Command="{StaticResource IndicateMonthlyGraphTabCommand}"/>
                     <Separator/>
-                    <MenuItem Header="去年(_L)" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Ctrl+←"/>
-                    <MenuItem Header="今年(_T)" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Ctrl+↓"/>
-                    <MenuItem Header="来年(_N)" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Ctrl+→"/>
+                    <MenuItem Header="去年(_L)" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                    <MenuItem Header="今年(_T)" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                    <MenuItem Header="来年(_N)" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Alt+→"/>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="更新(_U)" Command="{StaticResource UpdateCommand}" InputGestureText="F5"/>
@@ -353,7 +353,7 @@
                     </Grid>
 
                     <!-- ステータスバー -->
-                    <StatusBar Grid.Row="2" Grid.Column="0">
+                    <StatusBar Grid.Row="2" Grid.Column="0" Background="White">
                         <StatusBarItem>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <TextBlock>
@@ -370,6 +370,13 @@
                 </Grid>
             </TabItem>
             <TabItem Header="日別&#10;グラフ">
+                <TabItem.InputBindings>
+                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Up" Command="{StaticResource IndicateMonthlyGraphTabCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisMonthCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastMonthCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextMonthCommand}"/>
+                </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -403,7 +410,6 @@
                         <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemDailyGraphModel}" Controller="{Binding Controller}"/>
                     </Grid>
                 </Grid>
-                
             </TabItem>
             <TabItem Header="月別&#10;一覧">
                 <TabItem.InputBindings>
@@ -491,6 +497,12 @@
                 </Grid>
             </TabItem>
             <TabItem Header="月別&#10;グラフ">
+                <TabItem.InputBindings>
+                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextYearCommand}"/>
+                </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>

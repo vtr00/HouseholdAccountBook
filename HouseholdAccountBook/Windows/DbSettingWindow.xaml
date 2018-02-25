@@ -36,7 +36,7 @@
                         Executed="CancelCommand_Executed"/>
     </Window.CommandBindings>
 
-    <Grid Margin="5" Background="WhiteSmoke">
+    <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>

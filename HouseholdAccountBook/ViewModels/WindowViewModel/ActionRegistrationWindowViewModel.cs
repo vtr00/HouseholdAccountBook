@@ -275,7 +275,24 @@ namespace HouseholdAccountBook.ViewModels
         }
         private bool _IsLink = default(bool);
         #endregion
-        
+        /// <summary>
+        /// 休日設定種別辞書
+        /// </summary>
+        #region HolidaySettingKindDic
+        public Dictionary<HolidaySettingKind, string> HolidaySettingKindDic { get; } = HolidaySettingKindStr;
+        #endregion
+        /// <summary>
+        /// 選択された祝別設定種別
+        /// </summary>
+        #region SelectedHolidaySettingKind
+        public HolidaySettingKind SelectedHolidaySettingKind
+        {
+            get { return this._SelectedHolidaySettingKind; }
+            set { SetProperty(ref this._SelectedHolidaySettingKind, value); }
+        }
+        private HolidaySettingKind _SelectedHolidaySettingKind = HolidaySettingKind.Nothing;
+        #endregion
+
         /// <summary>
         /// 一致フラグ
         /// </summary>

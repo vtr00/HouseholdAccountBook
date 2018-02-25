@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Dao;
+using HouseholdAccountBook.Extentions;
 using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
 using System;
@@ -453,15 +454,33 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
             BalanceKind balanceKind = this.WVM.SelectedBalanceKind; // 収支種別
             int bookId = this.WVM.SelectedBookVM.Id.Value; // 帳簿ID
             int itemId = this.WVM.SelectedItemVM.Id; // 帳簿項目ID
-            DateTime actTime = this.WVM.SelectedDate; // 日付
+            DateTime actTime = this.WVM.SelectedDate; // 入力日付
             int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * this.WVM.Value.Value; // 値
             string shopName = this.WVM.SelectedShopName; // 店舗名
             string remark = this.WVM.SelectedRemark; // 備考
             int count = this.WVM.Count; // 繰返し回数
             bool isLink = this.WVM.IsLink;
             int isMatch = this.WVM.IsMatch == true ? 1 : 0;
+            HolidaySettingKind holidaySettingKind = this.WVM.SelectedHolidaySettingKind;
 
             int? resActionId = null;
+
+            // 休日設定を考慮した日付を取得する関数
+            Func<DateTime, DateTime> getDateTimeWithHolidaySettingKind = (tmpDateTime) => {
+                switch (holidaySettingKind) {
+                    case HolidaySettingKind.BeforeHoliday:
+                        while (tmpDateTime.IsHoliday()) {
+                            tmpDateTime = tmpDateTime.AddDays(-1);
+                        }
+                        break;
+                    case HolidaySettingKind.AfterHoliday:
+                        while (tmpDateTime.IsHoliday()) {
+                            tmpDateTime = tmpDateTime.AddDays(1);
+                        }
+                        break;
+                }
+                return tmpDateTime;
+            };
 
             using(DaoBase dao = this.builder.Build()) {
                 if (this.actionId == null) {
@@ -487,7 +506,7 @@ VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.
                                 tmpGroupId = record.ToInt("group_id");
                             });
 
-                            DateTime tmpActTime = actTime;
+                            DateTime tmpActTime = getDateTimeWithHolidaySettingKind(actTime); // 登録日付
                             for (int i = 0; i < count; ++i) {
                                 reader = dao.ExecQuery(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
@@ -501,7 +520,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8}
                                     });
                                 }
 
-                                tmpActTime = actTime.AddMonths(i + 1);
+                                tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(i + 1));
                             }
                         });
                     }
@@ -594,7 +613,7 @@ ORDER BY act_time ASC;", this.groupId, this.actionId);
                                 #endregion
                             }
 
-                            DateTime tmpActTime = actTime;
+                            DateTime tmpActTime = getDateTimeWithHolidaySettingKind(actTime);
 
                             // この帳簿項目にだけis_matchを反映する
                             Debug.Assert(actionIdList[0] == this.actionId);
@@ -602,11 +621,14 @@ ORDER BY act_time ASC;", this.groupId, this.actionId);
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = @{5}, remark = @{6}, is_match = @{7}, update_time = 'now', updater = @{8}
 WHERE action_id = @{9};", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, isMatch, Updater, this.actionId);
-                            tmpActTime = actTime.AddMonths(1);
 
                             for (int i = 1; i < actionIdList.Count; ++i) {
+                                tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(1));
+
                                 int targetActionId = actionIdList[i];
+
                                 if (i < count) { // 繰返し回数の範囲内のレコードを更新する
+                                    // 連動して編集時のみ変更する
                                     if (isLink) {
                                         dao.ExecNonQuery(@"
 UPDATE hst_action
@@ -620,15 +642,15 @@ UPDATE hst_action
 SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE action_id = @{1};", Updater, targetActionId);
                                 }
-                                tmpActTime = actTime.AddMonths(i + 1);
                             }
+
                             // 繰返し回数が帳簿項目数を越えていた場合に、新規レコードを追加する
                             for (int i = actionIdList.Count; i < count; ++i) {
+                                tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(i + 1));
+
                                 dao.ExecNonQuery(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8});", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, Updater, Inserter);
-
-                                tmpActTime = actTime.AddMonths(i + 1);
                             }
                         });
                         #endregion

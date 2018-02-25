@@ -515,7 +515,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             this.Cursor = Cursors.Wait;
 
             App app = Application.Current as App;
-            app?.CreateBackUpFile(backUpNum: Math.Max(HouseholdAccountBook.Properties.Settings.Default.App_BackUpNum, 1));
+            app?.CreateBackUpFile();
 
             this.Cursor = crrCursor;
 
@@ -1200,6 +1200,19 @@ WHERE action_id = @{0};", vm.ActionId);
         }
 
         /// <summary>
+        /// ウィンドウ状態変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainWindow_StateChanegd(object sender, EventArgs e)
+        {
+            if (this.WindowState == WindowState.Minimized) {
+                App app = Application.Current as App;
+                app?.CreateBackUpFile();
+            }
+        }
+
+        /// <summary>
         /// 選択中のタブを変更した時
         /// </summary>
         /// <param name="sender"></param>
@@ -1303,6 +1316,7 @@ ORDER BY sort_order;");
             this.WVM.SelectedBookVM = selectedBookVM;
         }
 
+        #region VM取得
         /// <summary>
         /// 月内帳簿項目VMリストを取得する
         /// </summary>
@@ -1847,6 +1861,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             return vmList;
         }
+        #endregion
 
         #region 帳簿タブ更新用の関数
         /// <summary>

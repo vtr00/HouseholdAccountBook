@@ -135,6 +135,31 @@ namespace HouseholdAccountBook.ConstValue
         };
 
         /// <summary>
+        /// 休日設定種別
+        /// </summary>
+        public enum HolidaySettingKind
+        {
+            /// <summary>
+            /// なし
+            /// </summary>
+            Nothing,
+            /// <summary>
+            /// 休日前
+            /// </summary>
+            BeforeHoliday,
+            /// <summary>
+            /// 休日後
+            /// </summary>
+            AfterHoliday,
+        }
+        /// <summary>
+        /// 休日設定種別文字列
+        /// </summary>
+        public static Dictionary<HolidaySettingKind, string> HolidaySettingKindStr { get; } = new Dictionary<HolidaySettingKind, string>() {
+            { HolidaySettingKind.Nothing, "なし" }, { HolidaySettingKind.BeforeHoliday, "休日前" }, { HolidaySettingKind.AfterHoliday, "休日後" }
+        };
+
+        /// <summary>
         /// グループ種別
         /// </summary>
         public enum GroupKind 
@@ -185,7 +210,7 @@ namespace HouseholdAccountBook.ConstValue
             Balance = 1
         }
         /// <summary>
-        /// グループ種別文字列
+        /// グラフ種別文字列
         /// </summary>
         public static Dictionary<GraphKind, string> GraphKindStr { get; } = new Dictionary<GraphKind, string>() {
             { GraphKind.IncomeAndOutgo, "収支グラフ" }, { GraphKind.Balance, "残高グラフ" }

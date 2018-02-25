@@ -54,5 +54,25 @@ namespace HouseholdAccountBook.Extentions
             DateTime ans = new DateTime(dateTime.Year, dateTime.Month, day);
             return ans;
         }
+
+        /// <summary>
+        /// 休日かどうかを取得する
+        /// </summary>
+        /// <param name="dateTime">対象の日付</param>
+        /// <returns>休日かどうか</returns>
+        public static bool IsHoliday(this DateTime dateTime)
+        {
+            bool ans = false;
+            switch (dateTime.DayOfWeek) {
+                case DayOfWeek.Saturday:
+                case DayOfWeek.Sunday:
+                    ans = true;
+                    break;
+                default:
+                    ans = false; //TODO: 祝日対応
+                    break;
+            }
+            return ans;
+        }
     }
 }
