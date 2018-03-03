@@ -52,19 +52,42 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
         
         /// <summary>
-        /// 選択された日時
+        /// 日付(移動元)
         /// </summary>
-        #region SelectedDate
-        public DateTime SelectedDate
+        #region MovedDate
+        public DateTime MovedDate
         {
-            get { return this._SelectedDate; }
+            get { return this._MovedDate; }
             set {
-                if (SetProperty(ref this._SelectedDate, value)) {
+                if (SetProperty(ref this._MovedDate, value)) {
                     CommandManager.InvalidateRequerySuggested();
+
+                    if(this.MovingDate < value) {
+                        this.MovingDate = value;
+                    }
                 }
             }
         }
-        private DateTime _SelectedDate = default(DateTime);
+        private DateTime _MovedDate = DateTime.Today;
+        #endregion
+        /// <summary>
+        /// 日付(移動先)
+        /// </summary>
+        #region MovingDate
+        public DateTime MovingDate
+        {
+            get { return this._MovingDate; }
+            set {
+                if (SetProperty(ref this._MovingDate, value)) {
+                    CommandManager.InvalidateRequerySuggested();
+
+                    if (value < this.MovedDate) {
+                        this.MovedDate = value;
+                    }
+                }
+            }
+        }
+        private DateTime _MovingDate = DateTime.Today;
         #endregion
 
         /// <summary>
@@ -81,12 +104,12 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 選択された移動元帳簿VM
         /// </summary>
-        #region SelectedFromBookVM
-        public BookViewModel SelectedFromBookVM
+        #region MovedBookVM
+        public BookViewModel MovedBookVM
         {
-            get { return this._SelectedFromBookVM; }
+            get { return this._MovedBookVM; }
             set {
-                if (SetProperty(ref this._SelectedFromBookVM, value)) {
+                if (SetProperty(ref this._MovedBookVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
                         FromBookChanged?.Invoke();
@@ -95,17 +118,17 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private BookViewModel _SelectedFromBookVM = default(BookViewModel);
+        private BookViewModel _MovedBookVM = default(BookViewModel);
         #endregion
         /// <summary>
         /// 選択された移動先帳簿VM
         /// </summary>
-        #region SelectedToBookVM
-        public BookViewModel SelectedToBookVM
+        #region MovingBookVM
+        public BookViewModel MovingBookVM
         {
-            get { return this._SelectedToBookVM; }
+            get { return this._MovingBookVM; }
             set {
-                if (SetProperty(ref this._SelectedToBookVM, value)) {
+                if (SetProperty(ref this._MovingBookVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
                         ToBookChanged?.Invoke();
@@ -114,7 +137,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private BookViewModel _SelectedToBookVM = default(BookViewModel);
+        private BookViewModel _MovingBookVM = default(BookViewModel);
         #endregion
 
         /// <summary>

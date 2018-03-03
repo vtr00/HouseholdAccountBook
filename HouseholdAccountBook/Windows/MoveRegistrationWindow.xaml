@@ -22,11 +22,9 @@
 
     <Window.CommandBindings>
         <CommandBinding Command="{StaticResource TodayCommand}"
-                        CanExecute="TodayCommand_CanExecute"
-                        Executed="TodayCommand_Executed"/>
+                        CanExecute="TodayCommand_CanExecute" Executed="TodayCommand_Executed"/>
         <CommandBinding Command="{StaticResource RegisterCommand}" 
-                        CanExecute="RegisterCommand_CanExecute"
-                        Executed="RegisterCommand_Executed"/>
+                        CanExecute="RegisterCommand_CanExecute" Executed="RegisterCommand_Executed"/>
         <CommandBinding Command="{StaticResource CancelCommand}" 
                         Executed="CancelCommand_Executed"/>
     </Window.CommandBindings>
@@ -40,13 +38,13 @@
         <Style TargetType="Window">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding RegMode}" Value="Add">
-                    <Setter Property="Title" Value="移動(追加)"/>
+                    <Setter Property="Title" Value="移動 - 追加"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding RegMode}" Value="Edit">
-                    <Setter Property="Title" Value="移動(編集)"/>
+                    <Setter Property="Title" Value="移動 - 編集"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding RegMode}" Value="Copy">
-                    <Setter Property="Title" Value="移動(追加)"/>
+                    <Setter Property="Title" Value="移動 - 追加"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -65,6 +63,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="1.0*"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -77,37 +76,38 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
-                       Text="日付" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <controls:DateTimePicker Grid.Row="0" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
-                        DateFormat="yyyy/MM/dd" SelectedDate="{Binding SelectedDate}"/>
-            <Button Grid.Row="0" Grid.Column="3" Margin="5" Content="今日" Command="{StaticResource TodayCommand}"/>
-            <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                        Text="移動元" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"  Grid.ColumnSpan="3"
-                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedFromBookVM}" DisplayMemberPath="Name"/>
+            <ComboBox Grid.Row="0" Grid.Column="1" Margin="5"  Grid.ColumnSpan="3"
+                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding MovedBookVM}" DisplayMemberPath="Name"/>
+            <controls:DateTimePicker Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
+                        DateFormat="yyyy/MM/dd" SelectedDate="{Binding MovedDate}"/>
+            <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="今日" Command="{StaticResource TodayCommand}" CommandParameter="1"/>
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                        Text="移動先" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="2" Grid.Column="1" Margin="5"  Grid.ColumnSpan="3"
-                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedToBookVM}" DisplayMemberPath="Name"/>
-            <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
+                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding MovingBookVM}" DisplayMemberPath="Name"/>
+            <controls:DateTimePicker Grid.Row="3" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
+                        DateFormat="yyyy/MM/dd" SelectedDate="{Binding MovingDate}"/>
+            <Button Grid.Row="3" Grid.Column="3" Margin="5" Content="今日" Command="{StaticResource TodayCommand}" CommandParameter="2"/>
+            <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                        Text="金額" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" 
+            <controls:NumericUpDown Grid.Row="4" Grid.Column="1" Margin="5" 
                        Value="{Binding Value, TargetNullValue=''}" MinValue="1"/>
-            <TextBlock Grid.Row="4" Grid.Column="0" Margin="5"
+            <TextBlock Grid.Row="5" Grid.Column="0" Margin="5"
                        Text="手数料負担" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ListBox Grid.Row="4" Grid.Column="1" Margin="5" Grid.ColumnSpan="3"
+            <ListBox Grid.Row="5" Grid.Column="1" Margin="5" Grid.ColumnSpan="3"
                      ItemsSource="{Binding CommissionKindDic}" SelectedValue="{Binding SelectedCommissionKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
-            <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
-                       Text="手数料項目" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ListBox Grid.Row="5" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" 
-                     ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="Name"/>
             <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" 
-                       Text="手数料" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <controls:NumericUpDown Grid.Row="6" Grid.Column="1" Margin="5" 
-                                    Value="{Binding Commission, TargetNullValue=''}" MinValue="0"/>
+                       Text="手数料項目" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <ListBox Grid.Row="6" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" 
+                     ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="Name"/>
             <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
+                       Text="手数料" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <controls:NumericUpDown Grid.Row="7" Grid.Column="1" Margin="5" 
+                                    Value="{Binding Commission, TargetNullValue=''}" MinValue="0"/>
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="5" 
                        Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="7" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" IsEditable="True"
+            <ComboBox Grid.Row="8" Grid.Column="1" Margin="5" Grid.ColumnSpan="3" IsEditable="True"
                       ItemsSource="{Binding RemarkList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
 

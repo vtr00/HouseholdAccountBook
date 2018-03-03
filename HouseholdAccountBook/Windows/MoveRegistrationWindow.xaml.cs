@@ -93,9 +93,10 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
             }
 
             this.WVM.BookVMList = bookVMList;
-            this.WVM.SelectedDate = selectedDateTime != null ? (payDay != null ? selectedDateTime.Value.GetDateInMonth(payDay.Value) : selectedDateTime.Value) : DateTime.Today;
-            this.WVM.SelectedFromBookVM = debitBookId != null ? bookVMList.FirstOrDefault((vm)=> { return vm.Id == debitBookId; }) : selectedBookVM;
-            this.WVM.SelectedToBookVM = selectedBookVM;
+            this.WVM.MovedDate = selectedDateTime != null ? (payDay != null ? selectedDateTime.Value.GetDateInMonth(payDay.Value) : selectedDateTime.Value) : DateTime.Today;
+            this.WVM.MovedBookVM = debitBookId != null ? bookVMList.FirstOrDefault((vm)=> { return vm.Id == debitBookId; }) : selectedBookVM;
+            this.WVM.MovingDate = selectedDateTime != null ? (payDay != null ? selectedDateTime.Value.GetDateInMonth(payDay.Value) : selectedDateTime.Value) : DateTime.Today;
+            this.WVM.MovingBookVM = selectedBookVM;
             this.WVM.SelectedCommissionKind = CommissionKind.FromBook;
 
             UpdateItemList();
@@ -147,16 +148,18 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
             }
 
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
-            int fromBookId = -1;
-            BookViewModel selectedFromBookVM = null;
-            int toBookId = -1;
-            BookViewModel selectedToBookVM = null;
-            DateTime actDate = DateTime.Now;
+            int movedBookId = -1;
+            BookViewModel movedBookVM = null;
+            int movingBookId = -1;
+            BookViewModel movingBookVM = null;
+            DateTime movedDate = DateTime.Now;
+            DateTime movingDate = DateTime.Now;
             int moveValue = -1;
             CommissionKind commissionKind = CommissionKind.FromBook;
             int? commissionItemId = null;
             int commissionValue = 0;
             string commissionRemark = null;
+
             using (DaoBase dao = builder.Build()) {
                 DaoReader reader = dao.ExecQuery(@"
 SELECT A.book_id, A.action_id, A.item_id, A.act_time, A.act_value, A.remark, I.move_flg
@@ -164,31 +167,34 @@ FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
 WHERE A.del_flg = 0 AND A.group_id = @{0}
 ORDER BY move_flg DESC;", groupId);
+
                 reader.ExecWholeRow((count, record) => {
                     int bookId = record.ToInt("book_id");
+                    DateTime dateTime = DateTime.Parse(record["act_time"]);
                     int actionId = record.ToInt("action_id");
                     int itemId = record.ToInt("item_id");
-                    actDate = DateTime.Parse(record["act_time"]);
                     int actValue = record.ToInt("act_value");
                     int moveFlg = record.ToInt("move_flg");
                     string remark = record["remark"];
                     
                     if (moveFlg == 1) {
                         if(actValue < 0) {
-                            fromBookId = bookId;
+                            movedBookId = bookId;
+                            movedDate = dateTime;
                             this.fromActionId = actionId;
                         }
                         else {
-                            toBookId = bookId;
+                            movingBookId = bookId;
+                            movingDate = dateTime;
                             this.toActionId = actionId;
                             moveValue = actValue;
                         }
                     }
                     else {
-                        if (bookId == fromBookId) { // 移動元負担
+                        if (bookId == movedBookId) { // 移動元負担
                             commissionKind = CommissionKind.FromBook;
                         }
-                        else if (bookId == toBookId) { // 移動先負担
+                        else if (bookId == movingBookId) { // 移動先負担
                             commissionKind = CommissionKind.ToBook;
                         }
                         this.commissionActionId = actionId;
@@ -204,19 +210,20 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
                 reader.ExecWholeRow((count, record) => {
                     BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                     bookVMList.Add(vm);
-                    if (selectedFromBookVM == null || fromBookId == vm.Id) {
-                        selectedFromBookVM = vm;
+                    if (movedBookVM == null || movedBookId == vm.Id) {
+                        movedBookVM = vm;
                     }
-                    if (selectedToBookVM == null || toBookId == vm.Id) {
-                        selectedToBookVM = vm;
+                    if (movingBookVM == null || movingBookId == vm.Id) {
+                        movingBookVM = vm;
                     }
                     return true;
                 });
             }
-            this.WVM.SelectedDate = actDate;
+            this.WVM.MovedDate = movedDate;
+            this.WVM.MovingDate = movingDate;
             this.WVM.BookVMList = bookVMList;
-            this.WVM.SelectedFromBookVM = selectedFromBookVM;
-            this.WVM.SelectedToBookVM = selectedToBookVM;
+            this.WVM.MovedBookVM = movedBookVM;
+            this.WVM.MovingBookVM = movingBookVM;
             this.WVM.Value = moveValue;
             this.WVM.SelectedCommissionKind = commissionKind;
             this.WVM.Commission = commissionValue;
@@ -254,7 +261,12 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         /// <param name="e"></param>
         private void TodayCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.SelectedDate != DateTime.Today;
+            if ((string)e.Parameter == "1") {
+                e.CanExecute = this.WVM.MovedDate != DateTime.Today;
+            }
+            else {
+                e.CanExecute = this.WVM.MovingDate != DateTime.Today;
+            }
         }
 
         /// <summary>
@@ -264,7 +276,12 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         /// <param name="e"></param>
         private void TodayCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WVM.SelectedDate = DateTime.Today;
+            if ((string)e.Parameter == "1") {
+                this.WVM.MovedDate = DateTime.Today;
+            }
+            else {
+                this.WVM.MovingDate = DateTime.Today;
+            }
         }
 
         /// <summary>
@@ -329,10 +346,10 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
                 int bookId = -1;
                 switch (this.WVM.SelectedCommissionKind) {
                     case CommissionKind.FromBook:
-                        bookId = this.WVM.SelectedFromBookVM.Id.Value;
+                        bookId = this.WVM.MovedBookVM.Id.Value;
                         break;
                     case CommissionKind.ToBook:
-                        bookId = this.WVM.SelectedToBookVM.Id.Value;
+                        bookId = this.WVM.MovingBookVM.Id.Value;
                         break;
                 }
                 DaoReader reader = dao.ExecQuery(@"
@@ -387,7 +404,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         /// <returns>登録された帳簿項目ID</returns>
         private int? RegisterToDb()
         {
-            if(this.WVM.SelectedFromBookVM == this.WVM.SelectedToBookVM) {
+            if(this.WVM.MovedBookVM == this.WVM.MovingBookVM) {
                 MessageBox.Show(this, MessageText.IllegalSameBook, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return null;
             }
@@ -396,9 +413,10 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
                 return null;
             }
 
-            DateTime actTime = this.WVM.SelectedDate;
-            int fromBookId = this.WVM.SelectedFromBookVM.Id.Value;
-            int toBookId = this.WVM.SelectedToBookVM.Id.Value;
+            DateTime movedTime = this.WVM.MovedDate;
+            DateTime movingTime = this.WVM.MovingDate;
+            int movedBookId = this.WVM.MovedBookVM.Id.Value;
+            int movingBookId = this.WVM.MovingBookVM.Id.Value;
             int actValue = this.WVM.Value.Value;
             CommissionKind commissionKind = this.WVM.SelectedCommissionKind;
             int commissionItemId = this.WVM.SelectedItemVM.Id;
@@ -428,8 +446,8 @@ VALUES (@{0}, (
   INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @{6}) C ON C.category_id = I.category_id
   WHERE move_flg = 1
 ), @{1}, @{2}, @{3}, 0, 'now', @{4}, 'now', @{5}) RETURNING action_id;",
-                            fromBookId, actTime, - actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Outgo);
-                        if(this.selectedBookId == fromBookId) {
+                            movedBookId, movedTime, - actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Outgo);
+                        if(this.selectedBookId == movedBookId) {
                             reader.ExecARow((record) => {
                                 resActionId = record.ToInt("action_id");
                             });
@@ -443,8 +461,8 @@ VALUES (@{0}, (
   INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @{6}) C ON C.category_id = I.category_id
   WHERE move_flg = 1
 ), @{1}, @{2}, @{3}, 0, 'now', @{4}, 'now', @{5}) RETURNING action_id;",
-                            toBookId, actTime, actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Income);
-                        if (this.selectedBookId == toBookId) {
+                            movingBookId, movingTime, actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Income);
+                        if (this.selectedBookId == movingBookId) {
                             reader.ExecARow((record) => {
                                 resActionId = record.ToInt("action_id");
                             });
@@ -458,8 +476,8 @@ VALUES (@{0}, (
 -- 移動元
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
-WHERE action_id = @{4};", fromBookId, actTime, - actValue, Updater, this.fromActionId);
-                        if(this.selectedBookId == fromBookId) {
+WHERE action_id = @{4};", movedBookId, movedTime, - actValue, Updater, this.fromActionId);
+                        if(this.selectedBookId == movedBookId) {
                             resActionId = this.fromActionId;
                         }
 
@@ -467,8 +485,8 @@ WHERE action_id = @{4};", fromBookId, actTime, - actValue, Updater, this.fromAct
 -- 移動先
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
-WHERE action_id = @{4};", toBookId, actTime, actValue, Updater, this.toActionId);
-                        if(this.selectedBookId == toBookId) {
+WHERE action_id = @{4};", movingBookId, movingTime, actValue, Updater, this.toActionId);
+                        if(this.selectedBookId == movingBookId) {
                             resActionId = this.toActionId;
                         }
                         #endregion
@@ -477,12 +495,15 @@ WHERE action_id = @{4};", toBookId, actTime, actValue, Updater, this.toActionId)
                     if (commission != 0) {
                         #region 手数料あり
                         int bookId = -1;
+                        DateTime actTime = DateTime.Now;
                         switch (commissionKind) {
                             case CommissionKind.FromBook:
-                                bookId = fromBookId;
+                                bookId = movedBookId;
+                                actTime = movedTime;
                                 break;
                             case CommissionKind.ToBook:
-                                bookId = toBookId;
+                                bookId = movingBookId;
+                                actTime = movingTime;
                                 break;
                         }
                         if (this.commissionActionId != null) {
@@ -519,13 +540,13 @@ WHERE item_id = @{0} AND remark = @{1};", commissionItemId, remark);
                     if (reader.Count == 0) {
                         dao.ExecNonQuery(@"
 INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, 0, @{2}, 0, 'now', @{3}, 'now', @{4});", commissionItemId, remark, actTime, Updater, Inserter);
+VALUES (@{0}, @{1}, 0, @{2}, 0, 'now', @{3}, 'now', @{4});", commissionItemId, remark, movedTime > movingTime ? movedTime : movingTime, Updater, Inserter);
                     }
                     else {
                         dao.ExecNonQuery(@"
 UPDATE hst_remark
 SET used_time = @{0}, del_flg = 0, update_time = 'now', updater = @{1}
-WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", actTime, Updater, commissionItemId, remark);
+WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", movedTime > movingTime ? movedTime : movingTime, Updater, commissionItemId, remark);
                     }
                     #endregion
                 }
