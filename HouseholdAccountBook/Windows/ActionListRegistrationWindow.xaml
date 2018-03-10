@@ -76,10 +76,10 @@
                        Text="日付/金額" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <DataGrid Grid.Row="4" Grid.Column="1" Margin="5"
                       ItemsSource="{Binding DateValueVMList}" 
-                      CanUserAddRows="True" CanUserDeleteRows="True" CanUserResizeRows="False"
+                      CanUserAddRows="True" CanUserDeleteRows="True" CanUserResizeRows="False" SelectionMode="Single"
                       AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
                       HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo"
-                      AddingNewItem="DataGrid_AddingNewItem">
+                      AddingNewItem="DataGrid_AddingNewItem" SelectionChanged="DataGrid_SelectionChanged" >
                 <DataGrid.Resources>
                     <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
                 </DataGrid.Resources>
@@ -87,7 +87,7 @@
                     <controls:DataGridEditableTemplateColumn Header="日付" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ActDate, StringFormat=\{0:yyyy\/MM\/dd\}}"/>
+                                <TextBlock Margin="4,3,4,5" Text="{Binding ActDate, StringFormat=\{0:yyyy\/MM\/dd\}}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                         <DataGridTemplateColumn.CellEditingTemplate>

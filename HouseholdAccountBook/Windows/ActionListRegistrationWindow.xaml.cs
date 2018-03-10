@@ -250,6 +250,36 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         }
         
         /// <summary>
+        /// 日付金額リスト選択変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DataGrid dataGrid = sender as DataGrid;
+            
+            if(dataGrid.SelectedIndex != -1) {
+                dataGrid.BeginEdit();
+            }
+        }
+
+        /// <summary>
+        /// 金額列セルフォーカス取得時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DataGridCell_GotFocus(object sender, RoutedEventArgs e)
+        {
+            DataGridCell dataGridCell = sender as DataGridCell;
+            
+            // 新しいセルに移動していたら数値入力ボタンを非表示にする
+            if (dataGridCell != this.lastDataGridCell) {
+                this.WVM.IsEditing = false;
+            }
+            this.lastDataGridCell = dataGridCell;
+        }
+        
+        /// <summary>
         /// 入力された値を表示前にチェックする
         /// </summary>
         /// <param name="sender"></param>
@@ -295,22 +325,6 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
                 this.WVM.IsEditing = true;
             }
             e.Handled = true;
-        }
-
-        /// <summary>
-        /// 選択された金額列のセルを記録する
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DataGridCell_GotFocus(object sender, RoutedEventArgs e)
-        {
-            DataGridCell dataGridCell = sender as DataGridCell;
-            
-            // 新しいセルに移動していたら数値入力ボタンを非表示にする
-            if (dataGridCell != this.lastDataGridCell) {
-                this.WVM.IsEditing = false;
-            }
-            this.lastDataGridCell = dataGridCell;
         }
         #endregion
 
