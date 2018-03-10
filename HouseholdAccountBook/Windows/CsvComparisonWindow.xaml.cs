@@ -66,7 +66,17 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// CSVファイルを開く
+        /// CSVファイルオープン可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OpenCsvFilesCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.WVM.SelectedBookVM.ActDateIndex.HasValue && this.WVM.SelectedBookVM.ItemNameIndex.HasValue && this.WVM.SelectedBookVM.OutgoIndex.HasValue;
+        }
+
+        /// <summary>
+        /// CSVファイルオープン処理
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -101,20 +111,21 @@ namespace HouseholdAccountBook.Windows
             settings.App_CsvFilePath = ofd.FileName;
             settings.Save();
 
+            int? actDateIndex = this.WVM.SelectedBookVM.ActDateIndex;
+            int? itemNameIndex = this.WVM.SelectedBookVM.ItemNameIndex;
+            int? outgoIndex = this.WVM.SelectedBookVM.OutgoIndex;
+            
             // CSVファイルをマッピングする
-            Configuration config = new Configuration() {
-                HasHeaderRecord = true,  MissingFieldFound = (handlerName, index, contexts) => { }
+            Configuration csvConfig = new Configuration() {
+                HasHeaderRecord = true,
+                MissingFieldFound = (handlerNames, index, contexts) => { }
             };
             List<CsvComparisonViewModel> tmpList = new List<CsvComparisonViewModel>();
-            foreach(string tmpFileName in ofd.FileNames) {
-                using (CsvReader reader = new CsvReader(new StreamReader(tmpFileName, Encoding.GetEncoding(932)), config)) { 
+            foreach (string tmpFileName in ofd.FileNames) {
+                using (CsvReader reader = new CsvReader(new StreamReader(tmpFileName, Encoding.GetEncoding(932)), csvConfig)) {
                     while (reader.Read()) {
                         try {
-                            int actDateIndex = this.WVM.SelectedBookVM.ActDateIndex;
-                            int itemNameIndex = this.WVM.SelectedBookVM.ItemNameIndex;
-                            int outgoIndex = this.WVM.SelectedBookVM.OutgoIndex;
-                        
-                            if(reader.TryGetField<DateTime>(actDateIndex, out DateTime date) && reader.TryGetField<string>(itemNameIndex, out string name) && reader.TryGetField<int>(outgoIndex, out int value)) {
+                            if (reader.TryGetField<DateTime>(actDateIndex.Value, out DateTime date) && reader.TryGetField<string>(itemNameIndex.Value, out string name) && reader.TryGetField<int>(outgoIndex.Value, out int value)) {
                                 tmpList.Add(new CsvComparisonViewModel() { Record = new CsvComparisonViewModel.CsvRecord() { Date = date, Name = name, Value = value } });
                             }
                         }
@@ -122,7 +133,7 @@ namespace HouseholdAccountBook.Windows
                     }
                 }
             }
-            foreach(CsvComparisonViewModel vm in tmpList) {
+            foreach (CsvComparisonViewModel vm in tmpList) {
                 this.WVM.CsvComparisonVMList.Add(vm);
             }
             this.csvCompDataGrid.ScrollToTop();
@@ -206,7 +217,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         /// <param name="e"></param>
         private void UpdateCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.CsvFileName != default(string) && this.WVM.SelectedBookVM != null;
+            e.CanExecute = this.WVM.CsvFileName != default(string) && this.WVM.SelectedBookVM != null && this.WVM.CsvComparisonVMList.Count != 0;
         }
 
         /// <summary>
@@ -242,6 +253,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         private void ClearListCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.WVM.CsvComparisonVMList.Clear();
+            this.WVM.CsvFileName = default(string);
         }
 
         /// <summary>
@@ -308,9 +320,9 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
                     BookComparisonViewModel vm = new BookComparisonViewModel() {
                         Id = record.ToInt("book_id"),
                         Name = record["book_name"],
-                        ActDateIndex = record.ToNullableInt("csv_act_time_index") ?? 0,
-                        OutgoIndex = record.ToNullableInt("csv_outgo_index") ?? 0,
-                        ItemNameIndex = record.ToNullableInt("csv_item_name_index") ?? 0
+                        ActDateIndex = record.ToNullableInt("csv_act_time_index"),
+                        OutgoIndex = record.ToNullableInt("csv_outgo_index"),
+                        ItemNameIndex = record.ToNullableInt("csv_item_name_index")
                     };
                     bookCompVMList.Add(vm);
 

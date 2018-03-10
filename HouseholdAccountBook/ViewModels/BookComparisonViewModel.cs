@@ -19,17 +19,17 @@
         /// <summary>
         /// 日付インデックス
         /// </summary>
-        public int ActDateIndex { get; set; }
+        public int? ActDateIndex { get; set; }
 
         /// <summary>
         /// 支出インデックス
         /// </summary>
-        public int OutgoIndex { get; set; }
+        public int? OutgoIndex { get; set; }
 
         /// <summary>
         /// 項目名インデックス
         /// </summary>
-        public int ItemNameIndex { get; set; }
+        public int? ItemNameIndex { get; set; }
         #endregion
     }
 }

@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.ViewModels
             get { return this._SelectedBookVM; }
             set { SetProperty(ref this._SelectedBookVM, value); }
         }
-        private BookComparisonViewModel _SelectedBookVM;
+        private BookComparisonViewModel _SelectedBookVM = new BookComparisonViewModel() { };
         #endregion
 
         /// <summary>

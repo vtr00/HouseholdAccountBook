@@ -6,7 +6,7 @@
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:project="clr-namespace:HouseholdAccountBook"
         mc:Ignorable="d"
-        Title="CSV比較 - Household Account Book" Height="450" Width="600" ShowInTaskbar="False" WindowStyle="ToolWindow"
+        Title="CSV比較 - Household Account Book" Height="450" Width="600" WindowStyle="ToolWindow"
         Closed="CsvComparisonWindow_Closed">
     <Window.DataContext>
         <viewmodels:CsvComparisonWindowViewModel x:Name="WVM"/>
@@ -43,7 +43,7 @@
     <Window.CommandBindings>
         <!-- ファイルコマンド -->
         <CommandBinding Command="{x:Static ApplicationCommands.Close}" Executed="CloseWindowCommand_Executed"/>
-        <CommandBinding Command="{StaticResource OpenCsvFilesCommand}" Executed="OpenCsvFilesCommand_Executed"/>
+        <CommandBinding Command="{StaticResource OpenCsvFilesCommand}" CanExecute="OpenCsvFilesCommandCanExecute" Executed="OpenCsvFilesCommand_Executed"/>
 
         <!-- 編集コマンド -->
         <CommandBinding Command="{StaticResource EditActionCommand}" CanExecute="EditActionCommand_CanExecute" Executed="EditActionCommand_Executed"/>
@@ -95,18 +95,19 @@
             <Grid Grid.Row="0" VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Margin="5" Width="100" Content="一括チェック" Command="{StaticResource BulkCheckCommand}"/>
-                <TextBlock Grid.Column="2" Margin="5" VerticalAlignment="Center" Text="帳簿："/>
-                <ComboBox Grid.Column="3" HorizontalAlignment="Stretch" Margin="5" MinWidth="100"
+                <TextBlock Grid.Column="0" Margin="5" VerticalAlignment="Center" Text="帳簿："/>
+                <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" Margin="5" MinWidth="100"
                           ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
-                <Button Grid.Column="4" Margin="5" Width="50" Content="更新" Command="{StaticResource UpdateCommand}"/>
+                <Button Grid.Column="2" Margin="5" Width="75" Content="開く" Command="{StaticResource OpenCsvFilesCommand}"/>
+                <Button Grid.Column="3" Margin="5" Width="75" Content="一括チェック" Command="{StaticResource BulkCheckCommand}"/>
+                <Button Grid.Column="5" Margin="5" Width="75" Content="表示更新" Command="{StaticResource UpdateCommand}"/>
             </Grid>
 
             <DataGrid x:Name="csvCompDataGrid" Grid.Row="1"
@@ -162,11 +163,11 @@
                 CSVファイル：
                 <TextBlock Text="{Binding CsvFileName, TargetNullValue='--'}"/>
                 日付：
-                <TextBlock Text="{Binding SelectedBookVM.ActDateIndex}"/> 列目
+                <TextBlock Text="{Binding SelectedBookVM.ActDateIndex, TargetNullValue='--'}"/> 列目
                 支出：
-                <TextBlock Text="{Binding SelectedBookVM.OutgoIndex}"/> 列目
+                <TextBlock Text="{Binding SelectedBookVM.OutgoIndex, TargetNullValue='--'}"/> 列目
                 項目名：
-                <TextBlock Text="{Binding SelectedBookVM.ItemNameIndex}"/> 列目
+                <TextBlock Text="{Binding SelectedBookVM.ItemNameIndex, TargetNullValue='--'}"/> 列目
             </TextBlock>
         </StatusBar>
     </Grid>
