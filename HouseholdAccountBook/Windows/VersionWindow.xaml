@@ -19,7 +19,7 @@
                         Executed="CloseWindowCommand_Executed"/>
     </Window.CommandBindings>
     
-    <Grid Background="WhiteSmoke" Margin="5">
+    <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>

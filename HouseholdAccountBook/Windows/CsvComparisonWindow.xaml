@@ -88,29 +88,11 @@
 
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0" VerticalAlignment="Center">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Column="0" Margin="5" VerticalAlignment="Center" Text="帳簿："/>
-                <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" Margin="5" MinWidth="100"
-                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
-                <Button Grid.Column="2" Margin="5" Width="75" Content="開く" Command="{StaticResource OpenCsvFilesCommand}"/>
-                <Button Grid.Column="3" Margin="5" Width="75" Content="一括チェック" Command="{StaticResource BulkCheckCommand}"/>
-                <Button Grid.Column="5" Margin="5" Width="75" Content="表示更新" Command="{StaticResource UpdateCommand}"/>
-            </Grid>
-
-            <DataGrid x:Name="csvCompDataGrid" Grid.Row="1"
+            <DataGrid x:Name="csvCompDataGrid" Grid.Row="0"
                     ItemsSource="{Binding CsvComparisonVMList}" SelectedItem="{Binding SelectedCsvComparisonVM}" SelectionUnit="FullRow" IsReadOnly="True"
                     CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="3"
                     AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
@@ -156,6 +138,24 @@
                     <DataGridTextColumn Header="備考" Binding="{Binding Remark}"/>
                 </DataGrid.Columns>
             </DataGrid>
+
+            <Grid Grid.Row="1" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Margin="5" VerticalAlignment="Center" Text="帳簿："/>
+                <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" Margin="5" MinWidth="100"
+                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
+                <Button Grid.Column="2" Margin="5" Width="75" Content="開く" Command="{StaticResource OpenCsvFilesCommand}"/>
+                <Button Grid.Column="3" Margin="5" Width="75" Content="一括チェック" Command="{StaticResource BulkCheckCommand}"/>
+                <Button Grid.Column="5" Margin="5" Width="75" Content="表示更新" Command="{StaticResource UpdateCommand}"/>
+            </Grid>
         </Grid>
 
         <StatusBar Grid.Row="2">

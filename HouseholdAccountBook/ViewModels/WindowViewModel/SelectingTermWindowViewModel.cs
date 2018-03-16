@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.ViewModels
             get { return this._StartDate; }
             set { SetProperty(ref this._StartDate, value); }
         }
-        private DateTime _StartDate = default(DateTime);
+        private DateTime _StartDate = DateTime.Now;
         #endregion
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace HouseholdAccountBook.ViewModels
             get { return this._EndDate; }
             set { SetProperty(ref this._EndDate, value); }
         }
-        private DateTime _EndDate = default(DateTime);
+        private DateTime _EndDate = DateTime.Now;
         #endregion
     }
 }

@@ -29,19 +29,16 @@ namespace HouseholdAccountBook.Dao
         /// <returns>接続結果</returns>
         private bool Open()
         {
-            try
-            {
+            try {
                 this.connection.Open();
                 while (this.connection.State == System.Data.ConnectionState.Connecting) {; }
 
                 return this.connection.State == System.Data.ConnectionState.Open;
             }
-            catch (Npgsql.PostgresException)
-            {
+            catch (Npgsql.PostgresException) {
                 return false;
             }
-            catch (System.Net.Sockets.SocketException)
-            {
+            catch (System.Net.Sockets.SocketException) {
                 return false;
             }
         }

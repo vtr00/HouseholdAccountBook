@@ -6,7 +6,7 @@
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         mc:Ignorable="d" 
-        Height="150" Width="300" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize"
+        Height="130" Width="300" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize"
         Title="期間選択 - Household Account Book">
     
     <Window.DataContext>

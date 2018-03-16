@@ -96,7 +96,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private DateTime _SelectedDate = default(DateTime);
+        private DateTime _SelectedDate = DateTime.Now;
         #endregion
 
         /// <summary>

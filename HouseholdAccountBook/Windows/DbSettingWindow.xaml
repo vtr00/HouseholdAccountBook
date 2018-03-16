@@ -71,7 +71,7 @@
             <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding Port}" 
                      PreviewTextInput="TextBox_PreviewTextInput"/>
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="ユーザ名" Margin="1" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="ユーザ名" Margin="5" VerticalAlignment="Center"/>
             <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding UserName}"/>
 
             <TextBlock Grid.Row="3" Grid.Column="0" Text="パスワード" Margin="5" VerticalAlignment="Center"/>
