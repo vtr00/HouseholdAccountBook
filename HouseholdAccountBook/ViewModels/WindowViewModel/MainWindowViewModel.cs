@@ -208,6 +208,18 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
         
         /// <summary>
+        /// 最後に操作した帳簿項目の日付
+        /// </summary>
+        #region ActDateLastEdited
+        public DateTime? ActDateLastEdited
+        {
+            get { return this._ActDateLastEdited; }
+            set { SetProperty(ref this._ActDateLastEdited, value); }
+        }
+        private DateTime? _ActDateLastEdited = null;
+        #endregion
+
+        /// <summary>
         /// 平均値
         /// </summary>
         #region AverageValue

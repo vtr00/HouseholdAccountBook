@@ -144,6 +144,7 @@
 
     <Window.InputBindings>
         <KeyBinding Gesture="Alt+F4" Command="{x:Static ApplicationCommands.Close}"/>
+        <KeyBinding Gesture="F1" Command="{StaticResource OpenVersionWindowCommand}"/>
     </Window.InputBindings>
     
     <Grid Background="WhiteSmoke">
@@ -354,17 +355,21 @@
 
                     <!-- ステータスバー -->
                     <StatusBar Grid.Row="2" Grid.Column="0" Background="White">
-                        <StatusBarItem>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <TextBlock>
-                                    データの個数： 
-                                    <TextBlock Text="{Binding Amount, TargetNullValue='--'}"/>
-                                    平均： 
-                                    <TextBlock Text="{Binding AverageValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
-                                    合計： 
-                                    <TextBlock Text="{Binding SumValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
-                                </TextBlock>
-                            </StackPanel>
+                        <StatusBarItem HorizontalAlignment="Right">
+                            <TextBlock>
+                                最後に操作した帳簿項目: 
+                                <TextBlock Text="{Binding ActDateLastEdited, TargetNullValue='----/--/--', StringFormat='yyyy/MM/dd'}"/>
+                            </TextBlock>
+                        </StatusBarItem>
+                        <StatusBarItem HorizontalAlignment="Right">
+                            <TextBlock>
+                                平均: 
+                                <TextBlock Text="{Binding AverageValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/><TextBlock Text="  "/>
+                                データの個数: 
+                                <TextBlock Text="{Binding Amount, TargetNullValue='--'}"/><TextBlock Text="  "/>
+                                合計: 
+                                <TextBlock Text="{Binding SumValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
+                            </TextBlock>
                         </StatusBarItem>
                     </StatusBar>
                 </Grid>

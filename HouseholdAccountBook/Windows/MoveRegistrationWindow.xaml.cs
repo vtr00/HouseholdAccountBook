@@ -301,6 +301,15 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         /// <param name="e"></param>
         private void RegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            if (this.WVM.MovedBookVM == this.WVM.MovingBookVM) {
+                MessageBox.Show(this, MessageText.IllegalSameBook, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return;
+            }
+            if (!this.WVM.Value.HasValue && this.WVM.Value <= 0) {
+                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return;
+            }
+            
             // DB登録
             int? id = RegisterToDb();
 
@@ -404,15 +413,6 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         /// <returns>登録された帳簿項目ID</returns>
         private int? RegisterToDb()
         {
-            if(this.WVM.MovedBookVM == this.WVM.MovingBookVM) {
-                MessageBox.Show(this, MessageText.IllegalSameBook, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return null;
-            }
-            if(!this.WVM.Value.HasValue && this.WVM.Value <= 0) {
-                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return null;
-            }
-
             DateTime movedTime = this.WVM.MovedDate;
             DateTime movingTime = this.WVM.MovingDate;
             int movedBookId = this.WVM.MovedBookVM.Id.Value;

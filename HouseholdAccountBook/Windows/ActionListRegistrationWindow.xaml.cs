@@ -131,6 +131,11 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         /// <param name="e"></param>
         private void RegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            if (this.WVM.DateValueVMList.Count < 1) {
+                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return;
+            }
+
             // DB登録
             int? id = RegisterToDb();
 
@@ -458,11 +463,6 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         /// <returns>登録された帳簿項目ID</returns>
         private int? RegisterToDb()
         {
-            if(this.WVM.DateValueVMList.Count < 1) {
-                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return null;
-            }
-
             BalanceKind balanceKind = this.WVM.SelectedBalanceKind; // 収支種別
             int bookId = this.WVM.SelectedBookVM.Id.Value; // 帳簿ID
             int itemId = this.WVM.SelectedItemVM.Id; // 帳簿項目ID

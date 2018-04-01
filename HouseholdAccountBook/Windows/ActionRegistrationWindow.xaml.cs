@@ -257,6 +257,11 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
         /// <param name="e"></param>
         private void ContinueToRegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            if (!this.WVM.Value.HasValue || this.WVM.Value <= 0) {
+                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return;
+            }
+            
             // DB登録
             int? id = RegisterToDb();
 
@@ -285,6 +290,11 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
         /// <param name="e"></param>
         private void RegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            if (!this.WVM.Value.HasValue || this.WVM.Value <= 0) {
+                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return;
+            }
+
             // DB登録
             int? id = RegisterToDb();
 
@@ -446,11 +456,6 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         /// <returns>登録された帳簿項目ID</returns>
         private int? RegisterToDb()
         {
-            if(!this.WVM.Value.HasValue || this.WVM.Value <= 0) {
-                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return null;
-            }
-
             BalanceKind balanceKind = this.WVM.SelectedBalanceKind; // 収支種別
             int bookId = this.WVM.SelectedBookVM.Id.Value; // 帳簿ID
             int itemId = this.WVM.SelectedItemVM.Id; // 帳簿項目ID
@@ -622,9 +627,8 @@ UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = @{5}, remark = @{6}, is_match = @{7}, update_time = 'now', updater = @{8}
 WHERE action_id = @{9};", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, isMatch, Updater, this.actionId);
 
+                            tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(1));
                             for (int i = 1; i < actionIdList.Count; ++i) {
-                                tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(1));
-
                                 int targetActionId = actionIdList[i];
 
                                 if (i < count) { // 繰返し回数の範囲内のレコードを更新する
@@ -642,15 +646,17 @@ UPDATE hst_action
 SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE action_id = @{1};", Updater, targetActionId);
                                 }
+
+                                tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(i + 1));
                             }
 
                             // 繰返し回数が帳簿項目数を越えていた場合に、新規レコードを追加する
                             for (int i = actionIdList.Count; i < count; ++i) {
-                                tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(i + 1));
-
                                 dao.ExecNonQuery(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8});", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, Updater, Inserter);
+
+                                tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(i + 1));
                             }
                         });
                         #endregion

@@ -51,7 +51,7 @@ namespace HouseholdAccountBook.Windows
             UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
 
             // 日別データ更新
-            UpdateBookTabData(true);
+            UpdateBookTabData(isScroll: true, isUpdateActDateLastEdited: true);
             InitializeDailyGraphTabData();
             UpdateDailyGraphTabData();
 
@@ -304,7 +304,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
             if (isOpen) {
                 UpdateBookList();
-                UpdateBookTabData(true);
+                UpdateBookTabData(isScroll: true, isUpdateActDateLastEdited: true);
                 UpdateDailyGraphTabData();
                 UpdateMonthlyListTabData();
                 UpdateMonthlyGraphTabData();
@@ -409,7 +409,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             if (process.ExitCode == 0) {
                 // 画面を更新する
                 UpdateBookList();
-                UpdateBookTabData(true);
+                UpdateBookTabData(isScroll: true, isUpdateActDateLastEdited: true);
                 UpdateDailyGraphTabData();
                 UpdateMonthlyListTabData();
                 UpdateMonthlyGraphTabData();
@@ -547,7 +547,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             // 登録時イベントを登録する
             mrw.Registrated += (sender2, e2) => {
                 // 帳簿一覧タブを更新する
-                UpdateBookTabData(e2.Value);
+                UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
@@ -578,7 +578,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             // 登録時イベントを登録する
             arw.Registrated += (sender2, e2)=> {
                 // 帳簿一覧タブを更新する
-                UpdateBookTabData(e2.Value);
+                UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
@@ -609,7 +609,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             // 登録時イベントを登録する
             alrw.Registrated += (sender2, e2) => {
                 // 帳簿一覧タブを更新する
-                UpdateBookTabData(e2.Value);
+                UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
@@ -655,7 +655,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 // 登録時イベントを登録する
                 arw.Registrated += (sender2, e2) => {
                     // 帳簿一覧タブを更新する
-                    UpdateBookTabData(e2.Value);
+                    UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
@@ -667,7 +667,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 // 登録時イベントを登録する
                 mrw.Registrated += (sender2, e2) => {
                     // 帳簿一覧タブを更新する
-                    UpdateBookTabData(e2.Value);
+                    UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
@@ -713,7 +713,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 // 登録時イベントを登録する
                 arw.Registrated += (sender2, e2) => {
                     // 帳簿一覧タブを更新する
-                    UpdateBookTabData(e2.Value);
+                    UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
@@ -725,7 +725,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 // 登録時イベントを登録する
                 mrw.Registrated += (sender2, e2) => {
                     // 帳簿一覧タブを更新する
-                    UpdateBookTabData(e2.Value);
+                    UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
@@ -795,7 +795,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 }
 
                 // 帳簿一覧タブを更新する
-                UpdateBookTabData();
+                UpdateBookTabData(isUpdateActDateLastEdited: true);
             }
         }
         #endregion
@@ -891,7 +891,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
-            UpdateBookTabData(false);
+            UpdateBookTabData(isScroll:false);
             InitializeDailyGraphTabData();
             UpdateDailyGraphTabData();
 
@@ -927,7 +927,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             switch (this.WVM.DisplayedDailyTermKind) {
                 case DailyTermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
-                    UpdateBookTabData(true);
+                    UpdateBookTabData(isScroll:true);
 
                     InitializeDailyGraphTabData();
                     UpdateDailyGraphTabData();
@@ -961,7 +961,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
-            UpdateBookTabData(true);
+            UpdateBookTabData(isScroll:true);
 
             InitializeDailyGraphTabData();
             UpdateDailyGraphTabData();
@@ -993,7 +993,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             switch (this.WVM.DisplayedDailyTermKind) {
                 case DailyTermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
-                    UpdateBookTabData(true);
+                    UpdateBookTabData(isScroll:true);
 
                     InitializeDailyGraphTabData();
                     UpdateDailyGraphTabData();
@@ -1019,7 +1019,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 this.WVM.StartDate = stw.WVM.StartDate;
                 this.WVM.EndDate = stw.WVM.EndDate;
                 
-                UpdateBookTabData(true);
+                UpdateBookTabData(isScroll:true);
 
                 InitializeDailyGraphTabData();
                 UpdateDailyGraphTabData();
@@ -1225,7 +1225,7 @@ WHERE action_id = @{0};", vm.ActionId);
 
                 switch (this.WVM.SelectedTab) {
                     case Tabs.BooksTab:
-                        UpdateBookTabData(true);
+                        UpdateBookTabData(isScroll:true);
                         break;
                     case Tabs.DailyGraphTab:
                         InitializeDailyGraphTabData();
@@ -1254,7 +1254,7 @@ WHERE action_id = @{0};", vm.ActionId);
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
             
-            UpdateBookTabData(true);
+            UpdateBookTabData(isScroll:true);
             UpdateDailyGraphTabData();
 
             UpdateMonthlyListTabData();
@@ -1865,20 +1865,12 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
         #region 帳簿タブ更新用の関数
         /// <summary>
-        /// 帳簿タブに表示するデータを更新する(スクロールなし)
-        /// </summary>
-        /// <param name="actionId">選択対象の帳簿項目ID</param>
-        private void UpdateBookTabData(int? actionId)
-        {
-            UpdateBookTabData(false, actionId);
-        }
-
-        /// <summary>
         /// 帳簿タブに表示するデータを更新する
         /// </summary>
-        /// <param name="isScroll">スクロールするか</param>
         /// <param name="actionId">選択対象の帳簿項目ID</param>
-        private void UpdateBookTabData(bool isScroll = false, int? actionId = null)
+        /// <param name="isScroll">スクロールするか</param>
+        /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
+        private void UpdateBookTabData(int? actionId = null, bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
             if (this.WVM.SelectedTab == Tabs.BooksTab) {
                 // 指定がなければ、更新前の帳簿項目の選択を維持する
@@ -1915,6 +1907,23 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                     else {
                         // 今月でない場合は、先頭が表示されるようにする
                         this.actionDataGrid.ScrollToTop();
+                    }
+                }
+
+                // 最後に操作した帳簿項目の日付を更新する
+                if (isUpdateActDateLastEdited) {
+                    if (actionId.HasValue) {
+                        using (DaoBase dao = this.builder.Build()) {
+                            DaoReader reader = dao.ExecQuery(@"
+    SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", actionId.Value);
+
+                            reader.ExecARow((record) => {
+                                this.WVM.ActDateLastEdited = DateTime.Parse(record["act_time"]);
+                            });
+                        }
+                    }
+                    else {
+                        this.WVM.ActDateLastEdited = null;
                     }
                 }
             }
