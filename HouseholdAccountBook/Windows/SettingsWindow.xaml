@@ -8,8 +8,8 @@
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Behaviors"
         mc:Ignorable="d"
-        Title="設定 - Household Account Book" Height="700" Width="1050" ShowInTaskbar="False" WindowStyle="ToolWindow"
-        Closed="SettingsWindow_Closed">
+        Title="設定 - Household Account Book" Height="700" Width="1050" WindowStyle="ToolWindow"
+        Closing="SettingsWindow_Closing" Closed="SettingsWindow_Closed">
     <Window.DataContext>
         <viewmodels:SettingsWindowViewModel x:Name="WVM"/>
     </Window.DataContext>

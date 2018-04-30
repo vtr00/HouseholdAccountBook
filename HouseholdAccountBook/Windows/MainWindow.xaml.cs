@@ -543,7 +543,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void MoveToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder,
-                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime);
+                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime ?? this.WVM.DisplayedMonth);
             // 登録時イベントを登録する
             mrw.Registrated += (sender2, e2) => {
                 // 帳簿一覧タブを更新する
@@ -1131,7 +1131,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 Cursor cCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
 
-                UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
+                UpdateBookList();
 
                 UpdateBookTabData();
                 InitializeDailyGraphTabData();

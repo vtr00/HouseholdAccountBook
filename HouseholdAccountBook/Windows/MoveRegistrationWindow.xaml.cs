@@ -55,8 +55,8 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         /// <param name="selectedBookId">帳簿ID</param>
-        /// <param name="selectedDateTime">選択された日時</param>
-        public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, DateTime? selectedDateTime)
+        /// <param name="displayedDateTime">表示された日時</param>
+        public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, DateTime? displayedDateTime)
         {
             this.builder = builder;
 
@@ -93,9 +93,9 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
             }
 
             this.WVM.BookVMList = bookVMList;
-            this.WVM.MovedDate = selectedDateTime != null ? (payDay != null ? selectedDateTime.Value.GetDateInMonth(payDay.Value) : selectedDateTime.Value) : DateTime.Today;
+            this.WVM.MovedDate = displayedDateTime != null ? (payDay != null ? displayedDateTime.Value.GetDateInMonth(payDay.Value) : displayedDateTime.Value.GetFirstDateOfMonth()) : DateTime.Today;
             this.WVM.MovedBookVM = debitBookId != null ? bookVMList.FirstOrDefault((vm)=> { return vm.Id == debitBookId; }) : selectedBookVM;
-            this.WVM.MovingDate = selectedDateTime != null ? (payDay != null ? selectedDateTime.Value.GetDateInMonth(payDay.Value) : selectedDateTime.Value) : DateTime.Today;
+            this.WVM.MovingDate = this.WVM.MovedDate;
             this.WVM.MovingBookVM = selectedBookVM;
             this.WVM.SelectedCommissionKind = CommissionKind.FromBook;
 

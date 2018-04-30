@@ -32,6 +32,10 @@ namespace HouseholdAccountBook.Windows
         /// 前回選択していた設定タブ
         /// </summary>
         private SettingsTabs oldSelectedSettingsTab = SettingsTabs.ItemSettingsTab;
+        /// <summary>
+        /// DBに保存されたか
+        /// </summary>
+        private bool IsSaved = false;
         #endregion
 
         /// <summary>
@@ -99,6 +103,7 @@ RETURNING category_id;", (int)kind, Updater, Inserter);
                 });
             }
             UpdateItemSettingsTabData(HierarchicalKind.Category, categoryId);
+            this.IsSaved = true;
         }
 
         /// <summary>
@@ -136,6 +141,7 @@ RETURNING item_id;", categoryId, Updater, Inserter);
                 });
             }
             UpdateItemSettingsTabData(HierarchicalKind.Item, itemId);
+            this.IsSaved = true;
         }
 
         /// <summary>
@@ -202,6 +208,7 @@ WHERE item_id = @{1};", Updater, id);
                 }
             }
             UpdateItemSettingsTabData(this.WVM.SelectedItemVM.ParentVM.Kind, this.WVM.SelectedItemVM.ParentVM.Id);
+            this.IsSaved = true;
         }
 
         /// <summary>
@@ -309,6 +316,7 @@ WHERE item_id = @{2};", toCategoryId, Updater, changingId);
             }
 
             UpdateItemSettingsTabData(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
+            this.IsSaved = true;
         }
 
         /// <summary>
@@ -447,6 +455,7 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
             }
 
             UpdateItemSettingsTabData(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
+            this.IsSaved = true;
         }
 
         /// <summary>
@@ -490,6 +499,7 @@ WHERE item_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
             }
 
             MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
+            this.IsSaved = true;
         }
 
         /// <summary>
@@ -538,6 +548,7 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                     }
                 });
             }
+            this.IsSaved = true;
         }
 
         /// <summary>
@@ -646,6 +657,7 @@ RETURNING book_id;", Updater, Inserter);
             }
 
             UpdateBookSettingTabData(bookId);
+            this.IsSaved = true;
         }
 
         /// <summary>
@@ -684,6 +696,7 @@ WHERE book_id = @{1};", Updater, this.WVM.SelectedBookVM.Id);
             }
 
             UpdateBookSettingTabData();
+            this.IsSaved = true;
         }
 
         /// <summary>
@@ -736,6 +749,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             }
 
             UpdateBookSettingTabData(changingId);
+            this.IsSaved = true;
         }
 
         /// <summary>
@@ -788,6 +802,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             }
 
             UpdateBookSettingTabData(changingId);
+            this.IsSaved = true;
         }
 
         /// <summary>
@@ -816,6 +831,7 @@ WHERE book_id = @{9};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.S
             }
 
             MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
+            this.IsSaved = true;
         }
 
         /// <summary>
@@ -862,6 +878,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                     }
                 });
             }
+            this.IsSaved = true;
         }
         #endregion
 
@@ -970,6 +987,16 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         }
         #endregion
         #endregion
+
+        /// <summary>
+        /// フォーム終了前
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SettingsWindow_Closing(object sender, CancelEventArgs e)
+        {
+            this.DialogResult = this.IsSaved;
+        }
 
         /// <summary>
         /// フォーム終了時
