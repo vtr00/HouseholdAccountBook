@@ -8,7 +8,6 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,6 +15,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
+using Newtonsoft.Json;
+using HouseholdAccountBook.Dto;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -317,12 +318,15 @@ FROM mst_book
 WHERE del_flg = 0 AND book_kind <> @{0}
 ORDER BY sort_order;", (int)BookKind.Wallet);
                 reader.ExecWholeRow((count, record) => {
+                    string jsonCode = record["json_code"];
+                    MstBookJsonObject jsonObj = JsonConvert.DeserializeObject<MstBookJsonObject>(jsonCode);
+
                     BookComparisonViewModel vm = new BookComparisonViewModel() {
                         Id = record.ToInt("book_id"),
                         Name = record["book_name"],
-                        ActDateIndex = record.ToNullableInt("csv_act_time_index"),
-                        OutgoIndex = record.ToNullableInt("csv_outgo_index"),
-                        ItemNameIndex = record.ToNullableInt("csv_item_name_index")
+                        ActDateIndex = jsonObj?.CsvActDateIndex,
+                        OutgoIndex = jsonObj?.CsvOutgoIndex,
+                        ItemNameIndex = jsonObj?.CsvItemNameIndex
                     };
                     bookCompVMList.Add(vm);
 

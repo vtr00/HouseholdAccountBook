@@ -1,7 +1,9 @@
 ﻿using HouseholdAccountBook.Dao;
+using HouseholdAccountBook.Dto;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -824,10 +826,15 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
         {
             using (DaoBase dao = this.builder.Build()) {
                 BookSettingViewModel vm = this.WVM.SelectedBookVM;
+                MstBookJsonObject jsonObj = new MstBookJsonObject() {
+                    CsvActDateIndex = vm.ActDateIndex, CsvOutgoIndex = vm.OutgoIndex, CsvItemNameIndex = vm.ItemNameIndex
+                };
+                string jsonCode = JsonConvert.SerializeObject(jsonObj);
+
                 dao.ExecNonQuery(@"
 UPDATE mst_book
-SET book_name = @{0}, book_kind = @{1}, initial_value = @{2}, debit_book_id = @{3}, pay_day = @{4}, csv_act_time_index = @{5}, csv_outgo_index = @{6}, csv_item_name_index = @{7}, update_time = 'now', updater = @{8}
-WHERE book_id = @{9};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.SelectedDebitBookVM.Id == -1 ? null : vm.SelectedDebitBookVM.Id, vm.PayDay, vm.ActDateIndex, vm.OutgoIndex, vm.ItemNameIndex, Updater, vm.Id);
+SET book_name = @{0}, book_kind = @{1}, initial_value = @{2}, debit_book_id = @{3}, pay_day = @{4}, json_code = @{5}, update_time = 'now', updater = @{6}
+WHERE book_id = @{7};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.SelectedDebitBookVM.Id == -1 ? null : vm.SelectedDebitBookVM.Id, vm.PayDay, jsonCode, Updater, vm.Id);
             }
 
             MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
@@ -1303,7 +1310,7 @@ ORDER BY sort_order;");
 
                 // 帳簿一覧を取得する
                 reader = dao.ExecQuery(@"
-SELECT book_id, book_name, book_kind, debit_book_id, pay_day, initial_value, csv_act_time_index, csv_outgo_index, csv_item_name_index
+SELECT book_id, book_name, book_kind, debit_book_id, pay_day, initial_value, json_code
 FROM mst_book
 WHERE del_flg = 0
 ORDER BY sort_order;");
@@ -1315,9 +1322,9 @@ ORDER BY sort_order;");
                     int initialValue = record.ToInt("initial_value");
                     int? debitBookId = record.ToNullableInt("debit_book_id");
                     int? payDay = record.ToNullableInt("pay_day");
-                    int? actDateIndex = record.ToNullableInt("csv_act_time_index");
-                    int? outgoIndex = record.ToNullableInt("csv_outgo_index");
-                    int? itemNameIndex = record.ToNullableInt("csv_item_name_index");
+
+                    string jsonCode = record["json_code"];
+                    MstBookJsonObject jsonObj = JsonConvert.DeserializeObject<MstBookJsonObject>(jsonCode);
 
                     BookSettingViewModel tmpVM = new BookSettingViewModel() {
                         Id = bookId,
@@ -1326,9 +1333,9 @@ ORDER BY sort_order;");
                         InitialValue = initialValue,
                         DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((vm) => { return vm.Id != bookId; })),
                         PayDay = payDay,
-                        ActDateIndex = actDateIndex,
-                        OutgoIndex = outgoIndex,
-                        ItemNameIndex = itemNameIndex,
+                        ActDateIndex = jsonObj?.CsvActDateIndex,
+                        OutgoIndex = jsonObj?.CsvOutgoIndex,
+                        ItemNameIndex = jsonObj?.CsvItemNameIndex,
                     };
                     tmpVM.SelectedDebitBookVM = tmpVM.DebitBookVMList.FirstOrDefault((vm) => { return vm.Id == debitBookId; }) ?? tmpVM.DebitBookVMList[0];
 

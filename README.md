@@ -4,10 +4,10 @@
 It is for your household accounts book via PostgreSQL.  
 Currently, the binary file is unscheduled to publish.  
 It is for who can set PostgreSQL environments and build the project yourself.  
-This software is supported for Japanese Language only.  
+It is supported for Japanese Language only.  
 
 ## __概要__
-本ソフトはPostgreSQLを用いた家計簿ソフトです。  
+本ソフトは PostgreSQL を用いた家計簿ソフトです。  
 家計簿ソフト [記帳風月](http://hp.vector.co.jp/authors/VA024866/s_kicho.html) から多くのデータの移行が可能です。  
 [![K Life](http://hp.vector.co.jp/authors/VA024866/img/bunner.gif)](http://hp.vector.co.jp/authors/VA024866/)  
 現在、バイナリの公開は予定しておりません。  
@@ -89,7 +89,7 @@ DB: [PostgreSQL](https://www.postgresql.org/) 9.6
 
 ## __使用方法__
 1. PostgreSQLの環境を構築します。
-1. [create_account_book.backup](https://github.com/vtr00/HouseholdAccountBook/blob/master/create_account_book.backup) を用いて、データベースを構築します(owner:postgres name:account_book)。
+1. [create_account_book.backup](https://github.com/vtr00/HouseholdAccountBook/blob/master/db/create_account_book.backup) を用いて、データベースを構築します(owner:postgres name:account_book)。
 1. 本ソフトを起動し、構築したデータベースの接続設定を行います(初回のみ)。
 1. 「ツール」>「設定」で、必要なマスタデータの作成を行います。 - 帳簿、分類、項目、帳簿と項目の関連付け
 1. さあ、記帳しましょう。
@@ -102,4 +102,4 @@ DB: [PostgreSQL](https://www.postgresql.org/) 9.6
 ## __免責事項__
 * 本ソフトは、すべてのリビジョンにおいて不安定版です。
 * データベース仕様は予告なく変更することがあります。
-	* データベース仕様の変更時に、必ずしも [データベース仕様書](https://github.com/vtr00/HouseholdAccountBook/blob/master/DbSpecifications.xlsx) や [create_account_book.backup](https://github.com/vtr00/HouseholdAccountBook/blob/master/create_account_book.backup) が更新されるとは限りません。
+	* データベース仕様の変更時に、必ずしも [データベース仕様書](https://github.com/vtr00/HouseholdAccountBook/blob/master/db/DbSpecifications.xlsx) や [create_account_book.backup](https://github.com/vtr00/HouseholdAccountBook/blob/master/db/create_account_book.backup) が更新されるとは限りません。
