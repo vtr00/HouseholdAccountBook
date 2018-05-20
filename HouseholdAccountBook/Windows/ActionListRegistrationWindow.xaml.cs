@@ -3,8 +3,9 @@ using HouseholdAccountBook.UserControls;
 using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -38,7 +39,7 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// 登録時のイベント
         /// </summary>
-        public event EventHandler<EventArgs<int?>> Registrated = null;
+        public event EventHandler<EventArgs<List<int>>> Registrated = null;
         #endregion
 
         /// <summary>
@@ -137,10 +138,10 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
             }
 
             // DB登録
-            int? id = RegisterToDb();
+            List<int> idList = RegisterToDb();
 
             // MainWindow更新
-            Registrated?.Invoke(this, new EventArgs<int?>(id));
+            Registrated?.Invoke(this, new EventArgs<List<int>>(idList ?? new List<int>()));
 
             this.DialogResult = true;
             this.Close();
@@ -460,16 +461,17 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         /// <summary>
         /// DBに登録する
         /// </summary>
-        /// <returns>登録された帳簿項目ID</returns>
-        private int? RegisterToDb()
+        /// <returns>登録された帳簿項目IDリスト</returns>
+        private List<int> RegisterToDb()
         {
+            List<int> tmpActionIdList = new List<int>();
             BalanceKind balanceKind = this.WVM.SelectedBalanceKind; // 収支種別
             int bookId = this.WVM.SelectedBookVM.Id.Value; // 帳簿ID
             int itemId = this.WVM.SelectedItemVM.Id; // 帳簿項目ID
             string shopName = this.WVM.SelectedShopName; // 店舗名
             string remark = this.WVM.SelectedRemark; // 備考
 
-            DateTime lastActTime = this.WVM.DateValueVMList[0].ActDate;
+            DateTime lastActTime = this.WVM.DateValueVMList.Max((tmp) => tmp.ActDate);
             using (DaoBase dao = this.builder.Build()) {
                 #region 帳簿項目を追加する
                 foreach(DateValueViewModel vm in this.WVM.DateValueVMList) {
@@ -480,6 +482,10 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, remark, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7}) RETURNING action_id;",
                             bookId, itemId, actTime, actValue, shopName, remark, Updater, Inserter);
+
+                        reader.ExecARow((record) => {
+                            tmpActionIdList.Add(record.ToInt("action_id"));
+                        });
                     }
                 }
                 #endregion
@@ -529,7 +535,7 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", lastActTime, Upda
                 }
             }
 
-            return null;
+            return tmpActionIdList;
         }
 
         #region 設定反映用の関数

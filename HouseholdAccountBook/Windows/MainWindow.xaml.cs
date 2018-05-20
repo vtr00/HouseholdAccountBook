@@ -10,7 +10,6 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -625,7 +624,9 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void EditActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが0より大きい
-            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVM.ActionId > 0;
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && 
+                           ((this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVMList[0].ActionId > 0) ||
+                            (this.WVM.SelectedActionVM != null && this.WVM.SelectedActionVM.ActionId > 0));
         }
 
         /// <summary>
@@ -683,7 +684,9 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         private void CopyActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが0より大きい
-            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVM.ActionId > 0;
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && 
+                           ((this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVMList[0].ActionId > 0) || 
+                            (this.WVM.SelectedActionVM != null && this.WVM.SelectedActionVM.ActionId > 0));
         }
 
         /// <summary>
@@ -740,8 +743,9 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         /// <param name="e"></param>
         private void DeleteActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択していて、選択している帳簿項目が存在していて、選択している帳簿項目のIDが0より大きい
-            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0;
+            // 帳簿タブを選択していて、選択している帳簿項目が存在していて、選択している帳簿項目にIDが0より大きいものが存在する
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && 
+                           this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0;
         }
 
         /// <summary>
@@ -1867,14 +1871,14 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <summary>
         /// 帳簿タブに表示するデータを更新する
         /// </summary>
-        /// <param name="actionId">選択対象の帳簿項目ID</param>
+        /// <param name="actionIdList">選択対象の帳簿項目IDリスト</param>
         /// <param name="isScroll">スクロールするか</param>
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
-        private void UpdateBookTabData(int? actionId = null, bool isScroll = false, bool isUpdateActDateLastEdited = false)
+        private void UpdateBookTabData(List<int> actionIdList = null, bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
             if (this.WVM.SelectedTab == Tabs.BooksTab) {
                 // 指定がなければ、更新前の帳簿項目の選択を維持する
-                int? tmpActionId = actionId ?? this.WVM.SelectedActionVM?.ActionId;
+                List<int> tmpActionIdList = actionIdList ?? new List<int>(this.WVM.SelectedActionVMList.Select((tmp) => tmp.ActionId));
                 SummaryViewModel tmpSvm = this.WVM.SelectedSummaryVM;
 
                 switch (this.WVM.DisplayedDailyTermKind) {
@@ -1888,8 +1892,10 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                         break;
                 }
 
-                IEnumerable<ActionViewModel> query = this.WVM.ActionVMList.Where((avm) => { return avm.ActionId == tmpActionId; });
-                this.WVM.SelectedActionVM = query.Count() == 0 ? null : query.First();
+                // 帳簿項目を選択する
+                IEnumerable<ActionViewModel> query = this.WVM.ActionVMList.Where((avm) => { return tmpActionIdList.Contains(avm.ActionId); });
+                this.WVM.SelectedActionVMList.Clear();
+                foreach(ActionViewModel tmp in query) { this.WVM.SelectedActionVMList.Add(tmp); }
 
                 // 更新前のサマリーの選択を維持する
                 IEnumerable<SummaryViewModel> query2 = this.WVM.SummaryVMList.Where((svm) => {
@@ -1912,10 +1918,10 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
                 // 最後に操作した帳簿項目の日付を更新する
                 if (isUpdateActDateLastEdited) {
-                    if (actionId.HasValue) {
+                    if (actionIdList != null && actionIdList.Count != 0) {
                         using (DaoBase dao = this.builder.Build()) {
                             DaoReader reader = dao.ExecQuery(@"
-    SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", actionId.Value);
+    SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", actionIdList[0]);
 
                             reader.ExecARow((record) => {
                                 this.WVM.ActDateLastEdited = DateTime.Parse(record["act_time"]);

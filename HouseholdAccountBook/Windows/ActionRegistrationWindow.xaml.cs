@@ -37,7 +37,7 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// 登録時のイベント
         /// </summary>
-        public event EventHandler<EventArgs<int?>> Registrated = null;
+        public event EventHandler<EventArgs<List<int>>> Registrated = null;
         #endregion
 
         /// <summary>
@@ -266,7 +266,8 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
             int? id = RegisterToDb();
 
             // MainWindow更新
-            Registrated?.Invoke(this, new EventArgs<int?>(id));
+            List<int> value = id != null ? new List<int>() { id.Value } : new List<int>();
+            Registrated?.Invoke(this, new EventArgs<List<int>>(value));
 
             // 表示クリア
             this.WVM.Value = null;
@@ -299,7 +300,8 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
             int? id = RegisterToDb();
 
             // MainWindow更新
-            Registrated?.Invoke(this, new EventArgs<int?>(id));
+            List<int> value = id != null ? new List<int>() { id.Value } : new List<int>();
+            Registrated?.Invoke(this, new EventArgs<List<int>>(value));
 
             this.DialogResult = true;
             this.Close();

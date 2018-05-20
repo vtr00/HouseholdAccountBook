@@ -28,6 +28,7 @@ namespace HouseholdAccountBook.UserControls
         {
             this.Loaded += (sender, e) => {
                 TextBox textBox = GetTemplateTextBox(this);
+
                 textBox.SetValue(InputMethod.IsInputMethodEnabledProperty, false);
                 textBox.TextChanged += this.TextBox_TextChanged;
                 textBox.SelectionChanged += this.TextBox_SelectionChanged;
@@ -263,6 +264,7 @@ namespace HouseholdAccountBook.UserControls
         private void IncreaceSelectedNumber(TextBox textBox, DateTimePicker dateTimePicker)
         {
             textBox.SelectionChanged -= this.TextBox_SelectionChanged;
+
             int start = textBox.SelectionStart;
             int length = textBox.SelectionLength;
             DateKind kind = GetKindOfSelection(textBox, dateTimePicker);
@@ -281,6 +283,7 @@ namespace HouseholdAccountBook.UserControls
             textBox.Text = DatePickerDateTimeConverter.DateTimeToString(formatStr, dateTimePicker.SelectedDate);
             textBox.SelectionStart = start;
             textBox.SelectionLength = length;
+
             textBox.SelectionChanged += this.TextBox_SelectionChanged;
         }
 
@@ -292,6 +295,7 @@ namespace HouseholdAccountBook.UserControls
         private void DecreaceSelectedNumber(TextBox textBox, DateTimePicker dateTimePicker)
         {
             textBox.SelectionChanged -= this.TextBox_SelectionChanged;
+
             int start = textBox.SelectionStart;
             int length = textBox.SelectionLength;
             DateKind kind = GetKindOfSelection(textBox, dateTimePicker);
@@ -310,6 +314,7 @@ namespace HouseholdAccountBook.UserControls
             textBox.Text = DatePickerDateTimeConverter.DateTimeToString(formatStr, dateTimePicker.SelectedDate);
             textBox.SelectionStart = start;
             textBox.SelectionLength = length;
+
             textBox.SelectionChanged += this.TextBox_SelectionChanged;
         }
 
@@ -372,6 +377,7 @@ namespace HouseholdAccountBook.UserControls
         private bool TryToInputNumber(TextBox textBox, DateTimePicker dateTimePicker, int number)
         {
             textBox.SelectionChanged -= this.TextBox_SelectionChanged;
+
             bool ans = false;
 
             try {
@@ -414,6 +420,7 @@ namespace HouseholdAccountBook.UserControls
             catch (ArgumentOutOfRangeException) { }
 
             textBox.SelectionChanged += this.TextBox_SelectionChanged;
+
             return ans;
         }
     }

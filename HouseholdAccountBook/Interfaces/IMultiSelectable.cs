@@ -5,10 +5,10 @@
     /// </summary>
     /// <example>
     /// 伝達経路：
-    ///   VM.SelectedItemVM<->Behavior.SelectedItem<->VM.IsSelected<->View.IsSelected
+    ///   VM.SelectedItemVM - Behavior.SelectedItem - VM.IsSelected - View.IsSelected
     /// 
     /// <![CDATA[
-    /// <TreeViewItemsSource="{Binding HierachicalItemVMList}">
+    /// <TreeView ItemsSource="{Binding HierachicalItemVMList}">
     ///     <TreeView.ItemContainerStyle>
     ///         <Style TargetType="TreeViewItem">
     ///             <Setter Property="IsSelected" Value="{Binding IsSelected}" />

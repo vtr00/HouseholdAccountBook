@@ -14,7 +14,7 @@ namespace HouseholdAccountBook.UserEventArgs
         /// </summary>
         public TType1 Value1 { get; set; }
         /// <summary>
-        /// 値1
+        /// 値2
         /// </summary>
         public TType2 Value2 { get; set; }
 

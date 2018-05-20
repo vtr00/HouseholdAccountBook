@@ -21,7 +21,8 @@ namespace HouseholdAccountBook.Behaviors
             base.OnAttached();
 
             if (this.AssociatedObject != null) {
-                this.AssociatedObject.SelectionChanged += this.DataGrid_SelectionChanged;
+                // DataGridで選択された項目が変更された場合に発生するイベントを登録する
+                ((DataGrid)this.AssociatedObject).SelectionChanged += this.DataGrid_SelectionChanged;
             }
         }
 
@@ -31,13 +32,15 @@ namespace HouseholdAccountBook.Behaviors
         protected override void OnDetaching()
         {
             if (this.AssociatedObject != null) {
-                this.AssociatedObject.SelectionChanged -= this.DataGrid_SelectionChanged;
+                // DataGridで選択された項目が変更された場合に発生するイベントを解除する
+                ((DataGrid)this.AssociatedObject).SelectionChanged -= this.DataGrid_SelectionChanged;
             }
 
             base.OnDetaching();
         }
 
         #region 依存関係プロパティ
+        #region SelectedItems
         /// <summary>
         /// 選択されたアイテムリスト
         /// </summary>
@@ -55,10 +58,29 @@ namespace HouseholdAccountBook.Behaviors
                 PropertyName<BindSelectedItemsToDataGridBehavior>.Get(x => x.SelectedItems), 
                 typeof(IList), 
                 typeof(BindSelectedItemsToDataGridBehavior), 
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, SelectedItemsChanged));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, BindSelectedItemsToDataGridBehavior.SelectedItemsChanged));
+        #endregion
         #endregion
 
         #region イベントハンドラ
+        /// <summary>
+        /// <see cref="SelectedItems"/> を選択されたアイテムの変更に応じて更新します。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //新たに選択されたアイテムをリストに追加する
+            foreach (object addedItem in e.AddedItems) {
+                this.SelectedItems.Add(addedItem);
+            }
+
+            //選択解除されたアイテムをリストから削除する
+            foreach (object removedItem in e.RemovedItems) {
+                this.SelectedItems.Remove(removedItem);
+            }
+        }
+
         /// <summary>
         /// <see cref="SelectedItems"/> が変更されたときに <see cref="CollectionChanged(object, NotifyCollectionChangedEventArgs)"/> を設定します。
         /// </summary>
@@ -66,12 +88,12 @@ namespace HouseholdAccountBook.Behaviors
         /// <param name="e"></param>
         private static void SelectedItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if(e.OldValue == e.NewValue) {
+            if(e.OldValue != e.NewValue) {
                 if(e.OldValue is INotifyCollectionChanged oldValue) {
-                    oldValue.CollectionChanged -= CollectionChanged;
+                    oldValue.CollectionChanged -= BindSelectedItemsToDataGridBehavior.CollectionChanged;
                 }
                 if(e.NewValue is INotifyCollectionChanged newValue) {
-                    newValue.CollectionChanged += CollectionChanged;
+                    newValue.CollectionChanged += BindSelectedItemsToDataGridBehavior.CollectionChanged;
                 }
             }
         }
@@ -84,32 +106,20 @@ namespace HouseholdAccountBook.Behaviors
         private static void CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != e.NewItems) {
-                foreach(object oldItem in e.OldItems) {
-                    if (oldItem is IMultiSelectable oldV) {
-                        oldV.IsSelected = false;
+                if (e.OldItems != null) {
+                    foreach (object oldItem in e.OldItems) {
+                        if (oldItem is IMultiSelectable oldV) {
+                            oldV.IsSelected = false;
+                        }
                     }
                 }
-                foreach (object newItem in e.OldItems) {
-                    if (newItem is IMultiSelectable newV) {
-                        newV.IsSelected = true;
+                if (e.NewItems != null) {
+                    foreach (object newItem in e.NewItems) {
+                        if (newItem is IMultiSelectable newV) {
+                            newV.IsSelected = true;
+                        }
                     }
                 }
-            }
-        }
-
-        /// <summary>
-        /// <see cref="SelectedItems"/> を選択されたアイテムの変更に応じて更新します。
-        /// </summary>
-        protected void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //新たに選択されたアイテムをリストに追加する
-            foreach (object addedItem in e.AddedItems) {
-                this.SelectedItems.Add(addedItem);
-            }
-
-            //選択解除されたアイテムをリストから削除する
-            foreach (object removedItem in e.RemovedItems) {
-                this.SelectedItems.Remove(removedItem);
             }
         }
         #endregion

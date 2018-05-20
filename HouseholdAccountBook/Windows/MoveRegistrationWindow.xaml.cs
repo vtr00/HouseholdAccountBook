@@ -3,6 +3,7 @@ using HouseholdAccountBook.Extentions;
 using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -47,7 +48,7 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// 登録時のイベント
         /// </summary>
-        public event EventHandler<EventArgs<int?>> Registrated = null;
+        public event EventHandler<EventArgs<List<int>>> Registrated = null;
         #endregion
 
         /// <summary>
@@ -313,7 +314,9 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
             // DB登録
             int? id = RegisterToDb();
 
-            Registrated?.Invoke(this, new EventArgs<int?>(id));
+            // MainWindow更新
+            List<int> value = id != null ? new List<int>() { id.Value } : new List<int>();
+            Registrated?.Invoke(this, new EventArgs<List<int>>(value));
 
             this.DialogResult = true;
             this.Close();

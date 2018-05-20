@@ -86,17 +86,6 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-
-        <Style x:Key="BookItemStyle" TargetType="DataGridRow">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsMatch}" Value="True">
-                    <Setter Property="Foreground" Value="Green"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding IsFuture}" Value="True">
-                    <Setter Property="Foreground" Value="Gray"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -295,8 +284,7 @@
                                   ItemsSource="{Binding DisplayedActionVMList}" SelectedItem="{Binding SelectedActionVM}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="3"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
-                                  HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo"
-                                  ItemContainerStyle="{StaticResource BookItemStyle}">
+                                  HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
                             <DataGrid.Resources>
                                 <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
                             </DataGrid.Resources>
@@ -315,6 +303,19 @@
                             <i:Interaction.Behaviors>
                                 <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding SelectedActionVMList, Mode=OneWay}"/>
                             </i:Interaction.Behaviors>
+                            <DataGrid.ItemContainerStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsMatch}" Value="True">
+                                            <Setter Property="Foreground" Value="Green"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsFuture}" Value="True">
+                                            <Setter Property="Foreground" Value="Gray"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.ItemContainerStyle>
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="アクションID" Binding="{Binding ActionId}"
                                                     Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}"/>
@@ -324,11 +325,11 @@
                                                     CellStyle="{StaticResource DayOfWeekStyle}"/>
                                 <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
                                 <DataGridTextColumn Header="収入" Binding="{Binding Income, Converter={StaticResource IntToMoneyDisplayConverter}}" 
-                                        ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                                 <DataGridTextColumn Header="支出" Binding="{Binding Outgo, Converter={StaticResource IntToMoneyDisplayConverter}}" 
-                                        ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                                 <DataGridTextColumn Header="残高" Binding="{Binding Balance, Converter={StaticResource IntToMoneyDisplayConverter}}" 
-                                        ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                                 <DataGridTextColumn Header="店名" Binding="{Binding ShopName}"/>
                                 <DataGridTextColumn Header="備考" Binding="{Binding Remark}"/>
                                 <DataGridTextColumn Header="グループID" Binding="{Binding GroupId}" 
@@ -348,7 +349,7 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
                                 <DataGridTextColumn Header="合計" Binding="{Binding Summary, Converter={StaticResource IntToMoneyDisplayConverter}}" 
-                                        ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>

@@ -5,7 +5,7 @@ namespace HouseholdAccountBook.UserControls
     public partial class DateTimePicker : DatePicker
     {
         /// <summary>
-        /// 種別
+        /// 日付種別
         /// </summary>
         private enum DateKind 
         {

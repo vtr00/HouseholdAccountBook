@@ -1,34 +1,37 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Data;
 
 namespace HouseholdAccountBook.Converters
 {
     /// <summary>
-    /// DateTime->曜日変換
+    /// DateTime - 曜日変換
     /// </summary>
     public class DateTimeToDayOfWeekConverter : IValueConverter
     {
+        private static readonly Dictionary<DayOfWeek, string> dictionary = new Dictionary<DayOfWeek, string>() {
+            {DayOfWeek.Sunday, "日"},
+            {DayOfWeek.Monday, "月"},
+            {DayOfWeek.Tuesday, "火"},
+            {DayOfWeek.Wednesday, "水"},
+            {DayOfWeek.Thursday, "木"},
+            {DayOfWeek.Friday, "金"},
+            {DayOfWeek.Saturday, "土"}
+        };
+
+        /// <summary>
+        /// DateTime -> 曜日変換
+        /// </summary>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            switch (((DateTime)value).DayOfWeek)
-            {
-                case DayOfWeek.Sunday:
-                    return "日";
-                case DayOfWeek.Monday:
-                    return "月";
-                case DayOfWeek.Tuesday:
-                    return "火";
-                case DayOfWeek.Wednesday:
-                    return "水";
-                case DayOfWeek.Thursday:
-                    return "木";
-                case DayOfWeek.Friday:
-                    return "金";
-                case DayOfWeek.Saturday:
-                    return "土";
-                default:
-                    throw new NotImplementedException();
+            DayOfWeek dayOfWeek = ((DateTime)value).DayOfWeek;
+
+            if (dictionary.ContainsKey(dayOfWeek)) {
+                return dictionary[dayOfWeek];
+            }
+            else {
+                throw new NotImplementedException();
             }
         }
 

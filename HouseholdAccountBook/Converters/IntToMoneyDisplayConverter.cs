@@ -5,7 +5,7 @@ using System.Windows.Data;
 namespace HouseholdAccountBook.Converters
 {
     /// <summary>
-    /// int->金額表示変換
+    /// int - 金額表示変換
     /// </summary>
     public class IntToMoneyDisplayConverter : IValueConverter
     {

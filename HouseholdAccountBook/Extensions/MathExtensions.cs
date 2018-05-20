@@ -62,8 +62,7 @@ namespace HouseholdAccountBook.Extensions
         {
             value1 = Math.Abs(value1);
             value2 = Math.Abs(value2);
-            Func<int, int, int> gcd = null;
-            gcd = (x, y) => (y == 0 ? x : gcd(y, x % y));
+            int gcd(int x, int y) => (y == 0 ? x : gcd(y, x % y));
             return value1 > value2 ? gcd(value1, value2) : gcd(value2, value1);
         }
 

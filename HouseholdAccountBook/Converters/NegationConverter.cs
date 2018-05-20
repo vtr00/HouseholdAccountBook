@@ -5,7 +5,7 @@ using System.Windows.Data;
 namespace HouseholdAccountBook.Converters
 {
     /// <summary>
-    /// true <-> false変換
+    /// true - false変換
     /// </summary>
     public class NegationConverter : IValueConverter
     {

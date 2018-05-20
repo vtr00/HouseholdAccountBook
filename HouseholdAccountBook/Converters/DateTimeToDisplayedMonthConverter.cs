@@ -5,7 +5,7 @@ using System.Windows.Data;
 namespace HouseholdAccountBook.Converters
 {
     /// <summary>
-    /// DateTime->表示月変換
+    /// DateTime - 表示月変換
     /// </summary>
     public class DateTimeToDisplayedMonthConverter : IValueConverter
     {

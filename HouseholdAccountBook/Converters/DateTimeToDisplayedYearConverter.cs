@@ -5,7 +5,7 @@ using System.Windows.Data;
 namespace HouseholdAccountBook.Converters
 {
     /// <summary>
-    /// DateTime->表示年変換
+    /// DateTime - 表示年変換
     /// </summary>
     public class DateTimeToDisplayedYearConverter : IValueConverter
     {

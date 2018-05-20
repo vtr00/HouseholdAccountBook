@@ -18,7 +18,8 @@ namespace HouseholdAccountBook.Behaviors
             base.OnAttached();
 
             if (this.AssociatedObject != null) {
-                this.AssociatedObject.SelectedItemChanged += this.TreeView_SelectedItemChanged;
+                // TreeViewで選択された項目が変更された場合に発生するイベントを登録する
+                ((TreeView)this.AssociatedObject).SelectedItemChanged += this.TreeView_SelectedItemChanged;
             }
         }
 
@@ -28,13 +29,15 @@ namespace HouseholdAccountBook.Behaviors
         protected override void OnDetaching()
         {
             if (this.AssociatedObject != null) {
-                this.AssociatedObject.SelectedItemChanged -= this.TreeView_SelectedItemChanged;
+                // TreeViewで選択された項目が変更された場合に発生するイベントを解除する
+                ((TreeView)this.AssociatedObject).SelectedItemChanged -= this.TreeView_SelectedItemChanged;
             }
 
             base.OnDetaching();
         }
 
         #region 依存関係プロパティ
+        #region SelectedItem
         /// <summary>
         /// 選択されたアイテム
         /// </summary>
@@ -54,8 +57,21 @@ namespace HouseholdAccountBook.Behaviors
                 typeof(BindSelectedItemToTreeViewBehavior),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, SelectedItemChanged));
         #endregion
+        #endregion
 
         #region イベントハンドラ
+        /// <summary>
+        /// <see cref="TreeView.SelectedItem"/> 変更時に <see cref="SelectedItem"/> を変更します。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (this.SelectedItem != (sender as TreeView)?.SelectedItem) {
+                this.SelectedItem = (sender as TreeView)?.SelectedItem;
+            }
+        }
+
         /// <summary>
         /// <see cref="SelectedItem"/> が変更されたときに <see cref="IMultiSelectable.IsSelected"/> を更新します。
         /// </summary>
@@ -71,17 +87,6 @@ namespace HouseholdAccountBook.Behaviors
                 if (e.NewValue is IMultiSelectable newV) {
                     newV.IsSelected = true;
                 }
-            }
-        }
-        /// <summary>
-        /// <see cref="TreeView.SelectedItem"/> 変更時に <see cref="SelectedItem"/> を変更します。
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            if (this.SelectedItem != (sender as TreeView)?.SelectedItem) {
-                this.SelectedItem = (sender as TreeView)?.SelectedItem;
             }
         }
         #endregion
