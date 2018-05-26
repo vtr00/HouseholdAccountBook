@@ -72,12 +72,16 @@ namespace HouseholdAccountBook.Behaviors
         {
             //新たに選択されたアイテムをリストに追加する
             foreach (object addedItem in e.AddedItems) {
-                this.SelectedItems.Add(addedItem);
+                if (!this.SelectedItems.Contains(addedItem)) {
+                    this.SelectedItems.Add(addedItem);
+                }
             }
 
             //選択解除されたアイテムをリストから削除する
             foreach (object removedItem in e.RemovedItems) {
-                this.SelectedItems.Remove(removedItem);
+                while (this.SelectedItems.Contains(removedItem)) {
+                    this.SelectedItems.Remove(removedItem);
+                }
             }
         }
 
