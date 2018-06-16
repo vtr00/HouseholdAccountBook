@@ -886,6 +886,46 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         }
 
         /// <summary>
+        /// 年別一覧タブ表示可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void IndicateYearlyListTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.WVM.SelectedTab != Tabs.YearlyListTab;
+        }
+
+        /// <summary>
+        /// 年別一覧タブを表示する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void IndicateYearlyListTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.WVM.SelectedTab = Tabs.YearlyListTab;
+        }
+
+        /// <summary>
+        /// 年別グラフタブ表示可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void IndicateYearlyGraphTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.WVM.SelectedTab != Tabs.YearlyGraphTab;
+        }
+
+        /// <summary>
+        /// 年別グラフタブを表示する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void IndicateYearlyGraphTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.WVM.SelectedTab = Tabs.YearlyGraphTab;
+        }
+
+        /// <summary>
         /// 画面表示を更新する
         /// </summary>
         /// <param name="sender"></param>
@@ -902,6 +942,10 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             UpdateMonthlyListTabData();
             InitializeMonthlyGraphTabData();
             UpdateMonthlyGraphTabData();
+
+            UpdateYearlyListTabData();
+            InitializeYearlyGraphTabData();
+            UpdateYearlyGraphTabData();
 
             this.Cursor = cCursor;
         }
@@ -1242,6 +1286,13 @@ WHERE action_id = @{0};", vm.ActionId);
                         InitializeMonthlyGraphTabData();
                         UpdateMonthlyGraphTabData();
                         break;
+                    case Tabs.YearlyListTab:
+                        UpdateYearlyListTabData();
+                        break;
+                    case Tabs.YearlyGraphTab:
+                        InitializeYearlyGraphTabData();
+                        UpdateYearlyGraphTabData();
+                        break;
                 }
                 this.Cursor = cCursor;
             }
@@ -1264,6 +1315,9 @@ WHERE action_id = @{0};", vm.ActionId);
             UpdateMonthlyListTabData();
             UpdateMonthlyGraphTabData();
 
+            UpdateYearlyListTabData();
+            UpdateYearlyGraphTabData();
+
             this.Cursor = cCursor;
         }
         
@@ -1282,6 +1336,9 @@ WHERE action_id = @{0};", vm.ActionId);
 
             InitializeMonthlyGraphTabData();
             UpdateMonthlyGraphTabData();
+
+            InitializeYearlyGraphTabData();
+            UpdateYearlyGraphTabData();
 
             this.Cursor = cCursor;
         }
@@ -1351,6 +1408,7 @@ ORDER BY sort_order;");
                     reader = dao.ExecQuery(@"
 -- 繰越残高
 SELECT -1 AS action_id, @{1} AS act_time, -1 AS category_id, -1 AS item_id, '繰越残高' AS item_name, 0 AS act_value, (
+  -- 残高
   SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0)
   FROM hst_action AA
   INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -1359,6 +1417,7 @@ SELECT -1 AS action_id, @{1} AS act_time, -1 AS category_id, -1 AS item_id, '繰
 UNION
 -- 各帳簿項目
 SELECT A.action_id AS action_id, A.act_time AS act_time, C.category_id AS category_id, I.item_id AS item_id, I.item_name AS item_name, A.act_value AS act_value, (
+  -- 残高
   SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0)
   FROM hst_action AA 
   INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -1381,6 +1440,7 @@ ORDER BY act_time, action_id;", null, startTime, endTime);
                     reader = dao.ExecQuery(@"
 -- 繰越残高
 SELECT -1 AS action_id, @{1} AS act_time, -1 AS category_id, -1 AS item_id, '繰越残高' AS item_name, 0 AS act_value, (
+  -- 残高
   SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0})
   FROM hst_action AA
   INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -1389,6 +1449,7 @@ SELECT -1 AS action_id, @{1} AS act_time, -1 AS category_id, -1 AS item_id, '繰
 UNION
 -- 各帳簿項目
 SELECT A.action_id AS action_id, A.act_time AS act_time, C.category_id AS category_id, I.item_id AS item_id, I.item_name AS item_name, A.act_value AS act_value, (
+  -- 残高
   SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0})
   FROM hst_action AA 
   WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND (AA.act_time < A.act_time OR (AA.act_time = A.act_time AND AA.action_id <= A.action_id) )
@@ -1412,11 +1473,11 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
                     int? groupId = record.ToNullableInt("group_id");
                     string remark = record["remark"];
                     bool isMatch = record.ToInt("is_match") == 1;
+
+                    int actValue = record.ToInt("act_value");
                     BalanceKind balanceKind = BalanceKind.Others;
                     int? income = null;
                     int? outgo = null; 
-                    
-                    int actValue = record.ToInt("act_value");
                     if (actValue == 0) {
                         balanceKind = BalanceKind.Others;
                         income = null;
@@ -1559,6 +1620,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
             // カテゴリ小計
             List<SummaryViewModel> totalAsCategory = new List<SummaryViewModel>();
 
+            // 収支別に計算する
             foreach (IGrouping<int, SummaryViewModel> g1 in summaryVMList.GroupBy(obj => obj.BalanceKind)) {
                 // 収入/支出の小計を計算する
                 totalAsBalanceKind.Add(new SummaryViewModel() {
@@ -1832,6 +1894,123 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             for (int i = 1; i < monthes; ++i) {
                 tmpStartTime = tmpStartTime.AddMonths(1);
                 tmpEndTime = tmpStartTime.AddMonths(1).AddMilliseconds(-1);
+
+                summaryVMList = this.LoadSummaryViewModelList(bookId, tmpStartTime, tmpEndTime);
+                balance = balance + summaryVMList[0].Summary;
+                vmList[0].Values.Add(balance); // 残高
+                for (int j = 0; j < summaryVMList.Count; ++j) {
+                    int value = summaryVMList[j].Summary;
+
+                    vmList[j + 1].Values.Add(value);
+
+                    if (tmpEndTime < DateTime.Now) {
+                        vmList[j + 1].Average += value;
+                    }
+                    vmList[j + 1].Summary += value;
+                }
+                if (tmpEndTime < DateTime.Now) {
+                    ++averageCount;
+                }
+            }
+
+            // 平均値を計算する
+            foreach (SeriesViewModel vm in vmList) {
+                if (vm.Average != null) {
+                    if (averageCount != 0) {
+                        vm.Average /= averageCount;
+                    }
+                    else {
+                        vm.Average = 0;
+                    }
+                }
+            }
+
+            return vmList;
+        }
+
+        /// <summary>
+        /// 年別合計VMリストを取得する
+        /// </summary>
+        /// <param name="bookId">帳簿ID</param>
+        /// <returns>月別合計項目VMリスト</returns>
+        private ObservableCollection<SeriesViewModel> LoadYearlySummaryViewModelListWithinDecade(int? bookId)
+        {
+            DateTime startTime = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth).AddYears(-9);
+            DateTime endTime = startTime.AddYears(10);
+
+            // 開始年までの収支を取得する
+            int balance = 0;
+            using (DaoBase dao = this.builder.Build()) {
+                DaoReader reader;
+                if (bookId == null) {
+                    // 全帳簿
+                    reader = dao.ExecQuery(@"
+SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0) AS sum
+FROM hst_action AA
+INNER JOIN(SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
+WHERE AA.del_flg = 0 AND AA.act_time < @{1};", null, startTime);
+                }
+                else {
+                    // 各帳簿
+                    reader = dao.ExecQuery(@"
+SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0}) AS sum
+FROM hst_action AA
+INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
+WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, startTime);
+                }
+
+                reader.ExecARow((record) => {
+                    balance = record.ToInt("sum");
+                });
+            }
+
+            ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel> {
+                new SeriesViewModel() {
+                    BalanceKind = -1,
+                    CategoryId = -1,
+                    CategoryName = string.Empty,
+                    ItemId = -1,
+                    ItemName = "残高",
+                    Values = new List<int>()
+                }
+            };
+            int averageCount = 0; // 平均値計算に使用する年数(去年まで)
+
+            // 最初の年の分を取得する
+            DateTime tmpStartTime = startTime;
+            DateTime tmpEndTime = tmpStartTime.AddYears(1).AddMilliseconds(-1);
+            ObservableCollection<SummaryViewModel> summaryVMList = this.LoadSummaryViewModelList(bookId, tmpStartTime, tmpEndTime);
+            balance = balance + summaryVMList[0].Summary;
+            vmList[0].Values.Add(balance); // 残高
+            foreach (SummaryViewModel summaryVM in summaryVMList) {
+                int value = summaryVM.Summary;
+                SeriesViewModel vm = new SeriesViewModel() {
+                    BalanceKind = summaryVM.BalanceKind,
+                    CategoryId = summaryVM.CategoryId,
+                    CategoryName = summaryVM.CategoryName,
+                    ItemId = summaryVM.ItemId,
+                    ItemName = summaryVM.ItemName,
+                    Values = new List<int>(),
+                    Summary = value
+                };
+                if (tmpEndTime < DateTime.Now) {
+                    vm.Average = value;
+                }
+                else {
+                    vm.Average = 0;
+                }
+                vm.Values.Add(value);
+                vmList.Add(vm);
+            }
+            if (tmpEndTime < DateTime.Now) {
+                ++averageCount;
+            }
+
+            // 最初以外の年の分を取得する
+            int years = 10;
+            for (int i = 1; i < years; ++i) {
+                tmpStartTime = tmpStartTime.AddYears(1);
+                tmpEndTime = tmpStartTime.AddYears(1).AddMilliseconds(-1);
 
                 summaryVMList = this.LoadSummaryViewModelList(bookId, tmpStartTime, tmpEndTime);
                 balance = balance + summaryVMList[0].Summary;
@@ -2332,7 +2511,6 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                         }
                         break;
                     case GraphKind.Balance: {
-                            DateTime dateTime = this.WVM.DisplayedYear.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth); // 開始日
                             LineSeries cSeries = new LineSeries() {
                                 Title = "残高",
                                 TrackerFormatString = "{2}月: {4:#,0}" //月: 金額
@@ -2356,6 +2534,218 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
                 this.WVM.SelectedItemMonthlyGraphModel.Series.Clear();
                 this.WVM.SelectedItemMonthlyGraphModel.InvalidatePlot(true);
+            }
+        }
+        #endregion
+
+        #region 年別一覧タブ更新用の関数
+        /// <summary>
+        /// 年別一覧タブに表示するデータを更新する
+        /// </summary>
+        private void UpdateYearlyListTabData()
+        {
+            if (this.WVM.SelectedTab == Tabs.YearlyListTab) {
+                int startYear = DateTime.Now.Year - 9;
+
+                // 表示する月の文字列を作成する
+                ObservableCollection<string> displayedYears = new ObservableCollection<string>();
+                for (int i = startYear; i < startYear + 10; ++i) {
+                    displayedYears.Add(string.Format("{0}年", i));
+                }
+                this.WVM.DisplayedYears = displayedYears;
+                this.WVM.YearlySummaryVMList = LoadYearlySummaryViewModelListWithinDecade(this.WVM.SelectedBookVM.Id);
+            }
+        }
+        #endregion
+
+        #region 年別グラフタブ更新用の関数
+        /// <summary>
+        /// 年別グラフタブに表示するデータを初期化する
+        /// </summary>
+        private void InitializeYearlyGraphTabData()
+        {
+            if (this.WVM.SelectedTab == Tabs.YearlyGraphTab) {
+                int startYear = DateTime.Now.Year - 9;
+
+                // 全項目
+                this.WVM.WholeItemYearlyGraphModel.Axes.Clear();
+                this.WVM.WholeItemYearlyGraphModel.Series.Clear();
+
+                // 横軸 - 年軸
+                CategoryAxis cAxis1 = new CategoryAxis() { Unit = "年", Position = AxisPosition.Bottom };
+                cAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+                // 表示する年の文字列を作成する
+                for (int i = startYear; i < startYear + 10; ++i) {
+                    cAxis1.Labels.Add(string.Format("{0}", i));
+                }
+                this.WVM.WholeItemYearlyGraphModel.Axes.Add(cAxis1);
+
+                // 縦軸 - 線形軸
+                LinearAxis lAxis1 = new LinearAxis() {
+                    Unit = "円",
+                    Position = AxisPosition.Left,
+                    MajorGridlineStyle = LineStyle.Solid,
+                    MinorGridlineStyle = LineStyle.Dot,
+                    StringFormat = "#,0"
+                };
+                switch (this.WVM.SelectedGraphKind) {
+                    case GraphKind.IncomeAndOutgo: {
+                            lAxis1.Title = "収支";
+                        }
+                        break;
+                    case GraphKind.Balance: {
+                            lAxis1.Title = "残高";
+                        }
+                        break;
+                }
+                this.WVM.WholeItemYearlyGraphModel.Axes.Add(lAxis1);
+
+                this.WVM.WholeItemYearlyGraphModel.InvalidatePlot(true);
+
+                // 選択項目
+                this.WVM.SelectedItemYearlyGraphModel.Axes.Clear();
+                this.WVM.SelectedItemYearlyGraphModel.Series.Clear();
+
+                // 横軸 - 年軸
+                CategoryAxis cAxis2 = new CategoryAxis() { Unit = "年", Position = AxisPosition.Bottom };
+                cAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+                // 表示する年の文字列を作成する
+                for (int i = startYear; i < startYear + 10; ++i) {
+                    cAxis2.Labels.Add(string.Format("{0}", i));
+                }
+                this.WVM.SelectedItemYearlyGraphModel.Axes.Add(cAxis2);
+
+                // 縦軸 - 線形軸
+                LinearAxis lAxis2 = new LinearAxis() {
+                    Unit = "円",
+                    Position = AxisPosition.Left,
+                    MajorGridlineStyle = LineStyle.Solid,
+                    MinorGridlineStyle = LineStyle.Dot,
+                    StringFormat = "#,0"
+                };
+                switch (this.WVM.SelectedGraphKind) {
+                    case GraphKind.IncomeAndOutgo: {
+                            lAxis2.Title = "収支";
+                        }
+                        break;
+                    case GraphKind.Balance: {
+                            lAxis2.Title = "残高";
+                        }
+                        break;
+                }
+                this.WVM.SelectedItemYearlyGraphModel.Axes.Add(lAxis2);
+
+                this.WVM.SelectedItemYearlyGraphModel.InvalidatePlot(true);
+            }
+        }
+
+        /// <summary>
+        /// 年別グラフタブに表示するデータを更新する
+        /// </summary>
+        private void UpdateYearlyGraphTabData()
+        {
+            if (this.WVM.SelectedTab == Tabs.YearlyGraphTab) {
+                int startYear = DateTime.Now.Year - 9;
+                this.WVM.WholeItemYearlyGraphModel.Series.Clear();
+
+                switch (this.WVM.SelectedGraphKind) {
+                    case GraphKind.IncomeAndOutgo: {
+                            ObservableCollection<SeriesViewModel> vmList = LoadYearlySummaryViewModelListWithinDecade(this.WVM.SelectedBookVM.Id);
+                            List<int> sumPlus = new List<int>(); // 年ごとの合計収入
+                            List<int> sumMinus = new List<int>(); // 年ごとの合計支出
+
+                            foreach (SeriesViewModel tmpVM in vmList) {
+                                if (tmpVM.ItemId == -1) { continue; }
+
+                                CustomColumnSeries cSeries1 = new CustomColumnSeries() {
+                                    IsStacked = true,
+                                    Title = tmpVM.ItemName,
+                                    ItemsSource = tmpVM.Values.Select((value, index) => new SeriesItemViewModel {
+                                        Value = value,
+                                        Number = index + startYear,
+                                        ItemId = tmpVM.ItemId,
+                                        CategoryId = tmpVM.CategoryId
+                                    }),
+                                    ValueField = "Value",
+                                    TrackerFormatString = "{0}\n{1}年: {2:#,0}"
+                                };
+                                // 全項目年間グラフの項目を選択した時のイベントを登録する
+                                cSeries1.TrackerHitResultChanged += (sender, e) => {
+                                    if (e.Value == null) return;
+
+                                    SeriesItemViewModel itemVM = e.Value.Item as SeriesItemViewModel;
+                                    SeriesViewModel vm = vmList.FirstOrDefault((tmp) => tmp.ItemId == itemVM.ItemId);
+
+                                    this.WVM.SelectedItemYearlyGraphModel.Series.Clear();
+
+                                    CustomColumnSeries cSeries2 = new CustomColumnSeries() {
+                                        IsStacked = true,
+                                        Title = vm.ItemName,
+                                        FillColor = (e.Value.Series as CustomColumnSeries).ActualFillColor,
+                                        ItemsSource = vm.Values.Select((value, index) => new SeriesItemViewModel {
+                                            Value = value,
+                                            Number = index + startYear,
+                                            ItemId = vm.ItemId,
+                                            CategoryId = vm.CategoryId
+                                        }),
+                                        ValueField = "Value",
+                                        TrackerFormatString = "{1}年: {2:#,0}" //年: 金額
+                                    };
+                                    this.WVM.SelectedItemYearlyGraphModel.Series.Add(cSeries2);
+
+                                    foreach (Axis axis in this.WVM.SelectedItemYearlyGraphModel.Axes) {
+                                        if (axis.Position == AxisPosition.Left) {
+                                            this.SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
+                                            break;
+                                        }
+                                    }
+
+                                    this.WVM.SelectedItemYearlyGraphModel.InvalidatePlot(true);
+                                };
+                                this.WVM.WholeItemYearlyGraphModel.Series.Add(cSeries1);
+
+                                // 全項目の月毎の合計を計算する
+                                for (int i = 0; i < tmpVM.Values.Count; ++i) {
+                                    if (sumPlus.Count <= i) { sumPlus.Add(0); sumMinus.Add(0); }
+
+                                    if (tmpVM.Values[i] < 0) sumMinus[i] += tmpVM.Values[i];
+                                    else sumPlus[i] += tmpVM.Values[i];
+                                }
+                            }
+
+                            // Y軸の範囲を設定する
+                            foreach (Axis axis in this.WVM.WholeItemYearlyGraphModel.Axes) {
+                                if (axis.Position == AxisPosition.Left) {
+                                    this.SetAxisRange(axis, sumMinus.Min(), sumPlus.Max(), 10, true);
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    case GraphKind.Balance: {
+                            LineSeries cSeries = new LineSeries() {
+                                Title = "残高",
+                                TrackerFormatString = "{2}年: {4:#,0}" //年: 金額
+                            };
+                            ObservableCollection<SeriesViewModel> vmList = LoadYearlySummaryViewModelListWithinDecade(this.WVM.SelectedBookVM.Id);
+                            cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
+
+                            this.WVM.WholeItemYearlyGraphModel.Series.Add(cSeries);
+
+                            // Y軸の範囲を設定する
+                            foreach (Axis axis in this.WVM.WholeItemYearlyGraphModel.Axes) {
+                                if (axis.Position == AxisPosition.Left) {
+                                    this.SetAxisRange(axis, cSeries.Points.Min((value) => value.Y), cSeries.Points.Max((value) => value.Y), 10, true);
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                }
+                this.WVM.WholeItemYearlyGraphModel.InvalidatePlot(true);
+
+                this.WVM.SelectedItemYearlyGraphModel.Series.Clear();
+                this.WVM.SelectedItemYearlyGraphModel.InvalidatePlot(true);
             }
         }
         #endregion

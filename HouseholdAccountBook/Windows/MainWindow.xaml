@@ -37,6 +37,8 @@
         <RoutedCommand x:Key="IndicateDailyGraphTabCommand"/>
         <RoutedCommand x:Key="IndicateMonthlyListTabCommand"/>
         <RoutedCommand x:Key="IndicateMonthlyGraphTabCommand"/>
+        <RoutedCommand x:Key="IndicateYearlyListTabCommand"/>
+        <RoutedCommand x:Key="IndicateYearlyGraphTabCommand"/>
         <RoutedCommand x:Key="UpdateCommand"/>
         
         <!-- 帳簿表示操作コマンド -->
@@ -110,6 +112,8 @@
         <CommandBinding Command="{StaticResource IndicateDailyGraphTabCommand}" CanExecute="IndicateDailyGraphTabCommand_CanExecute" Executed="IndicateDailyGraphTabCommand_Executed"/>
         <CommandBinding Command="{StaticResource IndicateMonthlyListTabCommand}" CanExecute="IndicateMonthlyListTabCommand_CanExecute" Executed="IndicateMonthlyListTabCommand_Executed"/>
         <CommandBinding Command="{StaticResource IndicateMonthlyGraphTabCommand}" CanExecute="IndicateMonthlyGraphTabCommand_CanExecute" Executed="IndicateMonthlyGraphTabCommand_Executed"/>
+        <CommandBinding Command="{StaticResource IndicateYearlyListTabCommand}" CanExecute="IndicateYearlyListTabCommand_CanExecute" Executed="IndicateYearlyListTabCommand_Executed"/>
+        <CommandBinding Command="{StaticResource IndicateYearlyGraphTabCommand}" CanExecute="IndicateYearlyGraphTabCommand_CanExecute" Executed="IndicateYearlyGraphTabCommand_Executed"/>
         <CommandBinding Command="{StaticResource UpdateCommand}" Executed="UpdateCommand_Executed"/>
         
         <!-- 帳簿表示コマンド -->
@@ -204,6 +208,12 @@
                     <MenuItem Header="今年(_T)" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Alt+↓"/>
                     <MenuItem Header="来年(_N)" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Alt+→"/>
                 </MenuItem>
+                <MenuItem Header="年別一覧(_L)">
+                    <MenuItem Header="切替(_I)" Command="{StaticResource IndicateYearlyListTabCommand}"/>
+                </MenuItem>
+                <MenuItem Header="年別グラフ(_G)">
+                    <MenuItem Header="切替(_I)" Command="{StaticResource IndicateYearlyGraphTabCommand}"/>
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="更新(_U)" Command="{StaticResource UpdateCommand}" InputGestureText="F5"/>
             </MenuItem>
@@ -221,7 +231,7 @@
                     SelectedIndex="{Binding SelectedTabIndex}" SelectionChanged="TabControl_SelectionChanged">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="TabItem">
-                    <Setter Property="Height" Value="100"/>
+                    <Setter Property="Height" Value="75"/>
                 </Style>
             </TabControl.ItemContainerStyle>
             <TabItem Header="帳簿">
@@ -539,6 +549,118 @@
 
                         <oxy:PlotView Grid.Row="0" Model="{Binding WholeItemMonthlyGraphModel}" Controller="{Binding Controller}"/>
                         <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemMonthlyGraphModel}" Controller="{Binding Controller}"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="年別&#10;一覧">
+                <TabItem.InputBindings>
+                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                </TabItem.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 中央メニュー -->
+                    <Grid Grid.Row="0" Margin="2,2,2,1">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="◀" Width="20" IsEnabled="False"/>
+                            <Button Content="-" Width="120" IsEnabled="False"/>
+                            <Button Content="▶" Width="20" IsEnabled="False"/>
+                            <Button Content="-" Width="40" IsEnabled="False"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
+                                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
+                                          SelectionChanged="BookComboBox_SelectionChanged"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- データリスト -->
+                    <Grid Grid.Row="1" Margin="2" Background="White">
+                        <DataGrid Grid.Column="1" ItemsSource="{Binding YearlySummaryVMList}" IsReadOnly="True" SelectionUnit="FullRow"
+                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
+                                  AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
+                                  HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
+                                  ItemContainerStyle="{StaticResource SummaryStyle}">
+                            <DataGrid.Resources>
+                                <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <!-- 参考：http://oita.oika.me/2014/05/31/binding-datagridcolumn/ -->
+                                <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[0], Source={StaticResource Proxy}}" 
+                                                    Binding="{Binding Values[0], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[1], Source={StaticResource Proxy}}" 
+                                                    Binding="{Binding Values[1], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[2], Source={StaticResource Proxy}}" 
+                                                    Binding="{Binding Values[2], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[3], Source={StaticResource Proxy}}" 
+                                                    Binding="{Binding Values[3], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[4], Source={StaticResource Proxy}}" 
+                                                    Binding="{Binding Values[4], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[5], Source={StaticResource Proxy}}" 
+                                                    Binding="{Binding Values[5], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[6], Source={StaticResource Proxy}}" 
+                                                    Binding="{Binding Values[6], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[7], Source={StaticResource Proxy}}" 
+                                                    Binding="{Binding Values[7], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[8], Source={StaticResource Proxy}}" 
+                                                    Binding="{Binding Values[8], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[9], Source={StaticResource Proxy}}" 
+                                                    Binding="{Binding Values[9], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="平均" Binding="{Binding Average, Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="合計" Binding="{Binding Summary, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="年別&#10;グラフ">
+                <TabItem.InputBindings>
+                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                </TabItem.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 中央メニュー -->
+                    <Grid Grid.Row="0" Margin="2,2,2,1">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="◀" Width="20" IsEnabled="False"/>
+                            <Button Content="-" Width="120" IsEnabled="False"/>
+                            <Button Content="▶" Width="20" IsEnabled="False"/>
+                            <Button Content="-" Width="40" IsEnabled="False"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
+                                      SelectionChanged="BookComboBox_SelectionChanged"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                                      ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"
+                                      SelectionChanged="GraphKindComboBox_SelectionChanged"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="1" Margin="2" Background="White">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.7*"/>
+                            <RowDefinition Height="0.3*"/>
+                        </Grid.RowDefinitions>
+
+                        <oxy:PlotView Grid.Row="0" Model="{Binding WholeItemYearlyGraphModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemYearlyGraphModel}" Controller="{Binding Controller}"/>
                     </Grid>
                 </Grid>
             </TabItem>

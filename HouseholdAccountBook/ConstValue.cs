@@ -38,6 +38,14 @@ namespace HouseholdAccountBook.ConstValue
             /// 月別グラフタブ
             /// </summary>
             MonthlyGraphTab = 3,
+            /// <summary>
+            /// 年別一覧タブ
+            /// </summary>
+            YearlyListTab = 4,
+            /// <summary>
+            /// 年別グラフタブ
+            /// </summary>
+            YearlyGraphTab = 5
         }
 
         /// <summary>

@@ -2,7 +2,7 @@
 
 ## __Abstract__
 It is for your household accounts book via PostgreSQL.  
-Currently, the binary file is unscheduled to publish.  
+Currently, the binary file is unscheduled to be published.  
 It is for who can set PostgreSQL environments and build the project yourself.  
 It is supported for Japanese Language only.  
 
@@ -14,9 +14,12 @@ It is supported for Japanese Language only.
 自力で環境設定、ビルドできる方向けです。
 
 ## __開発環境__
-IDE: [Visual Studio Community](https://www.microsoft.com/ja-jp/dev/products/community.aspx) 2017  
-DB: [PostgreSQL](https://www.postgresql.org/) 9.6   
-言語: C# (.NET Framework 4.5.2)
+* IDE  
+  [Visual Studio Community](https://www.microsoft.com/ja-jp/dev/products/community.aspx) 2017  
+* DB  
+  [PostgreSQL](https://www.postgresql.org/) 9.6   
+* 言語  
+  C# (.NET Framework 4.5.2)
 
 ## __機能__
 ### 実装済
@@ -53,21 +56,26 @@ DB: [PostgreSQL](https://www.postgresql.org/) 9.6
 				- 「移動」クリック時に選択していた帳簿項目の日付と、初期「日付」の連動
 				- 「移動元」(支払元帳簿)、「日」(支払日)のデフォルト値の設定(クレジットカードのみ)
 * 「日別グラフ」機能
-	* 全項目の指定期間内の日単位での収支の推移
-	* 選択項目の指定期間内の日単位での収支の推移
-	* 指定期間内の日単位での残高の推移
+	* 選択した帳簿における全項目の指定期間内の日単位での収支の推移
+	* 選択した帳簿における選択項目の指定期間内の日単位での収支の推移
+	* 選択した帳簿における指定期間内の日単位での残高の推移
 * 「月別一覧」機能
 	* 記帳風月の「年間一覧」機能に加え、以下をサポートしています。
 		* 「記帳」機能の表示月と、表示年の連動
 		* 「今年」表示
 * 「月別グラフ」機能
 	* 記帳風月の「グラフ」機能を一部サポートしています。
-		* 全項目の年間(月単位)の収支の推移
-		* 選択項目の年間(月単位)の収支の推移
+		* 選択した帳簿における全項目の年間(月単位)の収支の推移
+		* 選択した帳簿における選択項目の年間(月単位)の収支の推移
 	* また、以下をサポートしています。
-		* 年間(月単位)の残高の推移
+		* 選択した帳簿における年間(月単位)の残高の推移
+* 「年別一覧」機能
+	* 「月別一覧」機能の年別版です。過去10年間(年単位)の一覧を表示できます。
+* 「年別グラフ」機能
+	* 「月別グラフ」機能の年別版です。過去10年間(年単位)の推移を表示できます。
 * その他の機能
 	* ファイル関連
+		* 記帳風月からのインポート
 		* データベースのインポート、エクスポート
 		* 最小化時の自動バックアップ
 		* 手動バックアップ

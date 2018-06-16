@@ -391,6 +391,34 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
         #endregion
 
+        #region 年別一覧タブ
+        #region プロパティ
+        /// <summary>
+        /// 表示年リスト
+        /// </summary>
+        #region DisplayedYears
+        public ObservableCollection<string> DisplayedYears
+        {
+            get { return this._DisplayedYears; }
+            set { SetProperty(ref this._DisplayedYears, value); }
+        }
+        private ObservableCollection<string> _DisplayedYears = default(ObservableCollection<string>);
+        #endregion
+
+        /// <summary>
+        /// 年別合計項目VMリスト
+        /// </summary>
+        #region YearlySummaryVMList
+        public ObservableCollection<SeriesViewModel> YearlySummaryVMList
+        {
+            get { return this._YearlySummaryVMList; }
+            set { SetProperty(ref this._YearlySummaryVMList, value); }
+        }
+        private ObservableCollection<SeriesViewModel> _YearlySummaryVMList = default(ObservableCollection<SeriesViewModel>);
+        #endregion
+        #endregion
+        #endregion
+
         #region グラフタブ
         #region プロパティ
         /// <summary>
@@ -488,6 +516,44 @@ namespace HouseholdAccountBook.ViewModels
         };
         #endregion
 
+        /// <summary>
+        /// 全項目年別グラフプロットモデル
+        /// </summary>
+        #region WholeItemYearlyGraphModel
+        public PlotModel WholeItemYearlyGraphModel
+        {
+            get { return this._WholeItemYearlyGraphModel; }
+            set { SetProperty(ref this._WholeItemYearlyGraphModel, value); }
+        }
+        private PlotModel _WholeItemYearlyGraphModel = new PlotModel() {
+            Title = "年別グラフ",
+            LegendOrientation = LegendOrientation.Horizontal,
+            LegendPlacement = LegendPlacement.Outside,
+            LegendPosition = LegendPosition.RightTop,
+            LegendTitle = "凡例",
+            LegendFontSize = 10.5
+        };
+        #endregion
+
+        /// <summary>
+        /// 選択項目年別グラフプロットモデル
+        /// </summary>
+        #region SelectedItemYearlyGraphModel
+        public PlotModel SelectedItemYearlyGraphModel
+        {
+            get { return this._SelectedItemYearlyGraphModel; }
+            set { SetProperty(ref this._SelectedItemYearlyGraphModel, value); }
+        }
+        private PlotModel _SelectedItemYearlyGraphModel = new PlotModel() {
+            Title = "個別グラフ",
+            LegendOrientation = LegendOrientation.Horizontal,
+            LegendPlacement = LegendPlacement.Outside,
+            LegendPosition = LegendPosition.RightTop,
+            LegendTitle = "凡例",
+            LegendFontSize = 10.5
+        };
+        #endregion
+        
         /// <summary>
         /// コントローラ
         /// </summary>
