@@ -1,12 +1,14 @@
-﻿using Prism.Mvvm;
+﻿using HouseholdAccountBook.Extentions;
+using Prism.Mvvm;
 using System;
+using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
     /// VM
     /// </summary>
-    public class SelectingTermWindowViewModel : BindableBase
+    public class TermWindowViewModel : BindableBase
     {
         /// <summary>
         /// 開始日
@@ -30,6 +32,24 @@ namespace HouseholdAccountBook.ViewModels
             set { SetProperty(ref this._EndDate, value); }
         }
         private DateTime _EndDate = DateTime.Now;
+        #endregion
+
+        /// <summary>
+        /// 選択された区間種別
+        /// </summary>
+        #region SelectedTermKind
+        public TermKind SelectedTermKind
+        {
+            get {
+                DateTime lastDate = this.StartDate.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1);
+                if (this.StartDate.Day == 1 && DateTime.Equals(this.EndDate.Date, lastDate.Date)) {
+                    return TermKind.Monthly;
+                }
+                else {
+                    return TermKind.Selected;
+                }
+            }
+        }
         #endregion
     }
 }

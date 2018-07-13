@@ -103,9 +103,9 @@ namespace HouseholdAccountBook.ConstValue
         };
 
         /// <summary>
-        /// 日別区間種別
+        /// 区間種別
         /// </summary>
-        public enum DailyTermKind 
+        public enum TermKind 
         {
             /// <summary>
             /// 月

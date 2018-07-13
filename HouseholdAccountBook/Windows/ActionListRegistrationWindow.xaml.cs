@@ -33,6 +33,10 @@ namespace HouseholdAccountBook.Windows
         /// 金額列の最後に選択したセル
         /// </summary>
         private DataGridCell lastDataGridCell;
+        /// <summary>
+        /// 最後に選択したセルのVM
+        /// </summary>
+        private DateValueViewModel lastDateValueVM;
         #endregion
 
         #region イベント
@@ -167,23 +171,26 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         {
             TextBox textBox = this._popup.PlacementTarget as TextBox;
             DateValueViewModel vm = textBox.DataContext as DateValueViewModel;
+            if (vm == null) { vm = this.lastDateValueVM; } // textBoxのDataContextが取得できないため応急処置
 
             switch (this.WVM.InputedKind) {
                 case NumericInputButton.InputKind.Number:
                     int value = this.WVM.InputedValue.Value;
                     if (vm.ActValue == null) {
                         vm.ActValue = value;
+                        textBox.Text = string.Format("{0}", vm.ActValue);
                         textBox.SelectionStart = 1;
                     }
                     else {
+                        // 選択された位置に値を挿入する
                         int selectionStart = textBox.SelectionStart;
                         int selectionEnd = selectionStart + textBox.SelectionLength;
                         string forwardText = textBox.Text.Substring(0, selectionStart);
-                        string selectedText = textBox.SelectedText;
                         string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
 
                         if(int.TryParse(string.Format("{0}{1}{2}", forwardText, value, backwardText), out int outValue)) {
                             vm.ActValue = outValue;
+                            textBox.Text = string.Format("{0}", vm.ActValue);
                             textBox.SelectionStart = selectionStart + 1;
                         }
                     }
@@ -202,6 +209,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
                         if (selectionLength != 0) {
                             if(int.TryParse(string.Format("{0}{1}", forwardText, backwardText), out int outValue)) {
                                 vm.ActValue = outValue;
+                                textBox.Text = string.Format("{0}", outValue);
                                 textBox.SelectionStart = selectionStart;
                             }
                         }
@@ -209,6 +217,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
                             string newText = string.Format("{0}{1}", forwardText.Substring(0, selectionStart - 1), backwardText);
                             if(string.Empty == newText || int.TryParse(newText, out int outValue)) {
                                 vm.ActValue = string.Empty == newText ? (int?)null : int.Parse(newText);
+                                textBox.Text = string.Format("{0}", vm.ActValue);
                                 textBox.SelectionStart = selectionStart - 1;
                             }
                         }
@@ -218,6 +227,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
                     vm.ActValue = null;
                     break;
             }
+
             // 外れたフォーカスを元に戻す
             this.lastDataGridCell.IsEditing = true; // セルを編集モードにする - 画面がちらつくがやむを得ない？
             textBox.Focus();
@@ -286,7 +296,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         }
         
         /// <summary>
-        /// 入力された値を表示前にチェックする
+        /// テキストボックステキスト入力確定前
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -318,7 +328,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         }
 
         /// <summary>
-        /// Popupを表示する
+        /// テキストボックスフォーカス取得時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -326,9 +336,11 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         {
             if (!this.WVM.IsEditing) { 
                 TextBox textBox = sender as TextBox;
-                this._popup.SetBinding(Popup.StaysOpenProperty, new Binding(TextBox.IsKeyboardFocusedProperty.Name) { Source = textBox });
+                this._popup.SetBinding(Popup.StaysOpenProperty, new Binding(IsKeyboardFocusedProperty.Name) { Source = textBox });
                 this._popup.PlacementTarget = textBox;
                 this.WVM.IsEditing = true;
+
+                this.lastDateValueVM = textBox.DataContext as DateValueViewModel;
             }
             e.Handled = true;
         }

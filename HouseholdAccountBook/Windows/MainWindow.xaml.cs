@@ -112,7 +112,7 @@ namespace HouseholdAccountBook.Windows
                 Filter = "MDBファイル|*.mdb"
             };
 
-            if (ofd.ShowDialog() == false) return;
+            if (ofd.ShowDialog(this) == false) return;
 
             if (MessageBox.Show(MessageText.DeleteOldDataNotification, this.Title,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
@@ -354,7 +354,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 CheckPathExists = true
             };
 
-            if (ofd.ShowDialog() == false) return;
+            if (ofd.ShowDialog(this) == false) return;
 
             if (MessageBox.Show(MessageText.DeleteOldDataNotification, this.Title,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
@@ -461,7 +461,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 Filter = "カスタム形式ファイル|*.*"
             };
 
-            if (sfd.ShowDialog() == false) return;
+            if (sfd.ShowDialog(this) == false) return;
 
             settings.App_CustomFormatFilePath = Path.Combine(sfd.InitialDirectory, sfd.FileName);
             settings.Save();
@@ -542,7 +542,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void MoveToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder,
-                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime ?? this.WVM.DisplayedMonth);
+                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime ?? this.WVM.DisplayedMonth) { Owner = this };
             // 登録時イベントを登録する
             mrw.Registrated += (sender2, e2) => {
                 // 帳簿一覧タブを更新する
@@ -550,7 +550,6 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
-            mrw.Owner = this;
             mrw.ShowDialog();
         }
 
@@ -573,7 +572,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void AddActionToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder,
-                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime);
+                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             // 登録時イベントを登録する
             arw.Registrated += (sender2, e2)=> {
                 // 帳簿一覧タブを更新する
@@ -581,7 +580,6 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
-            arw.Owner = this;
             arw.ShowDialog();
         }
 
@@ -604,7 +602,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void AddActionListToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder,
-                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime);
+                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             // 登録時イベントを登録する
             alrw.Registrated += (sender2, e2) => {
                 // 帳簿一覧タブを更新する
@@ -612,7 +610,6 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
-            alrw.Owner = this;
             alrw.ShowDialog();
         }
 
@@ -652,7 +649,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
 
             if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
                 // 移動以外の帳簿項目の編集時の処理
-                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId);
+                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId) { Owner = this };
                 // 登録時イベントを登録する
                 arw.Registrated += (sender2, e2) => {
                     // 帳簿一覧タブを更新する
@@ -664,7 +661,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
             }
             else {
                 // 移動の編集時の処理
-                MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value);
+                MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
                 // 登録時イベントを登録する
                 mrw.Registrated += (sender2, e2) => {
                     // 帳簿一覧タブを更新する
@@ -712,7 +709,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
 
             if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
                 // 移動以外の帳簿項目の複製時の処理
-                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId, RegistrationMode.Copy);
+                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId, RegistrationMode.Copy) { Owner = this };
                 // 登録時イベントを登録する
                 arw.Registrated += (sender2, e2) => {
                     // 帳簿一覧タブを更新する
@@ -724,7 +721,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
             }
             else {
                 // 移動の複製時の処理
-                MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationMode.Copy);
+                MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationMode.Copy) { Owner = this };
                 // 登録時イベントを登録する
                 mrw.Registrated += (sender2, e2) => {
                     // 帳簿一覧タブを更新する
@@ -959,7 +956,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         private void GoToLastMonthCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿/日別一覧タブを選択している
-            e.CanExecute = (this.WVM.SelectedTab == Tabs.BooksTab || this.WVM.SelectedTab == Tabs.DailyGraphTab) && this.WVM.DisplayedDailyTermKind == DailyTermKind.Monthly;
+            e.CanExecute = (this.WVM.SelectedTab == Tabs.BooksTab || this.WVM.SelectedTab == Tabs.DailyGraphTab) && this.WVM.DisplayedTermKind == TermKind.Monthly;
         }
 
         /// <summary>
@@ -972,8 +969,8 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
-            switch (this.WVM.DisplayedDailyTermKind) {
-                case DailyTermKind.Monthly:
+            switch (this.WVM.DisplayedTermKind) {
+                case TermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
                     UpdateBookTabData(isScroll:true);
 
@@ -995,7 +992,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             DateTime thisMonth = DateTime.Today.GetFirstDateOfMonth();
             // 帳簿/月間一覧タブを選択している かつ 今月が表示されていない
             e.CanExecute = (this.WVM.SelectedTab == Tabs.BooksTab || this.WVM.SelectedTab == Tabs.DailyGraphTab) &&
-                           (this.WVM.DisplayedDailyTermKind == DailyTermKind.Selected || !(thisMonth <= this.WVM.DisplayedMonth && this.WVM.DisplayedMonth < thisMonth.AddMonths(1)));
+                           (this.WVM.DisplayedTermKind == TermKind.Selected || !(thisMonth <= this.WVM.DisplayedMonth && this.WVM.DisplayedMonth < thisMonth.AddMonths(1)));
         }
 
         /// <summary>
@@ -1025,7 +1022,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         private void GoToNextMonthCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿/月間一覧タブを選択している
-            e.CanExecute = (this.WVM.SelectedTab == Tabs.BooksTab || this.WVM.SelectedTab == Tabs.DailyGraphTab) && this.WVM.DisplayedDailyTermKind == DailyTermKind.Monthly;
+            e.CanExecute = (this.WVM.SelectedTab == Tabs.BooksTab || this.WVM.SelectedTab == Tabs.DailyGraphTab) && this.WVM.DisplayedTermKind == TermKind.Monthly;
         }
 
         /// <summary>
@@ -1038,8 +1035,8 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
-            switch (this.WVM.DisplayedDailyTermKind) {
-                case DailyTermKind.Monthly:
+            switch (this.WVM.DisplayedTermKind) {
+                case TermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
                     UpdateBookTabData(isScroll:true);
 
@@ -1058,7 +1055,16 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void OpenSelectingDailyTermWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            SelectingDailyTermWindow stw = new SelectingDailyTermWindow(this.WVM.StartDate, this.WVM.EndDate);
+            TermWindow stw = null;
+            
+            switch (this.WVM.DisplayedTermKind) {
+                case TermKind.Monthly:
+                    stw = new TermWindow(this.WVM.DisplayedMonth.Value) { Owner = this };
+                    break;
+                case TermKind.Selected:
+                    stw = new TermWindow(this.WVM.StartDate, this.WVM.EndDate) { Owner = this };
+                    break;
+            }
             
             if (stw.ShowDialog() == true) {
                 Cursor cCursor = this.Cursor;
@@ -1174,7 +1180,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private void OpenSettingsWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            SettingsWindow sw = new SettingsWindow(this.builder);
+            SettingsWindow sw = new SettingsWindow(this.builder) { Owner = this };
             if (sw.ShowDialog() == true) {
                 Cursor cCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
@@ -1188,6 +1194,10 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 UpdateMonthlyListTabData();
                 InitializeMonthlyGraphTabData();
                 UpdateMonthlyGraphTabData();
+
+                UpdateYearlyListTabData();
+                InitializeYearlyGraphTabData();
+                UpdateYearlyGraphTabData();
 
                 this.Cursor = cCursor;
             }
@@ -1231,12 +1241,13 @@ WHERE action_id = @{0};", vm.ActionId);
         /// <param name="e"></param>
         private void OpenVersionWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            VersionWindow vw = new VersionWindow();
+            VersionWindow vw = new VersionWindow { Owner = this };
             vw.ShowDialog();
         }
         #endregion
         #endregion
 
+        #region ウィンドウ
         /// <summary>
         /// フォーム終了時
         /// </summary>
@@ -1259,7 +1270,9 @@ WHERE action_id = @{0};", vm.ActionId);
                 app?.CreateBackUpFile();
             }
         }
+        #endregion
 
+        #region タブ
         /// <summary>
         /// 選択中のタブを変更した時
         /// </summary>
@@ -1298,7 +1311,9 @@ WHERE action_id = @{0};", vm.ActionId);
             }
             this.oldSelectedTab = this.WVM.SelectedTab;
         }
+        #endregion
 
+        #region コンボボックス
         /// <summary>
         /// 選択中の帳簿を変更した時
         /// </summary>
@@ -1342,6 +1357,7 @@ WHERE action_id = @{0};", vm.ActionId);
 
             this.Cursor = cCursor;
         }
+        #endregion
         #endregion
 
         #region 画面更新用の関数
@@ -2060,12 +2076,12 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 List<int> tmpActionIdList = actionIdList ?? new List<int>(this.WVM.SelectedActionVMList.Select((tmp) => tmp.ActionId));
                 SummaryViewModel tmpSvm = this.WVM.SelectedSummaryVM;
 
-                switch (this.WVM.DisplayedDailyTermKind) {
-                    case DailyTermKind.Monthly:
+                switch (this.WVM.DisplayedTermKind) {
+                    case TermKind.Monthly:
                         this.WVM.ActionVMList = LoadActionViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                         this.WVM.SummaryVMList = LoadSummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                         break;
-                    case DailyTermKind.Selected:
+                    case TermKind.Selected:
                         this.WVM.ActionVMList = LoadActionViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                         this.WVM.SummaryVMList = LoadSummaryViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                         break;
@@ -2083,7 +2099,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 this.WVM.SelectedSummaryVM = query2.Count() == 0 ? null : query2.First();
 
                 if (isScroll) {
-                    if (this.WVM.DisplayedDailyTermKind == DailyTermKind.Monthly &&
+                    if (this.WVM.DisplayedTermKind == TermKind.Monthly &&
                         this.WVM.DisplayedMonth.Value.GetFirstDateOfMonth() < DateTime.Today && 
                         DateTime.Today < this.WVM.DisplayedMonth.Value.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1)) {
                         // 今月の場合は、末尾が表示されるようにする
@@ -2205,11 +2221,11 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 switch (this.WVM.SelectedGraphKind) {
                     case GraphKind.IncomeAndOutgo: {
                             ObservableCollection<SeriesViewModel> vmList = null;
-                            switch (this.WVM.DisplayedDailyTermKind) {
-                                case DailyTermKind.Monthly:
+                            switch (this.WVM.DisplayedTermKind) {
+                                case TermKind.Monthly:
                                     vmList = LoadDailySummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                                     break;
-                                case DailyTermKind.Selected:
+                                case TermKind.Selected:
                                     vmList = LoadDailySummaryViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                                     break;
                             }
@@ -2296,11 +2312,11 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                                 TrackerFormatString = "{2}日: {4:#,0}" //日付: 金額
                             };
                             ObservableCollection<SeriesViewModel> vmList = null;
-                            switch (this.WVM.DisplayedDailyTermKind) {
-                                case DailyTermKind.Monthly:
+                            switch (this.WVM.DisplayedTermKind) {
+                                case TermKind.Monthly:
                                     vmList = LoadDailySummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                                     break;
-                                case DailyTermKind.Selected:
+                                case TermKind.Selected:
                                     vmList = LoadDailySummaryViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                                     break;
                             }

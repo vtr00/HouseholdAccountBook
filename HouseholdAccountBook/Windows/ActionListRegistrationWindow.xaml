@@ -105,8 +105,7 @@
                         </DataGridTemplateColumn.CellStyle>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ActValue, TargetNullValue=''}" Margin="3,1"
-                                           TextAlignment="Right"/>
+                                <TextBlock Text="{Binding ActValue, TargetNullValue=''}" Margin="3,1" TextAlignment="Right"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                         <DataGridTemplateColumn.CellEditingTemplate>

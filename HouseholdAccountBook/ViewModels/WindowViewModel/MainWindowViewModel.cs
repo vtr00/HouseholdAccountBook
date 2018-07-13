@@ -82,15 +82,15 @@ namespace HouseholdAccountBook.ViewModels
         /// 表示区間種別
         /// </summary>
         #region DisplayedTermKind
-        public DailyTermKind DisplayedDailyTermKind
+        public TermKind DisplayedTermKind
         {
             get {
                 DateTime lastDate = this.StartDate.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1);
                 if(this.StartDate.Day == 1 && DateTime.Equals(this.EndDate.Date, lastDate.Date)) {
-                    return DailyTermKind.Monthly;
+                    return TermKind.Monthly;
                 }
                 else {
-                    return DailyTermKind.Selected;
+                    return TermKind.Selected;
                 }
             }
         }
@@ -103,10 +103,10 @@ namespace HouseholdAccountBook.ViewModels
         public DateTime? DisplayedMonth
         {
             get {
-                switch(this.DisplayedDailyTermKind) {
-                    case DailyTermKind.Monthly:
+                switch(this.DisplayedTermKind) {
+                    case TermKind.Monthly:
                         return this.StartDate;
-                    case DailyTermKind.Selected:
+                    case TermKind.Selected:
                         return null;
                     default:
                         return null;
