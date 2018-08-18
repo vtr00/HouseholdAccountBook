@@ -111,10 +111,10 @@ namespace HouseholdAccountBook.Windows
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (settings.TermWindow_Left != -1) {
+            if (0 <= settings.TermWindow_Left) {
                 this.Left = settings.TermWindow_Left;
             }
-            if (settings.TermWindow_Top != -1) {
+            if (0 <= settings.TermWindow_Top) {
                 this.Top = settings.TermWindow_Top;
             }
         }

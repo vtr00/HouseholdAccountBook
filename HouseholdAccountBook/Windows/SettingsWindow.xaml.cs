@@ -1381,10 +1381,10 @@ ORDER BY I.sort_order;", vm.Id);
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (settings.SettingsWindow_Left != -1) {
+            if (0 <= settings.SettingsWindow_Left) {
                 this.Left = settings.SettingsWindow_Left;
             }
-            if (settings.SettingsWindow_Top != -1) {
+            if (0 <= settings.SettingsWindow_Top) {
                 this.Top = settings.SettingsWindow_Top;
             }
             if (settings.SettingsWindow_Width != -1) {

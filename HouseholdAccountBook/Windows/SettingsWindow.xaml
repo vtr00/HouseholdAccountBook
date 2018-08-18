@@ -114,32 +114,31 @@
 
                             <TreeView x:Name="hierachicalTreeView" Grid.Row="1" Margin="5" ItemsSource="{Binding HierachicalItemVMList}"
                                                 SelectedItemChanged="TreeView_SelectedItemChanged">
-                            <TreeView.InputBindings>
-                                <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{StaticResource AddCategoryCommand}"/>
-                                <KeyBinding Gesture="Shift+Ctrl+Add" Command="{StaticResource AddCategoryCommand}"/>
-                                <KeyBinding Gesture="Ctrl+OEMPlus" Command="{StaticResource AddItemCommand}"/>
-                                <KeyBinding Gesture="Ctrl+Add" Command="{StaticResource AddItemCommand}"/>
-                                <KeyBinding Gesture="Delete" Command="{StaticResource DeleteItemCommand}"/>
-                                <KeyBinding Gesture="Ctrl+Up" Command="{StaticResource RaiseItemSortOrderCommand}"/>
-                                <KeyBinding Gesture="Ctrl+Down" Command="{StaticResource DropItemSortOrderCommand}"/>
-                            </TreeView.InputBindings>
-                            <TreeView.ItemContainerStyle>
-                                <Style TargetType="TreeViewItem">
-                                    <Setter Property="IsExpanded" Value="True"/>
-                                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
-                                </Style>
-                            </TreeView.ItemContainerStyle>
-                            <i:Interaction.Behaviors>
-                                <behaviors:BindSelectedItemToTreeViewBehavior SelectedItem="{Binding SelectedItemVM}"/>
-                            </i:Interaction.Behaviors>
-                            <TreeView.ItemTemplate>
-                                <HierarchicalDataTemplate DataType="viewmodels:SettingsViewModel.HierachicalItemViewModel" 
-                                                            ItemsSource="{Binding ChildrenVMList}">
-                                    <TextBlock Text="{Binding Name}" />
-                                </HierarchicalDataTemplate>
-                            </TreeView.ItemTemplate>
-                        </TreeView>
-
+                                <TreeView.InputBindings>
+                                    <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{StaticResource AddCategoryCommand}"/>
+                                    <KeyBinding Gesture="Shift+Ctrl+Add" Command="{StaticResource AddCategoryCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{StaticResource AddItemCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+Add" Command="{StaticResource AddItemCommand}"/>
+                                    <KeyBinding Gesture="Delete" Command="{StaticResource DeleteItemCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+Up" Command="{StaticResource RaiseItemSortOrderCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+Down" Command="{StaticResource DropItemSortOrderCommand}"/>
+                                </TreeView.InputBindings>
+                                <TreeView.ItemContainerStyle>
+                                    <Style TargetType="TreeViewItem">
+                                        <Setter Property="IsExpanded" Value="True"/>
+                                        <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                                    </Style>
+                                </TreeView.ItemContainerStyle>
+                                <i:Interaction.Behaviors>
+                                    <behaviors:BindSelectedItemToTreeViewBehavior SelectedItem="{Binding SelectedItemVM}"/>
+                                </i:Interaction.Behaviors>
+                                <TreeView.ItemTemplate>
+                                    <HierarchicalDataTemplate DataType="viewmodels:SettingsViewModel.HierachicalItemViewModel" 
+                                                                ItemsSource="{Binding ChildrenVMList}">
+                                        <TextBlock Text="{Binding Name}" />
+                                    </HierarchicalDataTemplate>
+                                </TreeView.ItemTemplate>
+                            </TreeView>
                         </Grid>
                     </GroupBox>
 
@@ -170,12 +169,12 @@
                                     <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="帳簿名"/>
                                     <TextBox Grid.Row="0" Grid.Column="1" Margin="5" 
                                                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding CantRename}"/>
-                                    <Button Grid.Row="1" Grid.Column="1" Margin="5,0" Content="確定" Command="{StaticResource SaveItemInfoCommand}" ToolTip="Ctrl+S"/>
+                                    <Button Grid.Row="1" Grid.Column="1" Margin="5" Content="確定" Command="{StaticResource SaveItemInfoCommand}" ToolTip="Ctrl+S"/>
                                 </Grid>
                             </GroupBox>
 
                             <GroupBox Grid.Row="1" Header="関連付け">
-                                <ListBox ItemsSource="{Binding RelationVMList}" SelectedItem="{Binding SelectedRelationVM}" IsEnabled="{Binding IsEnabled}">
+                                <ListBox Margin="5" ItemsSource="{Binding RelationVMList}" SelectedItem="{Binding SelectedRelationVM}" IsEnabled="{Binding IsEnabled}">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <Grid>
@@ -192,7 +191,7 @@
                             </GroupBox>
 
                             <GroupBox Grid.Row="2" Header="店舗">
-                                <ListBox x:Name="shopNameListBox" 
+                                <ListBox Margin="5" x:Name="shopNameListBox" 
                                                 ItemsSource="{Binding ShopNameList}" SelectedItem="{Binding SelectedShopName}" IsEnabled="{Binding IsEnabled}">
                                     <ListBox.InputBindings>
                                         <KeyBinding Gesture="Delete" Command="{StaticResource DeleteShopNameCommand}"/>
@@ -201,7 +200,7 @@
                             </GroupBox>
 
                             <GroupBox Grid.Row="3" Header="備考">
-                                <ListBox x:Name="remarkListBox" 
+                                <ListBox Margin="5" x:Name="remarkListBox" 
                                                     ItemsSource="{Binding RemarkList}" SelectedItem="{Binding SelectedRemark}" IsEnabled="{Binding IsEnabled}">
                                     <ListBox.InputBindings>
                                         <KeyBinding Gesture="Delete" Command="{StaticResource DeleteRemarkCommand}"/>
@@ -328,7 +327,7 @@
                                         
                                     </Grid>
                                 </GroupBox>
-                                <Button Grid.Row="5" Grid.Column="1" Margin="5,0" Content="確定" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
+                                <Button Grid.Row="5" Grid.Column="1" Margin="5" Content="確定" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
                             </Grid>
                         </GroupBox>
 
@@ -387,6 +386,8 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition SharedSizeGroup="Header"/>
@@ -394,12 +395,16 @@
                                     <ColumnDefinition SharedSizeGroup="Button"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="バックアップの個数" Margin="5" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="個数" Margin="5" VerticalAlignment="Center"/>
                                 <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" MinValue="0" MaxValue="100" Value="{Binding BackUpNum}"/>
 
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="バックアップ先フォルダ" Margin="5" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="フォルダ" Margin="5" VerticalAlignment="Center"/>
                                 <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding BackUpFolderPath}" IsReadOnly="True"/>
                                 <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource BackUpFolderPathDialogCommand}"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="タイミング" Margin="5"/>
+                                <CheckBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="メインウィンドウ最小化時" IsChecked="{Binding BackUpFlagAtMinimizing}"/>
+                                <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="メインウィンドウクローズ時" IsChecked="{Binding BackUpFlagAtClosing}"/>
                             </Grid>
                         </GroupBox>
                         <GroupBox Header="カレンダー">

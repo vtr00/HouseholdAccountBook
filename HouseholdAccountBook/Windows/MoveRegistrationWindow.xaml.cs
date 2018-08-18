@@ -566,10 +566,10 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", movedTime > movin
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (settings.MoveRegistrationWindow_Left != -1) {
+            if (0 <= settings.MoveRegistrationWindow_Left) {
                 this.Left = settings.MoveRegistrationWindow_Left;
             }
-            if (settings.MoveRegistrationWindow_Top != -1) {
+            if (0 <= settings.MoveRegistrationWindow_Top) {
                 this.Top = settings.MoveRegistrationWindow_Top;
             }
             if (settings.MoveRegistrationWindow_Width != -1) {

@@ -558,10 +558,10 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", lastActTime, Upda
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (settings.ActionListRegistrationWindow_Left != -1) {
+            if (0<= settings.ActionListRegistrationWindow_Left) {
                 this.Left = settings.ActionListRegistrationWindow_Left;
             }
-            if (settings.ActionListRegistrationWindow_Top != -1) {
+            if (0 <= settings.ActionListRegistrationWindow_Top) {
                 this.Top = settings.ActionListRegistrationWindow_Top;
             }
             if (settings.ActionListRegistrationWindow_Width != -1) {

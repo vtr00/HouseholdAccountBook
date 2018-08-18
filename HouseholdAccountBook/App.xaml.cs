@@ -132,14 +132,16 @@ namespace HouseholdAccountBook
                 if (this.connectInfo != null) {
                     settings.Reload();
                     mw.Hide();
-            
-                    OnBackUpWindow obuw = new OnBackUpWindow();
-                    obuw.Top = settings.MainWindow_Top + settings.MainWindow_Height / 2 - obuw.Height / 2;
-                    obuw.Left = settings.MainWindow_Left + settings.MainWindow_Width / 2 - obuw.Width / 2;
-                    obuw.Topmost = true;
-                    obuw.Show();
-                    this.CreateBackUpFile();
-                    obuw.Close();
+
+                    if (settings.App_BackUpFlagAtClosing) {
+                        OnBackUpWindow obuw = new OnBackUpWindow();
+                        obuw.Top = settings.MainWindow_Top + settings.MainWindow_Height / 2 - obuw.Height / 2;
+                        obuw.Left = settings.MainWindow_Left + settings.MainWindow_Width / 2 - obuw.Width / 2;
+                        obuw.Topmost = true;
+                        obuw.Show();
+                        this.CreateBackUpFile();
+                        obuw.Close();
+                    }
                 }
             };
 #endif
@@ -215,7 +217,7 @@ namespace HouseholdAccountBook
 
                         // バックアップする
                         Process process = Process.Start(info);
-                        return process.WaitForExit(10 * 1000);
+                        return process.WaitForExit(1 * 1000);
                     }
                     else {
                         return true;

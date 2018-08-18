@@ -398,10 +398,10 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (settings.CsvComparisonWindow_Left != -1) {
+            if (0 <= settings.CsvComparisonWindow_Left) {
                 this.Left = settings.CsvComparisonWindow_Left;
             }
-            if (settings.CsvComparisonWindow_Top != -1) {
+            if (0 <= settings.CsvComparisonWindow_Top) {
                 this.Top = settings.CsvComparisonWindow_Top;
             }
             if (settings.CsvComparisonWindow_Width != -1) {

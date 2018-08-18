@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.8.0.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -572,6 +572,30 @@ namespace HouseholdAccountBook.Properties {
             }
             set {
                 this["TermWindow_Left"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool App_BackUpFlagAtMinimizing {
+            get {
+                return ((bool)(this["App_BackUpFlagAtMinimizing"]));
+            }
+            set {
+                this["App_BackUpFlagAtMinimizing"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool App_BackUpFlagAtClosing {
+            get {
+                return ((bool)(this["App_BackUpFlagAtClosing"]));
+            }
+            set {
+                this["App_BackUpFlagAtClosing"] = value;
             }
         }
     }

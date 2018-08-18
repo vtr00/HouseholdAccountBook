@@ -173,6 +173,40 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// メインウィンドウ最小化時バックアップフラグ
+        /// </summary>
+        #region BackUpFlagAtMinimizing
+        public bool BackUpFlagAtMinimizing
+        {
+            get { return this._BackUpFlagAtMinimizing; }
+            set {
+                if (this.SetProperty(ref this._BackUpFlagAtMinimizing, value) && this.WithSave) {
+                    this.settings.App_BackUpFlagAtMinimizing = value;
+                    this.settings.Save();
+                }
+            }
+        }
+        private bool _BackUpFlagAtMinimizing = default(bool);
+        #endregion
+
+        /// <summary>
+        /// メインウィンドウクローズ時バックアップフラグ
+        /// </summary>
+        #region BackUpFlagAtClosing
+        public bool BackUpFlagAtClosing
+        {
+            get { return this._BackUpFlagAtClosing; }
+            set {
+                if (this.SetProperty(ref this._BackUpFlagAtClosing, value) && this.WithSave) {
+                    this.settings.App_BackUpFlagAtClosing = value;
+                    this.settings.Save();
+                }
+            }
+        }
+        private bool _BackUpFlagAtClosing = default(bool);
+        #endregion
+
+        /// <summary>
         /// 開始月
         /// </summary>
         #region StartMonth
@@ -209,6 +243,8 @@ namespace HouseholdAccountBook.ViewModels
             this.RestoreExePath = this.settings.App_Postgres_RestoreExePath;
             this.BackUpNum = this.settings.App_BackUpNum;
             this.BackUpFolderPath = this.settings.App_BackUpFolderPath;
+            this.BackUpFlagAtMinimizing = this.settings.App_BackUpFlagAtMinimizing;
+            this.BackUpFlagAtClosing = this.settings.App_BackUpFlagAtClosing;
             this.StartMonth = this.settings.App_StartMonth;
             this.WithSave = true;
         }

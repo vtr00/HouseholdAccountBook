@@ -1265,9 +1265,13 @@ WHERE action_id = @{0};", vm.ActionId);
         /// <param name="e"></param>
         private void MainWindow_StateChanegd(object sender, EventArgs e)
         {
-            if (this.WindowState == WindowState.Minimized) {
-                App app = Application.Current as App;
-                app?.CreateBackUpFile();
+            Properties.Settings settings = Properties.Settings.Default;
+
+            if (settings.App_BackUpFlagAtMinimizing) {
+                if (this.WindowState == WindowState.Minimized) {
+                    App app = Application.Current as App;
+                    app?.CreateBackUpFile();
+                }
             }
         }
         #endregion

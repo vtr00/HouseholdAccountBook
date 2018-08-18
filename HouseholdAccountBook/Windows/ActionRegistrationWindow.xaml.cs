@@ -724,10 +724,10 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", actTime, Updater,
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (settings.ActionRegistrationWindow_Left != -1) {
+            if (0 <= settings.ActionRegistrationWindow_Left) {
                 this.Left = settings.ActionRegistrationWindow_Left;
             }
-            if (settings.ActionRegistrationWindow_Top != -1) {
+            if (0 <= settings.ActionRegistrationWindow_Top) {
                 this.Top = settings.ActionRegistrationWindow_Top;
             }
             if (settings.ActionRegistrationWindow_Width != -1) {
