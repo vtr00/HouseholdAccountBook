@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Windows;
 
 namespace HouseholdAccountBook
@@ -137,7 +138,7 @@ namespace HouseholdAccountBook
                     obuw.Left = settings.MainWindow_Left + settings.MainWindow_Width / 2 - obuw.Width / 2;
                     obuw.Topmost = true;
                     obuw.Show();
-                    CreateBackUpFile();
+                    this.CreateBackUpFile();
                     obuw.Close();
                 }
             };
@@ -152,7 +153,7 @@ namespace HouseholdAccountBook
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void Application_Exit(object sender, ExitEventArgs e) {
-            ReleaseMutex();
+            this.ReleaseMutex();
         }
 
         /// <summary>

@@ -25,8 +25,8 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         public int? InputedValue
         {
-            get { return (int?)GetValue(InputedValueProperty); }
-            set { SetValue(InputedValueProperty, value); }
+            get { return (int?)this.GetValue(InputedValueProperty); }
+            set { this.SetValue(InputedValueProperty, value); }
         }
 
         /// <summary>
@@ -43,8 +43,8 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         public InputKind InputedKind
         {
-            get { return (InputKind)GetValue(InputedKindProperty); }
-            set { SetValue(InputedKindProperty, value); }
+            get { return (InputKind)this.GetValue(InputedKindProperty); }
+            set { this.SetValue(InputedKindProperty, value); }
         }
 
         /// <summary>
@@ -61,8 +61,8 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         public ICommand Command
         {
-            get { return (ICommand)GetValue(CommandProperty); }
-            set { SetValue(CommandProperty, value); }
+            get { return (ICommand)this.GetValue(CommandProperty); }
+            set { this.SetValue(CommandProperty, value); }
         }
 
         /// <summary>
@@ -79,8 +79,8 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         public object CommandParameter
         {
-            get { return GetValue(CommandParameterProperty); }
-            set { SetValue(CommandParameterProperty, value); }
+            get { return this.GetValue(CommandParameterProperty); }
+            set { this.SetValue(CommandParameterProperty, value); }
         }
 
         /// <summary>
@@ -97,8 +97,8 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         public IInputElement CommandTarget
         {
-            get { return (IInputElement)GetValue(CommandTargetProperty); }
-            set { SetValue(CommandTargetProperty, value); }
+            get { return (IInputElement)this.GetValue(CommandTargetProperty); }
+            set { this.SetValue(CommandTargetProperty, value); }
         }
         #endregion
 
@@ -107,7 +107,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         public NumericInputButton()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         #region イベントハンドラ
@@ -124,7 +124,7 @@ namespace HouseholdAccountBook.UserControls
 
             this.InputedValue = value;
             this.InputedKind = InputKind.Number;
-            CallCommandToExecute();
+            this.CallCommandToExecute();
 
             e.Handled = true;
         }
@@ -137,7 +137,7 @@ namespace HouseholdAccountBook.UserControls
         private void BackSpaceInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.InputedKind = InputKind.BackSpace;
-            CallCommandToExecute();
+            this.CallCommandToExecute();
 
             e.Handled = true;
         }
@@ -150,7 +150,7 @@ namespace HouseholdAccountBook.UserControls
         private void ClearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.InputedKind = InputKind.Clear;
-            CallCommandToExecute();
+            this.CallCommandToExecute();
 
             e.Handled = true;
         }

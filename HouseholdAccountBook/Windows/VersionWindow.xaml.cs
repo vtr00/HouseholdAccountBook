@@ -14,7 +14,7 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         public VersionWindow()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         #region イベントハンドラ

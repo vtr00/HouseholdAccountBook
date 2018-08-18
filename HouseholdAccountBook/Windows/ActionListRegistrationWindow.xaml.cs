@@ -57,7 +57,7 @@ namespace HouseholdAccountBook.Windows
             this.builder = builder;
             this.selectedDateTime = selectedDateTime;
 
-            InitializeComponent();
+            this.InitializeComponent();
 
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
             BookViewModel selectedBookVM = null;
@@ -81,34 +81,34 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
             DateTime dateTime = selectedDateTime ?? DateTime.Today;
             this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = dateTime });
 
-            UpdateCategoryList();
-            UpdateItemList();
-            UpdateShopList();
-            UpdateRemarkList();
+            this.UpdateCategoryList();
+            this.UpdateItemList();
+            this.UpdateShopList();
+            this.UpdateRemarkList();
 
-            LoadSetting();
+            this.LoadSetting();
 
             #region イベントハンドラの設定
             this.WVM.BookChanged += () => {
-                UpdateCategoryList();
-                UpdateItemList();
-                UpdateShopList();
-                UpdateRemarkList();
+                this.UpdateCategoryList();
+                this.UpdateItemList();
+                this.UpdateShopList();
+                this.UpdateRemarkList();
             };
             this.WVM.BalanceKindChanged += () => {
-                UpdateCategoryList();
-                UpdateItemList();
-                UpdateShopList();
-                UpdateRemarkList();
+                this.UpdateCategoryList();
+                this.UpdateItemList();
+                this.UpdateShopList();
+                this.UpdateRemarkList();
             };
             this.WVM.CategoryChanged += () => {
-                UpdateItemList();
-                UpdateShopList();
-                UpdateRemarkList();
+                this.UpdateItemList();
+                this.UpdateShopList();
+                this.UpdateRemarkList();
             };
             this.WVM.ItemChanged += () => {
-                UpdateShopList();
-                UpdateRemarkList();
+                this.UpdateShopList();
+                this.UpdateRemarkList();
             };
             #endregion
         }
@@ -142,7 +142,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
             }
 
             // DB登録
-            List<int> idList = RegisterToDb();
+            List<int> idList = this.RegisterToDb();
 
             // MainWindow更新
             Registrated?.Invoke(this, new EventArgs<List<int>>(idList ?? new List<int>()));
@@ -245,7 +245,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         /// <param name="e"></param>
         private void ActionListRegistrationWindow_Closed(object sender, EventArgs e)
         {
-            SaveSetting();
+            this.SaveSetting();
         }
 
         /// <summary>

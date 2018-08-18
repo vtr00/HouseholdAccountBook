@@ -48,11 +48,11 @@ namespace HouseholdAccountBook.Windows
         {
             this.builder = builder;
 
-            InitializeComponent();
+            this.InitializeComponent();
 
-            UpdateSettingWindowData();
+            this.UpdateSettingWindowData();
 
-            LoadSetting();
+            this.LoadSetting();
         }
 
         #region イベントハンドラ
@@ -104,7 +104,7 @@ RETURNING category_id;", (int)kind, Updater, Inserter);
                     categoryId = record.ToInt("category_id");
                 });
             }
-            UpdateItemSettingsTabData(HierarchicalKind.Category, categoryId);
+            this.UpdateItemSettingsTabData(HierarchicalKind.Category, categoryId);
             this.IsSaved = true;
         }
 
@@ -142,7 +142,7 @@ RETURNING item_id;", categoryId, Updater, Inserter);
                     itemId = record.ToInt("item_id");
                 });
             }
-            UpdateItemSettingsTabData(HierarchicalKind.Item, itemId);
+            this.UpdateItemSettingsTabData(HierarchicalKind.Item, itemId);
             this.IsSaved = true;
         }
 
@@ -209,7 +209,7 @@ WHERE item_id = @{1};", Updater, id);
                         break;
                 }
             }
-            UpdateItemSettingsTabData(this.WVM.SelectedItemVM.ParentVM.Kind, this.WVM.SelectedItemVM.ParentVM.Id);
+            this.UpdateItemSettingsTabData(this.WVM.SelectedItemVM.ParentVM.Kind, this.WVM.SelectedItemVM.ParentVM.Id);
             this.IsSaved = true;
         }
 
@@ -317,7 +317,7 @@ WHERE item_id = @{2};", toCategoryId, Updater, changingId);
                 }
             }
 
-            UpdateItemSettingsTabData(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
+            this.UpdateItemSettingsTabData(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
             this.IsSaved = true;
         }
 
@@ -456,7 +456,7 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
                 }
             }
 
-            UpdateItemSettingsTabData(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
+            this.UpdateItemSettingsTabData(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
             this.IsSaved = true;
         }
 
@@ -658,7 +658,7 @@ RETURNING book_id;", Updater, Inserter);
                 });
             }
 
-            UpdateBookSettingTabData(bookId);
+            this.UpdateBookSettingTabData(bookId);
             this.IsSaved = true;
         }
 
@@ -697,7 +697,7 @@ WHERE book_id = @{1};", Updater, this.WVM.SelectedBookVM.Id);
                 });
             }
 
-            UpdateBookSettingTabData();
+            this.UpdateBookSettingTabData();
             this.IsSaved = true;
         }
 
@@ -750,7 +750,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
                 });
             }
 
-            UpdateBookSettingTabData(changingId);
+            this.UpdateBookSettingTabData(changingId);
             this.IsSaved = true;
         }
 
@@ -803,7 +803,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
                 });
             }
 
-            UpdateBookSettingTabData(changingId);
+            this.UpdateBookSettingTabData(changingId);
             this.IsSaved = true;
         }
 
@@ -1012,7 +1012,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void SettingsWindow_Closed(object sender, EventArgs e)
         {
-            SaveSetting();
+            this.SaveSetting();
         }
 
         /// <summary>
@@ -1028,13 +1028,13 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
 
                 switch (this.WVM.SelectedTab) {
                     case SettingsTabs.ItemSettingsTab:
-                        UpdateItemSettingsTabData();
+                        this.UpdateItemSettingsTabData();
                         break;
                     case SettingsTabs.BookSettingsTab:
-                        UpdateBookSettingTabData();
+                        this.UpdateBookSettingTabData();
                         break;
                     case SettingsTabs.OtherSettingsTab:
-                        UpdateOtherSettingTabData();
+                        this.UpdateOtherSettingTabData();
                         break;
                 }
                 this.Cursor = cCursor;
@@ -1077,9 +1077,9 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="bookId">選択対象の帳簿ID</param>
         private void UpdateSettingWindowData(HierarchicalKind? kind = null, int? id = null, int? bookId = null)
         {
-            UpdateItemSettingsTabData(kind, id);
-            UpdateBookSettingTabData(bookId);
-            UpdateOtherSettingTabData();
+            this.UpdateItemSettingsTabData(kind, id);
+            this.UpdateBookSettingTabData(bookId);
+            this.UpdateOtherSettingTabData();
         }
 
         /// <summary>
@@ -1090,7 +1090,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         private void UpdateItemSettingsTabData(HierarchicalKind? kind = null, int? id = null)
         {
             if (this.WVM.SelectedTab == SettingsTabs.ItemSettingsTab) {
-                this.WVM.HierachicalItemVMList = LoadItemViewModelList();
+                this.WVM.HierachicalItemVMList = this.LoadItemViewModelList();
 
                 if (kind == null || id == null) {
                     this.WVM.SelectedItemVM = null;
@@ -1129,7 +1129,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         private void UpdateBookSettingTabData(int? bookId = null)
         {
             if (this.WVM.SelectedTab == SettingsTabs.BookSettingsTab) {
-                this.WVM.BookVMList = LoadBookSettingViewModelList();
+                this.WVM.BookVMList = this.LoadBookSettingViewModelList();
 
                 if (bookId == null) {
                     this.WVM.SelectedBookVM = null;

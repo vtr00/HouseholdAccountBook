@@ -28,8 +28,8 @@ namespace HouseholdAccountBook.UserControls
         #region Value
         public int? Value
         {
-            get { return (int?)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
+            get { return (int?)this.GetValue(ValueProperty); }
+            set { this.SetValue(ValueProperty, value); }
         }
         #endregion
 
@@ -50,8 +50,8 @@ namespace HouseholdAccountBook.UserControls
         #region Stride
         public int Stride
         {
-            get { return (int)GetValue(StrideProperty); }
-            set { SetValue(StrideProperty, value); }
+            get { return (int)this.GetValue(StrideProperty); }
+            set { this.SetValue(StrideProperty, value); }
         }
         #endregion
 
@@ -71,8 +71,8 @@ namespace HouseholdAccountBook.UserControls
         #region NullValue
         public int NullValue
         {
-            get { return (int)GetValue(NullValueProperty); }
-            set { SetValue(NullValueProperty, value); }
+            get { return (int)this.GetValue(NullValueProperty); }
+            set { this.SetValue(NullValueProperty, value); }
         }
         #endregion
 
@@ -93,8 +93,8 @@ namespace HouseholdAccountBook.UserControls
         #region MaxValue
         public int MaxValue
         {
-            get { return (int)GetValue(MaxValueProperty); }
-            set { SetValue(MaxValueProperty, value); }
+            get { return (int)this.GetValue(MaxValueProperty); }
+            set { this.SetValue(MaxValueProperty, value); }
         }
         #endregion
 
@@ -115,8 +115,8 @@ namespace HouseholdAccountBook.UserControls
         #region MinValue
         public int MinValue
         {
-            get { return (int)GetValue(MinValueProperty); }
-            set { SetValue(MinValueProperty, value); }
+            get { return (int)this.GetValue(MinValueProperty); }
+            set { this.SetValue(MinValueProperty, value); }
         }
         #endregion
         #endregion
@@ -126,7 +126,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         public NumericUpDown() 
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         #region イベントハンドラ
@@ -148,7 +148,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void IncreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            IncreaceNumber();
+            this.IncreaceNumber();
             e.Handled = true;
         }
 
@@ -169,7 +169,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void DecreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            DecreaceNumber();
+            this.DecreaceNumber();
             e.Handled = true;
         }
 
@@ -288,10 +288,10 @@ namespace HouseholdAccountBook.UserControls
         private void TextBox_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0) {
-                IncreaceNumber();
+                this.IncreaceNumber();
             }
             else if (e.Delta < 0) {
-                DecreaceNumber();
+                this.DecreaceNumber();
             }
         }
         

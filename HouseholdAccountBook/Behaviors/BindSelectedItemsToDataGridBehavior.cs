@@ -46,8 +46,8 @@ namespace HouseholdAccountBook.Behaviors
         /// </summary>
         public IList SelectedItems
         {
-            get { return (IList)GetValue(SelectedItemsProperty); }
-            set { SetValue(SelectedItemsProperty, value); }
+            get { return (IList)this.GetValue(SelectedItemsProperty); }
+            set { this.SetValue(SelectedItemsProperty, value); }
         }
 
         /// <summary>

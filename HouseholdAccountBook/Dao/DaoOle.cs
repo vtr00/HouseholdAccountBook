@@ -28,14 +28,14 @@ namespace HouseholdAccountBook.Dao
 
         public override int ExecNonQuery(string sql, params object[] objects)
         {
-            return CreateCommand(sql, objects).ExecuteNonQuery();
+            return this.CreateCommand(sql, objects).ExecuteNonQuery();
         }
 
         public override DaoReader ExecQuery(string sql, params object[] objects)
         {
             LinkedList<Dictionary<string, object>> resultSet = new LinkedList<Dictionary<string, object>>();
 
-            OleDbCommand command = CreateCommand(sql, objects);
+            OleDbCommand command = this.CreateCommand(sql, objects);
             using (OleDbDataReader reader = command.ExecuteReader()) {
                 // フィールド名の取得
                 List<string> fieldList = new List<string>();
@@ -46,8 +46,8 @@ namespace HouseholdAccountBook.Dao
                 // レコードの取得
                 while (reader.Read()) {
                     Dictionary<string, object> result = new Dictionary<string, object>();
-                    for (int i = 0; i < fieldList.Count; ++i) {
-                        result.Add(fieldList[i], reader[fieldList[i]]);
+                    foreach (string fieldName in fieldList) {
+                        result.Add(fieldName, reader[fieldName]);
                     }
                     resultSet.AddLast(result);
                 }

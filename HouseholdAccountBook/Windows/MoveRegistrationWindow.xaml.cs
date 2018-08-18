@@ -61,7 +61,7 @@ namespace HouseholdAccountBook.Windows
         {
             this.builder = builder;
 
-            InitializeComponent();
+            this.InitializeComponent();
             this.WVM.RegMode = RegistrationMode.Add;
 
             this.selectedBookId = selectedBookId;
@@ -100,26 +100,26 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
             this.WVM.MovingBookVM = selectedBookVM;
             this.WVM.SelectedCommissionKind = CommissionKind.FromBook;
 
-            UpdateItemList();
-            UpdateRemarkList();
+            this.UpdateItemList();
+            this.UpdateRemarkList();
 
-            LoadSetting();
+            this.LoadSetting();
 
             #region イベントハンドラの設定
             this.WVM.FromBookChanged += () => {
-                UpdateItemList();
-                UpdateRemarkList();
+                this.UpdateItemList();
+                this.UpdateRemarkList();
             };
             this.WVM.ToBookChanged += () => {
-                UpdateItemList();
-                UpdateRemarkList();
+                this.UpdateItemList();
+                this.UpdateRemarkList();
             };
             this.WVM.CommissionKindChanged += () => {
-                UpdateItemList();
-                UpdateRemarkList();
+                this.UpdateItemList();
+                this.UpdateRemarkList();
             };
             this.WVM.ItemChanged += () => {
-                UpdateRemarkList();
+                this.UpdateRemarkList();
             };
             #endregion
         }
@@ -135,7 +135,7 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
         {
             this.builder = builder;
 
-            InitializeComponent();
+            this.InitializeComponent();
             this.WVM.RegMode = mode;
             this.selectedBookId = selectedBookId;
 
@@ -229,26 +229,26 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
             this.WVM.SelectedCommissionKind = commissionKind;
             this.WVM.Commission = commissionValue;
 
-            UpdateItemList(commissionItemId);
-            UpdateRemarkList(commissionRemark);
+            this.UpdateItemList(commissionItemId);
+            this.UpdateRemarkList(commissionRemark);
 
-            LoadSetting();
+            this.LoadSetting();
 
             #region イベントハンドラの設定
             this.WVM.FromBookChanged += () => {
-                UpdateItemList();
-                UpdateRemarkList();
+                this.UpdateItemList();
+                this.UpdateRemarkList();
             };
             this.WVM.ToBookChanged += () => {
-                UpdateItemList();
-                UpdateRemarkList();
+                this.UpdateItemList();
+                this.UpdateRemarkList();
             };
             this.WVM.CommissionKindChanged += () => {
-                UpdateItemList();
-                UpdateRemarkList();
+                this.UpdateItemList();
+                this.UpdateRemarkList();
             };
             this.WVM.ItemChanged += () => {
-                UpdateRemarkList();
+                this.UpdateRemarkList();
             };
             #endregion
         }
@@ -312,7 +312,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
             }
             
             // DB登録
-            int? id = RegisterToDb();
+            int? id = this.RegisterToDb();
 
             // MainWindow更新
             List<int> value = id != null ? new List<int>() { id.Value } : new List<int>();
@@ -341,7 +341,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         /// <param name="e"></param>
         private void MoveRegistrationWindow_Closed(object sender, EventArgs e)
         {
-            SaveSetting();
+            this.SaveSetting();
         }
         #endregion
 

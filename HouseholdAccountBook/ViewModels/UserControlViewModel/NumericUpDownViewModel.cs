@@ -23,7 +23,7 @@ namespace HouseholdAccountBook.ViewModels
         public int? InputedValue
         {
             get { return this._InputedValue; }
-            set { SetProperty(ref this._InputedValue, value); }
+            set { this.SetProperty(ref this._InputedValue, value); }
         }
         private int? _InputedValue = default(int?);
         #endregion
@@ -35,7 +35,7 @@ namespace HouseholdAccountBook.ViewModels
         public NumericInputButton.InputKind InputedKind
         {
             get { return this._InputedKind; }
-            set { SetProperty(ref this._InputedKind, value); }
+            set { this.SetProperty(ref this._InputedKind, value); }
         }
         private NumericInputButton.InputKind _InputedKind = default(NumericInputButton.InputKind);
         #endregion
@@ -47,7 +47,7 @@ namespace HouseholdAccountBook.ViewModels
         public bool IsOpen
         {
             get { return this._IsOpen; }
-            set { SetProperty(ref this._IsOpen, value); }
+            set { this.SetProperty(ref this._IsOpen, value); }
         }
         private bool _IsOpen = default(bool);
         #endregion
@@ -61,7 +61,7 @@ namespace HouseholdAccountBook.ViewModels
             get { return this._NumericUpDownFocused; }
             set {
                 this._NumericUpDownFocused = value;
-                SetIsOpen();
+                this.SetIsOpen();
             }
         }
         private bool _NumericUpDownFocused = default(bool);
@@ -76,7 +76,7 @@ namespace HouseholdAccountBook.ViewModels
             get { return this._PopupFocused; }
             set {
                 this._PopupFocused = value;
-                SetIsOpen();
+                this.SetIsOpen();
             }
         }
         private bool _PopupFocused = default(bool);

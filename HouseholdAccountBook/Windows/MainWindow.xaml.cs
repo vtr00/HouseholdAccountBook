@@ -44,22 +44,22 @@ namespace HouseholdAccountBook.Windows
         {
             this.builder = builder;
 
-            InitializeComponent();
+            this.InitializeComponent();
 
             // 帳簿リスト更新
-            UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
+            this.UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
 
             // 日別データ更新
-            UpdateBookTabData(isScroll: true, isUpdateActDateLastEdited: true);
-            InitializeDailyGraphTabData();
-            UpdateDailyGraphTabData();
+            this.UpdateBookTabData(isScroll: true, isUpdateActDateLastEdited: true);
+            this.InitializeDailyGraphTabData();
+            this.UpdateDailyGraphTabData();
 
             // 月別データ更新
-            UpdateMonthlyListTabData();
-            InitializeMonthlyGraphTabData();
-            UpdateMonthlyGraphTabData();
+            this.UpdateMonthlyListTabData();
+            this.InitializeMonthlyGraphTabData();
+            this.UpdateMonthlyGraphTabData();
 
-            LoadSetting();
+            this.LoadSetting();
         }
 
         #region イベントハンドラ
@@ -302,11 +302,11 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             }
 
             if (isOpen) {
-                UpdateBookList();
-                UpdateBookTabData(isScroll: true, isUpdateActDateLastEdited: true);
-                UpdateDailyGraphTabData();
-                UpdateMonthlyListTabData();
-                UpdateMonthlyGraphTabData();
+                this.UpdateBookList();
+                this.UpdateBookTabData(isScroll: true, isUpdateActDateLastEdited: true);
+                this.UpdateDailyGraphTabData();
+                this.UpdateMonthlyListTabData();
+                this.UpdateMonthlyGraphTabData();
 
                 this.Cursor = cCursor;
 
@@ -407,11 +407,11 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
             if (process.ExitCode == 0) {
                 // 画面を更新する
-                UpdateBookList();
-                UpdateBookTabData(isScroll: true, isUpdateActDateLastEdited: true);
-                UpdateDailyGraphTabData();
-                UpdateMonthlyListTabData();
-                UpdateMonthlyGraphTabData();
+                this.UpdateBookList();
+                this.UpdateBookTabData(isScroll: true, isUpdateActDateLastEdited: true);
+                this.UpdateDailyGraphTabData();
+                this.UpdateMonthlyListTabData();
+                this.UpdateMonthlyGraphTabData();
 
                 this.Cursor = cCursor;
 
@@ -546,7 +546,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             // 登録時イベントを登録する
             mrw.Registrated += (sender2, e2) => {
                 // 帳簿一覧タブを更新する
-                UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
@@ -576,7 +576,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             // 登録時イベントを登録する
             arw.Registrated += (sender2, e2)=> {
                 // 帳簿一覧タブを更新する
-                UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
@@ -606,7 +606,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             // 登録時イベントを登録する
             alrw.Registrated += (sender2, e2) => {
                 // 帳簿一覧タブを更新する
-                UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
@@ -653,7 +653,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 // 登録時イベントを登録する
                 arw.Registrated += (sender2, e2) => {
                     // 帳簿一覧タブを更新する
-                    UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                    this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
@@ -665,7 +665,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 // 登録時イベントを登録する
                 mrw.Registrated += (sender2, e2) => {
                     // 帳簿一覧タブを更新する
-                    UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                    this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
@@ -713,7 +713,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 // 登録時イベントを登録する
                 arw.Registrated += (sender2, e2) => {
                     // 帳簿一覧タブを更新する
-                    UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                    this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
@@ -725,7 +725,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 // 登録時イベントを登録する
                 mrw.Registrated += (sender2, e2) => {
                     // 帳簿一覧タブを更新する
-                    UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                    this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
@@ -796,7 +796,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 }
 
                 // 帳簿一覧タブを更新する
-                UpdateBookTabData(isUpdateActDateLastEdited: true);
+                this.UpdateBookTabData(isUpdateActDateLastEdited: true);
             }
         }
         #endregion
@@ -932,17 +932,17 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
-            UpdateBookTabData(isScroll:false);
-            InitializeDailyGraphTabData();
-            UpdateDailyGraphTabData();
+            this.UpdateBookTabData(isScroll:false);
+            this.InitializeDailyGraphTabData();
+            this.UpdateDailyGraphTabData();
 
-            UpdateMonthlyListTabData();
-            InitializeMonthlyGraphTabData();
-            UpdateMonthlyGraphTabData();
+            this.UpdateMonthlyListTabData();
+            this.InitializeMonthlyGraphTabData();
+            this.UpdateMonthlyGraphTabData();
 
-            UpdateYearlyListTabData();
-            InitializeYearlyGraphTabData();
-            UpdateYearlyGraphTabData();
+            this.UpdateYearlyListTabData();
+            this.InitializeYearlyGraphTabData();
+            this.UpdateYearlyGraphTabData();
 
             this.Cursor = cCursor;
         }
@@ -972,10 +972,10 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
-                    UpdateBookTabData(isScroll:true);
+                    this.UpdateBookTabData(isScroll:true);
 
-                    InitializeDailyGraphTabData();
-                    UpdateDailyGraphTabData();
+                    this.InitializeDailyGraphTabData();
+                    this.UpdateDailyGraphTabData();
                     break;
             }
 
@@ -1006,10 +1006,10 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
-            UpdateBookTabData(isScroll:true);
+            this.UpdateBookTabData(isScroll:true);
 
-            InitializeDailyGraphTabData();
-            UpdateDailyGraphTabData();
+            this.InitializeDailyGraphTabData();
+            this.UpdateDailyGraphTabData();
 
             this.Cursor = cCursor;
         }
@@ -1038,10 +1038,10 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
-                    UpdateBookTabData(isScroll:true);
+                    this.UpdateBookTabData(isScroll:true);
 
-                    InitializeDailyGraphTabData();
-                    UpdateDailyGraphTabData();
+                    this.InitializeDailyGraphTabData();
+                    this.UpdateDailyGraphTabData();
                     break;
             }
 
@@ -1072,11 +1072,11 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 
                 this.WVM.StartDate = stw.WVM.StartDate;
                 this.WVM.EndDate = stw.WVM.EndDate;
-                
-                UpdateBookTabData(isScroll:true);
 
-                InitializeDailyGraphTabData();
-                UpdateDailyGraphTabData();
+                this.UpdateBookTabData(isScroll:true);
+
+                this.InitializeDailyGraphTabData();
+                this.UpdateDailyGraphTabData();
 
                 this.Cursor = cCursor;
             }
@@ -1106,8 +1106,8 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(-1);
-            UpdateMonthlyListTabData();
-            UpdateMonthlyGraphTabData();
+            this.UpdateMonthlyListTabData();
+            this.UpdateMonthlyGraphTabData();
 
             this.Cursor = cCursor;
         }
@@ -1136,8 +1136,8 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
-            UpdateMonthlyListTabData();
-            UpdateMonthlyGraphTabData();
+            this.UpdateMonthlyListTabData();
+            this.UpdateMonthlyGraphTabData();
 
             this.Cursor = cCursor;
         }
@@ -1164,8 +1164,8 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(1);
-            UpdateMonthlyListTabData();
-            UpdateMonthlyGraphTabData();
+            this.UpdateMonthlyListTabData();
+            this.UpdateMonthlyGraphTabData();
 
             this.Cursor = cCursor;
         }
@@ -1185,19 +1185,19 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 Cursor cCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
 
-                UpdateBookList();
+                this.UpdateBookList();
 
-                UpdateBookTabData();
-                InitializeDailyGraphTabData();
-                UpdateDailyGraphTabData();
+                this.UpdateBookTabData();
+                this.InitializeDailyGraphTabData();
+                this.UpdateDailyGraphTabData();
 
-                UpdateMonthlyListTabData();
-                InitializeMonthlyGraphTabData();
-                UpdateMonthlyGraphTabData();
+                this.UpdateMonthlyListTabData();
+                this.InitializeMonthlyGraphTabData();
+                this.UpdateMonthlyGraphTabData();
 
-                UpdateYearlyListTabData();
-                InitializeYearlyGraphTabData();
-                UpdateYearlyGraphTabData();
+                this.UpdateYearlyListTabData();
+                this.InitializeYearlyGraphTabData();
+                this.UpdateYearlyGraphTabData();
 
                 this.Cursor = cCursor;
             }
@@ -1255,7 +1255,7 @@ WHERE action_id = @{0};", vm.ActionId);
         /// <param name="e"></param>
         private void MainWindow_Closed(object sender, EventArgs e)
         {
-            SaveSetting();
+            this.SaveSetting();
         }
 
         /// <summary>
@@ -1286,25 +1286,25 @@ WHERE action_id = @{0};", vm.ActionId);
 
                 switch (this.WVM.SelectedTab) {
                     case Tabs.BooksTab:
-                        UpdateBookTabData(isScroll:true);
+                        this.UpdateBookTabData(isScroll:true);
                         break;
                     case Tabs.DailyGraphTab:
-                        InitializeDailyGraphTabData();
-                        UpdateDailyGraphTabData();
+                        this.InitializeDailyGraphTabData();
+                        this.UpdateDailyGraphTabData();
                         break;
                     case Tabs.MonthlyListTab:
-                        UpdateMonthlyListTabData();
+                        this.UpdateMonthlyListTabData();
                         break;
                     case Tabs.MonthlyGraphTab:
-                        InitializeMonthlyGraphTabData();
-                        UpdateMonthlyGraphTabData();
+                        this.InitializeMonthlyGraphTabData();
+                        this.UpdateMonthlyGraphTabData();
                         break;
                     case Tabs.YearlyListTab:
-                        UpdateYearlyListTabData();
+                        this.UpdateYearlyListTabData();
                         break;
                     case Tabs.YearlyGraphTab:
-                        InitializeYearlyGraphTabData();
-                        UpdateYearlyGraphTabData();
+                        this.InitializeYearlyGraphTabData();
+                        this.UpdateYearlyGraphTabData();
                         break;
                 }
                 this.Cursor = cCursor;
@@ -1323,15 +1323,15 @@ WHERE action_id = @{0};", vm.ActionId);
         {
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
-            
-            UpdateBookTabData(isScroll:true);
-            UpdateDailyGraphTabData();
 
-            UpdateMonthlyListTabData();
-            UpdateMonthlyGraphTabData();
+            this.UpdateBookTabData(isScroll:true);
+            this.UpdateDailyGraphTabData();
 
-            UpdateYearlyListTabData();
-            UpdateYearlyGraphTabData();
+            this.UpdateMonthlyListTabData();
+            this.UpdateMonthlyGraphTabData();
+
+            this.UpdateYearlyListTabData();
+            this.UpdateYearlyGraphTabData();
 
             this.Cursor = cCursor;
         }
@@ -1346,14 +1346,14 @@ WHERE action_id = @{0};", vm.ActionId);
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
-            InitializeDailyGraphTabData();
-            UpdateDailyGraphTabData();
+            this.InitializeDailyGraphTabData();
+            this.UpdateDailyGraphTabData();
 
-            InitializeMonthlyGraphTabData();
-            UpdateMonthlyGraphTabData();
+            this.InitializeMonthlyGraphTabData();
+            this.UpdateMonthlyGraphTabData();
 
-            InitializeYearlyGraphTabData();
-            UpdateYearlyGraphTabData();
+            this.InitializeYearlyGraphTabData();
+            this.UpdateYearlyGraphTabData();
 
             this.Cursor = cCursor;
         }
@@ -1404,7 +1404,7 @@ ORDER BY sort_order;");
         {
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.AddMonths(1).AddMilliseconds(-1);
-            return LoadActionViewModelList(bookId, startTime, endTime);
+            return this.LoadActionViewModelList(bookId, startTime, endTime);
         }
 
         /// <summary>
@@ -1548,7 +1548,7 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
         {
             DateTime startTime = new DateTime(includedTime.Year, includedTime.Month, includedTime.Day);
             DateTime endTime = startTime.AddDays(1).AddMilliseconds(-1);
-            return LoadSummaryViewModelList(bookId, startTime, endTime);
+            return this.LoadSummaryViewModelList(bookId, startTime, endTime);
         }
 
         /// <summary>
@@ -1561,7 +1561,7 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
         {
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.AddMonths(1).AddMilliseconds(-1);
-            return LoadSummaryViewModelList(bookId, startTime, endTime);
+            return this.LoadSummaryViewModelList(bookId, startTime, endTime);
         }
 
         /// <summary>
@@ -1692,7 +1692,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.AddMonths(1).AddMilliseconds(-1);
 
-            return LoadDailySummaryViewModelList(bookId, startTime, endTime);
+            return this.LoadDailySummaryViewModelList(bookId, startTime, endTime);
         }
 
         /// <summary>
@@ -1825,7 +1825,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             DateTime startTime = includedTime.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             DateTime endTime = startTime.AddYears(1).AddMilliseconds(-1);
 
-            return LoadMonthlySummaryViewModelList(bookId, startTime, endTime);
+            return this.LoadMonthlySummaryViewModelList(bookId, startTime, endTime);
         }
 
         /// <summary>
@@ -2078,12 +2078,12 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
                 switch (this.WVM.DisplayedTermKind) {
                     case TermKind.Monthly:
-                        this.WVM.ActionVMList = LoadActionViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
-                        this.WVM.SummaryVMList = LoadSummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                        this.WVM.ActionVMList = this.LoadActionViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                        this.WVM.SummaryVMList = this.LoadSummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                         break;
                     case TermKind.Selected:
-                        this.WVM.ActionVMList = LoadActionViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
-                        this.WVM.SummaryVMList = LoadSummaryViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                        this.WVM.ActionVMList = this.LoadActionViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                        this.WVM.SummaryVMList = this.LoadSummaryViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                         break;
                 }
 
@@ -2223,10 +2223,10 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                             ObservableCollection<SeriesViewModel> vmList = null;
                             switch (this.WVM.DisplayedTermKind) {
                                 case TermKind.Monthly:
-                                    vmList = LoadDailySummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                                    vmList = this.LoadDailySummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                                     break;
                                 case TermKind.Selected:
-                                    vmList = LoadDailySummaryViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                                    vmList = this.LoadDailySummaryViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                                     break;
                             }
                             List<int> sumPlus = new List<int>(); // 日ごとの合計収入
@@ -2314,10 +2314,10 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                             ObservableCollection<SeriesViewModel> vmList = null;
                             switch (this.WVM.DisplayedTermKind) {
                                 case TermKind.Monthly:
-                                    vmList = LoadDailySummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                                    vmList = this.LoadDailySummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                                     break;
                                 case TermKind.Selected:
-                                    vmList = LoadDailySummaryViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                                    vmList = this.LoadDailySummaryViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                                     break;
                             }
                             cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
@@ -2358,7 +2358,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                     displayedMonths.Add(string.Format("{0}月", (i - 1) % 12 + 1));
                 }
                 this.WVM.DisplayedMonths = displayedMonths;
-                this.WVM.MonthlySummaryVMList = LoadMonthlySummaryViewModelListWithinYear(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                this.WVM.MonthlySummaryVMList = this.LoadMonthlySummaryViewModelListWithinYear(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
             }
         }
         #endregion
@@ -2454,7 +2454,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
                 switch (this.WVM.SelectedGraphKind) {
                     case GraphKind.IncomeAndOutgo: {
-                            ObservableCollection<SeriesViewModel> vmList = LoadMonthlySummaryViewModelListWithinYear(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                            ObservableCollection<SeriesViewModel> vmList = this.LoadMonthlySummaryViewModelListWithinYear(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
                             List<int> sumPlus = new List<int>(); // 月ごとの合計収入
                             List<int> sumMinus = new List<int>(); // 月ごとの合計支出
 
@@ -2531,7 +2531,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                                 Title = "残高",
                                 TrackerFormatString = "{2}月: {4:#,0}" //月: 金額
                             };
-                            ObservableCollection<SeriesViewModel> vmList = LoadMonthlySummaryViewModelListWithinYear(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                            ObservableCollection<SeriesViewModel> vmList = this.LoadMonthlySummaryViewModelListWithinYear(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
                             cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
 
                             this.WVM.WholeItemMonthlyGraphModel.Series.Add(cSeries);
@@ -2569,7 +2569,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                     displayedYears.Add(string.Format("{0}年", i));
                 }
                 this.WVM.DisplayedYears = displayedYears;
-                this.WVM.YearlySummaryVMList = LoadYearlySummaryViewModelListWithinDecade(this.WVM.SelectedBookVM.Id);
+                this.WVM.YearlySummaryVMList = this.LoadYearlySummaryViewModelListWithinDecade(this.WVM.SelectedBookVM.Id);
             }
         }
         #endregion
@@ -2666,7 +2666,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
                 switch (this.WVM.SelectedGraphKind) {
                     case GraphKind.IncomeAndOutgo: {
-                            ObservableCollection<SeriesViewModel> vmList = LoadYearlySummaryViewModelListWithinDecade(this.WVM.SelectedBookVM.Id);
+                            ObservableCollection<SeriesViewModel> vmList = this.LoadYearlySummaryViewModelListWithinDecade(this.WVM.SelectedBookVM.Id);
                             List<int> sumPlus = new List<int>(); // 年ごとの合計収入
                             List<int> sumMinus = new List<int>(); // 年ごとの合計支出
 
@@ -2743,7 +2743,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                                 Title = "残高",
                                 TrackerFormatString = "{2}年: {4:#,0}" //年: 金額
                             };
-                            ObservableCollection<SeriesViewModel> vmList = LoadYearlySummaryViewModelListWithinDecade(this.WVM.SelectedBookVM.Id);
+                            ObservableCollection<SeriesViewModel> vmList = this.LoadYearlySummaryViewModelListWithinDecade(this.WVM.SelectedBookVM.Id);
                             cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
 
                             this.WVM.WholeItemYearlyGraphModel.Series.Add(cSeries);
@@ -2818,10 +2818,10 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (settings.MainWindow_Left != -1) {
+            if (0 <= settings.MainWindow_Left) {
                 this.Left = settings.MainWindow_Left;
             }
-            if (settings.MainWindow_Top != -1) {
+            if (0 <= settings.MainWindow_Top) {
                 this.Top = settings.MainWindow_Top;
             }
             if (settings.MainWindow_Width != -1) {

@@ -18,12 +18,12 @@ namespace HouseholdAccountBook.Windows
         /// <param name="endDate">終了日</param>
         public TermWindow(DateTime startDate, DateTime endDate)
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
             this.WVM.StartDate = startDate;
             this.WVM.EndDate = endDate;
 
-            LoadSetting();
+            this.LoadSetting();
         }
 
         /// <summary>
@@ -32,12 +32,12 @@ namespace HouseholdAccountBook.Windows
         /// <param name="dateWithinMonth">月内日付</param>
         public TermWindow(DateTime dateWithinMonth)
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
             this.WVM.StartDate = dateWithinMonth.GetFirstDateOfMonth();
             this.WVM.EndDate = this.WVM.StartDate.AddMonths(1).AddMilliseconds(-1);
 
-            LoadSetting();
+            this.LoadSetting();
         }
 
         #region イベントハンドラ
@@ -49,7 +49,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void TermWindow_Closed(object sender, EventArgs e)
         {
-            SaveSetting();
+            this.SaveSetting();
         }
         #endregion
 

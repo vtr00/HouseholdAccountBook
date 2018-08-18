@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.ViewModels
             public DateTime Date
             {
                 get { return this._Date; }
-                set { SetProperty(ref this._Date, value); }
+                set { this.SetProperty(ref this._Date, value); }
             }
             private DateTime _Date = default(DateTime);
             #endregion
@@ -29,7 +29,7 @@ namespace HouseholdAccountBook.ViewModels
             public int Value
             {
                 get { return this._Value; }
-                set { SetProperty(ref this._Value, value); }
+                set { this.SetProperty(ref this._Value, value); }
             }
             private int _Value = default(int);
             #endregion
@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.ViewModels
             public string Name
             {
                 get { return this._Name; }
-                set { SetProperty(ref this._Name, value); }
+                set { this.SetProperty(ref this._Name, value); }
             }
             private string _Name = default(string);
             #endregion

@@ -37,7 +37,7 @@ namespace HouseholdAccountBook.Dao
         public override int ExecNonQuery(string sql, params object[] objects)
         {
             try {
-                return CreateCommand(sql, objects).ExecuteNonQuery();
+                return this.CreateCommand(sql, objects).ExecuteNonQuery();
             }
             catch (Exception e) {
                 throw e;
@@ -55,7 +55,7 @@ namespace HouseholdAccountBook.Dao
             try {
                 LinkedList<Dictionary<string, object>> resultSet = new LinkedList<Dictionary<string, object>>();
 
-                NpgsqlCommand command = CreateCommand(sql, objects);
+                NpgsqlCommand command = this.CreateCommand(sql, objects);
                 using (NpgsqlDataReader reader = command.ExecuteReader()) {
                     // フィールド名の取得
                     List<string> fieldList = new List<string>();
@@ -66,8 +66,8 @@ namespace HouseholdAccountBook.Dao
                     // レコードの取得
                     while (reader.Read()) {
                         Dictionary<string, object> result = new Dictionary<string, object>();
-                        for (int i = 0; i < fieldList.Count; ++i) {
-                            result.Add(fieldList[i], reader[fieldList[i]]);
+                        foreach (string fieldName in fieldList) {
+                            result.Add(fieldName, reader[fieldName]);
                         }
                         resultSet.AddLast(result);
                     }

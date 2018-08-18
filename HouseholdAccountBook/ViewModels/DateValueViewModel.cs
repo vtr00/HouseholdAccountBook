@@ -23,7 +23,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._ActValue; }
             set {
-                if (SetProperty(ref this._ActValue, value)) {
+                if (this.SetProperty(ref this._ActValue, value)) {
                     CommandManager.InvalidateRequerySuggested();
                 }
             }

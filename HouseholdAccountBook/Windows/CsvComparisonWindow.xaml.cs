@@ -48,10 +48,10 @@ namespace HouseholdAccountBook.Windows
         {
             this.builder = builder;
 
-            InitializeComponent();
+            this.InitializeComponent();
 
-            UpdateBookList(bookId);
-            LoadSetting();
+            this.UpdateBookList(bookId);
+            this.LoadSetting();
         }
 
         #region イベントハンドラ
@@ -139,7 +139,7 @@ namespace HouseholdAccountBook.Windows
             }
             this.csvCompDataGrid.ScrollToTop();
 
-            UpdateComparisonInfo();
+            this.UpdateComparisonInfo();
 
             this.Cursor = cCursor;
         }
@@ -164,7 +164,7 @@ namespace HouseholdAccountBook.Windows
         {
             ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedCsvComparisonVM.ActionId.Value);
             arw.Registrated += (sender2, e2) => {
-                UpdateComparisonInfo();
+                this.UpdateComparisonInfo();
             };
             arw.ShowDialog();
         }
@@ -206,7 +206,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
                     }
                 });
             }
-            UpdateComparisonInfo();
+            this.UpdateComparisonInfo();
 
             this.Cursor = cursor;
         }
@@ -231,7 +231,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
-            UpdateComparisonInfo();
+            this.UpdateComparisonInfo();
 
             this.Cursor = cCursor;
         }
@@ -266,7 +266,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         {
             CsvComparisonViewModel vm = (this.WVM.SelectedCsvComparisonVM = (e.OriginalSource as CheckBox)?.DataContext as CsvComparisonViewModel);
             if (vm.ActionId.HasValue) {
-                ChangeIsMatch(vm.ActionId.Value, vm.IsMatch);
+                this.ChangeIsMatch(vm.ActionId.Value, vm.IsMatch);
             }
         }
         #endregion
@@ -278,7 +278,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         /// <param name="e"></param>
         private void CsvComparisonWindow_Closed(object sender, EventArgs e)
         {
-            SaveSetting();
+            this.SaveSetting();
         }
 
         /// <summary>
@@ -294,7 +294,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
 
                 CsvComparisonViewModel vm = (this.WVM.SelectedCsvComparisonVM = checkBox?.DataContext as CsvComparisonViewModel);
                 if (vm.ActionId.HasValue) {
-                    ChangeIsMatch(vm.ActionId.Value, vm.IsMatch);
+                    this.ChangeIsMatch(vm.ActionId.Value, vm.IsMatch);
                 }
             }
         }

@@ -46,7 +46,7 @@ namespace HouseholdAccountBook.ViewModels
         public RegistrationMode RegMode
         {
             get { return this._RegMode; }
-            set { SetProperty(ref this._RegMode, value); }
+            set { this.SetProperty(ref this._RegMode, value); }
         }
         private RegistrationMode _RegMode = default(RegistrationMode);
         #endregion
@@ -58,7 +58,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<BookViewModel> BookVMList
         {
             get { return this._BookVMList; }
-            set { SetProperty(ref this._BookVMList, value); }
+            set { this.SetProperty(ref this._BookVMList, value); }
         }
         private ObservableCollection<BookViewModel> _BookVMList = default(ObservableCollection<BookViewModel>);
         #endregion
@@ -70,7 +70,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._SelectedBookVM; }
             set {
-                if (SetProperty(ref this._SelectedBookVM, value)) {
+                if (this.SetProperty(ref this._SelectedBookVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
                         BookChanged?.Invoke();
@@ -91,7 +91,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._SelectedDate; }
             set {
-                if (SetProperty(ref this._SelectedDate, value)) {
+                if (this.SetProperty(ref this._SelectedDate, value)) {
                     CommandManager.InvalidateRequerySuggested();
                 }
             }
@@ -113,7 +113,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._SelectedBalanceKind; }
             set {
-                if (SetProperty(ref this._SelectedBalanceKind, value)) {
+                if (this.SetProperty(ref this._SelectedBalanceKind, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
                         BalanceKindChanged?.Invoke();
@@ -132,7 +132,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<CategoryViewModel> CategoryVMList
         {
             get { return this._CategoryVMList; }
-            set { SetProperty(ref this._CategoryVMList, value); }
+            set { this.SetProperty(ref this._CategoryVMList, value); }
         }
         private ObservableCollection<CategoryViewModel> _CategoryVMList = default(ObservableCollection<CategoryViewModel>);
         #endregion
@@ -144,7 +144,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._SelectedCategoryVM; }
             set {
-                if (SetProperty(ref this._SelectedCategoryVM, value)) {
+                if (this.SetProperty(ref this._SelectedCategoryVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
                         CategoryChanged?.Invoke();
@@ -163,7 +163,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<ItemViewModel> ItemVMList
         {
             get { return this._ItemVMList; }
-            set { SetProperty(ref this._ItemVMList, value); }
+            set { this.SetProperty(ref this._ItemVMList, value); }
         }
         private ObservableCollection<ItemViewModel> _ItemVMList = default(ObservableCollection<ItemViewModel>);
         #endregion
@@ -175,7 +175,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._SelectedItemVM; }
             set {
-                if (SetProperty(ref this._SelectedItemVM, value)) {
+                if (this.SetProperty(ref this._SelectedItemVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
                         ItemChanged?.Invoke();
@@ -195,7 +195,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._Value; }
             set {
-                if (SetProperty(ref this._Value, value)) {
+                if (this.SetProperty(ref this._Value, value)) {
                     CommandManager.InvalidateRequerySuggested();
                 }
             }
@@ -210,7 +210,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<string> ShopNameList
         {
             get { return this._ShopNameList; }
-            set { SetProperty(ref this._ShopNameList, value); }
+            set { this.SetProperty(ref this._ShopNameList, value); }
         }
         private ObservableCollection<string> _ShopNameList = default(ObservableCollection<string>);
         #endregion
@@ -221,7 +221,7 @@ namespace HouseholdAccountBook.ViewModels
         public string SelectedShopName
         {
             get { return this._SelectedShopName; }
-            set { SetProperty(ref this._SelectedShopName, value); }
+            set { this.SetProperty(ref this._SelectedShopName, value); }
         }
         private string _SelectedShopName = default(string);
         #endregion
@@ -233,7 +233,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<string> RemarkList
         {
             get { return this._RemarkList; }
-            set { SetProperty(ref this._RemarkList, value); }
+            set { this.SetProperty(ref this._RemarkList, value); }
         }
         private ObservableCollection<string> _RemarkList = default(ObservableCollection<string>);
         #endregion
@@ -244,7 +244,7 @@ namespace HouseholdAccountBook.ViewModels
         public string SelectedRemark
         {
             get { return this._SelectedRemark; }
-            set { SetProperty(ref this._SelectedRemark, value); }
+            set { this.SetProperty(ref this._SelectedRemark, value); }
         }
         private string _SelectedRemark = default(string);
         #endregion
@@ -257,7 +257,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._Count; }
             set {
-                if (SetProperty(ref this._Count, value)) {
+                if (this.SetProperty(ref this._Count, value)) {
                     CommandManager.InvalidateRequerySuggested();
                 }
             }
@@ -271,7 +271,7 @@ namespace HouseholdAccountBook.ViewModels
         public bool IsLink
         {
             get { return this._IsLink; }
-            set { SetProperty(ref this._IsLink, value); }
+            set { this.SetProperty(ref this._IsLink, value); }
         }
         private bool _IsLink = default(bool);
         #endregion
@@ -288,7 +288,7 @@ namespace HouseholdAccountBook.ViewModels
         public HolidaySettingKind SelectedHolidaySettingKind
         {
             get { return this._SelectedHolidaySettingKind; }
-            set { SetProperty(ref this._SelectedHolidaySettingKind, value); }
+            set { this.SetProperty(ref this._SelectedHolidaySettingKind, value); }
         }
         private HolidaySettingKind _SelectedHolidaySettingKind = HolidaySettingKind.Nothing;
         #endregion
@@ -300,7 +300,7 @@ namespace HouseholdAccountBook.ViewModels
         public bool IsMatch
         {
             get { return this._IsMatch; }
-            set { SetProperty(ref this._IsMatch, value); }
+            set { this.SetProperty(ref this._IsMatch, value); }
         }
         private bool _IsMatch = default(bool);
         #endregion

@@ -15,7 +15,7 @@ namespace HouseholdAccountBook.ViewModels
         public int? ActionId
         {
             get { return this._ActionId; }
-            set { SetProperty(ref this._ActionId, value); }
+            set { this.SetProperty(ref this._ActionId, value); }
         }
         private int? _ActionId = default(int?);
         #endregion
@@ -27,7 +27,7 @@ namespace HouseholdAccountBook.ViewModels
         public string ItemName
         {
             get { return this._ItemName; }
-            set { SetProperty(ref this._ItemName, value); }
+            set { this.SetProperty(ref this._ItemName, value); }
         }
         private string _ItemName = default(string);
         #endregion
@@ -39,7 +39,7 @@ namespace HouseholdAccountBook.ViewModels
         public string ShopName
         {
             get { return this._ShopName; }
-            set { SetProperty(ref this._ShopName, value); }
+            set { this.SetProperty(ref this._ShopName, value); }
         }
         private string _ShopName = default(string);
         #endregion
@@ -51,7 +51,7 @@ namespace HouseholdAccountBook.ViewModels
         public string Remark
         {
             get { return this._Remark; }
-            set { SetProperty(ref this._Remark, value); }
+            set { this.SetProperty(ref this._Remark, value); }
         }
         private string _Remark = default(string);
         #endregion
@@ -63,7 +63,7 @@ namespace HouseholdAccountBook.ViewModels
         public bool IsMatch
         {
             get { return this._IsMatch; }
-            set { SetProperty(ref this._IsMatch, value); }
+            set { this.SetProperty(ref this._IsMatch, value); }
         }
         private bool _IsMatch = default(bool);
         #endregion
@@ -75,7 +75,7 @@ namespace HouseholdAccountBook.ViewModels
         public CsvRecord Record
         {
             get { return this._Record; }
-            set { SetProperty(ref this._Record, value); }
+            set { this.SetProperty(ref this._Record, value); }
         }
         private CsvRecord _Record = default(CsvRecord);
         #endregion

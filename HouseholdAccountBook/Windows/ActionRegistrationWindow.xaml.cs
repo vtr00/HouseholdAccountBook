@@ -50,7 +50,7 @@ namespace HouseholdAccountBook.Windows
         {
             this.builder = builder;
 
-            InitializeComponent();
+            this.InitializeComponent();
             this.WVM.RegMode = RegistrationMode.Add;
 
             this.actionId = null;
@@ -75,34 +75,34 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
             this.WVM.SelectedDate = selectedDateTime != null ? selectedDateTime.Value : DateTime.Today;
             this.WVM.SelectedBalanceKind = BalanceKind.Outgo;
 
-            UpdateCategoryList();
-            UpdateItemList();
-            UpdateShopList();
-            UpdateRemarkList();
+            this.UpdateCategoryList();
+            this.UpdateItemList();
+            this.UpdateShopList();
+            this.UpdateRemarkList();
 
-            LoadSetting();
+            this.LoadSetting();
 
             #region イベントハンドラの設定
             this.WVM.BookChanged += () => {
-                UpdateCategoryList();
-                UpdateItemList();
-                UpdateShopList();
-                UpdateRemarkList();
+                this.UpdateCategoryList();
+                this.UpdateItemList();
+                this.UpdateShopList();
+                this.UpdateRemarkList();
             };
             this.WVM.BalanceKindChanged += () => {
-                UpdateCategoryList();
-                UpdateItemList();
-                UpdateShopList();
-                UpdateRemarkList();
+                this.UpdateCategoryList();
+                this.UpdateItemList();
+                this.UpdateShopList();
+                this.UpdateRemarkList();
             };
             this.WVM.CategoryChanged += () => {
-                UpdateItemList();
-                UpdateShopList();
-                UpdateRemarkList();
+                this.UpdateItemList();
+                this.UpdateShopList();
+                this.UpdateRemarkList();
             };
             this.WVM.ItemChanged += () => {
-                UpdateShopList();
-                UpdateRemarkList();
+                this.UpdateShopList();
+                this.UpdateRemarkList();
             };
             #endregion
         }
@@ -117,7 +117,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         {
             this.builder = builder;
 
-            InitializeComponent();
+            this.InitializeComponent();
             this.WVM.RegMode = mode;
 
             switch (this.WVM.RegMode) {
@@ -186,34 +186,34 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
             this.WVM.Count = count;
             this.WVM.IsMatch = isMatch;
 
-            UpdateCategoryList();
-            UpdateItemList(itemId);
-            UpdateShopList(shopName);
-            UpdateRemarkList(remark);
+            this.UpdateCategoryList();
+            this.UpdateItemList(itemId);
+            this.UpdateShopList(shopName);
+            this.UpdateRemarkList(remark);
 
-            LoadSetting();
+            this.LoadSetting();
 
             #region イベントハンドラの設定
             this.WVM.BookChanged += () => {
-                UpdateCategoryList();
-                UpdateItemList();
-                UpdateShopList();
-                UpdateRemarkList();
+                this.UpdateCategoryList();
+                this.UpdateItemList();
+                this.UpdateShopList();
+                this.UpdateRemarkList();
             };
             this.WVM.BalanceKindChanged += () => {
-                UpdateCategoryList();
-                UpdateItemList();
-                UpdateShopList();
-                UpdateRemarkList();
+                this.UpdateCategoryList();
+                this.UpdateItemList();
+                this.UpdateShopList();
+                this.UpdateRemarkList();
             };
             this.WVM.CategoryChanged += () => {
-                UpdateItemList();
-                UpdateShopList();
-                UpdateRemarkList();
+                this.UpdateItemList();
+                this.UpdateShopList();
+                this.UpdateRemarkList();
             };
             this.WVM.ItemChanged += () => {
-                UpdateShopList();
-                UpdateRemarkList();
+                this.UpdateShopList();
+                this.UpdateRemarkList();
             };
             #endregion
         }
@@ -263,7 +263,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
             }
             
             // DB登録
-            int? id = RegisterToDb();
+            int? id = this.RegisterToDb();
 
             // MainWindow更新
             List<int> value = id != null ? new List<int>() { id.Value } : new List<int>();
@@ -297,7 +297,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
             }
 
             // DB登録
-            int? id = RegisterToDb();
+            int? id = this.RegisterToDb();
 
             // MainWindow更新
             List<int> value = id != null ? new List<int>() { id.Value } : new List<int>();
@@ -326,7 +326,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
         /// <param name="e"></param>
         private void ActionRegistrationWindow_Closed(object sender, EventArgs e)
         {
-            SaveSetting();
+            this.SaveSetting();
         }
         #endregion
 

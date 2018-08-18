@@ -15,7 +15,7 @@ namespace HouseholdAccountBook.ViewModels
         public bool IsRelated
         {
             get { return this._IsRelated; }
-            set { SetProperty(ref this._IsRelated, value); }
+            set { this.SetProperty(ref this._IsRelated, value); }
         }
         private bool _IsRelated = default(bool);
         #endregion

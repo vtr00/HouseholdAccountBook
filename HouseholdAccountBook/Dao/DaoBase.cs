@@ -31,7 +31,7 @@ namespace HouseholdAccountBook.Dao
         {
             try {
                 this.connection.Open();
-                while (this.connection.State == System.Data.ConnectionState.Connecting) {; }
+                while (this.connection.State == System.Data.ConnectionState.Connecting) { ; }
 
                 return this.connection.State == System.Data.ConnectionState.Open;
             }

@@ -32,7 +32,7 @@ namespace HouseholdAccountBook.ViewModels
         public string Name
         {
             get { return this._Name; }
-            set { SetProperty(ref this._Name, value); }
+            set { this.SetProperty(ref this._Name, value); }
         }
         private string _Name = default(string);
         #endregion
@@ -44,7 +44,7 @@ namespace HouseholdAccountBook.ViewModels
         public bool IsSelected
         {
             get { return this._IsSelected; }
-            set { SetProperty(ref this._IsSelected, value); }
+            set { this.SetProperty(ref this._IsSelected, value); }
         }
         private bool _IsSelected = default(bool);
         #endregion
@@ -56,7 +56,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<HierarchicalItemViewModel> ChildrenVMList
         {
             get { return this._ChildrenVMList; }
-            set { SetProperty(ref this._ChildrenVMList, value); }
+            set { this.SetProperty(ref this._ChildrenVMList, value); }
         }
         private ObservableCollection<HierarchicalItemViewModel> _ChildrenVMList = default(ObservableCollection<HierarchicalItemViewModel>);
         #endregion
@@ -68,7 +68,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<RelationViewModel> RelationVMList
         {
             get { return this._RelationVMList; }
-            set { SetProperty(ref this._RelationVMList, value); }
+            set { this.SetProperty(ref this._RelationVMList, value); }
         }
         private ObservableCollection<RelationViewModel> _RelationVMList = default(ObservableCollection<RelationViewModel>);
         #endregion
@@ -79,7 +79,7 @@ namespace HouseholdAccountBook.ViewModels
         public RelationViewModel SelectedRelationVM
         {
             get { return this._SelectedRelationVM; }
-            set { SetProperty(ref this._SelectedRelationVM, value); }
+            set { this.SetProperty(ref this._SelectedRelationVM, value); }
         }
         private RelationViewModel _SelectedRelationVM = default(RelationViewModel);
         #endregion
@@ -91,7 +91,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<string> ShopNameList
         {
             get { return this._ShopNameList; }
-            set { SetProperty(ref this._ShopNameList, value); }
+            set { this.SetProperty(ref this._ShopNameList, value); }
         }
         private ObservableCollection<string> _ShopNameList = default(ObservableCollection<string>);
         #endregion
@@ -102,7 +102,7 @@ namespace HouseholdAccountBook.ViewModels
         public string SelectedShopName
         {
             get { return this._SelectedShopName; }
-            set { SetProperty(ref this._SelectedShopName, value); }
+            set { this.SetProperty(ref this._SelectedShopName, value); }
         }
         private string _SelectedShopName = default(string);
         #endregion
@@ -114,7 +114,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<string> RemarkList
         {
             get { return this._RemarkList; }
-            set { SetProperty(ref this._RemarkList, value); }
+            set { this.SetProperty(ref this._RemarkList, value); }
         }
         private ObservableCollection<string> _RemarkList = default(ObservableCollection<string>);
         #endregion
@@ -125,7 +125,7 @@ namespace HouseholdAccountBook.ViewModels
         public string SelectedRemark
         {
             get { return this._SelectedRemark; }
-            set { SetProperty(ref this._SelectedRemark, value); }
+            set { this.SetProperty(ref this._SelectedRemark, value); }
         }
         private string _SelectedRemark = default(string);
         #endregion

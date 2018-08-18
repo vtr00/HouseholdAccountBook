@@ -15,7 +15,7 @@ namespace HouseholdAccountBook.ViewModels
         public string Message
         {
             get { return this._Message; }
-            set { SetProperty(ref this._Message, value); }
+            set { this.SetProperty(ref this._Message, value); }
         }
         private string _Message = default(string);
         #endregion
@@ -27,7 +27,7 @@ namespace HouseholdAccountBook.ViewModels
         public string Host
         {
             get { return this._Host; }
-            set { SetProperty(ref this._Host, value); }
+            set { this.SetProperty(ref this._Host, value); }
         }
         private string _Host = default(string);
         #endregion
@@ -39,7 +39,7 @@ namespace HouseholdAccountBook.ViewModels
         public int Port
         {
             get { return this._Port; }
-            set { SetProperty(ref this._Port, value); }
+            set { this.SetProperty(ref this._Port, value); }
         }
         private int _Port = default(int);
         #endregion
@@ -51,7 +51,7 @@ namespace HouseholdAccountBook.ViewModels
         public string UserName
         {
             get { return this._UserName; }
-            set { SetProperty(ref this._UserName, value); }
+            set { this.SetProperty(ref this._UserName, value); }
         }
         private string _UserName = default(string);
         #endregion
@@ -63,7 +63,7 @@ namespace HouseholdAccountBook.ViewModels
         public string Password
         {
             get { return this._Password; }
-            set { SetProperty(ref this._Password, value); }
+            set { this.SetProperty(ref this._Password, value); }
         }
         private string _Password = default(string);
         #endregion
@@ -75,7 +75,7 @@ namespace HouseholdAccountBook.ViewModels
         public string DatabaseName
         {
             get { return this._DatabaseName; }
-            set { SetProperty(ref this._DatabaseName, value); }
+            set { this.SetProperty(ref this._DatabaseName, value); }
         }
         private string _DatabaseName = default(string);
         #endregion
@@ -87,7 +87,7 @@ namespace HouseholdAccountBook.ViewModels
         public string Role
         {
             get { return this._Role; }
-            set { SetProperty(ref this._Role, value); }
+            set { this.SetProperty(ref this._Role, value); }
         }
         private string _Role = default(string);
         #endregion
@@ -99,7 +99,7 @@ namespace HouseholdAccountBook.ViewModels
         public string DumpExePath
         {
             get { return this._DumpExePath; }
-            set { SetProperty(ref this._DumpExePath, value); }
+            set { this.SetProperty(ref this._DumpExePath, value); }
         }
         private string _DumpExePath = default(string);
         #endregion
@@ -111,7 +111,7 @@ namespace HouseholdAccountBook.ViewModels
         public string RestoreExePath
         {
             get { return this._RestoreExePath; }
-            set { SetProperty(ref this._RestoreExePath, value); }
+            set { this.SetProperty(ref this._RestoreExePath, value); }
         }
         private string _RestoreExePath = default(string);
         #endregion

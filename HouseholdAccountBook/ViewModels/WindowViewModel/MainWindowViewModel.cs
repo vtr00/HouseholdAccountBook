@@ -29,7 +29,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._SelectedTabIndex; }
             set {
-                if (SetProperty(ref this._SelectedTabIndex, value)) {
+                if (this.SetProperty(ref this._SelectedTabIndex, value)) {
                     this.SelectedTab = (Tabs)value;
                 }
             }
@@ -44,7 +44,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._SelectedTab; }
             set {
-                if (SetProperty(ref this._SelectedTab, value)) {
+                if (this.SetProperty(ref this._SelectedTab, value)) {
                     this.SelectedTabIndex = (int)value;
                 }
             }
@@ -59,7 +59,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<BookViewModel> BookVMList
         {
             get { return this._BookVMList; }
-            set { SetProperty(ref this._BookVMList, value); }
+            set { this.SetProperty(ref this._BookVMList, value); }
         }
         private ObservableCollection<BookViewModel> _BookVMList = default(ObservableCollection<BookViewModel>);
         #endregion
@@ -70,7 +70,7 @@ namespace HouseholdAccountBook.ViewModels
         public BookViewModel SelectedBookVM
         {
             get { return this._SelectedBookVM; }
-            set { SetProperty(ref this._SelectedBookVM, value); }
+            set { this.SetProperty(ref this._SelectedBookVM, value); }
         }
         private BookViewModel _SelectedBookVM;
         #endregion
@@ -127,7 +127,7 @@ namespace HouseholdAccountBook.ViewModels
                     }
                 }
                 if(oldDisplayedMonth != this.DisplayedMonth) {
-                    RaisePropertyChanged();
+                    this.RaisePropertyChanged();
                 }
             }
         }
@@ -142,8 +142,8 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._StartDate; }
             set {
-                SetProperty(ref this._StartDate, value);
-                RaisePropertyChanged(nameDisplayedMonth);
+                this.SetProperty(ref this._StartDate, value);
+                this.RaisePropertyChanged(nameDisplayedMonth);
             }
         }
         private DateTime _StartDate = DateTime.Now.GetFirstDateOfMonth();
@@ -156,8 +156,8 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._EndDate; }
             set {
-                SetProperty(ref this._EndDate, value);
-                RaisePropertyChanged(nameDisplayedMonth);
+                this.SetProperty(ref this._EndDate, value);
+                this.RaisePropertyChanged(nameDisplayedMonth);
             }
         }
         private DateTime _EndDate = DateTime.Now.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1);
@@ -171,8 +171,8 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._ActionVMList; }
             set {
-                SetProperty(ref this._ActionVMList, value);
-                UpdateDisplayedActionVMList();
+                this.SetProperty(ref this._ActionVMList, value);
+                this.UpdateDisplayedActionVMList();
             }
         }
         private ObservableCollection<ActionViewModel> _ActionVMList = default(ObservableCollection<ActionViewModel>);
@@ -184,7 +184,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<ActionViewModel> DisplayedActionVMList
         {
             get { return this._DisplayedActionVMList; }
-            set { SetProperty(ref this._DisplayedActionVMList, value); }
+            set { this.SetProperty(ref this._DisplayedActionVMList, value); }
         }
         private ObservableCollection<ActionViewModel> _DisplayedActionVMList = default(ObservableCollection<ActionViewModel>);
         #endregion
@@ -196,7 +196,7 @@ namespace HouseholdAccountBook.ViewModels
         public ActionViewModel SelectedActionVM
         {
             get { return this._SelectedActionVM; }
-            set { SetProperty(ref this._SelectedActionVM, value); }
+            set { this.SetProperty(ref this._SelectedActionVM, value); }
         }
         private ActionViewModel _SelectedActionVM = default(ActionViewModel);
         #endregion
@@ -214,7 +214,7 @@ namespace HouseholdAccountBook.ViewModels
         public DateTime? ActDateLastEdited
         {
             get { return this._ActDateLastEdited; }
-            set { SetProperty(ref this._ActDateLastEdited, value); }
+            set { this.SetProperty(ref this._ActDateLastEdited, value); }
         }
         private DateTime? _ActDateLastEdited = null;
         #endregion
@@ -226,7 +226,7 @@ namespace HouseholdAccountBook.ViewModels
         public double? AverageValue
         {
             get { return this._AverageValue; }
-            private set { SetProperty(ref this._AverageValue, value); }
+            private set { this.SetProperty(ref this._AverageValue, value); }
         }
         private double? _AverageValue = default(double?);
         #endregion
@@ -237,7 +237,7 @@ namespace HouseholdAccountBook.ViewModels
         public int Amount
         {
             get { return this._Amount; }
-            set { SetProperty(ref this._Amount, value); }
+            set { this.SetProperty(ref this._Amount, value); }
         }
         private int _Amount = default(int);
         #endregion
@@ -248,7 +248,7 @@ namespace HouseholdAccountBook.ViewModels
         public int? SumValue
         {
             get { return this._SumValue; }
-            private set { SetProperty(ref this._SumValue, value); }
+            private set { this.SetProperty(ref this._SumValue, value); }
         }
         private int? _SumValue = default(int?);
         #endregion
@@ -261,8 +261,8 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._SummaryVMList; }
             set {
-                SetProperty(ref this._SummaryVMList, value);
-                UpdateDisplayedActionVMList();
+                this.SetProperty(ref this._SummaryVMList, value);
+                this.UpdateDisplayedActionVMList();
             }
         }
         private ObservableCollection<SummaryViewModel> _SummaryVMList;
@@ -275,8 +275,8 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._SelectedSummaryVM; }
             set {
-                SetProperty(ref this._SelectedSummaryVM, value);
-                UpdateDisplayedActionVMList();
+                this.SetProperty(ref this._SelectedSummaryVM, value);
+                this.UpdateDisplayedActionVMList();
             }
         }
         private SummaryViewModel _SelectedSummaryVM = default(SummaryViewModel);
@@ -336,7 +336,7 @@ namespace HouseholdAccountBook.ViewModels
             get { return this._DisplayedYear; }
             set {
                 DateTime oldDisplayedYear = this._DisplayedYear;
-                if (SetProperty(ref this._DisplayedYear, value)) {
+                if (this.SetProperty(ref this._DisplayedYear, value)) {
                     if (!this.onUpdateDisplayedDate) {
                         int startMonth = Properties.Settings.Default.App_StartMonth;
                         int yearDiff = value.GetFirstDateOfFiscalYear(startMonth).Year - oldDisplayedYear.GetFirstDateOfFiscalYear(startMonth).Year;
@@ -372,7 +372,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<string> DisplayedMonths
         {
             get { return this._DisplayedMonths; }
-            set { SetProperty(ref this._DisplayedMonths, value); }
+            set { this.SetProperty(ref this._DisplayedMonths, value); }
         }
         private ObservableCollection<string> _DisplayedMonths = default(ObservableCollection<string>);
         #endregion
@@ -384,7 +384,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<SeriesViewModel> MonthlySummaryVMList
         {
             get { return this._MonthlySummaryVMList; }
-            set { SetProperty(ref this._MonthlySummaryVMList, value); }
+            set { this.SetProperty(ref this._MonthlySummaryVMList, value); }
         }
         private ObservableCollection<SeriesViewModel> _MonthlySummaryVMList = default(ObservableCollection<SeriesViewModel>);
         #endregion
@@ -400,7 +400,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<string> DisplayedYears
         {
             get { return this._DisplayedYears; }
-            set { SetProperty(ref this._DisplayedYears, value); }
+            set { this.SetProperty(ref this._DisplayedYears, value); }
         }
         private ObservableCollection<string> _DisplayedYears = default(ObservableCollection<string>);
         #endregion
@@ -412,7 +412,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<SeriesViewModel> YearlySummaryVMList
         {
             get { return this._YearlySummaryVMList; }
-            set { SetProperty(ref this._YearlySummaryVMList, value); }
+            set { this.SetProperty(ref this._YearlySummaryVMList, value); }
         }
         private ObservableCollection<SeriesViewModel> _YearlySummaryVMList = default(ObservableCollection<SeriesViewModel>);
         #endregion
@@ -435,7 +435,7 @@ namespace HouseholdAccountBook.ViewModels
         public GraphKind SelectedGraphKind
         {
             get { return this._SelectedGraphKind; }
-            set { SetProperty(ref this._SelectedGraphKind, value); }
+            set { this.SetProperty(ref this._SelectedGraphKind, value); }
         }
         private GraphKind _SelectedGraphKind = default(GraphKind);
         #endregion
@@ -447,7 +447,7 @@ namespace HouseholdAccountBook.ViewModels
         public PlotModel WholeItemDailyGraphModel
         {
             get { return this._WholeItemDailyGraphModel; }
-            set { SetProperty(ref this._WholeItemDailyGraphModel, value); }
+            set { this.SetProperty(ref this._WholeItemDailyGraphModel, value); }
         }
         private PlotModel _WholeItemDailyGraphModel = new PlotModel() {
             Title = "日別グラフ",
@@ -466,7 +466,7 @@ namespace HouseholdAccountBook.ViewModels
         public PlotModel SelectedItemDailyGraphModel
         {
             get { return this._SelectedItemDailyGraphModel; }
-            set { SetProperty(ref this._SelectedItemDailyGraphModel, value); }
+            set { this.SetProperty(ref this._SelectedItemDailyGraphModel, value); }
         }
         private PlotModel _SelectedItemDailyGraphModel = new PlotModel() {
             Title = "個別グラフ",
@@ -485,7 +485,7 @@ namespace HouseholdAccountBook.ViewModels
         public PlotModel WholeItemMonthlyGraphModel
         {
             get { return this._WholeItemMonthlyGraphModel; }
-            set { SetProperty(ref this._WholeItemMonthlyGraphModel, value); }
+            set { this.SetProperty(ref this._WholeItemMonthlyGraphModel, value); }
         }
         private PlotModel _WholeItemMonthlyGraphModel = new PlotModel() {
             Title = "月別グラフ",
@@ -504,7 +504,7 @@ namespace HouseholdAccountBook.ViewModels
         public PlotModel SelectedItemMonthlyGraphModel
         {
             get { return this._SelectedItemMonthlyGraphModel; }
-            set { SetProperty(ref this._SelectedItemMonthlyGraphModel, value); }
+            set { this.SetProperty(ref this._SelectedItemMonthlyGraphModel, value); }
         }
         private PlotModel _SelectedItemMonthlyGraphModel = new PlotModel() {
             Title = "個別グラフ",
@@ -523,7 +523,7 @@ namespace HouseholdAccountBook.ViewModels
         public PlotModel WholeItemYearlyGraphModel
         {
             get { return this._WholeItemYearlyGraphModel; }
-            set { SetProperty(ref this._WholeItemYearlyGraphModel, value); }
+            set { this.SetProperty(ref this._WholeItemYearlyGraphModel, value); }
         }
         private PlotModel _WholeItemYearlyGraphModel = new PlotModel() {
             Title = "年別グラフ",
@@ -542,7 +542,7 @@ namespace HouseholdAccountBook.ViewModels
         public PlotModel SelectedItemYearlyGraphModel
         {
             get { return this._SelectedItemYearlyGraphModel; }
-            set { SetProperty(ref this._SelectedItemYearlyGraphModel, value); }
+            set { this.SetProperty(ref this._SelectedItemYearlyGraphModel, value); }
         }
         private PlotModel _SelectedItemYearlyGraphModel = new PlotModel() {
             Title = "個別グラフ",
@@ -561,7 +561,7 @@ namespace HouseholdAccountBook.ViewModels
         public PlotController Controller
         {
             get { return this._Controller; }
-            set { SetProperty(ref this._Controller, value); }
+            set { this.SetProperty(ref this._Controller, value); }
         }
         private PlotController _Controller = new PlotController();
         #endregion
@@ -587,7 +587,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public MainWindowViewModel()
         {
-            this.SelectedActionVMList.CollectionChanged += (sender, e) => UpdateStatisticsValue();
+            this.SelectedActionVMList.CollectionChanged += (sender, e) => this.UpdateStatisticsValue();
             this.Controller.BindMouseEnter(PlotCommands.HoverPointsOnlyTrack);
         }
     }

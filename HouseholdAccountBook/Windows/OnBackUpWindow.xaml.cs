@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         public OnBackUpWindow()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

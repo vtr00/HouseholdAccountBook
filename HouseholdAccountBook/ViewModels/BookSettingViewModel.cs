@@ -23,7 +23,7 @@ namespace HouseholdAccountBook.ViewModels
         public string Name
         {
             get { return this._Name; }
-            set { SetProperty(ref this._Name, value); }
+            set { this.SetProperty(ref this._Name, value); }
         }
         private string _Name = default(string);
         #endregion
@@ -40,9 +40,9 @@ namespace HouseholdAccountBook.ViewModels
         {
             get { return this._SelectedBookKind; }
             set {
-                SetProperty(ref this._SelectedBookKind, value);
-                UpdateNeedToPay();
-                UpdateCsvDataExists();
+                this.SetProperty(ref this._SelectedBookKind, value);
+                this.UpdateNeedToPay();
+                this.UpdateCsvDataExists();
             }
         }
         private BookKind _SelectedBookKind = BookKind.Uncategorized;
@@ -55,7 +55,7 @@ namespace HouseholdAccountBook.ViewModels
         public int InitialValue
         {
             get { return this._InitialValue; }
-            set { SetProperty(ref this._InitialValue, value); }
+            set { this.SetProperty(ref this._InitialValue, value); }
         }
         private int _InitialValue = 0;
         #endregion
@@ -68,7 +68,7 @@ namespace HouseholdAccountBook.ViewModels
         public bool NeedToPay
         {
             get { return this._NeedToPay; }
-            private set { SetProperty(ref this._NeedToPay, value); }
+            private set { this.SetProperty(ref this._NeedToPay, value); }
         }
         private bool _NeedToPay = default(bool);
         #endregion
@@ -80,7 +80,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<BookViewModel> DebitBookVMList
         {
             get { return this._DebitBookVMList; }
-            set { SetProperty(ref this._DebitBookVMList, value); }
+            set { this.SetProperty(ref this._DebitBookVMList, value); }
         }
         private ObservableCollection<BookViewModel> _DebitBookVMList = default(ObservableCollection<BookViewModel>);
         #endregion
@@ -91,7 +91,7 @@ namespace HouseholdAccountBook.ViewModels
         public BookViewModel SelectedDebitBookVM
         {
             get { return this._SelectedDebitBookVM; }
-            set { SetProperty(ref this._SelectedDebitBookVM, value); }
+            set { this.SetProperty(ref this._SelectedDebitBookVM, value); }
         }
         private BookViewModel _SelectedDebitBookVM = default(BookViewModel);
         #endregion
@@ -103,7 +103,7 @@ namespace HouseholdAccountBook.ViewModels
         public int? PayDay
         {
             get { return this._PayDay; }
-            set { SetProperty(ref this._PayDay, value); }
+            set { this.SetProperty(ref this._PayDay, value); }
         }
         private int? _PayDay = default(int?);
         #endregion
@@ -117,7 +117,7 @@ namespace HouseholdAccountBook.ViewModels
         public bool CsvDataExists
         {
             get { return this._CsvDataExists; }
-            private set { SetProperty(ref this._CsvDataExists, value); }
+            private set { this.SetProperty(ref this._CsvDataExists, value); }
         }
         private bool _CsvDataExists = default(bool);
         #endregion
@@ -129,7 +129,7 @@ namespace HouseholdAccountBook.ViewModels
         public int? ActDateIndex
         {
             get { return this._ActDateIndex; }
-            set { SetProperty(ref this._ActDateIndex, value); }
+            set { this.SetProperty(ref this._ActDateIndex, value); }
         }
         private int? _ActDateIndex = default(int?);
         #endregion
@@ -141,7 +141,7 @@ namespace HouseholdAccountBook.ViewModels
         public int? OutgoIndex
         {
             get { return this._OutgoIndex; }
-            set { SetProperty(ref this._OutgoIndex, value); }
+            set { this.SetProperty(ref this._OutgoIndex, value); }
         }
         private int? _OutgoIndex = default(int?);
         #endregion
@@ -153,7 +153,7 @@ namespace HouseholdAccountBook.ViewModels
         public int? ItemNameIndex
         {
             get { return this._ItemNameIndex; }
-            set { SetProperty(ref this._ItemNameIndex, value); }
+            set { this.SetProperty(ref this._ItemNameIndex, value); }
         }
         private int? _ItemNameIndex = default(int?);
         #endregion
@@ -166,7 +166,7 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<RelationViewModel> RelationVMList
         {
             get { return this._RelationVMList; }
-            set { SetProperty(ref this._RelationVMList, value); }
+            set { this.SetProperty(ref this._RelationVMList, value); }
         }
         private ObservableCollection<RelationViewModel> _RelationVMList = default(ObservableCollection<RelationViewModel>);
         #endregion
@@ -177,7 +177,7 @@ namespace HouseholdAccountBook.ViewModels
         public RelationViewModel SelectedRelationVM
         {
             get { return this._SelectedRelationVM; }
-            set { SetProperty(ref this._SelectedRelationVM, value); }
+            set { this.SetProperty(ref this._SelectedRelationVM, value); }
         }
         private RelationViewModel _SelectedRelationVM = default(RelationViewModel);
         #endregion

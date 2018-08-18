@@ -18,7 +18,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="message">表示メッセージ</param>
         public DbSettingWindow(string message)
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
             Properties.Settings settings = Properties.Settings.Default;
             this.WVM.Message = message;

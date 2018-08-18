@@ -92,7 +92,7 @@ namespace HouseholdAccountBook.UserControls
                 case Key.NumPad9: {
                         int input = e.Key - Key.NumPad0;
                         textBox.TextChanged -= this.TextBox_TextChanged;
-                        TryToInputNumber(textBox, dateTimePicker, input);
+                        this.TryToInputNumber(textBox, dateTimePicker, input);
                         textBox.TextChanged += this.TextBox_TextChanged;
                         e.Handled = true;
                     }
@@ -109,7 +109,7 @@ namespace HouseholdAccountBook.UserControls
                 case Key.D9: {
                         int input = e.Key - Key.D0;
                         textBox.TextChanged -= this.TextBox_TextChanged;
-                        TryToInputNumber(textBox, dateTimePicker, input);
+                        this.TryToInputNumber(textBox, dateTimePicker, input);
                         textBox.TextChanged += this.TextBox_TextChanged;
                         e.Handled = true;
                     }
@@ -139,7 +139,7 @@ namespace HouseholdAccountBook.UserControls
                 case Key.Up: {
                         // 選択している箇所の数字をインクリメントする
                         textBox.TextChanged -= this.TextBox_TextChanged;
-                        IncreaceSelectedNumber(textBox, dateTimePicker);
+                        this.IncreaceSelectedNumber(textBox, dateTimePicker);
                         textBox.TextChanged += this.TextBox_TextChanged;
                         e.Handled = true;
                     }
@@ -147,7 +147,7 @@ namespace HouseholdAccountBook.UserControls
                 case Key.Down: {
                         // 選択している箇所の数字をデクリメントする
                         textBox.TextChanged -= this.TextBox_TextChanged;
-                        DecreaceSelectedNumber(textBox, dateTimePicker);
+                        this.DecreaceSelectedNumber(textBox, dateTimePicker);
                         textBox.TextChanged += this.TextBox_TextChanged;
                         e.Handled = true;
                     }
@@ -183,10 +183,10 @@ namespace HouseholdAccountBook.UserControls
 
             textBox.TextChanged -= this.TextBox_TextChanged;
             if (e.Delta < 0) {
-                DecreaceSelectedNumber(textBox, this);
+                this.DecreaceSelectedNumber(textBox, this);
             }
             else if (e.Delta > 0) {
-                IncreaceSelectedNumber(textBox, this);
+                this.IncreaceSelectedNumber(textBox, this);
             }
             textBox.TextChanged += this.TextBox_TextChanged;
 

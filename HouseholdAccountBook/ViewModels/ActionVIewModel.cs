@@ -67,7 +67,7 @@ namespace HouseholdAccountBook.ViewModels
         public bool IsMatch
         {
             get { return this._IsMatch; }
-            set { SetProperty(ref this._IsMatch, value); }
+            set { this.SetProperty(ref this._IsMatch, value); }
         }
         private bool _IsMatch = default(bool);
         #endregion
@@ -79,7 +79,7 @@ namespace HouseholdAccountBook.ViewModels
         public bool IsSelected
         {
             get { return this._IsSelected; }
-            set { SetProperty(ref this._IsSelected, value); }
+            set { this.SetProperty(ref this._IsSelected, value); }
         }
         private bool _IsSelected = default(bool);
         #endregion
