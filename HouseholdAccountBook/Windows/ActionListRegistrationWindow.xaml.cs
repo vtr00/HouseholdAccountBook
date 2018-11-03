@@ -170,8 +170,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         private void ButtonInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             TextBox textBox = this._popup.PlacementTarget as TextBox;
-            DateValueViewModel vm = textBox.DataContext as DateValueViewModel;
-            if (vm == null) { vm = this.lastDateValueVM; } // textBoxのDataContextが取得できないため応急処置
+            if (!(textBox.DataContext is DateValueViewModel vm)) vm = this.lastDateValueVM; // textBoxのDataContextが取得できないため応急処置
 
             switch (this.WVM.InputedKind) {
                 case NumericInputButton.InputKind.Number:

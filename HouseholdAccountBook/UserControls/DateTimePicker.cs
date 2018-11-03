@@ -38,23 +38,28 @@ namespace HouseholdAccountBook.UserControls
             this.CalendarOpened += this.DateTimePicker_CalendarOpened;
             this.CalendarClosed += this.DateTimePicker_CalendarClosed;
         }
-        
+
         #region 依存関係プロパティ
-        /// <summary>
-        /// 表示フォーマット(yyyy,MM,ddのみ。順序、デリミタには縛りなし)
-        /// </summary>
-        public string DateFormat {
-            get { return (string)this.GetValue(DateFormatProperty); }
-            set { this.SetValue(DateFormatProperty, value); }
-        }
         /// <summary>
         /// <see cref="DateFormat"/> 依存関係プロパティを識別します。
         /// </summary>
+        #region DateFormatProperty
         public static readonly DependencyProperty DateFormatProperty = DependencyProperty.RegisterAttached (
-                PropertyName<DateTimePicker>.Get(x => x.DateFormat), 
+                nameof(DateFormat), 
                 typeof(string), 
                 typeof(DateTimePicker),
                 new PropertyMetadata(DateFormatChanged));
+        #endregion
+        /// <summary>
+        /// 表示フォーマット(yyyy,MM,ddのみ。順序、デリミタには縛りなし)
+        /// </summary>
+        #region DateFormat
+        public string DateFormat
+        {
+            get => (string)this.GetValue(DateFormatProperty);
+            set => this.SetValue(DateFormatProperty, value);
+        }
+        #endregion
         #endregion
 
         #region イベントハンドラ

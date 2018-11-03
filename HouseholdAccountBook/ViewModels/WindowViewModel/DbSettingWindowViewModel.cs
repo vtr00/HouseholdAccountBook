@@ -14,8 +14,8 @@ namespace HouseholdAccountBook.ViewModels
         #region Message
         public string Message
         {
-            get { return this._Message; }
-            set { this.SetProperty(ref this._Message, value); }
+            get => this._Message;
+            set => this.SetProperty(ref this._Message, value);
         }
         private string _Message = default(string);
         #endregion
@@ -26,8 +26,8 @@ namespace HouseholdAccountBook.ViewModels
         #region Host
         public string Host
         {
-            get { return this._Host; }
-            set { this.SetProperty(ref this._Host, value); }
+            get => this._Host;
+            set => this.SetProperty(ref this._Host, value);
         }
         private string _Host = default(string);
         #endregion
@@ -38,8 +38,8 @@ namespace HouseholdAccountBook.ViewModels
         #region Port
         public int Port
         {
-            get { return this._Port; }
-            set { this.SetProperty(ref this._Port, value); }
+            get => this._Port;
+            set => this.SetProperty(ref this._Port, value);
         }
         private int _Port = default(int);
         #endregion
@@ -50,8 +50,8 @@ namespace HouseholdAccountBook.ViewModels
         #region UserName
         public string UserName
         {
-            get { return this._UserName; }
-            set { this.SetProperty(ref this._UserName, value); }
+            get => this._UserName;
+            set => this.SetProperty(ref this._UserName, value);
         }
         private string _UserName = default(string);
         #endregion
@@ -62,8 +62,8 @@ namespace HouseholdAccountBook.ViewModels
         #region Password
         public string Password
         {
-            get { return this._Password; }
-            set { this.SetProperty(ref this._Password, value); }
+            get => this._Password;
+            set => this.SetProperty(ref this._Password, value);
         }
         private string _Password = default(string);
         #endregion
@@ -74,8 +74,8 @@ namespace HouseholdAccountBook.ViewModels
         #region DatabaseName
         public string DatabaseName
         {
-            get { return this._DatabaseName; }
-            set { this.SetProperty(ref this._DatabaseName, value); }
+            get => this._DatabaseName;
+            set => this.SetProperty(ref this._DatabaseName, value);
         }
         private string _DatabaseName = default(string);
         #endregion
@@ -86,8 +86,8 @@ namespace HouseholdAccountBook.ViewModels
         #region Role
         public string Role
         {
-            get { return this._Role; }
-            set { this.SetProperty(ref this._Role, value); }
+            get => this._Role;
+            set => this.SetProperty(ref this._Role, value);
         }
         private string _Role = default(string);
         #endregion
@@ -98,8 +98,8 @@ namespace HouseholdAccountBook.ViewModels
         #region DumpExePath
         public string DumpExePath
         {
-            get { return this._DumpExePath; }
-            set { this.SetProperty(ref this._DumpExePath, value); }
+            get => this._DumpExePath;
+            set => this.SetProperty(ref this._DumpExePath, value);
         }
         private string _DumpExePath = default(string);
         #endregion
@@ -110,8 +110,8 @@ namespace HouseholdAccountBook.ViewModels
         #region RestoreExePath
         public string RestoreExePath
         {
-            get { return this._RestoreExePath; }
-            set { this.SetProperty(ref this._RestoreExePath, value); }
+            get => this._RestoreExePath;
+            set => this.SetProperty(ref this._RestoreExePath, value);
         }
         private string _RestoreExePath = default(string);
         #endregion

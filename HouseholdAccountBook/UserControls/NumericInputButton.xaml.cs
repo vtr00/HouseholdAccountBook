@@ -14,92 +14,112 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// <see cref="InputedValue"/> 依存関係プロパティを識別します。
         /// </summary>
+        #region InputedValueProperty
         public static readonly DependencyProperty InputedValueProperty = DependencyProperty.Register(
-                PropertyName<NumericInputButton>.Get(x => x.InputedValue),
+                nameof(InputedValue),
                 typeof(int?),
                 typeof(NumericInputButton),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
             );
+        #endregion
         /// <summary>
         /// 入力値
         /// </summary>
+        #region InputedValue
         public int? InputedValue
         {
-            get { return (int?)this.GetValue(InputedValueProperty); }
-            set { this.SetValue(InputedValueProperty, value); }
+            get => (int?)this.GetValue(InputedValueProperty);
+            set => this.SetValue(InputedValueProperty, value);
         }
+        #endregion
 
         /// <summary>
         /// <see cref="InputedKind"/> 依存関係プロパティを識別します。
         /// </summary>
+        #region InputedKindProperty
         public static readonly DependencyProperty InputedKindProperty = DependencyProperty.Register(
-                PropertyName<NumericInputButton>.Get(x => x.InputedKind),
+                nameof(InputedKind),
                 typeof(InputKind),
                 typeof(NumericInputButton),
                 new FrameworkPropertyMetadata(InputKind.Unputed, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
             );
+        #endregion
         /// <summary>
         /// 入力種別
         /// </summary>
+        #region InputedKind
         public InputKind InputedKind
         {
-            get { return (InputKind)this.GetValue(InputedKindProperty); }
-            set { this.SetValue(InputedKindProperty, value); }
+            get => (InputKind)this.GetValue(InputedKindProperty);
+            set => this.SetValue(InputedKindProperty, value);
         }
+        #endregion
 
         /// <summary>
         /// <see cref="Command"/> 依存関係プロパティを識別します。
         /// </summary>
+        #region CommandProperty
         public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(
-                PropertyName<NumericInputButton>.Get(x => x.Command),
+                nameof(Command),
                 typeof(ICommand),
                 typeof(NumericInputButton),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None, new PropertyChangedCallback(CommandChanged))
             );
+        #endregion
         /// <summary>
         /// コマンド
         /// </summary>
+        #region Command
         public ICommand Command
         {
-            get { return (ICommand)this.GetValue(CommandProperty); }
-            set { this.SetValue(CommandProperty, value); }
+            get => (ICommand)this.GetValue(CommandProperty);
+            set => this.SetValue(CommandProperty, value);
         }
+        #endregion
 
         /// <summary>
         /// <see cref="CommandParameter"/> 依存関係プロパティを識別します。
         /// </summary>
+        #region CommandParameterProperty
         public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(
-                PropertyName<NumericInputButton>.Get(x => x.CommandParameter),
+                nameof(CommandParameter),
                 typeof(object),
                 typeof(NumericInputButton),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None)
             );
+        #endregion
         /// <summary>
         /// コマンドパラメータ
         /// </summary>
+        #region CommandParameter
         public object CommandParameter
         {
-            get { return this.GetValue(CommandParameterProperty); }
-            set { this.SetValue(CommandParameterProperty, value); }
+            get => this.GetValue(CommandParameterProperty);
+            set => this.SetValue(CommandParameterProperty, value);
         }
+        #endregion
 
         /// <summary>
         /// <see cref="CommandTarget"/> 依存関係プロパティを識別します。
         /// </summary>
+        #region CommandTargetProperty
         public static readonly DependencyProperty CommandTargetProperty = DependencyProperty.Register(
-                PropertyName<NumericInputButton>.Get(x => x.CommandTarget),
+                nameof(CommandTarget),
                 typeof(IInputElement),
                 typeof(NumericInputButton),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None)
             );
+        #endregion
         /// <summary>
         /// コマンドターゲット
         /// </summary>
+        #region CommandTarget
         public IInputElement CommandTarget
         {
-            get { return (IInputElement)this.GetValue(CommandTargetProperty); }
-            set { this.SetValue(CommandTargetProperty, value); }
+            get => (IInputElement)this.GetValue(CommandTargetProperty);
+            set => this.SetValue(CommandTargetProperty, value);
         }
+        #endregion
         #endregion
 
         /// <summary>
@@ -200,7 +220,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         /// <param name="oldCommand">変更前のコマンド</param>
         /// <param name="newCommand">変更後のコマンド</param>
-        private void HookUpCommand (ICommand oldCommand, ICommand newCommand)
+        private void HookUpCommand(ICommand oldCommand, ICommand newCommand)
         {
             if(oldCommand != null) {
                 oldCommand.CanExecuteChanged -= this.OnCanExecuteChanged;

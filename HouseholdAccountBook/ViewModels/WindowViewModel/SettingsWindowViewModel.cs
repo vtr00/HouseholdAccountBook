@@ -26,7 +26,7 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedTabIndex
         public int SelectedTabIndex
         {
-            get { return this._SelectedTabIndex; }
+            get => this._SelectedTabIndex;
             set {
                 if (this.SetProperty(ref this._SelectedTabIndex, value)) {
                     this.SelectedTab = (SettingsTabs)value;
@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedTab
         public SettingsTabs SelectedTab
         {
-            get { return this._SelectedTab; }
+            get => this._SelectedTab;
             set {
                 if (this.SetProperty(ref this._SelectedTab, value)) {
                     this.SelectedTabIndex = (int)value;
@@ -58,8 +58,8 @@ namespace HouseholdAccountBook.ViewModels
         #region HierachicalItemVMList
         public ObservableCollection<HierarchicalItemViewModel> HierachicalItemVMList
         {
-            get { return this._HierachicalItemVMList; }
-            set { this.SetProperty(ref this._HierachicalItemVMList, value); }
+            get => this._HierachicalItemVMList;
+            set => this.SetProperty(ref this._HierachicalItemVMList, value);
         }
         private ObservableCollection<HierarchicalItemViewModel> _HierachicalItemVMList = default(ObservableCollection<HierarchicalItemViewModel>);
         #endregion
@@ -70,8 +70,8 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedItemVM
         public HierarchicalItemViewModel SelectedItemVM
         {
-            get { return this._SelectedItemVM; }
-            set { this.SetProperty(ref this._SelectedItemVM, value); }
+            get => this._SelectedItemVM;
+            set => this.SetProperty(ref this._SelectedItemVM, value);
         }
         private HierarchicalItemViewModel _SelectedItemVM = default(HierarchicalItemViewModel);
         #endregion
@@ -84,8 +84,8 @@ namespace HouseholdAccountBook.ViewModels
         #region BookVMList
         public ObservableCollection<BookSettingViewModel> BookVMList
         {
-            get { return this._BookVMList; }
-            set { this.SetProperty(ref this._BookVMList, value); }
+            get => this._BookVMList;
+            set => this.SetProperty(ref this._BookVMList, value);
         }
         private ObservableCollection<BookSettingViewModel> _BookVMList = default(ObservableCollection<BookSettingViewModel>);
         #endregion
@@ -96,8 +96,8 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedBookVM
         public BookSettingViewModel SelectedBookVM
         {
-            get { return this._SelectedBookVM; }
-            set { this.SetProperty(ref this._SelectedBookVM, value); }
+            get => this._SelectedBookVM;
+            set => this.SetProperty(ref this._SelectedBookVM, value);
         }
         private BookSettingViewModel _SelectedBookVM = default(BookSettingViewModel);
         #endregion
@@ -110,7 +110,7 @@ namespace HouseholdAccountBook.ViewModels
         #region DumpExePath
         public string DumpExePath
         {
-            get { return this._DumpExePath; }
+            get => this._DumpExePath;
             set {
                 if (this.SetProperty(ref this._DumpExePath, value) && this.WithSave) {
                     this.settings.App_Postgres_DumpExePath = value;
@@ -127,7 +127,7 @@ namespace HouseholdAccountBook.ViewModels
         #region RestoreExePath
         public string RestoreExePath
         {
-            get { return this._RestoreExePath; }
+            get => this._RestoreExePath;
             set {
                 if (this.SetProperty(ref this._RestoreExePath, value) && this.WithSave) {
                     this.settings.App_Postgres_RestoreExePath = value;
@@ -144,7 +144,7 @@ namespace HouseholdAccountBook.ViewModels
         #region BackUpNum
         public int BackUpNum
         {
-            get { return this._BackUpNum; }
+            get => this._BackUpNum;
             set {
                 if (this.SetProperty(ref this._BackUpNum, value) && this.WithSave) {
                     this.settings.App_BackUpNum = value;
@@ -161,7 +161,7 @@ namespace HouseholdAccountBook.ViewModels
         #region BackUpFolderPath
         public string BackUpFolderPath
         {
-            get { return this._BackUpFolderPath; }
+            get => this._BackUpFolderPath;
             set {
                 if (this.SetProperty(ref this._BackUpFolderPath, value) && this.WithSave) {
                     this.settings.App_BackUpFolderPath = value;
@@ -178,7 +178,7 @@ namespace HouseholdAccountBook.ViewModels
         #region BackUpFlagAtMinimizing
         public bool BackUpFlagAtMinimizing
         {
-            get { return this._BackUpFlagAtMinimizing; }
+            get => this._BackUpFlagAtMinimizing;
             set {
                 if (this.SetProperty(ref this._BackUpFlagAtMinimizing, value) && this.WithSave) {
                     this.settings.App_BackUpFlagAtMinimizing = value;
@@ -195,7 +195,7 @@ namespace HouseholdAccountBook.ViewModels
         #region BackUpFlagAtClosing
         public bool BackUpFlagAtClosing
         {
-            get { return this._BackUpFlagAtClosing; }
+            get => this._BackUpFlagAtClosing;
             set {
                 if (this.SetProperty(ref this._BackUpFlagAtClosing, value) && this.WithSave) {
                     this.settings.App_BackUpFlagAtClosing = value;
@@ -212,7 +212,7 @@ namespace HouseholdAccountBook.ViewModels
         #region StartMonth
         public int StartMonth
         {
-            get { return this._StartMonth; }
+            get => this._StartMonth;
             set {
                 if (this.SetProperty(ref this._StartMonth, value) && this.WithSave) {
                     this.settings.App_StartMonth = value;

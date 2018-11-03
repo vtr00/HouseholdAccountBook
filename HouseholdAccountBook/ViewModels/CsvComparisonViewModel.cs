@@ -14,8 +14,8 @@ namespace HouseholdAccountBook.ViewModels
         #region ActionId
         public int? ActionId
         {
-            get { return this._ActionId; }
-            set { this.SetProperty(ref this._ActionId, value); }
+            get => this._ActionId;
+            set => this.SetProperty(ref this._ActionId, value);
         }
         private int? _ActionId = default(int?);
         #endregion
@@ -26,8 +26,8 @@ namespace HouseholdAccountBook.ViewModels
         #region ItemName
         public string ItemName
         {
-            get { return this._ItemName; }
-            set { this.SetProperty(ref this._ItemName, value); }
+            get => this._ItemName;
+            set => this.SetProperty(ref this._ItemName, value);
         }
         private string _ItemName = default(string);
         #endregion
@@ -38,8 +38,8 @@ namespace HouseholdAccountBook.ViewModels
         #region ShopName
         public string ShopName
         {
-            get { return this._ShopName; }
-            set { this.SetProperty(ref this._ShopName, value); }
+            get => this._ShopName;
+            set => this.SetProperty(ref this._ShopName, value);
         }
         private string _ShopName = default(string);
         #endregion
@@ -50,8 +50,8 @@ namespace HouseholdAccountBook.ViewModels
         #region Remark
         public string Remark
         {
-            get { return this._Remark; }
-            set { this.SetProperty(ref this._Remark, value); }
+            get => this._Remark;
+            set => this.SetProperty(ref this._Remark, value);
         }
         private string _Remark = default(string);
         #endregion
@@ -62,8 +62,8 @@ namespace HouseholdAccountBook.ViewModels
         #region IsMatch
         public bool IsMatch
         {
-            get { return this._IsMatch; }
-            set { this.SetProperty(ref this._IsMatch, value); }
+            get => this._IsMatch;
+            set => this.SetProperty(ref this._IsMatch, value);
         }
         private bool _IsMatch = default(bool);
         #endregion
@@ -74,8 +74,8 @@ namespace HouseholdAccountBook.ViewModels
         #region Record
         public CsvRecord Record
         {
-            get { return this._Record; }
-            set { this.SetProperty(ref this._Record, value); }
+            get => this._Record;
+            set => this.SetProperty(ref this._Record, value);
         }
         private CsvRecord _Record = default(CsvRecord);
         #endregion

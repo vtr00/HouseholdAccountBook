@@ -16,8 +16,8 @@ namespace HouseholdAccountBook.ViewModels
         #region StartDate
         public DateTime StartDate
         {
-            get { return this._StartDate; }
-            set { this.SetProperty(ref this._StartDate, value); }
+            get => this._StartDate;
+            set => this.SetProperty(ref this._StartDate, value);
         }
         private DateTime _StartDate = DateTime.Now;
         #endregion
@@ -28,8 +28,8 @@ namespace HouseholdAccountBook.ViewModels
         #region EndDate
         public DateTime EndDate
         {
-            get { return this._EndDate; }
-            set { this.SetProperty(ref this._EndDate, value); }
+            get => this._EndDate;
+            set => this.SetProperty(ref this._EndDate, value);
         }
         private DateTime _EndDate = DateTime.Now;
         #endregion
@@ -42,12 +42,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get {
                 DateTime lastDate = this.StartDate.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1);
-                if (this.StartDate.Day == 1 && DateTime.Equals(this.EndDate.Date, lastDate.Date)) {
-                    return TermKind.Monthly;
-                }
-                else {
-                    return TermKind.Selected;
-                }
+                return (this.StartDate.Day == 1 && DateTime.Equals(this.EndDate.Date, lastDate.Date)) ? TermKind.Monthly : TermKind.Selected;
             }
         }
         #endregion

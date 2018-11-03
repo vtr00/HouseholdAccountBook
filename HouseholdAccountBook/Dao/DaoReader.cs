@@ -25,7 +25,7 @@ namespace HouseholdAccountBook.Dao
         /// <summary>
         /// レコード数
         /// </summary>
-        public int Count { get { return this.resultSet.Count; } }
+        public int Count => this.resultSet.Count;
 
         /// <summary>
         /// コンストラクタ

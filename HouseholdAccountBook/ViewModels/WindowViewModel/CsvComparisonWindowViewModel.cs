@@ -15,8 +15,8 @@ namespace HouseholdAccountBook.ViewModels
         #region CsvFileName
         public string CsvFileName
         {
-            get { return this._CsvFileName; }
-            set { this.SetProperty(ref this._CsvFileName, value); }
+            get => this._CsvFileName;
+            set => this.SetProperty(ref this._CsvFileName, value);
         }
         private string _CsvFileName = default(string);
         #endregion
@@ -27,8 +27,8 @@ namespace HouseholdAccountBook.ViewModels
         #region BookVMList
         public ObservableCollection<BookComparisonViewModel> BookVMList
         {
-            get { return this._BookVMList; }
-            set { this.SetProperty(ref this._BookVMList, value); }
+            get => this._BookVMList;
+            set => this.SetProperty(ref this._BookVMList, value);
         }
         private ObservableCollection<BookComparisonViewModel> _BookVMList = default(ObservableCollection<BookComparisonViewModel>);
         #endregion
@@ -38,8 +38,8 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedBookVM
         public BookComparisonViewModel SelectedBookVM
         {
-            get { return this._SelectedBookVM; }
-            set { this.SetProperty(ref this._SelectedBookVM, value); }
+            get => this._SelectedBookVM;
+            set => this.SetProperty(ref this._SelectedBookVM, value);
         }
         private BookComparisonViewModel _SelectedBookVM = new BookComparisonViewModel() { };
         #endregion
@@ -50,8 +50,8 @@ namespace HouseholdAccountBook.ViewModels
         #region CsvComparisonVMList
         public ObservableCollection<CsvComparisonViewModel> CsvComparisonVMList
         {
-            get { return this._CsvComparisonVMList; }
-            set { this.SetProperty(ref this._CsvComparisonVMList, value); }
+            get => this._CsvComparisonVMList;
+            set => this.SetProperty(ref this._CsvComparisonVMList, value);
         }
         private ObservableCollection<CsvComparisonViewModel> _CsvComparisonVMList = new ObservableCollection<CsvComparisonViewModel>();
         #endregion
@@ -61,8 +61,8 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedCsvComparisonVM
         public CsvComparisonViewModel SelectedCsvComparisonVM
         {
-            get { return this._SelectedCsvComparisonVM; }
-            set { this.SetProperty(ref this._SelectedCsvComparisonVM, value); }
+            get => this._SelectedCsvComparisonVM;
+            set => this.SetProperty(ref this._SelectedCsvComparisonVM, value);
         }
         private CsvComparisonViewModel _SelectedCsvComparisonVM = default(CsvComparisonViewModel);
         #endregion
@@ -70,16 +70,13 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// デバッグビルドか
         /// </summary>
-        public bool IsDebug
-        {
-            get {
+        #region IsDebug
 #if DEBUG
-                return true;
+        public bool IsDebug => true;
 #else
-                return false;
+        public bool IsDebug => false;
 #endif
-            }
-        }
+        #endregion
         #endregion
     }
 }

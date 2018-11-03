@@ -40,25 +40,26 @@ namespace HouseholdAccountBook.Behaviors
         }
 
         #region 依存関係プロパティ
+        /// <summary>
+        /// <see cref="SelectedItems"/> 依存関係プロパティを識別します。
+        /// </summary>
+        #region SelectedItemsProperty
+        public static DependencyProperty SelectedItemsProperty =
+            DependencyProperty.Register(
+                nameof(SelectedItems), 
+                typeof(IList), 
+                typeof(BindSelectedItemsToDataGridBehavior), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, BindSelectedItemsToDataGridBehavior.SelectedItemsChanged));
+        #endregion
         #region SelectedItems
         /// <summary>
         /// 選択されたアイテムリスト
         /// </summary>
         public IList SelectedItems
         {
-            get { return (IList)this.GetValue(SelectedItemsProperty); }
-            set { this.SetValue(SelectedItemsProperty, value); }
+            get => (IList)this.GetValue(SelectedItemsProperty);
+            set => this.SetValue(SelectedItemsProperty, value);
         }
-
-        /// <summary>
-        /// <see cref="SelectedItems"/> 依存関係プロパティを識別します。
-        /// </summary>
-        public static DependencyProperty SelectedItemsProperty =
-            DependencyProperty.Register(
-                PropertyName<BindSelectedItemsToDataGridBehavior>.Get(x => x.SelectedItems), 
-                typeof(IList), 
-                typeof(BindSelectedItemsToDataGridBehavior), 
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, BindSelectedItemsToDataGridBehavior.SelectedItemsChanged));
         #endregion
         #endregion
 

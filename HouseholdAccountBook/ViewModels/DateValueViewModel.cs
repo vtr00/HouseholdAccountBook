@@ -21,7 +21,7 @@ namespace HouseholdAccountBook.ViewModels
         #region ActValue
         public int? ActValue
         {
-            get { return this._ActValue; }
+            get => this._ActValue;
             set {
                 if (this.SetProperty(ref this._ActValue, value)) {
                     CommandManager.InvalidateRequerySuggested();

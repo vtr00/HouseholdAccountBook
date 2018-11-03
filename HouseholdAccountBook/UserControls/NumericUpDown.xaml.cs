@@ -16,7 +16,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         #region ValueProperty
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(
-                PropertyName<NumericUpDown>.Get(x => x.Value),
+                nameof(Value),
                 typeof(int?),
                 typeof(NumericUpDown),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
@@ -28,8 +28,8 @@ namespace HouseholdAccountBook.UserControls
         #region Value
         public int? Value
         {
-            get { return (int?)this.GetValue(ValueProperty); }
-            set { this.SetValue(ValueProperty, value); }
+            get => (int?)this.GetValue(ValueProperty);
+            set => this.SetValue(ValueProperty, value);
         }
         #endregion
 
@@ -38,7 +38,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         #region StrideProperty
         public static readonly DependencyProperty StrideProperty = DependencyProperty.Register(
-                PropertyName<NumericUpDown>.Get(x => x.Stride),
+                nameof(Stride),
                 typeof(int),
                 typeof(NumericUpDown),
                 new PropertyMetadata(1)
@@ -50,8 +50,8 @@ namespace HouseholdAccountBook.UserControls
         #region Stride
         public int Stride
         {
-            get { return (int)this.GetValue(StrideProperty); }
-            set { this.SetValue(StrideProperty, value); }
+            get => (int)this.GetValue(StrideProperty);
+            set => this.SetValue(StrideProperty, value);
         }
         #endregion
 
@@ -60,7 +60,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         #region NullValueProperty
         public static readonly DependencyProperty NullValueProperty = DependencyProperty.Register(
-            PropertyName<NumericUpDown>.Get(x => x.NullValue), 
+            nameof(NullValue), 
             typeof(int), 
             typeof(NumericUpDown), 
             new PropertyMetadata(0));
@@ -71,8 +71,8 @@ namespace HouseholdAccountBook.UserControls
         #region NullValue
         public int NullValue
         {
-            get { return (int)this.GetValue(NullValueProperty); }
-            set { this.SetValue(NullValueProperty, value); }
+            get => (int)this.GetValue(NullValueProperty);
+            set => this.SetValue(NullValueProperty, value);
         }
         #endregion
 
@@ -81,7 +81,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         #region MaxValueProperty
         public static readonly DependencyProperty MaxValueProperty = DependencyProperty.Register(
-                PropertyName<NumericUpDown>.Get(x => x.MaxValue),
+                nameof(MaxValue),
                 typeof(int),
                 typeof(NumericUpDown),
                 new PropertyMetadata(int.MaxValue)
@@ -93,8 +93,8 @@ namespace HouseholdAccountBook.UserControls
         #region MaxValue
         public int MaxValue
         {
-            get { return (int)this.GetValue(MaxValueProperty); }
-            set { this.SetValue(MaxValueProperty, value); }
+            get => (int)this.GetValue(MaxValueProperty);
+            set => this.SetValue(MaxValueProperty, value);
         }
         #endregion
 
@@ -103,7 +103,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         #region MinValueProperty
         public static readonly DependencyProperty MinValueProperty = DependencyProperty.Register(
-                PropertyName<NumericUpDown>.Get(x => x.MinValue),
+                nameof(MinValue),
                 typeof(int),
                 typeof(NumericUpDown),
                 new PropertyMetadata(int.MinValue)
@@ -115,8 +115,8 @@ namespace HouseholdAccountBook.UserControls
         #region MinValue
         public int MinValue
         {
-            get { return (int)this.GetValue(MinValueProperty); }
-            set { this.SetValue(MinValueProperty, value); }
+            get => (int)this.GetValue(MinValueProperty);
+            set => this.SetValue(MinValueProperty, value);
         }
         #endregion
         #endregion
@@ -366,6 +366,5 @@ namespace HouseholdAccountBook.UserControls
                 this.Value = this.MinValue;
             }
         }
-
     }
 }

@@ -43,8 +43,8 @@ namespace HouseholdAccountBook.Behaviors
         /// </summary>
         public object SelectedItem
         {
-            get { return this.GetValue(SelectedItemProperty); }
-            set { this.SetValue(SelectedItemProperty, value); }
+            get => this.GetValue(SelectedItemProperty);
+            set => this.SetValue(SelectedItemProperty, value);
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace HouseholdAccountBook.Behaviors
         /// </summary>
         public static DependencyProperty SelectedItemProperty =
             DependencyProperty.Register(
-                PropertyName<BindSelectedItemToTreeViewBehavior>.Get(x => x.SelectedItem),
+                nameof(SelectedItem),
                 typeof(object),
                 typeof(BindSelectedItemToTreeViewBehavior),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, SelectedItemChanged));
