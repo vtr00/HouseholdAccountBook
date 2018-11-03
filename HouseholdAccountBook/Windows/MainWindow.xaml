@@ -80,6 +80,9 @@
 
         <Style x:Key="DayOfWeekStyle" TargetType="DataGridCell">
             <Style.Triggers>
+                <DataTrigger Binding="{Binding ActTime, Converter={StaticResource DateTimeToIsNationalHolidayConverter}}" Value="true">
+                    <Setter Property="Foreground" Value="Red"/>
+                </DataTrigger>
                 <DataTrigger Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}}" Value="土">
                     <Setter Property="Foreground" Value="Blue"/>
                 </DataTrigger>

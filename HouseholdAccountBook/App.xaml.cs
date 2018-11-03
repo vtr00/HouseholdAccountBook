@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Dao;
+using HouseholdAccountBook.Extentions;
 using HouseholdAccountBook.Windows;
 using System;
 using System.Collections.Generic;
@@ -123,6 +124,9 @@ namespace HouseholdAccountBook
                     }
                 }
             }
+
+            // 休日リストを取得する
+            DateTimeExtensions.DownloadHolidayListAsync();
 
             // 接続できる場合だけメインウィンドウを開く
             MainWindow mw = new MainWindow(builder);

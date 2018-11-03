@@ -5,7 +5,6 @@ using HouseholdAccountBook.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
@@ -473,23 +472,24 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
             int? resActionId = null;
 
             // 休日設定を考慮した日付を取得する関数
-            Func<DateTime, DateTime> getDateTimeWithHolidaySettingKind = (tmpDateTime) => {
+            DateTime getDateTimeWithHolidaySettingKind(DateTime tmpDateTime)
+            {
                 switch (holidaySettingKind) {
                     case HolidaySettingKind.BeforeHoliday:
-                        while (tmpDateTime.IsHoliday()) {
+                        while (tmpDateTime.IsNationalHoliday() || tmpDateTime.DayOfWeek == DayOfWeek.Saturday || tmpDateTime.DayOfWeek == DayOfWeek.Sunday) {
                             tmpDateTime = tmpDateTime.AddDays(-1);
                         }
                         break;
                     case HolidaySettingKind.AfterHoliday:
-                        while (tmpDateTime.IsHoliday()) {
+                        while (tmpDateTime.IsNationalHoliday() || tmpDateTime.DayOfWeek == DayOfWeek.Saturday || tmpDateTime.DayOfWeek == DayOfWeek.Sunday) {
                             tmpDateTime = tmpDateTime.AddDays(1);
                         }
                         break;
                 }
                 return tmpDateTime;
-            };
+            }
 
-            using(DaoBase dao = this.builder.Build()) {
+            using (DaoBase dao = this.builder.Build()) {
                 if (this.actionId == null) {
                     #region 帳簿項目を追加する
                     if (count == 1) { // 繰返し回数が1回(繰返しなし)
