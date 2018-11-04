@@ -222,6 +222,40 @@ namespace HouseholdAccountBook.ViewModels
         }
         private int _StartMonth = default(int);
         #endregion
+
+        /// <summary>
+        /// 国民の祝日CSV URI
+        /// </summary>
+        #region NationalHolidayCsvURI
+        public string NationalHolidayCsvURI
+        {
+            get => this._NationalHolidayCsvURI;
+            set {
+                if(this.SetProperty(ref this._NationalHolidayCsvURI, value) && this.WithSave) {
+                    this.settings.App_NationalHolidayCsv_Uri = value;
+                    this.settings.Save();
+                }
+            }
+        }
+        private string _NationalHolidayCsvURI = default(string);
+        #endregion
+
+        /// <summary>
+        /// 国民の祝日CSV 日付位置(0開始)
+        /// </summary>
+        #region NationalHolidayCsvDateIndex
+        public int NationalHolidayCsvDateIndex
+        {
+            get => this._NationalHolidayCsvDateIndex;
+            set {
+                if (this.SetProperty(ref this._NationalHolidayCsvDateIndex, value) && this.WithSave) {
+                    this.settings.App_NationalHolidayCsv_DateIndex = value;
+                    this.settings.Save();
+                }
+            }
+        }
+        private int _NationalHolidayCsvDateIndex = default(int);
+        #endregion
         #endregion
         #endregion
 
@@ -246,6 +280,8 @@ namespace HouseholdAccountBook.ViewModels
             this.BackUpFlagAtMinimizing = this.settings.App_BackUpFlagAtMinimizing;
             this.BackUpFlagAtClosing = this.settings.App_BackUpFlagAtClosing;
             this.StartMonth = this.settings.App_StartMonth;
+            this.NationalHolidayCsvURI = this.settings.App_NationalHolidayCsv_Uri;
+            this.NationalHolidayCsvDateIndex = this.settings.App_NationalHolidayCsv_DateIndex;
             this.WithSave = true;
         }
     }

@@ -23,20 +23,23 @@ namespace HouseholdAccountBook.Extentions
         /// </summary>
         public static void DownloadHolidayListAsync()
         {
-            Uri uri = new Uri("http://www8.cao.go.jp/chosei/shukujitsu/syukujitsu_kyujitsu.csv");
+            Properties.Settings settings = Properties.Settings.Default;
+
+            Uri uri = new Uri(settings.App_NationalHolidayCsv_Uri);
             Configuration csvConfig = new Configuration() {
                 HasHeaderRecord = true,
                 MissingFieldFound = (handlerNames, index, contexts) => { }
             };
 
             using (WebClient client = new WebClient()) {
+                // ストリームの読み込み完了時
                 client.OpenReadCompleted += (sender, e) => {
                     if (!e.Cancelled) {
                         holidayList.Clear();
                         // CSVファイルを読み込む
                         using (CsvReader reader = new CsvReader(new StreamReader(e.Result, Encoding.GetEncoding(932)), csvConfig)) {
                             while (reader.Read()) {
-                                if(reader.TryGetField(0, out string dateString)) {
+                                if(reader.TryGetField(settings.App_NationalHolidayCsv_DateIndex, out string dateString)) {
                                     if (DateTime.TryParse(dateString, out DateTime dateTime)) {
                                         holidayList.Add(dateTime);
                                     }

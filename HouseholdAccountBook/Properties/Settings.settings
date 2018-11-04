@@ -146,5 +146,11 @@
     <Setting Name="App_BackUpFlagAtClosing" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="App_NationalHolidayCsv_Uri" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://www8.cao.go.jp/chosei/shukujitsu/syukujitsu_kyujitsu.csv</Value>
+    </Setting>
+    <Setting Name="App_NationalHolidayCsv_DateIndex" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

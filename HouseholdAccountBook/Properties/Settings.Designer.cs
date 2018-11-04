@@ -598,5 +598,29 @@ namespace HouseholdAccountBook.Properties {
                 this["App_BackUpFlagAtClosing"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://www8.cao.go.jp/chosei/shukujitsu/syukujitsu_kyujitsu.csv")]
+        public string App_NationalHolidayCsv_Uri {
+            get {
+                return ((string)(this["App_NationalHolidayCsv_Uri"]));
+            }
+            set {
+                this["App_NationalHolidayCsv_Uri"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int App_NationalHolidayCsv_DateIndex {
+            get {
+                return ((int)(this["App_NationalHolidayCsv_DateIndex"]));
+            }
+            set {
+                this["App_NationalHolidayCsv_DateIndex"] = value;
+            }
+        }
     }
 }
