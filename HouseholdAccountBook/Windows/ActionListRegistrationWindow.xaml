@@ -50,6 +50,7 @@
                 <RowDefinition Height="0.5*"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.25*"/>
@@ -118,13 +119,14 @@
                     </controls:DataGridEditableTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
-            <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
-                       Text="店舗" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="5" Grid.Column="1" Margin="5" IsEditable="True"
-                      ItemsSource="{Binding ShopNameList}" Text="{Binding SelectedShopName, UpdateSourceTrigger=PropertyChanged}"/>
+            <CheckBox Grid.Row="5" Grid.Column="2" Margin="5" IsChecked="{Binding IsDateAutoIncrement}" Content="日付の自動インクリメント"/>
             <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" 
-                       Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                       Text="店舗" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="6" Grid.Column="1" Margin="5" IsEditable="True"
+                      ItemsSource="{Binding ShopNameList}" Text="{Binding SelectedShopName, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
+                       Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <ComboBox Grid.Row="7" Grid.Column="1" Margin="5" IsEditable="True"
                       ItemsSource="{Binding RemarkList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}"/>
             
             <Popup x:Name="_popup" IsOpen="{Binding IsEditing, Mode=TwoWay}" Placement="Right">

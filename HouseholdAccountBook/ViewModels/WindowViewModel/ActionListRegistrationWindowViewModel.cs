@@ -189,7 +189,19 @@ namespace HouseholdAccountBook.ViewModels
         }
         private bool _IsEditing = default(bool);
         #endregion
-        
+
+        /// <summary>
+        /// 日付自動インクリメント
+        /// </summary>
+        #region IsDateAutoIncrement
+        public bool IsDateAutoIncrement
+        {
+            get => this._IsDateAutoIncrement;
+            set => this.SetProperty(ref this._IsDateAutoIncrement, value);
+        }
+        private bool _IsDateAutoIncrement = default(bool);
+        #endregion
+
         /// <summary>
         /// 店舗名リスト
         /// </summary>

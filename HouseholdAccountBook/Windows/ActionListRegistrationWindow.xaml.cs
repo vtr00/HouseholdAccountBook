@@ -260,7 +260,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
             else {
                 // リストに入力済の末尾のデータの日付を追加時に採用する
                 DateValueViewModel lastVM = this.WVM.DateValueVMList[this.WVM.DateValueVMList.Count - 1];
-                e.NewItem = new DateValueViewModel() { ActDate = lastVM.ActDate, ActValue = null };
+                e.NewItem = new DateValueViewModel() { ActDate = this.WVM.IsDateAutoIncrement ? lastVM.ActDate.AddDays(1) : lastVM.ActDate, ActValue = null };
             }
         }
         
