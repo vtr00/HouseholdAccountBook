@@ -123,10 +123,10 @@ namespace HouseholdAccountBook.Windows
             };
             List<CsvComparisonViewModel> tmpList = new List<CsvComparisonViewModel>();
             foreach (string tmpFileName in ofd.FileNames) {
-                using (CsvReader reader = new CsvReader(new StreamReader(tmpFileName, Encoding.GetEncoding(932)), csvConfig)) {
+                using (CsvReader reader = new CsvReader(new StreamReader(tmpFileName, Encoding.GetEncoding("Shift_JIS")), csvConfig)) {
                     while (reader.Read()) {
                         try {
-                            if (reader.TryGetField<DateTime>(actDateIndex.Value, out DateTime date) && reader.TryGetField<string>(itemNameIndex.Value, out string name) && reader.TryGetField<int>(outgoIndex.Value, out int value)) {
+                            if (reader.TryGetField(actDateIndex.Value, out DateTime date) && reader.TryGetField(itemNameIndex.Value, out string name) && reader.TryGetField(outgoIndex.Value, out int value)) {
                                 tmpList.Add(new CsvComparisonViewModel() { Record = new CsvComparisonViewModel.CsvRecord() { Date = date, Name = name, Value = value } });
                             }
                         }

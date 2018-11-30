@@ -31,22 +31,25 @@ namespace HouseholdAccountBook.Extentions
                 MissingFieldFound = (handlerNames, index, contexts) => { }
             };
 
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             using (WebClient client = new WebClient()) {
                 // ストリームの読み込み完了時
                 client.OpenReadCompleted += (sender, e) => {
-                    if (!e.Cancelled) {
+                    if (!e.Cancelled && e.Result.CanRead) {
                         holidayList.Clear();
-                        // CSVファイルを読み込む
-                        using (CsvReader reader = new CsvReader(new StreamReader(e.Result, Encoding.GetEncoding(932)), csvConfig)) {
-                            while (reader.Read()) {
-                                if(reader.TryGetField(settings.App_NationalHolidayCsv_DateIndex, out string dateString)) {
-                                    if (DateTime.TryParse(dateString, out DateTime dateTime)) {
-                                        holidayList.Add(dateTime);
+                        try {
+                            // CSVファイルを読み込む
+                            using (CsvReader reader = new CsvReader(new StreamReader(e.Result, Encoding.GetEncoding("Shift_JIS")), csvConfig)) {
+                                while (reader.Read()) {
+                                    if (reader.TryGetField(settings.App_NationalHolidayCsv_DateIndex, out string dateString)) {
+                                        if (DateTime.TryParse(dateString, out DateTime dateTime)) {
+                                            holidayList.Add(dateTime);
+                                        }
                                     }
                                 }
-
                             }
                         }
+                        catch (Exception) { }
                     }
                 };
                 client.OpenReadAsync(uri);
