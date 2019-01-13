@@ -116,7 +116,7 @@ namespace HouseholdAccountBook.Windows
             int? itemNameIndex = this.WVM.SelectedBookVM.ItemNameIndex;
             int? outgoIndex = this.WVM.SelectedBookVM.OutgoIndex;
             
-            // CSVファイルをマッピングする
+            // CSVファイルを読み込む
             Configuration csvConfig = new Configuration() {
                 HasHeaderRecord = true,
                 MissingFieldFound = (handlerNames, index, contexts) => { }
@@ -140,6 +140,9 @@ namespace HouseholdAccountBook.Windows
             this.csvCompDataGrid.ScrollToTop();
 
             this.UpdateComparisonInfo();
+
+            // 合計値を計算する
+            this.WVM.SumValue = this.WVM.CsvComparisonVMList.Sum(vm => vm.Record.Value);
 
             this.Cursor = cCursor;
         }

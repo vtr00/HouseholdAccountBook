@@ -68,6 +68,18 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// 合計値
+        /// </summary>
+        #region SumValue
+        public int? SumValue
+        {
+            get => this._SumValue;
+            set => this.SetProperty(ref this._SumValue, value);
+        }
+        private int? _SumValue = default(int?);
+        #endregion
+        
+        /// <summary>
         /// デバッグビルドか
         /// </summary>
         #region IsDebug

@@ -369,7 +369,7 @@
 
                     <!-- ステータスバー -->
                     <StatusBar Grid.Row="2" Grid.Column="0" Background="White">
-                        <StatusBarItem HorizontalAlignment="Right">
+                        <StatusBarItem HorizontalAlignment="Left">
                             <TextBlock>
                                 最後に操作した帳簿項目: 
                                 <TextBlock Text="{Binding ActDateLastEdited, TargetNullValue='----/--/--', StringFormat='yyyy/MM/dd'}"/>
