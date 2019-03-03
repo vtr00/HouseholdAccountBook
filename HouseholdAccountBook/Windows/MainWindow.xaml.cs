@@ -1229,6 +1229,10 @@ WHERE action_id = @{0};", vm.ActionId);
                     }
                 }
             };
+            // 複数の帳簿項目の一致を確認時のイベントを登録する
+            ccw.ChangedIsMatches += (sender3, e3) => {
+                this.UpdateBookTabData(isScroll: false);
+            };
             ccw.Show();
         }
         #endregion

@@ -37,6 +37,10 @@ namespace HouseholdAccountBook.Windows
         /// 比較結果が変更された時
         /// </summary>
         public event EventHandler<EventArgs<int>> ChangedIsMatch;
+        /// <summary>
+        /// 比較結果が同時に複数変更された時
+        /// </summary>
+        public event EventHandler<EventArgs> ChangedIsMatches;
         #endregion
 
         /// <summary>
@@ -209,6 +213,8 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
                     }
                 });
             }
+
+            this.ChangedIsMatches?.Invoke(this, new EventArgs());
             this.UpdateComparisonInfo();
 
             this.Cursor = cursor;
@@ -443,7 +449,7 @@ SET is_match = @{0}, update_time = 'now', updater = @{1}
 WHERE action_id = @{2};", isMatch ? 1 : 0, Updater, actionId);
             }
 
-            ChangedIsMatch?.Invoke(this, new EventArgs<int>(actionId));
+            this.ChangedIsMatch?.Invoke(this, new EventArgs<int>(actionId));
         }
     }
 }
