@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Threading.Tasks;
 using Npgsql;
 
 namespace HouseholdAccountBook.Dao
@@ -27,17 +29,17 @@ namespace HouseholdAccountBook.Dao
         /// <param name="databaseName">データベース名</param>
         public DaoNpgsql(string uri, int port, string userName, string password, string databaseName)
             : base(new NpgsqlConnection(string.Format(daoStringFormat, uri, port, userName, password, databaseName))) { }
-        
+
         /// <summary>
         /// 非クエリの実行
         /// </summary>
         /// <param name="sql">SQL</param>
         /// <param name="objects">SQLパラメータ</param>
         /// <returns>処理結果</returns>
-        public override int ExecNonQuery(string sql, params object[] objects)
+        public async override Task<int> ExecNonQueryAsync(string sql, params object[] objects)
         {
             try {
-                return this.CreateCommand(sql, objects).ExecuteNonQuery();
+                return await this.CreateCommand(sql, objects).ExecuteNonQueryAsync();
             }
             catch (Exception e) {
                 throw e;
@@ -50,13 +52,13 @@ namespace HouseholdAccountBook.Dao
         /// <param name="sql">SQL</param>
         /// <param name="objects">SQLパラメータ</param>
         /// <returns>DAOリーダ</returns>
-        public override DaoReader ExecQuery(string sql, params object[] objects)
+        public async override Task<DaoReader> ExecQueryAsync(string sql, params object[] objects)
         {
             try {
                 LinkedList<Dictionary<string, object>> resultSet = new LinkedList<Dictionary<string, object>>();
 
                 NpgsqlCommand command = this.CreateCommand(sql, objects);
-                using (NpgsqlDataReader reader = command.ExecuteReader()) {
+                using (DbDataReader reader = await command.ExecuteReaderAsync()) {
                     // フィールド名の取得
                     List<string> fieldList = new List<string>();
                     for (int i = 0; i < reader.FieldCount; ++i) {

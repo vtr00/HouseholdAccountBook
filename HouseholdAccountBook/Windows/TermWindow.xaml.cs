@@ -19,11 +19,10 @@ namespace HouseholdAccountBook.Windows
         public TermWindow(DateTime startDate, DateTime endDate)
         {
             this.InitializeComponent();
+            this.LoadSetting();
 
             this.WVM.StartDate = startDate;
             this.WVM.EndDate = endDate;
-
-            this.LoadSetting();
         }
 
         /// <summary>
@@ -33,15 +32,23 @@ namespace HouseholdAccountBook.Windows
         public TermWindow(DateTime dateWithinMonth)
         {
             this.InitializeComponent();
+            this.LoadSetting();
 
             this.WVM.StartDate = dateWithinMonth.GetFirstDateOfMonth();
             this.WVM.EndDate = this.WVM.StartDate.AddMonths(1).AddMilliseconds(-1);
-
-            this.LoadSetting();
         }
 
         #region イベントハンドラ
         #region ウィンドウ
+        /// <summary>
+        /// フォーム読込完了時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TermWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+        }
+
         /// <summary>
         /// フォーム終了時
         /// </summary>

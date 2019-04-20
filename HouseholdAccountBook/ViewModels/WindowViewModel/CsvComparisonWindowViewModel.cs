@@ -18,7 +18,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._CsvFileName;
             set => this.SetProperty(ref this._CsvFileName, value);
         }
-        private string _CsvFileName = default(string);
+        private string _CsvFileName = default;
         #endregion
         
         /// <summary>
@@ -30,7 +30,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._BookVMList;
             set => this.SetProperty(ref this._BookVMList, value);
         }
-        private ObservableCollection<BookComparisonViewModel> _BookVMList = default(ObservableCollection<BookComparisonViewModel>);
+        private ObservableCollection<BookComparisonViewModel> _BookVMList = default;
         #endregion
         /// <summary>
         /// 選択された帳簿VM
@@ -64,7 +64,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedCsvComparisonVM;
             set => this.SetProperty(ref this._SelectedCsvComparisonVM, value);
         }
-        private CsvComparisonViewModel _SelectedCsvComparisonVM = default(CsvComparisonViewModel);
+        private CsvComparisonViewModel _SelectedCsvComparisonVM = default;
         #endregion
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SumValue;
             set => this.SetProperty(ref this._SumValue, value);
         }
-        private int? _SumValue = default(int?);
+        private int? _SumValue = default;
         #endregion
         
         /// <summary>

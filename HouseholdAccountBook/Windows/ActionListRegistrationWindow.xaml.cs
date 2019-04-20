@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -24,11 +25,15 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// DAOビルダ
         /// </summary>
-        private DaoBuilder builder;
+        private readonly DaoBuilder builder;
+        /// <summary>
+        /// MainWindowで表示された帳簿ID
+        /// </summary>
+        private readonly int? selectedBookId;
         /// <summary>
         /// MainWindowで選択された帳簿項目の日付
         /// </summary>
-        private DateTime? selectedDateTime;
+        private readonly DateTime? selectedDateTime;
         /// <summary>
         /// 金額列の最後に選択したセル
         /// </summary>
@@ -50,67 +55,16 @@ namespace HouseholdAccountBook.Windows
         /// 複数の帳簿項目の新規登録のために <see cref="ActionListRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="selectedBookId">選択された帳簿ID</param>
         /// <param name="selectedDateTime">選択された日時</param>
-        public ActionListRegistrationWindow(DaoBuilder builder, int? bookId, DateTime? selectedDateTime = null)
+        public ActionListRegistrationWindow(DaoBuilder builder, int? selectedBookId, DateTime? selectedDateTime = null)
         {
             this.builder = builder;
+            this.selectedBookId = selectedBookId;
             this.selectedDateTime = selectedDateTime;
 
             this.InitializeComponent();
-
-            ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
-            BookViewModel selectedBookVM = null;
-            using (DaoBase dao = builder.Build()) {
-                DaoReader reader = dao.ExecQuery(@"
-SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
-                reader.ExecWholeRow((count, record) => {
-                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
-                    bookVMList.Add(vm);
-                    if(selectedBookVM == null || bookId == vm.Id) {
-                        selectedBookVM = vm;
-                    }
-                    return true;
-                });
-            }
-
-            this.WVM.BookVMList = bookVMList;
-            this.WVM.SelectedBookVM = selectedBookVM;
-            this.WVM.SelectedBalanceKind = BalanceKind.Outgo;
-
-            DateTime dateTime = selectedDateTime ?? DateTime.Today;
-            this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = dateTime });
-
-            this.UpdateCategoryList();
-            this.UpdateItemList();
-            this.UpdateShopList();
-            this.UpdateRemarkList();
-
             this.LoadSetting();
-
-            #region イベントハンドラの設定
-            this.WVM.BookChanged += () => {
-                this.UpdateCategoryList();
-                this.UpdateItemList();
-                this.UpdateShopList();
-                this.UpdateRemarkList();
-            };
-            this.WVM.BalanceKindChanged += () => {
-                this.UpdateCategoryList();
-                this.UpdateItemList();
-                this.UpdateShopList();
-                this.UpdateRemarkList();
-            };
-            this.WVM.CategoryChanged += () => {
-                this.UpdateItemList();
-                this.UpdateShopList();
-                this.UpdateRemarkList();
-            };
-            this.WVM.ItemChanged += () => {
-                this.UpdateShopList();
-                this.UpdateRemarkList();
-            };
-            #endregion
         }
 
         #region イベントハンドラ
@@ -134,7 +88,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void RegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void RegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (this.WVM.DateValueVMList.Count < 1) {
                 MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
@@ -142,7 +96,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
             }
 
             // DB登録
-            List<int> idList = this.RegisterToDb();
+            List<int> idList = await this.RegisterToDbAsync();
 
             // MainWindow更新
             Registrated?.Invoke(this, new EventArgs<List<int>>(idList ?? new List<int>()));
@@ -236,6 +190,65 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
             e.Handled = true;
         }
         #endregion
+        
+        /// <summary>
+        /// フォーム読込完了時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ActionListRegistrationWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
+            BookViewModel selectedBookVM = null;
+            using (DaoBase dao = this.builder.Build()) {
+                DaoReader reader = await dao.ExecQueryAsync(@"
+SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
+                reader.ExecWholeRow((count, record) => {
+                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
+                    bookVMList.Add(vm);
+                    if (selectedBookVM == null || this.selectedBookId == vm.Id) {
+                        selectedBookVM = vm;
+                    }
+                    return true;
+                });
+            }
+
+            this.WVM.BookVMList = bookVMList;
+            this.WVM.SelectedBookVM = selectedBookVM;
+            this.WVM.SelectedBalanceKind = BalanceKind.Outgo;
+
+            DateTime dateTime = this.selectedDateTime ?? DateTime.Today;
+            this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = dateTime });
+
+            await this.UpdateCategoryListAsync();
+            await this.UpdateItemListAsync();
+            await this.UpdateShopListAsync();
+            await this.UpdateRemarkListAsync();
+
+            #region イベントハンドラの設定
+            this.WVM.BookChanged += async () => {
+                await this.UpdateCategoryListAsync();
+                await this.UpdateItemListAsync();
+                await this.UpdateShopListAsync();
+                await this.UpdateRemarkListAsync();
+            };
+            this.WVM.BalanceKindChanged += async () => {
+                await this.UpdateCategoryListAsync();
+                await this.UpdateItemListAsync();
+                await this.UpdateShopListAsync();
+                await this.UpdateRemarkListAsync();
+            };
+            this.WVM.CategoryChanged += async () => {
+                await this.UpdateItemListAsync();
+                await this.UpdateShopListAsync();
+                await this.UpdateRemarkListAsync();
+            };
+            this.WVM.ItemChanged += async () => {
+                await this.UpdateShopListAsync();
+                await this.UpdateRemarkListAsync();
+            };
+            #endregion
+        }
 
         /// <summary>
         /// フォーム終了時
@@ -350,7 +363,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         /// カテゴリリストを更新する
         /// </summary>
         /// <param name="categoryId">選択対象のカテゴリ</param>
-        private void UpdateCategoryList(int? categoryId = null)
+        private async Task UpdateCategoryListAsync(int? categoryId = null)
         {
             ObservableCollection<CategoryViewModel> categoryVMList = new ObservableCollection<CategoryViewModel>() {
                 new CategoryViewModel() { Id = -1, Name = "(指定なし)" }
@@ -358,7 +371,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
             int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryVM?.Id ?? categoryVMList[0].Id;
             CategoryViewModel selectedCategoryVM = categoryVMList[0];
             using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = dao.ExecQuery(@"
+                DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT category_id, category_name FROM mst_category C 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM mst_item I WHERE I.category_id = C.category_id AND balance_kind = @{0} AND del_flg = 0 
   AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{1} AND RBI.item_id = I.item_id)) 
@@ -381,22 +394,24 @@ ORDER BY sort_order;", (int)this.WVM.SelectedBalanceKind, this.WVM.SelectedBookV
         /// 項目リストを更新する
         /// </summary>
         /// <param name="itemId">選択対象の項目</param>
-        private void UpdateItemList(int? itemId = null)
+        private async Task UpdateItemListAsync(int? itemId = null)
         {
+            if (this.WVM.SelectedCategoryVM == null) return;
+
             ObservableCollection<ItemViewModel> itemVMList = new ObservableCollection<ItemViewModel>();
             int? tmpItemId = itemId ?? this.WVM.SelectedItemVM?.Id;
             ItemViewModel selectedItemVM = null;
             using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader;
                 if (this.WVM.SelectedCategoryVM.Id == -1) {
-                    reader = dao.ExecQuery(@"
+                    reader = await dao.ExecQueryAsync(@"
 SELECT item_id, item_name FROM mst_item I 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{0} AND RBI.item_id = I.item_id AND del_flg = 0)
   AND EXISTS (SELECT * FROM mst_category C WHERE C.category_id = I.category_id AND balance_kind = @{1} AND del_flg = 0)
 ORDER BY sort_order;", this.WVM.SelectedBookVM.Id, (int)this.WVM.SelectedBalanceKind);
                 }
                 else {
-                    reader = dao.ExecQuery(@"
+                    reader = await dao.ExecQueryAsync(@"
 SELECT item_id, item_name FROM mst_item I 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{0} AND RBI.item_id = I.item_id AND del_flg = 0)
   AND category_id = @{1}
@@ -420,14 +435,16 @@ ORDER BY sort_order;", this.WVM.SelectedBookVM.Id, (int)this.WVM.SelectedCategor
         /// 店舗リストを更新する
         /// </summary>
         /// <param name="shopName">選択対象の店舗名</param>
-        private void UpdateShopList(string shopName = null)
+        private async Task UpdateShopListAsync(string shopName = null)
         {
+            if (this.WVM.SelectedItemVM == null) return;
+
             ObservableCollection<string> shopNameVMList = new ObservableCollection<string>() {
                 string.Empty
             };
             string selectedShopName = shopName ?? this.WVM.SelectedShopName ?? shopNameVMList[0];
             using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = dao.ExecQuery(@"
+                DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT shop_name FROM hst_shop 
 WHERE del_flg = 0 AND item_id = @{0} 
 ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
@@ -446,14 +463,16 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         /// 備考リストを更新する
         /// </summary>
         /// <param name="remark">選択対象の備考</param>
-        private void UpdateRemarkList(string remark = null)
+        private async Task UpdateRemarkListAsync(string remark = null)
         {
+            if (this.WVM.SelectedItemVM == null) return;
+
             ObservableCollection<string> remarkVMList = new ObservableCollection<string>() {
                 string.Empty
             };
             string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0];
             using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = dao.ExecQuery(@"
+                DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT remark FROM hst_remark 
 WHERE del_flg = 0 AND item_id = @{0} 
 ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
@@ -473,7 +492,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         /// DBに登録する
         /// </summary>
         /// <returns>登録された帳簿項目IDリスト</returns>
-        private List<int> RegisterToDb()
+        private async Task<List<int>> RegisterToDbAsync()
         {
             List<int> tmpActionIdList = new List<int>();
             BalanceKind balanceKind = this.WVM.SelectedBalanceKind; // 収支種別
@@ -489,7 +508,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
                     if (vm.ActValue.HasValue) {
                         DateTime actTime = vm.ActDate; // 日付
                         int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value; // 金額
-                        DaoReader reader = dao.ExecQuery(@"
+                        DaoReader reader = await dao.ExecQueryAsync(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, remark, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7}) RETURNING action_id;",
                             bookId, itemId, actTime, actValue, shopName, remark, Updater, Inserter);
@@ -503,18 +522,18 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7}) RETURNI
 
                 if (shopName != string.Empty) {
                     #region 店舗を追加する
-                    dao.ExecTransaction(() => {
-                        DaoReader reader = dao.ExecQuery(@"
+                    await dao.ExecTransactionAsync(async () => {
+                        DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT shop_name FROM hst_shop
 WHERE item_id = @{0} AND shop_name = @{1};", itemId, shopName);
 
                         if (reader.Count == 0) {
-                            dao.ExecNonQuery(@"
+                            await dao.ExecNonQueryAsync(@"
 INSERT INTO hst_shop (item_id, shop_name, used_time, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, 0, 'now', @{3}, 'now', @{4});", itemId, shopName, lastActTime, Updater, Inserter);
                         }
                         else {
-                            dao.ExecNonQuery(@"
+                            await dao.ExecNonQueryAsync(@"
 UPDATE hst_shop
 SET used_time = @{0}, del_flg = 0, update_time = 'now', updater = @{1}
 WHERE item_id = @{2} AND shop_name = @{3} AND used_time < @{0};", lastActTime, Updater, itemId, shopName);
@@ -525,18 +544,18 @@ WHERE item_id = @{2} AND shop_name = @{3} AND used_time < @{0};", lastActTime, U
 
                 if (remark != string.Empty) {
                     #region 備考を追加する
-                    dao.ExecTransaction(() => {
-                        DaoReader reader = dao.ExecQuery(@"
+                    await dao.ExecTransactionAsync(async () => {
+                        DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT remark FROM hst_remark
 WHERE item_id = @{0} AND remark = @{1};", itemId, remark);
 
                         if (reader.Count == 0) {
-                            dao.ExecNonQuery(@"
+                            await dao.ExecNonQueryAsync(@"
 INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, 0, @{2}, 0, 'now', @{3}, 'now', @{4});", itemId, remark, lastActTime, Updater, Inserter);
                         }
                         else {
-                            dao.ExecNonQuery(@"
+                            await dao.ExecNonQueryAsync(@"
 UPDATE hst_remark
 SET used_time = @{0}, del_flg = 0, update_time = 'now', updater = @{1}
 WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", lastActTime, Updater, itemId, remark);

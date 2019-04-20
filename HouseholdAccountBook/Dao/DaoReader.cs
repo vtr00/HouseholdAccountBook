@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Dao
 {
@@ -11,12 +13,12 @@ namespace HouseholdAccountBook.Dao
         /// <summary>
         /// 実行されたSQL(デバッグ用)
         /// </summary>
-        private string sql;
+        private readonly string sql;
 
         /// <summary>
         /// 実行結果
         /// </summary>
-        private LinkedList<Dictionary<string, object>> resultSet;
+        private readonly LinkedList<Dictionary<string, object>> resultSet;
         /// <summary>
         /// エヌメレータ
         /// </summary>
@@ -71,18 +73,25 @@ namespace HouseholdAccountBook.Dao
         }
 
         /// <summary>
-        /// 1レコードだけの処理
+        /// [同期]1レコードだけの処理
         /// </summary>
         /// <param name="record">レコード</param>
         public delegate void ExectionARow(Record record);
+
         /// <summary>
-        /// 1レコードだけ読み込む
+        /// [非同期]1レコードだけの処理
+        /// </summary>
+        /// <param name="record">レコード</param>
+        public delegate Task ExectionARowAsync(Record record);
+
+        /// <summary>
+        /// [同期]1レコードだけ読み込む
         /// </summary>
         /// <param name="exection">レコードの処理</param>
         public void ExecARow(ExectionARow exection)
         {
-            this.enumerator.MoveNext();
-            if (this.enumerator.Current != null) {
+            this.enumerator = this.resultSet.GetEnumerator();
+            if (this.enumerator.MoveNext()) {
                 exection(new Record(this.enumerator.Current));
             }
             else {
@@ -91,25 +100,73 @@ namespace HouseholdAccountBook.Dao
         }
 
         /// <summary>
-        /// 複数行の処理
+        /// [非同期]1レコードだけ読み込む
+        /// </summary>
+        /// <param name="exection">レコードの処理</param>
+        public async Task ExecARowAsync(ExectionARowAsync exection)
+        {
+            this.enumerator = this.resultSet.GetEnumerator();
+            if (this.enumerator.MoveNext()) {
+                await exection(new Record(this.enumerator.Current));
+            }
+            else {
+                throw new InvalidOperationException("有効なレコードがありません。");
+            }
+        }
+
+        /// <summary>
+        /// [同期]複数行の処理
         /// </summary>
         /// <param name="count">現在の行数</param>
         /// <param name="record">レコード</param>
         /// <returns>継続の有無</returns>
         public delegate bool ExectionWholeRow(int count, Record record);
+
         /// <summary>
-        /// 複数レコードを読み込む
+        /// [非同期]複数行の処理
+        /// </summary>
+        /// <param name="count">現在の行数</param>
+        /// <param name="record">レコード</param>
+        /// <returns>継続の有無</returns>
+        public delegate Task<bool> ExectionWholeRowAsync(int count, Record record);
+
+        /// <summary>
+        /// [同期]複数レコードを読み込む
         /// </summary>
         /// <param name="exection">レコードの処理</param>
         public void ExecWholeRow(ExectionWholeRow exection)
         {
             int count = 0;
-            while (this.enumerator.MoveNext()) {
-                if(!exection(count, new Record(this.enumerator.Current))) { break; }
-                count++;
-            }
+
             // 初期位置に戻す
             this.enumerator = this.resultSet.GetEnumerator();
+            try {
+                while (this.enumerator.MoveNext()) {
+                    if (!exection(count, new Record(this.enumerator.Current))) { break; }
+
+                    count++;
+                }
+            }
+            catch (Exception) {
+                ;
+            }
+        }
+
+        /// <summary>
+        /// [非同期]複数レコードを読み込む
+        /// </summary>
+        /// <param name="exection">レコードの処理</param>
+        public async Task ExecWholeRowAsync(ExectionWholeRowAsync exection)
+        {
+            int count = 0;
+
+            // 初期位置に戻す
+            this.enumerator = this.resultSet.GetEnumerator();
+            while (this.enumerator.MoveNext()) {
+                if (!await exection(count, new Record(this.enumerator.Current))) { break; }
+
+                count++;
+            }
         }
     }
 }

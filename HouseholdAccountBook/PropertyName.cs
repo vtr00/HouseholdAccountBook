@@ -30,8 +30,7 @@ namespace HouseholdAccountBook
         /// </example>
         public static string Get<TMember>(Expression<Func<TInstance, TMember>> propertyExpression)
         {
-            var memberExp = propertyExpression.Body as MemberExpression;
-            if (memberExp == null) {
+            if (!(propertyExpression.Body is MemberExpression memberExp)) {
                 throw new ArgumentException();
             }
 

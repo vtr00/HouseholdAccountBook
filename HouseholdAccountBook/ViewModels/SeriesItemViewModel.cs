@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._Value;
             set => this.SetProperty(ref this._Value, value);
         }
-        private int _Value = default(int);
+        private int _Value = default;
         #endregion
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._Number;
             set => this.SetProperty(ref this._Number, value);
         }
-        private int _Number = default(int);
+        private int _Number = default;
         #endregion
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._ItemId;
             set => this.SetProperty(ref this._ItemId, value);
         }
-        private int _ItemId = default(int);
+        private int _ItemId = default;
         #endregion
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._CategoryId;
             set => this.SetProperty(ref this._CategoryId, value);
         }
-        private int _CategoryId = default(int);
+        private int _CategoryId = default;
         #endregion
         #endregion
     }

@@ -106,7 +106,7 @@ namespace HouseholdAccountBook
                 // 接続を試行する
                 bool isOpen = false;
                 using (DaoBase dao = builder.Build()) {
-                    isOpen = dao.IsOpen();
+                    isOpen = dao.IsOpen;
                 }
 
                 if (isOpen) {

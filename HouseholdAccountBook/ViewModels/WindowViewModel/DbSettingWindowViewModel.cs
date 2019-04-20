@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._Message;
             set => this.SetProperty(ref this._Message, value);
         }
-        private string _Message = default(string);
+        private string _Message = default;
         #endregion
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._Host;
             set => this.SetProperty(ref this._Host, value);
         }
-        private string _Host = default(string);
+        private string _Host = default;
         #endregion
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._Port;
             set => this.SetProperty(ref this._Port, value);
         }
-        private int _Port = default(int);
+        private int _Port = default;
         #endregion
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._UserName;
             set => this.SetProperty(ref this._UserName, value);
         }
-        private string _UserName = default(string);
+        private string _UserName = default;
         #endregion
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._Password;
             set => this.SetProperty(ref this._Password, value);
         }
-        private string _Password = default(string);
+        private string _Password = default;
         #endregion
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._DatabaseName;
             set => this.SetProperty(ref this._DatabaseName, value);
         }
-        private string _DatabaseName = default(string);
+        private string _DatabaseName = default;
         #endregion
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._Role;
             set => this.SetProperty(ref this._Role, value);
         }
-        private string _Role = default(string);
+        private string _Role = default;
         #endregion
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._DumpExePath;
             set => this.SetProperty(ref this._DumpExePath, value);
         }
-        private string _DumpExePath = default(string);
+        private string _DumpExePath = default;
         #endregion
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._RestoreExePath;
             set => this.SetProperty(ref this._RestoreExePath, value);
         }
-        private string _RestoreExePath = default(string);
+        private string _RestoreExePath = default;
         #endregion
         #endregion
     }

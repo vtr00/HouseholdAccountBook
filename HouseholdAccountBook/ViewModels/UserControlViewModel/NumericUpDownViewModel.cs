@@ -13,7 +13,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// IsOpenの瞬時値
         /// </summary>
-        private bool localIsOpen = default(bool);
+        private bool localIsOpen = default;
 
         #region プロパティ
         /// <summary>
@@ -25,7 +25,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._InputedValue;
             set => this.SetProperty(ref this._InputedValue, value);
         }
-        private int? _InputedValue = default(int?);
+        private int? _InputedValue = default;
         #endregion
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._InputedKind;
             set => this.SetProperty(ref this._InputedKind, value);
         }
-        private NumericInputButton.InputKind _InputedKind = default(NumericInputButton.InputKind);
+        private NumericInputButton.InputKind _InputedKind = default;
         #endregion
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._IsOpen;
             set => this.SetProperty(ref this._IsOpen, value);
         }
-        private bool _IsOpen = default(bool);
+        private bool _IsOpen = default;
         #endregion
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace HouseholdAccountBook.ViewModels
                 this.SetIsOpen();
             }
         }
-        private bool _NumericUpDownFocused = default(bool);
+        private bool _NumericUpDownFocused = default;
         #endregion
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace HouseholdAccountBook.ViewModels
                 this.SetIsOpen();
             }
         }
-        private bool _PopupFocused = default(bool);
+        private bool _PopupFocused = default;
         #endregion
         #endregion
 

@@ -8,6 +8,7 @@
         xmlns:project="clr-namespace:HouseholdAccountBook"
         mc:Ignorable="d"
         Title="リスト追加" Height="Auto" Width="350" ShowInTaskbar="False" WindowStyle="ToolWindow"
+        Loaded="ActionListRegistrationWindow_Loaded"
         Closed="ActionListRegistrationWindow_Closed">
 
     <Window.Resources>

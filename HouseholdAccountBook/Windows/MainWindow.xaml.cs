@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -45,20 +46,6 @@ namespace HouseholdAccountBook.Windows
             this.builder = builder;
 
             this.InitializeComponent();
-
-            // 帳簿リスト更新
-            this.UpdateBookList(Properties.Settings.Default.MainWindow_SelectedBookId);
-
-            // 日別データ更新
-            this.UpdateBookTabData(isScroll: true, isUpdateActDateLastEdited: true);
-            this.InitializeDailyGraphTabData();
-            this.UpdateDailyGraphTabData();
-
-            // 月別データ更新
-            this.UpdateMonthlyListTabData();
-            this.InitializeMonthlyGraphTabData();
-            this.UpdateMonthlyGraphTabData();
-
             this.LoadSetting();
         }
 
@@ -92,7 +79,7 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ImportKichoHugetsuDbCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void ImportKichoHugetsuDbCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -127,25 +114,25 @@ namespace HouseholdAccountBook.Windows
 
             bool isOpen = false;
             using (DaoOle daoOle = new DaoOle(ofd.FileName)) {
-                isOpen = daoOle.IsOpen();
+                isOpen = daoOle.IsOpen;
 
                 if (isOpen) {
                     using (DaoBase dao = this.builder.Build()) {
-                        dao.ExecTransaction(() => {
+                        await dao.ExecTransactionAsync(async () => {
                             // 既存のデータを削除する
-                            dao.ExecNonQuery(@"DELETE FROM mst_book;");
-                            dao.ExecNonQuery(@"DELETE FROM mst_category;");
-                            dao.ExecNonQuery(@"DELETE FROM mst_item;");
-                            dao.ExecNonQuery(@"DELETE FROM hst_action;");
-                            dao.ExecNonQuery(@"DELETE FROM hst_group;");
-                            dao.ExecNonQuery(@"DELETE FROM hst_shop;");
-                            dao.ExecNonQuery(@"DELETE FROM hst_remark;");
-                            dao.ExecNonQuery(@"DELETE FROM rel_book_item;");
+                            await dao.ExecNonQueryAsync(@"DELETE FROM mst_book;");
+                            await dao.ExecNonQueryAsync(@"DELETE FROM mst_category;");
+                            await dao.ExecNonQueryAsync(@"DELETE FROM mst_item;");
+                            await dao.ExecNonQueryAsync(@"DELETE FROM hst_action;");
+                            await dao.ExecNonQueryAsync(@"DELETE FROM hst_group;");
+                            await dao.ExecNonQueryAsync(@"DELETE FROM hst_shop;");
+                            await dao.ExecNonQueryAsync(@"DELETE FROM hst_remark;");
+                            await dao.ExecNonQueryAsync(@"DELETE FROM rel_book_item;");
 
                             DaoReader reader;
                             // 帳簿IDのシーケンスを更新する
-                            reader = daoOle.ExecQuery(@"SELECT * FROM CBM_BOOK ORDER BY BOOK_ID;");
-                            dao.ExecNonQuery("SELECT setval('mst_book_book_id_seq', @{0});", reader[reader.Count - 1].ToInt("BOOK_ID"));
+                            reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBM_BOOK ORDER BY BOOK_ID;");
+                            await dao.ExecNonQueryAsync("SELECT setval('mst_book_book_id_seq', @{0});", reader[reader.Count - 1].ToInt("BOOK_ID"));
                             // 帳簿テーブルのレコードを作成する
                             reader.ExecWholeRow((count, record) => {
                                 int bookId = record.ToInt("BOOK_ID");
@@ -154,7 +141,7 @@ namespace HouseholdAccountBook.Windows
                                 int sortKey = record.ToInt("SORT_KEY");
                                 int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                dao.ExecNonQuery(@"
+                                dao.ExecNonQueryAsync(@"
 INSERT INTO mst_book 
 (book_id, book_name, initial_value, book_kind, pay_day, sort_order, del_flg, update_time, updater, insert_time, inserter) 
 VALUES (@{0}, @{1}, @{2}, 0, NULL, @{3}, @{4}, 'now', @{5}, 'now', @{6});",
@@ -163,8 +150,8 @@ VALUES (@{0}, @{1}, @{2}, 0, NULL, @{3}, @{4}, 'now', @{5}, 'now', @{6});",
                             });
 
                             // 分類IDのシーケンスを更新する
-                            reader = daoOle.ExecQuery(@"SELECT * FROM CBM_CATEGORY ORDER BY CATEGORY_ID;");
-                            dao.ExecNonQuery("SELECT setval('mst_category_category_id_seq', @{0});", reader[reader.Count - 1].ToInt("CATEGORY_ID"));
+                            reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBM_CATEGORY ORDER BY CATEGORY_ID;");
+                            await dao.ExecNonQueryAsync("SELECT setval('mst_category_category_id_seq', @{0});", reader[reader.Count - 1].ToInt("CATEGORY_ID"));
                             // 分類テーブルのレコードを作成する
                             reader.ExecWholeRow((count, record) => {
                                 int categoryId = record.ToInt("CATEGORY_ID");
@@ -173,7 +160,7 @@ VALUES (@{0}, @{1}, @{2}, 0, NULL, @{3}, @{4}, 'now', @{5}, 'now', @{6});",
                                 int sortKey = record.ToInt("SORT_KEY");
                                 int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                dao.ExecNonQuery(@"
+                                dao.ExecNonQueryAsync(@"
 INSERT INTO mst_category
 (category_id, category_name, balance_kind, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, 'now', @{5}, 'now', @{6});",
@@ -182,8 +169,8 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, 'now', @{5}, 'now', @{6});",
                             });
 
                             // 項目IDのシーケンスを更新する
-                            reader = daoOle.ExecQuery(@"SELECT * FROM CBM_ITEM ORDER BY ITEM_ID;");
-                            dao.ExecNonQuery("SELECT setval('mst_item_item_id_seq', @{0});", reader[reader.Count - 1].ToInt("ITEM_ID"));
+                            reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBM_ITEM ORDER BY ITEM_ID;");
+                            await dao.ExecNonQueryAsync("SELECT setval('mst_item_item_id_seq', @{0});", reader[reader.Count - 1].ToInt("ITEM_ID"));
                             // 項目テーブルのレコードを作成する
                             reader.ExecWholeRow((count, record) => {
                                 int itemId = record.ToInt("ITEM_ID");
@@ -193,7 +180,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, 'now', @{5}, 'now', @{6});",
                                 int sortKey = record.ToInt("SORT_KEY");
                                 int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                dao.ExecNonQuery(@"
+                                dao.ExecNonQueryAsync(@"
 INSERT INTO mst_item
 (item_id, item_name, category_id, move_flg, advance_flg, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 'now', @{7}, 'now', @{8});",
@@ -202,11 +189,11 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 'now', @{7}, 'now', @{8});",
                             });
 
                             // 帳簿項目IDのシーケンスを更新する
-                            reader = daoOle.ExecQuery(@"SELECT * FROM CBT_ACT ORDER BY ACT_ID;");
-                            dao.ExecNonQuery("SELECT setval('hst_action_action_id_seq', @{0});", reader[reader.Count - 1].ToInt("ACT_ID"));
+                            reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBT_ACT ORDER BY ACT_ID;");
+                            await dao.ExecNonQueryAsync("SELECT setval('hst_action_action_id_seq', @{0});", reader[reader.Count - 1].ToInt("ACT_ID"));
                             int maxGroupId = 0; // グループIDの最大値
                             // 帳簿テーブルのレコードを作成する
-                            reader.ExecWholeRow((count, record) => {
+                            await reader.ExecWholeRowAsync(async (count, record) => {
                                 int actId = record.ToInt("ACT_ID");
                                 int bookId = record.ToInt("BOOK_ID");
                                 int itemId = record.ToInt("ITEM_ID");
@@ -217,7 +204,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 'now', @{7}, 'now', @{8});",
                                 string noteName = record["NOTE_NAME"];
                                 int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                dao.ExecNonQuery(@"
+                                await dao.ExecNonQueryAsync(@"
 INSERT INTO hst_action
 (action_id, book_id, item_id, act_time, act_value, shop_name, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, NULL, @{5}, @{6}, @{7}, 'now', @{8}, 'now', @{9});",
@@ -229,11 +216,11 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, NULL, @{5}, @{6}, @{7}, 'now', @{8}, 'now'
                                     // グループIDの最大値を更新する
                                     if (maxGroupId < groupId) { maxGroupId = groupId.Value; }
 
-                                    reader = dao.ExecQuery("SELECT * FROM hst_group WHERE group_id = @{0};", groupId);
+                                    reader = await dao.ExecQueryAsync("SELECT * FROM hst_group WHERE group_id = @{0};", groupId);
                                     // groupId のレコードが登録されていないとき
                                     if (reader.Count == 0) {
                                         // グループの種類を調べる
-                                        reader = daoOle.ExecQuery("SELECT * FROM CBT_ACT WHERE GROUP_ID = @{0};", groupId);
+                                        reader = await daoOle.ExecQueryAsync("SELECT * FROM CBT_ACT WHERE GROUP_ID = @{0};", groupId);
                                         GroupKind groupKind = GroupKind.Repeat;
                                         int? tmpBookId = null;
                                         reader.ExecWholeRow((count2, record2) => {
@@ -255,7 +242,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, NULL, @{5}, @{6}, @{7}, 'now', @{8}, 'now'
                                         });
 
                                         // グループテーブルのレコードを作成する
-                                        dao.ExecNonQuery(@"
+                                        await dao.ExecNonQueryAsync(@"
 INSERT INTO hst_group
 (group_id, group_kind, remark, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, NULL, 0, 'now', @{2}, 'now', @{3});",
@@ -265,16 +252,16 @@ VALUES (@{0}, @{1}, NULL, 0, 'now', @{2}, 'now', @{3});",
                                 return true;
                             });
                             // グループIDのシーケンスを更新する
-                            dao.ExecNonQuery("SELECT setval('hst_group_group_id_seq', @{0});", maxGroupId);
+                            await dao.ExecNonQueryAsync("SELECT setval('hst_group_group_id_seq', @{0});", maxGroupId);
 
                             // 備考テーブルのレコードを作成する
-                            reader = daoOle.ExecQuery(@"SELECT * FROM CBT_NOTE;");
+                            reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBT_NOTE;");
                             reader.ExecWholeRow((count, record) => {
                                 int itemId = record.ToInt("ITEM_ID");
                                 string noteName = record["NOTE_NAME"];
                                 int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                dao.ExecNonQuery(@"
+                                dao.ExecNonQueryAsync(@"
 INSERT INTO hst_remark
 (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, 0, 'now', @{2}, 'now', @{3}, 'now', @{4});",
@@ -283,13 +270,13 @@ VALUES (@{0}, @{1}, 0, 'now', @{2}, 'now', @{3}, 'now', @{4});",
                             });
 
                             // 帳簿-項目テーブルのレコードを作成する
-                            reader = daoOle.ExecQuery("SELECT * FROM CBR_BOOK;");
+                            reader = await daoOle.ExecQueryAsync("SELECT * FROM CBR_BOOK;");
                             reader.ExecWholeRow((count, record) => {
                                 int bookId = record.ToInt("BOOK_ID");
                                 int itemId = record.ToInt("ITEM_ID");
                                 int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                dao.ExecNonQuery(@"
+                                dao.ExecNonQueryAsync(@"
 INSERT INTO rel_book_item
 (book_id, item_id, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
@@ -302,11 +289,11 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             }
 
             if (isOpen) {
-                this.UpdateBookList();
-                this.UpdateBookTabData(isScroll: true, isUpdateActDateLastEdited: true);
-                this.UpdateDailyGraphTabData();
-                this.UpdateMonthlyListTabData();
-                this.UpdateMonthlyGraphTabData();
+                await this.UpdateBookListAsync();
+                await this.UpdateBookTabDataAsync(isScroll: true, isUpdateActDateLastEdited: true);
+                await this.UpdateDailyGraphTabDataAsync();
+                await this.UpdateMonthlyListTabDataAsync();
+                await this.UpdateMonthlyGraphTabDataAsync();
 
                 this.Cursor = cCursor;
 
@@ -333,7 +320,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ImportCustomFileCommand_Excuted(object sender, ExecutedRoutedEventArgs e)
+        private async void ImportCustomFileCommand_Excuted(object sender, ExecutedRoutedEventArgs e)
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -369,14 +356,14 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
             using (DaoBase dao = this.builder.Build()) {
                 // 既存のデータを削除する
-                dao.ExecNonQuery(@"DELETE FROM mst_book;");
-                dao.ExecNonQuery(@"DELETE FROM mst_category;");
-                dao.ExecNonQuery(@"DELETE FROM mst_item;");
-                dao.ExecNonQuery(@"DELETE FROM hst_action;");
-                dao.ExecNonQuery(@"DELETE FROM hst_group;");
-                dao.ExecNonQuery(@"DELETE FROM hst_shop;");
-                dao.ExecNonQuery(@"DELETE FROM hst_remark;");
-                dao.ExecNonQuery(@"DELETE FROM rel_book_item;");
+                await dao.ExecNonQueryAsync(@"DELETE FROM mst_book;");
+                await dao.ExecNonQueryAsync(@"DELETE FROM mst_category;");
+                await dao.ExecNonQueryAsync(@"DELETE FROM mst_item;");
+                await dao.ExecNonQueryAsync(@"DELETE FROM hst_action;");
+                await dao.ExecNonQueryAsync(@"DELETE FROM hst_group;");
+                await dao.ExecNonQueryAsync(@"DELETE FROM hst_shop;");
+                await dao.ExecNonQueryAsync(@"DELETE FROM hst_remark;");
+                await dao.ExecNonQueryAsync(@"DELETE FROM rel_book_item;");
             }
 
             // 起動情報を設定する
@@ -407,11 +394,11 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
             if (process.ExitCode == 0) {
                 // 画面を更新する
-                this.UpdateBookList();
-                this.UpdateBookTabData(isScroll: true, isUpdateActDateLastEdited: true);
-                this.UpdateDailyGraphTabData();
-                this.UpdateMonthlyListTabData();
-                this.UpdateMonthlyGraphTabData();
+                await this.UpdateBookListAsync();
+                await this.UpdateBookTabDataAsync(isScroll: true, isUpdateActDateLastEdited: true);
+                await this.UpdateDailyGraphTabDataAsync();
+                await this.UpdateMonthlyListTabDataAsync();
+                await this.UpdateMonthlyGraphTabDataAsync();
 
                 this.Cursor = cCursor;
 
@@ -544,9 +531,9 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder,
                 this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime ?? this.WVM.DisplayedMonth) { Owner = this };
             // 登録時イベントを登録する
-            mrw.Registrated += (sender2, e2) => {
+            mrw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
-                this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
@@ -574,9 +561,9 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder,
                 this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             // 登録時イベントを登録する
-            arw.Registrated += (sender2, e2)=> {
+            arw.Registrated += async (sender2, e2)=> {
                 // 帳簿一覧タブを更新する
-                this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
@@ -604,9 +591,9 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder,
                 this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             // 登録時イベントを登録する
-            alrw.Registrated += (sender2, e2) => {
+            alrw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
-                this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
@@ -631,12 +618,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void EditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void EditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             // グループ種別を特定する
             int? groupKind = null;
             using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = dao.ExecQuery(@"
+                DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT A.group_id, G.group_kind
 FROM hst_action A
 LEFT JOIN (SELECT * FROM hst_group WHERE del_flg = 0) G ON G.group_id = A.group_id
@@ -651,9 +638,9 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 // 移動以外の帳簿項目の編集時の処理
                 ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId) { Owner = this };
                 // 登録時イベントを登録する
-                arw.Registrated += (sender2, e2) => {
+                arw.Registrated += async (sender2, e2) => {
                     // 帳簿一覧タブを更新する
-                    this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                    await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
@@ -663,9 +650,9 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 // 移動の編集時の処理
                 MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
                 // 登録時イベントを登録する
-                mrw.Registrated += (sender2, e2) => {
+                mrw.Registrated += async (sender2, e2) => {
                     // 帳簿一覧タブを更新する
-                    this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                    await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
@@ -691,12 +678,12 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void CopyActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void CopyActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             // グループ種別を特定する
             int? groupKind = null;
             using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = dao.ExecQuery(@"
+                DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT A.group_id, G.group_kind
 FROM hst_action A
 LEFT JOIN (SELECT * FROM hst_group WHERE del_flg = 0) G ON G.group_id = A.group_id
@@ -711,9 +698,9 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 // 移動以外の帳簿項目の複製時の処理
                 ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId, RegistrationMode.Copy) { Owner = this };
                 // 登録時イベントを登録する
-                arw.Registrated += (sender2, e2) => {
+                arw.Registrated += async (sender2, e2) => {
                     // 帳簿一覧タブを更新する
-                    this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                    await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
@@ -723,9 +710,9 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 // 移動の複製時の処理
                 MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationMode.Copy) { Owner = this };
                 // 登録時イベントを登録する
-                mrw.Registrated += (sender2, e2) => {
+                mrw.Registrated += async (sender2, e2) => {
                     // 帳簿一覧タブを更新する
-                    this.UpdateBookTabData(e2.Value, isUpdateActDateLastEdited: true);
+                    await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
@@ -750,7 +737,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DeleteActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void DeleteActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             if (MessageBox.Show(MessageText.DeleteNotification, this.Title, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 // 帳簿項目IDが0を超える項目についてループ
@@ -759,25 +746,25 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                     int? groupId = vm.GroupId;
 
                     using (DaoBase dao = this.builder.Build()) {
-                        dao.ExecTransaction(() => {
-                            dao.ExecNonQuery(@"
+                        await dao.ExecTransactionAsync(async () => {
+                            await dao.ExecNonQueryAsync(@"
 UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{1} 
 WHERE action_id = @{0};", actionId, Updater);
 
                             // 削除項目の日時以降の同じグループIDを持つ帳簿項目を削除する(日付の等号は「移動」削除用)
                             if (groupId != null) {
-                                dao.ExecNonQuery(@"
+                                await dao.ExecNonQueryAsync(@"
 UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{1}
 WHERE group_id = @{2} AND act_time >= (SELECT act_time FROM hst_action WHERE action_id = @{0});", actionId, Updater, groupId);
 
-                                DaoReader reader = dao.ExecQuery(@"
+                                DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT action_id FROM hst_action
 WHERE group_id = @{0} AND del_flg = 0;", groupId);
 
                                 if (reader.Count == 1) {
                                     // 同じグループIDを持つ帳簿項目が1つだけの場合にグループIDをクリアする
-                                    reader.ExecARow((record) => {
-                                        dao.ExecNonQuery(@"
+                                    await reader.ExecARowAsync(async (record) => {
+                                        await dao.ExecNonQueryAsync(@"
 UPDATE hst_action SET group_id = null, update_time = 'now', updater = @{1}
 WHERE group_id = @{0} AND del_flg = 0;", groupId, Updater);
                                     });
@@ -785,7 +772,7 @@ WHERE group_id = @{0} AND del_flg = 0;", groupId, Updater);
 
                                 if (reader.Count <= 1) {
                                     // 同じグループIDを持つ帳簿項目が存在しなくなる場合にグループを削除する
-                                    dao.ExecNonQuery(@"
+                                    await dao.ExecNonQueryAsync(@"
 UPDATE hst_group
 SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
@@ -796,7 +783,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 }
 
                 // 帳簿一覧タブを更新する
-                this.UpdateBookTabData(isUpdateActDateLastEdited: true);
+                await this.UpdateBookTabDataAsync(isUpdateActDateLastEdited: true);
             }
         }
         #endregion
@@ -927,22 +914,22 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
-            this.UpdateBookTabData(isScroll:false);
+            await this.UpdateBookTabDataAsync(isScroll:false);
             this.InitializeDailyGraphTabData();
-            this.UpdateDailyGraphTabData();
+            await this.UpdateDailyGraphTabDataAsync();
 
-            this.UpdateMonthlyListTabData();
+            await this.UpdateMonthlyListTabDataAsync();
             this.InitializeMonthlyGraphTabData();
-            this.UpdateMonthlyGraphTabData();
+            await this.UpdateMonthlyGraphTabDataAsync();
 
-            this.UpdateYearlyListTabData();
+            await this.UpdateYearlyListTabDataAsync();
             this.InitializeYearlyGraphTabData();
-            this.UpdateYearlyGraphTabData();
+            await this.UpdateYearlyGraphTabDataAsync();
 
             this.Cursor = cCursor;
         }
@@ -964,7 +951,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void GoToLastMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void GoToLastMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
@@ -972,10 +959,10 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
-                    this.UpdateBookTabData(isScroll:true);
+                    await this.UpdateBookTabDataAsync(isScroll:true);
 
                     this.InitializeDailyGraphTabData();
-                    this.UpdateDailyGraphTabData();
+                    await this.UpdateDailyGraphTabDataAsync();
                     break;
             }
 
@@ -1000,16 +987,16 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void GoToThisMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void GoToThisMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
-            this.UpdateBookTabData(isScroll:true);
+            await this.UpdateBookTabDataAsync(isScroll:true);
 
             this.InitializeDailyGraphTabData();
-            this.UpdateDailyGraphTabData();
+            await this.UpdateDailyGraphTabDataAsync();
 
             this.Cursor = cCursor;
         }
@@ -1030,7 +1017,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void GoToNextMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void GoToNextMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
@@ -1038,10 +1025,10 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
-                    this.UpdateBookTabData(isScroll:true);
+                    await this.UpdateBookTabDataAsync(isScroll:true);
 
                     this.InitializeDailyGraphTabData();
-                    this.UpdateDailyGraphTabData();
+                    await this.UpdateDailyGraphTabDataAsync();
                     break;
             }
 
@@ -1053,7 +1040,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OpenSelectingDailyTermWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void OpenSelectingDailyTermWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             TermWindow stw = null;
             
@@ -1073,10 +1060,10 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 this.WVM.StartDate = stw.WVM.StartDate;
                 this.WVM.EndDate = stw.WVM.EndDate;
 
-                this.UpdateBookTabData(isScroll:true);
+                await this.UpdateBookTabDataAsync(isScroll:true);
 
                 this.InitializeDailyGraphTabData();
-                this.UpdateDailyGraphTabData();
+                await this.UpdateDailyGraphTabDataAsync();
 
                 this.Cursor = cCursor;
             }
@@ -1100,14 +1087,14 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void GoToLastYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void GoToLastYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(-1);
-            this.UpdateMonthlyListTabData();
-            this.UpdateMonthlyGraphTabData();
+            await this.UpdateMonthlyListTabDataAsync();
+            await this.UpdateMonthlyGraphTabDataAsync();
 
             this.Cursor = cCursor;
         }
@@ -1130,14 +1117,14 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void GoToThisYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void GoToThisYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
-            this.UpdateMonthlyListTabData();
-            this.UpdateMonthlyGraphTabData();
+            await this.UpdateMonthlyListTabDataAsync();
+            await this.UpdateMonthlyGraphTabDataAsync();
 
             this.Cursor = cCursor;
         }
@@ -1158,14 +1145,14 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void GoToNextYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void GoToNextYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(1);
-            this.UpdateMonthlyListTabData();
-            this.UpdateMonthlyGraphTabData();
+            await this.UpdateMonthlyListTabDataAsync();
+            await this.UpdateMonthlyGraphTabDataAsync();
 
             this.Cursor = cCursor;
         }
@@ -1178,26 +1165,26 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OpenSettingsWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void OpenSettingsWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             SettingsWindow sw = new SettingsWindow(this.builder) { Owner = this };
             if (sw.ShowDialog() == true) {
                 Cursor cCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
 
-                this.UpdateBookList();
+                await this.UpdateBookListAsync();
 
-                this.UpdateBookTabData();
+                await this.UpdateBookTabDataAsync();
                 this.InitializeDailyGraphTabData();
-                this.UpdateDailyGraphTabData();
+                await this.UpdateDailyGraphTabDataAsync();
 
-                this.UpdateMonthlyListTabData();
+                await this.UpdateMonthlyListTabDataAsync();
                 this.InitializeMonthlyGraphTabData();
-                this.UpdateMonthlyGraphTabData();
+                await this.UpdateMonthlyGraphTabDataAsync();
 
-                this.UpdateYearlyListTabData();
+                await this.UpdateYearlyListTabDataAsync();
                 this.InitializeYearlyGraphTabData();
-                this.UpdateYearlyGraphTabData();
+                await this.UpdateYearlyGraphTabDataAsync();
 
                 this.Cursor = cCursor;
             }
@@ -1212,11 +1199,11 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         {
             CsvComparisonWindow ccw = new CsvComparisonWindow(this.builder, this.WVM.SelectedBookVM.Id);
             // 帳簿項目の一致を確認時のイベントを登録する
-            ccw.ChangedIsMatch += (sender2, e2) => {
+            ccw.ChangedIsMatch += async (sender2, e2) => {
                 ActionViewModel vm = this.WVM.ActionVMList.FirstOrDefault((tmpVM) => { return tmpVM.ActionId == e2.Value; });
                 if(vm != null) {
                     using (DaoBase dao = this.builder.Build()) {
-                        DaoReader reader = dao.ExecQuery(@"
+                        DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT is_match
 FROM hst_action
 WHERE action_id = @{0};", vm.ActionId);
@@ -1230,8 +1217,8 @@ WHERE action_id = @{0};", vm.ActionId);
                 }
             };
             // 複数の帳簿項目の一致を確認時のイベントを登録する
-            ccw.ChangedIsMatches += (sender3, e3) => {
-                this.UpdateBookTabData(isScroll: false);
+            ccw.ChangedIsMatches += async (sender3, e3) => {
+                await this.UpdateBookTabDataAsync(isScroll: false);
             };
             ccw.Show();
         }
@@ -1252,6 +1239,27 @@ WHERE action_id = @{0};", vm.ActionId);
         #endregion
 
         #region ウィンドウ
+        /// <summary>
+        /// フォーム読込完了時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            // 帳簿リスト更新
+            await this.UpdateBookListAsync(Properties.Settings.Default.MainWindow_SelectedBookId);
+
+            // 日別データ更新
+            await this.UpdateBookTabDataAsync(isScroll: true, isUpdateActDateLastEdited: true);
+            this.InitializeDailyGraphTabData();
+            await this.UpdateDailyGraphTabDataAsync();
+
+            // 月別データ更新
+            await this.UpdateMonthlyListTabDataAsync();
+            this.InitializeMonthlyGraphTabData();
+            await this.UpdateMonthlyGraphTabDataAsync();
+        }
+
         /// <summary>
         /// フォーム終了時
         /// </summary>
@@ -1286,7 +1294,7 @@ WHERE action_id = @{0};", vm.ActionId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (this.oldSelectedTab != this.WVM.SelectedTab) {
                 Cursor cCursor = this.Cursor;
@@ -1294,25 +1302,25 @@ WHERE action_id = @{0};", vm.ActionId);
 
                 switch (this.WVM.SelectedTab) {
                     case Tabs.BooksTab:
-                        this.UpdateBookTabData(isScroll:true);
+                        await this.UpdateBookTabDataAsync(isScroll:true);
                         break;
                     case Tabs.DailyGraphTab:
                         this.InitializeDailyGraphTabData();
-                        this.UpdateDailyGraphTabData();
+                        await this.UpdateDailyGraphTabDataAsync();
                         break;
                     case Tabs.MonthlyListTab:
-                        this.UpdateMonthlyListTabData();
+                        await this.UpdateMonthlyListTabDataAsync();
                         break;
                     case Tabs.MonthlyGraphTab:
                         this.InitializeMonthlyGraphTabData();
-                        this.UpdateMonthlyGraphTabData();
+                        await this.UpdateMonthlyGraphTabDataAsync();
                         break;
                     case Tabs.YearlyListTab:
-                        this.UpdateYearlyListTabData();
+                        await this.UpdateYearlyListTabDataAsync();
                         break;
                     case Tabs.YearlyGraphTab:
                         this.InitializeYearlyGraphTabData();
-                        this.UpdateYearlyGraphTabData();
+                        await this.UpdateYearlyGraphTabDataAsync();
                         break;
                 }
                 this.Cursor = cCursor;
@@ -1327,19 +1335,19 @@ WHERE action_id = @{0};", vm.ActionId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void BookComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void BookComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
-            this.UpdateBookTabData(isScroll:true);
-            this.UpdateDailyGraphTabData();
+            await this.UpdateBookTabDataAsync(isScroll:true);
+            await this.UpdateDailyGraphTabDataAsync();
 
-            this.UpdateMonthlyListTabData();
-            this.UpdateMonthlyGraphTabData();
+            await this.UpdateMonthlyListTabDataAsync();
+            await this.UpdateMonthlyGraphTabDataAsync();
 
-            this.UpdateYearlyListTabData();
-            this.UpdateYearlyGraphTabData();
+            await this.UpdateYearlyListTabDataAsync();
+            await this.UpdateYearlyGraphTabDataAsync();
 
             this.Cursor = cCursor;
         }
@@ -1349,19 +1357,19 @@ WHERE action_id = @{0};", vm.ActionId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void GraphKindComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void GraphKindComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             this.InitializeDailyGraphTabData();
-            this.UpdateDailyGraphTabData();
+            await this.UpdateDailyGraphTabDataAsync();
 
             this.InitializeMonthlyGraphTabData();
-            this.UpdateMonthlyGraphTabData();
+            await this.UpdateMonthlyGraphTabDataAsync();
 
             this.InitializeYearlyGraphTabData();
-            this.UpdateYearlyGraphTabData();
+            await this.UpdateYearlyGraphTabDataAsync();
 
             this.Cursor = cCursor;
         }
@@ -1373,7 +1381,7 @@ WHERE action_id = @{0};", vm.ActionId);
         /// 帳簿リストを更新する
         /// </summary>
         /// <param name="bookId">選択対象の帳簿ID</param>
-        private void UpdateBookList(int? bookId = null)
+        private async Task UpdateBookListAsync(int? bookId = null)
         {
             int? tmpBookId = bookId ?? this.WVM.SelectedBookVM?.Id;
 
@@ -1382,7 +1390,7 @@ WHERE action_id = @{0};", vm.ActionId);
             };
             BookViewModel selectedBookVM = bookVMList[0];
             using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = dao.ExecQuery(@"
+                DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT *
 FROM mst_book 
 WHERE del_flg = 0 
@@ -1408,11 +1416,11 @@ ORDER BY sort_order;");
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">月内の時刻</param>
         /// <returns>帳簿項目VMリスト</returns>
-        private ObservableCollection<ActionViewModel> LoadActionViewModelListWithinMonth(int? bookId, DateTime includedTime)
+        private async Task<ObservableCollection<ActionViewModel>> LoadActionViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
         {
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.AddMonths(1).AddMilliseconds(-1);
-            return this.LoadActionViewModelList(bookId, startTime, endTime);
+            return await this.LoadActionViewModelListAsync(bookId, startTime, endTime);
         }
 
         /// <summary>
@@ -1422,14 +1430,14 @@ ORDER BY sort_order;");
         /// <param name="startTime">開始時刻</param>
         /// <param name="endTime">終了時刻</param>
         /// <returns>帳簿項目VMリスト</returns>
-        private ObservableCollection<ActionViewModel> LoadActionViewModelList(int? bookId, DateTime startTime, DateTime endTime)
+        private async Task<ObservableCollection<ActionViewModel>> LoadActionViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
         {
             ObservableCollection<ActionViewModel> actionVMList = new ObservableCollection<ActionViewModel>();
             using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader;
                 if (bookId == null) {
                     // 全帳簿
-                    reader = dao.ExecQuery(@"
+                    reader = await dao.ExecQueryAsync(@"
 -- 繰越残高
 SELECT -1 AS action_id, @{1} AS act_time, -1 AS category_id, -1 AS item_id, '繰越残高' AS item_name, 0 AS act_value, (
   -- 残高
@@ -1461,7 +1469,7 @@ ORDER BY act_time, action_id;", null, startTime, endTime);
                 }
                 else {
                     // 各帳簿
-                    reader = dao.ExecQuery(@"
+                    reader = await dao.ExecQueryAsync(@"
 -- 繰越残高
 SELECT -1 AS action_id, @{1} AS act_time, -1 AS category_id, -1 AS item_id, '繰越残高' AS item_name, 0 AS act_value, (
   -- 残高
@@ -1552,11 +1560,11 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">日内の時間</param>
         /// <returns>合計項目VMリスト</returns>
-        private ObservableCollection<SummaryViewModel> LoadSummaryViewModelListWithinDay(int? bookId, DateTime includedTime)
+        private async Task<ObservableCollection<SummaryViewModel>> LoadSummaryViewModelListWithinDayAsync(int? bookId, DateTime includedTime)
         {
             DateTime startTime = new DateTime(includedTime.Year, includedTime.Month, includedTime.Day);
             DateTime endTime = startTime.AddDays(1).AddMilliseconds(-1);
-            return this.LoadSummaryViewModelList(bookId, startTime, endTime);
+            return await this.LoadSummaryViewModelListAsync(bookId, startTime, endTime);
         }
 
         /// <summary>
@@ -1565,11 +1573,11 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">月内の時間</param>
         /// <returns>合計項目VMリスト</returns>
-        private ObservableCollection<SummaryViewModel> LoadSummaryViewModelListWithinMonth(int? bookId, DateTime includedTime)
+        private async Task<ObservableCollection<SummaryViewModel>> LoadSummaryViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
         {
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.AddMonths(1).AddMilliseconds(-1);
-            return this.LoadSummaryViewModelList(bookId, startTime, endTime);
+            return await this.LoadSummaryViewModelListAsync(bookId, startTime, endTime);
         }
 
         /// <summary>
@@ -1579,7 +1587,7 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
         /// <param name="startTime">開始時刻</param>
         /// <param name="endTime">終了時刻</param>
         /// <returns>合計項目VMリスト</returns>
-        private ObservableCollection<SummaryViewModel> LoadSummaryViewModelList(int? bookId, DateTime startTime, DateTime endTime)
+        private async Task<ObservableCollection<SummaryViewModel>> LoadSummaryViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
         {
             ObservableCollection<SummaryViewModel> summaryVMList = new ObservableCollection<SummaryViewModel>();
 
@@ -1587,7 +1595,7 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
                 DaoReader reader;
 
                 if (bookId == null) {
-                    reader = dao.ExecQuery(@"
+                    reader = await dao.ExecQueryAsync(@"
 -- 全帳簿が対象
 SELECT C.balance_kind AS balance_kind, C.category_id AS category_id, C.category_name AS category_name, SQ.item_id AS item_id, I.item_name AS item_name, SQ.sum AS sum
 FROM (
@@ -1602,7 +1610,7 @@ INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I
 ORDER BY C.balance_kind, C.sort_order, I.sort_order;", null, startTime, endTime);
                 }
                 else {
-                    reader = dao.ExecQuery(@"
+                    reader = await dao.ExecQueryAsync(@"
 -- 特定の帳簿が対象
 SELECT C.balance_kind AS balance_kind, C.category_id AS category_id, C.category_name AS category_name, SQ.item_id AS item_id, I.item_name AS item_name, SQ.sum AS sum
 FROM (
@@ -1695,12 +1703,12 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">月内の時間</param>
         /// <returns>月内日別合計項目VMリスト</returns>
-        private ObservableCollection<SeriesViewModel> LoadDailySummaryViewModelListWithinMonth(int? bookId, DateTime includedTime)
+        private async Task<ObservableCollection<SeriesViewModel>> LoadDailySummaryViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
         {
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.AddMonths(1).AddMilliseconds(-1);
 
-            return this.LoadDailySummaryViewModelList(bookId, startTime, endTime);
+            return await this.LoadDailySummaryViewModelListAsync(bookId, startTime, endTime);
         }
 
         /// <summary>
@@ -1710,7 +1718,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         /// <param name="startTime">開始時刻</param>
         /// <param name="endTime">終了時刻</param>
         /// <returns>日別合計項目VMリスト</returns>
-        private ObservableCollection<SeriesViewModel> LoadDailySummaryViewModelList(int? bookId, DateTime startTime, DateTime endTime)
+        private async Task<ObservableCollection<SeriesViewModel>> LoadDailySummaryViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
         {
             // 開始日までの収支を取得する
             int balance = 0;
@@ -1718,7 +1726,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                 DaoReader reader;
                 if (bookId == null) {
                     // 全帳簿
-                    reader = dao.ExecQuery(@"
+                    reader = await dao.ExecQueryAsync(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0) AS sum
 FROM hst_action AA
 INNER JOIN(SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -1726,7 +1734,7 @@ WHERE AA.del_flg = 0 AND AA.act_time < @{1};", null, startTime);
                 }
                 else {
                     // 各帳簿
-                    reader = dao.ExecQuery(@"
+                    reader = await dao.ExecQueryAsync(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0}) AS sum
 FROM hst_action AA
 INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -1754,7 +1762,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             // 最初の日の分を取得する
             DateTime tmpStartTime = startTime;
             DateTime tmpEndTime = tmpStartTime.AddDays(1).AddMilliseconds(-1);
-            ObservableCollection<SummaryViewModel> summaryVMList = this.LoadSummaryViewModelList(bookId, tmpStartTime, tmpEndTime);
+            ObservableCollection<SummaryViewModel> summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
             balance = balance + summaryVMList[0].Summary;
             vmList[0].Values.Add(balance); // 残高
 
@@ -1789,7 +1797,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 tmpStartTime = tmpStartTime.AddDays(1);
                 tmpEndTime = tmpStartTime.AddDays(1).AddMilliseconds(-1);
 
-                summaryVMList = this.LoadSummaryViewModelList(bookId, tmpStartTime, tmpEndTime);
+                summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
                 balance = balance + summaryVMList[0].Summary;
                 vmList[0].Values.Add(balance); // 残高
                 for (int j = 0; j < summaryVMList.Count; ++j) {
@@ -1828,12 +1836,12 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">年度内の時間</param>
         /// <returns>年度内月別合計項目VMリスト</returns>
-        private ObservableCollection<SeriesViewModel> LoadMonthlySummaryViewModelListWithinYear(int? bookId, DateTime includedTime)
+        private async Task<ObservableCollection<SeriesViewModel>> LoadMonthlySummaryViewModelListWithinYearAsync(int? bookId, DateTime includedTime)
         {
             DateTime startTime = includedTime.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             DateTime endTime = startTime.AddYears(1).AddMilliseconds(-1);
 
-            return this.LoadMonthlySummaryViewModelList(bookId, startTime, endTime);
+            return await this.LoadMonthlySummaryViewModelListAsync(bookId, startTime, endTime);
         }
 
         /// <summary>
@@ -1843,7 +1851,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <param name="startTime">開始時間</param>
         /// <param name="endTime">開始時間</param>
         /// <returns>月別合計項目VMリスト</returns>
-        private ObservableCollection<SeriesViewModel> LoadMonthlySummaryViewModelList(int? bookId, DateTime startTime, DateTime endTime)
+        private async Task<ObservableCollection<SeriesViewModel>> LoadMonthlySummaryViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
         {
             // 開始月までの収支を取得する
             int balance = 0;
@@ -1851,7 +1859,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 DaoReader reader;
                 if (bookId == null) {
                     // 全帳簿
-                    reader = dao.ExecQuery(@"
+                    reader = await dao.ExecQueryAsync(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0) AS sum
 FROM hst_action AA
 INNER JOIN(SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -1859,7 +1867,7 @@ WHERE AA.del_flg = 0 AND AA.act_time < @{1};", null, startTime);
                 }
                 else {
                     // 各帳簿
-                    reader = dao.ExecQuery(@"
+                    reader = await dao.ExecQueryAsync(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0}) AS sum
 FROM hst_action AA
 INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -1886,8 +1894,8 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             // 最初の月の分を取得する
             DateTime tmpStartTime = startTime;
             DateTime tmpEndTime = tmpStartTime.AddMonths(1).AddMilliseconds(-1);
-            ObservableCollection<SummaryViewModel> summaryVMList = this.LoadSummaryViewModelList(bookId, tmpStartTime, tmpEndTime);
-            balance = balance + summaryVMList[0].Summary;
+            ObservableCollection<SummaryViewModel> summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
+            balance += summaryVMList[0].Summary;
             vmList[0].Values.Add(balance); // 残高
             foreach (SummaryViewModel summaryVM in summaryVMList) {
                 int value = summaryVM.Summary;
@@ -1919,8 +1927,8 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 tmpStartTime = tmpStartTime.AddMonths(1);
                 tmpEndTime = tmpStartTime.AddMonths(1).AddMilliseconds(-1);
 
-                summaryVMList = this.LoadSummaryViewModelList(bookId, tmpStartTime, tmpEndTime);
-                balance = balance + summaryVMList[0].Summary;
+                summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
+                balance += summaryVMList[0].Summary;
                 vmList[0].Values.Add(balance); // 残高
                 for (int j = 0; j < summaryVMList.Count; ++j) {
                     int value = summaryVMList[j].Summary;
@@ -1957,7 +1965,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <returns>月別合計項目VMリスト</returns>
-        private ObservableCollection<SeriesViewModel> LoadYearlySummaryViewModelListWithinDecade(int? bookId)
+        private async Task<ObservableCollection<SeriesViewModel>> LoadYearlySummaryViewModelListWithinDecadeAsync(int? bookId)
         {
             DateTime startTime = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth).AddYears(-9);
             DateTime endTime = startTime.AddYears(10);
@@ -1968,7 +1976,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 DaoReader reader;
                 if (bookId == null) {
                     // 全帳簿
-                    reader = dao.ExecQuery(@"
+                    reader = await dao.ExecQueryAsync(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0) AS sum
 FROM hst_action AA
 INNER JOIN(SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -1976,7 +1984,7 @@ WHERE AA.del_flg = 0 AND AA.act_time < @{1};", null, startTime);
                 }
                 else {
                     // 各帳簿
-                    reader = dao.ExecQuery(@"
+                    reader = await dao.ExecQueryAsync(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0}) AS sum
 FROM hst_action AA
 INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -2003,8 +2011,8 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             // 最初の年の分を取得する
             DateTime tmpStartTime = startTime;
             DateTime tmpEndTime = tmpStartTime.AddYears(1).AddMilliseconds(-1);
-            ObservableCollection<SummaryViewModel> summaryVMList = this.LoadSummaryViewModelList(bookId, tmpStartTime, tmpEndTime);
-            balance = balance + summaryVMList[0].Summary;
+            ObservableCollection<SummaryViewModel> summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
+            balance += summaryVMList[0].Summary;
             vmList[0].Values.Add(balance); // 残高
             foreach (SummaryViewModel summaryVM in summaryVMList) {
                 int value = summaryVM.Summary;
@@ -2036,8 +2044,8 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 tmpStartTime = tmpStartTime.AddYears(1);
                 tmpEndTime = tmpStartTime.AddYears(1).AddMilliseconds(-1);
 
-                summaryVMList = this.LoadSummaryViewModelList(bookId, tmpStartTime, tmpEndTime);
-                balance = balance + summaryVMList[0].Summary;
+                summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
+                balance += summaryVMList[0].Summary;
                 vmList[0].Values.Add(balance); // 残高
                 for (int j = 0; j < summaryVMList.Count; ++j) {
                     int value = summaryVMList[j].Summary;
@@ -2077,7 +2085,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <param name="actionIdList">選択対象の帳簿項目IDリスト</param>
         /// <param name="isScroll">スクロールするか</param>
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
-        private void UpdateBookTabData(List<int> actionIdList = null, bool isScroll = false, bool isUpdateActDateLastEdited = false)
+        private async Task UpdateBookTabDataAsync(List<int> actionIdList = null, bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
             if (this.WVM.SelectedTab == Tabs.BooksTab) {
                 // 指定がなければ、更新前の帳簿項目の選択を維持する
@@ -2086,12 +2094,12 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
                 switch (this.WVM.DisplayedTermKind) {
                     case TermKind.Monthly:
-                        this.WVM.ActionVMList = this.LoadActionViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
-                        this.WVM.SummaryVMList = this.LoadSummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                        this.WVM.ActionVMList = await this.LoadActionViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                        this.WVM.SummaryVMList = await this.LoadSummaryViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                         break;
                     case TermKind.Selected:
-                        this.WVM.ActionVMList = this.LoadActionViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
-                        this.WVM.SummaryVMList = this.LoadSummaryViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                        this.WVM.ActionVMList = await this.LoadActionViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                        this.WVM.SummaryVMList = await this.LoadSummaryViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                         break;
                 }
 
@@ -2123,7 +2131,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 if (isUpdateActDateLastEdited) {
                     if (actionIdList != null && actionIdList.Count != 0) {
                         using (DaoBase dao = this.builder.Build()) {
-                            DaoReader reader = dao.ExecQuery(@"
+                            DaoReader reader = await dao.ExecQueryAsync(@"
     SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", actionIdList[0]);
 
                             reader.ExecARow((record) => {
@@ -2221,7 +2229,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <summary>
         /// 日別グラフタブに表示するデータを更新する
         /// </summary>
-        private void UpdateDailyGraphTabData()
+        private async Task UpdateDailyGraphTabDataAsync()
         {
             if (this.WVM.SelectedTab == Tabs.DailyGraphTab) {
                 this.WVM.WholeItemDailyGraphModel.Series.Clear();
@@ -2231,10 +2239,10 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                             ObservableCollection<SeriesViewModel> vmList = null;
                             switch (this.WVM.DisplayedTermKind) {
                                 case TermKind.Monthly:
-                                    vmList = this.LoadDailySummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                                    vmList = await this.LoadDailySummaryViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                                     break;
                                 case TermKind.Selected:
-                                    vmList = this.LoadDailySummaryViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                                    vmList = await this.LoadDailySummaryViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                                     break;
                             }
                             List<int> sumPlus = new List<int>(); // 日ごとの合計収入
@@ -2322,10 +2330,10 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                             ObservableCollection<SeriesViewModel> vmList = null;
                             switch (this.WVM.DisplayedTermKind) {
                                 case TermKind.Monthly:
-                                    vmList = this.LoadDailySummaryViewModelListWithinMonth(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                                    vmList = await this.LoadDailySummaryViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                                     break;
                                 case TermKind.Selected:
-                                    vmList = this.LoadDailySummaryViewModelList(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                                    vmList = await this.LoadDailySummaryViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                                     break;
                             }
                             cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
@@ -2355,7 +2363,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <summary>
         /// 月別一覧タブに表示するデータを更新する
         /// </summary>
-        private void UpdateMonthlyListTabData()
+        private async Task UpdateMonthlyListTabDataAsync()
         {
             if (this.WVM.SelectedTab == Tabs.MonthlyListTab) {
                 int startMonth = Properties.Settings.Default.App_StartMonth;
@@ -2366,7 +2374,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                     displayedMonths.Add(string.Format("{0}月", (i - 1) % 12 + 1));
                 }
                 this.WVM.DisplayedMonths = displayedMonths;
-                this.WVM.MonthlySummaryVMList = this.LoadMonthlySummaryViewModelListWithinYear(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                this.WVM.MonthlySummaryVMList = await this.LoadMonthlySummaryViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
             }
         }
         #endregion
@@ -2454,7 +2462,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <summary>
         /// 月別グラフタブに表示するデータを更新する
         /// </summary>
-        private void UpdateMonthlyGraphTabData()
+        private async Task UpdateMonthlyGraphTabDataAsync()
         {
             if(this.WVM.SelectedTab == Tabs.MonthlyGraphTab) {
                 int startMonth = Properties.Settings.Default.App_StartMonth;
@@ -2462,7 +2470,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
                 switch (this.WVM.SelectedGraphKind) {
                     case GraphKind.IncomeAndOutgo: {
-                            ObservableCollection<SeriesViewModel> vmList = this.LoadMonthlySummaryViewModelListWithinYear(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                            ObservableCollection<SeriesViewModel> vmList = await this.LoadMonthlySummaryViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
                             List<int> sumPlus = new List<int>(); // 月ごとの合計収入
                             List<int> sumMinus = new List<int>(); // 月ごとの合計支出
 
@@ -2539,7 +2547,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                                 Title = "残高",
                                 TrackerFormatString = "{2}月: {4:#,0}" //月: 金額
                             };
-                            ObservableCollection<SeriesViewModel> vmList = this.LoadMonthlySummaryViewModelListWithinYear(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                            ObservableCollection<SeriesViewModel> vmList = await this.LoadMonthlySummaryViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
                             cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
 
                             this.WVM.WholeItemMonthlyGraphModel.Series.Add(cSeries);
@@ -2566,7 +2574,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <summary>
         /// 年別一覧タブに表示するデータを更新する
         /// </summary>
-        private void UpdateYearlyListTabData()
+        private async Task UpdateYearlyListTabDataAsync()
         {
             if (this.WVM.SelectedTab == Tabs.YearlyListTab) {
                 int startYear = DateTime.Now.Year - 9;
@@ -2577,7 +2585,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                     displayedYears.Add(string.Format("{0}年", i));
                 }
                 this.WVM.DisplayedYears = displayedYears;
-                this.WVM.YearlySummaryVMList = this.LoadYearlySummaryViewModelListWithinDecade(this.WVM.SelectedBookVM.Id);
+                this.WVM.YearlySummaryVMList = await this.LoadYearlySummaryViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
             }
         }
         #endregion
@@ -2666,7 +2674,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <summary>
         /// 年別グラフタブに表示するデータを更新する
         /// </summary>
-        private void UpdateYearlyGraphTabData()
+        private async Task UpdateYearlyGraphTabDataAsync()
         {
             if (this.WVM.SelectedTab == Tabs.YearlyGraphTab) {
                 int startYear = DateTime.Now.Year - 9;
@@ -2674,7 +2682,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
                 switch (this.WVM.SelectedGraphKind) {
                     case GraphKind.IncomeAndOutgo: {
-                            ObservableCollection<SeriesViewModel> vmList = this.LoadYearlySummaryViewModelListWithinDecade(this.WVM.SelectedBookVM.Id);
+                            ObservableCollection<SeriesViewModel> vmList = await this.LoadYearlySummaryViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
                             List<int> sumPlus = new List<int>(); // 年ごとの合計収入
                             List<int> sumMinus = new List<int>(); // 年ごとの合計支出
 
@@ -2751,7 +2759,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                                 Title = "残高",
                                 TrackerFormatString = "{2}年: {4:#,0}" //年: 金額
                             };
-                            ObservableCollection<SeriesViewModel> vmList = this.LoadYearlySummaryViewModelListWithinDecade(this.WVM.SelectedBookVM.Id);
+                            ObservableCollection<SeriesViewModel> vmList = await this.LoadYearlySummaryViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
                             cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
 
                             this.WVM.WholeItemYearlyGraphModel.Series.Add(cSeries);

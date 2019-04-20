@@ -23,19 +23,19 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event Action BookChanged = default(Action);
+        public event Action BookChanged = default;
         /// <summary>
         /// 収支変更時イベント
         /// </summary>
-        public event Action BalanceKindChanged = default(Action);
+        public event Action BalanceKindChanged = default;
         /// <summary>
         /// カテゴリ変更時イベント
         /// </summary>
-        public event Action CategoryChanged = default(Action);
+        public event Action CategoryChanged = default;
         /// <summary>
         /// 項目変更時イベント
         /// </summary>
-        public event Action ItemChanged = default(Action);
+        public event Action ItemChanged = default;
         #endregion
 
         #region プロパティ
@@ -55,7 +55,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._BookVMList;
             set => this.SetProperty(ref this._BookVMList, value);
         }
-        private ObservableCollection<BookViewModel> _BookVMList = default(ObservableCollection<BookViewModel>);
+        private ObservableCollection<BookViewModel> _BookVMList = default;
         #endregion
         /// <summary>
         /// 選択された帳簿VM
@@ -74,8 +74,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-
-        private BookViewModel _SelectedBookVM = default(BookViewModel);
+        private BookViewModel _SelectedBookVM = default;
         #endregion
         
         /// <summary>
@@ -101,7 +100,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private BalanceKind _SelectedBalanceKind = default(BalanceKind);
+        private BalanceKind _SelectedBalanceKind = default;
         #endregion
 
         /// <summary>
@@ -113,7 +112,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._CategoryVMList;
             set => this.SetProperty(ref this._CategoryVMList, value);
         }
-        private ObservableCollection<CategoryViewModel> _CategoryVMList = default(ObservableCollection<CategoryViewModel>);
+        private ObservableCollection<CategoryViewModel> _CategoryVMList = default;
         #endregion
         /// <summary>
         /// 選択されたカテゴリVM
@@ -132,7 +131,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private CategoryViewModel _SelectedCategoryVM = default(CategoryViewModel);
+        private CategoryViewModel _SelectedCategoryVM = default;
         #endregion
 
         /// <summary>
@@ -144,7 +143,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._ItemVMList;
             set => this.SetProperty(ref this._ItemVMList, value);
         }
-        private ObservableCollection<ItemViewModel> _ItemVMList = default(ObservableCollection<ItemViewModel>);
+        private ObservableCollection<ItemViewModel> _ItemVMList = default;
         #endregion
         /// <summary>
         /// 選択された項目VM
@@ -163,7 +162,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private ItemViewModel _SelectedItemVM = default(ItemViewModel);
+        private ItemViewModel _SelectedItemVM = default;
         #endregion
 
         /// <summary>
@@ -187,7 +186,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._IsEditing;
             set => this.SetProperty(ref this._IsEditing, value);
         }
-        private bool _IsEditing = default(bool);
+        private bool _IsEditing = default;
         #endregion
 
         /// <summary>
@@ -199,7 +198,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._IsDateAutoIncrement;
             set => this.SetProperty(ref this._IsDateAutoIncrement, value);
         }
-        private bool _IsDateAutoIncrement = default(bool);
+        private bool _IsDateAutoIncrement = default;
         #endregion
 
         /// <summary>
@@ -211,7 +210,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._ShopNameList;
             set => this.SetProperty(ref this._ShopNameList, value);
         }
-        private ObservableCollection<string> _ShopNameList = default(ObservableCollection<string>);
+        private ObservableCollection<string> _ShopNameList = default;
         #endregion
         /// <summary>
         /// 選択された店舗名
@@ -222,7 +221,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedShopName;
             set => this.SetProperty(ref this._SelectedShopName, value);
         }
-        private string _SelectedShopName = default(string);
+        private string _SelectedShopName = default;
         #endregion
 
         /// <summary>
@@ -234,7 +233,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._RemarkList;
             set => this.SetProperty(ref this._RemarkList, value);
         }
-        private ObservableCollection<string> _RemarkList = default(ObservableCollection<string>);
+        private ObservableCollection<string> _RemarkList = default;
         #endregion
         /// <summary>
         /// 選択された備考
@@ -245,7 +244,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedRemark;
             set => this.SetProperty(ref this._SelectedRemark, value);
         }
-        private string _SelectedRemark = default(string);
+        private string _SelectedRemark = default;
         #endregion
 
         /// <summary>

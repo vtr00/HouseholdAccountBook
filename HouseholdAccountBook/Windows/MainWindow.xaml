@@ -10,7 +10,9 @@
         xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
         mc:Ignorable="d"
         Title="Hausehold Account Book" Height="700" Width="1050"
-        Closed="MainWindow_Closed" StateChanged="MainWindow_StateChanegd">
+        Loaded="MainWindow_Loaded"
+        Closed="MainWindow_Closed"
+        StateChanged="MainWindow_StateChanegd">
     
     <Window.DataContext>
         <viewmodels:MainWindowViewModel x:Name="WVM"/>

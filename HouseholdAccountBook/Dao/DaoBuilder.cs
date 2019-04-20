@@ -8,11 +8,11 @@
         /// <summary>
         /// 接続対象
         /// </summary>
-        private Target target;
+        private readonly Target target;
         /// <summary>
         /// 接続情報
         /// </summary>
-        private DaoBase.ConnectInfo info;
+        private readonly DaoBase.ConnectInfo info;
 
         /// <summary>
         /// <see cref="DaoBuilder"/> クラスの新しいインスタンスを初期化します。
@@ -20,24 +20,26 @@
         /// <param name="info">接続情報</param>
         public DaoBuilder(DaoBase.ConnectInfo info)
         {
-            this.target = Target.Undefined;
-            this.info = null;
-
-            if (info is DaoNpgsql.ConnectInfo npgsqlInfo) {
+            if (info is DaoNpgsql.ConnectInfo) {
                 this.target = Target.PostgreSQL;
                 this.info = info;
                 return;
             }
-            if (info is DaoOle.ConnectInfo oleInfo) {
+
+            if (info is DaoOle.ConnectInfo) {
                 this.target = Target.OleDb;
                 this.info = info;
                 return;
             }
-            if (info is DaoSQLite.ConnectInfo sqliteInfo) {
+
+            if (info is DaoSQLite.ConnectInfo) {
                 this.target = Target.SQLite;
                 this.info = info;
                 return;
             }
+
+            this.target = Target.Undefined;
+            this.info = null;
         }
 
         /// <summary>

@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.ViewModels
                 get => this._Date;
                 set => this.SetProperty(ref this._Date, value);
             }
-            private DateTime _Date = default(DateTime);
+            private DateTime _Date = default;
             #endregion
 
             /// <summary>
@@ -31,7 +31,7 @@ namespace HouseholdAccountBook.ViewModels
                 get => this._Value;
                 set => this.SetProperty(ref this._Value, value);
             }
-            private int _Value = default(int);
+            private int _Value = default;
             #endregion
 
             /// <summary>
@@ -43,7 +43,7 @@ namespace HouseholdAccountBook.ViewModels
                 get => this._Name;
                 set => this.SetProperty(ref this._Name, value);
             }
-            private string _Name = default(string);
+            private string _Name = default;
             #endregion
         }
     }

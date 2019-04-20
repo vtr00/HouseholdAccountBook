@@ -33,7 +33,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private int _SelectedTabIndex = default(int);
+        private int _SelectedTabIndex = default;
         #endregion
         /// <summary>
         /// 選択された設定タブ種別
@@ -48,7 +48,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private SettingsTabs _SelectedTab = default(SettingsTabs);
+        private SettingsTabs _SelectedTab = default;
         #endregion
         
         #region 項目設定
@@ -61,7 +61,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._HierachicalItemVMList;
             set => this.SetProperty(ref this._HierachicalItemVMList, value);
         }
-        private ObservableCollection<HierarchicalItemViewModel> _HierachicalItemVMList = default(ObservableCollection<HierarchicalItemViewModel>);
+        private ObservableCollection<HierarchicalItemViewModel> _HierachicalItemVMList = default;
         #endregion
         /// <summary>
         /// 選択された項目VM
@@ -73,7 +73,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedItemVM;
             set => this.SetProperty(ref this._SelectedItemVM, value);
         }
-        private HierarchicalItemViewModel _SelectedItemVM = default(HierarchicalItemViewModel);
+        private HierarchicalItemViewModel _SelectedItemVM = default;
         #endregion
         #endregion
 
@@ -87,7 +87,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._BookVMList;
             set => this.SetProperty(ref this._BookVMList, value);
         }
-        private ObservableCollection<BookSettingViewModel> _BookVMList = default(ObservableCollection<BookSettingViewModel>);
+        private ObservableCollection<BookSettingViewModel> _BookVMList = default;
         #endregion
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedBookVM;
             set => this.SetProperty(ref this._SelectedBookVM, value);
         }
-        private BookSettingViewModel _SelectedBookVM = default(BookSettingViewModel);
+        private BookSettingViewModel _SelectedBookVM = default;
         #endregion
         #endregion
 
@@ -118,7 +118,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private string _DumpExePath = default(string);
+        private string _DumpExePath = default;
         #endregion
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private string _RestoreExePath = default(string);
+        private string _RestoreExePath = default;
         #endregion
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private int _BackUpNum = default(int);
+        private int _BackUpNum = default;
         #endregion
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private string _BackUpFolderPath = default(string);
+        private string _BackUpFolderPath = default;
         #endregion
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private bool _BackUpFlagAtMinimizing = default(bool);
+        private bool _BackUpFlagAtMinimizing = default;
         #endregion
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private bool _BackUpFlagAtClosing = default(bool);
+        private bool _BackUpFlagAtClosing = default;
         #endregion
 
         /// <summary>
@@ -220,7 +220,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private int _StartMonth = default(int);
+        private int _StartMonth = default;
         #endregion
 
         /// <summary>
@@ -237,7 +237,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private string _NationalHolidayCsvURI = default(string);
+        private string _NationalHolidayCsvURI = default;
         #endregion
 
         /// <summary>
@@ -254,7 +254,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private int _NationalHolidayCsvDateIndex = default(int);
+        private int _NationalHolidayCsvDateIndex = default;
         #endregion
         #endregion
         #endregion

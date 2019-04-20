@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._ActionId;
             set => this.SetProperty(ref this._ActionId, value);
         }
-        private int? _ActionId = default(int?);
+        private int? _ActionId = default;
         #endregion
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._ItemName;
             set => this.SetProperty(ref this._ItemName, value);
         }
-        private string _ItemName = default(string);
+        private string _ItemName = default;
         #endregion
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._ShopName;
             set => this.SetProperty(ref this._ShopName, value);
         }
-        private string _ShopName = default(string);
+        private string _ShopName = default;
         #endregion
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._Remark;
             set => this.SetProperty(ref this._Remark, value);
         }
-        private string _Remark = default(string);
+        private string _Remark = default;
         #endregion
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._IsMatch;
             set => this.SetProperty(ref this._IsMatch, value);
         }
-        private bool _IsMatch = default(bool);
+        private bool _IsMatch = default;
         #endregion
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._Record;
             set => this.SetProperty(ref this._Record, value);
         }
-        private CsvRecord _Record = default(CsvRecord);
+        private CsvRecord _Record = default;
         #endregion
         #endregion
 
@@ -86,11 +86,11 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public void ClearActionInfo()
         {
-            this.ActionId = default(int?);
-            this.ItemName = default(string);
-            this.ShopName = default(string);
-            this.Remark = default(string);
-            this.IsMatch = default(bool);
+            this.ActionId = default;
+            this.ItemName = default;
+            this.ShopName = default;
+            this.Remark = default;
+            this.IsMatch = default;
         }
     }
 }

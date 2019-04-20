@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.OleDb;
+using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Dao
 {
@@ -25,17 +27,17 @@ namespace HouseholdAccountBook.Dao
         /// <param name="filePath">ファイルパス</param>
         public DaoOle(string filePath) : base(new OleDbConnection(string.Format(DaoStringFormat, filePath))) { }
 
-        public override int ExecNonQuery(string sql, params object[] objects)
+        public async override Task<int> ExecNonQueryAsync(string sql, params object[] objects)
         {
-            return this.CreateCommand(sql, objects).ExecuteNonQuery();
+            return await this.CreateCommand(sql, objects).ExecuteNonQueryAsync();
         }
 
-        public override DaoReader ExecQuery(string sql, params object[] objects)
+        public async override Task<DaoReader> ExecQueryAsync(string sql, params object[] objects)
         {
             LinkedList<Dictionary<string, object>> resultSet = new LinkedList<Dictionary<string, object>>();
 
             OleDbCommand command = this.CreateCommand(sql, objects);
-            using (OleDbDataReader reader = command.ExecuteReader()) {
+            using (DbDataReader reader = await command.ExecuteReaderAsync()) {
                 // フィールド名の取得
                 List<string> fieldList = new List<string>();
                 for (int i = 0; i < reader.FieldCount; ++i) {

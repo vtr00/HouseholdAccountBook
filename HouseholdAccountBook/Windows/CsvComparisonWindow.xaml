@@ -7,6 +7,7 @@
         xmlns:project="clr-namespace:HouseholdAccountBook"
         mc:Ignorable="d"
         Title="CSV比較 - Household Account Book" Height="450" Width="600" WindowStyle="ToolWindow"
+        Loaded="CsvComparisonWindow_Loaded" 
         Closed="CsvComparisonWindow_Closed">
     <Window.DataContext>
         <viewmodels:CsvComparisonWindowViewModel x:Name="WVM"/>

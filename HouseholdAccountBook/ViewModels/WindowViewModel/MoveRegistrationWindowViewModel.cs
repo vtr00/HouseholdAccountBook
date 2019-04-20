@@ -23,19 +23,19 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 移動元帳簿変更時イベント
         /// </summary>
-        public event Action FromBookChanged = default(Action);
+        public event Action FromBookChanged = default;
         /// <summary>
         /// 移動先帳簿変更時イベント
         /// </summary>
-        public event Action ToBookChanged = default(Action);
+        public event Action ToBookChanged = default;
         /// <summary>
         /// 手数料種別変更時イベント
         /// </summary>
-        public event Action CommissionKindChanged = default(Action);
+        public event Action CommissionKindChanged = default;
         /// <summary>
         /// 項目変更時イベント
         /// </summary>
-        public event Action ItemChanged = default(Action);
+        public event Action ItemChanged = default;
         #endregion
 
         #region プロパティ
@@ -48,7 +48,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._RegMode;
             set => this.SetProperty(ref this._RegMode, value);
         }
-        private RegistrationMode _RegMode = default(RegistrationMode);
+        private RegistrationMode _RegMode = default;
         #endregion
         
         /// <summary>
@@ -99,7 +99,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._BookVMList;
             set => this.SetProperty(ref this._BookVMList, value);
         }
-        private ObservableCollection<BookViewModel> _BookVMList = default(ObservableCollection<BookViewModel>);
+        private ObservableCollection<BookViewModel> _BookVMList = default;
         #endregion
         /// <summary>
         /// 選択された移動元帳簿VM
@@ -118,7 +118,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private BookViewModel _MovedBookVM = default(BookViewModel);
+        private BookViewModel _MovedBookVM = default;
         #endregion
         /// <summary>
         /// 選択された移動先帳簿VM
@@ -137,7 +137,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private BookViewModel _MovingBookVM = default(BookViewModel);
+        private BookViewModel _MovingBookVM = default;
         #endregion
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private CommissionKind _SelectedCommissionKind = default(CommissionKind);
+        private CommissionKind _SelectedCommissionKind = default;
         #endregion
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._ItemVMList;
             set => this.SetProperty(ref this._ItemVMList, value);
         }
-        private ObservableCollection<ItemViewModel> _ItemVMList = default(ObservableCollection<ItemViewModel>);
+        private ObservableCollection<ItemViewModel> _ItemVMList = default;
         #endregion
         /// <summary>
         /// 選択された手数料項目VM
@@ -210,7 +210,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private ItemViewModel _SelectedItemVM = default(ItemViewModel);
+        private ItemViewModel _SelectedItemVM = default;
         #endregion
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._RemarkList;
             set => this.SetProperty(ref this._RemarkList, value);
         }
-        private ObservableCollection<string> _RemarkList = default(ObservableCollection<string>);
+        private ObservableCollection<string> _RemarkList = default;
         #endregion
         /// <summary>
         /// 選択された備考
@@ -249,7 +249,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedRemark;
             set => this.SetProperty(ref this._SelectedRemark, value);
         }
-        private string _SelectedRemark = default(string);
+        private string _SelectedRemark = default;
         #endregion
         #endregion
     }

@@ -51,10 +51,10 @@ namespace HouseholdAccountBook.Behaviors
                 typeof(BindSelectedItemsToDataGridBehavior), 
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, BindSelectedItemsToDataGridBehavior.SelectedItemsChanged));
         #endregion
-        #region SelectedItems
         /// <summary>
         /// 選択されたアイテムリスト
         /// </summary>
+        #region SelectedItems
         public IList SelectedItems
         {
             get => (IList)this.GetValue(SelectedItemsProperty);

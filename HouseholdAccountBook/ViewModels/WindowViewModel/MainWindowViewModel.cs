@@ -34,7 +34,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private int _SelectedTabIndex = default(int);
+        private int _SelectedTabIndex = default;
         #endregion
         /// <summary>
         /// 選択されたタブ種別
@@ -49,7 +49,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private Tabs _SelectedTab = default(Tabs);
+        private Tabs _SelectedTab = default;
         #endregion
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._BookVMList;
             set => this.SetProperty(ref this._BookVMList, value);
         }
-        private ObservableCollection<BookViewModel> _BookVMList = default(ObservableCollection<BookViewModel>);
+        private ObservableCollection<BookViewModel> _BookVMList = default;
         #endregion
         /// <summary>
         /// 選択された帳簿VM
@@ -170,7 +170,7 @@ namespace HouseholdAccountBook.ViewModels
                 this.UpdateDisplayedActionVMList();
             }
         }
-        private ObservableCollection<ActionViewModel> _ActionVMList = default(ObservableCollection<ActionViewModel>);
+        private ObservableCollection<ActionViewModel> _ActionVMList = default;
         #endregion
         /// <summary>
         /// 表示対象の帳簿項目VMリスト
@@ -181,7 +181,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._DisplayedActionVMList;
             set => this.SetProperty(ref this._DisplayedActionVMList, value);
         }
-        private ObservableCollection<ActionViewModel> _DisplayedActionVMList = default(ObservableCollection<ActionViewModel>);
+        private ObservableCollection<ActionViewModel> _DisplayedActionVMList = default;
         #endregion
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedActionVM;
             set => this.SetProperty(ref this._SelectedActionVM, value);
         }
-        private ActionViewModel _SelectedActionVM = default(ActionViewModel);
+        private ActionViewModel _SelectedActionVM = default;
         #endregion
         /// <summary>
         /// 選択された帳簿項目VMリスト
@@ -223,7 +223,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._AverageValue;
             private set => this.SetProperty(ref this._AverageValue, value);
         }
-        private double? _AverageValue = default(double?);
+        private double? _AverageValue = default;
         #endregion
         /// <summary>
         /// データの個数
@@ -234,7 +234,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._Amount;
             set => this.SetProperty(ref this._Amount, value);
         }
-        private int _Amount = default(int);
+        private int _Amount = default;
         #endregion
         /// <summary>
         /// 合計値
@@ -245,7 +245,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SumValue;
             private set => this.SetProperty(ref this._SumValue, value);
         }
-        private int? _SumValue = default(int?);
+        private int? _SumValue = default;
         #endregion
 
         /// <summary>
@@ -274,7 +274,7 @@ namespace HouseholdAccountBook.ViewModels
                 this.UpdateDisplayedActionVMList();
             }
         }
-        private SummaryViewModel _SelectedSummaryVM = default(SummaryViewModel);
+        private SummaryViewModel _SelectedSummaryVM = default;
         #endregion
         #endregion
 
@@ -369,7 +369,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._DisplayedMonths;
             set => this.SetProperty(ref this._DisplayedMonths, value);
         }
-        private ObservableCollection<string> _DisplayedMonths = default(ObservableCollection<string>);
+        private ObservableCollection<string> _DisplayedMonths = default;
         #endregion
 
         /// <summary>
@@ -381,7 +381,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._MonthlySummaryVMList;
             set => this.SetProperty(ref this._MonthlySummaryVMList, value);
         }
-        private ObservableCollection<SeriesViewModel> _MonthlySummaryVMList = default(ObservableCollection<SeriesViewModel>);
+        private ObservableCollection<SeriesViewModel> _MonthlySummaryVMList = default;
         #endregion
         #endregion
         #endregion
@@ -397,7 +397,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._DisplayedYears;
             set => this.SetProperty(ref this._DisplayedYears, value);
         }
-        private ObservableCollection<string> _DisplayedYears = default(ObservableCollection<string>);
+        private ObservableCollection<string> _DisplayedYears = default;
         #endregion
 
         /// <summary>
@@ -409,7 +409,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._YearlySummaryVMList;
             set => this.SetProperty(ref this._YearlySummaryVMList, value);
         }
-        private ObservableCollection<SeriesViewModel> _YearlySummaryVMList = default(ObservableCollection<SeriesViewModel>);
+        private ObservableCollection<SeriesViewModel> _YearlySummaryVMList = default;
         #endregion
         #endregion
         #endregion
@@ -432,7 +432,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedGraphKind;
             set => this.SetProperty(ref this._SelectedGraphKind, value);
         }
-        private GraphKind _SelectedGraphKind = default(GraphKind);
+        private GraphKind _SelectedGraphKind = default;
         #endregion
         
         /// <summary>

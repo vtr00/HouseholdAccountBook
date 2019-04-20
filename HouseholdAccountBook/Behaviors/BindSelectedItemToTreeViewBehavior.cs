@@ -37,19 +37,21 @@ namespace HouseholdAccountBook.Behaviors
         }
 
         #region 依存関係プロパティ
-        #region SelectedItem
         /// <summary>
         /// 選択されたアイテム
         /// </summary>
+        #region SelectedItem
         public object SelectedItem
         {
             get => this.GetValue(SelectedItemProperty);
             set => this.SetValue(SelectedItemProperty, value);
         }
+        #endregion
 
         /// <summary>
         /// <see cref="SelectedItem"/> 依存関係プロパティを識別します。
         /// </summary>
+        #region SelectedItemProperty
         public static DependencyProperty SelectedItemProperty =
             DependencyProperty.Register(
                 nameof(SelectedItem),

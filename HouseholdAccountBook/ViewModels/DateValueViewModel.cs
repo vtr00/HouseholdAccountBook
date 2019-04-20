@@ -28,7 +28,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private int? _ActValue = default(int?);
+        private int? _ActValue = default;
         #endregion
         #endregion
     }

@@ -25,7 +25,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._Name;
             set => this.SetProperty(ref this._Name, value);
         }
-        private string _Name = default(string);
+        private string _Name = default;
         #endregion
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._NeedToPay;
             private set => this.SetProperty(ref this._NeedToPay, value);
         }
-        private bool _NeedToPay = default(bool);
+        private bool _NeedToPay = default;
         #endregion
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._DebitBookVMList;
             set => this.SetProperty(ref this._DebitBookVMList, value);
         }
-        private ObservableCollection<BookViewModel> _DebitBookVMList = default(ObservableCollection<BookViewModel>);
+        private ObservableCollection<BookViewModel> _DebitBookVMList = default;
         #endregion
         /// <summary>
         /// 選択された支払元帳簿VM
@@ -93,7 +93,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedDebitBookVM;
             set => this.SetProperty(ref this._SelectedDebitBookVM, value);
         }
-        private BookViewModel _SelectedDebitBookVM = default(BookViewModel);
+        private BookViewModel _SelectedDebitBookVM = default;
         #endregion
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._PayDay;
             set => this.SetProperty(ref this._PayDay, value);
         }
-        private int? _PayDay = default(int?);
+        private int? _PayDay = default;
         #endregion
         #endregion
 
@@ -119,7 +119,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._CsvDataExists;
             private set => this.SetProperty(ref this._CsvDataExists, value);
         }
-        private bool _CsvDataExists = default(bool);
+        private bool _CsvDataExists = default;
         #endregion
         
         /// <summary>
@@ -131,7 +131,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._ActDateIndex;
             set => this.SetProperty(ref this._ActDateIndex, value);
         }
-        private int? _ActDateIndex = default(int?);
+        private int? _ActDateIndex = default;
         #endregion
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._OutgoIndex;
             set => this.SetProperty(ref this._OutgoIndex, value);
         }
-        private int? _OutgoIndex = default(int?);
+        private int? _OutgoIndex = default;
         #endregion
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._ItemNameIndex;
             set => this.SetProperty(ref this._ItemNameIndex, value);
         }
-        private int? _ItemNameIndex = default(int?);
+        private int? _ItemNameIndex = default;
         #endregion
         #endregion
 
@@ -168,7 +168,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._RelationVMList;
             set => this.SetProperty(ref this._RelationVMList, value);
         }
-        private ObservableCollection<RelationViewModel> _RelationVMList = default(ObservableCollection<RelationViewModel>);
+        private ObservableCollection<RelationViewModel> _RelationVMList = default;
         #endregion
         /// <summary>
         /// 選択された関係性VM
@@ -179,7 +179,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedRelationVM;
             set => this.SetProperty(ref this._SelectedRelationVM, value);
         }
-        private RelationViewModel _SelectedRelationVM = default(RelationViewModel);
+        private RelationViewModel _SelectedRelationVM = default;
         #endregion
         #endregion
 

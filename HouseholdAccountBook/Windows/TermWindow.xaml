@@ -7,7 +7,9 @@
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         mc:Ignorable="d" 
         Height="375" Width="300" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize"
-        Title="期間選択 - Household Account Book" Closed="TermWindow_Closed">
+        Title="期間選択 - Household Account Book"
+        Loaded="TermWindow_Loaded"
+        Closed="TermWindow_Closed">
     
     <Window.DataContext>
         <viewmodels:TermWindowViewModel x:Name="WVM"/>
