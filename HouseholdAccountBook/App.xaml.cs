@@ -1,5 +1,5 @@
 ﻿using HouseholdAccountBook.Dao;
-using HouseholdAccountBook.Extentions;
+using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Windows;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,5 @@
 ﻿using HouseholdAccountBook.Dao;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Extentions;
 using HouseholdAccountBook.UserControls;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
@@ -15,7 +14,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
@@ -30,11 +28,7 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// DAOビルダ
         /// </summary>
-        private DaoBuilder builder;
-        /// <summary>
-        /// 前回選択していたタブ
-        /// </summary>
-        private Tabs oldSelectedTab = Tabs.BooksTab;
+        private readonly DaoBuilder builder;
         #endregion
 
         /// <summary>
@@ -109,7 +103,6 @@ namespace HouseholdAccountBook.Windows
             settings.App_KichoDBFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             settings.Save();
 
-            Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             bool isOpen = false;
@@ -295,12 +288,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 await this.UpdateMonthlyListTabDataAsync();
                 await this.UpdateMonthlyGraphTabDataAsync();
 
-                this.Cursor = cCursor;
+                this.Cursor = null;
 
                 MessageBox.Show(MessageText.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                this.Cursor = cCursor;
+                this.Cursor = null;
                 MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
@@ -351,7 +344,6 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             settings.App_CustomFormatFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             settings.Save();
 
-            Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             using (DaoBase dao = this.builder.Build()) {
@@ -400,12 +392,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 await this.UpdateMonthlyListTabDataAsync();
                 await this.UpdateMonthlyGraphTabDataAsync();
 
-                this.Cursor = cCursor;
+                this.Cursor = null;
 
                 MessageBox.Show(MessageText.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                this.Cursor = cCursor;
+                this.Cursor = null;
 
                 MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
@@ -453,7 +445,6 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             settings.App_CustomFormatFilePath = Path.Combine(sfd.InitialDirectory, sfd.FileName);
             settings.Save();
 
-            Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             // 起動情報を設定する
@@ -481,7 +472,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             // バックアップする
             Process process = Process.Start(info);
             process.WaitForExit(10 * 1000);
-            this.Cursor = cCursor;
+            this.Cursor = null;
 
             if (process.ExitCode == 0) {
                 MessageBox.Show(MessageText.FinishToExport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
@@ -497,13 +488,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void BackUpCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor crrCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             App app = Application.Current as App;
             app?.CreateBackUpFile();
 
-            this.Cursor = crrCursor;
+            this.Cursor = null;
 
             MessageBox.Show(MessageText.FinishToBackUp, MessageTitle.Information);
         }
@@ -916,7 +906,6 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private async void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             await this.UpdateBookTabDataAsync(isScroll:false);
@@ -931,7 +920,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             this.InitializeYearlyGraphTabData();
             await this.UpdateYearlyGraphTabDataAsync();
 
-            this.Cursor = cCursor;
+            this.Cursor = null;
         }
 
         #region 月間表示
@@ -953,20 +942,18 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private async void GoToLastMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
                     await this.UpdateBookTabDataAsync(isScroll:true);
-
                     this.InitializeDailyGraphTabData();
                     await this.UpdateDailyGraphTabDataAsync();
                     break;
             }
 
-            this.Cursor = cCursor;
+            this.Cursor = null;
         }
 
         /// <summary>
@@ -989,16 +976,14 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private async void GoToThisMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
             await this.UpdateBookTabDataAsync(isScroll:true);
-
             this.InitializeDailyGraphTabData();
             await this.UpdateDailyGraphTabDataAsync();
 
-            this.Cursor = cCursor;
+            this.Cursor = null;
         }
 
         /// <summary>
@@ -1019,20 +1004,18 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private async void GoToNextMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
                     await this.UpdateBookTabDataAsync(isScroll:true);
-
                     this.InitializeDailyGraphTabData();
                     await this.UpdateDailyGraphTabDataAsync();
                     break;
             }
 
-            this.Cursor = cCursor;
+            this.Cursor = null;
         }
         
         /// <summary>
@@ -1054,7 +1037,6 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             }
             
             if (stw.ShowDialog() == true) {
-                Cursor cCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
                 
                 this.WVM.StartDate = stw.WVM.StartDate;
@@ -1065,7 +1047,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 this.InitializeDailyGraphTabData();
                 await this.UpdateDailyGraphTabDataAsync();
 
-                this.Cursor = cCursor;
+                this.Cursor = null;
             }
         }
         #endregion
@@ -1089,14 +1071,13 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private async void GoToLastYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(-1);
             await this.UpdateMonthlyListTabDataAsync();
             await this.UpdateMonthlyGraphTabDataAsync();
 
-            this.Cursor = cCursor;
+            this.Cursor = null;
         }
 
         /// <summary>
@@ -1119,14 +1100,13 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private async void GoToThisYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             await this.UpdateMonthlyListTabDataAsync();
             await this.UpdateMonthlyGraphTabDataAsync();
 
-            this.Cursor = cCursor;
+            this.Cursor = null;
         }
 
         /// <summary>
@@ -1147,14 +1127,13 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         /// <param name="e"></param>
         private async void GoToNextYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(1);
             await this.UpdateMonthlyListTabDataAsync();
             await this.UpdateMonthlyGraphTabDataAsync();
 
-            this.Cursor = cCursor;
+            this.Cursor = null;
         }
         #endregion
         #endregion
@@ -1169,7 +1148,6 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         {
             SettingsWindow sw = new SettingsWindow(this.builder) { Owner = this };
             if (sw.ShowDialog() == true) {
-                Cursor cCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
 
                 await this.UpdateBookListAsync();
@@ -1186,7 +1164,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                 this.InitializeYearlyGraphTabData();
                 await this.UpdateYearlyGraphTabDataAsync();
 
-                this.Cursor = cCursor;
+                this.Cursor = null;
             }
         }
 
@@ -1258,6 +1236,64 @@ WHERE action_id = @{0};", vm.ActionId);
             await this.UpdateMonthlyListTabDataAsync();
             this.InitializeMonthlyGraphTabData();
             await this.UpdateMonthlyGraphTabDataAsync();
+
+            this.WVM.SelectedTabChanged += async () => {
+                this.Cursor = Cursors.Wait;
+
+                switch (this.WVM.SelectedTab) {
+                    case Tabs.BooksTab:
+                        await this.UpdateBookTabDataAsync(isScroll: true);
+                        break;
+                    case Tabs.DailyGraphTab:
+                        this.InitializeDailyGraphTabData();
+                        await this.UpdateDailyGraphTabDataAsync();
+                        break;
+                    case Tabs.MonthlyListTab:
+                        await this.UpdateMonthlyListTabDataAsync();
+                        break;
+                    case Tabs.MonthlyGraphTab:
+                        this.InitializeMonthlyGraphTabData();
+                        await this.UpdateMonthlyGraphTabDataAsync();
+                        break;
+                    case Tabs.YearlyListTab:
+                        await this.UpdateYearlyListTabDataAsync();
+                        break;
+                    case Tabs.YearlyGraphTab:
+                        this.InitializeYearlyGraphTabData();
+                        await this.UpdateYearlyGraphTabDataAsync();
+                        break;
+                }
+
+                this.Cursor = null;
+            };
+            this.WVM.SelectedBookChanged += async () => {
+                this.Cursor = Cursors.Wait;
+
+                await this.UpdateBookTabDataAsync(isScroll: true);
+                await this.UpdateDailyGraphTabDataAsync();
+
+                await this.UpdateMonthlyListTabDataAsync();
+                await this.UpdateMonthlyGraphTabDataAsync();
+
+                await this.UpdateYearlyListTabDataAsync();
+                await this.UpdateYearlyGraphTabDataAsync();
+
+                this.Cursor = null;
+            };
+            this.WVM.SelectedGraphKindChanged += async () => {
+                this.Cursor = Cursors.Wait;
+
+                this.InitializeDailyGraphTabData();
+                await this.UpdateDailyGraphTabDataAsync();
+
+                this.InitializeMonthlyGraphTabData();
+                await this.UpdateMonthlyGraphTabDataAsync();
+
+                this.InitializeYearlyGraphTabData();
+                await this.UpdateYearlyGraphTabDataAsync();
+
+                this.Cursor = null;
+            };
         }
 
         /// <summary>
@@ -1285,93 +1321,6 @@ WHERE action_id = @{0};", vm.ActionId);
                     app?.CreateBackUpFile();
                 }
             }
-        }
-        #endregion
-
-        #region タブ
-        /// <summary>
-        /// 選択中のタブを変更した時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (this.oldSelectedTab != this.WVM.SelectedTab) {
-                Cursor cCursor = this.Cursor;
-                this.Cursor = Cursors.Wait;
-
-                switch (this.WVM.SelectedTab) {
-                    case Tabs.BooksTab:
-                        await this.UpdateBookTabDataAsync(isScroll:true);
-                        break;
-                    case Tabs.DailyGraphTab:
-                        this.InitializeDailyGraphTabData();
-                        await this.UpdateDailyGraphTabDataAsync();
-                        break;
-                    case Tabs.MonthlyListTab:
-                        await this.UpdateMonthlyListTabDataAsync();
-                        break;
-                    case Tabs.MonthlyGraphTab:
-                        this.InitializeMonthlyGraphTabData();
-                        await this.UpdateMonthlyGraphTabDataAsync();
-                        break;
-                    case Tabs.YearlyListTab:
-                        await this.UpdateYearlyListTabDataAsync();
-                        break;
-                    case Tabs.YearlyGraphTab:
-                        this.InitializeYearlyGraphTabData();
-                        await this.UpdateYearlyGraphTabDataAsync();
-                        break;
-                }
-                this.Cursor = cCursor;
-            }
-            this.oldSelectedTab = this.WVM.SelectedTab;
-        }
-        #endregion
-
-        #region コンボボックス
-        /// <summary>
-        /// 選択中の帳簿を変更した時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void BookComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            Cursor cCursor = this.Cursor;
-            this.Cursor = Cursors.Wait;
-
-            await this.UpdateBookTabDataAsync(isScroll:true);
-            await this.UpdateDailyGraphTabDataAsync();
-
-            await this.UpdateMonthlyListTabDataAsync();
-            await this.UpdateMonthlyGraphTabDataAsync();
-
-            await this.UpdateYearlyListTabDataAsync();
-            await this.UpdateYearlyGraphTabDataAsync();
-
-            this.Cursor = cCursor;
-        }
-        
-        /// <summary>
-        /// 選択中のグラフを変更した時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void GraphKindComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            Cursor cCursor = this.Cursor;
-            this.Cursor = Cursors.Wait;
-
-            this.InitializeDailyGraphTabData();
-            await this.UpdateDailyGraphTabDataAsync();
-
-            this.InitializeMonthlyGraphTabData();
-            await this.UpdateMonthlyGraphTabDataAsync();
-
-            this.InitializeYearlyGraphTabData();
-            await this.UpdateYearlyGraphTabDataAsync();
-
-            this.Cursor = cCursor;
         }
         #endregion
         #endregion
@@ -1653,7 +1602,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
             List<SummaryViewModel> totalAsCategory = new List<SummaryViewModel>();
 
             // 収支別に計算する
-            foreach (IGrouping<int, SummaryViewModel> g1 in summaryVMList.GroupBy(obj => obj.BalanceKind)) {
+            Parallel.ForEach(summaryVMList.GroupBy(obj => obj.BalanceKind), (g1) => {
                 // 収入/支出の小計を計算する
                 totalAsBalanceKind.Add(new SummaryViewModel() {
                     BalanceKind = g1.Key,
@@ -1664,7 +1613,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                     Summary = g1.Sum(obj => obj.Summary)
                 });
                 // カテゴリ別の小計を計算する
-                foreach (IGrouping<int, SummaryViewModel> g2 in g1.GroupBy(obj => obj.CategoryId)) {
+                Parallel.ForEach(g1.GroupBy(obj => obj.CategoryId), (g2) => {
                     totalAsCategory.Add(new SummaryViewModel() {
                         BalanceKind = g1.Key,
                         CategoryId = g2.Key,
@@ -1673,8 +1622,8 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                         ItemName = g2.First().CategoryName,
                         Summary = g2.Sum(obj => obj.Summary)
                     });
-                }
-            }
+                });
+            });
 
             // 差引損益を追加する
             summaryVMList.Insert(0, new SummaryViewModel() {
@@ -2090,27 +2039,38 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             if (this.WVM.SelectedTab == Tabs.BooksTab) {
                 // 指定がなければ、更新前の帳簿項目の選択を維持する
                 List<int> tmpActionIdList = actionIdList ?? new List<int>(this.WVM.SelectedActionVMList.Select((tmp) => tmp.ActionId));
-                SummaryViewModel tmpSvm = this.WVM.SelectedSummaryVM;
+                SummaryViewModel tmpSVM = this.WVM.SelectedSummaryVM;
 
+                // 表示するデータを指定する
                 switch (this.WVM.DisplayedTermKind) {
                     case TermKind.Monthly:
-                        this.WVM.ActionVMList = await this.LoadActionViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
-                        this.WVM.SummaryVMList = await this.LoadSummaryViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                        var (tmp1, tmp2) = await (
+                            this.LoadActionViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value),
+                            this.LoadSummaryViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value)).WhenAll();
+                        this.WVM.ActionVMList = tmp1;
+                        this.WVM.SummaryVMList = tmp2;
+                        //this.WVM.ActionVMList = await this.LoadActionViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                        //this.WVM.SummaryVMList = await this.LoadSummaryViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                         break;
                     case TermKind.Selected:
-                        this.WVM.ActionVMList = await this.LoadActionViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
-                        this.WVM.SummaryVMList = await this.LoadSummaryViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                        var (tmp3, tmp4) = await (
+                            this.LoadActionViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate),
+                            this.LoadSummaryViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate)).WhenAll();
+                        this.WVM.ActionVMList = tmp3;
+                        this.WVM.SummaryVMList = tmp4;
+                        //this.WVM.ActionVMList = await this.LoadActionViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                        //this.WVM.SummaryVMList = await this.LoadSummaryViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                         break;
                 }
 
                 // 帳簿項目を選択する
-                IEnumerable<ActionViewModel> query = this.WVM.ActionVMList.Where((avm) => { return tmpActionIdList.Contains(avm.ActionId); });
+                IEnumerable<ActionViewModel> query1 = this.WVM.ActionVMList.Where((avm) => { return tmpActionIdList.Contains(avm.ActionId); });
                 this.WVM.SelectedActionVMList.Clear();
-                foreach(ActionViewModel tmp in query) { this.WVM.SelectedActionVMList.Add(tmp); }
+                Parallel.ForEach(query1, (tmp) => { this.WVM.SelectedActionVMList.Add(tmp); });
 
                 // 更新前のサマリーの選択を維持する
                 IEnumerable<SummaryViewModel> query2 = this.WVM.SummaryVMList.Where((svm) => {
-                    return svm.BalanceKind == tmpSvm?.BalanceKind && svm.CategoryId == tmpSvm?.CategoryId && svm.ItemId == tmpSvm?.ItemId;
+                    return svm.BalanceKind == tmpSVM?.BalanceKind && svm.CategoryId == tmpSVM?.CategoryId && svm.ItemId == tmpSVM?.ItemId;
                 });
                 this.WVM.SelectedSummaryVM = query2.Count() == 0 ? null : query2.First();
 

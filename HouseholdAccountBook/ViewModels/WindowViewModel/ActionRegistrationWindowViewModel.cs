@@ -284,7 +284,7 @@ namespace HouseholdAccountBook.ViewModels
         public Dictionary<HolidaySettingKind, string> HolidaySettingKindDic { get; } = HolidaySettingKindStr;
         #endregion
         /// <summary>
-        /// 選択された祝別設定種別
+        /// 選択された休日設定種別
         /// </summary>
         #region SelectedHolidaySettingKind
         public HolidaySettingKind SelectedHolidaySettingKind

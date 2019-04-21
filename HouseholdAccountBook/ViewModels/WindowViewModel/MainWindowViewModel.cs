@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Extentions;
+﻿using HouseholdAccountBook.Extensions;
 using OxyPlot;
 using Prism.Mvvm;
 using System;
@@ -15,11 +15,29 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class MainWindowViewModel : BindableBase
     {
+        #region フィールド
         /// <summary>
         /// 表示日付の更新中か
         /// </summary>
         private bool onUpdateDisplayedDate = false;
+        #endregion
 
+        #region イベント
+        /// <summary>
+        /// 帳簿選択変更時イベント
+        /// </summary>
+        public event Action SelectedBookChanged = default;
+        /// <summary>
+        /// グラフ種別選択変更時イベント
+        /// </summary>
+        public event Action SelectedGraphKindChanged = default;
+        /// <summary>
+        /// タブ選択変更時イベント
+        /// </summary>
+        public event Action SelectedTabChanged = default;
+        #endregion
+
+        #region プロパティ
         #region プロパティ(共通)
         /// <summary>
         /// 選択されたタブインデックス
@@ -31,6 +49,7 @@ namespace HouseholdAccountBook.ViewModels
             set {
                 if (this.SetProperty(ref this._SelectedTabIndex, value)) {
                     this.SelectedTab = (Tabs)value;
+                    this.SelectedTabChanged?.Invoke();
                 }
             }
         }
@@ -42,14 +61,9 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedTab
         public Tabs SelectedTab
         {
-            get => this._SelectedTab;
-            set {
-                if (this.SetProperty(ref this._SelectedTab, value)) {
-                    this.SelectedTabIndex = (int)value;
-                }
-            }
+            get => (Tabs)this._SelectedTabIndex;
+            set => this.SelectedTabIndex = (int)value;
         }
-        private Tabs _SelectedTab = default;
         #endregion
 
         /// <summary>
@@ -70,14 +84,17 @@ namespace HouseholdAccountBook.ViewModels
         public BookViewModel SelectedBookVM
         {
             get => this._SelectedBookVM;
-            set => this.SetProperty(ref this._SelectedBookVM, value);
+            set {
+                if(this.SetProperty(ref this._SelectedBookVM, value)) {
+                    this.SelectedBookChanged?.Invoke();
+                }
+            }
         }
         private BookViewModel _SelectedBookVM;
         #endregion
         #endregion
 
         #region 帳簿タブ
-        #region プロパティ
         /// <summary>
         /// 表示区間種別
         /// </summary>
@@ -278,48 +295,6 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
         #endregion
 
-        /// <summary>
-        /// <see cref="DisplayedActionVMList"/> を更新する
-        /// </summary>
-        private void UpdateDisplayedActionVMList()
-        {
-            if(this._SelectedSummaryVM == null || (BalanceKind)this._SelectedSummaryVM.BalanceKind == BalanceKind.Others) {
-                this.DisplayedActionVMList = this._ActionVMList;
-            }
-            else {
-                if(this._SelectedSummaryVM.ItemId != -1) {
-                    this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
-                        return vm.ItemId == this._SelectedSummaryVM.ItemId;
-                    }));
-                }
-                else if (this._SelectedSummaryVM.CategoryId != -1) {
-                    this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
-                        return vm.CategoryId == this._SelectedSummaryVM.CategoryId;
-                    }));
-                }
-                else if((BalanceKind)this._SelectedSummaryVM.BalanceKind != BalanceKind.Others) {
-                    this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
-                        return vm.BalanceKind == (BalanceKind)this._SelectedSummaryVM.BalanceKind;
-                    }));
-                }
-                Debug.Assert(true);
-            }
-        }
-        /// <summary>
-        /// 統計値を更新する
-        /// </summary>
-        private void UpdateStatisticsValue()
-        {
-            int? sum = this.SelectedActionVMList.Count != 0 ? (int?)0 : null;
-            foreach (ActionViewModel vm in this.SelectedActionVMList) {
-                sum += vm.Income ?? 0 - vm.Outgo ?? 0;
-            }
-            this.SumValue = sum;
-            this.Amount = this.SelectedActionVMList.Count((vm) => { return vm.Income != null || vm.Outgo != null; });
-            this.AverageValue = this.SelectedActionVMList.Count != 0 ? (double?)sum / this.SelectedActionVMList.Count : null;
-        }
-        #endregion
-
         #region 月別一覧タブ
         #region プロパティ
         /// <summary>
@@ -415,7 +390,6 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         #region グラフタブ
-        #region プロパティ
         /// <summary>
         /// グラフ種別辞書
         /// </summary>
@@ -430,7 +404,11 @@ namespace HouseholdAccountBook.ViewModels
         public GraphKind SelectedGraphKind
         {
             get => this._SelectedGraphKind;
-            set => this.SetProperty(ref this._SelectedGraphKind, value);
+            set {
+                if (this.SetProperty(ref this._SelectedGraphKind, value)) {
+                    this.SelectedGraphKindChanged?.Invoke();
+                }
+            }
         }
         private GraphKind _SelectedGraphKind = default;
         #endregion
@@ -561,7 +539,6 @@ namespace HouseholdAccountBook.ViewModels
         private PlotController _Controller = new PlotController();
         #endregion
         #endregion
-        #endregion
 
         /// <summary>
         /// デバッグビルドか
@@ -571,6 +548,7 @@ namespace HouseholdAccountBook.ViewModels
 #else
         public bool IsDebug => false;
 #endif
+        #endregion
 
         /// <summary>
         /// <see cref="MainWindowViewModel"/> クラスの新しいインスタンスを初期化します。
@@ -579,6 +557,47 @@ namespace HouseholdAccountBook.ViewModels
         {
             this.SelectedActionVMList.CollectionChanged += (sender, e) => this.UpdateStatisticsValue();
             this.Controller.BindMouseEnter(PlotCommands.HoverPointsOnlyTrack);
+        }
+
+        /// <summary>
+        /// <see cref="DisplayedActionVMList"/> を更新する
+        /// </summary>
+        private void UpdateDisplayedActionVMList()
+        {
+            if(this._SelectedSummaryVM == null || (BalanceKind)this._SelectedSummaryVM.BalanceKind == BalanceKind.Others) {
+                this.DisplayedActionVMList = this._ActionVMList;
+            }
+            else {
+                if(this._SelectedSummaryVM.ItemId != -1) {
+                    this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
+                        return vm.ItemId == this._SelectedSummaryVM.ItemId;
+                    }));
+                }
+                else if (this._SelectedSummaryVM.CategoryId != -1) {
+                    this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
+                        return vm.CategoryId == this._SelectedSummaryVM.CategoryId;
+                    }));
+                }
+                else {
+                    this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
+                        return vm.BalanceKind == (BalanceKind)this._SelectedSummaryVM.BalanceKind;
+                    }));
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 統計値を更新する
+        /// </summary>
+        private void UpdateStatisticsValue()
+        {
+            int? sum = this.SelectedActionVMList.Count != 0 ? (int?)0 : null;
+            foreach (ActionViewModel vm in this.SelectedActionVMList) {
+                sum += vm.Income ?? 0 - vm.Outgo ?? 0;
+            }
+            this.SumValue = sum;
+            this.Amount = this.SelectedActionVMList.Count((vm) => { return vm.Income != null || vm.Outgo != null; });
+            this.AverageValue = this.SelectedActionVMList.Count != 0 ? (double?)sum / this.SelectedActionVMList.Count : null;
         }
     }
 }

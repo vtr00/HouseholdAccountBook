@@ -6,7 +6,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 
-namespace HouseholdAccountBook.Extentions
+namespace HouseholdAccountBook.Extensions
 {
     /// <summary>
     /// <see cref="DateTime"/> 拡張

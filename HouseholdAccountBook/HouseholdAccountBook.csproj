@@ -169,6 +169,7 @@
     <Compile Include="Dto\MstBookJsonObject.cs" />
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Extensions\MathExtensions.cs" />
+    <Compile Include="Extensions\ValueTuppleExtensions.cs" />
     <Compile Include="Interfaces\IMultiSelectable.cs" />
     <Compile Include="PropertyName.cs" />
     <Compile Include="UserControls\CustomColumnSeries.cs" />

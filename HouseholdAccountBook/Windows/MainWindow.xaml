@@ -233,7 +233,7 @@
         </Menu>
 
         <TabControl Grid.Row="1" Grid.Column="0" Width="Auto" Height="Auto" TabStripPlacement="Left"
-                    SelectedIndex="{Binding SelectedTabIndex}" SelectionChanged="TabControl_SelectionChanged">
+                    SelectedIndex="{Binding SelectedTabIndex}">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="TabItem">
                     <Setter Property="Height" Value="75"/>
@@ -271,8 +271,7 @@
                                 <Button Width="20" Content="▶" Command="{StaticResource GoToNextMonthCommand}"/>
                                 <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}"/>
                                 <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
-                                            ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
-                                            SelectionChanged="BookComboBox_SelectionChanged"/>
+                                            ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
                             </StackPanel>
                             
                             <StackPanel Grid.Column="2" Orientation="Horizontal">
@@ -413,11 +412,9 @@
                             <Button Width="20" Content="▶" Command="{StaticResource GoToNextMonthCommand}"/>
                             <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
-                                      SelectionChanged="BookComboBox_SelectionChanged"/>
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"
-                                      SelectionChanged="GraphKindComboBox_SelectionChanged"/>
+                                      ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
                         </StackPanel>
                     </Grid>
 
@@ -454,8 +451,7 @@
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
                             <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
-                                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
-                                          SelectionChanged="BookComboBox_SelectionChanged"/>
+                                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
                         </StackPanel>
                     </Grid>
 
@@ -538,11 +534,9 @@
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
                             <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
-                                      SelectionChanged="BookComboBox_SelectionChanged"/>
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"
-                                      SelectionChanged="GraphKindComboBox_SelectionChanged"/>
+                                      ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
                         </StackPanel>
                     </Grid>
 
@@ -575,8 +569,7 @@
                             <Button Content="▶" Width="20" IsEnabled="False"/>
                             <Button Content="-" Width="40" IsEnabled="False"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
-                                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
-                                          SelectionChanged="BookComboBox_SelectionChanged"/>
+                                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                         </StackPanel>
                     </Grid>
 
@@ -650,11 +643,9 @@
                             <Button Content="▶" Width="20" IsEnabled="False"/>
                             <Button Content="-" Width="40" IsEnabled="False"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" 
-                                      SelectionChanged="BookComboBox_SelectionChanged"/>
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"
-                                      SelectionChanged="GraphKindComboBox_SelectionChanged"/>
+                                      ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
                         </StackPanel>
                     </Grid>
 

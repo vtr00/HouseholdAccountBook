@@ -39,17 +39,23 @@ namespace HouseholdAccountBook.Dao
             SQLiteCommand command = this.CreateCommand(sql, objects);
             using (DbDataReader reader = await command.ExecuteReaderAsync()) {
                 // フィールド名の取得
-                List<string> fieldList = new List<string>();
-                for (int i = 0; i < reader.FieldCount; ++i) {
-                    fieldList.Add(reader.GetName(i));
-                }
+                List<string> fieldNameList = new List<string>();
+                Parallel.For(0, reader.FieldCount - 1, (i) => {
+                    string tmp = reader.GetName(i);
+                    lock (this) {
+                        fieldNameList.Add(tmp);
+                    }
+                });
 
                 // レコードの取得
                 while (reader.NextResult()) {
                     Dictionary<string, object> result = new Dictionary<string, object>();
-                    foreach (string fieldName in fieldList) {
-                        result.Add(fieldName, reader[fieldName]);
-                    }
+                    Parallel.ForEach(fieldNameList, (fieldName) => {
+                        object tmp = reader[fieldName];
+                        lock (this) {
+                            result.Add(fieldName, tmp);
+                        }
+                    });
                     resultSet.AddLast(result);
                 }
             }

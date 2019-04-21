@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
-using static HouseholdAccountBook.Extentions.DateTimeExtensions;
+using static HouseholdAccountBook.Extensions.DateTimeExtensions;
 
 namespace HouseholdAccountBook.Converters
 {

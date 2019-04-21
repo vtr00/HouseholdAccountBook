@@ -1031,7 +1031,6 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         private async void SettingsTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (this.oldSelectedSettingsTab != this.WVM.SelectedTab) {
-                Cursor cCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
 
                 switch (this.WVM.SelectedTab) {
@@ -1045,7 +1044,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                         this.UpdateOtherSettingTabData();
                         break;
                 }
-                this.Cursor = cCursor;
+                this.Cursor = null;
             }
             this.oldSelectedSettingsTab = this.WVM.SelectedTab;
         }

@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using HouseholdAccountBook.Extentions;
+using HouseholdAccountBook.Extensions;
 
 namespace HouseholdAccountBook.Windows
 {

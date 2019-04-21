@@ -111,7 +111,6 @@ namespace HouseholdAccountBook.Windows
 
             if (ofd.ShowDialog() == false) return;
 
-            Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             this.WVM.CsvFileName = Path.GetFileName(ofd.FileName);
@@ -152,7 +151,7 @@ namespace HouseholdAccountBook.Windows
             // 合計値を計算する
             this.WVM.SumValue = this.WVM.CsvComparisonVMList.Sum(vm => vm.Record.Value);
 
-            this.Cursor = cCursor;
+            this.Cursor = null;
         }
 
         /// <summary>
@@ -241,12 +240,11 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         /// <param name="e"></param>
         private void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cCursor = this.Cursor;
             this.Cursor = Cursors.Wait;
 
             this.UpdateComparisonInfo();
 
-            this.Cursor = cCursor;
+            this.Cursor = null;
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Extentions;
+﻿using HouseholdAccountBook.Extensions;
 using Prism.Mvvm;
 using System;
 using static HouseholdAccountBook.ConstValue.ConstValue;
