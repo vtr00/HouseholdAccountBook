@@ -1,12 +1,16 @@
 ﻿using HouseholdAccountBook.Dao;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Windows;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
+using Notifications.Wpf;
+using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook
 {
@@ -38,7 +42,7 @@ namespace HouseholdAccountBook
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Application_Startup(object sender, StartupEventArgs e)
+        private void App_Startup(object sender, StartupEventArgs e)
         {
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
 
@@ -50,13 +54,25 @@ namespace HouseholdAccountBook
             // 多重起動を抑止する
             App.mutex = new Mutex(false, this.GetType().Assembly.GetName().Name);
             if (!mutex.WaitOne(TimeSpan.Zero, false)) {
+                Process curProcess = Process.GetCurrentProcess();
+                Process[] processList = Process.GetProcessesByName(curProcess.ProcessName);
+
+                if (processList.Length >= 2) {
+                    foreach (Process process in processList) {
+                        if (process.ProcessName != curProcess.ProcessName) {
+                            // 外部プロセスのアクティブ化
+                        }
+                    }
+                }
+
                 MessageBox.Show("同時に複数起動することはできません。");
                 this.Shutdown();
                 return;
             }
 #endif
 
-            this.Exit += this.Application_Exit;
+            this.DispatcherUnhandledException += this.App_DispatcherUnhandledException;
+            this.Exit += this.App_Exit;
 
             // DB設定ダイアログ終了時に閉じないように設定する
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
@@ -131,26 +147,39 @@ namespace HouseholdAccountBook
             // 接続できる場合だけメインウィンドウを開く
             MainWindow mw = new MainWindow(builder);
             this.MainWindow = mw;
-#if !DEBUG
-            mw.Closing += (sender2, e2) => {
-                if (this.connectInfo != null) {
-                    settings.Reload();
-                    mw.Hide();
-
-                    if (settings.App_BackUpFlagAtClosing) {
-                        OnBackUpWindow obuw = new OnBackUpWindow();
-                        obuw.Top = settings.MainWindow_Top + settings.MainWindow_Height / 2 - obuw.Height / 2;
-                        obuw.Left = settings.MainWindow_Left + settings.MainWindow_Width / 2 - obuw.Width / 2;
-                        obuw.Topmost = true;
-                        obuw.Show();
-                        this.CreateBackUpFile();
-                        obuw.Close();
-                    }
-                }
-            };
-#endif
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             mw.Show();
+        }
+
+        /// <summary>
+        /// ハンドルされない例外発生時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            try {
+                // 例外情報をファイルに保存する
+                string jsonCode = JsonConvert.SerializeObject(e.Exception);
+                e.Handled = true;
+                using (FileStream fs = new FileStream(UnhandledExceptionInfoFileName, FileMode.Create)) {
+                    using (StreamWriter sw = new StreamWriter(fs)) {
+                        await sw.WriteLineAsync(jsonCode);
+                    }
+                }
+
+                // ハンドルされない例外の発生を通知する
+                NotificationManager nm = new NotificationManager();
+                NotificationContent nc = new NotificationContent() {
+                    Title = Current.MainWindow.Title,
+                    Message = MessageText.UnhandledExceptionOccured,
+                    Type = NotificationType.Warning
+                };
+                nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: ()=> {
+                    Process.Start(UnhandledExceptionInfoFileName);
+                });
+            }
+            catch (Exception) { }
         }
 
         /// <summary>
@@ -158,7 +187,7 @@ namespace HouseholdAccountBook
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Application_Exit(object sender, ExitEventArgs e) {
+        private void App_Exit(object sender, ExitEventArgs e) {
             this.ReleaseMutex();
         }
 
@@ -174,61 +203,6 @@ namespace HouseholdAccountBook
                 mutex = null;
             }
 #endif
-        }
-
-        /// <summary>
-        /// バックアップファイルを作成する
-        /// </summary>
-        /// <param name="dumpExePath">pg_dump.exeパス</param>
-        /// <param name="backUpNum">バックアップ数</param>
-        /// <param name="backUpFolderPath">バックアップ用フォルダパス</param>
-        /// <returns>バックアップの成否</returns>
-        public bool CreateBackUpFile(string dumpExePath = null, int? backUpNum = null, string backUpFolderPath = null)
-        {
-            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
-
-            string tmpDumpExePath = dumpExePath ?? settings.App_Postgres_DumpExePath;
-            int tmpBackUpNum = backUpNum ?? settings.App_BackUpNum;
-            string tmpBackUpFolderPath = backUpFolderPath ?? settings.App_BackUpFolderPath;
-
-            if (tmpBackUpFolderPath != string.Empty) {
-                if (!Directory.Exists(tmpBackUpFolderPath)) {
-                    Directory.CreateDirectory(tmpBackUpFolderPath);
-                }
-                else {
-                    // 古いバックアップを削除する
-                    List<string> fileList = new List<string>(Directory.GetFiles(tmpBackUpFolderPath, "*.backup", SearchOption.TopDirectoryOnly));
-                    if (fileList.Count >= tmpBackUpNum) {
-                        fileList.Sort();
-
-                        for (int i = 0; i <= fileList.Count - tmpBackUpNum; ++i) {
-                            File.Delete(fileList[i]);
-                        }
-                    }
-                }
-
-                if (tmpDumpExePath != string.Empty){
-                    if (tmpBackUpNum > 0) {
-                        // 起動情報を設定する
-                        ProcessStartInfo info = new ProcessStartInfo() {
-                            FileName = tmpDumpExePath,
-                            Arguments = string.Format(
-                                "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
-                                this.connectInfo.Host, this.connectInfo.Port, this.connectInfo.UserName, this.connectInfo.Role,
-                                string.Format(@"{0}/{1}.backup", tmpBackUpFolderPath, DateTime.Now.ToString("yyyyMMddHHmmss")), this.connectInfo.DatabaseName),
-                            WindowStyle = ProcessWindowStyle.Hidden
-                        };
-
-                        // バックアップする
-                        Process process = Process.Start(info);
-                        return process.WaitForExit(1 * 1000);
-                    }
-                    else {
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
     }
 }

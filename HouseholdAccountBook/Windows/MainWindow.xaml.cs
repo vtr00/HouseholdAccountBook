@@ -3,6 +3,7 @@ using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.UserControls;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
+using Notifications.Wpf;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
@@ -490,8 +491,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         {
             this.Cursor = Cursors.Wait;
 
-            App app = Application.Current as App;
-            app?.CreateBackUpFile();
+            this.CreateBackUpFile();
 
             this.Cursor = null;
 
@@ -1218,7 +1218,7 @@ WHERE action_id = @{0};", vm.ActionId);
 
         #region ウィンドウ
         /// <summary>
-        /// フォーム読込完了時
+        /// ウィンドウ読込完了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1297,7 +1297,26 @@ WHERE action_id = @{0};", vm.ActionId);
         }
 
         /// <summary>
-        /// フォーム終了時
+        /// ウィンドウクローズ時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            settings.Reload();
+            this.Hide();
+
+            if (settings.App_BackUpFlagAtClosing) {
+#if !DEBUG
+                this.CreateBackUpFile();
+#endif
+            }
+        }
+
+        /// <summary>
+        /// ウィンドウクローズ後
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1317,8 +1336,7 @@ WHERE action_id = @{0};", vm.ActionId);
 
             if (settings.App_BackUpFlagAtMinimizing) {
                 if (this.WindowState == WindowState.Minimized) {
-                    App app = Application.Current as App;
-                    app?.CreateBackUpFile();
+                    this.CreateBackUpFile();
                 }
             }
         }
@@ -1595,35 +1613,35 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
             }
 
             // 差引損益
-            int total = summaryVMList.Sum(obj => obj.Summary);
+            int total = summaryVMList.Sum((obj) => obj.Summary);
             // 収入/支出
-            List<SummaryViewModel> totalAsBalanceKind = new List<SummaryViewModel>();
+            List<SummaryViewModel> totalAsBalanceKindList = new List<SummaryViewModel>();
             // カテゴリ小計
-            List<SummaryViewModel> totalAsCategory = new List<SummaryViewModel>();
+            List<SummaryViewModel> totalAsCategoryList = new List<SummaryViewModel>();
 
             // 収支別に計算する
-            Parallel.ForEach(summaryVMList.GroupBy(obj => obj.BalanceKind), (g1) => {
+            foreach (var g1 in summaryVMList.GroupBy((obj) => obj.BalanceKind)) {
                 // 収入/支出の小計を計算する
-                totalAsBalanceKind.Add(new SummaryViewModel() {
+                totalAsBalanceKindList.Add(new SummaryViewModel() {
                     BalanceKind = g1.Key,
                     CategoryId = -1,
                     CategoryName = string.Empty,
                     ItemId = -1,
                     ItemName = BalanceKindStr[(BalanceKind)g1.Key],
-                    Summary = g1.Sum(obj => obj.Summary)
+                    Summary = g1.Sum((obj) => obj.Summary)
                 });
                 // カテゴリ別の小計を計算する
-                Parallel.ForEach(g1.GroupBy(obj => obj.CategoryId), (g2) => {
-                    totalAsCategory.Add(new SummaryViewModel() {
+                foreach (var g2 in g1.GroupBy((obj) => obj.CategoryId)) {
+                    totalAsCategoryList.Add(new SummaryViewModel() {
                         BalanceKind = g1.Key,
                         CategoryId = g2.Key,
                         CategoryName = string.Empty,
                         ItemId = -1,
                         ItemName = g2.First().CategoryName,
-                        Summary = g2.Sum(obj => obj.Summary)
+                        Summary = g2.Sum((obj) => obj.Summary)
                     });
-                });
-            });
+                }
+            }
 
             // 差引損益を追加する
             summaryVMList.Insert(0, new SummaryViewModel() {
@@ -1635,11 +1653,11 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                 Summary = total
             });
             // 収入/支出の小計を追加する
-            foreach (SummaryViewModel svm in totalAsBalanceKind) {
+            foreach (SummaryViewModel svm in totalAsBalanceKindList) {
                 summaryVMList.Insert(summaryVMList.IndexOf(summaryVMList.First(obj => obj.BalanceKind == svm.BalanceKind)), svm);
             }
             // カテゴリ別の小計を追加する
-            foreach (SummaryViewModel svm in totalAsCategory) {
+            foreach (SummaryViewModel svm in totalAsCategoryList) {
                 summaryVMList.Insert(summaryVMList.IndexOf(summaryVMList.First(obj => obj.CategoryId == svm.CategoryId)), svm);
             }
 
@@ -2066,7 +2084,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 // 帳簿項目を選択する
                 IEnumerable<ActionViewModel> query1 = this.WVM.ActionVMList.Where((avm) => { return tmpActionIdList.Contains(avm.ActionId); });
                 this.WVM.SelectedActionVMList.Clear();
-                Parallel.ForEach(query1, (tmp) => { this.WVM.SelectedActionVMList.Add(tmp); });
+                foreach(var tmp in query1) { this.WVM.SelectedActionVMList.Add(tmp); }
 
                 // 更新前のサマリーの選択を維持する
                 IEnumerable<SummaryViewModel> query2 = this.WVM.SummaryVMList.Where((svm) => {
@@ -2828,5 +2846,64 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             settings.Save();
         }
         #endregion
+
+        /// <summary>
+        /// バックアップファイルを作成する
+        /// </summary>
+        /// <param name="dumpExePath">pg_dump.exeパス</param>
+        /// <param name="backUpNum">バックアップ数</param>
+        /// <param name="backUpFolderPath">バックアップ用フォルダパス</param>
+        /// <returns>バックアップの成否</returns>
+        public bool CreateBackUpFile(string dumpExePath = null, int? backUpNum = null, string backUpFolderPath = null)
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            string tmpDumpExePath = dumpExePath ?? settings.App_Postgres_DumpExePath;
+            int tmpBackUpNum = backUpNum ?? settings.App_BackUpNum;
+            string tmpBackUpFolderPath = backUpFolderPath ?? settings.App_BackUpFolderPath;
+
+            if (tmpBackUpFolderPath != string.Empty) {
+                if (!Directory.Exists(tmpBackUpFolderPath)) {
+                    Directory.CreateDirectory(tmpBackUpFolderPath);
+                }
+                else {
+                    // 古いバックアップを削除する
+                    List<string> fileList = new List<string>(Directory.GetFiles(tmpBackUpFolderPath, "*.backup", SearchOption.TopDirectoryOnly));
+                    if (fileList.Count >= tmpBackUpNum) {
+                        fileList.Sort();
+
+                        for (int i = 0; i <= fileList.Count - tmpBackUpNum; ++i) {
+                            File.Delete(fileList[i]);
+                        }
+                    }
+                }
+
+                if (tmpDumpExePath != string.Empty) {
+                    if (tmpBackUpNum > 0) {
+                        // 起動情報を設定する
+                        ProcessStartInfo info = new ProcessStartInfo() {
+                            FileName = tmpDumpExePath,
+                            Arguments = string.Format(
+                                "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
+                                settings.App_Postgres_Host,
+                                settings.App_Postgres_Port,
+                                settings.App_Postgres_UserName,
+                                settings.App_Postgres_Role,
+                                string.Format(@"{0}/{1}.backup", tmpBackUpFolderPath, DateTime.Now.ToString("yyyyMMddHHmmss")),
+                                settings.App_Postgres_DatabaseName),
+                            WindowStyle = ProcessWindowStyle.Hidden
+                        };
+
+                        // バックアップする
+                        Process process = Process.Start(info);
+                        return process.WaitForExit(1 * 1000);
+                    }
+                    else {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 }

@@ -17,6 +17,11 @@ namespace HouseholdAccountBook.ConstValue
         public static string Inserter { get; } = "";
 
         /// <summary>
+        /// 補足されない例外の情報ファイル名
+        /// </summary>
+        public static string UnhandledExceptionInfoFileName = "UnhandledException.txt";
+
+        /// <summary>
         /// タブ
         /// </summary>
         /// <remarks>数字はタブのインデックスと対応付けること</remarks>
@@ -315,6 +320,10 @@ namespace HouseholdAccountBook.ConstValue
             /// 再起動します。よろしいですか？
             /// </summary>
             public static string RestartNotification { get; } = "再起動します。よろしいですか？";
+            /// <summary>
+            /// ハンドルされていない例外が発生しました。クリックで例外の情報を確認できます。
+            /// </summary>
+            public static string UnhandledExceptionOccured { get; } = "ハンドルされていない例外が発生しました。クリックで例外の情報を確認できます。";
         }
     }
 }

@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:HouseholdAccountBook"
              xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
              xmlns:converters="clr-namespace:HouseholdAccountBook.Converters"
-             Startup="Application_Startup">
+             Startup="App_Startup">
 
     <Application.Resources>
         <!-- コンバータ -->

@@ -11,6 +11,7 @@
         mc:Ignorable="d"
         Title="Hausehold Account Book" Height="700" Width="1050"
         Loaded="MainWindow_Loaded"
+        Closing="MainWindow_Closing"
         Closed="MainWindow_Closed"
         StateChanged="MainWindow_StateChanegd">
     
