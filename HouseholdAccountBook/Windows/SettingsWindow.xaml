@@ -88,7 +88,7 @@
             </MenuItem>
         </Menu>
         
-        <TabControl Grid.Row="1" TabStripPlacement="Left"
+        <TabControl Grid.Row="1" TabStripPlacement="Left" Margin="5"
                     SelectedIndex="{Binding SelectedTabIndex}" SelectionChanged="SettingsTabControl_SelectionChanged">
             <TabItem Header="項目設定">
                 <Grid>

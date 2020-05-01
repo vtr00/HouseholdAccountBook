@@ -26,7 +26,8 @@ namespace HouseholdAccountBook.Extensions
             Properties.Settings settings = Properties.Settings.Default;
 
             Uri uri = new Uri(settings.App_NationalHolidayCsv_Uri);
-            Configuration csvConfig = new Configuration() {
+            
+            CsvConfiguration csvConfig = new CsvConfiguration(System.Globalization.CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,
                 MissingFieldFound = (handlerNames, index, contexts) => { }
             };

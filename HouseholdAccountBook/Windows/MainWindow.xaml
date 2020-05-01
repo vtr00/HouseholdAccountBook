@@ -233,7 +233,7 @@
             </MenuItem>
         </Menu>
 
-        <TabControl Grid.Row="1" Grid.Column="0" Width="Auto" Height="Auto" TabStripPlacement="Left"
+        <TabControl Grid.Row="1" Grid.Column="0" Margin="5" Width="Auto" Height="Auto" TabStripPlacement="Left"
                     SelectedIndex="{Binding SelectedTabIndex}">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="TabItem">

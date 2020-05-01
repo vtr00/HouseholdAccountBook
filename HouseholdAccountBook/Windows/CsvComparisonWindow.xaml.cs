@@ -1,23 +1,23 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using HouseholdAccountBook.Dao;
+using HouseholdAccountBook.Dto;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
-using Newtonsoft.Json;
-using HouseholdAccountBook.Dto;
-using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -124,7 +124,7 @@ namespace HouseholdAccountBook.Windows
             int? outgoIndex = this.WVM.SelectedBookVM.OutgoIndex;
             
             // CSVファイルを読み込む
-            Configuration csvConfig = new Configuration() {
+            CsvConfiguration csvConfig = new CsvConfiguration(System.Globalization.CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,
                 MissingFieldFound = (handlerNames, index, contexts) => { }
             };
