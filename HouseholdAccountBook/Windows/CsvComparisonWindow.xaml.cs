@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -133,7 +134,8 @@ namespace HouseholdAccountBook.Windows
                 using (CsvReader reader = new CsvReader(new StreamReader(tmpFileName, Encoding.GetEncoding("Shift_JIS")), csvConfig)) {
                     while (reader.Read()) {
                         try {
-                            if (reader.TryGetField(actDateIndex.Value, out DateTime date) && reader.TryGetField(itemNameIndex.Value, out string name) && reader.TryGetField(outgoIndex.Value, out int value)) {
+                            if (reader.TryGetField(actDateIndex.Value, out DateTime date) && reader.TryGetField(itemNameIndex.Value, out string name) && reader.TryGetField(outgoIndex.Value, out string valueStr) &&
+                                int.TryParse(valueStr, NumberStyles.Any, NumberFormatInfo.CurrentInfo, out int value)) {
                                 tmpList.Add(new CsvComparisonViewModel() { Record = new CsvComparisonViewModel.CsvRecord() { Date = date, Name = name, Value = value } });
                             }
                         }
