@@ -15,7 +15,7 @@ namespace HouseholdAccountBook.Converters
         /// </summary>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if(value is DateTime dateTime) {
+            if (value is DateTime dateTime) {
                 return dateTime.IsNationalHoliday();
             }
             else {

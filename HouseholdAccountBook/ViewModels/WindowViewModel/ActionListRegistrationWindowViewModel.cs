@@ -43,7 +43,12 @@ namespace HouseholdAccountBook.ViewModels
         /// 登録モード
         /// </summary>
         #region RegMode
-        public RegistrationMode RegMode { get; } = RegistrationMode.Add;
+        public RegistrationMode RegMode
+        {
+            get => this._RegMode;
+            set => this.SetProperty(ref this._RegMode, value);
+        }
+        private RegistrationMode _RegMode = default;
         #endregion
 
         /// <summary>
@@ -76,7 +81,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private BookViewModel _SelectedBookVM = default;
         #endregion
-        
+
         /// <summary>
         /// 収支種別辞書
         /// </summary>
@@ -255,6 +260,15 @@ namespace HouseholdAccountBook.ViewModels
         /// 数値入力ボタンの入力種別
         /// </summary>
         public NumericInputButton.InputKind InputedKind { get; set; }
+
+        /// <summary>
+        /// デバッグビルドか
+        /// </summary>
+#if DEBUG
+        public bool IsDebug => true;
+#else
+        public bool IsDebug => false;
+#endif
         #endregion
     }
 }

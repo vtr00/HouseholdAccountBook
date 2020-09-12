@@ -825,7 +825,9 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             using (DaoBase dao = this.builder.Build()) {
                 BookSettingViewModel vm = this.WVM.SelectedBookVM;
                 MstBookJsonObject jsonObj = new MstBookJsonObject() {
-                    CsvActDateIndex = vm.ActDateIndex, CsvOutgoIndex = vm.OutgoIndex, CsvItemNameIndex = vm.ItemNameIndex
+                    CsvActDateIndex = vm.ActDateIndex,
+                    CsvOutgoIndex = vm.OutgoIndex,
+                    CsvItemNameIndex = vm.ItemNameIndex
                 };
                 string jsonCode = JsonConvert.SerializeObject(jsonObj);
 
@@ -1153,7 +1155,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// </summary>
         private void UpdateOtherSettingTabData()
         {
-            if(this.WVM.SelectedTab == SettingsTabs.OtherSettingsTab) {
+            if (this.WVM.SelectedTab == SettingsTabs.OtherSettingsTab) {
                 this.WVM.LoadSettings();
             }
         }
@@ -1379,7 +1381,7 @@ ORDER BY I.sort_order;", vm.Id);
             return settingVMList;
         }
         #endregion
-        
+
         #region 設定反映用の関数
         /// <summary>
         /// 設定を読み込む

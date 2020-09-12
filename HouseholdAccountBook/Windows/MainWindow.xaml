@@ -34,6 +34,7 @@
         <RoutedCommand x:Key="EditActionCommand"/>
         <RoutedCommand x:Key="CopyActionCommand"/>
         <RoutedCommand x:Key="DeleteActionCommand"/>
+        <RoutedCommand x:Key="ChangeIsMatchCommand"/>
 
         <!-- 表示コマンド -->
         <RoutedCommand x:Key="IndicateBookTabCommand"/>
@@ -105,14 +106,15 @@
         <CommandBinding Command="{StaticResource ExportCustomFileCommand}" CanExecute="ExportCustomFileCommand_CanExecute" Executed="ExportCustomFileCommand_Excuted"/>
         <CommandBinding Command="{StaticResource BackUpCommand}" Executed="BackUpCommand_Executed"/>
 
-        <!-- 操作コマンド -->
+        <!-- 編集コマンド -->
         <CommandBinding Command="{StaticResource MoveToBookCommand}" CanExecute="MoveToBookCommand_CanExecute" Executed="MoveToBookCommand_Executed"/>
         <CommandBinding Command="{StaticResource AddActionToBookCommand}" CanExecute="AddActionToBookCommand_CanExecute" Executed="AddActionToBookCommand_Executed"/>
         <CommandBinding Command="{StaticResource EditActionCommand}" CanExecute="EditActionCommand_CanExecute" Executed="EditActionCommand_Executed"/>
         <CommandBinding Command="{StaticResource AddActionListToBookCommand}" CanExecute="AddActionListToBookCommand_CanExecute" Executed="AddActionListToBookCommand_Executed"/>
         <CommandBinding Command="{StaticResource CopyActionCommand}" CanExecute="CopyActionCommand_CanExecute" Executed="CopyActionCommand_Executed"/>
         <CommandBinding Command="{StaticResource DeleteActionCommand}" CanExecute="DeleteActionCommand_CanExecute" Executed="DeleteActionCommand_Executed"/>
-        
+        <CommandBinding Command="{StaticResource ChangeIsMatchCommand}" CanExecute="ChangeIsMatchCommand_CanExecute" Executed="ChangeIsMatchCommand_Executed"/>
+
         <!-- 表示コマンド -->
         <CommandBinding Command="{StaticResource IndicateBookTabCommand}" CanExecute="IndicateBookTabCommand_CanExecute" Executed="IndicateBookTabCommand_Executed"/>
         <CommandBinding Command="{StaticResource IndicateDailyGraphTabCommand}" CanExecute="IndicateDailyGraphTabCommand_CanExecute" Executed="IndicateDailyGraphTabCommand_Executed"/>
@@ -282,6 +284,7 @@
                                 <Button Width="50" Content="編集" Command="{StaticResource EditActionCommand}"/>
                                 <Button Width="50" Content="複製" Command="{StaticResource CopyActionCommand}"/>
                                 <Button Width="50" Content="削除" Command="{StaticResource DeleteActionCommand}"/>
+                                <CheckBox Margin="3" ToolTip="CSV一致チェック" VerticalAlignment="Center" IsChecked="{Binding IsMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{StaticResource ChangeIsMatchCommand}"/>
                             </StackPanel>
                         </Grid>
                     </ScrollViewer>
@@ -332,7 +335,9 @@
                                 </Style>
                             </DataGrid.ItemContainerStyle>
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="アクションID" Binding="{Binding ActionId}"
+                                <DataGridTextColumn Header="ID" Binding="{Binding ActionId}"
+                                                    Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                <DataGridTextColumn Header="グループID" Binding="{Binding GroupId}" 
                                                     Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                 <DataGridTextColumn Header="月" Binding="{Binding ActTime, StringFormat='M月'}"/>
                                 <DataGridTextColumn Header="日" Binding="{Binding ActTime, StringFormat='d日'}"/>
@@ -347,8 +352,6 @@
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                                 <DataGridTextColumn Header="店名" Binding="{Binding ShopName}"/>
                                 <DataGridTextColumn Header="備考" Binding="{Binding Remark}"/>
-                                <DataGridTextColumn Header="グループID" Binding="{Binding GroupId}" 
-                                                    Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}"/>
                             </DataGrid.Columns>
                         </DataGrid>
 

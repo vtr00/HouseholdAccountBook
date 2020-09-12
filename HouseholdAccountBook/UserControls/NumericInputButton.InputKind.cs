@@ -8,7 +8,7 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// 入力種別
         /// </summary>
-        public enum InputKind 
+        public enum InputKind
         {
             /// <summary>
             /// 未入力
@@ -26,6 +26,6 @@ namespace HouseholdAccountBook.UserControls
             /// クリア
             /// </summary>
             Clear
-        }       
+        }
     }
 }

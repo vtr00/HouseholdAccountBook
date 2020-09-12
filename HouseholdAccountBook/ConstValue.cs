@@ -25,7 +25,7 @@ namespace HouseholdAccountBook.ConstValue
         /// タブ
         /// </summary>
         /// <remarks>数字はタブのインデックスと対応付けること</remarks>
-        public enum Tabs 
+        public enum Tabs
         {
             /// <summary>
             /// 帳簿タブ
@@ -57,7 +57,7 @@ namespace HouseholdAccountBook.ConstValue
         /// 設定タブ
         /// </summary>
         /// <remarks>数字は設定タブのインデックスと対応付けること</remarks>
-        public enum SettingsTabs 
+        public enum SettingsTabs
         {
             /// <summary>
             /// 項目設定タブ
@@ -76,7 +76,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 帳簿種別
         /// </summary>
-        public enum BookKind 
+        public enum BookKind
         {
             /// <summary>
             /// 未分類
@@ -110,7 +110,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 区間種別
         /// </summary>
-        public enum TermKind 
+        public enum TermKind
         {
             /// <summary>
             /// 月
@@ -125,7 +125,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 収支種別
         /// </summary>
-        public enum BalanceKind 
+        public enum BalanceKind
         {
             /// <summary>
             /// 収入
@@ -175,7 +175,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// グループ種別
         /// </summary>
-        public enum GroupKind 
+        public enum GroupKind
         {
             /// <summary>
             /// 移動
@@ -184,13 +184,17 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// 繰返し
             /// </summary>
-            Repeat = 1
+            Repeat = 1,
+            /// <summary>
+            /// リスト登録
+            /// </summary>
+            ListReg = 2
         }
 
         /// <summary>
         /// 手数料種別
         /// </summary>
-        public enum CommissionKind 
+        public enum CommissionKind
         {
             /// <summary>
             /// 支払元負担
@@ -211,7 +215,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// グラフ種別
         /// </summary>
-        public enum GraphKind 
+        public enum GraphKind
         {
             /// <summary>
             /// 収支
@@ -232,7 +236,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 登録モード
         /// </summary>
-        public enum RegistrationMode 
+        public enum RegistrationMode
         {
             /// <summary>
             /// 追加
@@ -251,7 +255,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// メッセージタイトルテキスト
         /// </summary>
-        public static class MessageTitle 
+        public static class MessageTitle
         {
             /// <summary>
             /// 情報
@@ -270,7 +274,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// メッセージテキスト
         /// </summary>
-        public static class MessageText 
+        public static class MessageText
         {
             /// <summary>
             /// 接続に失敗しました。

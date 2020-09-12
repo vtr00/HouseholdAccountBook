@@ -23,7 +23,8 @@ namespace HouseholdAccountBook.UserEventArgs
         /// </summary>
         /// <param name="value1">イベントデータ1</param>
         /// <param name="value2">イベントデータ2</param>
-        public EventArgs(TType1 value1, TType2 value2) : base() {
+        public EventArgs(TType1 value1, TType2 value2) : base()
+        {
             this.Value1 = value1;
             this.Value2 = value2;
         }

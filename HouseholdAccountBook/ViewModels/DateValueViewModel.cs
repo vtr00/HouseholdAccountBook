@@ -11,6 +11,11 @@ namespace HouseholdAccountBook.ViewModels
     {
         #region プロパティ
         /// <summary>
+        /// 帳簿項目ID
+        /// </summary>
+        public int? ActionId { get; set; }
+
+        /// <summary>
         /// 日付
         /// </summary>
         public DateTime ActDate { get; set; }

@@ -46,9 +46,9 @@ namespace HouseholdAccountBook.Behaviors
         #region SelectedItemsProperty
         public static DependencyProperty SelectedItemsProperty =
             DependencyProperty.Register(
-                nameof(SelectedItems), 
-                typeof(IList), 
-                typeof(BindSelectedItemsToDataGridBehavior), 
+                nameof(SelectedItems),
+                typeof(IList),
+                typeof(BindSelectedItemsToDataGridBehavior),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, BindSelectedItemsToDataGridBehavior.SelectedItemsChanged));
         #endregion
         /// <summary>
@@ -93,11 +93,11 @@ namespace HouseholdAccountBook.Behaviors
         /// <param name="e"></param>
         private static void SelectedItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if(e.OldValue != e.NewValue) {
-                if(e.OldValue is INotifyCollectionChanged oldValue) {
+            if (e.OldValue != e.NewValue) {
+                if (e.OldValue is INotifyCollectionChanged oldValue) {
                     oldValue.CollectionChanged -= BindSelectedItemsToDataGridBehavior.CollectionChanged;
                 }
-                if(e.NewValue is INotifyCollectionChanged newValue) {
+                if (e.NewValue is INotifyCollectionChanged newValue) {
                     newValue.CollectionChanged += BindSelectedItemsToDataGridBehavior.CollectionChanged;
                 }
             }

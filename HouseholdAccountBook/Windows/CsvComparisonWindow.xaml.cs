@@ -42,11 +42,11 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// 比較結果が変更された時
         /// </summary>
-        public event EventHandler<EventArgs<int>> ChangedIsMatch;
+        public event EventHandler<EventArgs<int>> IsMatchChanged;
         /// <summary>
         /// 比較結果が同時に複数変更された時
         /// </summary>
-        public event EventHandler<EventArgs> ChangedIsMatches;
+        public event EventHandler<EventArgs> IsMatchesChanged;
         #endregion
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OpenCsvFilesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void OpenCsvFilesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -123,7 +123,7 @@ namespace HouseholdAccountBook.Windows
             int? actDateIndex = this.WVM.SelectedBookVM.ActDateIndex;
             int? itemNameIndex = this.WVM.SelectedBookVM.ItemNameIndex;
             int? outgoIndex = this.WVM.SelectedBookVM.OutgoIndex;
-            
+
             // CSVファイルを読み込む
             CsvConfiguration csvConfig = new CsvConfiguration(System.Globalization.CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,
@@ -148,7 +148,7 @@ namespace HouseholdAccountBook.Windows
             }
             this.csvCompDataGrid.ScrollToTop();
 
-            this.UpdateComparisonInfoAsync();
+            await this.UpdateComparisonInfoAsync();
 
             // 合計値を計算する
             this.WVM.SumValue = this.WVM.CsvComparisonVMList.Sum(vm => vm.Record.Value);
@@ -175,8 +175,8 @@ namespace HouseholdAccountBook.Windows
         private void EditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedCsvComparisonVM.ActionId.Value);
-            arw.Registrated += (sender2, e2) => {
-                this.UpdateComparisonInfoAsync();
+            arw.Registrated += async (sender2, e2) => {
+                await this.UpdateComparisonInfoAsync();
             };
             arw.ShowDialog();
         }
@@ -208,7 +208,7 @@ namespace HouseholdAccountBook.Windows
 
             using (DaoBase dao = this.builder.Build()) {
                 await dao.ExecTransactionAsync(async () => {
-                    foreach(var vm in this.WVM.CsvComparisonVMList) {
+                    foreach (var vm in this.WVM.CsvComparisonVMList) {
                         if (vm.ActionId.HasValue) {
                             await dao.ExecNonQueryAsync(@"
 UPDATE hst_action
@@ -219,8 +219,8 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
                 });
             }
 
-            this.ChangedIsMatches?.Invoke(this, new EventArgs());
-            this.UpdateComparisonInfoAsync();
+            this.IsMatchesChanged?.Invoke(this, new EventArgs());
+            await this.UpdateComparisonInfoAsync();
 
             this.Cursor = cursor;
         }
@@ -240,11 +240,11 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.Cursor = Cursors.Wait;
 
-            this.UpdateComparisonInfoAsync();
+            await this.UpdateComparisonInfoAsync();
 
             this.Cursor = null;
         }
@@ -275,11 +275,11 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ChangeIsMatchCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void ChangeIsMatchCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             CsvComparisonViewModel vm = (this.WVM.SelectedCsvComparisonVM = (e.OriginalSource as CheckBox)?.DataContext as CsvComparisonViewModel);
             if (vm.ActionId.HasValue) {
-                this.ChangeIsMatchAsync(vm.ActionId.Value, vm.IsMatch);
+                await this.ChangeIsMatchAsync(vm.ActionId.Value, vm.IsMatch);
             }
         }
         #endregion
@@ -309,15 +309,15 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void CheckBox_MouseEnter(object sender, MouseEventArgs e)
+        private async void CheckBox_MouseEnter(object sender, MouseEventArgs e)
         {
-            if((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control) { 
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control) {
                 CheckBox checkBox = sender as CheckBox;
                 checkBox.IsChecked = !checkBox.IsChecked;
 
                 CsvComparisonViewModel vm = (this.WVM.SelectedCsvComparisonVM = checkBox?.DataContext as CsvComparisonViewModel);
                 if (vm.ActionId.HasValue) {
-                    this.ChangeIsMatchAsync(vm.ActionId.Value, vm.IsMatch);
+                    await this.ChangeIsMatchAsync(vm.ActionId.Value, vm.IsMatch);
                 }
             }
         }
@@ -362,15 +362,15 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
             this.WVM.BookVMList = bookCompVMList;
             this.WVM.SelectedBookVM = selectedBookCompVM ?? bookCompVMList[0];
         }
-        
+
         /// <summary>
         /// 比較情報を更新する
         /// </summary>
-        private async void UpdateComparisonInfoAsync()
+        private async Task UpdateComparisonInfoAsync()
         {
             // 指定された帳簿内で、日付、金額が一致する帳簿項目を探す
             using (DaoBase dao = this.builder.Build()) {
-                foreach(var vm in this.WVM.CsvComparisonVMList) {
+                foreach (var vm in this.WVM.CsvComparisonVMList) {
                     // 前回の結果をクリアする
                     vm.ClearActionInfo();
 
@@ -401,7 +401,7 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
                     });
                 }
             }
-            
+
             List<CsvComparisonViewModel> list = this.WVM.CsvComparisonVMList.ToList();
             // 日付と帳簿項目IDでソートする
             list.Sort((vm1, vm2) => {
@@ -454,7 +454,7 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         /// </summary>
         /// <param name="actionId">帳簿項目ID</param>
         /// <param name="isMatch">一致フラグ</param>
-        private async void ChangeIsMatchAsync(int actionId, bool isMatch)
+        private async Task ChangeIsMatchAsync(int actionId, bool isMatch)
         {
             using (DaoBase dao = this.builder.Build()) {
                 await dao.ExecNonQueryAsync(@"
@@ -463,7 +463,7 @@ SET is_match = @{0}, update_time = 'now', updater = @{1}
 WHERE action_id = @{2};", isMatch ? 1 : 0, Updater, actionId);
             }
 
-            this.ChangedIsMatch?.Invoke(this, new EventArgs<int>(actionId));
+            this.IsMatchChanged?.Invoke(this, new EventArgs<int>(actionId));
         }
     }
 }

@@ -50,7 +50,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private RegistrationMode _RegMode = default;
         #endregion
-        
+
         /// <summary>
         /// 日付(移動元)
         /// </summary>

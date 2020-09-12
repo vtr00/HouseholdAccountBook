@@ -477,11 +477,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
             if (process.ExitCode == 0) {
                 MessageBox.Show(MessageText.FinishToExport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
-            }else {
+            }
+            else {
                 MessageBox.Show(MessageText.FoultToExport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
-        
+
         /// <summary>
         /// 手動バックアップを行う
         /// </summary>
@@ -551,7 +552,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder,
                 this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             // 登録時イベントを登録する
-            arw.Registrated += async (sender2, e2)=> {
+            arw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
                 await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
@@ -598,9 +599,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void EditActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが0より大きい
-            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && 
-                           ((this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVMList[0].ActionId > 0) ||
-                            (this.WVM.SelectedActionVM != null && this.WVM.SelectedActionVM.ActionId > 0));
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab &&
+                           this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVMList[0].ActionId > 0;
         }
 
         /// <summary>
@@ -624,29 +624,44 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 });
             }
 
-            if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
-                // 移動以外の帳簿項目の編集時の処理
-                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId) { Owner = this };
-                // 登録時イベントを登録する
-                arw.Registrated += async (sender2, e2) => {
-                    // 帳簿一覧タブを更新する
-                    await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
-                    FocusManager.SetFocusedElement(this, this.actionDataGrid);
-                    this.actionDataGrid.Focus();
-                };
-                arw.ShowDialog();
-            }
-            else {
-                // 移動の編集時の処理
-                MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
-                // 登録時イベントを登録する
-                mrw.Registrated += async (sender2, e2) => {
-                    // 帳簿一覧タブを更新する
-                    await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
-                    FocusManager.SetFocusedElement(this, this.actionDataGrid);
-                    this.actionDataGrid.Focus();
-                };
-                mrw.ShowDialog();
+            switch (groupKind) {
+                case (int)GroupKind.Move:
+                    // 移動の編集時の処理
+                    MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
+                    // 登録時イベントを登録する
+                    mrw.Registrated += async (sender2, e2) => {
+                        // 帳簿一覧タブを更新する
+                        await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
+                        FocusManager.SetFocusedElement(this, this.actionDataGrid);
+                        this.actionDataGrid.Focus();
+                    };
+                    mrw.ShowDialog();
+                    break;
+                case (int)GroupKind.ListReg:
+                    // リスト登録された帳簿項目の編集時の処理
+                    ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
+                    // 登録時イベントを登録する
+                    alrw.Registrated += async (sender2, e2) => {
+                        // 帳簿一覧タブを更新する
+                        await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
+                        FocusManager.SetFocusedElement(this, this.actionDataGrid);
+                        this.actionDataGrid.Focus();
+                    };
+                    alrw.ShowDialog();
+                    break;
+                case (int)GroupKind.Repeat:
+                default:
+                    // 移動・リスト登録以外の帳簿項目の編集時の処理
+                    ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId) { Owner = this };
+                    // 登録時イベントを登録する
+                    arw.Registrated += async (sender2, e2) => {
+                        // 帳簿一覧タブを更新する
+                        await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
+                        FocusManager.SetFocusedElement(this, this.actionDataGrid);
+                        this.actionDataGrid.Focus();
+                    };
+                    arw.ShowDialog();
+                    break;
             }
         }
 
@@ -658,9 +673,8 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         private void CopyActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが0より大きい
-            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && 
-                           ((this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVMList[0].ActionId > 0) || 
-                            (this.WVM.SelectedActionVM != null && this.WVM.SelectedActionVM.ActionId > 0));
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab &&
+                           this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVMList[0].ActionId > 0;
         }
 
         /// <summary>
@@ -718,7 +732,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         private void DeleteActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択している帳簿項目が存在していて、選択している帳簿項目にIDが0より大きいものが存在する
-            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && 
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab &&
                            this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0;
         }
 
@@ -731,41 +745,60 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         {
             if (MessageBox.Show(MessageText.DeleteNotification, this.Title, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 // 帳簿項目IDが0を超える項目についてループ
-                foreach(ActionViewModel vm in this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; })) {
+                foreach (ActionViewModel vm in this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; })) {
                     int actionId = vm.ActionId;
                     int? groupId = vm.GroupId;
 
                     using (DaoBase dao = this.builder.Build()) {
                         await dao.ExecTransactionAsync(async () => {
+                            // 対象となる帳簿項目を削除する
                             await dao.ExecNonQueryAsync(@"
 UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{1} 
 WHERE action_id = @{0};", actionId, Updater);
 
-                            // 削除項目の日時以降の同じグループIDを持つ帳簿項目を削除する(日付の等号は「移動」削除用)
-                            if (groupId != null) {
-                                await dao.ExecNonQueryAsync(@"
+                            if (groupId.HasValue) {
+                                DaoReader reader = await dao.ExecQueryAsync(@"
+SELECT group_kind FROM hst_group
+WHERE group_id = @{0} AND del_flg = 0;", groupId);
+
+                                int groupKind = (int)GroupKind.Repeat;
+                                reader.ExecARow((record) => { groupKind = record.ToInt("group_kind"); });
+
+                                switch (groupKind) {
+                                    case (int)GroupKind.Move: {
+                                            // 移動の場合、削除項目と同じグループIDを持つ帳簿項目を削除する
+                                            await dao.ExecNonQueryAsync(@"
+UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{0}
+WHERE group_id = @{1});", Updater, groupId);
+                                        }
+                                        break;
+                                    case (int)GroupKind.Repeat: {
+                                            // 繰返しの場合、削除項目の日時以降の同じグループIDを持つ帳簿項目を削除する
+                                            await dao.ExecNonQueryAsync(@"
 UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{1}
 WHERE group_id = @{2} AND act_time >= (SELECT act_time FROM hst_action WHERE action_id = @{0});", actionId, Updater, groupId);
+                                        }
+                                        break;
+                                }
 
-                                DaoReader reader = await dao.ExecQueryAsync(@"
+                                reader = await dao.ExecQueryAsync(@"
 SELECT action_id FROM hst_action
 WHERE group_id = @{0} AND del_flg = 0;", groupId);
 
+                                // 同じグループIDを持つ帳簿項目が1つだけの場合にグループIDをクリアする
                                 if (reader.Count == 1) {
-                                    // 同じグループIDを持つ帳簿項目が1つだけの場合にグループIDをクリアする
                                     await reader.ExecARowAsync(async (record) => {
                                         await dao.ExecNonQueryAsync(@"
 UPDATE hst_action SET group_id = null, update_time = 'now', updater = @{1}
-WHERE group_id = @{0} AND del_flg = 0;", groupId, Updater);
+WHERE action_id = @{0} AND del_flg = 0;", record.ToInt("action_id"), Updater);
                                     });
                                 }
 
+                                // 同じグループIDを持つ帳簿項目が存在しなくなる場合にグループを削除する
                                 if (reader.Count <= 1) {
-                                    // 同じグループIDを持つ帳簿項目が存在しなくなる場合にグループを削除する
                                     await dao.ExecNonQueryAsync(@"
-UPDATE hst_group
-SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
+UPDATE hst_group SET del_flg = 1, update_time = 'now', updater = @{1}
+WHERE group_id = @{0} AND del_flg = 0;", groupId, Updater);
                                 }
                             }
                         });
@@ -774,6 +807,36 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
 
                 // 帳簿一覧タブを更新する
                 await this.UpdateBookTabDataAsync(isUpdateActDateLastEdited: true);
+            }
+        }
+
+        /// <summary>
+        /// CSV一致チェック可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ChangeIsMatchCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            // 帳簿タブを選択していて、選択している帳簿項目が存在していて、選択している帳簿項目にIDが0より大きいものが存在する
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab &&
+                           this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0;
+        }
+
+        /// <summary>
+        /// CSV一致チェック処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ChangeIsMatchCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            using (DaoBase dao = this.builder.Build()) {
+                // 帳簿項目IDが0を超える項目についてループ
+                foreach (ActionViewModel vm in this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; })) {
+                    await dao.ExecNonQueryAsync(@"
+UPDATE hst_action
+SET is_match = @{0}, update_time = 'now', updater = @{1}
+WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.ActionId);
+                }
             }
         }
         #endregion
@@ -908,7 +971,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         {
             this.Cursor = Cursors.Wait;
 
-            await this.UpdateBookTabDataAsync(isScroll:false);
+            await this.UpdateBookTabDataAsync(isScroll: false);
             this.InitializeDailyGraphTabData();
             await this.UpdateDailyGraphTabDataAsync();
 
@@ -947,7 +1010,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
-                    await this.UpdateBookTabDataAsync(isScroll:true);
+                    await this.UpdateBookTabDataAsync(isScroll: true);
                     this.InitializeDailyGraphTabData();
                     await this.UpdateDailyGraphTabDataAsync();
                     break;
@@ -979,7 +1042,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
-            await this.UpdateBookTabDataAsync(isScroll:true);
+            await this.UpdateBookTabDataAsync(isScroll: true);
             this.InitializeDailyGraphTabData();
             await this.UpdateDailyGraphTabDataAsync();
 
@@ -1009,7 +1072,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
-                    await this.UpdateBookTabDataAsync(isScroll:true);
+                    await this.UpdateBookTabDataAsync(isScroll: true);
                     this.InitializeDailyGraphTabData();
                     await this.UpdateDailyGraphTabDataAsync();
                     break;
@@ -1017,7 +1080,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
 
             this.Cursor = null;
         }
-        
+
         /// <summary>
         /// 日毎期間を選択するウィンドウを表示する
         /// </summary>
@@ -1026,7 +1089,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         private async void OpenSelectingDailyTermWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             TermWindow stw = null;
-            
+
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
                     stw = new TermWindow(this.WVM.DisplayedMonth.Value) { Owner = this };
@@ -1035,14 +1098,14 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
                     stw = new TermWindow(this.WVM.StartDate, this.WVM.EndDate) { Owner = this };
                     break;
             }
-            
+
             if (stw.ShowDialog() == true) {
                 this.Cursor = Cursors.Wait;
-                
+
                 this.WVM.StartDate = stw.WVM.StartDate;
                 this.WVM.EndDate = stw.WVM.EndDate;
 
-                await this.UpdateBookTabDataAsync(isScroll:true);
+                await this.UpdateBookTabDataAsync(isScroll: true);
 
                 this.InitializeDailyGraphTabData();
                 await this.UpdateDailyGraphTabDataAsync();
@@ -1177,9 +1240,9 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, groupId);
         {
             CsvComparisonWindow ccw = new CsvComparisonWindow(this.builder, this.WVM.SelectedBookVM.Id);
             // 帳簿項目の一致を確認時のイベントを登録する
-            ccw.ChangedIsMatch += async (sender2, e2) => {
+            ccw.IsMatchChanged += async (sender2, e2) => {
                 ActionViewModel vm = this.WVM.ActionVMList.FirstOrDefault((tmpVM) => { return tmpVM.ActionId == e2.Value; });
-                if(vm != null) {
+                if (vm != null) {
                     using (DaoBase dao = this.builder.Build()) {
                         DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT is_match
@@ -1195,7 +1258,7 @@ WHERE action_id = @{0};", vm.ActionId);
                 }
             };
             // 複数の帳簿項目の一致を確認時のイベントを登録する
-            ccw.ChangedIsMatches += async (sender3, e3) => {
+            ccw.IsMatchesChanged += async (sender3, e3) => {
                 await this.UpdateBookTabDataAsync(isScroll: false);
             };
             ccw.Show();
@@ -1366,7 +1429,7 @@ ORDER BY sort_order;");
                     BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                     bookVMList.Add(vm);
 
-                    if(vm.Id == tmpBookId) {
+                    if (vm.Id == tmpBookId) {
                         selectedBookVM = vm;
                     }
                     return true;
@@ -1463,7 +1526,7 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
                 }
                 reader.ExecWholeRow((count, record) => {
                     int actionId = record.ToInt("action_id");
-                    DateTime actTime = DateTime.Parse(record["act_time"]);
+                    DateTime actTime = record.ToDateTime("act_time");
                     int categoryId = record.ToInt("category_id");
                     int itemId = record.ToInt("item_id");
                     string itemName = record["item_name"];
@@ -1476,7 +1539,7 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
                     int actValue = record.ToInt("act_value");
                     BalanceKind balanceKind = BalanceKind.Others;
                     int? income = null;
-                    int? outgo = null; 
+                    int? outgo = null;
                     if (actValue == 0) {
                         balanceKind = BalanceKind.Others;
                         income = null;
@@ -1493,7 +1556,7 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
                         outgo = null;
                     }
 
-                    if(actionId == -1) {
+                    if (actionId == -1) {
                         balanceKind = BalanceKind.Others;
                     }
 
@@ -2084,7 +2147,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 // 帳簿項目を選択する
                 IEnumerable<ActionViewModel> query1 = this.WVM.ActionVMList.Where((avm) => { return tmpActionIdList.Contains(avm.ActionId); });
                 this.WVM.SelectedActionVMList.Clear();
-                foreach(var tmp in query1) { this.WVM.SelectedActionVMList.Add(tmp); }
+                foreach (var tmp in query1) { this.WVM.SelectedActionVMList.Add(tmp); }
 
                 // 更新前のサマリーの選択を維持する
                 IEnumerable<SummaryViewModel> query2 = this.WVM.SummaryVMList.Where((svm) => {
@@ -2094,7 +2157,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
                 if (isScroll) {
                     if (this.WVM.DisplayedTermKind == TermKind.Monthly &&
-                        this.WVM.DisplayedMonth.Value.GetFirstDateOfMonth() < DateTime.Today && 
+                        this.WVM.DisplayedMonth.Value.GetFirstDateOfMonth() < DateTime.Today &&
                         DateTime.Today < this.WVM.DisplayedMonth.Value.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1)) {
                         // 今月の場合は、末尾が表示されるようにする
                         this.actionDataGrid.ScrollToButtom();
@@ -2113,7 +2176,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
     SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", actionIdList[0]);
 
                             reader.ExecARow((record) => {
-                                this.WVM.ActDateLastEdited = DateTime.Parse(record["act_time"]);
+                                this.WVM.ActDateLastEdited = record.ToDateTime("act_time");
                             });
                         }
                     }
@@ -2166,7 +2229,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 this.WVM.WholeItemDailyGraphModel.Axes.Add(lAxis1);
 
                 this.WVM.WholeItemDailyGraphModel.InvalidatePlot(true);
-                
+
                 // 選択項目
                 this.WVM.SelectedItemDailyGraphModel.Axes.Clear();
                 this.WVM.SelectedItemDailyGraphModel.Series.Clear();
@@ -2228,7 +2291,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
                             foreach (SeriesViewModel tmpVM in vmList) {
                                 if (tmpVM.ItemId == -1) { continue; }
-                                
+
                                 CustomColumnSeries cSeries1 = new CustomColumnSeries() {
                                     IsStacked = true,
                                     Title = tmpVM.ItemName,
@@ -2251,7 +2314,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                                     SeriesViewModel vm = vmList.FirstOrDefault((tmp) => tmp.ItemId == itemVM.ItemId);
 
                                     this.WVM.SelectedItemDailyGraphModel.Series.Clear();
-                                    
+
                                     CustomColumnSeries cSeries2 = new CustomColumnSeries() {
                                         IsStacked = true,
                                         Title = vm.ItemName,
@@ -2269,7 +2332,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                                     };
 
                                     this.WVM.SelectedItemDailyGraphModel.Series.Add(cSeries2);
-                                    
+
                                     foreach (Axis axis in this.WVM.SelectedItemDailyGraphModel.Axes) {
                                         if (axis.Position == AxisPosition.Left) {
                                             this.SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
@@ -2283,7 +2346,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                                 this.WVM.WholeItemDailyGraphModel.Series.Add(cSeries1);
 
                                 // 全項目の日毎の合計を計算する
-                                for(int i = 0; i < tmpVM.Values.Count; ++i) {
+                                for (int i = 0; i < tmpVM.Values.Count; ++i) {
                                     if (sumPlus.Count <= i) { sumPlus.Add(0); sumMinus.Add(0); }
 
                                     if (tmpVM.Values[i] < 0) sumMinus[i] += tmpVM.Values[i];
@@ -2320,7 +2383,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
                             // Y軸の範囲を設定する
                             foreach (Axis axis in this.WVM.WholeItemDailyGraphModel.Axes) {
-                                if(axis.Position == AxisPosition.Left) {
+                                if (axis.Position == AxisPosition.Left) {
                                     this.SetAxisRange(axis, cSeries.Points.Min((value) => value.Y), cSeries.Points.Max((value) => value.Y), 10, true);
                                     break;
                                 }
@@ -2442,7 +2505,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// </summary>
         private async Task UpdateMonthlyGraphTabDataAsync()
         {
-            if(this.WVM.SelectedTab == Tabs.MonthlyGraphTab) {
+            if (this.WVM.SelectedTab == Tabs.MonthlyGraphTab) {
                 int startMonth = Properties.Settings.Default.App_StartMonth;
                 this.WVM.WholeItemMonthlyGraphModel.Series.Clear();
 
@@ -2775,7 +2838,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             // 0を表示範囲に含める
             if (isDisplayZero && !(minValue < 0 && 0 < maxValue)) {
-                if(Math.Abs(minValue - 1) < Math.Abs(maxValue + 1)) minValue = 0;
+                if (Math.Abs(minValue - 1) < Math.Abs(maxValue + 1)) minValue = 0;
                 else maxValue = 0;
             }
 
@@ -2792,7 +2855,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             int minimum = (int)Math.Round(MathExtensions.Floor(tmpMin, Math.Pow(10, diffDigit) * unit)); // 軸の最小値
             int maximum = (int)Math.Round(MathExtensions.Ceiling(tmpMax, Math.Pow(10, diffDigit) * unit)); // 軸の最大値
-            if(!(minValue == 0 && maxValue == 0)) {
+            if (!(minValue == 0 && maxValue == 0)) {
                 if (minValue == 0) minimum = 0;
                 if (maxValue == 0) maximum = 0;
             }
@@ -2835,7 +2898,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         private void SaveSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            if (this.WindowState != WindowState.Minimized) { 
+            if (this.WindowState != WindowState.Minimized) {
                 settings.MainWindow_WindowState = (int)this.WindowState;
             }
             settings.MainWindow_SelectedBookId = this.WVM.SelectedBookVM.Id ?? -1;

@@ -2,7 +2,7 @@
 
 namespace HouseholdAccountBook.Extensions
 {
-    public static class  MathExtensions
+    public static class MathExtensions
     {
         /// <summary>
         /// 指定した精度の値に切り上げます(0から遠ざかる)

@@ -13,7 +13,7 @@ namespace HouseholdAccountBook.Dao
             /// <summary>
             /// レコード
             /// </summary>
-            private Dictionary<string, object> _record;
+            private readonly Dictionary<string, object> _record;
 
             /// <summary>
             /// コンストラクタ
@@ -90,8 +90,25 @@ namespace HouseholdAccountBook.Dao
                     }
                     catch (InvalidCastException) {
                         string tmp = this._record[key] as string;
-                        return (tmp == "True" || tmp == "true") ? true : false;
+                        return tmp == "True" || tmp == "true";
                     }
+                }
+                else {
+                    throw new KeyNotFoundException();
+                }
+            }
+
+            /// <summary>
+            /// DateTime型で取得する
+            /// </summary>
+            /// <param name="key">カラム名</param>
+            /// <returns></returns>
+            public DateTime ToDateTime(string key)
+            {
+                key = key.ToLower();
+                if (this._record.ContainsKey(key)) {
+                    object tmp = this._record[key];
+                    return DateTime.Parse(tmp.ToString());
                 }
                 else {
                     throw new KeyNotFoundException();

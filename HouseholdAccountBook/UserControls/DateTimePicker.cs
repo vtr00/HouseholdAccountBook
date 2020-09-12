@@ -44,9 +44,9 @@ namespace HouseholdAccountBook.UserControls
         /// <see cref="DateFormat"/> 依存関係プロパティを識別します。
         /// </summary>
         #region DateFormatProperty
-        public static readonly DependencyProperty DateFormatProperty = DependencyProperty.RegisterAttached (
-                nameof(DateFormat), 
-                typeof(string), 
+        public static readonly DependencyProperty DateFormatProperty = DependencyProperty.RegisterAttached(
+                nameof(DateFormat),
+                typeof(string),
                 typeof(DateTimePicker),
                 new PropertyMetadata(DateFormatChanged));
         #endregion
@@ -176,7 +176,7 @@ namespace HouseholdAccountBook.UserControls
             SelectAsRange(textBox);
             textBox.SelectionChanged += this.TextBox_SelectionChanged;
         }
-        
+
         /// <summary>
         /// ホイールの回転方向に合わせて選択している数字を増減する
         /// </summary>

@@ -7,7 +7,7 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// 日付種別
         /// </summary>
-        private enum DateKind 
+        private enum DateKind
         {
             /// <summary>
             /// 年

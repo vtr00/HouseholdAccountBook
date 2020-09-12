@@ -4,6 +4,7 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using static HouseholdAccountBook.ConstValue.ConstValue;
@@ -85,7 +86,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._SelectedBookVM;
             set {
-                if(this.SetProperty(ref this._SelectedBookVM, value)) {
+                if (this.SetProperty(ref this._SelectedBookVM, value)) {
                     this.SelectedBookChanged?.Invoke();
                 }
             }
@@ -107,7 +108,7 @@ namespace HouseholdAccountBook.ViewModels
             }
         }
         #endregion
-        
+
         /// <summary>
         /// 表示月
         /// </summary>
@@ -115,7 +116,7 @@ namespace HouseholdAccountBook.ViewModels
         public DateTime? DisplayedMonth
         {
             get {
-                switch(this.DisplayedTermKind) {
+                switch (this.DisplayedTermKind) {
                     case TermKind.Monthly:
                         return this.StartDate;
                     case TermKind.Selected:
@@ -126,7 +127,7 @@ namespace HouseholdAccountBook.ViewModels
             }
             set {
                 DateTime? oldDisplayedMonth = this.DisplayedMonth;
-                if(value != null) {
+                if (value != null) {
                     // 開始日/終了日を更新する
                     this.StartDate = value.Value.GetFirstDateOfMonth();
                     this.EndDate = value.Value.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1);
@@ -138,12 +139,11 @@ namespace HouseholdAccountBook.ViewModels
                         this.onUpdateDisplayedDate = false;
                     }
                 }
-                if(oldDisplayedMonth != this.DisplayedMonth) {
+                if (oldDisplayedMonth != this.DisplayedMonth) {
                     this.RaisePropertyChanged();
                 }
             }
         }
-        private static string nameDisplayedMonth = nameof(DisplayedMonth);
         #endregion
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._StartDate;
             set {
                 this.SetProperty(ref this._StartDate, value);
-                this.RaisePropertyChanged(nameDisplayedMonth);
+                this.RaisePropertyChanged(nameof(this.DisplayedMonth));
             }
         }
         private DateTime _StartDate = DateTime.Now.GetFirstDateOfMonth();
@@ -169,12 +169,12 @@ namespace HouseholdAccountBook.ViewModels
             get => this._EndDate;
             set {
                 this.SetProperty(ref this._EndDate, value);
-                this.RaisePropertyChanged(nameDisplayedMonth);
+                this.RaisePropertyChanged(nameof(this.DisplayedMonth));
             }
         }
         private DateTime _EndDate = DateTime.Now.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1);
         #endregion
-        
+
         /// <summary>
         /// 帳簿項目VMリスト
         /// </summary>
@@ -218,7 +218,29 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedActionVMList
         public ObservableCollection<ActionViewModel> SelectedActionVMList { get; } = new ObservableCollection<ActionViewModel>();
         #endregion
-        
+
+        /// <summary>
+        /// CSVと一致したか
+        /// </summary>
+        #region IsMatch
+        public bool? IsMatch
+        {
+            get {
+                int count = this.SelectedActionVMList.Count((vm) => vm.IsMatch);
+                if (count == 0) return false;
+                else if (count == this.SelectedActionVMList.Count()) return true;
+                return null;
+            }
+            set {
+                if (value.HasValue) {
+                    foreach (ActionViewModel vm in this.SelectedActionVMList) {
+                        vm.IsMatch = value.Value;
+                    }
+                }
+            }
+        }
+        #endregion
+
         /// <summary>
         /// 最後に操作した帳簿項目の日付
         /// </summary>
@@ -232,37 +254,32 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 平均値
-        /// </summary>
-        #region AverageValue
-        public double? AverageValue
-        {
-            get => this._AverageValue;
-            private set => this.SetProperty(ref this._AverageValue, value);
-        }
-        private double? _AverageValue = default;
-        #endregion
-        /// <summary>
-        /// データの個数
-        /// </summary>
-        #region Amount
-        public int Amount
-        {
-            get => this._Amount;
-            set => this.SetProperty(ref this._Amount, value);
-        }
-        private int _Amount = default;
-        #endregion
-        /// <summary>
         /// 合計値
         /// </summary>
         #region SumValue
         public int? SumValue
         {
-            get => this._SumValue;
-            private set => this.SetProperty(ref this._SumValue, value);
+            get {
+                int? sum = this.SelectedActionVMList.Count != 0 ? (int?)0 : null;
+                foreach (ActionViewModel vm in this.SelectedActionVMList) {
+                    sum += vm.Income ?? 0 - vm.Outgo ?? 0;
+                }
+                return sum;
+
+            }
         }
-        private int? _SumValue = default;
+        #endregion
+        /// <summary>
+        /// データの個数
+        /// </summary>
+        #region Amount
+        public int Amount => this.SelectedActionVMList.Count((vm) => { return vm.Income != null || vm.Outgo != null; });
+        #endregion
+        /// <summary>
+        /// 平均値
+        /// </summary>
+        #region AverageValue
+        public double? AverageValue => this.SelectedActionVMList.Count != 0 ? (double?)this.SumValue / this.SelectedActionVMList.Count : null;
         #endregion
 
         /// <summary>
@@ -412,7 +429,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private GraphKind _SelectedGraphKind = default;
         #endregion
-        
+
         /// <summary>
         /// 全項目日別グラフプロットモデル
         /// </summary>
@@ -526,7 +543,7 @@ namespace HouseholdAccountBook.ViewModels
             LegendFontSize = 10.5
         };
         #endregion
-        
+
         /// <summary>
         /// コントローラ
         /// </summary>
@@ -555,7 +572,13 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public MainWindowViewModel()
         {
-            this.SelectedActionVMList.CollectionChanged += (sender, e) => this.UpdateStatisticsValue();
+            this.SelectedActionVMList.CollectionChanged += (sender, e) => {
+                this.RaisePropertyChanged(nameof(this.SumValue));
+                this.RaisePropertyChanged(nameof(this.Amount));
+                this.RaisePropertyChanged(nameof(this.AverageValue));
+
+                this.RaisePropertyChanged(nameof(this.IsMatch));
+            };
             this.Controller.BindMouseEnter(PlotCommands.HoverPointsOnlyTrack);
         }
 
@@ -564,11 +587,11 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         private void UpdateDisplayedActionVMList()
         {
-            if(this._SelectedSummaryVM == null || (BalanceKind)this._SelectedSummaryVM.BalanceKind == BalanceKind.Others) {
+            if (this._SelectedSummaryVM == null || (BalanceKind)this._SelectedSummaryVM.BalanceKind == BalanceKind.Others) {
                 this.DisplayedActionVMList = this._ActionVMList;
             }
             else {
-                if(this._SelectedSummaryVM.ItemId != -1) {
+                if (this._SelectedSummaryVM.ItemId != -1) {
                     this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
                         return vm.ItemId == this._SelectedSummaryVM.ItemId;
                     }));
@@ -584,20 +607,6 @@ namespace HouseholdAccountBook.ViewModels
                     }));
                 }
             }
-        }
-        
-        /// <summary>
-        /// 統計値を更新する
-        /// </summary>
-        private void UpdateStatisticsValue()
-        {
-            int? sum = this.SelectedActionVMList.Count != 0 ? (int?)0 : null;
-            foreach (ActionViewModel vm in this.SelectedActionVMList) {
-                sum += vm.Income ?? 0 - vm.Outgo ?? 0;
-            }
-            this.SumValue = sum;
-            this.Amount = this.SelectedActionVMList.Count((vm) => { return vm.Income != null || vm.Outgo != null; });
-            this.AverageValue = this.SelectedActionVMList.Count != 0 ? (double?)sum / this.SelectedActionVMList.Count : null;
         }
     }
 }

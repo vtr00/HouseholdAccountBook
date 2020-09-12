@@ -17,7 +17,8 @@ namespace HouseholdAccountBook.UserEventArgs
         /// <see cref="EventArgs"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="value">イベントデータ</param>
-        public EventArgs(TType value) : base() {
+        public EventArgs(TType value) : base()
+        {
             this.Value = value;
         }
     }

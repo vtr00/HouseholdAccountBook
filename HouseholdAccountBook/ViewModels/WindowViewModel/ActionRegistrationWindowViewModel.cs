@@ -50,7 +50,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private RegistrationMode _RegMode = default;
         #endregion
-        
+
         /// <summary>
         /// 帳簿VMリスト
         /// </summary>
@@ -264,7 +264,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private int _Count = 1;
         #endregion
-        
+
         /// <summary>
         /// 連動して編集
         /// </summary>
@@ -276,7 +276,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private bool _IsLink = default;
         #endregion
-        
+
         /// <summary>
         /// 休日設定種別辞書
         /// </summary>

@@ -113,7 +113,7 @@ namespace HouseholdAccountBook.Dao
                 throw;
             }
         }
-        
+
         /// <summary>
         /// [非同期]トランザクション処理を行う
         /// </summary>

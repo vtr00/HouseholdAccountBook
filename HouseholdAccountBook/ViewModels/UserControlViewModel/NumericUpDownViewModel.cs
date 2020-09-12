@@ -95,7 +95,7 @@ namespace HouseholdAccountBook.ViewModels
                 this.IsOpen = true;
             }
             else {
-                await Task.Run(()=> { Thread.Sleep(10); });
+                await Task.Run(() => { Thread.Sleep(10); });
                 this.IsOpen = this.localIsOpen || false;
             }
         }

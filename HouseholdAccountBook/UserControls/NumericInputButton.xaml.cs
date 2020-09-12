@@ -192,9 +192,9 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnCanExecuteChanged (object sender, EventArgs e)
+        private void OnCanExecuteChanged(object sender, EventArgs e)
         {
-            if(this.Command != null) {
+            if (this.Command != null) {
                 if (this.Command is RoutedCommand command) {
                     if (command.CanExecute(this.CommandParameter, this.CommandTarget)) {
                         this.IsEnabled = true;
@@ -222,10 +222,10 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="newCommand">変更後のコマンド</param>
         private void HookUpCommand(ICommand oldCommand, ICommand newCommand)
         {
-            if(oldCommand != null) {
+            if (oldCommand != null) {
                 oldCommand.CanExecuteChanged -= this.OnCanExecuteChanged;
             }
-            if(newCommand != null) {
+            if (newCommand != null) {
                 newCommand.CanExecuteChanged += this.OnCanExecuteChanged;
             }
         }
@@ -235,8 +235,8 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         private void CallCommandToExecute()
         {
-            if(this.Command != null) {
-                if(this.Command is RoutedCommand command) {
+            if (this.Command != null) {
+                if (this.Command is RoutedCommand command) {
                     command.Execute(this.CommandParameter, this.CommandTarget);
                 }
                 else {

@@ -24,15 +24,15 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         private readonly DaoBuilder builder;
         /// <summary>
-        /// 選択された帳簿ID
+        /// MainWindowで選択された帳簿ID
         /// </summary>
         private readonly int? selectedBookId;
         /// <summary>
-        /// 選択された日付
+        /// MainWindowで選択された日付
         /// </summary>
         private readonly DateTime? selectedDateTime;
         /// <summary>
-        /// 選択された帳簿項目ID
+        /// MainWindowで選択された帳簿項目ID
         /// </summary>
         private readonly int? selectedActionId;
         /// <summary>
@@ -134,7 +134,7 @@ namespace HouseholdAccountBook.Windows
                 MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return;
             }
-            
+
             // DB登録
             int? id = await this.RegisterToDbAsync();
 
@@ -146,7 +146,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.Value = null;
             this.WVM.Count = 1;
         }
-        
+
         /// <summary>
         /// 登録コマンド判定
         /// </summary>
@@ -154,7 +154,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void RegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute =  this.WVM.Value.HasValue;
+            e.CanExecute = this.WVM.Value.HasValue;
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace HouseholdAccountBook.Windows
             this.DialogResult = true;
             this.Close();
         }
-        
+
         /// <summary>
         /// キャンセルコマンド
         /// </summary>
@@ -209,7 +209,7 @@ namespace HouseholdAccountBook.Windows
             string shopName = null;
             string remark = null;
 
-            switch(this.WVM.RegMode) {
+            switch (this.WVM.RegMode) {
                 case RegistrationMode.Add: {
                         bookId = this.selectedBookId;
                         actDate = this.selectedDateTime != null ? this.selectedDateTime.Value : DateTime.Today;
@@ -228,7 +228,7 @@ WHERE del_flg = 0 AND action_id = @{0};", this.selectedActionId);
                             reader.ExecARow((record) => {
                                 bookId = record.ToInt("book_id");
                                 itemId = record.ToInt("item_id");
-                                actDate = DateTime.Parse(record["act_time"]);
+                                actDate = record.ToDateTime("act_time");
                                 actValue = record.ToInt("act_value");
                                 this.groupId = record.ToNullableInt("group_id");
                                 shopName = record["shop_name"];
@@ -338,7 +338,7 @@ ORDER BY sort_order;", (int)this.WVM.SelectedBalanceKind, this.WVM.SelectedBookV
                 reader.ExecWholeRow((count, record) => {
                     CategoryViewModel vm = new CategoryViewModel() { Id = record.ToInt("category_id"), Name = record["category_name"] };
                     categoryVMList.Add(vm);
-                    if(vm.Id == categoryId) {
+                    if (vm.Id == categoryId) {
                         selectedCategoryVM = vm;
                     }
                     return true;
@@ -439,7 +439,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
                     return true;
                 });
             }
-            
+
             this.WVM.RemarkList = remarkVMList;
             this.WVM.SelectedRemark = selectedRemark;
         }

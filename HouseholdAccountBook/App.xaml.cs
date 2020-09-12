@@ -101,11 +101,9 @@ namespace HouseholdAccountBook
             }
 
             DaoBuilder builder = null;
-            while (true)
-            {
+            while (true) {
                 // 接続設定を読み込む
-                this.connectInfo = new DaoNpgsql.ConnectInfo()
-                {
+                this.connectInfo = new DaoNpgsql.ConnectInfo() {
                     Host = settings.App_Postgres_Host,
                     Port = settings.App_Postgres_Port,
                     UserName = settings.App_Postgres_UserName,
@@ -161,7 +159,6 @@ namespace HouseholdAccountBook
             try {
                 // 例外情報をファイルに保存する
                 string jsonCode = JsonConvert.SerializeObject(e.Exception);
-                e.Handled = true;
                 using (FileStream fs = new FileStream(UnhandledExceptionInfoFileName, FileMode.Create)) {
                     using (StreamWriter sw = new StreamWriter(fs)) {
                         await sw.WriteLineAsync(jsonCode);
@@ -175,9 +172,11 @@ namespace HouseholdAccountBook
                     Message = MessageText.UnhandledExceptionOccured,
                     Type = NotificationType.Warning
                 };
-                nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: ()=> {
+                nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
                     Process.Start(UnhandledExceptionInfoFileName);
                 });
+
+                e.Handled = true;
             }
             catch (Exception) { }
         }
@@ -187,7 +186,8 @@ namespace HouseholdAccountBook
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void App_Exit(object sender, ExitEventArgs e) {
+        private void App_Exit(object sender, ExitEventArgs e)
+        {
             this.ReleaseMutex();
         }
 

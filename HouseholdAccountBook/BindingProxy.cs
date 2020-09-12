@@ -14,9 +14,9 @@ namespace HouseholdAccountBook
         /// </summary>
         #region DataContextProperty
         public static readonly DependencyProperty DataContextProperty = DependencyProperty.Register(
-                nameof(DataContext), 
-                typeof(object), 
-                typeof(BindingProxy), 
+                nameof(DataContext),
+                typeof(object),
+                typeof(BindingProxy),
                 new UIPropertyMetadata(null)
             );
         #endregion

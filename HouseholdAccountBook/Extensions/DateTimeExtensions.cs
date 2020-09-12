@@ -26,7 +26,7 @@ namespace HouseholdAccountBook.Extensions
             Properties.Settings settings = Properties.Settings.Default;
 
             Uri uri = new Uri(settings.App_NationalHolidayCsv_Uri);
-            
+
             CsvConfiguration csvConfig = new CsvConfiguration(System.Globalization.CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,
                 MissingFieldFound = (handlerNames, index, contexts) => { }
@@ -86,7 +86,7 @@ namespace HouseholdAccountBook.Extensions
         /// </summary>
         /// <param name="dateTime">対象の日付</param>
         /// <returns>月初め</returns>
-        public static DateTime GetFirstDateOfMonth (this DateTime dateTime)
+        public static DateTime GetFirstDateOfMonth(this DateTime dateTime)
         {
             DateTime ans = new DateTime(dateTime.Year, dateTime.Month, 1);
             return ans;

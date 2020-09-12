@@ -50,7 +50,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private SettingsTabs _SelectedTab = default;
         #endregion
-        
+
         #region 項目設定
         /// <summary>
         /// 階層構造項目VMリスト
@@ -231,7 +231,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._NationalHolidayCsvURI;
             set {
-                if(this.SetProperty(ref this._NationalHolidayCsvURI, value) && this.WithSave) {
+                if (this.SetProperty(ref this._NationalHolidayCsvURI, value) && this.WithSave) {
                     this.settings.App_NationalHolidayCsv_Uri = value;
                     this.settings.Save();
                 }

@@ -28,7 +28,7 @@ namespace HouseholdAccountBook.Extensions
         /// コンテンツの先頭まで垂直方向にスクロールします。
         /// </summary>
         /// <param name="dObj"></param>
-        public static void ScrollToTop (this DependencyObject dObj)
+        public static void ScrollToTop(this DependencyObject dObj)
         {
             if (VisualTreeHelper.GetChildrenCount(dObj) > 0) {
                 if (VisualTreeHelper.GetChild(dObj, 0) is Decorator decorator) {
@@ -58,7 +58,7 @@ namespace HouseholdAccountBook.Extensions
         /// コンテンツの末尾まで垂直方向にスクロールします。
         /// </summary>
         /// <param name="dObj"></param>
-        public static void ScrollToButtom (this DependencyObject dObj)
+        public static void ScrollToButtom(this DependencyObject dObj)
         {
             if (VisualTreeHelper.GetChildrenCount(dObj) > 0) {
                 if (VisualTreeHelper.GetChild(dObj, 0) is Decorator decorator) {

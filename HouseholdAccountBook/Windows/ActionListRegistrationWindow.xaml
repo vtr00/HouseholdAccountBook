@@ -7,9 +7,12 @@
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         xmlns:project="clr-namespace:HouseholdAccountBook"
         mc:Ignorable="d"
-        Title="リスト追加" Height="Auto" Width="350" ShowInTaskbar="False" WindowStyle="ToolWindow"
+        Height="Auto" Width="350" ShowInTaskbar="False" WindowStyle="ToolWindow"
         Loaded="ActionListRegistrationWindow_Loaded"
         Closed="ActionListRegistrationWindow_Closed">
+    <Window.DataContext>
+        <viewmodels:ActionListRegistrationWindowViewModel x:Name="WVM"/>
+    </Window.DataContext>
 
     <Window.Resources>
         <!-- 登録コマンド -->
@@ -31,10 +34,22 @@
         <KeyBinding Gesture="Enter" Command="{StaticResource RegisterCommand}"/>
         <KeyBinding Gesture="Esc" Command="{StaticResource CancelCommand}"/>
     </Window.InputBindings>
-    
-    <Window.DataContext>
-        <viewmodels:ActionListRegistrationWindowViewModel x:Name="WVM"/>
-    </Window.DataContext>
+
+    <Window.Style>
+        <Style TargetType="Window">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RegMode}" Value="Add">
+                    <Setter Property="Title" Value="リスト追加"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RegMode}" Value="Edit">
+                    <Setter Property="Title" Value="リスト編集"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RegMode}" Value="Copy">
+                    <Setter Property="Title" Value="リスト追加"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -86,6 +101,9 @@
                     <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
                 </DataGrid.Resources>
                 <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding ActionId}" 
+                                        Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}" IsReadOnly="True"/>
+                    
                     <controls:DataGridEditableTemplateColumn Header="日付" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>

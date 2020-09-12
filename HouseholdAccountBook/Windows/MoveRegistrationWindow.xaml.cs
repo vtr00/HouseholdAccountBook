@@ -159,7 +159,7 @@ namespace HouseholdAccountBook.Windows
                 MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return;
             }
-            
+
             // DB登録
             int? id = await this.RegisterToDbAsync();
 
@@ -217,7 +217,7 @@ ORDER BY move_flg DESC;", this.groupId);
 
                             reader.ExecWholeRow((count, record) => {
                                 int bookId = record.ToInt("book_id");
-                                DateTime dateTime = DateTime.Parse(record["act_time"]);
+                                DateTime dateTime = record.ToDateTime("act_time");
                                 int actionId = record.ToInt("action_id");
                                 int itemId = record.ToInt("item_id");
                                 int actValue = record.ToInt("act_value");
@@ -274,7 +274,7 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
                     if (movedBookVM == null || movedBookId == vm.Id) {
                         movedBookVM = vm;
 
-                        switch (this.WVM.RegMode){
+                        switch (this.WVM.RegMode) {
                             case RegistrationMode.Add: {
                                     if (record.ToInt("book_kind") == (int)BookKind.CreditCard) {
                                         debitBookId = record.ToNullableInt("debit_book_id");
@@ -295,7 +295,7 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
             this.WVM.MovingBookVM = movingBookVM;
             this.WVM.MovedBookVM = movedBookVM;
 
-            switch (this.WVM.RegMode) { 
+            switch (this.WVM.RegMode) {
                 case RegistrationMode.Add: {
                         if (debitBookId != null) {
                             this.WVM.MovedBookVM = bookVMList.FirstOrDefault((vm) => { return vm.Id == debitBookId; });
@@ -447,8 +447,8 @@ VALUES (@{0}, (
   INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @{6}) C ON C.category_id = I.category_id
   WHERE move_flg = 1
 ), @{1}, @{2}, @{3}, 0, 'now', @{4}, 'now', @{5}) RETURNING action_id;",
-                            movedBookId, movedTime, - actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Outgo);
-                        if(this.selectedBookId == movedBookId) {
+                            movedBookId, movedTime, -actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Outgo);
+                        if (this.selectedBookId == movedBookId) {
                             reader.ExecARow((record) => {
                                 resActionId = record.ToInt("action_id");
                             });
@@ -477,8 +477,8 @@ VALUES (@{0}, (
 -- 移動元
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
-WHERE action_id = @{4};", movedBookId, movedTime, - actValue, Updater, this.fromActionId);
-                        if(this.selectedBookId == movedBookId) {
+WHERE action_id = @{4};", movedBookId, movedTime, -actValue, Updater, this.fromActionId);
+                        if (this.selectedBookId == movedBookId) {
                             resActionId = this.fromActionId;
                         }
 
@@ -487,7 +487,7 @@ WHERE action_id = @{4};", movedBookId, movedTime, - actValue, Updater, this.from
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
 WHERE action_id = @{4};", movingBookId, movingTime, actValue, Updater, this.toActionId);
-                        if(this.selectedBookId == movingBookId) {
+                        if (this.selectedBookId == movingBookId) {
                             resActionId = this.toActionId;
                         }
                         #endregion
@@ -511,12 +511,12 @@ WHERE action_id = @{4};", movingBookId, movingTime, actValue, Updater, this.toAc
                             await dao.ExecNonQueryAsync(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, remark = @{4}, update_time = 'now', updater = @{5}
-WHERE action_id = @{6};", bookId, commissionItemId, actTime, - commission, remark, Updater, this.commissionActionId);
+WHERE action_id = @{6};", bookId, commissionItemId, actTime, -commission, remark, Updater, this.commissionActionId);
                         }
                         else {
                             await dao.ExecNonQueryAsync(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7});", bookId, commissionItemId, actTime, - commission, tmpGroupId, remark, Updater, Inserter);
+VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7});", bookId, commissionItemId, actTime, -commission, tmpGroupId, remark, Updater, Inserter);
                         }
                         #endregion
                     }

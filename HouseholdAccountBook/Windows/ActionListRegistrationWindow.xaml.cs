@@ -35,6 +35,14 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         private readonly DateTime? selectedDateTime;
         /// <summary>
+        /// MainWindowで選択された帳簿項目のグループID
+        /// </summary>
+        private readonly int? selectedGroupId;
+        /// <summary>
+        /// グループに属する帳簿項目の帳簿項目ID
+        /// </summary>
+        private readonly List<int> groupedActionIdList = new List<int>();
+        /// <summary>
         /// 金額列の最後に選択したセル
         /// </summary>
         private DataGridCell lastDataGridCell;
@@ -62,9 +70,36 @@ namespace HouseholdAccountBook.Windows
             this.builder = builder;
             this.selectedBookId = selectedBookId;
             this.selectedDateTime = selectedDateTime;
+            this.selectedGroupId = null;
 
             this.InitializeComponent();
             this.LoadSetting();
+
+            this.WVM.RegMode = RegistrationMode.Add;
+        }
+
+        /// <summary>
+        /// 複数の帳簿項目の編集(複製)のために <see cref="ActionListRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
+        /// </summary>
+        /// <param name="builder">DAOビルダ</param>
+        /// <param name="selectedGroupId">選択されたグループID</param>
+        /// <param name="mode">登録モード</param>
+        public ActionListRegistrationWindow(DaoBuilder builder, int selectedGroupId, RegistrationMode mode = RegistrationMode.Edit)
+        {
+            this.builder = builder;
+            this.selectedBookId = null;
+            this.selectedDateTime = null;
+            switch (mode) {
+                case RegistrationMode.Edit:
+                case RegistrationMode.Copy:
+                    this.selectedGroupId = selectedGroupId;
+                    break;
+            }
+
+            this.InitializeComponent();
+            this.LoadSetting();
+
+            this.WVM.RegMode = mode;
         }
 
         #region イベントハンドラ
@@ -76,11 +111,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void RegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.DateValueVMList.Count >= 1;
-            foreach (DateValueViewModel vm in this.WVM.DateValueVMList) {
-                if(!e.CanExecute) { break; }
-                e.CanExecute &= vm.ActValue.HasValue;
-            }
+            e.CanExecute = this.WVM.DateValueVMList.Count((vm) => vm.ActValue.HasValue) >= 1;
         }
 
         /// <summary>
@@ -99,12 +130,12 @@ namespace HouseholdAccountBook.Windows
             List<int> idList = await this.RegisterToDbAsync();
 
             // MainWindow更新
-            Registrated?.Invoke(this, new EventArgs<List<int>>(idList ?? new List<int>()));
+            this.Registrated?.Invoke(this, new EventArgs<List<int>>(idList ?? new List<int>()));
 
             this.DialogResult = true;
             this.Close();
         }
-        
+
         /// <summary>
         /// キャンセルコマンド
         /// </summary>
@@ -141,7 +172,7 @@ namespace HouseholdAccountBook.Windows
                         string forwardText = textBox.Text.Substring(0, selectionStart);
                         string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
 
-                        if(int.TryParse(string.Format("{0}{1}{2}", forwardText, value, backwardText), out int outValue)) {
+                        if (int.TryParse(string.Format("{0}{1}{2}", forwardText, value, backwardText), out int outValue)) {
                             vm.ActValue = outValue;
                             textBox.Text = string.Format("{0}", vm.ActValue);
                             textBox.SelectionStart = selectionStart + 1;
@@ -160,7 +191,7 @@ namespace HouseholdAccountBook.Windows
                         string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
 
                         if (selectionLength != 0) {
-                            if(int.TryParse(string.Format("{0}{1}", forwardText, backwardText), out int outValue)) {
+                            if (int.TryParse(string.Format("{0}{1}", forwardText, backwardText), out int outValue)) {
                                 vm.ActValue = outValue;
                                 textBox.Text = string.Format("{0}", outValue);
                                 textBox.SelectionStart = selectionStart;
@@ -168,7 +199,7 @@ namespace HouseholdAccountBook.Windows
                         }
                         else if (selectionStart != 0) {
                             string newText = string.Format("{0}{1}", forwardText.Substring(0, selectionStart - 1), backwardText);
-                            if(string.Empty == newText || int.TryParse(newText, out int outValue)) {
+                            if (string.Empty == newText || int.TryParse(newText, out int outValue)) {
                                 vm.ActValue = string.Empty == newText ? (int?)null : int.Parse(newText);
                                 textBox.Text = string.Format("{0}", vm.ActValue);
                                 textBox.SelectionStart = selectionStart - 1;
@@ -190,7 +221,7 @@ namespace HouseholdAccountBook.Windows
             e.Handled = true;
         }
         #endregion
-        
+
         /// <summary>
         /// フォーム読込完了時
         /// </summary>
@@ -199,14 +230,68 @@ namespace HouseholdAccountBook.Windows
         private async void ActionListRegistrationWindow_Loaded(object sender, RoutedEventArgs e)
         {
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
+            int? bookId = null;
             BookViewModel selectedBookVM = null;
+            BalanceKind balanceKind = BalanceKind.Outgo;
+
+            int? itemId = null;
+            string shopName = null;
+            string remark = null;
+
+            switch (this.WVM.RegMode) {
+                case RegistrationMode.Add: {
+                        bookId = this.selectedBookId;
+                        balanceKind = BalanceKind.Outgo;
+                        DateTime actDate = this.selectedDateTime != null ? this.selectedDateTime.Value : DateTime.Today;
+
+                        DateTime dateTime = this.selectedDateTime ?? DateTime.Today;
+                        this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = actDate });
+                    }
+                    break;
+                case RegistrationMode.Edit:
+                case RegistrationMode.Copy: {
+                        using (DaoBase dao = this.builder.Build()) {
+                            DaoReader reader = await dao.ExecQueryAsync(@"
+SELECT book_id, item_id, action_id, act_time, act_value, shop_name, remark
+FROM hst_action 
+WHERE del_flg = 0 AND group_id = @{0};", this.selectedGroupId);
+                            reader.ExecWholeRow((count, record) => {
+                                int actionId = -1;
+                                DateTime actDate = DateTime.Now;
+                                int actValue = -1;
+
+                                actionId = record.ToInt("action_id");
+                                actDate = record.ToDateTime("act_time");
+                                actValue = record.ToInt("act_value");
+                                bookId = record.ToInt("book_id");
+                                itemId = record.ToInt("item_id");
+                                shopName = record["shop_name"];
+                                remark = record["remark"];
+
+                                DateValueViewModel vm = new DateValueViewModel() {
+                                    ActionId = actionId,
+                                    ActDate = actDate,
+                                    ActValue = Math.Abs(actValue)
+                                };
+
+                                balanceKind = Math.Sign(actValue) > 0 ? BalanceKind.Income : BalanceKind.Outgo; // 収入 / 支出
+
+                                this.groupedActionIdList.Add(vm.ActionId.Value);
+                                this.WVM.DateValueVMList.Add(vm);
+                                return true;
+                            });
+                        }
+                    }
+                    break;
+            }
+
             using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
                 reader.ExecWholeRow((count, record) => {
                     BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                     bookVMList.Add(vm);
-                    if (selectedBookVM == null || this.selectedBookId == vm.Id) {
+                    if (selectedBookVM == null || bookId == vm.Id) {
                         selectedBookVM = vm;
                     }
                     return true;
@@ -215,15 +300,12 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
 
             this.WVM.BookVMList = bookVMList;
             this.WVM.SelectedBookVM = selectedBookVM;
-            this.WVM.SelectedBalanceKind = BalanceKind.Outgo;
-
-            DateTime dateTime = this.selectedDateTime ?? DateTime.Today;
-            this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = dateTime });
+            this.WVM.SelectedBalanceKind = balanceKind;
 
             await this.UpdateCategoryListAsync();
-            await this.UpdateItemListAsync();
-            await this.UpdateShopListAsync();
-            await this.UpdateRemarkListAsync();
+            await this.UpdateItemListAsync(itemId);
+            await this.UpdateShopListAsync(shopName);
+            await this.UpdateRemarkListAsync(remark);
 
             #region イベントハンドラの設定
             this.WVM.BookChanged += async () => {
@@ -276,7 +358,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
                 e.NewItem = new DateValueViewModel() { ActDate = this.WVM.IsDateAutoIncrement ? lastVM.ActDate.AddDays(1) : lastVM.ActDate, ActValue = null };
             }
         }
-        
+
         /// <summary>
         /// 日付金額リスト選択変更時
         /// </summary>
@@ -285,8 +367,8 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DataGrid dataGrid = sender as DataGrid;
-            
-            if(dataGrid.SelectedIndex != -1) {
+
+            if (dataGrid.SelectedIndex != -1) {
                 dataGrid.BeginEdit();
             }
         }
@@ -299,14 +381,14 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         private void DataGridCell_GotFocus(object sender, RoutedEventArgs e)
         {
             DataGridCell dataGridCell = sender as DataGridCell;
-            
+
             // 新しいセルに移動していたら数値入力ボタンを非表示にする
             if (dataGridCell != this.lastDataGridCell) {
                 this.WVM.IsEditing = false;
             }
             this.lastDataGridCell = dataGridCell;
         }
-        
+
         /// <summary>
         /// テキストボックステキスト入力確定前
         /// </summary>
@@ -346,7 +428,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         /// <param name="e"></param>
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (!this.WVM.IsEditing) { 
+            if (!this.WVM.IsEditing) {
                 TextBox textBox = sender as TextBox;
                 this._popup.SetBinding(Popup.StaysOpenProperty, new Binding(IsKeyboardFocusedProperty.Name) { Source = textBox });
                 this._popup.PlacementTarget = textBox;
@@ -379,7 +461,7 @@ ORDER BY sort_order;", (int)this.WVM.SelectedBalanceKind, this.WVM.SelectedBookV
                 reader.ExecWholeRow((count, record) => {
                     CategoryViewModel vm = new CategoryViewModel() { Id = record.ToInt("category_id"), Name = record["category_name"] };
                     categoryVMList.Add(vm);
-                    if(vm.Id == tmpCategoryId) {
+                    if (vm.Id == tmpCategoryId) {
                         selectedCategoryVM = vm;
                     }
                     return true;
@@ -482,7 +564,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
                     return true;
                 });
             }
-            
+
             this.WVM.RemarkList = remarkVMList;
             this.WVM.SelectedRemark = selectedRemark;
         }
@@ -503,22 +585,81 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
 
             DateTime lastActTime = this.WVM.DateValueVMList.Max((tmp) => tmp.ActDate);
             using (DaoBase dao = this.builder.Build()) {
-                #region 帳簿項目を追加する
-                foreach(DateValueViewModel vm in this.WVM.DateValueVMList) {
-                    if (vm.ActValue.HasValue) {
-                        DateTime actTime = vm.ActDate; // 日付
-                        int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value; // 金額
-                        DaoReader reader = await dao.ExecQueryAsync(@"
-INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7}) RETURNING action_id;",
-                            bookId, itemId, actTime, actValue, shopName, remark, Updater, Inserter);
+                switch (this.WVM.RegMode) {
+                    case RegistrationMode.Add: {
+                            #region 帳簿項目を追加する
+                            await dao.ExecTransactionAsync(async () => {
+                                int tmpGroupId = -1;
+                                // グループIDを取得する
+                                DaoReader reader = await dao.ExecQueryAsync(@"
+INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.ListReg, Updater, Inserter);
+                                reader.ExecARow((record) => {
+                                    tmpGroupId = record.ToInt("group_id");
+                                });
 
-                        reader.ExecARow((record) => {
-                            tmpActionIdList.Add(record.ToInt("action_id"));
-                        });
-                    }
+                                foreach (DateValueViewModel vm in this.WVM.DateValueVMList) {
+                                    if (vm.ActValue.HasValue) {
+                                        DateTime actTime = vm.ActDate; // 日付
+                                        int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value; // 金額
+                                        reader = await dao.ExecQueryAsync(@"
+INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 'now', @{7}, 'now', @{8}) RETURNING action_id;",
+                                            bookId, itemId, actTime, actValue, shopName, tmpGroupId, remark, Updater, Inserter);
+
+                                        reader.ExecARow((record) => {
+                                            tmpActionIdList.Add(record.ToInt("action_id"));
+                                        });
+                                    }
+                                }
+                            });
+                            #endregion
+                        }
+                        break;
+                    case RegistrationMode.Edit: {
+                            #region 帳簿項目を編集する
+                            await dao.ExecTransactionAsync(async () => {
+                                foreach (DateValueViewModel vm in this.WVM.DateValueVMList) {
+                                    if (vm.ActValue.HasValue) {
+                                        int? actionId = vm.ActionId;
+                                        DateTime actTime = vm.ActDate; // 日付
+                                        int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value; // 金額
+
+                                        if (actionId.HasValue) {
+                                            await dao.ExecNonQueryAsync(@"
+UPDATE hst_action
+SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, update_time = 'now', updater = @{6}
+WHERE action_id = @{7} AND NOT (book_id = @{0} AND item_id = @{1} AND act_time = @{2} AND act_value = @{3} AND shop_name = @{4} AND remark = @{5});",
+                                                bookId, itemId, actTime, actValue, shopName, remark, Updater, actionId.Value);
+
+
+                                            tmpActionIdList.Add(actionId.Value);
+                                        }
+                                        else {
+                                            DaoReader reader = await dao.ExecQueryAsync(@"
+INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 'now', @{7}, 'now', @{8}) RETURNING action_id;",
+                                                bookId, itemId, actTime, actValue, shopName, this.selectedGroupId, remark, Updater, Inserter);
+
+                                            reader.ExecARow((record) => {
+                                                tmpActionIdList.Add(record.ToInt("action_id"));
+                                            });
+                                        }
+                                    }
+                                }
+
+                                IEnumerable<int> expected = this.groupedActionIdList.Except(tmpActionIdList);
+                                foreach (int actionId in expected) {
+                                    await dao.ExecNonQueryAsync(@"
+UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{1} 
+WHERE action_id = @{0};", actionId, Updater);
+                                }
+                            });
+                            #endregion
+                        }
+                        break;
                 }
-                #endregion
+
 
                 if (shopName != string.Empty) {
                     #region 店舗を追加する
@@ -576,7 +717,7 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", lastActTime, Upda
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (0<= settings.ActionListRegistrationWindow_Left) {
+            if (0 <= settings.ActionListRegistrationWindow_Left) {
                 this.Left = settings.ActionListRegistrationWindow_Left;
             }
             if (0 <= settings.ActionListRegistrationWindow_Top) {

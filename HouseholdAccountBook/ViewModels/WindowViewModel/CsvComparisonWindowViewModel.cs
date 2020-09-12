@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private string _CsvFileName = default;
         #endregion
-        
+
         /// <summary>
         /// 帳簿VMリスト
         /// </summary>
@@ -78,7 +78,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private int? _SumValue = default;
         #endregion
-        
+
         /// <summary>
         /// デバッグビルドか
         /// </summary>

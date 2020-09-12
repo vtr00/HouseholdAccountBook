@@ -121,7 +121,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private bool _CsvDataExists = default;
         #endregion
-        
+
         /// <summary>
         /// 日付インデックス
         /// </summary>

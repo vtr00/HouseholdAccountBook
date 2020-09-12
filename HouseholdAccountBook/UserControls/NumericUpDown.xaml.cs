@@ -60,9 +60,9 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         #region NullValueProperty
         public static readonly DependencyProperty NullValueProperty = DependencyProperty.Register(
-            nameof(NullValue), 
-            typeof(int), 
-            typeof(NumericUpDown), 
+            nameof(NullValue),
+            typeof(int),
+            typeof(NumericUpDown),
             new PropertyMetadata(0));
         #endregion
         /// <summary>
@@ -124,7 +124,7 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// <see cref="NumericUpDown"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        public NumericUpDown() 
+        public NumericUpDown()
         {
             this.InitializeComponent();
         }
@@ -195,7 +195,7 @@ namespace HouseholdAccountBook.UserControls
                         string forwardText = textBox.Text.Substring(0, selectionStart);
                         string selectedText = textBox.SelectedText;
                         string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
-                        
+
                         if (int.TryParse(string.Format("{0}{1}{2}", forwardText, value, backwardText), out int outValue)) {
                             this.Value = outValue;
                             textBox.SelectionStart = selectionStart + 1;
@@ -294,7 +294,7 @@ namespace HouseholdAccountBook.UserControls
                 this.DecreaceNumber();
             }
         }
-        
+
         /// <summary>
         /// コントロールからフォーカスが外れたとき
         /// </summary>
@@ -339,7 +339,8 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// 数値をインクリメントする
         /// </summary>
-        private void IncreaceNumber() {
+        private void IncreaceNumber()
+        {
             if (this.Value == null) {
                 this.Value = this.MinValue;
             }
@@ -354,7 +355,7 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// 数値をデクリメントする
         /// </summary>
-        private void DecreaceNumber() 
+        private void DecreaceNumber()
         {
             if (this.Value == null) {
                 this.Value = this.MaxValue;
