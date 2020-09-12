@@ -1,11 +1,12 @@
-﻿using Prism.Mvvm;
+﻿using HouseholdAccountBook.Interfaces;
+using Prism.Mvvm;
 
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
     /// CSV比較VM
     /// </summary>
-    public partial class CsvComparisonViewModel : BindableBase
+    public partial class CsvComparisonViewModel : BindableBase, IMultiSelectable
     {
         #region プロパティ
         /// <summary>
@@ -78,6 +79,18 @@ namespace HouseholdAccountBook.ViewModels
             set => this.SetProperty(ref this._Record, value);
         }
         private CsvRecord _Record = default;
+        #endregion
+
+        /// <summary>
+        /// 選択されているか
+        /// </summary>
+        #region IsSelected
+        public bool IsSelected
+        {
+            get => this._IsSelected;
+            set => this.SetProperty(ref this._IsSelected, value);
+        }
+        private bool _IsSelected = default;
         #endregion
         #endregion
 

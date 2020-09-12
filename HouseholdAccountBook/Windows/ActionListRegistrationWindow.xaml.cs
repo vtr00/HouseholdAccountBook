@@ -27,15 +27,19 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         private readonly DaoBuilder builder;
         /// <summary>
-        /// MainWindowで表示された帳簿ID
+        /// <see cref="MainWindow"/>で表示された帳簿ID
         /// </summary>
         private readonly int? selectedBookId;
         /// <summary>
-        /// MainWindowで選択された帳簿項目の日付
+        /// <see cref="MainWindow"/>で選択された帳簿項目の日付
         /// </summary>
         private readonly DateTime? selectedDateTime;
         /// <summary>
-        /// MainWindowで選択された帳簿項目のグループID
+        /// <see cref="CsvComparisonWindow"/>で選択されたCSVレコードリスト
+        /// </summary>
+        private readonly List<CsvComparisonViewModel.CsvRecord> selectedRecordList;
+        /// <summary>
+        /// <see cref="MainWindow"/>で選択された帳簿項目のグループID
         /// </summary>
         private readonly int? selectedGroupId;
         /// <summary>
@@ -70,6 +74,25 @@ namespace HouseholdAccountBook.Windows
             this.builder = builder;
             this.selectedBookId = selectedBookId;
             this.selectedDateTime = selectedDateTime;
+            this.selectedGroupId = null;
+
+            this.InitializeComponent();
+            this.LoadSetting();
+
+            this.WVM.RegMode = RegistrationMode.Add;
+        }
+
+        /// <summary>
+        /// 複数の帳簿項目の新規登録のために <see cref="ActionListRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
+        /// </summary>
+        /// <param name="builder">DAOビルダ</param>
+        /// <param name="selectedBookId">選択された帳簿ID</param>
+        /// <param name="selectedRecordList">選択されたCSVレコードリスト</param>
+        public ActionListRegistrationWindow(DaoBuilder builder, int selectedBookId, List<CsvComparisonViewModel.CsvRecord> selectedRecordList)
+        {
+            this.builder = builder;
+            this.selectedBookId = selectedBookId;
+            this.selectedRecordList = selectedRecordList;
             this.selectedGroupId = null;
 
             this.InitializeComponent();
@@ -245,7 +268,15 @@ namespace HouseholdAccountBook.Windows
                         DateTime actDate = this.selectedDateTime != null ? this.selectedDateTime.Value : DateTime.Today;
 
                         DateTime dateTime = this.selectedDateTime ?? DateTime.Today;
-                        this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = actDate });
+
+                        if (this.selectedRecordList == null) {
+                            this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = actDate });
+                        }
+                        else {
+                            foreach (CsvComparisonViewModel.CsvRecord record in this.selectedRecordList) {
+                                this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = record.Date, ActValue = record.Value });
+                            }
+                        }
                     }
                     break;
                 case RegistrationMode.Edit:

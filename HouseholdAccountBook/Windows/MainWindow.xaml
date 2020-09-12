@@ -29,8 +29,8 @@
 
         <!-- 編集コマンド -->
         <RoutedCommand x:Key="MoveToBookCommand"/>
-        <RoutedCommand x:Key="AddActionToBookCommand"/>
-        <RoutedCommand x:Key="AddActionListToBookCommand"/>
+        <RoutedCommand x:Key="AddActionCommand"/>
+        <RoutedCommand x:Key="AddActionListCommand"/>
         <RoutedCommand x:Key="EditActionCommand"/>
         <RoutedCommand x:Key="CopyActionCommand"/>
         <RoutedCommand x:Key="DeleteActionCommand"/>
@@ -108,9 +108,9 @@
 
         <!-- 編集コマンド -->
         <CommandBinding Command="{StaticResource MoveToBookCommand}" CanExecute="MoveToBookCommand_CanExecute" Executed="MoveToBookCommand_Executed"/>
-        <CommandBinding Command="{StaticResource AddActionToBookCommand}" CanExecute="AddActionToBookCommand_CanExecute" Executed="AddActionToBookCommand_Executed"/>
+        <CommandBinding Command="{StaticResource AddActionCommand}" CanExecute="AddActionCommand_CanExecute" Executed="AddActionCommand_Executed"/>
         <CommandBinding Command="{StaticResource EditActionCommand}" CanExecute="EditActionCommand_CanExecute" Executed="EditActionCommand_Executed"/>
-        <CommandBinding Command="{StaticResource AddActionListToBookCommand}" CanExecute="AddActionListToBookCommand_CanExecute" Executed="AddActionListToBookCommand_Executed"/>
+        <CommandBinding Command="{StaticResource AddActionListCommand}" CanExecute="AddActionListCommand_CanExecute" Executed="AddActionListCommand_Executed"/>
         <CommandBinding Command="{StaticResource CopyActionCommand}" CanExecute="CopyActionCommand_CanExecute" Executed="CopyActionCommand_Executed"/>
         <CommandBinding Command="{StaticResource DeleteActionCommand}" CanExecute="DeleteActionCommand_CanExecute" Executed="DeleteActionCommand_Executed"/>
         <CommandBinding Command="{StaticResource ChangeIsMatchCommand}" CanExecute="ChangeIsMatchCommand_CanExecute" Executed="ChangeIsMatchCommand_Executed"/>
@@ -177,8 +177,8 @@
             <MenuItem Header="編集(_E)">
                 <MenuItem Header="移動(_T)..." Command="{StaticResource MoveToBookCommand}" InputGestureText="Ctrl+M"/>
                 <Separator/>
-                <MenuItem Header="追加(_A)..." Command="{StaticResource AddActionToBookCommand}" InputGestureText="Ctrl++"/>
-                <MenuItem Header="リスト追加(_W)..." Command="{StaticResource AddActionListToBookCommand}" InputGestureText="Ctrl+Shift++"/>
+                <MenuItem Header="追加(_A)..." Command="{StaticResource AddActionCommand}" InputGestureText="Ctrl++"/>
+                <MenuItem Header="リスト追加(_W)..." Command="{StaticResource AddActionListCommand}" InputGestureText="Ctrl+Shift++"/>
                 <MenuItem Header="編集(_E)..." Command="{StaticResource EditActionCommand}" InputGestureText="F2"/>
                 <MenuItem Header="複製(_C)..." Command="{StaticResource CopyActionCommand}" InputGestureText="Ctrl+Shift+C"/>
                 <MenuItem Header="削除(_D)" Command="{StaticResource DeleteActionCommand}" InputGestureText="Del"/>
@@ -279,8 +279,8 @@
                             
                             <StackPanel Grid.Column="2" Orientation="Horizontal">
                                 <Button Width="50" Content="移動" Command="{StaticResource MoveToBookCommand}"/>
-                                <Button Width="50" Content="追加" Command="{StaticResource AddActionToBookCommand}"/>
-                                <Button Width="80" Content="リスト追加" Command="{StaticResource AddActionListToBookCommand}"/>
+                                <Button Width="50" Content="追加" Command="{StaticResource AddActionCommand}"/>
+                                <Button Width="80" Content="リスト追加" Command="{StaticResource AddActionListCommand}"/>
                                 <Button Width="50" Content="編集" Command="{StaticResource EditActionCommand}"/>
                                 <Button Width="50" Content="複製" Command="{StaticResource CopyActionCommand}"/>
                                 <Button Width="50" Content="削除" Command="{StaticResource DeleteActionCommand}"/>
@@ -308,10 +308,10 @@
                             </DataGrid.Resources>
                             <DataGrid.InputBindings>
                                 <KeyBinding Gesture="Ctrl+M" Command="{StaticResource MoveToBookCommand}"/>
-                                <KeyBinding Gesture="Ctrl+OEMPlus" Command="{StaticResource AddActionToBookCommand}"/>
-                                <KeyBinding Gesture="Ctrl+Add" Command="{StaticResource AddActionToBookCommand}"/>
-                                <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{StaticResource AddActionListToBookCommand}"/>
-                                <KeyBinding Gesture="Shift+Ctrl+Add" Command="{StaticResource AddActionListToBookCommand}"/>
+                                <KeyBinding Gesture="Ctrl+OEMPlus" Command="{StaticResource AddActionCommand}"/>
+                                <KeyBinding Gesture="Ctrl+Add" Command="{StaticResource AddActionCommand}"/>
+                                <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{StaticResource AddActionListCommand}"/>
+                                <KeyBinding Gesture="Shift+Ctrl+Add" Command="{StaticResource AddActionListCommand}"/>
                                 <KeyBinding Gesture="F2" Command="{StaticResource EditActionCommand}"/>
                                 <KeyBinding Gesture="Enter" Command="{StaticResource EditActionCommand}"/>
                                 <KeyBinding Gesture="Ctrl+Shift+C" Command="{StaticResource CopyActionCommand}"/>

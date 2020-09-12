@@ -157,6 +157,42 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
+        /// 項目追加可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            // 選択されている帳簿項目が1つ以上存在していて、値を持たない帳簿項目IDが1つ以上ある
+            e.CanExecute = this.WVM.SelectedCsvComparisonVMList.Count != 0 && this.WVM.SelectedCsvComparisonVMList.Count((vm) => !vm.ActionId.HasValue) > 0;
+        }
+
+        /// <summary>
+        /// 項目追加処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            List<CsvComparisonViewModel.CsvRecord> vmList = new List<CsvComparisonViewModel.CsvRecord>(this.WVM.SelectedCsvComparisonVMList.Where((vm) => !vm.ActionId.HasValue).Select((vm) => vm.Record));
+            if (vmList.Count() == 1) {
+                CsvComparisonViewModel.CsvRecord record = vmList[0];
+                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, record);
+                arw.Registrated += async (sender2, e2) => {
+                    await this.UpdateComparisonInfoAsync();
+                };
+                arw.ShowDialog();
+            }
+            else {
+                ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, vmList);
+                alrw.Registrated += async (sender2, e2) => {
+                    await this.UpdateComparisonInfoAsync();
+                };
+                alrw.ShowDialog();
+            }
+        }
+
+        /// <summary>
         /// 項目編集可能か
         /// </summary>
         /// <param name="sender"></param>
@@ -164,7 +200,7 @@ namespace HouseholdAccountBook.Windows
         private void EditActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが値を持つ
-            e.CanExecute = this.WVM.SelectedCsvComparisonVM != null && this.WVM.SelectedCsvComparisonVM.ActionId.HasValue;
+            e.CanExecute = this.WVM.SelectedCsvComparisonVMList.Count == 1 && this.WVM.SelectedCsvComparisonVM.ActionId.HasValue;
         }
 
         /// <summary>

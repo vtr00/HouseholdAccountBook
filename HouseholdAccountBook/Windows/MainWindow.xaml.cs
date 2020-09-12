@@ -536,7 +536,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void AddActionToBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void AddActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択されている帳簿が存在する
             e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && this.WVM.SelectedBookVM != null;
@@ -547,7 +547,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void AddActionToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void AddActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder,
                 this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
@@ -566,7 +566,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void AddActionListToBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void AddActionListCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 帳簿タブを選択していて、選択されている帳簿が存在する
             e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && this.WVM.SelectedBookVM != null;
@@ -577,7 +577,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void AddActionListToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void AddActionListCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder,
                 this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime) { Owner = this };

@@ -24,15 +24,19 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         private readonly DaoBuilder builder;
         /// <summary>
-        /// MainWindowで選択された帳簿ID
+        /// <see cref="MainWindow"/>で選択された帳簿ID
         /// </summary>
         private readonly int? selectedBookId;
         /// <summary>
-        /// MainWindowで選択された日付
+        /// <see cref="MainWindow"/>で選択された日付
         /// </summary>
         private readonly DateTime? selectedDateTime;
         /// <summary>
-        /// MainWindowで選択された帳簿項目ID
+        /// <see cref="CsvComparisonWindow"/>で選択されたCSVレコード
+        /// </summary>
+        private readonly CsvComparisonViewModel.CsvRecord selectedRecord;
+        /// <summary>
+        /// <see cref="MainWindow"/>で選択された帳簿項目ID
         /// </summary>
         private readonly int? selectedActionId;
         /// <summary>
@@ -59,6 +63,26 @@ namespace HouseholdAccountBook.Windows
             this.builder = builder;
             this.selectedBookId = selectedBookId;
             this.selectedDateTime = selectedDateTime;
+            this.selectedActionId = null;
+
+            this.InitializeComponent();
+            this.LoadSetting();
+
+            this.WVM.RegMode = RegistrationMode.Add;
+        }
+
+        /// <summary>
+        /// 帳簿項目の新規登録のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
+        /// </summary>
+        /// <param name="builder">DAOビルダ</param>
+        /// <param name="selectedBookId">選択された帳簿ID</param>
+        /// <param name="selectedRecord">選択されたCSVレコード</param>
+        public ActionRegistrationWindow(DaoBuilder builder, int selectedBookId, CsvComparisonViewModel.CsvRecord selectedRecord)
+        {
+            this.builder = builder;
+            this.selectedBookId = selectedBookId;
+            this.selectedDateTime = null;
+            this.selectedRecord = selectedRecord;
             this.selectedActionId = null;
 
             this.InitializeComponent();
@@ -206,20 +230,26 @@ namespace HouseholdAccountBook.Windows
             BalanceKind balanceKind = BalanceKind.Outgo;
 
             int? itemId = null;
+            int? actValue = null;
+            bool isMatch = false;
             string shopName = null;
             string remark = null;
 
             switch (this.WVM.RegMode) {
                 case RegistrationMode.Add: {
                         bookId = this.selectedBookId;
-                        actDate = this.selectedDateTime != null ? this.selectedDateTime.Value : DateTime.Today;
                         balanceKind = BalanceKind.Outgo;
+                        if (this.selectedRecord == null) {
+                            actDate = this.selectedDateTime != null ? this.selectedDateTime.Value : DateTime.Today;
+                        }
+                        else {
+                            actDate = this.selectedRecord.Date;
+                            actValue = this.selectedRecord.Value;
+                        }
                     }
                     break;
                 case RegistrationMode.Edit:
                 case RegistrationMode.Copy: {
-                        int actValue = -1;
-                        bool isMatch = false;
                         using (DaoBase dao = this.builder.Build()) {
                             DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT book_id, item_id, act_time, act_value, group_id, shop_name, remark, is_match
@@ -236,10 +266,7 @@ WHERE del_flg = 0 AND action_id = @{0};", this.selectedActionId);
                                 isMatch = record.ToInt("is_match") == 1;
                             });
                         }
-                        balanceKind = Math.Sign(actValue) > 0 ? BalanceKind.Income : BalanceKind.Outgo; // 収入 / 支出
-
-                        this.WVM.Value = Math.Abs(actValue);
-                        this.WVM.IsMatch = isMatch;
+                        balanceKind = Math.Sign(actValue.Value) > 0 ? BalanceKind.Income : BalanceKind.Outgo; // 収入 / 支出
 
                         // 回数の表示
                         int count = 1;
@@ -273,8 +300,11 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
 
             this.WVM.BookVMList = bookVMList;
             this.WVM.SelectedBookVM = selectedBookVM;
-            this.WVM.SelectedDate = actDate;
             this.WVM.SelectedBalanceKind = balanceKind;
+            this.WVM.SelectedDate = actDate;
+
+            this.WVM.Value = actValue.HasValue ? Math.Abs(actValue.Value) : (int?)null;
+            this.WVM.IsMatch = isMatch;
 
             await this.UpdateCategoryListAsync();
             await this.UpdateItemListAsync(itemId);
