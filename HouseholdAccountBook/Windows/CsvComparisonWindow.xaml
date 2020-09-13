@@ -81,7 +81,7 @@
             </MenuItem>
             <MenuItem Header="編集(_E)">
                 <MenuItem Header="追加(_A)..." Command="{StaticResource AddActionCommand}" InputGestureText="Ctrl++"/>
-                <MenuItem Header="変更(_E)..." Command="{StaticResource EditActionCommand}" InputGestureText="F2"/>
+                <MenuItem Header="編集(_E)..." Command="{StaticResource EditActionCommand}" InputGestureText="F2"/>
                 <Separator/>
                 <MenuItem Header="一括チェック(_B)" Command="{StaticResource BulkCheckCommand}" InputGestureText="Ctrl+B"/>
             </MenuItem>

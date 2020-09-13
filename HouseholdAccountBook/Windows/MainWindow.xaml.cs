@@ -1257,8 +1257,8 @@ WHERE action_id = @{0};", vm.ActionId);
                     }
                 }
             };
-            // 複数の帳簿項目の一致を確認時のイベントを登録する
-            ccw.IsMatchesChanged += async (sender3, e3) => {
+            // 複数の帳簿項目変更時のイベントを登録する
+            ccw.ActionsStatusChanged += async (sender3, e3) => {
                 await this.UpdateBookTabDataAsync(isScroll: false);
             };
             ccw.Show();

@@ -44,9 +44,9 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         public event EventHandler<EventArgs<int>> IsMatchChanged;
         /// <summary>
-        /// 比較結果が同時に複数変更された時
+        /// 複数の帳簿項目の状態が変更された時
         /// </summary>
-        public event EventHandler<EventArgs> IsMatchesChanged;
+        public event EventHandler<EventArgs> ActionsStatusChanged;
         #endregion
 
         /// <summary>
@@ -180,6 +180,7 @@ namespace HouseholdAccountBook.Windows
                 ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, record);
                 arw.Registrated += async (sender2, e2) => {
                     await this.UpdateComparisonInfoAsync();
+                    this.ActionsStatusChanged?.Invoke(this, new EventArgs());
                 };
                 arw.ShowDialog();
             }
@@ -187,6 +188,7 @@ namespace HouseholdAccountBook.Windows
                 ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, vmList);
                 alrw.Registrated += async (sender2, e2) => {
                     await this.UpdateComparisonInfoAsync();
+                    this.ActionsStatusChanged?.Invoke(this, new EventArgs());
                 };
                 alrw.ShowDialog();
             }
@@ -213,6 +215,7 @@ namespace HouseholdAccountBook.Windows
             ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedCsvComparisonVM.ActionId.Value);
             arw.Registrated += async (sender2, e2) => {
                 await this.UpdateComparisonInfoAsync();
+                this.ActionsStatusChanged?.Invoke(this, new EventArgs());
             };
             arw.ShowDialog();
         }
@@ -255,8 +258,8 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
                 });
             }
 
-            this.IsMatchesChanged?.Invoke(this, new EventArgs());
             await this.UpdateComparisonInfoAsync();
+            this.ActionsStatusChanged?.Invoke(this, new EventArgs());
 
             this.Cursor = cursor;
         }
