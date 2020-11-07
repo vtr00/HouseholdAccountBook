@@ -1793,7 +1793,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             DateTime tmpStartTime = startTime;
             DateTime tmpEndTime = tmpStartTime.AddDays(1).AddMilliseconds(-1);
             ObservableCollection<SummaryViewModel> summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
-            balance = balance + summaryVMList[0].Summary;
+            balance += summaryVMList[0].Summary;
             vmList[0].Values.Add(balance); // 残高
 
             foreach (SummaryViewModel summaryVM in summaryVMList) {
@@ -1828,7 +1828,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 tmpEndTime = tmpStartTime.AddDays(1).AddMilliseconds(-1);
 
                 summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
-                balance = balance + summaryVMList[0].Summary;
+                balance += summaryVMList[0].Summary;
                 vmList[0].Values.Add(balance); // 残高
                 for (int j = 0; j < summaryVMList.Count; ++j) {
                     int value = summaryVMList[j].Summary;

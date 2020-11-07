@@ -65,7 +65,7 @@ namespace HouseholdAccountBook
                     }
                 }
 
-                MessageBox.Show("同時に複数起動することはできません。");
+                MessageBox.Show("同時に複数起動することはできません。", MessageTitle.Exclamation);
                 this.Shutdown();
                 return;
             }

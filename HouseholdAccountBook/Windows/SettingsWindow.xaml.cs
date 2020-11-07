@@ -30,7 +30,7 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// DAOビルダ
         /// </summary>
-        private DaoBuilder builder;
+        private readonly DaoBuilder builder;
         /// <summary>
         /// 前回選択していた設定タブ
         /// </summary>

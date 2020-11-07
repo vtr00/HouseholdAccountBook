@@ -76,6 +76,9 @@ namespace HouseholdAccountBook.Extensions
         /// <returns>会計年度初め</returns>
         public static DateTime GetFirstDateOfFiscalYear(this DateTime dateTime, int firstMonthOfFiscalYear)
         {
+            if (firstMonthOfFiscalYear <= 0) firstMonthOfFiscalYear = 1;
+            if (12 <= firstMonthOfFiscalYear) firstMonthOfFiscalYear = 12;
+
             DateTime ans = dateTime.AddMonths(-(firstMonthOfFiscalYear - 1));
             ans = new DateTime(ans.Year, firstMonthOfFiscalYear, 1);
             return ans;

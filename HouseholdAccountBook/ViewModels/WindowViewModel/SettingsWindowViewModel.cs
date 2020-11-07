@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 設定
         /// </summary>
-        private Properties.Settings settings;
+        private readonly Properties.Settings settings;
 
         #region プロパティ
         /// <summary>

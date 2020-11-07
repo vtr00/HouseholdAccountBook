@@ -148,7 +148,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void IncreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.IncreaceNumber();
+            this.IncreaseNumber();
             e.Handled = true;
         }
 
@@ -169,7 +169,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void DecreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.DecreaceNumber();
+            this.DecreaseNumber();
             e.Handled = true;
         }
 
@@ -182,29 +182,31 @@ namespace HouseholdAccountBook.UserControls
         {
             TextBox textBox = this._textBox;
 
+            int? tmpValue = this.Value;
+            int tmpSelectionStart = textBox.SelectionStart;
+
             switch (this.UVM.InputedKind) {
                 case NumericInputButton.InputKind.Number:
                     int value = this.UVM.InputedValue.Value;
-                    if (this.Value == null) {
-                        this.Value = value;
-                        textBox.SelectionStart = 1;
+                    if (tmpValue == null) {
+                        tmpValue = value;
+                        tmpSelectionStart = 1;
                     }
                     else {
                         int selectionStart = textBox.SelectionStart;
                         int selectionEnd = selectionStart + textBox.SelectionLength;
                         string forwardText = textBox.Text.Substring(0, selectionStart);
-                        string selectedText = textBox.SelectedText;
                         string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
 
                         if (int.TryParse(string.Format("{0}{1}{2}", forwardText, value, backwardText), out int outValue)) {
-                            this.Value = outValue;
-                            textBox.SelectionStart = selectionStart + 1;
+                            tmpValue = outValue;
+                            tmpSelectionStart = selectionStart + 1;
                         }
                     }
                     break;
                 case NumericInputButton.InputKind.BackSpace:
-                    if (this.Value == 0) {
-                        this.Value = null;
+                    if (tmpValue == 0) {
+                        tmpValue = null;
                     }
                     else {
                         int selectionStart = textBox.SelectionStart;
@@ -215,24 +217,34 @@ namespace HouseholdAccountBook.UserControls
 
                         if (selectionLength != 0) {
                             if (int.TryParse(string.Format("{0}{1}", forwardText, backwardText), out int outValue)) {
-                                this.Value = outValue;
-                                textBox.SelectionStart = selectionStart;
+                                tmpValue = outValue;
+                                tmpSelectionStart = selectionStart;
                             }
                         }
                         else if (selectionStart != 0) {
                             string newText = string.Format("{0}{1}", forwardText.Substring(0, selectionStart - 1), backwardText);
-                            if (string.Empty == newText || int.TryParse(newText, out int outValue)) {
-                                this.Value = string.Empty == newText ? (int?)null : int.Parse(newText);
-                                textBox.SelectionStart = selectionStart - 1;
+                            if (string.Empty == newText) {
+                                tmpValue = null;
+                                tmpSelectionStart = selectionStart - 1;
+                            }
+                            else if (int.TryParse(newText, out int outValue)) {
+                                tmpValue = outValue;
+                                tmpSelectionStart = selectionStart - 1;
                             }
                         }
                     }
                     break;
                 case NumericInputButton.InputKind.Clear:
-                    this.Value = null;
+                    tmpValue = null;
                     break;
             }
-            textBox.Focus();
+
+            if (this.MinValue <= tmpValue && tmpValue <= this.MaxValue) {
+                this.Value = tmpValue;
+                textBox.SelectionStart = tmpSelectionStart;
+
+                textBox.Focus();
+            }
 
             e.Handled = true;
         }
@@ -255,7 +267,7 @@ namespace HouseholdAccountBook.UserControls
                         yes_parse = true;
                     }
                     else {
-                        yes_parse = Int32.TryParse(tmp, out int xx);
+                        yes_parse = int.TryParse(tmp, out int xx);
 
                         // 範囲内かどうかチェック
                         if (yes_parse) {
@@ -288,10 +300,10 @@ namespace HouseholdAccountBook.UserControls
         private void TextBox_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0) {
-                this.IncreaceNumber();
+                this.IncreaseNumber();
             }
             else if (e.Delta < 0) {
-                this.DecreaceNumber();
+                this.DecreaseNumber();
             }
         }
 
@@ -339,7 +351,7 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// 数値をインクリメントする
         /// </summary>
-        private void IncreaceNumber()
+        private void IncreaseNumber()
         {
             if (this.Value == null) {
                 this.Value = this.MinValue;
@@ -355,7 +367,7 @@ namespace HouseholdAccountBook.UserControls
         /// <summary>
         /// 数値をデクリメントする
         /// </summary>
-        private void DecreaceNumber()
+        private void DecreaseNumber()
         {
             if (this.Value == null) {
                 this.Value = this.MaxValue;
