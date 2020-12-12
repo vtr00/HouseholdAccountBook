@@ -179,6 +179,9 @@ namespace HouseholdAccountBook.Windows
                 CsvComparisonViewModel.CsvRecord record = vmList[0];
                 ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, record);
                 arw.Registrated += async (sender2, e2) => {
+                    foreach (int value in e2.Value) {
+                        await this.ChangeIsMatchAsync(value, true);
+                    }
                     await this.UpdateComparisonInfoAsync();
                     this.ActionsStatusChanged?.Invoke(this, new EventArgs());
                 };
@@ -187,6 +190,9 @@ namespace HouseholdAccountBook.Windows
             else {
                 ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, vmList);
                 alrw.Registrated += async (sender2, e2) => {
+                    foreach (int value in e2.Value) {
+                        await this.ChangeIsMatchAsync(value, true);
+                    }
                     await this.UpdateComparisonInfoAsync();
                     this.ActionsStatusChanged?.Invoke(this, new EventArgs());
                 };
@@ -219,6 +225,37 @@ namespace HouseholdAccountBook.Windows
             };
             arw.ShowDialog();
         }
+
+        /// <summary>
+        /// 項目追加/編集可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddOrEditActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            this.AddActionCommand_CanExecute(sender, e);
+            if (!e.CanExecute) {
+                this.EditActionCommand_CanExecute(sender, e);
+            }
+        }
+
+        /// <summary>
+        /// 項目追加/編集処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddOrEditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            // 選択されている帳簿項目が1つ以上存在していて、値を持たない帳簿項目IDが1つ以上ある
+            if (this.WVM.SelectedCsvComparisonVMList.Count != 0 && this.WVM.SelectedCsvComparisonVMList.Count((vm) => !vm.ActionId.HasValue) > 0) {
+                this.AddActionCommand_Executed(sender, e);
+            }
+            else {
+                this.EditActionCommand_Executed(sender, e);
+            }
+
+        }
+
 
         /// <summary>
         /// 一括チェック可能か

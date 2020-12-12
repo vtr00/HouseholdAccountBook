@@ -89,6 +89,7 @@ namespace HouseholdAccountBook.Windows
             this.LoadSetting();
 
             this.WVM.RegMode = RegistrationMode.Add;
+            this.WVM.AddedByCsvComparison = true;
         }
 
         /// <summary>

@@ -23,6 +23,7 @@
         <RoutedCommand x:Key="AddActionCommand"/>
         <RoutedCommand x:Key="EditActionCommand"/>
         <RoutedCommand x:Key="BulkCheckCommand"/>
+        <RoutedCommand x:Key="AddOrEditActionCommand"/>
 
         <!-- 表示コマンド -->
         <RoutedCommand x:Key="UpdateCommand"/>
@@ -54,6 +55,8 @@
         <CommandBinding Command="{StaticResource EditActionCommand}" CanExecute="EditActionCommand_CanExecute" Executed="EditActionCommand_Executed"/>
         <CommandBinding Command="{StaticResource BulkCheckCommand}" CanExecute="BulkCheckCommand_CanExecute" Executed="BulkCheckCommand_Executed"/>
         
+        <CommandBinding Command="{StaticResource AddOrEditActionCommand}" CanExecute="AddOrEditActionCommand_CanExecute" Executed="AddOrEditActionCommand_Executed"/>
+
         <!-- 表示コマンド -->
         <CommandBinding Command="{StaticResource UpdateCommand}" CanExecute="UpdateCommand_CanExecute" Executed="UpdateCommand_Executed"/>
         <CommandBinding Command="{StaticResource ClearListCommand}" CanExecute="ClearListCommand_CanExecute" Executed="ClearListCommand_Executed"/>
@@ -124,7 +127,7 @@
                     <KeyBinding Gesture="F2" Command="{StaticResource EditActionCommand}"/>
                     <KeyBinding Gesture="Enter" Command="{StaticResource EditActionCommand}"/>
                     <KeyBinding Gesture="Ctrl+B" Command="{StaticResource BulkCheckCommand}"/>
-                    <MouseBinding Gesture="LeftDoubleClick" Command="{StaticResource EditActionCommand}"/>
+                    <MouseBinding Gesture="LeftDoubleClick" Command="{StaticResource AddOrEditActionCommand}"/>
                 </DataGrid.InputBindings>
                 <i:Interaction.Behaviors>
                     <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding SelectedCsvComparisonVMList, Mode=OneWay}"/>

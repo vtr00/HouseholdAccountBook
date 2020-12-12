@@ -50,6 +50,17 @@ namespace HouseholdAccountBook.ViewModels
         }
         private RegistrationMode _RegMode = default;
         #endregion
+        /// <summary>
+        /// CSV比較からの追加
+        /// </summary>
+        #region AddedByCsvComparison
+        public Boolean AddedByCsvComparison
+        {
+            get => this._AddedByCsvComparison;
+            set => this.SetProperty(ref this._AddedByCsvComparison, value);
+        }
+        private Boolean _AddedByCsvComparison = default;
+        #endregion
 
         /// <summary>
         /// 帳簿VMリスト
