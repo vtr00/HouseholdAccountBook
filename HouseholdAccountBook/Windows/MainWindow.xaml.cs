@@ -1215,17 +1215,29 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
 
                 await this.UpdateBookListAsync();
 
-                await this.UpdateBookTabDataAsync();
-                this.InitializeDailyGraphTabData();
-                await this.UpdateDailyGraphTabDataAsync();
-
-                await this.UpdateMonthlyListTabDataAsync();
-                this.InitializeMonthlyGraphTabData();
-                await this.UpdateMonthlyGraphTabDataAsync();
-
-                await this.UpdateYearlyListTabDataAsync();
-                this.InitializeYearlyGraphTabData();
-                await this.UpdateYearlyGraphTabDataAsync();
+                switch (this.WVM.SelectedTab) {
+                    case Tabs.BooksTab:
+                        await this.UpdateBookTabDataAsync();
+                        break;
+                    case Tabs.DailyGraphTab:
+                        this.InitializeDailyGraphTabData();
+                        await this.UpdateDailyGraphTabDataAsync();
+                        break;
+                    case Tabs.MonthlyListTab:
+                        await this.UpdateMonthlyListTabDataAsync();
+                        break;
+                    case Tabs.MonthlyGraphTab:
+                        this.InitializeMonthlyGraphTabData();
+                        await this.UpdateMonthlyGraphTabDataAsync();
+                        break;
+                    case Tabs.YearlyListTab:
+                        await this.UpdateYearlyListTabDataAsync();
+                        break;
+                    case Tabs.YearlyGraphTab:
+                        this.InitializeYearlyGraphTabData();
+                        await this.UpdateYearlyGraphTabDataAsync();
+                        break;
+                }
 
                 this.Cursor = null;
             }
@@ -1332,28 +1344,46 @@ WHERE action_id = @{0};", vm.ActionId);
             this.WVM.SelectedBookChanged += async () => {
                 this.Cursor = Cursors.Wait;
 
-                await this.UpdateBookTabDataAsync(isScroll: true);
-                await this.UpdateDailyGraphTabDataAsync();
-
-                await this.UpdateMonthlyListTabDataAsync();
-                await this.UpdateMonthlyGraphTabDataAsync();
-
-                await this.UpdateYearlyListTabDataAsync();
-                await this.UpdateYearlyGraphTabDataAsync();
+                switch (this.WVM.SelectedTab) {
+                    case Tabs.BooksTab:
+                        await this.UpdateBookTabDataAsync(isScroll: true);
+                        break;
+                    case Tabs.DailyGraphTab:
+                        await this.UpdateDailyGraphTabDataAsync();
+                        break;
+                    case Tabs.MonthlyListTab:
+                        await this.UpdateMonthlyListTabDataAsync();
+                        break;
+                    case Tabs.MonthlyGraphTab:
+                        await this.UpdateMonthlyGraphTabDataAsync();
+                        break;
+                    case Tabs.YearlyListTab:
+                        await this.UpdateYearlyListTabDataAsync();
+                        break;
+                    case Tabs.YearlyGraphTab:
+                        await this.UpdateYearlyGraphTabDataAsync();
+                        break;
+                }
 
                 this.Cursor = null;
             };
             this.WVM.SelectedGraphKindChanged += async () => {
                 this.Cursor = Cursors.Wait;
 
-                this.InitializeDailyGraphTabData();
-                await this.UpdateDailyGraphTabDataAsync();
-
-                this.InitializeMonthlyGraphTabData();
-                await this.UpdateMonthlyGraphTabDataAsync();
-
-                this.InitializeYearlyGraphTabData();
-                await this.UpdateYearlyGraphTabDataAsync();
+                switch (this.WVM.SelectedTab) {
+                    case Tabs.DailyGraphTab:
+                        this.InitializeDailyGraphTabData();
+                        await this.UpdateDailyGraphTabDataAsync();
+                        break;
+                    case Tabs.MonthlyGraphTab:
+                        this.InitializeMonthlyGraphTabData();
+                        await this.UpdateMonthlyGraphTabDataAsync();
+                        break;
+                    case Tabs.YearlyGraphTab:
+                        this.InitializeYearlyGraphTabData();
+                        await this.UpdateYearlyGraphTabDataAsync();
+                        break;
+                }
 
                 this.Cursor = null;
             };
@@ -1435,13 +1465,14 @@ ORDER BY sort_order;");
                     return true;
                 });
             }
+
             this.WVM.BookVMList = bookVMList;
             this.WVM.SelectedBookVM = selectedBookVM;
         }
 
         #region VM取得
         /// <summary>
-        /// 月内帳簿項目VMリストを取得する
+        /// 月内帳簿項目VMリストを取得する(帳簿タブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">月内の時刻</param>
@@ -1454,7 +1485,7 @@ ORDER BY sort_order;");
         }
 
         /// <summary>
-        /// 帳簿項目VMリストを取得する
+        /// 期間内帳簿項目VMリストを取得する(帳簿タブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="startTime">開始時刻</param>
@@ -1585,20 +1616,7 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
         }
 
         /// <summary>
-        /// 日内合計項目VMリストを取得する
-        /// </summary>
-        /// <param name="bookId">帳簿ID</param>
-        /// <param name="includedTime">日内の時間</param>
-        /// <returns>合計項目VMリスト</returns>
-        private async Task<ObservableCollection<SummaryViewModel>> LoadSummaryViewModelListWithinDayAsync(int? bookId, DateTime includedTime)
-        {
-            DateTime startTime = new DateTime(includedTime.Year, includedTime.Month, includedTime.Day);
-            DateTime endTime = startTime.AddDays(1).AddMilliseconds(-1);
-            return await this.LoadSummaryViewModelListAsync(bookId, startTime, endTime);
-        }
-
-        /// <summary>
-        /// 月内合計項目VMリストを取得する
+        /// 月内合計項目VMリストを取得する(帳簿タブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">月内の時間</param>
@@ -1611,7 +1629,7 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
         }
 
         /// <summary>
-        /// 合計項目VMリストを取得する
+        /// 期間内合計項目VMリストを取得する(帳簿タブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="startTime">開始時刻</param>
@@ -1728,7 +1746,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         }
 
         /// <summary>
-        /// 月内日別合計VMリストを取得する
+        /// 月内日別合計VMリストを取得する(日別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">月内の時間</param>
@@ -1742,7 +1760,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         }
 
         /// <summary>
-        /// 日別合計VMリストを取得する
+        /// 期間内日別合計VMリストを取得する(日別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="startTime">開始時刻</param>
@@ -1861,7 +1879,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         }
 
         /// <summary>
-        /// 年度内月別合計VMリストを取得する
+        /// 年度内月別合計VMリストを取得する(月別一覧/月別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">年度内の時間</param>
@@ -1871,18 +1889,6 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             DateTime startTime = includedTime.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             DateTime endTime = startTime.AddYears(1).AddMilliseconds(-1);
 
-            return await this.LoadMonthlySummaryViewModelListAsync(bookId, startTime, endTime);
-        }
-
-        /// <summary>
-        /// 月別合計VMリストを取得する
-        /// </summary>
-        /// <param name="bookId">帳簿ID</param>
-        /// <param name="startTime">開始時間</param>
-        /// <param name="endTime">開始時間</param>
-        /// <returns>月別合計項目VMリスト</returns>
-        private async Task<ObservableCollection<SeriesViewModel>> LoadMonthlySummaryViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
-        {
             // 開始月までの収支を取得する
             int balance = 0;
             using (DaoBase dao = this.builder.Build()) {
@@ -1991,10 +1997,10 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         }
 
         /// <summary>
-        /// 年別合計VMリストを取得する
+        /// 年別合計VMリストを取得する(年別一覧/年別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
-        /// <returns>月別合計項目VMリスト</returns>
+        /// <returns>年別合計項目VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadYearlySummaryViewModelListWithinDecadeAsync(int? bookId)
         {
             DateTime startTime = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth).AddYears(-9);
@@ -2130,8 +2136,6 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                             this.LoadSummaryViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value)).WhenAll();
                         this.WVM.ActionVMList = tmp1;
                         this.WVM.SummaryVMList = tmp2;
-                        //this.WVM.ActionVMList = await this.LoadActionViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
-                        //this.WVM.SummaryVMList = await this.LoadSummaryViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                         break;
                     case TermKind.Selected:
                         var (tmp3, tmp4) = await (
@@ -2139,8 +2143,6 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                             this.LoadSummaryViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate)).WhenAll();
                         this.WVM.ActionVMList = tmp3;
                         this.WVM.SummaryVMList = tmp4;
-                        //this.WVM.ActionVMList = await this.LoadActionViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
-                        //this.WVM.SummaryVMList = await this.LoadSummaryViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                         break;
                 }
 

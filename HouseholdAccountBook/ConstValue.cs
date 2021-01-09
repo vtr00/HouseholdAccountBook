@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 補足されない例外の情報ファイル名
         /// </summary>
-        public static string UnhandledExceptionInfoFileName = "UnhandledException.txt";
+        public static string UnhandledExceptionInfoFileName { get; } = "UnhandledException.txt";
 
         /// <summary>
         /// タブ

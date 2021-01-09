@@ -4,8 +4,6 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Linq;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
@@ -86,7 +84,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._SelectedBookVM;
             set {
-                if (this.SetProperty(ref this._SelectedBookVM, value)) {
+                if (this.SetProperty(ref this._SelectedBookVM, value) && value != null) { // SelectedBookVMがnullになることはない想定
                     this.SelectedBookChanged?.Invoke();
                 }
             }
@@ -313,7 +311,6 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         #region 月別一覧タブ
-        #region プロパティ
         /// <summary>
         /// 表示年
         /// </summary>
@@ -376,10 +373,8 @@ namespace HouseholdAccountBook.ViewModels
         private ObservableCollection<SeriesViewModel> _MonthlySummaryVMList = default;
         #endregion
         #endregion
-        #endregion
 
         #region 年別一覧タブ
-        #region プロパティ
         /// <summary>
         /// 表示年リスト
         /// </summary>
@@ -402,7 +397,6 @@ namespace HouseholdAccountBook.ViewModels
             set => this.SetProperty(ref this._YearlySummaryVMList, value);
         }
         private ObservableCollection<SeriesViewModel> _YearlySummaryVMList = default;
-        #endregion
         #endregion
         #endregion
 
