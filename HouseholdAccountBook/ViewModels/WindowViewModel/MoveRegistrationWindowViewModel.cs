@@ -62,7 +62,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._MovedDate, value)) {
                     CommandManager.InvalidateRequerySuggested();
 
-                    if (this.MovingDate < value) {
+                    if (this.MovingDate < value || this.IsLink) {
                         this.MovingDate = value;
                     }
                 }
@@ -88,6 +88,23 @@ namespace HouseholdAccountBook.ViewModels
             }
         }
         private DateTime _MovingDate = DateTime.Today;
+        #endregion
+        /// <summary>
+        /// 連動して編集
+        /// </summary>
+        #region IsLink
+        public bool IsLink
+        {
+            get => this._IsLink;
+            set {
+                if (this.SetProperty(ref this._IsLink, value)) {
+                    if (value) {
+                        this.MovingDate = this.MovedDate;
+                    }
+                }
+            }
+        }
+        private bool _IsLink = true;
         #endregion
 
         /// <summary>

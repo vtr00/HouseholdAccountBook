@@ -23,6 +23,7 @@ namespace HouseholdAccountBook.Windows
 
             this.WVM.StartDate = startDate;
             this.WVM.EndDate = endDate;
+            this.termRadioButton.IsChecked = true;
         }
 
         /// <summary>
@@ -36,6 +37,7 @@ namespace HouseholdAccountBook.Windows
 
             this.WVM.StartDate = dateWithinMonth.GetFirstDateOfMonth();
             this.WVM.EndDate = this.WVM.StartDate.AddMonths(1).AddMilliseconds(-1);
+            this.monthRadioButton.IsChecked = true;
         }
 
         #region イベントハンドラ

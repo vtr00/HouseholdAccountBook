@@ -1470,7 +1470,7 @@ ORDER BY sort_order;");
             this.WVM.SelectedBookVM = selectedBookVM;
         }
 
-        #region VM取得
+        #region VM取得用の関数
         /// <summary>
         /// 月内帳簿項目VMリストを取得する(帳簿タブ)
         /// </summary>
@@ -1509,13 +1509,8 @@ SELECT -1 AS action_id, @{1} AS act_time, -1 AS category_id, -1 AS item_id, '繰
 ) AS balance, NULL AS shop_name, NULL AS group_id, NULL AS remark, 0 AS is_match
 UNION
 -- 各帳簿項目
-SELECT A.action_id AS action_id, A.act_time AS act_time, C.category_id AS category_id, I.item_id AS item_id, I.item_name AS item_name, A.act_value AS act_value, (
-  -- 残高
-  SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0)
-  FROM hst_action AA 
-  INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
-  WHERE AA.del_flg = 0 AND (AA.act_time < A.act_time OR (AA.act_time = A.act_time AND AA.action_id <= A.action_id) )
-) AS balance, A.shop_name AS shop_name, A.group_id AS group_id, A.remark AS remark, A.is_match AS is_match
+SELECT A.action_id AS action_id, A.act_time AS act_time, C.category_id AS category_id, I.item_id AS item_id, I.item_name AS item_name, A.act_value AS act_value, 0 AS balance, 
+       A.shop_name AS shop_name, A.group_id AS group_id, A.remark AS remark, A.is_match AS is_match
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) B ON B.book_id = A.book_id
 INNER JOIN (SELECT * FROM mst_item WHERE item_id IN (
@@ -1541,12 +1536,8 @@ SELECT -1 AS action_id, @{1} AS act_time, -1 AS category_id, -1 AS item_id, '繰
 ) AS balance, NULL AS shop_name, NULL AS group_id, NULL AS remark, 0 AS is_match
 UNION
 -- 各帳簿項目
-SELECT A.action_id AS action_id, A.act_time AS act_time, C.category_id AS category_id, I.item_id AS item_id, I.item_name AS item_name, A.act_value AS act_value, (
-  -- 残高
-  SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0})
-  FROM hst_action AA 
-  WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND (AA.act_time < A.act_time OR (AA.act_time = A.act_time AND AA.action_id <= A.action_id) )
-) AS balance, A.shop_name AS shop_name, A.group_id AS group_id, A.remark AS remark, A.is_match AS is_match
+SELECT A.action_id AS action_id, A.act_time AS act_time, C.category_id AS category_id, I.item_id AS item_id, I.item_name AS item_name, A.act_value AS act_value, 0 AS balance,
+       A.shop_name AS shop_name, A.group_id AS group_id, A.remark AS remark, A.is_match AS is_match
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE (move_flg = 1 OR item_id IN (
   SELECT item_id FROM rel_book_item WHERE book_id = @{0} AND del_flg = 0
@@ -1555,19 +1546,20 @@ INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON I.category_id = C
 WHERE A.book_id = @{0} AND A.del_flg = 0 AND @{1} <= A.act_time AND A.act_time <= @{2}
 ORDER BY act_time, action_id;", bookId, startTime, endTime);
                 }
+                int balance = 0;
                 reader.ExecWholeRow((count, record) => {
                     int actionId = record.ToInt("action_id");
                     DateTime actTime = record.ToDateTime("act_time");
                     int categoryId = record.ToInt("category_id");
                     int itemId = record.ToInt("item_id");
                     string itemName = record["item_name"];
-                    int balance = record.ToInt("balance");
+                    int actValue = record.ToInt("act_value");
+                    balance = count == 0 ? record.ToInt("balance") : balance + actValue;
                     string shopName = record["shop_name"];
                     int? groupId = record.ToNullableInt("group_id");
                     string remark = record["remark"];
                     bool isMatch = record.ToInt("is_match") == 1;
 
-                    int actValue = record.ToInt("act_value");
                     BalanceKind balanceKind = BalanceKind.Others;
                     int? income = null;
                     int? outgo = null;
@@ -1616,11 +1608,11 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
         }
 
         /// <summary>
-        /// 月内合計項目VMリストを取得する(帳簿タブ)
+        /// 月内概要VMリストを取得する(帳簿タブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">月内の時間</param>
-        /// <returns>合計項目VMリスト</returns>
+        /// <returns>概要VMリスト</returns>
         private async Task<ObservableCollection<SummaryViewModel>> LoadSummaryViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
         {
             DateTime startTime = includedTime.GetFirstDateOfMonth();
@@ -1629,12 +1621,12 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
         }
 
         /// <summary>
-        /// 期間内合計項目VMリストを取得する(帳簿タブ)
+        /// 期間内概要VMリストを取得する(帳簿タブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="startTime">開始時刻</param>
         /// <param name="endTime">終了時刻</param>
-        /// <returns>合計項目VMリスト</returns>
+        /// <returns>概要VMリスト</returns>
         private async Task<ObservableCollection<SummaryViewModel>> LoadSummaryViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
         {
             ObservableCollection<SummaryViewModel> summaryVMList = new ObservableCollection<SummaryViewModel>();
@@ -1746,11 +1738,11 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         }
 
         /// <summary>
-        /// 月内日別合計VMリストを取得する(日別グラフタブ)
+        /// 月内日別概要VMリストを取得する(日別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">月内の時間</param>
-        /// <returns>月内日別合計項目VMリスト</returns>
+        /// <returns>月内日別概要VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadDailySummaryViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
         {
             DateTime startTime = includedTime.GetFirstDateOfMonth();
@@ -1760,12 +1752,12 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         }
 
         /// <summary>
-        /// 期間内日別合計VMリストを取得する(日別グラフタブ)
+        /// 期間内日別概要VMリストを取得する(日別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="startTime">開始時刻</param>
         /// <param name="endTime">終了時刻</param>
-        /// <returns>日別合計項目VMリスト</returns>
+        /// <returns>日別概要VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadDailySummaryViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
         {
             // 開始日までの収支を取得する
@@ -1879,11 +1871,11 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         }
 
         /// <summary>
-        /// 年度内月別合計VMリストを取得する(月別一覧/月別グラフタブ)
+        /// 年度内月別概要VMリストを取得する(月別一覧/月別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">年度内の時間</param>
-        /// <returns>年度内月別合計項目VMリスト</returns>
+        /// <returns>年度内月別概要VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadMonthlySummaryViewModelListWithinYearAsync(int? bookId, DateTime includedTime)
         {
             DateTime startTime = includedTime.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
@@ -1997,10 +1989,10 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         }
 
         /// <summary>
-        /// 年別合計VMリストを取得する(年別一覧/年別グラフタブ)
+        /// 10年内年別概要VMリストを取得する(年別一覧/年別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
-        /// <returns>年別合計項目VMリスト</returns>
+        /// <returns>年別概要VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadYearlySummaryViewModelListWithinDecadeAsync(int? bookId)
         {
             DateTime startTime = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth).AddYears(-9);
@@ -2126,7 +2118,9 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             if (this.WVM.SelectedTab == Tabs.BooksTab) {
                 // 指定がなければ、更新前の帳簿項目の選択を維持する
                 List<int> tmpActionIdList = actionIdList ?? new List<int>(this.WVM.SelectedActionVMList.Select((tmp) => tmp.ActionId));
-                SummaryViewModel tmpSVM = this.WVM.SelectedSummaryVM;
+                this.WVM.SelectedActionVMList.Clear();
+                // サマリーの選択を維持する
+                SummaryViewModel tmpSelectedSVM = this.WVM.SelectedSummaryVM;
 
                 // 表示するデータを指定する
                 switch (this.WVM.DisplayedTermKind) {
@@ -2146,14 +2140,13 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                         break;
                 }
 
-                // 帳簿項目を選択する
+                // 帳簿項目を選択する(サマリーの選択はこの段階では無視して処理する)
                 IEnumerable<ActionViewModel> query1 = this.WVM.ActionVMList.Where((avm) => { return tmpActionIdList.Contains(avm.ActionId); });
-                this.WVM.SelectedActionVMList.Clear();
                 foreach (var tmp in query1) { this.WVM.SelectedActionVMList.Add(tmp); }
 
                 // 更新前のサマリーの選択を維持する
                 IEnumerable<SummaryViewModel> query2 = this.WVM.SummaryVMList.Where((svm) => {
-                    return svm.BalanceKind == tmpSVM?.BalanceKind && svm.CategoryId == tmpSVM?.CategoryId && svm.ItemId == tmpSVM?.ItemId;
+                    return svm.BalanceKind == tmpSelectedSVM?.BalanceKind && svm.CategoryId == tmpSelectedSVM?.CategoryId && svm.ItemId == tmpSelectedSVM?.ItemId;
                 });
                 this.WVM.SelectedSummaryVM = query2.Count() == 0 ? null : query2.First();
 

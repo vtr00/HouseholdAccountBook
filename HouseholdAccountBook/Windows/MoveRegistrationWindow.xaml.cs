@@ -126,12 +126,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void TodayCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if ((string)e.Parameter == "1") {
-                this.WVM.MovedDate = DateTime.Today;
-            }
-            else {
-                this.WVM.MovingDate = DateTime.Today;
-            }
+            this.WVM.MovedDate = DateTime.Today;
         }
 
         /// <summary>
@@ -253,6 +248,7 @@ ORDER BY move_flg DESC;", this.groupId);
                             });
                         }
 
+                        this.WVM.IsLink = (movedDate == movingDate);
                         this.WVM.MovedDate = movedDate;
                         this.WVM.MovingDate = movingDate;
                         this.WVM.SelectedCommissionKind = commissionKind;
@@ -302,7 +298,7 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
                         }
                         this.WVM.MovedDate = this.selectedDateTime == null ? DateTime.Today : (
                             payDay != null ? this.selectedDateTime.Value.GetDateInMonth(payDay.Value) : this.selectedDateTime.Value.GetFirstDateOfMonth());
-                        this.WVM.MovingDate = this.WVM.MovedDate;
+                        this.WVM.IsLink = true;
                         this.WVM.SelectedCommissionKind = CommissionKind.FromBook;
                     }
                     break;

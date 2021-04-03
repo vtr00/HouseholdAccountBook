@@ -270,7 +270,21 @@
                             <StackPanel Grid.Column="0" Orientation="Horizontal">
                                 <Button Width="20" Content="◀" Command="{StaticResource GoToLastMonthCommand}"/>
                                 <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}, TargetNullValue='期間指定'}"
-                                        Command="{StaticResource OpenSelectingDailyTermWindowCommand}"/>
+                                        Command="{StaticResource OpenSelectingDailyTermWindowCommand}">
+                                    <ToolTipService.ToolTip>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0" Text="{Binding StartDate, StringFormat='yyyy/MM/dd'}"/>
+                                            <TextBlock Grid.Column="1" Text=" - "/>
+                                            <TextBlock Grid.Column="2" Text="{Binding EndDate, StringFormat='yyyy/MM/dd'}"/>
+                                        </Grid>
+                                    </ToolTipService.ToolTip>
+                                </Button>
                                 <Button Width="20" Content="▶" Command="{StaticResource GoToNextMonthCommand}"/>
                                 <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}"/>
                                 <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
@@ -300,7 +314,7 @@
                         <!-- 帳簿項目リスト -->
                         <DataGrid x:Name="actionDataGrid" Grid.Column="0" SelectionMode="Extended"
                                   ItemsSource="{Binding DisplayedActionVMList}" SelectedItem="{Binding SelectedActionVM}" IsReadOnly="True" SelectionUnit="FullRow"
-                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="3"
+                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="4"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
                                   HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
                             <DataGrid.Resources>
@@ -339,8 +353,7 @@
                                                     Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                 <DataGridTextColumn Header="グループID" Binding="{Binding GroupId}" 
                                                     Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}"/>
-                                <DataGridTextColumn Header="月" Binding="{Binding ActTime, StringFormat='M月'}"/>
-                                <DataGridTextColumn Header="日" Binding="{Binding ActTime, StringFormat='d日'}"/>
+                                <DataGridTextColumn Header="日付" Binding="{Binding ActTime, StringFormat='yyyy/MM/dd'}"/>
                                 <DataGridTextColumn Header="曜日" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}}"
                                                     CellStyle="{StaticResource DayOfWeekStyle}"/>
                                 <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>

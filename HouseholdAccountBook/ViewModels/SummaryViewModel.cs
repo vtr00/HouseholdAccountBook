@@ -1,7 +1,7 @@
 ﻿namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
-    /// 合計VM
+    /// 概要VM
     /// </summary>
     public class SummaryViewModel
     {
