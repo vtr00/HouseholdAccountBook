@@ -157,6 +157,8 @@ namespace HouseholdAccountBook
         private async void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             try {
+                e.Handled = true;
+
                 // 例外情報をファイルに保存する
                 string jsonCode = JsonConvert.SerializeObject(e.Exception);
                 using (FileStream fs = new FileStream(UnhandledExceptionInfoFileName, FileMode.Create)) {
@@ -175,8 +177,6 @@ namespace HouseholdAccountBook
                 nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
                     Process.Start(UnhandledExceptionInfoFileName);
                 });
-
-                e.Handled = true;
             }
             catch (Exception) { }
         }

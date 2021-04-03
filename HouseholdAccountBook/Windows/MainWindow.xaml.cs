@@ -769,7 +769,7 @@ WHERE group_id = @{0} AND del_flg = 0;", groupId);
                                             // 移動の場合、削除項目と同じグループIDを持つ帳簿項目を削除する
                                             await dao.ExecNonQueryAsync(@"
 UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE group_id = @{1});", Updater, groupId);
+WHERE group_id = @{1};", Updater, groupId);
                                         }
                                         break;
                                     case (int)GroupKind.Repeat: {
