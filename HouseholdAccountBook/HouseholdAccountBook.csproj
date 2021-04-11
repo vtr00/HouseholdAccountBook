@@ -18,6 +18,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -32,7 +33,6 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -43,6 +43,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -52,6 +53,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>HouseholdAccountBook.App</StartupObject>
@@ -235,7 +237,7 @@
     </ApplicationDefinition>
     <Compile Include="Behaviors\BindSelectedItemsToDataGridBehavior.cs" />
     <Compile Include="Behaviors\BindSelectedItemToTreeViewBehavior.cs" />
-    <Compile Include="BindingProxy.cs" />
+    <Compile Include="Others\BindingProxy.cs" />
     <Compile Include="Converters\DateTimeToIsNationalHolidayConverter.cs" />
     <Compile Include="Converters\DateTimeToDisplayedYearConverter.cs" />
     <Compile Include="Converters\NegationConverter.cs" />
@@ -250,7 +252,7 @@
     <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Extensions\ValueTuppleExtensions.cs" />
     <Compile Include="Interfaces\IMultiSelectable.cs" />
-    <Compile Include="PropertyName.cs" />
+    <Compile Include="Others\PropertyName.cs" />
     <Compile Include="UserControls\CustomColumnSeries.cs" />
     <Compile Include="UserControls\DataGridEditableTemplateColumn.cs" />
     <Compile Include="UserControls\DateTimePicker.cs" />
@@ -352,7 +354,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ConstValue.cs" />
+    <Compile Include="Others\ConstValue.cs" />
     <Compile Include="Converters\DateTimeToDayOfWeekConverter.cs" />
     <Compile Include="Converters\DateTimeToDisplayedMonthConverter.cs" />
     <Compile Include="Converters\IntToMoneyDisplayConverter.cs" />
@@ -407,7 +409,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UpdateLog.txt" />
+    <Resource Include="Resources\UpdateLog.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -420,9 +422,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="resheet.ico" />

@@ -59,5 +59,32 @@ namespace HouseholdAccountBook.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   ：------------------------------：
+        ///：---------- 更新ログ ----------：
+        ///：------------------------------：
+        ///
+        ///*記録以前
+        ///  記帳風月からのインポート
+        ///  帳簿項目追加、編集
+        ///  概要表示
+        ///
+        ///*2016
+        ///2016/12/29
+        ///  MainWindow.xaml.cs
+        ///    ＋削除時に移動も削除されるようにした(2017/01/01確認)
+        ///    ↑移動操作可能の判定が「帳簿」ではなく「帳簿項目」になっていたのを修正
+        ///    ↑項目編集処理のグループ種別判定処理のSQLを修正
+        ///    ↑NumericUpDown.ValueのModeをTwoWayに修正 - Editしたテキストが取得できなかったため
+        ///    ↑NumericUpDown内のTextBoxのUpdateSourceTriggerをPropertyChangedに修正 - Editしたテキストが取得できなかったため
+        ///  ActionRegistrationWindow.xaml.cs
+        ///    ↑登録完了時にDialogResul [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string UpdateLog {
+            get {
+                return ResourceManager.GetString("UpdateLog", resourceCulture);
+            }
+        }
     }
 }
