@@ -47,7 +47,6 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedTabIndex;
             set {
                 if (this.SetProperty(ref this._SelectedTabIndex, value)) {
-                    this.SelectedTab = (Tabs)value;
                     this.SelectedTabChanged?.Invoke();
                 }
             }
@@ -436,6 +435,16 @@ namespace HouseholdAccountBook.ViewModels
             }
         }
         private GraphKind _SelectedGraphKind = default;
+        #endregion
+        /// <summary>
+        /// 選択されたグラフ種別インデックス
+        /// </summary>
+        #region SelectedGraphKindIndex
+        public int SelectedGraphKindIndex
+        {
+            get => (int)this._SelectedGraphKind;
+            set => this.SelectedGraphKind = (GraphKind)value;
+        }
         #endregion
 
         /// <summary>

@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.3.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -620,6 +620,30 @@ namespace HouseholdAccountBook.Properties {
             }
             set {
                 this["App_NationalHolidayCsv_DateIndex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int MainWindow_SelectedTabIndex {
+            get {
+                return ((int)(this["MainWindow_SelectedTabIndex"]));
+            }
+            set {
+                this["MainWindow_SelectedTabIndex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int MainWindow_SelectedGraphKindIndex {
+            get {
+                return ((int)(this["MainWindow_SelectedGraphKindIndex"]));
+            }
+            set {
+                this["MainWindow_SelectedGraphKindIndex"] = value;
             }
         }
     }

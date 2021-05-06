@@ -70,7 +70,7 @@ namespace HouseholdAccountBook.Windows
             this.groupId = null;
 
             this.InitializeComponent();
-            this.LoadSetting();
+            this.LoadWindowSetting();
 
             this.WVM.RegMode = RegistrationMode.Add;
         }
@@ -97,7 +97,7 @@ namespace HouseholdAccountBook.Windows
             }
 
             this.InitializeComponent();
-            this.LoadSetting();
+            this.LoadWindowSetting();
 
             this.WVM.RegMode = mode;
         }
@@ -333,7 +333,7 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
         /// <param name="e"></param>
         private void MoveRegistrationWindow_Closed(object sender, EventArgs e)
         {
-            this.SaveSetting();
+            this.SaveWindowSetting();
         }
         #endregion
 
@@ -554,9 +554,9 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", movedTime > movin
 
         #region 設定反映用の関数
         /// <summary>
-        /// 設定を読み込む
+        /// ウィンドウ設定を読み込む
         /// </summary>
-        private void LoadSetting()
+        private void LoadWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -575,9 +575,9 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", movedTime > movin
         }
 
         /// <summary>
-        /// 設定を保存する
+        /// ウィンドウ設定を保存する
         /// </summary>
-        private void SaveSetting()
+        private void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 

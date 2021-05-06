@@ -429,7 +429,7 @@
                             <Button Width="20" Content="▶" Command="{StaticResource GoToNextMonthCommand}"/>
                             <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
                                       ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
                         </StackPanel>

@@ -50,7 +50,7 @@ namespace HouseholdAccountBook.Windows
             this.builder = builder;
 
             this.InitializeComponent();
-            this.LoadSetting();
+            this.LoadWindowSetting();
         }
 
         #region イベントハンドラ
@@ -1022,7 +1022,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void SettingsWindow_Closed(object sender, EventArgs e)
         {
-            this.SaveSetting();
+            this.SaveWindowSetting();
         }
 
         /// <summary>
@@ -1384,9 +1384,9 @@ ORDER BY I.sort_order;", vm.Id);
 
         #region 設定反映用の関数
         /// <summary>
-        /// 設定を読み込む
+        /// ウィンドウ設定を読み込む
         /// </summary>
-        private void LoadSetting()
+        private void LoadWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -1405,9 +1405,9 @@ ORDER BY I.sort_order;", vm.Id);
         }
 
         /// <summary>
-        /// 設定を保存する
+        /// ウィンドウ設定を保存する
         /// </summary>
-        private void SaveSetting()
+        private void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
             settings.SettingsWindow_Left = this.Left;

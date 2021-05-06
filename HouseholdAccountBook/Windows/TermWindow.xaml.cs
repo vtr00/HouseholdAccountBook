@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.Windows
         public TermWindow(DateTime startDate, DateTime endDate)
         {
             this.InitializeComponent();
-            this.LoadSetting();
+            this.LoadWindowSetting();
 
             this.WVM.StartDate = startDate;
             this.WVM.EndDate = endDate;
@@ -33,7 +33,7 @@ namespace HouseholdAccountBook.Windows
         public TermWindow(DateTime dateWithinMonth)
         {
             this.InitializeComponent();
-            this.LoadSetting();
+            this.LoadWindowSetting();
 
             this.WVM.StartDate = dateWithinMonth.GetFirstDateOfMonth();
             this.WVM.EndDate = this.WVM.StartDate.AddMonths(1).AddMilliseconds(-1);
@@ -58,7 +58,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void TermWindow_Closed(object sender, EventArgs e)
         {
-            this.SaveSetting();
+            this.SaveWindowSetting();
         }
         #endregion
 
@@ -114,9 +114,9 @@ namespace HouseholdAccountBook.Windows
 
         #region 設定反映用の関数
         /// <summary>
-        /// 設定を読み込む
+        /// ウィンドウ設定を読み込む
         /// </summary>
-        private void LoadSetting()
+        private void LoadWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -129,9 +129,9 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// 設定を保存する
+        /// ウィンドウ設定を保存する
         /// </summary>
-        private void SaveSetting()
+        private void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 

@@ -77,7 +77,7 @@ namespace HouseholdAccountBook.Windows
             this.selectedGroupId = null;
 
             this.InitializeComponent();
-            this.LoadSetting();
+            this.LoadWindowSetting();
 
             this.WVM.RegMode = RegistrationMode.Add;
         }
@@ -96,7 +96,7 @@ namespace HouseholdAccountBook.Windows
             this.selectedGroupId = null;
 
             this.InitializeComponent();
-            this.LoadSetting();
+            this.LoadWindowSetting();
 
             this.WVM.RegMode = RegistrationMode.Add;
         }
@@ -120,7 +120,7 @@ namespace HouseholdAccountBook.Windows
             }
 
             this.InitializeComponent();
-            this.LoadSetting();
+            this.LoadWindowSetting();
 
             this.WVM.RegMode = mode;
         }
@@ -370,7 +370,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         /// <param name="e"></param>
         private void ActionListRegistrationWindow_Closed(object sender, EventArgs e)
         {
-            this.SaveSetting();
+            this.SaveWindowSetting();
         }
 
         /// <summary>
@@ -742,9 +742,9 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", lastActTime, Upda
 
         #region 設定反映用の関数
         /// <summary>
-        /// 設定を読み込む
+        /// ウィンドウ設定を読み込む
         /// </summary>
-        private void LoadSetting()
+        private void LoadWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -763,9 +763,9 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", lastActTime, Upda
         }
 
         /// <summary>
-        /// 設定を保存する
+        /// ウィンドウ設定を保存する
         /// </summary>
-        private void SaveSetting()
+        private void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 

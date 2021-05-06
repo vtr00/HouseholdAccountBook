@@ -60,7 +60,7 @@ namespace HouseholdAccountBook.Windows
             this.selectedBookId = selectedBookId;
 
             this.InitializeComponent();
-            this.LoadSetting();
+            this.LoadWindowSetting();
         }
 
         #region イベントハンドラ
@@ -377,7 +377,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         /// <param name="e"></param>
         private void CsvComparisonWindow_Closed(object sender, EventArgs e)
         {
-            this.SaveSetting();
+            this.SaveWindowSetting();
         }
 
         /// <summary>
@@ -491,9 +491,9 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
 
         #region 設定反映用の関数
         /// <summary>
-        /// 設定を読み込む
+        /// ウィンドウ設定を読み込む
         /// </summary>
-        private void LoadSetting()
+        private void LoadWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -512,9 +512,9 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         }
 
         /// <summary>
-        /// 設定を保存する
+        /// ウィンドウ設定を保存する
         /// </summary>
-        private void SaveSetting()
+        private void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
             settings.CsvComparisonWindow_Left = this.Left;
