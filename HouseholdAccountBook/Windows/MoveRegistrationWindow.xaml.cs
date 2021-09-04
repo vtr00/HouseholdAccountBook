@@ -24,15 +24,19 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         private readonly DaoBuilder builder;
         /// <summary>
-        /// 選択されていた帳簿ID
+        /// <see cref="MainWindow"/>で選択された帳簿ID
         /// </summary>
         private readonly int? selectedBookId = null;
         /// <summary>
-        /// 選択された日付
+        /// <see cref="MainWindow"/>で選択された表示年月
         /// </summary>
-        private readonly DateTime? selectedDateTime = null;
+        private readonly DateTime? selectedMonth = null;
         /// <summary>
-        /// 選択された帳簿項目のグループID
+        /// <see cref="MainWindow"/>で選択された帳簿項目の日付
+        /// </summary>
+        private readonly DateTime? selectedDate = null;
+        /// <summary>
+        /// <see cref="MainWindow"/>で選択された帳簿項目のグループID
         /// </summary>
         private readonly int? groupId = null;
         /// <summary>
@@ -61,12 +65,14 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         /// <param name="selectedBookId">帳簿ID</param>
-        /// <param name="selectedDateTime">選択された日時</param>
-        public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, DateTime? selectedDateTime)
+        /// <param name="selectedMonth">選択された年月</param>
+        /// <param name="selectedDate">選択された日付</param>
+        public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate)
         {
             this.builder = builder;
             this.selectedBookId = selectedBookId;
-            this.selectedDateTime = selectedDateTime;
+            this.selectedMonth = selectedMonth;
+            this.selectedDate = selectedDate;
             this.groupId = null;
 
             this.InitializeComponent();
@@ -86,7 +92,8 @@ namespace HouseholdAccountBook.Windows
         {
             this.builder = builder;
             this.selectedBookId = selectedBookId;
-            this.selectedDateTime = null;
+            this.selectedMonth = null;
+            this.selectedDate = null;
             switch (mode) {
                 case RegistrationMode.Edit:
                     this.groupId = groupId;
@@ -136,7 +143,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void RegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.Value.HasValue;
+            e.CanExecute = this.WVM.Value.HasValue && this.WVM.SelectedMovedBookVM != this.WVM.SelectedMovingBookVM;
         }
 
         /// <summary>
@@ -146,15 +153,6 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void RegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (this.WVM.MovedBookVM == this.WVM.MovingBookVM) {
-                MessageBox.Show(this, MessageText.IllegalSameBook, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
-            }
-            if (!this.WVM.Value.HasValue && this.WVM.Value <= 0) {
-                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
-            }
-
             // DB登録
             int? id = await this.RegisterToDbAsync();
 
@@ -288,16 +286,18 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
             }
 
             this.WVM.BookVMList = bookVMList;
-            this.WVM.MovingBookVM = movingBookVM;
-            this.WVM.MovedBookVM = movedBookVM;
+            this.WVM.SelectedMovedBookVM = movedBookVM;
+            this.WVM.SelectedMovingBookVM = movingBookVM;
 
             switch (this.WVM.RegMode) {
                 case RegistrationMode.Add: {
                         if (debitBookId != null) {
-                            this.WVM.MovedBookVM = bookVMList.FirstOrDefault((vm) => { return vm.Id == debitBookId; });
+                            this.WVM.SelectedMovedBookVM = bookVMList.FirstOrDefault((vm) => { return vm.Id == debitBookId; });
                         }
-                        this.WVM.MovedDate = this.selectedDateTime == null ? DateTime.Today : (
-                            payDay != null ? this.selectedDateTime.Value.GetDateInMonth(payDay.Value) : this.selectedDateTime.Value.GetFirstDateOfMonth());
+                        this.WVM.MovedDate = this.selectedDate ?? ((this.selectedMonth == null || this.selectedMonth?.Month == DateTime.Today.Month) ? DateTime.Today : this.selectedMonth.Value);
+                        if (payDay != null) {
+                            this.WVM.MovedDate = this.WVM.MovedDate.GetDateInMonth(payDay.Value);
+                        }
                         this.WVM.IsLink = true;
                         this.WVM.SelectedCommissionKind = CommissionKind.FromBook;
                     }
@@ -350,10 +350,10 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
                 int bookId = -1;
                 switch (this.WVM.SelectedCommissionKind) {
                     case CommissionKind.FromBook:
-                        bookId = this.WVM.MovedBookVM.Id.Value;
+                        bookId = this.WVM.SelectedMovedBookVM.Id.Value;
                         break;
                     case CommissionKind.ToBook:
-                        bookId = this.WVM.MovingBookVM.Id.Value;
+                        bookId = this.WVM.SelectedMovingBookVM.Id.Value;
                         break;
                 }
                 DaoReader reader = await dao.ExecQueryAsync(@"
@@ -412,8 +412,8 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         {
             DateTime movedTime = this.WVM.MovedDate;
             DateTime movingTime = this.WVM.MovingDate;
-            int movedBookId = this.WVM.MovedBookVM.Id.Value;
-            int movingBookId = this.WVM.MovingBookVM.Id.Value;
+            int movedBookId = this.WVM.SelectedMovedBookVM.Id.Value;
+            int movingBookId = this.WVM.SelectedMovingBookVM.Id.Value;
             int actValue = this.WVM.Value.Value;
             CommissionKind commissionKind = this.WVM.SelectedCommissionKind;
             int commissionItemId = this.WVM.SelectedItemVM.Id;

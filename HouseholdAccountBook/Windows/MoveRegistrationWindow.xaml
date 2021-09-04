@@ -79,7 +79,7 @@
             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                        Text="移動元" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="0" Grid.Column="1" Margin="5"  Grid.ColumnSpan="3"
-                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding MovedBookVM}" DisplayMemberPath="Name"/>
+                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedMovedBookVM}" DisplayMemberPath="Name"/>
             <controls:DateTimePicker Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
                         DateFormat="yyyy/MM/dd" SelectedDate="{Binding MovedDate}"/>
             <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="今日" Command="{StaticResource TodayCommand}"/>
@@ -87,7 +87,7 @@
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                        Text="移動先" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="2" Grid.Column="1" Margin="5"  Grid.ColumnSpan="3"
-                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding MovingBookVM}" DisplayMemberPath="Name"/>
+                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedMovingBookVM}" DisplayMemberPath="Name"/>
             <controls:DateTimePicker x:Name="movingDateTimePicker" Grid.Row="3" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
                         DateFormat="yyyy/MM/dd" SelectedDate="{Binding MovingDate}" IsEnabled="{Binding IsLink, Converter={StaticResource NegationConverter}, Mode=TwoWay}"/>
             <CheckBox Grid.Row="3" Grid.Column="3" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Center" Content="設定" IsChecked="{Binding IsEnabled, ElementName=movingDateTimePicker}"/>

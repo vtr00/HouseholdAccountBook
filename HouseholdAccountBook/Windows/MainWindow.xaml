@@ -13,6 +13,7 @@
         Loaded="MainWindow_Loaded"
         Closing="MainWindow_Closing"
         Closed="MainWindow_Closed"
+        LocationChanged="MainWindow_LocationChanged"
         StateChanged="MainWindow_StateChanegd">
     
     <Window.DataContext>

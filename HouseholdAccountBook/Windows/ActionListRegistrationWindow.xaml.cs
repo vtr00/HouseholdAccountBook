@@ -31,9 +31,13 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         private readonly int? selectedBookId;
         /// <summary>
+        /// <see cref="MainWindow"/>で選択された表示月日
+        /// </summary>
+        private readonly DateTime? selectedMonth;
+        /// <summary>
         /// <see cref="MainWindow"/>で選択された帳簿項目の日付
         /// </summary>
-        private readonly DateTime? selectedDateTime;
+        private readonly DateTime? selectedDate;
         /// <summary>
         /// <see cref="CsvComparisonWindow"/>で選択されたCSVレコードリスト
         /// </summary>
@@ -68,12 +72,14 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         /// <param name="selectedBookId">選択された帳簿ID</param>
-        /// <param name="selectedDateTime">選択された日時</param>
-        public ActionListRegistrationWindow(DaoBuilder builder, int? selectedBookId, DateTime? selectedDateTime = null)
+        /// <param name="selectedMonth">選択された年月</param>
+        /// <param name="selectedDate">選択された日付</param>
+        public ActionListRegistrationWindow(DaoBuilder builder, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate = null)
         {
             this.builder = builder;
             this.selectedBookId = selectedBookId;
-            this.selectedDateTime = selectedDateTime;
+            this.selectedMonth = selectedMonth;
+            this.selectedDate = selectedDate;
             this.selectedGroupId = null;
 
             this.InitializeComponent();
@@ -93,6 +99,8 @@ namespace HouseholdAccountBook.Windows
             this.builder = builder;
             this.selectedBookId = selectedBookId;
             this.selectedRecordList = selectedRecordList;
+            this.selectedMonth = null;
+            this.selectedDate = null;
             this.selectedGroupId = null;
 
             this.InitializeComponent();
@@ -111,7 +119,8 @@ namespace HouseholdAccountBook.Windows
         {
             this.builder = builder;
             this.selectedBookId = null;
-            this.selectedDateTime = null;
+            this.selectedMonth = null;
+            this.selectedDate = null;
             switch (mode) {
                 case RegistrationMode.Edit:
                 case RegistrationMode.Copy:
@@ -144,11 +153,6 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void RegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (this.WVM.DateValueVMList.Count < 1) {
-                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
-            }
-
             // DB登録
             List<int> idList = await this.RegisterToDbAsync();
 
@@ -265,9 +269,7 @@ namespace HouseholdAccountBook.Windows
                 case RegistrationMode.Add: {
                         bookId = this.selectedBookId;
                         balanceKind = BalanceKind.Outgo;
-                        DateTime actDate = this.selectedDateTime != null ? this.selectedDateTime.Value : DateTime.Today;
-
-                        DateTime dateTime = this.selectedDateTime ?? DateTime.Today;
+                        DateTime actDate = this.selectedDate ?? ((this.selectedMonth == null || this.selectedMonth?.Month == DateTime.Today.Month) ? DateTime.Today : this.selectedMonth.Value);
 
                         if (this.selectedRecordList == null) {
                             this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = actDate });
@@ -381,7 +383,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         private void DataGrid_AddingNewItem(object sender, AddingNewItemEventArgs e)
         {
             if (this.WVM.DateValueVMList.Count == 0) {
-                e.NewItem = new DateValueViewModel() { ActDate = this.selectedDateTime ?? DateTime.Now, ActValue = null };
+                e.NewItem = new DateValueViewModel() { ActDate = this.selectedDate ?? DateTime.Today, ActValue = null };
             }
             else {
                 // リストに入力済の末尾のデータの日付を追加時に採用する

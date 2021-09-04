@@ -514,8 +514,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void MoveToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder,
-                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime ?? this.WVM.DisplayedMonth) { Owner = this };
+            MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
+                this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             // 登録時イベントを登録する
             mrw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
@@ -544,8 +544,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void AddActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder,
-                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
+            ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
+                this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             // 登録時イベントを登録する
             arw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
@@ -574,8 +574,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void AddActionListCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder,
-                this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
+            ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
+                this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             // 登録時イベントを登録する
             alrw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
@@ -1250,6 +1250,12 @@ WHERE action_id = @{0};", vm.ActionId);
         /// <param name="e"></param>
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            // *****
+            if (File.Exists("WindowLocation.txt")) {
+                File.Delete("WindowLocation.txt");
+            }
+            // *****
+
             Properties.Settings settings = Properties.Settings.Default;
 
             // 帳簿リスト更新
@@ -1335,11 +1341,59 @@ WHERE action_id = @{0};", vm.ActionId);
         /// <param name="e"></param>
         private void MainWindow_StateChanegd(object sender, EventArgs e)
         {
+            this.SaveWindowLocation();
+
             Properties.Settings settings = Properties.Settings.Default;
 
             if (settings.App_BackUpFlagAtMinimizing) {
                 if (this.WindowState == WindowState.Minimized) {
                     this.CreateBackUpFile();
+                }
+            }
+        }
+
+        /// <summary>
+        /// ウィンドウ位置変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainWindow_LocationChanged(object sender, EventArgs e)
+        {
+            this.SaveWindowLocation();
+
+            if (this.WindowState == WindowState.Normal && 2000000000 < Math.Max(Math.Abs(this.Left), Math.Abs(this.Top))) {
+                this.Top = 0;
+                this.Left = 0;
+            }
+        }
+
+        /// <summary>
+        /// ウィンドウの状態、位置をファイルに保存する
+        /// </summary>
+        private void SaveWindowLocation()
+        {
+            string windowState;
+            switch (this.WindowState) {
+                case WindowState.Maximized:
+                    windowState = "Max";
+                    break;
+                case WindowState.Minimized:
+                    windowState = "Min";
+                    break;
+                case WindowState.Normal:
+                    windowState = "Nor";
+                    break;
+                default:
+                    windowState = "---";
+                    break;
+            }
+
+            using (FileStream fs = new FileStream("WindowLocation.txt", FileMode.Append)) {
+                using (StreamWriter sw = new StreamWriter(fs)) {
+                    if (fs.Length == 0) {
+                        sw.WriteLine("yyyy/MM/dd HH:mm:ss.ffff\tStt\tL\tT\tW\tH");
+                    }
+                    sw.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff"), windowState, this.Left, this.Top, this.Width, this.Height));
                 }
             }
         }

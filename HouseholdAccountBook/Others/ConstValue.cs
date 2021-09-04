@@ -277,18 +277,6 @@ namespace HouseholdAccountBook.ConstValue
         public static class MessageText
         {
             /// <summary>
-            /// 接続に失敗しました。
-            /// </summary>
-            public static string ConnectionError { get; } = "接続に失敗しました。";
-            /// <summary>
-            /// 移動元と移動先の帳簿が同じです。
-            /// </summary>
-            public static string IllegalSameBook { get; } = "移動元と移動先の帳簿が同じです。";
-            /// <summary>
-            /// 金額が不正です。
-            /// </summary>
-            public static string IllegalValue { get; } = "金額が不正です。";
-            /// <summary>
             /// インポートが完了しました。
             /// </summary>
             public static string FinishToSave { get; } = "保存が完了しました。";

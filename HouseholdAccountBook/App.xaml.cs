@@ -154,23 +154,23 @@ namespace HouseholdAccountBook
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             try {
                 e.Handled = true;
 
                 // 例外情報をファイルに保存する
-                string jsonCode = JsonConvert.SerializeObject(e.Exception);
+                string jsonCode = JsonConvert.SerializeObject(e.Exception, Formatting.Indented);
                 using (FileStream fs = new FileStream(UnhandledExceptionInfoFileName, FileMode.Create)) {
                     using (StreamWriter sw = new StreamWriter(fs)) {
-                        await sw.WriteLineAsync(jsonCode);
+                        sw.WriteLine(jsonCode);
                     }
                 }
 
                 // ハンドルされない例外の発生を通知する
                 NotificationManager nm = new NotificationManager();
                 NotificationContent nc = new NotificationContent() {
-                    Title = Current.MainWindow.Title,
+                    Title = Current.MainWindow?.Title ?? "",
                     Message = MessageText.UnhandledExceptionOccured,
                     Type = NotificationType.Warning
                 };

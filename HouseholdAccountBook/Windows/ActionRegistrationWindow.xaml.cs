@@ -28,9 +28,13 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         private readonly int? selectedBookId;
         /// <summary>
-        /// <see cref="MainWindow"/>で選択された日付
+        /// <see cref="MainWindow"/>で選択された表示年月
         /// </summary>
-        private readonly DateTime? selectedDateTime;
+        private readonly DateTime? selectedMonth;
+        /// <summary>
+        /// <see cref="MainWindow"/>で選択された帳簿項目の日付
+        /// </summary>
+        private readonly DateTime? selectedDate;
         /// <summary>
         /// <see cref="CsvComparisonWindow"/>で選択されたCSVレコード
         /// </summary>
@@ -57,12 +61,14 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         /// <param name="selectedBookId">選択された帳簿ID</param>
-        /// <param name="selectedDateTime">選択された日時</param>
-        public ActionRegistrationWindow(DaoBuilder builder, int? selectedBookId, DateTime? selectedDateTime)
+        /// <param name="selectedMonth">選択された年月</param>
+        /// <param name="selectedDate">選択された日付</param>
+        public ActionRegistrationWindow(DaoBuilder builder, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate)
         {
             this.builder = builder;
             this.selectedBookId = selectedBookId;
-            this.selectedDateTime = selectedDateTime;
+            this.selectedMonth = selectedMonth;
+            this.selectedDate = selectedDate;
             this.selectedActionId = null;
 
             this.InitializeComponent();
@@ -81,7 +87,8 @@ namespace HouseholdAccountBook.Windows
         {
             this.builder = builder;
             this.selectedBookId = selectedBookId;
-            this.selectedDateTime = null;
+            this.selectedMonth = null;
+            this.selectedDate = null;
             this.selectedRecord = selectedRecord;
             this.selectedActionId = null;
 
@@ -102,7 +109,8 @@ namespace HouseholdAccountBook.Windows
         {
             this.builder = builder;
             this.selectedBookId = null;
-            this.selectedDateTime = null;
+            this.selectedMonth = null;
+            this.selectedDate = null;
             switch (mode) {
                 case RegistrationMode.Edit:
                 case RegistrationMode.Copy:
@@ -145,7 +153,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void ContinueToRegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.RegMode != RegistrationMode.Edit && this.WVM.Value.HasValue;
+            e.CanExecute = this.WVM.RegMode != RegistrationMode.Edit && this.WVM.Value.HasValue && 0 < this.WVM.Value;
         }
 
         /// <summary>
@@ -155,11 +163,6 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void ContinueToRegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!this.WVM.Value.HasValue || this.WVM.Value <= 0) {
-                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
-            }
-
             // DB登録
             int? id = await this.RegisterToDbAsync();
 
@@ -179,7 +182,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void RegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.Value.HasValue;
+            e.CanExecute = this.WVM.Value.HasValue && 0 < this.WVM.Value;
         }
 
         /// <summary>
@@ -189,11 +192,6 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void RegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!this.WVM.Value.HasValue || this.WVM.Value <= 0) {
-                MessageBox.Show(this, MessageText.IllegalValue, MessageTitle.Exclamation, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
-            }
-
             // DB登録
             int? id = await this.RegisterToDbAsync();
 
@@ -241,7 +239,7 @@ namespace HouseholdAccountBook.Windows
                         bookId = this.selectedBookId;
                         balanceKind = BalanceKind.Outgo;
                         if (this.selectedRecord == null) {
-                            actDate = this.selectedDateTime != null ? this.selectedDateTime.Value : DateTime.Today;
+                            actDate = this.selectedDate ?? ((this.selectedMonth == null || this.selectedMonth?.Month == DateTime.Today.Month) ? DateTime.Today : this.selectedMonth.Value);
                         }
                         else {
                             actDate = this.selectedRecord.Date;
