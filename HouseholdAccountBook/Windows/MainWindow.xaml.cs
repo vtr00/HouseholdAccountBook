@@ -2187,7 +2187,11 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             this.WVM.WholeItemDailyGraphModel.Series.Clear();
 
             // 横軸 - 日軸
-            CategoryAxis cAxis1 = new CategoryAxis() { Unit = "日", Position = AxisPosition.Bottom };
+            CategoryAxis cAxis1 = new CategoryAxis() {
+                Unit = "日",
+                Position = AxisPosition.Bottom,
+                Key = "Category"
+            };
             cAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する日の文字列を作成する
             for (DateTime tmp = this.WVM.StartDate; tmp <= this.WVM.EndDate; tmp = tmp.AddDays(1)) {
@@ -2201,7 +2205,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
-                StringFormat = "#,0"
+                StringFormat = "#,0",
+                Key = "Value"
             };
             switch (this.WVM.SelectedGraphKind) {
                 case GraphKind.IncomeAndOutgo: {
@@ -2222,7 +2227,11 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             this.WVM.SelectedItemDailyGraphModel.Series.Clear();
 
             // 横軸 - 日軸
-            CategoryAxis cAxis2 = new CategoryAxis() { Unit = "日", Position = AxisPosition.Bottom };
+            CategoryAxis cAxis2 = new CategoryAxis() {
+                Unit = "日",
+                Position = AxisPosition.Bottom,
+                Key = "Category"
+            };
             cAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する日の文字列を作成する
             for (DateTime tmp = this.WVM.StartDate; tmp <= this.WVM.EndDate; tmp = tmp.AddDays(1)) {
@@ -2236,7 +2245,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
-                StringFormat = "#,0"
+                StringFormat = "#,0",
+                Key = "Value"
             };
             switch (this.WVM.SelectedGraphKind) {
                 case GraphKind.IncomeAndOutgo: {
@@ -2278,7 +2288,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                         foreach (SeriesViewModel tmpVM in vmList) {
                             if (tmpVM.ItemId == -1) { continue; }
 
-                            CustomColumnSeries cSeries1 = new CustomColumnSeries() {
+                            CustomBarSeries cSeries1 = new CustomBarSeries() {
                                 IsStacked = true,
                                 Title = tmpVM.ItemName,
                                 ItemsSource = tmpVM.Values.Select((value, index) => {
@@ -2290,7 +2300,9 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                     };
                                 }),
                                 ValueField = "Value",
-                                TrackerFormatString = "{0}\n{1}日: {2:#,0}"
+                                TrackerFormatString = "{0}\n{1}日: {2:#,0}", //日付: 金額
+                                XAxisKey = "Value",
+                                YAxisKey = "Category"
                             };
                             // 全項目月間グラフの項目を選択した時のイベントを登録する
                             cSeries1.TrackerHitResultChanged += (sender, e) => {
@@ -2301,10 +2313,10 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
                                 this.WVM.SelectedItemDailyGraphModel.Series.Clear();
 
-                                CustomColumnSeries cSeries2 = new CustomColumnSeries() {
+                                CustomBarSeries cSeries2 = new CustomBarSeries() {
                                     IsStacked = true,
                                     Title = vm.ItemName,
-                                    FillColor = (e.Value.Series as CustomColumnSeries).ActualFillColor,
+                                    FillColor = (e.Value.Series as CustomBarSeries).ActualFillColor,
                                     ItemsSource = vm.Values.Select((value, index) => {
                                         return new SeriesItemViewModel {
                                             Value = value,
@@ -2314,7 +2326,9 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                         };
                                     }),
                                     ValueField = "Value",
-                                    TrackerFormatString = "{1}日: {2:#,0}" //日付: 金額
+                                    TrackerFormatString = "{1}日: {2:#,0}", //日付: 金額
+                                    XAxisKey = "Value",
+                                    YAxisKey = "Category"
                                 };
 
                                 this.WVM.SelectedItemDailyGraphModel.Series.Add(cSeries2);
@@ -2420,9 +2434,13 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             this.WVM.WholeItemMonthlyGraphModel.Series.Clear();
 
             // 横軸 - 月軸
-            CategoryAxis cAxis1 = new CategoryAxis() { Unit = "月", Position = AxisPosition.Bottom };
+            CategoryAxis cAxis1 = new CategoryAxis() {
+                Unit = "月",
+                Position = AxisPosition.Bottom,
+                Key = "Category"
+            };
             cAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
-                                   // 表示する月の文字列を作成する
+            // 表示する月の文字列を作成する
             for (int i = startMonth; i < startMonth + 12; ++i) {
                 cAxis1.Labels.Add(string.Format("{0}", (i - 1) % 12 + 1));
             }
@@ -2434,7 +2452,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
-                StringFormat = "#,0"
+                StringFormat = "#,0",
+                Key = "Value"
             };
             switch (this.WVM.SelectedGraphKind) {
                 case GraphKind.IncomeAndOutgo: {
@@ -2455,9 +2474,13 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             this.WVM.SelectedItemMonthlyGraphModel.Series.Clear();
 
             // 横軸 - 月軸
-            CategoryAxis cAxis2 = new CategoryAxis() { Unit = "月", Position = AxisPosition.Bottom };
+            CategoryAxis cAxis2 = new CategoryAxis() {
+                Unit = "月",
+                Position = AxisPosition.Bottom,
+                Key = "Category"
+            };
             cAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
-                                   // 表示する月の文字列を作成する
+            // 表示する月の文字列を作成する
             for (int i = startMonth; i < startMonth + 12; ++i) {
                 cAxis2.Labels.Add(string.Format("{0}", (i - 1) % 12 + 1));
             }
@@ -2469,7 +2492,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
-                StringFormat = "#,0"
+                StringFormat = "#,0",
+                Key = "Value"
             };
             switch (this.WVM.SelectedGraphKind) {
                 case GraphKind.IncomeAndOutgo: {
@@ -2505,7 +2529,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                         foreach (SeriesViewModel tmpVM in vmList) {
                             if (tmpVM.ItemId == -1) { continue; }
 
-                            CustomColumnSeries cSeries1 = new CustomColumnSeries() {
+                            CustomBarSeries cSeries1 = new CustomBarSeries() {
                                 IsStacked = true,
                                 Title = tmpVM.ItemName,
                                 ItemsSource = tmpVM.Values.Select((value, index) => new SeriesItemViewModel {
@@ -2515,7 +2539,9 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                     CategoryId = tmpVM.CategoryId
                                 }),
                                 ValueField = "Value",
-                                TrackerFormatString = "{0}\n{1}月: {2:#,0}"
+                                TrackerFormatString = "{0}\n{1}月: {2:#,0}", //月: 金額
+                                XAxisKey = "Value",
+                                YAxisKey = "Category"
                             };
                             // 全項目年間グラフの項目を選択した時のイベントを登録する
                             cSeries1.TrackerHitResultChanged += (sender, e) => {
@@ -2526,10 +2552,10 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
                                 this.WVM.SelectedItemMonthlyGraphModel.Series.Clear();
 
-                                CustomColumnSeries cSeries2 = new CustomColumnSeries() {
+                                CustomBarSeries cSeries2 = new CustomBarSeries() {
                                     IsStacked = true,
                                     Title = vm.ItemName,
-                                    FillColor = (e.Value.Series as CustomColumnSeries).ActualFillColor,
+                                    FillColor = (e.Value.Series as CustomBarSeries).ActualFillColor,
                                     ItemsSource = vm.Values.Select((value, index) => new SeriesItemViewModel {
                                         Value = value,
                                         Number = index + startMonth,
@@ -2537,7 +2563,9 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                         CategoryId = vm.CategoryId
                                     }),
                                     ValueField = "Value",
-                                    TrackerFormatString = "{1}月: {2:#,0}" //月: 金額
+                                    TrackerFormatString = "{1}月: {2:#,0}", //月: 金額
+                                    XAxisKey = "Value",
+                                    YAxisKey = "Category"
                                 };
                                 this.WVM.SelectedItemMonthlyGraphModel.Series.Add(cSeries2);
 
@@ -2633,9 +2661,13 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             this.WVM.WholeItemYearlyGraphModel.Series.Clear();
 
             // 横軸 - 年軸
-            CategoryAxis cAxis1 = new CategoryAxis() { Unit = "年", Position = AxisPosition.Bottom };
+            CategoryAxis cAxis1 = new CategoryAxis() {
+                Unit = "年",
+                Position = AxisPosition.Bottom,
+                Key = "Category"
+            };
             cAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
-                                   // 表示する年の文字列を作成する
+            // 表示する年の文字列を作成する
             for (int i = startYear; i < startYear + 10; ++i) {
                 cAxis1.Labels.Add(string.Format("{0}", i));
             }
@@ -2647,7 +2679,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
-                StringFormat = "#,0"
+                StringFormat = "#,0",
+                Key = "Value"
             };
             switch (this.WVM.SelectedGraphKind) {
                 case GraphKind.IncomeAndOutgo: {
@@ -2668,9 +2701,13 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             this.WVM.SelectedItemYearlyGraphModel.Series.Clear();
 
             // 横軸 - 年軸
-            CategoryAxis cAxis2 = new CategoryAxis() { Unit = "年", Position = AxisPosition.Bottom };
+            CategoryAxis cAxis2 = new CategoryAxis() {
+                Unit = "年",
+                Position = AxisPosition.Bottom,
+                Key = "Category"
+            };
             cAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
-                                   // 表示する年の文字列を作成する
+            // 表示する年の文字列を作成する
             for (int i = startYear; i < startYear + 10; ++i) {
                 cAxis2.Labels.Add(string.Format("{0}", i));
             }
@@ -2682,7 +2719,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
-                StringFormat = "#,0"
+                StringFormat = "#,0",
+                Key = "Value"
             };
             switch (this.WVM.SelectedGraphKind) {
                 case GraphKind.IncomeAndOutgo: {
@@ -2718,7 +2756,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                         foreach (SeriesViewModel tmpVM in vmList) {
                             if (tmpVM.ItemId == -1) { continue; }
 
-                            CustomColumnSeries cSeries1 = new CustomColumnSeries() {
+                            CustomBarSeries cSeries1 = new CustomBarSeries() {
                                 IsStacked = true,
                                 Title = tmpVM.ItemName,
                                 ItemsSource = tmpVM.Values.Select((value, index) => new SeriesItemViewModel {
@@ -2728,7 +2766,9 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                     CategoryId = tmpVM.CategoryId
                                 }),
                                 ValueField = "Value",
-                                TrackerFormatString = "{0}\n{1}年: {2:#,0}"
+                                TrackerFormatString = "{0}\n{1}年: {2:#,0}", //年: 金額
+                                XAxisKey = "Value",
+                                YAxisKey = "Category"
                             };
                             // 全項目年間グラフの項目を選択した時のイベントを登録する
                             cSeries1.TrackerHitResultChanged += (sender, e) => {
@@ -2739,10 +2779,10 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
                                 this.WVM.SelectedItemYearlyGraphModel.Series.Clear();
 
-                                CustomColumnSeries cSeries2 = new CustomColumnSeries() {
+                                CustomBarSeries cSeries2 = new CustomBarSeries() {
                                     IsStacked = true,
                                     Title = vm.ItemName,
-                                    FillColor = (e.Value.Series as CustomColumnSeries).ActualFillColor,
+                                    FillColor = (e.Value.Series as CustomBarSeries).ActualFillColor,
                                     ItemsSource = vm.Values.Select((value, index) => new SeriesItemViewModel {
                                         Value = value,
                                         Number = index + startYear,
@@ -2750,7 +2790,9 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                         CategoryId = vm.CategoryId
                                     }),
                                     ValueField = "Value",
-                                    TrackerFormatString = "{1}年: {2:#,0}" //年: 金額
+                                    TrackerFormatString = "{1}年: {2:#,0}", //年: 金額
+                                    XAxisKey = "Value",
+                                    YAxisKey = "Category"
                                 };
                                 this.WVM.SelectedItemYearlyGraphModel.Series.Add(cSeries2);
 

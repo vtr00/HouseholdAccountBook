@@ -4,7 +4,7 @@
 It is for your household accounts book via PostgreSQL.  
 Currently, the binary file is unscheduled to be published.  
 It is for who can set PostgreSQL environments and build the project yourself.  
-It is supported for Japanese Language only.  
+It is supported for Japanese Language/Location only.  
 
 ## __概要__
 本ソフトは PostgreSQL を用いた家計簿ソフトです。  
@@ -15,11 +15,11 @@ It is supported for Japanese Language only.
 
 ## __開発環境__
 * IDE  
-  [Visual Studio Community](https://www.microsoft.com/ja-jp/dev/products/community.aspx) 2019  
+  [Visual Studio Community](https://www.microsoft.com/ja-jp/dev/products/community.aspx) 2022  
 * DB  
   [PostgreSQL](https://www.postgresql.org/) 9.6   
 * 言語  
-  C# (.NET Framework 4.6.1)
+  C# (.NET Framework 4.7.2)
 
 ## __機能__
 ### 実装済

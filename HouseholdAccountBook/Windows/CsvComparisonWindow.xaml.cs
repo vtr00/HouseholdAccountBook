@@ -127,7 +127,7 @@ namespace HouseholdAccountBook.Windows
             // CSVファイルを読み込む
             CsvConfiguration csvConfig = new CsvConfiguration(System.Globalization.CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,
-                MissingFieldFound = (handlerNames, index, contexts) => { }
+                MissingFieldFound = (mffa) => { }
             };
             List<CsvComparisonViewModel> tmpList = new List<CsvComparisonViewModel>();
             foreach (string tmpFileName in ofd.FileNames) {

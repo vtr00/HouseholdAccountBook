@@ -6,9 +6,9 @@ using System;
 namespace HouseholdAccountBook.UserControls
 {
     /// <summary>
-    /// <see cref="TrackerHitResult"/> の変化を通知する機能付き <see cref="ColumnSeries"/>
+    /// <see cref="TrackerHitResult"/> の変化を通知する機能付き <see cref="BarSeries"/>
     /// </summary>
-    public class CustomColumnSeries : ColumnSeries
+    public class CustomBarSeries : BarSeries
     {
         /// <summary>
         /// 前回の <see cref="GetNearestPoint(ScreenPoint, bool)"/> 呼び出し時の <see cref="TrackerHitResult"/>

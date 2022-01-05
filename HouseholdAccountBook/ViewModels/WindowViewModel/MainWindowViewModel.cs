@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Extensions;
 using OxyPlot;
+using OxyPlot.Legends;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -458,11 +459,15 @@ namespace HouseholdAccountBook.ViewModels
         }
         private PlotModel _WholeItemDailyGraphModel = new PlotModel() {
             Title = "日別グラフ",
-            LegendOrientation = LegendOrientation.Horizontal,
-            LegendPlacement = LegendPlacement.Outside,
-            LegendPosition = LegendPosition.RightTop,
-            LegendTitle = "凡例",
-            LegendFontSize = 10.5
+            Legends = {
+                new Legend(){ 
+                    LegendOrientation = LegendOrientation.Horizontal,
+                    LegendPlacement = LegendPlacement.Outside,
+                    LegendPosition = LegendPosition.RightTop,
+                    LegendTitle = "凡例",
+                    LegendFontSize = 10.5
+                }
+            }
         };
         #endregion
 
@@ -477,11 +482,15 @@ namespace HouseholdAccountBook.ViewModels
         }
         private PlotModel _SelectedItemDailyGraphModel = new PlotModel() {
             Title = "個別グラフ",
-            LegendOrientation = LegendOrientation.Horizontal,
-            LegendPlacement = LegendPlacement.Outside,
-            LegendPosition = LegendPosition.RightTop,
-            LegendTitle = "凡例",
-            LegendFontSize = 10.5
+            Legends = {
+                new Legend() {
+                    LegendOrientation = LegendOrientation.Horizontal,
+                    LegendPlacement = LegendPlacement.Outside,
+                    LegendPosition = LegendPosition.RightTop,
+                    LegendTitle = "凡例",
+                    LegendFontSize = 10.5
+                }
+            }
         };
         #endregion
 
@@ -496,11 +505,15 @@ namespace HouseholdAccountBook.ViewModels
         }
         private PlotModel _WholeItemMonthlyGraphModel = new PlotModel() {
             Title = "月別グラフ",
-            LegendOrientation = LegendOrientation.Horizontal,
-            LegendPlacement = LegendPlacement.Outside,
-            LegendPosition = LegendPosition.RightTop,
-            LegendTitle = "凡例",
-            LegendFontSize = 10.5
+            Legends = {
+                new Legend() {
+                    LegendOrientation = LegendOrientation.Horizontal,
+                    LegendPlacement = LegendPlacement.Outside,
+                    LegendPosition = LegendPosition.RightTop,
+                    LegendTitle = "凡例",
+                    LegendFontSize = 10.5
+                }
+            }
         };
         #endregion
 
@@ -515,11 +528,15 @@ namespace HouseholdAccountBook.ViewModels
         }
         private PlotModel _SelectedItemMonthlyGraphModel = new PlotModel() {
             Title = "個別グラフ",
-            LegendOrientation = LegendOrientation.Horizontal,
-            LegendPlacement = LegendPlacement.Outside,
-            LegendPosition = LegendPosition.RightTop,
-            LegendTitle = "凡例",
-            LegendFontSize = 10.5
+            Legends = {
+                new Legend() {
+                    LegendOrientation = LegendOrientation.Horizontal,
+                    LegendPlacement = LegendPlacement.Outside,
+                    LegendPosition = LegendPosition.RightTop,
+                    LegendTitle = "凡例",
+                    LegendFontSize = 10.5
+                }
+            }
         };
         #endregion
 
@@ -534,11 +551,15 @@ namespace HouseholdAccountBook.ViewModels
         }
         private PlotModel _WholeItemYearlyGraphModel = new PlotModel() {
             Title = "年別グラフ",
-            LegendOrientation = LegendOrientation.Horizontal,
-            LegendPlacement = LegendPlacement.Outside,
-            LegendPosition = LegendPosition.RightTop,
-            LegendTitle = "凡例",
-            LegendFontSize = 10.5
+            Legends = {
+                new Legend() {
+                    LegendOrientation = LegendOrientation.Horizontal,
+                    LegendPlacement = LegendPlacement.Outside,
+                    LegendPosition = LegendPosition.RightTop,
+                    LegendTitle = "凡例",
+                    LegendFontSize = 10.5
+                }
+            }
         };
         #endregion
 
@@ -553,11 +574,15 @@ namespace HouseholdAccountBook.ViewModels
         }
         private PlotModel _SelectedItemYearlyGraphModel = new PlotModel() {
             Title = "個別グラフ",
-            LegendOrientation = LegendOrientation.Horizontal,
-            LegendPlacement = LegendPlacement.Outside,
-            LegendPosition = LegendPosition.RightTop,
-            LegendTitle = "凡例",
-            LegendFontSize = 10.5
+            Legends = {
+                new Legend() {
+                    LegendOrientation = LegendOrientation.Horizontal,
+                    LegendPlacement = LegendPlacement.Outside,
+                    LegendPosition = LegendPosition.RightTop,
+                    LegendTitle = "凡例",
+                    LegendFontSize = 10.5
+                }
+            }
         };
         #endregion
 
