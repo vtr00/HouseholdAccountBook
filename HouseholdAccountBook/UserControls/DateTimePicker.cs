@@ -31,8 +31,8 @@ namespace HouseholdAccountBook.UserControls
 
                 textBox.SetValue(InputMethod.IsInputMethodEnabledProperty, false);
                 textBox.TextChanged += this.TextBox_TextChanged;
-                textBox.SelectionChanged += this.TextBox_SelectionChanged;
                 textBox.PreviewKeyDown += this.TextBox_PreviewKeyDown;
+                textBox.SelectionChanged += this.TextBox_SelectionChanged;
                 textBox.MouseWheel += this.TextBox_MouseWheel;
             };
             this.CalendarOpened += this.DateTimePicker_CalendarOpened;
@@ -393,7 +393,7 @@ namespace HouseholdAccountBook.UserControls
                 switch (kind) {
                     case DateKind.Year:
                         try {
-                            dateTimePicker.SelectedDate = new DateTime(dt.Year % 10 + number, dt.Month, dt.Day);
+                            dateTimePicker.SelectedDate = new DateTime((dt.Year % 1000) * 10 + number, dt.Month, dt.Day);
                         }
                         catch (ArgumentOutOfRangeException) {
                             dateTimePicker.SelectedDate = new DateTime(number, dt.Month, dt.Day);
@@ -401,7 +401,7 @@ namespace HouseholdAccountBook.UserControls
                         break;
                     case DateKind.Month:
                         try {
-                            dateTimePicker.SelectedDate = new DateTime(dt.Year, dt.Month % 10 + number, dt.Day);
+                            dateTimePicker.SelectedDate = new DateTime(dt.Year, (dt.Month % 10) * 10 + number, dt.Day);
                         }
                         catch (ArgumentOutOfRangeException) {
                             dateTimePicker.SelectedDate = new DateTime(dt.Year, number, dt.Day);
@@ -409,7 +409,7 @@ namespace HouseholdAccountBook.UserControls
                         break;
                     case DateKind.Day:
                         try {
-                            dateTimePicker.SelectedDate = new DateTime(dt.Year, dt.Month, dt.Day % 10 + number);
+                            dateTimePicker.SelectedDate = new DateTime(dt.Year, dt.Month, (dt.Day % 10) * 10 + number);
                         }
                         catch (ArgumentOutOfRangeException) {
                             dateTimePicker.SelectedDate = new DateTime(dt.Year, dt.Month, number);

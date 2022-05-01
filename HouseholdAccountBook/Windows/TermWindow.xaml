@@ -42,7 +42,8 @@
                     <RadioButton x:Name="monthRadioButton" Content="月指定" GroupName="TermKind" IsChecked="True"/>
                 </GroupBox.Header>
                 <Grid IsEnabled="{Binding IsChecked, ElementName=monthRadioButton}">
-                    <Calendar x:Name="calendar" DisplayDate="{Binding StartDate, Mode=OneWay}" SelectedDate="{Binding StartDate}" DisplayModeChanged="Calendar_DisplayModeChanged" Loaded="Calendar_Loaded"/>
+                    <Calendar x:Name="calendar" DisplayMode="Year" DisplayDate="{Binding StartDate, Mode=TwoWay}" SelectedDate="{Binding StartDate}" 
+                              DisplayModeChanged="Calendar_DisplayModeChanged" Loaded="Calendar_Loaded" />
                 </Grid>
             </GroupBox>
             

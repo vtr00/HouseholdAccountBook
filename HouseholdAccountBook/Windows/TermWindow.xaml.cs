@@ -43,7 +43,7 @@ namespace HouseholdAccountBook.Windows
         #region イベントハンドラ
         #region ウィンドウ
         /// <summary>
-        /// フォーム読込完了時
+        /// ウィンドウ読込完了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -52,7 +52,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// フォーム終了時
+        /// ウィンドウ終了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -69,11 +69,10 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void Calendar_Loaded(object sender, RoutedEventArgs e)
         {
-            this.calendar.DisplayMode = CalendarMode.Year;
         }
 
         /// <summary>
-        /// カレンダー表示モード変更時
+        /// カレンダー表示モード変更時: 月選択時に開始/終了日付を確定させる
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
