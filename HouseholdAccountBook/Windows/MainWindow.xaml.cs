@@ -30,6 +30,10 @@ namespace HouseholdAccountBook.Windows
         /// DAOビルダ
         /// </summary>
         private readonly DaoBuilder builder;
+        /// <summary>
+        /// 起動時刻
+        /// </summary>
+        private readonly DateTime startUpDate;
         #endregion
 
         /// <summary>
@@ -39,9 +43,11 @@ namespace HouseholdAccountBook.Windows
         public MainWindow(DaoBuilder builder)
         {
             this.builder = builder;
+            this.startUpDate = DateTime.Now;
 
             this.InitializeComponent();
             this.LoadWindowSetting();
+            this.LogWindowStateAndLocation("Constructor");
         }
 
         #region イベントハンドラ
@@ -1250,12 +1256,6 @@ WHERE action_id = @{0};", vm.ActionId);
         /// <param name="e"></param>
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            // *****
-            if (File.Exists("WindowLocation.txt")) {
-                File.Delete("WindowLocation.txt");
-            }
-            // *****
-
             Properties.Settings settings = Properties.Settings.Default;
 
             // 帳簿リスト更新
@@ -1303,6 +1303,8 @@ WHERE action_id = @{0};", vm.ActionId);
 
                 this.Cursor = null;
             };
+
+            this.LogWindowStateAndLocation("Loaded");
         }
 
         /// <summary>
@@ -1332,6 +1334,7 @@ WHERE action_id = @{0};", vm.ActionId);
         private void MainWindow_Closed(object sender, EventArgs e)
         {
             this.SaveWindowSetting();
+            this.LogWindowStateAndLocation("Closed");
         }
 
         /// <summary>
@@ -1341,7 +1344,7 @@ WHERE action_id = @{0};", vm.ActionId);
         /// <param name="e"></param>
         private void MainWindow_StateChanegd(object sender, EventArgs e)
         {
-            this.SaveWindowLocation();
+            this.LogWindowStateAndLocation();
 
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -1359,7 +1362,7 @@ WHERE action_id = @{0};", vm.ActionId);
         /// <param name="e"></param>
         private void MainWindow_LocationChanged(object sender, EventArgs e)
         {
-            this.SaveWindowLocation();
+            this.LogWindowStateAndLocation();
 
             if (this.WindowState == WindowState.Normal && 2000000000 < Math.Max(Math.Abs(this.Left), Math.Abs(this.Top))) {
                 this.Top = 0;
@@ -1368,34 +1371,13 @@ WHERE action_id = @{0};", vm.ActionId);
         }
 
         /// <summary>
-        /// ウィンドウの状態、位置をファイルに保存する
+        /// ウィンドウサイズ変更時
         /// </summary>
-        private void SaveWindowLocation()
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            string windowState;
-            switch (this.WindowState) {
-                case WindowState.Maximized:
-                    windowState = "Max";
-                    break;
-                case WindowState.Minimized:
-                    windowState = "Min";
-                    break;
-                case WindowState.Normal:
-                    windowState = "Nor";
-                    break;
-                default:
-                    windowState = "---";
-                    break;
-            }
-
-            using (FileStream fs = new FileStream("WindowLocation.txt", FileMode.Append)) {
-                using (StreamWriter sw = new StreamWriter(fs)) {
-                    if (fs.Length == 0) {
-                        sw.WriteLine("yyyy/MM/dd HH:mm:ss.ffff\tStt\tL\tT\tW\tH");
-                    }
-                    sw.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff"), windowState, this.Left, this.Top, this.Width, this.Height));
-                }
-            }
+            this.LogWindowStateAndLocation();
         }
         #endregion
         #endregion
@@ -2942,6 +2924,43 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         #endregion
 
         /// <summary>
+        /// ウィンドウの状態、位置をファイルに保存する
+        /// </summary>
+        /// <param name="comment">コメント</param>
+        private void LogWindowStateAndLocation(string comment = "")
+        {
+            string windowState;
+            switch (this.WindowState) {
+                case WindowState.Maximized:
+                    windowState = "Max";
+                    break;
+                case WindowState.Minimized:
+                    windowState = "Min";
+                    break;
+                case WindowState.Normal:
+                    windowState = "Nor";
+                    break;
+                default:
+                    windowState = "---";
+                    break;
+            }
+
+            using (FileStream fs = new FileStream(string.Format("WindowLocation_{0}.txt", this.startUpDate.ToString("yyyyMMdd_hhmmss")), FileMode.Append)) {
+                using (StreamWriter sw = new StreamWriter(fs)) {
+                    if (fs.Length == 0) {
+                        sw.WriteLine("yyyy/MM/dd HH:mm:ss.ffff\tStt\tL\tT\tW\tH");
+                    }
+                    if (string.IsNullOrEmpty(comment)) {
+                        sw.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff"), windowState, this.Left, this.Top, this.Width, this.Height));
+                    }
+                    else {
+                        sw.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff"), windowState, this.Left, this.Top, this.Width, this.Height, comment));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// バックアップファイルを作成する
         /// </summary>
         /// <param name="dumpExePath">pg_dump.exeパス</param>
@@ -2999,5 +3018,6 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             }
             return false;
         }
+
     }
 }

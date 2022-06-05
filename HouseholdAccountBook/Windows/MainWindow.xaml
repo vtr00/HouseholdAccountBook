@@ -14,7 +14,8 @@
         Closing="MainWindow_Closing"
         Closed="MainWindow_Closed"
         LocationChanged="MainWindow_LocationChanged"
-        StateChanged="MainWindow_StateChanegd">
+        StateChanged="MainWindow_StateChanegd"
+        SizeChanged="MainWindow_SizeChanged">
     
     <Window.DataContext>
         <viewmodels:MainWindowViewModel x:Name="WVM"/>
