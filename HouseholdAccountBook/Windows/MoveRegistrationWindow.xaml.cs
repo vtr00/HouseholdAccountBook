@@ -58,8 +58,25 @@ namespace HouseholdAccountBook.Windows
         /// 登録時のイベント
         /// </summary>
         public event EventHandler<EventArgs<List<int>>> Registrated = null;
+        /// <summary>
+        /// 移動元変更時のイベント
+        /// </summary>
+        public event EventHandler<EventArgs<int?>> FromBookChanged = null;
+        /// <summary>
+        /// 移動元日時変更時のイベント
+        /// </summary>
+        public event EventHandler<EventArgs<DateTime>> FromDateChanged = null;
+        /// <summary>
+        /// 移動先変更時のイベント
+        /// </summary>
+        public event EventHandler<EventArgs<int?>> ToBookChanged = null;
+        /// <summary>
+        /// 移動先日時変更時のイベント
+        /// </summary>
+        public event EventHandler<EventArgs<DateTime>> ToDateChanged = null;
         #endregion
 
+        #region コンストラクタ
         /// <summary>
         /// 帳簿項目(移動)の新規登録のために <see cref="MoveRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
@@ -108,21 +125,22 @@ namespace HouseholdAccountBook.Windows
 
             this.WVM.RegMode = mode;
         }
+        #endregion
 
         #region イベントハンドラ
         #region コマンド
         /// <summary>
-        /// 今日コマンド判定
+        /// 今日コマンド操作可能判定
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void TodayCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             if ((string)e.Parameter == "1") {
-                e.CanExecute = this.WVM.MovedDate != DateTime.Today;
+                e.CanExecute = this.WVM.FromDate != DateTime.Today;
             }
             else {
-                e.CanExecute = this.WVM.MovingDate != DateTime.Today;
+                e.CanExecute = this.WVM.ToDate != DateTime.Today;
             }
         }
 
@@ -133,17 +151,17 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void TodayCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WVM.MovedDate = DateTime.Today;
+            this.WVM.FromDate = DateTime.Today;
         }
 
         /// <summary>
-        /// 登録コマンド判定
+        /// 登録コマンド操作可能判定
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void RegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.Value.HasValue && this.WVM.SelectedMovedBookVM != this.WVM.SelectedMovingBookVM;
+            e.CanExecute = this.WVM.Value.HasValue && this.WVM.SelectedFromBookVM != this.WVM.SelectedToBookVM;
         }
 
         /// <summary>
@@ -160,7 +178,10 @@ namespace HouseholdAccountBook.Windows
             List<int> value = id != null ? new List<int>() { id.Value } : new List<int>();
             Registrated?.Invoke(this, new EventArgs<List<int>>(value));
 
-            this.DialogResult = true;
+            try {
+                this.DialogResult = true;
+            }
+            catch (InvalidOperationException) { }
             this.Close();
         }
 
@@ -171,7 +192,10 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void CancelCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.DialogResult = false;
+            try {
+                this.DialogResult = false;
+            }
+            catch (InvalidOperationException) { }
             this.Close();
         }
         #endregion
@@ -184,18 +208,18 @@ namespace HouseholdAccountBook.Windows
         private async void MoveRegistrationWindow_Loaded(object sender, RoutedEventArgs e)
         {
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
-            int? movedBookId = this.selectedBookId;
-            int? movingBookId = this.selectedBookId;
-            BookViewModel movedBookVM = null;
-            BookViewModel movingBookVM = null;
+            int? fromBookId = this.selectedBookId;
+            int? toBookId = this.selectedBookId;
+            BookViewModel fromBookVM = null;
+            BookViewModel toBookVM = null;
             int? commissionItemId = null;
             string commissionRemark = null;
 
             switch (this.WVM.RegMode) {
                 case RegistrationMode.Edit:
                 case RegistrationMode.Copy: {
-                        DateTime movedDate = DateTime.Now;
-                        DateTime movingDate = DateTime.Now;
+                        DateTime fromDate = DateTime.Now;
+                        DateTime toDate = DateTime.Now;
                         CommissionKind commissionKind = CommissionKind.FromBook;
                         int moveValue = -1;
                         int commissionValue = 0;
@@ -219,22 +243,22 @@ ORDER BY move_flg DESC;", this.groupId);
 
                                 if (moveFlg == 1) {
                                     if (actValue < 0) {
-                                        movedBookId = bookId;
-                                        movedDate = dateTime;
+                                        fromBookId = bookId;
+                                        fromDate = dateTime;
                                         this.fromActionId = actionId;
                                     }
                                     else {
-                                        movingBookId = bookId;
-                                        movingDate = dateTime;
+                                        toBookId = bookId;
+                                        toDate = dateTime;
                                         this.toActionId = actionId;
                                         moveValue = actValue;
                                     }
                                 }
                                 else { // 手数料
-                                    if (bookId == movedBookId) { // 移動元負担
+                                    if (bookId == fromBookId) { // 移動元負担
                                         commissionKind = CommissionKind.FromBook;
                                     }
-                                    else if (bookId == movingBookId) { // 移動先負担
+                                    else if (bookId == toBookId) { // 移動先負担
                                         commissionKind = CommissionKind.ToBook;
                                     }
                                     this.commissionActionId = actionId;
@@ -246,9 +270,9 @@ ORDER BY move_flg DESC;", this.groupId);
                             });
                         }
 
-                        this.WVM.IsLink = (movedDate == movingDate);
-                        this.WVM.MovedDate = movedDate;
-                        this.WVM.MovingDate = movingDate;
+                        this.WVM.IsLink = (fromDate == toDate);
+                        this.WVM.FromDate = fromDate;
+                        this.WVM.ToDate = toDate;
                         this.WVM.SelectedCommissionKind = commissionKind;
                         this.WVM.Value = moveValue;
                         this.WVM.Commission = commissionValue;
@@ -265,8 +289,8 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
                     BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                     bookVMList.Add(vm);
 
-                    if (movedBookVM == null || movedBookId == vm.Id) {
-                        movedBookVM = vm;
+                    if (fromBookVM == null || fromBookId == vm.Id) {
+                        fromBookVM = vm;
 
                         switch (this.WVM.RegMode) {
                             case RegistrationMode.Add: {
@@ -278,25 +302,25 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
                                 break;
                         };
                     }
-                    if (movingBookVM == null || movingBookId == vm.Id) {
-                        movingBookVM = vm;
+                    if (toBookVM == null || toBookId == vm.Id) {
+                        toBookVM = vm;
                     }
                     return true;
                 });
             }
 
             this.WVM.BookVMList = bookVMList;
-            this.WVM.SelectedMovedBookVM = movedBookVM;
-            this.WVM.SelectedMovingBookVM = movingBookVM;
+            this.WVM.SelectedFromBookVM = fromBookVM;
+            this.WVM.SelectedToBookVM = toBookVM;
 
             switch (this.WVM.RegMode) {
                 case RegistrationMode.Add: {
                         if (debitBookId != null) {
-                            this.WVM.SelectedMovedBookVM = bookVMList.FirstOrDefault((vm) => { return vm.Id == debitBookId; });
+                            this.WVM.SelectedFromBookVM = bookVMList.FirstOrDefault((vm) => { return vm.Id == debitBookId; });
                         }
-                        this.WVM.MovedDate = this.selectedDate ?? ((this.selectedMonth == null || this.selectedMonth?.Month == DateTime.Today.Month) ? DateTime.Today : this.selectedMonth.Value);
+                        this.WVM.FromDate = this.selectedDate ?? ((this.selectedMonth == null || this.selectedMonth?.Month == DateTime.Today.Month) ? DateTime.Today : this.selectedMonth.Value);
                         if (payDay != null) {
-                            this.WVM.MovedDate = this.WVM.MovedDate.GetDateInMonth(payDay.Value);
+                            this.WVM.FromDate = this.WVM.FromDate.GetDateInMonth(payDay.Value);
                         }
                         this.WVM.IsLink = true;
                         this.WVM.SelectedCommissionKind = CommissionKind.FromBook;
@@ -307,23 +331,7 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
             await this.UpdateItemListAsync(commissionItemId);
             await this.UpdateRemarkListAsync(commissionRemark);
 
-            #region イベントハンドラの設定
-            this.WVM.FromBookChanged += async () => {
-                await this.UpdateItemListAsync();
-                await this.UpdateRemarkListAsync();
-            };
-            this.WVM.ToBookChanged += async () => {
-                await this.UpdateItemListAsync();
-                await this.UpdateRemarkListAsync();
-            };
-            this.WVM.CommissionKindChanged += async () => {
-                await this.UpdateItemListAsync();
-                await this.UpdateRemarkListAsync();
-            };
-            this.WVM.ItemChanged += async () => {
-                await this.UpdateRemarkListAsync();
-            };
-            #endregion
+            this.RegisterEventHandlerToWVM();
         }
 
         /// <summary>
@@ -350,10 +358,10 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
                 int bookId = -1;
                 switch (this.WVM.SelectedCommissionKind) {
                     case CommissionKind.FromBook:
-                        bookId = this.WVM.SelectedMovedBookVM.Id.Value;
+                        bookId = this.WVM.SelectedFromBookVM.Id.Value;
                         break;
                     case CommissionKind.ToBook:
-                        bookId = this.WVM.SelectedMovingBookVM.Id.Value;
+                        bookId = this.WVM.SelectedToBookVM.Id.Value;
                         break;
                 }
                 DaoReader reader = await dao.ExecQueryAsync(@"
@@ -405,15 +413,45 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         #endregion
 
         /// <summary>
+        /// WVMのイベントハンドラに登録する
+        /// </summary>
+        private void RegisterEventHandlerToWVM()
+        {
+            this.WVM.FromBookChanged += async (fromBookId) => {
+                await this.UpdateItemListAsync();
+                await this.UpdateRemarkListAsync();
+                this.FromBookChanged?.Invoke(this, new EventArgs<int?>(fromBookId));
+            };
+            this.WVM.FromDateChanged += (fromDate) => {
+                this.FromDateChanged?.Invoke(this, new EventArgs<DateTime>(fromDate));
+            };
+            this.WVM.ToBookChanged += async (toBookId) => {
+                await this.UpdateItemListAsync();
+                await this.UpdateRemarkListAsync();
+                this.ToBookChanged?.Invoke(this, new EventArgs<int?>(toBookId));
+            };
+            this.WVM.ToDateChanged += (toDate) => {
+                this.ToDateChanged?.Invoke(this, new EventArgs<DateTime>(toDate));
+            };
+            this.WVM.CommissionKindChanged += async (_) => {
+                await this.UpdateItemListAsync();
+                await this.UpdateRemarkListAsync();
+            };
+            this.WVM.ItemChanged += async (_) => {
+                await this.UpdateRemarkListAsync();
+            };
+        }
+
+        /// <summary>
         /// DBに登録する
         /// </summary>
         /// <returns>登録された帳簿項目ID</returns>
         private async Task<int?> RegisterToDbAsync()
         {
-            DateTime movedTime = this.WVM.MovedDate;
-            DateTime movingTime = this.WVM.MovingDate;
-            int movedBookId = this.WVM.SelectedMovedBookVM.Id.Value;
-            int movingBookId = this.WVM.SelectedMovingBookVM.Id.Value;
+            DateTime fromDate = this.WVM.FromDate;
+            DateTime toDate = this.WVM.ToDate;
+            int fromBookId = this.WVM.SelectedFromBookVM.Id.Value;
+            int toBookId = this.WVM.SelectedToBookVM.Id.Value;
             int actValue = this.WVM.Value.Value;
             CommissionKind commissionKind = this.WVM.SelectedCommissionKind;
             int commissionItemId = this.WVM.SelectedItemVM.Id;
@@ -443,8 +481,8 @@ VALUES (@{0}, (
   INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @{6}) C ON C.category_id = I.category_id
   WHERE move_flg = 1
 ), @{1}, @{2}, @{3}, 0, 'now', @{4}, 'now', @{5}) RETURNING action_id;",
-                            movedBookId, movedTime, -actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Outgo);
-                        if (this.selectedBookId == movedBookId) {
+                            fromBookId, fromDate, -actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Outgo);
+                        if (this.selectedBookId == fromBookId) {
                             reader.ExecARow((record) => {
                                 resActionId = record.ToInt("action_id");
                             });
@@ -458,8 +496,8 @@ VALUES (@{0}, (
   INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @{6}) C ON C.category_id = I.category_id
   WHERE move_flg = 1
 ), @{1}, @{2}, @{3}, 0, 'now', @{4}, 'now', @{5}) RETURNING action_id;",
-                            movingBookId, movingTime, actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Income);
-                        if (this.selectedBookId == movingBookId) {
+                            toBookId, toDate, actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Income);
+                        if (this.selectedBookId == toBookId) {
                             reader.ExecARow((record) => {
                                 resActionId = record.ToInt("action_id");
                             });
@@ -473,8 +511,8 @@ VALUES (@{0}, (
 -- 移動元
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
-WHERE action_id = @{4};", movedBookId, movedTime, -actValue, Updater, this.fromActionId);
-                        if (this.selectedBookId == movedBookId) {
+WHERE action_id = @{4};", fromBookId, fromDate, -actValue, Updater, this.fromActionId);
+                        if (this.selectedBookId == fromBookId) {
                             resActionId = this.fromActionId;
                         }
 
@@ -482,8 +520,8 @@ WHERE action_id = @{4};", movedBookId, movedTime, -actValue, Updater, this.fromA
 -- 移動先
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
-WHERE action_id = @{4};", movingBookId, movingTime, actValue, Updater, this.toActionId);
-                        if (this.selectedBookId == movingBookId) {
+WHERE action_id = @{4};", toBookId, toDate, actValue, Updater, this.toActionId);
+                        if (this.selectedBookId == toBookId) {
                             resActionId = this.toActionId;
                         }
                         #endregion
@@ -495,12 +533,12 @@ WHERE action_id = @{4};", movingBookId, movingTime, actValue, Updater, this.toAc
                         DateTime actTime = DateTime.Now;
                         switch (commissionKind) {
                             case CommissionKind.FromBook:
-                                bookId = movedBookId;
-                                actTime = movedTime;
+                                bookId = fromBookId;
+                                actTime = fromDate;
                                 break;
                             case CommissionKind.ToBook:
-                                bookId = movingBookId;
-                                actTime = movingTime;
+                                bookId = toBookId;
+                                actTime = toDate;
                                 break;
                         }
                         if (this.commissionActionId != null) {
@@ -537,13 +575,13 @@ WHERE item_id = @{0} AND remark = @{1};", commissionItemId, remark);
                     if (reader.Count == 0) {
                         await dao.ExecNonQueryAsync(@"
 INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, 0, @{2}, 0, 'now', @{3}, 'now', @{4});", commissionItemId, remark, movedTime > movingTime ? movedTime : movingTime, Updater, Inserter);
+VALUES (@{0}, @{1}, 0, @{2}, 0, 'now', @{3}, 'now', @{4});", commissionItemId, remark, fromDate > toDate ? fromDate : toDate, Updater, Inserter);
                     }
                     else {
                         await dao.ExecNonQueryAsync(@"
 UPDATE hst_remark
 SET used_time = @{0}, del_flg = 0, update_time = 'now', updater = @{1}
-WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", movedTime > movingTime ? movedTime : movingTime, Updater, commissionItemId, remark);
+WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", fromDate > toDate ? fromDate : toDate, Updater, commissionItemId, remark);
                     }
                     #endregion
                 }

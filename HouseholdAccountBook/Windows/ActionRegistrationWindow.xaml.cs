@@ -54,8 +54,17 @@ namespace HouseholdAccountBook.Windows
         /// 登録時のイベント
         /// </summary>
         public event EventHandler<EventArgs<List<int>>> Registrated = null;
+        /// <summary>
+        /// 帳簿変更時のイベント
+        /// </summary>
+        public event EventHandler<EventArgs<int?>> BookChanged = null;
+        /// <summary>
+        /// 日時変更時のイベント
+        /// </summary>
+        public event EventHandler<EventArgs<DateTime>> DateChanged = null;
         #endregion
 
+        #region コンストラクタ
         /// <summary>
         /// 帳簿項目の新規登録のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
@@ -123,11 +132,12 @@ namespace HouseholdAccountBook.Windows
 
             this.WVM.RegMode = mode;
         }
+        #endregion
 
         #region イベントハンドラ
         #region コマンド
         /// <summary>
-        /// 今日コマンド判定
+        /// 今日コマンド操作可能判定
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -147,7 +157,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// 続けて入力コマンド判定
+        /// 続けて入力コマンド操作可能判定
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -176,7 +186,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// 登録コマンド判定
+        /// 登録コマンド操作可能判定
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -199,7 +209,10 @@ namespace HouseholdAccountBook.Windows
             List<int> value = id != null ? new List<int>() { id.Value } : new List<int>();
             Registrated?.Invoke(this, new EventArgs<List<int>>(value));
 
-            this.DialogResult = true;
+            try {
+                this.DialogResult = true;
+            }
+            catch (InvalidOperationException) { }
             this.Close();
         }
 
@@ -210,7 +223,10 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void CancelCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.DialogResult = false;
+            try {
+                this.DialogResult = false;
+            }
+            catch (InvalidOperationException) { }
             this.Close();
         }
         #endregion
@@ -310,29 +326,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
             await this.UpdateShopListAsync(shopName);
             await this.UpdateRemarkListAsync(remark);
 
-            #region イベントハンドラの設定
-            this.WVM.BookChanged += async () => {
-                await this.UpdateCategoryListAsync();
-                await this.UpdateItemListAsync();
-                await this.UpdateShopListAsync();
-                await this.UpdateRemarkListAsync();
-            };
-            this.WVM.BalanceKindChanged += async () => {
-                await this.UpdateCategoryListAsync();
-                await this.UpdateItemListAsync();
-                await this.UpdateShopListAsync();
-                await this.UpdateRemarkListAsync();
-            };
-            this.WVM.CategoryChanged += async () => {
-                await this.UpdateItemListAsync();
-                await this.UpdateShopListAsync();
-                await this.UpdateRemarkListAsync();
-            };
-            this.WVM.ItemChanged += async () => {
-                await this.UpdateShopListAsync();
-                await this.UpdateRemarkListAsync();
-            };
-            #endregion
+            this.RegisterEventHandlerToWVM();
         }
 
         /// <summary>
@@ -473,6 +467,38 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
             this.WVM.SelectedRemark = selectedRemark;
         }
         #endregion
+
+        /// <summary>
+        /// イベントハンドラをWVMに登録する
+        /// </summary>
+        private void RegisterEventHandlerToWVM()
+        {
+            this.WVM.BookChanged += async (bookId) => {
+                await this.UpdateCategoryListAsync();
+                await this.UpdateItemListAsync();
+                await this.UpdateShopListAsync();
+                await this.UpdateRemarkListAsync();
+                this.BookChanged?.Invoke(this, new EventArgs<int?>(bookId));
+            };
+            this.WVM.DateChanged += (date) => {
+                this.DateChanged?.Invoke(this, new EventArgs<DateTime>(date));
+            };
+            this.WVM.BalanceKindChanged += async (_) => {
+                await this.UpdateCategoryListAsync();
+                await this.UpdateItemListAsync();
+                await this.UpdateShopListAsync();
+                await this.UpdateRemarkListAsync();
+            };
+            this.WVM.CategoryChanged += async (_) => {
+                await this.UpdateItemListAsync();
+                await this.UpdateShopListAsync();
+                await this.UpdateRemarkListAsync();
+            };
+            this.WVM.ItemChanged += async (_) => {
+                await this.UpdateShopListAsync();
+                await this.UpdateRemarkListAsync();
+            };
+        }
 
         /// <summary>
         /// DBに登録する

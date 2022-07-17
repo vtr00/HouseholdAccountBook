@@ -23,6 +23,7 @@
 
     <Window.Resources>
         <!-- ファイルコマンド -->
+        <RoutedCommand x:Key="FileCommand"/>
         <RoutedCommand x:Key="ImportKichoHugetsuDbCommand"/>
         <RoutedCommand x:Key="ImportCustomFileCommand"/>
         <RoutedCommand x:Key="ExportExcelFileCommand"/>
@@ -30,6 +31,7 @@
         <RoutedCommand x:Key="BackUpCommand"/>
 
         <!-- 編集コマンド -->
+        <RoutedCommand x:Key="EditCommand"/>
         <RoutedCommand x:Key="MoveToBookCommand"/>
         <RoutedCommand x:Key="AddActionCommand"/>
         <RoutedCommand x:Key="AddActionListCommand"/>
@@ -59,6 +61,7 @@
         <RoutedCommand x:Key="GoToNextYearCommand"/>
 
         <!-- ツールコマンド -->
+        <RoutedCommand x:Key="ToolCommand"/>
         <RoutedCommand x:Key="OpenSettingsWindowCommand"/>
         <RoutedCommand x:Key="OpenCsvComparisonWindowCommand"/>
         
@@ -101,14 +104,16 @@
 
     <Window.CommandBindings>
         <!-- ファイルコマンド -->
-        <CommandBinding Command="{x:Static ApplicationCommands.Close}" Executed="CloseWindowCommand_Executed"/>
+        <CommandBinding Command="{StaticResource FileCommand}" CanExecute="FileCommand_CanExecute"/>
+        <CommandBinding Command="{x:Static ApplicationCommands.Close}" CanExecute="CloseWindowCommand_CanExecute" Executed="CloseWindowCommand_Executed"/>
         <CommandBinding Command="{StaticResource ImportKichoHugetsuDbCommand}" CanExecute="ImportKichoHugetsuDbCommand_CanExecute" Executed="ImportKichoHugetsuDbCommand_Executed"/>
         <CommandBinding Command="{StaticResource ImportCustomFileCommand}" CanExecute="ImportCustomFileCommand_CanExecute" Executed="ImportCustomFileCommand_Excuted"/>
         <CommandBinding Command="{StaticResource ExportExcelFileCommand}"/>
         <CommandBinding Command="{StaticResource ExportCustomFileCommand}" CanExecute="ExportCustomFileCommand_CanExecute" Executed="ExportCustomFileCommand_Excuted"/>
-        <CommandBinding Command="{StaticResource BackUpCommand}" Executed="BackUpCommand_Executed"/>
+        <CommandBinding Command="{StaticResource BackUpCommand}" CanExecute="BackUpCommand_CanExecute" Executed="BackUpCommand_Executed"/>
 
         <!-- 編集コマンド -->
+        <CommandBinding Command="{StaticResource EditCommand}" CanExecute="EditCommand_CanExecute"/>
         <CommandBinding Command="{StaticResource MoveToBookCommand}" CanExecute="MoveToBookCommand_CanExecute" Executed="MoveToBookCommand_Executed"/>
         <CommandBinding Command="{StaticResource AddActionCommand}" CanExecute="AddActionCommand_CanExecute" Executed="AddActionCommand_Executed"/>
         <CommandBinding Command="{StaticResource EditActionCommand}" CanExecute="EditActionCommand_CanExecute" Executed="EditActionCommand_Executed"/>
@@ -138,8 +143,9 @@
         <CommandBinding Command="{StaticResource GoToNextYearCommand}" CanExecute="GoToNextYearCommand_CanExecute" Executed="GoToNextYearCommand_Executed"/>
         
         <!-- ツールコマンド -->
-        <CommandBinding Command="{StaticResource OpenSettingsWindowCommand}" Executed="OpenSettingsWindowCommand_Executed"/>
-        <CommandBinding Command="{StaticResource OpenCsvComparisonWindowCommand}" Executed="OpenCsvComparisonWindowCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ToolCommand}" CanExecute="ToolCommand_CanExecute"/>
+        <CommandBinding Command="{StaticResource OpenSettingsWindowCommand}" CanExecute="OpenSettingsWindowCommand_CanExecute" Executed="OpenSettingsWindowCommand_Executed"/>
+        <CommandBinding Command="{StaticResource OpenCsvComparisonWindowCommand}" CanExecute="OpenCsvComparisonWindowCommand_CanExecute" Executed="OpenCsvComparisonWindowCommand_Executed"/>
         
         <!-- ヘルプコマンド -->
         <CommandBinding Command="{StaticResource OpenVersionWindowCommand}" Executed="OpenVersionWindowCommand_Executed"/>
@@ -162,7 +168,7 @@
 
         <!-- メニュー -->
         <Menu Grid.Row="0" Grid.Column="0">
-            <MenuItem Header="ファイル(_F)">
+            <MenuItem Header="ファイル(_F)" Command="{StaticResource FileCommand}">
                 <MenuItem Header="インポート(_I)">
                     <MenuItem Header="記帳風月からインポート(_K)..." Command="{StaticResource ImportKichoHugetsuDbCommand}"/>
                     <MenuItem Header="カスタム形式ファイルからインポート(_S)..." Command="{StaticResource ImportCustomFileCommand}"/>
@@ -176,7 +182,7 @@
                 <Separator/>
                 <MenuItem Header="終了(_X)" Command="{x:Static ApplicationCommands.Close}" InputGestureText="Alt+F4"/>
             </MenuItem>
-            <MenuItem Header="編集(_E)">
+            <MenuItem Header="編集(_E)" Command="{StaticResource EditCommand}">
                 <MenuItem Header="移動(_T)..." Command="{StaticResource MoveToBookCommand}" InputGestureText="Ctrl+M"/>
                 <Separator/>
                 <MenuItem Header="追加(_A)..." Command="{StaticResource AddActionCommand}" InputGestureText="Ctrl++"/>
@@ -227,7 +233,7 @@
                 <Separator/>
                 <MenuItem Header="更新(_U)" Command="{StaticResource UpdateCommand}" InputGestureText="F5"/>
             </MenuItem>
-            <MenuItem Header="ツール(_T)">
+            <MenuItem Header="ツール(_T)" Command="{StaticResource ToolCommand}">
                 <MenuItem Header="CSV比較(_C)..." Command="{StaticResource OpenCsvComparisonWindowCommand}"/>
                 <Separator/>
                 <MenuItem Header="設定(_S)..." Command="{StaticResource OpenSettingsWindowCommand}"/>
@@ -353,7 +359,7 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="ID" Binding="{Binding ActionId}"
                                                     Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}"/>
-                                <DataGridTextColumn Header="グループID" Binding="{Binding GroupId}" 
+                                <DataGridTextColumn Header="GroupID" Binding="{Binding GroupId}" 
                                                     Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                 <DataGridTextColumn Header="日付" Binding="{Binding ActTime, StringFormat='yyyy/MM/dd'}"/>
                                 <DataGridTextColumn Header="曜日" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}}"

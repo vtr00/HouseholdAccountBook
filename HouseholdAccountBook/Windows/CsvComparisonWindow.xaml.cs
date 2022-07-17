@@ -40,13 +40,17 @@ namespace HouseholdAccountBook.Windows
 
         #region イベント
         /// <summary>
-        /// 比較結果が変更された時
+        /// 比較結果変更時のイベント
         /// </summary>
-        public event EventHandler<EventArgs<int>> IsMatchChanged;
+        public event EventHandler<EventArgs<int?>> IsMatchChanged;
         /// <summary>
-        /// 複数の帳簿項目の状態が変更された時
+        /// 複数の比較結果変更時のイベント
         /// </summary>
         public event EventHandler<EventArgs> ActionsStatusChanged;
+        /// <summary>
+        /// 帳簿変更時のイベント
+        /// </summary>
+        public event EventHandler<EventArgs<int?>> BookChanged;
         #endregion
 
         /// <summary>
@@ -256,7 +260,6 @@ namespace HouseholdAccountBook.Windows
 
         }
 
-
         /// <summary>
         /// 一括チェック可能か
         /// </summary>
@@ -368,6 +371,8 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         private async void CsvComparisonWindow_Loaded(object sender, RoutedEventArgs e)
         {
             await this.UpdateBookListAsync(this.selectedBookId);
+
+            this.RegisterEventHandlerToWVM();
         }
 
         /// <summary>
@@ -465,24 +470,24 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
                         bool isMatch = record.ToInt("is_match") == 1;
 
                         // 帳簿項目IDが使用済なら次のレコードを調べるようにする
-                        bool ans = this.WVM.CsvComparisonVMList.Where((tmpVM) => { return tmpVM.ActionId == actionId; }).Count() != 0;
-                        if (!ans) {
+                        bool checkNext = this.WVM.CsvComparisonVMList.Where((tmpVM) => { return tmpVM.ActionId == actionId; }).Count() != 0;
+                        if (!checkNext) {
                             vm.ActionId = actionId;
                             vm.ItemName = itemName;
                             vm.ShopName = shopName;
                             vm.Remark = remark;
                             vm.IsMatch = isMatch;
                         }
-                        return ans;
+                        return checkNext;
                     });
                 }
             }
 
             List<CsvComparisonViewModel> list = this.WVM.CsvComparisonVMList.ToList();
-            // 日付と帳簿項目IDでソートする
+            // 日付と帳簿項目IDでソートする(帳簿項目ID未登録なら下に来る)
             list.Sort((vm1, vm2) => {
                 int rslt = (int)((vm1.Record.Date - vm2.Record.Date).TotalDays);
-                if (rslt == 0) { rslt = (vm1.ActionId ?? 0) - (vm2.ActionId ?? 0); }
+                if (rslt == 0) { rslt = (vm1.ActionId ?? int.MaxValue) - (vm2.ActionId ?? int.MaxValue); }
                 return rslt;
             });
             this.WVM.CsvComparisonVMList = new ObservableCollection<CsvComparisonViewModel>(list);
@@ -526,6 +531,16 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         #endregion
 
         /// <summary>
+        /// イベントハンドラをWVMに登録する
+        /// </summary>
+        private void RegisterEventHandlerToWVM()
+        {
+            this.WVM.BookChanged += (bookId) => {
+                this.BookChanged?.Invoke(this, new EventArgs<int?>(bookId));
+            };
+        }
+
+        /// <summary>
         /// 一致フラグを更新する
         /// </summary>
         /// <param name="actionId">帳簿項目ID</param>
@@ -539,7 +554,7 @@ SET is_match = @{0}, update_time = 'now', updater = @{1}
 WHERE action_id = @{2};", isMatch ? 1 : 0, Updater, actionId);
             }
 
-            this.IsMatchChanged?.Invoke(this, new EventArgs<int>(actionId));
+            this.IsMatchChanged?.Invoke(this, new EventArgs<int?>(actionId));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using System;
 using System.Collections.ObjectModel;
 
 namespace HouseholdAccountBook.ViewModels
@@ -8,6 +9,11 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class CsvComparisonWindowViewModel : BindableBase
     {
+        /// <summary>
+        /// 帳簿変更時のイベント
+        /// </summary>
+        public event Action<int?> BookChanged;
+
         #region プロパティ
         /// <summary>
         /// CSVファイル名
@@ -39,7 +45,11 @@ namespace HouseholdAccountBook.ViewModels
         public BookComparisonViewModel SelectedBookVM
         {
             get => this._SelectedBookVM;
-            set => this.SetProperty(ref this._SelectedBookVM, value);
+            set {
+                if (this.SetProperty(ref this._SelectedBookVM, value)) {
+                    this.BookChanged?.Invoke(value.Id);
+                }
+            }
         }
         private BookComparisonViewModel _SelectedBookVM = new BookComparisonViewModel() { };
         #endregion

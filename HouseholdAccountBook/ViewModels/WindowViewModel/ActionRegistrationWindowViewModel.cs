@@ -23,19 +23,23 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event Action BookChanged = default;
+        public event Action<int?> BookChanged = default;
+        /// <summary>
+        /// 日時変更時イベント
+        /// </summary>
+        public event Action<DateTime> DateChanged = default;
         /// <summary>
         /// 収支変更時イベント
         /// </summary>
-        public event Action BalanceKindChanged = default;
+        public event Action<BalanceKind> BalanceKindChanged = default;
         /// <summary>
         /// カテゴリ変更時イベント
         /// </summary>
-        public event Action CategoryChanged = default;
+        public event Action<int?> CategoryChanged = default;
         /// <summary>
         /// 項目変更時イベント
         /// </summary>
-        public event Action ItemChanged = default;
+        public event Action<int?> ItemChanged = default;
         #endregion
 
         #region プロパティ
@@ -48,18 +52,18 @@ namespace HouseholdAccountBook.ViewModels
             get => this._RegMode;
             set => this.SetProperty(ref this._RegMode, value);
         }
-        private RegistrationMode _RegMode = default;
+        private RegistrationMode _RegMode = RegistrationMode.Add;
         #endregion
         /// <summary>
         /// CSV比較からの追加
         /// </summary>
         #region AddedByCsvComparison
-        public Boolean AddedByCsvComparison
+        public bool AddedByCsvComparison
         {
             get => this._AddedByCsvComparison;
             set => this.SetProperty(ref this._AddedByCsvComparison, value);
         }
-        private Boolean _AddedByCsvComparison = default;
+        private bool _AddedByCsvComparison = default;
         #endregion
 
         /// <summary>
@@ -84,7 +88,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._SelectedBookVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        BookChanged?.Invoke();
+                        this.BookChanged?.Invoke(value?.Id);
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -103,6 +107,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedDate;
             set {
                 if (this.SetProperty(ref this._SelectedDate, value)) {
+                    this.DateChanged?.Invoke(value);
                     CommandManager.InvalidateRequerySuggested();
                 }
             }
@@ -127,7 +132,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._SelectedBalanceKind, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        BalanceKindChanged?.Invoke();
+                        this.BalanceKindChanged?.Invoke(value);
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -158,7 +163,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._SelectedCategoryVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        CategoryChanged?.Invoke();
+                        this.CategoryChanged?.Invoke(value?.Id);
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -189,7 +194,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._SelectedItemVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        ItemChanged?.Invoke();
+                        this.ItemChanged?.Invoke(value?.Id);
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -277,7 +282,7 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 連動して編集
+        /// 同じグループIDを持つ帳簿項目を連動して編集
         /// </summary>
         #region IsLink
         public bool IsLink

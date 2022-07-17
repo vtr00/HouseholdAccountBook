@@ -23,19 +23,19 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event Action BookChanged = default;
+        public event Action<int?> BookChanged = default;
         /// <summary>
         /// 収支変更時イベント
         /// </summary>
-        public event Action BalanceKindChanged = default;
+        public event Action<BalanceKind> BalanceKindChanged = default;
         /// <summary>
         /// カテゴリ変更時イベント
         /// </summary>
-        public event Action CategoryChanged = default;
+        public event Action<int?> CategoryChanged = default;
         /// <summary>
         /// 項目変更時イベント
         /// </summary>
-        public event Action ItemChanged = default;
+        public event Action<int?> ItemChanged = default;
         #endregion
 
         #region プロパティ
@@ -73,7 +73,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._SelectedBookVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        BookChanged?.Invoke();
+                        this.BookChanged?.Invoke(value?.Id);
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -99,7 +99,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._SelectedBalanceKind, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        BalanceKindChanged?.Invoke();
+                        this.BalanceKindChanged?.Invoke(value);
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -130,7 +130,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._SelectedCategoryVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        CategoryChanged?.Invoke();
+                        this.CategoryChanged?.Invoke(value?.Id);
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -161,7 +161,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._SelectedItemVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        ItemChanged?.Invoke();
+                        this.ItemChanged?.Invoke(value?.Id);
                         this.isUpdateOnChanged = false;
                     }
                 }

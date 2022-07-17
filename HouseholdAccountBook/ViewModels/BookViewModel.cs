@@ -9,6 +9,7 @@
         /// <summary>
         /// 帳簿ID
         /// </summary>
+        /// <note>null許容型の理由は？</note>
         public int? Id { get; set; }
 
         /// <summary>

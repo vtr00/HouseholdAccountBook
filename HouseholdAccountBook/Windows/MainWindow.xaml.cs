@@ -34,7 +34,29 @@ namespace HouseholdAccountBook.Windows
         /// 起動時刻
         /// </summary>
         private readonly DateTime startUpDate;
+
+        /// <summary>
+        /// 移動登録ウィンドウ
+        /// </summary>
+        private MoveRegistrationWindow mrw;
+        /// <summary>
+        /// 項目登録ウィンドウ
+        /// </summary>
+        private ActionRegistrationWindow arw;
+        /// <summary>
+        /// 項目リスト登録ウィンドウ
+        /// </summary>
+        private ActionListRegistrationWindow alrw;
+        /// <summary>
+        /// CSV比較ウィンドウ
+        /// </summary>
+        private CsvComparisonWindow ccw;
         #endregion
+
+        /// <summary>
+        /// 子ウィンドウを開いているか
+        /// </summary>
+        private bool ChildrenWindowOpened => this.mrw != null || this.arw != null || this.alrw != null || this.ccw != null;
 
         /// <summary>
         /// <see cref="MainWindow"/> クラスの新しいインスタンスを初期化します。
@@ -54,13 +76,23 @@ namespace HouseholdAccountBook.Windows
         #region コマンド
         #region ファイル
         /// <summary>
+        /// ファイルメニュー操作可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !this.ChildrenWindowOpened;
+        }
+
+        /// <summary>
         /// 記帳風月のDBを取り込み可能か
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void ImportKichoHugetsuDbCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true; // TODO: 設定で無効化できるようにする
+            e.CanExecute = !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -299,7 +331,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void ImportCustomFileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = Properties.Settings.Default.App_Postgres_RestoreExePath != string.Empty;
+            e.CanExecute = Properties.Settings.Default.App_Postgres_RestoreExePath != string.Empty && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -402,7 +434,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void ExportCustomFileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = Properties.Settings.Default.App_Postgres_DumpExePath != string.Empty;
+            e.CanExecute = Properties.Settings.Default.App_Postgres_DumpExePath != string.Empty && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -475,6 +507,17 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         }
 
         /// <summary>
+        /// 手動バックアップ可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private void BackUpCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !this.ChildrenWindowOpened;
+        }
+
+        /// <summary>
         /// 手動バックアップを行う
         /// </summary>
         /// <param name="sender"></param>
@@ -491,6 +534,17 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         }
 
         /// <summary>
+        /// ウィンドウを閉じれるか
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private void CloseWindowCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !this.ChildrenWindowOpened;
+        }
+
+        /// <summary>
         /// ウィンドウを閉じる
         /// </summary>
         /// <param name="sender"></param>
@@ -503,14 +557,24 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
         #region 編集
         /// <summary>
+        /// 編集メニュー操作可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void EditCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !this.ChildrenWindowOpened;
+        }
+
+        /// <summary>
         /// 移動操作可能か
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void MoveToBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択していて、帳簿が2つ以上存在していて、選択されている帳簿が存在する
-            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && this.WVM.BookVMList?.Count >= 2 && this.WVM.SelectedBookVM != null;
+            // 帳簿タブを選択 かつ 帳簿が2つ以上存在 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && this.WVM.BookVMList?.Count >= 2 && this.WVM.SelectedBookVM != null && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -520,16 +584,20 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void MoveToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
+            this.mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             // 登録時イベントを登録する
-            mrw.Registrated += async (sender2, e2) => {
+            this.mrw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
                 await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
-            mrw.ShowDialog();
+            // クローズ時イベントを登録する
+            this.mrw.Closed += (sender3, e3) => {
+                this.mrw = null;
+            };
+            this.mrw.Show();
         }
 
         /// <summary>
@@ -539,8 +607,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void AddActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択していて、選択されている帳簿が存在する
-            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && this.WVM.SelectedBookVM != null;
+            // 帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && this.WVM.SelectedBookVM != null && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -550,16 +618,20 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void AddActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
+            this.arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             // 登録時イベントを登録する
-            arw.Registrated += async (sender2, e2) => {
+            this.arw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
                 await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
-            arw.ShowDialog();
+            // クローズ時イベントを登録する
+            this.arw.Closed += (sender3, e3) => {
+                this.arw = null;
+            };
+            this.arw.Show();
         }
 
         /// <summary>
@@ -569,8 +641,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void AddActionListCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択していて、選択されている帳簿が存在する
-            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && this.WVM.SelectedBookVM != null;
+            // 帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウを開いていない
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab && this.WVM.SelectedBookVM != null && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -580,16 +652,20 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void AddActionListCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
+            this.alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             // 登録時イベントを登録する
-            alrw.Registrated += async (sender2, e2) => {
+            this.alrw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
                 await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                 FocusManager.SetFocusedElement(this, this.actionDataGrid);
                 this.actionDataGrid.Focus();
             };
-            alrw.ShowDialog();
+            // クローズ時イベントを登録する
+            this.alrw.Closed += (sender3, e3) => {
+                this.alrw = null;
+            };
+            this.alrw.Show();
         }
 
         /// <summary>
@@ -599,9 +675,9 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void EditActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択していて、選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが0より大きい
+            // 帳簿タブを選択 かつ 選択されている帳簿項目が1つだけ存在 かつ 選択している帳簿項目のIDが0より大きい かつ 子ウィンドウを開いていない
             e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab &&
-                           this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVMList[0].ActionId > 0;
+                           this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVMList[0].ActionId > 0 && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -628,40 +704,52 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
             switch (groupKind) {
                 case (int)GroupKind.Move:
                     // 移動の編集時の処理
-                    MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
+                    this.mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
                     // 登録時イベントを登録する
-                    mrw.Registrated += async (sender2, e2) => {
+                    this.mrw.Registrated += async (sender2, e2) => {
                         // 帳簿一覧タブを更新する
                         await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                         FocusManager.SetFocusedElement(this, this.actionDataGrid);
                         this.actionDataGrid.Focus();
                     };
-                    mrw.ShowDialog();
+                    // クローズ時イベントを登録する
+                    this.mrw.Closed += (sender3, e3) => {
+                        this.mrw = null;
+                    };
+                    this.mrw.Show();
                     break;
                 case (int)GroupKind.ListReg:
                     // リスト登録された帳簿項目の編集時の処理
-                    ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
+                    this.alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
                     // 登録時イベントを登録する
-                    alrw.Registrated += async (sender2, e2) => {
+                    this.alrw.Registrated += async (sender2, e2) => {
                         // 帳簿一覧タブを更新する
                         await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                         FocusManager.SetFocusedElement(this, this.actionDataGrid);
                         this.actionDataGrid.Focus();
                     };
-                    alrw.ShowDialog();
+                    // クローズ時イベントを登録する
+                    this.alrw.Closed += (sender3, e3) => {
+                        this.alrw = null;
+                    };
+                    this.alrw.Show();
                     break;
                 case (int)GroupKind.Repeat:
                 default:
                     // 移動・リスト登録以外の帳簿項目の編集時の処理
-                    ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId) { Owner = this };
+                    this.arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId) { Owner = this };
                     // 登録時イベントを登録する
-                    arw.Registrated += async (sender2, e2) => {
+                    this.arw.Registrated += async (sender2, e2) => {
                         // 帳簿一覧タブを更新する
                         await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                         FocusManager.SetFocusedElement(this, this.actionDataGrid);
                         this.actionDataGrid.Focus();
                     };
-                    arw.ShowDialog();
+
+                    this.arw.Closed += (sender3, e3) => {
+                        this.arw = null;
+                    };
+                    this.arw.Show();
                     break;
             }
         }
@@ -673,9 +761,9 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         /// <param name="e"></param>
         private void CopyActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択していて、選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが0より大きい
+            // 帳簿タブを選択 かつ 選択されている帳簿項目が1つだけ存在 かつ 選択している帳簿項目のIDが0より大きい かつ 子ウィンドウを開いていない
             e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab &&
-                           this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVMList[0].ActionId > 0;
+                           this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVMList[0].ActionId > 0 && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -701,27 +789,33 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
 
             if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
                 // 移動以外の帳簿項目の複製時の処理
-                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId, RegistrationMode.Copy) { Owner = this };
+                this.arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId, RegistrationMode.Copy) { Owner = this };
                 // 登録時イベントを登録する
-                arw.Registrated += async (sender2, e2) => {
+                this.arw.Registrated += async (sender2, e2) => {
                     // 帳簿一覧タブを更新する
                     await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
-                arw.ShowDialog();
+                this.arw.Closed += (sender3, e3) => {
+                    this.arw = null;
+                };
+                this.arw.Show();
             }
             else {
                 // 移動の複製時の処理
-                MoveRegistrationWindow mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationMode.Copy) { Owner = this };
+                this.mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationMode.Copy) { Owner = this };
                 // 登録時イベントを登録する
-                mrw.Registrated += async (sender2, e2) => {
+                this.mrw.Registrated += async (sender2, e2) => {
                     // 帳簿一覧タブを更新する
                     await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                     FocusManager.SetFocusedElement(this, this.actionDataGrid);
                     this.actionDataGrid.Focus();
                 };
-                mrw.ShowDialog();
+                this.mrw.Closed += (sender3, e3) => {
+                    this.mrw = null;
+                };
+                this.mrw.Show();
             }
         }
 
@@ -732,9 +826,9 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         /// <param name="e"></param>
         private void DeleteActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択していて、選択している帳簿項目が存在していて、選択している帳簿項目にIDが0より大きいものが存在する
+            // 帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 子ウィンドウが開いていない
             e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab &&
-                           this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0;
+                           this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0 && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -818,9 +912,9 @@ WHERE group_id = @{0} AND del_flg = 0;", groupId, Updater);
         /// <param name="e"></param>
         private void ChangeIsMatchCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択していて、選択している帳簿項目が存在していて、選択している帳簿項目にIDが0より大きいものが存在する
+            // 帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 子ウィンドウが開いていない
             e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab &&
-                           this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0;
+                           this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0 && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -1182,6 +1276,27 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
 
         #region ツール
         /// <summary>
+        /// ツールメニュー操作可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ToolCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !this.ChildrenWindowOpened;
+        }
+
+        /// <summary>
+        /// 設定操作可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private void OpenSettingsWindowCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !this.ChildrenWindowOpened;
+        }
+
+        /// <summary>
         /// 設定ウィンドウを開く
         /// </summary>
         /// <param name="sender"></param>
@@ -1199,6 +1314,17 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 this.Cursor = null;
             }
         }
+        
+        /// <summary>
+        /// CSV比較可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private void OpenCsvComparisonWindowCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !this.ChildrenWindowOpened;
+        }
 
         /// <summary>
         /// CSV比較ウィンドウを開く
@@ -1207,9 +1333,9 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void OpenCsvComparisonWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            CsvComparisonWindow ccw = new CsvComparisonWindow(this.builder, this.WVM.SelectedBookVM.Id);
+            this.ccw = new CsvComparisonWindow(this.builder, this.WVM.SelectedBookVM.Id);
             // 帳簿項目の一致を確認時のイベントを登録する
-            ccw.IsMatchChanged += async (sender2, e2) => {
+            this.ccw.IsMatchChanged += async (sender2, e2) => {
                 ActionViewModel vm = this.WVM.ActionVMList.FirstOrDefault((tmpVM) => { return tmpVM.ActionId == e2.Value; });
                 if (vm != null) {
                     using (DaoBase dao = this.builder.Build()) {
@@ -1227,10 +1353,19 @@ WHERE action_id = @{0};", vm.ActionId);
                 }
             };
             // 複数の帳簿項目変更時のイベントを登録する
-            ccw.ActionsStatusChanged += async (sender3, e3) => {
+            this.ccw.ActionsStatusChanged += async (sender3, e3) => {
                 await this.UpdateBookTabDataAsync(isScroll: false);
             };
-            ccw.Show();
+            // 帳簿変更時のイベントを登録する
+            this.ccw.BookChanged += async (sender4, e4) => {
+                this.WVM.SelectedBookVM = this.WVM.BookVMList.FirstOrDefault((vm) => { return vm.Id == e4.Value; });
+                await this.UpdateAsync();
+            };
+            // クローズ時イベントを登録する
+            this.ccw.Closed += (sender4, e4) => {
+                this.ccw = null;
+            };
+            this.ccw.Show();
         }
         #endregion
 
@@ -1314,6 +1449,12 @@ WHERE action_id = @{0};", vm.ActionId);
         /// <param name="e"></param>
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            // 他のウィンドウを開いているときは閉じない
+            if (this.ChildrenWindowOpened) {
+                e.Cancel = true;
+                return;
+            }
+
             Properties.Settings settings = Properties.Settings.Default;
 
             settings.Reload();
@@ -1383,6 +1524,12 @@ WHERE action_id = @{0};", vm.ActionId);
         #endregion
 
         #region 画面更新用の関数
+        /// <summary>
+        /// 画面更新(タブ非依存)
+        /// </summary>
+        /// <param name="isScroll">スクロールするか</param>
+        /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
+        /// <returns></returns>
         private async Task UpdateAsync(bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
             switch (this.WVM.SelectedTab) {
@@ -3018,6 +3165,5 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             }
             return false;
         }
-
     }
 }

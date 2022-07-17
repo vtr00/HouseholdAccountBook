@@ -23,19 +23,27 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 移動元帳簿変更時イベント
         /// </summary>
-        public event Action FromBookChanged = default;
+        public event Action<int?> FromBookChanged = default;
+        /// <summary>
+        /// 移動元日時変更時イベント
+        /// </summary>
+        public event Action<DateTime> FromDateChanged = default;
         /// <summary>
         /// 移動先帳簿変更時イベント
         /// </summary>
-        public event Action ToBookChanged = default;
+        public event Action<int?> ToBookChanged = default;
+        /// <summary>
+        /// 移動先日時変更時イベント
+        /// </summary>
+        public event Action<DateTime> ToDateChanged = default;
         /// <summary>
         /// 手数料種別変更時イベント
         /// </summary>
-        public event Action CommissionKindChanged = default;
+        public event Action<CommissionKind> CommissionKindChanged = default;
         /// <summary>
         /// 項目変更時イベント
         /// </summary>
-        public event Action ItemChanged = default;
+        public event Action<int?> ItemChanged = default;
         #endregion
 
         #region プロパティ
@@ -52,62 +60,6 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 日付(移動元)
-        /// </summary>
-        #region MovedDate
-        public DateTime MovedDate
-        {
-            get => this._MovedDate;
-            set {
-                if (this.SetProperty(ref this._MovedDate, value)) {
-                    CommandManager.InvalidateRequerySuggested();
-
-                    if (this.MovingDate < value || this.IsLink) {
-                        this.MovingDate = value;
-                    }
-                }
-            }
-        }
-        private DateTime _MovedDate = DateTime.Today;
-        #endregion
-        /// <summary>
-        /// 日付(移動先)
-        /// </summary>
-        #region MovingDate
-        public DateTime MovingDate
-        {
-            get => this._MovingDate;
-            set {
-                if (this.SetProperty(ref this._MovingDate, value)) {
-                    CommandManager.InvalidateRequerySuggested();
-
-                    if (value < this.MovedDate) {
-                        this.MovedDate = value;
-                    }
-                }
-            }
-        }
-        private DateTime _MovingDate = DateTime.Today;
-        #endregion
-        /// <summary>
-        /// 連動して編集
-        /// </summary>
-        #region IsLink
-        public bool IsLink
-        {
-            get => this._IsLink;
-            set {
-                if (this.SetProperty(ref this._IsLink, value)) {
-                    if (value) {
-                        this.MovingDate = this.MovedDate;
-                    }
-                }
-            }
-        }
-        private bool _IsLink = true;
-        #endregion
-
-        /// <summary>
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
@@ -121,40 +73,101 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 選択された移動元帳簿VM
         /// </summary>
-        #region SelectedMovedBookVM
-        public BookViewModel SelectedMovedBookVM
+        #region SelectedFromBookVM
+        public BookViewModel SelectedFromBookVM
         {
-            get => this._SelectedMovedBookVM;
+            get => this._SelectedFromBookVM;
             set {
-                if (this.SetProperty(ref this._SelectedMovedBookVM, value)) {
+                if (this.SetProperty(ref this._SelectedFromBookVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        FromBookChanged?.Invoke();
+                        this.FromBookChanged?.Invoke(value.Id);
                         this.isUpdateOnChanged = false;
                     }
                 }
             }
         }
-        private BookViewModel _SelectedMovedBookVM = default;
+        private BookViewModel _SelectedFromBookVM = default;
         #endregion
         /// <summary>
         /// 選択された移動先帳簿VM
         /// </summary>
-        #region SelectedMovingBookVM
-        public BookViewModel SelectedMovingBookVM
+        #region SelectedToBookVM
+        public BookViewModel SelectedToBookVM
         {
-            get => this._SelectedMovingBookVM;
+            get => this._SelectedToBookVM;
             set {
-                if (this.SetProperty(ref this._SelectedMovingBookVM, value)) {
+                if (this.SetProperty(ref this._SelectedToBookVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        ToBookChanged?.Invoke();
+                        this.ToBookChanged?.Invoke(value.Id);
                         this.isUpdateOnChanged = false;
                     }
                 }
             }
         }
-        private BookViewModel _SelectedMovingBookVM = default;
+        private BookViewModel _SelectedToBookVM = default;
+        #endregion
+
+        /// <summary>
+        /// 日付(移動元)
+        /// </summary>
+        #region FromDate
+        public DateTime FromDate
+        {
+            get => this._FromDate;
+            set {
+                if (this.SetProperty(ref this._FromDate, value)) {
+                    this.FromDateChanged?.Invoke(value);
+                    CommandManager.InvalidateRequerySuggested();
+
+                    if (this.ToDate < value || this.IsLink) {
+                        this.ToDate = value;
+                    }
+                }
+            }
+        }
+        private DateTime _FromDate = DateTime.Today;
+        #endregion
+        /// <summary>
+        /// 日付(移動先)
+        /// </summary>
+        #region ToDate
+        public DateTime ToDate
+        {
+            get => this._ToDate;
+            set {
+                if (this.SetProperty(ref this._ToDate, value)) {
+                    if (!this.IsLink) {
+                        this.ToDateChanged?.Invoke(value);
+                    }
+                    CommandManager.InvalidateRequerySuggested();
+
+                    if (value < this.FromDate) {
+                        this.FromDate = value;
+                        this.IsLink = true;
+                    }
+                }
+            }
+        }
+        private DateTime _ToDate = DateTime.Today;
+        #endregion
+        /// <summary>
+        /// 移動先日時が移動元日時に連動して編集
+        /// </summary>
+        #region IsLink
+        public bool IsLink
+        {
+            get => this._IsLink;
+            set {
+                if (this.SetProperty(ref this._IsLink, value)) {
+                    if (value) {
+                        this.ToDate = this.FromDate;
+                    }
+                }
+            }
+        }
+        private bool _IsLink = true;
         #endregion
 
         /// <summary>
@@ -190,7 +203,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._SelectedCommissionKind, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        CommissionKindChanged?.Invoke();
+                        CommissionKindChanged?.Invoke(value);
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -221,7 +234,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._SelectedItemVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        ItemChanged?.Invoke();
+                        ItemChanged?.Invoke(value?.Id);
                         this.isUpdateOnChanged = false;
                     }
                 }
