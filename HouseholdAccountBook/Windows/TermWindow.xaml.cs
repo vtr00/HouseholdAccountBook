@@ -49,6 +49,8 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void TermWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            // xamlで指定するとCalendarが正しく表示されないため、ここで指定する
+            this.calendar.DisplayMode = CalendarMode.Year;
         }
 
         /// <summary>
@@ -70,10 +72,9 @@ namespace HouseholdAccountBook.Windows
         private void Calendar_DisplayModeChanged(object sender, CalendarModeChangedEventArgs e)
         {
             if (e.NewMode == CalendarMode.Month) {
-                Calendar calendar = sender as Calendar;
                 this.WVM.StartDate = calendar.DisplayDate.GetFirstDateOfMonth();
                 this.WVM.EndDate = this.WVM.StartDate.AddMonths(1).AddMilliseconds(-1);
-                calendar.DisplayMode = CalendarMode.Year;
+                this.calendar.DisplayMode = CalendarMode.Year;
 
                 Mouse.Capture(null);
             }
