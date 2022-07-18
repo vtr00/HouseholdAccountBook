@@ -1037,10 +1037,10 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
 
                 switch (this.WVM.SelectedTab) {
                     case SettingsTabs.ItemSettingsTab:
-                        await this.UpdateItemSettingsTabDataAsync();
+                        await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM?.Kind, this.WVM.SelectedItemVM?.Id);
                         break;
                     case SettingsTabs.BookSettingsTab:
-                        await this.UpdateBookSettingTabDataAsync();
+                        await this.UpdateBookSettingTabDataAsync(this.WVM.SelectedBookVM?.Id);
                         break;
                     case SettingsTabs.OtherSettingsTab:
                         this.UpdateOtherSettingTabData();
@@ -1126,7 +1126,12 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                         }
                     }
 
-                    this.WVM.SelectedItemVM = query.Count() == 0 ? null : query.First();
+                    this.WVM.SelectedItemVM = query.Count() != 0 ? query.First() : null;
+                }
+
+                // 何も選択されていないなら1番上の項目を選択する
+                if (this.WVM.SelectedItemVM == null && this.WVM.HierachicalItemVMList.Count != 0) {
+                    this.WVM.SelectedItemVM = this.WVM.HierachicalItemVMList[0];
                 }
             }
         }
@@ -1145,7 +1150,12 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 }
                 else {
                     IEnumerable<BookSettingViewModel> query = this.WVM.BookVMList.Where((vm) => { return vm.Id == bookId; });
-                    this.WVM.SelectedBookVM = query.Count() == 0 ? null : query.First();
+                    this.WVM.SelectedBookVM = query.Count() != 0 ? query.First() : null;
+                }
+
+                // 何も選択されていないなら1番上の項目を選択する
+                if (this.WVM.SelectedBookVM == null && this.WVM.BookVMList.Count != 0) {
+                    this.WVM.SelectedBookVM = this.WVM.BookVMList[0];
                 }
             }
         }

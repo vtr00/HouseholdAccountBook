@@ -157,8 +157,8 @@
                     <DataGridTextColumn Header="支出" Binding="{Binding Record.Value, Converter={StaticResource IntToMoneyDisplayConverter}}" 
                                         ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                     <DataGridTextColumn Header="CSV項目名" Binding="{Binding Record.Name}"/>
-                    <DataGridTextColumn Header="アクションID" Binding="{Binding ActionId}"
-                                        Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <DataGridTextColumn Header="ActionId" Binding="{Binding ActionId}"
+                                        Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                     <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
                     <DataGridTextColumn Header="店名" Binding="{Binding ShopName}"/>
                     <DataGridTextColumn Header="備考" Binding="{Binding Remark}"/>

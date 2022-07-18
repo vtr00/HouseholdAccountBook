@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace HouseholdAccountBook.ConstValue
 {
@@ -19,7 +20,12 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 補足されない例外の情報ファイル名
         /// </summary>
-        public static string UnhandledExceptionInfoFileName { get; } = "UnhandledException.txt";
+        public static string UnhandledExceptionInfoFileName {
+            get {
+                DateTime dt = DateTime.Now;
+                return dt.ToString("UnhandledException_yyMMdd_hhmmss.txt");
+            }
+        }
 
         /// <summary>
         /// タブ

@@ -60,6 +60,40 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// 移動元帳簿項目ID
+        /// </summary>
+        #region FromId
+        public int? FromId
+        {
+            get => this._FromId;
+            set => this.SetProperty(ref this._FromId, value);
+        }
+        private int? _FromId = default;
+        #endregion
+        /// <summary>
+        /// 移動先帳簿項目ID
+        /// </summary>
+        #region ToId
+        public int? ToId
+        {
+            get => this._ToId;
+            set => this.SetProperty(ref this._ToId, value);
+        }
+        private int? _ToId = default;
+        #endregion
+        /// <summary>
+        /// グループID
+        /// </summary>
+        #region GroupId
+        public int? GroupId
+        {
+            get => this._GroupId;
+            set => this.SetProperty(ref this._GroupId, value);
+        }
+        private int? _GroupId = default;
+        #endregion
+
+        /// <summary>
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
@@ -184,6 +218,18 @@ namespace HouseholdAccountBook.ViewModels
             }
         }
         private int? _Value = null;
+        #endregion
+
+        /// <summary>
+        /// 手数料ID
+        /// </summary>
+        #region CommissionId
+        public int? CommissionId
+        {
+            get => this._CommissionId;
+            set => this.SetProperty(ref this._CommissionId, value);
+        }
+        private int? _CommissionId = default;
         #endregion
 
         /// <summary>

@@ -48,22 +48,27 @@
         /// <returns>DAO</returns>
         public DaoBase Build()
         {
-            DaoBase daoBase;
-            switch (this.target) {
-                case Target.SQLite:
-                    daoBase = new DaoSQLite(this.info as DaoSQLite.ConnectInfo);
-                    break;
-                case Target.PostgreSQL:
-                    daoBase = new DaoNpgsql(this.info as DaoNpgsql.ConnectInfo);
-                    break;
-                case Target.OleDb:
-                    daoBase = new DaoOle(this.info as DaoOle.ConnectInfo);
-                    break;
-                default:
-                    daoBase = null;
-                    break;
+            try {
+                DaoBase daoBase;
+                switch (this.target) {
+                    case Target.SQLite:
+                        daoBase = new DaoSQLite(this.info as DaoSQLite.ConnectInfo);
+                        break;
+                    case Target.PostgreSQL:
+                        daoBase = new DaoNpgsql(this.info as DaoNpgsql.ConnectInfo);
+                        break;
+                    case Target.OleDb:
+                        daoBase = new DaoOle(this.info as DaoOle.ConnectInfo);
+                        break;
+                    default:
+                        daoBase = null;
+                        break;
+                }
+                return daoBase;
             }
-            return daoBase;
+            catch (System.TimeoutException e) {
+                throw e;
+            }
         }
     }
 }

@@ -52,6 +52,18 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// グループID
+        /// </summary>
+        #region GroupId
+        public int? GroupId
+        {
+            get => this._GroupId;
+            set => this.SetProperty(ref this._GroupId, value);
+        }
+        private int? _GroupId = default;
+        #endregion
+
+        /// <summary>
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
@@ -260,15 +272,6 @@ namespace HouseholdAccountBook.ViewModels
         /// 数値入力ボタンの入力種別
         /// </summary>
         public NumericInputButton.InputKind InputedKind { get; set; }
-
-        /// <summary>
-        /// デバッグビルドか
-        /// </summary>
-#if DEBUG
-        public bool IsDebug => true;
-#else
-        public bool IsDebug => false;
-#endif
         #endregion
     }
 }

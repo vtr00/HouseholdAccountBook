@@ -42,7 +42,7 @@ namespace HouseholdAccountBook
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void App_Startup(object sender, StartupEventArgs e)
+        private async void App_Startup(object sender, StartupEventArgs e)
         {
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
 
@@ -59,8 +59,8 @@ namespace HouseholdAccountBook
 
                 if (processList.Length >= 2) {
                     foreach (Process process in processList) {
-                        if (process.ProcessName != curProcess.ProcessName) {
-                            // 外部プロセスのアクティブ化
+                        if (process.Id != curProcess.Id) {
+                            // 外部プロセスのアクティブ化したい(Win32を使わざるを得ない)
                         }
                     }
                 }
@@ -74,9 +74,6 @@ namespace HouseholdAccountBook
             this.DispatcherUnhandledException += this.App_DispatcherUnhandledException;
             this.Exit += this.App_Exit;
 
-            // DB設定ダイアログ終了時に閉じないように設定する
-            this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-
             // 前バージョンからのUpgradeを実行していないときはUpgradeを実施する
             Version assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             if (!Version.TryParse(settings.App_Version, out Version preVersion) || preVersion < assemblyVersion) {
@@ -86,6 +83,13 @@ namespace HouseholdAccountBook
 
             // 初回起動時
             if (settings.App_InitFlag) {
+#if !DEBUG
+                // リリースビルドの初回起動時デバッグモードはOFF
+                settings.App_IsDebug = false;
+#endif
+                // DB設定ダイアログ終了時に閉じないように設定する(明示的なシャットダウンが必要)
+                this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
                 // データベース接続を設定する
                 DbSettingWindow dsw = new DbSettingWindow("DB接続設定を入力してください。");
                 bool? result = dsw.ShowDialog();
@@ -119,9 +123,12 @@ namespace HouseholdAccountBook
 
                 // 接続を試行する
                 bool isOpen = false;
-                using (DaoBase dao = builder.Build()) {
-                    isOpen = dao.IsOpen;
+                try {
+                    using (DaoBase dao = builder.Build()) {
+                        isOpen = dao.IsOpen;
+                    }
                 }
+                catch (TimeoutException) { }
 
                 if (isOpen) {
                     break;
@@ -140,9 +147,12 @@ namespace HouseholdAccountBook
             }
 
             // 休日リストを取得する
-            DateTimeExtensions.DownloadHolidayListAsync();
+            await DateTimeExtensions.DownloadHolidayListAsync();
 
-            // 接続できる場合だけメインウィンドウを開く
+            // 設定をリソースに登録する
+            this.RegisterSettingsToResource();
+
+            // DBに接続できる場合だけメインウィンドウを開く
             MainWindow mw = new MainWindow(builder);
             this.MainWindow = mw;
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
@@ -159,9 +169,10 @@ namespace HouseholdAccountBook
             try {
                 e.Handled = true;
 
+                string fileName = UnhandledExceptionInfoFileName;
                 // 例外情報をファイルに保存する
                 string jsonCode = JsonConvert.SerializeObject(e.Exception, Formatting.Indented);
-                using (FileStream fs = new FileStream(UnhandledExceptionInfoFileName, FileMode.Create)) {
+                using (FileStream fs = new FileStream(fileName, FileMode.Create)) {
                     using (StreamWriter sw = new StreamWriter(fs)) {
                         sw.WriteLine(jsonCode);
                     }
@@ -175,7 +186,7 @@ namespace HouseholdAccountBook
                     Type = NotificationType.Warning
                 };
                 nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
-                    Process.Start(UnhandledExceptionInfoFileName);
+                    Process.Start(fileName);
                 });
             }
             catch (Exception) { }
@@ -189,6 +200,18 @@ namespace HouseholdAccountBook
         private void App_Exit(object sender, ExitEventArgs e)
         {
             this.ReleaseMutex();
+        }
+
+        /// <summary>
+        /// 設定をリソースに登録する
+        /// </summary>
+        public void RegisterSettingsToResource()
+        {
+            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
+            ResourceDictionary rd = Current.Resources;
+            if (rd.Contains("Settings")) {
+                rd["Settings"] = settings;
+            }
         }
 
         /// <summary>

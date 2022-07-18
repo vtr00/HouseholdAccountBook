@@ -238,9 +238,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void ActionRegistrationWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
             int? bookId = null;
-            BookViewModel selectedBookVM = null;
             DateTime actDate = DateTime.Now;
             BalanceKind balanceKind = BalanceKind.Outgo;
 
@@ -250,6 +248,7 @@ namespace HouseholdAccountBook.Windows
             string shopName = null;
             string remark = null;
 
+            // DBから値を読み込む
             switch (this.WVM.RegMode) {
                 case RegistrationMode.Add: {
                         bookId = this.selectedBookId;
@@ -300,32 +299,24 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
                     break;
             }
 
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
-                reader.ExecWholeRow((count, record) => {
-                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
-                    bookVMList.Add(vm);
-                    if (selectedBookVM == null || bookId == vm.Id) {
-                        selectedBookVM = vm;
-                    }
-                    return true;
-                });
+            // WVMに値を設定する
+            if (this.WVM.RegMode == RegistrationMode.Edit) {
+                this.WVM.ActionId = this.selectedActionId;
+                this.WVM.GroupId = this.groupId;
             }
-
-            this.WVM.BookVMList = bookVMList;
-            this.WVM.SelectedBookVM = selectedBookVM;
             this.WVM.SelectedBalanceKind = balanceKind;
             this.WVM.SelectedDate = actDate;
-
             this.WVM.Value = actValue.HasValue ? Math.Abs(actValue.Value) : (int?)null;
             this.WVM.IsMatch = isMatch;
 
+            // リストを更新する
+            await this.UpdateBookListAsync(bookId);
             await this.UpdateCategoryListAsync();
             await this.UpdateItemListAsync(itemId);
             await this.UpdateShopListAsync(shopName);
             await this.UpdateRemarkListAsync(remark);
 
+            // イベントハンドラを設定する
             this.RegisterEventHandlerToWVM();
         }
 
@@ -342,9 +333,36 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
 
         #region 画面更新用の関数
         /// <summary>
+        /// 帳簿リストを更新する
+        /// </summary>
+        /// <param name="bookId">選択対象の帳簿ID</param>
+        /// <returns></returns>
+        private async Task UpdateBookListAsync(int? bookId = null)
+        {
+            // 帳簿を取得する
+            ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
+            BookViewModel selectedBookVM = null;
+            using (DaoBase dao = this.builder.Build()) {
+                DaoReader reader = await dao.ExecQueryAsync(@"
+SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
+                reader.ExecWholeRow((count, record) => {
+                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
+                    bookVMList.Add(vm);
+                    if (selectedBookVM == null || bookId == vm.Id) {
+                        selectedBookVM = vm;
+                    }
+                    return true;
+                });
+            }
+            this.WVM.BookVMList = bookVMList;
+            this.WVM.SelectedBookVM = selectedBookVM;
+        }
+
+        /// <summary>
         /// カテゴリリストを更新する
         /// </summary>
-        /// <param name="categoryId">選択対象のカテゴリ</param>
+        /// <param name="categoryId">選択対象のカテゴリID</param>
+        /// <returns></returns>
         private async Task UpdateCategoryListAsync(int? categoryId = null)
         {
             ObservableCollection<CategoryViewModel> categoryVMList = new ObservableCollection<CategoryViewModel>() {
@@ -374,7 +392,8 @@ ORDER BY sort_order;", (int)this.WVM.SelectedBalanceKind, this.WVM.SelectedBookV
         /// <summary>
         /// 項目リストを更新する
         /// </summary>
-        /// <param name="itemId">選択対象の項目</param>
+        /// <param name="itemId">選択対象の項目ID</param>
+        /// <returns></returns>
         private async Task UpdateItemListAsync(int? itemId = null)
         {
             if (this.WVM.SelectedCategoryVM == null) return;
@@ -415,6 +434,7 @@ ORDER BY sort_order;", this.WVM.SelectedBookVM.Id, (int)this.WVM.SelectedCategor
         /// 店舗リストを更新する
         /// </summary>
         /// <param name="shopName">選択対象の店舗名</param>
+        /// <returns></returns>
         private async Task UpdateShopListAsync(string shopName = null)
         {
             if (this.WVM.SelectedItemVM == null) return;
@@ -443,6 +463,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         /// 備考リストを更新する
         /// </summary>
         /// <param name="remark">選択対象の備考</param>
+        /// <returns></returns>
         private async Task UpdateRemarkListAsync(string remark = null)
         {
             if (this.WVM.SelectedItemVM == null) return;

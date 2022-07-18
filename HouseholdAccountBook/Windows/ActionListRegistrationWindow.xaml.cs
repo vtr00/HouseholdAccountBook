@@ -269,90 +269,79 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void ActionListRegistrationWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
             int? bookId = null;
-            BookViewModel selectedBookVM = null;
             BalanceKind balanceKind = BalanceKind.Outgo;
 
             int? itemId = null;
             string shopName = null;
             string remark = null;
 
+            // DBから値を読み込む
             switch (this.WVM.RegMode) {
                 case RegistrationMode.Add: {
-                        bookId = this.selectedBookId;
-                        balanceKind = BalanceKind.Outgo;
-                        DateTime actDate = this.selectedDate ?? ((this.selectedMonth == null || this.selectedMonth?.Month == DateTime.Today.Month) ? DateTime.Today : this.selectedMonth.Value);
+                    bookId = this.selectedBookId;
+                    balanceKind = BalanceKind.Outgo;
+                    DateTime actDate = this.selectedDate ?? ((this.selectedMonth == null || this.selectedMonth?.Month == DateTime.Today.Month) ? DateTime.Today : this.selectedMonth.Value);
 
-                        if (this.selectedRecordList == null) {
-                            this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = actDate });
-                        }
-                        else {
-                            foreach (CsvComparisonViewModel.CsvRecord record in this.selectedRecordList) {
-                                this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = record.Date, ActValue = record.Value });
-                            }
+                    if (this.selectedRecordList == null) {
+                        this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = actDate });
+                    }
+                    else {
+                        foreach (CsvComparisonViewModel.CsvRecord record in this.selectedRecordList) {
+                            this.WVM.DateValueVMList.Add(new DateValueViewModel() { ActDate = record.Date, ActValue = record.Value });
                         }
                     }
-                    break;
+                }
+                break;
                 case RegistrationMode.Edit:
                 case RegistrationMode.Copy: {
-                        using (DaoBase dao = this.builder.Build()) {
-                            DaoReader reader = await dao.ExecQueryAsync(@"
+                    using (DaoBase dao = this.builder.Build()) {
+                        DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT book_id, item_id, action_id, act_time, act_value, shop_name, remark
 FROM hst_action 
 WHERE del_flg = 0 AND group_id = @{0};", this.selectedGroupId);
-                            reader.ExecWholeRow((count, record) => {
-                                int actionId = -1;
-                                DateTime actDate = DateTime.Now;
-                                int actValue = -1;
+                        reader.ExecWholeRow((count, record) => {
+                            int actionId = -1;
+                            DateTime actDate = DateTime.Now;
+                            int actValue = -1;
 
-                                actionId = record.ToInt("action_id");
-                                actDate = record.ToDateTime("act_time");
-                                actValue = record.ToInt("act_value");
-                                bookId = record.ToInt("book_id");
-                                itemId = record.ToInt("item_id");
-                                shopName = record["shop_name"];
-                                remark = record["remark"];
+                            actionId = record.ToInt("action_id");
+                            actDate = record.ToDateTime("act_time");
+                            actValue = record.ToInt("act_value");
+                            bookId = record.ToInt("book_id");
+                            itemId = record.ToInt("item_id");
+                            shopName = record["shop_name"];
+                            remark = record["remark"];
 
-                                DateValueViewModel vm = new DateValueViewModel() {
-                                    ActionId = actionId,
-                                    ActDate = actDate,
-                                    ActValue = Math.Abs(actValue)
-                                };
+                            DateValueViewModel vm = new DateValueViewModel() {
+                                ActionId = actionId,
+                                ActDate = actDate,
+                                ActValue = Math.Abs(actValue)
+                            };
 
-                                balanceKind = Math.Sign(actValue) > 0 ? BalanceKind.Income : BalanceKind.Outgo; // 収入 / 支出
+                            balanceKind = Math.Sign(actValue) > 0 ? BalanceKind.Income : BalanceKind.Outgo; // 収入 / 支出
 
-                                this.groupedActionIdList.Add(vm.ActionId.Value);
-                                this.WVM.DateValueVMList.Add(vm);
-                                return true;
-                            });
-                        }
+                            this.groupedActionIdList.Add(vm.ActionId.Value);
+                            this.WVM.DateValueVMList.Add(vm);
+                            return true;
+                        });
                     }
-                    break;
+                }
+                break;
             }
 
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
-                reader.ExecWholeRow((count, record) => {
-                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
-                    bookVMList.Add(vm);
-                    if (selectedBookVM == null || bookId == vm.Id) {
-                        selectedBookVM = vm;
-                    }
-                    return true;
-                });
-            }
-
-            this.WVM.BookVMList = bookVMList;
-            this.WVM.SelectedBookVM = selectedBookVM;
+            // WVMに値を設定する
+            this.WVM.GroupId = this.WVM.RegMode == RegistrationMode.Edit ? this.selectedGroupId : null;
             this.WVM.SelectedBalanceKind = balanceKind;
 
+            // リストを更新する
+            await this.UpdateBookListAsync(bookId);
             await this.UpdateCategoryListAsync();
             await this.UpdateItemListAsync(itemId);
             await this.UpdateShopListAsync(shopName);
             await this.UpdateRemarkListAsync(remark);
 
+            // イベントハンドラを登録する
             this.RegisterEventHandlerToWVM();
         }
 
@@ -466,9 +455,36 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
 
         #region 画面更新用の関数
         /// <summary>
+        /// 帳簿リストを更新する
+        /// </summary>
+        /// <param name="bookId">選択対象の帳簿ID</param>
+        /// <returns></returns>
+        private async Task UpdateBookListAsync(int? bookId = null)
+        {
+            ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
+            BookViewModel selectedBookVM = null;
+            using (DaoBase dao = this.builder.Build()) {
+                DaoReader reader = await dao.ExecQueryAsync(@"
+SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
+                reader.ExecWholeRow((count, record) => {
+                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
+                    bookVMList.Add(vm);
+                    if (selectedBookVM == null || bookId == vm.Id) {
+                        selectedBookVM = vm;
+                    }
+                    return true;
+                });
+            }
+
+            this.WVM.BookVMList = bookVMList;
+            this.WVM.SelectedBookVM = selectedBookVM;
+        }
+
+        /// <summary>
         /// カテゴリリストを更新する
         /// </summary>
-        /// <param name="categoryId">選択対象のカテゴリ</param>
+        /// <param name="categoryId">選択対象のカテゴリID</param>
+        /// <returns></returns>
         private async Task UpdateCategoryListAsync(int? categoryId = null)
         {
             ObservableCollection<CategoryViewModel> categoryVMList = new ObservableCollection<CategoryViewModel>() {
@@ -499,7 +515,8 @@ ORDER BY sort_order;", (int)this.WVM.SelectedBalanceKind, this.WVM.SelectedBookV
         /// <summary>
         /// 項目リストを更新する
         /// </summary>
-        /// <param name="itemId">選択対象の項目</param>
+        /// <param name="itemId">選択対象の項目ID</param>
+        /// <returns></returns>
         private async Task UpdateItemListAsync(int? itemId = null)
         {
             if (this.WVM.SelectedCategoryVM == null) return;
@@ -541,6 +558,7 @@ ORDER BY sort_order;", this.WVM.SelectedBookVM.Id, (int)this.WVM.SelectedCategor
         /// 店舗リストを更新する
         /// </summary>
         /// <param name="shopName">選択対象の店舗名</param>
+        /// <returns></returns>
         private async Task UpdateShopListAsync(string shopName = null)
         {
             if (this.WVM.SelectedItemVM == null) return;
@@ -569,6 +587,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         /// 備考リストを更新する
         /// </summary>
         /// <param name="remark">選択対象の備考</param>
+        /// <returns></returns>
         private async Task UpdateRemarkListAsync(string remark = null)
         {
             if (this.WVM.SelectedItemVM == null) return;

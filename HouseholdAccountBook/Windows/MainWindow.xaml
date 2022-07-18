@@ -306,7 +306,8 @@
                                 <Button Width="50" Content="編集" Command="{StaticResource EditActionCommand}"/>
                                 <Button Width="50" Content="複製" Command="{StaticResource CopyActionCommand}"/>
                                 <Button Width="50" Content="削除" Command="{StaticResource DeleteActionCommand}"/>
-                                <CheckBox Margin="3" ToolTip="CSV一致チェック" VerticalAlignment="Center" IsChecked="{Binding IsMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{StaticResource ChangeIsMatchCommand}"/>
+                                <CheckBox Margin="3" ToolTip="CSV一致チェック" VerticalAlignment="Center"
+                                          IsChecked="{Binding IsMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{StaticResource ChangeIsMatchCommand}"/>
                             </StackPanel>
                         </Grid>
                     </ScrollViewer>
@@ -357,10 +358,10 @@
                                 </Style>
                             </DataGrid.ItemContainerStyle>
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="ID" Binding="{Binding ActionId}"
-                                                    Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}"/>
-                                <DataGridTextColumn Header="GroupID" Binding="{Binding GroupId}" 
-                                                    Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                <DataGridTextColumn Header="Id" Binding="{Binding ActionId}"
+                                                    Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                <DataGridTextColumn Header="GId" Binding="{Binding GroupId}"
+                                                    Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                 <DataGridTextColumn Header="日付" Binding="{Binding ActTime, StringFormat='yyyy/MM/dd'}"/>
                                 <DataGridTextColumn Header="曜日" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}}"
                                                     CellStyle="{StaticResource DayOfWeekStyle}"/>
@@ -386,6 +387,10 @@
                                   HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
                                   ItemContainerStyle="{StaticResource SummaryStyle}">
                             <DataGrid.Columns>
+                                <DataGridTextColumn Header="CId" Binding="{Binding CategoryId}"
+                                                     Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                <DataGridTextColumn Header="IId" Binding="{Binding ItemId}"
+                                                     Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                 <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
                                 <DataGridTextColumn Header="合計" Binding="{Binding Summary, Converter={StaticResource IntToMoneyDisplayConverter}}" 
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>

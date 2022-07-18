@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Extensions
 {
@@ -21,7 +22,7 @@ namespace HouseholdAccountBook.Extensions
         /// <summary>
         /// 国民の祝日リストを取得する
         /// </summary>
-        public static void DownloadHolidayListAsync()
+        public static async Task DownloadHolidayListAsync()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -34,26 +35,23 @@ namespace HouseholdAccountBook.Extensions
 
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             using (WebClient client = new WebClient()) {
-                // ストリームの読み込み完了時
-                client.OpenReadCompleted += (sender, e) => {
-                    if (!e.Cancelled && e.Result.CanRead) {
-                        holidayList.Clear();
-                        try {
-                            // CSVファイルを読み込む
-                            using (CsvReader reader = new CsvReader(new StreamReader(e.Result, Encoding.GetEncoding("Shift_JIS")), csvConfig)) {
-                                while (reader.Read()) {
-                                    if (reader.TryGetField(settings.App_NationalHolidayCsv_DateIndex, out string dateString)) {
-                                        if (DateTime.TryParse(dateString, out DateTime dateTime)) {
-                                            holidayList.Add(dateTime);
-                                        }
+                Stream stream = await client.OpenReadTaskAsync(uri);
+                if (stream.CanRead) {
+                    holidayList.Clear();
+                    try {
+                        // CSVファイルを読み込む
+                        using (CsvReader reader = new CsvReader(new StreamReader(stream, Encoding.GetEncoding("Shift_JIS")), csvConfig)) {
+                            while (reader.Read()) {
+                                if (reader.TryGetField(settings.App_NationalHolidayCsv_DateIndex, out string dateString)) {
+                                    if (DateTime.TryParse(dateString, out DateTime dateTime)) {
+                                        holidayList.Add(dateTime);
                                     }
                                 }
                             }
                         }
-                        catch (Exception) { }
                     }
-                };
-                client.OpenReadAsync(uri);
+                    catch (Exception) { }
+                }
             }
         }
 

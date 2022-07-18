@@ -44,6 +44,29 @@ namespace HouseholdAccountBook.ViewModels
 
         #region プロパティ
         /// <summary>
+        /// 帳簿項目ID
+        /// </summary>
+        #region ActionId
+        public int? ActionId
+        {
+            get => this._ActionId;
+            set => this.SetProperty(ref this._ActionId, value);
+        }
+        private int? _ActionId = default;
+        #endregion
+        /// <summary>
+        /// グループID
+        /// </summary>
+        #region GroupId
+        public int? GroupId
+        {
+            get => this._GroupId;
+            set => this.SetProperty(ref this._GroupId, value);
+        }
+        private int? _GroupId = default;
+        #endregion
+
+        /// <summary>
         /// 登録モード
         /// </summary>
         #region RegMode

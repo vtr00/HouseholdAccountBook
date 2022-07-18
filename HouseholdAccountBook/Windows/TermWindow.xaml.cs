@@ -63,15 +63,6 @@ namespace HouseholdAccountBook.Windows
         #endregion
 
         /// <summary>
-        /// カレンダー読み込み時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Calendar_Loaded(object sender, RoutedEventArgs e)
-        {
-        }
-
-        /// <summary>
         /// カレンダー表示モード変更時: 月選択時に開始/終了日付を確定させる
         /// </summary>
         /// <param name="sender"></param>

@@ -207,130 +207,93 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void MoveRegistrationWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
             int? fromBookId = this.selectedBookId;
             int? toBookId = this.selectedBookId;
-            BookViewModel fromBookVM = null;
-            BookViewModel toBookVM = null;
             int? commissionItemId = null;
             string commissionRemark = null;
 
+            // DBから値を読み込む
             switch (this.WVM.RegMode) {
+                case RegistrationMode.Add:
+                    // 追加時の日時、金額は帳簿リスト更新時に取得する
+                    break;
                 case RegistrationMode.Edit:
                 case RegistrationMode.Copy: {
-                        DateTime fromDate = DateTime.Now;
-                        DateTime toDate = DateTime.Now;
-                        CommissionKind commissionKind = CommissionKind.FromBook;
-                        int moveValue = -1;
-                        int commissionValue = 0;
+                    DateTime fromDate = DateTime.Now;
+                    DateTime toDate = DateTime.Now;
+                    CommissionKind commissionKind = CommissionKind.FromBook;
+                    int moveValue = -1;
+                    int commissionValue = 0;
 
-                        using (DaoBase dao = this.builder.Build()) {
-                            DaoReader reader = await dao.ExecQueryAsync(@"
+                    using (DaoBase dao = this.builder.Build()) {
+                        DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT A.book_id, A.action_id, A.item_id, A.act_time, A.act_value, A.remark, I.move_flg
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
 WHERE A.del_flg = 0 AND A.group_id = @{0}
 ORDER BY move_flg DESC;", this.groupId);
 
-                            reader.ExecWholeRow((count, record) => {
-                                int bookId = record.ToInt("book_id");
-                                DateTime dateTime = record.ToDateTime("act_time");
-                                int actionId = record.ToInt("action_id");
-                                int itemId = record.ToInt("item_id");
-                                int actValue = record.ToInt("act_value");
-                                int moveFlg = record.ToInt("move_flg");
-                                string remark = record["remark"];
+                        reader.ExecWholeRow((count, record) => {
+                            int bookId = record.ToInt("book_id");
+                            DateTime dateTime = record.ToDateTime("act_time");
+                            int actionId = record.ToInt("action_id");
+                            int itemId = record.ToInt("item_id");
+                            int actValue = record.ToInt("act_value");
+                            int moveFlg = record.ToInt("move_flg");
+                            string remark = record["remark"];
 
-                                if (moveFlg == 1) {
-                                    if (actValue < 0) {
-                                        fromBookId = bookId;
-                                        fromDate = dateTime;
-                                        this.fromActionId = actionId;
-                                    }
-                                    else {
-                                        toBookId = bookId;
-                                        toDate = dateTime;
-                                        this.toActionId = actionId;
-                                        moveValue = actValue;
-                                    }
+                            if (moveFlg == 1) {
+                                if (actValue < 0) {
+                                    fromBookId = bookId;
+                                    fromDate = dateTime;
+                                    this.fromActionId = actionId;
                                 }
-                                else { // 手数料
-                                    if (bookId == fromBookId) { // 移動元負担
-                                        commissionKind = CommissionKind.FromBook;
-                                    }
-                                    else if (bookId == toBookId) { // 移動先負担
-                                        commissionKind = CommissionKind.ToBook;
-                                    }
-                                    this.commissionActionId = actionId;
-                                    commissionItemId = itemId;
-                                    commissionValue = Math.Abs(actValue);
-                                    commissionRemark = remark;
+                                else {
+                                    toBookId = bookId;
+                                    toDate = dateTime;
+                                    this.toActionId = actionId;
+                                    moveValue = actValue;
                                 }
-                                return true;
-                            });
-                        }
-
-                        this.WVM.IsLink = (fromDate == toDate);
-                        this.WVM.FromDate = fromDate;
-                        this.WVM.ToDate = toDate;
-                        this.WVM.SelectedCommissionKind = commissionKind;
-                        this.WVM.Value = moveValue;
-                        this.WVM.Commission = commissionValue;
+                            }
+                            else { // 手数料
+                                if (bookId == fromBookId) { // 移動元負担
+                                    commissionKind = CommissionKind.FromBook;
+                                }
+                                else if (bookId == toBookId) { // 移動先負担
+                                    commissionKind = CommissionKind.ToBook;
+                                }
+                                this.commissionActionId = actionId;
+                                commissionItemId = itemId;
+                                commissionValue = Math.Abs(actValue);
+                                commissionRemark = remark;
+                            }
+                            return true;
+                        });
                     }
-                    break;
+
+                    // WVMに値を設定する
+                    if (this.WVM.RegMode == RegistrationMode.Edit) {
+                        this.WVM.FromId = this.fromActionId;
+                        this.WVM.ToId = this.toActionId;
+                        this.WVM.GroupId = this.groupId;
+                        this.WVM.CommissionId = this.commissionActionId;
+                    }
+                    this.WVM.IsLink = (fromDate == toDate);
+                    this.WVM.FromDate = fromDate;
+                    this.WVM.ToDate = toDate;
+                    this.WVM.SelectedCommissionKind = commissionKind;
+                    this.WVM.Value = moveValue;
+                    this.WVM.Commission = commissionValue;
+                }
+                break;
             }
 
-            int? debitBookId = null;
-            int? payDay = null;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
-                reader.ExecWholeRow((count, record) => {
-                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
-                    bookVMList.Add(vm);
-
-                    if (fromBookVM == null || fromBookId == vm.Id) {
-                        fromBookVM = vm;
-
-                        switch (this.WVM.RegMode) {
-                            case RegistrationMode.Add: {
-                                    if (record.ToInt("book_kind") == (int)BookKind.CreditCard) {
-                                        debitBookId = record.ToNullableInt("debit_book_id");
-                                        payDay = record.ToNullableInt("pay_day");
-                                    }
-                                }
-                                break;
-                        };
-                    }
-                    if (toBookVM == null || toBookId == vm.Id) {
-                        toBookVM = vm;
-                    }
-                    return true;
-                });
-            }
-
-            this.WVM.BookVMList = bookVMList;
-            this.WVM.SelectedFromBookVM = fromBookVM;
-            this.WVM.SelectedToBookVM = toBookVM;
-
-            switch (this.WVM.RegMode) {
-                case RegistrationMode.Add: {
-                        if (debitBookId != null) {
-                            this.WVM.SelectedFromBookVM = bookVMList.FirstOrDefault((vm) => { return vm.Id == debitBookId; });
-                        }
-                        this.WVM.FromDate = this.selectedDate ?? ((this.selectedMonth == null || this.selectedMonth?.Month == DateTime.Today.Month) ? DateTime.Today : this.selectedMonth.Value);
-                        if (payDay != null) {
-                            this.WVM.FromDate = this.WVM.FromDate.GetDateInMonth(payDay.Value);
-                        }
-                        this.WVM.IsLink = true;
-                        this.WVM.SelectedCommissionKind = CommissionKind.FromBook;
-                    }
-                    break;
-            };
-
+            // リストを更新する
+            await this.UpdateBookListAsync(fromBookId, toBookId);
             await this.UpdateItemListAsync(commissionItemId);
             await this.UpdateRemarkListAsync(commissionRemark);
 
+            // イベントハンドラを登録する
             this.RegisterEventHandlerToWVM();
         }
 
@@ -347,13 +310,77 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
 
         #region 画面更新用の関数
         /// <summary>
+        /// 帳簿リストを更新する
+        /// </summary>
+        /// <param name="fromBookId">移動元帳簿ID</param>
+        /// <param name="toBookId">移動先帳簿ID</param>
+        /// <returns></returns>
+        private async Task UpdateBookListAsync(int? fromBookId = null, int? toBookId = null)
+        {
+            ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
+            BookViewModel fromBookVM = null;
+            BookViewModel toBookVM = null;
+
+            int? debitBookId = null;
+            int? payDay = null;
+            using (DaoBase dao = this.builder.Build()) {
+                DaoReader reader = await dao.ExecQueryAsync(@"
+SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
+                reader.ExecWholeRow((count, record) => {
+                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
+                    bookVMList.Add(vm);
+
+                    if (fromBookVM == null || fromBookId == vm.Id) {
+                        fromBookVM = vm;
+
+                        switch (this.WVM.RegMode) {
+                            case RegistrationMode.Add: {
+                                if (record.ToInt("book_kind") == (int)BookKind.CreditCard) {
+                                    debitBookId = record.ToNullableInt("debit_book_id");
+                                    payDay = record.ToNullableInt("pay_day");
+                                }
+                            }
+                            break;
+                        };
+                    }
+                    if (toBookVM == null || toBookId == vm.Id) {
+                        toBookVM = vm;
+                    }
+                    return true;
+                });
+            }
+
+            this.WVM.BookVMList = bookVMList;
+            this.WVM.SelectedFromBookVM = fromBookVM;
+            this.WVM.SelectedToBookVM = toBookVM;
+
+            switch (this.WVM.RegMode) {
+                case RegistrationMode.Add: {
+                    if (debitBookId != null) {
+                        this.WVM.SelectedFromBookVM = bookVMList.FirstOrDefault((vm) => { return vm.Id == debitBookId; });
+                    }
+                    this.WVM.FromDate = this.selectedDate ?? ((this.selectedMonth == null || this.selectedMonth?.Month == DateTime.Today.Month) ? DateTime.Today : this.selectedMonth.Value);
+                    if (payDay != null) {
+                        this.WVM.FromDate = this.WVM.FromDate.GetDateInMonth(payDay.Value);
+                    }
+                    this.WVM.IsLink = true;
+                    this.WVM.SelectedCommissionKind = CommissionKind.FromBook;
+                }
+                break;
+            };
+
+        }
+
+        /// <summary>
         /// 手数料項目リストを更新する
         /// </summary>
         /// <param name="itemId">選択対象の項目</param>
+        /// <returns></returns>
         private async Task UpdateItemListAsync(int? itemId = null)
         {
             ObservableCollection<ItemViewModel> itemVMList = new ObservableCollection<ItemViewModel>();
             ItemViewModel selectedItemVM = null;
+
             using (DaoBase dao = this.builder.Build()) {
                 int bookId = -1;
                 switch (this.WVM.SelectedCommissionKind) {
@@ -387,6 +414,7 @@ ORDER BY sort_order;", bookId, (int)BalanceKind.Outgo);
         /// 備考リストを更新する
         /// </summary>
         /// <param name="remark">選択対象の備考</param>
+        /// <returns></returns>
         private async Task UpdateRemarkListAsync(string remark = null)
         {
             if (this.WVM?.SelectedItemVM?.Id == null) return;

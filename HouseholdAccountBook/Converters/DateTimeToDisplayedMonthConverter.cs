@@ -15,11 +15,14 @@ namespace HouseholdAccountBook.Converters
                 return null;
             }
             else if (value is DateTime dateTime) {
-#if DEBUG
-                return dateTime.ToString("yyyy/MM/dd HH:mm:ss");
-#else
-                return dateTime.ToString("yyyy/MM");
-#endif
+                Properties.Settings settings = App.Current.Resources["Settings"] as Properties.Settings;
+
+                if (settings.App_IsDebug) {
+                    return dateTime.ToString("yyyy/MM/dd HH:mm:ss");
+                }
+                else {
+                    return dateTime.ToString("yyyy/MM");
+                }
             }
             throw new NotImplementedException();
         }

@@ -75,7 +75,7 @@ namespace HouseholdAccountBook.Dao
         /// </summary>
         /// <param name="sql">SQL</param>
         /// <param name="objects">引数リスト</param>
-        /// <returns>リーダー</returns>
+        /// <returns>DAOリーダ</returns>
         public abstract Task<DaoReader> ExecQueryAsync(string sql, params object[] objects);
 
         /// <summary>
