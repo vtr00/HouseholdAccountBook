@@ -11,14 +11,11 @@ namespace HouseholdAccountBook.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is DateTime dateTime) {
-                Properties.Settings settings = App.Current.Resources["Settings"] as Properties.Settings;
-
-                if (settings.App_IsDebug) {
-                    return dateTime.ToString("yyyy/MM/dd HH:mm:ss");
-                } else {
-                    return dateTime.ToString("yyyy年");
-                }
+            if (value == null) {
+                return null;
+            }
+            else if (value is DateTime dateTime) {
+                return dateTime.ToString("yyyy年");
             }
             throw new NotImplementedException();
         }

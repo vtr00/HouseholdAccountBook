@@ -108,7 +108,7 @@
                 </DataGrid.Resources>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Id" Binding="{Binding ActionId, TargetNullValue='--'}" 
-                                        Visibility="{Binding DataContext.IsDebug, Source={StaticResource Proxy}, Converter={StaticResource BoolVisibilityConverter}}" IsReadOnly="True"/>
+                                        Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}" IsReadOnly="True"/>
                     
                     <controls:DataGridEditableTemplateColumn Header="日付" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
