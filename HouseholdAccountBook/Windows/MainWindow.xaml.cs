@@ -57,6 +57,10 @@ namespace HouseholdAccountBook.Windows
         /// 子ウィンドウを開いているか
         /// </summary>
         private bool ChildrenWindowOpened => this.mrw != null || this.arw != null || this.alrw != null || this.ccw != null;
+        /// <summary>
+        /// 登録ウィンドウを開いているか
+        /// </summary>
+        private bool RegistrationWindowOpened => this.mrw != null || this.arw != null || this.alrw != null;
 
         /// <summary>
         /// <see cref="MainWindow"/> クラスの新しいインスタンスを初期化します。
@@ -596,6 +600,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             // クローズ時イベントを登録する
             this.mrw.Closed += (sender3, e3) => {
                 this.mrw = null;
+                this.Activate();
             };
             this.mrw.Show();
         }
@@ -630,6 +635,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             // クローズ時イベントを登録する
             this.arw.Closed += (sender3, e3) => {
                 this.arw = null;
+                this.Activate();
             };
             this.arw.Show();
         }
@@ -664,6 +670,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             // クローズ時イベントを登録する
             this.alrw.Closed += (sender3, e3) => {
                 this.alrw = null;
+                this.Activate();
             };
             this.alrw.Show();
         }
@@ -715,6 +722,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                     // クローズ時イベントを登録する
                     this.mrw.Closed += (sender3, e3) => {
                         this.mrw = null;
+                        this.Activate();
                     };
                     this.mrw.Show();
                     break;
@@ -731,6 +739,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                     // クローズ時イベントを登録する
                     this.alrw.Closed += (sender3, e3) => {
                         this.alrw = null;
+                        this.Activate();
                     };
                     this.alrw.Show();
                     break;
@@ -748,6 +757,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
 
                     this.arw.Closed += (sender3, e3) => {
                         this.arw = null;
+                        this.Activate();
                     };
                     this.arw.Show();
                     break;
@@ -799,6 +809,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 };
                 this.arw.Closed += (sender3, e3) => {
                     this.arw = null;
+                    this.Activate();
                 };
                 this.arw.Show();
             }
@@ -814,6 +825,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 };
                 this.mrw.Closed += (sender3, e3) => {
                     this.mrw = null;
+                    this.Activate();
                 };
                 this.mrw.Show();
             }
@@ -912,9 +924,9 @@ WHERE group_id = @{0} AND del_flg = 0;", groupId, Updater);
         /// <param name="e"></param>
         private void ChangeIsMatchCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 子ウィンドウが開いていない
+            // 帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 登録ウィンドウが開いていない
             e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab &&
-                           this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0 && !this.ChildrenWindowOpened;
+                           this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0 && !this.RegistrationWindowOpened;
         }
 
         /// <summary>
@@ -1364,6 +1376,7 @@ WHERE action_id = @{0};", vm.ActionId);
             // クローズ時イベントを登録する
             this.ccw.Closed += (sender4, e4) => {
                 this.ccw = null;
+                this.Activate();
             };
             this.ccw.Show();
         }

@@ -220,9 +220,11 @@ namespace HouseholdAccountBook.ViewModels
             set {
                 if (this.SetProperty(ref this._SelectedActionVMList, value)) {
                     this.SelectedActionVMList.CollectionChanged += (sender, e) => {
-                        this.RaisePropertyChanged(nameof(this.SumValue));
-                        this.RaisePropertyChanged(nameof(this.Amount));
                         this.RaisePropertyChanged(nameof(this.AverageValue));
+                        this.RaisePropertyChanged(nameof(this.Amount));
+                        this.RaisePropertyChanged(nameof(this.SumValue));
+                        this.RaisePropertyChanged(nameof(this.IncomeSumValue));
+                        this.RaisePropertyChanged(nameof(this.OutgoSumValue));
 
                         this.RaisePropertyChanged(nameof(this.IsMatch));
                     };
@@ -267,19 +269,10 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 合計値
+        /// 平均値
         /// </summary>
-        #region SumValue
-        public int? SumValue
-        {
-            get {
-                int? sum = this.SelectedActionVMList.Count != 0 ? (int?)0 : null;
-                foreach (ActionViewModel vm in this.SelectedActionVMList) {
-                    sum += vm.Income ?? 0 - vm.Outgo ?? 0;
-                }
-                return sum;
-            }
-        }
+        #region AverageValue
+        public double? AverageValue => this.SelectedActionVMList.Count != 0 ? (double?)this.SumValue / this.SelectedActionVMList.Count : null;
         #endregion
         /// <summary>
         /// データの個数
@@ -288,10 +281,40 @@ namespace HouseholdAccountBook.ViewModels
         public int Amount => this.SelectedActionVMList.Count((vm) => { return vm.Income != null || vm.Outgo != null; });
         #endregion
         /// <summary>
-        /// 平均値
+        /// 合計値
         /// </summary>
-        #region AverageValue
-        public double? AverageValue => this.SelectedActionVMList.Count != 0 ? (double?)this.SumValue / this.SelectedActionVMList.Count : null;
+        #region SumValue
+        public int? SumValue => this.IncomeSumValue + this.OutgoSumValue;
+        #endregion
+        /// <summary>
+        /// 収入合計値
+        /// </summary>
+        #region IncomeSumValue
+        public int? IncomeSumValue
+        {
+            get {
+                int? sum = this.SelectedActionVMList.Count != 0 ? (int?)0 : null;
+                foreach (ActionViewModel vm in this.SelectedActionVMList) {
+                    sum += vm.Income ?? 0;
+                }
+                return sum;
+            }
+        }
+        #endregion
+        /// <summary>
+        /// 支出合計値
+        /// </summary>
+        #region OutgoSumValue
+        public int? OutgoSumValue
+        {
+            get {
+                int? sum = this.SelectedActionVMList.Count != 0 ? (int?)0 : null;
+                foreach (ActionViewModel vm in this.SelectedActionVMList) {
+                    sum -= vm.Outgo ?? 0;
+                }
+                return sum;
+            }
+        }
         #endregion
 
         /// <summary>
@@ -598,15 +621,6 @@ namespace HouseholdAccountBook.ViewModels
         private PlotController _Controller = new PlotController();
         #endregion
         #endregion
-
-        /// <summary>
-        /// デバッグビルドか
-        /// </summary>
-#if DEBUG
-        public bool IsDebug => true;
-#else
-        public bool IsDebug => false;
-#endif
         #endregion
 
         /// <summary>

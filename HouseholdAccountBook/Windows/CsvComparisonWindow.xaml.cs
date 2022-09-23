@@ -536,6 +536,10 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         private void RegisterEventHandlerToWVM()
         {
             this.WVM.BookChanged += (bookId) => {
+                // リストをクリアする
+                this.WVM.CsvComparisonVMList.Clear();
+                this.WVM.CsvFileName = default;
+
                 this.BookChanged?.Invoke(this, new EventArgs<int?>(bookId));
             };
         }

@@ -414,6 +414,8 @@
                                 <TextBlock Text="{Binding Amount, TargetNullValue='--'}"/><TextBlock Text="  "/>
                                 合計: 
                                 <TextBlock Text="{Binding SumValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
+                                 (<TextBlock Text="{Binding IncomeSumValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>, 
+                                <TextBlock Text="{Binding OutgoSumValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>)
                             </TextBlock>
                         </StatusBarItem>
                     </StatusBar>
