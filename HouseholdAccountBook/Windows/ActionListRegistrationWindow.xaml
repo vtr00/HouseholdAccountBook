@@ -7,7 +7,7 @@
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         xmlns:project="clr-namespace:HouseholdAccountBook"
         mc:Ignorable="d"
-        Height="Auto" Width="350" ShowInTaskbar="False" WindowStyle="ToolWindow"
+        Width="350" Height="Auto" ShowInTaskbar="False" WindowStyle="ToolWindow"
         Loaded="ActionListRegistrationWindow_Loaded"
         Closed="ActionListRegistrationWindow_Closed">
     <Window.DataContext>
@@ -110,7 +110,7 @@
                     <DataGridTextColumn Header="Id" Binding="{Binding ActionId, TargetNullValue='--'}" 
                                         Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}" IsReadOnly="True"/>
                     
-                    <controls:DataGridEditableTemplateColumn Header="日付" Width="100">
+                    <controls:DataGridEditableTemplateColumn Header="日付" Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Margin="4,3,4,5" Text="{Binding ActDate, StringFormat=\{0:yyyy\/MM\/dd\}}"/>
@@ -123,7 +123,7 @@
                         </DataGridTemplateColumn.CellEditingTemplate>
                     </controls:DataGridEditableTemplateColumn>
 
-                    <controls:DataGridEditableTemplateColumn Header="金額" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}">
+                    <controls:DataGridEditableTemplateColumn Header="金額" Width="*">
                         <DataGridTemplateColumn.CellStyle>
                             <Style TargetType="{x:Type DataGridCell}">
                                 <EventSetter Event="GotFocus" Handler="DataGridCell_GotFocus"/>

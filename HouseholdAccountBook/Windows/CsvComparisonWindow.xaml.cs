@@ -147,10 +147,11 @@ namespace HouseholdAccountBook.Windows
                     }
                 }
             }
+            tmpList.Sort((tmp1, tmp2) => { return (int)(tmp1.Record.Date - tmp2.Record.Date).TotalDays; });
             foreach (CsvComparisonViewModel vm in tmpList) {
                 this.WVM.CsvComparisonVMList.Add(vm);
             }
-            this.csvCompDataGrid.ScrollToTop();
+            this.csvCompDataGrid.ScrollToButtom();
 
             await this.UpdateComparisonInfoAsync();
 
@@ -345,8 +346,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         /// <param name="e"></param>
         private void ClearListCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WVM.CsvComparisonVMList.Clear();
-            this.WVM.CsvFileName = default;
+            this.ClearComparisonInfo();
         }
 
         /// <summary>
@@ -482,15 +482,17 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
                     });
                 }
             }
+        }
 
-            List<CsvComparisonViewModel> list = this.WVM.CsvComparisonVMList.ToList();
-            // 日付と帳簿項目IDでソートする(帳簿項目ID未登録なら下に来る)
-            list.Sort((vm1, vm2) => {
-                int rslt = (int)((vm1.Record.Date - vm2.Record.Date).TotalDays);
-                if (rslt == 0) { rslt = (vm1.ActionId ?? int.MaxValue) - (vm2.ActionId ?? int.MaxValue); }
-                return rslt;
-            });
-            this.WVM.CsvComparisonVMList = new ObservableCollection<CsvComparisonViewModel>(list);
+        /// <summary>
+        /// 比較情報をクリアする
+        /// </summary>
+        private void ClearComparisonInfo()
+        {
+            // リストをクリアする
+            this.WVM.CsvComparisonVMList.Clear();
+            this.WVM.CsvFileName = default;
+            this.WVM.SumValue = default;
         }
         #endregion
 
@@ -536,9 +538,7 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         private void RegisterEventHandlerToWVM()
         {
             this.WVM.BookChanged += (bookId) => {
-                // リストをクリアする
-                this.WVM.CsvComparisonVMList.Clear();
-                this.WVM.CsvFileName = default;
+                this.ClearComparisonInfo();
 
                 this.BookChanged?.Invoke(this, new EventArgs<int?>(bookId));
             };

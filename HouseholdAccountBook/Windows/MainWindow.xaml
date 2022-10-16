@@ -266,51 +266,48 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <ScrollViewer Grid.Row="0" Grid.Column="0" Margin="2,2,2,1"
-                                  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="1.0*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                    <Grid Grid.Row="0" Grid.Column="0" Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="1.0*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                            <StackPanel Grid.Column="0" Orientation="Horizontal">
-                                <Button Width="20" Content="◀" Command="{StaticResource GoToLastMonthCommand}"/>
-                                <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}, TargetNullValue='期間指定'}"
-                                        Command="{StaticResource OpenSelectingDailyTermWindowCommand}">
-                                    <ToolTipService.ToolTip>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <Button Width="20" Content="◀" Command="{StaticResource GoToLastMonthCommand}"/>
+                            <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}, TargetNullValue='期間指定'}"
+                                    Command="{StaticResource OpenSelectingDailyTermWindowCommand}">
+                                <ToolTipService.ToolTip>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
 
-                                            <TextBlock Grid.Column="0" Text="{Binding StartDate, StringFormat='yyyy/MM/dd'}"/>
-                                            <TextBlock Grid.Column="1" Text=" - "/>
-                                            <TextBlock Grid.Column="2" Text="{Binding EndDate, StringFormat='yyyy/MM/dd'}"/>
-                                        </Grid>
-                                    </ToolTipService.ToolTip>
-                                </Button>
-                                <Button Width="20" Content="▶" Command="{StaticResource GoToNextMonthCommand}"/>
-                                <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}"/>
-                                <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
-                                            ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
-                            </StackPanel>
+                                        <TextBlock Grid.Column="0" Text="{Binding StartDate, StringFormat='yyyy/MM/dd'}"/>
+                                        <TextBlock Grid.Column="1" Text=" - "/>
+                                        <TextBlock Grid.Column="2" Text="{Binding EndDate, StringFormat='yyyy/MM/dd'}"/>
+                                    </Grid>
+                                </ToolTipService.ToolTip>
+                            </Button>
+                            <Button Width="20" Content="▶" Command="{StaticResource GoToNextMonthCommand}"/>
+                            <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
+                                        ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
+                        </StackPanel>
                             
-                            <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                <Button Width="50" Content="移動" Command="{StaticResource MoveToBookCommand}"/>
-                                <Button Width="50" Content="追加" Command="{StaticResource AddActionCommand}"/>
-                                <Button Width="80" Content="リスト追加" Command="{StaticResource AddActionListCommand}"/>
-                                <Button Width="50" Content="編集" Command="{StaticResource EditActionCommand}"/>
-                                <Button Width="50" Content="複製" Command="{StaticResource CopyActionCommand}"/>
-                                <Button Width="50" Content="削除" Command="{StaticResource DeleteActionCommand}"/>
-                                <CheckBox Margin="3" ToolTip="CSV一致チェック" VerticalAlignment="Center"
-                                          IsChecked="{Binding IsMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{StaticResource ChangeIsMatchCommand}"/>
-                            </StackPanel>
-                        </Grid>
-                    </ScrollViewer>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button Width="50" Content="移動" Command="{StaticResource MoveToBookCommand}"/>
+                            <Button Width="50" Content="追加" Command="{StaticResource AddActionCommand}"/>
+                            <Button Width="80" Content="リスト追加" Command="{StaticResource AddActionListCommand}"/>
+                            <Button Width="50" Content="編集" Command="{StaticResource EditActionCommand}"/>
+                            <Button Width="50" Content="複製" Command="{StaticResource CopyActionCommand}"/>
+                            <Button Width="50" Content="削除" Command="{StaticResource DeleteActionCommand}"/>
+                            <CheckBox Margin="3" ToolTip="CSV一致チェック" VerticalAlignment="Center"
+                                        IsChecked="{Binding IsMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{StaticResource ChangeIsMatchCommand}"/>
+                        </StackPanel>
+                    </Grid>
 
                     <!-- データリスト -->
                     <Grid Grid.Row="1" Grid.Column="0" Margin="2">
@@ -365,15 +362,15 @@
                                 <DataGridTextColumn Header="日付" Binding="{Binding ActTime, StringFormat='yyyy/MM/dd'}"/>
                                 <DataGridTextColumn Header="曜日" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}}"
                                                     CellStyle="{StaticResource DayOfWeekStyle}"/>
-                                <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
-                                <DataGridTextColumn Header="収入" Binding="{Binding Income, Converter={StaticResource IntToMoneyDisplayConverter}}" 
-                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="支出" Binding="{Binding Outgo, Converter={StaticResource IntToMoneyDisplayConverter}}" 
-                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="残高" Binding="{Binding Balance, Converter={StaticResource IntToMoneyDisplayConverter}}" 
-                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="店名" Binding="{Binding ShopName}"/>
-                                <DataGridTextColumn Header="備考" Binding="{Binding Remark}"/>
+                                <DataGridTextColumn Header="項目名" Width="*" Binding="{Binding ItemName}"/>
+                                <DataGridTextColumn Header="収入" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Income, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                    ElementStyle="{StaticResource TextAlignRight}"/>
+                                <DataGridTextColumn Header="支出" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Outgo, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                    ElementStyle="{StaticResource TextAlignRight}"/>
+                                <DataGridTextColumn Header="残高" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Balance, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                    ElementStyle="{StaticResource TextAlignRight}"/>
+                                <DataGridTextColumn Header="店名" Width="*" Binding="{Binding ShopName}"/>
+                                <DataGridTextColumn Header="備考" Width="*" Binding="{Binding Remark}"/>
                             </DataGrid.Columns>
                         </DataGrid>
 
@@ -392,8 +389,8 @@
                                 <DataGridTextColumn Header="IId" Binding="{Binding ItemId}"
                                                      Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                 <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
-                                <DataGridTextColumn Header="合計" Binding="{Binding Summary, Converter={StaticResource IntToMoneyDisplayConverter}}" 
-                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="合計" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Summary, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                    ElementStyle="{StaticResource TextAlignRight}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
@@ -489,7 +486,7 @@
 
                     <!-- データリスト -->
                     <Grid Grid.Row="1" Margin="2" Background="White">
-                        <DataGrid Grid.Column="1" ItemsSource="{Binding MonthlySummaryVMList}" IsReadOnly="True" SelectionUnit="FullRow"
+                        <DataGrid Grid.Column="1" ItemsSource="{Binding MonthlySummaryVMList}" IsReadOnly="True"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
                                   HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"

@@ -992,6 +992,77 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 }
             }
         }
+        
+        /// <summary>
+        /// ウィンドウ設定を再読込する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ReloadWindowSettingCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.WVM.LoadWindowSetting();
+        }
+
+        /// <summary>
+        /// ウィンドウ設定を初期化する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void InitializeWindowSettingCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (MessageBox.Show(MessageText.RestartNotification, this.Title, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
+                Properties.Settings settings = Properties.Settings.Default;
+
+                // メイン
+                settings.MainWindow_Left = -1;
+                settings.MainWindow_Top = -1;
+                settings.MainWindow_Width = -1;
+                settings.MainWindow_Height = -1;
+
+                // 移動
+                settings.MoveRegistrationWindow_Left = -1;
+                settings.MoveRegistrationWindow_Top = -1;
+                settings.MoveRegistrationWindow_Width = -1;
+                settings.MoveRegistrationWindow_Height = -1;
+
+                // 追加・変更
+                settings.ActionRegistrationWindow_Left = -1;
+                settings.ActionRegistrationWindow_Top = -1;
+                settings.ActionRegistrationWindow_Width = -1;
+                settings.ActionRegistrationWindow_Height = -1;
+
+                // リスト追加
+                settings.ActionListRegistrationWindow_Left = -1;
+                settings.ActionListRegistrationWindow_Top = -1;
+                settings.ActionListRegistrationWindow_Width = -1;
+                settings.ActionListRegistrationWindow_Height = -1;
+
+                // CSV比較
+                settings.CsvComparisonWindow_Left = -1;
+                settings.CsvComparisonWindow_Top = -1;
+                settings.CsvComparisonWindow_Width = -1;
+                settings.CsvComparisonWindow_Height = -1;
+
+                // 期間選択
+                settings.TermWindow_Left = -1;
+                settings.TermWindow_Top = -1;
+                // settings.TermWindow_Width = -1;
+                // settings.TermWindow_Height = -1;
+
+                // 設定
+                settings.SettingsWindow_Left = -1;
+                settings.SettingsWindow_Top = -1;
+                settings.SettingsWindow_Width = -1;
+                settings.SettingsWindow_Height = -1;
+
+                settings.App_InitSizeFlag = true;
+                settings.Save();
+
+                ((App)Application.Current).ReleaseMutex();
+                Process.Start(Application.ResourceAssembly.Location);
+                Application.Current.Shutdown();
+            }
+        }
         #endregion
         #endregion
 
@@ -1406,11 +1477,11 @@ ORDER BY I.sort_order;", vm.Id);
             if (0 <= settings.SettingsWindow_Top) {
                 this.Top = settings.SettingsWindow_Top;
             }
-            if (settings.SettingsWindow_Width != -1) {
-                this.Width = settings.SettingsWindow_Width;
-            }
             if (settings.SettingsWindow_Height != -1) {
                 this.Height = settings.SettingsWindow_Height;
+            }
+            if (settings.SettingsWindow_Width != -1) {
+                this.Width = settings.SettingsWindow_Width;
             }
         }
 
@@ -1420,11 +1491,13 @@ ORDER BY I.sort_order;", vm.Id);
         private void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            settings.SettingsWindow_Left = this.Left;
-            settings.SettingsWindow_Top = this.Top;
-            settings.SettingsWindow_Width = this.Width;
-            settings.SettingsWindow_Height = this.Height;
-            settings.Save();
+            if (!settings.App_InitSizeFlag) {
+                settings.SettingsWindow_Left = this.Left;
+                settings.SettingsWindow_Top = this.Top;
+                settings.SettingsWindow_Height = this.Height;
+                settings.SettingsWindow_Width = this.Width;
+                settings.Save();
+            }
         }
         #endregion
     }

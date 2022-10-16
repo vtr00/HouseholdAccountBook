@@ -276,6 +276,18 @@ namespace HouseholdAccountBook.ViewModels
         private bool _DebugMode = default;
         #endregion
 
+        /// <summary>
+        /// ウィンドウ設定
+        /// </summary>
+        #region WindowSettingVMList
+        public ObservableCollection<WindowSettingViewModel> WindowSettingVMList
+        {
+            get => this._WindowSettingVMList;
+            set => this.SetProperty(ref this._WindowSettingVMList, value);
+        }
+        private ObservableCollection<WindowSettingViewModel> _WindowSettingVMList = default;
+        #endregion
+
         #endregion
         #endregion
 
@@ -304,6 +316,47 @@ namespace HouseholdAccountBook.ViewModels
             this.NationalHolidayCsvDateIndex = this.settings.App_NationalHolidayCsv_DateIndex;
             this.DebugMode = this.settings.App_IsDebug;
             this.WithSave = true;
+
+            this.LoadWindowSetting();
+        }
+
+        /// <summary>
+        /// ウィンドウ設定を読み込む
+        /// </summary>
+        public void LoadWindowSetting()
+        {
+            ObservableCollection<WindowSettingViewModel> list = new ObservableCollection<WindowSettingViewModel>() {
+                new WindowSettingViewModel(){
+                    Kind = "メイン",
+                    Left = this.settings.MainWindow_Left, Top = this.settings.MainWindow_Top,
+                    Width = this.settings.MainWindow_Width, Height = this.settings.MainWindow_Height },
+                new WindowSettingViewModel(){
+                    Kind = "移動",
+                    Left = this.settings.MoveRegistrationWindow_Left, Top = this.settings.MoveRegistrationWindow_Top,
+                    Width = this.settings.MoveRegistrationWindow_Width, Height = this.settings.MoveRegistrationWindow_Height },
+                new WindowSettingViewModel(){
+                    Kind = "追加・変更",
+                    Left = this.settings.ActionRegistrationWindow_Left, Top = this.settings.ActionRegistrationWindow_Top,
+                    Width = this.settings.ActionRegistrationWindow_Width, Height = this.settings.ActionRegistrationWindow_Height },
+                new WindowSettingViewModel(){
+                    Kind = "リスト追加",
+                    Left = this.settings.ActionListRegistrationWindow_Left, Top = this.settings.ActionListRegistrationWindow_Top,
+                    Width = this.settings.ActionListRegistrationWindow_Width, Height = this.settings.ActionListRegistrationWindow_Height },
+                new WindowSettingViewModel(){
+                    Kind = "CSV比較",
+                    Left = this.settings.CsvComparisonWindow_Left, Top = this.settings.CsvComparisonWindow_Top,
+                    Width = this.settings.CsvComparisonWindow_Width, Height = this.settings.CsvComparisonWindow_Height },
+                new WindowSettingViewModel(){
+                    Kind = "設定",
+                    Left = this.settings.SettingsWindow_Left, Top = this.settings.SettingsWindow_Top,
+                    Width = this.settings.SettingsWindow_Width, Height = this.settings.SettingsWindow_Height },
+                new WindowSettingViewModel(){
+                    Kind = "期間選択",
+                    Left = this.settings.TermWindow_Left, Top = this.settings.TermWindow_Top,
+                    Width = -1, Height = -1 }
+
+            };
+            this.WindowSettingVMList = list;
         }
     }
 }

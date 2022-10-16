@@ -23,17 +23,10 @@
     </Window.Resources>
 
     <Window.CommandBindings>
-        <CommandBinding Command="{StaticResource TodayCommand}"
-                        CanExecute="TodayCommand_CanExecute"
-                        Executed="TodayCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ContinueToRegisterCommand}" 
-                        CanExecute="ContinueToRegisterCommand_CanExecute" 
-                        Executed="ContinueToRegisterCommand_Executed"/>
-        <CommandBinding Command="{StaticResource RegisterCommand}" 
-                        CanExecute="RegisterCommand_CanExecute" 
-                        Executed="RegisterCommand_Executed"/>
-        <CommandBinding Command="{StaticResource CancelCommand}" 
-                        Executed="CancelCommand_Executed"/>
+        <CommandBinding Command="{StaticResource TodayCommand}" CanExecute="TodayCommand_CanExecute" Executed="TodayCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ContinueToRegisterCommand}" CanExecute="ContinueToRegisterCommand_CanExecute" Executed="ContinueToRegisterCommand_Executed"/>
+        <CommandBinding Command="{StaticResource RegisterCommand}" CanExecute="RegisterCommand_CanExecute" Executed="RegisterCommand_Executed"/>
+        <CommandBinding Command="{StaticResource CancelCommand}" Executed="CancelCommand_Executed"/>
     </Window.CommandBindings>
 
     <Window.InputBindings>

@@ -3062,6 +3062,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             if (settings.MainWindow_WindowState != -1) {
                 this.WindowState = (WindowState)settings.MainWindow_WindowState;
             }
+            settings.App_InitSizeFlag = false;
+            settings.Save();
         }
 
         /// <summary>
@@ -3070,16 +3072,17 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         private void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
+            if (!settings.App_InitSizeFlag) {
+                if (this.WindowState != WindowState.Minimized) {
+                    settings.MainWindow_WindowState = (int)this.WindowState;
+                }
+                settings.MainWindow_Left = this.Left;
+                settings.MainWindow_Top = this.Top;
+                settings.MainWindow_Width = this.Width;
+                settings.MainWindow_Height = this.Height;
 
-            if (this.WindowState != WindowState.Minimized) {
-                settings.MainWindow_WindowState = (int)this.WindowState;
+                settings.Save();
             }
-            settings.MainWindow_Left = this.Left;
-            settings.MainWindow_Top = this.Top;
-            settings.MainWindow_Width = this.Width;
-            settings.MainWindow_Height = this.Height;
-
-            settings.Save();
         }
         #endregion
 
@@ -3108,13 +3111,13 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             using (FileStream fs = new FileStream(string.Format("WindowLocation_{0}.txt", this.startUpDate.ToString("yyyyMMdd_hhmmss")), FileMode.Append)) {
                 using (StreamWriter sw = new StreamWriter(fs)) {
                     if (fs.Length == 0) {
-                        sw.WriteLine("yyyy/MM/dd HH:mm:ss.ffff\tStt\tL\tT\tW\tH");
+                        sw.WriteLine("yyyy/MM/dd HH:mm:ss.ffff\tStt\tLeft\tTop\tHeight\tWidth");
                     }
                     if (string.IsNullOrEmpty(comment)) {
-                        sw.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff"), windowState, this.Left, this.Top, this.Width, this.Height));
+                        sw.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff"), windowState, this.Left, this.Top, this.Height, this.Width));
                     }
                     else {
-                        sw.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff"), windowState, this.Left, this.Top, this.Width, this.Height, comment));
+                        sw.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff"), windowState, this.Left, this.Top, this.Height, this.Width, comment));
                     }
                 }
             }

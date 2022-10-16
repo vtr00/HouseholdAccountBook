@@ -187,6 +187,7 @@ namespace HouseholdAccountBook
                 };
                 nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
                     Process.Start(fileName);
+                    Application.Current.Shutdown();
                 });
             }
             catch (Exception) { }

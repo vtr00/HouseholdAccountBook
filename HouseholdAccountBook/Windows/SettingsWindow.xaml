@@ -40,6 +40,8 @@
         <RoutedCommand x:Key="RestoreExePathDialogCommand"/>
         <RoutedCommand x:Key="RestartForDbSettingCommand"/>
         <RoutedCommand x:Key="BackUpFolderPathDialogCommand"/>
+        <RoutedCommand x:Key="ReloadWindowSettingCommand"/>
+        <RoutedCommand x:Key="InitializeWindowSettingCommand"/>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -70,6 +72,8 @@
         <CommandBinding Command="{StaticResource RestoreExePathDialogCommand}" Executed="RestorePathDialogCommand_Executed"/>
         <CommandBinding Command="{StaticResource RestartForDbSettingCommand}" Executed="RestartForDbSettingCommand_Executed"/>
         <CommandBinding Command="{StaticResource BackUpFolderPathDialogCommand}" Executed="BackUpFolderPathDialogCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ReloadWindowSettingCommand}" Executed="ReloadWindowSettingCommand_Executed"/>
+        <CommandBinding Command="{StaticResource InitializeWindowSettingCommand}" Executed="InitializeWindowSettingCommand_Executed"/>
     </Window.CommandBindings>
     
     <Window.InputBindings>
@@ -369,7 +373,7 @@
             </TabItem>
             <TabItem Header="その他">
                 <ScrollViewer>
-                    <StackPanel Grid.IsSharedSizeScope="True">
+                    <StackPanel Grid.IsSharedSizeScope="True" Margin="0,0,5,0">
                         <GroupBox Header="データベース">
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -468,9 +472,39 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition SharedSizeGroup="Button"/>
                                 </Grid.ColumnDefinitions>
-                                
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="モード" Margin="5" VerticalAlignment="Center"/>
                                 <CheckBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
                                           Content="デバッグモード" IsChecked="{Binding DebugMode}"/>
+
+                                <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Header="ウィンドウ" 
+                                          Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <DataGrid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding WindowSettingVMList}"
+                                                  IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
+                                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
+                                                  AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
+                                                  HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="種別" Width="*" Binding="{Binding Kind}"/>
+                                                <DataGridTextColumn Header="Left" Width="*" Binding="{Binding Left}"/>
+                                                <DataGridTextColumn Header="Top" Width="*" Binding="{Binding Top}"/>
+                                                <DataGridTextColumn Header="Width" Width="*" Binding="{Binding Width}"/>
+                                                <DataGridTextColumn Header="Height" Width="*" Binding="{Binding Height}"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+
+                                        <Button Grid.Row="1" Content="位置・サイズを初期化する(再起動)" Command="{StaticResource InitializeWindowSettingCommand}"/>
+                                    </Grid>
+                                </GroupBox>
                                 
                             </Grid>
                         </GroupBox>

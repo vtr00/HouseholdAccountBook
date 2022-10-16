@@ -658,5 +658,17 @@ namespace HouseholdAccountBook.Properties {
                 this["App_IsDebug"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool App_InitSizeFlag {
+            get {
+                return ((bool)(this["App_InitSizeFlag"]));
+            }
+            set {
+                this["App_InitSizeFlag"] = value;
+            }
+        }
     }
 }

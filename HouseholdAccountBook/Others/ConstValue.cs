@@ -23,7 +23,7 @@ namespace HouseholdAccountBook.ConstValue
         public static string UnhandledExceptionInfoFileName {
             get {
                 DateTime dt = DateTime.Now;
-                return dt.ToString("UnhandledException_yyMMdd_hhmmss.txt");
+                return string.Format("UnhandledException_{0}_{1}.txt", dt.ToString("yyMMdd"), dt.ToString("hhmmss"));
             }
         }
 

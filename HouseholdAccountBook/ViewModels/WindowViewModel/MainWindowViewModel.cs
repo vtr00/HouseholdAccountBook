@@ -329,7 +329,7 @@ namespace HouseholdAccountBook.ViewModels
                 this.UpdateDisplayedActionVMList();
             }
         }
-        private ObservableCollection<SummaryViewModel> _SummaryVMList;
+        private ObservableCollection<SummaryViewModel> _SummaryVMList = default;
         #endregion
         /// <summary>
         /// 選択された概要VM
@@ -644,7 +644,7 @@ namespace HouseholdAccountBook.ViewModels
             else {
                 if (this._SelectedSummaryVM.ItemId != -1) {
                     this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
-                        return vm.ItemId == this._SelectedSummaryVM.ItemId;
+                        return vm.ActionId == -1 || vm.ItemId == this._SelectedSummaryVM.ItemId;
                     }));
                     this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this.SelectedActionVMList.Where((vm) => {
                         return vm.ItemId == this._SelectedSummaryVM.ItemId;
@@ -652,7 +652,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
                 else if (this._SelectedSummaryVM.CategoryId != -1) {
                     this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
-                        return vm.CategoryId == this._SelectedSummaryVM.CategoryId;
+                        return vm.ActionId == -1 || vm.CategoryId == this._SelectedSummaryVM.CategoryId;
                     }));
                     this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this._SelectedActionVMList.Where((vm) => {
                         return vm.CategoryId == this._SelectedSummaryVM.CategoryId;
@@ -660,7 +660,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
                 else {
                     this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
-                        return vm.BalanceKind == (BalanceKind)this._SelectedSummaryVM.BalanceKind;
+                        return vm.ActionId == -1 || vm.BalanceKind == (BalanceKind)this._SelectedSummaryVM.BalanceKind;
                     }));
                     this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this._SelectedActionVMList.Where((vm) => {
                         return vm.BalanceKind == (BalanceKind)this._SelectedSummaryVM.BalanceKind;

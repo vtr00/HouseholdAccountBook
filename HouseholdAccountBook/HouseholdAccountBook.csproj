@@ -323,6 +323,7 @@
       <DependentUpon>NumericUpDown.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dao\DaoBuilder.cs" />
+    <Compile Include="ViewModels\WindowSettingViewModel.cs" />
     <Compile Include="ViewModels\CsvComparisonViewModel.CsvRecord.cs" />
     <Compile Include="ViewModels\WindowViewModel\TermWindowViewModel.cs" />
     <Compile Include="ViewModels\DateValueViewModel.cs" />
