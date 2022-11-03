@@ -294,7 +294,7 @@
                             <Button Width="20" Content="▶" Command="{StaticResource GoToNextMonthCommand}"/>
                             <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
-                                        ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
                         </StackPanel>
                             
                         <StackPanel Grid.Column="2" Orientation="Horizontal">
@@ -362,7 +362,7 @@
                                 <DataGridTextColumn Header="日付" Binding="{Binding ActTime, StringFormat='yyyy/MM/dd'}"/>
                                 <DataGridTextColumn Header="曜日" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}}"
                                                     CellStyle="{StaticResource DayOfWeekStyle}"/>
-                                <DataGridTextColumn Header="項目名" Width="*" Binding="{Binding ItemName}"/>
+                                <DataGridTextColumn Header="項目名" MinWidth="70" Binding="{Binding ItemName}"/>
                                 <DataGridTextColumn Header="収入" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Income, Converter={StaticResource IntToMoneyDisplayConverter}}" 
                                                     ElementStyle="{StaticResource TextAlignRight}"/>
                                 <DataGridTextColumn Header="支出" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Outgo, Converter={StaticResource IntToMoneyDisplayConverter}}" 

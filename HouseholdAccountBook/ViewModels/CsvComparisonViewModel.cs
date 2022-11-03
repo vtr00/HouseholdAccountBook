@@ -64,7 +64,11 @@ namespace HouseholdAccountBook.ViewModels
         public bool IsMatch
         {
             get => this._IsMatch;
-            set => this.SetProperty(ref this._IsMatch, value);
+            set {
+                if (this.ActionId.HasValue) {
+                    this.SetProperty(ref this._IsMatch, value);
+                }
+            }
         }
         private bool _IsMatch = default;
         #endregion

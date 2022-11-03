@@ -18,6 +18,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.Windows
@@ -64,6 +66,7 @@ namespace HouseholdAccountBook.Windows
             this.selectedBookId = selectedBookId;
 
             this.InitializeComponent();
+
             this.LoadWindowSetting();
         }
 
@@ -150,13 +153,10 @@ namespace HouseholdAccountBook.Windows
             tmpList.Sort((tmp1, tmp2) => { return (int)(tmp1.Record.Date - tmp2.Record.Date).TotalDays; });
             foreach (CsvComparisonViewModel vm in tmpList) {
                 this.WVM.CsvComparisonVMList.Add(vm);
+                this.csvCompDataGrid.ScrollToButtom();
             }
-            this.csvCompDataGrid.ScrollToButtom();
 
             await this.UpdateComparisonInfoAsync();
-
-            // 合計値を計算する
-            this.WVM.SumValue = this.WVM.CsvComparisonVMList.Sum(vm => vm.Record.Value);
 
             this.Cursor = null;
         }
@@ -350,13 +350,26 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         }
 
         /// <summary>
+        /// 一致チェックボックスを変更可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ChangeIsMatchCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            // これを使って判定するとチェックされなくなるので使用しない
+            CsvComparisonViewModel vm = (e.OriginalSource as CheckBox)?.DataContext as CsvComparisonViewModel;
+            e.CanExecute = vm.ActionId.HasValue;
+        }
+
+        /// <summary>
         /// 一致チェックボックスが変更されたら保存する
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private async void ChangeIsMatchCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            CsvComparisonViewModel vm = (this.WVM.SelectedCsvComparisonVM = (e.OriginalSource as CheckBox)?.DataContext as CsvComparisonViewModel);
+            CsvComparisonViewModel vm = (e.OriginalSource as CheckBox)?.DataContext as CsvComparisonViewModel;
+            this.WVM.SelectedCsvComparisonVM = vm;
             if (vm.ActionId.HasValue) {
                 await this.ChangeIsMatchAsync(vm.ActionId.Value, vm.IsMatch);
             }
@@ -373,6 +386,15 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
             await this.UpdateBookListAsync(this.selectedBookId);
 
             this.RegisterEventHandlerToWVM();
+
+            var dcr = VisualTreeHelper.GetChild(this.csvCompDataGrid, 0) as Decorator;
+            var sv = dcr.Child as ScrollViewer;
+            sv.ScrollChanged += this.CsvCompDataGrid_ScrollChanged;
+        }
+
+        private void CsvCompDataGrid_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            // TODO: 一致列の有効無効の表示状態を更新したい
         }
 
         /// <summary>
@@ -492,7 +514,6 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
             // リストをクリアする
             this.WVM.CsvComparisonVMList.Clear();
             this.WVM.CsvFileName = default;
-            this.WVM.SumValue = default;
         }
         #endregion
 

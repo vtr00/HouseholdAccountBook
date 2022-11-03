@@ -1,6 +1,7 @@
 ﻿using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace HouseholdAccountBook.ViewModels
 {
@@ -84,27 +85,43 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// 未チェック数
+        /// </summary>
+        /// <remarks>UI上に反映するには？</remarks>
+        #region UncheckedNum
+        public int? UncheckedNum
+        {
+            get {
+                if (this.CsvComparisonVMList.Count == 0) return null;
+                return this.CsvComparisonVMList.Count((tmp) => !tmp.IsMatch);
+            }
+        }
+        #endregion
+        /// <summary>
         /// 合計値
         /// </summary>
         #region SumValue
         public int? SumValue
         {
-            get => this._SumValue;
-            set => this.SetProperty(ref this._SumValue, value);
+            get {
+                int? sum = (this.SelectedCsvComparisonVMList.Count != 0) ? (int?)0 : null;
+                foreach (CsvComparisonViewModel vm in this.SelectedCsvComparisonVMList) {
+                    sum += vm.Record.Value;
+                }
+                return sum;
+            }
         }
-        private int? _SumValue = default;
+        #endregion
         #endregion
 
         /// <summary>
-        /// デバッグビルドか
+        /// コンストラクタ
         /// </summary>
-        #region IsDebug
-#if DEBUG
-        public bool IsDebug => true;
-#else
-        public bool IsDebug => false;
-#endif
-        #endregion
-        #endregion
+        public CsvComparisonWindowViewModel()
+        {
+            this.SelectedCsvComparisonVMList.CollectionChanged += (sender, args) => {
+                this.RaisePropertyChanged(nameof(this.SumValue));
+            };
+        }
     }
 }

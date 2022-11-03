@@ -118,7 +118,7 @@
             <DataGrid x:Name="csvCompDataGrid" Grid.Row="1" Margin="5,0"
                     ItemsSource="{Binding CsvComparisonVMList}" SelectedItem="{Binding SelectedCsvComparisonVM}" SelectionUnit="FullRow" IsReadOnly="True"
                     CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="3"
-                    AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
+                    AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True" 
                     HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
                 <DataGrid.Resources>
                     <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
@@ -132,12 +132,22 @@
                 <i:Interaction.Behaviors>
                     <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding SelectedCsvComparisonVMList, Mode=OneWay}"/>
                 </i:Interaction.Behaviors>
+                <DataGrid.ItemContainerStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ActionId}" Value="{x:Null}">
+                                <Setter Property="Foreground" Value="DarkRed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.ItemContainerStyle>
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="一致">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox IsChecked="{Binding IsMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MouseEnter="CheckBox_MouseEnter"
-                                          Command="{StaticResource ChangeIsMatchCommand}">
+                                           Command="{StaticResource ChangeIsMatchCommand}">
                                     <CheckBox.Style>
                                         <Style TargetType="CheckBox">
                                             <Style.Triggers>
@@ -156,7 +166,7 @@
                                         CellStyle="{StaticResource DayOfWeekStyle}"/>
                     <DataGridTextColumn Header="支出" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Record.Value, Converter={StaticResource IntToMoneyDisplayConverter}}" 
                                         ElementStyle="{StaticResource TextAlignRight}"/>
-                    <DataGridTextColumn Header="CSV項目名" Width="*" Binding="{Binding Record.Name}"/>
+                    <DataGridTextColumn Header="CSV項目名" Binding="{Binding Record.Name}"/>
                     <DataGridTextColumn Header="ActionId" Binding="{Binding ActionId}"
                                         Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                     <DataGridTextColumn Header="項目名" Width="*" Binding="{Binding ItemName}"/>
