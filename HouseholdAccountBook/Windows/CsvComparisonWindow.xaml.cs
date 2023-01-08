@@ -182,7 +182,7 @@ namespace HouseholdAccountBook.Windows
             List<CsvComparisonViewModel.CsvRecord> vmList = new List<CsvComparisonViewModel.CsvRecord>(this.WVM.SelectedCsvComparisonVMList.Where((vm) => !vm.ActionId.HasValue).Select((vm) => vm.Record));
             if (vmList.Count() == 1) {
                 CsvComparisonViewModel.CsvRecord record = vmList[0];
-                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, record);
+                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, record) { Owner = this };
                 arw.Registrated += async (sender2, e2) => {
                     foreach (int value in e2.Value) {
                         await this.ChangeIsMatchAsync(value, true);
@@ -193,7 +193,7 @@ namespace HouseholdAccountBook.Windows
                 arw.ShowDialog();
             }
             else {
-                ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, vmList);
+                ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, vmList) { Owner = this };
                 alrw.Registrated += async (sender2, e2) => {
                     foreach (int value in e2.Value) {
                         await this.ChangeIsMatchAsync(value, true);
@@ -223,7 +223,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void EditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedCsvComparisonVM.ActionId.Value);
+            ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedCsvComparisonVM.ActionId.Value) { Owner = this };
             arw.Registrated += async (sender2, e2) => {
                 await this.UpdateComparisonInfoAsync();
                 this.ActionsStatusChanged?.Invoke(this, new EventArgs());

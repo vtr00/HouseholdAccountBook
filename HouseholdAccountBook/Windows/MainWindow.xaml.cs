@@ -51,7 +51,23 @@ namespace HouseholdAccountBook.Windows
         /// CSV比較ウィンドウ
         /// </summary>
         private CsvComparisonWindow ccw;
-        #endregion
+
+        /// <summary>
+        /// ウィンドウの位置の上端(最終値)
+        /// </summary>
+        private double LastTop = default;
+        /// <summary>
+        /// ウィンドウの位置の左端(最終値)
+        /// </summary>
+        private double LastLeft = default;
+        /// <summary>
+        /// ウィンドウの高さ(最終値)
+        /// </summary>
+        private double LastHeight = default;
+        /// <summary>
+        /// ウィンドウの幅(最終値)
+        /// </summary>
+        private double LastWidth = default;
 
         /// <summary>
         /// 子ウィンドウを開いているか
@@ -61,6 +77,7 @@ namespace HouseholdAccountBook.Windows
         /// 登録ウィンドウを開いているか
         /// </summary>
         private bool RegistrationWindowOpened => this.mrw != null || this.arw != null || this.alrw != null;
+        #endregion
 
         /// <summary>
         /// <see cref="MainWindow"/> クラスの新しいインスタンスを初期化します。
@@ -72,8 +89,14 @@ namespace HouseholdAccountBook.Windows
             this.startUpDate = DateTime.Now;
 
             this.InitializeComponent();
-            this.LoadWindowSetting();
+
+            this.LastTop = this.Top;
+            this.LastLeft = this.Left;
+            this.LastWidth = this.Width;
+            this.LastHeight = this.Height;
+
             this.LogWindowStateAndLocation("Constructor");
+            this.LoadWindowSetting();
         }
 
         #region イベントハンドラ
@@ -1345,7 +1368,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void OpenCsvComparisonWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.ccw = new CsvComparisonWindow(this.builder, this.WVM.SelectedBookVM.Id);
+            this.ccw = new CsvComparisonWindow(this.builder, this.WVM.SelectedBookVM.Id) { Owner = this };
             // 帳簿項目の一致を確認時のイベントを登録する
             this.ccw.IsMatchChanged += async (sender2, e2) => {
                 ActionViewModel vm = this.WVM.ActionVMList.FirstOrDefault((tmpVM) => { return tmpVM.ActionId == e2.Value; });
@@ -1519,8 +1542,13 @@ WHERE action_id = @{0};", vm.ActionId);
             this.LogWindowStateAndLocation();
 
             if (this.WindowState == WindowState.Normal && 2000000000 < Math.Max(Math.Abs(this.Left), Math.Abs(this.Top))) {
+                this.LocationChanged -= this.MainWindow_LocationChanged;
+
                 this.Top = 0;
                 this.Left = 0;
+                this.LogWindowStateAndLocation("LocModified");
+
+                this.LocationChanged += this.MainWindow_LocationChanged;
             }
         }
 
@@ -1532,6 +1560,26 @@ WHERE action_id = @{0};", vm.ActionId);
         private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             this.LogWindowStateAndLocation();
+
+            if (this.Height < 40) {
+                if (40 < this.LastHeight) {
+                    this.SizeChanged -= this.MainWindow_StateChanegd;
+
+                    this.Top = this.LastTop;
+                    this.Left = this.LastLeft;
+                    this.Width = this.LastWidth;
+                    this.Height = this.LastHeight;
+                    this.LogWindowStateAndLocation("SizeModified");
+
+                    this.SizeChanged += this.MainWindow_SizeChanged;
+                }
+            }
+            else {
+                this.LastTop = this.Top;
+                this.LastLeft = this.Left;
+                this.LastWidth = this.Width;
+                this.LastHeight = this.Height;
+            }
         }
         #endregion
         #endregion
@@ -3047,16 +3095,12 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (0 <= settings.MainWindow_Left) {
+            if (0 <= settings.MainWindow_Left && 0 <= settings.MainWindow_Top) {
                 this.Left = settings.MainWindow_Left;
-            }
-            if (0 <= settings.MainWindow_Top) {
                 this.Top = settings.MainWindow_Top;
             }
-            if (settings.MainWindow_Width != -1) {
+            if (settings.MainWindow_Width != -1 && 40 <= settings.MainWindow_Height) {
                 this.Width = settings.MainWindow_Width;
-            }
-            if (settings.MainWindow_Height != -1) {
                 this.Height = settings.MainWindow_Height;
             }
             if (settings.MainWindow_WindowState != -1) {
@@ -3101,7 +3145,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     windowState = "Min";
                     break;
                 case WindowState.Normal:
-                    windowState = "Nor";
+                    windowState = "Normal";
                     break;
                 default:
                     windowState = "---";
@@ -3111,7 +3155,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             using (FileStream fs = new FileStream(string.Format("WindowLocation_{0}.txt", this.startUpDate.ToString("yyyyMMdd_hhmmss")), FileMode.Append)) {
                 using (StreamWriter sw = new StreamWriter(fs)) {
                     if (fs.Length == 0) {
-                        sw.WriteLine("yyyy/MM/dd HH:mm:ss.ffff\tStt\tLeft\tTop\tHeight\tWidth");
+                        sw.WriteLine("yyyy/MM/dd HH:mm:ss.ffff\tState\tLeft\tTop\tHeight\tWidth");
                     }
                     if (string.IsNullOrEmpty(comment)) {
                         sw.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff"), windowState, this.Left, this.Top, this.Height, this.Width));
