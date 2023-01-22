@@ -307,6 +307,7 @@
     <Compile Include="Extensions\ValueTuppleExtensions.cs" />
     <Compile Include="Interfaces\IMultiSelectable.cs" />
     <Compile Include="Others\PropertyName.cs" />
+    <Compile Include="UserControls\FollowablePopup.cs" />
     <Compile Include="UserControls\CustomBarSeries.cs" />
     <Compile Include="UserControls\DataGridEditableTemplateColumn.cs" />
     <Compile Include="UserControls\DateTimePicker.cs" />

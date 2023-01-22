@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Dao;
 using HouseholdAccountBook.Extensions;
+using HouseholdAccountBook.Properties;
 using HouseholdAccountBook.UserControls;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
@@ -617,13 +618,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             this.mrw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
                 await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
-                FocusManager.SetFocusedElement(this, this.actionDataGrid);
-                this.actionDataGrid.Focus();
             };
             // クローズ時イベントを登録する
             this.mrw.Closed += (sender3, e3) => {
                 this.mrw = null;
                 this.Activate();
+                this.actionDataGrid.Focus();
             };
             this.mrw.Show();
         }
@@ -652,13 +652,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             this.arw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
                 await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
-                FocusManager.SetFocusedElement(this, this.actionDataGrid);
-                this.actionDataGrid.Focus();
             };
             // クローズ時イベントを登録する
             this.arw.Closed += (sender3, e3) => {
                 this.arw = null;
                 this.Activate();
+                this.actionDataGrid.Focus();
             };
             this.arw.Show();
         }
@@ -687,13 +686,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             this.alrw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
                 await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
-                FocusManager.SetFocusedElement(this, this.actionDataGrid);
-                this.actionDataGrid.Focus();
             };
             // クローズ時イベントを登録する
             this.alrw.Closed += (sender3, e3) => {
                 this.alrw = null;
                 this.Activate();
+                this.actionDataGrid.Focus();
             };
             this.alrw.Show();
         }
@@ -739,13 +737,12 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                     this.mrw.Registrated += async (sender2, e2) => {
                         // 帳簿一覧タブを更新する
                         await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
-                        FocusManager.SetFocusedElement(this, this.actionDataGrid);
-                        this.actionDataGrid.Focus();
                     };
                     // クローズ時イベントを登録する
                     this.mrw.Closed += (sender3, e3) => {
                         this.mrw = null;
                         this.Activate();
+                        this.actionDataGrid.Focus();
                     };
                     this.mrw.Show();
                     break;
@@ -756,13 +753,12 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                     this.alrw.Registrated += async (sender2, e2) => {
                         // 帳簿一覧タブを更新する
                         await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
-                        FocusManager.SetFocusedElement(this, this.actionDataGrid);
-                        this.actionDataGrid.Focus();
                     };
                     // クローズ時イベントを登録する
                     this.alrw.Closed += (sender3, e3) => {
                         this.alrw = null;
                         this.Activate();
+                        this.actionDataGrid.Focus();
                     };
                     this.alrw.Show();
                     break;
@@ -774,13 +770,12 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                     this.arw.Registrated += async (sender2, e2) => {
                         // 帳簿一覧タブを更新する
                         await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
-                        FocusManager.SetFocusedElement(this, this.actionDataGrid);
-                        this.actionDataGrid.Focus();
                     };
 
                     this.arw.Closed += (sender3, e3) => {
                         this.arw = null;
                         this.Activate();
+                        this.actionDataGrid.Focus();
                     };
                     this.arw.Show();
                     break;
@@ -827,12 +822,11 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 this.arw.Registrated += async (sender2, e2) => {
                     // 帳簿一覧タブを更新する
                     await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
-                    FocusManager.SetFocusedElement(this, this.actionDataGrid);
-                    this.actionDataGrid.Focus();
                 };
                 this.arw.Closed += (sender3, e3) => {
                     this.arw = null;
                     this.Activate();
+                    this.actionDataGrid.Focus();
                 };
                 this.arw.Show();
             }
@@ -843,12 +837,11 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 this.mrw.Registrated += async (sender2, e2) => {
                     // 帳簿一覧タブを更新する
                     await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
-                    FocusManager.SetFocusedElement(this, this.actionDataGrid);
-                    this.actionDataGrid.Focus();
                 };
                 this.mrw.Closed += (sender3, e3) => {
                     this.mrw = null;
                     this.Activate();
+                    this.actionDataGrid.Focus();
                 };
                 this.mrw.Show();
             }
@@ -2176,7 +2169,8 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <returns>年別概要VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadYearlySummaryViewModelListWithinDecadeAsync(int? bookId)
         {
-            DateTime startTime = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth).AddYears(-9);
+            Settings settings = Settings.Default;
+            DateTime startTime = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).AddYears(-9);
             DateTime endTime = startTime.AddYears(10);
 
             // 開始年までの収支を取得する
@@ -2824,12 +2818,13 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.YearlyListTab) return;
 
-            int startYear = DateTime.Now.Year - 9;
+            Settings settings = Settings.Default;
+            int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
 
             // 表示する月の文字列を作成する
             ObservableCollection<string> displayedYears = new ObservableCollection<string>();
             for (int i = startYear; i < startYear + 10; ++i) {
-                displayedYears.Add(string.Format("{0}年", i));
+                displayedYears.Add(string.Format("{0}年度", i));
             }
             this.WVM.DisplayedYears = displayedYears;
             this.WVM.YearlySummaryVMList = await this.LoadYearlySummaryViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
@@ -2844,7 +2839,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.YearlyGraphTab) return;
 
-            int startYear = DateTime.Now.Year - 9;
+            Settings settings = Settings.Default;
+            int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
 
             // 全項目
             this.WVM.WholeItemYearlyGraphModel.Axes.Clear();
@@ -2852,7 +2848,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 横軸 - 年軸
             CategoryAxis cAxis1 = new CategoryAxis() {
-                Unit = "年",
+                Unit = "年度",
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
@@ -2892,7 +2888,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 横軸 - 年軸
             CategoryAxis cAxis2 = new CategoryAxis() {
-                Unit = "年",
+                Unit = "年度",
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
@@ -2934,7 +2930,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.YearlyGraphTab) return;
 
-            int startYear = DateTime.Now.Year - 9;
+            Settings settings = Settings.Default;
+            int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
 
             switch (this.WVM.SelectedGraphKind) {
                 case GraphKind.IncomeAndOutgo: {
@@ -2956,7 +2953,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                     CategoryId = tmpVM.CategoryId
                                 }),
                                 ValueField = "Value",
-                                TrackerFormatString = "{0}\n{1}年: {2:#,0}", //年: 金額
+                                TrackerFormatString = "{0}\n{1}年度: {2:#,0}", //年: 金額
                                 XAxisKey = "Value",
                                 YAxisKey = "Category"
                             };
@@ -2980,7 +2977,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                         CategoryId = vm.CategoryId
                                     }),
                                     ValueField = "Value",
-                                    TrackerFormatString = "{1}年: {2:#,0}", //年: 金額
+                                    TrackerFormatString = "{1}年度: {2:#,0}", //年: 金額
                                     XAxisKey = "Value",
                                     YAxisKey = "Category"
                                 };
@@ -3018,7 +3015,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                 case GraphKind.Balance: {
                         LineSeries cSeries = new LineSeries() {
                             Title = "残高",
-                            TrackerFormatString = "{2}年: {4:#,0}" //年: 金額
+                            TrackerFormatString = "{2}年度: {4:#,0}" //年: 金額
                         };
                         ObservableCollection<SeriesViewModel> vmList = await this.LoadYearlySummaryViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
                         cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
@@ -3152,7 +3149,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     break;
             }
 
-            using (FileStream fs = new FileStream(string.Format("WindowLocation_{0}.txt", this.startUpDate.ToString("yyyyMMdd_hhmmss")), FileMode.Append)) {
+            using (FileStream fs = new FileStream(ConstValue.ConstValue.WindowLocationFileName, FileMode.Append)) {
                 using (StreamWriter sw = new StreamWriter(fs)) {
                     if (fs.Length == 0) {
                         sw.WriteLine("yyyy/MM/dd HH:mm:ss.ffff\tState\tLeft\tTop\tHeight\tWidth");

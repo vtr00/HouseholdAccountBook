@@ -18,12 +18,32 @@ namespace HouseholdAccountBook.ConstValue
         public static string Inserter { get; } = "";
 
         /// <summary>
-        /// 補足されない例外の情報ファイル名
+        /// 補足されない例外情報のファイル名のヘッダ
         /// </summary>
-        public static string UnhandledExceptionInfoFileName {
+        public static string UnhandledExceptionInfoFileNameHeader = "UnhandledException_";
+        /// <summary>
+        /// 補足されない例外情報のファイル名
+        /// </summary>
+        public static string UnhandledExceptionInfoFileName
+        {
             get {
                 DateTime dt = DateTime.Now;
-                return string.Format("UnhandledException_{0}_{1}.txt", dt.ToString("yyMMdd"), dt.ToString("hhmmss"));
+                return string.Format("{0}{1}.txt", UnhandledExceptionInfoFileNameHeader, dt.ToString("yyMMdd_hhmmss"));
+            }
+        }
+
+        /// <summary>
+        /// ウィンドウ情報のファイル名のヘッダ
+        /// </summary>
+        public static string WindowLocationFileNameHeader = "WindowLocation_";
+        /// <summary>
+        /// ウィンドウ情報のファイル名
+        /// </summary>
+        public static string WindowLocationFileName
+        {
+            get {
+                DateTime dt = App.StartupTime;
+                return string.Format("{0}{1}.txt", WindowLocationFileNameHeader, dt.ToString("yyyyMMdd_hhmmss"));
             }
         }
 

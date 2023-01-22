@@ -392,11 +392,6 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
             sv.ScrollChanged += this.CsvCompDataGrid_ScrollChanged;
         }
 
-        private void CsvCompDataGrid_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            // TODO: 一致列の有効無効の表示状態を更新したい
-        }
-
         /// <summary>
         /// フォーム終了時
         /// </summary>
@@ -408,12 +403,26 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         }
 
         /// <summary>
-        /// マウスのホーバーでチェックを入れる
+        /// DataGridスクロール時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CsvCompDataGrid_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            // TODO: 一致列の有効無効の表示状態を更新したい
+            // 表示を更新する
+            DataGrid dataGrid = sender as DataGrid;
+            dataGrid?.UpdateLayout();
+        }
+
+        /// <summary>
+        /// CheckBoxマウスホーバー時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private async void CheckBox_MouseEnter(object sender, MouseEventArgs e)
         {
+            // Ctrlキーが押されていたらチェックを入れる
             if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control) {
                 CheckBox checkBox = sender as CheckBox;
                 checkBox.IsChecked = !checkBox.IsChecked;

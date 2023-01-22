@@ -19,6 +19,13 @@ namespace HouseholdAccountBook
     /// </summary>
     public partial class App : Application
     {
+        #region プロパティ
+        /// <summary>
+        /// 起動時刻
+        /// </summary>
+        static public DateTime StartupTime = DateTime.Now;
+        #endregion
+
         #region フィールド
         /// <summary>
         /// 接続情報

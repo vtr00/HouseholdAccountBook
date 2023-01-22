@@ -443,7 +443,6 @@ WHERE del_flg = 0 AND group_id = @{0};", this.selectedGroupId);
         {
             if (!this.WVM.IsEditing) {
                 TextBox textBox = sender as TextBox;
-                this._popup.SetBinding(Popup.StaysOpenProperty, new Binding(IsKeyboardFocusedProperty.Name) { Source = textBox });
                 this._popup.PlacementTarget = textBox;
                 this.WVM.IsEditing = true;
 

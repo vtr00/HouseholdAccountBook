@@ -61,7 +61,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._NumericUpDownFocused;
             set {
                 this._NumericUpDownFocused = value;
-                this.SetIsOpen();
+                this.UpdateIsOpenProperty();
             }
         }
         private bool _NumericUpDownFocused = default;
@@ -76,7 +76,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._PopupFocused;
             set {
                 this._PopupFocused = value;
-                this.SetIsOpen();
+                this.UpdateIsOpenProperty();
             }
         }
         private bool _PopupFocused = default;
@@ -86,7 +86,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// <see cref="System.Windows.Controls.Primitives.Popup"/> の表示状態を更新する
         /// </summary>
-        private async void SetIsOpen()
+        private async void UpdateIsOpenProperty()
         {
             this.localIsOpen = this.NumericUpDownFocused || this.PopupFocused;
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -144,7 +145,7 @@ namespace HouseholdAccountBook.UserControls
 
             this.InputedValue = value;
             this.InputedKind = InputKind.Number;
-            this.CallCommandToExecute();
+            this.ExecuteCommand();
 
             e.Handled = true;
         }
@@ -157,7 +158,7 @@ namespace HouseholdAccountBook.UserControls
         private void BackSpaceInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.InputedKind = InputKind.BackSpace;
-            this.CallCommandToExecute();
+            this.ExecuteCommand();
 
             e.Handled = true;
         }
@@ -170,7 +171,7 @@ namespace HouseholdAccountBook.UserControls
         private void ClearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.InputedKind = InputKind.Clear;
-            this.CallCommandToExecute();
+            this.ExecuteCommand();
 
             e.Handled = true;
         }
@@ -183,8 +184,14 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private static void CommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            NumericInputButton nib = (NumericInputButton)d;
-            nib.HookUpCommand((ICommand)e.OldValue, (ICommand)e.NewValue);
+            if (d is NumericInputButton nib) {
+                if (e.OldValue != null && e.OldValue is ICommand oldCommand) {
+                    oldCommand.CanExecuteChanged -= nib.OnCanExecuteChanged;
+                }
+                if (e.NewValue != null && e.NewValue is ICommand newCommand) {
+                    newCommand.CanExecuteChanged += nib.OnCanExecuteChanged;
+                }
+            }
         }
 
         /// <summary>
@@ -196,44 +203,19 @@ namespace HouseholdAccountBook.UserControls
         {
             if (this.Command != null) {
                 if (this.Command is RoutedCommand command) {
-                    if (command.CanExecute(this.CommandParameter, this.CommandTarget)) {
-                        this.IsEnabled = true;
-                    }
-                    else {
-                        this.IsEnabled = false;
-                    }
+                    //this.IsEnabled = command.CanExecute(this.CommandParameter, this.CommandTarget);
                 }
                 else {
-                    if (this.Command.CanExecute(this.CommandParameter)) {
-                        this.IsEnabled = true;
-                    }
-                    else {
-                        this.IsEnabled = false;
-                    }
+                    //this.IsEnabled = this.Command.CanExecute(this.CommandParameter);
                 }
             }
         }
         #endregion
 
         /// <summary>
-        /// コマンドプロパティ変更時処理
+        /// コマンドを実行する
         /// </summary>
-        /// <param name="oldCommand">変更前のコマンド</param>
-        /// <param name="newCommand">変更後のコマンド</param>
-        private void HookUpCommand(ICommand oldCommand, ICommand newCommand)
-        {
-            if (oldCommand != null) {
-                oldCommand.CanExecuteChanged -= this.OnCanExecuteChanged;
-            }
-            if (newCommand != null) {
-                newCommand.CanExecuteChanged += this.OnCanExecuteChanged;
-            }
-        }
-
-        /// <summary>
-        /// 入力があったときにコマンドを実行する
-        /// </summary>
-        private void CallCommandToExecute()
+        private void ExecuteCommand()
         {
             if (this.Command != null) {
                 if (this.Command is RoutedCommand command) {

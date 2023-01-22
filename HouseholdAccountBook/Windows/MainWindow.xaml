@@ -354,6 +354,11 @@
                                     </Style.Triggers>
                                 </Style>
                             </DataGrid.ItemContainerStyle>
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Id" Binding="{Binding ActionId}"
                                                     Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
@@ -383,6 +388,11 @@
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
                                   HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
                                   ItemContainerStyle="{StaticResource SummaryStyle}">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="CId" Binding="{Binding CategoryId}"
                                                      Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
@@ -494,6 +504,11 @@
                             <DataGrid.Resources>
                                 <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
                             </DataGrid.Resources>
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
                                 <!-- 参考：http://oita.oika.me/2014/05/31/binding-datagridcolumn/ -->
                                 <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
@@ -612,6 +627,11 @@
                             <DataGrid.Resources>
                                 <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
                             </DataGrid.Resources>
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
                                 <!-- 参考：http://oita.oika.me/2014/05/31/binding-datagridcolumn/ -->
                                 <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>

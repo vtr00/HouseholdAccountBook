@@ -493,6 +493,12 @@
                                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
                                                   HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
+
+                                            <DataGrid.ColumnHeaderStyle>
+                                                <Style TargetType="DataGridColumnHeader">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </DataGrid.ColumnHeaderStyle>
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="種別" Width="*" Binding="{Binding Kind}"/>
                                                 <DataGridTextColumn Header="Left" Width="*" Binding="{Binding Left}"/>

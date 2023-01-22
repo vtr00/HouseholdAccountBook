@@ -66,7 +66,7 @@ namespace HouseholdAccountBook.UserControls
             new PropertyMetadata(0));
         #endregion
         /// <summary>
-        /// NULL値
+        /// ValueがnullのときValueを何と見做すか
         /// </summary>
         #region NullValue
         public int NullValue
@@ -117,6 +117,28 @@ namespace HouseholdAccountBook.UserControls
         {
             get => (int)this.GetValue(MinValueProperty);
             set => this.SetValue(MinValueProperty, value);
+        }
+        #endregion
+
+        /// <summary>
+        /// <see cref="IsAcceptableMouseWheel"/> 依存関係プロパティを識別します。
+        /// </summary>
+        #region IsAcceptableMouseWheelProperty
+        public static readonly DependencyProperty IsAcceptableMouseWheelProperty = DependencyProperty.Register(
+                nameof(IsAcceptableMouseWheel), 
+                typeof(bool), 
+                typeof(NumericUpDown), 
+                new PropertyMetadata(true)
+            );
+        #endregion
+        /// <summary>
+        /// マウスホイールによる入力を受け付けるか
+        /// </summary>
+        #region IsAcceptableMouseWheel
+        public bool IsAcceptableMouseWheel
+        {
+            get => (bool)GetValue(IsAcceptableMouseWheelProperty);
+            set => SetValue(IsAcceptableMouseWheelProperty, value);
         }
         #endregion
         #endregion
@@ -239,7 +261,7 @@ namespace HouseholdAccountBook.UserControls
                     break;
             }
 
-            if (this.MinValue <= tmpValue && tmpValue <= this.MaxValue) {
+            if ((this.MinValue <= tmpValue && tmpValue <= this.MaxValue) || tmpValue == null) {
                 this.Value = tmpValue;
                 textBox.SelectionStart = tmpSelectionStart;
 
@@ -251,7 +273,7 @@ namespace HouseholdAccountBook.UserControls
         #endregion
 
         /// <summary>
-        /// 入力された値を表示前にチェックする
+        /// テキストボックスにテキストが入力される前
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -283,22 +305,15 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// Popupを表示する
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            this.UVM.IsOpen = true;
-        }
-
-        /// <summary>
-        /// ホイールの回転方向に合わせて数字を増減する
+        /// テキストボックスでホイールが回転したとき
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void TextBox_MouseWheel(object sender, MouseWheelEventArgs e)
         {
+            if (!this.IsAcceptableMouseWheel) return;
+
+            // 方向に合わせて数字を増減する
             if (e.Delta > 0) {
                 this.IncreaseNumber();
             }
@@ -328,7 +343,7 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// Popupからフォーカスが外れたとき
+        /// <see cref="System.Windows.Controls.Primitives.Popup"/> からフォーカスが外れたとき
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -338,7 +353,7 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// Popupがフォーカスを得たとき
+        /// <see cref="System.Windows.Controls.Primitives.Popup"/> がフォーカスを得たとき
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -354,13 +369,17 @@ namespace HouseholdAccountBook.UserControls
         private void IncreaseNumber()
         {
             if (this.Value == null) {
-                this.Value = this.MinValue;
-            }
-            else if ((this.Value + this.Stride) <= this.MaxValue) {
-                this.Value += this.Stride;
+                if (this.NullValue + this.Stride <= this.MaxValue) {
+                    this.Value = this.NullValue + this.Stride;
+                }
             }
             else {
-                this.Value = this.MaxValue;
+                if ((this.Value + this.Stride) <= this.MaxValue) {
+                    this.Value += this.Stride;
+                }
+                else {
+                    this.Value = this.MaxValue;
+                }
             }
         }
 
@@ -370,13 +389,17 @@ namespace HouseholdAccountBook.UserControls
         private void DecreaseNumber()
         {
             if (this.Value == null) {
-                this.Value = this.MaxValue;
-            }
-            else if ((this.Value - this.Stride) >= this.MinValue) {
-                this.Value -= this.Stride;
+                if (this.NullValue - this.Stride >= this.MinValue) {
+                    this.Value = this.NullValue - this.Stride;
+                }
             }
             else {
-                this.Value = this.MinValue;
+                if ((this.Value - this.Stride) >= this.MinValue) {
+                    this.Value -= this.Stride;
+                }
+                else {
+                    this.Value = this.MinValue;
+                }
             }
         }
     }

@@ -106,13 +106,18 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Margin="0,5" VerticalAlignment="Center" Text="CSV："/>
-                <Button Grid.Column="1" Margin="0,5" Width="75" Content="開く" Command="{StaticResource OpenCsvFilesCommand}"/>
-                <Button Grid.Column="2" Margin="0,5" Width="75" Content="クリア" Command="{StaticResource ClearListCommand}"/>
+                <ComboBox Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,5" MinWidth="100"
+                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
+                <Button Grid.Column="1" Margin="0,5" Width="50" Content="更新" Command="{StaticResource UpdateCommand}"/>
+                <Button Grid.Column="3" Margin="0,5" Width="50" Content="追加" Command="{StaticResource AddActionCommand}"/>
+                <Button Grid.Column="4" Margin="0,5" Width="50" Content="編集" Command="{StaticResource EditActionCommand}"/>
+                <Button Grid.Column="5" Margin="0,5" Width="75" Content="一括チェック" Command="{StaticResource BulkCheckCommand}"/>
             </Grid>
 
             <DataGrid x:Name="csvCompDataGrid" Grid.Row="1" Margin="5,0"
@@ -142,6 +147,11 @@
                         </Style.Triggers>
                     </Style>
                 </DataGrid.ItemContainerStyle>
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="一致">
                         <DataGridTemplateColumn.CellTemplate>
@@ -181,18 +191,11 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Margin="0,5" VerticalAlignment="Center" Text="帳簿："/>
-                <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,5" MinWidth="100"
-                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
-                <Button Grid.Column="2" Margin="0,5" Width="75" Content="更新" Command="{StaticResource UpdateCommand}"/>
-                <Button Grid.Column="4" Margin="0,5" Width="75" Content="追加" Command="{StaticResource AddActionCommand}"/>
-                <Button Grid.Column="5" Margin="0,5" Width="75" Content="編集" Command="{StaticResource EditActionCommand}"/>
-                <Button Grid.Column="6" Margin="0,5" Width="75" Content="一括チェック" Command="{StaticResource BulkCheckCommand}"/>
+                <TextBlock Grid.Column="0" Margin="0,5" VerticalAlignment="Center" Text="CSV："/>
+                <Button Grid.Column="1" Margin="0,5" Width="75" Content="開く" Command="{StaticResource OpenCsvFilesCommand}"/>
+                <Button Grid.Column="2" Margin="0,5" Width="75" Content="クリア" Command="{StaticResource ClearListCommand}"/>
             </Grid>
         </Grid>
 
