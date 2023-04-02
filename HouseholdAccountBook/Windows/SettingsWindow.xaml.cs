@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Dao;
 using HouseholdAccountBook.Dto;
 using HouseholdAccountBook.ViewModels;
+using HouseholdAccountBook.Extensions;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Newtonsoft.Json;
@@ -50,7 +51,6 @@ namespace HouseholdAccountBook.Windows
             this.builder = builder;
 
             this.InitializeComponent();
-            this.LoadWindowSetting();
         }
 
         #region イベントハンドラ
@@ -1066,8 +1066,9 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         #endregion
         #endregion
 
+        #region ウィンドウ
         /// <summary>
-        /// フォーム読込完了時
+        /// ウィンドウ読込完了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1077,7 +1078,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         }
 
         /// <summary>
-        /// フォーム終了前
+        /// ウィンドウ終了前
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1087,7 +1088,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         }
 
         /// <summary>
-        /// フォーム終了時
+        /// ウィンドウ終了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1095,6 +1096,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         {
             this.SaveWindowSetting();
         }
+        #endregion
 
         /// <summary>
         /// 選択中の設定タブを変更した時
@@ -1467,20 +1469,20 @@ ORDER BY I.sort_order;", vm.Id);
         /// <summary>
         /// ウィンドウ設定を読み込む
         /// </summary>
-        private void LoadWindowSetting()
+        public void LoadWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (0 <= settings.SettingsWindow_Left) {
+            if (settings.App_IsPositionSaved && (-10 <= settings.SettingsWindow_Left && 0 <= settings.SettingsWindow_Top)) {
                 this.Left = settings.SettingsWindow_Left;
-            }
-            if (0 <= settings.SettingsWindow_Top) {
                 this.Top = settings.SettingsWindow_Top;
             }
-            if (settings.SettingsWindow_Height != -1) {
-                this.Height = settings.SettingsWindow_Height;
+            else {
+                this.MoveOwnersCenter();
             }
-            if (settings.SettingsWindow_Width != -1) {
+
+            if (settings.SettingsWindow_Height != -1 && settings.SettingsWindow_Width != -1) {
+                this.Height = settings.SettingsWindow_Height;
                 this.Width = settings.SettingsWindow_Width;
             }
         }
@@ -1488,12 +1490,14 @@ ORDER BY I.sort_order;", vm.Id);
         /// <summary>
         /// ウィンドウ設定を保存する
         /// </summary>
-        private void SaveWindowSetting()
+        public void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            if (!settings.App_InitSizeFlag) {
-                settings.SettingsWindow_Left = this.Left;
-                settings.SettingsWindow_Top = this.Top;
+            if (!settings.App_InitSizeFlag && this.WindowState == WindowState.Normal) {
+                if (settings.App_IsPositionSaved) {
+                    settings.SettingsWindow_Left = this.Left;
+                    settings.SettingsWindow_Top = this.Top;
+                }
                 settings.SettingsWindow_Height = this.Height;
                 settings.SettingsWindow_Width = this.Width;
                 settings.Save();

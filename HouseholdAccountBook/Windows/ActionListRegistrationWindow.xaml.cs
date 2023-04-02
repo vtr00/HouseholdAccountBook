@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Dao;
+using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.UserControls;
 using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
@@ -88,7 +89,6 @@ namespace HouseholdAccountBook.Windows
             this.selectedGroupId = null;
 
             this.InitializeComponent();
-            this.LoadWindowSetting();
 
             this.WVM.RegMode = RegistrationMode.Add;
         }
@@ -109,7 +109,6 @@ namespace HouseholdAccountBook.Windows
             this.selectedGroupId = null;
 
             this.InitializeComponent();
-            this.LoadWindowSetting();
 
             this.WVM.RegMode = RegistrationMode.Add;
         }
@@ -134,7 +133,6 @@ namespace HouseholdAccountBook.Windows
             }
 
             this.InitializeComponent();
-            this.LoadWindowSetting();
 
             this.WVM.RegMode = mode;
         }
@@ -262,8 +260,9 @@ namespace HouseholdAccountBook.Windows
         }
         #endregion
 
+        #region ウィンドウ
         /// <summary>
-        /// フォーム読込完了時
+        /// ウィンドウ読込完了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -346,7 +345,7 @@ WHERE del_flg = 0 AND group_id = @{0};", this.selectedGroupId);
         }
 
         /// <summary>
-        /// フォーム終了時
+        /// ウィンドウ終了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -354,6 +353,7 @@ WHERE del_flg = 0 AND group_id = @{0};", this.selectedGroupId);
         {
             this.SaveWindowSetting();
         }
+        #endregion
 
         /// <summary>
         /// 日付金額リスト追加時
@@ -784,20 +784,19 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", lastActTime, Upda
         /// <summary>
         /// ウィンドウ設定を読み込む
         /// </summary>
-        private void LoadWindowSetting()
+        public void LoadWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (0 <= settings.ActionListRegistrationWindow_Left) {
+            if (settings.App_IsPositionSaved && (-10 <= settings.ActionListRegistrationWindow_Left && 0 <= settings.ActionListRegistrationWindow_Top)) {
                 this.Left = settings.ActionListRegistrationWindow_Left;
-            }
-            if (0 <= settings.ActionListRegistrationWindow_Top) {
                 this.Top = settings.ActionListRegistrationWindow_Top;
             }
-            if (settings.ActionListRegistrationWindow_Width != -1) {
-                this.Width = settings.ActionListRegistrationWindow_Width;
+            else {
+                this.MoveOwnersCenter();
             }
-            if (settings.ActionListRegistrationWindow_Height != -1) {
+            if (settings.ActionListRegistrationWindow_Width != -1 && settings.ActionListRegistrationWindow_Height != -1) {
+                this.Width = settings.ActionListRegistrationWindow_Width;
                 this.Height = settings.ActionListRegistrationWindow_Height;
             }
         }
@@ -805,13 +804,15 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", lastActTime, Upda
         /// <summary>
         /// ウィンドウ設定を保存する
         /// </summary>
-        private void SaveWindowSetting()
+        public void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
             if (this.WindowState == WindowState.Normal) {
-                settings.ActionListRegistrationWindow_Left = this.Left;
-                settings.ActionListRegistrationWindow_Top = this.Top;
+                if (settings.App_IsPositionSaved) {
+                    settings.ActionListRegistrationWindow_Left = this.Left;
+                    settings.ActionListRegistrationWindow_Top = this.Top;
+                }
                 settings.ActionListRegistrationWindow_Width = this.Width;
                 settings.ActionListRegistrationWindow_Height = this.Height;
                 settings.Save();

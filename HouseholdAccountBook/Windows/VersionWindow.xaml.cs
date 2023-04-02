@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using HouseholdAccountBook.Extensions;
+using System;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Navigation;
 
@@ -18,7 +20,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         #region イベントハンドラ
-        #region ウィンドウ
+        #region コマンド
         /// <summary>
         /// ウィンドウを閉じる
         /// </summary>

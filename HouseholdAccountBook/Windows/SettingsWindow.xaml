@@ -410,16 +410,17 @@
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition SharedSizeGroup="Header"/>
+                                    <ColumnDefinition Width="100" SharedSizeGroup="Number"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition SharedSizeGroup="Button"/>
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="個数" Margin="5" VerticalAlignment="Center"/>
-                                <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" MinValue="0" MaxValue="100" Value="{Binding BackUpNum}"/>
+                                <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="0" MaxValue="100" Value="{Binding BackUpNum}"/>
 
                                 <TextBlock Grid.Row="1" Grid.Column="0" Text="フォルダ" Margin="5" VerticalAlignment="Center"/>
-                                <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding BackUpFolderPath}" IsReadOnly="True"/>
-                                <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource BackUpFolderPathDialogCommand}"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" Text="{Binding BackUpFolderPath}" IsReadOnly="True"/>
+                                <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="..." Command="{StaticResource BackUpFolderPathDialogCommand}"/>
 
                                 <TextBlock Grid.Row="2" Grid.Column="0" Text="タイミング" Margin="5"/>
                                 <CheckBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="メインウィンドウ最小化時" IsChecked="{Binding BackUpFlagAtMinimizing}"/>
@@ -434,13 +435,14 @@
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition SharedSizeGroup="Header"/>
+                                    <ColumnDefinition SharedSizeGroup="Number"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition SharedSizeGroup="Button"/>
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="開始月" Margin="5" VerticalAlignment="Center"/>
-                                <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" MinValue="1" MaxValue="12" Value="{Binding StartMonth}"/>
-                                <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Header="国民の祝日" Margin="5">
+                                <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="1" MaxValue="12" Value="{Binding StartMonth}"/>
+                                <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Header="国民の祝日" Margin="5">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
@@ -448,19 +450,36 @@
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition SharedSizeGroup="Header"/>
+                                            <ColumnDefinition SharedSizeGroup="Number"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition SharedSizeGroup="Button"/>
                                         </Grid.ColumnDefinitions>
 
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="URI" Margin="5" VerticalAlignment="Center"/>
-                                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Text="{Binding NationalHolidayCsvURI}"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Margin="5" Text="{Binding NationalHolidayCsvURI}"/>
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" Text="日付位置(0開始)" Margin="5" VerticalAlignment="Center"/>
-                                        <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" MinValue="0" Value="{Binding NationalHolidayCsvDateIndex}"/>
+                                        <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" MinValue="0" Value="{Binding NationalHolidayCsvDateIndex}"/>
                                     </Grid>
                                 </GroupBox>
                             </Grid>
                         </GroupBox>
+                        <GroupBox Header="ウィンドウ">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition SharedSizeGroup="Header"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="保存対象" Margin="5" VerticalAlignment="Center"/>
+                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" Content="メインウィンドウ以外の位置" IsChecked="{Binding IsPositionSaved}" />
+
+                            </Grid>
+                        </GroupBox>
+                        
                         <GroupBox Header="デバッグ">
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -477,7 +496,7 @@
                                 <CheckBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
                                           Content="デバッグモード" IsChecked="{Binding DebugMode}"/>
 
-                                <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Header="ウィンドウ" 
+                                <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Header="ウィンドウ位置・サイズ" 
                                           Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}">
                                     <Grid>
                                         <Grid.RowDefinitions>
@@ -487,8 +506,8 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-
-                                        <DataGrid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding WindowSettingVMList}"
+                                        
+                                        <DataGrid Grid.Row="0" Margin="5" ItemsSource="{Binding WindowSettingVMList}"
                                                   IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
                                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"

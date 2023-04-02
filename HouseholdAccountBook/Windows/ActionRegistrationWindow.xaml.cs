@@ -81,7 +81,6 @@ namespace HouseholdAccountBook.Windows
             this.selectedActionId = null;
 
             this.InitializeComponent();
-            this.LoadWindowSetting();
 
             this.WVM.RegMode = RegistrationMode.Add;
         }
@@ -102,7 +101,6 @@ namespace HouseholdAccountBook.Windows
             this.selectedActionId = null;
 
             this.InitializeComponent();
-            this.LoadWindowSetting();
 
             this.WVM.RegMode = RegistrationMode.Add;
             this.WVM.AddedByCsvComparison = true;
@@ -128,7 +126,6 @@ namespace HouseholdAccountBook.Windows
             }
 
             this.InitializeComponent();
-            this.LoadWindowSetting();
 
             this.WVM.RegMode = mode;
         }
@@ -231,8 +228,9 @@ namespace HouseholdAccountBook.Windows
         }
         #endregion
 
+        #region ウィンドウ
         /// <summary>
-        /// フォーム読込完了時
+        /// ウィンドウ読込完了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -321,7 +319,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
         }
 
         /// <summary>
-        /// フォーム終了時
+        /// ウィンドウ終了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -329,6 +327,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
         {
             this.SaveWindowSetting();
         }
+        #endregion
         #endregion
 
         #region 画面更新用の関数
@@ -795,20 +794,20 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", actTime, Updater,
         /// <summary>
         /// ウィンドウ設定を読み込む
         /// </summary>
-        private void LoadWindowSetting()
+        public void LoadWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (0 <= settings.ActionRegistrationWindow_Left) {
+            if (settings.App_IsPositionSaved && (-10 <= settings.ActionRegistrationWindow_Left && 0 <= settings.ActionRegistrationWindow_Top)) {
                 this.Left = settings.ActionRegistrationWindow_Left;
-            }
-            if (0 <= settings.ActionRegistrationWindow_Top) {
                 this.Top = settings.ActionRegistrationWindow_Top;
             }
-            if (settings.ActionRegistrationWindow_Width != -1) {
-                this.Width = settings.ActionRegistrationWindow_Width;
+            else {
+                this.MoveOwnersCenter();
             }
-            if (settings.ActionRegistrationWindow_Height != -1) {
+
+            if (settings.ActionRegistrationWindow_Width != -1 && settings.ActionRegistrationWindow_Height != -1) {
+                this.Width = settings.ActionRegistrationWindow_Width;
                 this.Height = settings.ActionRegistrationWindow_Height;
             }
         }
@@ -816,13 +815,15 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", actTime, Updater,
         /// <summary>
         /// ウィンドウ設定を保存する
         /// </summary>
-        private void SaveWindowSetting()
+        public void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
             if (this.WindowState == WindowState.Normal) {
-                settings.ActionRegistrationWindow_Left = this.Left;
-                settings.ActionRegistrationWindow_Top = this.Top;
+                if (settings.App_IsPositionSaved) {
+                    settings.ActionRegistrationWindow_Left = this.Left;
+                    settings.ActionRegistrationWindow_Top = this.Top;
+                }
                 settings.ActionRegistrationWindow_Width = this.Width;
                 settings.ActionRegistrationWindow_Height = this.Height;
                 settings.Save();

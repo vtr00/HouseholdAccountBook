@@ -10,9 +10,8 @@
         xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
         mc:Ignorable="d"
         Title="Household Account Book" Height="700" Width="1050"
-        Loaded="MainWindow_Loaded"
-        Closing="MainWindow_Closing"
-        Closed="MainWindow_Closed"
+        Initialized="MainWindow_Initialized" Loaded="MainWindow_Loaded"
+        Closing="MainWindow_Closing" Closed="MainWindow_Closed"
         LocationChanged="MainWindow_LocationChanged"
         StateChanged="MainWindow_StateChanegd"
         SizeChanged="MainWindow_SizeChanged">
@@ -464,7 +463,17 @@
                         </Grid.RowDefinitions>
 
                         <oxy:PlotView Grid.Row="0" Model="{Binding WholeItemDailyGraphModel}" Controller="{Binding Controller}"/>
-                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemDailyGraphModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemDailyGraphModel}" Controller="{Binding Controller}">
+                            <oxy:PlotView.Style>
+                                <Style TargetType="oxy:PlotView">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedGraphKind}" Value="Balance">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </oxy:PlotView.Style>
+                        </oxy:PlotView>
                     </Grid>
                 </Grid>
             </TabItem>
@@ -591,7 +600,17 @@
                         </Grid.RowDefinitions>
 
                         <oxy:PlotView Grid.Row="0" Model="{Binding WholeItemMonthlyGraphModel}" Controller="{Binding Controller}"/>
-                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemMonthlyGraphModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemMonthlyGraphModel}" Controller="{Binding Controller}">
+                            <oxy:PlotView.Style>
+                                <Style TargetType="oxy:PlotView">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedGraphKind}" Value="Balance">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </oxy:PlotView.Style>
+                        </oxy:PlotView>
                     </Grid>
                 </Grid>
             </TabItem>
@@ -705,7 +724,17 @@
                         </Grid.RowDefinitions>
 
                         <oxy:PlotView Grid.Row="0" Model="{Binding WholeItemYearlyGraphModel}" Controller="{Binding Controller}"/>
-                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemYearlyGraphModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemYearlyGraphModel}" Controller="{Binding Controller}">
+                            <oxy:PlotView.Style>
+                                <Style TargetType="oxy:PlotView">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedGraphKind}" Value="Balance">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </oxy:PlotView.Style>
+                        </oxy:PlotView>
                     </Grid>
                 </Grid>
             </TabItem>

@@ -97,7 +97,6 @@ namespace HouseholdAccountBook.Windows
             this.LastHeight = this.Height;
 
             this.LogWindowStateAndLocation("Constructor");
-            this.LoadWindowSetting();
         }
 
         #region イベントハンドラ
@@ -606,7 +605,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         }
 
         /// <summary>
-        /// 移動処理
+        /// 移動登録ウィンドウを開く
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -614,6 +613,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         {
             this.mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
+            this.mrw.LoadWindowSetting();
+
             // 登録時イベントを登録する
             this.mrw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
@@ -640,7 +641,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         }
 
         /// <summary>
-        /// 項目追加処理
+        /// 項目追加ウィンドウを開く
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -648,6 +649,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         {
             this.arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
+            this.arw.LoadWindowSetting();
+
             // 登録時イベントを登録する
             this.arw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
@@ -663,7 +666,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         }
 
         /// <summary>
-        /// 項目まとめて追加可能か
+        /// 項目リスト追加可能か
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -674,7 +677,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         }
 
         /// <summary>
-        /// 項目まとめて追加処理
+        /// 項目リスト追加ウィンドウを開く
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -682,6 +685,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         {
             this.alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
+            this.alrw.LoadWindowSetting();
+
             // 登録時イベントを登録する
             this.alrw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
@@ -709,7 +714,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         }
 
         /// <summary>
-        /// 項目編集処理
+        /// 項目編集ウィンドウを開く
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -733,6 +738,8 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 case (int)GroupKind.Move:
                     // 移動の編集時の処理
                     this.mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
+                    this.mrw.LoadWindowSetting();
+
                     // 登録時イベントを登録する
                     this.mrw.Registrated += async (sender2, e2) => {
                         // 帳簿一覧タブを更新する
@@ -749,6 +756,8 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 case (int)GroupKind.ListReg:
                     // リスト登録された帳簿項目の編集時の処理
                     this.alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
+                    this.alrw.LoadWindowSetting();
+
                     // 登録時イベントを登録する
                     this.alrw.Registrated += async (sender2, e2) => {
                         // 帳簿一覧タブを更新する
@@ -766,6 +775,8 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 default:
                     // 移動・リスト登録以外の帳簿項目の編集時の処理
                     this.arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId) { Owner = this };
+                    this.arw.LoadWindowSetting();
+
                     // 登録時イベントを登録する
                     this.arw.Registrated += async (sender2, e2) => {
                         // 帳簿一覧タブを更新する
@@ -795,7 +806,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         }
 
         /// <summary>
-        /// 項目複製処理
+        /// 項目複製ウィンドウを開く
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -818,6 +829,8 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
             if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
                 // 移動以外の帳簿項目の複製時の処理
                 this.arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId, RegistrationMode.Copy) { Owner = this };
+                this.arw.LoadWindowSetting();
+
                 // 登録時イベントを登録する
                 this.arw.Registrated += async (sender2, e2) => {
                     // 帳簿一覧タブを更新する
@@ -833,6 +846,8 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
             else {
                 // 移動の複製時の処理
                 this.mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationMode.Copy) { Owner = this };
+                this.mrw.LoadWindowSetting();
+
                 // 登録時イベントを登録する
                 this.mrw.Registrated += async (sender2, e2) => {
                     // 帳簿一覧タブを更新する
@@ -860,7 +875,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         }
 
         /// <summary>
-        /// 項目削除処理
+        /// 項目削除
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -946,7 +961,7 @@ WHERE group_id = @{0} AND del_flg = 0;", groupId, Updater);
         }
 
         /// <summary>
-        /// CSV一致チェック処理
+        /// CSV一致チェック
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1099,7 +1114,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             this.Cursor = null;
         }
 
-        #region 月間表示
+        #region 帳簿表示
         /// <summary>
         /// 先月を表示可能か
         /// </summary>
@@ -1196,7 +1211,6 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         private async void OpenSelectingDailyTermWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             TermWindow stw = null;
-
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
                     stw = new TermWindow(this.WVM.DisplayedMonth.Value) { Owner = this };
@@ -1205,6 +1219,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                     stw = new TermWindow(this.WVM.StartDate, this.WVM.EndDate) { Owner = this };
                     break;
             }
+            stw.LoadWindowSetting();
 
             if (stw.ShowDialog() == true) {
                 this.Cursor = Cursors.Wait;
@@ -1332,6 +1347,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         private async void OpenSettingsWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             SettingsWindow sw = new SettingsWindow(this.builder) { Owner = this };
+            sw.LoadWindowSetting();
+
             if (sw.ShowDialog() == true) {
                 this.Cursor = Cursors.Wait;
 
@@ -1362,6 +1379,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         private void OpenCsvComparisonWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.ccw = new CsvComparisonWindow(this.builder, this.WVM.SelectedBookVM.Id) { Owner = this };
+            this.ccw.LoadWindowSetting();
+
             // 帳簿項目の一致を確認時のイベントを登録する
             this.ccw.IsMatchChanged += async (sender2, e2) => {
                 ActionViewModel vm = this.WVM.ActionVMList.FirstOrDefault((tmpVM) => { return tmpVM.ActionId == e2.Value; });
@@ -1407,12 +1426,24 @@ WHERE action_id = @{0};", vm.ActionId);
         private void OpenVersionWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             VersionWindow vw = new VersionWindow { Owner = this };
+            vw.MoveOwnersCenter();
+
             vw.ShowDialog();
         }
         #endregion
         #endregion
 
         #region ウィンドウ
+        /// <summary>
+        /// ウィンドウ初期化完了時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainWindow_Initialized(object sender, EventArgs e)
+        {
+            this.LoadWindowSetting();
+        }
+
         /// <summary>
         /// ウィンドウ読込完了時
         /// </summary>
@@ -3088,11 +3119,11 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// <summary>
         /// ウィンドウ設定を読み込む
         /// </summary>
-        private void LoadWindowSetting()
+        public void LoadWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (0 <= settings.MainWindow_Left && 0 <= settings.MainWindow_Top) {
+            if (-10 <= settings.MainWindow_Left && 0 <= settings.MainWindow_Top) {
                 this.Left = settings.MainWindow_Left;
                 this.Top = settings.MainWindow_Top;
             }
@@ -3110,17 +3141,19 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// <summary>
         /// ウィンドウ設定を保存する
         /// </summary>
-        private void SaveWindowSetting()
+        public void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
             if (!settings.App_InitSizeFlag) {
                 if (this.WindowState != WindowState.Minimized) {
                     settings.MainWindow_WindowState = (int)this.WindowState;
                 }
-                settings.MainWindow_Left = this.Left;
-                settings.MainWindow_Top = this.Top;
-                settings.MainWindow_Width = this.Width;
-                settings.MainWindow_Height = this.Height;
+                if (this.WindowState == WindowState.Normal) {
+                    settings.MainWindow_Left = this.Left;
+                    settings.MainWindow_Top = this.Top;
+                    settings.MainWindow_Width = this.Width;
+                    settings.MainWindow_Height = this.Height;
+                }
 
                 settings.Save();
             }

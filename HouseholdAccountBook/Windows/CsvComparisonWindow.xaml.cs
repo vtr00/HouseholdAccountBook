@@ -66,8 +66,6 @@ namespace HouseholdAccountBook.Windows
             this.selectedBookId = selectedBookId;
 
             this.InitializeComponent();
-
-            this.LoadWindowSetting();
         }
 
         #region イベントハンドラ
@@ -93,7 +91,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// CSVファイルオープン処理
+        /// CSVファイルを開く
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -173,7 +171,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// 項目追加処理
+        /// 項目追加ウィンドウを開く
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -183,6 +181,8 @@ namespace HouseholdAccountBook.Windows
             if (vmList.Count() == 1) {
                 CsvComparisonViewModel.CsvRecord record = vmList[0];
                 ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, record) { Owner = this };
+                arw.LoadWindowSetting();
+
                 arw.Registrated += async (sender2, e2) => {
                     foreach (int value in e2.Value) {
                         await this.ChangeIsMatchAsync(value, true);
@@ -194,6 +194,8 @@ namespace HouseholdAccountBook.Windows
             }
             else {
                 ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, vmList) { Owner = this };
+                alrw.LoadWindowSetting();
+
                 alrw.Registrated += async (sender2, e2) => {
                     foreach (int value in e2.Value) {
                         await this.ChangeIsMatchAsync(value, true);
@@ -217,13 +219,15 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// 項目編集処理
+        /// 項目編集ウィンドウを開く
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void EditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedCsvComparisonVM.ActionId.Value) { Owner = this };
+            arw.LoadWindowSetting();
+
             arw.Registrated += async (sender2, e2) => {
                 await this.UpdateComparisonInfoAsync();
                 this.ActionsStatusChanged?.Invoke(this, new EventArgs());
@@ -245,7 +249,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// 項目追加/編集処理
+        /// 項目追加/編集ウィンドウを開く
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -376,8 +380,9 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         }
         #endregion
 
+        #region ウィンドウ
         /// <summary>
-        /// フォーム読込完了時
+        /// ウィンドウ読込完了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -393,7 +398,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         }
 
         /// <summary>
-        /// フォーム終了時
+        /// ウィンドウ終了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -401,6 +406,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         {
             this.SaveWindowSetting();
         }
+        #endregion
 
         /// <summary>
         /// DataGridスクロール時
@@ -530,20 +536,20 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         /// <summary>
         /// ウィンドウ設定を読み込む
         /// </summary>
-        private void LoadWindowSetting()
+        public void LoadWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (0 <= settings.CsvComparisonWindow_Left) {
+            if (settings.App_IsPositionSaved && (-10 <= settings.CsvComparisonWindow_Left && 0 <= settings.CsvComparisonWindow_Top)) {
                 this.Left = settings.CsvComparisonWindow_Left;
-            }
-            if (0 <= settings.CsvComparisonWindow_Top) {
                 this.Top = settings.CsvComparisonWindow_Top;
             }
-            if (settings.CsvComparisonWindow_Width != -1) {
-                this.Width = settings.CsvComparisonWindow_Width;
+            else {
+                this.MoveOwnersCenter();
             }
-            if (settings.CsvComparisonWindow_Height != -1) {
+
+            if (settings.CsvComparisonWindow_Width != -1 && settings.CsvComparisonWindow_Height != -1) {
+                this.Width = settings.CsvComparisonWindow_Width;
                 this.Height = settings.CsvComparisonWindow_Height;
             }
         }
@@ -551,14 +557,19 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         /// <summary>
         /// ウィンドウ設定を保存する
         /// </summary>
-        private void SaveWindowSetting()
+        public void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            settings.CsvComparisonWindow_Left = this.Left;
-            settings.CsvComparisonWindow_Top = this.Top;
-            settings.CsvComparisonWindow_Width = this.Width;
-            settings.CsvComparisonWindow_Height = this.Height;
-            settings.Save();
+
+            if (this.WindowState == WindowState.Normal) {
+                if (settings.App_IsPositionSaved) {
+                    settings.CsvComparisonWindow_Left = this.Left;
+                    settings.CsvComparisonWindow_Top = this.Top;
+                }
+                settings.CsvComparisonWindow_Width = this.Width;
+                settings.CsvComparisonWindow_Height = this.Height;
+                settings.Save();
+            }
         }
         #endregion
 

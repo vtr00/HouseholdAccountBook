@@ -19,7 +19,6 @@ namespace HouseholdAccountBook.Windows
         public TermWindow(DateTime startDate, DateTime endDate)
         {
             this.InitializeComponent();
-            this.LoadWindowSetting();
 
             this.WVM.StartDate = startDate;
             this.WVM.EndDate = endDate;
@@ -33,7 +32,6 @@ namespace HouseholdAccountBook.Windows
         public TermWindow(DateTime dateWithinMonth)
         {
             this.InitializeComponent();
-            this.LoadWindowSetting();
 
             this.WVM.StartDate = dateWithinMonth.GetFirstDateOfMonth();
             this.WVM.EndDate = this.WVM.StartDate.AddMonths(1).AddMilliseconds(-1);
@@ -107,27 +105,30 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// ウィンドウ設定を読み込む
         /// </summary>
-        private void LoadWindowSetting()
+        public void LoadWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (0 <= settings.TermWindow_Left) {
+            if (settings.App_IsPositionSaved && (0 <= settings.TermWindow_Left && 0 <= settings.TermWindow_Top)) {
                 this.Left = settings.TermWindow_Left;
-            }
-            if (0 <= settings.TermWindow_Top) {
                 this.Top = settings.TermWindow_Top;
+            }
+            else {
+                this.MoveOwnersCenter();
             }
         }
 
         /// <summary>
         /// ウィンドウ設定を保存する
         /// </summary>
-        private void SaveWindowSetting()
+        public void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            settings.TermWindow_Left = this.Left;
-            settings.TermWindow_Top = this.Top;
+            if (settings.App_IsPositionSaved) {
+                settings.TermWindow_Left = this.Left;
+                settings.TermWindow_Top = this.Top;
+            }
             settings.Save();
         }
         #endregion

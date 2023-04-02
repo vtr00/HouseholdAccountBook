@@ -93,7 +93,6 @@ namespace HouseholdAccountBook.Windows
             this.groupId = null;
 
             this.InitializeComponent();
-            this.LoadWindowSetting();
 
             this.WVM.RegMode = RegistrationMode.Add;
         }
@@ -121,7 +120,6 @@ namespace HouseholdAccountBook.Windows
             }
 
             this.InitializeComponent();
-            this.LoadWindowSetting();
 
             this.WVM.RegMode = mode;
         }
@@ -200,8 +198,9 @@ namespace HouseholdAccountBook.Windows
         }
         #endregion
 
+        #region ウィンドウ
         /// <summary>
-        /// フォーム読込完了時
+        /// ウィンドウ読込完了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -298,7 +297,7 @@ ORDER BY move_flg DESC;", this.groupId);
         }
 
         /// <summary>
-        /// フォーム終了時
+        /// ウィンドウ終了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -306,6 +305,7 @@ ORDER BY move_flg DESC;", this.groupId);
         {
             this.SaveWindowSetting();
         }
+        #endregion
         #endregion
 
         #region 画面更新用の関数
@@ -622,20 +622,20 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", fromDate > toDate
         /// <summary>
         /// ウィンドウ設定を読み込む
         /// </summary>
-        private void LoadWindowSetting()
+        public void LoadWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (0 <= settings.MoveRegistrationWindow_Left) {
+            if (settings.App_IsPositionSaved && (-10 <= settings.MoveRegistrationWindow_Left && 0 <= settings.MoveRegistrationWindow_Top)) {
                 this.Left = settings.MoveRegistrationWindow_Left;
-            }
-            if (0 <= settings.MoveRegistrationWindow_Top) {
                 this.Top = settings.MoveRegistrationWindow_Top;
             }
-            if (settings.MoveRegistrationWindow_Width != -1) {
-                this.Width = settings.MoveRegistrationWindow_Width;
+            else {
+                this.MoveOwnersCenter();
             }
-            if (settings.MoveRegistrationWindow_Height != -1) {
+
+            if (settings.MoveRegistrationWindow_Width != -1 && settings.MoveRegistrationWindow_Height != -1) {
+                this.Width = settings.MoveRegistrationWindow_Width;
                 this.Height = settings.MoveRegistrationWindow_Height;
             }
         }
@@ -643,13 +643,15 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", fromDate > toDate
         /// <summary>
         /// ウィンドウ設定を保存する
         /// </summary>
-        private void SaveWindowSetting()
+        public void SaveWindowSetting()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
             if (this.WindowState == WindowState.Normal) {
-                settings.MoveRegistrationWindow_Left = this.Left;
-                settings.MoveRegistrationWindow_Top = this.Top;
+                if (settings.App_IsPositionSaved) {
+                    settings.MoveRegistrationWindow_Left = this.Left;
+                    settings.MoveRegistrationWindow_Top = this.Top;
+                }
                 settings.MoveRegistrationWindow_Width = this.Width;
                 settings.MoveRegistrationWindow_Height = this.Height;
                 settings.Save();

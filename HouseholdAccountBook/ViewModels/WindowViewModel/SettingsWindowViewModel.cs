@@ -277,6 +277,26 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// ウィンドウ位置を保存するか
+        /// </summary>
+        #region IsPositionSaved
+        public bool IsPositionSaved
+        {
+            get => this._IsPositionSaved;
+            set {
+                if (this.SetProperty(ref this._IsPositionSaved, value) && this.WithSave) {
+                    this.settings.App_IsPositionSaved = value;
+                    this.settings.Save();
+
+                    App app = System.Windows.Application.Current as App;
+                    app.RegisterSettingsToResource();
+                }
+            }
+        }
+        private bool _IsPositionSaved = default;
+        #endregion
+
+        /// <summary>
         /// ウィンドウ設定
         /// </summary>
         #region WindowSettingVMList
@@ -314,7 +334,10 @@ namespace HouseholdAccountBook.ViewModels
             this.StartMonth = this.settings.App_StartMonth;
             this.NationalHolidayCsvURI = this.settings.App_NationalHolidayCsv_Uri;
             this.NationalHolidayCsvDateIndex = this.settings.App_NationalHolidayCsv_DateIndex;
+
             this.DebugMode = this.settings.App_IsDebug;
+            this.IsPositionSaved = this.settings.App_IsPositionSaved;
+
             this.WithSave = true;
 
             this.LoadWindowSetting();
