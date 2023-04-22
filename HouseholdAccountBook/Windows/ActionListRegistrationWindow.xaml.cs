@@ -788,16 +788,17 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", lastActTime, Upda
         {
             Properties.Settings settings = Properties.Settings.Default;
 
+            if (settings.ActionListRegistrationWindow_Width != -1 && settings.ActionListRegistrationWindow_Height != -1) {
+                this.Width = settings.ActionListRegistrationWindow_Width;
+                this.Height = settings.ActionListRegistrationWindow_Height;
+            }
+
             if (settings.App_IsPositionSaved && (-10 <= settings.ActionListRegistrationWindow_Left && 0 <= settings.ActionListRegistrationWindow_Top)) {
                 this.Left = settings.ActionListRegistrationWindow_Left;
                 this.Top = settings.ActionListRegistrationWindow_Top;
             }
             else {
                 this.MoveOwnersCenter();
-            }
-            if (settings.ActionListRegistrationWindow_Width != -1 && settings.ActionListRegistrationWindow_Height != -1) {
-                this.Width = settings.ActionListRegistrationWindow_Width;
-                this.Height = settings.ActionListRegistrationWindow_Height;
             }
         }
 

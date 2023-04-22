@@ -9,8 +9,8 @@
     <Application.Resources>
         <!-- コンバータ -->
         <converters:DateTimeToDayOfWeekConverter x:Key="DateTimeToDayOfWeekConverter"/>
-        <converters:DateTimeToDisplayedMonthConverter x:Key="DateTimeToThisMonthConverter"/>
-        <converters:DateTimeToDisplayedYearConverter x:Key="DateTimeToThisYearConverter"/>
+        <converters:DateTimeToDisplayedMonthConverter x:Key="DateTimeToDisplayedMonthConverter"/>
+        <converters:DateTimeToDisplayedYearConverter x:Key="DateTimeToDisplayedYearConverter"/>
         <converters:DateTimeToIsNationalHolidayConverter x:Key="DateTimeToIsNationalHolidayConverter"/>
         <converters:IntToMoneyDisplayConverter x:Key="IntToMoneyDisplayConverter"/>
         <converters:NegationConverter x:Key="NegationConverter"/>

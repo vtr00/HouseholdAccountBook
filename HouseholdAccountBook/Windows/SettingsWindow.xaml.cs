@@ -37,9 +37,9 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         private SettingsTabs oldSelectedSettingsTab = SettingsTabs.ItemSettingsTab;
         /// <summary>
-        /// DBに保存されたか
+        /// 表示更新の必要があるか
         /// </summary>
-        private bool IsSaved = false;
+        private bool needToUpdate = false;
         #endregion
 
         /// <summary>
@@ -103,7 +103,7 @@ RETURNING category_id;", (int)kind, Updater, Inserter);
                 });
             }
             await this.UpdateItemSettingsTabDataAsync(HierarchicalKind.Category, categoryId);
-            this.IsSaved = true;
+            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ RETURNING item_id;", categoryId, Updater, Inserter);
                 });
             }
             await this.UpdateItemSettingsTabDataAsync(HierarchicalKind.Item, itemId);
-            this.IsSaved = true;
+            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ WHERE item_id = @{1};", Updater, id);
                 }
             }
             await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM.ParentVM.Kind, this.WVM.SelectedItemVM.ParentVM.Id);
-            this.IsSaved = true;
+            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -316,7 +316,7 @@ WHERE item_id = @{2};", toCategoryId, Updater, changingId);
             }
 
             await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
-            this.IsSaved = true;
+            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -455,7 +455,7 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
             }
 
             await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
-            this.IsSaved = true;
+            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -499,7 +499,7 @@ WHERE item_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
             }
 
             MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
-            this.IsSaved = true;
+            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -548,7 +548,7 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                     }
                 });
             }
-            this.IsSaved = true;
+            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -657,7 +657,7 @@ RETURNING book_id;", Updater, Inserter);
             }
 
             await this.UpdateBookSettingTabDataAsync(bookId);
-            this.IsSaved = true;
+            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -696,7 +696,7 @@ WHERE book_id = @{1};", Updater, this.WVM.SelectedBookVM.Id);
             }
 
             await this.UpdateBookSettingTabDataAsync();
-            this.IsSaved = true;
+            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -749,7 +749,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             }
 
             await this.UpdateBookSettingTabDataAsync(changingId);
-            this.IsSaved = true;
+            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -802,7 +802,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             }
 
             await this.UpdateBookSettingTabDataAsync(changingId);
-            this.IsSaved = true;
+            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -838,7 +838,7 @@ WHERE book_id = @{7};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.S
             }
 
             MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
-            this.IsSaved = true;
+            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -885,7 +885,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                     }
                 });
             }
-            this.IsSaved = true;
+            this.needToUpdate = true;
         }
         #endregion
 
@@ -955,9 +955,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 Properties.Settings.Default.App_InitFlag = true;
                 Properties.Settings.Default.Save();
 
-                ((App)Application.Current).ReleaseMutex();
-                Process.Start(Application.ResourceAssembly.Location);
-                Application.Current.Shutdown();
+                ((App)Application.Current).Restart();
             }
         }
 
@@ -1058,9 +1056,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 settings.App_InitSizeFlag = true;
                 settings.Save();
 
-                ((App)Application.Current).ReleaseMutex();
-                Process.Start(Application.ResourceAssembly.Location);
-                Application.Current.Shutdown();
+                ((App)Application.Current).Restart();
             }
         }
         #endregion
@@ -1084,7 +1080,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void SettingsWindow_Closing(object sender, CancelEventArgs e)
         {
-            this.DialogResult = this.IsSaved;
+            this.DialogResult = this.needToUpdate || this.WVM.NeedToUpdate;
         }
 
         /// <summary>
@@ -1473,17 +1469,17 @@ ORDER BY I.sort_order;", vm.Id);
         {
             Properties.Settings settings = Properties.Settings.Default;
 
+            if (settings.SettingsWindow_Height != -1 && settings.SettingsWindow_Width != -1) {
+                this.Height = settings.SettingsWindow_Height;
+                this.Width = settings.SettingsWindow_Width;
+            }
+
             if (settings.App_IsPositionSaved && (-10 <= settings.SettingsWindow_Left && 0 <= settings.SettingsWindow_Top)) {
                 this.Left = settings.SettingsWindow_Left;
                 this.Top = settings.SettingsWindow_Top;
             }
             else {
                 this.MoveOwnersCenter();
-            }
-
-            if (settings.SettingsWindow_Height != -1 && settings.SettingsWindow_Width != -1) {
-                this.Height = settings.SettingsWindow_Height;
-                this.Width = settings.SettingsWindow_Width;
             }
         }
 

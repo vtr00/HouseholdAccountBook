@@ -15,7 +15,13 @@ namespace HouseholdAccountBook.Converters
                 return null;
             }
             else if (value is DateTime dateTime) {
-                return dateTime.ToString("yyyy年");
+                Properties.Settings settings = Properties.Settings.Default;
+                if (settings.App_StartMonth == 1) {
+                    return dateTime.ToString("yyyy");
+                } else {
+                    return "'" + dateTime.ToString("yyyy");
+                }
+
             }
             throw new NotImplementedException();
         }

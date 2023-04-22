@@ -235,5 +235,15 @@ namespace HouseholdAccountBook
             }
 #endif
         }
+
+        /// <summary>
+        /// アプリケーションを再起動する
+        /// </summary>
+        public void Restart()
+        {
+            ReleaseMutex();
+            Process.Start(Application.ResourceAssembly.Location);
+            Shutdown();
+        }
     }
 }

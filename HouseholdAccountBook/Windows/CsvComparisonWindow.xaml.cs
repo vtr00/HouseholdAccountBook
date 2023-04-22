@@ -540,17 +540,17 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         {
             Properties.Settings settings = Properties.Settings.Default;
 
+            if (settings.CsvComparisonWindow_Width != -1 && settings.CsvComparisonWindow_Height != -1) {
+                this.Width = settings.CsvComparisonWindow_Width;
+                this.Height = settings.CsvComparisonWindow_Height;
+            }
+
             if (settings.App_IsPositionSaved && (-10 <= settings.CsvComparisonWindow_Left && 0 <= settings.CsvComparisonWindow_Top)) {
                 this.Left = settings.CsvComparisonWindow_Left;
                 this.Top = settings.CsvComparisonWindow_Top;
             }
             else {
                 this.MoveOwnersCenter();
-            }
-
-            if (settings.CsvComparisonWindow_Width != -1 && settings.CsvComparisonWindow_Height != -1) {
-                this.Width = settings.CsvComparisonWindow_Width;
-                this.Height = settings.CsvComparisonWindow_Height;
             }
         }
 

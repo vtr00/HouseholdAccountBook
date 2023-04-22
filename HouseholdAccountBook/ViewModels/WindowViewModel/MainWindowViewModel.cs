@@ -359,24 +359,13 @@ namespace HouseholdAccountBook.ViewModels
                 DateTime oldDisplayedYear = this._DisplayedYear;
                 if (this.SetProperty(ref this._DisplayedYear, value)) {
                     if (!this.onUpdateDisplayedDate) {
+                        this.onUpdateDisplayedDate = true;
                         int startMonth = Properties.Settings.Default.App_StartMonth;
                         int yearDiff = value.GetFirstDateOfFiscalYear(startMonth).Year - oldDisplayedYear.GetFirstDateOfFiscalYear(startMonth).Year;
-                        this.onUpdateDisplayedDate = true;
+
                         if (this.DisplayedMonth != null) {
                             // 表示年の差分を表示月に反映する
                             this.DisplayedMonth = this.DisplayedMonth.Value.AddYears(yearDiff);
-                            // 同年度中の未来の月の場合には、表示月を今日にする
-                            if (this.DisplayedMonth > DateTime.Now &&
-                               this.DisplayedMonth.Value.GetFirstDateOfFiscalYear(startMonth).Year == DateTime.Now.GetFirstDateOfFiscalYear(startMonth).Year) {
-                                this.DisplayedMonth = DateTime.Now;
-                            }
-                        }
-                        else {
-                            this.DisplayedMonth = value.GetFirstDateOfFiscalYear(startMonth);
-                            // 同年度中の月の場合には、表示月を今日にする
-                            if (this.DisplayedMonth.Value.GetFirstDateOfFiscalYear(startMonth).Year == DateTime.Now.GetFirstDateOfFiscalYear(startMonth).Year) {
-                                this.DisplayedMonth = DateTime.Now;
-                            }
                         }
                         this.onUpdateDisplayedDate = false;
                     }
@@ -390,50 +379,75 @@ namespace HouseholdAccountBook.ViewModels
         /// 表示月リスト(月別一覧の月)
         /// </summary>
         #region DisplayedMonths
-        public ObservableCollection<string> DisplayedMonths
+        public ObservableCollection<DateTime> DisplayedMonths
         {
             get => this._DisplayedMonths;
             set => this.SetProperty(ref this._DisplayedMonths, value);
         }
-        private ObservableCollection<string> _DisplayedMonths = default;
+        private ObservableCollection<DateTime> _DisplayedMonths = default;
         #endregion
 
         /// <summary>
-        /// 月別概要VMリスト
+        /// 月別系列VMリスト
         /// </summary>
-        #region MonthlySummaryVMList
-        public ObservableCollection<SeriesViewModel> MonthlySummaryVMList
+        #region MonthlySeriesVMList
+        public ObservableCollection<SeriesViewModel> MonthlySeriesVMList
         {
-            get => this._MonthlySummaryVMList;
-            set => this.SetProperty(ref this._MonthlySummaryVMList, value);
+            get => this._MonthlySeriesVMList;
+            set => this.SetProperty(ref this._MonthlySeriesVMList, value);
         }
-        private ObservableCollection<SeriesViewModel> _MonthlySummaryVMList = default;
+        private ObservableCollection<SeriesViewModel> _MonthlySeriesVMList = default;
         #endregion
+
+        /// <summary>
+        /// 選択された月別系列VM
+        /// </summary>
+        #region SelectedMonthlySeriesVM
+        public SeriesViewModel SelectedMonthlySeriesVM
+        {
+            get => this._SelectedMonthlySeriesVM;
+            set => this.SetProperty(ref this._SelectedMonthlySeriesVM, value);
+        }
+        private SeriesViewModel _SelectedMonthlySeriesVM = default;
+        #endregion
+
         #endregion
 
         #region 年別一覧タブ
         /// <summary>
-        /// 表示年リスト
+        /// 表示年リスト(年別一覧の年)
         /// </summary>
         #region DisplayedYears
-        public ObservableCollection<string> DisplayedYears
+        public ObservableCollection<DateTime> DisplayedYears
         {
             get => this._DisplayedYears;
             set => this.SetProperty(ref this._DisplayedYears, value);
         }
-        private ObservableCollection<string> _DisplayedYears = default;
+        private ObservableCollection<DateTime> _DisplayedYears = default;
         #endregion
 
         /// <summary>
-        /// 年別概要VMリスト
+        /// 年別系列VMリスト
         /// </summary>
-        #region YearlySummaryVMList
-        public ObservableCollection<SeriesViewModel> YearlySummaryVMList
+        #region YearlySeriesVMList
+        public ObservableCollection<SeriesViewModel> YearlySeriesVMList
         {
-            get => this._YearlySummaryVMList;
-            set => this.SetProperty(ref this._YearlySummaryVMList, value);
+            get => this._YearlySeriesVMList;
+            set => this.SetProperty(ref this._YearlySeriesVMList, value);
         }
-        private ObservableCollection<SeriesViewModel> _YearlySummaryVMList = default;
+        private ObservableCollection<SeriesViewModel> _YearlySeriesVMList = default;
+        #endregion
+
+        /// <summary>
+        /// 選択された年別系列VM
+        /// </summary>
+        #region SelectedYearlySummaryVM
+        public SeriesViewModel SelectedYearlySeriesVM
+        {
+            get => this._SelectedYearlySeriesVM;
+            set => this.SetProperty(ref this._SelectedYearlySeriesVM, value);
+        }
+        private SeriesViewModel _SelectedYearlySeriesVM = default;
         #endregion
         #endregion
 
@@ -630,6 +644,14 @@ namespace HouseholdAccountBook.ViewModels
         {
             this.SelectedActionVMList = new ObservableCollection<ActionViewModel>();
             this.Controller.BindMouseEnter(PlotCommands.HoverPointsOnlyTrack);
+        }
+
+        /// <summary>
+        /// 表示年変更を通知する
+        /// </summary>
+        public void RaiseDisplayedYearChanged()
+        {
+            this.RaisePropertyChanged(nameof(DisplayedYear));
         }
 
         /// <summary>

@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
@@ -980,6 +981,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         #endregion
 
         #region 表示
+        #region タブ切替
         /// <summary>
         /// 帳簿タブ表示可能か
         /// </summary>
@@ -1099,20 +1101,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         {
             this.WVM.SelectedTab = Tabs.YearlyGraphTab;
         }
-
-        /// <summary>
-        /// 画面表示を更新する
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            this.Cursor = Cursors.Wait;
-
-            await this.UpdateAsync();
-
-            this.Cursor = null;
-        }
+        #endregion
 
         #region 帳簿表示
         /// <summary>
@@ -1315,6 +1304,20 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             this.Cursor = null;
         }
         #endregion
+
+        /// <summary>
+        /// 画面表示を更新する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.Cursor = Cursors.Wait;
+
+            await this.UpdateAsync();
+
+            this.Cursor = null;
+        }
         #endregion
 
         #region ツール
@@ -1353,8 +1356,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 this.Cursor = Cursors.Wait;
 
                 await this.UpdateBookListAsync();
-
                 await this.UpdateAsync();
+                this.WVM.RaiseDisplayedYearChanged();
 
                 this.Cursor = null;
             }
@@ -1469,6 +1472,7 @@ WHERE action_id = @{0};", vm.ActionId);
 
             // イベントハンドラ設定
             this.WVM.SelectedTabChanged += async () => {
+                Cursor lastCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
 
                 settings.MainWindow_SelectedTabIndex = this.WVM.SelectedTabIndex;
@@ -1476,9 +1480,10 @@ WHERE action_id = @{0};", vm.ActionId);
 
                 await this.UpdateAsync(isScroll: true);
 
-                this.Cursor = null;
+                this.Cursor = lastCursor;
             };
             this.WVM.SelectedBookChanged += async () => {
+                Cursor lastCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
 
                 settings.MainWindow_SelectedBookId = this.WVM.SelectedBookVM.Id ?? -1;
@@ -1486,9 +1491,10 @@ WHERE action_id = @{0};", vm.ActionId);
 
                 await this.UpdateAsync(isScroll: true);
 
-                this.Cursor = null;
+                this.Cursor = lastCursor;
             };
             this.WVM.SelectedGraphKindChanged += async () => {
+                Cursor lastCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
 
                 settings.MainWindow_SelectedGraphKindIndex = this.WVM.SelectedGraphKindIndex;
@@ -1496,7 +1502,7 @@ WHERE action_id = @{0};", vm.ActionId);
 
                 await this.UpdateAsync();
 
-                this.Cursor = null;
+                this.Cursor = lastCursor;
             };
 
             this.LogWindowStateAndLocation("Loaded");
@@ -1606,6 +1612,54 @@ WHERE action_id = @{0};", vm.ActionId);
             }
         }
         #endregion
+
+        /// <summary>
+        /// 月別一覧ダブルクリック時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MonthlyListDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (this.WVM.SelectedTab != Tabs.MonthlyListTab) return;
+
+            if (e.MouseDevice.DirectlyOver is FrameworkElement fe) {
+                if (fe.Parent is DataGridCell cell) {
+                    int col = cell.Column.DisplayIndex;
+                    
+                    if (1 <= col && col <= 12) {
+                        // 選択された月の帳簿タブを開く
+                        this.WVM.DisplayedMonth = this.WVM.DisplayedYear.AddMonths(col - 1);
+                        this.WVM.SelectedTab = Tabs.BooksTab;
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 年別一覧ダブルクリック時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void YearlyListDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (this.WVM.SelectedTab != Tabs.YearlyListTab) return;
+
+            if (e.MouseDevice.DirectlyOver is FrameworkElement fe) {
+                if (fe.Parent is DataGridCell cell) {
+                    int col = cell.Column.DisplayIndex;
+
+                    if (1 <= col && col <= 10) {
+                        // 選択された年の月別一覧タブを開く
+                        Properties.Settings settings = Properties.Settings.Default;
+
+                        this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).AddYears(col - 10);
+                        this.WVM.SelectedTab = Tabs.MonthlyListTab;
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
         #endregion
 
         #region 画面更新用の関数
@@ -1943,27 +1997,27 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         }
 
         /// <summary>
-        /// 月内日別概要VMリストを取得する(日別グラフタブ)
+        /// 月内日別系列VMリストを取得する(日別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">月内の時間</param>
-        /// <returns>月内日別概要VMリスト</returns>
-        private async Task<ObservableCollection<SeriesViewModel>> LoadDailySummaryViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
+        /// <returns>月内日別系列VMリスト</returns>
+        private async Task<ObservableCollection<SeriesViewModel>> LoadDailySeriesViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
         {
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.AddMonths(1).AddMilliseconds(-1);
 
-            return await this.LoadDailySummaryViewModelListAsync(bookId, startTime, endTime);
+            return await this.LoadDailySeriesViewModelListAsync(bookId, startTime, endTime);
         }
 
         /// <summary>
-        /// 期間内日別概要VMリストを取得する(日別グラフタブ)
+        /// 期間内日別系列VMリストを取得する(日別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="startTime">開始時刻</param>
         /// <param name="endTime">終了時刻</param>
-        /// <returns>日別概要VMリスト</returns>
-        private async Task<ObservableCollection<SeriesViewModel>> LoadDailySummaryViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
+        /// <returns>日別系列VMリスト</returns>
+        private async Task<ObservableCollection<SeriesViewModel>> LoadDailySeriesViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
         {
             // 開始日までの収支を取得する
             int balance = 0;
@@ -2076,12 +2130,12 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         }
 
         /// <summary>
-        /// 年度内月別概要VMリストを取得する(月別一覧/月別グラフタブ)
+        /// 年度内月別系列VMリストを取得する(月別一覧/月別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">年度内の時間</param>
-        /// <returns>年度内月別概要VMリスト</returns>
-        private async Task<ObservableCollection<SeriesViewModel>> LoadMonthlySummaryViewModelListWithinYearAsync(int? bookId, DateTime includedTime)
+        /// <returns>年度内月別系列VMリスト</returns>
+        private async Task<ObservableCollection<SeriesViewModel>> LoadMonthlySeriesViewModelListWithinYearAsync(int? bookId, DateTime includedTime)
         {
             DateTime startTime = includedTime.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             DateTime endTime = startTime.AddYears(1).AddMilliseconds(-1);
@@ -2194,11 +2248,11 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         }
 
         /// <summary>
-        /// 10年内年別概要VMリストを取得する(年別一覧/年別グラフタブ)
+        /// 10年内年別系列VMリストを取得する(年別一覧/年別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
-        /// <returns>年別概要VMリスト</returns>
-        private async Task<ObservableCollection<SeriesViewModel>> LoadYearlySummaryViewModelListWithinDecadeAsync(int? bookId)
+        /// <returns>年別系列VMリスト</returns>
+        private async Task<ObservableCollection<SeriesViewModel>> LoadYearlySeriesViewModelListWithinDecadeAsync(int? bookId)
         {
             Settings settings = Settings.Default;
             DateTime startTime = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).AddYears(-9);
@@ -2490,10 +2544,10 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                         ObservableCollection<SeriesViewModel> vmList = null;
                         switch (this.WVM.DisplayedTermKind) {
                             case TermKind.Monthly:
-                                vmList = await this.LoadDailySummaryViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                                vmList = await this.LoadDailySeriesViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                                 break;
                             case TermKind.Selected:
-                                vmList = await this.LoadDailySummaryViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                                vmList = await this.LoadDailySeriesViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                                 break;
                         }
                         List<int> sumPlus = new List<int>(); // 日ごとの合計収入
@@ -2586,10 +2640,10 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                         ObservableCollection<SeriesViewModel> vmList = null;
                         switch (this.WVM.DisplayedTermKind) {
                             case TermKind.Monthly:
-                                vmList = await this.LoadDailySummaryViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                                vmList = await this.LoadDailySeriesViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
                                 break;
                             case TermKind.Selected:
-                                vmList = await this.LoadDailySummaryViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                                vmList = await this.LoadDailySeriesViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
                                 break;
                         }
                         cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
@@ -2624,14 +2678,16 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             if (this.WVM.SelectedTab != Tabs.MonthlyListTab) return;
 
             int startMonth = Properties.Settings.Default.App_StartMonth;
+            DateTime tmpMonth = this.WVM.DisplayedYear.GetFirstDateOfFiscalYear(startMonth);
 
             // 表示する月の文字列を作成する
-            ObservableCollection<string> displayedMonths = new ObservableCollection<string>();
-            for (int i = startMonth; i < startMonth + 12; ++i) {
-                displayedMonths.Add(string.Format("{0}月", (i - 1) % 12 + 1));
+            ObservableCollection<DateTime> displayedMonths = new ObservableCollection<DateTime>();
+            for (int i = 0; i < 12; ++i) {
+                displayedMonths.Add(tmpMonth);
+                tmpMonth = tmpMonth.AddMonths(1);
             }
             this.WVM.DisplayedMonths = displayedMonths;
-            this.WVM.MonthlySummaryVMList = await this.LoadMonthlySummaryViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+            this.WVM.MonthlySeriesVMList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
         }
         #endregion
 
@@ -2736,7 +2792,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             switch (this.WVM.SelectedGraphKind) {
                 case GraphKind.IncomeAndOutgo: {
-                        ObservableCollection<SeriesViewModel> vmList = await this.LoadMonthlySummaryViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                        ObservableCollection<SeriesViewModel> vmList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
                         List<int> sumPlus = new List<int>(); // 月ごとの合計収入
                         List<int> sumMinus = new List<int>(); // 月ごとの合計支出
 
@@ -2818,7 +2874,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                             Title = "残高",
                             TrackerFormatString = "{2}月: {4:#,0}" //月: 金額
                         };
-                        ObservableCollection<SeriesViewModel> vmList = await this.LoadMonthlySummaryViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                        ObservableCollection<SeriesViewModel> vmList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
                         cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
 
                         this.WVM.WholeItemMonthlyGraphModel.Series.Clear();
@@ -2849,16 +2905,17 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.YearlyListTab) return;
 
-            Settings settings = Settings.Default;
-            int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
+            int startMonth = Properties.Settings.Default.App_StartMonth;
+            DateTime tmpYear = DateTime.Now.GetFirstDateOfFiscalYear(startMonth).AddYears(-9);
 
             // 表示する月の文字列を作成する
-            ObservableCollection<string> displayedYears = new ObservableCollection<string>();
-            for (int i = startYear; i < startYear + 10; ++i) {
-                displayedYears.Add(string.Format("{0}年度", i));
+            ObservableCollection<DateTime> displayedYears = new ObservableCollection<DateTime>();
+            for (int i = 0; i < 10; ++i) {
+                displayedYears.Add(tmpYear);
+                tmpYear = tmpYear.AddYears(1);
             }
             this.WVM.DisplayedYears = displayedYears;
-            this.WVM.YearlySummaryVMList = await this.LoadYearlySummaryViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
+            this.WVM.YearlySeriesVMList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
         }
         #endregion
 
@@ -2966,7 +3023,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             switch (this.WVM.SelectedGraphKind) {
                 case GraphKind.IncomeAndOutgo: {
-                        ObservableCollection<SeriesViewModel> vmList = await this.LoadYearlySummaryViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
+                        ObservableCollection<SeriesViewModel> vmList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
                         List<int> sumPlus = new List<int>(); // 年ごとの合計収入
                         List<int> sumMinus = new List<int>(); // 年ごとの合計支出
 
@@ -3048,7 +3105,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                             Title = "残高",
                             TrackerFormatString = "{2}年度: {4:#,0}" //年: 金額
                         };
-                        ObservableCollection<SeriesViewModel> vmList = await this.LoadYearlySummaryViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
+                        ObservableCollection<SeriesViewModel> vmList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
                         cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
 
                         this.WVM.WholeItemYearlyGraphModel.Series.Clear();

@@ -274,7 +274,7 @@
 
                         <StackPanel Grid.Column="0" Orientation="Horizontal">
                             <Button Width="20" Content="◀" Command="{StaticResource GoToLastMonthCommand}"/>
-                            <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}, TargetNullValue='期間指定'}"
+                            <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToDisplayedMonthConverter}, TargetNullValue='期間指定'}"
                                     Command="{StaticResource OpenSelectingDailyTermWindowCommand}">
                                 <ToolTipService.ToolTip>
                                     <Grid>
@@ -445,8 +445,22 @@
                     <Grid Grid.Row="0" Margin="2,2,2,1">
                         <StackPanel Orientation="Horizontal">
                             <Button Width="20" Content="◀" Command="{StaticResource GoToLastMonthCommand}"/>
-                            <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToThisMonthConverter}, TargetNullValue='期間指定'}"
-                                    Command="{StaticResource OpenSelectingDailyTermWindowCommand}"/>
+                            <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToDisplayedMonthConverter}, TargetNullValue='期間指定'}"
+                                    Command="{StaticResource OpenSelectingDailyTermWindowCommand}">
+                                <ToolTipService.ToolTip>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="{Binding StartDate, StringFormat='yyyy/MM/dd'}"/>
+                                        <TextBlock Grid.Column="1" Text=" - "/>
+                                        <TextBlock Grid.Column="2" Text="{Binding EndDate, StringFormat='yyyy/MM/dd'}"/>
+                                    </Grid>
+                                </ToolTipService.ToolTip>
+                            </Button>
                             <Button Width="20" Content="▶" Command="{StaticResource GoToNextMonthCommand}"/>
                             <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
@@ -494,7 +508,7 @@
                     <Grid Grid.Row="0" Margin="2,2,2,1">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="◀" Width="20" Command="{StaticResource GoToLastYearCommand}"/>
-                            <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToThisYearConverter}}" Width="120"
+                            <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}" Width="120"
                                     Command="{StaticResource UpdateCommand}"/>
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
                             <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
@@ -505,11 +519,12 @@
 
                     <!-- データリスト -->
                     <Grid Grid.Row="1" Margin="2" Background="White">
-                        <DataGrid Grid.Column="1" ItemsSource="{Binding MonthlySummaryVMList}" IsReadOnly="True"
+                        <DataGrid Grid.Column="1"
+                                  ItemsSource="{Binding MonthlySeriesVMList}" SelectedItem="{Binding SelectedMonthlySeriesVM}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
                                   HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
-                                  ItemContainerStyle="{StaticResource SummaryStyle}">
+                                  ItemContainerStyle="{StaticResource SummaryStyle}" MouseDoubleClick="MonthlyListDataGrid_MouseDoubleClick">
                             <DataGrid.Resources>
                                 <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
                             </DataGrid.Resources>
@@ -521,40 +536,40 @@
                             <DataGrid.Columns>
                                 <!-- 参考：http://oita.oika.me/2014/05/31/binding-datagridcolumn/ -->
                                 <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[0], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[0], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[0], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[1], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[1], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[1], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[2], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[2], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[2], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[3], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[3], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[3], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[4], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[4], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[4], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[5], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[5], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[5], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[6], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[6], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[6], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[7], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[7], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[7], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[8], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[8], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[8], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[9], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[9], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[9], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[10], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[10], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[10], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[11], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[11], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[11], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                                 <DataGridTextColumn Header="平均" Binding="{Binding Average, Converter={StaticResource IntToMoneyDisplayConverter}}"
@@ -583,7 +598,7 @@
                     <Grid Grid.Row="0" Margin="2,2,2,1">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="◀" Width="20" Command="{StaticResource GoToLastYearCommand}"/>
-                            <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToThisYearConverter}}" Width="120"/>
+                            <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}" Width="120"/>
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
                             <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
@@ -632,17 +647,18 @@
                             <Button Content="▶" Width="20" IsEnabled="False"/>
                             <Button Content="-" Width="40" IsEnabled="False"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
-                                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                         </StackPanel>
                     </Grid>
 
                     <!-- データリスト -->
                     <Grid Grid.Row="1" Margin="2" Background="White">
-                        <DataGrid Grid.Column="1" ItemsSource="{Binding YearlySummaryVMList}" IsReadOnly="True" SelectionUnit="FullRow"
+                        <DataGrid Grid.Column="1"
+                                  ItemsSource="{Binding YearlySeriesVMList}" SelectedItem="{Binding SelectedYearlySeriesVM}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
                                   HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
-                                  ItemContainerStyle="{StaticResource SummaryStyle}">
+                                  ItemContainerStyle="{StaticResource SummaryStyle}" MouseDoubleClick="YearlyListDataGrid_MouseDoubleClick">
                             <DataGrid.Resources>
                                 <project:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
                             </DataGrid.Resources>
@@ -654,34 +670,34 @@
                             <DataGrid.Columns>
                                 <!-- 参考：http://oita.oika.me/2014/05/31/binding-datagridcolumn/ -->
                                 <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[0], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[0], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
                                                     Binding="{Binding Values[0], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[1], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[1], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
                                                     Binding="{Binding Values[1], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[2], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[2], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
                                                     Binding="{Binding Values[2], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[3], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[3], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
                                                     Binding="{Binding Values[3], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[4], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[4], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
                                                     Binding="{Binding Values[4], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[5], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[5], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
                                                     Binding="{Binding Values[5], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[6], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[6], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
                                                     Binding="{Binding Values[6], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[7], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[7], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
                                                     Binding="{Binding Values[7], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[8], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[8], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
                                                     Binding="{Binding Values[8], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[9], Source={StaticResource Proxy}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[9], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
                                                     Binding="{Binding Values[9], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                                 <DataGridTextColumn Header="平均" Binding="{Binding Average, Converter={StaticResource IntToMoneyDisplayConverter}}"

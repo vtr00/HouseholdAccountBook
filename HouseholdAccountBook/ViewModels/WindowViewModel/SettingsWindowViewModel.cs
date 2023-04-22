@@ -19,6 +19,10 @@ namespace HouseholdAccountBook.ViewModels
         /// 設定を保存するか
         /// </summary>
         public bool WithSave { get; set; } = true;
+        /// <summary>
+        /// 表示更新の必要があるか
+        /// </summary>
+        public bool NeedToUpdate { get; set; } = false;
 
         /// <summary>
         /// 選択された設定タブインデックス
@@ -216,6 +220,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._StartMonth, value) && this.WithSave) {
                     this.settings.App_StartMonth = value;
                     this.settings.Save();
+                    this.NeedToUpdate = true;
                 }
             }
         }
@@ -268,6 +273,7 @@ namespace HouseholdAccountBook.ViewModels
                     this.settings.App_IsDebug = value;
                     this.settings.Save();
 
+                    // リソースを更新して他ウィンドウの項目の表示/非表示を切り替える
                     App app = System.Windows.Application.Current as App;
                     app.RegisterSettingsToResource();
                 }
@@ -287,9 +293,6 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._IsPositionSaved, value) && this.WithSave) {
                     this.settings.App_IsPositionSaved = value;
                     this.settings.Save();
-
-                    App app = System.Windows.Application.Current as App;
-                    app.RegisterSettingsToResource();
                 }
             }
         }
@@ -307,7 +310,6 @@ namespace HouseholdAccountBook.ViewModels
         }
         private ObservableCollection<WindowSettingViewModel> _WindowSettingVMList = default;
         #endregion
-
         #endregion
         #endregion
 
@@ -334,9 +336,9 @@ namespace HouseholdAccountBook.ViewModels
             this.StartMonth = this.settings.App_StartMonth;
             this.NationalHolidayCsvURI = this.settings.App_NationalHolidayCsv_Uri;
             this.NationalHolidayCsvDateIndex = this.settings.App_NationalHolidayCsv_DateIndex;
+            this.IsPositionSaved = this.settings.App_IsPositionSaved;
 
             this.DebugMode = this.settings.App_IsDebug;
-            this.IsPositionSaved = this.settings.App_IsPositionSaved;
 
             this.WithSave = true;
 
