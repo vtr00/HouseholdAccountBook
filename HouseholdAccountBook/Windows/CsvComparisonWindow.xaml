@@ -17,7 +17,8 @@
 
     <Window.Resources>
         <!-- ファイルコマンド -->
-        <RoutedCommand x:Key="OpenCsvFilesCommand"/>
+        <RoutedCommand x:Key="MoveCsvFilesCommand"/>
+        <RoutedCommand x:Key="ExitWindowCommand"/>
 
         <!-- 編集コマンド -->
         <RoutedCommand x:Key="AddActionCommand"/>
@@ -26,7 +27,7 @@
         <RoutedCommand x:Key="AddOrEditActionCommand"/>
 
         <!-- 表示コマンド -->
-        <RoutedCommand x:Key="UpdateCommand"/>
+        <RoutedCommand x:Key="UpdateListCommand"/>
         <RoutedCommand x:Key="ClearListCommand"/>
         
         <!-- その他コマンド -->
@@ -35,6 +36,9 @@
         <!-- スタイル -->
         <Style x:Key="DayOfWeekStyle" TargetType="DataGridCell">
             <Style.Triggers>
+                <DataTrigger Binding="{Binding Record.Date, Converter={StaticResource DateTimeToIsNationalHolidayConverter}}" Value="true">
+                    <Setter Property="Foreground" Value="Red"/>
+                </DataTrigger>
                 <DataTrigger Binding="{Binding Record.Date, Converter={StaticResource DateTimeToDayOfWeekConverter}}" Value="土">
                     <Setter Property="Foreground" Value="Blue"/>
                 </DataTrigger>
@@ -47,8 +51,10 @@
 
     <Window.CommandBindings>
         <!-- ファイルコマンド -->
-        <CommandBinding Command="{x:Static ApplicationCommands.Close}" Executed="CloseWindowCommand_Executed"/>
-        <CommandBinding Command="{StaticResource OpenCsvFilesCommand}" CanExecute="OpenCsvFilesCommandCanExecute" Executed="OpenCsvFilesCommand_Executed"/>
+        <CommandBinding Command="{x:Static ApplicationCommands.Open}" CanExecute="OpenCsvFilesCommand_CanExecute" Executed="OpenCsvFilesCommand_Executed"/>
+        <CommandBinding Command="{StaticResource MoveCsvFilesCommand}" CanExecute="MoveCsvFilesCommand_CanExecute" Executed="MoveCsvFilesCommand_Executed"/>
+        <CommandBinding Command="{x:Static ApplicationCommands.Close}" CanExecute="CloseCsvFilesCommand_CanExecute" Executed="CloseCsvFilesCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ExitWindowCommand}" Executed="ExitWindowCommand_Executed"/>
 
         <!-- 編集コマンド -->
         <CommandBinding Command="{StaticResource AddActionCommand}" CanExecute="AddActionCommand_CanExecute" Executed="AddActionCommand_Executed"/>
@@ -58,15 +64,14 @@
         <CommandBinding Command="{StaticResource AddOrEditActionCommand}" CanExecute="AddOrEditActionCommand_CanExecute" Executed="AddOrEditActionCommand_Executed"/>
 
         <!-- 表示コマンド -->
-        <CommandBinding Command="{StaticResource UpdateCommand}" CanExecute="UpdateCommand_CanExecute" Executed="UpdateCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ClearListCommand}" CanExecute="ClearListCommand_CanExecute" Executed="ClearListCommand_Executed"/>
+        <CommandBinding Command="{StaticResource UpdateListCommand}" CanExecute="UpdateListCommand_CanExecute" Executed="UpdateListCommand_Executed"/>
         
         <!-- その他コマンド -->
         <CommandBinding Command="{StaticResource ChangeIsMatchCommand}" Executed="ChangeIsMatchCommand_Executed"/>
     </Window.CommandBindings>
 
     <Window.InputBindings>
-        <KeyBinding Gesture="Alt+F4" Command="{x:Static ApplicationCommands.Close}"/>
+        <KeyBinding Gesture="Alt+F4" Command="{StaticResource ExitWindowCommand}"/>
     </Window.InputBindings>
 
     <Grid>
@@ -74,13 +79,18 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
             <MenuItem Header="ファイル(_F)">
-                <MenuItem Header="開く(_O)..." Command="{StaticResource OpenCsvFilesCommand}" InputGestureText="Ctrl+O"/>
+                <MenuItem Header="開く(_O)..." Command="{x:Static ApplicationCommands.Open}" InputGestureText="Ctrl+O"/>
                 <Separator/>
-                <MenuItem Header="閉じる(_X)" Command="{x:Static ApplicationCommands.Close}" InputGestureText="Alt+F4"/>
+                <MenuItem Header="移動(_M)" Command="{StaticResource MoveCsvFilesCommand}" InputGestureText="Ctrl+M"/>
+                <Separator/>
+                <MenuItem Header="閉じる(_C)" Command="{x:Static ApplicationCommands.Close}"/>
+                <Separator/>
+                <MenuItem Header="終了(_X)" Command="{StaticResource ExitWindowCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>
             <MenuItem Header="編集(_E)">
                 <MenuItem Header="追加(_A)..." Command="{StaticResource AddActionCommand}" InputGestureText="Ctrl++"/>
@@ -89,9 +99,7 @@
                 <MenuItem Header="一括チェック(_B)" Command="{StaticResource BulkCheckCommand}" InputGestureText="Ctrl+B"/>
             </MenuItem>
             <MenuItem Header="表示(_V)">
-                <MenuItem Header="更新(_U)" Command="{StaticResource UpdateCommand}" InputGestureText="F5"/>
-                <Separator/>
-                <MenuItem Header="リストをクリア(_L)" Command="{StaticResource ClearListCommand}" InputGestureText="Ctrl+L"/>
+                <MenuItem Header="更新(_U)" Command="{StaticResource UpdateListCommand}" InputGestureText="F5"/>
             </MenuItem>
         </Menu>
 
@@ -105,19 +113,17 @@
             <Grid Grid.Row="0" Margin="5,0" VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <ComboBox Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,5" MinWidth="100"
+                <ComboBox Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,5" MinWidth="150"
                           ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
-                <Button Grid.Column="1" Margin="0,5" Width="50" Content="更新" Command="{StaticResource UpdateCommand}"/>
-                <Button Grid.Column="3" Margin="0,5" Width="50" Content="追加" Command="{StaticResource AddActionCommand}"/>
-                <Button Grid.Column="4" Margin="0,5" Width="50" Content="編集" Command="{StaticResource EditActionCommand}"/>
-                <Button Grid.Column="5" Margin="0,5" Width="75" Content="一括チェック" Command="{StaticResource BulkCheckCommand}"/>
+                <Button Grid.Column="2" Margin="0,5" Width="50" Content="追加" Command="{StaticResource AddActionCommand}"/>
+                <Button Grid.Column="3" Margin="0,5" Width="50" Content="編集" Command="{StaticResource EditActionCommand}"/>
+                <Button Grid.Column="4" Margin="0,5" Width="75" Content="一括チェック" Command="{StaticResource BulkCheckCommand}"/>
             </Grid>
 
             <DataGrid x:Name="csvCompDataGrid" Grid.Row="1" Margin="5,0"
@@ -130,7 +136,7 @@
                 </DataGrid.Resources>
                 <DataGrid.InputBindings>
                     <KeyBinding Gesture="F2" Command="{StaticResource EditActionCommand}"/>
-                    <KeyBinding Gesture="Enter" Command="{StaticResource EditActionCommand}"/>
+                    <KeyBinding Gesture="Enter" Command="{StaticResource AddOrEditActionCommand}"/>
                     <KeyBinding Gesture="Ctrl+B" Command="{StaticResource BulkCheckCommand}"/>
                     <MouseBinding Gesture="LeftDoubleClick" Command="{StaticResource AddOrEditActionCommand}"/>
                 </DataGrid.InputBindings>
@@ -187,36 +193,50 @@
 
             <Grid Grid.Row="2" Margin="5,0" VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Margin="0,5" VerticalAlignment="Center" Text="CSV："/>
-                <Button Grid.Column="1" Margin="0,5" Width="75" Content="開く" Command="{StaticResource OpenCsvFilesCommand}"/>
-                <Button Grid.Column="2" Margin="0,5" Width="75" Content="クリア" Command="{StaticResource ClearListCommand}"/>
+                <TextBlock Grid.Column="0" Margin="0,5" VerticalAlignment="Center">
+                    CSVファイル:
+                    <TextBlock Text="{Binding CsvFilePath, TargetNullValue='--'}"/>
+                </TextBlock>
+                <Button Grid.Column="1" Margin="0,5" Width="75" Content="開く" Command="{x:Static ApplicationCommands.Open}"/>
+                <Button Grid.Column="2" Margin="0,5" Width="75" Content="移動" Command="{StaticResource MoveCsvFilesCommand}"/>
             </Grid>
         </Grid>
 
         <StatusBar Grid.Row="2">
-            <StatusBarItem HorizontalAlignment="Left">
+            <StatusBarItem>
                 <TextBlock VerticalAlignment="Center">
-                    CSVファイル：
-                    <TextBlock Text="{Binding CsvFileName, TargetNullValue='--'}"/>
-                    日付：
-                    <TextBlock Text="{Binding SelectedBookVM.ActDateIndex, TargetNullValue='--'}"/> 列目
-                    支出：
-                    <TextBlock Text="{Binding SelectedBookVM.OutgoIndex, TargetNullValue='--'}"/> 列目
-                    項目名：
+                    CSVフォルダ:
+                    <TextBlock Text="{Binding SelectedBookVM.CsvFolderPath, TargetNullValue='--'}"/><TextBlock Text="  "/>
+                    日付:
+                    <TextBlock Text="{Binding SelectedBookVM.ActDateIndex, TargetNullValue='--'}"/> 列目<TextBlock Text="  "/>
+                    支出:
+                    <TextBlock Text="{Binding SelectedBookVM.OutgoIndex, TargetNullValue='--'}"/> 列目<TextBlock Text="  "/>
+                    項目名:
                     <TextBlock Text="{Binding SelectedBookVM.ItemNameIndex, TargetNullValue='--'}"/> 列目
                 </TextBlock>
             </StatusBarItem>
+        </StatusBar>
 
-            <StatusBarItem HorizontalAlignment="Right">
-                <TextBlock VerticalAlignment="Center">
+        <StatusBar Grid.Row="3">
+            <StatusBarItem HorizontalContentAlignment="Right">
+                <TextBlock Margin="5,0" VerticalAlignment="Center">
+                    [全体]
+                    未チェック:
+                    <TextBlock Text="{Binding AllUncheckedCount}"/><TextBlock Text=" / "/>
+                    <TextBlock Text="{Binding AllCount}"/><TextBlock Text="  "/>
                     合計: 
-                    <TextBlock Text="{Binding SumValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/>
+                    <TextBlock Text="{Binding AllSumValue, Converter={StaticResource IntToMoneyDisplayConverter}}"/><TextBlock Text="  "/>
+                    [選択]
+                    未チェック:
+                    <TextBlock Text="{Binding SelectedUncheckedCount}"/><TextBlock Text=" / "/>
+                    <TextBlock Text="{Binding SelectedCount}"/><TextBlock Text="  "/>
+                    合計: 
+                    <TextBlock Text="{Binding SelectedSumValue, Converter={StaticResource IntToMoneyDisplayConverter}}"/>
                 </TextBlock>
             </StatusBarItem>
         </StatusBar>

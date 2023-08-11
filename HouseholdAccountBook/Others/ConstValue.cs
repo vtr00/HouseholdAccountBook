@@ -17,6 +17,7 @@ namespace HouseholdAccountBook.ConstValue
         /// </summary>
         public static string Inserter { get; } = "";
 
+        #region 補足されない例外情報
         /// <summary>
         /// 補足されない例外情報のファイル名のヘッダ
         /// </summary>
@@ -31,7 +32,9 @@ namespace HouseholdAccountBook.ConstValue
                 return string.Format("{0}{1}.txt", UnhandledExceptionInfoFileNameHeader, dt.ToString("yyMMdd_hhmmss"));
             }
         }
+        #endregion
 
+        #region ウィンドウ情報
         /// <summary>
         /// ウィンドウ情報のファイル名のヘッダ
         /// </summary>
@@ -46,6 +49,7 @@ namespace HouseholdAccountBook.ConstValue
                 return string.Format("{0}{1}.txt", WindowLocationFileNameHeader, dt.ToString("yyyyMMdd_hhmmss"));
             }
         }
+        #endregion
 
         /// <summary>
         /// タブ
@@ -121,7 +125,7 @@ namespace HouseholdAccountBook.ConstValue
             /// </summary>
             CreditCard = 3,
             /// <summary>
-            /// 株式
+            /// 株式口座
             /// </summary>
             Stock = 4
         }
@@ -130,7 +134,7 @@ namespace HouseholdAccountBook.ConstValue
         /// </summary>
         public static Dictionary<BookKind, string> BookKindStr { get; } = new Dictionary<BookKind, string>() {
             { BookKind.Uncategorized, "未分類" }, { BookKind.Wallet, "財布" }, { BookKind.BankAccount, "銀行口座" },
-            { BookKind.CreditCard, "クレジットカード" }, {BookKind.Stock, "株式" }
+            { BookKind.CreditCard, "クレジットカード" }, {BookKind.Stock, "株式口座" }
         };
 
         /// <summary>
@@ -341,7 +345,11 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// ハンドルされていない例外が発生しました。クリックで例外の情報を確認できます。
             /// </summary>
-            public static string UnhandledExceptionOccured { get; } = "ハンドルされていない例外が発生しました。クリックで例外の情報を確認できます。";
+            public static string UnhandledExceptionOccurred { get; } = "ハンドルされていない例外が発生しました。クリックで例外の情報を確認できます。";
+            /// <summary>
+            /// CSVファイルの移動に失敗しました。
+            /// </summary>
+            public static string FoultToMoveCsv { get; } = "CSVファイルの移動に失敗しました。";
         }
     }
 }

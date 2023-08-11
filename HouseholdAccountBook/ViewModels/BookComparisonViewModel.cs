@@ -17,6 +17,11 @@
         public string Name { get; set; }
 
         /// <summary>
+        /// CSVフォルダパス
+        /// </summary>
+        public string CsvFolderPath { get; set; }
+
+        /// <summary>
         /// 日付インデックス
         /// </summary>
         public int? ActDateIndex { get; set; }

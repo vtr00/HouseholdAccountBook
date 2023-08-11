@@ -189,7 +189,7 @@ namespace HouseholdAccountBook
                 NotificationManager nm = new NotificationManager();
                 NotificationContent nc = new NotificationContent() {
                     Title = Current.MainWindow?.Title ?? "",
-                    Message = MessageText.UnhandledExceptionOccured,
+                    Message = MessageText.UnhandledExceptionOccurred,
                     Type = NotificationType.Warning
                 };
                 nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {

@@ -567,7 +567,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        private void CloseWindowCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void ExitWindowCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = !this.ChildrenWindowOpened;
         }
@@ -577,7 +577,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void CloseWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void ExitWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.Close();
         }

@@ -6,6 +6,11 @@
     public class MstBookJsonObject
     {
         /// <summary>
+        /// CSVフォルダパス
+        /// </summary>
+        public string CsvFolderPath { get; set; } = null;
+
+        /// <summary>
         /// CSV内での日付のインデックス
         /// </summary>
         public int? CsvActDateIndex { get; set; } = null;

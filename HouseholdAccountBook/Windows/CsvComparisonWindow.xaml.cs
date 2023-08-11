@@ -70,22 +70,13 @@ namespace HouseholdAccountBook.Windows
 
         #region イベントハンドラ
         #region コマンド
-        /// <summary>
-        /// ウィンドウを閉じる
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CloseWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            this.Close();
-        }
-
+        #region ファイル
         /// <summary>
         /// CSVファイルオープン可能か
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OpenCsvFilesCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void OpenCsvFilesCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = this.WVM.SelectedBookVM.ActDateIndex.HasValue && this.WVM.SelectedBookVM.ItemNameIndex.HasValue && this.WVM.SelectedBookVM.OutgoIndex.HasValue;
         }
@@ -99,66 +90,146 @@ namespace HouseholdAccountBook.Windows
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            string directory = string.Empty;
+            string folderPath = string.Empty;
             string fileName = string.Empty;
             if (settings.App_CsvFilePath != string.Empty) {
-                directory = Path.GetDirectoryName(settings.App_CsvFilePath);
+                folderPath = Path.GetDirectoryName(settings.App_CsvFilePath);
                 fileName = Path.GetFileName(settings.App_CsvFilePath);
+            }
+            if (this.WVM.CsvFilePath != string.Empty) {
+                folderPath = Path.GetDirectoryName(this.WVM.CsvFilePath);
+                fileName = Path.GetFileName(this.WVM.CsvFilePath);
             }
 
             OpenFileDialog ofd = new OpenFileDialog() {
                 CheckFileExists = true,
-                InitialDirectory = directory,
+                InitialDirectory = folderPath,
                 FileName = fileName,
                 Title = "ファイル選択",
                 Filter = "CSVファイル|*.csv",
                 Multiselect = true
             };
 
-            if (ofd.ShowDialog() == false) return;
+            if (ofd.ShowDialog() == true) {
+                this.Cursor = Cursors.Wait;
+
+                this.WVM.CsvFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+
+                // 開いたCSVファイルのパスを設定として保存する
+                settings.App_CsvFilePath = this.WVM.CsvFilePath;
+                settings.Save();
+
+                int? actDateIndex = this.WVM.SelectedBookVM.ActDateIndex;
+                int? itemNameIndex = this.WVM.SelectedBookVM.ItemNameIndex;
+                int? outgoIndex = this.WVM.SelectedBookVM.OutgoIndex;
+
+                // CSVファイルを読み込む
+                CsvConfiguration csvConfig = new CsvConfiguration(System.Globalization.CultureInfo.CurrentCulture) {
+                    HasHeaderRecord = true,
+                    MissingFieldFound = (mffa) => { }
+                };
+                List<CsvComparisonViewModel> tmpList = new List<CsvComparisonViewModel>();
+                foreach (string tmpFileName in ofd.FileNames) {
+                    using (CsvReader reader = new CsvReader(new StreamReader(tmpFileName, Encoding.GetEncoding("Shift_JIS")), csvConfig)) {
+                        while (reader.Read()) {
+                            try {
+                                if (reader.TryGetField(actDateIndex.Value, out DateTime date) && reader.TryGetField(itemNameIndex.Value, out string name) && reader.TryGetField(outgoIndex.Value, out string valueStr) &&
+                                    int.TryParse(valueStr, NumberStyles.Any, NumberFormatInfo.CurrentInfo, out int value)) {
+                                    tmpList.Add(new CsvComparisonViewModel() { Record = new CsvComparisonViewModel.CsvRecord() { Date = date, Name = name, Value = value } });
+                                }
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                }
+                tmpList.Sort((tmp1, tmp2) => { return (int)(tmp1.Record.Date - tmp2.Record.Date).TotalDays; });
+                foreach (CsvComparisonViewModel vm in tmpList) {
+                    this.WVM.CsvComparisonVMList.Add(vm);
+                    this.csvCompDataGrid.ScrollToButtom();
+                }
+
+                await this.UpdateComparisonInfoAsync();
+
+                this.Cursor = null;
+            }
+        }
+
+        /// <summary>
+        /// CSVファイル移動可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MoveCsvFilesCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.WVM.SelectedBookVM.CsvFolderPath != string.Empty && File.Exists(this.WVM.CsvFilePath) &&
+                           Path.GetDirectoryName(this.WVM.CsvFilePath).CompareTo(this.WVM.SelectedBookVM.CsvFolderPath) != 0;
+        }
+
+        /// <summary>
+        /// CSVファイルを移動する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void MoveCsvFilesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            string srcFilePath = this.WVM.CsvFilePath;
+            string dstFilePath = Path.Combine(this.WVM.SelectedBookVM.CsvFolderPath, Path.GetFileName(srcFilePath)); ;
 
             this.Cursor = Cursors.Wait;
 
-            this.WVM.CsvFileName = Path.GetFileName(ofd.FileName);
-
-            // 開いたCSVファイルのパスを設定として保存する
-            settings.App_CsvFilePath = ofd.FileName;
-            settings.Save();
-
-            int? actDateIndex = this.WVM.SelectedBookVM.ActDateIndex;
-            int? itemNameIndex = this.WVM.SelectedBookVM.ItemNameIndex;
-            int? outgoIndex = this.WVM.SelectedBookVM.OutgoIndex;
-
-            // CSVファイルを読み込む
-            CsvConfiguration csvConfig = new CsvConfiguration(System.Globalization.CultureInfo.CurrentCulture) {
-                HasHeaderRecord = true,
-                MissingFieldFound = (mffa) => { }
-            };
-            List<CsvComparisonViewModel> tmpList = new List<CsvComparisonViewModel>();
-            foreach (string tmpFileName in ofd.FileNames) {
-                using (CsvReader reader = new CsvReader(new StreamReader(tmpFileName, Encoding.GetEncoding("Shift_JIS")), csvConfig)) {
-                    while (reader.Read()) {
-                        try {
-                            if (reader.TryGetField(actDateIndex.Value, out DateTime date) && reader.TryGetField(itemNameIndex.Value, out string name) && reader.TryGetField(outgoIndex.Value, out string valueStr) &&
-                                int.TryParse(valueStr, NumberStyles.Any, NumberFormatInfo.CurrentInfo, out int value)) {
-                                tmpList.Add(new CsvComparisonViewModel() { Record = new CsvComparisonViewModel.CsvRecord() { Date = date, Name = name, Value = value } });
-                            }
-                        }
-                        catch (Exception) { }
-                    }
+            try {
+                if (File.Exists(dstFilePath)) {
+                    File.Delete(dstFilePath);
                 }
-            }
-            tmpList.Sort((tmp1, tmp2) => { return (int)(tmp1.Record.Date - tmp2.Record.Date).TotalDays; });
-            foreach (CsvComparisonViewModel vm in tmpList) {
-                this.WVM.CsvComparisonVMList.Add(vm);
-                this.csvCompDataGrid.ScrollToButtom();
-            }
 
-            await this.UpdateComparisonInfoAsync();
+                if (srcFilePath.CompareTo(dstFilePath) != 0) {
+                    File.Move(srcFilePath, dstFilePath);
+                    this.WVM.CsvFilePath = dstFilePath;
+                }
+
+                await this.UpdateComparisonInfoAsync();
+            }
+            catch (Exception exp) {
+                MessageBox.Show(MessageText.FoultToMoveCsv, MessageTitle.Error +"(" + exp.Message + ")");
+            }
 
             this.Cursor = null;
         }
 
+        /// <summary>
+        /// CSVファイルをクローズ可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CloseCsvFilesCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.WVM.CsvComparisonVMList.Count > 0;
+        }
+
+        /// <summary>
+        /// CSVファイルを閉じる
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CloseCsvFilesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.ClearComparisonInfo();
+        }
+
+        /// <summary>
+        /// ウィンドウを閉じる
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExitWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+
+        #endregion
+
+        #region 編集
         /// <summary>
         /// 項目追加可能か
         /// </summary>
@@ -308,15 +379,17 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
 
             this.Cursor = cursor;
         }
+        #endregion
 
+        #region 表示
         /// <summary>
         /// 比較情報を更新可能か
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void UpdateCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void UpdateListCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.CsvFileName != default && this.WVM.SelectedBookVM != null && this.WVM.CsvComparisonVMList.Count != 0;
+            e.CanExecute = this.WVM.CsvFilePath != default && this.WVM.SelectedBookVM != null && this.WVM.CsvComparisonVMList.Count != 0;
         }
 
         /// <summary>
@@ -324,7 +397,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void UpdateListCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.Cursor = Cursors.Wait;
 
@@ -332,26 +405,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
 
             this.Cursor = null;
         }
-
-        /// <summary>
-        /// リストをクリア可能か
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ClearListCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.WVM.CsvComparisonVMList.Count > 0;
-        }
-
-        /// <summary>
-        /// リストをクリアする
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ClearListCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            this.ClearComparisonInfo();
-        }
+        #endregion
 
         /// <summary>
         /// 一致チェックボックスを変更可能か
@@ -465,6 +519,7 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
                     BookComparisonViewModel vm = new BookComparisonViewModel() {
                         Id = record.ToInt("book_id"),
                         Name = record["book_name"],
+                        CsvFolderPath = jsonObj?.CsvFolderPath == string.Empty ? null : jsonObj?.CsvFolderPath,
                         ActDateIndex = jsonObj?.CsvActDateIndex,
                         OutgoIndex = jsonObj?.CsvOutgoIndex,
                         ItemNameIndex = jsonObj?.CsvItemNameIndex
@@ -528,7 +583,7 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         {
             // リストをクリアする
             this.WVM.CsvComparisonVMList.Clear();
-            this.WVM.CsvFileName = default;
+            this.WVM.CsvFilePath = default;
         }
         #endregion
 
@@ -600,6 +655,7 @@ WHERE action_id = @{2};", isMatch ? 1 : 0, Updater, actionId);
             }
 
             this.IsMatchChanged?.Invoke(this, new EventArgs<int?>(actionId));
+            this.WVM.RaiseUncheckedNumChanged();
         }
     }
 }

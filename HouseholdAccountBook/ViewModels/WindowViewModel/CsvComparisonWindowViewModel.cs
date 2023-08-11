@@ -17,15 +17,15 @@ namespace HouseholdAccountBook.ViewModels
 
         #region プロパティ
         /// <summary>
-        /// CSVファイル名
+        /// CSVファイルパス
         /// </summary>
-        #region CsvFileName
-        public string CsvFileName
+        #region CsvFilePath
+        public string CsvFilePath
         {
-            get => this._CsvFileName;
-            set => this.SetProperty(ref this._CsvFileName, value);
+            get => this._CsvFilePath;
+            set => this.SetProperty(ref this._CsvFilePath, value);
         }
-        private string _CsvFileName = default;
+        private string _CsvFilePath = default;
         #endregion
 
         /// <summary>
@@ -67,6 +67,25 @@ namespace HouseholdAccountBook.ViewModels
         private ObservableCollection<CsvComparisonViewModel> _CsvComparisonVMList = new ObservableCollection<CsvComparisonViewModel>();
         #endregion
         /// <summary>
+        /// CSV比較VMの未チェック数
+        /// </summary>
+        #region UncheckedNum
+        public int AllUncheckedCount => this.CsvComparisonVMList.Count((tmp) => !tmp.IsMatch);
+        #endregion
+        /// <summary>
+        /// CSV比較VMの個数
+        /// </summary>
+        #region AllCount
+        public int AllCount => this.CsvComparisonVMList.Count;
+        #endregion
+        /// <summary>
+        /// CSV比較VMの合計値
+        /// </summary>
+        #region AllSumValue
+        public int AllSumValue => this.CsvComparisonVMList.Sum((vm) => vm.Record.Value);
+        #endregion
+        
+        /// <summary>
         /// 選択されたCSV比較VM(先頭)
         /// </summary>
         #region SelectedCsvComparisonVM
@@ -83,34 +102,23 @@ namespace HouseholdAccountBook.ViewModels
         #region SelectedCsvComparisonVMList
         public ObservableCollection<CsvComparisonViewModel> SelectedCsvComparisonVMList { get; } = new ObservableCollection<CsvComparisonViewModel>();
         #endregion
-
         /// <summary>
-        /// 未チェック数
+        /// 選択されたCSV比較VMの未チェック数
         /// </summary>
-        /// <remarks>UI上に反映するには？</remarks>
         #region UncheckedNum
-        public int? UncheckedNum
-        {
-            get {
-                if (this.CsvComparisonVMList.Count == 0) return null;
-                return this.CsvComparisonVMList.Count((tmp) => !tmp.IsMatch);
-            }
-        }
+        public int? SelectedUncheckedCount => this.SelectedCsvComparisonVMList.Count((tmp) => !tmp.IsMatch);
         #endregion
         /// <summary>
-        /// 合計値
+        /// 選択されたCSV比較VMの個数
         /// </summary>
-        #region SumValue
-        public int? SumValue
-        {
-            get {
-                int? sum = (this.SelectedCsvComparisonVMList.Count != 0) ? (int?)0 : null;
-                foreach (CsvComparisonViewModel vm in this.SelectedCsvComparisonVMList) {
-                    sum += vm.Record.Value;
-                }
-                return sum;
-            }
-        }
+        #region SelectedCount
+        public int SelectedCount => this.SelectedCsvComparisonVMList.Count;
+        #endregion
+        /// <summary>
+        /// 選択されたCSV比較VMの合計値
+        /// </summary>
+        #region SelectedSumValue
+        public int SelectedSumValue => this.SelectedCsvComparisonVMList.Sum((vm) => vm.Record.Value);
         #endregion
         #endregion
 
@@ -119,9 +127,25 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public CsvComparisonWindowViewModel()
         {
-            this.SelectedCsvComparisonVMList.CollectionChanged += (sender, args) => {
-                this.RaisePropertyChanged(nameof(this.SumValue));
+            this.CsvComparisonVMList.CollectionChanged += (sender, args) => {
+                this.RaisePropertyChanged(nameof(this.AllUncheckedCount));
+                this.RaisePropertyChanged(nameof(this.AllCount));
+                this.RaisePropertyChanged(nameof(this.AllSumValue));
             };
+            this.SelectedCsvComparisonVMList.CollectionChanged += (sender, args) => {
+                this.RaisePropertyChanged(nameof(this.SelectedUncheckedCount));
+                this.RaisePropertyChanged(nameof(this.SelectedCount));
+                this.RaisePropertyChanged(nameof(this.SelectedSumValue));
+            };
+        }
+
+        /// <summary>
+        /// 未チェック数変更を通知する
+        /// </summary>
+        public void RaiseUncheckedNumChanged()
+        {
+            this.RaisePropertyChanged(nameof(this.AllUncheckedCount));
+            this.RaisePropertyChanged(nameof(this.SelectedUncheckedCount));
         }
     }
 }

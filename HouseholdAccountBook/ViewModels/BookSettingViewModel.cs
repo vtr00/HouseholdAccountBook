@@ -123,6 +123,18 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// CSVフォルダパス
+        /// </summary>
+        #region CsvFolderPath
+        public string CsvFolderPath
+        {
+            get => this._CsvFolderPath;
+            set => this.SetProperty(ref this._CsvFolderPath, value);
+        }
+        private string _CsvFolderPath = default;
+        #endregion
+
+        /// <summary>
         /// 日付インデックス
         /// </summary>
         #region ActDateIndex

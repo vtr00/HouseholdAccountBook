@@ -16,6 +16,8 @@
     </Window.DataContext>
 
     <Window.Resources>
+        <RoutedCommand x:Key="ExitWindowCommand"/>
+
         <!-- 設定操作コマンド -->
         <RoutedCommand x:Key="AddCategoryCommand"/>
         <RoutedCommand x:Key="AddItemCommand"/>
@@ -34,6 +36,7 @@
         <RoutedCommand x:Key="DropBookSortOrderCommand"/>
         <RoutedCommand x:Key="SaveBookInfoCommand"/>
         <RoutedCommand x:Key="ChangeBookRelationCommand"/>
+        <RoutedCommand x:Key="CsvFolderPathDialogCommand"/>
 
         <!-- その他設定操作コマンド -->
         <RoutedCommand x:Key="DumpExePathDialogCommand"/>
@@ -46,7 +49,7 @@
 
     <Window.CommandBindings>
         <!-- ファイルコマンド -->
-        <CommandBinding Command="{x:Static ApplicationCommands.Close}" Executed="CloseWindowCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ExitWindowCommand}" Executed="ExitWindowCommand_Executed"/>
 
         <!-- 項目設定操作コマンド -->
         <CommandBinding Command="{StaticResource AddCategoryCommand}" CanExecute="AddCategoryCommand_CanExecute" Executed="AddCategoryCommand_Executed"/>
@@ -66,6 +69,7 @@
         <CommandBinding Command="{StaticResource DropBookSortOrderCommand}" CanExecute="DropBookSortOrderCommand_CanExecute" Executed="DropBookSortOrderCommand_Executed"/>
         <CommandBinding Command="{StaticResource SaveBookInfoCommand}" CanExecute="SaveBookInfoCommand_CanExecute" Executed="SaveBookInfoCommand_Executed"/>
         <CommandBinding Command="{StaticResource ChangeBookRelationCommand}" Executed="ChangeBookRelationCommand_Executed"/>
+        <CommandBinding Command="{StaticResource CsvFolderPathDialogCommand}" Executed="CsvFolderPathDialogCommand_Executed"/>
 
         <!-- その他設定操作コマンド -->
         <CommandBinding Command="{StaticResource DumpExePathDialogCommand}" Executed="DumpExePathDialogCommand_Executed"/>
@@ -77,7 +81,7 @@
     </Window.CommandBindings>
     
     <Window.InputBindings>
-        <KeyBinding Gesture="Alt+F4" Command="{x:Static ApplicationCommands.Close}"/>
+        <KeyBinding Gesture="Alt+F4" Command="{StaticResource ExitWindowCommand}"/>
     </Window.InputBindings>
 
     <Grid Background="WhiteSmoke">
@@ -88,7 +92,7 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="ファイル(_F)">
-                <MenuItem Header="閉じる(_X)" Command="{x:Static ApplicationCommands.Close}" InputGestureText="Alt+F4"/>
+                <MenuItem Header="終了(_X)" Command="{StaticResource ExitWindowCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>
         </Menu>
         
@@ -181,7 +185,7 @@
                                            Text="項目名"/>
                                 <TextBox Grid.Row="1" Grid.Column="1" Margin="5" 
                                                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding CantRename}"/>
-                                <Button Grid.Row="2" Grid.Column="1" Margin="5" Content="確定" Command="{StaticResource SaveItemInfoCommand}" ToolTip="Ctrl+S"/>
+                                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Content="確定" Command="{StaticResource SaveItemInfoCommand}" ToolTip="Ctrl+S"/>
                             </Grid>
                         </GroupBox>
 
@@ -259,7 +263,7 @@
                         
                     <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns" VerticalAlignment="Stretch"/>
 
-                    <Grid Grid.Column="2" DataContext="{Binding SelectedBookVM}">
+                    <Grid Grid.Column="2" Grid.IsSharedSizeScope="True" DataContext="{Binding SelectedBookVM}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="1.0*"/>
@@ -280,8 +284,10 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="0.5*"/>
-                                    <ColumnDefinition Width="0.5*"/>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
+                                    <ColumnDefinition Width="100" SharedSizeGroup="Number"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="30" SharedSizeGroup="Button" />
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
@@ -290,30 +296,32 @@
                                            Text="{Binding Id, TargetNullValue='--'}"/>
 
                                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="帳簿名"/>
-                                <TextBox Grid.Row="1" Grid.Column="1" Margin="5" 
+                                <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
 
                                 <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="帳簿種別"/>
-                                <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" 
+                                <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                         ItemsSource="{Binding BookKindDic}" SelectedValue="{Binding SelectedBookKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
 
                                 <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Text="初期残高"/>
                                 <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" 
                                                                     Value="{Binding InitialValue}"/>
 
-                                <GroupBox Grid.Row="4" Grid.ColumnSpan="2" Header="支払情報" IsEnabled="{Binding NeedToPay}">
+                                <GroupBox Grid.Row="4" Grid.ColumnSpan="4" Header="支払情報" IsEnabled="{Binding NeedToPay}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="0.5*"/>
-                                            <ColumnDefinition Width="0.5*"/>
+                                            <ColumnDefinition SharedSizeGroup="Header"/>
+                                            <ColumnDefinition SharedSizeGroup="Number"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition SharedSizeGroup="Button"/>
                                         </Grid.ColumnDefinitions>
                                         
                                         <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="支払元帳簿"/>
-                                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
+                                        <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                                 ItemsSource="{Binding DebitBookVMList}" SelectedItem="{Binding SelectedDebitBookVM}" DisplayMemberPath="Name"/>
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="支払日"/>
@@ -322,31 +330,37 @@
                                     </Grid>
                                 </GroupBox>
 
-                                <GroupBox Grid.Row="5" Grid.ColumnSpan="2" Header="CSV情報" IsEnabled="{Binding CsvDataExists}">
+                                <GroupBox Grid.Row="5" Grid.ColumnSpan="4" Header="CSV情報" IsEnabled="{Binding CsvDataExists}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
+                                            <ColumnDefinition SharedSizeGroup="Header"/>
+                                            <ColumnDefinition SharedSizeGroup="Number"/>
                                             <ColumnDefinition Width="0.5*"/>
-                                            <ColumnDefinition Width="0.5*"/>
+                                            <ColumnDefinition SharedSizeGroup="Button"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="日付位置(0開始)"/>
-                                        <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="0"
-                                                                            Value="{Binding ActDateIndex, TargetNullValue=''}"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="支出位置(0開始)"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="フォルダパス"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
+                                                 Text="{Binding CsvFolderPath, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <Button Grid.Row="0" Grid.Column="3" Margin="5" Content="..." Command="{StaticResource CsvFolderPathDialogCommand}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="日付位置(0開始)"/>
                                         <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" MinValue="0"
-                                                                            Value="{Binding OutgoIndex, TargetNullValue=''}"/>
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="項目名位置(0開始)"/>
+                                                                            Value="{Binding ActDateIndex, TargetNullValue=''}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="支出位置(0開始)"/>
                                         <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" MinValue="0"
+                                                                            Value="{Binding OutgoIndex, TargetNullValue=''}"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Text="項目名位置(0開始)"/>
+                                        <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" MinValue="0"
                                                                             Value="{Binding ItemNameIndex, TargetNullValue=''}"/>
-                                        
                                     </Grid>
                                 </GroupBox>
-                                <Button Grid.Row="6" Grid.Column="1" Margin="5" Content="確定" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
+                                <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" Content="確定" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
                             </Grid>
                         </GroupBox>
 
@@ -456,7 +470,7 @@
                                         </Grid.ColumnDefinitions>
 
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="URI" Margin="5" VerticalAlignment="Center"/>
-                                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Margin="5" Text="{Binding NationalHolidayCsvURI}"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Text="{Binding NationalHolidayCsvURI}"/>
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" Text="日付位置(0開始)" Margin="5" VerticalAlignment="Center"/>
                                         <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" MinValue="0" Value="{Binding NationalHolidayCsvDateIndex}"/>
@@ -472,6 +486,7 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition SharedSizeGroup="Header"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition SharedSizeGroup="Button"/>
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="保存対象" Margin="5" VerticalAlignment="Center"/>

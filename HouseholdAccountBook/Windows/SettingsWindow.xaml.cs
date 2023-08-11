@@ -61,7 +61,7 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void CloseWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void ExitWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.Close();
         }
@@ -816,6 +816,35 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
         }
 
         /// <summary>
+        /// CSVフォルダパスを指定するダイアログを表示する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CsvFolderPathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            string folderPath = Path.GetDirectoryName(settings.App_CsvFilePath);
+            string fileName = string.Empty;
+            if (this.WVM.SelectedBookVM.CsvFolderPath != null && this.WVM.SelectedBookVM.CsvFolderPath != string.Empty) {
+                folderPath = Path.GetDirectoryName(this.WVM.SelectedBookVM.CsvFolderPath);
+                fileName = Path.GetFileName(this.WVM.SelectedBookVM.CsvFolderPath);
+            }
+
+            CommonOpenFileDialog ofd = new CommonOpenFileDialog() {
+                EnsureFileExists = true,
+                IsFolderPicker = true,
+                InitialDirectory = folderPath,
+                DefaultFileName = fileName,
+                Title = "CSVフォルダ選択"
+            };
+
+            if (ofd.ShowDialog() == CommonFileDialogResult.Ok) {
+                this.WVM.SelectedBookVM.CsvFolderPath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            }
+        }
+
+        /// <summary>
         /// 帳簿の情報を保存する
         /// </summary>
         /// <param name="sender"></param>
@@ -825,6 +854,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             using (DaoBase dao = this.builder.Build()) {
                 BookSettingViewModel vm = this.WVM.SelectedBookVM;
                 MstBookJsonObject jsonObj = new MstBookJsonObject() {
+                    CsvFolderPath = vm.CsvFolderPath == string.Empty ? null : vm.CsvFolderPath,
                     CsvActDateIndex = vm.ActDateIndex,
                     CsvOutgoIndex = vm.OutgoIndex,
                     CsvItemNameIndex = vm.ItemNameIndex
@@ -897,16 +927,16 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void DumpExePathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            string directory = string.Empty;
+            string folderPath = string.Empty;
             string fileName = string.Empty;
             if (this.WVM.DumpExePath != string.Empty) {
-                directory = Path.GetDirectoryName(this.WVM.DumpExePath);
+                folderPath = Path.GetDirectoryName(this.WVM.DumpExePath);
                 fileName = Path.GetFileName(this.WVM.DumpExePath);
             }
 
             OpenFileDialog ofd = new OpenFileDialog() {
                 CheckFileExists = true,
-                InitialDirectory = directory,
+                InitialDirectory = folderPath,
                 FileName = fileName,
                 Title = "ファイル選択",
                 Filter = "pg_dump.exe|pg_dump.exe"
@@ -924,16 +954,16 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void RestorePathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            string directory = string.Empty;
+            string folderPath = string.Empty;
             string fileName = string.Empty;
             if (this.WVM.RestoreExePath != string.Empty) {
-                directory = Path.GetDirectoryName(this.WVM.RestoreExePath);
+                folderPath = Path.GetDirectoryName(this.WVM.RestoreExePath);
                 fileName = Path.GetFileName(this.WVM.RestoreExePath);
             }
 
             OpenFileDialog ofd = new OpenFileDialog() {
                 CheckFileExists = true,
-                InitialDirectory = directory,
+                InitialDirectory = folderPath,
                 FileName = fileName,
                 Title = "ファイル選択",
                 Filter = "pg_restore.exe|pg_restore.exe"
@@ -966,23 +996,23 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void BackUpFolderPathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            string directory = Path.GetDirectoryName(Application.ResourceAssembly.Location);
+            string folderPath = Path.GetDirectoryName(Application.ResourceAssembly.Location);
             string fileName = string.Empty;
             if (this.WVM.BackUpFolderPath != string.Empty) {
-                directory = Path.GetDirectoryName(this.WVM.BackUpFolderPath);
+                folderPath = Path.GetDirectoryName(this.WVM.BackUpFolderPath);
                 fileName = Path.GetFileName(this.WVM.BackUpFolderPath);
             }
 
             CommonOpenFileDialog ofd = new CommonOpenFileDialog() {
                 EnsureFileExists = true,
                 IsFolderPicker = true,
-                InitialDirectory = directory,
+                InitialDirectory = folderPath,
                 DefaultFileName = fileName,
                 Title = "バックアップフォルダ選択"
             };
 
             if (ofd.ShowDialog() == CommonFileDialogResult.Ok) {
-                if (directory.CompareTo(ofd.InitialDirectory) == 0) {
+                if (Path.GetDirectoryName(Application.ResourceAssembly.Location).CompareTo(ofd.InitialDirectory) == 0) {
                     this.WVM.BackUpFolderPath = Path.GetFileName(ofd.FileName);
                 }
                 else {
@@ -1421,6 +1451,7 @@ ORDER BY sort_order;");
                         InitialValue = initialValue,
                         DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((vm) => { return vm.Id != bookId; })),
                         PayDay = payDay,
+                        CsvFolderPath = jsonObj?.CsvFolderPath,
                         ActDateIndex = jsonObj?.CsvActDateIndex,
                         OutgoIndex = jsonObj?.CsvOutgoIndex,
                         ItemNameIndex = jsonObj?.CsvItemNameIndex,

@@ -218,10 +218,11 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._SelectedActionVMList;
             set {
+                // Summary選択時に呼出し
                 if (this.SetProperty(ref this._SelectedActionVMList, value)) {
                     this.SelectedActionVMList.CollectionChanged += (sender, e) => {
                         this.RaisePropertyChanged(nameof(this.AverageValue));
-                        this.RaisePropertyChanged(nameof(this.Amount));
+                        this.RaisePropertyChanged(nameof(this.Count));
                         this.RaisePropertyChanged(nameof(this.SumValue));
                         this.RaisePropertyChanged(nameof(this.IncomeSumValue));
                         this.RaisePropertyChanged(nameof(this.OutgoSumValue));
@@ -269,52 +270,34 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 平均値
+        /// 選択されたデータの平均値
         /// </summary>
         #region AverageValue
-        public double? AverageValue => this.SelectedActionVMList.Count != 0 ? (double?)this.SumValue / this.SelectedActionVMList.Count : null;
+        public double? AverageValue => this.Count != 0 ? (double?)this.SumValue / this.Count : null;
         #endregion
         /// <summary>
-        /// データの個数
+        /// 選択されたデータの個数
         /// </summary>
-        #region Amount
-        public int Amount => this.SelectedActionVMList.Count((vm) => { return vm.Income != null || vm.Outgo != null; });
+        #region Count
+        public int Count => this.SelectedActionVMList.Count((vm) => { return vm.Income != null || vm.Outgo != null; });
         #endregion
         /// <summary>
-        /// 合計値
+        /// 選択されたデータの合計値
         /// </summary>
         #region SumValue
-        public int? SumValue => this.IncomeSumValue + this.OutgoSumValue;
+        public int SumValue => this.IncomeSumValue + this.OutgoSumValue;
         #endregion
         /// <summary>
-        /// 収入合計値
+        /// 選択されたデータの収入合計値
         /// </summary>
         #region IncomeSumValue
-        public int? IncomeSumValue
-        {
-            get {
-                int? sum = this.SelectedActionVMList.Count != 0 ? (int?)0 : null;
-                foreach (ActionViewModel vm in this.SelectedActionVMList) {
-                    sum += vm.Income ?? 0;
-                }
-                return sum;
-            }
-        }
+        public int IncomeSumValue => this.SelectedActionVMList.Sum((vm) => vm.Income ?? 0);
         #endregion
         /// <summary>
-        /// 支出合計値
+        /// 選択されたデータの支出合計値
         /// </summary>
         #region OutgoSumValue
-        public int? OutgoSumValue
-        {
-            get {
-                int? sum = this.SelectedActionVMList.Count != 0 ? (int?)0 : null;
-                foreach (ActionViewModel vm in this.SelectedActionVMList) {
-                    sum -= vm.Outgo ?? 0;
-                }
-                return sum;
-            }
-        }
+        public int OutgoSumValue => this.SelectedActionVMList.Sum((vm) => -vm.Outgo ?? 0);
         #endregion
 
         /// <summary>
@@ -410,7 +393,6 @@ namespace HouseholdAccountBook.ViewModels
         }
         private SeriesViewModel _SelectedMonthlySeriesVM = default;
         #endregion
-
         #endregion
 
         #region 年別一覧タブ
@@ -668,7 +650,7 @@ namespace HouseholdAccountBook.ViewModels
                     this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
                         return vm.ActionId == -1 || vm.ItemId == this._SelectedSummaryVM.ItemId;
                     }));
-                    this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this.SelectedActionVMList.Where((vm) => {
+                    this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this._SelectedActionVMList.Where((vm) => {
                         return vm.ItemId == this._SelectedSummaryVM.ItemId;
                     }));
                 }
