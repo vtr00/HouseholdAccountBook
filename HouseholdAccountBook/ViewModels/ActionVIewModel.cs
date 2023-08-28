@@ -24,13 +24,25 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public BalanceKind BalanceKind { get; set; }
         /// <summary>
-        /// カテゴリID
+        /// 帳簿ID
+        /// </summary>
+        public int BookId { get; set; }
+        /// <summary>
+        /// 分類ID
         /// </summary>
         public int CategoryId { get; set; }
         /// <summary>
         /// 項目ID
         /// </summary>
         public int ItemId { get; set; }
+        /// <summary>
+        /// 帳簿名
+        /// </summary>
+        public string BookName { get; set; }
+        /// <summary>
+        /// 分類名
+        /// </summary>
+        public string CategoryName { get; set; }
         /// <summary>
         /// 項目名
         /// </summary>

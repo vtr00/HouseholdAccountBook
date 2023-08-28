@@ -134,7 +134,7 @@ namespace HouseholdAccountBook.ConstValue
         /// </summary>
         public static Dictionary<BookKind, string> BookKindStr { get; } = new Dictionary<BookKind, string>() {
             { BookKind.Uncategorized, "未分類" }, { BookKind.Wallet, "財布" }, { BookKind.BankAccount, "銀行口座" },
-            { BookKind.CreditCard, "クレジットカード" }, {BookKind.Stock, "株式口座" }
+            { BookKind.CreditCard, "クレジットカード" }, {BookKind.Stock, "証券口座" }
         };
 
         /// <summary>

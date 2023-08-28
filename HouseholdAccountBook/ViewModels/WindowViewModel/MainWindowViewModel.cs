@@ -633,7 +633,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public void RaiseDisplayedYearChanged()
         {
-            this.RaisePropertyChanged(nameof(DisplayedYear));
+            this.RaisePropertyChanged(nameof(this.DisplayedYear));
         }
 
         /// <summary>

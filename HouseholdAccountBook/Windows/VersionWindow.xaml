@@ -3,11 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="バージョン情報 - Household Account Book"
         Height="150" Width="400" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize">
 
+    <Window.DataContext>
+        <viewmodels:VersionWindowViewModel x:Name="WVM"/>
+    </Window.DataContext>
+    
     <Window.Resources>
         <RoutedCommand x:Key="CloseWindowCommand"/>
 
@@ -41,11 +46,11 @@
         </TextBlock>
 
         <TextBlock Grid.Row="2">
-            サポート: <Hyperlink NavigateUri="http://hp.vector.co.jp/authors/VA043062/" ToolTip="{Binding NavigateUri}" RequestNavigate="Hyperlink_RequestNavigate">http://hp.vector.co.jp/authors/VA043062/</Hyperlink>
+            サポート: <Hyperlink NavigateUri="{Binding SupportSiteUri}" ToolTip="{Binding SupportSiteUri}" RequestNavigate="Hyperlink_RequestNavigate">http://hp.vector.co.jp/authors/VA043062/</Hyperlink>
         </TextBlock>
         
         <TextBlock Grid.Row="3">
-            Twitter: <Hyperlink NavigateUri="https://twitter.com/toresebu" ToolTip="{Binding NavigateUri}" RequestNavigate="Hyperlink_RequestNavigate">@toresebu</Hyperlink>
+            SNS: <Hyperlink NavigateUri="{Binding SnsSiteUri}" ToolTip="{Binding SnsSiteUri}" RequestNavigate="Hyperlink_RequestNavigate">@toresebu</Hyperlink>
         </TextBlock>
 
         <Button Grid.Row="4" HorizontalAlignment="Right" Margin="5" Width="100" Content="閉じる" Command="{StaticResource CloseWindowCommand}"/>

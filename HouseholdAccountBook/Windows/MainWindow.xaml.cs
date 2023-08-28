@@ -1733,43 +1733,48 @@ ORDER BY sort_order;");
         /// <summary>
         /// 月内帳簿項目VMリストを取得する(帳簿タブ)
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="targetBookId">帳簿ID</param>
         /// <param name="includedTime">月内の時刻</param>
         /// <returns>帳簿項目VMリスト</returns>
-        private async Task<ObservableCollection<ActionViewModel>> LoadActionViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
+        private async Task<ObservableCollection<ActionViewModel>> LoadActionViewModelListWithinMonthAsync(int? targetBookId, DateTime includedTime)
         {
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.AddMonths(1).AddMilliseconds(-1);
-            return await this.LoadActionViewModelListAsync(bookId, startTime, endTime);
+            return await this.LoadActionViewModelListAsync(targetBookId, startTime, endTime);
         }
 
         /// <summary>
         /// 期間内帳簿項目VMリストを取得する(帳簿タブ)
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="targetBookId">帳簿ID</param>
         /// <param name="startTime">開始時刻</param>
         /// <param name="endTime">終了時刻</param>
         /// <returns>帳簿項目VMリスト</returns>
-        private async Task<ObservableCollection<ActionViewModel>> LoadActionViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
+        private async Task<ObservableCollection<ActionViewModel>> LoadActionViewModelListAsync(int? targetBookId, DateTime startTime, DateTime endTime)
         {
             ObservableCollection<ActionViewModel> actionVMList = new ObservableCollection<ActionViewModel>();
             using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader;
-                if (bookId == null) {
+                if (targetBookId == null) {
                     // 全帳簿
                     reader = await dao.ExecQueryAsync(@"
 -- 繰越残高
-SELECT -1 AS action_id, @{1} AS act_time, -1 AS category_id, -1 AS item_id, '繰越残高' AS item_name, 0 AS act_value, (
-  -- 残高
-  SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0)
-  FROM hst_action AA
-  INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
-  WHERE AA.del_flg = 0 AND AA.act_time < @{1}
-) AS balance, NULL AS shop_name, NULL AS group_id, NULL AS remark, 0 AS is_match
+SELECT -1 AS action_id, @{1} AS act_time, -1 AS book_id, -1 AS category_id, -1 AS item_id, 
+       '' AS book_name, '' AS category_name, '繰越残高' AS item_name, 0 AS act_value, (
+           -- 残高
+           SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0)
+           FROM hst_action AA
+           INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
+           WHERE AA.del_flg = 0 AND AA.act_time < @{1}
+       ) AS balance,
+       NULL AS shop_name, NULL AS group_id, NULL AS remark, 0 AS is_match, 
+       0 AS balance_kind, 0 AS c_order, 0 AS i_order, 0 AS b_order
 UNION
 -- 各帳簿項目
-SELECT A.action_id AS action_id, A.act_time AS act_time, C.category_id AS category_id, I.item_id AS item_id, I.item_name AS item_name, A.act_value AS act_value, 0 AS balance, 
-       A.shop_name AS shop_name, A.group_id AS group_id, A.remark AS remark, A.is_match AS is_match
+SELECT A.action_id AS action_id, A.act_time AS act_time, B.book_id AS book_id, C.category_id AS category_id, I.item_id AS item_id, 
+       B.book_name AS book_name, C.category_name AS category_name, I.item_name AS item_name, A.act_value AS act_value, 0 AS balance, 
+       A.shop_name AS shop_name, A.group_id AS group_id, A.remark AS remark, A.is_match AS is_match, 
+       C.balance_kind AS balance_kind, C.sort_order AS c_order, I.sort_order AS i_order, B.sort_order AS b_order
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) B ON B.book_id = A.book_id
 INNER JOIN (SELECT * FROM mst_item WHERE item_id IN (
@@ -1780,40 +1785,49 @@ INNER JOIN (SELECT * FROM mst_item WHERE item_id IN (
 ) AND del_flg = 0) I ON I.item_id = A.item_id
 INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON I.category_id = C.category_id
 WHERE A.del_flg = 0 AND @{1} <= A.act_time AND A.act_time <= @{2}
-ORDER BY act_time, action_id;", null, startTime, endTime);
+ORDER BY act_time, balance_kind, c_order, i_order, b_order, action_id;", null, startTime, endTime);
                 }
                 else {
                     // 各帳簿
                     reader = await dao.ExecQueryAsync(@"
 -- 繰越残高
-SELECT -1 AS action_id, @{1} AS act_time, -1 AS category_id, -1 AS item_id, '繰越残高' AS item_name, 0 AS act_value, (
-  -- 残高
-  SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0})
-  FROM hst_action AA
-  INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
-  WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1}
-) AS balance, NULL AS shop_name, NULL AS group_id, NULL AS remark, 0 AS is_match
+SELECT -1 AS action_id, @{1} AS act_time, -1 AS book_id, -1 AS category_id, -1 AS item_id, 
+       '' AS book_name, '' AS category_name, '繰越残高' AS item_name, 0 AS act_value, (
+           -- 残高
+           SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0})
+           FROM hst_action AA
+           INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
+           WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1}
+       ) AS balance, 
+       NULL AS shop_name, NULL AS group_id, NULL AS remark, 0 AS is_match, 
+       0 AS balance_kind, 0 AS c_order, 0 AS i_order
 UNION
 -- 各帳簿項目
-SELECT A.action_id AS action_id, A.act_time AS act_time, C.category_id AS category_id, I.item_id AS item_id, I.item_name AS item_name, A.act_value AS act_value, 0 AS balance,
-       A.shop_name AS shop_name, A.group_id AS group_id, A.remark AS remark, A.is_match AS is_match
+SELECT A.action_id AS action_id, A.act_time AS act_time, B.book_id AS book_id, C.category_id AS category_id, I.item_id AS item_id, 
+       B.book_name AS book_name, C.category_name AS category_name, I.item_name AS item_name, A.act_value AS act_value, 0 AS balance,
+       A.shop_name AS shop_name, A.group_id AS group_id, A.remark AS remark, A.is_match AS is_match, 
+       C.balance_kind AS balance_kind, C.sort_order AS c_order, I.sort_order AS i_order
 FROM hst_action A
+INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) B ON B.book_id = A.book_id
 INNER JOIN (SELECT * FROM mst_item WHERE (move_flg = 1 OR item_id IN (
   SELECT item_id FROM rel_book_item WHERE book_id = @{0} AND del_flg = 0
 )) AND del_flg = 0) I ON I.item_id = A.item_id
 INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON I.category_id = C.category_id
 WHERE A.book_id = @{0} AND A.del_flg = 0 AND @{1} <= A.act_time AND A.act_time <= @{2}
-ORDER BY act_time, action_id;", bookId, startTime, endTime);
+ORDER BY act_time, balance_kind, c_order, i_order, action_id;", targetBookId, startTime, endTime);
                 }
                 int balance = 0;
                 reader.ExecWholeRow((count, record) => {
                     int actionId = record.ToInt("action_id");
                     DateTime actTime = record.ToDateTime("act_time");
+                    int bookId = record.ToInt("book_id");
                     int categoryId = record.ToInt("category_id");
                     int itemId = record.ToInt("item_id");
+                    string bookName = record["book_name"];
+                    string categoryName = record["category_name"];
                     string itemName = record["item_name"];
                     int actValue = record.ToInt("act_value");
-                    balance = count == 0 ? record.ToInt("balance") : balance + actValue;
+                    balance = (count == 0 ? record.ToInt("balance") : balance + actValue);
                     string shopName = record["shop_name"];
                     int? groupId = record.ToNullableInt("group_id");
                     string remark = record["remark"];
@@ -1845,8 +1859,11 @@ ORDER BY act_time, action_id;", bookId, startTime, endTime);
                     ActionViewModel avm = new ActionViewModel() {
                         ActionId = actionId,
                         ActTime = actTime,
+                        BookId = bookId,
                         CategoryId = categoryId,
                         ItemId = itemId,
+                        BookName = bookName,
+                        CategoryName = categoryName,
                         ItemName = itemName,
                         BalanceKind = balanceKind,
                         Income = income,

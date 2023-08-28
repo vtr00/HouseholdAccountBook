@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Dao;
 using HouseholdAccountBook.Dto;
-using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.Extensions;
+using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Newtonsoft.Json;
@@ -244,9 +244,9 @@ WHERE item_id = @{1};", Updater, id);
         {
             var parentVM = this.WVM.SelectedItemVM.ParentVM;
             int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
-            int changingId = parentVM.ChildrenVMList[index].Id;
+            int changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
             if (0 < index) {
-                int changedId = parentVM.ChildrenVMList[index - 1].Id;
+                int changedId = parentVM.ChildrenVMList[index - 1].Id; // 入れ替え対象の項目のID
 
                 using (DaoBase dao = this.builder.Build()) {
                     switch (this.WVM.SelectedItemVM.Kind) {
@@ -352,9 +352,9 @@ WHERE item_id = @{2};", toCategoryId, Updater, changingId);
         {
             var parentVM = this.WVM.SelectedItemVM.ParentVM;
             int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
-            int changingId = parentVM.ChildrenVMList[index].Id;
+            int changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
             if (parentVM.ChildrenVMList.Count - 1 > index) {
-                int changedId = parentVM.ChildrenVMList[index + 1].Id;
+                int changedId = parentVM.ChildrenVMList[index + 1].Id; // 入れ替え対象の項目のID
 
                 using (DaoBase dao = this.builder.Build()) {
                     switch (this.WVM.SelectedItemVM.Kind) {
@@ -1279,6 +1279,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
             HierarchicalItemViewModel incomeVM = new HierarchicalItemViewModel() {
                 Kind = HierarchicalKind.Balance,
                 Id = (int)BalanceKind.Income,
+                SortOrder = -1,
                 Name = "収入項目",
                 ParentVM = null,
                 RelationVMList = null,
@@ -1289,6 +1290,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
             HierarchicalItemViewModel outgoVM = new HierarchicalItemViewModel() {
                 Kind = HierarchicalKind.Balance,
                 Id = (int)BalanceKind.Outgo,
+                SortOrder = -1,
                 Name = "支出項目",
                 ParentVM = null,
                 RelationVMList = null,
@@ -1297,20 +1299,23 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
             vmList.Add(outgoVM);
 
             foreach (HierarchicalItemViewModel vm in vmList) {
+                // 分類
                 using (DaoBase dao = this.builder.Build()) {
                     DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT category_id, category_name 
+SELECT category_id, category_name, sort_order 
 FROM mst_category
 WHERE balance_kind = @{0} AND del_flg = 0 AND sort_order <> 0
 ORDER BY sort_order;", vm.Id);
 
                     reader.ExecWholeRow((count, record) => {
                         int categoryId = record.ToInt("category_id");
+                        int sortOrder = record.ToInt("sort_order");
                         string categoryName = record["category_name"];
 
                         vm.ChildrenVMList.Add(new HierarchicalItemViewModel() {
                             Kind = HierarchicalKind.Category,
                             Id = categoryId,
+                            SortOrder = sortOrder,
                             Name = categoryName,
                             ParentVM = vm,
                             RelationVMList = null,
@@ -1319,22 +1324,25 @@ ORDER BY sort_order;", vm.Id);
                         return true;
                     });
 
-                    foreach (HierarchicalItemViewModel childVM in vm.ChildrenVMList) {
+                    foreach (HierarchicalItemViewModel categocyVM in vm.ChildrenVMList) {
+                        // 項目
                         reader = await dao.ExecQueryAsync(@"
-SELECT item_id, item_name
+SELECT item_id, item_name, sort_order
 FROM mst_item
 WHERE category_id = @{0} AND del_flg = 0
-ORDER BY sort_order;", childVM.Id);
+ORDER BY sort_order;", categocyVM.Id);
 
                         reader.ExecWholeRow((count, record) => {
                             int itemId = record.ToInt("item_id");
+                            int sortOrder = record.ToInt("sort_order");
                             string itemName = record["item_name"];
 
-                            childVM.ChildrenVMList.Add(new HierarchicalItemViewModel() {
+                            categocyVM.ChildrenVMList.Add(new HierarchicalItemViewModel() {
                                 Kind = HierarchicalKind.Item,
                                 Id = itemId,
+                                SortOrder = sortOrder,
                                 Name = itemName,
-                                ParentVM = childVM,
+                                ParentVM = categocyVM,
                                 RelationVMList = new ObservableCollection<RelationViewModel>(),
                                 ShopNameList = new ObservableCollection<string>(),
                                 RemarkList = new ObservableCollection<string>()
@@ -1342,20 +1350,20 @@ ORDER BY sort_order;", childVM.Id);
                             return true;
                         });
 
-                        foreach (HierarchicalItemViewModel vm2 in childVM.ChildrenVMList) {
+                        foreach (HierarchicalItemViewModel itemVM in categocyVM.ChildrenVMList) {
                             reader = await dao.ExecQueryAsync(@"
 SELECT B.book_id AS BookId, B.book_name, RBI.book_id IS NULL AS IsNotRelated
 FROM mst_book B
 LEFT JOIN (SELECT book_id FROM rel_book_item WHERE del_flg = 0 AND item_id = @{0}) RBI ON RBI.book_id = B.book_id
 WHERE del_flg = 0
-ORDER BY B.sort_order;", vm2.Id);
+ORDER BY B.sort_order;", itemVM.Id);
 
                             reader.ExecWholeRow((count2, record2) => {
                                 int bookId = record2.ToInt("BookId");
                                 string bookName = record2["book_name"];
                                 bool isRelated = !record2.ToBoolean("IsNotRelated");
 
-                                vm2.RelationVMList.Add(new RelationViewModel() {
+                                itemVM.RelationVMList.Add(new RelationViewModel() {
                                     Id = bookId,
                                     Name = bookName,
                                     IsRelated = isRelated
@@ -1368,11 +1376,11 @@ ORDER BY B.sort_order;", vm2.Id);
 SELECT shop_name
 FROM hst_shop
 WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time DESC;", vm2.Id);
+ORDER BY used_time DESC;", itemVM.Id);
 
                             reader.ExecWholeRow((count2, record2) => {
                                 string shopName = record2["shop_name"];
-                                vm2.ShopNameList.Add(shopName);
+                                itemVM.ShopNameList.Add(shopName);
                                 return true;
                             });
 
@@ -1381,11 +1389,11 @@ ORDER BY used_time DESC;", vm2.Id);
 SELECT remark
 FROM hst_remark
 WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time DESC;", vm2.Id);
+ORDER BY used_time DESC;", itemVM.Id);
 
                             reader.ExecWholeRow((count2, record2) => {
                                 string remark = record2["remark"];
-                                vm2.RemarkList.Add(remark);
+                                itemVM.RemarkList.Add(remark);
                                 return true;
                             });
                         }
@@ -1428,13 +1436,14 @@ ORDER BY sort_order;");
 
                 // 帳簿一覧を取得する
                 reader = await dao.ExecQueryAsync(@"
-SELECT book_id, book_name, book_kind, debit_book_id, pay_day, initial_value, json_code
+SELECT book_id, book_name, book_kind, debit_book_id, pay_day, initial_value, json_code, sort_order
 FROM mst_book
 WHERE del_flg = 0
 ORDER BY sort_order;");
 
                 reader.ExecWholeRow((count, record) => {
                     int bookId = record.ToInt("book_id");
+                    int sortOrder = record.ToInt("sort_order");
                     string bookName = record["book_name"];
                     BookKind bookKind = (BookKind)record.ToInt("book_kind");
                     int initialValue = record.ToInt("initial_value");
@@ -1446,6 +1455,7 @@ ORDER BY sort_order;");
 
                     BookSettingViewModel tmpVM = new BookSettingViewModel() {
                         Id = bookId,
+                        SortOrder = sortOrder,
                         Name = bookName,
                         SelectedBookKind = bookKind,
                         InitialValue = initialValue,

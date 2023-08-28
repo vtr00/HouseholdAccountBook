@@ -26,6 +26,18 @@ namespace HouseholdAccountBook.ViewModels
         public HierarchicalItemViewModel ParentVM { get; set; }
 
         /// <summary>
+        /// ソート順
+        /// </summary>
+        #region SortOrder
+        public int SortOrder
+        {
+            get => this._SortOrder;
+            set => this.SetProperty(ref this._SortOrder, value);
+        }
+        private int _SortOrder = default;
+        #endregion
+
+        /// <summary>
         /// 名称
         /// </summary>
         #region Name

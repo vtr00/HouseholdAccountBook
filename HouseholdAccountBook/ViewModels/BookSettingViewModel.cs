@@ -17,6 +17,18 @@ namespace HouseholdAccountBook.ViewModels
         public int? Id { get; set; }
 
         /// <summary>
+        /// ソート順
+        /// </summary>
+        #region SortOrder
+        public int SortOrder
+        {
+            get => this._SortOrder;
+            set => this.SetProperty(ref this._SortOrder, value);
+        }
+        private int _SortOrder = default;
+        #endregion
+
+        /// <summary>
         /// 帳簿名
         /// </summary>
         #region Name
