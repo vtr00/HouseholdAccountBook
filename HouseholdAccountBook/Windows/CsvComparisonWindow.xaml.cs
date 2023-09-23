@@ -96,10 +96,6 @@ namespace HouseholdAccountBook.Windows
                 folderPath = Path.GetDirectoryName(settings.App_CsvFilePath);
                 fileName = Path.GetFileName(settings.App_CsvFilePath);
             }
-            if (this.WVM.CsvFilePath != string.Empty) {
-                folderPath = Path.GetDirectoryName(this.WVM.CsvFilePath);
-                fileName = Path.GetFileName(this.WVM.CsvFilePath);
-            }
 
             OpenFileDialog ofd = new OpenFileDialog() {
                 CheckFileExists = true,
@@ -113,12 +109,12 @@ namespace HouseholdAccountBook.Windows
             if (ofd.ShowDialog() == true) {
                 this.Cursor = Cursors.Wait;
 
-                this.WVM.CsvFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
-
-                // 開いたCSVファイルのパスを設定として保存する
-                settings.App_CsvFilePath = this.WVM.CsvFilePath;
+                // 開いたCSVファイルのパスを設定として保存する(複数存在する場合は先頭のみ)
+                string csvFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                settings.App_CsvFilePath = csvFilePath;
                 settings.Save();
 
+                // CSVファイル上の対象インデックスを取得する
                 int? actDateIndex = this.WVM.SelectedBookVM.ActDateIndex;
                 int? itemNameIndex = this.WVM.SelectedBookVM.ItemNameIndex;
                 int? outgoIndex = this.WVM.SelectedBookVM.OutgoIndex;
@@ -128,27 +124,43 @@ namespace HouseholdAccountBook.Windows
                     HasHeaderRecord = true,
                     MissingFieldFound = (mffa) => { }
                 };
-                List<CsvComparisonViewModel> tmpList = new List<CsvComparisonViewModel>();
+                List<string> tmpCsvFilePathList = new List<string>();
+                List<CsvComparisonViewModel> tmpVMList = new List<CsvComparisonViewModel>();
                 foreach (string tmpFileName in ofd.FileNames) {
                     using (CsvReader reader = new CsvReader(new StreamReader(tmpFileName, Encoding.GetEncoding("Shift_JIS")), csvConfig)) {
+                        List<CsvComparisonViewModel> tmpVMList2 = new List<CsvComparisonViewModel>();
                         while (reader.Read()) {
                             try {
                                 if (reader.TryGetField(actDateIndex.Value, out DateTime date) && reader.TryGetField(itemNameIndex.Value, out string name) && reader.TryGetField(outgoIndex.Value, out string valueStr) &&
                                     int.TryParse(valueStr, NumberStyles.Any, NumberFormatInfo.CurrentInfo, out int value)) {
-                                    tmpList.Add(new CsvComparisonViewModel() { Record = new CsvComparisonViewModel.CsvRecord() { Date = date, Name = name, Value = value } });
+                                    tmpVMList2.Add(new CsvComparisonViewModel() { Record = new CsvComparisonViewModel.CsvRecord() { Date = date, Name = name, Value = value } });
+
                                 }
                             }
                             catch (Exception) { }
                         }
+
+                        // 有効な行があればファイル名を記録する
+                        if (0 < tmpVMList2.Count) {
+                            tmpCsvFilePathList.Add(tmpFileName);
+                            tmpVMList.AddRange(tmpVMList2);
+                        }
                     }
                 }
-                tmpList.Sort((tmp1, tmp2) => { return (int)(tmp1.Record.Date - tmp2.Record.Date).TotalDays; });
-                foreach (CsvComparisonViewModel vm in tmpList) {
-                    this.WVM.CsvComparisonVMList.Add(vm);
+
+                // 有効な行があればリストに追加する
+                if (0 < tmpVMList.Count) {
+                    foreach (string path in tmpCsvFilePathList) {
+                        this.WVM.CsvFilePathList.Add(path);
+                    }
+                    tmpVMList.Sort((tmp1, tmp2) => { return (int)(tmp1.Record.Date - tmp2.Record.Date).TotalDays; });
+                    foreach (CsvComparisonViewModel vm in tmpVMList) {
+                        this.WVM.CsvComparisonVMList.Add(vm);
+                    }
+
+                    await this.UpdateComparisonInfoAsync();
                     this.csvCompDataGrid.ScrollToButtom();
                 }
-
-                await this.UpdateComparisonInfoAsync();
 
                 this.Cursor = null;
             }
@@ -161,8 +173,15 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void MoveCsvFilesCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.SelectedBookVM.CsvFolderPath != string.Empty && File.Exists(this.WVM.CsvFilePath) &&
-                           Path.GetDirectoryName(this.WVM.CsvFilePath).CompareTo(this.WVM.SelectedBookVM.CsvFolderPath) != 0;
+            e.CanExecute = this.WVM.SelectedBookVM.CsvFolderPath != string.Empty;
+
+            bool canExecute = false;
+            string dstFolderPath = this.WVM.SelectedBookVM.CsvFolderPath;
+            foreach (string srcFilePath in this.WVM.CsvFilePathList) {
+                string dstFilePath = Path.Combine(dstFolderPath, Path.GetFileName(srcFilePath));
+                canExecute |= File.Exists(srcFilePath) & srcFilePath.CompareTo(dstFilePath) != 0;
+            }
+            e.CanExecute &= canExecute;
         }
 
         /// <summary>
@@ -172,26 +191,40 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void MoveCsvFilesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            string srcFilePath = this.WVM.CsvFilePath;
-            string dstFilePath = Path.Combine(this.WVM.SelectedBookVM.CsvFolderPath, Path.GetFileName(srcFilePath)); ;
-
             this.Cursor = Cursors.Wait;
 
-            try {
-                if (File.Exists(dstFilePath)) {
-                    File.Delete(dstFilePath);
+            this.WVM.CsvFilePathList.Clear();
+
+            List<string> tmpCsvFilePathList = new List<string>();
+            string dstFolderPath = this.WVM.SelectedBookVM.CsvFolderPath;
+            foreach (string srcFilePath in this.WVM.CsvFilePathList) {
+                if (!File.Exists(srcFilePath)) continue;
+
+                // 移動元と移動先が一致するなら移動しない
+                string dstFilePath = Path.Combine(dstFolderPath, Path.GetFileName(srcFilePath));
+                if (srcFilePath.CompareTo(dstFilePath) == 0) {
+                    tmpCsvFilePathList.Add(srcFilePath);
+                    continue;
                 }
 
-                if (srcFilePath.CompareTo(dstFilePath) != 0) {
+                // ファイルを移動する(既に存在すれば上書き)
+                try {
+                    if (File.Exists(dstFilePath)) {
+                        File.Delete(dstFilePath);
+                    }
+
                     File.Move(srcFilePath, dstFilePath);
-                    this.WVM.CsvFilePath = dstFilePath;
+                    tmpCsvFilePathList.Add(dstFilePath);
                 }
+                catch (Exception exp) {
+                    MessageBox.Show(MessageText.FoultToMoveCsv + "(" + exp.Message + ")", MessageTitle.Error);
+                }
+            }
+            foreach (string tmpCsvFilePath in tmpCsvFilePathList) {
+                this.WVM.CsvFilePathList.Add(tmpCsvFilePath);
+            }
 
-                await this.UpdateComparisonInfoAsync();
-            }
-            catch (Exception exp) {
-                MessageBox.Show(MessageText.FoultToMoveCsv, MessageTitle.Error +"(" + exp.Message + ")");
-            }
+            await this.UpdateComparisonInfoAsync();
 
             this.Cursor = null;
         }
@@ -203,7 +236,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void CloseCsvFilesCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.CsvComparisonVMList.Count > 0;
+            e.CanExecute = 0 < this.WVM.CsvFilePathList.Count;
         }
 
         /// <summary>
@@ -225,8 +258,6 @@ namespace HouseholdAccountBook.Windows
         {
             this.Close();
         }
-
-
         #endregion
 
         #region 編集
@@ -389,7 +420,7 @@ WHERE action_id = @{0} AND is_match <> 1;", vm.ActionId, Updater);
         /// <param name="e"></param>
         private void UpdateListCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.CsvFilePath != default && this.WVM.SelectedBookVM != null && this.WVM.CsvComparisonVMList.Count != 0;
+            e.CanExecute = 0 < this.WVM.CsvFilePathList.Count && this.WVM.SelectedBookVM != null && 0 < this.WVM.CsvComparisonVMList.Count;
         }
 
         /// <summary>
@@ -583,7 +614,7 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         {
             // リストをクリアする
             this.WVM.CsvComparisonVMList.Clear();
-            this.WVM.CsvFilePath = default;
+            this.WVM.CsvFilePathList.Clear();
         }
         #endregion
 

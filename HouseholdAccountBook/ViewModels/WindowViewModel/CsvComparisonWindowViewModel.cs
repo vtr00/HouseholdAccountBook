@@ -17,15 +17,31 @@ namespace HouseholdAccountBook.ViewModels
 
         #region プロパティ
         /// <summary>
-        /// CSVファイルパス
+        /// CSVファイルパス(1番目)
         /// </summary>
         #region CsvFilePath
         public string CsvFilePath
         {
-            get => this._CsvFilePath;
-            set => this.SetProperty(ref this._CsvFilePath, value);
+            get {
+                if (0 < this._CsvFilePathList.Count) {
+                    return this._CsvFilePathList[0];
+                }
+                else {
+                    return null;
+                }
+            }
         }
-        private string _CsvFilePath = default;
+        #endregion
+        /// <summary>
+        /// CSVファイルパスリスト
+        /// </summary>
+        #region CsvFilePathList
+        public ObservableCollection<string> CsvFilePathList
+        {
+            get => this._CsvFilePathList;
+            set => this.SetProperty(ref this._CsvFilePathList, value);
+        }
+        private ObservableCollection<string> _CsvFilePathList = new ObservableCollection<string>();
         #endregion
 
         /// <summary>
@@ -127,6 +143,10 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public CsvComparisonWindowViewModel()
         {
+            this.CsvFilePathList.CollectionChanged += (sender, args) => {
+                this.RaisePropertyChanged(nameof(this.CsvFilePath));
+            };
+
             this.CsvComparisonVMList.CollectionChanged += (sender, args) => {
                 this.RaisePropertyChanged(nameof(this.AllUncheckedCount));
                 this.RaisePropertyChanged(nameof(this.AllCount));

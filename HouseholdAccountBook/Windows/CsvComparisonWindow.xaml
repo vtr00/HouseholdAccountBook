@@ -36,13 +36,13 @@
         <!-- スタイル -->
         <Style x:Key="DayOfWeekStyle" TargetType="DataGridCell">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Record.Date, Converter={StaticResource DateTimeToIsNationalHolidayConverter}}" Value="true">
-                    <Setter Property="Foreground" Value="Red"/>
-                </DataTrigger>
                 <DataTrigger Binding="{Binding Record.Date, Converter={StaticResource DateTimeToDayOfWeekConverter}}" Value="土">
                     <Setter Property="Foreground" Value="Blue"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Record.Date, Converter={StaticResource DateTimeToDayOfWeekConverter}}" Value="日">
+                    <Setter Property="Foreground" Value="Red"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Record.Date, Converter={StaticResource DateTimeToIsNationalHolidayConverter}}" Value="true">
                     <Setter Property="Foreground" Value="Red"/>
                 </DataTrigger>
             </Style.Triggers>
@@ -196,14 +196,17 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0" Margin="0,5" VerticalAlignment="Center">
                     CSVファイル:
                     <TextBlock Text="{Binding CsvFilePath, TargetNullValue='--'}"/>
+                    (<TextBlock Text="{Binding CsvFilePathList.Count, TargetNullValue='0'}"/>)
                 </TextBlock>
                 <Button Grid.Column="1" Margin="0,5" Width="75" Content="開く" Command="{x:Static ApplicationCommands.Open}"/>
                 <Button Grid.Column="2" Margin="0,5" Width="75" Content="移動" Command="{StaticResource MoveCsvFilesCommand}"/>
+                <Button Grid.Column="3" Margin="0,5" Width="75" Content="閉じる" Command="{x:Static ApplicationCommands.Close}"/>
             </Grid>
         </Grid>
 
