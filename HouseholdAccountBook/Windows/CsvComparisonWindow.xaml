@@ -79,7 +79,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
@@ -106,11 +105,34 @@
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0" Margin="5,0" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Margin="0,5" Width="75" Content="開く" Command="{x:Static ApplicationCommands.Open}"/>
+                <Button Grid.Column="2" Margin="0,5" Width="75" Content="移動" Command="{StaticResource MoveCsvFilesCommand}"/>
+                <Button Grid.Column="3" Margin="0,5" Width="75" Content="閉じる" Command="{x:Static ApplicationCommands.Close}"/>
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="25,0">
+                <TextBlock VerticalAlignment="Center">
+                    CSVファイル:
+                    <TextBlock Text="{Binding CsvFilePathes, TargetNullValue='--'}"/>
+                    (<TextBlock Text="{Binding CsvFilePathList.Count, TargetNullValue='0'}"/>)
+                </TextBlock>
+            </Grid>
+            
+            <Grid Grid.Row="2" Margin="5,0" VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -121,12 +143,25 @@
 
                 <ComboBox Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,5" MinWidth="150"
                           ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
-                <Button Grid.Column="2" Margin="0,5" Width="50" Content="追加" Command="{StaticResource AddActionCommand}"/>
-                <Button Grid.Column="3" Margin="0,5" Width="50" Content="編集" Command="{StaticResource EditActionCommand}"/>
+                <Button Grid.Column="2" Margin="0,5" Width="75" Content="追加" Command="{StaticResource AddActionCommand}"/>
+                <Button Grid.Column="3" Margin="0,5" Width="75" Content="編集" Command="{StaticResource EditActionCommand}"/>
                 <Button Grid.Column="4" Margin="0,5" Width="75" Content="一括チェック" Command="{StaticResource BulkCheckCommand}"/>
             </Grid>
 
-            <DataGrid x:Name="csvCompDataGrid" Grid.Row="1" Margin="5,0"
+            <Grid Grid.Row="3" Margin="25,0">
+                <TextBlock VerticalAlignment="Center">
+                    CSVフォルダ:
+                    <TextBlock Text="{Binding SelectedBookVM.CsvFolderPath, TargetNullValue='--'}"/><TextBlock Text="  "/>
+                    日付:
+                    <TextBlock Text="{Binding SelectedBookVM.ActDateIndex, TargetNullValue='--'}"/> 列目<TextBlock Text="  "/>
+                    支出:
+                    <TextBlock Text="{Binding SelectedBookVM.OutgoIndex, TargetNullValue='--'}"/> 列目<TextBlock Text="  "/>
+                    項目名:
+                    <TextBlock Text="{Binding SelectedBookVM.ItemNameIndex, TargetNullValue='--'}"/> 列目
+                </TextBlock>
+            </Grid>
+
+            <DataGrid x:Name="csvCompDataGrid" Grid.Row="4" Margin="5,5"
                     ItemsSource="{Binding CsvComparisonVMList}" SelectedItem="{Binding SelectedCsvComparisonVM}" SelectionUnit="FullRow" IsReadOnly="True"
                     CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="3"
                     AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True" 
@@ -190,42 +225,9 @@
                     <DataGridTextColumn Header="備考" Width="*" Binding="{Binding Remark}"/>
                 </DataGrid.Columns>
             </DataGrid>
-
-            <Grid Grid.Row="2" Margin="5,0" VerticalAlignment="Center">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Column="0" Margin="0,5" VerticalAlignment="Center">
-                    CSVファイル:
-                    <TextBlock Text="{Binding CsvFilePath, TargetNullValue='--'}"/>
-                    (<TextBlock Text="{Binding CsvFilePathList.Count, TargetNullValue='0'}"/>)
-                </TextBlock>
-                <Button Grid.Column="1" Margin="0,5" Width="75" Content="開く" Command="{x:Static ApplicationCommands.Open}"/>
-                <Button Grid.Column="2" Margin="0,5" Width="75" Content="移動" Command="{StaticResource MoveCsvFilesCommand}"/>
-                <Button Grid.Column="3" Margin="0,5" Width="75" Content="閉じる" Command="{x:Static ApplicationCommands.Close}"/>
-            </Grid>
         </Grid>
 
         <StatusBar Grid.Row="2">
-            <StatusBarItem>
-                <TextBlock VerticalAlignment="Center">
-                    CSVフォルダ:
-                    <TextBlock Text="{Binding SelectedBookVM.CsvFolderPath, TargetNullValue='--'}"/><TextBlock Text="  "/>
-                    日付:
-                    <TextBlock Text="{Binding SelectedBookVM.ActDateIndex, TargetNullValue='--'}"/> 列目<TextBlock Text="  "/>
-                    支出:
-                    <TextBlock Text="{Binding SelectedBookVM.OutgoIndex, TargetNullValue='--'}"/> 列目<TextBlock Text="  "/>
-                    項目名:
-                    <TextBlock Text="{Binding SelectedBookVM.ItemNameIndex, TargetNullValue='--'}"/> 列目
-                </TextBlock>
-            </StatusBarItem>
-        </StatusBar>
-
-        <StatusBar Grid.Row="3">
             <StatusBarItem HorizontalContentAlignment="Right">
                 <TextBlock Margin="5,0" VerticalAlignment="Center">
                     [全体]

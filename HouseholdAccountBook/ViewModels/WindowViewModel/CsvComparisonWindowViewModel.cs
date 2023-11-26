@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using HouseholdAccountBook.UserEventArgs;
+using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -10,21 +11,23 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class CsvComparisonWindowViewModel : BindableBase
     {
+        #region イベント
         /// <summary>
         /// 帳簿変更時のイベント
         /// </summary>
         public event Action<int?> BookChanged;
+        #endregion
 
         #region プロパティ
         /// <summary>
         /// CSVファイルパス(1番目)
         /// </summary>
-        #region CsvFilePath
-        public string CsvFilePath
+        #region CsvFilePathes
+        public string CsvFilePathes
         {
             get {
                 if (0 < this._CsvFilePathList.Count) {
-                    return this._CsvFilePathList[0];
+                    return string.Join(",", this._CsvFilePathList);
                 }
                 else {
                     return null;
@@ -86,7 +89,7 @@ namespace HouseholdAccountBook.ViewModels
         /// CSV比較VMの未チェック数
         /// </summary>
         #region UncheckedNum
-        public int AllUncheckedCount => this.CsvComparisonVMList.Count((tmp) => !tmp.IsMatch);
+        public int AllUncheckedCount => this.CsvComparisonVMList.Count((vm) => !vm.IsMatch);
         #endregion
         /// <summary>
         /// CSV比較VMの個数
@@ -122,7 +125,7 @@ namespace HouseholdAccountBook.ViewModels
         /// 選択されたCSV比較VMの未チェック数
         /// </summary>
         #region UncheckedNum
-        public int? SelectedUncheckedCount => this.SelectedCsvComparisonVMList.Count((tmp) => !tmp.IsMatch);
+        public int SelectedUncheckedCount => this.SelectedCsvComparisonVMList.Count((vm) => !vm.IsMatch);
         #endregion
         /// <summary>
         /// 選択されたCSV比較VMの個数
@@ -144,13 +147,28 @@ namespace HouseholdAccountBook.ViewModels
         public CsvComparisonWindowViewModel()
         {
             this.CsvFilePathList.CollectionChanged += (sender, args) => {
-                this.RaisePropertyChanged(nameof(this.CsvFilePath));
+                this.RaisePropertyChanged(nameof(this.CsvFilePathes));
             };
 
             this.CsvComparisonVMList.CollectionChanged += (sender, args) => {
                 this.RaisePropertyChanged(nameof(this.AllUncheckedCount));
                 this.RaisePropertyChanged(nameof(this.AllCount));
                 this.RaisePropertyChanged(nameof(this.AllSumValue));
+
+                if (args.OldItems != null) {
+                    foreach (object tmp in args.OldItems) {
+                        if (tmp is CsvComparisonViewModel vm) {
+                            vm.IsMatchChanged -= this.RaiseUncheckedCountChanged;
+                        }
+                    }
+                }
+                if (args.NewItems != null) {
+                    foreach (object tmp in args.NewItems) {
+                        if (tmp is CsvComparisonViewModel vm) {
+                            vm.IsMatchChanged += this.RaiseUncheckedCountChanged;
+                        }
+                    }
+                }
             };
             this.SelectedCsvComparisonVMList.CollectionChanged += (sender, args) => {
                 this.RaisePropertyChanged(nameof(this.SelectedUncheckedCount));
@@ -162,7 +180,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 未チェック数変更を通知する
         /// </summary>
-        public void RaiseUncheckedNumChanged()
+        public void RaiseUncheckedCountChanged(EventArgs<int?, bool> e)
         {
             this.RaisePropertyChanged(nameof(this.AllUncheckedCount));
             this.RaisePropertyChanged(nameof(this.SelectedUncheckedCount));

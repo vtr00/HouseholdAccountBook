@@ -1384,27 +1384,18 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             this.ccw = new CsvComparisonWindow(this.builder, this.WVM.SelectedBookVM.Id) { Owner = this };
             this.ccw.LoadWindowSetting();
 
-            // 帳簿項目の一致を確認時のイベントを登録する
-            this.ccw.IsMatchChanged += async (sender2, e2) => {
-                ActionViewModel vm = this.WVM.ActionVMList.FirstOrDefault((tmpVM) => { return tmpVM.ActionId == e2.Value; });
+            // 帳簿項目の一致フラグ変更時のイベントを登録する
+            this.ccw.IsMatchChanged += (sender2, e2) => {
+                ActionViewModel vm = this.WVM.ActionVMList.FirstOrDefault((tmpVM) => { return tmpVM.ActionId == e2.Value1; });
                 if (vm != null) {
-                    using (DaoBase dao = this.builder.Build()) {
-                        DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT is_match
-FROM hst_action
-WHERE action_id = @{0};", vm.ActionId);
-
-                        bool isMatch = false;
-                        reader.ExecARow((record) => {
-                            isMatch = record.ToInt("is_match") == 1;
-                        });
-                        vm.IsMatch = isMatch;
-                    }
+                    // UI上の表記だけを更新する
+                    vm.IsMatch = e2.Value2;
                 }
             };
-            // 複数の帳簿項目変更時のイベントを登録する
-            this.ccw.ActionsStatusChanged += async (sender3, e3) => {
-                await this.UpdateBookTabDataAsync(isScroll: false);
+            // 帳簿項目変更時のイベントを登録する
+            this.ccw.ActionChanged += async (sender3, e3) => {
+                // 帳簿一覧タブを更新する
+                await this.UpdateBookTabDataAsync(isScroll: false, isUpdateActDateLastEdited: true);
             };
             // 帳簿変更時のイベントを登録する
             this.ccw.BookChanged += async (sender4, e4) => {

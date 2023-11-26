@@ -1,5 +1,7 @@
 ﻿using HouseholdAccountBook.Interfaces;
+using HouseholdAccountBook.UserEventArgs;
 using Prism.Mvvm;
+using System;
 
 namespace HouseholdAccountBook.ViewModels
 {
@@ -8,6 +10,13 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public partial class CsvComparisonViewModel : BindableBase, IMultiSelectable
     {
+        #region フィールド
+        /// <summary>
+        /// 一致フラグ変更時のイベント
+        /// </summary>
+        public event Action<EventArgs<int?, bool>> IsMatchChanged;
+        #endregion
+
         #region プロパティ
         /// <summary>
         /// 帳簿項目ID
@@ -58,7 +67,7 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 一致するか
+        /// 一致フラグ
         /// </summary>
         #region IsMatch
         public bool IsMatch
@@ -66,7 +75,9 @@ namespace HouseholdAccountBook.ViewModels
             get => this._IsMatch;
             set {
                 if (this.ActionId.HasValue) {
-                    this.SetProperty(ref this._IsMatch, value);
+                    if (this.SetProperty(ref this._IsMatch, value)) {
+                        this.IsMatchChanged?.Invoke(new EventArgs<int?, bool>(this.ActionId, value));
+                    }
                 }
             }
         }
@@ -86,7 +97,7 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 選択されているか
+        /// 選択フラグ
         /// </summary>
         #region IsSelected
         public bool IsSelected
@@ -107,6 +118,7 @@ namespace HouseholdAccountBook.ViewModels
             this.ItemName = default;
             this.ShopName = default;
             this.Remark = default;
+
             this.IsMatch = default;
         }
     }
