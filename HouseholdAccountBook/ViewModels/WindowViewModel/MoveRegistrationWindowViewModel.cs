@@ -306,15 +306,15 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 備考リスト
+        /// 備考VMリスト
         /// </summary>
-        #region RemarkList
-        public ObservableCollection<string> RemarkList
+        #region RemarkVMList
+        public ObservableCollection<RemarkViewModel> RemarkVMList
         {
-            get => this._RemarkList;
-            set => this.SetProperty(ref this._RemarkList, value);
+            get => this._RemarkVMList;
+            set => this.SetProperty(ref this._RemarkVMList, value);
         }
-        private ObservableCollection<string> _RemarkList = default;
+        private ObservableCollection<RemarkViewModel> _RemarkVMList = default;
         #endregion
         /// <summary>
         /// 選択された備考

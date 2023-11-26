@@ -358,9 +358,9 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         }
 
         /// <summary>
-        /// カテゴリリストを更新する
+        /// 分類リストを更新する
         /// </summary>
-        /// <param name="categoryId">選択対象のカテゴリID</param>
+        /// <param name="categoryId">選択対象の分類ID</param>
         /// <returns></returns>
         private async Task UpdateCategoryListAsync(int? categoryId = null)
         {
@@ -404,20 +404,28 @@ ORDER BY sort_order;", (int)this.WVM.SelectedBalanceKind, this.WVM.SelectedBookV
                 DaoReader reader;
                 if (this.WVM.SelectedCategoryVM.Id == -1) {
                     reader = await dao.ExecQueryAsync(@"
-SELECT item_id, item_name FROM mst_item I 
-WHERE del_flg = 0 AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{0} AND RBI.item_id = I.item_id AND del_flg = 0)
-  AND EXISTS (SELECT * FROM mst_category C WHERE C.category_id = I.category_id AND balance_kind = @{1} AND del_flg = 0)
-ORDER BY sort_order;", this.WVM.SelectedBookVM.Id, (int)this.WVM.SelectedBalanceKind);
+SELECT I.item_id, I.item_name, C.category_name
+FROM mst_item I
+INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
+WHERE I.del_flg = 0 AND C.balance_kind = @{0} AND
+      EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{1} AND RBI.item_id = I.item_id AND del_flg = 0)
+ORDER BY C.sort_order, I.sort_order;", (int)this.WVM.SelectedBalanceKind, this.WVM.SelectedBookVM.Id);
                 }
                 else {
                     reader = await dao.ExecQueryAsync(@"
-SELECT item_id, item_name FROM mst_item I 
-WHERE del_flg = 0 AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{0} AND RBI.item_id = I.item_id AND del_flg = 0)
-  AND category_id = @{1}
-ORDER BY sort_order;", this.WVM.SelectedBookVM.Id, (int)this.WVM.SelectedCategoryVM.Id);
+SELECT I.item_id, I.item_name, C.category_name
+FROM mst_item I
+INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
+WHERE I.del_flg = 0 AND C.category_id = @{0} AND
+      EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{1} AND RBI.item_id = I.item_id AND del_flg = 0)
+ORDER BY I.sort_order;", (int)this.WVM.SelectedCategoryVM.Id, this.WVM.SelectedBookVM.Id);
                 }
                 reader.ExecWholeRow((count, record) => {
-                    ItemViewModel vm = new ItemViewModel() { Id = record.ToInt("item_id"), Name = record["item_name"] };
+                    ItemViewModel vm = new ItemViewModel() {
+                        Id = record.ToInt("item_id"),
+                        Name = record["item_name"],
+                        CategoryName = this.WVM.SelectedCategoryVM.Id == -1 ? record["category_name"] : ""
+                    };
                     itemVMList.Add(vm);
                     if (selectedItemVM == null || vm.Id == tmpItemId) {
                         selectedItemVM = vm;
@@ -438,23 +446,30 @@ ORDER BY sort_order;", this.WVM.SelectedBookVM.Id, (int)this.WVM.SelectedCategor
         {
             if (this.WVM.SelectedItemVM == null) return;
 
-            ObservableCollection<string> shopNameVMList = new ObservableCollection<string>() {
-                string.Empty
+            ObservableCollection<ShopViewModel> shopNameVMList = new ObservableCollection<ShopViewModel>() {
+                new ShopViewModel() { Name = String.Empty }
             };
-            string selectedShopName = shopName ?? this.WVM.SelectedShopName ?? shopNameVMList[0];
+            string selectedShopName = shopName ?? this.WVM.SelectedShopName ?? shopNameVMList[0].Name;
+            ShopViewModel selectedShopVM = shopNameVMList[0]; // UNUSED
             using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT shop_name FROM hst_shop 
-WHERE del_flg = 0 AND item_id = @{0} 
-ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
+SELECT S.shop_name, COUNT(A.shop_name) AS shop_count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
+FROM hst_shop S
+LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.shop_name = S.shop_name AND A.item_id = S.item_id
+WHERE S.del_flg = 0 AND S.item_id = @{0}
+GROUP BY S.shop_name
+ORDER BY sort_time DESC, shop_count DESC;", this.WVM.SelectedItemVM.Id);
                 reader.ExecWholeRow((count, record) => {
-                    string tmp = record["shop_name"];
-                    shopNameVMList.Add(tmp);
+                    ShopViewModel svm = new ShopViewModel() { Name = record["shop_name"], UsedCount = record.ToInt("shop_count"), UsedTime = record.ToNullableDateTime("used_time") };
+                    shopNameVMList.Add(svm);
+                    if (selectedShopVM == null || svm.Name == selectedShopName) {
+                        selectedShopVM = svm;
+                    }
                     return true;
                 });
             }
 
-            this.WVM.ShopNameList = shopNameVMList;
+            this.WVM.ShopVMList = shopNameVMList;
             this.WVM.SelectedShopName = selectedShopName;
         }
 
@@ -467,23 +482,30 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         {
             if (this.WVM.SelectedItemVM == null) return;
 
-            ObservableCollection<string> remarkVMList = new ObservableCollection<string>() {
-                    string.Empty
+            ObservableCollection<RemarkViewModel> remarkVMList = new ObservableCollection<RemarkViewModel>() {
+                    new RemarkViewModel() { Remark = string.Empty }
             };
-            string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0];
+            string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0].Remark;
+            RemarkViewModel selectedRemarkVM = remarkVMList[0]; // UNUSED
             using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT remark FROM hst_remark 
-WHERE del_flg = 0 AND item_id = @{0} 
-ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
+SELECT R.remark, COUNT(A.remark) AS remark_count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
+FROM hst_remark R
+LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.remark = R.remark AND A.item_id = R.item_id
+WHERE R.del_flg = 0 AND R.item_id = @{0}
+GROUP BY R.remark
+ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
                 reader.ExecWholeRow((count, record) => {
-                    string tmp = record["remark"];
-                    remarkVMList.Add(tmp);
+                    RemarkViewModel rvm = new RemarkViewModel() { Remark = record["remark"], UsedCount = record.ToInt("remark_count"), UsedTime = record.ToNullableDateTime("used_time") };
+                    remarkVMList.Add(rvm);
+                    if (selectedRemarkVM == null || rvm.Remark == selectedRemark) {
+                        selectedRemarkVM = rvm;
+                    }
                     return true;
                 });
             }
 
-            this.WVM.RemarkList = remarkVMList;
+            this.WVM.RemarkVMList = remarkVMList;
             this.WVM.SelectedRemark = selectedRemark;
         }
         #endregion

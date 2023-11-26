@@ -6,7 +6,7 @@
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         mc:Ignorable="d" 
-        Height="375" Width="300" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize"
+        Height="Auto" Width="300" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize"
         Title="期間選択 - Household Account Book"
         Loaded="TermWindow_Loaded"
         Closed="TermWindow_Closed">
@@ -79,7 +79,6 @@
 
             <Button Grid.Column="0" Margin="5" Content="OK" Command="{StaticResource OKCommand}"/>
             <Button Grid.Column="1" Margin="5" Content="キャンセル" Command="{StaticResource CancelCommand}"/>
-
         </Grid>
     </Grid>
 </Window>

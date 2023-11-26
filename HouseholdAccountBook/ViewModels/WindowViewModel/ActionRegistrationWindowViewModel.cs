@@ -243,18 +243,18 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 店舗名リスト
+        /// 店舗VMリスト
         /// </summary>
-        #region ShopNameList
-        public ObservableCollection<string> ShopNameList
+        #region ShopVMList
+        public ObservableCollection<ShopViewModel> ShopVMList
         {
-            get => this._ShopNameList;
-            set => this.SetProperty(ref this._ShopNameList, value);
+            get => this._ShopVMList;
+            set => this.SetProperty(ref this._ShopVMList, value);
         }
-        private ObservableCollection<string> _ShopNameList = default;
+        private ObservableCollection<ShopViewModel> _ShopVMList = default;
         #endregion
         /// <summary>
-        /// 選択された店舗名
+        /// 選択された店名
         /// </summary>
         #region SelectedShopName
         public string SelectedShopName
@@ -266,15 +266,15 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 備考リスト
+        /// 備考VMリスト
         /// </summary>
-        #region RemarkList
-        public ObservableCollection<string> RemarkList
+        #region RemarkVMList
+        public ObservableCollection<RemarkViewModel> RemarkVMList
         {
-            get => this._RemarkList;
-            set => this.SetProperty(ref this._RemarkList, value);
+            get => this._RemarkVMList;
+            set => this.SetProperty(ref this._RemarkVMList, value);
         }
-        private ObservableCollection<string> _RemarkList = default;
+        private ObservableCollection<RemarkViewModel> _RemarkVMList = default;
         #endregion
         /// <summary>
         /// 選択された備考

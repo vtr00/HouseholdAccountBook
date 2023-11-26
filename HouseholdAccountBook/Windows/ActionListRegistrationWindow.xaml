@@ -94,7 +94,7 @@
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                        Text="項目" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="4" Grid.Column="1" Margin="5" 
-                     ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="Name"/>
+                     ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="NameWithCategory"/>
             <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
                        Text="日付/金額" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <DataGrid Grid.Row="5" Grid.Column="1" Margin="5"
@@ -148,11 +148,11 @@
             <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
                        Text="店舗" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="7" Grid.Column="1" Margin="5" IsEditable="True"
-                      ItemsSource="{Binding ShopNameList}" Text="{Binding SelectedShopName, UpdateSourceTrigger=PropertyChanged}"/>
+                      ItemsSource="{Binding ShopVMList}" Text="{Binding SelectedShopName, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
             <TextBlock Grid.Row="8" Grid.Column="0" Margin="5" 
                        Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="8" Grid.Column="1" Margin="5" IsEditable="True"
-                      ItemsSource="{Binding RemarkList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}"/>
+                      ItemsSource="{Binding RemarkVMList}" Text="{Binding SelectedRemarkVM, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
             
             <controls:FollowablePopup x:Name="_popup" IsOpen="{Binding IsEditing, Mode=TwoWay}" Placement="Right">
                 <controls:NumericInputButton InputedValue="{Binding InputedValue}" InputedKind="{Binding InputedKind}"

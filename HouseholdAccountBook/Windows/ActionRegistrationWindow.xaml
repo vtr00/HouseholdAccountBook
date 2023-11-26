@@ -111,7 +111,7 @@
             <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" 
                        Text="項目" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="6" Grid.Column="1" Margin="5" Grid.ColumnSpan="3"
-                     ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="Name"/>
+                     ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="NameWithCategory"/>
             <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
                            Text="金額" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <controls:NumericUpDown Grid.Row="7" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
@@ -119,11 +119,11 @@
             <TextBlock Grid.Row="8" Grid.Column="0" Margin="5"
                        Text="店舗" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="8" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="3"
-                      ItemsSource="{Binding ShopNameList}" Text="{Binding SelectedShopName, UpdateSourceTrigger=PropertyChanged}"/>
+                      ItemsSource="{Binding ShopVMList}" Text="{Binding SelectedShopName, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
             <TextBlock Grid.Row="9" Grid.Column="0" Margin="5"
                        Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="9" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="3"
-                      ItemsSource="{Binding RemarkList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}"/>
+                      ItemsSource="{Binding RemarkVMList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
             <TextBlock Grid.Row="10" Grid.Column="0" Margin="5"
                            Text="回数" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <controls:NumericUpDown Grid.Row="10" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
@@ -141,8 +141,7 @@
                     </Style>
                 </ComboBox.Style>
             </ComboBox>
-            <TextBlock Grid.Row="12" Grid.Column="1" Margin="5"
-                       Text="連動して編集" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <TextBlock Grid.Row="12" Grid.Column="1" Margin="5" Text="連動して編集" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -169,8 +168,7 @@
                     </Style>
                 </CheckBox.Style>
             </CheckBox>
-            <TextBlock Grid.Row="13" Grid.Column="0" Margin="5"
-                       Text="チェック済" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <TextBlock Grid.Row="13" Grid.Column="0" Margin="5" Text="チェック済" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="Visibility" Value="Collapsed"/>

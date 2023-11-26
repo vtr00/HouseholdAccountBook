@@ -211,21 +211,51 @@
                         </GroupBox>
 
                         <GroupBox Grid.Row="2" Header="店舗">
-                            <ListBox Margin="5" x:Name="shopNameListBox" 
-                                            ItemsSource="{Binding ShopNameList}" SelectedItem="{Binding SelectedShopName}" IsEnabled="{Binding IsEnabled}">
-                                <ListBox.InputBindings>
+                            <DataGrid Margin="5" x:Name="shopDataGrid" 
+                                      ItemsSource="{Binding ShopVMList}" SelectedItem="{Binding SelectedShopVM}" IsEnabled="{Binding IsEnabled}"
+                                      IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
+                                      CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
+                                      AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
+                                      HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
+
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.InputBindings>
                                     <KeyBinding Gesture="Delete" Command="{StaticResource DeleteShopNameCommand}"/>
-                                </ListBox.InputBindings>
-                            </ListBox>
+                                </DataGrid.InputBindings>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="店名" Width="*" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="使用回数" Width="*" Binding="{Binding UsedCount}"/>
+                                    <DataGridTextColumn Header="最終使用日" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy/MM/dd', TargetNullValue='----/--/--'}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
                         </GroupBox>
 
                         <GroupBox Grid.Row="3" Header="備考">
-                            <ListBox Margin="5" x:Name="remarkListBox" 
-                                                ItemsSource="{Binding RemarkList}" SelectedItem="{Binding SelectedRemark}" IsEnabled="{Binding IsEnabled}">
-                                <ListBox.InputBindings>
+                            <DataGrid Margin="5" x:Name="remarkDataGrid" 
+                                      ItemsSource="{Binding RemarkVMList}" SelectedItem="{Binding SelectedRemarkVM}" IsEnabled="{Binding IsEnabled}"
+                                      IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
+                                      CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
+                                      AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
+                                      HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
+
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.InputBindings>
                                     <KeyBinding Gesture="Delete" Command="{StaticResource DeleteRemarkCommand}"/>
-                                </ListBox.InputBindings>
-                            </ListBox>
+                                </DataGrid.InputBindings>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="備考" Width="*" Binding="{Binding Remark}"/>
+                                    <DataGridTextColumn Header="使用回数" Width="*" Binding="{Binding UsedCount}"/>
+                                    <DataGridTextColumn Header="最終使用日" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy/MM/dd', TargetNullValue='----/--/--'}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
                         </GroupBox>
                     </Grid>
                 </Grid>

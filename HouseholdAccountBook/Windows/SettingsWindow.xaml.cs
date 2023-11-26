@@ -69,7 +69,7 @@ namespace HouseholdAccountBook.Windows
 
         #region 項目設定の操作
         /// <summary>
-        /// カテゴリを追加可能か判定
+        /// 分類を追加可能か判定
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -79,7 +79,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// カテゴリを追加する
+        /// 分類を追加する
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -558,7 +558,7 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void DeleteShopNameCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.SelectedItemVM?.SelectedShopName != null;
+            e.CanExecute = this.WVM.SelectedItemVM?.SelectedShopVM != null;
         }
 
         /// <summary>
@@ -570,25 +570,14 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         {
             if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+
                 using (DaoBase dao = this.builder.Build()) {
                     await dao.ExecQueryAsync(@"
 UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedShopName, this.WVM.SelectedItemVM.Id);
+WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedShopVM.Name, this.WVM.SelectedItemVM.Id);
 
                     // 店舗名を更新する
-                    DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT shop_name
-FROM hst_shop
-WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
-
-                    this.WVM.SelectedItemVM.ShopNameList.Clear();
-                    reader.ExecWholeRow((count, record) => {
-                        string shopName = record["shop_name"];
-
-                        this.WVM.SelectedItemVM.ShopNameList.Add(shopName);
-                        return true;
-                    });
+                    this.WVM.SelectedItemVM.ShopVMList = await this.LoadShopViewModelListAsync(dao, this.WVM.SelectedItemVM.Id);
                 }
             }
         }
@@ -600,7 +589,7 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         /// <param name="e"></param>
         private void DeleteRemarkCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.SelectedItemVM?.SelectedRemark != null;
+            e.CanExecute = this.WVM.SelectedItemVM?.SelectedRemarkVM != null;
         }
 
         /// <summary>
@@ -612,25 +601,14 @@ ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
         {
             if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+
                 using (DaoBase dao = this.builder.Build()) {
                     await dao.ExecQueryAsync(@"
 UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE remark = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedRemark, this.WVM.SelectedItemVM.Id);
+WHERE remark = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedRemarkVM.Remark, this.WVM.SelectedItemVM.Id);
 
                     // 備考欄の表示を更新する
-                    DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT remark
-FROM hst_remark
-WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
-
-                    this.WVM.SelectedItemVM.RemarkList.Clear();
-                    reader.ExecWholeRow((count, record) => {
-                        string remark = record["remark"];
-
-                        this.WVM.SelectedItemVM.RemarkList.Add(remark);
-                        return true;
-                    });
+                    this.WVM.SelectedItemVM.RemarkVMList = await this.LoadRemarkViewModelListAsync(dao, this.WVM.SelectedItemVM.Id);
                 }
             }
         }
@@ -1158,15 +1136,15 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (this.shopNameListBox.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.shopNameListBox) > 0) {
-                if (VisualTreeHelper.GetChild(this.shopNameListBox, 0) is Decorator border) {
+            if (this.shopDataGrid.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.shopDataGrid) > 0) {
+                if (VisualTreeHelper.GetChild(this.shopDataGrid, 0) is Decorator border) {
                     if (border.Child is ScrollViewer scroll) {
                         scroll.ScrollToTop();
                     }
                 }
             }
-            if (this.remarkListBox.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.remarkListBox) > 0) {
-                if (VisualTreeHelper.GetChild(this.remarkListBox, 0) is Decorator border) {
+            if (this.remarkDataGrid.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.remarkDataGrid) > 0) {
+                if (VisualTreeHelper.GetChild(this.remarkDataGrid, 0) is Decorator border) {
                     if (border.Child is ScrollViewer scroll) {
                         scroll.ScrollToTop();
                     }
@@ -1344,8 +1322,8 @@ ORDER BY sort_order;", categocyVM.Id);
                                 Name = itemName,
                                 ParentVM = categocyVM,
                                 RelationVMList = new ObservableCollection<RelationViewModel>(),
-                                ShopNameList = new ObservableCollection<string>(),
-                                RemarkList = new ObservableCollection<string>()
+                                ShopVMList = new ObservableCollection<ShopViewModel>(),
+                                RemarkVMList = new ObservableCollection<RemarkViewModel>()
                             });
                             return true;
                         });
@@ -1372,30 +1350,9 @@ ORDER BY B.sort_order;", itemVM.Id);
                             });
 
                             // 店舗名の一覧を取得する
-                            reader = await dao.ExecQueryAsync(@"
-SELECT shop_name
-FROM hst_shop
-WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time DESC;", itemVM.Id);
-
-                            reader.ExecWholeRow((count2, record2) => {
-                                string shopName = record2["shop_name"];
-                                itemVM.ShopNameList.Add(shopName);
-                                return true;
-                            });
-
+                            itemVM.ShopVMList = await this.LoadShopViewModelListAsync(dao, itemVM.Id);
                             // 備考の一覧を取得する
-                            reader = await dao.ExecQueryAsync(@"
-SELECT remark
-FROM hst_remark
-WHERE del_flg = 0 AND item_id = @{0}
-ORDER BY used_time DESC;", itemVM.Id);
-
-                            reader.ExecWholeRow((count2, record2) => {
-                                string remark = record2["remark"];
-                                itemVM.RemarkList.Add(remark);
-                                return true;
-                            });
+                            itemVM.RemarkVMList = await this.LoadRemarkViewModelListAsync(dao, itemVM.Id);
                         }
                     }
                 }
@@ -1485,7 +1442,7 @@ ORDER BY I.sort_order;", vm.Id);
                     vm.RelationVMList = new ObservableCollection<RelationViewModel>();
                     reader.ExecWholeRow((count, record) => {
                         int itemId = record.ToInt("ItemId");
-                        string name = string.Format(@"{0} - {1}", record["category_name"], record["item_name"]);
+                        string name = string.Format(@"{0} > {1}", record["category_name"], record["item_name"]);
                         bool isRelated = !record.ToBoolean("IsNotRelated");
 
                         vm.RelationVMList.Add(new RelationViewModel() {
@@ -1499,6 +1456,54 @@ ORDER BY I.sort_order;", vm.Id);
             }
 
             return settingVMList;
+        }
+        
+        /// <summary>
+        /// 店舗VMリストを取得する
+        /// </summary>
+        /// <param name="dao">DAO</param>
+        /// <param name="itemId">項目ID</param>
+        /// <returns></returns>
+        private async Task<ObservableCollection<ShopViewModel>> LoadShopViewModelListAsync(DaoBase dao, int itemId)
+        {
+            ObservableCollection<ShopViewModel> svmList = new ObservableCollection<ShopViewModel>();
+            DaoReader reader = await dao.ExecQueryAsync(@"
+SELECT S.shop_name, COUNT(A.shop_name) AS shop_count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
+FROM hst_shop S
+LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.shop_name = S.shop_name AND A.item_id = S.item_id
+WHERE S.del_flg = 0 AND S.item_id = @{0}
+GROUP BY S.shop_name
+ORDER BY sort_time DESC, shop_count DESC;", itemId);
+            reader.ExecWholeRow((count, record) => {
+                ShopViewModel svm = new ShopViewModel() { Name = record["shop_name"], UsedCount = record.ToInt("shop_count"), UsedTime = record.ToNullableDateTime("used_time") };
+                svmList.Add(svm);
+                return true;
+            });
+            return svmList;
+        }
+
+        /// <summary>
+        /// 備考VMリストを取得する
+        /// </summary>
+        /// <param name="dao">DAO</param>
+        /// <param name="itemId">項目ID</param>
+        /// <returns></returns>
+        private async Task<ObservableCollection<RemarkViewModel>> LoadRemarkViewModelListAsync(DaoBase dao, int itemId)
+        {
+            ObservableCollection<RemarkViewModel> rvmList = new ObservableCollection<RemarkViewModel>();
+            DaoReader reader = await dao.ExecQueryAsync(@"
+SELECT R.remark, COUNT(A.remark) AS remark_count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
+FROM hst_remark R
+LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.remark = R.remark AND A.item_id = R.item_id
+WHERE R.del_flg = 0 AND R.item_id = @{0}
+GROUP BY R.remark
+ORDER BY sort_time DESC, remark_count DESC;", itemId);
+            reader.ExecWholeRow((count, record) => {
+                RemarkViewModel rvm = new RemarkViewModel() { Remark = record["remark"], UsedCount = record.ToInt("remark_count"), UsedTime = record.ToNullableDateTime("used_time") };
+                rvmList.Add(rvm);
+                return true;
+            });
+            return rvmList;
         }
         #endregion
 

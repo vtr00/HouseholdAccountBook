@@ -392,13 +392,19 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
                         break;
                 }
                 DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT item_id, item_name FROM mst_item I 
-WHERE del_flg = 0 AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{0} AND RBI.item_id = I.item_id AND del_flg = 0)
-  AND EXISTS (SELECT * FROM mst_category C WHERE C.category_id = I.category_id AND balance_kind = @{1} AND del_flg = 0)
-ORDER BY sort_order;", bookId, (int)BalanceKind.Outgo);
+SELECT I.item_id, I.item_name, C.category_name
+FROM mst_item I
+INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
+WHERE I.del_flg = 0 AND C.balance_kind = @{0} AND
+      EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{1} AND RBI.item_id = I.item_id AND del_flg = 0)
+ORDER BY C.sort_order, I.sort_order;", (int)BalanceKind.Outgo, bookId);
 
                 reader.ExecWholeRow((count, record) => {
-                    ItemViewModel vm = new ItemViewModel() { Id = record.ToInt("item_id"), Name = record["item_name"] };
+                    ItemViewModel vm = new ItemViewModel() {
+                        Id = record.ToInt("item_id"),
+                        Name = record["item_name"],
+                        CategoryName = record["category_name"]
+                    };
                     itemVMList.Add(vm);
                     if (selectedItemVM == null || vm.Id == itemId) {
                         selectedItemVM = vm;
@@ -419,23 +425,30 @@ ORDER BY sort_order;", bookId, (int)BalanceKind.Outgo);
         {
             if (this.WVM?.SelectedItemVM?.Id == null) return;
 
-            ObservableCollection<string> remarkVMList = new ObservableCollection<string>() {
-                string.Empty
+            ObservableCollection<RemarkViewModel> remarkVMList = new ObservableCollection<RemarkViewModel>() {
+                new RemarkViewModel(){ Remark = string.Empty }
             };
-            string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0];
+            string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0].Remark;
+            RemarkViewModel selectedRemarkVM = remarkVMList[0]; // UNUSED
             using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT remark FROM hst_remark 
-WHERE del_flg = 0 AND item_id = @{0} 
-ORDER BY used_time DESC;", this.WVM.SelectedItemVM.Id);
+SELECT R.remark, COUNT(A.remark) AS remark_count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
+FROM hst_remark R
+LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.remark = R.remark AND A.item_id = R.item_id
+WHERE R.del_flg = 0 AND R.item_id = @{0}
+GROUP BY R.remark
+ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
                 reader.ExecWholeRow((count, record) => {
-                    string tmp = record["remark"];
-                    remarkVMList.Add(tmp);
+                    RemarkViewModel rvm = new RemarkViewModel() { Remark = record["remark"], UsedCount = record.ToInt("remark_count"), UsedTime = record.ToNullableDateTime("used_time") };
+                    remarkVMList.Add(rvm);
+                    if (selectedRemarkVM == null || rvm.Remark == selectedRemark) {
+                        selectedRemarkVM = rvm;
+                    }
                     return true;
                 });
             }
 
-            this.WVM.RemarkList = remarkVMList;
+            this.WVM.RemarkVMList = remarkVMList;
             this.WVM.SelectedRemark = selectedRemark;
         }
         #endregion

@@ -189,7 +189,7 @@
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                            Text="項目" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ListBox Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" 
-                         ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="Name"/>
+                         ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="NameWithCategory"/>
                     <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                            Text="金額" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5"
@@ -197,7 +197,7 @@
                     <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                            Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsEditable="True"
-                          ItemsSource="{Binding RemarkList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}"/>
+                          ItemsSource="{Binding RemarkVMList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
                 </Grid>
             </GroupBox>
         </Grid>

@@ -114,6 +114,24 @@ namespace HouseholdAccountBook.Dao
                     throw new KeyNotFoundException();
                 }
             }
+
+            /// <summary>
+            /// DateTime?型で取得する
+            /// </summary>
+            /// <param name="key">カラム名</param>
+            /// <returns></returns>
+            public DateTime? ToNullableDateTime(string key)
+            {
+                key = key.ToLower();
+                if (this._record.ContainsKey(key)) {
+                    object tmp = this._record[key];
+                    if (tmp == DBNull.Value) return null;
+                    return DateTime.Parse(tmp.ToString());
+                }
+                else {
+                    throw new KeyNotFoundException();
+                }
+            }
         }
     }
 }
