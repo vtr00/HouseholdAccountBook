@@ -6,7 +6,7 @@
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         mc:Ignorable="d" 
-        Height="Auto" Width="300" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize"
+        Height="430" Width="300" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize"
         Title="期間選択 - Household Account Book"
         Loaded="TermWindow_Loaded"
         Closed="TermWindow_Closed">
@@ -16,11 +16,19 @@
     </Window.DataContext>
     
     <Window.Resources>
+        <RoutedCommand x:Key="CheckSelectedMonthCommand"/>
+        <RoutedCommand x:Key="ThisMonthCommand"/>
+        <RoutedCommand x:Key="CheckSelectedTeamCommand"/>
+        <RoutedCommand x:Key="AllTermCommand"/>
         <RoutedCommand x:Key="OKCommand"/>
         <RoutedCommand x:Key="CancelCommand"/>
     </Window.Resources>
 
     <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource CheckSelectedMonthCommand}" Executed="CheckSelectedMonthCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ThisMonthCommand}" Executed="ThisMonthCommand_Executed"/>
+        <CommandBinding Command="{StaticResource CheckSelectedTeamCommand}" Executed="CheckSelectedTermCommand_Executed"/>
+        <CommandBinding Command="{StaticResource AllTermCommand}" Executed="AllTermCommand_Executed"/>
         <CommandBinding Command="{StaticResource OKCommand}" Executed="OKCommand_Executed"/>
         <CommandBinding Command="{StaticResource CancelCommand}" Executed="CancelCommand_Executed"/>
     </Window.CommandBindings>
@@ -35,24 +43,34 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <GroupBox Grid.Row="0">
                 <GroupBox.Header>
-                    <RadioButton x:Name="monthRadioButton" Content="月指定" GroupName="TermKind" IsChecked="True"/>
+                    <RadioButton x:Name="selectedMonthRadioButton" Content="指定月" GroupName="TermKind" IsChecked="True" Command="{StaticResource CheckSelectedMonthCommand}"/>
                 </GroupBox.Header>
-                <Grid IsEnabled="{Binding IsChecked, ElementName=monthRadioButton}">
-                    <Calendar x:Name="calendar" DisplayDate="{Binding StartDate, Mode=TwoWay}" SelectedDate="{Binding StartDate, Mode=TwoWay}" 
-                              DisplayModeChanged="Calendar_DisplayModeChanged" />
+                
+                <Grid IsEnabled="{Binding IsChecked, ElementName=selectedMonthRadioButton}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="0" Margin="5" Content="今月" Command="{StaticResource ThisMonthCommand}"/>
+                    <Calendar Grid.Row="1" x:Name="calendar" DisplayDate="{Binding StartDate, Mode=TwoWay}" SelectedDate="{Binding StartDate, Mode=TwoWay}" 
+                              DisplayModeChanged="Calendar_DisplayModeChanged"/>
                 </Grid>
             </GroupBox>
             
             <GroupBox Grid.Row="1">
                 <GroupBox.Header>
-                    <RadioButton x:Name="termRadioButton" Content="期間指定" GroupName="TermKind"/>
+                    <RadioButton x:Name="selectedTermRadioButton" Content="指定期間" GroupName="TermKind" Command="{StaticResource CheckSelectedTeamCommand}"/>
                 </GroupBox.Header>
-                <Grid IsEnabled="{Binding IsChecked, ElementName=termRadioButton}">
+                
+                <Grid IsEnabled="{Binding IsChecked, ElementName=selectedTermRadioButton}">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
@@ -61,11 +79,12 @@
                         <ColumnDefinition Width="0.5*"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="開始：" VerticalAlignment="Center"/>
-                    <controls:DateTimePicker Grid.Row="0" Grid.Column="1" Margin="5" DateFormat="yyyy/MM/dd" 
-                                             SelectedDate="{Binding StartDate}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="終了：" VerticalAlignment="Center"/>
+                    <Button Grid.Row="0" Grid.ColumnSpan="2" Margin="5" Content="全期間" Command="{StaticResource AllTermCommand}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="開始：" VerticalAlignment="Center"/>
                     <controls:DateTimePicker Grid.Row="1" Grid.Column="1" Margin="5" DateFormat="yyyy/MM/dd" 
+                                             SelectedDate="{Binding StartDate}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="終了：" VerticalAlignment="Center"/>
+                    <controls:DateTimePicker Grid.Row="2" Grid.Column="1" Margin="5" DateFormat="yyyy/MM/dd" 
                                              SelectedDate="{Binding EndDate}"/>
                 </Grid>
             </GroupBox>

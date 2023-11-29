@@ -101,7 +101,7 @@ namespace HouseholdAccountBook.ViewModels
         public TermKind DisplayedTermKind
         {
             get {
-                DateTime lastDate = this.StartDate.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1);
+                DateTime lastDate = this.StartDate.GetLastDateOfMonth();
                 return (this.StartDate.Day == 1 && DateTime.Equals(this.EndDate.Date, lastDate.Date)) ? TermKind.Monthly : TermKind.Selected;
             }
         }
@@ -128,7 +128,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (value != null) {
                     // 開始日/終了日を更新する
                     this.StartDate = value.Value.GetFirstDateOfMonth();
-                    this.EndDate = value.Value.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1);
+                    this.EndDate = value.Value.GetLastDateOfMonth();
 
                     if (!this.onUpdateDisplayedDate) {
                         this.onUpdateDisplayedDate = true;
@@ -170,7 +170,7 @@ namespace HouseholdAccountBook.ViewModels
                 this.RaisePropertyChanged(nameof(this.DisplayedMonth));
             }
         }
-        private DateTime _EndDate = DateTime.Now.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1);
+        private DateTime _EndDate = DateTime.Now.GetLastDateOfMonth();
         #endregion
 
         /// <summary>

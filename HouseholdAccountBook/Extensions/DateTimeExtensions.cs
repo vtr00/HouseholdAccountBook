@@ -56,10 +56,10 @@ namespace HouseholdAccountBook.Extensions
         }
 
         /// <summary>
-        /// 年初めを取得する
+        /// 年始めを取得する
         /// </summary>
         /// <param name="dateTime">対象の日付</param>
-        /// <returns>年初め</returns>
+        /// <returns>年始め</returns>
         public static DateTime GetFirstDateOfYear(this DateTime dateTime)
         {
             DateTime ans = new DateTime(dateTime.Year, 1, 1);
@@ -67,15 +67,25 @@ namespace HouseholdAccountBook.Extensions
         }
 
         /// <summary>
-        /// 会計年度初めを取得する
+        /// 年終わりを取得する
         /// </summary>
         /// <param name="dateTime">対象の日付</param>
-        /// <param name="yearsFirstMonth">初め月</param>
-        /// <returns>会計年度初め</returns>
+        /// <returns>年終わり</returns>
+        public static DateTime GetLastDateOfYear(this DateTime dateTime)
+        {
+            DateTime ans = new DateTime(dateTime.Year, 1, 1).AddYears(1).AddMilliseconds(-1);
+            return ans;
+        }
+
+        /// <summary>
+        /// 会計年度始めを取得する
+        /// </summary>
+        /// <param name="dateTime">対象の日付</param>
+        /// <param name="yearsFirstMonth">開始月</param>
+        /// <returns>会計年度始め</returns>
         public static DateTime GetFirstDateOfFiscalYear(this DateTime dateTime, int firstMonthOfFiscalYear)
         {
-            if (firstMonthOfFiscalYear <= 0) firstMonthOfFiscalYear = 1;
-            if (12 <= firstMonthOfFiscalYear) firstMonthOfFiscalYear = 12;
+            firstMonthOfFiscalYear = Math.Max(1, Math.Min(firstMonthOfFiscalYear, 12));
 
             DateTime ans = dateTime.AddMonths(-(firstMonthOfFiscalYear - 1));
             ans = new DateTime(ans.Year, firstMonthOfFiscalYear, 1);
@@ -83,13 +93,39 @@ namespace HouseholdAccountBook.Extensions
         }
 
         /// <summary>
-        /// 月初めを取得する
+        /// 会計年度終わりを取得する
         /// </summary>
         /// <param name="dateTime">対象の日付</param>
-        /// <returns>月初め</returns>
+        /// <param name="firstMonthOfFiscalYear">開始月</param>
+        /// <returns>会計年度終わり</returns>
+        public static DateTime GetLastDateOfFiscalYear(this DateTime dateTime, int firstMonthOfFiscalYear)
+        {
+            firstMonthOfFiscalYear = Math.Max(1, Math.Min(firstMonthOfFiscalYear, 12));
+
+            DateTime ans = dateTime.AddMonths(-(firstMonthOfFiscalYear - 1));
+            ans = new DateTime(ans.Year, firstMonthOfFiscalYear, 1).AddYears(1).AddMilliseconds(-1);
+            return ans;
+        }
+
+        /// <summary>
+        /// 月始めを取得する
+        /// </summary>
+        /// <param name="dateTime">対象の日付</param>
+        /// <returns>月始め</returns>
         public static DateTime GetFirstDateOfMonth(this DateTime dateTime)
         {
             DateTime ans = new DateTime(dateTime.Year, dateTime.Month, 1);
+            return ans;
+        }
+
+        /// <summary>
+        /// 月終わりを取得する
+        /// </summary>
+        /// <param name="dateTime">対象の日付</param>
+        /// <returns>月終わり</returns>
+        public static DateTime GetLastDateOfMonth(this DateTime dateTime)
+        {
+            DateTime ans = new DateTime(dateTime.Year, dateTime.Month, 1).AddMonths(1).AddMilliseconds(-1);
             return ans;
         }
 

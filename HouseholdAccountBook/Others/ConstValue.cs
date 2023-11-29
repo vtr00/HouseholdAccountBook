@@ -138,7 +138,7 @@ namespace HouseholdAccountBook.ConstValue
         };
 
         /// <summary>
-        /// 区間種別
+        /// 期間種別
         /// </summary>
         public enum TermKind
         {
@@ -149,7 +149,7 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// 選択
             /// </summary>
-            Selected,
+            Selected
         }
 
         /// <summary>

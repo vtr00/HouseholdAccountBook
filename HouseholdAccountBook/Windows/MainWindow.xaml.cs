@@ -1202,10 +1202,10 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             TermWindow stw = null;
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
-                    stw = new TermWindow(this.WVM.DisplayedMonth.Value) { Owner = this };
+                    stw = new TermWindow(builder, this.WVM.DisplayedMonth.Value) { Owner = this };
                     break;
                 case TermKind.Selected:
-                    stw = new TermWindow(this.WVM.StartDate, this.WVM.EndDate) { Owner = this };
+                    stw = new TermWindow(builder, this.WVM.StartDate, this.WVM.EndDate) { Owner = this };
                     break;
             }
             stw.LoadWindowSetting();
@@ -2421,8 +2421,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             if (isScroll) {
                 if (this.WVM.DisplayedTermKind == TermKind.Monthly &&
-                    this.WVM.DisplayedMonth.Value.GetFirstDateOfMonth() < DateTime.Today &&
-                    DateTime.Today < this.WVM.DisplayedMonth.Value.GetFirstDateOfMonth().AddMonths(1).AddMilliseconds(-1)) {
+                    this.WVM.DisplayedMonth.Value.GetFirstDateOfMonth() < DateTime.Today && DateTime.Today < this.WVM.DisplayedMonth.Value.GetLastDateOfMonth()) {
                     // 今月の場合は、末尾が表示されるようにする
                     this.actionDataGrid.ScrollToButtom();
                 }
