@@ -121,7 +121,7 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void TermWindow_Loaded(object sender, RoutedEventArgs e)
+        private void TermWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // xamlで指定するとCalendarが正しく表示されないため、ここで指定する
             this.calendar.DisplayMode = CalendarMode.Year;

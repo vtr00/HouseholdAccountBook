@@ -294,6 +294,7 @@
                             </Button>
                             <Button Width="20" Content="▶" Command="{StaticResource GoToNextMonthCommand}"/>
                             <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}"/>
+                            
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="150"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
                         </StackPanel>
@@ -387,27 +388,36 @@
                         <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns" VerticalAlignment="Stretch"/>
 
                         <!-- サマリーリスト -->
-                        <DataGrid Grid.Column="2" ItemsSource="{Binding SummaryVMList}" SelectedItem="{Binding SelectedSummaryVM}" 
-                                  IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
-                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
-                                  AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
-                                  HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
-                                  ItemContainerStyle="{StaticResource SummaryStyle}">
-                            <DataGrid.ColumnHeaderStyle>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                </Style>
-                            </DataGrid.ColumnHeaderStyle>
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="CId" Binding="{Binding CategoryId}"
-                                                     Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
-                                <DataGridTextColumn Header="IId" Binding="{Binding ItemId}"
-                                                     Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
-                                <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
-                                <DataGridTextColumn Header="合計" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Summary, Converter={StaticResource IntToMoneyDisplayConverter}}" 
-                                                    ElementStyle="{StaticResource TextAlignRight}"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
+                        <Grid Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1.0*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <DataGrid Grid.Row="0" ItemsSource="{Binding SummaryVMList}" SelectedItem="{Binding SelectedSummaryVM}" 
+                                      IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
+                                      CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
+                                      AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
+                                      HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
+                                      ItemContainerStyle="{StaticResource SummaryStyle}">
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="CId" Binding="{Binding CategoryId}"
+                                                         Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                    <DataGridTextColumn Header="IId" Binding="{Binding ItemId}"
+                                                         Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                    <DataGridTextColumn Header="項目名" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="合計" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Summary, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                        ElementStyle="{StaticResource TextAlignRight}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <CheckBox Grid.Row="1" Margin="5" Content="絞り込み" IsChecked="{Binding IsLink}"/>
+                        </Grid>
                     </Grid>
 
                     <!-- ステータスバー -->
@@ -445,10 +455,11 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0" Margin="2,2,2,1">
+                    <Grid Grid.Row="0" Margin="2">
                         <StackPanel Orientation="Horizontal">
                             <Button Width="20" Content="◀" Command="{StaticResource GoToLastMonthCommand}"/>
                             <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToDisplayedMonthConverter}, TargetNullValue='期間指定'}"
@@ -469,31 +480,67 @@
                             </Button>
                             <Button Width="20" Content="▶" Command="{StaticResource GoToNextMonthCommand}"/>
                             <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}"/>
+                            
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                      ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                                      ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
+                                <ComboBox.Style>
+                                    <Style TargetType="ComboBox">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ComboBox.Style>
+                            </ComboBox>
                         </StackPanel>
                     </Grid>
 
                     <Grid Grid.Row="1" Margin="2" Background="White">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="0.7*"/>
-                            <RowDefinition Height="0.3*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <oxy:PlotView Grid.Row="0" Model="{Binding DailyGraphPlotModel}" Controller="{Binding Controller}"/>
+                    </Grid>
+
+                    <Grid Grid.Row="2" Margin="2" Background="White" Height="200">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <oxy:PlotView Grid.Row="0" Model="{Binding WholeItemDailyGraphModel}" Controller="{Binding Controller}"/>
-                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemDailyGraphModel}" Controller="{Binding Controller}">
-                            <oxy:PlotView.Style>
-                                <Style TargetType="oxy:PlotView">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SelectedGraphKind}" Value="Balance">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </oxy:PlotView.Style>
-                        </oxy:PlotView>
+                        <Grid Grid.Row="0">
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                                          ItemsSource="{Binding DailyGraphSeriesVMList}" SelectedItem="{Binding SelectedDailyGraphSeriesVM}" DisplayMemberPath="GraphName">
+                                    <ComboBox.Style>
+                                        <Style TargetType="ComboBox">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelecedGraphKind2}" Value="ItemGraph">
+                                                    <Setter Property="DisplayMemberPath" Value="ItemName"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ComboBox.Style>
+                                </ComboBox>
+                            </StackPanel>
+                        </Grid>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedDailyGraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
                 </Grid>
             </TabItem>
@@ -541,7 +588,7 @@
                             </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
                                 <!-- 参考：http://oita.oika.me/2014/05/31/binding-datagridcolumn/ -->
-                                <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
+                                <DataGridTextColumn Header="項目名" Binding="{Binding Name}"/>
                                 <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[0], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[0], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
@@ -598,6 +645,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
@@ -610,28 +658,63 @@
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                      ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                                      ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
+                                <ComboBox.Style>
+                                    <Style TargetType="ComboBox">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ComboBox.Style>
+                            </ComboBox>
                         </StackPanel>
                     </Grid>
 
                     <Grid Grid.Row="1" Margin="2" Background="White">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="0.7*"/>
-                            <RowDefinition Height="0.3*"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <oxy:PlotView Grid.Row="0" Model="{Binding WholeItemMonthlyGraphModel}" Controller="{Binding Controller}"/>
-                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemMonthlyGraphModel}" Controller="{Binding Controller}">
-                            <oxy:PlotView.Style>
-                                <Style TargetType="oxy:PlotView">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SelectedGraphKind}" Value="Balance">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </oxy:PlotView.Style>
-                        </oxy:PlotView>
+                        <oxy:PlotView Grid.Row="0" Model="{Binding MonthlyGraphPlotModel}" Controller="{Binding Controller}"/>
+                    </Grid>
+
+                    <Grid Grid.Row="2" Margin="2" Background="White" Height="200">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                                          ItemsSource="{Binding MonthlyGraphSeriesVMList}" SelectedItem="{Binding SelectedMonthlyGraphSeriesVM}" DisplayMemberPath="GraphName">
+                                    <ComboBox.Style>
+                                        <Style TargetType="ComboBox">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelecedGraphKind2}" Value="ItemGraph">
+                                                    <Setter Property="DisplayMemberPath" Value="ItemName"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ComboBox.Style>
+                                </ComboBox>
+                            </StackPanel>
+                        </Grid>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedMonthlyGraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
                 </Grid>
             </TabItem>
@@ -675,7 +758,7 @@
                             </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
                                 <!-- 参考：http://oita.oika.me/2014/05/31/binding-datagridcolumn/ -->
-                                <DataGridTextColumn Header="項目名" Binding="{Binding ItemName}"/>
+                                <DataGridTextColumn Header="項目名" Binding="{Binding Name}"/>
                                 <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[0], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
                                                     Binding="{Binding Values[0], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
@@ -723,6 +806,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
@@ -735,28 +819,54 @@
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKindDic}" SelectedValue="{Binding SelectedGraphKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                      ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                                      ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
+                                <ComboBox.Style>
+                                    <Style TargetType="ComboBox">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ComboBox.Style>
+                            </ComboBox>
                         </StackPanel>
                     </Grid>
 
                     <Grid Grid.Row="1" Margin="2" Background="White">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="0.7*"/>
-                            <RowDefinition Height="0.3*"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <oxy:PlotView Grid.Row="0" Model="{Binding WholeItemYearlyGraphModel}" Controller="{Binding Controller}"/>
-                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedItemYearlyGraphModel}" Controller="{Binding Controller}">
-                            <oxy:PlotView.Style>
-                                <Style TargetType="oxy:PlotView">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SelectedGraphKind}" Value="Balance">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </oxy:PlotView.Style>
-                        </oxy:PlotView>
+                        <oxy:PlotView Grid.Row="0" Model="{Binding YearlyGraphPlotModel}" Controller="{Binding Controller}"/>
+                    </Grid>
+
+                    <Grid Grid.Row="2" Margin="2" Background="White" Height="200">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                                          ItemsSource="{Binding YearlyGraphSeriesVMList}" SelectedItem="{Binding SelectedYearlyGraphSeriesVM}" DisplayMemberPath="GraphName"/>
+                            </StackPanel>
+                        </Grid>
+                        
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedYearlyGraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
                 </Grid>
             </TabItem>

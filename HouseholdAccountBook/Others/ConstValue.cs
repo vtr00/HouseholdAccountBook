@@ -51,6 +51,7 @@ namespace HouseholdAccountBook.ConstValue
         }
         #endregion
 
+        #region タブ
         /// <summary>
         /// タブ
         /// </summary>
@@ -102,7 +103,9 @@ namespace HouseholdAccountBook.ConstValue
             /// </summary>
             OtherSettingsTab = 2
         }
+        #endregion
 
+        #region 種別
         /// <summary>
         /// 帳簿種別
         /// </summary>
@@ -130,14 +133,6 @@ namespace HouseholdAccountBook.ConstValue
             Stock = 4
         }
         /// <summary>
-        /// 帳簿種別文字列
-        /// </summary>
-        public static Dictionary<BookKind, string> BookKindStr { get; } = new Dictionary<BookKind, string>() {
-            { BookKind.Uncategorized, "未分類" }, { BookKind.Wallet, "財布" }, { BookKind.BankAccount, "銀行口座" },
-            { BookKind.CreditCard, "クレジットカード" }, {BookKind.Stock, "証券口座" }
-        };
-
-        /// <summary>
         /// 期間種別
         /// </summary>
         public enum TermKind
@@ -151,7 +146,6 @@ namespace HouseholdAccountBook.ConstValue
             /// </summary>
             Selected
         }
-
         /// <summary>
         /// 収支種別
         /// </summary>
@@ -171,13 +165,6 @@ namespace HouseholdAccountBook.ConstValue
             Others = -1
         }
         /// <summary>
-        /// 収支種別文字列
-        /// </summary>
-        public static Dictionary<BalanceKind, string> BalanceKindStr { get; } = new Dictionary<BalanceKind, string>() {
-            { BalanceKind.Income, "収入" }, { BalanceKind.Outgo, "支出" }
-        };
-
-        /// <summary>
         /// 休日設定種別
         /// </summary>
         public enum HolidaySettingKind
@@ -196,13 +183,6 @@ namespace HouseholdAccountBook.ConstValue
             AfterHoliday,
         }
         /// <summary>
-        /// 休日設定種別文字列
-        /// </summary>
-        public static Dictionary<HolidaySettingKind, string> HolidaySettingKindStr { get; } = new Dictionary<HolidaySettingKind, string>() {
-            { HolidaySettingKind.Nothing, "なし" }, { HolidaySettingKind.BeforeHoliday, "休日前" }, { HolidaySettingKind.AfterHoliday, "休日後" }
-        };
-
-        /// <summary>
         /// グループ種別
         /// </summary>
         public enum GroupKind
@@ -220,7 +200,6 @@ namespace HouseholdAccountBook.ConstValue
             /// </summary>
             ListReg = 2
         }
-
         /// <summary>
         /// 手数料種別
         /// </summary>
@@ -236,32 +215,83 @@ namespace HouseholdAccountBook.ConstValue
             ToBook = 1
         }
         /// <summary>
+        /// グラフ種別1
+        /// </summary>
+        public enum GraphKind1
+        {
+            /// <summary>
+            /// 収支グラフ
+            /// </summary>
+            IncomeAndOutgoGraph = 0,
+            /// <summary>
+            /// 残高グラフ
+            /// </summary>
+            BalanceGraph = 1
+        }
+        /// <summary>
+        /// グラフ種別2
+        /// </summary>
+        public enum GraphKind2
+        {
+            /// <summary>
+            /// 分類グラフ
+            /// </summary>
+            CategoryGraph = 0,
+            /// <summary>
+            /// 項目グラフ
+            /// </summary>
+            ItemGraph = 1
+        }
+        #endregion
+
+        #region 種別文字列
+        /// <summary>
+        /// 帳簿種別文字列
+        /// </summary>
+        public static Dictionary<BookKind, string> BookKindStr { get; } = new Dictionary<BookKind, string>() {
+            { BookKind.Uncategorized,   "未分類" },
+            { BookKind.Wallet,          "財布" },
+            { BookKind.BankAccount,     "銀行口座" },
+            { BookKind.CreditCard,      "クレジットカード" },
+            { BookKind.Stock,           "証券口座" }
+        };
+        /// <summary>
+        /// 収支種別文字列
+        /// </summary>
+        public static Dictionary<BalanceKind, string> BalanceKindStr { get; } = new Dictionary<BalanceKind, string>() {
+            { BalanceKind.Income,   "収入" },
+            { BalanceKind.Outgo,    "支出" }
+        };
+        /// <summary>
+        /// 休日設定種別文字列
+        /// </summary>
+        public static Dictionary<HolidaySettingKind, string> HolidaySettingKindStr { get; } = new Dictionary<HolidaySettingKind, string>() {
+            { HolidaySettingKind.Nothing,       "なし" },
+            { HolidaySettingKind.BeforeHoliday, "休日前" },
+            { HolidaySettingKind.AfterHoliday,  "休日後" }
+        };
+        /// <summary>
         /// 手数料種別文字列
         /// </summary>
         public static Dictionary<CommissionKind, string> CommissionKindStr { get; } = new Dictionary<CommissionKind, string>() {
-            { CommissionKind.FromBook, "移動元" }, { CommissionKind.ToBook, "移動先" }
+            { CommissionKind.FromBook,  "移動元" },
+            { CommissionKind.ToBook,    "移動先" }
         };
-
         /// <summary>
-        /// グラフ種別
+        /// グラフ種別1文字列
         /// </summary>
-        public enum GraphKind
-        {
-            /// <summary>
-            /// 収支
-            /// </summary>
-            IncomeAndOutgo = 0,
-            /// <summary>
-            /// 残高
-            /// </summary>
-            Balance = 1
-        }
-        /// <summary>
-        /// グラフ種別文字列
-        /// </summary>
-        public static Dictionary<GraphKind, string> GraphKindStr { get; } = new Dictionary<GraphKind, string>() {
-            { GraphKind.IncomeAndOutgo, "収支グラフ" }, { GraphKind.Balance, "残高グラフ" }
+        public static Dictionary<GraphKind1, string> GraphKind1Str { get; } = new Dictionary<GraphKind1, string>() {
+            { GraphKind1.IncomeAndOutgoGraph, "収支" },
+            { GraphKind1.BalanceGraph,        "残高" }
         };
+        /// <summary>
+        /// グラフ種別2文字列
+        /// </summary>
+        public static Dictionary<GraphKind2, string> GraphKind2Str { get; } = new Dictionary<GraphKind2, string>() {
+            { GraphKind2.CategoryGraph, "分類" },
+            { GraphKind2.ItemGraph,     "項目" }
+        };
+        #endregion
 
         /// <summary>
         /// 登録モード

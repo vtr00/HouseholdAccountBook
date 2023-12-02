@@ -348,7 +348,7 @@
     <Compile Include="ViewModels\WindowViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel\MoveRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\RelationViewModel.cs" />
-    <Compile Include="ViewModels\SeriesItemViewModel.cs" />
+    <Compile Include="ViewModels\GraphDatumViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel\SettingsWindowViewModel.cs" />
     <Compile Include="ViewModels\SummaryViewModel.cs" />
     <Compile Include="ViewModels\SeriesViewModel.cs" />

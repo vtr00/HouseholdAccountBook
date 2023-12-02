@@ -35,6 +35,10 @@ namespace HouseholdAccountBook.ViewModels
         /// タブ選択変更時イベント
         /// </summary>
         public event Action SelectedTabChanged = default;
+        /// <summary>
+        /// 系列選択変更時イベント
+        /// </summary>
+        public event Action SelectedSeriesChanged = default;
         #endregion
 
         #region プロパティ
@@ -90,6 +94,86 @@ namespace HouseholdAccountBook.ViewModels
             }
         }
         private BookViewModel _SelectedBookVM;
+        #endregion
+
+        /// <summary>
+        /// 選択された収支種別
+        /// </summary>
+        public int? SelectedBalanceKind { get; set; } = default;
+        /// <summary>
+        /// 選択された分類ID
+        /// </summary>
+        public int? SelectedCategoryId { get; set; } = default;
+        /// <summary>
+        /// 選択された項目ID
+        /// </summary>
+        public int? SelectedItemId { get; set; } = default;
+        #endregion
+
+        #region プロパティ(グラフ)
+        /// <summary>
+        /// グラフ種別1辞書
+        /// </summary>
+        #region GraphKind1Dic
+        public Dictionary<GraphKind1, string> GraphKind1Dic { get; } = GraphKind1Str;
+        #endregion
+        /// <summary>
+        /// 選択されたグラフ種別1
+        /// </summary>
+        #region SelectedGraphKind1
+        public GraphKind1 SelectedGraphKind1
+        {
+            get => this._SelectedGraphKind1;
+            set {
+                if (this.SetProperty(ref this._SelectedGraphKind1, value)) {
+                    this.SelectedGraphKindChanged?.Invoke();
+                }
+            }
+        }
+        private GraphKind1 _SelectedGraphKind1 = default;
+        #endregion
+        /// <summary>
+        /// 選択されたグラフ種別1インデックス
+        /// </summary>
+        #region SelectedGraphKind1Index
+        public int SelectedGraphKind1Index
+        {
+            get => (int)this._SelectedGraphKind1;
+            set => this.SelectedGraphKind1 = (GraphKind1)value;
+        }
+        #endregion
+
+        /// <summary>
+        /// グラフ種別2辞書
+        /// </summary>
+        #region GraphKind2Dic
+        public Dictionary<GraphKind2, string> GraphKind2Dic { get; } = GraphKind2Str;
+        #endregion
+        /// <summary>
+        /// 選択されたグラフ種別2
+        /// </summary>
+        #region SelectedGraphKind2
+        public GraphKind2 SelectedGraphKind2
+        {
+            get => this._SelectedGraphKind2;
+            set {
+                if (this.SetProperty(ref this._SelectedGraphKind2, value)) {
+                    this.SelectedGraphKindChanged?.Invoke();
+                    this.SelectedSeriesChanged?.Invoke();
+                }
+            }
+        }
+        private GraphKind2 _SelectedGraphKind2 = default;
+        #endregion
+        /// <summary>
+        /// 選択されたグラフ種別2インデックス
+        /// </summary>
+        #region SelectedGraphKind2Index
+        public int SelectedGraphKind2Index
+        {
+            get => (int)this._SelectedGraphKind2;
+            set => this.SelectedGraphKind2 = (GraphKind2)value;
+        }
         #endregion
         #endregion
 
@@ -322,11 +406,113 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._SelectedSummaryVM;
             set {
-                this.SetProperty(ref this._SelectedSummaryVM, value);
-                this.UpdateDisplayedActionVMList();
+                if (this.SetProperty(ref this._SelectedSummaryVM, value)) {
+                    this.SelectedBalanceKind = value.BalanceKind;
+                    this.SelectedCategoryId = value.CategoryId;
+                    this.SelectedItemId = value.ItemId;
+
+                    this.UpdateDisplayedActionVMList();
+                }
             }
         }
         private SummaryViewModel _SelectedSummaryVM = default;
+        #endregion
+
+        /// <summary>
+        /// 帳簿項目を概要によって絞り込むか
+        /// </summary>
+        #region IsLink
+        public bool IsLink
+        {
+            get => this._IsLink;
+            set {
+                if (this.SetProperty(ref this._IsLink, value)) {
+                    this.UpdateDisplayedActionVMList();
+                }
+            }
+        }
+        private bool _IsLink = false;
+        #endregion
+
+        #endregion
+
+        #region 日別グラフタブ
+        /// <summary>
+        /// 日別グラフ系列VMリスト
+        /// </summary>
+        #region DailyGraphSeriesVMList
+        public ObservableCollection<SeriesViewModel> DailyGraphSeriesVMList
+        {
+            get => this._DailyGraphSeriesVMList;
+            set => this.SetProperty(ref this._DailyGraphSeriesVMList, value);
+        }
+        private ObservableCollection<SeriesViewModel> _DailyGraphSeriesVMList = default;
+        #endregion
+
+        /// <summary>
+        /// 選択された日別グラフ系列VM
+        /// </summary>
+        #region SelectedDailyGraphSeriesVM
+        public SeriesViewModel SelectedDailyGraphSeriesVM
+        {
+            get => this._SelectedDailyGraphSeriesVM;
+            set {
+                if(this.SetProperty(ref this._SelectedDailyGraphSeriesVM, value)) {
+                    this.SelectedBalanceKind = value.BalanceKind;
+                    this.SelectedCategoryId = value.CategoryId;
+                    this.SelectedItemId = value.ItemId;
+
+                    this.SelectedSeriesChanged?.Invoke();
+                }
+            }
+        }
+        private SeriesViewModel _SelectedDailyGraphSeriesVM = default;
+        #endregion
+
+        /// <summary>
+        /// 日別グラフプロットモデル
+        /// </summary>
+        #region DailyGraphPlotModel
+        public PlotModel DailyGraphPlotModel
+        {
+            get => this._DailyGraphPlotModel;
+            set => this.SetProperty(ref this._DailyGraphPlotModel, value);
+        }
+        private PlotModel _DailyGraphPlotModel = new PlotModel() {
+            Title = "日別グラフ",
+            Legends = {
+                new Legend(){ 
+                    LegendOrientation = LegendOrientation.Horizontal,
+                    LegendPlacement = LegendPlacement.Outside,
+                    LegendPosition = LegendPosition.RightTop,
+                    LegendTitle = "凡例",
+                    LegendFontSize = 10.5
+                }
+            }
+        };
+        #endregion
+
+        /// <summary>
+        /// 選択項目日別グラフプロットモデル
+        /// </summary>
+        #region SelectedDailyGraphPlotModel
+        public PlotModel SelectedDailyGraphPlotModel
+        {
+            get => this._SelectedDailyGraphPlotModel;
+            set => this.SetProperty(ref this._SelectedDailyGraphPlotModel, value);
+        }
+        private PlotModel _SelectedDailyGraphPlotModel = new PlotModel() {
+            Title = "個別グラフ",
+            Legends = {
+                new Legend() {
+                    LegendOrientation = LegendOrientation.Horizontal,
+                    LegendPlacement = LegendPlacement.Outside,
+                    LegendPosition = LegendPosition.RightTop,
+                    LegendTitle = "凡例",
+                    LegendFontSize = 10.5
+                }
+            }
+        };
         #endregion
         #endregion
 
@@ -389,9 +575,97 @@ namespace HouseholdAccountBook.ViewModels
         public SeriesViewModel SelectedMonthlySeriesVM
         {
             get => this._SelectedMonthlySeriesVM;
-            set => this.SetProperty(ref this._SelectedMonthlySeriesVM, value);
+            set {
+                if(this.SetProperty(ref this._SelectedMonthlySeriesVM, value)) {
+                    this.SelectedBalanceKind = value.BalanceKind;
+                    this.SelectedCategoryId = value.CategoryId;
+                    this.SelectedItemId = value.ItemId;
+
+                    this.SelectedSeriesChanged?.Invoke();
+                }
+            }
         }
         private SeriesViewModel _SelectedMonthlySeriesVM = default;
+        #endregion
+        #endregion
+
+        #region 月別グラフタブ
+        /// <summary>
+        /// 月別グラフ系列VMリスト
+        /// </summary>
+        #region MonthlyGraphSeriesVMList
+        public ObservableCollection<SeriesViewModel> MonthlyGraphSeriesVMList
+        {
+            get => this._MonthlyGraphSeriesVMList;
+            set => this.SetProperty(ref this._MonthlyGraphSeriesVMList, value);
+        }
+        private ObservableCollection<SeriesViewModel> _MonthlyGraphSeriesVMList = default;
+        #endregion
+
+        /// <summary>
+        /// 選択された月別グラフ系列VM
+        /// </summary>
+        #region SelectedMonthlyGraphSeriesVM
+        public SeriesViewModel SelectedMonthlyGraphSeriesVM
+        {
+            get => this._SelectedMonthlyGraphSeriesVM;
+            set {
+                if (this.SetProperty(ref this._SelectedMonthlyGraphSeriesVM, value)) {
+                    this.SelectedBalanceKind = value.BalanceKind;
+                    this.SelectedCategoryId = value.CategoryId;
+                    this.SelectedItemId = value.ItemId;
+
+                    this.SelectedSeriesChanged?.Invoke();
+                }
+            }
+        }
+        private SeriesViewModel _SelectedMonthlyGraphSeriesVM = default;
+        #endregion
+
+        /// <summary>
+        /// 月別グラフプロットモデル
+        /// </summary>
+        #region MonthlyGraphPlotModel
+        public PlotModel MonthlyGraphPlotModel
+        {
+            get => this._MonthlyGraphPlotModel;
+            set => this.SetProperty(ref this._MonthlyGraphPlotModel, value);
+        }
+        private PlotModel _MonthlyGraphPlotModel = new PlotModel() {
+            Title = "月別グラフ",
+            Legends = {
+                new Legend() {
+                    LegendOrientation = LegendOrientation.Horizontal,
+                    LegendPlacement = LegendPlacement.Outside,
+                    LegendPosition = LegendPosition.RightTop,
+                    LegendTitle = "凡例",
+                    LegendFontSize = 10.5
+                }
+            }
+        };
+        #endregion
+
+        /// <summary>
+        /// 選択項目月別グラフプロットモデル
+        /// </summary>
+        #region SelectedMonthlyGraphPlotModel
+        public PlotModel SelectedMonthlyGraphPlotModel
+        {
+            get => this._SelectedMonthlyGraphPlotModel;
+            set => this.SetProperty(ref this._SelectedMonthlyGraphPlotModel, value);
+        }
+        private PlotModel _SelectedMonthlyGraphPlotModel = new PlotModel() {
+            Title = "個別グラフ",
+            Legends = {
+                new Legend() {
+                    LegendOrientation = LegendOrientation.Horizontal,
+                    LegendPlacement = LegendPlacement.Outside,
+                    LegendPosition = LegendPosition.RightTop,
+                    LegendTitle = "凡例",
+                    LegendFontSize = 10.5
+                }
+            }
+        };
         #endregion
         #endregion
 
@@ -427,148 +701,63 @@ namespace HouseholdAccountBook.ViewModels
         public SeriesViewModel SelectedYearlySeriesVM
         {
             get => this._SelectedYearlySeriesVM;
-            set => this.SetProperty(ref this._SelectedYearlySeriesVM, value);
+            set {
+                if (this.SetProperty(ref this._SelectedYearlySeriesVM, value)) {
+                    this.SelectedBalanceKind = value.BalanceKind;
+                    this.SelectedCategoryId = value.CategoryId;
+                    this.SelectedItemId = value.ItemId;
+
+                    this.SelectedSeriesChanged?.Invoke();
+                }
+            }
         }
         private SeriesViewModel _SelectedYearlySeriesVM = default;
         #endregion
         #endregion
 
-        #region グラフタブ
+        #region 年別グラフタブ
         /// <summary>
-        /// グラフ種別辞書
+        /// 年別グラフ系列VMリスト
         /// </summary>
-        #region GraphKindDic
-        public Dictionary<GraphKind, string> GraphKindDic { get; } = GraphKindStr;
+        #region YearlyGraphSeriesVMList
+        public ObservableCollection<SeriesViewModel> YearlyGraphSeriesVMList
+        {
+            get => this._YearlyGraphSeriesVMList;
+            set => this.SetProperty(ref this._YearlyGraphSeriesVMList, value);
+        }
+        private ObservableCollection<SeriesViewModel> _YearlyGraphSeriesVMList = default;
         #endregion
 
         /// <summary>
-        /// 選択されたグラフ種別
+        /// 選択された年別グラフ系列VM
         /// </summary>
-        #region SelectedGraphKind
-        public GraphKind SelectedGraphKind
+        #region SelectedYearlyGraphSummaryVM
+        public SeriesViewModel SelectedYearlyGraphSeriesVM
         {
-            get => this._SelectedGraphKind;
+            get => this._SelectedYearlyGraphSeriesVM;
             set {
-                if (this.SetProperty(ref this._SelectedGraphKind, value)) {
-                    this.SelectedGraphKindChanged?.Invoke();
-                }
-            }
-        }
-        private GraphKind _SelectedGraphKind = default;
-        #endregion
-        /// <summary>
-        /// 選択されたグラフ種別インデックス
-        /// </summary>
-        #region SelectedGraphKindIndex
-        public int SelectedGraphKindIndex
-        {
-            get => (int)this._SelectedGraphKind;
-            set => this.SelectedGraphKind = (GraphKind)value;
-        }
-        #endregion
+                if (this.SetProperty(ref this._SelectedYearlyGraphSeriesVM, value)) {
+                    this.SelectedBalanceKind = value.BalanceKind;
+                    this.SelectedCategoryId = value.CategoryId;
+                    this.SelectedItemId = value.ItemId;
 
-        /// <summary>
-        /// 全項目日別グラフプロットモデル
-        /// </summary>
-        #region WholeItemDailyGraphModel
-        public PlotModel WholeItemDailyGraphModel
-        {
-            get => this._WholeItemDailyGraphModel;
-            set => this.SetProperty(ref this._WholeItemDailyGraphModel, value);
-        }
-        private PlotModel _WholeItemDailyGraphModel = new PlotModel() {
-            Title = "日別グラフ",
-            Legends = {
-                new Legend(){ 
-                    LegendOrientation = LegendOrientation.Horizontal,
-                    LegendPlacement = LegendPlacement.Outside,
-                    LegendPosition = LegendPosition.RightTop,
-                    LegendTitle = "凡例",
-                    LegendFontSize = 10.5
+                    this.SelectedSeriesChanged?.Invoke();
                 }
             }
-        };
-        #endregion
-
-        /// <summary>
-        /// 選択項目日別グラフプロットモデル
-        /// </summary>
-        #region SelectedItemDailyGraphModel
-        public PlotModel SelectedItemDailyGraphModel
-        {
-            get => this._SelectedItemDailyGraphModel;
-            set => this.SetProperty(ref this._SelectedItemDailyGraphModel, value);
         }
-        private PlotModel _SelectedItemDailyGraphModel = new PlotModel() {
-            Title = "個別グラフ",
-            Legends = {
-                new Legend() {
-                    LegendOrientation = LegendOrientation.Horizontal,
-                    LegendPlacement = LegendPlacement.Outside,
-                    LegendPosition = LegendPosition.RightTop,
-                    LegendTitle = "凡例",
-                    LegendFontSize = 10.5
-                }
-            }
-        };
-        #endregion
-
-        /// <summary>
-        /// 全項目月別グラフプロットモデル
-        /// </summary>
-        #region WholeItemMonthlyGraphModel
-        public PlotModel WholeItemMonthlyGraphModel
-        {
-            get => this._WholeItemMonthlyGraphModel;
-            set => this.SetProperty(ref this._WholeItemMonthlyGraphModel, value);
-        }
-        private PlotModel _WholeItemMonthlyGraphModel = new PlotModel() {
-            Title = "月別グラフ",
-            Legends = {
-                new Legend() {
-                    LegendOrientation = LegendOrientation.Horizontal,
-                    LegendPlacement = LegendPlacement.Outside,
-                    LegendPosition = LegendPosition.RightTop,
-                    LegendTitle = "凡例",
-                    LegendFontSize = 10.5
-                }
-            }
-        };
-        #endregion
-
-        /// <summary>
-        /// 選択項目月別グラフプロットモデル
-        /// </summary>
-        #region SelectedItemMonthlyGraphModel
-        public PlotModel SelectedItemMonthlyGraphModel
-        {
-            get => this._SelectedItemMonthlyGraphModel;
-            set => this.SetProperty(ref this._SelectedItemMonthlyGraphModel, value);
-        }
-        private PlotModel _SelectedItemMonthlyGraphModel = new PlotModel() {
-            Title = "個別グラフ",
-            Legends = {
-                new Legend() {
-                    LegendOrientation = LegendOrientation.Horizontal,
-                    LegendPlacement = LegendPlacement.Outside,
-                    LegendPosition = LegendPosition.RightTop,
-                    LegendTitle = "凡例",
-                    LegendFontSize = 10.5
-                }
-            }
-        };
+        private SeriesViewModel _SelectedYearlyGraphSeriesVM = default;
         #endregion
 
         /// <summary>
         /// 全項目年別グラフプロットモデル
         /// </summary>
-        #region WholeItemYearlyGraphModel
-        public PlotModel WholeItemYearlyGraphModel
+        #region YearlyGraphPlotModel
+        public PlotModel YearlyGraphPlotModel
         {
-            get => this._WholeItemYearlyGraphModel;
-            set => this.SetProperty(ref this._WholeItemYearlyGraphModel, value);
+            get => this._YearlyGraphPlotModel;
+            set => this.SetProperty(ref this._YearlyGraphPlotModel, value);
         }
-        private PlotModel _WholeItemYearlyGraphModel = new PlotModel() {
+        private PlotModel _YearlyGraphPlotModel = new PlotModel() {
             Title = "年別グラフ",
             Legends = {
                 new Legend() {
@@ -585,13 +774,13 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 選択項目年別グラフプロットモデル
         /// </summary>
-        #region SelectedItemYearlyGraphModel
-        public PlotModel SelectedItemYearlyGraphModel
+        #region SelectedYearlyGraphPlotModel
+        public PlotModel SelectedYearlyGraphPlotModel
         {
-            get => this._SelectedItemYearlyGraphModel;
-            set => this.SetProperty(ref this._SelectedItemYearlyGraphModel, value);
+            get => this._SelectedYearlyGraphPlotModel;
+            set => this.SetProperty(ref this._SelectedYearlyGraphPlotModel, value);
         }
-        private PlotModel _SelectedItemYearlyGraphModel = new PlotModel() {
+        private PlotModel _SelectedYearlyGraphPlotModel = new PlotModel() {
             Title = "個別グラフ",
             Legends = {
                 new Legend() {
@@ -604,7 +793,9 @@ namespace HouseholdAccountBook.ViewModels
             }
         };
         #endregion
+        #endregion
 
+        #region グラフコントローラ
         /// <summary>
         /// コントローラ
         /// </summary>
@@ -642,7 +833,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <remarks>表示されている項目のみ選択する</remarks>
         private void UpdateDisplayedActionVMList()
         {
-            if (this._SelectedSummaryVM == null || (BalanceKind)this._SelectedSummaryVM.BalanceKind == BalanceKind.Others) {
+            if (!this.IsLink || this._SelectedSummaryVM == null || (BalanceKind)this._SelectedSummaryVM.BalanceKind == BalanceKind.Others) {
                 this.DisplayedActionVMList = this._ActionVMList;
             }
             else {

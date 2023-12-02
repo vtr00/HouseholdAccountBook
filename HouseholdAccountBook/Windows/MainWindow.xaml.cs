@@ -4,7 +4,6 @@ using HouseholdAccountBook.Properties;
 using HouseholdAccountBook.UserControls;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
-using Notifications.Wpf;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
@@ -1454,9 +1453,13 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             if (settings.MainWindow_SelectedTabIndex != -1) {
                 this.WVM.SelectedTabIndex = settings.MainWindow_SelectedTabIndex;
             }
-            // グラフ種別選択
+            // グラフ種別1選択
             if (settings.MainWindow_SelectedGraphKindIndex != -1) {
-                this.WVM.SelectedGraphKindIndex = settings.MainWindow_SelectedGraphKindIndex;
+                this.WVM.SelectedGraphKind1Index = settings.MainWindow_SelectedGraphKindIndex;
+            }
+            // グラフ種別2選択
+            if (settings.MainWindow_SelectedGraphKind2Index != -1) {
+                this.WVM.SelectedGraphKind2Index = settings.MainWindow_SelectedGraphKind2Index;
             }
 
             await this.UpdateAsync(isScroll: true, isUpdateActDateLastEdited: true);
@@ -1488,12 +1491,18 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 Cursor lastCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
 
-                settings.MainWindow_SelectedGraphKindIndex = this.WVM.SelectedGraphKindIndex;
+                settings.MainWindow_SelectedGraphKindIndex = this.WVM.SelectedGraphKind1Index;
                 settings.Save();
 
                 await this.UpdateAsync();
 
                 this.Cursor = lastCursor;
+            };
+            this.WVM.SelectedSeriesChanged += () => {
+                settings.MainWindow_SelectedGraphKind2Index = this.WVM.SelectedGraphKind2Index;
+                settings.Save();
+
+                this.UpdateSelectedItemGraph();
             };
 
             this.LogWindowStateAndLocation("Loaded");
@@ -1720,6 +1729,24 @@ ORDER BY sort_order;");
             this.WVM.SelectedBookVM = selectedBookVM;
         }
 
+        /// <summary>
+        /// 選択項目グラフを更新する
+        /// </summary>
+        private void UpdateSelectedItemGraph()
+        {
+            switch (this.WVM.SelectedTab) {
+                case Tabs.DailyGraphTab:
+                    this.UpdateSelectedItemDailyGraph();
+                    break;
+                case Tabs.MonthlyGraphTab:
+                    this.UpdateSelectedItemMonthlyGraph();
+                    break;
+                case Tabs.YearlyGraphTab:
+                    this.UpdateSelectedItemYearlyGraph();
+                    break;
+            }
+        }
+
         #region VM取得用の関数
         /// <summary>
         /// 月内帳簿項目VMリストを取得する(帳簿タブ)
@@ -1942,10 +1969,11 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
 
                     summaryVMList.Add(new SummaryViewModel() {
                         BalanceKind = balanceKind,
+                        BalanceName = BalanceKindStr[(BalanceKind)balanceKind],
                         CategoryId = categoryId,
                         CategoryName = categoryName,
                         ItemId = itemId,
-                        ItemName = string.Format("  {0}", itemName),
+                        ItemName = itemName,
                         Summary = summary
                     });
                     return true;
@@ -1956,7 +1984,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
             int total = summaryVMList.Sum((obj) => obj.Summary);
             // 収入/支出
             List<SummaryViewModel> totalAsBalanceKindList = new List<SummaryViewModel>();
-            // カテゴリ小計
+            // 分類小計
             List<SummaryViewModel> totalAsCategoryList = new List<SummaryViewModel>();
 
             // 収支別に計算する
@@ -1964,20 +1992,16 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                 // 収入/支出の小計を計算する
                 totalAsBalanceKindList.Add(new SummaryViewModel() {
                     BalanceKind = g1.Key,
-                    CategoryId = -1,
-                    CategoryName = string.Empty,
-                    ItemId = -1,
-                    ItemName = BalanceKindStr[(BalanceKind)g1.Key],
+                    BalanceName = BalanceKindStr[(BalanceKind)g1.Key],
                     Summary = g1.Sum((obj) => obj.Summary)
                 });
-                // カテゴリ別の小計を計算する
+                // 分類別の小計を計算する
                 foreach (var g2 in g1.GroupBy((obj) => obj.CategoryId)) {
                     totalAsCategoryList.Add(new SummaryViewModel() {
                         BalanceKind = g1.Key,
+                        BalanceName = BalanceKindStr[(BalanceKind)g1.Key],
                         CategoryId = g2.Key,
-                        CategoryName = string.Empty,
-                        ItemId = -1,
-                        ItemName = g2.First().CategoryName,
+                        CategoryName = g2.First().CategoryName,
                         Summary = g2.Sum((obj) => obj.Summary)
                     });
                 }
@@ -1985,18 +2009,14 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
 
             // 差引損益を追加する
             summaryVMList.Insert(0, new SummaryViewModel() {
-                BalanceKind = -1,
-                CategoryId = -1,
-                CategoryName = string.Empty,
-                ItemId = -1,
-                ItemName = "差引損益",
+                OtherName = "差引損益",
                 Summary = total
             });
             // 収入/支出の小計を追加する
             foreach (SummaryViewModel svm in totalAsBalanceKindList) {
                 summaryVMList.Insert(summaryVMList.IndexOf(summaryVMList.First(obj => obj.BalanceKind == svm.BalanceKind)), svm);
             }
-            // カテゴリ別の小計を追加する
+            // 分類別の小計を追加する
             foreach (SummaryViewModel svm in totalAsCategoryList) {
                 summaryVMList.Insert(summaryVMList.IndexOf(summaryVMList.First(obj => obj.CategoryId == svm.CategoryId)), svm);
             }
@@ -2056,11 +2076,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             // 系列データ
             ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel> {
                 new SeriesViewModel() {
-                    BalanceKind = -1,
-                    CategoryId = -1,
-                    CategoryName = string.Empty,
-                    ItemId = -1,
-                    ItemName = "残高",
+                    OtherName = "残高",
                     Values = new List<int>()
                 }
             };
@@ -2075,12 +2091,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             foreach (SummaryViewModel summaryVM in summaryVMList) {
                 int value = summaryVM.Summary;
-                SeriesViewModel vm = new SeriesViewModel() {
-                    BalanceKind = summaryVM.BalanceKind,
-                    CategoryId = summaryVM.CategoryId,
-                    CategoryName = summaryVM.CategoryName,
-                    ItemId = summaryVM.ItemId,
-                    ItemName = summaryVM.ItemName,
+                SeriesViewModel vm = new SeriesViewModel(summaryVM) {
                     Values = new List<int>(),
                     Summary = value
                 };
@@ -2176,11 +2187,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel> {
                 new SeriesViewModel() {
-                    BalanceKind = -1,
-                    CategoryId = -1,
-                    CategoryName = string.Empty,
-                    ItemId = -1,
-                    ItemName = "残高",
+                    OtherName = "残高",
                     Values = new List<int>()
                 }
             };
@@ -2194,12 +2201,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             vmList[0].Values.Add(balance); // 残高
             foreach (SummaryViewModel summaryVM in summaryVMList) {
                 int value = summaryVM.Summary;
-                SeriesViewModel vm = new SeriesViewModel() {
-                    BalanceKind = summaryVM.BalanceKind,
-                    CategoryId = summaryVM.CategoryId,
-                    CategoryName = summaryVM.CategoryName,
-                    ItemId = summaryVM.ItemId,
-                    ItemName = summaryVM.ItemName,
+                SeriesViewModel vm = new SeriesViewModel(summaryVM) {
                     Values = new List<int>(),
                     Summary = value
                 };
@@ -2294,11 +2296,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel> {
                 new SeriesViewModel() {
-                    BalanceKind = -1,
-                    CategoryId = -1,
-                    CategoryName = string.Empty,
-                    ItemId = -1,
-                    ItemName = "残高",
+                    OtherName = "残高",
                     Values = new List<int>()
                 }
             };
@@ -2312,12 +2310,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             vmList[0].Values.Add(balance); // 残高
             foreach (SummaryViewModel summaryVM in summaryVMList) {
                 int value = summaryVM.Summary;
-                SeriesViewModel vm = new SeriesViewModel() {
-                    BalanceKind = summaryVM.BalanceKind,
-                    CategoryId = summaryVM.CategoryId,
-                    CategoryName = summaryVM.CategoryName,
-                    ItemId = summaryVM.ItemId,
-                    ItemName = summaryVM.ItemName,
+                SeriesViewModel vm = new SeriesViewModel(summaryVM) {
                     Values = new List<int>(),
                     Summary = value
                 };
@@ -2379,17 +2372,22 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// 帳簿タブに表示するデータを更新する
         /// </summary>
         /// <param name="actionIdList">選択対象の帳簿項目IDリスト</param>
+        /// <param name="balanceKind">選択対象の収支種別</param>
+        /// <param name="categoryId">選択対象の分類ID</param>
+        /// <param name="itemId">選択対象の項目ID</param>
         /// <param name="isScroll">スクロールするか</param>
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
-        private async Task UpdateBookTabDataAsync(List<int> actionIdList = null, bool isScroll = false, bool isUpdateActDateLastEdited = false)
+        private async Task UpdateBookTabDataAsync(List<int> actionIdList = null, int? balanceKind = null, int? categoryId = null, int? itemId = null, 
+                                                  bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
             if (this.WVM.SelectedTab != Tabs.BooksTab) return;
 
             // 指定がなければ、更新前の帳簿項目の選択を維持する
             List<int> tmpActionIdList = actionIdList ?? new List<int>(this.WVM.SelectedActionVMList.Select((tmp) => tmp.ActionId));
-            this.WVM.SelectedActionVMList.Clear();
-            // サマリーの選択を維持する
-            SummaryViewModel tmpSelectedSVM = this.WVM.SelectedSummaryVM;
+            // 指定がなければ、更新前のサマリーの選択を維持する
+            int? tmpBalanceKind = balanceKind ?? this.WVM.SelectedBalanceKind ?? null;
+            int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId ?? null;
+            int? tmpItemId = itemId ?? this.WVM.SelectedItemId ?? null;
 
             // 表示するデータを指定する
             switch (this.WVM.DisplayedTermKind) {
@@ -2410,14 +2408,10 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             }
 
             // 帳簿項目を選択する(サマリーの選択はこの段階では無視して処理する)
-            IEnumerable<ActionViewModel> query1 = this.WVM.ActionVMList.Where((avm) => { return tmpActionIdList.Contains(avm.ActionId); });
-            foreach (var tmp in query1) { this.WVM.SelectedActionVMList.Add(tmp); }
+            this.WVM.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this.WVM.ActionVMList.Where((vm) => tmpActionIdList.Contains(vm.ActionId)));
 
-            // 更新前のサマリーの選択を維持する
-            IEnumerable<SummaryViewModel> query2 = this.WVM.SummaryVMList.Where((svm) => {
-                return svm.BalanceKind == tmpSelectedSVM?.BalanceKind && svm.CategoryId == tmpSelectedSVM?.CategoryId && svm.ItemId == tmpSelectedSVM?.ItemId;
-            });
-            this.WVM.SelectedSummaryVM = query2.Count() == 0 ? null : query2.First();
+            // サマリーを選択する
+            this.WVM.SelectedSummaryVM = this.WVM.SummaryVMList.FirstOrDefault((vm) => (vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
 
             if (isScroll) {
                 if (this.WVM.DisplayedTermKind == TermKind.Monthly &&
@@ -2458,221 +2452,234 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.DailyGraphTab) return;
 
-            // 全項目
-            this.WVM.WholeItemDailyGraphModel.Axes.Clear();
-            this.WVM.WholeItemDailyGraphModel.Series.Clear();
+            #region 全項目
+            this.WVM.DailyGraphPlotModel.Axes.Clear();
+            this.WVM.DailyGraphPlotModel.Series.Clear();
 
             // 横軸 - 日軸
-            CategoryAxis cAxis1 = new CategoryAxis() {
+            CategoryAxis horizontalAxis1 = new CategoryAxis() {
                 Unit = "日",
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
-            cAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+            horizontalAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する日の文字列を作成する
             for (DateTime tmp = this.WVM.StartDate; tmp <= this.WVM.EndDate; tmp = tmp.AddDays(1)) {
-                cAxis1.Labels.Add(tmp.ToString("%d"));
+                horizontalAxis1.Labels.Add(tmp.ToString("%d"));
             }
-            this.WVM.WholeItemDailyGraphModel.Axes.Add(cAxis1);
+            this.WVM.DailyGraphPlotModel.Axes.Add(horizontalAxis1);
 
             // 縦軸 - 線形軸
-            LinearAxis lAxis1 = new LinearAxis() {
+            LinearAxis verticalAxis1 = new LinearAxis() {
                 Unit = "円",
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
                 StringFormat = "#,0",
-                Key = "Value"
+                Key = "Value",
+                Title = GraphKind1Str[this.WVM.SelectedGraphKind1]
             };
-            switch (this.WVM.SelectedGraphKind) {
-                case GraphKind.IncomeAndOutgo: {
-                        lAxis1.Title = "収支";
-                    }
-                    break;
-                case GraphKind.Balance: {
-                        lAxis1.Title = "残高";
-                    }
-                    break;
-            }
-            this.WVM.WholeItemDailyGraphModel.Axes.Add(lAxis1);
+            this.WVM.DailyGraphPlotModel.Axes.Add(verticalAxis1);
 
-            this.WVM.WholeItemDailyGraphModel.InvalidatePlot(true);
+            this.WVM.DailyGraphPlotModel.InvalidatePlot(true);
+            #endregion
 
-            // 選択項目
-            this.WVM.SelectedItemDailyGraphModel.Axes.Clear();
-            this.WVM.SelectedItemDailyGraphModel.Series.Clear();
+            #region 選択項目
+            this.WVM.SelectedDailyGraphPlotModel.Axes.Clear();
+            this.WVM.SelectedDailyGraphPlotModel.Series.Clear();
 
             // 横軸 - 日軸
-            CategoryAxis cAxis2 = new CategoryAxis() {
+            CategoryAxis horizontalAxis2 = new CategoryAxis() {
                 Unit = "日",
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
-            cAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+            horizontalAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する日の文字列を作成する
             for (DateTime tmp = this.WVM.StartDate; tmp <= this.WVM.EndDate; tmp = tmp.AddDays(1)) {
-                cAxis2.Labels.Add(tmp.ToString("%d"));
+                horizontalAxis2.Labels.Add(tmp.ToString("%d"));
             }
-            this.WVM.SelectedItemDailyGraphModel.Axes.Add(cAxis2);
+            this.WVM.SelectedDailyGraphPlotModel.Axes.Add(horizontalAxis2);
 
             // 縦軸 - 線形軸
-            LinearAxis lAxis2 = new LinearAxis() {
+            LinearAxis verticalAxis2 = new LinearAxis() {
                 Unit = "円",
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
                 StringFormat = "#,0",
-                Key = "Value"
+                Key = "Value",
+                Title = GraphKind1Str[this.WVM.SelectedGraphKind1]
             };
-            switch (this.WVM.SelectedGraphKind) {
-                case GraphKind.IncomeAndOutgo: {
-                        lAxis2.Title = "収支";
-                    }
-                    break;
-                case GraphKind.Balance: {
-                        lAxis2.Title = "残高";
-                    }
-                    break;
-            }
-            this.WVM.SelectedItemDailyGraphModel.Axes.Add(lAxis2);
+            this.WVM.SelectedDailyGraphPlotModel.Axes.Add(verticalAxis2);
 
-            this.WVM.SelectedItemDailyGraphModel.InvalidatePlot(true);
+            this.WVM.SelectedDailyGraphPlotModel.InvalidatePlot(true);
+            #endregion
         }
 
         /// <summary>
         /// 日別グラフタブに表示するデータを更新する
         /// </summary>
-        private async Task UpdateDailyGraphTabDataAsync()
+        /// <param name="categoryId">選択対象の分類ID</param>
+        /// <param name="itemId">選択対象の項目ID</param>
+        private async Task UpdateDailyGraphTabDataAsync(int? categoryId = null, int? itemId = null)
         {
             if (this.WVM.SelectedTab != Tabs.DailyGraphTab) return;
 
-            switch (this.WVM.SelectedGraphKind) {
-                case GraphKind.IncomeAndOutgo: {
-                        ObservableCollection<SeriesViewModel> vmList = null;
-                        switch (this.WVM.DisplayedTermKind) {
-                            case TermKind.Monthly:
-                                vmList = await this.LoadDailySeriesViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
-                                break;
-                            case TermKind.Selected:
-                                vmList = await this.LoadDailySeriesViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
-                                break;
-                        }
-                        List<int> sumPlus = new List<int>(); // 日ごとの合計収入
-                        List<int> sumMinus = new List<int>(); // 日ごとの合計支出
+            int? tmpCategotyId = categoryId ?? this.WVM.SelectedCategoryId ?? null;
+            int? tmpItemId = itemId ?? this.WVM.SelectedItemId ?? null;
 
-                        this.WVM.WholeItemDailyGraphModel.Series.Clear();
-                        foreach (SeriesViewModel tmpVM in vmList) {
-                            if (tmpVM.ItemId == -1) { continue; }
+            switch (this.WVM.SelectedGraphKind1) {
+                case GraphKind1.IncomeAndOutgoGraph: {
+                    List<int> sumPlus = new List<int>(); // 日ごとの合計収入(Y軸範囲の計算に使用)
+                    List<int> sumMinus = new List<int>(); // 日ごとの合計支出(Y軸範囲の計算に使用)
 
-                            CustomBarSeries cSeries1 = new CustomBarSeries() {
-                                IsStacked = true,
-                                Title = tmpVM.ItemName,
-                                ItemsSource = tmpVM.Values.Select((value, index) => {
-                                    return new SeriesItemViewModel {
-                                        Value = value,
-                                        Number = index,
-                                        ItemId = tmpVM.ItemId,
-                                        CategoryId = tmpVM.CategoryId
-                                    };
-                                }),
-                                ValueField = "Value",
-                                TrackerFormatString = "{0}\n{1}日: {2:#,0}", //日付: 金額
-                                XAxisKey = "Value",
-                                YAxisKey = "Category"
-                            };
-                            // 全項目月間グラフの項目を選択した時のイベントを登録する
-                            cSeries1.TrackerHitResultChanged += (sender, e) => {
-                                if (e.Value == null) return;
+                    // グラフ表示データを取得する
+                    ObservableCollection<SeriesViewModel> tmpVMList = null;
+                    switch (this.WVM.DisplayedTermKind) {
+                        case TermKind.Monthly:
+                            tmpVMList = await this.LoadDailySeriesViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                            break;
+                        case TermKind.Selected:
+                            tmpVMList = await this.LoadDailySeriesViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                            break;
+                    }
+                    // グラフ表示データを設定用に絞り込む
+                    switch (this.WVM.SelectedGraphKind2) {
+                        case GraphKind2.CategoryGraph:
+                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => (vm.CategoryId != -1 && vm.ItemId == -1) ));
+                            break;
+                        case GraphKind2.ItemGraph:
+                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => (vm.ItemId != -1) ));
+                            break;
+                    }
+                    this.WVM.DailyGraphSeriesVMList = tmpVMList;
 
-                                SeriesItemViewModel itemVM = e.Value.Item as SeriesItemViewModel;
-                                SeriesViewModel vm = vmList.FirstOrDefault((tmp) => tmp.ItemId == itemVM.ItemId);
-
-                                this.WVM.SelectedItemDailyGraphModel.Series.Clear();
-
-                                CustomBarSeries cSeries2 = new CustomBarSeries() {
-                                    IsStacked = true,
-                                    Title = vm.ItemName,
-                                    FillColor = (e.Value.Series as CustomBarSeries).ActualFillColor,
-                                    ItemsSource = vm.Values.Select((value, index) => {
-                                        return new SeriesItemViewModel {
-                                            Value = value,
-                                            Number = index,
-                                            ItemId = vm.ItemId,
-                                            CategoryId = vm.CategoryId
-                                        };
-                                    }),
-                                    ValueField = "Value",
-                                    TrackerFormatString = "{1}日: {2:#,0}", //日付: 金額
-                                    XAxisKey = "Value",
-                                    YAxisKey = "Category"
+                    // グラフ表示データを設定する
+                    this.WVM.DailyGraphPlotModel.Series.Clear();
+                    foreach (SeriesViewModel tmpVM in this.WVM.DailyGraphSeriesVMList) {
+                        CustomBarSeries wholeSeries = new CustomBarSeries() {
+                            IsStacked = true,
+                            Title = tmpVM.GraphName,
+                            ItemsSource = tmpVM.Values.Select((value, index) => {
+                                return new GraphDatumViewModel {
+                                    Value = value,
+                                    Number = index,
+                                    ItemId = tmpVM.ItemId,
+                                    CategoryId = tmpVM.CategoryId
                                 };
-
-                                this.WVM.SelectedItemDailyGraphModel.Series.Add(cSeries2);
-
-                                foreach (Axis axis in this.WVM.SelectedItemDailyGraphModel.Axes) {
-                                    if (axis.Position == AxisPosition.Left) {
-                                        this.SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
-                                        break;
-                                    }
-                                }
-
-                                this.WVM.SelectedItemDailyGraphModel.InvalidatePlot(true);
-                            };
-
-                            this.WVM.WholeItemDailyGraphModel.Series.Add(cSeries1);
-
-                            // 全項目の日毎の合計を計算する
-                            for (int i = 0; i < tmpVM.Values.Count; ++i) {
-                                if (sumPlus.Count <= i) { sumPlus.Add(0); sumMinus.Add(0); }
-
-                                if (tmpVM.Values[i] < 0) sumMinus[i] += tmpVM.Values[i];
-                                else sumPlus[i] += tmpVM.Values[i];
-                            }
-                        }
-
-                        // Y軸の範囲を設定する
-                        foreach (Axis axis in this.WVM.WholeItemDailyGraphModel.Axes) {
-                            if (axis.Position == AxisPosition.Left) {
-                                this.SetAxisRange(axis, sumMinus.Min(), sumPlus.Max(), 10, true);
-                                break;
-                            }
-                        }
-                    }
-                    break;
-                case GraphKind.Balance: {
-                        LineSeries cSeries = new LineSeries() {
-                            Title = "残高",
-                            TrackerFormatString = "{2}日: {4:#,0}" //日付: 金額
+                            }),
+                            ValueField = "Value",
+                            TrackerFormatString = "{0}\n{1}日: {2:#,0}", //日付: 金額
+                            XAxisKey = "Value",
+                            YAxisKey = "Category"
                         };
-                        ObservableCollection<SeriesViewModel> vmList = null;
-                        switch (this.WVM.DisplayedTermKind) {
-                            case TermKind.Monthly:
-                                vmList = await this.LoadDailySeriesViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
-                                break;
-                            case TermKind.Selected:
-                                vmList = await this.LoadDailySeriesViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
-                                break;
+                        // 全項目日別グラフの項目を選択した時のイベントを登録する
+                        wholeSeries.TrackerHitResultChanged += (sender, e) => {
+                            if (e.Value == null) return;
+
+                            GraphDatumViewModel datumVM = e.Value.Item as GraphDatumViewModel;
+                            this.WVM.SelectedDailyGraphSeriesVM = this.WVM.DailyGraphSeriesVMList.FirstOrDefault((tmp) => (tmp.CategoryId == datumVM.CategoryId && tmp.ItemId == datumVM.ItemId));
+                        };
+
+                        this.WVM.DailyGraphPlotModel.Series.Add(wholeSeries);
+
+                        // 全項目の日毎の合計を計算する
+                        for (int i = 0; i < tmpVM.Values.Count; ++i) {
+                            if (sumPlus.Count <= i) { sumPlus.Add(0); sumMinus.Add(0); }
+
+                            if (tmpVM.Values[i] < 0) sumMinus[i] += tmpVM.Values[i];
+                            else sumPlus[i] += tmpVM.Values[i];
                         }
-                        cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
+                    }
 
-                        this.WVM.WholeItemDailyGraphModel.Series.Clear();
-                        this.WVM.WholeItemDailyGraphModel.Series.Add(cSeries);
-
-                        // Y軸の範囲を設定する
-                        foreach (Axis axis in this.WVM.WholeItemDailyGraphModel.Axes) {
-                            if (axis.Position == AxisPosition.Left) {
-                                this.SetAxisRange(axis, cSeries.Points.Min((value) => value.Y), cSeries.Points.Max((value) => value.Y), 10, true);
-                                break;
-                            }
+                    // Y軸の範囲を設定する
+                    foreach (Axis axis in this.WVM.DailyGraphPlotModel.Axes) {
+                        if (axis.Position == AxisPosition.Left) {
+                            this.SetAxisRange(axis, sumMinus.Min(), sumPlus.Max(), 10, true);
+                            break;
                         }
                     }
                     break;
+                }
+                case GraphKind1.BalanceGraph: {
+                    // グラフ表示データを取得する
+                    ObservableCollection<SeriesViewModel> seriesVMList = null;
+                    switch (this.WVM.DisplayedTermKind) {
+                        case TermKind.Monthly:
+                            seriesVMList = await this.LoadDailySeriesViewModelListWithinMonthAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedMonth.Value);
+                            break;
+                        case TermKind.Selected:
+                            seriesVMList = await this.LoadDailySeriesViewModelListAsync(this.WVM.SelectedBookVM?.Id, this.WVM.StartDate, this.WVM.EndDate);
+                            break;
+                    }
+                    this.WVM.DailyGraphSeriesVMList = seriesVMList;
+
+                    // グラフ表示データを設定する
+                    this.WVM.DailyGraphPlotModel.Series.Clear();
+                    LineSeries series = new LineSeries() {
+                        Title = "残高",
+                        TrackerFormatString = "{2}日: {4:#,0}" //日付: 金額
+                    };
+                    series.Points.AddRange(new List<int>(this.WVM.DailyGraphSeriesVMList[0].Values).Select((value, index) => new DataPoint(index, value)));
+                    this.WVM.DailyGraphPlotModel.Series.Add(series);
+
+                    // Y軸の範囲を設定する
+                    foreach (Axis axis in this.WVM.DailyGraphPlotModel.Axes) {
+                        if (axis.Position == AxisPosition.Left) {
+                            this.SetAxisRange(axis, series.Points.Min((value) => value.Y), series.Points.Max((value) => value.Y), 10, true);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            this.WVM.DailyGraphPlotModel.InvalidatePlot(true);
+
+            this.WVM.SelectedDailyGraphSeriesVM = this.WVM.DailyGraphSeriesVMList.FirstOrDefault((vm) => (vm.CategoryId == tmpCategotyId && vm.ItemId == tmpItemId));
+        }
+
+        /// <summary>
+        /// 選択項目日別グラフを更新する
+        /// </summary>
+        private void UpdateSelectedItemDailyGraph()
+        {
+            if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndOutgoGraph) return;
+
+            SeriesViewModel vm = this.WVM.SelectedDailyGraphSeriesVM;
+
+            // グラフ表示データを設定する
+            this.WVM.SelectedDailyGraphPlotModel.Series.Clear();
+            if (vm != null) {
+                CustomBarSeries slectedSeries = new CustomBarSeries() {
+                    IsStacked = true,
+                    Title = vm.GraphName,
+                    FillColor = (this.WVM.DailyGraphPlotModel.Series.FirstOrDefault(s => ((s as CustomBarSeries).Title == vm.GraphName)) as CustomBarSeries).ActualFillColor,
+                    ItemsSource = vm.Values.Select((value, index) => {
+                        return new GraphDatumViewModel {
+                            Value = value,
+                            Number = index,
+                            ItemId = vm.ItemId,
+                            CategoryId = vm.CategoryId
+                        };
+                    }),
+                    ValueField = "Value",
+                    TrackerFormatString = "{1}日: {2:#,0}", //日付: 金額
+                    XAxisKey = "Value",
+                    YAxisKey = "Category"
+                };
+
+                this.WVM.SelectedDailyGraphPlotModel.Series.Add(slectedSeries);
+
+                foreach (Axis axis in this.WVM.SelectedDailyGraphPlotModel.Axes) {
+                    if (axis.Position == AxisPosition.Left) {
+                        this.SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
+                        break;
+                    }
+                }
             }
 
-            this.WVM.WholeItemDailyGraphModel.InvalidatePlot(true);
-
-            this.WVM.SelectedItemDailyGraphModel.Series.Clear();
-            this.WVM.SelectedItemDailyGraphModel.InvalidatePlot(true);
+            this.WVM.SelectedDailyGraphPlotModel.InvalidatePlot(true);
         }
         #endregion
 
@@ -2680,9 +2687,16 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// <summary>
         /// 月別一覧タブに表示するデータを更新する
         /// </summary>
-        private async Task UpdateMonthlyListTabDataAsync()
+        /// <param name="balanceKind">選択対象の収支種別</param>
+        /// <param name="categoryId">選択対象の分類ID</param>
+        /// <param name="itemId">選択対象の項目ID</param>
+        private async Task UpdateMonthlyListTabDataAsync(int? balanceKind = null, int? categoryId = null, int? itemId = null)
         {
             if (this.WVM.SelectedTab != Tabs.MonthlyListTab) return;
+
+            int? tmpBalanceKind = balanceKind ?? this.WVM.SelectedBalanceKind ?? null;
+            int? tmpCategotyId = categoryId ?? this.WVM.SelectedCategoryId ?? null;
+            int? tmpItemId = itemId ?? this.WVM.SelectedItemId ?? null;
 
             int startMonth = Properties.Settings.Default.App_StartMonth;
             DateTime tmpMonth = this.WVM.DisplayedYear.GetFirstDateOfFiscalYear(startMonth);
@@ -2695,6 +2709,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             }
             this.WVM.DisplayedMonths = displayedMonths;
             this.WVM.MonthlySeriesVMList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+
+            this.WVM.SelectedMonthlySeriesVM = this.WVM.MonthlySeriesVMList.FirstOrDefault((vm) => (vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategotyId && vm.ItemId == tmpItemId));
         }
         #endregion
 
@@ -2706,201 +2722,230 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.MonthlyGraphTab) return;
 
-            int startMonth = Properties.Settings.Default.App_StartMonth;
-            // 全項目
-            this.WVM.WholeItemMonthlyGraphModel.Axes.Clear();
-            this.WVM.WholeItemMonthlyGraphModel.Series.Clear();
+            Settings settings = Settings.Default;
+            int startMonth = settings.App_StartMonth;
+            #region 全項目
+            this.WVM.MonthlyGraphPlotModel.Axes.Clear();
+            this.WVM.MonthlyGraphPlotModel.Series.Clear();
 
             // 横軸 - 月軸
-            CategoryAxis cAxis1 = new CategoryAxis() {
+            CategoryAxis horizontalAxis1 = new CategoryAxis() {
                 Unit = "月",
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
-            cAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+            horizontalAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する月の文字列を作成する
             for (int i = startMonth; i < startMonth + 12; ++i) {
-                cAxis1.Labels.Add(string.Format("{0}", (i - 1) % 12 + 1));
+                horizontalAxis1.Labels.Add(string.Format("{0}", (i - 1) % 12 + 1));
             }
-            this.WVM.WholeItemMonthlyGraphModel.Axes.Add(cAxis1);
+            this.WVM.MonthlyGraphPlotModel.Axes.Add(horizontalAxis1);
 
             // 縦軸 - 線形軸
-            LinearAxis lAxis1 = new LinearAxis() {
+            LinearAxis verticalAxis1 = new LinearAxis() {
                 Unit = "円",
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
                 StringFormat = "#,0",
-                Key = "Value"
+                Key = "Value",
+                Title = GraphKind1Str[this.WVM.SelectedGraphKind1]
             };
-            switch (this.WVM.SelectedGraphKind) {
-                case GraphKind.IncomeAndOutgo: {
-                        lAxis1.Title = "収支";
-                    }
-                    break;
-                case GraphKind.Balance: {
-                        lAxis1.Title = "残高";
-                    }
-                    break;
-            }
-            this.WVM.WholeItemMonthlyGraphModel.Axes.Add(lAxis1);
+            this.WVM.MonthlyGraphPlotModel.Axes.Add(verticalAxis1);
 
-            this.WVM.WholeItemMonthlyGraphModel.InvalidatePlot(true);
+            this.WVM.MonthlyGraphPlotModel.InvalidatePlot(true);
+            #endregion
 
-            // 選択項目
-            this.WVM.SelectedItemMonthlyGraphModel.Axes.Clear();
-            this.WVM.SelectedItemMonthlyGraphModel.Series.Clear();
+            #region 選択項目
+            this.WVM.SelectedMonthlyGraphPlotModel.Axes.Clear();
+            this.WVM.SelectedMonthlyGraphPlotModel.Series.Clear();
 
             // 横軸 - 月軸
-            CategoryAxis cAxis2 = new CategoryAxis() {
+            CategoryAxis horizontalAxis2 = new CategoryAxis() {
                 Unit = "月",
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
-            cAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+            horizontalAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する月の文字列を作成する
             for (int i = startMonth; i < startMonth + 12; ++i) {
-                cAxis2.Labels.Add(string.Format("{0}", (i - 1) % 12 + 1));
+                horizontalAxis2.Labels.Add(string.Format("{0}", (i - 1) % 12 + 1));
             }
-            this.WVM.SelectedItemMonthlyGraphModel.Axes.Add(cAxis2);
+            this.WVM.SelectedMonthlyGraphPlotModel.Axes.Add(horizontalAxis2);
 
             // 縦軸 - 線形軸
-            LinearAxis lAxis2 = new LinearAxis() {
+            LinearAxis verticalAxis2 = new LinearAxis() {
                 Unit = "円",
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
                 StringFormat = "#,0",
-                Key = "Value"
+                Key = "Value",
+                Title = GraphKind1Str[this.WVM.SelectedGraphKind1]
             };
-            switch (this.WVM.SelectedGraphKind) {
-                case GraphKind.IncomeAndOutgo: {
-                        lAxis2.Title = "収支";
-                    }
-                    break;
-                case GraphKind.Balance: {
-                        lAxis2.Title = "残高";
-                    }
-                    break;
-            }
-            this.WVM.SelectedItemMonthlyGraphModel.Axes.Add(lAxis2);
+            this.WVM.SelectedMonthlyGraphPlotModel.Axes.Add(verticalAxis2);
 
-            this.WVM.SelectedItemMonthlyGraphModel.InvalidatePlot(true);
+            this.WVM.SelectedMonthlyGraphPlotModel.InvalidatePlot(true);
+            #endregion
         }
 
         /// <summary>
         /// 月別グラフタブに表示するデータを更新する
         /// </summary>
-        private async Task UpdateMonthlyGraphTabDataAsync()
+        /// <param name="categoryId">選択対象の分類ID</param>
+        /// <param name="itemId">選択対象の項目ID</param>
+        private async Task UpdateMonthlyGraphTabDataAsync(int? categoryId = null, int? itemId = null)
         {
             if (this.WVM.SelectedTab != Tabs.MonthlyGraphTab) return;
 
-            int startMonth = Properties.Settings.Default.App_StartMonth;
+            int? tmpCategotyId = categoryId ?? this.WVM.SelectedCategoryId ?? null;
+            int? tmpItemId = itemId ?? this.WVM.SelectedItemId ?? null;
 
-            switch (this.WVM.SelectedGraphKind) {
-                case GraphKind.IncomeAndOutgo: {
-                        ObservableCollection<SeriesViewModel> vmList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
-                        List<int> sumPlus = new List<int>(); // 月ごとの合計収入
-                        List<int> sumMinus = new List<int>(); // 月ごとの合計支出
+            Settings settings = Settings.Default;
+            int startMonth = settings.App_StartMonth;
 
-                        this.WVM.WholeItemMonthlyGraphModel.Series.Clear();
-                        foreach (SeriesViewModel tmpVM in vmList) {
-                            if (tmpVM.ItemId == -1) { continue; }
+            switch (this.WVM.SelectedGraphKind1) {
+                case GraphKind1.IncomeAndOutgoGraph: {
+                    List<int> sumPlus = new List<int>(); // 月ごとの合計収入
+                    List<int> sumMinus = new List<int>(); // 月ごとの合計支出
 
-                            CustomBarSeries cSeries1 = new CustomBarSeries() {
-                                IsStacked = true,
-                                Title = tmpVM.ItemName,
-                                ItemsSource = tmpVM.Values.Select((value, index) => new SeriesItemViewModel {
-                                    Value = value,
-                                    Number = index + startMonth,
-                                    ItemId = tmpVM.ItemId,
-                                    CategoryId = tmpVM.CategoryId
-                                }),
-                                ValueField = "Value",
-                                TrackerFormatString = "{0}\n{1}月: {2:#,0}", //月: 金額
-                                XAxisKey = "Value",
-                                YAxisKey = "Category"
-                            };
-                            // 全項目年間グラフの項目を選択した時のイベントを登録する
-                            cSeries1.TrackerHitResultChanged += (sender, e) => {
-                                if (e.Value == null) return;
-
-                                SeriesItemViewModel itemVM = e.Value.Item as SeriesItemViewModel;
-                                SeriesViewModel vm = vmList.FirstOrDefault((tmp) => tmp.ItemId == itemVM.ItemId);
-
-                                this.WVM.SelectedItemMonthlyGraphModel.Series.Clear();
-
-                                CustomBarSeries cSeries2 = new CustomBarSeries() {
-                                    IsStacked = true,
-                                    Title = vm.ItemName,
-                                    FillColor = (e.Value.Series as CustomBarSeries).ActualFillColor,
-                                    ItemsSource = vm.Values.Select((value, index) => new SeriesItemViewModel {
-                                        Value = value,
-                                        Number = index + startMonth,
-                                        ItemId = vm.ItemId,
-                                        CategoryId = vm.CategoryId
-                                    }),
-                                    ValueField = "Value",
-                                    TrackerFormatString = "{1}月: {2:#,0}", //月: 金額
-                                    XAxisKey = "Value",
-                                    YAxisKey = "Category"
-                                };
-                                this.WVM.SelectedItemMonthlyGraphModel.Series.Add(cSeries2);
-
-                                foreach (Axis axis in this.WVM.SelectedItemMonthlyGraphModel.Axes) {
-                                    if (axis.Position == AxisPosition.Left) {
-                                        this.SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
-                                        break;
-                                    }
-                                }
-
-                                this.WVM.SelectedItemMonthlyGraphModel.InvalidatePlot(true);
-                            };
-                            this.WVM.WholeItemMonthlyGraphModel.Series.Add(cSeries1);
-
-                            // 全項目の月毎の合計を計算する
-                            for (int i = 0; i < tmpVM.Values.Count; ++i) {
-                                if (sumPlus.Count <= i) { sumPlus.Add(0); sumMinus.Add(0); }
-
-                                if (tmpVM.Values[i] < 0) sumMinus[i] += tmpVM.Values[i];
-                                else sumPlus[i] += tmpVM.Values[i];
-                            }
-                        }
-
-                        // Y軸の範囲を設定する
-                        foreach (Axis axis in this.WVM.WholeItemMonthlyGraphModel.Axes) {
-                            if (axis.Position == AxisPosition.Left) {
-                                this.SetAxisRange(axis, sumMinus.Min(), sumPlus.Max(), 10, true);
-                                break;
-                            }
-                        }
+                    // グラフ表示データを取得する
+                    ObservableCollection<SeriesViewModel> tmpVMList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                    // グラフ表示データを設定用に絞り込む
+                    switch (this.WVM.SelectedGraphKind2) {
+                        case GraphKind2.CategoryGraph:
+                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => (vm.CategoryId != -1 && vm.ItemId == -1)));
+                            break;
+                        case GraphKind2.ItemGraph:
+                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => (vm.ItemId != -1)));
+                            break;
                     }
-                    break;
-                case GraphKind.Balance: {
-                        LineSeries cSeries = new LineSeries() {
-                            Title = "残高",
-                            TrackerFormatString = "{2}月: {4:#,0}" //月: 金額
+                    this.WVM.MonthlyGraphSeriesVMList = tmpVMList;
+
+                    // グラフ表示データを設定する
+                    this.WVM.MonthlyGraphPlotModel.Series.Clear();
+                    foreach (SeriesViewModel tmpVM in this.WVM.MonthlyGraphSeriesVMList) {
+                        string title = string.Empty;
+                        switch (this.WVM.SelectedGraphKind2) {
+                            case GraphKind2.CategoryGraph:
+                                title = tmpVM.CategoryName;
+                                break;
+                            case GraphKind2.ItemGraph:
+                                title = tmpVM.ItemName;
+                                break;
+                        }
+
+                        CustomBarSeries wholeSeries = new CustomBarSeries() {
+                            IsStacked = true,
+                            Title = title,
+                            ItemsSource = tmpVM.Values.Select((value, index) => new GraphDatumViewModel {
+                                Value = value,
+                                Number = index + startMonth,
+                                ItemId = tmpVM.ItemId,
+                                CategoryId = tmpVM.CategoryId
+                            }),
+                            ValueField = "Value",
+                            TrackerFormatString = "{0}\n{1}月: {2:#,0}", //月: 金額
+                            XAxisKey = "Value",
+                            YAxisKey = "Category"
                         };
-                        ObservableCollection<SeriesViewModel> vmList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
-                        cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
+                        // 全項目年間グラフの項目を選択した時のイベントを登録する
+                        wholeSeries.TrackerHitResultChanged += (sender, e) => {
+                            if (e.Value == null) return;
 
-                        this.WVM.WholeItemMonthlyGraphModel.Series.Clear();
-                        this.WVM.WholeItemMonthlyGraphModel.Series.Add(cSeries);
+                            GraphDatumViewModel datumVM = e.Value.Item as GraphDatumViewModel;
+                            this.WVM.SelectedMonthlyGraphSeriesVM = this.WVM.MonthlyGraphSeriesVMList.FirstOrDefault((tmp) => (tmp.CategoryId == datumVM.CategoryId && tmp.ItemId == datumVM.ItemId));
+                        };
+                        this.WVM.MonthlyGraphPlotModel.Series.Add(wholeSeries);
 
-                        // Y軸の範囲を設定する
-                        foreach (Axis axis in this.WVM.WholeItemMonthlyGraphModel.Axes) {
-                            if (axis.Position == AxisPosition.Left) {
-                                this.SetAxisRange(axis, cSeries.Points.Min((value) => value.Y), cSeries.Points.Max((value) => value.Y), 10, true);
-                                break;
-                            }
+                        // 全項目の月毎の合計を計算する
+                        for (int i = 0; i < tmpVM.Values.Count; ++i) {
+                            if (sumPlus.Count <= i) { sumPlus.Add(0); sumMinus.Add(0); }
+
+                            if (tmpVM.Values[i] < 0) sumMinus[i] += tmpVM.Values[i];
+                            else sumPlus[i] += tmpVM.Values[i];
+                        }
+                    }
+
+                    // Y軸の範囲を設定する
+                    foreach (Axis axis in this.WVM.MonthlyGraphPlotModel.Axes) {
+                        if (axis.Position == AxisPosition.Left) {
+                            this.SetAxisRange(axis, sumMinus.Min(), sumPlus.Max(), 10, true);
+                            break;
                         }
                     }
                     break;
-            }
-            this.WVM.WholeItemMonthlyGraphModel.InvalidatePlot(true);
+                }
+                case GraphKind1.BalanceGraph: {
+                    // グラフ表示データを取得する
+                    this.WVM.MonthlyGraphSeriesVMList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
 
-            this.WVM.SelectedItemMonthlyGraphModel.Series.Clear();
-            this.WVM.SelectedItemMonthlyGraphModel.InvalidatePlot(true);
+                    // グラフ表示データを設定する
+                    this.WVM.MonthlyGraphPlotModel.Series.Clear();
+                    LineSeries series = new LineSeries() {
+                        Title = "残高",
+                        TrackerFormatString = "{2}月: {4:#,0}" //月: 金額
+                    };
+                    series.Points.AddRange(new List<int>(this.WVM.MonthlyGraphSeriesVMList[0].Values).Select((value, index) => new DataPoint(index, value)));
+                    this.WVM.MonthlyGraphPlotModel.Series.Add(series);
+
+                    // Y軸の範囲を設定する
+                    foreach (Axis axis in this.WVM.MonthlyGraphPlotModel.Axes) {
+                        if (axis.Position == AxisPosition.Left) {
+                            this.SetAxisRange(axis, series.Points.Min((value) => value.Y), series.Points.Max((value) => value.Y), 10, true);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            this.WVM.MonthlyGraphPlotModel.InvalidatePlot(true);
+
+            this.WVM.SelectedMonthlyGraphSeriesVM = this.WVM.MonthlyGraphSeriesVMList.FirstOrDefault((vm) => (vm.CategoryId == tmpCategotyId && vm.ItemId == tmpItemId));
+        }
+        
+        /// <summary>
+        /// 選択項目月別グラフを更新する
+        /// </summary>
+        private void UpdateSelectedItemMonthlyGraph()
+        {
+            if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndOutgoGraph) return;
+
+            Settings settings = Settings.Default;
+            int startMonth = settings.App_StartMonth;
+
+            SeriesViewModel vm = this.WVM.SelectedMonthlyGraphSeriesVM;
+
+            // グラフ表示データを設定する
+            this.WVM.SelectedMonthlyGraphPlotModel.Series.Clear();
+            if (vm != null) {
+                CustomBarSeries selectedSeries = new CustomBarSeries() {
+                    IsStacked = true,
+                    Title = vm.GraphName,
+                    FillColor = (this.WVM.MonthlyGraphPlotModel.Series.FirstOrDefault(s => ((s as CustomBarSeries).Title == vm.GraphName)) as CustomBarSeries).ActualFillColor,
+                    ItemsSource = vm.Values.Select((value, index) => new GraphDatumViewModel {
+                        Value = value,
+                        Number = index + startMonth,
+                        ItemId = vm.ItemId,
+                        CategoryId = vm.CategoryId
+                    }),
+                    ValueField = "Value",
+                    TrackerFormatString = "{1}月: {2:#,0}", //月: 金額
+                    XAxisKey = "Value",
+                    YAxisKey = "Category"
+                };
+                this.WVM.SelectedMonthlyGraphPlotModel.Series.Add(selectedSeries);
+
+                // Y軸の範囲を設定する
+                foreach (Axis axis in this.WVM.SelectedMonthlyGraphPlotModel.Axes) {
+                    if (axis.Position == AxisPosition.Left) {
+                        this.SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
+                        break;
+                    }
+                }
+            }
+
+            this.WVM.SelectedMonthlyGraphPlotModel.InvalidatePlot(true);
         }
         #endregion
 
@@ -2908,11 +2953,19 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// <summary>
         /// 年別一覧タブに表示するデータを更新する
         /// </summary>
-        private async Task UpdateYearlyListTabDataAsync()
+        /// <param name="balanceKind">選択対象の収支種別</param>
+        /// <param name="categoryId">選択対象の分類ID</param>
+        /// <param name="itemId">選択対象の項目ID</param>
+        private async Task UpdateYearlyListTabDataAsync(int? balanceKind = null, int? categoryId = null, int? itemId = null)
         {
             if (this.WVM.SelectedTab != Tabs.YearlyListTab) return;
 
-            int startMonth = Properties.Settings.Default.App_StartMonth;
+            int? tmpBalanceKind = balanceKind ?? this.WVM.SelectedBalanceKind ?? null;
+            int? tmpCategotyId = categoryId ?? this.WVM.SelectedCategoryId ?? null;
+            int? tmpItemId = itemId ?? this.WVM.SelectedItemId ?? null;
+
+            Settings settings = Settings.Default;
+            int startMonth = settings.App_StartMonth;
             DateTime tmpYear = DateTime.Now.GetFirstDateOfFiscalYear(startMonth).AddYears(-9);
 
             // 表示する月の文字列を作成する
@@ -2921,8 +2974,11 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                 displayedYears.Add(tmpYear);
                 tmpYear = tmpYear.AddYears(1);
             }
+
             this.WVM.DisplayedYears = displayedYears;
             this.WVM.YearlySeriesVMList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
+
+            this.WVM.SelectedYearlySeriesVM = this.WVM.YearlySeriesVMList.FirstOrDefault((vm) => (vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategotyId && vm.ItemId == tmpItemId));
         }
         #endregion
 
@@ -2937,201 +2993,218 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             Settings settings = Settings.Default;
             int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
 
-            // 全項目
-            this.WVM.WholeItemYearlyGraphModel.Axes.Clear();
-            this.WVM.WholeItemYearlyGraphModel.Series.Clear();
+            #region 全項目
+            this.WVM.YearlyGraphPlotModel.Axes.Clear();
+            this.WVM.YearlyGraphPlotModel.Series.Clear();
 
             // 横軸 - 年軸
-            CategoryAxis cAxis1 = new CategoryAxis() {
+            CategoryAxis horizontalAxis1 = new CategoryAxis() {
                 Unit = "年度",
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
-            cAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+            horizontalAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する年の文字列を作成する
             for (int i = startYear; i < startYear + 10; ++i) {
-                cAxis1.Labels.Add(string.Format("{0}", i));
+                horizontalAxis1.Labels.Add(string.Format("{0}", i));
             }
-            this.WVM.WholeItemYearlyGraphModel.Axes.Add(cAxis1);
+            this.WVM.YearlyGraphPlotModel.Axes.Add(horizontalAxis1);
 
             // 縦軸 - 線形軸
-            LinearAxis lAxis1 = new LinearAxis() {
+            LinearAxis verticalAxis1 = new LinearAxis() {
                 Unit = "円",
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
                 StringFormat = "#,0",
-                Key = "Value"
+                Key = "Value",
+                Title = GraphKind1Str[this.WVM.SelectedGraphKind1]
             };
-            switch (this.WVM.SelectedGraphKind) {
-                case GraphKind.IncomeAndOutgo: {
-                        lAxis1.Title = "収支";
-                    }
-                    break;
-                case GraphKind.Balance: {
-                        lAxis1.Title = "残高";
-                    }
-                    break;
-            }
-            this.WVM.WholeItemYearlyGraphModel.Axes.Add(lAxis1);
+            this.WVM.YearlyGraphPlotModel.Axes.Add(verticalAxis1);
 
-            this.WVM.WholeItemYearlyGraphModel.InvalidatePlot(true);
+            this.WVM.YearlyGraphPlotModel.InvalidatePlot(true);
+            #endregion
 
-            // 選択項目
-            this.WVM.SelectedItemYearlyGraphModel.Axes.Clear();
-            this.WVM.SelectedItemYearlyGraphModel.Series.Clear();
+            #region 選択項目
+            this.WVM.SelectedYearlyGraphPlotModel.Axes.Clear();
+            this.WVM.SelectedYearlyGraphPlotModel.Series.Clear();
 
             // 横軸 - 年軸
-            CategoryAxis cAxis2 = new CategoryAxis() {
+            CategoryAxis horizontalAxis2 = new CategoryAxis() {
                 Unit = "年度",
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
-            cAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+            horizontalAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する年の文字列を作成する
             for (int i = startYear; i < startYear + 10; ++i) {
-                cAxis2.Labels.Add(string.Format("{0}", i));
+                horizontalAxis2.Labels.Add(string.Format("{0}", i));
             }
-            this.WVM.SelectedItemYearlyGraphModel.Axes.Add(cAxis2);
+            this.WVM.SelectedYearlyGraphPlotModel.Axes.Add(horizontalAxis2);
 
             // 縦軸 - 線形軸
-            LinearAxis lAxis2 = new LinearAxis() {
+            LinearAxis verticalAxis2 = new LinearAxis() {
                 Unit = "円",
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
                 StringFormat = "#,0",
-                Key = "Value"
+                Key = "Value",
+                Title = GraphKind1Str[this.WVM.SelectedGraphKind1]
             };
-            switch (this.WVM.SelectedGraphKind) {
-                case GraphKind.IncomeAndOutgo: {
-                        lAxis2.Title = "収支";
-                    }
-                    break;
-                case GraphKind.Balance: {
-                        lAxis2.Title = "残高";
-                    }
-                    break;
-            }
-            this.WVM.SelectedItemYearlyGraphModel.Axes.Add(lAxis2);
+            this.WVM.SelectedYearlyGraphPlotModel.Axes.Add(verticalAxis2);
 
-            this.WVM.SelectedItemYearlyGraphModel.InvalidatePlot(true);
+            this.WVM.SelectedYearlyGraphPlotModel.InvalidatePlot(true);
+            #endregion
         }
 
         /// <summary>
         /// 年別グラフタブに表示するデータを更新する
         /// </summary>
-        private async Task UpdateYearlyGraphTabDataAsync()
+        /// <param name="categoryId">選択対象の分類ID</param>
+        /// <param name="itemId">選択対象の項目ID</param>
+        private async Task UpdateYearlyGraphTabDataAsync(int? categoryId = null, int? itemId = null)
         {
             if (this.WVM.SelectedTab != Tabs.YearlyGraphTab) return;
+
+            int? tmpCategotyId = categoryId ?? this.WVM.SelectedCategoryId ?? null;
+            int? tmpItemId = itemId ?? this.WVM.SelectedItemId ?? null;
 
             Settings settings = Settings.Default;
             int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
 
-            switch (this.WVM.SelectedGraphKind) {
-                case GraphKind.IncomeAndOutgo: {
-                        ObservableCollection<SeriesViewModel> vmList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
-                        List<int> sumPlus = new List<int>(); // 年ごとの合計収入
-                        List<int> sumMinus = new List<int>(); // 年ごとの合計支出
+            switch (this.WVM.SelectedGraphKind1) {
+                case GraphKind1.IncomeAndOutgoGraph: {
+                    List<int> sumPlus = new List<int>(); // 年ごとの合計収入
+                    List<int> sumMinus = new List<int>(); // 年ごとの合計支出
 
-                        this.WVM.WholeItemYearlyGraphModel.Series.Clear();
-                        foreach (SeriesViewModel tmpVM in vmList) {
-                            if (tmpVM.ItemId == -1) { continue; }
-
-                            CustomBarSeries cSeries1 = new CustomBarSeries() {
-                                IsStacked = true,
-                                Title = tmpVM.ItemName,
-                                ItemsSource = tmpVM.Values.Select((value, index) => new SeriesItemViewModel {
-                                    Value = value,
-                                    Number = index + startYear,
-                                    ItemId = tmpVM.ItemId,
-                                    CategoryId = tmpVM.CategoryId
-                                }),
-                                ValueField = "Value",
-                                TrackerFormatString = "{0}\n{1}年度: {2:#,0}", //年: 金額
-                                XAxisKey = "Value",
-                                YAxisKey = "Category"
-                            };
-                            // 全項目年間グラフの項目を選択した時のイベントを登録する
-                            cSeries1.TrackerHitResultChanged += (sender, e) => {
-                                if (e.Value == null) return;
-
-                                SeriesItemViewModel itemVM = e.Value.Item as SeriesItemViewModel;
-                                SeriesViewModel vm = vmList.FirstOrDefault((tmp) => tmp.ItemId == itemVM.ItemId);
-
-                                this.WVM.SelectedItemYearlyGraphModel.Series.Clear();
-
-                                CustomBarSeries cSeries2 = new CustomBarSeries() {
-                                    IsStacked = true,
-                                    Title = vm.ItemName,
-                                    FillColor = (e.Value.Series as CustomBarSeries).ActualFillColor,
-                                    ItemsSource = vm.Values.Select((value, index) => new SeriesItemViewModel {
-                                        Value = value,
-                                        Number = index + startYear,
-                                        ItemId = vm.ItemId,
-                                        CategoryId = vm.CategoryId
-                                    }),
-                                    ValueField = "Value",
-                                    TrackerFormatString = "{1}年度: {2:#,0}", //年: 金額
-                                    XAxisKey = "Value",
-                                    YAxisKey = "Category"
-                                };
-                                this.WVM.SelectedItemYearlyGraphModel.Series.Add(cSeries2);
-
-                                foreach (Axis axis in this.WVM.SelectedItemYearlyGraphModel.Axes) {
-                                    if (axis.Position == AxisPosition.Left) {
-                                        this.SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
-                                        break;
-                                    }
-                                }
-
-                                this.WVM.SelectedItemYearlyGraphModel.InvalidatePlot(true);
-                            };
-                            this.WVM.WholeItemYearlyGraphModel.Series.Add(cSeries1);
-
-                            // 全項目の月毎の合計を計算する
-                            for (int i = 0; i < tmpVM.Values.Count; ++i) {
-                                if (sumPlus.Count <= i) { sumPlus.Add(0); sumMinus.Add(0); }
-
-                                if (tmpVM.Values[i] < 0) sumMinus[i] += tmpVM.Values[i];
-                                else sumPlus[i] += tmpVM.Values[i];
-                            }
-                        }
-
-                        // Y軸の範囲を設定する
-                        foreach (Axis axis in this.WVM.WholeItemYearlyGraphModel.Axes) {
-                            if (axis.Position == AxisPosition.Left) {
-                                this.SetAxisRange(axis, sumMinus.Min(), sumPlus.Max(), 10, true);
-                                break;
-                            }
-                        }
+                    // グラフ表示データを取得する
+                    ObservableCollection<SeriesViewModel> tmpVMList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
+                    // グラフ表示データを設定用に絞り込む
+                    switch (this.WVM.SelectedGraphKind2) {
+                        case GraphKind2.CategoryGraph:
+                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => (vm.CategoryId != -1 && vm.ItemId == -1)));
+                            break;
+                        case GraphKind2.ItemGraph:
+                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => (vm.ItemId != -1)));
+                            break;
                     }
-                    break;
-                case GraphKind.Balance: {
-                        LineSeries cSeries = new LineSeries() {
-                            Title = "残高",
-                            TrackerFormatString = "{2}年度: {4:#,0}" //年: 金額
+                    this.WVM.YearlyGraphSeriesVMList = tmpVMList;
+
+                    // グラフ表示データを設定する
+                    this.WVM.YearlyGraphPlotModel.Series.Clear();
+                    foreach (SeriesViewModel tmpVM in this.WVM.YearlyGraphSeriesVMList) {
+                        CustomBarSeries wholeSeries = new CustomBarSeries() {
+                            IsStacked = true,
+                            Title = tmpVM.GraphName,
+                            ItemsSource = tmpVM.Values.Select((value, index) => new GraphDatumViewModel {
+                                Value = value,
+                                Number = index + startYear,
+                                ItemId = tmpVM.ItemId,
+                                CategoryId = tmpVM.CategoryId
+                            }),
+                            ValueField = "Value",
+                            TrackerFormatString = "{0}\n{1}年度: {2:#,0}", //年度: 金額
+                            XAxisKey = "Value",
+                            YAxisKey = "Category"
                         };
-                        ObservableCollection<SeriesViewModel> vmList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
-                        cSeries.Points.AddRange(new List<int>(vmList[0].Values).Select((value, index) => new DataPoint(index, value)));
+                        // 全項目年間グラフの項目を選択した時のイベントを登録する
+                        wholeSeries.TrackerHitResultChanged += (sender, e) => {
+                            if (e.Value == null) return;
 
-                        this.WVM.WholeItemYearlyGraphModel.Series.Clear();
-                        this.WVM.WholeItemYearlyGraphModel.Series.Add(cSeries);
+                            GraphDatumViewModel datumVM = e.Value.Item as GraphDatumViewModel;
+                            this.WVM.SelectedYearlyGraphSeriesVM = this.WVM.YearlyGraphSeriesVMList.FirstOrDefault((tmp) => (tmp.CategoryId == datumVM.CategoryId && tmp.ItemId == datumVM.ItemId));
+                        };
+                        this.WVM.YearlyGraphPlotModel.Series.Add(wholeSeries);
 
-                        // Y軸の範囲を設定する
-                        foreach (Axis axis in this.WVM.WholeItemYearlyGraphModel.Axes) {
-                            if (axis.Position == AxisPosition.Left) {
-                                this.SetAxisRange(axis, cSeries.Points.Min((value) => value.Y), cSeries.Points.Max((value) => value.Y), 10, true);
-                                break;
-                            }
+                        // 全項目の月毎の合計を計算する
+                        for (int i = 0; i < tmpVM.Values.Count; ++i) {
+                            if (sumPlus.Count <= i) { sumPlus.Add(0); sumMinus.Add(0); }
+
+                            if (tmpVM.Values[i] < 0) sumMinus[i] += tmpVM.Values[i];
+                            else sumPlus[i] += tmpVM.Values[i];
+                        }
+                    }
+
+                    // Y軸の範囲を設定する
+                    foreach (Axis axis in this.WVM.YearlyGraphPlotModel.Axes) {
+                        if (axis.Position == AxisPosition.Left) {
+                            this.SetAxisRange(axis, sumMinus.Min(), sumPlus.Max(), 10, true);
+                            break;
                         }
                     }
                     break;
-            }
-            this.WVM.WholeItemYearlyGraphModel.InvalidatePlot(true);
+                }
+                case GraphKind1.BalanceGraph: {
+                    // グラフ表示データを取得する
+                    this.WVM.YearlyGraphSeriesVMList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
 
-            this.WVM.SelectedItemYearlyGraphModel.Series.Clear();
-            this.WVM.SelectedItemYearlyGraphModel.InvalidatePlot(true);
+                    // グラフ表示データを設定する
+                    this.WVM.YearlyGraphPlotModel.Series.Clear();
+                    LineSeries series = new LineSeries() {
+                        Title = "残高",
+                        TrackerFormatString = "{2}年度: {4:#,0}" //年度: 金額
+                    };
+                    series.Points.AddRange(new List<int>(this.WVM.YearlyGraphSeriesVMList[0].Values).Select((value, index) => new DataPoint(index, value)));
+                    this.WVM.YearlyGraphPlotModel.Series.Add(series);
+
+                    // Y軸の範囲を設定する
+                    foreach (Axis axis in this.WVM.YearlyGraphPlotModel.Axes) {
+                        if (axis.Position == AxisPosition.Left) {
+                            this.SetAxisRange(axis, series.Points.Min((value) => value.Y), series.Points.Max((value) => value.Y), 10, true);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            this.WVM.YearlyGraphPlotModel.InvalidatePlot(true);
+
+            this.WVM.SelectedYearlyGraphSeriesVM = this.WVM.YearlyGraphSeriesVMList.FirstOrDefault((vm) => (vm.CategoryId == tmpCategotyId && vm.ItemId == tmpItemId));
+        }
+        
+        /// <summary>
+        /// 選択項目年別グラフを更新する
+        /// </summary>
+        private void UpdateSelectedItemYearlyGraph()
+        {
+            if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndOutgoGraph) return;
+
+            Settings settings = Settings.Default;
+            int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
+
+            SeriesViewModel vm = this.WVM.SelectedYearlyGraphSeriesVM;
+
+            // グラフ表示データを設定する
+            this.WVM.SelectedYearlyGraphPlotModel.Series.Clear();
+            if (vm != null) {
+                CustomBarSeries selectedSeries = new CustomBarSeries() {
+                    IsStacked = true,
+                    Title = vm.GraphName,
+                    FillColor = (this.WVM.YearlyGraphPlotModel.Series.FirstOrDefault(s => ((s as CustomBarSeries).Title == vm.GraphName)) as CustomBarSeries).ActualFillColor,
+                    ItemsSource = vm.Values.Select((value, index) => new GraphDatumViewModel {
+                        Value = value,
+                        Number = index + startYear,
+                        ItemId = vm.ItemId,
+                        CategoryId = vm.CategoryId
+                    }),
+                    ValueField = "Value",
+                    TrackerFormatString = "{1}年度: {2:#,0}", //年: 金額
+                    XAxisKey = "Value",
+                    YAxisKey = "Category"
+                };
+                this.WVM.SelectedYearlyGraphPlotModel.Series.Add(selectedSeries);
+
+                // Y軸の範囲を設定する
+                foreach (Axis axis in this.WVM.SelectedYearlyGraphPlotModel.Axes) {
+                    if (axis.Position == AxisPosition.Left) {
+                        this.SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
+                        break;
+                    }
+                }
+            }
+
+            this.WVM.SelectedYearlyGraphPlotModel.InvalidatePlot(true);
         }
         #endregion
 

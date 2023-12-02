@@ -3,9 +3,9 @@
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
-    /// グラフ項目VM
+    /// グラフデータVM
     /// </summary>
-    public class SeriesItemViewModel : BindableBase
+    public class GraphDatumViewModel : BindableBase
     {
         #region プロパティ
         /// <summary>
