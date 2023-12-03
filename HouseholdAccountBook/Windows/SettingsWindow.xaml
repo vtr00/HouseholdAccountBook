@@ -121,7 +121,7 @@
                                 <Button Content="↓" Width="25" Command="{StaticResource DropItemSortOrderCommand}" ToolTip="Ctrl+↓"/>
                             </StackPanel>
 
-                            <TreeView x:Name="hierachicalTreeView" Grid.Row="1" Margin="5" ItemsSource="{Binding HierachicalItemVMList}"
+                            <TreeView x:Name="hierachicalTreeView" Grid.Row="1" Margin="5" ItemsSource="{Binding HierachicalSettingVMList}"
                                                 SelectedItemChanged="TreeView_SelectedItemChanged">
                                 <TreeView.InputBindings>
                                     <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{StaticResource AddCategoryCommand}"/>
@@ -142,8 +142,8 @@
                                     <behaviors:BindSelectedItemToTreeViewBehavior SelectedItem="{Binding SelectedItemVM}"/>
                                 </i:Interaction.Behaviors>
                                 <TreeView.ItemTemplate>
-                                    <HierarchicalDataTemplate DataType="viewmodels:SettingsViewModel.HierachicalItemViewModel" 
-                                                                ItemsSource="{Binding ChildrenVMList}">
+                                    <HierarchicalDataTemplate DataType="viewmodels:SettingsViewModel.HierachicalSettingViewModel" 
+                                                              ItemsSource="{Binding ChildrenVMList}">
                                         <TextBlock Text="{Binding Name}" />
                                     </HierarchicalDataTemplate>
                                 </TreeView.ItemTemplate>

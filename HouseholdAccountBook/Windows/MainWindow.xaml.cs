@@ -1502,7 +1502,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 settings.MainWindow_SelectedGraphKind2Index = this.WVM.SelectedGraphKind2Index;
                 settings.Save();
 
-                this.UpdateSelectedItemGraph();
+                this.UpdateSelectedGraph();
             };
 
             this.LogWindowStateAndLocation("Loaded");
@@ -1732,17 +1732,17 @@ ORDER BY sort_order;");
         /// <summary>
         /// 選択項目グラフを更新する
         /// </summary>
-        private void UpdateSelectedItemGraph()
+        private void UpdateSelectedGraph()
         {
             switch (this.WVM.SelectedTab) {
                 case Tabs.DailyGraphTab:
-                    this.UpdateSelectedItemDailyGraph();
+                    this.UpdateSelectedDailyGraph();
                     break;
                 case Tabs.MonthlyGraphTab:
-                    this.UpdateSelectedItemMonthlyGraph();
+                    this.UpdateSelectedMonthlyGraph();
                     break;
                 case Tabs.YearlyGraphTab:
-                    this.UpdateSelectedItemYearlyGraph();
+                    this.UpdateSelectedYearlyGraph();
                     break;
             }
         }
@@ -2560,7 +2560,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     foreach (SeriesViewModel tmpVM in this.WVM.DailyGraphSeriesVMList) {
                         CustomBarSeries wholeSeries = new CustomBarSeries() {
                             IsStacked = true,
-                            Title = tmpVM.GraphName,
+                            Title = tmpVM.Name,
                             ItemsSource = tmpVM.Values.Select((value, index) => {
                                 return new GraphDatumViewModel {
                                     Value = value,
@@ -2642,7 +2642,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// <summary>
         /// 選択項目日別グラフを更新する
         /// </summary>
-        private void UpdateSelectedItemDailyGraph()
+        private void UpdateSelectedDailyGraph()
         {
             if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndOutgoGraph) return;
 
@@ -2653,8 +2653,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             if (vm != null) {
                 CustomBarSeries slectedSeries = new CustomBarSeries() {
                     IsStacked = true,
-                    Title = vm.GraphName,
-                    FillColor = (this.WVM.DailyGraphPlotModel.Series.FirstOrDefault(s => ((s as CustomBarSeries).Title == vm.GraphName)) as CustomBarSeries).ActualFillColor,
+                    Title = vm.Name,
+                    FillColor = (this.WVM.DailyGraphPlotModel.Series.FirstOrDefault(s => ((s as CustomBarSeries).Title == vm.Name)) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Select((value, index) => {
                         return new GraphDatumViewModel {
                             Value = value,
@@ -2907,7 +2907,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// <summary>
         /// 選択項目月別グラフを更新する
         /// </summary>
-        private void UpdateSelectedItemMonthlyGraph()
+        private void UpdateSelectedMonthlyGraph()
         {
             if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndOutgoGraph) return;
 
@@ -2921,8 +2921,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             if (vm != null) {
                 CustomBarSeries selectedSeries = new CustomBarSeries() {
                     IsStacked = true,
-                    Title = vm.GraphName,
-                    FillColor = (this.WVM.MonthlyGraphPlotModel.Series.FirstOrDefault(s => ((s as CustomBarSeries).Title == vm.GraphName)) as CustomBarSeries).ActualFillColor,
+                    Title = vm.Name,
+                    FillColor = (this.WVM.MonthlyGraphPlotModel.Series.FirstOrDefault(s => ((s as CustomBarSeries).Title == vm.Name)) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Select((value, index) => new GraphDatumViewModel {
                         Value = value,
                         Number = index + startMonth,
@@ -3096,7 +3096,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     foreach (SeriesViewModel tmpVM in this.WVM.YearlyGraphSeriesVMList) {
                         CustomBarSeries wholeSeries = new CustomBarSeries() {
                             IsStacked = true,
-                            Title = tmpVM.GraphName,
+                            Title = tmpVM.Name,
                             ItemsSource = tmpVM.Values.Select((value, index) => new GraphDatumViewModel {
                                 Value = value,
                                 Number = index + startYear,
@@ -3166,7 +3166,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// <summary>
         /// 選択項目年別グラフを更新する
         /// </summary>
-        private void UpdateSelectedItemYearlyGraph()
+        private void UpdateSelectedYearlyGraph()
         {
             if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndOutgoGraph) return;
 
@@ -3180,8 +3180,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             if (vm != null) {
                 CustomBarSeries selectedSeries = new CustomBarSeries() {
                     IsStacked = true,
-                    Title = vm.GraphName,
-                    FillColor = (this.WVM.YearlyGraphPlotModel.Series.FirstOrDefault(s => ((s as CustomBarSeries).Title == vm.GraphName)) as CustomBarSeries).ActualFillColor,
+                    Title = vm.Name,
+                    FillColor = (this.WVM.YearlyGraphPlotModel.Series.FirstOrDefault(s => ((s as CustomBarSeries).Title == vm.Name)) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Select((value, index) => new GraphDatumViewModel {
                         Value = value,
                         Number = index + startYear,

@@ -5,10 +5,33 @@ using System.Collections.ObjectModel;
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
-    /// 階層構造項目VM
+    /// 階層構造設定VM
     /// </summary>
-    public partial class HierarchicalItemViewModel : BindableBase, IMultiSelectable
+    public class HierarchicalSettingViewModel : BindableBase, IMultiSelectable
     {
+        /// <summary>
+        /// 階層種別
+        /// </summary>
+        public enum HierarchicalKind
+        {
+            /// <summary>
+            /// 帳簿
+            /// </summary>
+            Book,
+            /// <summary>
+            /// 収支
+            /// </summary>
+            Balance,
+            /// <summary>
+            /// 種別
+            /// </summary>
+            Category,
+            /// <summary>
+            /// 項目
+            /// </summary>
+            Item
+        }
+
         #region プロパティ
         /// <summary>
         /// 種類
@@ -23,7 +46,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 親要素VM
         /// </summary>
-        public HierarchicalItemViewModel ParentVM { get; set; }
+        public HierarchicalSettingViewModel ParentVM { get; set; }
 
         /// <summary>
         /// ソート順
@@ -65,12 +88,12 @@ namespace HouseholdAccountBook.ViewModels
         /// 子要素VMリスト
         /// </summary>
         #region ChildrenVMList
-        public ObservableCollection<HierarchicalItemViewModel> ChildrenVMList
+        public ObservableCollection<HierarchicalSettingViewModel> ChildrenVMList
         {
             get => this._ChildrenVMList;
             set => this.SetProperty(ref this._ChildrenVMList, value);
         }
-        private ObservableCollection<HierarchicalItemViewModel> _ChildrenVMList = default;
+        private ObservableCollection<HierarchicalSettingViewModel> _ChildrenVMList = default;
         #endregion
 
         /// <summary>

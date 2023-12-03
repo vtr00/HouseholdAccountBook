@@ -8,7 +8,7 @@
     ///   VM.SelectedItemVM - Behavior.SelectedItem - VM.IsSelected - View.IsSelected
     /// 
     /// <![CDATA[
-    /// <TreeView ItemsSource="{Binding HierachicalItemVMList}">
+    /// <TreeView ItemsSource="{Binding HierachicalSettingVMList}">
     ///     <TreeView.ItemContainerStyle>
     ///         <Style TargetType="TreeViewItem">
     ///             <Setter Property="IsSelected" Value="{Binding IsSelected}" />

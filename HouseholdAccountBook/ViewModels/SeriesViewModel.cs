@@ -3,7 +3,7 @@
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
-    /// 系列VM(一覧の行、グラフの系列用データ)
+    /// 系列VM(一覧の行、グラフの系列データ)
     /// </summary>
     public class SeriesViewModel
     {
@@ -57,6 +57,19 @@ namespace HouseholdAccountBook.ViewModels
         public string Name
         {
             get {
+                if (this.ItemName != string.Empty) return this.ItemName;
+                if (this.CategoryName != string.Empty) return this.CategoryName;
+                if (this.BalanceName != string.Empty) return this.BalanceName;
+                return this.OtherName;
+            }
+            private set { }
+        }
+        /// <summary>
+        /// 一覧表示名
+        /// </summary>
+        public string ListName
+        {
+            get {
                 if (this.ItemName != string.Empty) return "  " + this.ItemName;
                 if (this.CategoryName != string.Empty) return this.CategoryName;
                 if (this.BalanceName != string.Empty) return this.BalanceName;
@@ -65,11 +78,12 @@ namespace HouseholdAccountBook.ViewModels
             private set { }
         }
         /// <summary>
-        /// グラフ表示名
+        /// 選択項目表示名
         /// </summary>
-        public string GraphName
+        public string SelectedName
         {
             get {
+                if (this.ItemName != string.Empty && this.CategoryName != string.Empty) return this.CategoryName + " > " + this.ItemName;
                 if (this.ItemName != string.Empty) return this.ItemName;
                 if (this.CategoryName != string.Empty) return this.CategoryName;
                 if (this.BalanceName != string.Empty) return this.BalanceName;
@@ -86,7 +100,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// コピーコンストラクタ
         /// </summary>
-        /// <param name="summary"></param>
+        /// <param name="summary">コピー元の概要VM</param>
         public SeriesViewModel(SummaryViewModel summary)
         {
             this.BalanceKind = summary.BalanceKind;

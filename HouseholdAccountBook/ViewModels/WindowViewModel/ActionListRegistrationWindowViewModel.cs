@@ -29,7 +29,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public event Action<BalanceKind> BalanceKindChanged = default;
         /// <summary>
-        /// カテゴリ変更時イベント
+        /// 分類変更時イベント
         /// </summary>
         public event Action<int?> CategoryChanged = default;
         /// <summary>

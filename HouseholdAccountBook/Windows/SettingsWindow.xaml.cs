@@ -18,7 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using static HouseholdAccountBook.ConstValue.ConstValue;
-using static HouseholdAccountBook.ViewModels.HierarchicalItemViewModel;
+using static HouseholdAccountBook.ViewModels.HierarchicalSettingViewModel;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -85,7 +85,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void AddCategoryCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            HierarchicalItemViewModel vm = this.WVM.SelectedItemVM;
+            HierarchicalSettingViewModel vm = this.WVM.SelectedItemVM;
             while (vm.Kind != HierarchicalKind.Balance) {
                 vm = vm.ParentVM;
             }
@@ -123,7 +123,7 @@ RETURNING category_id;", (int)kind, Updater, Inserter);
         /// <param name="e"></param>
         private async void AddItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            HierarchicalItemViewModel vm = this.WVM.SelectedItemVM;
+            HierarchicalSettingViewModel vm = this.WVM.SelectedItemVM;
             while (vm.Kind != HierarchicalKind.Category) {
                 vm = vm.ParentVM;
             }
@@ -511,7 +511,7 @@ WHERE item_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
         {
             Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
 
-            HierarchicalItemViewModel vm = this.WVM.SelectedItemVM;
+            HierarchicalSettingViewModel vm = this.WVM.SelectedItemVM;
             vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
             vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
 
@@ -1176,25 +1176,25 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         private async Task UpdateItemSettingsTabDataAsync(HierarchicalKind? kind = null, int? id = null)
         {
             if (this.WVM.SelectedTab == SettingsTabs.ItemSettingsTab) {
-                this.WVM.HierachicalItemVMList = await this.LoadItemViewModelListAsync();
+                this.WVM.HierachicalSettingVMList = await this.LoadItemViewModelListAsync();
 
                 if (kind == null || id == null) {
                     this.WVM.SelectedItemVM = null;
                 }
                 else {
                     // 収支から探す
-                    IEnumerable<HierarchicalItemViewModel> query = this.WVM.HierachicalItemVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
+                    IEnumerable<HierarchicalSettingViewModel> query = this.WVM.HierachicalSettingVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
                     if (query.Count() == 0) {
-                        // カテゴリから探す
-                        foreach (HierarchicalItemViewModel tmpVM in this.WVM.HierachicalItemVMList) {
+                        // 分類から探す
+                        foreach (HierarchicalSettingViewModel tmpVM in this.WVM.HierachicalSettingVMList) {
                             query = tmpVM.ChildrenVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
                             if (query.Count() != 0) { break; }
                         }
 
                         if (query.Count() == 0) {
                             // 項目から探す
-                            foreach (HierarchicalItemViewModel tmpVM in this.WVM.HierachicalItemVMList) {
-                                foreach (HierarchicalItemViewModel tmpVM2 in tmpVM.ChildrenVMList) {
+                            foreach (HierarchicalSettingViewModel tmpVM in this.WVM.HierachicalSettingVMList) {
+                                foreach (HierarchicalSettingViewModel tmpVM2 in tmpVM.ChildrenVMList) {
                                     query = tmpVM2.ChildrenVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
                                     if (query.Count() != 0) { break; }
                                 }
@@ -1207,8 +1207,8 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 }
 
                 // 何も選択されていないなら1番上の項目を選択する
-                if (this.WVM.SelectedItemVM == null && this.WVM.HierachicalItemVMList.Count != 0) {
-                    this.WVM.SelectedItemVM = this.WVM.HierachicalItemVMList[0];
+                if (this.WVM.SelectedItemVM == null && this.WVM.HierachicalSettingVMList.Count != 0) {
+                    this.WVM.SelectedItemVM = this.WVM.HierachicalSettingVMList[0];
                 }
             }
         }
@@ -1251,32 +1251,32 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// 階層構造項目VMリストを取得する
         /// </summary>
         /// <returns>階層構造項目VMリスト</returns>
-        private async Task<ObservableCollection<HierarchicalItemViewModel>> LoadItemViewModelListAsync()
+        private async Task<ObservableCollection<HierarchicalSettingViewModel>> LoadItemViewModelListAsync()
         {
-            ObservableCollection<HierarchicalItemViewModel> vmList = new ObservableCollection<HierarchicalItemViewModel>();
-            HierarchicalItemViewModel incomeVM = new HierarchicalItemViewModel() {
+            ObservableCollection<HierarchicalSettingViewModel> vmList = new ObservableCollection<HierarchicalSettingViewModel>();
+            HierarchicalSettingViewModel incomeVM = new HierarchicalSettingViewModel() {
                 Kind = HierarchicalKind.Balance,
                 Id = (int)BalanceKind.Income,
                 SortOrder = -1,
                 Name = "収入項目",
                 ParentVM = null,
                 RelationVMList = null,
-                ChildrenVMList = new ObservableCollection<HierarchicalItemViewModel>()
+                ChildrenVMList = new ObservableCollection<HierarchicalSettingViewModel>()
             };
             vmList.Add(incomeVM);
 
-            HierarchicalItemViewModel outgoVM = new HierarchicalItemViewModel() {
+            HierarchicalSettingViewModel outgoVM = new HierarchicalSettingViewModel() {
                 Kind = HierarchicalKind.Balance,
                 Id = (int)BalanceKind.Outgo,
                 SortOrder = -1,
                 Name = "支出項目",
                 ParentVM = null,
                 RelationVMList = null,
-                ChildrenVMList = new ObservableCollection<HierarchicalItemViewModel>()
+                ChildrenVMList = new ObservableCollection<HierarchicalSettingViewModel>()
             };
             vmList.Add(outgoVM);
 
-            foreach (HierarchicalItemViewModel vm in vmList) {
+            foreach (HierarchicalSettingViewModel vm in vmList) {
                 // 分類
                 using (DaoBase dao = this.builder.Build()) {
                     DaoReader reader = await dao.ExecQueryAsync(@"
@@ -1290,19 +1290,19 @@ ORDER BY sort_order;", vm.Id);
                         int sortOrder = record.ToInt("sort_order");
                         string categoryName = record["category_name"];
 
-                        vm.ChildrenVMList.Add(new HierarchicalItemViewModel() {
+                        vm.ChildrenVMList.Add(new HierarchicalSettingViewModel() {
                             Kind = HierarchicalKind.Category,
                             Id = categoryId,
                             SortOrder = sortOrder,
                             Name = categoryName,
                             ParentVM = vm,
                             RelationVMList = null,
-                            ChildrenVMList = new ObservableCollection<HierarchicalItemViewModel>()
+                            ChildrenVMList = new ObservableCollection<HierarchicalSettingViewModel>()
                         });
                         return true;
                     });
 
-                    foreach (HierarchicalItemViewModel categocyVM in vm.ChildrenVMList) {
+                    foreach (HierarchicalSettingViewModel categocyVM in vm.ChildrenVMList) {
                         // 項目
                         reader = await dao.ExecQueryAsync(@"
 SELECT item_id, item_name, sort_order
@@ -1315,7 +1315,7 @@ ORDER BY sort_order;", categocyVM.Id);
                             int sortOrder = record.ToInt("sort_order");
                             string itemName = record["item_name"];
 
-                            categocyVM.ChildrenVMList.Add(new HierarchicalItemViewModel() {
+                            categocyVM.ChildrenVMList.Add(new HierarchicalSettingViewModel() {
                                 Kind = HierarchicalKind.Item,
                                 Id = itemId,
                                 SortOrder = sortOrder,
@@ -1328,7 +1328,7 @@ ORDER BY sort_order;", categocyVM.Id);
                             return true;
                         });
 
-                        foreach (HierarchicalItemViewModel itemVM in categocyVM.ChildrenVMList) {
+                        foreach (HierarchicalSettingViewModel itemVM in categocyVM.ChildrenVMList) {
                             reader = await dao.ExecQueryAsync(@"
 SELECT B.book_id AS BookId, B.book_name, RBI.book_id IS NULL AS IsNotRelated
 FROM mst_book B

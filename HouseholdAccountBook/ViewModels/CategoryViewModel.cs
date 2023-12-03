@@ -1,17 +1,17 @@
 ﻿namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
-    /// カテゴリVM
+    /// 分類VM
     /// </summary>
     public partial class CategoryViewModel
     {
         #region プロパティ
         /// <summary>
-        /// カテゴリID
+        /// 分類ID
         /// </summary>
         public int Id { get; set; }
         /// <summary>
-        /// カテゴリ名
+        /// 分類名
         /// </summary>
         public string Name { get; set; }
         #endregion

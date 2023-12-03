@@ -57,27 +57,27 @@ namespace HouseholdAccountBook.ViewModels
 
         #region 項目設定
         /// <summary>
-        /// 階層構造項目VMリスト
+        /// 階層構造設定VMリスト
         /// </summary>
-        #region HierachicalItemVMList
-        public ObservableCollection<HierarchicalItemViewModel> HierachicalItemVMList
+        #region HierachicalSettingVMList
+        public ObservableCollection<HierarchicalSettingViewModel> HierachicalSettingVMList
         {
-            get => this._HierachicalItemVMList;
-            set => this.SetProperty(ref this._HierachicalItemVMList, value);
+            get => this._HierachicalSettingVMList;
+            set => this.SetProperty(ref this._HierachicalSettingVMList, value);
         }
-        private ObservableCollection<HierarchicalItemViewModel> _HierachicalItemVMList = default;
+        private ObservableCollection<HierarchicalSettingViewModel> _HierachicalSettingVMList = default;
         #endregion
         /// <summary>
         /// 選択された項目VM
         /// </summary>
         /// <remarks>Not Binded</remarks>
         #region SelectedItemVM
-        public HierarchicalItemViewModel SelectedItemVM
+        public HierarchicalSettingViewModel SelectedItemVM
         {
             get => this._SelectedItemVM;
             set => this.SetProperty(ref this._SelectedItemVM, value);
         }
-        private HierarchicalItemViewModel _SelectedItemVM = default;
+        private HierarchicalSettingViewModel _SelectedItemVM = default;
         #endregion
         #endregion
 

@@ -69,7 +69,7 @@
         <Style x:Key="SummaryStyle" TargetType="DataGridRow">
             <Setter Property="Background" Value="#FFEEE3FB"/>
             <Style.Triggers>
-                <!-- カテゴリ小計 -->
+                <!-- 分類小計 -->
                 <DataTrigger Binding="{Binding ItemId}" Value="-1">
                     <Setter Property="Background" Value="#FFFFFFB0"/>
                 </DataTrigger>
@@ -77,7 +77,7 @@
                 <DataTrigger Binding="{Binding CategoryId}" Value="-1">
                     <Setter Property="Background" Value="#FFB0FFB0"/>
                 </DataTrigger>
-                <!-- 差引損益 -->
+                <!-- 差引損益/残高 -->
                 <DataTrigger Binding="{Binding BalanceKind}" Value="-1">
                     <Setter Property="Background" Value="#FFFFB0B0"/>
                 </DataTrigger>
@@ -459,7 +459,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0" Margin="2">
+                    <Grid Grid.Row="0" Margin="2,2,2,0">
                         <StackPanel Orientation="Horizontal">
                             <Button Width="20" Content="◀" Command="{StaticResource GoToLastMonthCommand}"/>
                             <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToDisplayedMonthConverter}, TargetNullValue='期間指定'}"
@@ -481,11 +481,11 @@
                             <Button Width="20" Content="▶" Command="{StaticResource GoToNextMonthCommand}"/>
                             <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}"/>
                             
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="150"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
                                       ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
                                       ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
                                 <ComboBox.Style>
                                     <Style TargetType="ComboBox">
@@ -500,6 +500,7 @@
                         </StackPanel>
                     </Grid>
 
+                    <!-- 全体グラフ -->
                     <Grid Grid.Row="1" Margin="2" Background="White">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -508,7 +509,8 @@
                         <oxy:PlotView Grid.Row="0" Model="{Binding DailyGraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
 
-                    <Grid Grid.Row="2" Margin="2" Background="White" Height="200">
+                    <!-- 個別グラフ -->
+                    <Grid Grid.Row="2" Margin="2,0,2,2" Background="White" Height="200">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
@@ -526,18 +528,8 @@
 
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
-                                <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
-                                          ItemsSource="{Binding DailyGraphSeriesVMList}" SelectedItem="{Binding SelectedDailyGraphSeriesVM}" DisplayMemberPath="GraphName">
-                                    <ComboBox.Style>
-                                        <Style TargetType="ComboBox">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding SelecedGraphKind2}" Value="ItemGraph">
-                                                    <Setter Property="DisplayMemberPath" Value="ItemName"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ComboBox.Style>
-                                </ComboBox>
+                                <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="200"
+                                          ItemsSource="{Binding DailyGraphSeriesVMList}" SelectedItem="{Binding SelectedDailyGraphSeriesVM}" DisplayMemberPath="SelectedName"/>
                             </StackPanel>
                         </Grid>
                         <oxy:PlotView Grid.Row="1" Model="{Binding SelectedDailyGraphPlotModel}" Controller="{Binding Controller}"/>
@@ -565,7 +557,7 @@
                                     Command="{StaticResource UpdateCommand}"/>
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
                             <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="150"
                                           ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
                         </StackPanel>
                     </Grid>
@@ -588,7 +580,7 @@
                             </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
                                 <!-- 参考：http://oita.oika.me/2014/05/31/binding-datagridcolumn/ -->
-                                <DataGridTextColumn Header="項目名" Binding="{Binding Name}"/>
+                                <DataGridTextColumn Header="項目名" Binding="{Binding ListName}"/>
                                 <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[0], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
                                                     Binding="{Binding Values[0], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
@@ -649,17 +641,17 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0" Margin="2,2,2,1">
+                    <Grid Grid.Row="0" Margin="2,2,2,0">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="◀" Width="20" Command="{StaticResource GoToLastYearCommand}"/>
                             <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}" Width="120"/>
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
                             <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="150"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
                                       ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
                                       ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
                                 <ComboBox.Style>
                                     <Style TargetType="ComboBox">
@@ -674,6 +666,7 @@
                         </StackPanel>
                     </Grid>
 
+                    <!-- 全体グラフ -->
                     <Grid Grid.Row="1" Margin="2" Background="White">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -682,7 +675,8 @@
                         <oxy:PlotView Grid.Row="0" Model="{Binding MonthlyGraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
 
-                    <Grid Grid.Row="2" Margin="2" Background="White" Height="200">
+                    <!-- 個別グラフ -->
+                    <Grid Grid.Row="2" Margin="2,0,2,2" Background="White" Height="200">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
@@ -700,18 +694,8 @@
 
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
-                                <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
-                                          ItemsSource="{Binding MonthlyGraphSeriesVMList}" SelectedItem="{Binding SelectedMonthlyGraphSeriesVM}" DisplayMemberPath="GraphName">
-                                    <ComboBox.Style>
-                                        <Style TargetType="ComboBox">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding SelecedGraphKind2}" Value="ItemGraph">
-                                                    <Setter Property="DisplayMemberPath" Value="ItemName"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ComboBox.Style>
-                                </ComboBox>
+                                <ComboBox HorizontalAlignment="Stretch" MinWidth="200"
+                                          ItemsSource="{Binding MonthlyGraphSeriesVMList}" SelectedItem="{Binding SelectedMonthlyGraphSeriesVM}" DisplayMemberPath="SelectedName"/>
                             </StackPanel>
                         </Grid>
                         <oxy:PlotView Grid.Row="1" Model="{Binding SelectedMonthlyGraphPlotModel}" Controller="{Binding Controller}"/>
@@ -735,7 +719,7 @@
                             <Button Content="-" Width="120" IsEnabled="False"/>
                             <Button Content="▶" Width="20" IsEnabled="False"/>
                             <Button Content="-" Width="40" IsEnabled="False"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="150"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                         </StackPanel>
                     </Grid>
@@ -758,7 +742,7 @@
                             </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
                                 <!-- 参考：http://oita.oika.me/2014/05/31/binding-datagridcolumn/ -->
-                                <DataGridTextColumn Header="項目名" Binding="{Binding Name}"/>
+                                <DataGridTextColumn Header="項目名" Binding="{Binding ListName}"/>
                                 <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[0], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
                                                     Binding="{Binding Values[0], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
@@ -810,17 +794,17 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0" Margin="2,2,2,1">
+                    <Grid Grid.Row="0" Margin="2,2,2,0">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="◀" Width="20" IsEnabled="False"/>
                             <Button Content="-" Width="120" IsEnabled="False"/>
                             <Button Content="▶" Width="20" IsEnabled="False"/>
                             <Button Content="-" Width="40" IsEnabled="False"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0" MinWidth="150"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
                                       ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
                                       ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
                                 <ComboBox.Style>
                                     <Style TargetType="ComboBox">
@@ -835,6 +819,7 @@
                         </StackPanel>
                     </Grid>
 
+                    <!-- 全体グラフ -->
                     <Grid Grid.Row="1" Margin="2" Background="White">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -843,7 +828,8 @@
                         <oxy:PlotView Grid.Row="0" Model="{Binding YearlyGraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
 
-                    <Grid Grid.Row="2" Margin="2" Background="White" Height="200">
+                    <!-- 個別グラフ -->
+                    <Grid Grid.Row="2" Margin="2,0,2,2" Background="White" Height="200">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
@@ -861,8 +847,8 @@
 
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
-                                <ComboBox HorizontalAlignment="Stretch" Margin="5,0,0,0" MinWidth="100"
-                                          ItemsSource="{Binding YearlyGraphSeriesVMList}" SelectedItem="{Binding SelectedYearlyGraphSeriesVM}" DisplayMemberPath="GraphName"/>
+                                <ComboBox HorizontalAlignment="Stretch" MinWidth="200"
+                                          ItemsSource="{Binding YearlyGraphSeriesVMList}" SelectedItem="{Binding SelectedYearlyGraphSeriesVM}" DisplayMemberPath="SelectedName"/>
                             </StackPanel>
                         </Grid>
                         

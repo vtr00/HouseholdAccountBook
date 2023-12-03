@@ -33,7 +33,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public event Action<BalanceKind> BalanceKindChanged = default;
         /// <summary>
-        /// カテゴリ変更時イベント
+        /// 分類変更時イベント
         /// </summary>
         public event Action<int?> CategoryChanged = default;
         /// <summary>
@@ -165,7 +165,7 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// カテゴリVMリスト
+        /// 分類VMリスト
         /// </summary>
         #region CategoryVMList
         public ObservableCollection<CategoryViewModel> CategoryVMList
@@ -176,7 +176,7 @@ namespace HouseholdAccountBook.ViewModels
         private ObservableCollection<CategoryViewModel> _CategoryVMList = default;
         #endregion
         /// <summary>
-        /// 選択されたカテゴリVM
+        /// 選択された分類VM
         /// </summary>
         #region SelectedCategoryVM
         public CategoryViewModel SelectedCategoryVM

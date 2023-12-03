@@ -482,7 +482,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         /// <summary>
         /// 分類リストを更新する
         /// </summary>
-        /// <param name="categoryId">選択対象のカテゴリID</param>
+        /// <param name="categoryId">選択対象の分類ID</param>
         /// <returns></returns>
         private async Task UpdateCategoryListAsync(int? categoryId = null)
         {
@@ -680,77 +680,77 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
             using (DaoBase dao = this.builder.Build()) {
                 switch (this.WVM.RegMode) {
                     case RegistrationMode.Add: {
-                            #region 帳簿項目を追加する
-                            await dao.ExecTransactionAsync(async () => {
-                                int tmpGroupId = -1;
-                                // グループIDを取得する
-                                DaoReader reader = await dao.ExecQueryAsync(@"
+                        #region 帳簿項目を追加する
+                        await dao.ExecTransactionAsync(async () => {
+                            int tmpGroupId = -1;
+                            // グループIDを取得する
+                            DaoReader reader = await dao.ExecQueryAsync(@"
 INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.ListReg, Updater, Inserter);
-                                reader.ExecARow((record) => {
-                                    tmpGroupId = record.ToInt("group_id");
-                                });
+                            reader.ExecARow((record) => {
+                                tmpGroupId = record.ToInt("group_id");
+                            });
 
-                                foreach (DateValueViewModel vm in this.WVM.DateValueVMList) {
-                                    if (vm.ActValue.HasValue) {
-                                        DateTime actTime = vm.ActDate; // 日付
-                                        int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value; // 金額
-                                        reader = await dao.ExecQueryAsync(@"
+                            foreach (DateValueViewModel vm in this.WVM.DateValueVMList) {
+                                if (vm.ActValue.HasValue) {
+                                    DateTime actTime = vm.ActDate; // 日付
+                                    int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value; // 金額
+                                    reader = await dao.ExecQueryAsync(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 'now', @{7}, 'now', @{8}) RETURNING action_id;",
-                                            bookId, itemId, actTime, actValue, shopName, tmpGroupId, remark, Updater, Inserter);
+                                        bookId, itemId, actTime, actValue, shopName, tmpGroupId, remark, Updater, Inserter);
+
+                                    reader.ExecARow((record) => {
+                                        tmpActionIdList.Add(record.ToInt("action_id"));
+                                    });
+                                }
+                            }
+                        });
+                        #endregion
+                        break;
+                    }
+                    case RegistrationMode.Edit: {
+                        #region 帳簿項目を編集する
+                        await dao.ExecTransactionAsync(async () => {
+                            foreach (DateValueViewModel vm in this.WVM.DateValueVMList) {
+                                if (vm.ActValue.HasValue) {
+                                    int? actionId = vm.ActionId;
+                                    DateTime actTime = vm.ActDate; // 日付
+                                    int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value; // 金額
+
+                                    if (actionId.HasValue) {
+                                        await dao.ExecNonQueryAsync(@"
+UPDATE hst_action
+SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, update_time = 'now', updater = @{6}
+WHERE action_id = @{7} AND NOT (book_id = @{0} AND item_id = @{1} AND act_time = @{2} AND act_value = @{3} AND shop_name = @{4} AND remark = @{5});",
+                                            bookId, itemId, actTime, actValue, shopName, remark, Updater, actionId.Value);
+
+
+                                        tmpActionIdList.Add(actionId.Value);
+                                    }
+                                    else {
+                                        DaoReader reader = await dao.ExecQueryAsync(@"
+INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 'now', @{7}, 'now', @{8}) RETURNING action_id;",
+                                            bookId, itemId, actTime, actValue, shopName, this.selectedGroupId, remark, Updater, Inserter);
 
                                         reader.ExecARow((record) => {
                                             tmpActionIdList.Add(record.ToInt("action_id"));
                                         });
                                     }
                                 }
-                            });
-                            #endregion
-                        }
-                        break;
-                    case RegistrationMode.Edit: {
-                            #region 帳簿項目を編集する
-                            await dao.ExecTransactionAsync(async () => {
-                                foreach (DateValueViewModel vm in this.WVM.DateValueVMList) {
-                                    if (vm.ActValue.HasValue) {
-                                        int? actionId = vm.ActionId;
-                                        DateTime actTime = vm.ActDate; // 日付
-                                        int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value; // 金額
+                            }
 
-                                        if (actionId.HasValue) {
-                                            await dao.ExecNonQueryAsync(@"
-UPDATE hst_action
-SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, update_time = 'now', updater = @{6}
-WHERE action_id = @{7} AND NOT (book_id = @{0} AND item_id = @{1} AND act_time = @{2} AND act_value = @{3} AND shop_name = @{4} AND remark = @{5});",
-                                                bookId, itemId, actTime, actValue, shopName, remark, Updater, actionId.Value);
-
-
-                                            tmpActionIdList.Add(actionId.Value);
-                                        }
-                                        else {
-                                            DaoReader reader = await dao.ExecQueryAsync(@"
-INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 'now', @{7}, 'now', @{8}) RETURNING action_id;",
-                                                bookId, itemId, actTime, actValue, shopName, this.selectedGroupId, remark, Updater, Inserter);
-
-                                            reader.ExecARow((record) => {
-                                                tmpActionIdList.Add(record.ToInt("action_id"));
-                                            });
-                                        }
-                                    }
-                                }
-
-                                IEnumerable<int> expected = this.groupedActionIdList.Except(tmpActionIdList);
-                                foreach (int actionId in expected) {
-                                    await dao.ExecNonQueryAsync(@"
+                            IEnumerable<int> expected = this.groupedActionIdList.Except(tmpActionIdList);
+                            foreach (int actionId in expected) {
+                                await dao.ExecNonQueryAsync(@"
 UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{1} 
 WHERE action_id = @{0};", actionId, Updater);
-                                }
-                            });
-                            #endregion
-                        }
+                            }
+                        });
+                        #endregion
                         break;
+                    }
                 }
 
 

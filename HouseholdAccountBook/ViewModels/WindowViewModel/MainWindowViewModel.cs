@@ -1,6 +1,5 @@
 ﻿using HouseholdAccountBook.Extensions;
 using OxyPlot;
-using OxyPlot.Legends;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -480,15 +479,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private PlotModel _DailyGraphPlotModel = new PlotModel() {
             Title = "日別グラフ",
-            Legends = {
-                new Legend(){ 
-                    LegendOrientation = LegendOrientation.Horizontal,
-                    LegendPlacement = LegendPlacement.Outside,
-                    LegendPosition = LegendPosition.RightTop,
-                    LegendTitle = "凡例",
-                    LegendFontSize = 10.5
-                }
-            }
+            IsLegendVisible = false
         };
         #endregion
 
@@ -503,15 +494,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private PlotModel _SelectedDailyGraphPlotModel = new PlotModel() {
             Title = "個別グラフ",
-            Legends = {
-                new Legend() {
-                    LegendOrientation = LegendOrientation.Horizontal,
-                    LegendPlacement = LegendPlacement.Outside,
-                    LegendPosition = LegendPosition.RightTop,
-                    LegendTitle = "凡例",
-                    LegendFontSize = 10.5
-                }
-            }
+            IsLegendVisible = false
         };
         #endregion
         #endregion
@@ -633,15 +616,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private PlotModel _MonthlyGraphPlotModel = new PlotModel() {
             Title = "月別グラフ",
-            Legends = {
-                new Legend() {
-                    LegendOrientation = LegendOrientation.Horizontal,
-                    LegendPlacement = LegendPlacement.Outside,
-                    LegendPosition = LegendPosition.RightTop,
-                    LegendTitle = "凡例",
-                    LegendFontSize = 10.5
-                }
-            }
+            IsLegendVisible = false
         };
         #endregion
 
@@ -656,15 +631,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private PlotModel _SelectedMonthlyGraphPlotModel = new PlotModel() {
             Title = "個別グラフ",
-            Legends = {
-                new Legend() {
-                    LegendOrientation = LegendOrientation.Horizontal,
-                    LegendPlacement = LegendPlacement.Outside,
-                    LegendPosition = LegendPosition.RightTop,
-                    LegendTitle = "凡例",
-                    LegendFontSize = 10.5
-                }
-            }
+            IsLegendVisible = false
         };
         #endregion
         #endregion
@@ -749,7 +716,7 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 全項目年別グラフプロットモデル
+        /// 年別グラフプロットモデル
         /// </summary>
         #region YearlyGraphPlotModel
         public PlotModel YearlyGraphPlotModel
@@ -759,15 +726,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private PlotModel _YearlyGraphPlotModel = new PlotModel() {
             Title = "年別グラフ",
-            Legends = {
-                new Legend() {
-                    LegendOrientation = LegendOrientation.Horizontal,
-                    LegendPlacement = LegendPlacement.Outside,
-                    LegendPosition = LegendPosition.RightTop,
-                    LegendTitle = "凡例",
-                    LegendFontSize = 10.5
-                }
-            }
+            IsLegendVisible = false
         };
         #endregion
 
@@ -782,15 +741,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         private PlotModel _SelectedYearlyGraphPlotModel = new PlotModel() {
             Title = "個別グラフ",
-            Legends = {
-                new Legend() {
-                    LegendOrientation = LegendOrientation.Horizontal,
-                    LegendPlacement = LegendPlacement.Outside,
-                    LegendPosition = LegendPosition.RightTop,
-                    LegendTitle = "凡例",
-                    LegendFontSize = 10.5
-                }
-            }
+            IsLegendVisible = false
         };
         #endregion
         #endregion
