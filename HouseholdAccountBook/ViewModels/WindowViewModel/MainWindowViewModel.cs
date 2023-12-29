@@ -301,21 +301,13 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._SelectedActionVMList;
             set {
-                // Summary選択時に呼出し
-                if (this.SetProperty(ref this._SelectedActionVMList, value)) {
-                    this.SelectedActionVMList.CollectionChanged += (sender, e) => {
-                        this.RaisePropertyChanged(nameof(this.AverageValue));
-                        this.RaisePropertyChanged(nameof(this.Count));
-                        this.RaisePropertyChanged(nameof(this.SumValue));
-                        this.RaisePropertyChanged(nameof(this.IncomeSumValue));
-                        this.RaisePropertyChanged(nameof(this.OutgoSumValue));
-
-                        this.RaisePropertyChanged(nameof(this.IsMatch));
-                    };
+                this._SelectedActionVMList.Clear();
+                foreach (ActionViewModel vm in value) {
+                    this._SelectedActionVMList.Add(vm);
                 }
             }
         }
-        private ObservableCollection<ActionViewModel> _SelectedActionVMList = default;
+        private ObservableCollection<ActionViewModel> _SelectedActionVMList = new ObservableCollection<ActionViewModel>();
         #endregion
 
         /// <summary>
@@ -766,8 +758,11 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public MainWindowViewModel()
         {
-            this.SelectedActionVMList = new ObservableCollection<ActionViewModel>();
             this.Controller.BindMouseEnter(PlotCommands.HoverPointsOnlyTrack);
+
+            this.SelectedActionVMList.CollectionChanged += (sender, e) => {
+                this.RaiseSelectedActionVMListChanged();
+            };
         }
 
         /// <summary>
@@ -776,6 +771,20 @@ namespace HouseholdAccountBook.ViewModels
         public void RaiseDisplayedYearChanged()
         {
             this.RaisePropertyChanged(nameof(this.DisplayedYear));
+        }
+
+        /// <summary>
+        /// 選択帳簿項目変更を通知する
+        /// </summary>
+        public void RaiseSelectedActionVMListChanged()
+        {
+            this.RaisePropertyChanged(nameof(this.AverageValue));
+            this.RaisePropertyChanged(nameof(this.Count));
+            this.RaisePropertyChanged(nameof(this.SumValue));
+            this.RaisePropertyChanged(nameof(this.IncomeSumValue));
+            this.RaisePropertyChanged(nameof(this.OutgoSumValue));
+
+            this.RaisePropertyChanged(nameof(this.IsMatch));
         }
 
         /// <summary>
