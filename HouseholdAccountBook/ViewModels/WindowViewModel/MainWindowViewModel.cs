@@ -87,7 +87,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._SelectedBookVM;
             set {
-                if (this.SetProperty(ref this._SelectedBookVM, value) && value != null) { // SelectedBookVMがnullになることはない想定
+                if (this.SetProperty(ref this._SelectedBookVM, value)) { // SelectedBookVMがnullになることはない想定
                     this.SelectedBookChanged?.Invoke();
                 }
             }
@@ -307,7 +307,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private ObservableCollection<ActionViewModel> _SelectedActionVMList = new ObservableCollection<ActionViewModel>();
+        private readonly ObservableCollection<ActionViewModel> _SelectedActionVMList = new ObservableCollection<ActionViewModel>();
         #endregion
 
         /// <summary>

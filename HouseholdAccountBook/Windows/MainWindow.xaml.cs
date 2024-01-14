@@ -1,9 +1,11 @@
 ﻿using HouseholdAccountBook.Dao;
+using HouseholdAccountBook.Dto;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Properties;
 using HouseholdAccountBook.UserControls;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
@@ -336,10 +338,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             }
 
             if (isOpen) {
-                // 帳簿リスト更新
-                await this.UpdateBookListAsync();
-
-                await this.UpdateAsync(isScroll: true, isUpdateActDateLastEdited: true);
+                await this.UpdateAsync(isUpdateBookList:true, isScroll: true, isUpdateActDateLastEdited: true);
 
                 this.Cursor = null;
 
@@ -347,6 +346,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             }
             else {
                 this.Cursor = null;
+
                 MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
@@ -438,10 +438,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             process.WaitForExit(10 * 1000);
 
             if (process.ExitCode == 0) {
-                // 帳簿リスト更新
-                await this.UpdateBookListAsync();
-
-                await this.UpdateAsync(isScroll: true, isUpdateActDateLastEdited: true);
+                await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
 
                 this.Cursor = null;
 
@@ -1126,7 +1123,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
-                    await this.UpdateAsync(isScroll: true);
+                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
                     break;
             }
 
@@ -1156,7 +1153,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
-            await this.UpdateAsync(isScroll: true);
+            await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
 
             this.Cursor = null;
         }
@@ -1184,7 +1181,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
                     this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
-                    await this.UpdateAsync(isScroll: true);
+                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
                     break;
             }
 
@@ -1215,7 +1212,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 this.WVM.StartDate = stw.WVM.StartDate;
                 this.WVM.EndDate = stw.WVM.EndDate;
 
-                await this.UpdateAsync(isScroll: true);
+                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
 
                 this.Cursor = null;
             }
@@ -1244,7 +1241,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(-1);
-            await this.UpdateAsync();
+            await this.UpdateAsync(isUpdateBookList: true);
 
             this.Cursor = null;
         }
@@ -1272,7 +1269,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
-            await this.UpdateAsync();
+            await this.UpdateAsync(isUpdateBookList: true);
 
             this.Cursor = null;
         }
@@ -1298,7 +1295,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             this.Cursor = Cursors.Wait;
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(1);
-            await this.UpdateAsync();
+            await this.UpdateAsync(isUpdateBookList: true);
 
             this.Cursor = null;
         }
@@ -1313,7 +1310,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         {
             this.Cursor = Cursors.Wait;
 
-            await this.UpdateAsync();
+            await this.UpdateAsync(isUpdateBookList: true);
 
             this.Cursor = null;
         }
@@ -1354,8 +1351,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             if (sw.ShowDialog() == true) {
                 this.Cursor = Cursors.Wait;
 
-                await this.UpdateBookListAsync();
-                await this.UpdateAsync();
+                await this.UpdateAsync(isUpdateBookList: true);
                 this.WVM.RaiseDisplayedYearChanged();
 
                 this.Cursor = null;
@@ -1472,7 +1468,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 settings.MainWindow_SelectedTabIndex = this.WVM.SelectedTabIndex;
                 settings.Save();
 
-                await this.UpdateAsync(isScroll: true);
+                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
 
                 this.Cursor = lastCursor;
             };
@@ -1480,7 +1476,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 Cursor lastCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
 
-                settings.MainWindow_SelectedBookId = this.WVM.SelectedBookVM.Id ?? -1;
+                settings.MainWindow_SelectedBookId = this.WVM.SelectedBookVM?.Id ?? -1;
                 settings.Save();
 
                 await this.UpdateAsync(isScroll: true);
@@ -1499,10 +1495,15 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 this.Cursor = lastCursor;
             };
             this.WVM.SelectedSeriesChanged += () => {
+                Cursor lastCursor = this.Cursor;
+                this.Cursor = Cursors.Wait;
+
                 settings.MainWindow_SelectedGraphKind2Index = this.WVM.SelectedGraphKind2Index;
                 settings.Save();
 
                 this.UpdateSelectedGraph();
+
+                this.Cursor = lastCursor;
             };
 
             this.LogWindowStateAndLocation("Loaded");
@@ -1557,7 +1558,9 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
 
             if (settings.App_BackUpFlagAtMinimizing) {
                 if (this.WindowState == WindowState.Minimized) {
+#if !DEBUG
                     this.CreateBackUpFile();
+#endif
                 }
             }
         }
@@ -1611,7 +1614,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 this.LastHeight = this.Height;
             }
         }
-        #endregion
+#endregion
 
         /// <summary>
         /// 月別一覧ダブルクリック時
@@ -1660,22 +1663,25 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 }
             }
         }
-        #endregion
+#endregion
 
         #region 画面更新用の関数
         /// <summary>
         /// 画面更新(タブ非依存)
         /// </summary>
-        /// <param name="isScroll">スクロールするか</param>
+        /// <param name="isUpdateBookList">帳簿リストを更新するか</param>
+        /// <param name="isScroll">帳簿項目一覧をスクロールするか</param>
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
         /// <returns></returns>
-        private async Task UpdateAsync(bool isScroll = false, bool isUpdateActDateLastEdited = false)
+        private async Task UpdateAsync(bool isUpdateBookList = false, bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
             switch (this.WVM.SelectedTab) {
                 case Tabs.BooksTab:
+                    if (isUpdateBookList) await this.UpdateBookListAsync();
                     await this.UpdateBookTabDataAsync(isScroll: isScroll, isUpdateActDateLastEdited: isUpdateActDateLastEdited);
                     break;
                 case Tabs.DailyGraphTab:
+                    if (isUpdateBookList) await this.UpdateBookListAsync();
                     this.InitializeDailyGraphTabData();
                     await this.UpdateDailyGraphTabDataAsync();
                     break;
@@ -1714,13 +1720,20 @@ SELECT *
 FROM mst_book 
 WHERE del_flg = 0 
 ORDER BY sort_order;");
-                reader.ExecWholeRow((count, record) => {
-                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
-                    bookVMList.Add(vm);
 
-                    if (vm.Id == tmpBookId) {
-                        selectedBookVM = vm;
+                reader.ExecWholeRow((count, record) => {
+                    string jsonCode = record["json_code"];
+                    MstBookJsonObject jsonObj = JsonConvert.DeserializeObject<MstBookJsonObject>(jsonCode);
+
+                    if (DateTimeExtensions.IsWithIn(this.WVM.StartDate, this.WVM.EndDate, jsonObj?.StartDate, jsonObj?.EndDate)) {
+                        BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
+                        bookVMList.Add(vm);
+
+                        if (vm.Id == tmpBookId) {
+                            selectedBookVM = vm;
+                        }
                     }
+
                     return true;
                 });
             }
@@ -2157,7 +2170,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         private async Task<ObservableCollection<SeriesViewModel>> LoadMonthlySeriesViewModelListWithinYearAsync(int? bookId, DateTime includedTime)
         {
             DateTime startTime = includedTime.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
-            DateTime endTime = startTime.AddYears(1).AddMilliseconds(-1);
+            DateTime endTime = startTime.GetLastDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
 
             // 開始月までの収支を取得する
             int balance = 0;
@@ -2195,7 +2208,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             // 最初の月の分を取得する
             DateTime tmpStartTime = startTime;
-            DateTime tmpEndTime = tmpStartTime.AddMonths(1).AddMilliseconds(-1);
+            DateTime tmpEndTime = tmpStartTime.GetLastDateOfMonth();
             ObservableCollection<SummaryViewModel> summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
             balance += summaryVMList[0].Summary;
             vmList[0].Values.Add(balance); // 残高
@@ -2222,7 +2235,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             int monthes = (endTime.Year * 12 + endTime.Month) - (startTime.Year * 12 + startTime.Month - 1);
             for (int i = 1; i < monthes; ++i) {
                 tmpStartTime = tmpStartTime.AddMonths(1);
-                tmpEndTime = tmpStartTime.AddMonths(1).AddMilliseconds(-1);
+                tmpEndTime = tmpStartTime.GetLastDateOfMonth();
 
                 summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
                 balance += summaryVMList[0].Summary;
@@ -2304,7 +2317,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             // 最初の年の分を取得する
             DateTime tmpStartTime = startTime;
-            DateTime tmpEndTime = tmpStartTime.AddYears(1).AddMilliseconds(-1);
+            DateTime tmpEndTime = tmpStartTime.GetLastDateOfFiscalYear(settings.App_StartMonth);
             ObservableCollection<SummaryViewModel> summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
             balance += summaryVMList[0].Summary;
             vmList[0].Values.Add(balance); // 残高
@@ -2331,7 +2344,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             int years = 10;
             for (int i = 1; i < years; ++i) {
                 tmpStartTime = tmpStartTime.AddYears(1);
-                tmpEndTime = tmpStartTime.AddYears(1).AddMilliseconds(-1);
+                tmpEndTime = tmpStartTime.GetLastDateOfFiscalYear(settings.App_StartMonth);
 
                 summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
                 balance += summaryVMList[0].Summary;
@@ -2375,7 +2388,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <param name="balanceKind">選択対象の収支種別</param>
         /// <param name="categoryId">選択対象の分類ID</param>
         /// <param name="itemId">選択対象の項目ID</param>
-        /// <param name="isScroll">スクロールするか</param>
+        /// <param name="isScroll">帳簿項目一覧をスクロールするか</param>
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
         private async Task UpdateBookTabDataAsync(List<int> actionIdList = null, int? balanceKind = null, int? categoryId = null, int? itemId = null, 
                                                   bool isScroll = false, bool isUpdateActDateLastEdited = false)
@@ -3319,7 +3332,9 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     break;
             }
 
-            using (FileStream fs = new FileStream(ConstValue.ConstValue.WindowLocationFileName, FileMode.Append)) {
+
+            if (!Directory.Exists(WindowLocationFolderPath)) Directory.CreateDirectory(WindowLocationFolderPath);
+            using (FileStream fs = new FileStream(ConstValue.ConstValue.WindowLocationFilePath, FileMode.Append)) {
                 using (StreamWriter sw = new StreamWriter(fs)) {
                     if (fs.Length == 0) {
                         sw.WriteLine("yyyy/MM/dd HH:mm:ss.ffff\tState\tLeft\tTop\tHeight\tWidth");

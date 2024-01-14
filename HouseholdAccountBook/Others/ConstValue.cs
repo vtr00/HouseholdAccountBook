@@ -8,6 +8,7 @@ namespace HouseholdAccountBook.ConstValue
     /// </summary>
     public static class ConstValue
     {
+        #region DB
         /// <summary>
         /// 更新者
         /// </summary>
@@ -16,37 +17,55 @@ namespace HouseholdAccountBook.ConstValue
         /// 挿入者
         /// </summary>
         public static string Inserter { get; } = "";
+        #endregion
 
-        #region 補足されない例外情報
+        #region ログ
         /// <summary>
-        /// 補足されない例外情報のファイル名のヘッダ
+        /// ログファイルのフォルダ名
         /// </summary>
-        public static string UnhandledExceptionInfoFileNameHeader = "UnhandledException_";
+        public static string LogFolderPath = "Logs";
         /// <summary>
-        /// 補足されない例外情報のファイル名
+        /// ログファイルパス
         /// </summary>
-        public static string UnhandledExceptionInfoFileName
+        public static string LogFilePath
+        {
+            get {
+                DateTime dt = App.StartupTime;
+                return string.Format("{0}/{1}.txt", LogFolderPath, dt.ToString("yyMMdd_hhmmss"));
+            }
+        }
+        #endregion
+
+        #region 捕捉されない例外情報
+        /// <summary>
+        /// 捕捉されない例外情報のファイルのフォルダ名
+        /// </summary>
+        public static string UnhandledExceptionInfoFolderPath = "UnhandledExceptions";
+        /// <summary>
+        /// 捕捉されない例外情報のファイルパス
+        /// </summary>
+        public static string UnhandledExceptionInfoFilePath
         {
             get {
                 DateTime dt = DateTime.Now;
-                return string.Format("{0}{1}.txt", UnhandledExceptionInfoFileNameHeader, dt.ToString("yyMMdd_hhmmss"));
+                return string.Format("{0}/{1}.txt", UnhandledExceptionInfoFolderPath, dt.ToString("yyMMdd_hhmmss"));
             }
         }
         #endregion
 
         #region ウィンドウ情報
         /// <summary>
-        /// ウィンドウ情報のファイル名のヘッダ
+        /// ウィンドウ情報のファイルのフォルダ名
         /// </summary>
-        public static string WindowLocationFileNameHeader = "WindowLocation_";
+        public static string WindowLocationFolderPath = "WindowLocations";
         /// <summary>
-        /// ウィンドウ情報のファイル名
+        /// ウィンドウ情報のファイルパス
         /// </summary>
-        public static string WindowLocationFileName
+        public static string WindowLocationFilePath
         {
             get {
                 DateTime dt = App.StartupTime;
-                return string.Format("{0}{1}.txt", WindowLocationFileNameHeader, dt.ToString("yyyyMMdd_hhmmss"));
+                return string.Format("{0}/{1}.txt", WindowLocationFolderPath, dt.ToString("yyyyMMdd_hhmmss"));
             }
         }
         #endregion

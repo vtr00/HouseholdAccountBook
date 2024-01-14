@@ -1,10 +1,21 @@
-﻿namespace HouseholdAccountBook.Dto
+﻿using System;
+
+namespace HouseholdAccountBook.Dto
 {
     /// <summary>
     /// mst_bookテーブルでのJsonCodeに対応するオブジェクト
     /// </summary>
     public class MstBookJsonObject
     {
+        /// <summary>
+        /// 開始日
+        /// </summary>
+        public DateTime? StartDate { get; set; } = null;
+        /// <summary>
+        /// 終了日
+        /// </summary>
+        public DateTime? EndDate { get; set; } = null;
+
         /// <summary>
         /// CSVフォルダパス
         /// </summary>

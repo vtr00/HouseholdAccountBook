@@ -33,7 +33,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedTabIndex;
             set {
                 if (this.SetProperty(ref this._SelectedTabIndex, value)) {
-                    this.SelectedTab = (SettingsTabs)value;
+                    this._SelectedTab = (SettingsTabs)value;
                 }
             }
         }
@@ -48,7 +48,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedTab;
             set {
                 if (this.SetProperty(ref this._SelectedTab, value)) {
-                    this.SelectedTabIndex = (int)value;
+                    this._SelectedTabIndex = (int)value;
                 }
             }
         }
@@ -89,9 +89,15 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<BookSettingViewModel> BookVMList
         {
             get => this._BookVMList;
-            set => this.SetProperty(ref this._BookVMList, value);
+            set {
+                this._BookVMList.Clear();
+                foreach (BookSettingViewModel vm in value) {
+                    this._BookVMList.Add(vm);
+                }
+                this.RaisePropertyChanged(nameof(this.BookVMList));
+            }
         }
-        private ObservableCollection<BookSettingViewModel> _BookVMList = default;
+        private readonly ObservableCollection<BookSettingViewModel> _BookVMList = new ObservableCollection<BookSettingViewModel>();
         #endregion
         /// <summary>
         /// 選択された帳簿VM

@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Notifications.Wpf;
 using static HouseholdAccountBook.ConstValue.ConstValue;
+using System.Text;
 
 namespace HouseholdAccountBook
 {
@@ -54,8 +55,10 @@ namespace HouseholdAccountBook
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
 
 #if DEBUG
-            Debug.Listeners.Add(new ConsoleTraceListener());
+            System.Diagnostics.Debug.Listeners.Add(new ConsoleTraceListener());
 #endif
+
+            Log.Info("Application Start");
 
 #if !DEBUG
             // 多重起動を抑止する
@@ -174,9 +177,12 @@ namespace HouseholdAccountBook
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             try {
+                Log.Error("Unhandled Exception Occured.");
+
                 e.Handled = true;
 
-                string fileName = UnhandledExceptionInfoFileName;
+                if (!Directory.Exists(UnhandledExceptionInfoFolderPath)) Directory.CreateDirectory(UnhandledExceptionInfoFolderPath);
+                string fileName = UnhandledExceptionInfoFilePath;
                 // 例外情報をファイルに保存する
                 string jsonCode = JsonConvert.SerializeObject(e.Exception, Formatting.Indented);
                 using (FileStream fs = new FileStream(fileName, FileMode.Create)) {
@@ -207,7 +213,10 @@ namespace HouseholdAccountBook
         /// <param name="e"></param>
         private void App_Exit(object sender, ExitEventArgs e)
         {
+            Log.Info("Application End");
+
             this.ReleaseMutex();
+            Log.Close();
         }
 
         /// <summary>
@@ -241,9 +250,14 @@ namespace HouseholdAccountBook
         /// </summary>
         public void Restart()
         {
-            ReleaseMutex();
+            Log.Info("Application Restart");
+
+            this.ReleaseMutex();
+            Log.Close();
+
             Process.Start(Application.ResourceAssembly.Location);
-            Shutdown();
+
+            this.Shutdown();
         }
     }
 }

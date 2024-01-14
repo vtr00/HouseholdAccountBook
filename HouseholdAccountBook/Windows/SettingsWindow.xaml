@@ -317,6 +317,7 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
@@ -347,7 +348,34 @@
                                 <controls:NumericUpDown Grid.Row="4" Grid.Column="1" Margin="5" 
                                                                     Value="{Binding InitialValue}"/>
 
-                                <GroupBox Grid.Row="5" Grid.ColumnSpan="4" Header="支払情報" IsEnabled="{Binding NeedToPay}">
+                                <GroupBox Grid.Row="5" Grid.ColumnSpan="4" Margin="5" Header="期間情報">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition SharedSizeGroup="Header"/>
+                                            <ColumnDefinition Width="75"/>
+                                            <ColumnDefinition Width="200" SharedSizeGroup="DateTime"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition SharedSizeGroup="Button"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="開始日"/>
+                                        <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" Content="指定" IsChecked="{Binding StartDateExists}"/>
+                                        <controls:DateTimePicker Grid.Row="0" Grid.Column="2" Margin="1" IsEnabled="{Binding StartDateExists}"
+                                                                 DateFormat="yyyy/MM/dd" SelectedDate="{Binding StartDate}"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="終了日"/>
+                                        <CheckBox Grid.Row="1" Grid.Column="1" Margin="5" Content="指定" IsChecked="{Binding EndDateExists}"/>
+                                        <controls:DateTimePicker Grid.Row="1" Grid.Column="2" Margin="1" IsEnabled="{Binding EndDateExists}"
+                                                                 DateFormat="yyyy/MM/dd" SelectedDate="{Binding EndDate}"/>
+                                    </Grid>
+                                </GroupBox>
+                                
+                                <GroupBox Grid.Row="6" Grid.ColumnSpan="4" Header="支払情報" IsEnabled="{Binding NeedToPay}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
@@ -370,7 +398,7 @@
                                     </Grid>
                                 </GroupBox>
 
-                                <GroupBox Grid.Row="6" Grid.ColumnSpan="4" Header="CSV情報" IsEnabled="{Binding CsvDataExists}">
+                                <GroupBox Grid.Row="7" Grid.ColumnSpan="4" Header="CSV情報" IsEnabled="{Binding CsvDataExists}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
@@ -381,7 +409,7 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition SharedSizeGroup="Header"/>
                                             <ColumnDefinition SharedSizeGroup="Number"/>
-                                            <ColumnDefinition Width="0.5*"/>
+                                            <ColumnDefinition Width="*"/>
                                             <ColumnDefinition SharedSizeGroup="Button"/>
                                         </Grid.ColumnDefinitions>
 
@@ -400,7 +428,7 @@
                                                                             Value="{Binding ItemNameIndex, TargetNullValue=''}"/>
                                     </Grid>
                                 </GroupBox>
-                                <Button Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" Content="確定" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
+                                <Button Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" Content="確定" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
                             </Grid>
                         </GroupBox>
 

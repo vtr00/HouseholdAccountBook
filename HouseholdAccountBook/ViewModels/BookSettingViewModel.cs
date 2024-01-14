@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using static HouseholdAccountBook.ConstValue.ConstValue;
@@ -70,6 +71,54 @@ namespace HouseholdAccountBook.ViewModels
             set => this.SetProperty(ref this._InitialValue, value);
         }
         private int _InitialValue = 0;
+        #endregion
+
+        #region 期間情報
+        /// <summary>
+        /// 開始日の有無
+        /// </summary>
+        #region StartDateExists
+        public bool StartDateExists
+        {
+            get => this._StartDateExists;
+            set => this.SetProperty(ref this._StartDateExists, value);
+        }
+        private bool _StartDateExists = default;
+        #endregion
+        /// <summary>
+        /// 開始日
+        /// </summary>
+        #region StartDate
+        public DateTime StartDate
+        {
+            get => this._StartDate;
+            set => this.SetProperty(ref this._StartDate, value);
+        }
+        private DateTime _StartDate = DateTime.Now;
+        #endregion
+
+        /// <summary>
+        /// 終了日の有無
+        /// </summary>
+        #region EndDateExists
+        public bool EndDateExists
+        {
+            get => this._EndDateExists;
+            set => this.SetProperty(ref this._EndDateExists, value);
+        }
+        private bool _EndDateExists = default;
+        #endregion
+        /// <summary>
+        /// 終了日
+        /// </summary>
+        #region EndDate
+        public DateTime EndDate
+        {
+            get => this._EndDate;
+            set => this.SetProperty(ref this._EndDate, value);
+        }
+        private DateTime _EndDate = DateTime.Now;
+        #endregion
         #endregion
 
         #region 支払情報

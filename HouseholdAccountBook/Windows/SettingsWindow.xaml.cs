@@ -832,7 +832,9 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             using (DaoBase dao = this.builder.Build()) {
                 BookSettingViewModel vm = this.WVM.SelectedBookVM;
                 MstBookJsonObject jsonObj = new MstBookJsonObject() {
-                    CsvFolderPath = vm.CsvFolderPath == string.Empty ? null : vm.CsvFolderPath,
+                    StartDate = vm.StartDateExists ? (DateTime?)vm.StartDate : null,
+                    EndDate = vm.EndDateExists ? (DateTime?)vm.EndDate : null,
+                    CsvFolderPath = vm.CsvFolderPath != string.Empty ? vm.CsvFolderPath : null,
                     CsvActDateIndex = vm.ActDateIndex,
                     CsvOutgoIndex = vm.OutgoIndex,
                     CsvItemNameIndex = vm.ItemNameIndex
@@ -1110,6 +1112,9 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         private async void SettingsTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (this.oldSelectedSettingsTab != this.WVM.SelectedTab) {
+                Log.Info(this.WVM.SelectedTab.ToString());
+
+                this.oldSelectedSettingsTab = this.WVM.SelectedTab;
                 this.Cursor = Cursors.Wait;
 
                 switch (this.WVM.SelectedTab) {
@@ -1125,7 +1130,6 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 }
                 this.Cursor = null;
             }
-            this.oldSelectedSettingsTab = this.WVM.SelectedTab;
         }
 
         #region 項目設定操作
@@ -1163,6 +1167,8 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="bookId">選択対象の帳簿ID</param>
         private async Task UpdateSettingWindowDataAsync(HierarchicalKind? kind = null, int? id = null, int? bookId = null)
         {
+            Log.Info();
+
             await this.UpdateItemSettingsTabDataAsync(kind, id);
             await this.UpdateBookSettingTabDataAsync(bookId);
             this.UpdateOtherSettingTabData();
@@ -1176,12 +1182,12 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         private async Task UpdateItemSettingsTabDataAsync(HierarchicalKind? kind = null, int? id = null)
         {
             if (this.WVM.SelectedTab == SettingsTabs.ItemSettingsTab) {
+                Log.Info();
+
                 this.WVM.HierachicalSettingVMList = await this.LoadItemViewModelListAsync();
 
-                if (kind == null || id == null) {
-                    this.WVM.SelectedItemVM = null;
-                }
-                else {
+                HierarchicalSettingViewModel selectedVM = null;
+                if (kind != null && id != null) {
                     // 収支から探す
                     IEnumerable<HierarchicalSettingViewModel> query = this.WVM.HierachicalSettingVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
                     if (query.Count() == 0) {
@@ -1203,13 +1209,14 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                         }
                     }
 
-                    this.WVM.SelectedItemVM = query.Count() != 0 ? query.First() : null;
+                    selectedVM = query.Count() != 0 ? query.First() : null;
                 }
 
                 // 何も選択されていないなら1番上の項目を選択する
                 if (this.WVM.SelectedItemVM == null && this.WVM.HierachicalSettingVMList.Count != 0) {
-                    this.WVM.SelectedItemVM = this.WVM.HierachicalSettingVMList[0];
+                    selectedVM = this.WVM.HierachicalSettingVMList[0];
                 }
+                this.WVM.SelectedItemVM = selectedVM;
             }
         }
 
@@ -1220,20 +1227,21 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         private async Task UpdateBookSettingTabDataAsync(int? bookId = null)
         {
             if (this.WVM.SelectedTab == SettingsTabs.BookSettingsTab) {
+                Log.Info();
+
                 this.WVM.BookVMList = await this.LoadBookSettingViewModelListAsync();
 
-                if (bookId == null) {
-                    this.WVM.SelectedBookVM = null;
-                }
-                else {
+                BookSettingViewModel tmpVM = null;
+                if (bookId != null) {
                     IEnumerable<BookSettingViewModel> query = this.WVM.BookVMList.Where((vm) => { return vm.Id == bookId; });
-                    this.WVM.SelectedBookVM = query.Count() != 0 ? query.First() : null;
+                    tmpVM = query.Count() != 0 ? query.First() : null;
                 }
-
+                
                 // 何も選択されていないなら1番上の項目を選択する
-                if (this.WVM.SelectedBookVM == null && this.WVM.BookVMList.Count != 0) {
-                    this.WVM.SelectedBookVM = this.WVM.BookVMList[0];
+                if (tmpVM == null && this.WVM.BookVMList.Count != 0) {
+                    tmpVM = this.WVM.BookVMList[0];
                 }
+                this.WVM.SelectedBookVM = tmpVM;
             }
         }
 
@@ -1243,6 +1251,8 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         private void UpdateOtherSettingTabData()
         {
             if (this.WVM.SelectedTab == SettingsTabs.OtherSettingsTab) {
+                Log.Info();
+
                 this.WVM.LoadSettings();
             }
         }
@@ -1253,6 +1263,8 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <returns>階層構造項目VMリスト</returns>
         private async Task<ObservableCollection<HierarchicalSettingViewModel>> LoadItemViewModelListAsync()
         {
+            Log.Info();
+
             ObservableCollection<HierarchicalSettingViewModel> vmList = new ObservableCollection<HierarchicalSettingViewModel>();
             HierarchicalSettingViewModel incomeVM = new HierarchicalSettingViewModel() {
                 Kind = HierarchicalKind.Balance,
@@ -1330,16 +1342,16 @@ ORDER BY sort_order;", categocyVM.Id);
 
                         foreach (HierarchicalSettingViewModel itemVM in categocyVM.ChildrenVMList) {
                             reader = await dao.ExecQueryAsync(@"
-SELECT B.book_id AS BookId, B.book_name, RBI.book_id IS NULL AS IsNotRelated
+SELECT B.book_id AS book_id, B.book_name, RBI.book_id IS NULL AS is_not_related
 FROM mst_book B
 LEFT JOIN (SELECT book_id FROM rel_book_item WHERE del_flg = 0 AND item_id = @{0}) RBI ON RBI.book_id = B.book_id
 WHERE del_flg = 0
 ORDER BY B.sort_order;", itemVM.Id);
 
                             reader.ExecWholeRow((count2, record2) => {
-                                int bookId = record2.ToInt("BookId");
+                                int bookId = record2.ToInt("book_id");
                                 string bookName = record2["book_name"];
-                                bool isRelated = !record2.ToBoolean("IsNotRelated");
+                                bool isRelated = !record2.ToBoolean("is_not_related");
 
                                 itemVM.RelationVMList.Add(new RelationViewModel() {
                                     Id = bookId,
@@ -1367,6 +1379,8 @@ ORDER BY B.sort_order;", itemVM.Id);
         /// <returns>帳簿VM(設定用)リスト</returns>
         private async Task<ObservableCollection<BookSettingViewModel>> LoadBookSettingViewModelListAsync()
         {
+            Log.Info();
+
             ObservableCollection<BookSettingViewModel> settingVMList = new ObservableCollection<BookSettingViewModel>();
             ObservableCollection<BookViewModel> vmList = new ObservableCollection<BookViewModel>() {
                 new BookViewModel(){ Id = -1, Name = "なし" }
@@ -1393,10 +1407,12 @@ ORDER BY sort_order;");
 
                 // 帳簿一覧を取得する
                 reader = await dao.ExecQueryAsync(@"
-SELECT book_id, book_name, book_kind, debit_book_id, pay_day, initial_value, json_code, sort_order
-FROM mst_book
-WHERE del_flg = 0
-ORDER BY sort_order;");
+SELECT B.book_id, B.book_name, B.book_kind, B.debit_book_id, B.pay_day, B.initial_value, B.json_code, B.sort_order, MIN(A.act_time) AS start_date, MAX(A.act_time) AS end_date
+FROM mst_book B
+INNER JOIN hst_action A ON A.book_id = B.book_id AND A.del_flg = 0
+WHERE B.del_flg = 0
+GROUP BY B.book_id
+ORDER BY B.sort_order;");
 
                 reader.ExecWholeRow((count, record) => {
                     int bookId = record.ToInt("book_id");
@@ -1406,6 +1422,8 @@ ORDER BY sort_order;");
                     int initialValue = record.ToInt("initial_value");
                     int? debitBookId = record.ToNullableInt("debit_book_id");
                     int? payDay = record.ToNullableInt("pay_day");
+                    DateTime startDate = record.ToDateTime("start_date");
+                    DateTime endDate = record.ToDateTime("end_date");
 
                     string jsonCode = record["json_code"];
                     MstBookJsonObject jsonObj = JsonConvert.DeserializeObject<MstBookJsonObject>(jsonCode);
@@ -1418,6 +1436,10 @@ ORDER BY sort_order;");
                         InitialValue = initialValue,
                         DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((vm) => { return vm.Id != bookId; })),
                         PayDay = payDay,
+                        StartDateExists = jsonObj?.StartDate != null,
+                        StartDate = jsonObj?.StartDate ?? startDate,
+                        EndDateExists = jsonObj?.EndDate != null,
+                        EndDate = jsonObj?.EndDate ?? endDate,
                         CsvFolderPath = jsonObj?.CsvFolderPath,
                         ActDateIndex = jsonObj?.CsvActDateIndex,
                         OutgoIndex = jsonObj?.CsvOutgoIndex,
@@ -1432,7 +1454,7 @@ ORDER BY sort_order;");
                 // 項目との関係の一覧を取得する(移動を除く)
                 foreach (BookSettingViewModel vm in settingVMList) {
                     reader = await dao.ExecQueryAsync(@"
-SELECT I.item_id AS ItemId, I.item_name, C.category_name, RBI.item_id IS NULL AS IsNotRelated
+SELECT I.item_id AS item_id, I.item_name AS item_name, C.category_name AS category_name, RBI.item_id IS NULL AS is_not_related
 FROM mst_item I
 INNER JOIN (SELECT category_id, category_name FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
 LEFT JOIN (SELECT item_id FROM rel_book_item WHERE del_flg = 0 AND book_id = @{0}) RBI ON RBI.item_id = I.item_id
@@ -1441,9 +1463,9 @@ ORDER BY I.sort_order;", vm.Id);
 
                     vm.RelationVMList = new ObservableCollection<RelationViewModel>();
                     reader.ExecWholeRow((count, record) => {
-                        int itemId = record.ToInt("ItemId");
+                        int itemId = record.ToInt("item_id");
                         string name = string.Format(@"{0} > {1}", record["category_name"], record["item_name"]);
-                        bool isRelated = !record.ToBoolean("IsNotRelated");
+                        bool isRelated = !record.ToBoolean("is_not_related");
 
                         vm.RelationVMList.Add(new RelationViewModel() {
                             Id = itemId,

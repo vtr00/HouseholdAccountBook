@@ -2,6 +2,7 @@
 using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -151,6 +152,28 @@ namespace HouseholdAccountBook.Extensions
         {
             bool ans = holidayList.Contains(dateTime);
             return ans;
+        }
+
+        /// <summary>
+        /// 期間内かどうかを取得する
+        /// </summary>
+        /// <param name="startDateTime1">期間1開始</param>
+        /// <param name="endDateTime1">期間1終了</param>
+        /// <param name="startDateTime2">期間2開始</param>
+        /// <param name="endDateTime2">期間2終了</param>
+        /// <returns>期間内かどうか</returns>
+        public static bool IsWithIn(DateTime? startDateTime1, DateTime? endDateTime1, DateTime? startDateTime2, DateTime? endDateTime2)
+        {
+            Debug.Assert(startDateTime1 == null || endDateTime1 == null || startDateTime1 < endDateTime1);
+            Debug.Assert(startDateTime2 == null || endDateTime2 == null || startDateTime2 < endDateTime2);
+
+            if (startDateTime1 != null && endDateTime2 != null && endDateTime2 < startDateTime1) {
+                return false;
+            }
+            if (startDateTime2 != null && endDateTime1 != null && endDateTime1 < startDateTime2) {
+                return false;
+            }
+            return true;
         }
     }
 }
