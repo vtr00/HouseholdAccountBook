@@ -13,26 +13,51 @@ namespace HouseholdAccountBook
     /// </summary>
     public static class Log
     {
-        static private StreamWriter sw = null;
+        private static readonly string listenerName = "logFileOutput";
+        private static TextWriterTraceListener listener = null;
 
         static Log()
         {
-            TextWriterTraceListener listener = new TextWriterTraceListener();
-            if (!Directory.Exists(LogFolderPath)) Directory.CreateDirectory(LogFolderPath);
-            sw = new StreamWriter(LogFilePath, true, Encoding.GetEncoding("Shift_JIS"));
-            listener.Writer = sw;
-            listener.TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId | TraceOptions.ThreadId;
-
-            System.Diagnostics.Debug.Listeners.Add(listener);
             System.Diagnostics.Debug.AutoFlush = true;
+            CreateNewFileListener();
         }
 
+        /// <summary>
+        /// リスナーを生成する
+        /// </summary>
+        static private void CreateNewFileListener()
+        {
+            if (listener == null) {
+                listener = new TextWriterTraceListener();
+                if (!Directory.Exists(LogFolderPath)) Directory.CreateDirectory(LogFolderPath);
+                TextWriter sw = new StreamWriter(LogFilePath, true, Encoding.GetEncoding("Shift_JIS"));
+                listener.Name = listenerName;
+                listener.Writer = sw;
+                listener.TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId | TraceOptions.ThreadId;
+
+                System.Diagnostics.Debug.Listeners.Add(listener);
+            }
+        }
+
+        /// <summary>
+        /// ログファイルを変更する
+        /// </summary>
+        static public void ChangeNewFile()
+        {
+            System.Diagnostics.Debug.Listeners.Remove(listenerName);
+            Close();
+            CreateNewFileListener();
+        }
+
+        /// <summary>
+        /// リスナーを閉じる
+        /// </summary>
         static public void Close()
         {
-            if (sw != null) {
-                sw.Close();
-                sw.Dispose();
-                sw = null;
+            if (listener != null) {
+                listener.Close();
+                listener.Dispose();
+                listener = null;
             }
         }
 

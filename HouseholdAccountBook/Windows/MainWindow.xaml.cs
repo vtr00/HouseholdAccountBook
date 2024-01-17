@@ -1120,12 +1120,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         {
             this.Cursor = Cursors.Wait;
 
-            switch (this.WVM.DisplayedTermKind) {
-                case TermKind.Monthly:
-                    this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
-                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
-                    break;
-            }
+            this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
+            await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
 
             this.Cursor = null;
         }
@@ -1178,12 +1174,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         {
             this.Cursor = Cursors.Wait;
 
-            switch (this.WVM.DisplayedTermKind) {
-                case TermKind.Monthly:
-                    this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
-                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
-                    break;
-            }
+            this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
+            await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
 
             this.Cursor = null;
         }
@@ -1440,6 +1432,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            Log.Info();
+
             Properties.Settings settings = Properties.Settings.Default;
 
             // 帳簿リスト更新
@@ -1458,10 +1452,14 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 this.WVM.SelectedGraphKind2Index = settings.MainWindow_SelectedGraphKind2Index;
             }
 
+            Log.Info($"SelectedTabIndex: {this.WVM.SelectedTabIndex} SelectedGraphKind1Index: {this.WVM.SelectedGraphKind1Index} SelectedGraphKind2Index: {this.WVM.SelectedGraphKind2Index}");
+
             await this.UpdateAsync(isScroll: true, isUpdateActDateLastEdited: true);
 
             // イベントハンドラ設定
             this.WVM.SelectedTabChanged += async () => {
+                Log.Info($"SelectedTabChanged SelectedTabIndex: {this.WVM.SelectedTabIndex}");
+
                 Cursor lastCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
 
@@ -1473,6 +1471,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 this.Cursor = lastCursor;
             };
             this.WVM.SelectedBookChanged += async () => {
+                Log.Info($"SelectedBookChanged SelectedBookId: {this.WVM.SelectedBookVM?.Id}");
+
                 Cursor lastCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
 
@@ -1484,10 +1484,13 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 this.Cursor = lastCursor;
             };
             this.WVM.SelectedGraphKindChanged += async () => {
+                Log.Info($"SelectedGraphKindChanged SelectedGraphKind1Index: {this.WVM.SelectedGraphKind1Index} SelectedGraphKind2Index: {this.WVM.SelectedGraphKind2Index}");
+
                 Cursor lastCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
 
                 settings.MainWindow_SelectedGraphKindIndex = this.WVM.SelectedGraphKind1Index;
+                settings.MainWindow_SelectedGraphKind2Index = this.WVM.SelectedGraphKind2Index;
                 settings.Save();
 
                 await this.UpdateAsync();
@@ -1495,11 +1498,10 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 this.Cursor = lastCursor;
             };
             this.WVM.SelectedSeriesChanged += () => {
+                Log.Info("SelectedSeriesChanged");
+
                 Cursor lastCursor = this.Cursor;
                 this.Cursor = Cursors.Wait;
-
-                settings.MainWindow_SelectedGraphKind2Index = this.WVM.SelectedGraphKind2Index;
-                settings.Save();
 
                 this.UpdateSelectedGraph();
 
@@ -1663,7 +1665,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 }
             }
         }
-#endregion
+        #endregion
 
         #region 画面更新用の関数
         /// <summary>
@@ -1672,16 +1674,17 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="isUpdateBookList">帳簿リストを更新するか</param>
         /// <param name="isScroll">帳簿項目一覧をスクロールするか</param>
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
-        /// <returns></returns>
         private async Task UpdateAsync(bool isUpdateBookList = false, bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
+            Log.Info($"isUpdateBookList: {isUpdateBookList} isScroll: {isScroll} isUpdateActDateLastEdited: {isUpdateActDateLastEdited}");
+
+            if (isUpdateBookList) await this.UpdateBookListAsync();
+
             switch (this.WVM.SelectedTab) {
                 case Tabs.BooksTab:
-                    if (isUpdateBookList) await this.UpdateBookListAsync();
                     await this.UpdateBookTabDataAsync(isScroll: isScroll, isUpdateActDateLastEdited: isUpdateActDateLastEdited);
                     break;
                 case Tabs.DailyGraphTab:
-                    if (isUpdateBookList) await this.UpdateBookListAsync();
                     this.InitializeDailyGraphTabData();
                     await this.UpdateDailyGraphTabDataAsync();
                     break;
@@ -1708,7 +1711,10 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="bookId">選択対象の帳簿ID</param>
         private async Task UpdateBookListAsync(int? bookId = null)
         {
+            Log.Info($"bookId: {bookId}");
+
             int? tmpBookId = bookId ?? this.WVM.SelectedBookVM?.Id;
+            Log.Info($"tmpBookId: {tmpBookId}");
 
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>() {
                 new BookViewModel() { Id = null, Name = "一覧" }
@@ -1725,12 +1731,13 @@ ORDER BY sort_order;");
                     string jsonCode = record["json_code"];
                     MstBookJsonObject jsonObj = JsonConvert.DeserializeObject<MstBookJsonObject>(jsonCode);
 
-                    if (DateTimeExtensions.IsWithIn(this.WVM.StartDate, this.WVM.EndDate, jsonObj?.StartDate, jsonObj?.EndDate)) {
+                    if (DateTimeExtensions.IsWithIn(this.WVM.DisplayedStartDate, this.WVM.DisplayedEndDate, jsonObj?.StartDate, jsonObj?.EndDate)) {
                         BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
                         bookVMList.Add(vm);
 
                         if (vm.Id == tmpBookId) {
                             selectedBookVM = vm;
+                            Log.Info($"select {selectedBookVM?.Id}");
                         }
                     }
 
@@ -1738,8 +1745,8 @@ ORDER BY sort_order;");
                 });
             }
 
+            this.WVM.SelectedBookVM = selectedBookVM; // 先に選択しておく
             this.WVM.BookVMList = bookVMList;
-            this.WVM.SelectedBookVM = selectedBookVM;
         }
 
         /// <summary>
@@ -1769,8 +1776,10 @@ ORDER BY sort_order;");
         /// <returns>帳簿項目VMリスト</returns>
         private async Task<ObservableCollection<ActionViewModel>> LoadActionViewModelListWithinMonthAsync(int? targetBookId, DateTime includedTime)
         {
+            Log.Info($"targetBookId: {targetBookId}, includedTime: {includedTime}");
+
             DateTime startTime = includedTime.GetFirstDateOfMonth();
-            DateTime endTime = startTime.AddMonths(1).AddMilliseconds(-1);
+            DateTime endTime = startTime.GetLastDateOfMonth();
             return await this.LoadActionViewModelListAsync(targetBookId, startTime, endTime);
         }
 
@@ -1783,6 +1792,8 @@ ORDER BY sort_order;");
         /// <returns>帳簿項目VMリスト</returns>
         private async Task<ObservableCollection<ActionViewModel>> LoadActionViewModelListAsync(int? targetBookId, DateTime startTime, DateTime endTime)
         {
+            Log.Info($"targetBookId: {targetBookId} startTime:{startTime} endTime:{endTime}");
+
             ObservableCollection<ActionViewModel> actionVMList = new ObservableCollection<ActionViewModel>();
             using (DaoBase dao = this.builder.Build()) {
                 DaoReader reader;
@@ -1922,8 +1933,10 @@ ORDER BY act_time, balance_kind, c_order, i_order, action_id;", targetBookId, st
         /// <returns>概要VMリスト</returns>
         private async Task<ObservableCollection<SummaryViewModel>> LoadSummaryViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
         {
+            Log.Info($"bookId: {bookId} includedTime: {includedTime}");
+
             DateTime startTime = includedTime.GetFirstDateOfMonth();
-            DateTime endTime = startTime.AddMonths(1).AddMilliseconds(-1);
+            DateTime endTime = startTime.GetLastDateOfMonth();
             return await this.LoadSummaryViewModelListAsync(bookId, startTime, endTime);
         }
 
@@ -1936,6 +1949,8 @@ ORDER BY act_time, balance_kind, c_order, i_order, action_id;", targetBookId, st
         /// <returns>概要VMリスト</returns>
         private async Task<ObservableCollection<SummaryViewModel>> LoadSummaryViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
         {
+            Log.Info($"bookId: {bookId} startTime: {startTime} endTime: {endTime}");
+
             ObservableCollection<SummaryViewModel> summaryVMList = new ObservableCollection<SummaryViewModel>();
 
             using (DaoBase dao = this.builder.Build()) {
@@ -2045,8 +2060,10 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         /// <returns>月内日別系列VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadDailySeriesViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
         {
+            Log.Info($"bookId: {bookId} includedTime: {includedTime}");
+
             DateTime startTime = includedTime.GetFirstDateOfMonth();
-            DateTime endTime = startTime.AddMonths(1).AddMilliseconds(-1);
+            DateTime endTime = startTime.GetLastDateOfMonth();
 
             return await this.LoadDailySeriesViewModelListAsync(bookId, startTime, endTime);
         }
@@ -2060,6 +2077,8 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         /// <returns>日別系列VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadDailySeriesViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
         {
+            Log.Info($"bookId: {bookId} startTime: {startTime} endTime: {endTime}");
+
             // 開始日までの収支を取得する
             int balance = 0;
             using (DaoBase dao = this.builder.Build()) {
@@ -2169,6 +2188,8 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <returns>年度内月別系列VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadMonthlySeriesViewModelListWithinYearAsync(int? bookId, DateTime includedTime)
         {
+            Log.Info($"bookId: {bookId} includedTime: {includedTime}");
+
             DateTime startTime = includedTime.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             DateTime endTime = startTime.GetLastDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
 
@@ -2277,6 +2298,8 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <returns>年別系列VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadYearlySeriesViewModelListWithinDecadeAsync(int? bookId)
         {
+            Log.Info($"bookId: {bookId}");
+
             Settings settings = Settings.Default;
             DateTime startTime = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).AddYears(-9);
             DateTime endTime = startTime.AddYears(10);
@@ -2395,12 +2418,16 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         {
             if (this.WVM.SelectedTab != Tabs.BooksTab) return;
 
+            List<int> emptyIdList = new List<int>();
+            Log.Info($"actionIdList: {string.Join(",", actionIdList ?? emptyIdList)} balanceKind: {balanceKind} categoryId: {categoryId} itemId: {itemId} isScroll: {isScroll} isUpdateActDateLastEdited: {isUpdateActDateLastEdited}");
+
             // 指定がなければ、更新前の帳簿項目の選択を維持する
             List<int> tmpActionIdList = actionIdList ?? new List<int>(this.WVM.SelectedActionVMList.Select((tmp) => tmp.ActionId));
             // 指定がなければ、更新前のサマリーの選択を維持する
-            int? tmpBalanceKind = balanceKind ?? this.WVM.SelectedBalanceKind ?? null;
-            int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId ?? null;
-            int? tmpItemId = itemId ?? this.WVM.SelectedItemId ?? null;
+            int? tmpBalanceKind = balanceKind ?? this.WVM.SelectedBalanceKind;
+            int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId;
+            int? tmpItemId = itemId ?? this.WVM.SelectedItemId;
+            Log.Info($"tmpActionIdList: {string.Join(",", tmpActionIdList ?? emptyIdList)} tmpBalanceKind: {tmpBalanceKind} tmpCategoryId: {tmpCategoryId} tmpItemId: {tmpItemId}");
 
             // 表示するデータを指定する
             switch (this.WVM.DisplayedTermKind) {
@@ -2464,6 +2491,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         private void InitializeDailyGraphTabData()
         {
             if (this.WVM.SelectedTab != Tabs.DailyGraphTab) return;
+
+            Log.Info();
 
             #region 全項目
             this.WVM.DailyGraphPlotModel.Axes.Clear();
@@ -2539,8 +2568,11 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.DailyGraphTab) return;
 
-            int? tmpCategotyId = categoryId ?? this.WVM.SelectedCategoryId ?? null;
+            Log.Info($"categoryId: {categoryId} itemId: {itemId}");
+
+            int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId;
             int? tmpItemId = itemId ?? this.WVM.SelectedItemId ?? null;
+            Log.Info($"tmpCategoryId: {tmpCategoryId} tmpItemId: {tmpItemId}");
 
             switch (this.WVM.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndOutgoGraph: {
@@ -2649,7 +2681,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             }
             this.WVM.DailyGraphPlotModel.InvalidatePlot(true);
 
-            this.WVM.SelectedDailyGraphSeriesVM = this.WVM.DailyGraphSeriesVMList.FirstOrDefault((vm) => (vm.CategoryId == tmpCategotyId && vm.ItemId == tmpItemId));
+            this.WVM.SelectedDailyGraphSeriesVM = this.WVM.DailyGraphSeriesVMList.FirstOrDefault((vm) => (vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
         }
 
         /// <summary>
@@ -2658,6 +2690,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         private void UpdateSelectedDailyGraph()
         {
             if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndOutgoGraph) return;
+
+            Log.Info();
 
             SeriesViewModel vm = this.WVM.SelectedDailyGraphSeriesVM;
 
@@ -2707,9 +2741,12 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.MonthlyListTab) return;
 
-            int? tmpBalanceKind = balanceKind ?? this.WVM.SelectedBalanceKind ?? null;
-            int? tmpCategotyId = categoryId ?? this.WVM.SelectedCategoryId ?? null;
-            int? tmpItemId = itemId ?? this.WVM.SelectedItemId ?? null;
+            Log.Info($"balanceKind: {balanceKind} categoryId: {categoryId} itemId: {itemId}");
+
+            int? tmpBalanceKind = balanceKind ?? this.WVM.SelectedBalanceKind;
+            int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId;
+            int? tmpItemId = itemId ?? this.WVM.SelectedItemId;
+            Log.Info($"tmpBalanceKind: {tmpBalanceKind} tmpCategoryId: {tmpCategoryId} tmpItemId: {tmpItemId}");
 
             int startMonth = Properties.Settings.Default.App_StartMonth;
             DateTime tmpMonth = this.WVM.DisplayedYear.GetFirstDateOfFiscalYear(startMonth);
@@ -2721,9 +2758,9 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                 tmpMonth = tmpMonth.AddMonths(1);
             }
             this.WVM.DisplayedMonths = displayedMonths;
-            this.WVM.MonthlySeriesVMList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+            this.WVM.MonthlySeriesVMList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedYear);
 
-            this.WVM.SelectedMonthlySeriesVM = this.WVM.MonthlySeriesVMList.FirstOrDefault((vm) => (vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategotyId && vm.ItemId == tmpItemId));
+            this.WVM.SelectedMonthlySeriesVM = this.WVM.MonthlySeriesVMList.FirstOrDefault((vm) => (vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
         }
         #endregion
 
@@ -2734,6 +2771,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         private void InitializeMonthlyGraphTabData()
         {
             if (this.WVM.SelectedTab != Tabs.MonthlyGraphTab) return;
+
+            Log.Info();
 
             Settings settings = Settings.Default;
             int startMonth = settings.App_StartMonth;
@@ -2811,8 +2850,11 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.MonthlyGraphTab) return;
 
-            int? tmpCategotyId = categoryId ?? this.WVM.SelectedCategoryId ?? null;
-            int? tmpItemId = itemId ?? this.WVM.SelectedItemId ?? null;
+            Log.Info($"categoryId: {categoryId} itemId: {itemId}");
+
+            int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId;
+            int? tmpItemId = itemId ?? this.WVM.SelectedItemId;
+            Log.Info($"tmpCategoryId: {tmpCategoryId} tmpItemId: {tmpItemId}");
 
             Settings settings = Settings.Default;
             int startMonth = settings.App_StartMonth;
@@ -2823,7 +2865,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     List<int> sumMinus = new List<int>(); // 月ごとの合計支出
 
                     // グラフ表示データを取得する
-                    ObservableCollection<SeriesViewModel> tmpVMList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM.Id, this.WVM.DisplayedYear);
+                    ObservableCollection<SeriesViewModel> tmpVMList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedYear);
                     // グラフ表示データを設定用に絞り込む
                     switch (this.WVM.SelectedGraphKind2) {
                         case GraphKind2.CategoryGraph:
@@ -2914,7 +2956,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             }
             this.WVM.MonthlyGraphPlotModel.InvalidatePlot(true);
 
-            this.WVM.SelectedMonthlyGraphSeriesVM = this.WVM.MonthlyGraphSeriesVMList.FirstOrDefault((vm) => (vm.CategoryId == tmpCategotyId && vm.ItemId == tmpItemId));
+            this.WVM.SelectedMonthlyGraphSeriesVM = this.WVM.MonthlyGraphSeriesVMList.FirstOrDefault((vm) => (vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
         }
         
         /// <summary>
@@ -2923,6 +2965,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         private void UpdateSelectedMonthlyGraph()
         {
             if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndOutgoGraph) return;
+
+            Log.Info();
 
             Settings settings = Settings.Default;
             int startMonth = settings.App_StartMonth;
@@ -2973,9 +3017,12 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.YearlyListTab) return;
 
-            int? tmpBalanceKind = balanceKind ?? this.WVM.SelectedBalanceKind ?? null;
-            int? tmpCategotyId = categoryId ?? this.WVM.SelectedCategoryId ?? null;
-            int? tmpItemId = itemId ?? this.WVM.SelectedItemId ?? null;
+            Log.Info($"balanceKind: {balanceKind} categoryId: {categoryId} itemId: {itemId}");
+
+            int? tmpBalanceKind = balanceKind ?? this.WVM.SelectedBalanceKind;
+            int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId;
+            int? tmpItemId = itemId ?? this.WVM.SelectedItemId;
+            Log.Info($"tmpBalanceKind: {tmpBalanceKind} tmpCategoryId: {tmpCategoryId} tmpItemId: {tmpItemId}");
 
             Settings settings = Settings.Default;
             int startMonth = settings.App_StartMonth;
@@ -2989,9 +3036,9 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             }
 
             this.WVM.DisplayedYears = displayedYears;
-            this.WVM.YearlySeriesVMList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
+            this.WVM.YearlySeriesVMList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM?.Id);
 
-            this.WVM.SelectedYearlySeriesVM = this.WVM.YearlySeriesVMList.FirstOrDefault((vm) => (vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategotyId && vm.ItemId == tmpItemId));
+            this.WVM.SelectedYearlySeriesVM = this.WVM.YearlySeriesVMList.FirstOrDefault((vm) => (vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
         }
         #endregion
 
@@ -3002,6 +3049,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         private void InitializeYearlyGraphTabData()
         {
             if (this.WVM.SelectedTab != Tabs.YearlyGraphTab) return;
+
+            Log.Info();
 
             Settings settings = Settings.Default;
             int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
@@ -3080,8 +3129,11 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.YearlyGraphTab) return;
 
-            int? tmpCategotyId = categoryId ?? this.WVM.SelectedCategoryId ?? null;
-            int? tmpItemId = itemId ?? this.WVM.SelectedItemId ?? null;
+            Log.Info($"categoryId: {categoryId} itemId: {itemId}");
+
+            int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId;
+            int? tmpItemId = itemId ?? this.WVM.SelectedItemId;
+            Log.Info($"tmpCategoryId: {tmpCategoryId} tmpItemId: {tmpItemId}");
 
             Settings settings = Settings.Default;
             int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
@@ -3092,7 +3144,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     List<int> sumMinus = new List<int>(); // 年ごとの合計支出
 
                     // グラフ表示データを取得する
-                    ObservableCollection<SeriesViewModel> tmpVMList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM.Id);
+                    ObservableCollection<SeriesViewModel> tmpVMList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM?.Id);
                     // グラフ表示データを設定用に絞り込む
                     switch (this.WVM.SelectedGraphKind2) {
                         case GraphKind2.CategoryGraph:
@@ -3173,7 +3225,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             }
             this.WVM.YearlyGraphPlotModel.InvalidatePlot(true);
 
-            this.WVM.SelectedYearlyGraphSeriesVM = this.WVM.YearlyGraphSeriesVMList.FirstOrDefault((vm) => (vm.CategoryId == tmpCategotyId && vm.ItemId == tmpItemId));
+            this.WVM.SelectedYearlyGraphSeriesVM = this.WVM.YearlyGraphSeriesVMList.FirstOrDefault((vm) => (vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
         }
         
         /// <summary>
@@ -3182,6 +3234,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         private void UpdateSelectedYearlyGraph()
         {
             if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndOutgoGraph) return;
+
+            Log.Info();
 
             Settings settings = Settings.Default;
             int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;

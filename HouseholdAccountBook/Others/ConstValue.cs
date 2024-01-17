@@ -21,9 +21,9 @@ namespace HouseholdAccountBook.ConstValue
 
         #region ログ
         /// <summary>
-        /// ログファイルのフォルダ名
+        /// ログファイルのフォルダパス
         /// </summary>
-        public static string LogFolderPath = "Logs";
+        public static string LogFolderPath = "./Logs";
         /// <summary>
         /// ログファイルパス
         /// </summary>
@@ -38,9 +38,9 @@ namespace HouseholdAccountBook.ConstValue
 
         #region 捕捉されない例外情報
         /// <summary>
-        /// 捕捉されない例外情報のファイルのフォルダ名
+        /// 捕捉されない例外情報のファイルのフォルダパス
         /// </summary>
-        public static string UnhandledExceptionInfoFolderPath = "UnhandledExceptions";
+        public static string UnhandledExceptionInfoFolderPath = "./UnhandledExceptions";
         /// <summary>
         /// 捕捉されない例外情報のファイルパス
         /// </summary>
@@ -55,9 +55,9 @@ namespace HouseholdAccountBook.ConstValue
 
         #region ウィンドウ情報
         /// <summary>
-        /// ウィンドウ情報のファイルのフォルダ名
+        /// ウィンドウ情報のファイルのフォルダパス
         /// </summary>
-        public static string WindowLocationFolderPath = "WindowLocations";
+        public static string WindowLocationFolderPath = "./WindowLocations";
         /// <summary>
         /// ウィンドウ情報のファイルパス
         /// </summary>

@@ -87,7 +87,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._SelectedBookVM;
             set {
-                if (this.SetProperty(ref this._SelectedBookVM, value)) { // SelectedBookVMがnullになることはない想定
+                if (this.SetProperty(ref this._SelectedBookVM, value)) {
                     this.SelectedBookChanged?.Invoke();
                 }
             }
@@ -107,6 +107,49 @@ namespace HouseholdAccountBook.ViewModels
         /// 選択された項目ID
         /// </summary>
         public int? SelectedItemId { get; set; } = default;
+
+        /// <summary>
+        /// 表示開始日
+        /// </summary>
+        public DateTime DisplayedStartDate {
+            get {
+                int startMonth = Properties.Settings.Default.App_StartMonth;
+                switch (this.SelectedTab) {
+                    case Tabs.BooksTab:
+                    case Tabs.DailyGraphTab:
+                        return this.StartDate;
+                    case Tabs.MonthlyListTab:
+                    case Tabs.MonthlyGraphTab:
+                        return this.DisplayedYear.GetFirstDateOfFiscalYear(startMonth);
+                    case Tabs.YearlyGraphTab:
+                    case Tabs.YearlyListTab:
+                        return DateTime.Now.GetFirstDateOfFiscalYear(startMonth).AddYears(-10);
+                    default:
+                        return this.StartDate;
+                }
+            }
+        }
+        /// <summary>
+        /// 表示終了日
+        /// </summary>
+        public DateTime DisplayedEndDate {
+            get {
+                int startMonth = Properties.Settings.Default.App_StartMonth;
+                switch (this.SelectedTab) {
+                    case Tabs.BooksTab:
+                    case Tabs.DailyGraphTab:
+                        return this.EndDate;
+                    case Tabs.MonthlyListTab:
+                    case Tabs.MonthlyGraphTab:
+                        return this.DisplayedYear.GetLastDateOfFiscalYear(startMonth);
+                    case Tabs.YearlyGraphTab:
+                    case Tabs.YearlyListTab:
+                        return DateTime.Now.GetLastDateOfFiscalYear(startMonth);
+                    default:
+                        return this.EndDate;
+                }
+            }
+        }
         #endregion
 
         #region プロパティ(グラフ)
@@ -398,9 +441,9 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedSummaryVM;
             set {
                 if (this.SetProperty(ref this._SelectedSummaryVM, value)) {
-                    this.SelectedBalanceKind = value.BalanceKind;
-                    this.SelectedCategoryId = value.CategoryId;
-                    this.SelectedItemId = value.ItemId;
+                    this.SelectedBalanceKind = value?.BalanceKind;
+                    this.SelectedCategoryId = value?.CategoryId;
+                    this.SelectedItemId = value?.ItemId;
 
                     this.UpdateDisplayedActionVMList();
                 }

@@ -2,16 +2,13 @@
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Windows;
 using Newtonsoft.Json;
+using Notifications.Wpf;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
-using Notifications.Wpf;
 using static HouseholdAccountBook.ConstValue.ConstValue;
-using System.Text;
 
 namespace HouseholdAccountBook
 {
@@ -55,10 +52,10 @@ namespace HouseholdAccountBook
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
 
 #if DEBUG
-            System.Diagnostics.Debug.Listeners.Add(new ConsoleTraceListener());
+            Debug.Listeners.Add(new ConsoleTraceListener());
 #endif
 
-            Log.Info("Application Start");
+            Log.Info("Application Startup");
 
 #if !DEBUG
             // 多重起動を抑止する
@@ -182,14 +179,15 @@ namespace HouseholdAccountBook
                 e.Handled = true;
 
                 if (!Directory.Exists(UnhandledExceptionInfoFolderPath)) Directory.CreateDirectory(UnhandledExceptionInfoFolderPath);
-                string fileName = UnhandledExceptionInfoFilePath;
+                string filePath = UnhandledExceptionInfoFilePath;
                 // 例外情報をファイルに保存する
                 string jsonCode = JsonConvert.SerializeObject(e.Exception, Formatting.Indented);
-                using (FileStream fs = new FileStream(fileName, FileMode.Create)) {
+                using (FileStream fs = new FileStream(filePath, FileMode.Create)) {
                     using (StreamWriter sw = new StreamWriter(fs)) {
                         sw.WriteLine(jsonCode);
                     }
                 }
+                Log.Info("Create Unhandled Exception Info File: " + filePath);
 
                 // ハンドルされない例外の発生を通知する
                 NotificationManager nm = new NotificationManager();
@@ -199,7 +197,7 @@ namespace HouseholdAccountBook
                     Type = NotificationType.Warning
                 };
                 nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
-                    Process.Start(fileName);
+                    Process.Start(filePath);
                     Application.Current.Shutdown();
                 });
             }
