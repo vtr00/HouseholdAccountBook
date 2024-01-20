@@ -159,7 +159,7 @@ namespace HouseholdAccountBook.Windows
             settings.App_KichoDBFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             settings.Save();
 
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
             bool isOpen = false;
             using (DaoOle daoOle = new DaoOle(ofd.FileName)) {
@@ -340,12 +340,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             if (isOpen) {
                 await this.UpdateAsync(isUpdateBookList:true, isScroll: true, isUpdateActDateLastEdited: true);
 
-                this.Cursor = null;
+                this.WaitCursorCountDecrement();
 
                 MessageBox.Show(MessageText.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                this.Cursor = null;
+                this.WaitCursorCountDecrement();
 
                 MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
@@ -397,7 +397,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             settings.App_CustomFormatFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             settings.Save();
 
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
             using (DaoBase dao = this.builder.Build()) {
                 // 既存のデータを削除する
@@ -440,12 +440,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             if (process.ExitCode == 0) {
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
 
-                this.Cursor = null;
+                this.WaitCursorCountDecrement();
 
                 MessageBox.Show(MessageText.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                this.Cursor = null;
+                this.WaitCursorCountDecrement();
 
                 MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
@@ -493,7 +493,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             settings.App_CustomFormatFilePath = Path.Combine(sfd.InitialDirectory, sfd.FileName);
             settings.Save();
 
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
             // 起動情報を設定する
             ProcessStartInfo info = new ProcessStartInfo() {
@@ -520,7 +520,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             // バックアップする
             Process process = Process.Start(info);
             process.WaitForExit(10 * 1000);
-            this.Cursor = null;
+            this.WaitCursorCountDecrement();
 
             if (process.ExitCode == 0) {
                 MessageBox.Show(MessageText.FinishToExport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
@@ -548,11 +548,11 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void BackUpCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
             this.CreateBackUpFile();
 
-            this.Cursor = null;
+            this.WaitCursorCountDecrement();
 
             MessageBox.Show(MessageText.FinishToBackUp, MessageTitle.Information);
         }
@@ -1118,12 +1118,12 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void GoToLastMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
             this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
             await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
 
-            this.Cursor = null;
+            this.WaitCursorCountDecrement();
         }
 
         /// <summary>
@@ -1146,12 +1146,12 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void GoToThisMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
             this.WVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
             await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
 
-            this.Cursor = null;
+            this.WaitCursorCountDecrement();
         }
 
         /// <summary>
@@ -1172,12 +1172,12 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void GoToNextMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
             this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
             await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
 
-            this.Cursor = null;
+            this.WaitCursorCountDecrement();
         }
 
         /// <summary>
@@ -1199,14 +1199,14 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             stw.LoadWindowSetting();
 
             if (stw.ShowDialog() == true) {
-                this.Cursor = Cursors.Wait;
+                this.WaitCursorCountIncrement();
 
                 this.WVM.StartDate = stw.WVM.StartDate;
                 this.WVM.EndDate = stw.WVM.EndDate;
 
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
 
-                this.Cursor = null;
+                this.WaitCursorCountDecrement();
             }
         }
         #endregion
@@ -1230,12 +1230,12 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void GoToLastYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(-1);
             await this.UpdateAsync(isUpdateBookList: true);
 
-            this.Cursor = null;
+            this.WaitCursorCountDecrement();
         }
 
         /// <summary>
@@ -1258,12 +1258,12 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void GoToThisYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
             this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             await this.UpdateAsync(isUpdateBookList: true);
 
-            this.Cursor = null;
+            this.WaitCursorCountDecrement();
         }
 
         /// <summary>
@@ -1284,12 +1284,12 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void GoToNextYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
             this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(1);
             await this.UpdateAsync(isUpdateBookList: true);
 
-            this.Cursor = null;
+            this.WaitCursorCountDecrement();
         }
         #endregion
 
@@ -1300,11 +1300,11 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
             await this.UpdateAsync(isUpdateBookList: true);
 
-            this.Cursor = null;
+            this.WaitCursorCountDecrement();
         }
         #endregion
 
@@ -1341,13 +1341,23 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             sw.LoadWindowSetting();
 
             if (sw.ShowDialog() == true) {
-                this.Cursor = Cursors.Wait;
+                this.WaitCursorCountIncrement();
 
                 await this.UpdateAsync(isUpdateBookList: true);
                 this.WVM.RaiseDisplayedYearChanged();
 
-                this.Cursor = null;
+                this.WaitCursorCountDecrement();
             }
+        }
+
+        /// <summary>
+        /// 帳簿ツールメニュー操作可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ToolInBookCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab;
         }
         
         /// <summary>
@@ -1381,13 +1391,16 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             };
             // 帳簿項目変更時のイベントを登録する
             this.ccw.ActionChanged += async (sender3, e3) => {
+                this.WaitCursorCountIncrement();
+
                 // 帳簿一覧タブを更新する
                 await this.UpdateBookTabDataAsync(isScroll: false, isUpdateActDateLastEdited: true);
+
+                this.WaitCursorCountDecrement();
             };
             // 帳簿変更時のイベントを登録する
-            this.ccw.BookChanged += async (sender4, e4) => {
+            this.ccw.BookChanged += (sender4, e4) => {
                 this.WVM.SelectedBookVM = this.WVM.BookVMList.FirstOrDefault((vm) => { return vm.Id == e4.Value; });
-                await this.UpdateAsync();
             };
             // クローズ時イベントを登録する
             this.ccw.Closed += (sender4, e4) => {
@@ -1456,57 +1469,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
 
             await this.UpdateAsync(isScroll: true, isUpdateActDateLastEdited: true);
 
-            // イベントハンドラ設定
-            this.WVM.SelectedTabChanged += async () => {
-                Log.Info($"SelectedTabChanged SelectedTabIndex: {this.WVM.SelectedTabIndex}");
-
-                Cursor lastCursor = this.Cursor;
-                this.Cursor = Cursors.Wait;
-
-                settings.MainWindow_SelectedTabIndex = this.WVM.SelectedTabIndex;
-                settings.Save();
-
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
-
-                this.Cursor = lastCursor;
-            };
-            this.WVM.SelectedBookChanged += async () => {
-                Log.Info($"SelectedBookChanged SelectedBookId: {this.WVM.SelectedBookVM?.Id}");
-
-                Cursor lastCursor = this.Cursor;
-                this.Cursor = Cursors.Wait;
-
-                settings.MainWindow_SelectedBookId = this.WVM.SelectedBookVM?.Id ?? -1;
-                settings.Save();
-
-                await this.UpdateAsync(isScroll: true);
-
-                this.Cursor = lastCursor;
-            };
-            this.WVM.SelectedGraphKindChanged += async () => {
-                Log.Info($"SelectedGraphKindChanged SelectedGraphKind1Index: {this.WVM.SelectedGraphKind1Index} SelectedGraphKind2Index: {this.WVM.SelectedGraphKind2Index}");
-
-                Cursor lastCursor = this.Cursor;
-                this.Cursor = Cursors.Wait;
-
-                settings.MainWindow_SelectedGraphKindIndex = this.WVM.SelectedGraphKind1Index;
-                settings.MainWindow_SelectedGraphKind2Index = this.WVM.SelectedGraphKind2Index;
-                settings.Save();
-
-                await this.UpdateAsync();
-
-                this.Cursor = lastCursor;
-            };
-            this.WVM.SelectedSeriesChanged += () => {
-                Log.Info("SelectedSeriesChanged");
-
-                Cursor lastCursor = this.Cursor;
-                this.Cursor = Cursors.Wait;
-
-                this.UpdateSelectedGraph();
-
-                this.Cursor = lastCursor;
-            };
+            this.RegisterEventHandlerToWVM();
 
             this.LogWindowStateAndLocation("Loaded");
         }
@@ -3363,6 +3326,66 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             }
         }
         #endregion
+
+
+        /// <summary>
+        /// イベントハンドラをWVMに登録する
+        /// </summary>
+        private void RegisterEventHandlerToWVM()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            // タブ選択変更時
+            this.WVM.SelectedTabChanged += async () => {
+                Log.Info($"SelectedTabChanged SelectedTabIndex: {this.WVM.SelectedTabIndex}");
+
+                this.WaitCursorCountIncrement();
+
+                settings.MainWindow_SelectedTabIndex = this.WVM.SelectedTabIndex;
+                settings.Save();
+
+                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
+
+                this.WaitCursorCountDecrement();
+            };
+            // 帳簿選択変更時
+            this.WVM.SelectedBookChanged += async () => {
+                Log.Info($"SelectedBookChanged SelectedBookId: {this.WVM.SelectedBookVM?.Id}");
+
+                this.WaitCursorCountIncrement();
+
+                settings.MainWindow_SelectedBookId = this.WVM.SelectedBookVM?.Id ?? -1;
+                settings.Save();
+
+                await this.UpdateAsync(isScroll: true);
+
+                this.WaitCursorCountDecrement();
+            };
+            // グラフ種別選択変更時
+            this.WVM.SelectedGraphKindChanged += async () => {
+                Log.Info($"SelectedGraphKindChanged SelectedGraphKind1Index: {this.WVM.SelectedGraphKind1Index} SelectedGraphKind2Index: {this.WVM.SelectedGraphKind2Index}");
+
+                this.WaitCursorCountIncrement();
+
+                settings.MainWindow_SelectedGraphKindIndex = this.WVM.SelectedGraphKind1Index;
+                settings.MainWindow_SelectedGraphKind2Index = this.WVM.SelectedGraphKind2Index;
+                settings.Save();
+
+                await this.UpdateAsync();
+
+                this.WaitCursorCountDecrement();
+            };
+            // 系列選択変更時
+            this.WVM.SelectedSeriesChanged += () => {
+                Log.Info("SelectedSeriesChanged");
+
+                this.WaitCursorCountIncrement();
+
+                this.UpdateSelectedGraph();
+
+                this.WaitCursorCountDecrement();
+            };
+        }
 
         /// <summary>
         /// ウィンドウの状態、位置をファイルに保存する

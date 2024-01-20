@@ -332,7 +332,7 @@ namespace HouseholdAccountBook.ConstValue
         }
 
         /// <summary>
-        /// メッセージタイトルテキスト
+        /// メッセージタイトル
         /// </summary>
         public static class MessageTitle
         {

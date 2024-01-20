@@ -106,7 +106,7 @@ namespace HouseholdAccountBook.Windows
             };
 
             if (ofd.ShowDialog() == true) {
-                this.Cursor = Cursors.Wait;
+                this.WaitCursorCountIncrement();
 
                 // 開いたCSVファイルのパスを設定として保存する(複数存在する場合は先頭のみ)
                 string csvFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
@@ -123,7 +123,7 @@ namespace HouseholdAccountBook.Windows
                 this.ReloadCsvFiles();
                 await this.UpdateComparisonVMListAsync(true);
 
-                this.Cursor = null;
+                this.WaitCursorCountDecrement();
             }
         }
 
@@ -156,7 +156,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void MoveCsvFilesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
             // ファイルの移動を試みる
             List<string> tmpCsvFilePathList = new List<string>();
@@ -195,7 +195,7 @@ namespace HouseholdAccountBook.Windows
             this.ReloadCsvFiles();
             await this.UpdateComparisonVMListAsync();
 
-            this.Cursor = null;
+            this.WaitCursorCountDecrement();
         }
 
         /// <summary>
@@ -362,10 +362,9 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void BulkCheckCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Cursor cursor = this.Cursor;
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
-            foreach(CsvComparisonViewModel vm in this.WVM.CsvComparisonVMList) {
+            foreach (CsvComparisonViewModel vm in this.WVM.CsvComparisonVMList) {
                 if (vm.ActionId.HasValue && !vm.IsMatch) {
                     vm.IsMatch = true;
                     this.IsMatchChanged?.Invoke(this, new EventArgs<int?, bool>(vm.ActionId, vm.IsMatch));
@@ -373,7 +372,7 @@ namespace HouseholdAccountBook.Windows
                 }
             }
 
-            this.Cursor = cursor;
+            this.WaitCursorCountDecrement();
         }
         #endregion
 
@@ -395,11 +394,11 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void UpdateListCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.Cursor = Cursors.Wait;
+            this.WaitCursorCountIncrement();
 
             await this.UpdateComparisonVMListAsync();
 
-            this.Cursor = null;
+            this.WaitCursorCountDecrement();
         }
         #endregion
 

@@ -291,6 +291,7 @@
     </ApplicationDefinition>
     <Compile Include="Behaviors\BindSelectedItemsToDataGridBehavior.cs" />
     <Compile Include="Behaviors\BindSelectedItemToTreeViewBehavior.cs" />
+    <Compile Include="Extensions\FrameworkElementExtensions.cs" />
     <Compile Include="Extensions\WindowExtentions.cs" />
     <Compile Include="Others\BindingProxy.cs" />
     <Compile Include="Converters\DateTimeToIsNationalHolidayConverter.cs" />

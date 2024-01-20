@@ -52,7 +52,7 @@ namespace HouseholdAccountBook.Behaviors
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, BindSelectedItemsToDataGridBehavior.SelectedItemsChanged));
         #endregion
         /// <summary>
-        /// 選択されたアイテムリスト
+        /// 選択されたアイテムのコレクション
         /// </summary>
         #region SelectedItems
         public IList SelectedItems

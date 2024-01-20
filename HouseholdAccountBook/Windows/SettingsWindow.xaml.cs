@@ -1115,7 +1115,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 Log.Info(this.WVM.SelectedTab.ToString());
 
                 this.oldSelectedSettingsTab = this.WVM.SelectedTab;
-                this.Cursor = Cursors.Wait;
+                this.WaitCursorCountIncrement();
 
                 switch (this.WVM.SelectedTab) {
                     case SettingsTabs.ItemSettingsTab:
@@ -1128,7 +1128,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                         this.UpdateOtherSettingTabData();
                         break;
                 }
-                this.Cursor = null;
+                this.WaitCursorCountDecrement();
             }
         }
 

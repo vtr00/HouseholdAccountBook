@@ -63,6 +63,7 @@
         <!-- ツールコマンド -->
         <RoutedCommand x:Key="ToolCommand"/>
         <RoutedCommand x:Key="OpenSettingsWindowCommand"/>
+        <RoutedCommand x:Key="ToolInBookCommand"/>
         <RoutedCommand x:Key="OpenCsvComparisonWindowCommand"/>
 
         <!-- スタイル -->
@@ -142,6 +143,7 @@
         <!-- ツールコマンド -->
         <CommandBinding Command="{StaticResource ToolCommand}" CanExecute="ToolCommand_CanExecute"/>
         <CommandBinding Command="{StaticResource OpenSettingsWindowCommand}" CanExecute="OpenSettingsWindowCommand_CanExecute" Executed="OpenSettingsWindowCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ToolInBookCommand}" CanExecute="ToolInBookCommand_CanExecute"/>
         <CommandBinding Command="{StaticResource OpenCsvComparisonWindowCommand}" CanExecute="OpenCsvComparisonWindowCommand_CanExecute" Executed="OpenCsvComparisonWindowCommand_Executed"/>
         
         <!-- ヘルプコマンド -->
@@ -236,6 +238,11 @@
             </MenuItem>
             <MenuItem Header="ツール(_T)" Command="{StaticResource ToolCommand}">
                 <MenuItem Header="CSV比較(_C)..." Command="{StaticResource OpenCsvComparisonWindowCommand}"/>
+                <Separator/>
+                <MenuItem Header="帳簿(_B)" Command="{StaticResource ToolInBookCommand}">
+                    <MenuItem Header="絞り込み(_F)" IsCheckable="True" IsChecked="{Binding IsFilter}"/>
+                    <MenuItem Header="選択(_S)" IsCheckable="True" IsChecked="{Binding IsSelect}"/>
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="設定(_S)..." Command="{StaticResource OpenSettingsWindowCommand}"/>
             </MenuItem>
@@ -415,8 +422,6 @@
                                                         ElementStyle="{StaticResource TextAlignRight}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
-
-                            <CheckBox Grid.Row="1" Margin="5" Content="絞り込み" IsChecked="{Binding IsLink}"/>
                         </Grid>
                     </Grid>
 
