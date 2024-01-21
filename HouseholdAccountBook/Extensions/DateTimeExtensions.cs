@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace HouseholdAccountBook.Extensions
 {
     /// <summary>
-    /// <see cref="DateTime"/> 拡張
+    /// <see cref="DateTime"/> の拡張メソッドを提供します
     /// </summary>
     public static class DateTimeExtensions
     {

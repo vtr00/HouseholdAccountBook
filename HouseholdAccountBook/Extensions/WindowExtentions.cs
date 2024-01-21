@@ -3,8 +3,15 @@ using System.Windows;
 
 namespace HouseholdAccountBook.Extensions
 {
+    /// <summary>
+    /// <see cref="Window"/> の拡張メソッドを提供します
+    /// </summary>
     public static class WindowExtentions
     {
+        /// <summary>
+        /// <see cref="Window.Owner"/> の中央位置に移動する
+        /// </summary>
+        /// <param name="window"></param>
         public static void MoveOwnersCenter(this Window window)
         {
             if (window.Owner != null) {

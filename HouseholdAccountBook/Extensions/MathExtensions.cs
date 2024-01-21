@@ -2,6 +2,9 @@
 
 namespace HouseholdAccountBook.Extensions
 {
+    /// <summary>
+    /// <see cref="Math"/> の拡張メソッドを提供します
+    /// </summary>
     public static class MathExtensions
     {
         /// <summary>

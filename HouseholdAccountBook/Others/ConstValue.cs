@@ -31,7 +31,20 @@ namespace HouseholdAccountBook.ConstValue
         {
             get {
                 DateTime dt = App.StartupTime;
-                return string.Format("{0}/{1}.txt", LogFolderPath, dt.ToString("yyMMdd_hhmmss"));
+                return string.Format("{0}/{1}.txt", LogFolderPath, dt.ToString("yyyyMMdd_HHmmss"));
+            }
+        }
+        #endregion
+
+        #region バックアップファイル
+        /// <summary>
+        /// バックアップファイル名
+        /// </summary>
+        public static string BackupFileName
+        {
+            get {
+                DateTime dt = DateTime.Now;
+                return string.Format("{0}.backup", dt.ToString("yyyyMMdd_HHmmss"));
             }
         }
         #endregion
@@ -48,7 +61,7 @@ namespace HouseholdAccountBook.ConstValue
         {
             get {
                 DateTime dt = DateTime.Now;
-                return string.Format("{0}/{1}.txt", UnhandledExceptionInfoFolderPath, dt.ToString("yyMMdd_hhmmss"));
+                return string.Format("{0}/{1}.txt", UnhandledExceptionInfoFolderPath, dt.ToString("yyyyMMdd_HHmmss"));
             }
         }
         #endregion
@@ -65,7 +78,7 @@ namespace HouseholdAccountBook.ConstValue
         {
             get {
                 DateTime dt = App.StartupTime;
-                return string.Format("{0}/{1}.txt", WindowLocationFolderPath, dt.ToString("yyyyMMdd_hhmmss"));
+                return string.Format("{0}/{1}.txt", WindowLocationFolderPath, dt.ToString("yyyyMMdd_HHmmss"));
             }
         }
         #endregion

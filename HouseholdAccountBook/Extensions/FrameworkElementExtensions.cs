@@ -4,9 +4,12 @@ using System.Windows.Input;
 
 namespace HouseholdAccountBook.Extensions
 {
+    /// <summary>
+    /// <see cref="FrameworkElement"/> の拡張メソッドを提供します
+    /// </summary>
     public static class FrameworkElementExtensions
     {
-        private static Mutex _mutex = new Mutex(false);
+        private static readonly Mutex _mutex = new Mutex(false);
         private static int _count = 0;
 
         /// <summary>

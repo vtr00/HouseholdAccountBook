@@ -307,7 +307,7 @@
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Extensions\ValueTuppleExtensions.cs" />
-    <Compile Include="Interfaces\IMultiSelectable.cs" />
+    <Compile Include="Interfaces\ISelectable.cs" />
     <Compile Include="Others\Log.cs" />
     <Compile Include="Others\PropertyName.cs" />
     <Compile Include="UserControls\FollowablePopup.cs" />

@@ -8,7 +8,7 @@ namespace HouseholdAccountBook.ViewModels
     /// <summary>
     /// CSV比較VM
     /// </summary>
-    public partial class CsvComparisonViewModel : BindableBase, IMultiSelectable
+    public partial class CsvComparisonViewModel : BindableBase, ISelectable
     {
         #region フィールド
         /// <summary>
@@ -100,12 +100,12 @@ namespace HouseholdAccountBook.ViewModels
         /// 選択フラグ
         /// </summary>
         #region IsSelected
-        public bool IsSelected
+        public bool SelectFlag
         {
-            get => this._IsSelected;
-            set => this.SetProperty(ref this._IsSelected, value);
+            get => this._SelectFlag;
+            set => this.SetProperty(ref this._SelectFlag, value);
         }
-        private bool _IsSelected = default;
+        private bool _SelectFlag = default;
         #endregion
         #endregion
 

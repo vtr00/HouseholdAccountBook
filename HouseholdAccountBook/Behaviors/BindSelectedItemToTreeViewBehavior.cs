@@ -75,19 +75,19 @@ namespace HouseholdAccountBook.Behaviors
         }
 
         /// <summary>
-        /// <see cref="SelectedItem"/> が変更されたときに <see cref="IMultiSelectable.IsSelected"/> を更新します。
+        /// <see cref="SelectedItem"/> が変更されたときに <see cref="ISelectable.SelectFlag"/> を更新します。
         /// </summary>
         /// <param name="d"></param>
         /// <param name="e"></param>
         private static void SelectedItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (e.OldValue != e.NewValue) {
-                if (e.OldValue is IMultiSelectable oldV) {
-                    oldV.IsSelected = false;
+                if (e.OldValue is ISelectable oldV) {
+                    oldV.SelectFlag = false;
                 }
 
-                if (e.NewValue is IMultiSelectable newV) {
-                    newV.IsSelected = true;
+                if (e.NewValue is ISelectable newV) {
+                    newV.SelectFlag = true;
                 }
             }
         }

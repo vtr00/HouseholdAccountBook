@@ -345,8 +345,15 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedActionVMList;
             set {
                 if (value != null) {
+                    //Log.Debug($"Old SelectedActionVMList.Count: {this._SelectedActionVMList.Count}");
+                    //Log.Debug($"New SelectedActionVMList.Count: {value.Count}");
+
                     List<ActionViewModel> added = new List<ActionViewModel>(value.Except(this._SelectedActionVMList));
                     List<ActionViewModel> removed = new List<ActionViewModel>(this._SelectedActionVMList.Except(value));
+
+                    //Log.Debug($"added.Count: {added.Count}");
+                    //Log.Debug($"removed.Count: {removed.Count}");
+
                     foreach (ActionViewModel vm in added) {
                         this._SelectedActionVMList.Add(vm);
                     }
@@ -355,6 +362,9 @@ namespace HouseholdAccountBook.ViewModels
                     }
                 }
                 else {
+                    //Log.Debug($"Old SelectedActionVMList.Count: {this._SelectedActionVMList.Count}");
+                    //Log.Debug($"New SelectedActionVMList.Count: 0(null)");
+
                     // null の場合はリストを空にする(ClearだとBehaviorが意図した挙動にならない)
                     while (this._SelectedActionVMList.Count > 0) {
                         this._SelectedActionVMList.RemoveAt(0);

@@ -5,7 +5,7 @@ using System.Windows.Media;
 namespace HouseholdAccountBook.Extensions
 {
     /// <summary>
-    /// <see cref="DependencyObject"/> 拡張
+    /// <see cref="DependencyObject"/> の拡張メソッドを提供します
     /// </summary>
     public static class DependencyObjectExtensions
     {

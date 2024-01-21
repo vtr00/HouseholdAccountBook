@@ -8,7 +8,7 @@ namespace HouseholdAccountBook.ViewModels
     /// <summary>
     /// 帳簿項目VM
     /// </summary>
-    public class ActionViewModel : BindableBase, IMultiSelectable
+    public class ActionViewModel : BindableBase, ISelectable
     {
         #region プロパティ
         /// <summary>
@@ -87,13 +87,13 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 選択されているか
         /// </summary>
-        #region IsSelected
-        public bool IsSelected
+        #region SelectFlag
+        public bool SelectFlag
         {
-            get => this._IsSelected;
-            set => this.SetProperty(ref this._IsSelected, value);
+            get => this._SelectFlag;
+            set => this.SetProperty(ref this._SelectFlag, value);
         }
-        private bool _IsSelected = default;
+        private bool _SelectFlag = default;
         #endregion
 
         /// <summary>

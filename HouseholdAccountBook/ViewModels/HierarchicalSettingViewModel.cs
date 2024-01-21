@@ -7,7 +7,7 @@ namespace HouseholdAccountBook.ViewModels
     /// <summary>
     /// 階層構造設定VM
     /// </summary>
-    public class HierarchicalSettingViewModel : BindableBase, IMultiSelectable
+    public class HierarchicalSettingViewModel : BindableBase, ISelectable
     {
         /// <summary>
         /// 階層種別
@@ -76,12 +76,12 @@ namespace HouseholdAccountBook.ViewModels
         /// 選択されているか
         /// </summary>
         #region IsSelected
-        public bool IsSelected
+        public bool SelectFlag
         {
-            get => this._IsSelected;
-            set => this.SetProperty(ref this._IsSelected, value);
+            get => this._SelectFlag;
+            set => this.SetProperty(ref this._SelectFlag, value);
         }
-        private bool _IsSelected = default;
+        private bool _SelectFlag = default;
         #endregion
 
         /// <summary>

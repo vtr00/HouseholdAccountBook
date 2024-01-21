@@ -241,7 +241,7 @@
                 <Separator/>
                 <MenuItem Header="帳簿(_B)" Command="{StaticResource ToolInBookCommand}">
                     <MenuItem Header="絞り込み(_F)" IsCheckable="True" IsChecked="{Binding IsFilter}"/>
-                    <MenuItem Header="選択(_S)" IsCheckable="True" IsChecked="{Binding IsSelect}"/>
+                    <MenuItem Header="選択(_S)" IsCheckable="True" IsChecked="{Binding IsSelect}" IsEnabled="False"/>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="設定(_S)..." Command="{StaticResource OpenSettingsWindowCommand}"/>
@@ -348,11 +348,11 @@
                                 <MouseBinding Gesture="LeftDoubleClick" Command="{StaticResource EditActionCommand}"/>
                             </DataGrid.InputBindings>
                             <i:Interaction.Behaviors>
-                                <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding SelectedActionVMList, Mode=OneWay}"/>
+                                <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding SelectedActionVMList}"/>
                             </i:Interaction.Behaviors>
                             <DataGrid.ItemContainerStyle>
                                 <Style TargetType="DataGridRow">
-                                    <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                                    <Setter Property="IsSelected" Value="{Binding SelectFlag, Mode=TwoWay}"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsMatch}" Value="True">
                                             <Setter Property="Foreground" Value="Green"/>
@@ -369,6 +369,8 @@
                                 </Style>
                             </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
+                                <DataGridCheckBoxColumn Header="" Binding="{Binding SelectFlag}"
+                                                    Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                 <DataGridTextColumn Header="Id" Binding="{Binding ActionId}"
                                                     Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                 <DataGridTextColumn Header="GId" Binding="{Binding GroupId}"

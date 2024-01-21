@@ -3468,7 +3468,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                 settings.App_Postgres_Port,
                                 settings.App_Postgres_UserName,
                                 settings.App_Postgres_Role,
-                                string.Format(@"{0}/{1}.backup", tmpBackUpFolderPath, DateTime.Now.ToString("yyyyMMddHHmmss")),
+                                string.Format(@"{0}/{1}", tmpBackUpFolderPath, BackupFileName),
                                 settings.App_Postgres_DatabaseName),
                             WindowStyle = ProcessWindowStyle.Hidden
                         };

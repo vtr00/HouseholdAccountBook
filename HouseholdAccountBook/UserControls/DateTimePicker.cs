@@ -237,7 +237,6 @@ namespace HouseholdAccountBook.UserControls
         private static void DateTimePicker_DateFormatChanged(DependencyObject dobj, DependencyPropertyChangedEventArgs e)
         {
             DateTimePicker dateTimePicker = (DateTimePicker)dobj;
-            Log.Info(dateTimePicker.Text);
 
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action<DateTimePicker>(DateTimePicker.ApplyDateFormat), dateTimePicker);
 

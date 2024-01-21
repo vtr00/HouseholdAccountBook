@@ -9,7 +9,7 @@ using static HouseholdAccountBook.ConstValue.ConstValue;
 namespace HouseholdAccountBook
 {
     /// <summary>
-    /// ログ出力
+    /// トレースログ出力
     /// </summary>
     public static class Log
     {
@@ -18,7 +18,7 @@ namespace HouseholdAccountBook
 
         static Log()
         {
-            System.Diagnostics.Debug.AutoFlush = true;
+            Trace.AutoFlush = true;
             CreateNewFileListener();
         }
 
@@ -35,7 +35,7 @@ namespace HouseholdAccountBook
                 listener.Writer = sw;
                 listener.TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId | TraceOptions.ThreadId;
 
-                System.Diagnostics.Debug.Listeners.Add(listener);
+                Trace.Listeners.Add(listener);
             }
         }
 
@@ -44,7 +44,7 @@ namespace HouseholdAccountBook
         /// </summary>
         static public void ChangeNewFile()
         {
-            System.Diagnostics.Debug.Listeners.Remove(listenerName);
+            Trace.Listeners.Remove(listenerName);
             Close();
             CreateNewFileListener();
         }
@@ -121,7 +121,7 @@ namespace HouseholdAccountBook
             int index = fileName.LastIndexOf("\\");
             string className = fileName.Substring(index + 1, fileName.IndexOf(".", index + 1) - index - 1);
 
-            System.Diagnostics.Debug.WriteLine($"{DateTime.Now:yyyy/MM/dd hh:mm:ss.fff} [{Thread.CurrentThread.ManagedThreadId:000}] {type} [{className}::{methodName}({lineNumber})] {message}");
+            Trace.WriteLine($"{DateTime.Now:yyyy/MM/dd hh:mm:ss.fff} [{Thread.CurrentThread.ManagedThreadId:000}] {type} [{className}::{methodName}({lineNumber})] {message}");
         }
     }
 }
