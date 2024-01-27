@@ -474,7 +474,7 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void SaveItemInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void SaveItemInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             HierarchicalKind kind = this.WVM.SelectedItemVM.Kind;
             int id = this.WVM.SelectedItemVM.Id;
@@ -482,14 +482,14 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
             using (DaoBase dao = this.builder.Build()) {
                 switch (kind) {
                     case HierarchicalKind.Category: {
-                            dao.ExecNonQueryAsync(@"
+                            await dao.ExecNonQueryAsync(@"
 UPDATE mst_category
 SET category_name = @{0}, update_time = 'now', updater = @{1}
 WHERE category_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
                         }
                         break;
                     case HierarchicalKind.Item: {
-                            dao.ExecNonQueryAsync(@"
+                            await dao.ExecNonQueryAsync(@"
 UPDATE mst_item
 SET item_name = @{0}, update_time = 'now', updater = @{1}
 WHERE item_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
@@ -572,7 +572,7 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
 
                 using (DaoBase dao = this.builder.Build()) {
-                    await dao.ExecQueryAsync(@"
+                    await dao.ExecNonQueryAsync(@"
 UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedShopVM.Name, this.WVM.SelectedItemVM.Id);
 
@@ -603,7 +603,7 @@ WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.Se
                 Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
 
                 using (DaoBase dao = this.builder.Build()) {
-                    await dao.ExecQueryAsync(@"
+                    await dao.ExecNonQueryAsync(@"
 UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE remark = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedRemarkVM.Remark, this.WVM.SelectedItemVM.Id);
 

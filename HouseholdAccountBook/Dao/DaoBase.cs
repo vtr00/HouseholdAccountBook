@@ -63,7 +63,7 @@ namespace HouseholdAccountBook.Dao
         }
 
         /// <summary>
-        /// 非クエリを実行する
+        /// [非同期]非クエリを実行する
         /// </summary>
         /// <param name="sql">SQL</param>
         /// <param name="objects">引数リスト</param>
@@ -71,7 +71,7 @@ namespace HouseholdAccountBook.Dao
         public abstract Task<int> ExecNonQueryAsync(string sql, params object[] objects);
 
         /// <summary>
-        /// クエリを実行する
+        /// [非同期]クエリを実行する
         /// </summary>
         /// <param name="sql">SQL</param>
         /// <param name="objects">引数リスト</param>
