@@ -98,11 +98,16 @@
         
         <TabControl Grid.Row="1" TabStripPlacement="Left" Margin="5"
                     SelectedIndex="{Binding SelectedTabIndex}" SelectionChanged="SettingsTabControl_SelectionChanged">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter Property="Height" Value="75"/>
+                </Style>
+            </TabControl.ItemContainerStyle>
             <TabItem Header="項目設定">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.3*"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="5"/>
                         <ColumnDefinition Width="0.6*"/>
                     </Grid.ColumnDefinitions>
 
@@ -151,7 +156,7 @@
                         </Grid>
                     </GroupBox>
 
-                    <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns" VerticalAlignment="Stretch"/>
+                    <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
 
                     <Grid Grid.Column="2" DataContext="{Binding SelectedItemVM}">
                         <Grid.RowDefinitions>
@@ -264,7 +269,7 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.3*"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="5"/>
                         <ColumnDefinition Width="0.6*"/>
                     </Grid.ColumnDefinitions>
 
@@ -295,7 +300,7 @@
                         </Grid>
                     </GroupBox>
                         
-                    <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns" VerticalAlignment="Stretch"/>
+                    <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
 
                     <Grid Grid.Column="2" Grid.IsSharedSizeScope="True" DataContext="{Binding SelectedBookVM}">
                         <Grid.RowDefinitions>

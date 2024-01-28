@@ -321,9 +321,9 @@
                     <!-- データリスト -->
                     <Grid Grid.Row="1" Grid.Column="0" Margin="2">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1.0*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="1.0*" MinWidth="200"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="Auto" MinWidth="150"/>
                         </Grid.ColumnDefinitions>
 
                         <!-- 帳簿項目リスト -->
@@ -394,7 +394,7 @@
                             </DataGrid.Columns>
                         </DataGrid>
 
-                        <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns" VerticalAlignment="Stretch"/>
+                        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
 
                         <!-- サマリーリスト -->
                         <Grid Grid.Column="2">
@@ -461,8 +461,9 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="0.7*" MinHeight="200"/>
+                        <RowDefinition Height="5"/>
+                        <RowDefinition Height="0.3*" MinHeight="200"/>
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
@@ -516,8 +517,10 @@
                         <oxy:PlotView Grid.Row="0" Model="{Binding DailyGraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
 
+                    <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch"/>
+
                     <!-- 個別グラフ -->
-                    <Grid Grid.Row="2" Margin="2,0,2,2" Background="White" Height="200">
+                    <Grid Grid.Row="3" Margin="2,0,2,2" Background="White">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
@@ -643,8 +646,9 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="0.7*" MinHeight="200"/>
+                        <RowDefinition Height="5"/>
+                        <RowDefinition Height="0.3*" MinHeight="200"/>
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
@@ -682,8 +686,10 @@
                         <oxy:PlotView Grid.Row="0" Model="{Binding MonthlyGraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
 
+                    <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch"/>
+                    
                     <!-- 個別グラフ -->
-                    <Grid Grid.Row="2" Margin="2,0,2,2" Background="White" Height="200">
+                    <Grid Grid.Row="3" Margin="2,0,2,2" Background="White">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
@@ -796,8 +802,9 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="0.7*" MinHeight="200"/>
+                        <RowDefinition Height="5"/>
+                        <RowDefinition Height="0.3*" MinHeight="200"/>
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
@@ -835,8 +842,10 @@
                         <oxy:PlotView Grid.Row="0" Model="{Binding YearlyGraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
 
+                    <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch"/>
+                    
                     <!-- 個別グラフ -->
-                    <Grid Grid.Row="2" Margin="2,0,2,2" Background="White" Height="200">
+                    <Grid Grid.Row="3" Margin="2,0,2,2" Background="White">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
