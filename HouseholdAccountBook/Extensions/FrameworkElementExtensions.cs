@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 
@@ -10,7 +11,7 @@ namespace HouseholdAccountBook.Extensions
     public static class FrameworkElementExtensions
     {
         private static readonly Mutex _mutex = new Mutex(false);
-        private static int _count = 0;
+        private static readonly Dictionary<FrameworkElement, int> _countMap = new Dictionary<FrameworkElement, int>();
 
         /// <summary>
         /// <see cref="Cursors.Wait"/> のカウンタを増やす
@@ -19,8 +20,11 @@ namespace HouseholdAccountBook.Extensions
         public static void WaitCursorCountIncrement(this FrameworkElement fe)
         {
             _mutex.WaitOne();
-            _count++;
-            fe.Cursor = Cursors.Wait;
+            if (!_countMap.ContainsKey(fe)) {
+                _countMap.Add(fe, 0);
+                fe.Cursor = Cursors.Wait;
+            }
+            _countMap[fe]++;
             _mutex.ReleaseMutex();
         }
 
@@ -32,9 +36,12 @@ namespace HouseholdAccountBook.Extensions
         public static void WaitCursorCountDecrement(this FrameworkElement fe)
         {
             _mutex.WaitOne();
-            _count--;
-            if (_count == 0) {
-                fe.Cursor = null;
+            if (_countMap.ContainsKey(fe)) {
+                _countMap[fe]--;
+                if (_countMap[fe] <= 0) {
+                    fe.Cursor = null;
+                    _countMap.Remove(fe);
+                }
             }
             _mutex.ReleaseMutex();
         }
