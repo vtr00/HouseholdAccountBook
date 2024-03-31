@@ -1317,7 +1317,7 @@ ORDER BY sort_order;", vm.Id);
                     foreach (HierarchicalSettingViewModel categocyVM in vm.ChildrenVMList) {
                         // 項目
                         reader = await dao.ExecQueryAsync(@"
-SELECT item_id, item_name, sort_order
+SELECT item_id, item_name, advance_flg, sort_order
 FROM mst_item
 WHERE category_id = @{0} AND del_flg = 0
 ORDER BY sort_order;", categocyVM.Id);
@@ -1326,6 +1326,7 @@ ORDER BY sort_order;", categocyVM.Id);
                             int itemId = record.ToInt("item_id");
                             int sortOrder = record.ToInt("sort_order");
                             string itemName = record["item_name"];
+                            int advanceFlg = record.ToInt("advance_flg");
 
                             categocyVM.ChildrenVMList.Add(new HierarchicalSettingViewModel() {
                                 Kind = HierarchicalKind.Item,

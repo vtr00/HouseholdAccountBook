@@ -38,7 +38,7 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// <see cref="MainWindow"/>で選択された帳簿項目のグループID
         /// </summary>
-        private readonly int? groupId = null;
+        private readonly int? selectedGroupId = null;
         /// <summary>
         /// 移動元帳簿項目ID
         /// </summary>
@@ -90,7 +90,7 @@ namespace HouseholdAccountBook.Windows
             this.selectedBookId = selectedBookId;
             this.selectedMonth = selectedMonth;
             this.selectedDate = selectedDate;
-            this.groupId = null;
+            this.selectedGroupId = null;
 
             this.InitializeComponent();
 
@@ -102,22 +102,15 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         /// <param name="selectedBookId">選択された帳簿ID</param>
-        /// <param name="groupId">グループID</param>
+        /// <param name="selectedGroupId">グループID</param>
         /// <param name="mode">登録モード</param>
-        public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, int groupId, RegistrationMode mode = RegistrationMode.Edit)
+        public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, int selectedGroupId, RegistrationMode mode = RegistrationMode.Edit)
         {
             this.builder = builder;
             this.selectedBookId = selectedBookId;
             this.selectedMonth = null;
             this.selectedDate = null;
-            switch (mode) {
-                case RegistrationMode.Edit:
-                    this.groupId = groupId;
-                    break;
-                case RegistrationMode.Copy:
-                    this.groupId = null;
-                    break;
-            }
+            this.selectedGroupId = selectedGroupId;
 
             this.InitializeComponent();
 
@@ -230,7 +223,7 @@ SELECT A.book_id, A.action_id, A.item_id, A.act_time, A.act_value, A.remark, I.m
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
 WHERE A.del_flg = 0 AND A.group_id = @{0}
-ORDER BY move_flg DESC;", this.groupId);
+ORDER BY move_flg DESC;", this.selectedGroupId);
 
                         reader.ExecWholeRow((count, record) => {
                             int bookId = record.ToInt("book_id");
@@ -274,7 +267,7 @@ ORDER BY move_flg DESC;", this.groupId);
                     if (this.WVM.RegMode == RegistrationMode.Edit) {
                         this.WVM.FromId = this.fromActionId;
                         this.WVM.ToId = this.toActionId;
-                        this.WVM.GroupId = this.groupId;
+                        this.WVM.GroupId = this.selectedGroupId;
                         this.WVM.CommissionId = this.commissionActionId;
                     }
                     this.WVM.IsLink = (fromDate == toDate);
@@ -504,17 +497,19 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
             int tmpGroupId = -1; // ローカル用
             using (DaoBase dao = this.builder.Build()) {
                 await dao.ExecTransactionAsync(async () => {
-                    if (this.groupId == null) { // 追加
-                        #region 帳簿項目を追加する
-                        // グループIDを取得する
-                        DaoReader reader = await dao.ExecQueryAsync(@"
+                    switch (this.WVM.RegMode) {
+                        case RegistrationMode.Add:
+                        case RegistrationMode.Copy: {
+                            #region 帳簿項目を追加する
+                            // グループIDを取得する
+                            DaoReader reader = await dao.ExecQueryAsync(@"
 INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.Move, Updater, Inserter);
-                        reader.ExecARow((record) => {
-                            tmpGroupId = record.ToInt("group_id");
-                        });
+                            reader.ExecARow((record) => {
+                                tmpGroupId = record.ToInt("group_id");
+                            });
 
-                        reader = await dao.ExecQueryAsync(@"
+                            reader = await dao.ExecQueryAsync(@"
 -- 移動元
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, (
@@ -522,14 +517,14 @@ VALUES (@{0}, (
   INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @{6}) C ON C.category_id = I.category_id
   WHERE move_flg = 1
 ), @{1}, @{2}, @{3}, 0, 'now', @{4}, 'now', @{5}) RETURNING action_id;",
-                            fromBookId, fromDate, -actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Outgo);
-                        if (this.selectedBookId == fromBookId) {
-                            reader.ExecARow((record) => {
-                                resActionId = record.ToInt("action_id");
-                            });
-                        }
+                                fromBookId, fromDate, -actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Outgo);
+                            if (this.selectedBookId == fromBookId) {
+                                reader.ExecARow((record) => {
+                                    resActionId = record.ToInt("action_id");
+                                });
+                            }
 
-                        reader = await dao.ExecQueryAsync(@"
+                            reader = await dao.ExecQueryAsync(@"
 -- 移動先
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, (
@@ -537,35 +532,38 @@ VALUES (@{0}, (
   INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @{6}) C ON C.category_id = I.category_id
   WHERE move_flg = 1
 ), @{1}, @{2}, @{3}, 0, 'now', @{4}, 'now', @{5}) RETURNING action_id;",
-                            toBookId, toDate, actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Income);
-                        if (this.selectedBookId == toBookId) {
-                            reader.ExecARow((record) => {
-                                resActionId = record.ToInt("action_id");
-                            });
+                                toBookId, toDate, actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Income);
+                            if (this.selectedBookId == toBookId) {
+                                reader.ExecARow((record) => {
+                                    resActionId = record.ToInt("action_id");
+                                });
+                            }
+                            #endregion
+                            break;
                         }
-                        #endregion
-                    }
-                    else { // 編集
-                        #region 帳簿項目を編集する
-                        tmpGroupId = this.groupId.Value;
-                        await dao.ExecNonQueryAsync(@"
+                        case RegistrationMode.Edit: {
+                            #region 帳簿項目を変更する
+                            tmpGroupId = this.selectedGroupId.Value;
+                            await dao.ExecNonQueryAsync(@"
 -- 移動元
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
 WHERE action_id = @{4};", fromBookId, fromDate, -actValue, Updater, this.fromActionId);
-                        if (this.selectedBookId == fromBookId) {
-                            resActionId = this.fromActionId;
-                        }
+                            if (this.selectedBookId == fromBookId) {
+                                resActionId = this.fromActionId;
+                            }
 
-                        await dao.ExecNonQueryAsync(@"
+                            await dao.ExecNonQueryAsync(@"
 -- 移動先
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
 WHERE action_id = @{4};", toBookId, toDate, actValue, Updater, this.toActionId);
-                        if (this.selectedBookId == toBookId) {
-                            resActionId = this.toActionId;
+                            if (this.selectedBookId == toBookId) {
+                                resActionId = this.toActionId;
+                            }
+                            #endregion
+                            break;
                         }
-                        #endregion
                     }
 
                     if (commission != 0) {

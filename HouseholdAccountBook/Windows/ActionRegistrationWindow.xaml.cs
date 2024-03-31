@@ -581,188 +581,190 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
             }
 
             using (DaoBase dao = this.builder.Build()) {
-                switch (this.WVM.RegMode) {
-                    case RegistrationMode.Add:
-                    case RegistrationMode.Copy: {
-                            #region 帳簿項目を追加する
-                            if (count == 1) { // 繰返し回数が1回(繰返しなし)
-                                DaoReader reader = await dao.ExecQueryAsync(@"
-    INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
-    VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 0, 'now', @{6}, 'now', @{7}) RETURNING action_id;",
-                                    bookId, itemId, actTime, actValue, shopName, remark, Updater, Inserter);
-
-                                reader.ExecARow((record) => {
-                                    resActionId = record.ToInt("action_id");
-                                });
-                            }
-                            else { // 繰返し回数が2回以上(繰返しあり)
-                                await dao.ExecTransactionAsync(async () => {
-                                    int tmpGroupId = -1;
-                                    // グループIDを取得する
+                await dao.ExecTransactionAsync(async () => {
+                    switch (this.WVM.RegMode) {
+                        case RegistrationMode.Add:
+                        case RegistrationMode.Copy: {
+                                #region 帳簿項目を追加する
+                                if (count == 1) { // 繰返し回数が1回(繰返しなし)
                                     DaoReader reader = await dao.ExecQueryAsync(@"
-    INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
-    VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.Repeat, Updater, Inserter);
+        INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
+        VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 0, 'now', @{6}, 'now', @{7}) RETURNING action_id;",
+                                        bookId, itemId, actTime, actValue, shopName, remark, Updater, Inserter);
+
                                     reader.ExecARow((record) => {
-                                        tmpGroupId = record.ToInt("group_id");
+                                        resActionId = record.ToInt("action_id");
                                     });
-
-                                    DateTime tmpActTime = getDateTimeWithHolidaySettingKind(actTime); // 登録日付
-                                    for (int i = 0; i < count; ++i) {
-                                        reader = await dao.ExecQueryAsync(@"
-    INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
-    VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8}) RETURNING action_id;",
-                                            bookId, itemId, tmpActTime, actValue, shopName, tmpGroupId, remark, Updater, Inserter);
-
-                                        // 繰り返しの最初の1回を選択するようにする
-                                        if (i == 0) {
-                                            reader.ExecARow((record) => {
-                                                resActionId = record.ToInt("action_id");
-                                            });
-                                        }
-
-                                        tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(i + 1));
-                                    }
-                                });
-                            }
-                            #endregion
-                        }
-                        break;
-                    case RegistrationMode.Edit: {
-                            #region 帳簿項目を編集する
-                            if (count == 1) {
-                                #region 繰返し回数が1回
-                                if (this.groupId == null) {
-                                    #region グループに属していない
-                                    await dao.ExecNonQueryAsync(@"
-UPDATE hst_action
-SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
-WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, this.selectedActionId);
-                                    #endregion
                                 }
-                                else {
-                                    #region グループに属している
+                                else { // 繰返し回数が2回以上(繰返しあり)
                                     await dao.ExecTransactionAsync(async () => {
-                                        // この帳簿項目以降の繰返し分のレコードを削除する
-                                        await dao.ExecNonQueryAsync(@"
-UPDATE hst_action
-SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE del_flg = 0 AND group_id = @{1} AND act_time > (SELECT act_time FROM hst_action WHERE action_id = @{2});", Updater, this.groupId, this.selectedActionId);
-
-                                        // グループに属する項目の個数を調べる
+                                        int tmpGroupId = -1;
+                                        // グループIDを取得する
                                         DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT action_id FROM hst_action
-WHERE del_flg = 0 AND group_id = @{0};", this.groupId);
+        INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
+        VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.Repeat, Updater, Inserter);
+                                        reader.ExecARow((record) => {
+                                            tmpGroupId = record.ToInt("group_id");
+                                        });
 
-                                        if (reader.Count <= 1) {
-                                            #region グループに属する項目が1項目以下
-                                            // この帳簿項目のグループIDをクリアする
-                                            await dao.ExecNonQueryAsync(@"
-UPDATE hst_action
-SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = null, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
-WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, this.selectedActionId);
+                                        DateTime tmpActTime = getDateTimeWithHolidaySettingKind(actTime); // 登録日付
+                                        for (int i = 0; i < count; ++i) {
+                                            reader = await dao.ExecQueryAsync(@"
+        INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
+        VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8}) RETURNING action_id;",
+                                                bookId, itemId, tmpActTime, actValue, shopName, tmpGroupId, remark, Updater, Inserter);
 
-                                            // グループを削除する
-                                            await dao.ExecNonQueryAsync(@"
-UPDATE hst_group
-SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE del_flg = 0 AND group_id = @{1};", Updater, this.groupId);
-                                            #endregion
-                                        }
-                                        else {
-                                            #region グループに属する項目が2項目以上
-                                            // この帳簿項目のグループIDをクリアせずに残す
-                                            await dao.ExecNonQueryAsync(@"
-UPDATE hst_action
-SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
-WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, this.selectedActionId);
-                                            #endregion
+                                            // 繰り返しの最初の1回を選択するようにする
+                                            if (i == 0) {
+                                                reader.ExecARow((record) => {
+                                                    resActionId = record.ToInt("action_id");
+                                                });
+                                            }
+
+                                            tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(i + 1));
                                         }
                                     });
-                                    #endregion
                                 }
                                 #endregion
+                                break;
                             }
-                            else {
-                                #region 繰返し回数が2回以上
-                                await dao.ExecTransactionAsync(async () => {
-                                    List<int> actionIdList = new List<int>();
-
-                                    DaoReader reader;
+                        case RegistrationMode.Edit: {
+                                #region 帳簿項目を編集する
+                                if (count == 1) {
+                                    #region 繰返し回数が1回
                                     if (this.groupId == null) {
-                                        #region グループIDが未割当て
-                                        // グループIDを取得する
-                                        reader = await dao.ExecQueryAsync(@"
-INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.Repeat, Updater, Inserter);
-                                        reader.ExecARow((record) => {
-                                            this.groupId = record.ToInt("group_id");
-                                        });
-                                        actionIdList.Add(this.selectedActionId.Value);
+                                        #region グループに属していない
+                                        await dao.ExecNonQueryAsync(@"
+    UPDATE hst_action
+    SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
+    WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, this.selectedActionId);
                                         #endregion
                                     }
                                     else {
-                                        #region グループIDが割当て済
-                                        // 変更の対象となる帳簿項目を洗い出す
-                                        reader = await dao.ExecQueryAsync(@"
-SELECT action_id FROM hst_action 
-WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_action WHERE action_id = @{1})
-ORDER BY act_time ASC;", this.groupId, this.selectedActionId);
-                                        reader.ExecWholeRow((recCount, record) => {
-                                            actionIdList.Add(record.ToInt("action_id"));
-                                            return true;
+                                        #region グループに属している
+                                        await dao.ExecTransactionAsync(async () => {
+                                            // この帳簿項目以降の繰返し分のレコードを削除する
+                                            await dao.ExecNonQueryAsync(@"
+    UPDATE hst_action
+    SET del_flg = 1, update_time = 'now', updater = @{0}
+    WHERE del_flg = 0 AND group_id = @{1} AND act_time > (SELECT act_time FROM hst_action WHERE action_id = @{2});", Updater, this.groupId, this.selectedActionId);
+
+                                            // グループに属する項目の個数を調べる
+                                            DaoReader reader = await dao.ExecQueryAsync(@"
+    SELECT action_id FROM hst_action
+    WHERE del_flg = 0 AND group_id = @{0};", this.groupId);
+
+                                            if (reader.Count <= 1) {
+                                                #region グループに属する項目が1項目以下
+                                                // この帳簿項目のグループIDをクリアする
+                                                await dao.ExecNonQueryAsync(@"
+    UPDATE hst_action
+    SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = null, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
+    WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, this.selectedActionId);
+
+                                                // グループを削除する
+                                                await dao.ExecNonQueryAsync(@"
+    UPDATE hst_group
+    SET del_flg = 1, update_time = 'now', updater = @{0}
+    WHERE del_flg = 0 AND group_id = @{1};", Updater, this.groupId);
+                                                #endregion
+                                            }
+                                            else {
+                                                #region グループに属する項目が2項目以上
+                                                // この帳簿項目のグループIDをクリアせずに残す
+                                                await dao.ExecNonQueryAsync(@"
+    UPDATE hst_action
+    SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
+    WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, this.selectedActionId);
+                                                #endregion
+                                            }
                                         });
                                         #endregion
                                     }
+                                    #endregion
+                                }
+                                else {
+                                    #region 繰返し回数が2回以上
+                                    await dao.ExecTransactionAsync(async () => {
+                                        List<int> actionIdList = new List<int>();
 
-                                    DateTime tmpActTime = getDateTimeWithHolidaySettingKind(actTime);
-
-                                    // この帳簿項目にだけis_matchを反映する
-                                    Debug.Assert(actionIdList[0] == this.selectedActionId);
-                                    await dao.ExecNonQueryAsync(@"
-UPDATE hst_action
-SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = @{5}, remark = @{6}, is_match = @{7}, update_time = 'now', updater = @{8}
-WHERE action_id = @{9};", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, isMatch, Updater, this.selectedActionId);
-
-                                    tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(1));
-                                    for (int i = 1; i < actionIdList.Count; ++i) {
-                                        int targetActionId = actionIdList[i];
-
-                                        if (i < count) { // 繰返し回数の範囲内のレコードを更新する
-                                            // 連動して編集時のみ変更する
-                                            if (isLink) {
-                                                await dao.ExecNonQueryAsync(@"
-UPDATE hst_action
-SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = @{5}, remark = @{6}, update_time = 'now', updater = @{7}
-WHERE action_id = @{8};", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, Updater, targetActionId);
-                                            }
+                                        DaoReader reader;
+                                        if (this.groupId == null) {
+                                            #region グループIDが未割当て
+                                            // グループIDを取得する
+                                            reader = await dao.ExecQueryAsync(@"
+    INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
+    VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.Repeat, Updater, Inserter);
+                                            reader.ExecARow((record) => {
+                                                this.groupId = record.ToInt("group_id");
+                                            });
+                                            actionIdList.Add(this.selectedActionId.Value);
+                                            #endregion
                                         }
-                                        else { // 繰返し回数が帳簿項目数を下回っていた場合に、越えたレコードを削除する
-                                            await dao.ExecNonQueryAsync(@"
-UPDATE hst_action
-SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE action_id = @{1};", Updater, targetActionId);
+                                        else {
+                                            #region グループIDが割当て済
+                                            // 変更の対象となる帳簿項目を洗い出す
+                                            reader = await dao.ExecQueryAsync(@"
+    SELECT action_id FROM hst_action 
+    WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_action WHERE action_id = @{1})
+    ORDER BY act_time ASC;", this.groupId, this.selectedActionId);
+                                            reader.ExecWholeRow((recCount, record) => {
+                                                actionIdList.Add(record.ToInt("action_id"));
+                                                return true;
+                                            });
+                                            #endregion
                                         }
 
-                                        tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(i + 1));
-                                    }
+                                        DateTime tmpActTime = getDateTimeWithHolidaySettingKind(actTime);
 
-                                    // 繰返し回数が帳簿項目数を越えていた場合に、新規レコードを追加する
-                                    for (int i = actionIdList.Count; i < count; ++i) {
+                                        // この帳簿項目にだけis_matchを反映する
+                                        Debug.Assert(actionIdList[0] == this.selectedActionId);
                                         await dao.ExecNonQueryAsync(@"
-INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8});", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, Updater, Inserter);
+    UPDATE hst_action
+    SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = @{5}, remark = @{6}, is_match = @{7}, update_time = 'now', updater = @{8}
+    WHERE action_id = @{9};", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, isMatch, Updater, this.selectedActionId);
 
-                                        tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(i + 1));
-                                    }
-                                });
+                                        tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(1));
+                                        for (int i = 1; i < actionIdList.Count; ++i) {
+                                            int targetActionId = actionIdList[i];
+
+                                            if (i < count) { // 繰返し回数の範囲内のレコードを更新する
+                                                // 連動して編集時のみ変更する
+                                                if (isLink) {
+                                                    await dao.ExecNonQueryAsync(@"
+    UPDATE hst_action
+    SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = @{5}, remark = @{6}, update_time = 'now', updater = @{7}
+    WHERE action_id = @{8};", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, Updater, targetActionId);
+                                                }
+                                            }
+                                            else { // 繰返し回数が帳簿項目数を下回っていた場合に、越えたレコードを削除する
+                                                await dao.ExecNonQueryAsync(@"
+    UPDATE hst_action
+    SET del_flg = 1, update_time = 'now', updater = @{0}
+    WHERE action_id = @{1};", Updater, targetActionId);
+                                            }
+
+                                            tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(i + 1));
+                                        }
+
+                                        // 繰返し回数が帳簿項目数を越えていた場合に、新規レコードを追加する
+                                        for (int i = actionIdList.Count; i < count; ++i) {
+                                            await dao.ExecNonQueryAsync(@"
+    INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
+    VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8});", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, Updater, Inserter);
+
+                                            tmpActTime = getDateTimeWithHolidaySettingKind(actTime.AddMonths(i + 1));
+                                        }
+                                    });
+                                    #endregion
+                                }
+
+                                resActionId = this.selectedActionId;
                                 #endregion
+                                break;
                             }
-
-                            resActionId = this.selectedActionId;
-                            #endregion
-                        }
-                        break;
-                }
+                    }
+                });
 
                 if (shopName != string.Empty) {
                     #region 店舗を追加する
