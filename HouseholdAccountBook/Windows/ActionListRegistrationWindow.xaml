@@ -152,7 +152,7 @@
             <TextBlock Grid.Row="8" Grid.Column="0" Margin="5" 
                        Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="8" Grid.Column="1" Margin="5" IsEditable="True"
-                      ItemsSource="{Binding RemarkVMList}" Text="{Binding SelectedRemarkVM, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
+                      ItemsSource="{Binding RemarkVMList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
             
             <controls:FollowablePopup x:Name="_popup" IsOpen="{Binding IsEditing, Mode=TwoWay}" Placement="Right">
                 <controls:NumericInputButton InputedValue="{Binding InputedValue}" InputedKind="{Binding InputedKind}"
