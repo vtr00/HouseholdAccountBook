@@ -23,7 +23,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// ログファイルのフォルダパス
         /// </summary>
-        public static string LogFolderPath = "./Logs";
+        public static string LogFolderPath = @".\Logs";
         /// <summary>
         /// ログファイルパス
         /// </summary>
@@ -31,7 +31,7 @@ namespace HouseholdAccountBook.ConstValue
         {
             get {
                 DateTime dt = App.StartupTime;
-                return string.Format("{0}/{1}.txt", LogFolderPath, dt.ToString("yyyyMMdd_HHmmss"));
+                return string.Format(@"{0}\{1}.txt", LogFolderPath, dt.ToString("yyyyMMdd_HHmmss"));
             }
         }
         #endregion
@@ -53,7 +53,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 捕捉されない例外情報のファイルのフォルダパス
         /// </summary>
-        public static string UnhandledExceptionInfoFolderPath = "./UnhandledExceptions";
+        public static string UnhandledExceptionInfoFolderPath = @".\UnhandledExceptions";
         /// <summary>
         /// 捕捉されない例外情報のファイルパス
         /// </summary>
@@ -61,7 +61,7 @@ namespace HouseholdAccountBook.ConstValue
         {
             get {
                 DateTime dt = DateTime.Now;
-                return string.Format("{0}/{1}.txt", UnhandledExceptionInfoFolderPath, dt.ToString("yyyyMMdd_HHmmss"));
+                return string.Format(@"{0}\{1}.txt", UnhandledExceptionInfoFolderPath, dt.ToString("yyyyMMdd_HHmmss"));
             }
         }
         #endregion
@@ -70,7 +70,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// ウィンドウ情報のファイルのフォルダパス
         /// </summary>
-        public static string WindowLocationFolderPath = "./WindowLocations";
+        public static string WindowLocationFolderPath = @".\WindowLocations";
         /// <summary>
         /// ウィンドウ情報のファイルパス
         /// </summary>
@@ -78,7 +78,7 @@ namespace HouseholdAccountBook.ConstValue
         {
             get {
                 DateTime dt = App.StartupTime;
-                return string.Format("{0}/{1}.txt", WindowLocationFolderPath, dt.ToString("yyyyMMdd_HHmmss"));
+                return string.Format(@"{0}\{1}.txt", WindowLocationFolderPath, dt.ToString("yyyyMMdd_HHmmss"));
             }
         }
         #endregion

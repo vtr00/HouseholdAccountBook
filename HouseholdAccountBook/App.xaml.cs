@@ -198,7 +198,9 @@ namespace HouseholdAccountBook
                     Type = NotificationType.Warning
                 };
                 nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
-                    Process.Start(filePath);
+                    string absoluteFilePath = GetCurrentDir() + filePath;
+                    Log.Info("Create Unhandled Exception Info Absolute File: " + absoluteFilePath);
+                    Process.Start(absoluteFilePath);
                     Application.Current.Shutdown();
                 });
             }
@@ -257,6 +259,15 @@ namespace HouseholdAccountBook
             Process.Start(Application.ResourceAssembly.Location);
 
             this.Shutdown();
+        }
+
+        /// <summary>
+        /// 実行ファイルのパスを取得する
+        /// </summary>
+        /// <returns>実行ファイルのパス</returns>
+        public static string GetCurrentDir()
+        {
+            return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         }
     }
 }
