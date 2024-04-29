@@ -56,21 +56,43 @@ namespace HouseholdAccountBook.Windows
         private CsvComparisonWindow ccw;
 
         /// <summary>
-        /// ウィンドウの位置の上端(最終値)
+        /// ウィンドウの位置の上端(最終補正値)
         /// </summary>
-        private double LastTop = default;
+        private double lastModTop = default;
         /// <summary>
-        /// ウィンドウの位置の左端(最終値)
+        /// ウィンドウの位置の左端(最終補正値)
         /// </summary>
-        private double LastLeft = default;
+        private double lastModLeft = default;
         /// <summary>
-        /// ウィンドウの高さ(最終値)
+        /// ウィンドウの高さ(最終補正値)
         /// </summary>
-        private double LastHeight = default;
+        private double lastModHeight = default;
         /// <summary>
-        /// ウィンドウの幅(最終値)
+        /// ウィンドウの幅(最終補正値)
         /// </summary>
-        private double LastWidth = default;
+        private double lastModWidth = default;
+
+        /// <summary>
+        /// ウィンドウの状態(最終保存値)
+        /// </summary>
+        private WindowState lastSavedWindowState = default;
+        /// <summary>
+        /// ウィンドウの位置の上端(最終保存値)
+        /// </summary>
+        private double lastSavedTop = default;
+        /// <summary>
+        /// ウィンドウの位置の左端(最終保存値)
+        /// </summary>
+        private double lastSavedLeft = default;
+        /// <summary>
+        /// ウィンドウの高さ(最終保存値)
+        /// </summary>
+        private double lastSavedHeight = default;
+        /// <summary>
+        /// ウィンドウの幅(最終保存値)
+        /// </summary>
+        private double lastSavedWidth = default;
+        #endregion
 
         /// <summary>
         /// 子ウィンドウを開いているか
@@ -80,7 +102,6 @@ namespace HouseholdAccountBook.Windows
         /// 登録ウィンドウを開いているか
         /// </summary>
         private bool RegistrationWindowOpened => this.mrw != null || this.arw != null || this.alrw != null;
-        #endregion
 
         /// <summary>
         /// <see cref="MainWindow"/> クラスの新しいインスタンスを初期化します。
@@ -91,14 +112,9 @@ namespace HouseholdAccountBook.Windows
             this.builder = builder;
             this.startUpDate = DateTime.Now;
 
+            this.LogWindowStateAndLocation("Constructor", true);
+
             this.InitializeComponent();
-
-            this.LastTop = this.Top;
-            this.LastLeft = this.Left;
-            this.LastWidth = this.Width;
-            this.LastHeight = this.Height;
-
-            this.LogWindowStateAndLocation("Constructor");
         }
 
         #region イベントハンドラ
@@ -1435,6 +1451,13 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void MainWindow_Initialized(object sender, EventArgs e)
         {
+            this.LogWindowStateAndLocation("Initialized", true);
+
+            this.lastModTop = this.Top;
+            this.lastModLeft = this.Left;
+            this.lastModWidth = this.Width;
+            this.lastModHeight = this.Height;
+
             this.LoadWindowSetting();
         }
 
@@ -1446,6 +1469,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             Log.Info();
+
+            this.LogWindowStateAndLocation("Loaded", true);
 
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -1470,8 +1495,6 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             await this.UpdateAsync(isScroll: true, isUpdateActDateLastEdited: true);
 
             this.RegisterEventHandlerToWVM();
-
-            this.LogWindowStateAndLocation("Loaded");
         }
 
         /// <summary>
@@ -1515,10 +1538,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MainWindow_StateChanegd(object sender, EventArgs e)
+        private void MainWindow_StateChanged(object sender, EventArgs e)
         {
-            this.LogWindowStateAndLocation();
-
             Properties.Settings settings = Properties.Settings.Default;
 
             if (settings.App_BackUpFlagAtMinimizing) {
@@ -1528,6 +1549,15 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
 #endif
                 }
             }
+
+            this.SizeChanged -= this.MainWindow_SizeChanged;
+            this.LocationChanged -= this.MainWindow_LocationChanged;
+
+            this.LogWindowStateAndLocation("StateChanged");
+            this.ModifyLocationOrSize();
+
+            this.SizeChanged += this.MainWindow_SizeChanged;
+            this.LocationChanged += this.MainWindow_LocationChanged;
         }
 
         /// <summary>
@@ -1537,17 +1567,14 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void MainWindow_LocationChanged(object sender, EventArgs e)
         {
-            this.LogWindowStateAndLocation();
+            this.SizeChanged -= this.MainWindow_SizeChanged;
+            this.LocationChanged -= this.MainWindow_LocationChanged;
 
-            if (this.WindowState == WindowState.Normal && 2000000000 < Math.Max(Math.Abs(this.Left), Math.Abs(this.Top))) {
-                this.LocationChanged -= this.MainWindow_LocationChanged;
+            this.LogWindowStateAndLocation("LocationChanged");
+            this.ModifyLocationOrSize();
 
-                this.Top = 0;
-                this.Left = 0;
-                this.LogWindowStateAndLocation("LocModified");
-
-                this.LocationChanged += this.MainWindow_LocationChanged;
-            }
+            this.SizeChanged += this.MainWindow_SizeChanged;
+            this.LocationChanged += this.MainWindow_LocationChanged;
         }
 
         /// <summary>
@@ -1557,27 +1584,14 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            this.LogWindowStateAndLocation();
+            this.SizeChanged -= this.MainWindow_SizeChanged;
+            this.LocationChanged -= this.MainWindow_LocationChanged;
 
-            if (this.Height < 40) {
-                if (40 < this.LastHeight) {
-                    this.SizeChanged -= this.MainWindow_StateChanegd;
+            this.LogWindowStateAndLocation("SizeChanged");
+            this.ModifyLocationOrSize();
 
-                    this.Top = this.LastTop;
-                    this.Left = this.LastLeft;
-                    this.Width = this.LastWidth;
-                    this.Height = this.LastHeight;
-                    this.LogWindowStateAndLocation("SizeModified");
-
-                    this.SizeChanged += this.MainWindow_SizeChanged;
-                }
-            }
-            else {
-                this.LastTop = this.Top;
-                this.LastLeft = this.Left;
-                this.LastWidth = this.Width;
-                this.LastHeight = this.Height;
-            }
+            this.SizeChanged += this.MainWindow_SizeChanged;
+            this.LocationChanged += this.MainWindow_LocationChanged;
         }
 #endregion
 
@@ -3288,21 +3302,30 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// </summary>
         public void LoadWindowSetting()
         {
-            Properties.Settings settings = Properties.Settings.Default;
+            this.SizeChanged -= this.MainWindow_SizeChanged;
+            this.LocationChanged -= this.MainWindow_LocationChanged;
 
-            if (-10 <= settings.MainWindow_Left && 0 <= settings.MainWindow_Top) {
+            Properties.Settings settings = Properties.Settings.Default;
+            settings.App_InitSizeFlag = false;
+            settings.Save();
+
+            if (0 <= settings.MainWindow_Left && 0 <= settings.MainWindow_Top) {
                 this.Left = settings.MainWindow_Left;
                 this.Top = settings.MainWindow_Top;
             }
-            if (settings.MainWindow_Width != -1 && 40 <= settings.MainWindow_Height) {
+            if (0 < settings.MainWindow_Width && 40 <= settings.MainWindow_Height) {
                 this.Width = settings.MainWindow_Width;
                 this.Height = settings.MainWindow_Height;
             }
             if (settings.MainWindow_WindowState != -1) {
                 this.WindowState = (WindowState)settings.MainWindow_WindowState;
             }
-            settings.App_InitSizeFlag = false;
-            settings.Save();
+
+            this.LogWindowStateAndLocation("SettingLoaded", true);
+            this.ModifyLocationOrSize();
+
+            this.SizeChanged += this.MainWindow_SizeChanged;
+            this.LocationChanged += this.MainWindow_LocationChanged;
         }
 
         /// <summary>
@@ -3326,7 +3349,6 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             }
         }
         #endregion
-
 
         /// <summary>
         /// イベントハンドラをWVMに登録する
@@ -3388,11 +3410,72 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         }
 
         /// <summary>
+        /// ウィンドウ位置またはサイズを修正する
+        /// </summary>
+        private void ModifyLocationOrSize()
+        {
+            if (30000 < Math.Max(Math.Abs(this.Left), Math.Abs(this.Top))) {
+                double tmpTop = this.Top;
+                double tmpLeft = this.Left;
+                if (30000 < Math.Max(Math.Abs(this.lastModLeft), Math.Abs(this.lastModTop))) {
+                    this.Top = this.lastModTop;
+                    this.Left = this.lastModLeft;
+                }
+                else {
+                    this.MoveOwnersCenter();
+                }
+
+                if (tmpTop != this.Top || tmpLeft != this.Left) {
+                    this.LogWindowStateAndLocation("LocationModified", true);
+                }
+                else {
+                    this.LogWindowStateAndLocation("FailedToModifyLocation", true);
+                }
+            }
+            if (this.Height < 40 || this.Width < 40) {
+                double tmpHeight = this.Height;
+                double tmpWidth = this.Width;
+                if (40 < this.lastModHeight && 40 < this.lastModWidth) {
+                    this.Height = this.lastModHeight;
+                    this.Width = this.lastModWidth;
+                }
+                else {
+                    this.Height = 700;
+                    this.Width = 1050;
+                }
+
+                if (tmpHeight != this.Height || tmpWidth != this.Width) {
+                    this.LogWindowStateAndLocation("SizeModified", true);
+                }
+                else {
+                    this.LogWindowStateAndLocation("FailedToModifySize", true);
+                }
+            }
+
+            this.lastModTop = this.Top;
+            this.lastModLeft = this.Left;
+            this.lastModWidth = this.Width;
+            this.lastModHeight = this.Height;
+        }
+
+        /// <summary>
         /// ウィンドウの状態、位置をファイルに保存する
         /// </summary>
         /// <param name="comment">コメント</param>
-        private void LogWindowStateAndLocation(string comment = "")
+        /// <param name="force">状態、位置が変わっていなくても保存するか</param>
+        private void LogWindowStateAndLocation(string comment = "", bool force = false)
         {
+            if (!force && 
+                this.lastSavedWindowState == this.WindowState &&
+                this.lastSavedLeft == this.Left && this.lastSavedTop == this.Top && 
+                this.lastSavedHeight == this.Height && this.lastSavedWidth == this.Width) return;
+
+            this.lastSavedWindowState = this.WindowState;
+            this.lastSavedTop = this.Top;
+            this.lastSavedLeft = this.Left;
+            this.lastSavedWidth = this.Width;
+            this.lastSavedHeight = this.Height;
+
             string windowState;
             switch (this.WindowState) {
                 case WindowState.Maximized:
@@ -3409,19 +3492,18 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     break;
             }
 
-
             if (!Directory.Exists(WindowLocationFolderPath)) Directory.CreateDirectory(WindowLocationFolderPath);
             using (FileStream fs = new FileStream(ConstValue.ConstValue.WindowLocationFilePath, FileMode.Append)) {
                 using (StreamWriter sw = new StreamWriter(fs)) {
                     if (fs.Length == 0) {
                         sw.WriteLine("yyyy/MM/dd HH:mm:ss.ffff\tState\tLeft\tTop\tHeight\tWidth");
                     }
-                    if (string.IsNullOrEmpty(comment)) {
-                        sw.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff"), windowState, this.Left, this.Top, this.Height, this.Width));
+
+                    sw.Write(string.Format($"{DateTime.Now:yyyy/MM/dd HH:mm:ss.ffff}\t{windowState}\t{this.Left}\t{this.Top}\t{this.Height}\t{this.Width}"));
+                    if (!string.IsNullOrEmpty(comment)) {
+                        sw.Write(string.Format($"\t{comment}"));
                     }
-                    else {
-                        sw.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.ffff"), windowState, this.Left, this.Top, this.Height, this.Width, comment));
-                    }
+                    sw.WriteLine();
                 }
             }
         }

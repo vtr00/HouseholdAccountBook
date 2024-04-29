@@ -12,8 +12,8 @@
         Title="Household Account Book" Height="700" Width="1050"
         Initialized="MainWindow_Initialized" Loaded="MainWindow_Loaded"
         Closing="MainWindow_Closing" Closed="MainWindow_Closed"
+        StateChanged="MainWindow_StateChanged"
         LocationChanged="MainWindow_LocationChanged"
-        StateChanged="MainWindow_StateChanegd"
         SizeChanged="MainWindow_SizeChanged">
     
     <Window.DataContext>
