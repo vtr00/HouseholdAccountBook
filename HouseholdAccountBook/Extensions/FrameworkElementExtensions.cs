@@ -25,6 +25,8 @@ namespace HouseholdAccountBook.Extensions
                 fe.Cursor = Cursors.Wait;
             }
             _countMap[fe]++;
+
+            Log.Debug(string.Format("WaitCounter increment: {0}", _countMap[fe]));
             _mutex.ReleaseMutex();
         }
 
@@ -35,8 +37,11 @@ namespace HouseholdAccountBook.Extensions
         /// <remarks>カウンタが0になったら<see cref="null"/>に戻す</remarks>
         public static void WaitCursorCountDecrement(this FrameworkElement fe)
         {
+
             _mutex.WaitOne();
             if (_countMap.ContainsKey(fe)) {
+                Log.Debug(string.Format("WaitCounter decrement: {0}", _countMap[fe]-1));
+
                 _countMap[fe]--;
                 if (_countMap[fe] <= 0) {
                     fe.Cursor = null;

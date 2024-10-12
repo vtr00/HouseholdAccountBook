@@ -568,7 +568,8 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private async void DeleteShopNameCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
+            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, 
+                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
 
                 using (DaoBase dao = this.builder.Build()) {
@@ -599,7 +600,8 @@ WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.Se
         /// <param name="e"></param>
         private async void DeleteRemarkCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
+            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, 
+                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
 
                 using (DaoBase dao = this.builder.Build()) {
@@ -961,7 +963,8 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void RestartForDbSettingCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.RestartNotification, this.Title, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
+            if (MessageBox.Show(MessageText.RestartNotification, MessageTitle.Comformation, 
+                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Properties.Settings.Default.App_InitFlag = true;
                 Properties.Settings.Default.Save();
 
@@ -1018,7 +1021,8 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void InitializeWindowSettingCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.RestartNotification, this.Title, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
+            if (MessageBox.Show(MessageText.RestartNotification, MessageTitle.Comformation, 
+                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Properties.Settings settings = Properties.Settings.Default;
 
                 // メイン

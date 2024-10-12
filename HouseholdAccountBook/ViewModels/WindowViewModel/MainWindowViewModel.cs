@@ -477,32 +477,81 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 帳簿項目を概要によって絞り込むか
         /// </summary>
-        #region IsFilter
-        public bool IsFilter
+        #region UseFilter
+        public bool UseFilter
         {
-            get => this._IsFilter;
+            get => this._UseFilter;
             set {
-                if (this.SetProperty(ref this._IsFilter, value)) {
+                if (this.SetProperty(ref this._UseFilter, value)) {
                     this.UpdateDisplayedActionVMList();
                 }
             }
         }
-        private bool _IsFilter = false;
+        private bool _UseFilter = false;
+        #endregion
+
+        /// <summary>
+        /// 選択された検索種別
+        /// </summary>
+        #region SelectedFindKind
+        public FindKind SelectedFindKind {
+            get => this._SelectedFindKind;
+            set {
+                if (this.SetProperty(ref this._SelectedFindKind, value)) {
+                    this.RaisePropertyChanged(nameof(this.ShowFindBox));
+                    this.RaisePropertyChanged(nameof(this.ShowReplaceBox));
+                }
+            }
+        }
+        private FindKind _SelectedFindKind = FindKind.None;
         #endregion
         /// <summary>
-        /// 帳簿項目を概要によって選択するか
+        /// 検索欄を表示するか
         /// </summary>
-        #region IsSelect
-        public bool IsSelect
+        #region ShowFindBox
+        public bool ShowFindBox => this.SelectedFindKind != FindKind.None;
+        #endregion
+        /// <summary>
+        /// 検索入力テキスト
+        /// </summary>
+        #region FindInputText
+        public string FindInputText
         {
-            get => this._IsSelect;
+            get => this._FindInputText;
+            set => this.SetProperty(ref this._FindInputText, value);
+        }
+        private string _FindInputText = string.Empty;
+        #endregion
+        /// <summary>
+        /// 検索テキスト(設定時に絞り込み)
+        /// </summary>
+        #region FindText
+        public string FindText {
+            get => this._FindText;
             set {
-                if (this.SetProperty(ref this._IsSelect, value)) {
+                if (this.SetProperty(ref this._FindText, value)) {
                     this.UpdateDisplayedActionVMList();
                 }
             }
         }
-        private bool _IsSelect = false;
+        private string _FindText = string.Empty;
+        #endregion
+        /// <summary>
+        /// 置換欄を表示するか
+        /// </summary>
+        #region ShowReplaceBox
+        public bool ShowReplaceBox => this.SelectedFindKind == FindKind.Replace;
+        #endregion
+        /// <summary>
+        /// 置換テキスト
+        /// </summary>
+        #region ReplaceText
+        public string ReplaceText
+        {
+            get => this._ReplaceText;
+            set => this.SetProperty(ref this._ReplaceText, value);
+        }
+        private string _ReplaceText = string.Empty;
         #endregion
         #endregion
 
@@ -872,76 +921,45 @@ namespace HouseholdAccountBook.ViewModels
         /// <remarks>表示されている項目のみ選択する</remarks>
         private void UpdateDisplayedActionVMList()
         {
-            if (this._SelectedSummaryVM == null || (BalanceKind)this._SelectedSummaryVM.BalanceKind == BalanceKind.Others) {
-                // 概要が選択されていない または 収支種別が収入/支出以外の場合、表示する帳簿項目を絞り込まない
-                this.DisplayedActionVMList = this._ActionVMList;
+            ObservableCollection<ActionViewModel> tmp = this._ActionVMList;
 
-                if (this.IsSelect) {
-                    // 選択をクリアする
-                    this.SelectedActionVMList = null;
-                }
-            }
-            else {
-                if (this._IsFilter) { // フィルタ有効の場合
-                    if (this._SelectedSummaryVM.ItemId != -1) { // 項目名が選択されている
-                        this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
-                            return vm.ActionId == -1 || vm.ItemId == this._SelectedSummaryVM.ItemId;
-                        }));
-                    }
-                    else if (this._SelectedSummaryVM.CategoryId != -1) { // 分類名が選択されている
-                        this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
-                            return vm.ActionId == -1 || vm.CategoryId == this._SelectedSummaryVM.CategoryId;
-                        }));
-                    }
-                    else { // 収支種別が選択されている
-                        this.DisplayedActionVMList = new ObservableCollection<ActionViewModel>(this._ActionVMList.Where((vm) => {
-                            return vm.ActionId == -1 || vm.BalanceKind == (BalanceKind)this._SelectedSummaryVM.BalanceKind;
-                        }));
-                    }
-                } 
-                else {
-                    // フィルタが無効の場合、絞り込まない
-                    this.DisplayedActionVMList = this._ActionVMList;
-                }
-
-                if (this._IsSelect) { // 選択有効の場合
-                    if (this._SelectedSummaryVM.ItemId != -1) { // 項目名が選択されている
-                        this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this._DisplayedActionVMList.Where((vm) => {
-                            return vm.ItemId == this._SelectedSummaryVM.ItemId;
-                        }));
-                    }
-                    else if (this._SelectedSummaryVM.CategoryId != -1) { // 分類名が選択されている
-                        this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this._DisplayedActionVMList.Where((vm) => {
-                            return vm.CategoryId == this._SelectedSummaryVM.CategoryId;
-                        }));
-                    }
-                    else { // 収支種別が選択されている
-                        this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this._DisplayedActionVMList.Where((vm) => {
-                            return vm.BalanceKind == (BalanceKind)this._SelectedSummaryVM.BalanceKind;
-                        }));
-                    }
-                }
-                else {
-                    if (this._IsFilter) { // 選択無効でフィルタ有効の場合
-                        // 選択されている帳簿項目を概要の選択に応じて絞り込む
-                        if (this._SelectedSummaryVM.ItemId != -1) { // 項目名が選択されている
-                            this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this._SelectedActionVMList.Where((vm) => {
-                                return vm.ItemId == this._SelectedSummaryVM.ItemId;
+            if (this._UseFilter) {   // フィルタ有効の場合
+                // 概要が選択されている場合
+                if (this._SelectedSummaryVM != null) {
+                    // 収支が選択されている場合
+                    if ((BalanceKind)this._SelectedSummaryVM.BalanceKind != BalanceKind.Others) {
+                        if (this._SelectedSummaryVM.ItemId != -1) {             // 項目名が選択されている
+                            tmp = new ObservableCollection<ActionViewModel>(tmp.Where((vm) => {
+                                return vm.ItemId == this._SelectedSummaryVM.ItemId || vm.ActionId == -1;
                             }));
                         }
-                        else if (this._SelectedSummaryVM.CategoryId != -1) { // 分類名が選択されている
-                            this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this._SelectedActionVMList.Where((vm) => {
-                                return vm.CategoryId == this._SelectedSummaryVM.CategoryId;
+                        else if (this._SelectedSummaryVM.CategoryId != -1) {    // 分類名が選択されている
+                            tmp = new ObservableCollection<ActionViewModel>(tmp.Where((vm) => {
+                                return vm.CategoryId == this._SelectedSummaryVM.CategoryId || vm.ActionId == -1;
                             }));
                         }
-                        else { // 収支種別が選択されている
-                            this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this._SelectedActionVMList.Where((vm) => {
-                                return vm.BalanceKind == (BalanceKind)this._SelectedSummaryVM.BalanceKind;
+                        else {                                                  // 収支種別が選択されている
+                            tmp = new ObservableCollection<ActionViewModel>(tmp.Where((vm) => {
+                                return vm.BalanceKind == (BalanceKind)this._SelectedSummaryVM.BalanceKind || vm.ActionId == -1;
                             }));
                         }
                     }
                 }
             }
+
+            // 検索テキストで絞り込む
+            if (this.FindText != string.Empty) {
+                tmp = new ObservableCollection<ActionViewModel>(tmp.Where((vm) => {
+                    return vm.ShopName.Contains(this.FindText) || vm.Remark.Contains(this.FindText);
+                }));
+            }
+
+            this.DisplayedActionVMList = tmp;
+
+            // 選択項目を表示項目に限定する
+            this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this._SelectedActionVMList.Where((vm) => {
+                return this.DisplayedActionVMList.Contains(vm);
+            }));
         }
     }
 }

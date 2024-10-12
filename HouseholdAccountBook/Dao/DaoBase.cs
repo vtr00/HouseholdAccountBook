@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Common;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Dao
@@ -32,7 +33,9 @@ namespace HouseholdAccountBook.Dao
         {
             try {
                 this.connection.Open();
-                while (this.connection.State == System.Data.ConnectionState.Connecting) {; }
+                while (this.connection.State == System.Data.ConnectionState.Connecting) {
+                    Thread.Sleep(100);
+                }
 
                 return this.connection.State == System.Data.ConnectionState.Open;
             }

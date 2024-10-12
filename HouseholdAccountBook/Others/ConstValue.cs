@@ -137,6 +137,20 @@ namespace HouseholdAccountBook.ConstValue
 
         #region 種別
         /// <summary>
+        /// 期間種別
+        /// </summary>
+        public enum TermKind
+        {
+            /// <summary>
+            /// 月
+            /// </summary>
+            Monthly,
+            /// <summary>
+            /// 選択
+            /// </summary>
+            Selected
+        }
+        /// <summary>
         /// 帳簿種別
         /// </summary>
         public enum BookKind
@@ -161,20 +175,6 @@ namespace HouseholdAccountBook.ConstValue
             /// 株式口座
             /// </summary>
             Stock = 4
-        }
-        /// <summary>
-        /// 期間種別
-        /// </summary>
-        public enum TermKind
-        {
-            /// <summary>
-            /// 月
-            /// </summary>
-            Monthly,
-            /// <summary>
-            /// 選択
-            /// </summary>
-            Selected
         }
         /// <summary>
         /// 収支種別
@@ -243,6 +243,24 @@ namespace HouseholdAccountBook.ConstValue
             /// 支払先負担
             /// </summary>
             ToBook = 1
+        }
+        /// <summary>
+        /// 検索種別
+        /// </summary>
+        public enum FindKind
+        {
+            /// <summary>
+            /// 表示なし
+            /// </summary>
+            None = 0,
+            /// <summary>
+            /// 検索
+            /// </summary>
+            Find = 1,
+            /// <summary>
+            /// 置換
+            /// </summary>
+            Replace = 2
         }
         /// <summary>
         /// グラフ種別1
@@ -359,6 +377,10 @@ namespace HouseholdAccountBook.ConstValue
             /// エラー
             /// </summary>
             public static string Error { get; } = "エラー";
+            /// <summary>
+            /// 確認
+            /// </summary>
+            public static string Comformation { get; } = "確認";
         }
 
         /// <summary>
@@ -391,13 +413,17 @@ namespace HouseholdAccountBook.ConstValue
             /// </summary>
             public static string FinishToBackUp { get; } = "バックアップが完了しました。";
             /// <summary>
-            /// 選択した項目を削除しますか？
+            /// 選択した項目を削除します。よろしいですか？
             /// </summary>
             public static string DeleteNotification { get; } = "選択した項目を削除します。よろしいですか？";
             /// <summary>
             /// 既存のデータを削除します。よろしいですか？
             /// </summary>
             public static string DeleteOldDataNotification { get; } = "既存のデータを削除します。よろしいですか？";
+            /// <summary>
+            /// {0} を {1} に置き換えます。よろしいですか？
+            /// </summary>
+            public static string ReplaceShopNameRemarkNotification { get; } = @"{0} を {1} に置き換えます。よろしいですか？";
             /// <summary>
             /// 再起動します。よろしいですか？
             /// </summary>

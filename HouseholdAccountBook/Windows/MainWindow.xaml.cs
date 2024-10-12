@@ -149,7 +149,7 @@ namespace HouseholdAccountBook.Windows
 
             if (ofd.ShowDialog(this) == false) return;
 
-            if (MessageBox.Show(MessageText.DeleteOldDataNotification, this.Title,
+            if (MessageBox.Show(MessageText.DeleteOldDataNotification, MessageTitle.Comformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
                 return;
             }
@@ -387,7 +387,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
             if (ofd.ShowDialog(this) == false) return;
 
-            if (MessageBox.Show(MessageText.DeleteOldDataNotification, this.Title,
+            if (MessageBox.Show(MessageText.DeleteOldDataNotification, MessageTitle.Comformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
                 return;
             }
@@ -586,6 +586,48 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         private void EditCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = !this.ChildrenWindowOpened;
+        }
+
+        /// <summary>
+        /// 検索欄を表示可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShowFindBoxCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            // 帳簿タブを選択
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab;
+        }
+
+        /// <summary>
+        /// 検索欄を表示する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShowFindBoxCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.WVM.SelectedFindKind = FindKind.Find;
+        }
+
+        /// <summary>
+        /// 置換欄を表示可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShowReplaceBoxCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            // 帳簿タブを選択
+            e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab;
+        }
+
+        /// <summary>
+        /// 置換欄を表示する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ShowReplaceBoxCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.WVM.SelectedFindKind = FindKind.Replace;
         }
 
         /// <summary>
@@ -876,7 +918,8 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         /// <param name="e"></param>
         private async void DeleteActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.DeleteNotification, this.Title, MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
+            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Comformation, 
+                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 // 帳簿項目IDが0を超える項目についてループ
                 foreach (ActionViewModel vm in this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; })) {
                     int actionId = vm.ActionId;
@@ -981,7 +1024,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IndicateBookTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void ShowBookTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = this.WVM.SelectedTab != Tabs.BooksTab;
         }
@@ -991,7 +1034,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IndicateBookTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void ShowBookTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.WVM.SelectedTab = Tabs.BooksTab;
         }
@@ -1001,7 +1044,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IndicateDailyGraphTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void ShowDailyGraphTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = this.WVM.SelectedTab != Tabs.DailyGraphTab;
         }
@@ -1011,7 +1054,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IndicateDailyGraphTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void ShowDailyGraphTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.WVM.SelectedTab = Tabs.DailyGraphTab;
         }
@@ -1021,7 +1064,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IndicateMonthlyListTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void ShowMonthlyListTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = this.WVM.SelectedTab != Tabs.MonthlyListTab;
         }
@@ -1031,7 +1074,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IndicateMonthlyListTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void ShowMonthlyListTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.WVM.SelectedTab = Tabs.MonthlyListTab;
         }
@@ -1041,7 +1084,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IndicateMonthlyGraphTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void ShowMonthlyGraphTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = this.WVM.SelectedTab != Tabs.MonthlyGraphTab;
         }
@@ -1051,7 +1094,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IndicateMonthlyGraphTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void ShowMonthlyGraphTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.WVM.SelectedTab = Tabs.MonthlyGraphTab;
         }
@@ -1061,7 +1104,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IndicateYearlyListTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void ShowYearlyListTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = this.WVM.SelectedTab != Tabs.YearlyListTab;
         }
@@ -1071,7 +1114,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IndicateYearlyListTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void ShowYearlyListTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.WVM.SelectedTab = Tabs.YearlyListTab;
         }
@@ -1081,7 +1124,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IndicateYearlyGraphTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void ShowYearlyGraphTabCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = this.WVM.SelectedTab != Tabs.YearlyGraphTab;
         }
@@ -1091,7 +1134,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IndicateYearlyGraphTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void ShowYearlyGraphTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.WVM.SelectedTab = Tabs.YearlyGraphTab;
         }
@@ -1423,12 +1466,81 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             vw.ShowDialog();
         }
         #endregion
+
+        #region 検索
+        /// <summary>
+        /// 検索欄を非表示にする
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HideFindBoxCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.WVM.FindText = string.Empty;
+            this.WVM.SelectedFindKind = FindKind.None;
+        }
+
+        /// <summary>
+        /// 置換欄を非表示にする
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HideReplaceBoxCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.WVM.SelectedFindKind = FindKind.Find;
+        }
+
+        /// <summary>
+        /// 店名か備考を検索する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FindActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.WVM.FindText = this.WVM.FindInputText;
+        }
+
+        /// <summary>
+        /// 店名と備考を置換する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ReplaceActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (this.WVM.FindInputText == string.Empty) return;
+            if (this.WVM.FindInputText == this.WVM.ReplaceText) return;
+
+            this.WVM.FindText = this.WVM.FindInputText;
+
+            if (MessageBox.Show(string.Format(MessageText.ReplaceShopNameRemarkNotification, this.WVM.FindText, this.WVM.ReplaceText), MessageTitle.Comformation,
+                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
+                this.WVM.FindText = string.Empty; // 検索をクリアしておく
+                return;
+            }
+
+            List<int> actionIdList = new List<int>();
+            foreach (ActionViewModel vm in this.WVM.DisplayedActionVMList) {
+                actionIdList.Add(vm.ActionId);
+
+                string shopName = vm.ShopName.Replace(this.WVM.FindText, this.WVM.ReplaceText);
+                string remark = vm.Remark.Replace(this.WVM.FindText, this.WVM.ReplaceText);
+
+                using (DaoBase dao = this.builder.Build()) {
+                    await dao.ExecNonQueryAsync(@"
+UPDATE hst_action SET shop_name = @{1}, remark = @{2}, update_time = 'now', updater = @{3}
+WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater);
+                }
+            }
+
+            this.WVM.FindText = string.Empty; // 検索をクリアしておく
+            await this.UpdateBookTabDataAsync(actionIdList);
+        }
+        #endregion
         #endregion
 
-
-
         #region ウィンドウ
-
+        /// <summary>
+        /// ラッパ関数の呼び出し回数
+        /// </summary>
         private int wrapperCount = 0;
         /// <summary>
         /// ウィンドウのサイズと位置を変更する際のラッパ関数
