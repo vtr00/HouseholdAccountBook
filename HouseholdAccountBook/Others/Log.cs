@@ -16,6 +16,9 @@ namespace HouseholdAccountBook
         private static readonly string listenerName = "logFileOutput";
         private static TextWriterTraceListener listener = null;
 
+        /// <summary>
+        /// <see cref="Log"/> クラスの新しいインスタンスを初期化します。
+        /// </summary>
         static Log()
         {
             Trace.AutoFlush = true;

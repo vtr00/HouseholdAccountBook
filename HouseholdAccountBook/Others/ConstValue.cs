@@ -74,12 +74,10 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// ウィンドウ情報のファイルパス
         /// </summary>
-        public static string WindowLocationFilePath
+        public static string WindowLocationFilePath(String windowName)
         {
-            get {
-                DateTime dt = App.StartupTime;
-                return string.Format(@"{0}\{1}.txt", WindowLocationFolderPath, dt.ToString("yyyyMMdd_HHmmss"));
-            }
+            DateTime dt = App.StartupTime;
+            return string.Format(@"{0}\{1}_{2}.txt", WindowLocationFolderPath, windowName, dt.ToString("yyyyMMdd_HHmmss"));
         }
         #endregion
 
