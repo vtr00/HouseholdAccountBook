@@ -188,7 +188,7 @@ namespace HouseholdAccountBook
                         sw.WriteLine(jsonCode);
                     }
                 }
-                Log.Info("Create Unhandled Exception Info File: " + filePath);
+                Log.Info("Create Unhandled Exception Info File:" + filePath);
 
                 // ハンドルされない例外の発生を通知する
                 NotificationManager nm = new NotificationManager();
@@ -199,7 +199,7 @@ namespace HouseholdAccountBook
                 };
                 nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
                     string absoluteFilePath = GetCurrentDir() + filePath;
-                    Log.Info("Create Unhandled Exception Info Absolute File: " + absoluteFilePath);
+                    Log.Info("Create Unhandled Exception Info Absolute File:" + absoluteFilePath);
                     Process.Start(absoluteFilePath);
                     Application.Current.Shutdown();
                 });

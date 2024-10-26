@@ -10,10 +10,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -158,7 +157,10 @@ namespace HouseholdAccountBook.Windows
         private async void RegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             // DB登録
-            List<int> idList = await this.RegisterToDbAsync();
+            List<int> idList = null;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                idList = await this.RegisterToDbAsync();
+            }
 
             // MainWindow更新
             this.Registrated?.Invoke(this, new EventArgs<List<int>>(idList ?? new List<int>()));
@@ -640,26 +642,34 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
         private void RegisterEventHandlerToWVM()
         {
             this.WVM.BookChanged += async (bookId) => {
-                await this.UpdateCategoryListAsync();
-                await this.UpdateItemListAsync();
-                await this.UpdateShopListAsync();
-                await this.UpdateRemarkListAsync();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    await this.UpdateCategoryListAsync();
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
                 this.BookChanged?.Invoke(this, new EventArgs<int?>(bookId));
             };
             this.WVM.BalanceKindChanged += async (_) => {
-                await this.UpdateCategoryListAsync();
-                await this.UpdateItemListAsync();
-                await this.UpdateShopListAsync();
-                await this.UpdateRemarkListAsync();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    await this.UpdateCategoryListAsync();
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
             };
             this.WVM.CategoryChanged += async (_) => {
-                await this.UpdateItemListAsync();
-                await this.UpdateShopListAsync();
-                await this.UpdateRemarkListAsync();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
             };
             this.WVM.ItemChanged += async (_) => {
-                await this.UpdateShopListAsync();
-                await this.UpdateRemarkListAsync();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
             };
         }
 
@@ -669,12 +679,13 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
         /// <returns>登録された帳簿項目IDリスト</returns>
         private async Task<List<int>> RegisterToDbAsync()
         {
-            List<int> tmpActionIdList = new List<int>();
+            List<int> resActionIdList = new List<int>();
+
             BalanceKind balanceKind = this.WVM.SelectedBalanceKind; // 収支種別
-            int bookId = this.WVM.SelectedBookVM.Id.Value; // 帳簿ID
-            int itemId = this.WVM.SelectedItemVM.Id; // 帳簿項目ID
-            string shopName = this.WVM.SelectedShopName; // 店舗名
-            string remark = this.WVM.SelectedRemark; // 備考
+            int bookId = this.WVM.SelectedBookVM.Id.Value;          // 帳簿ID
+            int itemId = this.WVM.SelectedItemVM.Id;                // 帳簿項目ID
+            string shopName = this.WVM.SelectedShopName;            // 店舗名
+            string remark = this.WVM.SelectedRemark;                // 備考
 
             DateTime lastActTime = this.WVM.DateValueVMList.Max((tmp) => tmp.ActDate);
             using (DaoBase dao = this.builder.Build()) {
@@ -701,7 +712,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 'now', @{7}, 'now', @{8}) R
                                         bookId, itemId, actTime, actValue, shopName, tmpGroupId, remark, Updater, Inserter);
 
                                     reader.ExecARow((record) => {
-                                        tmpActionIdList.Add(record.ToInt("action_id"));
+                                        resActionIdList.Add(record.ToInt("action_id"));
                                     });
                                 }
                             }
@@ -726,7 +737,7 @@ WHERE action_id = @{7} AND NOT (book_id = @{0} AND item_id = @{1} AND act_time =
                                             bookId, itemId, actTime, actValue, shopName, remark, Updater, actionId.Value);
 
 
-                                        tmpActionIdList.Add(actionId.Value);
+                                        resActionIdList.Add(actionId.Value);
                                     }
                                     else {
                                         DaoReader reader = await dao.ExecQueryAsync(@"
@@ -735,13 +746,13 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 'now', @{7}, 'now', @{8}) R
                                             bookId, itemId, actTime, actValue, shopName, this.selectedGroupId, remark, Updater, Inserter);
 
                                         reader.ExecARow((record) => {
-                                            tmpActionIdList.Add(record.ToInt("action_id"));
+                                            resActionIdList.Add(record.ToInt("action_id"));
                                         });
                                     }
                                 }
                             }
 
-                            IEnumerable<int> expected = this.groupedActionIdList.Except(tmpActionIdList);
+                            IEnumerable<int> expected = this.groupedActionIdList.Except(resActionIdList);
                             foreach (int actionId in expected) {
                                 await dao.ExecNonQueryAsync(@"
 UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{1} 
@@ -799,7 +810,7 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", lastActTime, Upda
                 }
             }
 
-            return tmpActionIdList;
+            return resActionIdList;
         }
 
         #region 設定反映用の関数

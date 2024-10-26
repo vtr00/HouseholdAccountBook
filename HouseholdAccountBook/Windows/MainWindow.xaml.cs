@@ -21,6 +21,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -129,6 +130,8 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void ImportKichoHugetsuDbCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             Properties.Settings settings = Properties.Settings.Default;
 
             string directory = string.Empty; // ディレクトリ
@@ -157,194 +160,192 @@ namespace HouseholdAccountBook.Windows
             settings.App_KichoDBFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             settings.Save();
 
-            this.WaitCursorCountIncrement();
-
             bool isOpen = false;
-            using (DaoOle daoOle = new DaoOle(ofd.FileName)) {
-                isOpen = daoOle.IsOpen;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (DaoOle daoOle = new DaoOle(ofd.FileName)) {
+                    isOpen = daoOle.IsOpen;
 
-                if (isOpen) {
-                    using (DaoBase dao = this.builder.Build()) {
-                        await dao.ExecTransactionAsync(async () => {
-                            // 既存のデータを削除する
-                            await dao.ExecNonQueryAsync(@"DELETE FROM mst_book;");
-                            await dao.ExecNonQueryAsync(@"DELETE FROM mst_category;");
-                            await dao.ExecNonQueryAsync(@"DELETE FROM mst_item;");
-                            await dao.ExecNonQueryAsync(@"DELETE FROM hst_action;");
-                            await dao.ExecNonQueryAsync(@"DELETE FROM hst_group;");
-                            await dao.ExecNonQueryAsync(@"DELETE FROM hst_shop;");
-                            await dao.ExecNonQueryAsync(@"DELETE FROM hst_remark;");
-                            await dao.ExecNonQueryAsync(@"DELETE FROM rel_book_item;");
+                    if (isOpen) {
+                        using (DaoBase dao = this.builder.Build()) {
+                            await dao.ExecTransactionAsync(async () => {
+                                // 既存のデータを削除する
+                                await dao.ExecNonQueryAsync(@"DELETE FROM mst_book;");
+                                await dao.ExecNonQueryAsync(@"DELETE FROM mst_category;");
+                                await dao.ExecNonQueryAsync(@"DELETE FROM mst_item;");
+                                await dao.ExecNonQueryAsync(@"DELETE FROM hst_action;");
+                                await dao.ExecNonQueryAsync(@"DELETE FROM hst_group;");
+                                await dao.ExecNonQueryAsync(@"DELETE FROM hst_shop;");
+                                await dao.ExecNonQueryAsync(@"DELETE FROM hst_remark;");
+                                await dao.ExecNonQueryAsync(@"DELETE FROM rel_book_item;");
 
-                            DaoReader reader;
-                            // 帳簿IDのシーケンスを更新する
-                            reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBM_BOOK ORDER BY BOOK_ID;");
-                            await dao.ExecNonQueryAsync("SELECT setval('mst_book_book_id_seq', @{0});", reader[reader.Count - 1].ToInt("BOOK_ID"));
-                            // 帳簿テーブルのレコードを作成する
-                            reader.ExecWholeRow((count, record) => {
-                                int bookId = record.ToInt("BOOK_ID");
-                                string bookName = record["BOOK_NAME"];
-                                int balance = record.ToInt("BALANCE");
-                                int sortKey = record.ToInt("SORT_KEY");
-                                int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
+                                DaoReader reader;
+                                // 帳簿IDのシーケンスを更新する
+                                reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBM_BOOK ORDER BY BOOK_ID;");
+                                await dao.ExecNonQueryAsync("SELECT setval('mst_book_book_id_seq', @{0});", reader[reader.Count - 1].ToInt("BOOK_ID"));
+                                // 帳簿テーブルのレコードを作成する
+                                reader.ExecWholeRow((count, record) => {
+                                    int bookId = record.ToInt("BOOK_ID");
+                                    string bookName = record["BOOK_NAME"];
+                                    int balance = record.ToInt("BALANCE");
+                                    int sortKey = record.ToInt("SORT_KEY");
+                                    int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                dao.ExecNonQueryAsync(@"
+                                    dao.ExecNonQueryAsync(@"
 INSERT INTO mst_book 
 (book_id, book_name, initial_value, book_kind, pay_day, sort_order, del_flg, update_time, updater, insert_time, inserter) 
 VALUES (@{0}, @{1}, @{2}, 0, NULL, @{3}, @{4}, 'now', @{5}, 'now', @{6});",
-                                    bookId, bookName, balance, sortKey, delFlg, Updater, Inserter);
-                                return true;
-                            });
+                                        bookId, bookName, balance, sortKey, delFlg, Updater, Inserter);
+                                    return true;
+                                });
 
-                            // 分類IDのシーケンスを更新する
-                            reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBM_CATEGORY ORDER BY CATEGORY_ID;");
-                            await dao.ExecNonQueryAsync("SELECT setval('mst_category_category_id_seq', @{0});", reader[reader.Count - 1].ToInt("CATEGORY_ID"));
-                            // 分類テーブルのレコードを作成する
-                            reader.ExecWholeRow((count, record) => {
-                                int categoryId = record.ToInt("CATEGORY_ID");
-                                string categoryName = record["CATEGORY_NAME"];
-                                int rexpDiv = record.ToInt("REXP_DIV") - 1;
-                                int sortKey = record.ToInt("SORT_KEY");
-                                int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
+                                // 分類IDのシーケンスを更新する
+                                reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBM_CATEGORY ORDER BY CATEGORY_ID;");
+                                await dao.ExecNonQueryAsync("SELECT setval('mst_category_category_id_seq', @{0});", reader[reader.Count - 1].ToInt("CATEGORY_ID"));
+                                // 分類テーブルのレコードを作成する
+                                reader.ExecWholeRow((count, record) => {
+                                    int categoryId = record.ToInt("CATEGORY_ID");
+                                    string categoryName = record["CATEGORY_NAME"];
+                                    int rexpDiv = record.ToInt("REXP_DIV") - 1;
+                                    int sortKey = record.ToInt("SORT_KEY");
+                                    int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                dao.ExecNonQueryAsync(@"
+                                    dao.ExecNonQueryAsync(@"
 INSERT INTO mst_category
 (category_id, category_name, balance_kind, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, 'now', @{5}, 'now', @{6});",
-                                    categoryId, categoryName, rexpDiv, sortKey, delFlg, Updater, Inserter);
-                                return true;
-                            });
+                                        categoryId, categoryName, rexpDiv, sortKey, delFlg, Updater, Inserter);
+                                    return true;
+                                });
 
-                            // 項目IDのシーケンスを更新する
-                            reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBM_ITEM ORDER BY ITEM_ID;");
-                            await dao.ExecNonQueryAsync("SELECT setval('mst_item_item_id_seq', @{0});", reader[reader.Count - 1].ToInt("ITEM_ID"));
-                            // 項目テーブルのレコードを作成する
-                            reader.ExecWholeRow((count, record) => {
-                                int itemId = record.ToInt("ITEM_ID");
-                                string itemName = record["ITEM_NAME"];
-                                int moveFlg = record.ToBoolean("MOVE_FLG") ? 1 : 0;
-                                int categoryId = record.ToInt("CATEGORY_ID");
-                                int sortKey = record.ToInt("SORT_KEY");
-                                int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
+                                // 項目IDのシーケンスを更新する
+                                reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBM_ITEM ORDER BY ITEM_ID;");
+                                await dao.ExecNonQueryAsync("SELECT setval('mst_item_item_id_seq', @{0});", reader[reader.Count - 1].ToInt("ITEM_ID"));
+                                // 項目テーブルのレコードを作成する
+                                reader.ExecWholeRow((count, record) => {
+                                    int itemId = record.ToInt("ITEM_ID");
+                                    string itemName = record["ITEM_NAME"];
+                                    int moveFlg = record.ToBoolean("MOVE_FLG") ? 1 : 0;
+                                    int categoryId = record.ToInt("CATEGORY_ID");
+                                    int sortKey = record.ToInt("SORT_KEY");
+                                    int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                dao.ExecNonQueryAsync(@"
+                                    dao.ExecNonQueryAsync(@"
 INSERT INTO mst_item
 (item_id, item_name, category_id, move_flg, advance_flg, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 'now', @{7}, 'now', @{8});",
-                                    itemId, itemName, categoryId, moveFlg, 0, sortKey, delFlg, Updater, Inserter);
-                                return true;
-                            });
+                                        itemId, itemName, categoryId, moveFlg, 0, sortKey, delFlg, Updater, Inserter);
+                                    return true;
+                                });
 
-                            // 帳簿項目IDのシーケンスを更新する
-                            reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBT_ACT ORDER BY ACT_ID;");
-                            await dao.ExecNonQueryAsync("SELECT setval('hst_action_action_id_seq', @{0});", reader[reader.Count - 1].ToInt("ACT_ID"));
-                            int maxGroupId = 0; // グループIDの最大値
-                            // 帳簿テーブルのレコードを作成する
-                            await reader.ExecWholeRowAsync(async (count, record) => {
-                                int actId = record.ToInt("ACT_ID");
-                                int bookId = record.ToInt("BOOK_ID");
-                                int itemId = record.ToInt("ITEM_ID");
-                                string actDt = record["ACT_DT"];
-                                int income = record.ToInt("INCOME");
-                                int expense = record.ToInt("EXPENSE");
-                                int? groupId = record.ToInt("GROUP_ID") == 0 ? null : (int?)record.ToInt("GROUP_ID");
-                                string noteName = record["NOTE_NAME"];
-                                int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
+                                // 帳簿項目IDのシーケンスを更新する
+                                reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBT_ACT ORDER BY ACT_ID;");
+                                await dao.ExecNonQueryAsync("SELECT setval('hst_action_action_id_seq', @{0});", reader[reader.Count - 1].ToInt("ACT_ID"));
+                                int maxGroupId = 0; // グループIDの最大値
+                                                    // 帳簿テーブルのレコードを作成する
+                                await reader.ExecWholeRowAsync(async (count, record) => {
+                                    int actId = record.ToInt("ACT_ID");
+                                    int bookId = record.ToInt("BOOK_ID");
+                                    int itemId = record.ToInt("ITEM_ID");
+                                    string actDt = record["ACT_DT"];
+                                    int income = record.ToInt("INCOME");
+                                    int expense = record.ToInt("EXPENSE");
+                                    int? groupId = record.ToInt("GROUP_ID") == 0 ? null : (int?)record.ToInt("GROUP_ID");
+                                    string noteName = record["NOTE_NAME"];
+                                    int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                await dao.ExecNonQueryAsync(@"
+                                    await dao.ExecNonQueryAsync(@"
 INSERT INTO hst_action
 (action_id, book_id, item_id, act_time, act_value, shop_name, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, NULL, @{5}, @{6}, @{7}, 'now', @{8}, 'now', @{9});",
-                                    actId, bookId, itemId, DateTime.Parse(actDt), (income != 0 ? income : -expense),
-                                    groupId, noteName, delFlg, Updater, Inserter);
+                                        actId, bookId, itemId, DateTime.Parse(actDt), (income != 0 ? income : -expense),
+                                        groupId, noteName, delFlg, Updater, Inserter);
 
-                                // groupId が存在するとき
-                                if (groupId != null) {
-                                    // グループIDの最大値を更新する
-                                    if (maxGroupId < groupId) { maxGroupId = groupId.Value; }
+                                    // groupId が存在するとき
+                                    if (groupId != null) {
+                                        // グループIDの最大値を更新する
+                                        if (maxGroupId < groupId) { maxGroupId = groupId.Value; }
 
-                                    reader = await dao.ExecQueryAsync("SELECT * FROM hst_group WHERE group_id = @{0};", groupId);
-                                    // groupId のレコードが登録されていないとき
-                                    if (reader.Count == 0) {
-                                        // グループの種類を調べる
-                                        reader = await daoOle.ExecQueryAsync("SELECT * FROM CBT_ACT WHERE GROUP_ID = @{0};", groupId);
-                                        GroupKind groupKind = GroupKind.Repeat;
-                                        int? tmpBookId = null;
-                                        reader.ExecWholeRow((count2, record2) => {
-                                            if (tmpBookId == null) { // 1つ目のレコードの帳簿IDを記録する
-                                                tmpBookId = record2.ToInt("BOOK_ID");
-                                            }
-                                            else { // 2つ目のレコードの帳簿IDが1つ目と一致するか
-                                                if (tmpBookId != record2.ToInt("BOOK_ID")) {
-                                                    // 帳簿が一致しない場合は移動
-                                                    groupKind = GroupKind.Move;
+                                        reader = await dao.ExecQueryAsync("SELECT * FROM hst_group WHERE group_id = @{0};", groupId);
+                                        // groupId のレコードが登録されていないとき
+                                        if (reader.Count == 0) {
+                                            // グループの種類を調べる
+                                            reader = await daoOle.ExecQueryAsync("SELECT * FROM CBT_ACT WHERE GROUP_ID = @{0};", groupId);
+                                            GroupKind groupKind = GroupKind.Repeat;
+                                            int? tmpBookId = null;
+                                            reader.ExecWholeRow((count2, record2) => {
+                                                if (tmpBookId == null) { // 1つ目のレコードの帳簿IDを記録する
+                                                    tmpBookId = record2.ToInt("BOOK_ID");
                                                 }
-                                                else {
-                                                    // 帳簿が一致する場合は繰り返し
-                                                    groupKind = GroupKind.Repeat;
+                                                else { // 2つ目のレコードの帳簿IDが1つ目と一致するか
+                                                    if (tmpBookId != record2.ToInt("BOOK_ID")) {
+                                                        // 帳簿が一致しない場合は移動
+                                                        groupKind = GroupKind.Move;
+                                                    }
+                                                    else {
+                                                        // 帳簿が一致する場合は繰り返し
+                                                        groupKind = GroupKind.Repeat;
+                                                    }
+                                                    return false;
                                                 }
-                                                return false;
-                                            }
-                                            return true;
-                                        });
+                                                return true;
+                                            });
 
-                                        // グループテーブルのレコードを作成する
-                                        await dao.ExecNonQueryAsync(@"
+                                            // グループテーブルのレコードを作成する
+                                            await dao.ExecNonQueryAsync(@"
 INSERT INTO hst_group
 (group_id, group_kind, remark, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, NULL, 0, 'now', @{2}, 'now', @{3});",
-                                            groupId, (int)groupKind, Updater, Inserter);
+                                                groupId, (int)groupKind, Updater, Inserter);
+                                        }
                                     }
-                                }
-                                return true;
-                            });
-                            // グループIDのシーケンスを更新する
-                            await dao.ExecNonQueryAsync("SELECT setval('hst_group_group_id_seq', @{0});", maxGroupId);
+                                    return true;
+                                });
+                                // グループIDのシーケンスを更新する
+                                await dao.ExecNonQueryAsync("SELECT setval('hst_group_group_id_seq', @{0});", maxGroupId);
 
-                            // 備考テーブルのレコードを作成する
-                            reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBT_NOTE;");
-                            reader.ExecWholeRow((count, record) => {
-                                int itemId = record.ToInt("ITEM_ID");
-                                string noteName = record["NOTE_NAME"];
-                                int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
+                                // 備考テーブルのレコードを作成する
+                                reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBT_NOTE;");
+                                reader.ExecWholeRow((count, record) => {
+                                    int itemId = record.ToInt("ITEM_ID");
+                                    string noteName = record["NOTE_NAME"];
+                                    int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                dao.ExecNonQueryAsync(@"
+                                    dao.ExecNonQueryAsync(@"
 INSERT INTO hst_remark
 (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, 0, 'now', @{2}, 'now', @{3}, 'now', @{4});",
-                                    itemId, noteName, delFlg, Updater, Inserter);
-                                return true;
-                            });
+                                        itemId, noteName, delFlg, Updater, Inserter);
+                                    return true;
+                                });
 
-                            // 帳簿-項目テーブルのレコードを作成する
-                            reader = await daoOle.ExecQueryAsync("SELECT * FROM CBR_BOOK;");
-                            reader.ExecWholeRow((count, record) => {
-                                int bookId = record.ToInt("BOOK_ID");
-                                int itemId = record.ToInt("ITEM_ID");
-                                int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
+                                // 帳簿-項目テーブルのレコードを作成する
+                                reader = await daoOle.ExecQueryAsync("SELECT * FROM CBR_BOOK;");
+                                reader.ExecWholeRow((count, record) => {
+                                    int bookId = record.ToInt("BOOK_ID");
+                                    int itemId = record.ToInt("ITEM_ID");
+                                    int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                dao.ExecNonQueryAsync(@"
+                                    dao.ExecNonQueryAsync(@"
 INSERT INTO rel_book_item
 (book_id, item_id, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
-                                    bookId, itemId, delFlg, Updater, Inserter);
-                                return true;
+                                        bookId, itemId, delFlg, Updater, Inserter);
+                                    return true;
+                                });
                             });
-                        });
+                        }
                     }
+                }
+
+                if (isOpen) {
+                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
                 }
             }
 
             if (isOpen) {
-                await this.UpdateAsync(isUpdateBookList:true, isScroll: true, isUpdateActDateLastEdited: true);
-
-                this.WaitCursorCountDecrement();
-
                 MessageBox.Show(MessageText.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                this.WaitCursorCountDecrement();
-
                 MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
@@ -366,6 +367,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private async void ImportCustomFileCommand_Excuted(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             Properties.Settings settings = Properties.Settings.Default;
 
             string directory = string.Empty;
@@ -395,56 +398,56 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             settings.App_CustomFormatFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             settings.Save();
 
-            this.WaitCursorCountIncrement();
+            int exitCode = -1;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (DaoBase dao = this.builder.Build()) {
+                    // 既存のデータを削除する
+                    await dao.ExecNonQueryAsync(@"DELETE FROM mst_book;");
+                    await dao.ExecNonQueryAsync(@"DELETE FROM mst_category;");
+                    await dao.ExecNonQueryAsync(@"DELETE FROM mst_item;");
+                    await dao.ExecNonQueryAsync(@"DELETE FROM hst_action;");
+                    await dao.ExecNonQueryAsync(@"DELETE FROM hst_group;");
+                    await dao.ExecNonQueryAsync(@"DELETE FROM hst_shop;");
+                    await dao.ExecNonQueryAsync(@"DELETE FROM hst_remark;");
+                    await dao.ExecNonQueryAsync(@"DELETE FROM rel_book_item;");
+                }
 
-            using (DaoBase dao = this.builder.Build()) {
-                // 既存のデータを削除する
-                await dao.ExecNonQueryAsync(@"DELETE FROM mst_book;");
-                await dao.ExecNonQueryAsync(@"DELETE FROM mst_category;");
-                await dao.ExecNonQueryAsync(@"DELETE FROM mst_item;");
-                await dao.ExecNonQueryAsync(@"DELETE FROM hst_action;");
-                await dao.ExecNonQueryAsync(@"DELETE FROM hst_group;");
-                await dao.ExecNonQueryAsync(@"DELETE FROM hst_shop;");
-                await dao.ExecNonQueryAsync(@"DELETE FROM hst_remark;");
-                await dao.ExecNonQueryAsync(@"DELETE FROM rel_book_item;");
+                // 起動情報を設定する
+                ProcessStartInfo info = new ProcessStartInfo() {
+                    FileName = settings.App_Postgres_RestoreExePath,
+                    Arguments = string.Format(
+                        "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --data-only --verbose --dbname \"{5}\" \"{4}\"",
+                        settings.App_Postgres_Host,
+                        settings.App_Postgres_Port,
+                        settings.App_Postgres_UserName,
+                        settings.App_Postgres_Role,
+                        ofd.FileName,
+    #if DEBUG
+                        settings.App_Postgres_DatabaseName_Debug
+    #else
+                        settings.App_Postgres_DatabaseName
+    #endif
+                        ),
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
+    #if DEBUG
+                Console.WriteLine(string.Format("リストア：\"{0}\" {1}", info.FileName, info.Arguments));
+    #endif
+
+                // リストアする
+                Process process = Process.Start(info);
+                process.WaitForExit(10 * 1000);
+                exitCode = process.ExitCode;
+
+                if (exitCode == 0) {
+                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
+                }
             }
 
-            // 起動情報を設定する
-            ProcessStartInfo info = new ProcessStartInfo() {
-                FileName = settings.App_Postgres_RestoreExePath,
-                Arguments = string.Format(
-                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --data-only --verbose --dbname \"{5}\" \"{4}\"",
-                    settings.App_Postgres_Host,
-                    settings.App_Postgres_Port,
-                    settings.App_Postgres_UserName,
-                    settings.App_Postgres_Role,
-                    ofd.FileName,
-#if DEBUG
-                    settings.App_Postgres_DatabaseName_Debug
-#else
-                    settings.App_Postgres_DatabaseName
-#endif
-                    ),
-                WindowStyle = ProcessWindowStyle.Hidden
-            };
-#if DEBUG
-            Console.WriteLine(string.Format("リストア：\"{0}\" {1}", info.FileName, info.Arguments));
-#endif
-
-            // リストアする
-            Process process = Process.Start(info);
-            process.WaitForExit(10 * 1000);
-
-            if (process.ExitCode == 0) {
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
-
-                this.WaitCursorCountDecrement();
-
+            if (exitCode == 0) {
                 MessageBox.Show(MessageText.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                this.WaitCursorCountDecrement();
-
                 MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
@@ -466,6 +469,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void ExportCustomFileCommand_Excuted(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             Properties.Settings settings = Properties.Settings.Default;
 
             string directory = string.Empty;
@@ -491,36 +496,37 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             settings.App_CustomFormatFilePath = Path.Combine(sfd.InitialDirectory, sfd.FileName);
             settings.Save();
 
-            this.WaitCursorCountIncrement();
-
-            // 起動情報を設定する
-            ProcessStartInfo info = new ProcessStartInfo() {
-                FileName = settings.App_Postgres_DumpExePath,
-                Arguments = string.Format(
-                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
-                    settings.App_Postgres_Host,
-                    settings.App_Postgres_Port,
-                    settings.App_Postgres_UserName,
-                    settings.App_Postgres_Role,
-                    sfd.FileName,
+            int exitCode = -1;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                // 起動情報を設定する
+                ProcessStartInfo info = new ProcessStartInfo() {
+                    FileName = settings.App_Postgres_DumpExePath,
+                    Arguments = string.Format(
+                        "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --no-password --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
+                        settings.App_Postgres_Host,
+                        settings.App_Postgres_Port,
+                        settings.App_Postgres_UserName,
+                        settings.App_Postgres_Role,
+                        sfd.FileName,
 #if DEBUG
-                    settings.App_Postgres_DatabaseName_Debug
+                        settings.App_Postgres_DatabaseName_Debug
 #else
                     settings.App_Postgres_DatabaseName
 #endif
-                    ),
-                WindowStyle = ProcessWindowStyle.Hidden
-            };
+                        ),
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
 #if DEBUG
-            Console.WriteLine(string.Format("ダンプ：\"{0}\" {1}", info.FileName, info.Arguments));
+                Console.WriteLine(string.Format("ダンプ：\"{0}\" {1}", info.FileName, info.Arguments));
 #endif
 
-            // バックアップする
-            Process process = Process.Start(info);
-            process.WaitForExit(10 * 1000);
-            this.WaitCursorCountDecrement();
+                // バックアップする
+                Process process = Process.Start(info);
+                process.WaitForExit(10 * 1000);
+                exitCode = process.ExitCode;
+            }
 
-            if (process.ExitCode == 0) {
+            if (exitCode == 0) {
                 MessageBox.Show(MessageText.FinishToExport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
@@ -546,11 +552,11 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void BackUpCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WaitCursorCountIncrement();
+            Log.Info();
 
-            this.CreateBackUpFile();
-
-            this.WaitCursorCountDecrement();
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                this.CreateBackUpFile();
+            }
 
             MessageBox.Show(MessageText.FinishToBackUp, MessageTitle.Information);
         }
@@ -573,6 +579,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void ExitWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.Close();
         }
         #endregion
@@ -606,6 +614,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void ShowFindBoxCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.WVM.SelectedFindKind = FindKind.Find;
         }
 
@@ -627,6 +637,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void ShowReplaceBoxCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.WVM.SelectedFindKind = FindKind.Replace;
         }
 
@@ -648,6 +660,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void MoveToBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             this.mrw.LoadWindowSetting();
@@ -684,6 +698,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void AddActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             this.arw.LoadWindowSetting();
@@ -720,6 +736,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private void AddActionListCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             this.alrw.LoadWindowSetting();
@@ -757,6 +775,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// <param name="e"></param>
         private async void EditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             // グループ種別を特定する
             int? groupKind = null;
             using (DaoBase dao = this.builder.Build()) {
@@ -849,6 +869,8 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         /// <param name="e"></param>
         private async void CopyActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             // グループ種別を特定する
             int? groupKind = null;
             using (DaoBase dao = this.builder.Build()) {
@@ -918,6 +940,8 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         /// <param name="e"></param>
         private async void DeleteActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Comformation, 
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 // 帳簿項目IDが0を超える項目についてループ
@@ -1005,6 +1029,8 @@ WHERE group_id = @{0} AND del_flg = 0;", groupId, Updater);
         /// <param name="e"></param>
         private async void ChangeIsMatchCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             using (DaoBase dao = this.builder.Build()) {
                 // 帳簿項目IDが0を超える項目についてループ
                 foreach (ActionViewModel vm in this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; })) {
@@ -1036,6 +1062,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void ShowBookTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.WVM.SelectedTab = Tabs.BooksTab;
         }
 
@@ -1056,6 +1084,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void ShowDailyGraphTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.WVM.SelectedTab = Tabs.DailyGraphTab;
         }
 
@@ -1076,6 +1106,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void ShowMonthlyListTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.WVM.SelectedTab = Tabs.MonthlyListTab;
         }
 
@@ -1096,6 +1128,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void ShowMonthlyGraphTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.WVM.SelectedTab = Tabs.MonthlyGraphTab;
         }
 
@@ -1116,6 +1150,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void ShowYearlyListTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.WVM.SelectedTab = Tabs.YearlyListTab;
         }
 
@@ -1136,6 +1172,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void ShowYearlyGraphTabCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.WVM.SelectedTab = Tabs.YearlyGraphTab;
         }
         #endregion
@@ -1159,12 +1197,12 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void GoToLastMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WaitCursorCountIncrement();
+            Log.Info();
 
-            this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
-            await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
-
-            this.WaitCursorCountDecrement();
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
+                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
+            }
         }
 
         /// <summary>
@@ -1187,12 +1225,12 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void GoToThisMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WaitCursorCountIncrement();
+            Log.Info();
 
-            this.WVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
-            await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
-
-            this.WaitCursorCountDecrement();
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                this.WVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
+                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
+            }
         }
 
         /// <summary>
@@ -1213,12 +1251,12 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void GoToNextMonthCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WaitCursorCountIncrement();
+            Log.Info();
 
-            this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
-            await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
-
-            this.WaitCursorCountDecrement();
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
+                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
+            }
         }
 
         /// <summary>
@@ -1228,6 +1266,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void OpenSelectingDailyTermWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             TermWindow stw = null;
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
@@ -1240,14 +1280,12 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             stw.LoadWindowSetting();
 
             if (stw.ShowDialog() == true) {
-                this.WaitCursorCountIncrement();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    this.WVM.StartDate = stw.WVM.StartDate;
+                    this.WVM.EndDate = stw.WVM.EndDate;
 
-                this.WVM.StartDate = stw.WVM.StartDate;
-                this.WVM.EndDate = stw.WVM.EndDate;
-
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
-
-                this.WaitCursorCountDecrement();
+                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
+                }
             }
         }
         #endregion
@@ -1271,12 +1309,12 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void GoToLastYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WaitCursorCountIncrement();
+            Log.Info();
 
-            this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(-1);
-            await this.UpdateAsync(isUpdateBookList: true);
-
-            this.WaitCursorCountDecrement();
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(-1);
+                await this.UpdateAsync(isUpdateBookList: true);
+            }
         }
 
         /// <summary>
@@ -1299,12 +1337,12 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void GoToThisYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WaitCursorCountIncrement();
+            Log.Info();
 
-            this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
-            await this.UpdateAsync(isUpdateBookList: true);
-
-            this.WaitCursorCountDecrement();
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
+                await this.UpdateAsync(isUpdateBookList: true);
+            }
         }
 
         /// <summary>
@@ -1325,12 +1363,12 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void GoToNextYearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WaitCursorCountIncrement();
+            Log.Info();
 
-            this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(1);
-            await this.UpdateAsync(isUpdateBookList: true);
-
-            this.WaitCursorCountDecrement();
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(1);
+                await this.UpdateAsync(isUpdateBookList: true);
+            }
         }
         #endregion
 
@@ -1341,11 +1379,11 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void UpdateCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WaitCursorCountIncrement();
+            Log.Info();
 
-            await this.UpdateAsync(isUpdateBookList: true);
-
-            this.WaitCursorCountDecrement();
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                await this.UpdateAsync(isUpdateBookList: true);
+            }
         }
         #endregion
 
@@ -1378,16 +1416,16 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void OpenSettingsWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             SettingsWindow sw = new SettingsWindow(this.builder) { Owner = this };
             sw.LoadWindowSetting();
 
             if (sw.ShowDialog() == true) {
-                this.WaitCursorCountIncrement();
-
-                await this.UpdateAsync(isUpdateBookList: true);
-                this.WVM.RaiseDisplayedYearChanged();
-
-                this.WaitCursorCountDecrement();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    await this.UpdateAsync(isUpdateBookList: true);
+                    this.WVM.RaiseDisplayedYearChanged();
+                }
             }
         }
 
@@ -1419,6 +1457,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void OpenCsvComparisonWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.ccw = new CsvComparisonWindow(this.builder, this.WVM.SelectedBookVM.Id) { Owner = this };
             this.ccw.LoadWindowSetting();
 
@@ -1432,12 +1472,10 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             };
             // 帳簿項目変更時のイベントを登録する
             this.ccw.ActionChanged += async (sender3, e3) => {
-                this.WaitCursorCountIncrement();
-
-                // 帳簿一覧タブを更新する
-                await this.UpdateBookTabDataAsync(isScroll: false, isUpdateActDateLastEdited: true);
-
-                this.WaitCursorCountDecrement();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    // 帳簿一覧タブを更新する
+                    await this.UpdateBookTabDataAsync(isScroll: false, isUpdateActDateLastEdited: true);
+                }
             };
             // 帳簿変更時のイベントを登録する
             this.ccw.BookChanged += (sender4, e4) => {
@@ -1460,6 +1498,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void OpenVersionWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             VersionWindow vw = new VersionWindow { Owner = this };
             vw.MoveOwnersCenter();
 
@@ -1475,6 +1515,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void HideFindBoxCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.WVM.FindText = string.Empty;
             this.WVM.SelectedFindKind = FindKind.None;
         }
@@ -1496,6 +1538,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private void FindActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             this.WVM.FindText = this.WVM.FindInputText;
         }
 
@@ -1506,6 +1550,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         /// <param name="e"></param>
         private async void ReplaceActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            Log.Info();
+
             if (this.WVM.FindInputText == string.Empty) return;
             if (this.WVM.FindInputText == this.WVM.ReplaceText) return;
 
@@ -1609,7 +1655,7 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
                 this.WVM.SelectedGraphKind2Index = settings.MainWindow_SelectedGraphKind2Index;
             }
 
-            Log.Info($"SelectedTabIndex: {this.WVM.SelectedTabIndex} SelectedGraphKind1Index: {this.WVM.SelectedGraphKind1Index} SelectedGraphKind2Index: {this.WVM.SelectedGraphKind2Index}");
+            Log.Info($"SelectedTabIndex:{this.WVM.SelectedTabIndex} SelectedGraphKind1Index:{this.WVM.SelectedGraphKind1Index} SelectedGraphKind2Index:{this.WVM.SelectedGraphKind2Index}");
 
             await this.UpdateAsync(isScroll: true, isUpdateActDateLastEdited: true);
 
@@ -1704,6 +1750,8 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
         /// <param name="e"></param>
         private void MonthlyListDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            Log.Info();
+
             if (this.WVM.SelectedTab != Tabs.MonthlyListTab) return;
 
             if (e.MouseDevice.DirectlyOver is FrameworkElement fe) {
@@ -1727,6 +1775,8 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
         /// <param name="e"></param>
         private void YearlyListDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            Log.Info();
+
             if (this.WVM.SelectedTab != Tabs.YearlyListTab) return;
 
             if (e.MouseDevice.DirectlyOver is FrameworkElement fe) {
@@ -1755,7 +1805,7 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
         private async Task UpdateAsync(bool isUpdateBookList = false, bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
-            Log.Info($"isUpdateBookList: {isUpdateBookList} isScroll: {isScroll} isUpdateActDateLastEdited: {isUpdateActDateLastEdited}");
+            Log.Info($"isUpdateBookList:{isUpdateBookList} isScroll:{isScroll} isUpdateActDateLastEdited:{isUpdateActDateLastEdited}");
 
             if (isUpdateBookList) await this.UpdateBookListAsync();
 
@@ -1790,10 +1840,10 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
         /// <param name="bookId">選択対象の帳簿ID</param>
         private async Task UpdateBookListAsync(int? bookId = null)
         {
-            Log.Info($"bookId: {bookId}");
+            Log.Info($"bookId:{bookId}");
 
             int? tmpBookId = bookId ?? this.WVM.SelectedBookVM?.Id;
-            Log.Info($"tmpBookId: {tmpBookId}");
+            Log.Info($"tmpBookId:{tmpBookId}");
 
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>() {
                 new BookViewModel() { Id = null, Name = "一覧" }
@@ -1855,7 +1905,7 @@ ORDER BY sort_order;");
         /// <returns>帳簿項目VMリスト</returns>
         private async Task<ObservableCollection<ActionViewModel>> LoadActionViewModelListWithinMonthAsync(int? targetBookId, DateTime includedTime)
         {
-            Log.Info($"targetBookId: {targetBookId}, includedTime: {includedTime}");
+            Log.Info($"targetBookId:{targetBookId}, includedTime:{includedTime:yyyy/MM/dd}");
 
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.GetLastDateOfMonth();
@@ -1871,7 +1921,7 @@ ORDER BY sort_order;");
         /// <returns>帳簿項目VMリスト</returns>
         private async Task<ObservableCollection<ActionViewModel>> LoadActionViewModelListAsync(int? targetBookId, DateTime startTime, DateTime endTime)
         {
-            Log.Info($"targetBookId: {targetBookId} startTime:{startTime} endTime:{endTime}");
+            Log.Info($"targetBookId:{targetBookId} startTime:{startTime:yyyy/MM/dd} endTime:{endTime:yyyy/MM/dd}");
 
             ObservableCollection<ActionViewModel> actionVMList = new ObservableCollection<ActionViewModel>();
             using (DaoBase dao = this.builder.Build()) {
@@ -2012,7 +2062,7 @@ ORDER BY act_time, balance_kind, c_order, i_order, action_id;", targetBookId, st
         /// <returns>概要VMリスト</returns>
         private async Task<ObservableCollection<SummaryViewModel>> LoadSummaryViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
         {
-            Log.Info($"bookId: {bookId} includedTime: {includedTime}");
+            Log.Info($"bookId:{bookId} includedTime:{includedTime:yyyy/MM/dd}");
 
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.GetLastDateOfMonth();
@@ -2028,7 +2078,7 @@ ORDER BY act_time, balance_kind, c_order, i_order, action_id;", targetBookId, st
         /// <returns>概要VMリスト</returns>
         private async Task<ObservableCollection<SummaryViewModel>> LoadSummaryViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
         {
-            Log.Info($"bookId: {bookId} startTime: {startTime} endTime: {endTime}");
+            Log.Info($"bookId:{bookId} startTime:{startTime:yyyy/MM/dd} endTime:{endTime:yyyy/MM/dd}");
 
             ObservableCollection<SummaryViewModel> summaryVMList = new ObservableCollection<SummaryViewModel>();
 
@@ -2139,7 +2189,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         /// <returns>月内日別系列VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadDailySeriesViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
         {
-            Log.Info($"bookId: {bookId} includedTime: {includedTime}");
+            Log.Info($"bookId:{bookId} includedTime:{includedTime:yyyy/MM/dd}");
 
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.GetLastDateOfMonth();
@@ -2156,7 +2206,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         /// <returns>日別系列VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadDailySeriesViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
         {
-            Log.Info($"bookId: {bookId} startTime: {startTime} endTime: {endTime}");
+            Log.Info($"bookId:{bookId} startTime:{startTime:yyyy/MM/dd} endTime:{endTime:yyyy/MM/dd}");
 
             // 開始日までの収支を取得する
             int balance = 0;
@@ -2267,7 +2317,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <returns>年度内月別系列VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadMonthlySeriesViewModelListWithinYearAsync(int? bookId, DateTime includedTime)
         {
-            Log.Info($"bookId: {bookId} includedTime: {includedTime}");
+            Log.Info($"bookId:{bookId} includedTime:{includedTime:yyyy/MM/dd}");
 
             DateTime startTime = includedTime.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             DateTime endTime = startTime.GetLastDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
@@ -2377,7 +2427,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <returns>年別系列VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadYearlySeriesViewModelListWithinDecadeAsync(int? bookId)
         {
-            Log.Info($"bookId: {bookId}");
+            Log.Info($"bookId:{bookId}");
 
             Settings settings = Settings.Default;
             DateTime startTime = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).AddYears(-9);
@@ -2498,7 +2548,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             if (this.WVM.SelectedTab != Tabs.BooksTab) return;
 
             List<int> emptyIdList = new List<int>();
-            Log.Info($"actionIdList: {string.Join(",", actionIdList ?? emptyIdList)} balanceKind: {balanceKind} categoryId: {categoryId} itemId: {itemId} isScroll: {isScroll} isUpdateActDateLastEdited: {isUpdateActDateLastEdited}");
+            Log.Info($"actionIdList:{string.Join(",", actionIdList ?? emptyIdList)} balanceKind:{balanceKind} categoryId:{categoryId} itemId:{itemId} isScroll:{isScroll} isUpdateActDateLastEdited:{isUpdateActDateLastEdited}");
 
             // 指定がなければ、更新前の帳簿項目の選択を維持する
             List<int> tmpActionIdList = actionIdList ?? new List<int>(this.WVM.SelectedActionVMList.Select((tmp) => tmp.ActionId));
@@ -2506,7 +2556,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             int? tmpBalanceKind = balanceKind ?? this.WVM.SelectedBalanceKind;
             int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId;
             int? tmpItemId = itemId ?? this.WVM.SelectedItemId;
-            Log.Info($"tmpActionIdList: {string.Join(",", tmpActionIdList ?? emptyIdList)} tmpBalanceKind: {tmpBalanceKind} tmpCategoryId: {tmpCategoryId} tmpItemId: {tmpItemId}");
+            Log.Info($"tmpActionIdList:{string.Join(",", tmpActionIdList ?? emptyIdList)} tmpBalanceKind:{tmpBalanceKind} tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
 
             // 表示するデータを指定する
             switch (this.WVM.DisplayedTermKind) {
@@ -2647,11 +2697,11 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.DailyGraphTab) return;
 
-            Log.Info($"categoryId: {categoryId} itemId: {itemId}");
+            Log.Info($"categoryId:{categoryId} itemId:{itemId}");
 
             int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId;
             int? tmpItemId = itemId ?? this.WVM.SelectedItemId ?? null;
-            Log.Info($"tmpCategoryId: {tmpCategoryId} tmpItemId: {tmpItemId}");
+            Log.Info($"tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
 
             switch (this.WVM.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndOutgoGraph: {
@@ -2820,12 +2870,12 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.MonthlyListTab) return;
 
-            Log.Info($"balanceKind: {balanceKind} categoryId: {categoryId} itemId: {itemId}");
+            Log.Info($"balanceKind:{balanceKind} categoryId:{categoryId} itemId:{itemId}");
 
             int? tmpBalanceKind = balanceKind ?? this.WVM.SelectedBalanceKind;
             int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId;
             int? tmpItemId = itemId ?? this.WVM.SelectedItemId;
-            Log.Info($"tmpBalanceKind: {tmpBalanceKind} tmpCategoryId: {tmpCategoryId} tmpItemId: {tmpItemId}");
+            Log.Info($"tmpBalanceKind:{tmpBalanceKind} tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
 
             int startMonth = Properties.Settings.Default.App_StartMonth;
             DateTime tmpMonth = this.WVM.DisplayedYear.GetFirstDateOfFiscalYear(startMonth);
@@ -2929,11 +2979,11 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.MonthlyGraphTab) return;
 
-            Log.Info($"categoryId: {categoryId} itemId: {itemId}");
+            Log.Info($"categoryId:{categoryId} itemId:{itemId}");
 
             int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId;
             int? tmpItemId = itemId ?? this.WVM.SelectedItemId;
-            Log.Info($"tmpCategoryId: {tmpCategoryId} tmpItemId: {tmpItemId}");
+            Log.Info($"tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
 
             Settings settings = Settings.Default;
             int startMonth = settings.App_StartMonth;
@@ -3096,12 +3146,12 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.YearlyListTab) return;
 
-            Log.Info($"balanceKind: {balanceKind} categoryId: {categoryId} itemId: {itemId}");
+            Log.Info($"balanceKind:{balanceKind} categoryId:{categoryId} itemId:{itemId}");
 
             int? tmpBalanceKind = balanceKind ?? this.WVM.SelectedBalanceKind;
             int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId;
             int? tmpItemId = itemId ?? this.WVM.SelectedItemId;
-            Log.Info($"tmpBalanceKind: {tmpBalanceKind} tmpCategoryId: {tmpCategoryId} tmpItemId: {tmpItemId}");
+            Log.Info($"tmpBalanceKind:{tmpBalanceKind} tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
 
             Settings settings = Settings.Default;
             int startMonth = settings.App_StartMonth;
@@ -3208,11 +3258,11 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         {
             if (this.WVM.SelectedTab != Tabs.YearlyGraphTab) return;
 
-            Log.Info($"categoryId: {categoryId} itemId: {itemId}");
+            Log.Info($"categoryId:{categoryId} itemId:{itemId}");
 
             int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId;
             int? tmpItemId = itemId ?? this.WVM.SelectedItemId;
-            Log.Info($"tmpCategoryId: {tmpCategoryId} tmpItemId: {tmpItemId}");
+            Log.Info($"tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
 
             Settings settings = Settings.Default;
             int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
@@ -3457,53 +3507,45 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // タブ選択変更時
             this.WVM.SelectedTabChanged += async () => {
-                Log.Info($"SelectedTabChanged SelectedTabIndex: {this.WVM.SelectedTabIndex}");
+                Log.Info($"SelectedTabChanged SelectedTabIndex:{this.WVM.SelectedTabIndex}");
 
-                this.WaitCursorCountIncrement();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    settings.MainWindow_SelectedTabIndex = this.WVM.SelectedTabIndex;
+                    settings.Save();
 
-                settings.MainWindow_SelectedTabIndex = this.WVM.SelectedTabIndex;
-                settings.Save();
-
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
-
-                this.WaitCursorCountDecrement();
+                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
+                }
             };
             // 帳簿選択変更時
             this.WVM.SelectedBookChanged += async () => {
-                Log.Info($"SelectedBookChanged SelectedBookId: {this.WVM.SelectedBookVM?.Id}");
+                Log.Info($"SelectedBookChanged SelectedBookId:{this.WVM.SelectedBookVM?.Id}");
 
-                this.WaitCursorCountIncrement();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    settings.MainWindow_SelectedBookId = this.WVM.SelectedBookVM?.Id ?? -1;
+                    settings.Save();
 
-                settings.MainWindow_SelectedBookId = this.WVM.SelectedBookVM?.Id ?? -1;
-                settings.Save();
-
-                await this.UpdateAsync(isScroll: true);
-
-                this.WaitCursorCountDecrement();
+                    await this.UpdateAsync(isScroll: true);
+                }
             };
             // グラフ種別選択変更時
             this.WVM.SelectedGraphKindChanged += async () => {
-                Log.Info($"SelectedGraphKindChanged SelectedGraphKind1Index: {this.WVM.SelectedGraphKind1Index} SelectedGraphKind2Index: {this.WVM.SelectedGraphKind2Index}");
+                Log.Info($"SelectedGraphKindChanged SelectedGraphKind1Index:{this.WVM.SelectedGraphKind1Index} SelectedGraphKind2Index:{this.WVM.SelectedGraphKind2Index}");
 
-                this.WaitCursorCountIncrement();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    settings.MainWindow_SelectedGraphKindIndex = this.WVM.SelectedGraphKind1Index;
+                    settings.MainWindow_SelectedGraphKind2Index = this.WVM.SelectedGraphKind2Index;
+                    settings.Save();
 
-                settings.MainWindow_SelectedGraphKindIndex = this.WVM.SelectedGraphKind1Index;
-                settings.MainWindow_SelectedGraphKind2Index = this.WVM.SelectedGraphKind2Index;
-                settings.Save();
-
-                await this.UpdateAsync();
-
-                this.WaitCursorCountDecrement();
+                    await this.UpdateAsync();
+                }
             };
             // 系列選択変更時
             this.WVM.SelectedSeriesChanged += () => {
                 Log.Info("SelectedSeriesChanged");
 
-                this.WaitCursorCountIncrement();
-
-                this.UpdateSelectedGraph();
-
-                this.WaitCursorCountDecrement();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    this.UpdateSelectedGraph();
+                }
             };
         }
 

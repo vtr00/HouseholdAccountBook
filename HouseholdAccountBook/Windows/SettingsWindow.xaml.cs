@@ -18,6 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 using static HouseholdAccountBook.ViewModels.HierarchicalSettingViewModel;
 
 namespace HouseholdAccountBook.Windows
@@ -85,25 +86,27 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void AddCategoryCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            HierarchicalSettingViewModel vm = this.WVM.SelectedItemVM;
-            while (vm.Kind != HierarchicalKind.Balance) {
-                vm = vm.ParentVM;
-            }
-            BalanceKind kind = (BalanceKind)vm.Id;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                HierarchicalSettingViewModel vm = this.WVM.SelectedItemVM;
+                while (vm.Kind != HierarchicalKind.Balance) {
+                    vm = vm.ParentVM;
+                }
+                BalanceKind kind = (BalanceKind)vm.Id;
 
-            int categoryId = -1;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+                int categoryId = -1;
+                using (DaoBase dao = this.builder.Build()) {
+                    DaoReader reader = await dao.ExecQueryAsync(@"
 INSERT INTO mst_category (category_name, balance_kind, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES ('(no name)', @{0}, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_category), 0, 'now', @{1}, 'now', @{2})
 RETURNING category_id;", (int)kind, Updater, Inserter);
 
-                reader.ExecARow((record) => {
-                    categoryId = record.ToInt("category_id");
-                });
+                    reader.ExecARow((record) => {
+                        categoryId = record.ToInt("category_id");
+                    });
+                }
+                await this.UpdateItemSettingsTabDataAsync(HierarchicalKind.Category, categoryId);
+                this.needToUpdate = true;
             }
-            await this.UpdateItemSettingsTabDataAsync(HierarchicalKind.Category, categoryId);
-            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -123,25 +126,27 @@ RETURNING category_id;", (int)kind, Updater, Inserter);
         /// <param name="e"></param>
         private async void AddItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            HierarchicalSettingViewModel vm = this.WVM.SelectedItemVM;
-            while (vm.Kind != HierarchicalKind.Category) {
-                vm = vm.ParentVM;
-            }
-            int categoryId = vm.Id;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                HierarchicalSettingViewModel vm = this.WVM.SelectedItemVM;
+                while (vm.Kind != HierarchicalKind.Category) {
+                    vm = vm.ParentVM;
+                }
+                int categoryId = vm.Id;
 
-            int itemId = -1;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+                int itemId = -1;
+                using (DaoBase dao = this.builder.Build()) {
+                    DaoReader reader = await dao.ExecQueryAsync(@"
 INSERT INTO mst_item (item_name, category_id, advance_flg, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES ('(no name)', @{0}, 0, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), 0, 'now', @{1}, 'now', @{2})
 RETURNING item_id;", categoryId, Updater, Inserter);
 
-                reader.ExecARow((record) => {
-                    itemId = record.ToInt("item_id");
-                });
+                    reader.ExecARow((record) => {
+                        itemId = record.ToInt("item_id");
+                    });
+                }
+                await this.UpdateItemSettingsTabDataAsync(HierarchicalKind.Item, itemId);
+                this.needToUpdate = true;
             }
-            await this.UpdateItemSettingsTabDataAsync(HierarchicalKind.Item, itemId);
-            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -161,12 +166,13 @@ RETURNING item_id;", categoryId, Updater, Inserter);
         /// <param name="e"></param>
         private async void DeleteItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            HierarchicalKind kind = this.WVM.SelectedItemVM.Kind;
-            int id = this.WVM.SelectedItemVM.Id;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                HierarchicalKind kind = this.WVM.SelectedItemVM.Kind;
+                int id = this.WVM.SelectedItemVM.Id;
 
-            using (DaoBase dao = this.builder.Build()) {
-                switch (kind) {
-                    case HierarchicalKind.Category: {
+                using (DaoBase dao = this.builder.Build()) {
+                    switch (kind) {
+                        case HierarchicalKind.Category: {
                             await dao.ExecTransactionAsync(async () => {
                                 DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT 1
@@ -186,7 +192,7 @@ WHERE category_id = @{1};", Updater, id);
                             });
                         }
                         break;
-                    case HierarchicalKind.Item: {
+                        case HierarchicalKind.Item: {
                             await dao.ExecTransactionAsync(async () => {
                                 DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT *
@@ -205,10 +211,11 @@ WHERE item_id = @{1};", Updater, id);
                             });
                         }
                         break;
+                    }
                 }
+                await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM.ParentVM.Kind, this.WVM.SelectedItemVM.ParentVM.Id);
+                this.needToUpdate = true;
             }
-            await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM.ParentVM.Kind, this.WVM.SelectedItemVM.ParentVM.Id);
-            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -242,15 +249,16 @@ WHERE item_id = @{1};", Updater, id);
         /// <param name="e"></param>
         private async void RaiseItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var parentVM = this.WVM.SelectedItemVM.ParentVM;
-            int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
-            int changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
-            if (0 < index) {
-                int changedId = parentVM.ChildrenVMList[index - 1].Id; // 入れ替え対象の項目のID
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                var parentVM = this.WVM.SelectedItemVM.ParentVM;
+                int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
+                int changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
+                if (0 < index) {
+                    int changedId = parentVM.ChildrenVMList[index - 1].Id; // 入れ替え対象の項目のID
 
-                using (DaoBase dao = this.builder.Build()) {
-                    switch (this.WVM.SelectedItemVM.Kind) {
-                        case HierarchicalKind.Category: {
+                    using (DaoBase dao = this.builder.Build()) {
+                        switch (this.WVM.SelectedItemVM.Kind) {
+                            case HierarchicalKind.Category: {
                                 await dao.ExecTransactionAsync(async () => {
                                     DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT sort_order
@@ -274,7 +282,7 @@ WHERE category_id = @{2};", tmpOrder, Updater, changingId);
                                 });
                             }
                             break;
-                        case HierarchicalKind.Item: {
+                            case HierarchicalKind.Item: {
                                 await dao.ExecTransactionAsync(async () => {
                                     DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT sort_order
@@ -298,25 +306,26 @@ WHERE item_id = @{2};", tmpOrder, Updater, changingId);
                                 });
                             }
                             break;
+                        }
                     }
                 }
-            }
-            else { // 分類を跨いで項目の表示順を変更するとき
-                Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
-                var grandparentVM = parentVM.ParentVM;
-                int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
-                int toCategoryId = grandparentVM.ChildrenVMList[index2 - 1].Id;
+                else { // 分類を跨いで項目の表示順を変更するとき
+                    Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                    var grandparentVM = parentVM.ParentVM;
+                    int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
+                    int toCategoryId = grandparentVM.ChildrenVMList[index2 - 1].Id;
 
-                using (DaoBase dao = this.builder.Build()) {
-                    await dao.ExecNonQueryAsync(@"
+                    using (DaoBase dao = this.builder.Build()) {
+                        await dao.ExecNonQueryAsync(@"
 UPDATE mst_item
 SET category_id = @{0}, sort_order = (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), update_time = 'now', updater = @{1}
 WHERE item_id = @{2};", toCategoryId, Updater, changingId);
+                    }
                 }
-            }
 
-            await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
-            this.needToUpdate = true;
+                await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
+                this.needToUpdate = true;
+            }
         }
 
         /// <summary>
@@ -350,15 +359,16 @@ WHERE item_id = @{2};", toCategoryId, Updater, changingId);
         /// <param name="e"></param>
         private async void DropItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var parentVM = this.WVM.SelectedItemVM.ParentVM;
-            int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
-            int changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
-            if (parentVM.ChildrenVMList.Count - 1 > index) {
-                int changedId = parentVM.ChildrenVMList[index + 1].Id; // 入れ替え対象の項目のID
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                var parentVM = this.WVM.SelectedItemVM.ParentVM;
+                int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
+                int changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
+                if (parentVM.ChildrenVMList.Count - 1 > index) {
+                    int changedId = parentVM.ChildrenVMList[index + 1].Id; // 入れ替え対象の項目のID
 
-                using (DaoBase dao = this.builder.Build()) {
-                    switch (this.WVM.SelectedItemVM.Kind) {
-                        case HierarchicalKind.Category: {
+                    using (DaoBase dao = this.builder.Build()) {
+                        switch (this.WVM.SelectedItemVM.Kind) {
+                            case HierarchicalKind.Category: {
                                 await dao.ExecTransactionAsync(async () => {
                                     DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT sort_order
@@ -382,7 +392,7 @@ WHERE category_id = @{2};", tmpOrder, Updater, changingId);
                                 });
                             }
                             break;
-                        case HierarchicalKind.Item: {
+                            case HierarchicalKind.Item: {
                                 await dao.ExecTransactionAsync(async () => {
                                     DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT sort_order
@@ -406,56 +416,57 @@ WHERE item_id = @{2};", tmpOrder, Updater, changingId);
                                 });
                             }
                             break;
+                        }
                     }
                 }
-            }
-            else { // 分類を跨いで項目の表示順を変更するとき
-                Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
-                var grandparentVM = parentVM.ParentVM;
-                int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
-                int toCategoryId = grandparentVM.ChildrenVMList[index2 + 1].Id;
+                else { // 分類を跨いで項目の表示順を変更するとき
+                    Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                    var grandparentVM = parentVM.ParentVM;
+                    int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
+                    int toCategoryId = grandparentVM.ChildrenVMList[index2 + 1].Id;
 
-                using (DaoBase dao = this.builder.Build()) {
-                    await dao.ExecTransactionAsync(async () => {
-                        // 種別IDを更新する
-                        await dao.ExecNonQueryAsync(@"
+                    using (DaoBase dao = this.builder.Build()) {
+                        await dao.ExecTransactionAsync(async () => {
+                            // 種別IDを更新する
+                            await dao.ExecNonQueryAsync(@"
 UPDATE mst_item
 SET category_id = @{0}, update_time = 'now', updater = @{1}
 WHERE item_id = @{2};", toCategoryId, Updater, changingId);
 
-                        // 移動対象のソート順を取得する
-                        int tmpOrder = -1;
-                        DaoReader reader = await dao.ExecQueryAsync(@"
+                            // 移動対象のソート順を取得する
+                            int tmpOrder = -1;
+                            DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT sort_order
 FROM mst_item
 WHERE item_id = @{0};", changingId);
-                        reader.ExecARow((record) => {
-                            tmpOrder = record.ToInt("sort_order");
-                        });
-                        foreach (var vm in grandparentVM.ChildrenVMList[index2 + 1].ChildrenVMList) {
-                            int changedId = vm.Id;
+                            reader.ExecARow((record) => {
+                                tmpOrder = record.ToInt("sort_order");
+                            });
+                            foreach (var vm in grandparentVM.ChildrenVMList[index2 + 1].ChildrenVMList) {
+                                int changedId = vm.Id;
 
-                            // ソート順が若ければ、移動対象のソート順を移動先のソート順に変更する
-                            int num = await dao.ExecNonQueryAsync(@"
+                                // ソート順が若ければ、移動対象のソート順を移動先のソート順に変更する
+                                int num = await dao.ExecNonQueryAsync(@"
 UPDATE mst_item
 SET sort_order = (SELECT sort_order FROM mst_item WHERE item_id = @{0}), update_time = 'now', updater = @{1}
 WHERE item_id = @{2} AND (SELECT sort_order FROM mst_item WHERE item_id = @{0}) < @{3};", changedId, Updater, changingId, tmpOrder);
 
-                            if (num == 0) { break; }
+                                if (num == 0) { break; }
 
-                            // 移動先のソート順を移動対象のソート順に変更する
-                            await dao.ExecNonQueryAsync(@"
+                                // 移動先のソート順を移動対象のソート順に変更する
+                                await dao.ExecNonQueryAsync(@"
 UPDATE mst_item
 SET sort_order = @{0}, update_time = 'now', updater = @{1}
 WHERE item_id = @{2};", tmpOrder, Updater, changedId);
-                            changingId = changedId;
-                        }
-                    });
+                                changingId = changedId;
+                            }
+                        });
+                    }
                 }
-            }
 
-            await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
-            this.needToUpdate = true;
+                await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
+                this.needToUpdate = true;
+            }
         }
 
         /// <summary>
@@ -476,30 +487,32 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
         /// <param name="e"></param>
         private async void SaveItemInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            HierarchicalKind kind = this.WVM.SelectedItemVM.Kind;
-            int id = this.WVM.SelectedItemVM.Id;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                HierarchicalKind kind = this.WVM.SelectedItemVM.Kind;
+                int id = this.WVM.SelectedItemVM.Id;
 
-            using (DaoBase dao = this.builder.Build()) {
-                switch (kind) {
-                    case HierarchicalKind.Category: {
+                using (DaoBase dao = this.builder.Build()) {
+                    switch (kind) {
+                        case HierarchicalKind.Category: {
                             await dao.ExecNonQueryAsync(@"
 UPDATE mst_category
 SET category_name = @{0}, update_time = 'now', updater = @{1}
 WHERE category_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
                         }
                         break;
-                    case HierarchicalKind.Item: {
+                        case HierarchicalKind.Item: {
                             await dao.ExecNonQueryAsync(@"
 UPDATE mst_item
 SET item_name = @{0}, update_time = 'now', updater = @{1}
 WHERE item_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
                         }
                         break;
+                    }
                 }
-            }
 
-            MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
-            this.needToUpdate = true;
+                MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
+                this.needToUpdate = true;
+            }
         }
 
         /// <summary>
@@ -509,46 +522,48 @@ WHERE item_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
         /// <param name="e"></param>
         private async void ChangeItemRelationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
 
-            HierarchicalSettingViewModel vm = this.WVM.SelectedItemVM;
-            vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
-            vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
+                HierarchicalSettingViewModel vm = this.WVM.SelectedItemVM;
+                vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
+                vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
 
-            using (DaoBase dao = this.builder.Build()) {
-                await dao.ExecTransactionAsync(async () => {
-                    DaoReader reader = await dao.ExecQueryAsync(@"
+                using (DaoBase dao = this.builder.Build()) {
+                    await dao.ExecTransactionAsync(async () => {
+                        DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT *
 FROM rel_book_item
 WHERE item_id = @{0} AND book_id = @{1};", vm.Id, vm.SelectedRelationVM.Id);
 
-                    if (reader.Count == 0) {
-                        await dao.ExecNonQueryAsync(@"
+                        if (reader.Count == 0) {
+                            await dao.ExecNonQueryAsync(@"
 INSERT INTO rel_book_item (book_id, item_id, del_flg, insert_time, inserter, update_time, updater)
 VALUES (@{0}, @{1}, 0, 'now', @{2}, 'now', @{3});", vm.SelectedRelationVM.Id, vm.Id, Inserter, Updater);
-                        vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
-                    }
-                    else {
-                        reader = await dao.ExecQueryAsync(@"
+                            vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
+                        }
+                        else {
+                            reader = await dao.ExecQueryAsync(@"
 SELECT *
 FROM hst_action
 WHERE book_id = @{0} AND item_id = @{1} AND del_flg = 0;", vm.SelectedRelationVM.Id, vm.Id);
 
-                        if (reader.Count != 0) {
-                            MessageBox.Show("帳簿内の該当する項目に帳簿項目が存在するので削除できません。"); // TODO
-                            e.Handled = true;
-                            return;
-                        }
+                            if (reader.Count != 0) {
+                                MessageBox.Show("帳簿内の該当する項目に帳簿項目が存在するので削除できません。"); // TODO
+                                e.Handled = true;
+                                return;
+                            }
 
-                        vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
-                        await dao.ExecNonQueryAsync(@"
+                            vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
+                            await dao.ExecNonQueryAsync(@"
 UPDATE rel_book_item
 SET del_flg = @{0}, update_time = 'now', updater = @{1}
 WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 : 1, Updater, vm.Id, vm.SelectedRelationVM.Id);
-                    }
-                });
+                        }
+                    });
+                }
+                this.needToUpdate = true;
             }
-            this.needToUpdate = true;
         }
 
         /// <summary>
@@ -570,15 +585,17 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         {
             if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, 
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
 
-                using (DaoBase dao = this.builder.Build()) {
-                    await dao.ExecNonQueryAsync(@"
+                    using (DaoBase dao = this.builder.Build()) {
+                        await dao.ExecNonQueryAsync(@"
 UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedShopVM.Name, this.WVM.SelectedItemVM.Id);
 
-                    // 店舗名を更新する
-                    this.WVM.SelectedItemVM.ShopVMList = await this.LoadShopViewModelListAsync(dao, this.WVM.SelectedItemVM.Id);
+                        // 店舗名を更新する
+                        this.WVM.SelectedItemVM.ShopVMList = await this.LoadShopViewModelListAsync(dao, this.WVM.SelectedItemVM.Id);
+                    }
                 }
             }
         }
@@ -602,15 +619,17 @@ WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.Se
         {
             if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, 
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
 
-                using (DaoBase dao = this.builder.Build()) {
-                    await dao.ExecNonQueryAsync(@"
+                    using (DaoBase dao = this.builder.Build()) {
+                        await dao.ExecNonQueryAsync(@"
 UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE remark = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedRemarkVM.Remark, this.WVM.SelectedItemVM.Id);
 
-                    // 備考欄の表示を更新する
-                    this.WVM.SelectedItemVM.RemarkVMList = await this.LoadRemarkViewModelListAsync(dao, this.WVM.SelectedItemVM.Id);
+                        // 備考欄の表示を更新する
+                        this.WVM.SelectedItemVM.RemarkVMList = await this.LoadRemarkViewModelListAsync(dao, this.WVM.SelectedItemVM.Id);
+                    }
                 }
             }
         }
@@ -624,20 +643,22 @@ WHERE remark = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.Selec
         /// <param name="e"></param>
         private async void AddBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            int bookId = -1;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                int bookId = -1;
+                using (DaoBase dao = this.builder.Build()) {
+                    DaoReader reader = await dao.ExecQueryAsync(@"
 INSERT INTO mst_book (book_name, book_kind, pay_day, initial_value, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES ('(no name)', 0, null, 0, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), 0, 'now', @{0}, 'now', @{1})
 RETURNING book_id;", Updater, Inserter);
 
-                reader.ExecARow((record) => {
-                    bookId = record.ToInt("book_id");
-                });
-            }
+                    reader.ExecARow((record) => {
+                        bookId = record.ToInt("book_id");
+                    });
+                }
 
-            await this.UpdateBookSettingTabDataAsync(bookId);
-            this.needToUpdate = true;
+                await this.UpdateBookSettingTabDataAsync(bookId);
+                this.needToUpdate = true;
+            }
         }
 
         /// <summary>
@@ -657,26 +678,28 @@ RETURNING book_id;", Updater, Inserter);
         /// <param name="e"></param>
         private async void DeleteBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (DaoBase dao = this.builder.Build()) {
-                await dao.ExecTransactionAsync(async () => {
-                    DaoReader reader = await dao.ExecQueryAsync(@"
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (DaoBase dao = this.builder.Build()) {
+                    await dao.ExecTransactionAsync(async () => {
+                        DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT * FROM hst_action
 WHERE book_id = @{0} AND del_flg = 0;", this.WVM.SelectedBookVM.Id);
 
-                    if (reader.Count != 0) {
-                        MessageBox.Show("帳簿内に帳簿項目が存在するので削除できません。"); // TODO
-                        return;
-                    }
+                        if (reader.Count != 0) {
+                            MessageBox.Show("帳簿内に帳簿項目が存在するので削除できません。"); // TODO
+                            return;
+                        }
 
-                    await dao.ExecNonQueryAsync(@"
+                        await dao.ExecNonQueryAsync(@"
 UPDATE mst_book
 SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE book_id = @{1};", Updater, this.WVM.SelectedBookVM.Id);
-                });
-            }
+                    });
+                }
 
-            await this.UpdateBookSettingTabDataAsync();
-            this.needToUpdate = true;
+                await this.UpdateBookSettingTabDataAsync();
+                this.needToUpdate = true;
+            }
         }
 
         /// <summary>
@@ -700,36 +723,38 @@ WHERE book_id = @{1};", Updater, this.WVM.SelectedBookVM.Id);
         /// <param name="e"></param>
         private async void RaiseBookSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            int index = this.WVM.BookVMList.IndexOf(this.WVM.SelectedBookVM);
-            int changedId = this.WVM.BookVMList[index - 1].Id.Value;
-            int changingId = this.WVM.BookVMList[index].Id.Value;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                int index = this.WVM.BookVMList.IndexOf(this.WVM.SelectedBookVM);
+                int changedId = this.WVM.BookVMList[index - 1].Id.Value;
+                int changingId = this.WVM.BookVMList[index].Id.Value;
 
-            using (DaoBase dao = this.builder.Build()) {
-                await dao.ExecTransactionAsync(async () => {
-                    DaoReader reader = await dao.ExecQueryAsync(@"
+                using (DaoBase dao = this.builder.Build()) {
+                    await dao.ExecTransactionAsync(async () => {
+                        DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT sort_order
 FROM mst_book
 WHERE book_id = @{0};", changedId);
 
-                    int tmpOrder = -1;
-                    reader.ExecARow((record) => {
-                        tmpOrder = record.ToInt("sort_order");
-                    });
+                        int tmpOrder = -1;
+                        reader.ExecARow((record) => {
+                            tmpOrder = record.ToInt("sort_order");
+                        });
 
-                    await dao.ExecNonQueryAsync(@"
+                        await dao.ExecNonQueryAsync(@"
 UPDATE mst_book
 SET sort_order = (SELECT sort_order FROM mst_book WHERE book_id = @{0}), update_time = 'now', updater = @{1}
 WHERE book_id = @{2};", changingId, Updater, changedId);
 
-                    await dao.ExecNonQueryAsync(@"
+                        await dao.ExecNonQueryAsync(@"
 UPDATE mst_book
 SET sort_order = @{0}, update_time = 'now', updater = @{1}
 WHERE book_id = @{2};", tmpOrder, Updater, changingId);
-                });
-            }
+                    });
+                }
 
-            await this.UpdateBookSettingTabDataAsync(changingId);
-            this.needToUpdate = true;
+                await this.UpdateBookSettingTabDataAsync(changingId);
+                this.needToUpdate = true;
+            }
         }
 
         /// <summary>
@@ -753,36 +778,38 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
         /// <param name="e"></param>
         private async void DropBookSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            int index = this.WVM.BookVMList.IndexOf(this.WVM.SelectedBookVM);
-            int changedId = this.WVM.BookVMList[index + 1].Id.Value;
-            int changingId = this.WVM.BookVMList[index].Id.Value;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                int index = this.WVM.BookVMList.IndexOf(this.WVM.SelectedBookVM);
+                int changedId = this.WVM.BookVMList[index + 1].Id.Value;
+                int changingId = this.WVM.BookVMList[index].Id.Value;
 
-            using (DaoBase dao = this.builder.Build()) {
-                await dao.ExecTransactionAsync(async () => {
-                    DaoReader reader = await dao.ExecQueryAsync(@"
+                using (DaoBase dao = this.builder.Build()) {
+                    await dao.ExecTransactionAsync(async () => {
+                        DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT sort_order
 FROM mst_book
 WHERE book_id = @{0};", changedId);
 
-                    int tmpOrder = -1;
-                    reader.ExecARow((record) => {
-                        tmpOrder = record.ToInt("sort_order");
-                    });
+                        int tmpOrder = -1;
+                        reader.ExecARow((record) => {
+                            tmpOrder = record.ToInt("sort_order");
+                        });
 
-                    await dao.ExecNonQueryAsync(@"
+                        await dao.ExecNonQueryAsync(@"
 UPDATE mst_book
 SET sort_order = (SELECT sort_order FROM mst_book WHERE book_id = @{0}), update_time = 'now', updater = @{1}
 WHERE book_id = @{2};", changingId, Updater, changedId);
 
-                    await dao.ExecNonQueryAsync(@"
+                        await dao.ExecNonQueryAsync(@"
 UPDATE mst_book
 SET sort_order = @{0}, update_time = 'now', updater = @{1}
 WHERE book_id = @{2};", tmpOrder, Updater, changingId);
-                });
-            }
+                    });
+                }
 
-            await this.UpdateBookSettingTabDataAsync(changingId);
-            this.needToUpdate = true;
+                await this.UpdateBookSettingTabDataAsync(changingId);
+                this.needToUpdate = true;
+            }
         }
 
         /// <summary>
@@ -831,26 +858,28 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
         /// <param name="e"></param>
         private async void SaveBookInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (DaoBase dao = this.builder.Build()) {
-                BookSettingViewModel vm = this.WVM.SelectedBookVM;
-                MstBookJsonObject jsonObj = new MstBookJsonObject() {
-                    StartDate = vm.StartDateExists ? (DateTime?)vm.StartDate : null,
-                    EndDate = vm.EndDateExists ? (DateTime?)vm.EndDate : null,
-                    CsvFolderPath = vm.CsvFolderPath != string.Empty ? vm.CsvFolderPath : null,
-                    CsvActDateIndex = vm.ActDateIndex,
-                    CsvOutgoIndex = vm.OutgoIndex,
-                    CsvItemNameIndex = vm.ItemNameIndex
-                };
-                string jsonCode = JsonConvert.SerializeObject(jsonObj);
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (DaoBase dao = this.builder.Build()) {
+                    BookSettingViewModel vm = this.WVM.SelectedBookVM;
+                    MstBookJsonObject jsonObj = new MstBookJsonObject() {
+                        StartDate = vm.StartDateExists ? (DateTime?)vm.StartDate : null,
+                        EndDate = vm.EndDateExists ? (DateTime?)vm.EndDate : null,
+                        CsvFolderPath = vm.CsvFolderPath != string.Empty ? vm.CsvFolderPath : null,
+                        CsvActDateIndex = vm.ActDateIndex,
+                        CsvOutgoIndex = vm.OutgoIndex,
+                        CsvItemNameIndex = vm.ItemNameIndex
+                    };
+                    string jsonCode = JsonConvert.SerializeObject(jsonObj);
 
-                await dao.ExecNonQueryAsync(@"
+                    await dao.ExecNonQueryAsync(@"
 UPDATE mst_book
 SET book_name = @{0}, book_kind = @{1}, initial_value = @{2}, debit_book_id = @{3}, pay_day = @{4}, json_code = @{5}, update_time = 'now', updater = @{6}
 WHERE book_id = @{7};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.SelectedDebitBookVM.Id == -1 ? null : vm.SelectedDebitBookVM.Id, vm.PayDay, jsonCode, Updater, vm.Id);
-            }
+                }
 
-            MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
-            this.needToUpdate = true;
+                MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
+                this.needToUpdate = true;
+            }
         }
 
         /// <summary>
@@ -860,44 +889,46 @@ WHERE book_id = @{7};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.S
         /// <param name="e"></param>
         private async void ChangeBookRelationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            BookSettingViewModel vm = this.WVM.SelectedBookVM;
-            vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
-            vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                BookSettingViewModel vm = this.WVM.SelectedBookVM;
+                vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
+                vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
 
-            using (DaoBase dao = this.builder.Build()) {
-                await dao.ExecTransactionAsync(async () => {
-                    DaoReader reader = await dao.ExecQueryAsync(@"
+                using (DaoBase dao = this.builder.Build()) {
+                    await dao.ExecTransactionAsync(async () => {
+                        DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT *
 FROM rel_book_item
 WHERE book_id = @{0} AND item_id = @{1};", vm.Id, vm.SelectedRelationVM.Id);
 
-                    if (reader.Count == 0) {
-                        await dao.ExecNonQueryAsync(@"
+                        if (reader.Count == 0) {
+                            await dao.ExecNonQueryAsync(@"
 INSERT INTO rel_book_item (book_id, item_id, del_flg, insert_time, inserter, update_time, updater)
 VALUES (@{0}, @{1}, 0, 'now', @{2}, 'now', @{3});", vm.Id, vm.SelectedRelationVM.Id, Inserter, Updater);
-                        vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
-                    }
-                    else {
-                        reader = await dao.ExecQueryAsync(@"
+                            vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
+                        }
+                        else {
+                            reader = await dao.ExecQueryAsync(@"
 SELECT *
 FROM hst_action
 WHERE book_id = @{0} AND item_id = @{1} AND del_flg = 0;", vm.Id, vm.SelectedRelationVM.Id);
 
-                        if (reader.Count != 0) {
-                            MessageBox.Show("帳簿内の該当する項目に帳簿項目が存在するので削除できません。"); // TODO
-                            e.Handled = true;
-                            return;
-                        }
+                            if (reader.Count != 0) {
+                                MessageBox.Show("帳簿内の該当する項目に帳簿項目が存在するので削除できません。"); // TODO
+                                e.Handled = true;
+                                return;
+                            }
 
-                        vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
-                        await dao.ExecNonQueryAsync(@"
+                            vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
+                            await dao.ExecNonQueryAsync(@"
 UPDATE rel_book_item
 SET del_flg = @{0}, update_time = 'now', updater = @{1}
 WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 : 1, Updater, vm.Id, vm.SelectedRelationVM.Id);
-                    }
-                });
+                        }
+                    });
+                }
+                this.needToUpdate = true;
             }
-            this.needToUpdate = true;
         }
         #endregion
 
@@ -1119,20 +1150,19 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 Log.Info(this.WVM.SelectedTab.ToString());
 
                 this.oldSelectedSettingsTab = this.WVM.SelectedTab;
-                this.WaitCursorCountIncrement();
-
-                switch (this.WVM.SelectedTab) {
-                    case SettingsTabs.ItemSettingsTab:
-                        await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM?.Kind, this.WVM.SelectedItemVM?.Id);
-                        break;
-                    case SettingsTabs.BookSettingsTab:
-                        await this.UpdateBookSettingTabDataAsync(this.WVM.SelectedBookVM?.Id);
-                        break;
-                    case SettingsTabs.OtherSettingsTab:
-                        this.UpdateOtherSettingTabData();
-                        break;
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    switch (this.WVM.SelectedTab) {
+                        case SettingsTabs.ItemSettingsTab:
+                            await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM?.Kind, this.WVM.SelectedItemVM?.Id);
+                            break;
+                        case SettingsTabs.BookSettingsTab:
+                            await this.UpdateBookSettingTabDataAsync(this.WVM.SelectedBookVM?.Id);
+                            break;
+                        case SettingsTabs.OtherSettingsTab:
+                            this.UpdateOtherSettingTabData();
+                            break;
+                    }
                 }
-                this.WaitCursorCountDecrement();
             }
         }
 

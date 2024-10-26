@@ -22,12 +22,12 @@ namespace HouseholdAccountBook.Extensions
 
             double right = window.Left + window.Width;
             double bottom = window.Top + window.Height;
-            Log.Info(string.Format("window - top:{0} right:{1} bottom:{2} left:{3} width:{4} height:{5}", window.Top, right, bottom, window.Left, window.Width, window.Height));
+            Log.Info(string.Format($"window - top:{window.Top} right:{right} bottom:{bottom} left:{window.Left} width:{window.Width} height:{window.Height}"));
 
             if (window.Owner != null) {
                 double OwnerRight = window.Owner.Left + window.Owner.Width;
                 double OwnerBottom = window.Owner.Left + window.Owner.Height;
-                Log.Info(string.Format("owner  - top:{0} right:{1} bottom:{2} left:{3} width:{4} height:{5}", window.Owner.Top, OwnerRight, OwnerBottom, window.Owner.Left, window.Owner.Width, window.Owner.Height));
+                Log.Info(string.Format($"owner  - top:{window.Owner.Top} right:{OwnerRight} bottom:{OwnerBottom} left:{window.Owner.Left} width:{window.Owner.Width} height:{window.Owner.Height}"));
             }
         }
     }

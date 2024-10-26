@@ -20,6 +20,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -106,24 +107,22 @@ namespace HouseholdAccountBook.Windows
             };
 
             if (ofd.ShowDialog() == true) {
-                this.WaitCursorCountIncrement();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    // 開いたCSVファイルのパスを設定として保存する(複数存在する場合は先頭のみ)
+                    string csvFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                    settings.App_CsvFilePath = csvFilePath;
+                    settings.Save();
 
-                // 開いたCSVファイルのパスを設定として保存する(複数存在する場合は先頭のみ)
-                string csvFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
-                settings.App_CsvFilePath = csvFilePath;
-                settings.Save();
-
-                foreach (string tmpFileName in ofd.FileNames) {
-                    if (!this.WVM.CsvFilePathList.Contains(tmpFileName)) {
-                        this.WVM.CsvFilePathList.Add(tmpFileName);
+                    foreach (string tmpFileName in ofd.FileNames) {
+                        if (!this.WVM.CsvFilePathList.Contains(tmpFileName)) {
+                            this.WVM.CsvFilePathList.Add(tmpFileName);
+                        }
                     }
+
+                    // CSVファイルを再読み込みする
+                    this.ReloadCsvFiles();
+                    await this.UpdateComparisonVMListAsync(true);
                 }
-
-                // CSVファイルを再読み込みする
-                this.ReloadCsvFiles();
-                await this.UpdateComparisonVMListAsync(true);
-
-                this.WaitCursorCountDecrement();
             }
         }
 
@@ -156,46 +155,44 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void MoveCsvFilesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WaitCursorCountIncrement();
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                // ファイルの移動を試みる
+                List<string> tmpCsvFilePathList = new List<string>();
+                string dstFolderPath = this.WVM.SelectedBookVM.CsvFolderPath;
+                foreach (string srcFilePath in this.WVM.CsvFilePathList) {
+                    if (!File.Exists(srcFilePath)) continue;
 
-            // ファイルの移動を試みる
-            List<string> tmpCsvFilePathList = new List<string>();
-            string dstFolderPath = this.WVM.SelectedBookVM.CsvFolderPath;
-            foreach (string srcFilePath in this.WVM.CsvFilePathList) {
-                if (!File.Exists(srcFilePath)) continue;
-
-                // 移動元と移動先が一致するなら移動しない
-                string dstFilePath = Path.Combine(dstFolderPath, Path.GetFileName(srcFilePath));
-                if (srcFilePath.CompareTo(dstFilePath) == 0) {
-                    tmpCsvFilePathList.Add(srcFilePath);
-                    continue;
-                }
-
-                // ファイルを移動する(既に存在すれば上書き)
-                try {
-                    if (File.Exists(dstFilePath)) {
-                        File.Delete(dstFilePath);
+                    // 移動元と移動先が一致するなら移動しない
+                    string dstFilePath = Path.Combine(dstFolderPath, Path.GetFileName(srcFilePath));
+                    if (srcFilePath.CompareTo(dstFilePath) == 0) {
+                        tmpCsvFilePathList.Add(srcFilePath);
+                        continue;
                     }
 
-                    File.Move(srcFilePath, dstFilePath);
-                    tmpCsvFilePathList.Add(dstFilePath);
+                    // ファイルを移動する(既に存在すれば上書き)
+                    try {
+                        if (File.Exists(dstFilePath)) {
+                            File.Delete(dstFilePath);
+                        }
+
+                        File.Move(srcFilePath, dstFilePath);
+                        tmpCsvFilePathList.Add(dstFilePath);
+                    }
+                    catch (Exception exp) {
+                        MessageBox.Show(MessageText.FoultToMoveCsv + "(" + exp.Message + ")", MessageTitle.Error);
+                    }
                 }
-                catch (Exception exp) {
-                    MessageBox.Show(MessageText.FoultToMoveCsv + "(" + exp.Message + ")", MessageTitle.Error);
+
+                // 移動に成功したファイルだけ記録する
+                this.WVM.CsvFilePathList.Clear();
+                foreach (string tmpCsvFilePath in tmpCsvFilePathList) {
+                    this.WVM.CsvFilePathList.Add(tmpCsvFilePath);
                 }
+
+                // CSVファイルを再読み込みする
+                this.ReloadCsvFiles();
+                await this.UpdateComparisonVMListAsync();
             }
-
-            // 移動に成功したファイルだけ記録する
-            this.WVM.CsvFilePathList.Clear();
-            foreach (string tmpCsvFilePath in tmpCsvFilePathList) {
-                this.WVM.CsvFilePathList.Add(tmpCsvFilePath);
-            }
-
-            // CSVファイルを再読み込みする
-            this.ReloadCsvFiles();
-            await this.UpdateComparisonVMListAsync();
-
-            this.WaitCursorCountDecrement();
         }
 
         /// <summary>
@@ -362,17 +359,15 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void BulkCheckCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WaitCursorCountIncrement();
-
-            foreach (CsvComparisonViewModel vm in this.WVM.CsvComparisonVMList) {
-                if (vm.ActionId.HasValue && !vm.IsMatch) {
-                    vm.IsMatch = true;
-                    this.IsMatchChanged?.Invoke(this, new EventArgs<int?, bool>(vm.ActionId, vm.IsMatch));
-                    await this.SaveIsMatchAsync(vm.ActionId.Value, vm.IsMatch);
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                foreach (CsvComparisonViewModel vm in this.WVM.CsvComparisonVMList) {
+                    if (vm.ActionId.HasValue && !vm.IsMatch) {
+                        vm.IsMatch = true;
+                        this.IsMatchChanged?.Invoke(this, new EventArgs<int?, bool>(vm.ActionId, vm.IsMatch));
+                        await this.SaveIsMatchAsync(vm.ActionId.Value, vm.IsMatch);
+                    }
                 }
             }
-
-            this.WaitCursorCountDecrement();
         }
         #endregion
 
@@ -394,11 +389,9 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void UpdateListCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WaitCursorCountIncrement();
-
-            await this.UpdateComparisonVMListAsync();
-
-            this.WaitCursorCountDecrement();
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                await this.UpdateComparisonVMListAsync();
+            }
         }
         #endregion
 

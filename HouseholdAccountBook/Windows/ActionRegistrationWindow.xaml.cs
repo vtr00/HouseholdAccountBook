@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -171,7 +172,10 @@ namespace HouseholdAccountBook.Windows
         private async void ContinueToRegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             // DB登録
-            int? id = await this.RegisterToDbAsync();
+            int? id = null;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                id = await this.RegisterToDbAsync();
+            }
 
             // MainWindow更新
             List<int> value = id != null ? new List<int>() { id.Value } : new List<int>();
@@ -200,7 +204,10 @@ namespace HouseholdAccountBook.Windows
         private async void RegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             // DB登録
-            int? id = await this.RegisterToDbAsync();
+            int? id = null;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                id = await this.RegisterToDbAsync();
+            }
 
             // MainWindow更新
             List<int> value = id != null ? new List<int>() { id.Value } : new List<int>();
@@ -516,29 +523,37 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
         private void RegisterEventHandlerToWVM()
         {
             this.WVM.BookChanged += async (bookId) => {
-                await this.UpdateCategoryListAsync();
-                await this.UpdateItemListAsync();
-                await this.UpdateShopListAsync();
-                await this.UpdateRemarkListAsync();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    await this.UpdateCategoryListAsync();
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
                 this.BookChanged?.Invoke(this, new EventArgs<int?>(bookId));
             };
             this.WVM.DateChanged += (date) => {
                 this.DateChanged?.Invoke(this, new EventArgs<DateTime>(date));
             };
             this.WVM.BalanceKindChanged += async (_) => {
-                await this.UpdateCategoryListAsync();
-                await this.UpdateItemListAsync();
-                await this.UpdateShopListAsync();
-                await this.UpdateRemarkListAsync();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    await this.UpdateCategoryListAsync();
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
             };
             this.WVM.CategoryChanged += async (_) => {
-                await this.UpdateItemListAsync();
-                await this.UpdateShopListAsync();
-                await this.UpdateRemarkListAsync();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
             };
             this.WVM.ItemChanged += async (_) => {
-                await this.UpdateShopListAsync();
-                await this.UpdateRemarkListAsync();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
             };
         }
 

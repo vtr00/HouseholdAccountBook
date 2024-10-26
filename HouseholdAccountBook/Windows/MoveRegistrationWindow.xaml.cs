@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -163,11 +164,13 @@ namespace HouseholdAccountBook.Windows
         private async void RegisterCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             // DB登録
-            int? id = await this.RegisterToDbAsync();
+            List<int> idList = null;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                idList = await this.RegisterToDbAsync();
+            }
 
             // MainWindow更新
-            List<int> value = id != null ? new List<int>() { id.Value } : new List<int>();
-            Registrated?.Invoke(this, new EventArgs<List<int>>(value));
+            Registrated?.Invoke(this, new EventArgs<List<int>>(idList ?? new List<int>()));
 
             try {
                 this.DialogResult = true;
@@ -452,27 +455,35 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
         private void RegisterEventHandlerToWVM()
         {
             this.WVM.FromBookChanged += async (fromBookId) => {
-                await this.UpdateItemListAsync();
-                await this.UpdateRemarkListAsync();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    await this.UpdateItemListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
                 this.FromBookChanged?.Invoke(this, new EventArgs<int?>(fromBookId));
             };
             this.WVM.FromDateChanged += (fromDate) => {
                 this.FromDateChanged?.Invoke(this, new EventArgs<DateTime>(fromDate));
             };
             this.WVM.ToBookChanged += async (toBookId) => {
-                await this.UpdateItemListAsync();
-                await this.UpdateRemarkListAsync();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    await this.UpdateItemListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
                 this.ToBookChanged?.Invoke(this, new EventArgs<int?>(toBookId));
             };
             this.WVM.ToDateChanged += (toDate) => {
                 this.ToDateChanged?.Invoke(this, new EventArgs<DateTime>(toDate));
             };
             this.WVM.CommissionKindChanged += async (_) => {
-                await this.UpdateItemListAsync();
-                await this.UpdateRemarkListAsync();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    await this.UpdateItemListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
             };
             this.WVM.ItemChanged += async (_) => {
-                await this.UpdateRemarkListAsync();
+                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    await this.UpdateRemarkListAsync();
+                }
             };
         }
 
@@ -480,8 +491,10 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
         /// DBに登録する
         /// </summary>
         /// <returns>登録された帳簿項目ID</returns>
-        private async Task<int?> RegisterToDbAsync()
+        private async Task<List<int>> RegisterToDbAsync()
         {
+            List<int> resActionIdList = new List<int>();
+
             DateTime fromDate = this.WVM.FromDate;
             DateTime toDate = this.WVM.ToDate;
             int fromBookId = this.WVM.SelectedFromBookVM.Id.Value;
@@ -491,8 +504,6 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
             int commissionItemId = this.WVM.SelectedItemVM.Id;
             int commission = this.WVM.Commission ?? 0;
             string remark = this.WVM.SelectedRemark;
-
-            int? resActionId = null;
 
             int tmpGroupId = -1; // ローカル用
             using (DaoBase dao = this.builder.Build()) {
@@ -520,7 +531,7 @@ VALUES (@{0}, (
                                 fromBookId, fromDate, -actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Outgo);
                             if (this.selectedBookId == fromBookId) {
                                 reader.ExecARow((record) => {
-                                    resActionId = record.ToInt("action_id");
+                                    resActionIdList.Add(record.ToInt("action_id"));
                                 });
                             }
 
@@ -535,7 +546,7 @@ VALUES (@{0}, (
                                 toBookId, toDate, actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Income);
                             if (this.selectedBookId == toBookId) {
                                 reader.ExecARow((record) => {
-                                    resActionId = record.ToInt("action_id");
+                                    resActionIdList.Add(record.ToInt("action_id"));
                                 });
                             }
                             #endregion
@@ -550,7 +561,7 @@ UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
 WHERE action_id = @{4};", fromBookId, fromDate, -actValue, Updater, this.fromActionId);
                             if (this.selectedBookId == fromBookId) {
-                                resActionId = this.fromActionId;
+                                resActionIdList.Add(this.fromActionId.Value);
                             }
 
                             await dao.ExecNonQueryAsync(@"
@@ -559,7 +570,7 @@ UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
 WHERE action_id = @{4};", toBookId, toDate, actValue, Updater, this.toActionId);
                             if (this.selectedBookId == toBookId) {
-                                resActionId = this.toActionId;
+                                resActionIdList.Add(this.toActionId.Value);
                             }
                             #endregion
                             break;
@@ -580,16 +591,22 @@ WHERE action_id = @{4};", toBookId, toDate, actValue, Updater, this.toActionId);
                                 actTime = toDate;
                                 break;
                         }
+
+                        DaoReader reader = null;
                         if (this.commissionActionId != null) {
                             await dao.ExecNonQueryAsync(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, remark = @{4}, update_time = 'now', updater = @{5}
 WHERE action_id = @{6};", bookId, commissionItemId, actTime, -commission, remark, Updater, this.commissionActionId);
+                            resActionIdList.Add(this.commissionActionId.Value);
                         }
                         else {
-                            await dao.ExecNonQueryAsync(@"
+                            reader = await dao.ExecQueryAsync(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7});", bookId, commissionItemId, actTime, -commission, tmpGroupId, remark, Updater, Inserter);
+VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7}) RETURNING action_id;", bookId, commissionItemId, actTime, -commission, tmpGroupId, remark, Updater, Inserter);
+                            reader.ExecARow((record) => {
+                                resActionIdList.Add(record.ToInt("action_id"));
+                            });
                         }
                         #endregion
                     }
@@ -625,7 +642,7 @@ WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", fromDate > toDate
                     #endregion
                 }
 
-                return resActionId;
+                return resActionIdList;
             }
         }
 
