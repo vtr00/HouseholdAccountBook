@@ -59,7 +59,7 @@
     <StartupObject>HouseholdAccountBook.App</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>resheet.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\resheet.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CalcBinding, Version=2.5.2.0, Culture=neutral, processorArchitecture=MSIL">
@@ -463,7 +463,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
@@ -492,7 +492,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="resheet.ico" />
+    <Resource Include="Resources\resheet.ico" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

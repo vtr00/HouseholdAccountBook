@@ -1,6 +1,4 @@
-﻿using HouseholdAccountBook.Extensions;
-using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 using System.Windows.Navigation;
 
@@ -42,6 +40,18 @@ namespace HouseholdAccountBook.Windows
             System.Diagnostics.Process.Start(e.Uri.AbsoluteUri);
             e.Handled = true;
         }
+
+        #region ウィンドウ
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void VersionWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            HistoryLog.ScrollToEnd();
+        }
+        #endregion
         #endregion
     }
 }

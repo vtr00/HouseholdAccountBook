@@ -19,10 +19,10 @@ namespace HouseholdAccountBook.Properties {
     // または Visual Studio のようなツールを使用して自動生成されました。
     // メンバーを追加または削除するには、.ResX ファイルを編集して、/str オプションと共に
     // ResGen を実行し直すか、または VS プロジェクトをビルドし直します。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace HouseholdAccountBook.Properties {
         ///   このクラスで使用されているキャッシュされた ResourceManager インスタンスを返します。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("HouseholdAccountBook.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace HouseholdAccountBook.Properties {
         ///   現在のスレッドの CurrentUICulture プロパティをオーバーライドします。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -65,23 +65,23 @@ namespace HouseholdAccountBook.Properties {
         ///：---------- 更新ログ ----------：
         ///：------------------------------：
         ///
-        ///*記録以前
+        ///* 記録以前
         ///  記帳風月からのインポート
         ///  帳簿項目追加、編集
         ///  概要表示
         ///
-        ///*2016
+        ///* 2016
         ///2016/12/29
         ///  MainWindow.xaml.cs
         ///    ＋削除時に移動も削除されるようにした(2017/01/01確認)
-        ///    ↑移動操作可能の判定が「帳簿」ではなく「帳簿項目」になっていたのを修正
-        ///    ↑項目編集処理のグループ種別判定処理のSQLを修正
-        ///    ↑NumericUpDown.ValueのModeをTwoWayに修正 - Editしたテキストが取得できなかったため
-        ///    ↑NumericUpDown内のTextBoxのUpdateSourceTriggerをPropertyChangedに修正 - Editしたテキストが取得できなかったため
+        ///    ↑移動操作可能の判定が「帳簿」ではなく「帳簿項目」になっていたのを修正した
+        ///    ↑項目編集処理のグループ種別判定処理のSQLを修正した
+        ///    ↑NumericUpDown.ValueのModeをTwoWayに修正した - Editしたテキストが取得できなかったため
+        ///    ↑NumericUpDown内のTextBoxのUpdateSourceTriggerをPropertyChangedに修正した - Editしたテキストが取得できなかったため
         ///  ActionRegistrationWindow.xaml.cs
-        ///    ↑登録完了時にDialogResul [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        ///    △グループに属す [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        internal static string UpdateLog {
+        public static string UpdateLog {
             get {
                 return ResourceManager.GetString("UpdateLog", resourceCulture);
             }

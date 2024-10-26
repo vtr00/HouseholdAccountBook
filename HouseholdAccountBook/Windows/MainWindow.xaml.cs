@@ -550,12 +550,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void BackUpCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void BackUpCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Log.Info();
 
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                this.CreateBackUpFile();
+                await this.CreateBackUpFileAsync(true);
             }
 
             MessageBox.Show(MessageText.FinishToBackUp, MessageTitle.Information);
@@ -1482,7 +1482,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 this.WVM.SelectedBookVM = this.WVM.BookVMList.FirstOrDefault((vm) => { return vm.Id == e4.Value; });
             };
             // クローズ時イベントを登録する
-            this.ccw.Closed += (sender4, e4) => {
+            this.ccw.Closed += (sender5, e5) => {
                 this.ccw = null;
                 this.Activate();
             };
@@ -1667,7 +1667,7 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             // 他のウィンドウを開いているときは閉じない
             if (this.ChildrenWindowOpened) {
@@ -1681,9 +1681,7 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
             this.Hide();
 
             if (settings.App_BackUpFlagAtClosing) {
-#if !DEBUG
-                this.CreateBackUpFile();
-#endif
+                await this.CreateBackUpFileAsync(true);
             }
         }
 
@@ -1704,15 +1702,20 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MainWindow_StateChanged(object sender, EventArgs e)
+        private async void MainWindow_StateChanged(object sender, EventArgs e)
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (settings.App_BackUpFlagAtMinimizing) {
-                if (this.WindowState == WindowState.Minimized) {
-#if !DEBUG
-                    this.CreateBackUpFile();
-#endif
+            if (this.WindowState == WindowState.Minimized) {
+                if (settings.App_BackUpFlagAtMinimizing) {
+                    DateTime nextBackup = settings.App_BackUpCurrentAtMinimizing.AddMinutes(settings.App_BackUpIntervalMinAtMinimizing);
+
+                    if (nextBackup <= DateTime.Now) {
+                        bool? result = await this.CreateBackUpFileAsync(false);
+                        if (result != false) {
+                            settings.App_BackUpCurrentAtMinimizing = DateTime.Now;
+                        }
+                    }
                 }
             }
 
@@ -3605,11 +3608,12 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// <summary>
         /// バックアップファイルを作成する
         /// </summary>
+        /// <param name="waitForFinish">完了を待つか</param>
         /// <param name="dumpExePath">pg_dump.exeパス</param>
         /// <param name="backUpNum">バックアップ数</param>
         /// <param name="backUpFolderPath">バックアップ用フォルダパス</param>
         /// <returns>バックアップの成否</returns>
-        public bool CreateBackUpFile(string dumpExePath = null, int? backUpNum = null, string backUpFolderPath = null)
+        public async Task<bool?> CreateBackUpFileAsync(bool waitForFinish, string dumpExePath = null, int? backUpNum = null, string backUpFolderPath = null)
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -3617,12 +3621,11 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             int tmpBackUpNum = backUpNum ?? settings.App_BackUpNum;
             string tmpBackUpFolderPath = backUpFolderPath ?? settings.App_BackUpFolderPath;
 
+            bool? result = false;
+
+            // 古いバックアップを削除する
             if (tmpBackUpFolderPath != string.Empty) {
-                if (!Directory.Exists(tmpBackUpFolderPath)) {
-                    Directory.CreateDirectory(tmpBackUpFolderPath);
-                }
-                else {
-                    // 古いバックアップを削除する
+                if (Directory.Exists(tmpBackUpFolderPath)) {
                     List<string> fileList = new List<string>(Directory.GetFiles(tmpBackUpFolderPath, "*.backup", SearchOption.TopDirectoryOnly));
                     if (fileList.Count >= tmpBackUpNum) {
                         fileList.Sort();
@@ -3632,9 +3635,15 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                         }
                     }
                 }
+            }
 
-                if (tmpDumpExePath != string.Empty) {
-                    if (tmpBackUpNum > 0) {
+            if (0 < tmpBackUpNum) {
+                if (tmpBackUpFolderPath != string.Empty) {
+                    if (!Directory.Exists(tmpBackUpFolderPath)) {
+                        Directory.CreateDirectory(tmpBackUpFolderPath);
+                    }
+
+                    if (tmpDumpExePath == string.Empty) {
                         // 起動情報を設定する
                         ProcessStartInfo info = new ProcessStartInfo() {
                             FileName = tmpDumpExePath,
@@ -3644,21 +3653,34 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                 settings.App_Postgres_Port,
                                 settings.App_Postgres_UserName,
                                 settings.App_Postgres_Role,
-                                string.Format(@"{0}/{1}", tmpBackUpFolderPath, BackupFileName),
+                                Path.Combine(tmpBackUpFolderPath, BackupFileName),
                                 settings.App_Postgres_DatabaseName),
                             WindowStyle = ProcessWindowStyle.Hidden
                         };
 
                         // バックアップする
-                        Process process = Process.Start(info);
-                        return process.WaitForExit(1 * 1000);
-                    }
-                    else {
-                        return true;
+                        Task<bool?> task = new Task<bool?>(() => {
+                            Log.Info("Start Backup");
+
+                            Process process = Process.Start(info);
+                            if (waitForFinish) {
+                                return process.WaitForExit(1 * 1000);
+                            }
+                            else {
+                                return process != null;
+                            }
+                        });
+
+                        result = await task;
                     }
                 }
             }
-            return false;
+            else {
+                // バックアップ不要
+                result = null;
+            }
+
+            return result;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.11.0.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -692,6 +692,30 @@ namespace HouseholdAccountBook.Properties {
             }
             set {
                 this["MainWindow_SelectedGraphKind2Index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1970-01-01")]
+        public global::System.DateTime App_BackUpCurrentAtMinimizing {
+            get {
+                return ((global::System.DateTime)(this["App_BackUpCurrentAtMinimizing"]));
+            }
+            set {
+                this["App_BackUpCurrentAtMinimizing"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("60")]
+        public int App_BackUpIntervalMinAtMinimizing {
+            get {
+                return ((int)(this["App_BackUpIntervalMinAtMinimizing"]));
+            }
+            set {
+                this["App_BackUpIntervalMinAtMinimizing"] = value;
             }
         }
     }

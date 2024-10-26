@@ -5,6 +5,10 @@
     {
       "AbsoluteMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|c:\\data\\program\\c#\\householdaccountbook\\householdaccountbook\\resources\\updatelog.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|solutionrelative:householdaccountbook\\resources\\updatelog.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|c:\\data\\program\\c#\\householdaccountbook\\householdaccountbook\\windows\\versionwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|solutionrelative:householdaccountbook\\windows\\versionwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,12 +26,24 @@
               "Title": "UpdateLog.txt",
               "DocumentMoniker": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\Resources\\UpdateLog.txt",
               "RelativeDocumentMoniker": "HouseholdAccountBook\\Resources\\UpdateLog.txt",
-              "ToolTip": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\Resources\\UpdateLog.txt",
-              "RelativeToolTip": "HouseholdAccountBook\\Resources\\UpdateLog.txt",
-              "ViewState": "AgIAAGADAAAAAAAAAAAowIMDAAAFAAAAAAAAAA==",
+              "ToolTip": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\Resources\\UpdateLog.txt*",
+              "RelativeToolTip": "HouseholdAccountBook\\Resources\\UpdateLog.txt*",
+              "ViewState": "AgIAAFYDAAAAAAAAAAAAADkDAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
               "WhenOpened": "2024-10-12T01:25:24.323Z",
               "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "VersionWindow.xaml",
+              "DocumentMoniker": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\Windows\\VersionWindow.xaml",
+              "RelativeDocumentMoniker": "HouseholdAccountBook\\Windows\\VersionWindow.xaml",
+              "ToolTip": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\Windows\\VersionWindow.xaml",
+              "RelativeToolTip": "HouseholdAccountBook\\Windows\\VersionWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2024-10-26T15:16:55.181Z",
               "EditorCaption": ""
             },
             {

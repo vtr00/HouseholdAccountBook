@@ -4,10 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
+        xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="バージョン情報 - Household Account Book"
-        Height="150" Width="400" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize">
+        Height="600" Width="500" ShowInTaskbar="False" WindowStyle="ToolWindow"
+        Loaded="VersionWindow_Loaded">
 
     <Window.DataContext>
         <viewmodels:VersionWindowViewModel x:Name="WVM"/>
@@ -27,32 +29,45 @@
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Household Account Book" FontSize="18" FontWeight="Bold"/>
-        <TextBlock Grid.Row="0" TextAlignment="Right" VerticalAlignment="Center">
+        <Image Source="/Resources/resheet.ico"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center" Text="Household Account Book" FontSize="18" FontWeight="Bold"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" TextAlignment="Right" VerticalAlignment="Bottom">
             Ver.
             <TextBlock Text="{Binding App_Version, Source={StaticResource Settings}}"/>
         </TextBlock>
 
-        <TextBlock Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center">
             Copyright (c) toresebu 
             <TextBlock Text="{Binding Now, Source={StaticResource DateTime}, StringFormat={}{0:yyyy}}"/>
             All rights reserved.
         </TextBlock>
 
-        <TextBlock Grid.Row="2">
-            サポート: <Hyperlink NavigateUri="{Binding SupportSiteUri}" ToolTip="{Binding SupportSiteUri}" RequestNavigate="Hyperlink_RequestNavigate">http://hp.vector.co.jp/authors/VA043062/</Hyperlink>
-        </TextBlock>
-        
-        <TextBlock Grid.Row="3">
-            SNS: <Hyperlink NavigateUri="{Binding SnsSiteUri}" ToolTip="{Binding SnsSiteUri}" RequestNavigate="Hyperlink_RequestNavigate">@toresebu</Hyperlink>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="サポート:"/>
+        <TextBlock Grid.Row="2" Grid.Column="1">
+            <Hyperlink NavigateUri="{Binding SupportSiteUri}" ToolTip="{Binding SupportSiteUri}" RequestNavigate="Hyperlink_RequestNavigate">https://github.com/vtr00/</Hyperlink>
         </TextBlock>
 
-        <Button Grid.Row="4" HorizontalAlignment="Right" Margin="5" Width="100" Content="閉じる" Command="{StaticResource CloseWindowCommand}"/>
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="SNS:"/>
+        <TextBlock Grid.Row="3" Grid.Column="1">
+            <Hyperlink NavigateUri="{Binding SnsSiteUri}" ToolTip="{Binding SnsSiteUri}" RequestNavigate="Hyperlink_RequestNavigate">@toresebu</Hyperlink>
+        </TextBlock>
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="履歴:"/>
+        <TextBox x:Name="HistoryLog" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="3" Text="{x:Static properties:Resources.UpdateLog}"
+                 AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" IsReadOnly="True"/>
+
+        <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="5" Width="100" Content="閉じる" Command="{StaticResource CloseWindowCommand}"/>
     </Grid>
 </Window>

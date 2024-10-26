@@ -170,5 +170,11 @@
     <Setting Name="MainWindow_SelectedGraphKind2Index" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">-1</Value>
     </Setting>
+    <Setting Name="App_BackUpCurrentAtMinimizing" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)">1970-01-01</Value>
+    </Setting>
+    <Setting Name="App_BackUpIntervalMinAtMinimizing" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">60</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

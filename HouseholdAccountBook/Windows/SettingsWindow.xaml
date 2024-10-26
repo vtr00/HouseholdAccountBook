@@ -483,7 +483,7 @@
                                 <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource RestoreExePathDialogCommand}"/>
 
                                 <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Content="データベース通信設定を再登録する(再起動)"
-                                                    Command="{StaticResource RestartForDbSettingCommand}"/>
+                                        Command="{StaticResource RestartForDbSettingCommand}"/>
                             </Grid>
                         </GroupBox>
                         <GroupBox Header="バックアップ">
@@ -510,8 +510,24 @@
                                 <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="..." Command="{StaticResource BackUpFolderPathDialogCommand}"/>
 
                                 <TextBlock Grid.Row="2" Grid.Column="0" Text="タイミング" Margin="5"/>
-                                <CheckBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="メインウィンドウ最小化時" IsChecked="{Binding BackUpFlagAtMinimizing}"/>
-                                <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="メインウィンドウクローズ時" IsChecked="{Binding BackUpFlagAtClosing}"/>
+                                <GroupBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="5">
+                                    <GroupBox.Header>
+                                        <CheckBox Content="メインウィンドウ最小化時" IsChecked="{Binding BackUpFlagAtMinimizing}"/>
+                                    </GroupBox.Header>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition SharedSizeGroup="Header"/>
+                                            <ColumnDefinition Width="100" SharedSizeGroup="Number"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="インターバル" Margin="5" VerticalAlignment="Center"/>
+                                        <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" MinValue="0" MaxValue="100" Value="{Binding BackUpIntervalAtMinimizing}"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="2" Text="分" Margin="5" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </GroupBox>
+                                
+                                <CheckBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="メインウィンドウクローズ時" IsChecked="{Binding BackUpFlagAtClosing}"/>
                             </Grid>
                         </GroupBox>
                         <GroupBox Header="カレンダー">
@@ -555,6 +571,7 @@
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition SharedSizeGroup="Header"/>
@@ -565,13 +582,36 @@
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="保存対象" Margin="5" VerticalAlignment="Center"/>
                                 <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" Content="メインウィンドウ以外の位置" IsChecked="{Binding IsPositionSaved}" />
 
+
+                                <DataGrid Grid.Row="1" Grid.ColumnSpan="3" Margin="5" ItemsSource="{Binding WindowSettingVMList}"
+                                                  IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
+                                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
+                                                  AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
+                                                  HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
+
+                                    <DataGrid.ColumnHeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader">
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGrid.ColumnHeaderStyle>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="種別" Width="*" Binding="{Binding Kind}"/>
+                                        <DataGridTextColumn Header="Left" Width="*" Binding="{Binding Left}"/>
+                                        <DataGridTextColumn Header="Top" Width="*" Binding="{Binding Top}"/>
+                                        <DataGridTextColumn Header="Width" Width="*" Binding="{Binding Width}"/>
+                                        <DataGridTextColumn Header="Height" Width="*" Binding="{Binding Height}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
                             </Grid>
                         </GroupBox>
                         
-                        <GroupBox Header="デバッグ">
-                            <Grid>
+                        <GroupBox>
+                            <GroupBox.Header>
+                                <CheckBox Content="デバッグ" IsChecked="{Binding DebugMode}"/>
+                            </GroupBox.Header>
+
+                            <Grid Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
@@ -580,45 +620,8 @@
                                     <ColumnDefinition SharedSizeGroup="Button"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="モード" Margin="5" VerticalAlignment="Center"/>
-                                <CheckBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
-                                          Content="デバッグモード" IsChecked="{Binding DebugMode}"/>
-
-                                <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Header="ウィンドウ位置・サイズ" 
-                                          Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        
-                                        <DataGrid Grid.Row="0" Margin="5" ItemsSource="{Binding WindowSettingVMList}"
-                                                  IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
-                                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
-                                                  AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
-                                                  HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
-
-                                            <DataGrid.ColumnHeaderStyle>
-                                                <Style TargetType="DataGridColumnHeader">
-                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                                </Style>
-                                            </DataGrid.ColumnHeaderStyle>
-                                            <DataGrid.Columns>
-                                                <DataGridTextColumn Header="種別" Width="*" Binding="{Binding Kind}"/>
-                                                <DataGridTextColumn Header="Left" Width="*" Binding="{Binding Left}"/>
-                                                <DataGridTextColumn Header="Top" Width="*" Binding="{Binding Top}"/>
-                                                <DataGridTextColumn Header="Width" Width="*" Binding="{Binding Width}"/>
-                                                <DataGridTextColumn Header="Height" Width="*" Binding="{Binding Height}"/>
-                                            </DataGrid.Columns>
-                                        </DataGrid>
-
-                                        <Button Grid.Row="1" Content="位置・サイズを初期化する(再起動)" Command="{StaticResource InitializeWindowSettingCommand}"/>
-                                    </Grid>
-                                </GroupBox>
-                                
+                                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Content="位置・サイズを初期化する(再起動)"
+                                        Command="{StaticResource InitializeWindowSettingCommand}"/>
                             </Grid>
                         </GroupBox>
                     </StackPanel>

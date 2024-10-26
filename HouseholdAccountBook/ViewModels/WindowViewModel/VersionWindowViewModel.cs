@@ -10,7 +10,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// サポートサイト
         /// </summary>
-        public string SupportSiteUri { get; } = "http://hp.vector.co.jp/authors/VA043062/";
+        public string SupportSiteUri { get; } = "https://github.com/vtr00/";
         /// <summary>
         /// SNSサイト
         /// </summary>

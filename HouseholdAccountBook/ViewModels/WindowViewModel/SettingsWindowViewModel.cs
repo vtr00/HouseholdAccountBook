@@ -199,6 +199,23 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// メインウィンドウ最小化時バックアップインターバル(分)
+        /// </summary>
+        #region BackUpIntervalAtMinimizing
+        public int BackUpIntervalAtMinimizing
+        {
+            get => this._BackUpIntervalAtMinimizing;
+            set {
+                if (this.SetProperty(ref this._BackUpIntervalAtMinimizing, value) && this.WithSave) {
+                    this.settings.App_BackUpIntervalMinAtMinimizing = value;
+                    this.settings.Save();
+                }
+            }
+        }
+        private int _BackUpIntervalAtMinimizing = default;
+        #endregion
+
+        /// <summary>
         /// メインウィンドウクローズ時バックアップフラグ
         /// </summary>
         #region BackUpFlagAtClosing
@@ -333,11 +350,13 @@ namespace HouseholdAccountBook.ViewModels
         public void LoadSettings()
         {
             this.WithSave = false;
+
             this.DumpExePath = this.settings.App_Postgres_DumpExePath;
             this.RestoreExePath = this.settings.App_Postgres_RestoreExePath;
             this.BackUpNum = this.settings.App_BackUpNum;
             this.BackUpFolderPath = this.settings.App_BackUpFolderPath;
             this.BackUpFlagAtMinimizing = this.settings.App_BackUpFlagAtMinimizing;
+            this.BackUpIntervalAtMinimizing = this.settings.App_BackUpIntervalMinAtMinimizing;
             this.BackUpFlagAtClosing = this.settings.App_BackUpFlagAtClosing;
             this.StartMonth = this.settings.App_StartMonth;
             this.NationalHolidayCsvURI = this.settings.App_NationalHolidayCsv_Uri;
