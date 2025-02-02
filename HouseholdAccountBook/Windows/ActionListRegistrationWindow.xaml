@@ -118,7 +118,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                         <DataGridTemplateColumn.CellEditingTemplate>
                             <DataTemplate>
-                                <controls:DateTimePicker DateFormat="yyyy/MM/dd" SelectedDate="{Binding ActDate, Mode=TwoWay}"/>
+                                <controls:DateTimePicker DateFormat="yyyy-MM-dd" SelectedDate="{Binding ActDate, Mode=TwoWay}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>
                     </controls:DataGridEditableTemplateColumn>

@@ -108,7 +108,7 @@
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                                 Text="日付" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <controls:DateTimePicker Grid.Row="2" Grid.Column="1" Margin="5"
-                                DateFormat="yyyy/MM/dd" SelectedDate="{Binding FromDate}"/>
+                                DateFormat="yyyy-MM-dd" SelectedDate="{Binding FromDate}"/>
                     <Button Grid.Row="2" Grid.Column="3" Margin="5"
                             Content="今日" Command="{StaticResource TodayCommand}"/>
                 </Grid>
@@ -141,7 +141,7 @@
                     <CheckBox Grid.Row="2" Grid.Column="3" Margin="5"
                               VerticalAlignment="Center" HorizontalAlignment="Center" Content="設定" IsChecked="{Binding IsEnabled, ElementName=movingDateTimePicker}"/>
                     <controls:DateTimePicker x:Name="movingDateTimePicker" Grid.Row="6" Grid.Column="1" Margin="5"
-                                DateFormat="yyyy/MM/dd" SelectedDate="{Binding ToDate}" IsEnabled="{Binding IsLink, Converter={StaticResource NegationConverter}, Mode=TwoWay}"/>
+                                DateFormat="yyyy-MM-dd" SelectedDate="{Binding ToDate}" IsEnabled="{Binding IsLink, Converter={StaticResource NegationConverter}, Mode=TwoWay}"/>
 
                 </Grid>
             </GroupBox>

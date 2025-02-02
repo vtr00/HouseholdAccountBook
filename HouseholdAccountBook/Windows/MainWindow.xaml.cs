@@ -1910,7 +1910,7 @@ ORDER BY sort_order;");
         /// <returns>帳簿項目VMリスト</returns>
         private async Task<ObservableCollection<ActionViewModel>> LoadActionViewModelListWithinMonthAsync(int? targetBookId, DateTime includedTime)
         {
-            Log.Info($"targetBookId:{targetBookId}, includedTime:{includedTime:yyyy/MM/dd}");
+            Log.Info($"targetBookId:{targetBookId}, includedTime:{includedTime:yyyy-MM-dd}");
 
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.GetLastDateOfMonth();
@@ -1926,7 +1926,7 @@ ORDER BY sort_order;");
         /// <returns>帳簿項目VMリスト</returns>
         private async Task<ObservableCollection<ActionViewModel>> LoadActionViewModelListAsync(int? targetBookId, DateTime startTime, DateTime endTime)
         {
-            Log.Info($"targetBookId:{targetBookId} startTime:{startTime:yyyy/MM/dd} endTime:{endTime:yyyy/MM/dd}");
+            Log.Info($"targetBookId:{targetBookId} startTime:{startTime:yyyy-MM-dd} endTime:{endTime:yyyy-MM-dd}");
 
             ObservableCollection<ActionViewModel> actionVMList = new ObservableCollection<ActionViewModel>();
             using (DaoBase dao = this.builder.Build()) {
@@ -2067,7 +2067,7 @@ ORDER BY act_time, balance_kind, c_order, i_order, action_id;", targetBookId, st
         /// <returns>概要VMリスト</returns>
         private async Task<ObservableCollection<SummaryViewModel>> LoadSummaryViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
         {
-            Log.Info($"bookId:{bookId} includedTime:{includedTime:yyyy/MM/dd}");
+            Log.Info($"bookId:{bookId} includedTime:{includedTime:yyyy-MM-dd}");
 
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.GetLastDateOfMonth();
@@ -2083,7 +2083,7 @@ ORDER BY act_time, balance_kind, c_order, i_order, action_id;", targetBookId, st
         /// <returns>概要VMリスト</returns>
         private async Task<ObservableCollection<SummaryViewModel>> LoadSummaryViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
         {
-            Log.Info($"bookId:{bookId} startTime:{startTime:yyyy/MM/dd} endTime:{endTime:yyyy/MM/dd}");
+            Log.Info($"bookId:{bookId} startTime:{startTime:yyyy-MM-dd} endTime:{endTime:yyyy-MM-dd}");
 
             ObservableCollection<SummaryViewModel> summaryVMList = new ObservableCollection<SummaryViewModel>();
 
@@ -2194,7 +2194,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         /// <returns>月内日別系列VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadDailySeriesViewModelListWithinMonthAsync(int? bookId, DateTime includedTime)
         {
-            Log.Info($"bookId:{bookId} includedTime:{includedTime:yyyy/MM/dd}");
+            Log.Info($"bookId:{bookId} includedTime:{includedTime:yyyy-MM-dd}");
 
             DateTime startTime = includedTime.GetFirstDateOfMonth();
             DateTime endTime = startTime.GetLastDateOfMonth();
@@ -2211,7 +2211,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
         /// <returns>日別系列VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadDailySeriesViewModelListAsync(int? bookId, DateTime startTime, DateTime endTime)
         {
-            Log.Info($"bookId:{bookId} startTime:{startTime:yyyy/MM/dd} endTime:{endTime:yyyy/MM/dd}");
+            Log.Info($"bookId:{bookId} startTime:{startTime:yyyy-MM-dd} endTime:{endTime:yyyy-MM-dd}");
 
             // 開始日までの収支を取得する
             int balance = 0;
@@ -2322,7 +2322,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
         /// <returns>年度内月別系列VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadMonthlySeriesViewModelListWithinYearAsync(int? bookId, DateTime includedTime)
         {
-            Log.Info($"bookId:{bookId} includedTime:{includedTime:yyyy/MM/dd}");
+            Log.Info($"bookId:{bookId} includedTime:{includedTime:yyyy-MM-dd}");
 
             DateTime startTime = includedTime.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
             DateTime endTime = startTime.GetLastDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);

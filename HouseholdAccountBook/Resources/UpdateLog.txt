@@ -907,6 +907,8 @@
     △サポートをVectorからGithubに変更した
 
 2025/02/02
+  全体
+    △日付のフォーマットを yyyy/MM/dd から yyyy-MM-dd に変更した
   MainWindow
     △ウィンドウの位置が不正な場合に設定に保存しないように変更した
 
@@ -919,7 +921,6 @@
     適当な行を選択すると、表示している範囲だけ更新される
 
 修正案:
-  ・年月日を yyyy-MM-dd 表記にする
   ・帳簿が一定額を下回ったら通知する
   ・SQLite or Oleに対応する(別ブランチ？)
   ・DisplaySettingsChanged後、Left/Top=-32000でFailedToModifyLocationしたら位置を保存せずに再起動する

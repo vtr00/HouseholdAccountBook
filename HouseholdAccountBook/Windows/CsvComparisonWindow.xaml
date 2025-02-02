@@ -212,7 +212,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="日付" Binding="{Binding Record.Date, StringFormat='yyyy/MM/dd'}"/>
+                    <DataGridTextColumn Header="日付" Binding="{Binding Record.Date, StringFormat='yyyy-MM-dd'}"/>
                     <DataGridTextColumn Header="曜日" Binding="{Binding Record.Date, Converter={StaticResource DateTimeToDayOfWeekConverter}}"
                                         CellStyle="{StaticResource DayOfWeekStyle}"/>
                     <DataGridTextColumn Header="支出" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Record.Value, Converter={StaticResource IntToMoneyDisplayConverter}}" 

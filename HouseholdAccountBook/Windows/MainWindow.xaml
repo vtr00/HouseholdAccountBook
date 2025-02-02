@@ -317,9 +317,9 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Column="0" Text="{Binding StartDate, StringFormat='yyyy/MM/dd'}"/>
+                                        <TextBlock Grid.Column="0" Text="{Binding StartDate, StringFormat='yyyy-MM-dd'}"/>
                                         <TextBlock Grid.Column="1" Text=" - "/>
-                                        <TextBlock Grid.Column="2" Text="{Binding EndDate, StringFormat='yyyy/MM/dd'}"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding EndDate, StringFormat='yyyy-MM-dd'}"/>
                                     </Grid>
                                 </ToolTipService.ToolTip>
                             </Button>
@@ -406,7 +406,7 @@
                                                     Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                     <DataGridTextColumn Header="GId" Binding="{Binding GroupId}"
                                                     Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
-                                    <DataGridTextColumn Header="日付" Binding="{Binding ActTime, StringFormat='yyyy/MM/dd'}"/>
+                                    <DataGridTextColumn Header="日付" Binding="{Binding ActTime, StringFormat='yyyy-MM-dd'}"/>
                                     <DataGridTextColumn Header="曜日" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}}"
                                                     CellStyle="{StaticResource DayOfWeekStyle}"/>
                                     <DataGridTextColumn Header="帳簿名" MinWidth="70" Binding="{Binding BookName}"
@@ -518,7 +518,7 @@
                         <StatusBarItem HorizontalAlignment="Left">
                             <TextBlock>
                                 最後に操作した帳簿項目: 
-                                <TextBlock Text="{Binding ActDateLastEdited, TargetNullValue='----/--/--', StringFormat='yyyy/MM/dd'}"/>
+                                <TextBlock Text="{Binding ActDateLastEdited, TargetNullValue='-', StringFormat='yyyy-MM-dd'}"/>
                             </TextBlock>
                         </StatusBarItem>
                         <StatusBarItem HorizontalAlignment="Right">
@@ -566,9 +566,9 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Column="0" Text="{Binding StartDate, StringFormat='yyyy/MM/dd'}"/>
+                                        <TextBlock Grid.Column="0" Text="{Binding StartDate, StringFormat='yyyy-MM-dd'}"/>
                                         <TextBlock Grid.Column="1" Text=" - "/>
-                                        <TextBlock Grid.Column="2" Text="{Binding EndDate, StringFormat='yyyy/MM/dd'}"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding EndDate, StringFormat='yyyy-MM-dd'}"/>
                                     </Grid>
                                 </ToolTipService.ToolTip>
                             </Button>

@@ -81,10 +81,10 @@
 
                     <Button Grid.Row="0" Grid.ColumnSpan="2" Margin="5" Content="全期間" Command="{StaticResource AllTermCommand}"/>
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="開始：" VerticalAlignment="Center"/>
-                    <controls:DateTimePicker Grid.Row="1" Grid.Column="1" Margin="5" DateFormat="yyyy/MM/dd" 
+                    <controls:DateTimePicker Grid.Row="1" Grid.Column="1" Margin="5" DateFormat="yyyy-MM-dd" 
                                              SelectedDate="{Binding StartDate}"/>
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="終了：" VerticalAlignment="Center"/>
-                    <controls:DateTimePicker Grid.Row="2" Grid.Column="1" Margin="5" DateFormat="yyyy/MM/dd" 
+                    <controls:DateTimePicker Grid.Row="2" Grid.Column="1" Margin="5" DateFormat="yyyy-MM-dd" 
                                              SelectedDate="{Binding EndDate}"/>
                 </Grid>
             </GroupBox>

@@ -98,7 +98,7 @@
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                        Text="日付" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <controls:DateTimePicker Grid.Row="3" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
-                         DateFormat="yyyy/MM/dd" SelectedDate="{Binding SelectedDate}"/>
+                         DateFormat="yyyy-MM-dd" SelectedDate="{Binding SelectedDate}"/>
             <Button Grid.Row="3" Grid.Column="3" Margin="5" Content="今日" Command="{StaticResource TodayCommand}"/>
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                        Text="収支" HorizontalAlignment="Left" VerticalAlignment="Center"/>

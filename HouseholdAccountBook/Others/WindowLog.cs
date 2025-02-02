@@ -106,10 +106,10 @@ namespace HouseholdAccountBook.Others
             using (FileStream fs = new FileStream(ConstValue.ConstValue.WindowLocationFilePath(this.window.Name), FileMode.Append)) {
                 using (StreamWriter sw = new StreamWriter(fs)) {
                     if (fs.Length == 0) {
-                        sw.WriteLine("yyyy/MM/dd HH:mm:ss.ffff\tState\tLeft\tTop\tHeight\tWidth");
+                        sw.WriteLine("yyyy-MM-dd HH:mm:ss.ffff\tState\tLeft\tTop\tHeight\tWidth");
                     }
 
-                    sw.Write(string.Format($"{DateTime.Now:yyyy/MM/dd HH:mm:ss.ffff}\t{windowState}\t{this.window.Left}\t{this.window.Top}\t{this.window.Height}\t{this.window.Width}"));
+                    sw.Write(string.Format($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.ffff}\t{windowState}\t{this.window.Left}\t{this.window.Top}\t{this.window.Height}\t{this.window.Width}"));
                     if (!string.IsNullOrEmpty(comment)) {
                         sw.Write(string.Format($"\t{comment}"));
                     }

@@ -15,7 +15,7 @@ namespace HouseholdAccountBook.Converters
                 return null;
             }
             else if (value is DateTime dateTime) {
-                return dateTime.ToString("yyyy/MM");
+                return dateTime.ToString("yyyy-MM");
             }
             throw new NotImplementedException();
         }

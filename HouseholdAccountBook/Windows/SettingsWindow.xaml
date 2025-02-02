@@ -234,7 +234,7 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="店名" Width="*" Binding="{Binding Name}"/>
                                     <DataGridTextColumn Header="使用回数" Width="*" Binding="{Binding UsedCount}"/>
-                                    <DataGridTextColumn Header="最終使用日" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy/MM/dd', TargetNullValue='----/--/--'}"/>
+                                    <DataGridTextColumn Header="最終使用日" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>
@@ -258,7 +258,7 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="備考" Width="*" Binding="{Binding Remark}"/>
                                     <DataGridTextColumn Header="使用回数" Width="*" Binding="{Binding UsedCount}"/>
-                                    <DataGridTextColumn Header="最終使用日" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy/MM/dd', TargetNullValue='----/--/--'}"/>
+                                    <DataGridTextColumn Header="最終使用日" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>
@@ -371,12 +371,12 @@
                                         <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="開始日"/>
                                         <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" Content="指定" IsChecked="{Binding StartDateExists}"/>
                                         <controls:DateTimePicker Grid.Row="0" Grid.Column="2" Margin="1" IsEnabled="{Binding StartDateExists}"
-                                                                 DateFormat="yyyy/MM/dd" SelectedDate="{Binding StartDate}"/>
+                                                                 DateFormat="yyyy-MM-dd" SelectedDate="{Binding StartDate}"/>
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="終了日"/>
                                         <CheckBox Grid.Row="1" Grid.Column="1" Margin="5" Content="指定" IsChecked="{Binding EndDateExists}"/>
                                         <controls:DateTimePicker Grid.Row="1" Grid.Column="2" Margin="1" IsEnabled="{Binding EndDateExists}"
-                                                                 DateFormat="yyyy/MM/dd" SelectedDate="{Binding EndDate}"/>
+                                                                 DateFormat="yyyy-MM-dd" SelectedDate="{Binding EndDate}"/>
                                     </Grid>
                                 </GroupBox>
                                 

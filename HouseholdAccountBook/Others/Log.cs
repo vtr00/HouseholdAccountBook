@@ -124,7 +124,7 @@ namespace HouseholdAccountBook
             int index = fileName.LastIndexOf("\\");
             string className = fileName.Substring(index + 1, fileName.IndexOf(".", index + 1) - index - 1);
 
-            Trace.WriteLine($"{DateTime.Now:yyyy/MM/dd hh:mm:ss.fff} [{Thread.CurrentThread.ManagedThreadId:000}] {type} {className}::{methodName}:{lineNumber} {message}");
+            Trace.WriteLine($"{DateTime.Now:yyyy-MM-dd hh:mm:ss.fff} [{Thread.CurrentThread.ManagedThreadId:000}] {type} {className}::{methodName}:{lineNumber} {message}");
         }
     }
 }
