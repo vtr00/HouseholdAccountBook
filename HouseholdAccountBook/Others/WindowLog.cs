@@ -1,10 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
@@ -71,7 +67,7 @@ namespace HouseholdAccountBook.Others
         }
 
         /// <summary>
-        /// ウィンドウの状態、位置をファイルに保存する
+        /// ウィンドウの状態、位置をログファイルに保存する
         /// </summary>
         /// <param name="comment">コメント</param>
         /// <param name="forceLog">状態、位置が変わっていなくても保存するか</param>

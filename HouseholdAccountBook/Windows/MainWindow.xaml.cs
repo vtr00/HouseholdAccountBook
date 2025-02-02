@@ -1591,8 +1591,8 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
         /// <summary>
         /// ウィンドウのサイズと位置を変更する際のラッパ関数
         /// </summary>
-        /// <param name="action"></param>
-        private void ChangedLocationOrSizeWrapper(Action action)
+        /// <param name="func">ウィンドウのサイズと位置を変更する関数</param>
+        private bool ChangedLocationOrSizeWrapper(Func<bool> func)
         {
             if (wrapperCount == 0) {
                 this.SizeChanged -= this.MainWindow_SizeChanged;
@@ -1600,13 +1600,15 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
             }
             wrapperCount++;
 
-            action.Invoke();
+            bool ret = func.Invoke();
 
             wrapperCount--;
             if (wrapperCount == 0) {
                 this.SizeChanged += this.MainWindow_SizeChanged;
                 this.LocationChanged += this.MainWindow_LocationChanged;
             }
+
+            return ret;
         }
 
         /// <summary>
@@ -3466,7 +3468,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     this.Left = settings.MainWindow_Left;
                     this.Top = settings.MainWindow_Top;
                 }
-                if (0 < settings.MainWindow_Width && 40 <= settings.MainWindow_Height) {
+                if (40 < settings.MainWindow_Width && 40 < settings.MainWindow_Height) {
                     this.Width = settings.MainWindow_Width;
                     this.Height = settings.MainWindow_Height;
                 }
@@ -3476,6 +3478,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
                 this.windowLog.Log("SettingLoaded", true);
                 this.ModifyLocationOrSize();
+
+                return true;
             });
         }
 
@@ -3490,13 +3494,18 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     settings.MainWindow_WindowState = (int)this.WindowState;
                 }
                 if (this.WindowState == WindowState.Normal) {
-                    settings.MainWindow_Left = this.Left;
-                    settings.MainWindow_Top = this.Top;
-                    settings.MainWindow_Width = this.Width;
-                    settings.MainWindow_Height = this.Height;
+                    if (0 <= this.Left && 0 <= this.Top) {
+                        settings.MainWindow_Left = this.Left;
+                        settings.MainWindow_Top = this.Top;
+                    }
+                    if (40 < this.Width && 40 < this.Height) {
+                        settings.MainWindow_Width = this.Width;
+                        settings.MainWindow_Height = this.Height;
+                    }
                 }
 
                 settings.Save();
+                this.windowLog.Log("SettingSaved", true);
             }
         }
         #endregion
@@ -3555,9 +3564,11 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// <summary>
         /// ウィンドウ位置またはサイズを修正する
         /// </summary>
-        private void ModifyLocationOrSize()
+        private bool ModifyLocationOrSize()
         {
-            this.ChangedLocationOrSizeWrapper(() => {
+            bool ret = this.ChangedLocationOrSizeWrapper(() => {
+                bool ret2 = true;
+
                 /// 位置調整
                 if (30000 < Math.Max(Math.Abs(this.Left), Math.Abs(this.Top))) {
                     double tmpTop = this.Top;
@@ -3567,6 +3578,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                         this.Left = this.lastModLeft;
                     }
                     else {
+                        // ディスプレイの中央に移動する
                         this.MoveOwnersCenter();
                     }
 
@@ -3575,8 +3587,10 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     }
                     else {
                         this.windowLog.Log("FailedToModifyLocation", true);
+                        ret2 = false;
                     }
                 }
+
                 /// サイズ調整
                 if (this.Height < 40 || this.Width < 40) {
                     double tmpHeight = this.Height;
@@ -3595,14 +3609,19 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     }
                     else {
                         this.windowLog.Log("FailedToModifySize", true);
+                        ret2 = false;
                     }
                 }
+
+                return ret2;
             });
 
             this.lastModTop = this.Top;
             this.lastModLeft = this.Left;
             this.lastModWidth = this.Width;
             this.lastModHeight = this.Height;
+
+            return ret;
         }
 
         /// <summary>
@@ -3643,7 +3662,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                         Directory.CreateDirectory(tmpBackUpFolderPath);
                     }
 
-                    if (tmpDumpExePath == string.Empty) {
+                    if (tmpDumpExePath != string.Empty) {
                         // 起動情報を設定する
                         ProcessStartInfo info = new ProcessStartInfo() {
                             FileName = tmpDumpExePath,
@@ -3659,7 +3678,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                         };
 
                         // バックアップする
-                        Task<bool?> task = new Task<bool?>(() => {
+                        result = await Task.Run<bool?>(() => {
                             Log.Info("Start Backup");
 
                             Process process = Process.Start(info);
@@ -3670,8 +3689,6 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                 return process != null;
                             }
                         });
-
-                        result = await task;
                     }
                 }
             }

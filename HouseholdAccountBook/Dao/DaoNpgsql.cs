@@ -99,9 +99,7 @@ namespace HouseholdAccountBook.Dao
 
             int cnt = 0;
             foreach (object obj in objects) {
-                object tmpObj = obj;
-                if (tmpObj == null) tmpObj = DBNull.Value;
-
+                object tmpObj = obj ?? DBNull.Value;
                 command.Parameters.AddWithValue("@_" + cnt + "_", tmpObj);
                 ++cnt;
             }
