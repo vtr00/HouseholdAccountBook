@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -56,7 +58,7 @@ namespace HouseholdAccountBook.UserControls
                 new PropertyMetadata(DateTimePicker_DateFormatChanged));
         #endregion
         /// <summary>
-        /// デートフォーマット(yyyy,MM,ddのみ。/区切り。順序に縛りなし)
+        /// 日付フォーマット(yyyy,MM,ddのみ。区切り文字は/または-。順序に縛りなし)
         /// </summary>
         #region DateFormat
         public string DateFormat
@@ -172,7 +174,7 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// 選択が変更されたときに「/」内をまとめて選択する
+        /// 選択が変更されたときに区切り文字間をまとめて選択する
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -335,16 +337,22 @@ namespace HouseholdAccountBook.UserControls
         }
 
         /// <summary>
-        /// 「/」内をまとめて選択する
+        /// 区切り文字間をまとめて選択する
         /// </summary>
         /// <param name="textBox">テキストボックス</param>
         private static void SelectAsRange(TextBox textBox)
         {
+            List<char> charList = new List<char>();
+            if (-1 != textBox.Text.LastIndexOf('/')) charList.Add('/');
+            if (-1 != textBox.Text.LastIndexOf('-')) charList.Add('-');
+            Debug.Assert(charList.Count == 1);
+            char separetor = charList.Count == 1 ? charList[0] : '-';
+
             string forward = textBox.Text.Substring(0, textBox.SelectionStart);
             string backward = textBox.Text.Substring(textBox.SelectionStart, textBox.Text.Length - textBox.SelectionStart);
 
-            int start = forward.LastIndexOf('/') + 1;
-            int end = forward.Length + (backward.IndexOf('/') >= 0 ? backward.IndexOf('/') : backward.Length);
+            int start = forward.LastIndexOf(separetor) + 1;
+            int end = forward.Length + (backward.IndexOf(separetor) >= 0 ? backward.IndexOf(separetor) : backward.Length);
 
             textBox.SelectionStart = start;
             textBox.SelectionLength = end - start;

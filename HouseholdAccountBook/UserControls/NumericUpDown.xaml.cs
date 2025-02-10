@@ -137,8 +137,8 @@ namespace HouseholdAccountBook.UserControls
         #region IsAcceptableMouseWheel
         public bool IsAcceptableMouseWheel
         {
-            get => (bool)GetValue(IsAcceptableMouseWheelProperty);
-            set => SetValue(IsAcceptableMouseWheelProperty, value);
+            get => (bool)this.GetValue(IsAcceptableMouseWheelProperty);
+            set => this.SetValue(IsAcceptableMouseWheelProperty, value);
         }
         #endregion
         #endregion
