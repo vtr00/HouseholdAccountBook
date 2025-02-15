@@ -493,7 +493,7 @@ ALTER TABLE ONLY rel_book_item
     ADD CONSTRAINT rel_book_item_pkey PRIMARY KEY (book_id, item_id);
 
 INSERT INTO mst_book (book_name, book_kind, initial_value, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES ('Ç®ç‡ïz', 1, 1, 0, 0, 'now', '', 'now', '');
+VALUES ('Ç®ç‡ïz', 1, 0, 0, 0, 'now', '', 'now', '');
 
 INSERT INTO mst_category (category_name, balance_kind, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES ('ì¡éÍ', 0, 0, 0, 'now', '', 'now', '');
@@ -501,9 +501,9 @@ INSERT INTO mst_category (category_name, balance_kind, sort_order, del_flg, upda
 VALUES ('ì¡éÍ', 1, 0, 0, 'now', '', 'now', '');
 
 INSERT INTO mst_item (item_name, category_id, advance_flg, sort_order, move_flg, del_flg, update_time, updater, insert_time, inserter)
-VALUES ('åªã‡à⁄ìÆ', 1, 0, 1, 0, 0, 'now', '', 'now', '');  
+VALUES ('åªã‡à⁄ìÆ', 1, 0, 1, 1, 0, 'now', '', 'now', '');  
 INSERT INTO mst_item (item_name, category_id, advance_flg, sort_order, move_flg, del_flg, update_time, updater, insert_time, inserter)
-VALUES ('åªã‡à⁄ìÆ', 2, 0, 1, 0, 0, 'now', '', 'now', '');
+VALUES ('åªã‡à⁄ìÆ', 2, 0, 1, 1, 0, 'now', '', 'now', '');
 
 -- Completed on 2018-04-30 18:37:24
 

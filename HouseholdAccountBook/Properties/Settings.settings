@@ -159,13 +159,13 @@
       <Value Profile="(Default)">-1</Value>
     </Setting>
     <Setting Name="App_IsDebug" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="App_InitSizeFlag" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="App_IsPositionSaved" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="MainWindow_SelectedGraphKind2Index" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">-1</Value>

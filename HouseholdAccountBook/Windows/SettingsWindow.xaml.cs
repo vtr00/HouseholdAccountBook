@@ -1444,7 +1444,7 @@ ORDER BY sort_order;");
                 reader = await dao.ExecQueryAsync(@"
 SELECT B.book_id, B.book_name, B.book_kind, B.debit_book_id, B.pay_day, B.initial_value, B.json_code, B.sort_order, MIN(A.act_time) AS start_date, MAX(A.act_time) AS end_date
 FROM mst_book B
-INNER JOIN hst_action A ON A.book_id = B.book_id AND A.del_flg = 0
+LEFT OUTER JOIN hst_action A ON A.book_id = B.book_id AND A.del_flg = 0
 WHERE B.del_flg = 0
 GROUP BY B.book_id
 ORDER BY B.sort_order;");
@@ -1457,8 +1457,8 @@ ORDER BY B.sort_order;");
                     int initialValue = record.ToInt("initial_value");
                     int? debitBookId = record.ToNullableInt("debit_book_id");
                     int? payDay = record.ToNullableInt("pay_day");
-                    DateTime startDate = record.ToDateTime("start_date");
-                    DateTime endDate = record.ToDateTime("end_date");
+                    DateTime? startDate = record.ToNullableDateTime("start_date");
+                    DateTime? endDate = record.ToNullableDateTime("end_date");
 
                     string jsonCode = record["json_code"];
                     MstBookJsonObject jsonObj = JsonConvert.DeserializeObject<MstBookJsonObject>(jsonCode);
@@ -1472,9 +1472,9 @@ ORDER BY B.sort_order;");
                         DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((vm) => { return vm.Id != bookId; })),
                         PayDay = payDay,
                         StartDateExists = jsonObj?.StartDate != null,
-                        StartDate = jsonObj?.StartDate ?? startDate,
+                        StartDate = jsonObj?.StartDate ?? startDate ?? DateTime.Today,
                         EndDateExists = jsonObj?.EndDate != null,
-                        EndDate = jsonObj?.EndDate ?? endDate,
+                        EndDate = jsonObj?.EndDate ?? endDate ?? DateTime.Today,
                         CsvFolderPath = jsonObj?.CsvFolderPath,
                         ActDateIndex = jsonObj?.CsvActDateIndex,
                         OutgoIndex = jsonObj?.CsvOutgoIndex,

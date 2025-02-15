@@ -345,7 +345,6 @@ namespace HouseholdAccountBook.UserControls
             List<char> charList = new List<char>();
             if (-1 != textBox.Text.LastIndexOf('/')) charList.Add('/');
             if (-1 != textBox.Text.LastIndexOf('-')) charList.Add('-');
-            Debug.Assert(charList.Count == 1);
             char separetor = charList.Count == 1 ? charList[0] : '-';
 
             string forward = textBox.Text.Substring(0, textBox.SelectionStart);
