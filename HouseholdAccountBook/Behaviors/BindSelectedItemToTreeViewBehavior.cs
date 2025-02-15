@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Interfaces;
+using Microsoft.Xaml.Behaviors;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Interactivity;
 
 namespace HouseholdAccountBook.Behaviors
 {
