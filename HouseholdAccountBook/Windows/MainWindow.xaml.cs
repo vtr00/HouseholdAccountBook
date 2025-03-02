@@ -765,7 +765,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         {
             // 帳簿タブを選択 かつ 選択されている帳簿項目が1つだけ存在 かつ 選択している帳簿項目のIDが0より大きい かつ 子ウィンドウを開いていない
             e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab &&
-                           this.WVM.SelectedActionVMList.Count == 1 && this.WVM.SelectedActionVMList[0].ActionId > 0 && !this.ChildrenWindowOpened;
+                           this.WVM.SelectedActionVMList.Count == 1 && 0 < this.WVM.SelectedActionVMList[0].ActionId && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -2835,7 +2835,10 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                 CustomBarSeries slectedSeries = new CustomBarSeries() {
                     IsStacked = true,
                     Title = vm.Name,
-                    FillColor = (this.WVM.DailyGraphPlotModel.Series.FirstOrDefault(s => ((s as CustomBarSeries).Title == vm.Name)) as CustomBarSeries).ActualFillColor,
+                    FillColor = (this.WVM.DailyGraphPlotModel.Series.FirstOrDefault((s) => {
+                        List<GraphDatumViewModel> datumVMList = new List<GraphDatumViewModel>((s as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
+                        return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
+                    }) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Select((value, index) => {
                         return new GraphDatumViewModel {
                             Value = value,
@@ -3113,7 +3116,10 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                 CustomBarSeries selectedSeries = new CustomBarSeries() {
                     IsStacked = true,
                     Title = vm.Name,
-                    FillColor = (this.WVM.MonthlyGraphPlotModel.Series.FirstOrDefault(s => ((s as CustomBarSeries).Title == vm.Name)) as CustomBarSeries).ActualFillColor,
+                    FillColor = (this.WVM.MonthlyGraphPlotModel.Series.FirstOrDefault((s) => {
+                        List<GraphDatumViewModel> datumVMList = new List<GraphDatumViewModel>((s as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
+                        return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
+                    }) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Select((value, index) => new GraphDatumViewModel {
                         Value = value,
                         Number = index + startMonth,
@@ -3382,7 +3388,10 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                 CustomBarSeries selectedSeries = new CustomBarSeries() {
                     IsStacked = true,
                     Title = vm.Name,
-                    FillColor = (this.WVM.YearlyGraphPlotModel.Series.FirstOrDefault(s => ((s as CustomBarSeries).Title == vm.Name)) as CustomBarSeries).ActualFillColor,
+                    FillColor = (this.WVM.YearlyGraphPlotModel.Series.FirstOrDefault((s) => {
+                        List<GraphDatumViewModel> datumVMList = new List<GraphDatumViewModel>((s as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
+                        return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
+                    }) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Select((value, index) => new GraphDatumViewModel {
                         Value = value,
                         Number = index + startYear,
@@ -3390,7 +3399,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                         CategoryId = vm.CategoryId
                     }),
                     ValueField = "Value",
-                    TrackerFormatString = "{1}年度: {2:#,0}", //年: 金額
+                    TrackerFormatString = "{1}年度: {2:#,0}", //年度: 金額
                     XAxisKey = "Value",
                     YAxisKey = "Category"
                 };
