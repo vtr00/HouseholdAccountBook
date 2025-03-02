@@ -119,9 +119,9 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Margin="0,5" Width="75" Content="開く" Command="{x:Static ApplicationCommands.Open}"/>
-                <Button Grid.Column="2" Margin="0,5" Width="75" Content="移動" Command="{StaticResource MoveCsvFilesCommand}"/>
-                <Button Grid.Column="3" Margin="0,5" Width="75" Content="閉じる" Command="{x:Static ApplicationCommands.Close}"/>
+                <Button Grid.Column="0" Margin="0,5" Width="50" Content="開く" Command="{x:Static ApplicationCommands.Open}"/>
+                <Button Grid.Column="2" Margin="0,5" Width="50" Content="移動" Command="{StaticResource MoveCsvFilesCommand}"/>
+                <Button Grid.Column="3" Margin="3,5,0,5" Width="50" Content="閉じる" Command="{x:Static ApplicationCommands.Close}"/>
             </Grid>
 
             <Grid Grid.Row="1" Margin="25,0">
@@ -143,9 +143,9 @@
 
                 <ComboBox Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,5" MinWidth="150"
                           ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
-                <Button Grid.Column="2" Margin="0,5" Width="75" Content="追加" Command="{StaticResource AddActionCommand}"/>
-                <Button Grid.Column="3" Margin="0,5" Width="75" Content="編集" Command="{StaticResource EditActionCommand}"/>
-                <Button Grid.Column="4" Margin="0,5" Width="75" Content="一括チェック" Command="{StaticResource BulkCheckCommand}"/>
+                <Button Grid.Column="2" Margin="0,5" Width="50" Content="追加" Command="{StaticResource AddActionCommand}"/>
+                <Button Grid.Column="3" Margin="3,5,0,5" Width="50" Content="編集" Command="{StaticResource EditActionCommand}"/>
+                <Button Grid.Column="4" Margin="3,5,0,5" Width="80" Content="一括チェック" Command="{StaticResource BulkCheckCommand}"/>
             </Grid>
 
             <Grid Grid.Row="3" Margin="25,0">

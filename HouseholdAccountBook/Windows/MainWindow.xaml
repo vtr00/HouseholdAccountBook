@@ -38,8 +38,8 @@
         <RoutedCommand x:Key="MoveToBookCommand"/>
         <RoutedCommand x:Key="AddActionCommand"/>
         <RoutedCommand x:Key="AddActionListCommand"/>
-        <RoutedCommand x:Key="EditActionCommand"/>
         <RoutedCommand x:Key="CopyActionCommand"/>
+        <RoutedCommand x:Key="EditActionCommand"/>
         <RoutedCommand x:Key="DeleteActionCommand"/>
         <RoutedCommand x:Key="ChangeIsMatchCommand"/>
 
@@ -208,8 +208,10 @@
                 <Separator/>
                 <MenuItem Header="追加(_A)..." Command="{StaticResource AddActionCommand}" InputGestureText="Ctrl++"/>
                 <MenuItem Header="リスト追加(_W)..." Command="{StaticResource AddActionListCommand}" InputGestureText="Ctrl+Shift++"/>
-                <MenuItem Header="編集(_E)..." Command="{StaticResource EditActionCommand}" InputGestureText="F2"/>
                 <MenuItem Header="複製(_C)..." Command="{StaticResource CopyActionCommand}" InputGestureText="Ctrl+Shift+C"/>
+                <Separator/>
+                <MenuItem Header="編集(_E)..." Command="{StaticResource EditActionCommand}" InputGestureText="F2"/>
+                <Separator/>
                 <MenuItem Header="削除(_D)" Command="{StaticResource DeleteActionCommand}" InputGestureText="Del"/>
             </MenuItem>
             <MenuItem Header="表示(_V)">
@@ -297,7 +299,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- 中央メニュー -->
+                    <!-- 上部メニュー -->
                     <Grid Grid.Row="0" Grid.Column="0" Margin="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -334,9 +336,9 @@
                             <Button Width="50" Margin="0,0,3,0" Content="移動" Command="{StaticResource MoveToBookCommand}"/>
                             <Button Width="50" Content="追加" Command="{StaticResource AddActionCommand}"/>
                             <Button Width="80" Content="リスト追加" Command="{StaticResource AddActionListCommand}"/>
-                            <Button Width="50" Content="編集" Command="{StaticResource EditActionCommand}"/>
-                            <Button Width="50" Margin="3,0,0,0" Content="複製" Command="{StaticResource CopyActionCommand}"/>
-                            <Button Width="50" Content="削除" Command="{StaticResource DeleteActionCommand}"/>
+                            <Button Width="50" Content="複製" Command="{StaticResource CopyActionCommand}"/>
+                            <Button Width="50" Margin="3,0,0,0" Content="編集" Command="{StaticResource EditActionCommand}"/>
+                            <Button Width="50" Margin="3,0,0,0" Content="削除" Command="{StaticResource DeleteActionCommand}"/>
                             <CheckBox Margin="3,3,0,3" ToolTip="CSV一致チェック" VerticalAlignment="Center"
                                         IsChecked="{Binding IsMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{StaticResource ChangeIsMatchCommand}"/>
                         </StackPanel>
@@ -371,9 +373,9 @@
                                     <KeyBinding Gesture="Ctrl+Add" Command="{StaticResource AddActionCommand}"/>
                                     <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{StaticResource AddActionListCommand}"/>
                                     <KeyBinding Gesture="Shift+Ctrl+Add" Command="{StaticResource AddActionListCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+Shift+C" Command="{StaticResource CopyActionCommand}"/>
                                     <KeyBinding Gesture="F2" Command="{StaticResource EditActionCommand}"/>
                                     <KeyBinding Gesture="Enter" Command="{StaticResource EditActionCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+Shift+C" Command="{StaticResource CopyActionCommand}"/>
                                     <KeyBinding Gesture="Delete" Command="{StaticResource DeleteActionCommand}"/>
                                     
                                     <MouseBinding Gesture="LeftDoubleClick" Command="{StaticResource EditActionCommand}"/>
