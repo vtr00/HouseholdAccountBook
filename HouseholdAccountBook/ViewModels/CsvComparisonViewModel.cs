@@ -67,6 +67,18 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// グループID
+        /// </summary>
+        #region GroupId
+        public int? GroupId
+        {
+            get => this._GroupId;
+            set => this.SetProperty(ref this._GroupId, value);
+        }
+        private int? _GroupId = default;
+        #endregion
+
+        /// <summary>
         /// 一致フラグ
         /// </summary>
         #region IsMatch

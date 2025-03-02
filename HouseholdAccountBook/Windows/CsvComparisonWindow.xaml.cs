@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -292,17 +293,55 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void EditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void EditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedCsvComparisonVM.ActionId.Value) { Owner = this };
-            arw.LoadWindowSetting();
+            // グループ種別を特定する
+            int? groupKind = null;
+            using (DaoBase dao = this.builder.Build()) {
+                DaoReader reader = await dao.ExecQueryAsync(@"
+SELECT A.group_id, G.group_kind
+FROM hst_action A
+LEFT JOIN (SELECT * FROM hst_group WHERE del_flg = 0) G ON G.group_id = A.group_id
+WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedCsvComparisonVM.ActionId);
 
-            arw.Registrated += async (sender2, e2) => {
-                // 表示を更新する
-                this.ActionChanged?.Invoke(this, e2);
-                await this.UpdateComparisonVMListAsync();
-            };
-            arw.ShowDialog();
+                reader.ExecARow((record) => {
+                    groupKind = record.ToNullableInt("group_kind");
+                });
+            }
+
+            switch (groupKind) {
+                case (int)GroupKind.Move:
+                    Debug.Assert(true);
+                    break;
+                case (int)GroupKind.ListReg:
+                    // リスト登録された帳簿項目の編集時の処理
+                    ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedCsvComparisonVM.GroupId.Value) { Owner = this };
+                    alrw.LoadWindowSetting();
+
+                    // 登録時イベントを登録する
+                    alrw.Registrated += async (sender2, e2) => {
+                        // 表示を更新する
+                        this.ActionChanged?.Invoke(this, e2);
+                        await this.UpdateComparisonVMListAsync();
+                    };
+                    alrw.ShowDialog();
+                    break;
+                case (int)GroupKind.Repeat:
+                default:
+                    // 移動・リスト登録以外の帳簿項目の編集時の処理
+                    ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedCsvComparisonVM.ActionId.Value) { Owner = this };
+                    arw.LoadWindowSetting();
+
+                    // 登録時イベントを登録する
+                    arw.Registrated += async (sender2, e2) => {
+                        // 表示を更新する
+                        this.ActionChanged?.Invoke(this, e2);
+                        await this.UpdateComparisonVMListAsync();
+                    };
+                    arw.ShowDialog();
+                    break;
+            }
+
         }
 
         /// <summary>
@@ -326,13 +365,12 @@ namespace HouseholdAccountBook.Windows
         private void AddOrEditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             // 選択されている帳簿項目が1つ以上存在していて、値を持たない帳簿項目IDが1つ以上ある
-            if (this.WVM.SelectedCsvComparisonVMList.Count != 0 && this.WVM.SelectedCsvComparisonVMList.Count((vm) => !vm.ActionId.HasValue) > 0) {
+            if (0 < this.WVM.SelectedCsvComparisonVMList.Count && 0 < this.WVM.SelectedCsvComparisonVMList.Count((vm) => !vm.ActionId.HasValue)) {
                 this.AddActionCommand_Executed(sender, e);
             }
             else {
                 this.EditActionCommand_Executed(sender, e);
             }
-
         }
 
         /// <summary>
@@ -600,7 +638,7 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
                     vm.ClearActionInfo();
 
                     DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT A.action_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match
+SELECT A.action_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match, A.group_id
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
 WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_value = -@{1} AND book_id = @{2} AND A.del_flg = 0;", vm.Record.Date, vm.Record.Value, this.WVM.SelectedBookVM.Id);
@@ -612,6 +650,7 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
                         string shopName = record["shop_name"];
                         string remark = record["remark"];
                         bool isMatch = record.ToInt("is_match") == 1;
+                        int? groupId = record.ToNullableInt("group_id");
 
                         // 帳簿項目IDが使用済なら次のレコードを調べるようにする
                         bool checkNext = this.WVM.CsvComparisonVMList.Where((tmpVM) => { return tmpVM.ActionId == actionId; }).Count() != 0;
@@ -622,6 +661,7 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
                             vm.ShopName = shopName;
                             vm.Remark = remark;
                             vm.IsMatch = isMatch;
+                            vm.GroupId = groupId;
                         }
                         return checkNext;
                     });
