@@ -399,7 +399,6 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             settings.Save();
 
             int exitCode = -1;
-            string errorMessage = string.Empty;
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 using (DaoBase dao = this.builder.Build()) {
                     // 既存のデータを削除する
@@ -413,39 +412,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                     await dao.ExecNonQueryAsync(@"DELETE FROM rel_book_item;");
                 }
 
-                // 起動情報を設定する
-                ProcessStartInfo info = new ProcessStartInfo() {
-                    FileName = settings.App_Postgres_RestoreExePath,
-                    Arguments = string.Format(
-                        "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --data-only --verbose --dbname \"{5}\" \"{4}\"",
-                        settings.App_Postgres_Host,
-                        settings.App_Postgres_Port,
-                        settings.App_Postgres_UserName,
-                        settings.App_Postgres_Role,
-                        ofd.FileName,
-    #if DEBUG
-                        settings.App_Postgres_DatabaseName_Debug
-    #else
-                        settings.App_Postgres_DatabaseName
-    #endif
-                        ),
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    RedirectStandardInput = true,
-                    UseShellExecute = false
-                };
-    #if DEBUG
-                Console.WriteLine(string.Format("リストア：\"{0}\" {1}", info.FileName, info.Arguments));
-    #endif
-
-                // リストアする
-                Process process = Process.Start(info);
-                process.WaitForExit(10 * 1000);
-                exitCode = process.ExitCode;
-                using (StreamReader r = process.StandardError) {
-                    errorMessage = r.ReadToEnd();
-                }
+                exitCode = await this.ExecuteRestore(ofd.FileName);
 
                 if (exitCode == 0) {
                     await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
@@ -456,7 +423,6 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 MessageBox.Show(MessageText.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                Log.Error(errorMessage);
                 MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
@@ -476,7 +442,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ExportCustomFileCommand_Excuted(object sender, ExecutedRoutedEventArgs e)
+        private async void ExportCustomFileCommand_Excuted(object sender, ExecutedRoutedEventArgs e)
         {
             Log.Info();
 
@@ -505,50 +471,72 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             settings.App_CustomFormatFilePath = Path.Combine(sfd.InitialDirectory, sfd.FileName);
             settings.Save();
 
-            int exitCode = -1;
-            string errorMessage = string.Empty;
+            int? exitCode = -1;
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                // 起動情報を設定する
-                ProcessStartInfo info = new ProcessStartInfo() {
-                    FileName = settings.App_Postgres_DumpExePath,
-                    Arguments = string.Format(
-                        "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
-                        settings.App_Postgres_Host,
-                        settings.App_Postgres_Port,
-                        settings.App_Postgres_UserName,
-                        settings.App_Postgres_Role,
-                        sfd.FileName,
-#if DEBUG
-                        settings.App_Postgres_DatabaseName_Debug
-#else
-                        settings.App_Postgres_DatabaseName
-#endif
-                    ),
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    RedirectStandardInput = true,
-                    UseShellExecute = false
-                };
-#if DEBUG
-                Console.WriteLine(string.Format("Dump: \"{0}\" {1}", info.FileName, info.Arguments));
-#endif
-
-                // バックアップする
-                Process process = Process.Start(info);
-                if (process.WaitForExit(10 * 1000)) {
-                    exitCode = process.ExitCode;
-                }
-                using (StreamReader r = process.StandardError) {
-                    errorMessage = r.ReadToEnd();
-                }
+                exitCode = await this.ExecuteDump(sfd.FileName, PostgresFormat.Custom);
             }
 
             if (exitCode == 0) {
                 MessageBox.Show(MessageText.FinishToExport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                Log.Error(errorMessage);
+                MessageBox.Show(MessageText.FoultToExport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            }
+        }
+
+        /// <summary>
+        /// SQLファイル出力可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExportSQLFileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Properties.Settings.Default.App_Postgres_DumpExePath != string.Empty && !this.ChildrenWindowOpened;
+        }
+
+        /// <summary>
+        /// SQLファイルに出力する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ExportSQLFileCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Log.Info();
+
+            Properties.Settings settings = Properties.Settings.Default;
+
+            string directory = string.Empty;
+            string fileName = string.Empty;
+            // 過去に読み込んだときのフォルダとファイルをデフォルトにする
+            if (settings.App_SQLFilePath != string.Empty) {
+                directory = Path.GetDirectoryName(settings.App_SQLFilePath);
+                fileName = Path.GetFileName(settings.App_SQLFilePath);
+            }
+            else {
+                directory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            }
+
+            SaveFileDialog sfd = new SaveFileDialog() {
+                InitialDirectory = directory,
+                FileName = fileName,
+                Title = "ファイル選択",
+                Filter = "SQLファイル|*.sql"
+            };
+
+            if (sfd.ShowDialog(this) == false) return;
+
+            settings.App_SQLFilePath = Path.Combine(sfd.InitialDirectory, sfd.FileName);
+            settings.Save();
+
+            int? exitCode = -1;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                exitCode = await this.ExecuteDump(sfd.FileName, PostgresFormat.Plain);
+            }
+
+            if (exitCode == 0) {
+                MessageBox.Show(MessageText.FinishToExport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+            }
+            else {
                 MessageBox.Show(MessageText.FoultToExport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
@@ -573,11 +561,17 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         {
             Log.Info();
 
+            int? exitCode = null;
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                await this.CreateBackUpFileAsync(true);
+                await this.CreateBackUpFileAsync();
             }
 
-            MessageBox.Show(MessageText.FinishToBackUp, MessageTitle.Information);
+            if (exitCode == 0) {
+                MessageBox.Show(MessageText.FinishToBackup, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+            }
+            else {
+                MessageBox.Show(MessageText.FoultToBackup, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            }
         }
 
         /// <summary>
@@ -1702,7 +1696,7 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
             this.Hide();
 
             if (settings.App_BackUpFlagAtClosing) {
-                await this.CreateBackUpFileAsync(true);
+                await this.CreateBackUpFileAsync();
             }
         }
 
@@ -1729,12 +1723,15 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
 
             if (this.WindowState == WindowState.Minimized) {
                 if (settings.App_BackUpFlagAtMinimizing) {
+                    Log.Info(string.Format("BackUpCurrentAtMinimizing: {0}", settings.App_BackUpCurrentAtMinimizing));
                     DateTime nextBackup = settings.App_BackUpCurrentAtMinimizing.AddMinutes(settings.App_BackUpIntervalMinAtMinimizing);
+                    Log.Info(string.Format("NextBackup: {0}", nextBackup));
 
                     if (nextBackup <= DateTime.Now) {
-                        bool? result = await this.CreateBackUpFileAsync(false);
+                        bool? result = await this.CreateBackUpFileAsync();
                         if (result != false) {
                             settings.App_BackUpCurrentAtMinimizing = DateTime.Now;
+                            Log.Info(string.Format("Update BackUpCurrentAtMinimizing: {0}", settings.App_BackUpCurrentAtMinimizing));
                         }
                     }
                 }
@@ -3656,15 +3653,13 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// バックアップファイルを作成する
         /// </summary>
         /// <param name="waitForFinish">完了を待つか</param>
-        /// <param name="dumpExePath">pg_dump.exeパス</param>
         /// <param name="backUpNum">バックアップ数</param>
         /// <param name="backUpFolderPath">バックアップ用フォルダパス</param>
         /// <returns>成功/失敗</returns>
-        public async Task<bool> CreateBackUpFileAsync(bool waitForFinish, string dumpExePath = null, int? backUpNum = null, string backUpFolderPath = null)
+        public async Task<bool> CreateBackUpFileAsync(bool waitForFinish = true, int? backUpNum = null, string backUpFolderPath = null)
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            string tmpDumpExePath = dumpExePath ?? settings.App_Postgres_DumpExePath;
             int tmpBackUpNum = backUpNum ?? settings.App_BackUpNum;
             string tmpBackUpFolderPath = backUpFolderPath ?? settings.App_BackUpFolderPath;
 
@@ -3686,53 +3681,14 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             if (0 < tmpBackUpNum) {
                 if (tmpBackUpFolderPath != string.Empty) {
+                    // フォルダが存在しなければ作成する
                     if (!Directory.Exists(tmpBackUpFolderPath)) {
                         Directory.CreateDirectory(tmpBackUpFolderPath);
                     }
 
-                    if (tmpDumpExePath != string.Empty) {
-                        // 起動情報を設定する
-                        ProcessStartInfo info = new ProcessStartInfo() {
-                            FileName = tmpDumpExePath,
-                            Arguments = string.Format(
-                                "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --format custom --data-only --verbose --file \"{4}\" \"{5}\"",
-                                settings.App_Postgres_Host,
-                                settings.App_Postgres_Port,
-                                settings.App_Postgres_UserName,
-                                settings.App_Postgres_Role,
-                                Path.Combine(tmpBackUpFolderPath, BackupFileName),
-#if DEBUG
-                                settings.App_Postgres_DatabaseName_Debug
-#else
-                                settings.App_Postgres_DatabaseName
-#endif
-                            ),
-                            WindowStyle = ProcessWindowStyle.Hidden,
-                            RedirectStandardOutput = true,
-                            RedirectStandardError = true,
-                            RedirectStandardInput = true,
-                            UseShellExecute = false
-                        };
-#if DEBUG
-                        Console.WriteLine(string.Format("Dump: \"{0}\" {1}", info.FileName, info.Arguments));
-#endif
-
-                        // バックアップする
-                        exitCode = await Task.Run<int?>(() => {
-                            int? localExitCode = -1;
-                            Log.Info("Start Backup");
-
-                            Process process = Process.Start(info);
-                            if (waitForFinish) {
-                                if (process.WaitForExit(10 * 1000)) {
-                                    localExitCode = process.ExitCode;
-                                }
-                            }
-                            else {
-                                localExitCode = null;
-                            }
-                            return localExitCode;
-                        });
+                    if (settings.App_Postgres_DumpExePath != string.Empty) {
+                        string backupFilePath = Path.Combine(tmpBackUpFolderPath, BackupFileName);
+                        exitCode = await this.ExecuteDump(backupFilePath, PostgresFormat.Custom, waitForFinish);
                     }
                 }
             }
@@ -3742,6 +3698,134 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             }
 
             return exitCode == 0;
+        }
+
+        /// <summary>
+        /// ダンプを実行する
+        /// </summary>
+        /// <param name="backupFilePath">バックアップファイルパス</param>
+        /// <param name="format">ダンプフォーマット</param>
+        /// <param name="waitForFinish">処理の完了を待機する</param>
+        /// <returns>成功/失敗/不明</returns>
+        private async Task<int?> ExecuteDump(string backupFilePath, PostgresFormat format, bool waitForFinish = true)
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            // 起動情報を設定する
+            ProcessStartInfo info = new ProcessStartInfo() {
+                FileName = settings.App_Postgres_DumpExePath,
+                Arguments = string.Format(
+                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --format {4} --data-only --verbose --column-inserts --file \"{5}\" \"{6}\"",
+                    settings.App_Postgres_Host,
+                    settings.App_Postgres_Port,
+                    settings.App_Postgres_UserName,
+                    settings.App_Postgres_Role,
+                    format.ToString().ToLower(),
+                    backupFilePath,
+#if DEBUG
+                    settings.App_Postgres_DatabaseName_Debug
+#else
+                    settings.App_Postgres_DatabaseName
+#endif
+                ),
+                WindowStyle = ProcessWindowStyle.Hidden,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                RedirectStandardInput = true,
+                UseShellExecute = false
+            };
+#if DEBUG
+            Console.WriteLine(string.Format("Dump: \"{0}\" {1}", info.FileName, info.Arguments));
+#endif
+
+            // バックアップする
+            int? exitCode = await Task.Run(() => {
+                int? localExitCode = -1;
+                Log.Info("Start Backup");
+
+                Process process = Process.Start(info);
+                Log.Info("Process executing...");
+                if (waitForFinish) {
+                    if (process.WaitForExit(10 * 1000)) {
+                        localExitCode = process.ExitCode;
+                        if (localExitCode != 0) {
+                            using (StreamReader r = process.StandardError) {
+                                string errorMessage = r.ReadToEnd();
+                                Log.Error(errorMessage);
+                            }
+                        }
+                        Log.Info("Process exit");
+                    }
+                    else {
+                        Log.Error("Process timeout");
+                    }
+                }
+                else {
+                    localExitCode = null;
+                }
+                return localExitCode;
+            });
+
+            return exitCode;
+        }
+
+        /// <summary>
+        /// リストアを実行する
+        /// </summary>
+        /// <param name="backupFilePath">バックアップファイルパス</param>
+        /// <returns>成功/失敗</returns>
+        private async Task<int> ExecuteRestore(string backupFilePath)
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            // 起動情報を設定する
+            ProcessStartInfo info = new ProcessStartInfo() {
+                FileName = settings.App_Postgres_RestoreExePath,
+                Arguments = string.Format(
+                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --data-only --verbose --dbname \"{4}\" \"{5}\"",
+                    settings.App_Postgres_Host,
+                    settings.App_Postgres_Port,
+                    settings.App_Postgres_UserName,
+                    settings.App_Postgres_Role,
+#if DEBUG
+                    settings.App_Postgres_DatabaseName_Debug,
+#else
+                    settings.App_Postgres_DatabaseName,
+#endif
+                    backupFilePath
+                ),
+                WindowStyle = ProcessWindowStyle.Hidden,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                RedirectStandardInput = true,
+                UseShellExecute = false
+            };
+#if DEBUG
+            Console.WriteLine(string.Format("Restore: \"{0}\" {1}", info.FileName, info.Arguments));
+#endif
+
+            // リストアする
+            int exitCode = await Task.Run(() => {
+                int localExitCode = -1;
+                Log.Info("Start Restore");
+
+                Process process = Process.Start(info);
+                if (process.WaitForExit(10 * 1000)) {
+                    localExitCode = process.ExitCode;
+                    if (localExitCode != 0) {
+                        using (StreamReader r = process.StandardError) {
+                            string errorMessage = r.ReadToEnd();
+                            Log.Error(errorMessage);
+                        }
+                    }
+                }
+                else {
+                    Log.Error("Process timeout");
+                }
+                return localExitCode;
+            });
+
+            return exitCode;
         }
     }
 }

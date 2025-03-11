@@ -718,5 +718,29 @@ namespace HouseholdAccountBook.Properties {
                 this["App_BackUpIntervalMinAtMinimizing"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int App_Postgres_Password_Input {
+            get {
+                return ((int)(this["App_Postgres_Password_Input"]));
+            }
+            set {
+                this["App_Postgres_Password_Input"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string App_SQLFilePath {
+            get {
+                return ((string)(this["App_SQLFilePath"]));
+            }
+            set {
+                this["App_SQLFilePath"] = value;
+            }
+        }
     }
 }

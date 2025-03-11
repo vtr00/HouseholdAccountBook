@@ -262,9 +262,9 @@ namespace HouseholdAccountBook
         }
 
         /// <summary>
-        /// 実行ファイルのパスを取得する
+        /// 実行ファイルの存在するフォルダのパスを取得する
         /// </summary>
-        /// <returns>実行ファイルのパス</returns>
+        /// <returns>実行ファイルの存在するフォルダのパス</returns>
         public static string GetCurrentDir()
         {
             return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);

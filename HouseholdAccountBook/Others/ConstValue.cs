@@ -17,6 +17,30 @@ namespace HouseholdAccountBook.ConstValue
         /// 挿入者
         /// </summary>
         public static string Inserter { get; } = "";
+        /// <summary>
+        /// PostgreSQL パスワード入力方法
+        /// </summary>
+        public enum PostgresPasswordInput
+        {
+            /// <summary>
+            /// InputWindowによる入力
+            /// </summary>
+            InputWindow = 0,
+            /// <summary>
+            /// pgpass.confによる入力
+            /// </summary>
+            PgPassConf = 1
+        }
+        /// <summary>
+        /// PostgreSQL ダンプ/リストアフォーマット
+        /// </summary>
+        public enum PostgresFormat
+        {
+            Plain = 0,
+            Custom = 1,
+            Dictionary = 2,
+            Tar = 3
+        }
         #endregion
 
         #region ログ
@@ -411,7 +435,11 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// バックアップが完了しました。
             /// </summary>
-            public static string FinishToBackUp { get; } = "バックアップが完了しました。";
+            public static string FinishToBackup { get; } = "バックアップが完了しました。";
+            /// <summary>
+            /// バックアップに失敗しました。
+            /// </summary>
+            public static string FoultToBackup { get; } = "バックアップに失敗しました。";
             /// <summary>
             /// 選択した項目を削除します。よろしいですか？
             /// </summary>
