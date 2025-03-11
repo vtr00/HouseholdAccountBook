@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|C:\\Data\\Program\\C#\\HouseholdAccountBook\\householdaccountbook\\resources\\updatelog.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|solutionrelative:householdaccountbook\\resources\\updatelog.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|c:\\data\\program\\c#\\householdaccountbook\\householdaccountbook\\windows\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|solutionrelative:householdaccountbook\\windows\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|C:\\Data\\Program\\C#\\HouseholdAccountBook\\householdaccountbook\\resources\\updatelog.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|solutionrelative:householdaccountbook\\resources\\updatelog.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|c:\\data\\program\\c#\\householdaccountbook\\householdaccountbook\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|solutionrelative:householdaccountbook\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|C:\\Data\\Program\\C#\\HouseholdAccountBook\\householdaccountbook\\others\\constvalue.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -22,20 +26,33 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "UpdateLog.txt",
               "DocumentMoniker": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\Resources\\UpdateLog.txt",
               "RelativeDocumentMoniker": "HouseholdAccountBook\\Resources\\UpdateLog.txt",
               "ToolTip": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\Resources\\UpdateLog.txt",
               "RelativeToolTip": "HouseholdAccountBook\\Resources\\UpdateLog.txt",
-              "ViewState": "AgIAAIcDAAAAAAAAAAAAAKkDAAAfAAAAAAAAAA==",
+              "ViewState": "AgIAAIcDAAAAAAAAAAAAAKADAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
               "WhenOpened": "2024-10-12T01:25:24.323Z",
               "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "App.xaml.cs",
+              "DocumentMoniker": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\App.xaml.cs",
+              "RelativeDocumentMoniker": "HouseholdAccountBook\\App.xaml.cs",
+              "ToolTip": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\App.xaml.cs",
+              "RelativeToolTip": "HouseholdAccountBook\\App.xaml.cs",
+              "ViewState": "AgIAACoAAAAAAAAAAADwv8AAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-11T14:54:32.09Z",
               "EditorCaption": ""
             },
             {
@@ -52,7 +69,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "ConstValue.cs",
               "DocumentMoniker": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\Others\\ConstValue.cs",
               "RelativeDocumentMoniker": "HouseholdAccountBook\\Others\\ConstValue.cs",
@@ -65,13 +82,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "MainWindow.xaml.cs",
               "DocumentMoniker": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\Windows\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "HouseholdAccountBook\\Windows\\MainWindow.xaml.cs",
-              "ToolTip": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\Windows\\MainWindow.xaml.cs*",
-              "RelativeToolTip": "HouseholdAccountBook\\Windows\\MainWindow.xaml.cs*",
-              "ViewState": "AgIAAG8GAAAAAAAAAAAYwMUGAACFAAAAAAAAAA==",
+              "ToolTip": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\Windows\\MainWindow.xaml.cs",
+              "RelativeToolTip": "HouseholdAccountBook\\Windows\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAG0GAAAAAAAAAAAgwKMGAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-02T00:29:14.222Z",
               "EditorCaption": ""

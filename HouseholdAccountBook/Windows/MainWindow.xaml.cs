@@ -7,6 +7,7 @@ using HouseholdAccountBook.UserControls;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using Notifications.Wpf;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
@@ -561,12 +562,12 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         {
             Log.Info();
 
-            int? exitCode = null;
+            bool result = false;
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                await this.CreateBackUpFileAsync();
+                result = await this.CreateBackUpFileAsync();
             }
 
-            if (exitCode == 0) {
+            if (result) {
                 MessageBox.Show(MessageText.FinishToBackup, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
@@ -1696,6 +1697,7 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
             this.Hide();
 
             if (settings.App_BackUpFlagAtClosing) {
+                // 通知しても即座に終了するため通知しない
                 await this.CreateBackUpFileAsync();
             }
         }
@@ -1728,9 +1730,10 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
                     Log.Info(string.Format("NextBackup: {0}", nextBackup));
 
                     if (nextBackup <= DateTime.Now) {
-                        bool? result = await this.CreateBackUpFileAsync();
+                        bool result = await this.CreateBackUpFileAsync(true);
                         if (result != false) {
                             settings.App_BackUpCurrentAtMinimizing = DateTime.Now;
+                            settings.Save();
                             Log.Info(string.Format("Update BackUpCurrentAtMinimizing: {0}", settings.App_BackUpCurrentAtMinimizing));
                         }
                     }
@@ -3652,11 +3655,12 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// <summary>
         /// バックアップファイルを作成する
         /// </summary>
+        /// <param name="notifyResult">実行結果を通知する</param>
         /// <param name="waitForFinish">完了を待つか</param>
         /// <param name="backUpNum">バックアップ数</param>
         /// <param name="backUpFolderPath">バックアップ用フォルダパス</param>
         /// <returns>成功/失敗</returns>
-        public async Task<bool> CreateBackUpFileAsync(bool waitForFinish = true, int? backUpNum = null, string backUpFolderPath = null)
+        public async Task<bool> CreateBackUpFileAsync(bool notifyResult = false, bool waitForFinish = true, int? backUpNum = null, string backUpFolderPath = null)
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -3688,7 +3692,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
                     if (settings.App_Postgres_DumpExePath != string.Empty) {
                         string backupFilePath = Path.Combine(tmpBackUpFolderPath, BackupFileName);
-                        exitCode = await this.ExecuteDump(backupFilePath, PostgresFormat.Custom, waitForFinish);
+                        exitCode = await this.ExecuteDump(backupFilePath, PostgresFormat.Custom, notifyResult, waitForFinish);
                     }
                 }
             }
@@ -3705,9 +3709,10 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// </summary>
         /// <param name="backupFilePath">バックアップファイルパス</param>
         /// <param name="format">ダンプフォーマット</param>
+        /// <param name="notifyResult">実行結果を通知する</param>
         /// <param name="waitForFinish">処理の完了を待機する</param>
         /// <returns>成功/失敗/不明</returns>
-        private async Task<int?> ExecuteDump(string backupFilePath, PostgresFormat format, bool waitForFinish = true)
+        private async Task<int?> ExecuteDump(string backupFilePath, PostgresFormat format, bool notifyResult = false, bool waitForFinish = true)
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -3765,6 +3770,27 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                 }
                 return localExitCode;
             });
+
+            if (notifyResult) {
+                if (exitCode == 0) {
+                    NotificationManager nm = new NotificationManager();
+                    NotificationContent nc = new NotificationContent() {
+                        Title = this.Title,
+                        Message = MessageText.FinishToBackup,
+                        Type = NotificationType.Success
+                    };
+                    nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+                }
+                else if (exitCode != null) {
+                    NotificationManager nm = new NotificationManager();
+                    NotificationContent nc = new NotificationContent() {
+                        Title = this.Title,
+                        Message = MessageText.FoultToBackup,
+                        Type = NotificationType.Error
+                    };
+                    nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+                }
+            }
 
             return exitCode;
         }
