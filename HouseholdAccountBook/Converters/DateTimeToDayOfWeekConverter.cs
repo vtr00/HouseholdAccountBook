@@ -25,16 +25,23 @@ namespace HouseholdAccountBook.Converters
         /// </summary>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            DayOfWeek dayOfWeek = ((DateTime)value).DayOfWeek;
-
-            if (dictionary.ContainsKey(dayOfWeek)) {
-                return dictionary[dayOfWeek];
+            if (value is DateTime dateTime) {
+                return dictionary[dateTime.DayOfWeek];
             }
             else {
                 throw new NotImplementedException();
             }
         }
 
+        /// <summary>
+        /// 曜日 -> DateTime変換
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="targetType"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();

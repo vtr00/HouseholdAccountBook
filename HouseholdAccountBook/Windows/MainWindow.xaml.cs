@@ -3720,11 +3720,12 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             ProcessStartInfo info = new ProcessStartInfo() {
                 FileName = settings.App_Postgres_DumpExePath,
                 Arguments = string.Format(
-                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --format {4} --data-only --verbose --column-inserts --file \"{5}\" \"{6}\"",
+                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" {4} --format {5} --data-only --verbose --column-inserts --file \"{6}\" \"{7}\"",
                     settings.App_Postgres_Host,
                     settings.App_Postgres_Port,
                     settings.App_Postgres_UserName,
                     settings.App_Postgres_Role,
+                    settings.App_Postgres_Password_Input == (int)PostgresPasswordInput.PgPassConf ? "--no-password" : "--password",
                     format.ToString().ToLower(),
                     backupFilePath,
 #if DEBUG
@@ -3772,6 +3773,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             });
 
             if (notifyResult) {
+                // ダンプ結果を通知する
                 if (exitCode == 0) {
                     NotificationManager nm = new NotificationManager();
                     NotificationContent nc = new NotificationContent() {
@@ -3808,11 +3810,12 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             ProcessStartInfo info = new ProcessStartInfo() {
                 FileName = settings.App_Postgres_RestoreExePath,
                 Arguments = string.Format(
-                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" --data-only --verbose --dbname \"{4}\" \"{5}\"",
+                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" {4} --data-only --verbose --dbname \"{5}\" \"{6}\"",
                     settings.App_Postgres_Host,
                     settings.App_Postgres_Port,
                     settings.App_Postgres_UserName,
                     settings.App_Postgres_Role,
+                    settings.App_Postgres_Password_Input == (int)PostgresPasswordInput.PgPassConf ? "--no-password" : "--password",
 #if DEBUG
                     settings.App_Postgres_DatabaseName_Debug,
 #else

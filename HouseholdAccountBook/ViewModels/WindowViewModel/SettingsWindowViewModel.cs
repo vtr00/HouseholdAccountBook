@@ -113,6 +113,7 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         #region その他
+        #region データベース
         /// <summary>
         /// pg_dump.exeパス
         /// </summary>
@@ -146,7 +147,9 @@ namespace HouseholdAccountBook.ViewModels
         }
         private string _RestoreExePath = default;
         #endregion
+        #endregion
 
+        #region バックアップ
         /// <summary>
         /// バックアップ数
         /// </summary>
@@ -233,6 +236,25 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// パスワード入力方法
+        /// </summary>
+        #region PasswordInput
+        public PostgresPasswordInput PasswordInput
+        {
+            get => this._PasswordInput;
+            set {
+                if (this.SetProperty(ref this._PasswordInput, value) && this.WithSave) {
+                    this.settings.App_Postgres_Password_Input = (int)value;
+                    this.settings.Save();
+                }
+            }
+        }
+        private PostgresPasswordInput _PasswordInput = PostgresPasswordInput.InputWindow;
+        #endregion
+        #endregion
+
+        #region カレンダー
+        /// <summary>
         /// 開始月
         /// </summary>
         #region StartMonth
@@ -283,28 +305,9 @@ namespace HouseholdAccountBook.ViewModels
         }
         private int _NationalHolidayCsvDateIndex = default;
         #endregion
-
-        /// <summary>
-        /// デバッグモード
-        /// </summary>
-        #region DebugMode
-        public bool DebugMode
-        {
-            get => this._DebugMode;
-            set {
-                if (this.SetProperty(ref this._DebugMode, value) && this.WithSave) {
-                    this.settings.App_IsDebug = value;
-                    this.settings.Save();
-
-                    // リソースを更新して他ウィンドウの項目の表示/非表示を切り替える
-                    App app = System.Windows.Application.Current as App;
-                    app.RegisterSettingsToResource();
-                }
-            }
-        }
-        private bool _DebugMode = default;
         #endregion
 
+        #region ウィンドウ
         /// <summary>
         /// ウィンドウ位置を保存するか
         /// </summary>
@@ -334,6 +337,28 @@ namespace HouseholdAccountBook.ViewModels
         private ObservableCollection<WindowSettingViewModel> _WindowSettingVMList = default;
         #endregion
         #endregion
+
+        /// <summary>
+        /// デバッグモード
+        /// </summary>
+        #region DebugMode
+        public bool DebugMode
+        {
+            get => this._DebugMode;
+            set {
+                if (this.SetProperty(ref this._DebugMode, value) && this.WithSave) {
+                    this.settings.App_IsDebug = value;
+                    this.settings.Save();
+
+                    // リソースを更新して他ウィンドウの項目の表示/非表示を切り替える
+                    App app = System.Windows.Application.Current as App;
+                    app.RegisterSettingsToResource();
+                }
+            }
+        }
+        private bool _DebugMode = default;
+        #endregion
+        #endregion
         #endregion
 
         /// <summary>
@@ -358,6 +383,7 @@ namespace HouseholdAccountBook.ViewModels
             this.BackUpFlagAtMinimizing = this.settings.App_BackUpFlagAtMinimizing;
             this.BackUpIntervalAtMinimizing = this.settings.App_BackUpIntervalMinAtMinimizing;
             this.BackUpFlagAtClosing = this.settings.App_BackUpFlagAtClosing;
+            this.PasswordInput = (PostgresPasswordInput)this.settings.App_Postgres_Password_Input;
             this.StartMonth = this.settings.App_StartMonth;
             this.NationalHolidayCsvURI = this.settings.App_NationalHolidayCsv_Uri;
             this.NationalHolidayCsvDateIndex = this.settings.App_NationalHolidayCsv_DateIndex;

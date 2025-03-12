@@ -494,6 +494,7 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition SharedSizeGroup="Header"/>
@@ -517,7 +518,7 @@
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition SharedSizeGroup="Header"/>
-                                            <ColumnDefinition Width="100" SharedSizeGroup="Number"/>
+                                            <ColumnDefinition SharedSizeGroup="Number"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         
@@ -526,8 +527,13 @@
                                         <TextBlock Grid.Row="3" Grid.Column="2" Text="分" Margin="5" VerticalAlignment="Center"/>
                                     </Grid>
                                 </GroupBox>
-                                
-                                <CheckBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="メインウィンドウクローズ時" IsChecked="{Binding BackUpFlagAtClosing}"/>
+                                <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="メインウィンドウクローズ時" IsChecked="{Binding BackUpFlagAtClosing}"/>
+
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="パスワード" Margin="5"/>
+                                <RadioButton Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_input" Content="入力ウィンドウを表示する" Margin="5"
+                                             IsChecked="{Binding PasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=InputWindow}"/>
+                                <RadioButton Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_pgpass" Content="pgpass.conf を指定する" Margin="5"
+                                             IsChecked="{Binding PasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=PgPassConf}"/>
                             </Grid>
                         </GroupBox>
                         <GroupBox Header="カレンダー">
