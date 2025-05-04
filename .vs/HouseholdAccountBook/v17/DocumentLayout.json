@@ -3,8 +3,14 @@
   "WorkspaceRootPath": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{00000000-0000-0000-0000-000000000000}|\u003CSolution\u003E|HouseholdAccountBook||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|c:\\data\\program\\c#\\householdaccountbook\\householdaccountbook\\resources\\updatelog.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|solutionrelative:householdaccountbook\\resources\\updatelog.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}|HouseholdAccountBook\\HouseholdAccountBook.csproj|c:\\data\\program\\c#\\householdaccountbook\\householdaccountbook\\||{B270807C-D8C6-49EB-8EBE-8E8D566637A1}|5e9a8ac2-4f34-4521-858f-4c248ba31532"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,20 +20,32 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "UpdateLog.txt",
               "DocumentMoniker": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\Resources\\UpdateLog.txt",
               "RelativeDocumentMoniker": "HouseholdAccountBook\\Resources\\UpdateLog.txt",
               "ToolTip": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\Resources\\UpdateLog.txt",
               "RelativeToolTip": "HouseholdAccountBook\\Resources\\UpdateLog.txt",
-              "ViewState": "AgIAAIcDAAAAAAAAAAAAAKcDAAAaAAAAAAAAAA==",
+              "ViewState": "AgIAAIQDAAAAAAAAAAAAALIDAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
               "WhenOpened": "2024-10-12T01:25:24.323Z",
               "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HouseholdAccountBook",
+              "DocumentMoniker": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\HouseholdAccountBook.csproj",
+              "RelativeDocumentMoniker": "HouseholdAccountBook\\HouseholdAccountBook.csproj",
+              "ToolTip": "C:\\Data\\Program\\C#\\HouseholdAccountBook\\HouseholdAccountBook\\HouseholdAccountBook.csproj",
+              "RelativeToolTip": "HouseholdAccountBook\\HouseholdAccountBook.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-05-04T11:53:09.98Z",
               "EditorCaption": ""
             },
             {
