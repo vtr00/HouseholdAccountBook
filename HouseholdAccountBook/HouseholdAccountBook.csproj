@@ -342,6 +342,7 @@
       <DependentUpon>NumericUpDown.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dao\DaoBuilder.cs" />
+    <Compile Include="ViewModels\HierarchicalViewModel.cs" />
     <Compile Include="ViewModels\RemarkViewModel.cs" />
     <Compile Include="ViewModels\ShopViewModel.cs" />
     <Compile Include="ViewModels\WindowSettingViewModel.cs" />

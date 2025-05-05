@@ -126,7 +126,7 @@
                                 <Button Content="↓" Width="25" Command="{StaticResource DropItemSortOrderCommand}" ToolTip="Ctrl+↓"/>
                             </StackPanel>
 
-                            <TreeView x:Name="hierachicalTreeView" Grid.Row="1" Margin="5" ItemsSource="{Binding HierachicalSettingVMList}"
+                            <TreeView x:Name="hierarchicalTreeView" Grid.Row="1" Margin="5" ItemsSource="{Binding HierarchicalVMList}"
                                       SelectedItemChanged="TreeView_SelectedItemChanged">
                                 <TreeView.InputBindings>
                                     <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{StaticResource AddCategoryCommand}"/>
@@ -140,16 +140,16 @@
                                 <TreeView.ItemContainerStyle>
                                     <Style TargetType="TreeViewItem">
                                         <Setter Property="IsExpanded" Value="True"/>
-                                        <Setter Property="IsSelected" Value="{Binding SelectFlag}" />
+                                        <Setter Property="IsSelected" Value="{Binding SelectFlag}"/>
                                     </Style>
                                 </TreeView.ItemContainerStyle>
                                 <i:Interaction.Behaviors>
-                                    <behaviors:BindSelectedItemToTreeViewBehavior SelectedItem="{Binding SelectedItemVM}"/>
+                                    <behaviors:BindSelectedItemToTreeViewBehavior SelectedItem="{Binding SelectedHierarchicalVM}"/>
                                 </i:Interaction.Behaviors>
                                 <TreeView.ItemTemplate>
-                                    <HierarchicalDataTemplate DataType="viewmodels:SettingsViewModel.HierachicalSettingViewModel" 
+                                    <HierarchicalDataTemplate DataType="viewmodels:HierarchicalViewModel" 
                                                               ItemsSource="{Binding ChildrenVMList}">
-                                        <TextBlock Text="{Binding Name}" />
+                                        <TextBlock Text="{Binding Name}"/>
                                     </HierarchicalDataTemplate>
                                 </TreeView.ItemTemplate>
                             </TreeView>
@@ -158,7 +158,7 @@
 
                     <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
 
-                    <Grid Grid.Column="2" DataContext="{Binding SelectedItemVM}">
+                    <Grid Grid.Column="2" DataContext="{Binding DisplayedHierarchicalSettingVM}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="0.3*"/>
@@ -193,13 +193,13 @@
                                 <TextBlock Grid.Row="2" Grid.Column="0" Margin="5"
                                            Text="項目名"/>
                                 <TextBox Grid.Row="2" Grid.Column="1" Margin="5" 
-                                                    Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding CantRename}"/>
+                                                    Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsRenamable, Converter={StaticResource NegationConverter}}"/>
                                 <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Content="確定" Command="{StaticResource SaveItemInfoCommand}" ToolTip="Ctrl+S"/>
                             </Grid>
                         </GroupBox>
 
                         <GroupBox Grid.Row="1" Header="関連付け">
-                            <ListBox Margin="5" ItemsSource="{Binding RelationVMList}" SelectedItem="{Binding SelectedRelationVM}" IsEnabled="{Binding IsEnabled}">
+                            <ListBox Margin="5" ItemsSource="{Binding RelationVMList}" SelectedItem="{Binding SelectedRelationVM}" IsEnabled="{Binding IsSettable}">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <Grid>
@@ -217,7 +217,7 @@
 
                         <GroupBox Grid.Row="2" Header="店舗">
                             <DataGrid Margin="5" x:Name="shopDataGrid" 
-                                      ItemsSource="{Binding ShopVMList}" SelectedItem="{Binding SelectedShopVM}" IsEnabled="{Binding IsEnabled}"
+                                      ItemsSource="{Binding ShopVMList}" SelectedItem="{Binding SelectedShopVM}" IsEnabled="{Binding IsSettable}"
                                       IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
                                       CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                       AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
@@ -241,7 +241,7 @@
 
                         <GroupBox Grid.Row="3" Header="備考">
                             <DataGrid Margin="5" x:Name="remarkDataGrid" 
-                                      ItemsSource="{Binding RemarkVMList}" SelectedItem="{Binding SelectedRemarkVM}" IsEnabled="{Binding IsEnabled}"
+                                      ItemsSource="{Binding RemarkVMList}" SelectedItem="{Binding SelectedRemarkVM}" IsEnabled="{Binding IsSettable}"
                                       IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
                                       CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                       AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
@@ -302,7 +302,7 @@
                         
                     <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
 
-                    <Grid Grid.Column="2" Grid.IsSharedSizeScope="True" DataContext="{Binding SelectedBookVM}">
+                    <Grid Grid.Column="2" Grid.IsSharedSizeScope="True" DataContext="{Binding DisplayedBookSettingVM}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="1.0*"/>
@@ -353,7 +353,7 @@
                                 <controls:NumericUpDown Grid.Row="4" Grid.Column="1" Margin="5" 
                                                                     Value="{Binding InitialValue}"/>
 
-                                <GroupBox Grid.Row="5" Grid.ColumnSpan="4" Margin="5" Header="期間情報">
+                                <GroupBox Grid.Row="5" Grid.ColumnSpan="4" Header="期間情報">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
@@ -422,13 +422,13 @@
                                         <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                  Text="{Binding CsvFolderPath, UpdateSourceTrigger=PropertyChanged}"/>
                                         <Button Grid.Row="0" Grid.Column="3" Margin="5" Content="..." Command="{StaticResource CsvFolderPathDialogCommand}"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="日付位置(0開始)"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="日付位置(1開始)"/>
                                         <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" MinValue="0"
                                                                             Value="{Binding ActDateIndex, TargetNullValue=''}"/>
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="支出位置(0開始)"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="支出位置(1開始)"/>
                                         <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" MinValue="0"
                                                                             Value="{Binding OutgoIndex, TargetNullValue=''}"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Text="項目名位置(0開始)"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Text="項目名位置(1開始)"/>
                                         <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" MinValue="0"
                                                                             Value="{Binding ItemNameIndex, TargetNullValue=''}"/>
                                     </Grid>
@@ -567,7 +567,7 @@
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="URI" Margin="5" VerticalAlignment="Center"/>
                                         <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Text="{Binding NationalHolidayCsvURI}"/>
 
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="日付位置(0開始)" Margin="5" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="日付位置(1開始)" Margin="5" VerticalAlignment="Center"/>
                                         <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" MinValue="0" Value="{Binding NationalHolidayCsvDateIndex}"/>
                                     </Grid>
                                 </GroupBox>

@@ -20,20 +20,10 @@ namespace HouseholdAccountBook.ViewModels
 
         #region プロパティ
         /// <summary>
-        /// CSVファイルパス(1番目)
+        /// CSVファイルパス
         /// </summary>
         #region CsvFilePathes
-        public string CsvFilePathes
-        {
-            get {
-                if (0 < this._CsvFilePathList.Count) {
-                    return string.Join(",", this._CsvFilePathList);
-                }
-                else {
-                    return null;
-                }
-            }
-        }
+        public string CsvFilePathes => 0 < this._CsvFilePathList.Count ? string.Join(",", this._CsvFilePathList) : null;
         #endregion
         /// <summary>
         /// CSVファイルパスリスト

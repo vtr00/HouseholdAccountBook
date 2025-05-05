@@ -76,7 +76,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void AddCategoryCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.SelectedItemVM.Kind != HierarchicalKind.Item;
+            e.CanExecute = this.WVM.SelectedHierarchicalVM != null;
         }
 
         /// <summary>
@@ -87,8 +87,8 @@ namespace HouseholdAccountBook.Windows
         private async void AddCategoryCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                HierarchicalSettingViewModel vm = this.WVM.SelectedItemVM;
-                while (vm.Kind != HierarchicalKind.Balance) {
+                HierarchicalViewModel vm = this.WVM.SelectedHierarchicalVM;
+                while (HierarchicalSettingViewModel.GetHierarchicalKind(vm) != HierarchicalKind.Balance) {
                     vm = vm.ParentVM;
                 }
                 BalanceKind kind = (BalanceKind)vm.Id;
@@ -116,7 +116,7 @@ RETURNING category_id;", (int)kind, Updater, Inserter);
         /// <param name="e"></param>
         private void AddItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.SelectedItemVM.Kind != HierarchicalKind.Balance;
+            e.CanExecute = this.WVM.SelectedHierarchicalVM != null && HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM) != HierarchicalKind.Balance;
         }
 
         /// <summary>
@@ -127,8 +127,8 @@ RETURNING category_id;", (int)kind, Updater, Inserter);
         private async void AddItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                HierarchicalSettingViewModel vm = this.WVM.SelectedItemVM;
-                while (vm.Kind != HierarchicalKind.Category) {
+                HierarchicalViewModel vm = this.WVM.SelectedHierarchicalVM;
+                while (HierarchicalSettingViewModel.GetHierarchicalKind(vm) != HierarchicalKind.Category) {
                     vm = vm.ParentVM;
                 }
                 int categoryId = vm.Id;
@@ -156,7 +156,7 @@ RETURNING item_id;", categoryId, Updater, Inserter);
         /// <param name="e"></param>
         private void DeleteItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.SelectedItemVM.Kind != HierarchicalKind.Balance;
+            e.CanExecute = this.WVM.SelectedHierarchicalVM != null && HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM) != HierarchicalKind.Balance;
         }
 
         /// <summary>
@@ -167,8 +167,8 @@ RETURNING item_id;", categoryId, Updater, Inserter);
         private async void DeleteItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                HierarchicalKind kind = this.WVM.SelectedItemVM.Kind;
-                int id = this.WVM.SelectedItemVM.Id;
+                HierarchicalKind? kind = HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM);
+                int id = this.WVM.SelectedHierarchicalVM.Id;
 
                 using (DaoBase dao = this.builder.Build()) {
                     switch (kind) {
@@ -213,23 +213,23 @@ WHERE item_id = @{1};", Updater, id);
                         break;
                     }
                 }
-                await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM.ParentVM.Kind, this.WVM.SelectedItemVM.ParentVM.Id);
+                await this.UpdateItemSettingsTabDataAsync(HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM.ParentVM), this.WVM.SelectedHierarchicalVM.ParentVM.Id);
                 this.needToUpdate = true;
             }
         }
 
         /// <summary>
-        /// 分類/項目の表示順を上げれるか判定
+        /// 分類/項目の表示順を上げられるか判定
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void RaiseItemSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.SelectedItemVM.ParentVM != null;
+            e.CanExecute = this.WVM.SelectedHierarchicalVM != null && this.WVM.SelectedHierarchicalVM.ParentVM != null;
             if (e.CanExecute) {
                 // 同じ階層で、よりソート順序が上の分類/項目がある場合trueになる
-                var parentVM = this.WVM.SelectedItemVM.ParentVM;
-                int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
+                var parentVM = this.WVM.SelectedHierarchicalVM.ParentVM;
+                int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedHierarchicalVM);
                 e.CanExecute = 0 < index;
 
                 // 選択された対象が項目で分類内の最も上位にいる場合
@@ -250,14 +250,14 @@ WHERE item_id = @{1};", Updater, id);
         private async void RaiseItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                var parentVM = this.WVM.SelectedItemVM.ParentVM;
-                int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
+                var parentVM = this.WVM.SelectedHierarchicalVM.ParentVM;
+                int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedHierarchicalVM);
                 int changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
                 if (0 < index) {
                     int changedId = parentVM.ChildrenVMList[index - 1].Id; // 入れ替え対象の項目のID
 
                     using (DaoBase dao = this.builder.Build()) {
-                        switch (this.WVM.SelectedItemVM.Kind) {
+                        switch (HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM)) {
                             case HierarchicalKind.Category: {
                                 await dao.ExecTransactionAsync(async () => {
                                     DaoReader reader = await dao.ExecQueryAsync(@"
@@ -310,7 +310,7 @@ WHERE item_id = @{2};", tmpOrder, Updater, changingId);
                     }
                 }
                 else { // 分類を跨いで項目の表示順を変更するとき
-                    Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                    Debug.Assert(HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM) == HierarchicalKind.Item);
                     var grandparentVM = parentVM.ParentVM;
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     int toCategoryId = grandparentVM.ChildrenVMList[index2 - 1].Id;
@@ -323,23 +323,23 @@ WHERE item_id = @{2};", toCategoryId, Updater, changingId);
                     }
                 }
 
-                await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
+                await this.UpdateItemSettingsTabDataAsync(HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM), this.WVM.SelectedHierarchicalVM.Id);
                 this.needToUpdate = true;
             }
         }
 
         /// <summary>
-        /// 分類/項目の表示順を下げれるか判定
+        /// 分類/項目の表示順を下げられるか判定
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void DropItemSortOrderCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.SelectedItemVM.ParentVM != null;
+            e.CanExecute = this.WVM.SelectedHierarchicalVM != null && this.WVM.SelectedHierarchicalVM.ParentVM != null;
             if (e.CanExecute) {
                 // 同じ階層で、よりソート順序が下の分類/項目がある場合trueになる
-                var parentVM = this.WVM.SelectedItemVM.ParentVM;
-                int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
+                var parentVM = this.WVM.SelectedHierarchicalVM.ParentVM;
+                int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedHierarchicalVM);
                 e.CanExecute = parentVM.ChildrenVMList.Count - 1 > index;
 
                 // 選択された対象が項目で分類内の最も上位にいる場合
@@ -360,14 +360,14 @@ WHERE item_id = @{2};", toCategoryId, Updater, changingId);
         private async void DropItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                var parentVM = this.WVM.SelectedItemVM.ParentVM;
-                int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedItemVM);
+                var parentVM = this.WVM.SelectedHierarchicalVM.ParentVM;
+                int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedHierarchicalVM);
                 int changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
                 if (parentVM.ChildrenVMList.Count - 1 > index) {
                     int changedId = parentVM.ChildrenVMList[index + 1].Id; // 入れ替え対象の項目のID
 
                     using (DaoBase dao = this.builder.Build()) {
-                        switch (this.WVM.SelectedItemVM.Kind) {
+                        switch (HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM)) {
                             case HierarchicalKind.Category: {
                                 await dao.ExecTransactionAsync(async () => {
                                     DaoReader reader = await dao.ExecQueryAsync(@"
@@ -420,7 +420,7 @@ WHERE item_id = @{2};", tmpOrder, Updater, changingId);
                     }
                 }
                 else { // 分類を跨いで項目の表示順を変更するとき
-                    Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                    Debug.Assert(HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM) == HierarchicalKind.Item);
                     var grandparentVM = parentVM.ParentVM;
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     int toCategoryId = grandparentVM.ChildrenVMList[index2 + 1].Id;
@@ -464,7 +464,7 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
                     }
                 }
 
-                await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM.Kind, this.WVM.SelectedItemVM.Id);
+                await this.UpdateItemSettingsTabDataAsync(HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM), this.WVM.SelectedHierarchicalVM.Id);
                 this.needToUpdate = true;
             }
         }
@@ -476,8 +476,8 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
         /// <param name="e"></param>
         private void SaveItemInfoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.SelectedItemVM.Kind != HierarchicalKind.Balance &&
-                !string.IsNullOrWhiteSpace(this.WVM.SelectedItemVM.Name);
+            e.CanExecute = this.WVM.SelectedHierarchicalVM != null && HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM) != HierarchicalKind.Balance &&
+                !string.IsNullOrWhiteSpace(this.WVM.SelectedHierarchicalVM.Name);
         }
 
         /// <summary>
@@ -488,28 +488,28 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
         private async void SaveItemInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                HierarchicalKind kind = this.WVM.SelectedItemVM.Kind;
-                int id = this.WVM.SelectedItemVM.Id;
+                HierarchicalSettingViewModel vm = this.WVM.DisplayedHierarchicalSettingVM;
 
                 using (DaoBase dao = this.builder.Build()) {
-                    switch (kind) {
+                    switch (vm.Kind) {
                         case HierarchicalKind.Category: {
                             await dao.ExecNonQueryAsync(@"
 UPDATE mst_category
 SET category_name = @{0}, update_time = 'now', updater = @{1}
-WHERE category_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
+WHERE category_id = @{2};", vm.Name, Updater, vm.Id);
                         }
                         break;
                         case HierarchicalKind.Item: {
                             await dao.ExecNonQueryAsync(@"
 UPDATE mst_item
 SET item_name = @{0}, update_time = 'now', updater = @{1}
-WHERE item_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
+WHERE item_id = @{2};", vm.Name, Updater, vm.Id);
                         }
                         break;
                     }
                 }
 
+                await this.UpdateItemSettingsTabDataAsync(vm.Kind, vm.Id);
                 MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
                 this.needToUpdate = true;
             }
@@ -523,9 +523,9 @@ WHERE item_id = @{2};", this.WVM.SelectedItemVM.Name, Updater, id);
         private async void ChangeItemRelationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
-                HierarchicalSettingViewModel vm = this.WVM.SelectedItemVM;
+                HierarchicalSettingViewModel vm = this.WVM.DisplayedHierarchicalSettingVM;
                 vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
                 vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
 
@@ -573,7 +573,7 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void DeleteShopNameCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.SelectedItemVM?.SelectedShopVM != null;
+            e.CanExecute = this.WVM.DisplayedHierarchicalSettingVM?.SelectedShopVM != null;
         }
 
         /// <summary>
@@ -583,18 +583,18 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private async void DeleteShopNameCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, 
+            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                    Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                    Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
                     using (DaoBase dao = this.builder.Build()) {
                         await dao.ExecNonQueryAsync(@"
 UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedShopVM.Name, this.WVM.SelectedItemVM.Id);
+WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.DisplayedHierarchicalSettingVM.SelectedShopVM.Name, this.WVM.DisplayedHierarchicalSettingVM.Id);
 
                         // 店舗名を更新する
-                        this.WVM.SelectedItemVM.ShopVMList = await this.LoadShopViewModelListAsync(dao, this.WVM.SelectedItemVM.Id);
+                        this.WVM.DisplayedHierarchicalSettingVM.ShopVMList = await this.LoadShopViewModelListAsync(dao, this.WVM.DisplayedHierarchicalSettingVM.Id);
                     }
                 }
             }
@@ -607,7 +607,7 @@ WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.Se
         /// <param name="e"></param>
         private void DeleteRemarkCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.SelectedItemVM?.SelectedRemarkVM != null;
+            e.CanExecute = this.WVM.DisplayedHierarchicalSettingVM?.SelectedRemarkVM != null;
         }
 
         /// <summary>
@@ -617,18 +617,18 @@ WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.Se
         /// <param name="e"></param>
         private async void DeleteRemarkCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information, 
+            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                    Debug.Assert(this.WVM.SelectedItemVM.Kind == HierarchicalKind.Item);
+                    Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
                     using (DaoBase dao = this.builder.Build()) {
                         await dao.ExecNonQueryAsync(@"
 UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE remark = @{1} AND item_id = @{2};", Updater, this.WVM.SelectedItemVM.SelectedRemarkVM.Remark, this.WVM.SelectedItemVM.Id);
+WHERE remark = @{1} AND item_id = @{2};", Updater, this.WVM.DisplayedHierarchicalSettingVM.SelectedRemarkVM.Remark, this.WVM.DisplayedHierarchicalSettingVM.Id);
 
                         // 備考欄の表示を更新する
-                        this.WVM.SelectedItemVM.RemarkVMList = await this.LoadRemarkViewModelListAsync(dao, this.WVM.SelectedItemVM.Id);
+                        this.WVM.DisplayedHierarchicalSettingVM.RemarkVMList = await this.LoadRemarkViewModelListAsync(dao, this.WVM.DisplayedHierarchicalSettingVM.Id);
                     }
                 }
             }
@@ -703,7 +703,7 @@ WHERE book_id = @{1};", Updater, this.WVM.SelectedBookVM.Id);
         }
 
         /// <summary>
-        /// 帳簿の表示順を上げれるか判定
+        /// 帳簿の表示順を上げられるか判定
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -758,7 +758,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
         }
 
         /// <summary>
-        /// 帳簿の表示順を下げれるか判定
+        /// 帳簿の表示順を下げられるか判定
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -813,16 +813,6 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
         }
 
         /// <summary>
-        /// 帳簿の情報を保存できるか判定
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SaveBookInfoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.WVM.SelectedBookVM != null && !string.IsNullOrWhiteSpace(this.WVM.SelectedBookVM.Name);
-        }
-
-        /// <summary>
         /// CSVフォルダパスを指定するダイアログを表示する
         /// </summary>
         /// <param name="sender"></param>
@@ -833,9 +823,9 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
 
             string folderPath = Path.GetDirectoryName(settings.App_CsvFilePath);
             string fileName = string.Empty;
-            if (this.WVM.SelectedBookVM.CsvFolderPath != null && this.WVM.SelectedBookVM.CsvFolderPath != string.Empty) {
-                folderPath = Path.GetDirectoryName(this.WVM.SelectedBookVM.CsvFolderPath);
-                fileName = Path.GetFileName(this.WVM.SelectedBookVM.CsvFolderPath);
+            if (this.WVM.DisplayedBookSettingVM.CsvFolderPath != null && this.WVM.DisplayedBookSettingVM.CsvFolderPath != string.Empty) {
+                folderPath = Path.GetDirectoryName(this.WVM.DisplayedBookSettingVM.CsvFolderPath);
+                fileName = Path.GetFileName(this.WVM.DisplayedBookSettingVM.CsvFolderPath);
             }
 
             CommonOpenFileDialog ofd = new CommonOpenFileDialog() {
@@ -847,8 +837,18 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             };
 
             if (ofd.ShowDialog() == CommonFileDialogResult.Ok) {
-                this.WVM.SelectedBookVM.CsvFolderPath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                this.WVM.DisplayedBookSettingVM.CsvFolderPath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             }
+        }
+
+        /// <summary>
+        /// 帳簿の情報を保存できるか判定
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveBookInfoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.WVM.SelectedBookVM != null && !string.IsNullOrWhiteSpace(this.WVM.SelectedBookVM.Name);
         }
 
         /// <summary>
@@ -859,15 +859,15 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
         private async void SaveBookInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                BookSettingViewModel vm = this.WVM.DisplayedBookSettingVM;
                 using (DaoBase dao = this.builder.Build()) {
-                    BookSettingViewModel vm = this.WVM.SelectedBookVM;
                     MstBookJsonObject jsonObj = new MstBookJsonObject() {
                         StartDate = vm.StartDateExists ? (DateTime?)vm.StartDate : null,
                         EndDate = vm.EndDateExists ? (DateTime?)vm.EndDate : null,
                         CsvFolderPath = vm.CsvFolderPath != string.Empty ? vm.CsvFolderPath : null,
-                        CsvActDateIndex = vm.ActDateIndex,
-                        CsvOutgoIndex = vm.OutgoIndex,
-                        CsvItemNameIndex = vm.ItemNameIndex
+                        CsvActDateIndex = vm.ActDateIndex - 1,
+                        CsvOutgoIndex = vm.OutgoIndex - 1,
+                        CsvItemNameIndex = vm.ItemNameIndex - 1
                     };
                     string jsonCode = JsonConvert.SerializeObject(jsonObj);
 
@@ -877,6 +877,7 @@ SET book_name = @{0}, book_kind = @{1}, initial_value = @{2}, debit_book_id = @{
 WHERE book_id = @{7};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.SelectedDebitBookVM.Id == -1 ? null : vm.SelectedDebitBookVM.Id, vm.PayDay, jsonCode, Updater, vm.Id);
                 }
 
+                await this.UpdateBookSettingTabDataAsync(vm.Id);
                 MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
                 this.needToUpdate = true;
             }
@@ -890,7 +891,7 @@ WHERE book_id = @{7};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.S
         private async void ChangeBookRelationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                BookSettingViewModel vm = this.WVM.SelectedBookVM;
+                BookSettingViewModel vm = this.WVM.DisplayedBookSettingVM;
                 vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
                 vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
 
@@ -994,7 +995,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void RestartForDbSettingCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.RestartNotification, MessageTitle.Comformation, 
+            if (MessageBox.Show(MessageText.RestartNotification, MessageTitle.Comformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Properties.Settings.Default.App_InitFlag = true;
                 Properties.Settings.Default.Save();
@@ -1034,7 +1035,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 }
             }
         }
-        
+
         /// <summary>
         /// ウィンドウ設定を再読込する
         /// </summary>
@@ -1052,7 +1053,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void InitializeWindowSettingCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.RestartNotification, MessageTitle.Comformation, 
+            if (MessageBox.Show(MessageText.RestartNotification, MessageTitle.Comformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Properties.Settings settings = Properties.Settings.Default;
 
@@ -1116,6 +1117,8 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         private async void SettingsWindow_Loaded(object sender, RoutedEventArgs e)
         {
             await this.UpdateSettingWindowDataAsync();
+
+            this.RegisterEventHandlerToWVM();
         }
 
         /// <summary>
@@ -1153,7 +1156,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                     switch (this.WVM.SelectedTab) {
                         case SettingsTabs.ItemSettingsTab:
-                            await this.UpdateItemSettingsTabDataAsync(this.WVM.SelectedItemVM?.Kind, this.WVM.SelectedItemVM?.Id);
+                            await this.UpdateItemSettingsTabDataAsync(HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM), this.WVM.SelectedHierarchicalVM?.Id);
                             break;
                         case SettingsTabs.BookSettingsTab:
                             await this.UpdateBookSettingTabDataAsync(this.WVM.SelectedBookVM?.Id);
@@ -1197,13 +1200,13 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// 設定ウィンドウに表示するデータを更新する
         /// </summary>
         /// <param name="kind">選択対象の階層種別</param>
-        /// <param name="id">選択対象のID</param>
+        /// <param name="categoryOrItemId">選択対象のID</param>
         /// <param name="bookId">選択対象の帳簿ID</param>
-        private async Task UpdateSettingWindowDataAsync(HierarchicalKind? kind = null, int? id = null, int? bookId = null)
+        private async Task UpdateSettingWindowDataAsync(HierarchicalKind? kind = null, int? categoryOrItemId = null, int? bookId = null)
         {
             Log.Info();
 
-            await this.UpdateItemSettingsTabDataAsync(kind, id);
+            await this.UpdateItemSettingsTabDataAsync(kind, categoryOrItemId);
             await this.UpdateBookSettingTabDataAsync(bookId);
             this.UpdateOtherSettingTabData();
         }
@@ -1218,28 +1221,36 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
             if (this.WVM.SelectedTab == SettingsTabs.ItemSettingsTab) {
                 Log.Info();
 
-                this.WVM.HierachicalSettingVMList = await this.LoadItemViewModelListAsync();
+                // 指定がなければ現在選択中の項目を再選択する
+                if (this.WVM.SelectedHierarchicalVM != null && kind == null && id == null) {
+                    kind = HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM);
+                    id = this.WVM.SelectedHierarchicalVM.Id;
+                }
 
-                HierarchicalSettingViewModel selectedVM = null;
+                this.WVM.HierarchicalVMList = await this.LoadHierarchicalViewModelListAsync();
+
+                // 選択する項目を探す
+                HierarchicalViewModel selectedVM = null;
                 if (kind != null && id != null) {
                     // 収支から探す
-                    IEnumerable<HierarchicalSettingViewModel> query = this.WVM.HierachicalSettingVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
+                    IEnumerable<HierarchicalViewModel> query = this.WVM.HierarchicalVMList.Where((vm) => { return HierarchicalSettingViewModel.GetHierarchicalKind(vm) == kind && vm.Id == id; });
+
                     if (query.Count() == 0) {
                         // 分類から探す
-                        foreach (HierarchicalSettingViewModel tmpVM in this.WVM.HierachicalSettingVMList) {
-                            query = tmpVM.ChildrenVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
+                        foreach (HierarchicalViewModel tmpVM in this.WVM.HierarchicalVMList) {
+                            query = tmpVM.ChildrenVMList.Where((vm) => { return HierarchicalSettingViewModel.GetHierarchicalKind(vm) == kind && vm.Id == id; });
                             if (query.Count() != 0) { break; }
                         }
+                    }
 
-                        if (query.Count() == 0) {
-                            // 項目から探す
-                            foreach (HierarchicalSettingViewModel tmpVM in this.WVM.HierachicalSettingVMList) {
-                                foreach (HierarchicalSettingViewModel tmpVM2 in tmpVM.ChildrenVMList) {
-                                    query = tmpVM2.ChildrenVMList.Where((vm) => { return vm.Kind == kind && vm.Id == id; });
-                                    if (query.Count() != 0) { break; }
-                                }
+                    if (query.Count() == 0) {
+                        // 項目から探す
+                        foreach (HierarchicalViewModel tmpVM in this.WVM.HierarchicalVMList) {
+                            foreach (HierarchicalViewModel tmpVM2 in tmpVM.ChildrenVMList) {
+                                query = tmpVM2.ChildrenVMList.Where((vm) => { return HierarchicalSettingViewModel.GetHierarchicalKind(vm) == kind && vm.Id == id; });
                                 if (query.Count() != 0) { break; }
                             }
+                            if (query.Count() != 0) { break; }
                         }
                     }
 
@@ -1247,11 +1258,84 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 }
 
                 // 何も選択されていないなら1番上の項目を選択する
-                if (this.WVM.SelectedItemVM == null && this.WVM.HierachicalSettingVMList.Count != 0) {
-                    selectedVM = this.WVM.HierachicalSettingVMList[0];
+                if (selectedVM != null && this.WVM.HierarchicalVMList.Count != 0) {
+                    selectedVM = this.WVM.HierarchicalVMList[0];
                 }
-                this.WVM.SelectedItemVM = selectedVM;
+                this.WVM.SelectedHierarchicalVM = selectedVM;
             }
+        }
+
+        /// <summary>
+        /// 項目設定タブの入力欄に表示するデータを更新する
+        /// </summary>
+        /// <param name="kind">表示対象の階層種別</param>
+        /// <param name="id">表示対象のID</param>
+        /// <returns></returns>
+        private async Task UpdateItemSettingsTabInputDataAsync(HierarchicalKind kind, int id)
+        {
+            HierarchicalSettingViewModel vm = null;
+
+            switch (kind) {
+                case HierarchicalKind.Balance: {
+                    vm = new HierarchicalSettingViewModel() {
+                        Kind = HierarchicalKind.Balance,
+                        Id = this.WVM.SelectedHierarchicalVM.Id,
+                        Name = this.WVM.SelectedHierarchicalVM.Name
+                    };
+                    break;
+                }
+                case HierarchicalKind.Category: {
+                    // 分類
+                    using (DaoBase dao = this.builder.Build()) {
+                        DaoReader reader = await dao.ExecQueryAsync(@"
+SELECT category_name, sort_order
+FROM mst_category
+WHERE category_id = @{0} AND del_flg = 0 AND sort_order <> 0
+ORDER BY sort_order;", id);
+
+                        reader.ExecARow((record) => {
+                            int sortOrder = record.ToInt("sort_order");
+                            string categoryName = record["category_name"];
+
+                            vm = new HierarchicalSettingViewModel() {
+                                Kind = HierarchicalKind.Category,
+                                Id = id,
+                                SortOrder = sortOrder,
+                                Name = categoryName
+                            };
+                        });
+                    }
+                    break;
+                }
+                case HierarchicalKind.Item: {
+                    // 項目
+                    using (DaoBase dao = this.builder.Build()) {
+                        DaoReader reader = await dao.ExecQueryAsync(@"
+SELECT item_name, sort_order
+FROM mst_item
+WHERE item_id = @{0} AND del_flg = 0
+ORDER BY sort_order;", id);
+
+                        reader.ExecARow((record) => {
+                            int sortOrder = record.ToInt("sort_order");
+                            string itemName = record["item_name"];
+
+                            vm = new HierarchicalSettingViewModel() {
+                                Kind = HierarchicalKind.Item,
+                                Id = id,
+                                SortOrder = sortOrder,
+                                Name = itemName
+                            };
+                        });
+                        vm.RelationVMList = await this.LoadRelationViewModelList1Async(dao, id);
+                        vm.ShopVMList = await this.LoadShopViewModelListAsync(dao, id);
+                        vm.RemarkVMList = await this.LoadRemarkViewModelListAsync(dao, id);
+                    }
+                    break;
+                }
+            }
+
+            this.WVM.DisplayedHierarchicalSettingVM = vm;
         }
 
         /// <summary>
@@ -1263,20 +1347,105 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
             if (this.WVM.SelectedTab == SettingsTabs.BookSettingsTab) {
                 Log.Info();
 
-                this.WVM.BookVMList = await this.LoadBookSettingViewModelListAsync();
+                // 指定がなければ現在選択中の項目を再選択する
+                if (this.WVM.SelectedBookVM != null && bookId == null) {
+                    bookId = this.WVM.SelectedBookVM.Id;
+                }
 
-                BookSettingViewModel tmpVM = null;
+                this.WVM.BookVMList = await this.LoadBookViewModelListAsync();
+
+                // 選択する項目を探す
+                BookViewModel selectedVM = null;
                 if (bookId != null) {
-                    IEnumerable<BookSettingViewModel> query = this.WVM.BookVMList.Where((vm) => { return vm.Id == bookId; });
-                    tmpVM = query.Count() != 0 ? query.First() : null;
+                    IEnumerable<BookViewModel> query = this.WVM.BookVMList.Where((vm) => { return vm.Id == bookId; });
+                    selectedVM = query.Count() != 0 ? query.First() : null;
                 }
-                
+
                 // 何も選択されていないなら1番上の項目を選択する
-                if (tmpVM == null && this.WVM.BookVMList.Count != 0) {
-                    tmpVM = this.WVM.BookVMList[0];
+                if (selectedVM == null && this.WVM.BookVMList.Count != 0) {
+                    selectedVM = this.WVM.BookVMList[0];
                 }
-                this.WVM.SelectedBookVM = tmpVM;
+                this.WVM.SelectedBookVM = selectedVM;
             }
+        }
+
+        /// <summary>
+        /// 帳簿設定タブの入力欄に表示するデータを更新する
+        /// </summary>
+        /// <param name="bookId">表示対象の帳簿ID</param>
+        /// <returns></returns>
+        private async Task UpdateBookSettingTabInputDataAsync(int bookId)
+        {
+            BookSettingViewModel vm = null;
+
+            ObservableCollection<BookViewModel> vmList = new ObservableCollection<BookViewModel>() {
+                new BookViewModel(){ Id = -1, Name = "なし" }
+            };
+
+            using (DaoBase dao = this.builder.Build()) {
+                // 帳簿一覧を取得する(支払元選択用)
+                DaoReader reader = await dao.ExecQueryAsync(@"
+SELECT book_id, book_name
+FROM mst_book
+WHERE del_flg = 0
+ORDER BY sort_order;");
+
+                reader.ExecWholeRow((count, record) => {
+                    int tmpBookId = record.ToInt("book_id");
+                    string tmpBookName = record["book_name"];
+
+                    vmList.Add(new BookViewModel() {
+                        Id = tmpBookId,
+                        Name = tmpBookName
+                    });
+                    return true;
+                });
+
+                // 帳簿一覧を取得する
+                reader = await dao.ExecQueryAsync(@"
+SELECT B.book_name, B.book_kind, B.debit_book_id, B.pay_day, B.initial_value, B.json_code, B.sort_order, MIN(A.act_time) AS start_date, MAX(A.act_time) AS end_date
+FROM mst_book B
+LEFT OUTER JOIN hst_action A ON A.book_id = B.book_id AND A.del_flg = 0
+WHERE B.book_id = @{0} AND B.del_flg = 0
+GROUP BY B.book_id
+ORDER BY B.sort_order;", bookId);
+
+                reader.ExecARow((record) => {
+                    int sortOrder = record.ToInt("sort_order");
+                    string bookName = record["book_name"];
+                    BookKind bookKind = (BookKind)record.ToInt("book_kind");
+                    int initialValue = record.ToInt("initial_value");
+                    int? debitBookId = record.ToNullableInt("debit_book_id");
+                    int? payDay = record.ToNullableInt("pay_day");
+                    DateTime? startDate = record.ToNullableDateTime("start_date");
+                    DateTime? endDate = record.ToNullableDateTime("end_date");
+
+                    string jsonCode = record["json_code"];
+                    MstBookJsonObject jsonObj = JsonConvert.DeserializeObject<MstBookJsonObject>(jsonCode);
+
+                    vm = new BookSettingViewModel() {
+                        Id = bookId,
+                        SortOrder = sortOrder,
+                        Name = bookName,
+                        SelectedBookKind = bookKind,
+                        InitialValue = initialValue,
+                        StartDateExists = jsonObj?.StartDate != null,
+                        StartDate = jsonObj?.StartDate ?? startDate ?? DateTime.Today,
+                        EndDateExists = jsonObj?.EndDate != null,
+                        EndDate = jsonObj?.EndDate ?? endDate ?? DateTime.Today,
+                        DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((tmpVM) => { return tmpVM.Id != bookId; })),
+                        PayDay = payDay,
+                        CsvFolderPath = jsonObj?.CsvFolderPath,
+                        ActDateIndex = jsonObj?.CsvActDateIndex + 1,
+                        OutgoIndex = jsonObj?.CsvOutgoIndex + 1,
+                        ItemNameIndex = jsonObj?.CsvItemNameIndex + 1
+                    };
+                    vm.SelectedDebitBookVM = vm.DebitBookVMList.FirstOrDefault((tmpVM) => { return tmpVM.Id == debitBookId; }) ?? vm.DebitBookVMList[0];
+                });
+                vm.RelationVMList = await this.LoadRelationViewModelList2Async(dao, bookId);
+            }
+
+            this.WVM.DisplayedBookSettingVM = vm;
         }
 
         /// <summary>
@@ -1295,34 +1464,32 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// 階層構造項目VMリストを取得する
         /// </summary>
         /// <returns>階層構造項目VMリスト</returns>
-        private async Task<ObservableCollection<HierarchicalSettingViewModel>> LoadItemViewModelListAsync()
+        private async Task<ObservableCollection<HierarchicalViewModel>> LoadHierarchicalViewModelListAsync()
         {
             Log.Info();
 
-            ObservableCollection<HierarchicalSettingViewModel> vmList = new ObservableCollection<HierarchicalSettingViewModel>();
-            HierarchicalSettingViewModel incomeVM = new HierarchicalSettingViewModel() {
-                Kind = HierarchicalKind.Balance,
+            ObservableCollection<HierarchicalViewModel> vmList = new ObservableCollection<HierarchicalViewModel>();
+            HierarchicalViewModel incomeVM = new HierarchicalViewModel() {
+                Depth = (int)HierarchicalKind.Balance,
                 Id = (int)BalanceKind.Income,
                 SortOrder = -1,
                 Name = "収入項目",
                 ParentVM = null,
-                RelationVMList = null,
-                ChildrenVMList = new ObservableCollection<HierarchicalSettingViewModel>()
+                ChildrenVMList = new ObservableCollection<HierarchicalViewModel>()
             };
             vmList.Add(incomeVM);
 
-            HierarchicalSettingViewModel outgoVM = new HierarchicalSettingViewModel() {
-                Kind = HierarchicalKind.Balance,
+            HierarchicalViewModel outgoVM = new HierarchicalViewModel() {
+                Depth = (int)HierarchicalKind.Balance,
                 Id = (int)BalanceKind.Outgo,
                 SortOrder = -1,
                 Name = "支出項目",
                 ParentVM = null,
-                RelationVMList = null,
-                ChildrenVMList = new ObservableCollection<HierarchicalSettingViewModel>()
+                ChildrenVMList = new ObservableCollection<HierarchicalViewModel>()
             };
             vmList.Add(outgoVM);
 
-            foreach (HierarchicalSettingViewModel vm in vmList) {
+            foreach (HierarchicalViewModel vm in vmList) {
                 // 分類
                 using (DaoBase dao = this.builder.Build()) {
                     DaoReader reader = await dao.ExecQueryAsync(@"
@@ -1336,19 +1503,18 @@ ORDER BY sort_order;", vm.Id);
                         int sortOrder = record.ToInt("sort_order");
                         string categoryName = record["category_name"];
 
-                        vm.ChildrenVMList.Add(new HierarchicalSettingViewModel() {
-                            Kind = HierarchicalKind.Category,
+                        vm.ChildrenVMList.Add(new HierarchicalViewModel() {
+                            Depth = (int)HierarchicalKind.Category,
                             Id = categoryId,
                             SortOrder = sortOrder,
                             Name = categoryName,
                             ParentVM = vm,
-                            RelationVMList = null,
-                            ChildrenVMList = new ObservableCollection<HierarchicalSettingViewModel>()
+                            ChildrenVMList = new ObservableCollection<HierarchicalViewModel>()
                         });
                         return true;
                     });
 
-                    foreach (HierarchicalSettingViewModel categocyVM in vm.ChildrenVMList) {
+                    foreach (HierarchicalViewModel categocyVM in vm.ChildrenVMList) {
                         // 項目
                         reader = await dao.ExecQueryAsync(@"
 SELECT item_id, item_name, advance_flg, sort_order
@@ -1362,45 +1528,15 @@ ORDER BY sort_order;", categocyVM.Id);
                             string itemName = record["item_name"];
                             int advanceFlg = record.ToInt("advance_flg");
 
-                            categocyVM.ChildrenVMList.Add(new HierarchicalSettingViewModel() {
-                                Kind = HierarchicalKind.Item,
+                            categocyVM.ChildrenVMList.Add(new HierarchicalViewModel() {
+                                Depth = (int)HierarchicalKind.Item,
                                 Id = itemId,
                                 SortOrder = sortOrder,
                                 Name = itemName,
                                 ParentVM = categocyVM,
-                                RelationVMList = new ObservableCollection<RelationViewModel>(),
-                                ShopVMList = new ObservableCollection<ShopViewModel>(),
-                                RemarkVMList = new ObservableCollection<RemarkViewModel>()
                             });
                             return true;
                         });
-
-                        foreach (HierarchicalSettingViewModel itemVM in categocyVM.ChildrenVMList) {
-                            reader = await dao.ExecQueryAsync(@"
-SELECT B.book_id AS book_id, B.book_name, RBI.book_id IS NULL AS is_not_related
-FROM mst_book B
-LEFT JOIN (SELECT book_id FROM rel_book_item WHERE del_flg = 0 AND item_id = @{0}) RBI ON RBI.book_id = B.book_id
-WHERE del_flg = 0
-ORDER BY B.sort_order;", itemVM.Id);
-
-                            reader.ExecWholeRow((count2, record2) => {
-                                int bookId = record2.ToInt("book_id");
-                                string bookName = record2["book_name"];
-                                bool isRelated = !record2.ToBoolean("is_not_related");
-
-                                itemVM.RelationVMList.Add(new RelationViewModel() {
-                                    Id = bookId,
-                                    Name = bookName,
-                                    IsRelated = isRelated
-                                });
-                                return true;
-                            });
-
-                            // 店舗名の一覧を取得する
-                            itemVM.ShopVMList = await this.LoadShopViewModelListAsync(dao, itemVM.Id);
-                            // 備考の一覧を取得する
-                            itemVM.RemarkVMList = await this.LoadRemarkViewModelListAsync(dao, itemVM.Id);
-                        }
                     }
                 }
             }
@@ -1409,20 +1545,17 @@ ORDER BY B.sort_order;", itemVM.Id);
         }
 
         /// <summary>
-        /// 帳簿VM(設定用)リストを取得する
+        /// 帳簿VMリストを取得する
         /// </summary>
-        /// <returns>帳簿VM(設定用)リスト</returns>
-        private async Task<ObservableCollection<BookSettingViewModel>> LoadBookSettingViewModelListAsync()
+        /// <returns>帳簿VMリスト</returns>
+        private async Task<ObservableCollection<BookViewModel>> LoadBookViewModelListAsync()
         {
             Log.Info();
 
-            ObservableCollection<BookSettingViewModel> settingVMList = new ObservableCollection<BookSettingViewModel>();
-            ObservableCollection<BookViewModel> vmList = new ObservableCollection<BookViewModel>() {
-                new BookViewModel(){ Id = -1, Name = "なし" }
-            };
+            ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
 
             using (DaoBase dao = this.builder.Build()) {
-                // 帳簿一覧を取得する(支払元選択用)
+                // 帳簿一覧を取得する
                 DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT book_id, book_name
 FROM mst_book
@@ -1433,94 +1566,90 @@ ORDER BY sort_order;");
                     int bookId = record.ToInt("book_id");
                     string bookName = record["book_name"];
 
-                    vmList.Add(new BookViewModel() {
+                    BookViewModel tmpVM = new BookViewModel() {
                         Id = bookId,
                         Name = bookName
-                    });
-                    return true;
-                });
-
-                // 帳簿一覧を取得する
-                reader = await dao.ExecQueryAsync(@"
-SELECT B.book_id, B.book_name, B.book_kind, B.debit_book_id, B.pay_day, B.initial_value, B.json_code, B.sort_order, MIN(A.act_time) AS start_date, MAX(A.act_time) AS end_date
-FROM mst_book B
-LEFT OUTER JOIN hst_action A ON A.book_id = B.book_id AND A.del_flg = 0
-WHERE B.del_flg = 0
-GROUP BY B.book_id
-ORDER BY B.sort_order;");
-
-                reader.ExecWholeRow((count, record) => {
-                    int bookId = record.ToInt("book_id");
-                    int sortOrder = record.ToInt("sort_order");
-                    string bookName = record["book_name"];
-                    BookKind bookKind = (BookKind)record.ToInt("book_kind");
-                    int initialValue = record.ToInt("initial_value");
-                    int? debitBookId = record.ToNullableInt("debit_book_id");
-                    int? payDay = record.ToNullableInt("pay_day");
-                    DateTime? startDate = record.ToNullableDateTime("start_date");
-                    DateTime? endDate = record.ToNullableDateTime("end_date");
-
-                    string jsonCode = record["json_code"];
-                    MstBookJsonObject jsonObj = JsonConvert.DeserializeObject<MstBookJsonObject>(jsonCode);
-
-                    BookSettingViewModel tmpVM = new BookSettingViewModel() {
-                        Id = bookId,
-                        SortOrder = sortOrder,
-                        Name = bookName,
-                        SelectedBookKind = bookKind,
-                        InitialValue = initialValue,
-                        DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((vm) => { return vm.Id != bookId; })),
-                        PayDay = payDay,
-                        StartDateExists = jsonObj?.StartDate != null,
-                        StartDate = jsonObj?.StartDate ?? startDate ?? DateTime.Today,
-                        EndDateExists = jsonObj?.EndDate != null,
-                        EndDate = jsonObj?.EndDate ?? endDate ?? DateTime.Today,
-                        CsvFolderPath = jsonObj?.CsvFolderPath,
-                        ActDateIndex = jsonObj?.CsvActDateIndex,
-                        OutgoIndex = jsonObj?.CsvOutgoIndex,
-                        ItemNameIndex = jsonObj?.CsvItemNameIndex,
                     };
-                    tmpVM.SelectedDebitBookVM = tmpVM.DebitBookVMList.FirstOrDefault((vm) => { return vm.Id == debitBookId; }) ?? tmpVM.DebitBookVMList[0];
 
-                    settingVMList.Add(tmpVM);
+                    bookVMList.Add(tmpVM);
                     return true;
                 });
+            }
 
-                // 項目との関係の一覧を取得する(移動を除く)
-                foreach (BookSettingViewModel vm in settingVMList) {
-                    reader = await dao.ExecQueryAsync(@"
+            return bookVMList;
+        }
+
+        /// <summary>
+        /// 関連VMリスト1(項目主体)を取得する
+        /// </summary>
+        /// <param name="dao">DAO</param>
+        /// <param name="itemId">項目ID</param>
+        /// <returns>関連VMリスト</returns>
+        private async Task<ObservableCollection<RelationViewModel>> LoadRelationViewModelList1Async(DaoBase dao, int itemId)
+        {
+            ObservableCollection<RelationViewModel> rvmList = new ObservableCollection<RelationViewModel>();
+            DaoReader reader = await dao.ExecQueryAsync(@"
+SELECT B.book_id AS book_id, B.book_name, RBI.book_id IS NULL AS is_not_related
+FROM mst_book B
+LEFT JOIN (SELECT book_id FROM rel_book_item WHERE del_flg = 0 AND item_id = @{0}) RBI ON RBI.book_id = B.book_id
+WHERE del_flg = 0
+ORDER BY B.sort_order;", itemId);
+
+            reader.ExecWholeRow((count, record) => {
+                int bookId = record.ToInt("book_id");
+                string bookName = record["book_name"];
+                bool isRelated = !record.ToBoolean("is_not_related");
+
+                RelationViewModel rvm = new RelationViewModel() {
+                    Id = bookId,
+                    Name = bookName,
+                    IsRelated = isRelated
+                };
+                rvmList.Add(rvm);
+                return true;
+            });
+            return rvmList;
+        }
+
+        /// <summary>
+        /// 関連VMリスト2(帳簿主体)を取得する
+        /// </summary>
+        /// <param name="dao">DAO</param>
+        /// <param name="bookId">帳簿ID</param>
+        /// <returns>関連VMリスト</returns>
+        private async Task<ObservableCollection<RelationViewModel>> LoadRelationViewModelList2Async(DaoBase dao, int bookId)
+        {
+            ObservableCollection<RelationViewModel> rvmList = new ObservableCollection<RelationViewModel>();
+            DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT I.item_id AS item_id, I.item_name AS item_name, C.category_name AS category_name, RBI.item_id IS NULL AS is_not_related
 FROM mst_item I
 INNER JOIN (SELECT category_id, category_name FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
 LEFT JOIN (SELECT item_id FROM rel_book_item WHERE del_flg = 0 AND book_id = @{0}) RBI ON RBI.item_id = I.item_id
 WHERE del_flg = 0 AND move_flg = 0
-ORDER BY I.sort_order;", vm.Id);
+ORDER BY I.sort_order;", bookId);
 
-                    vm.RelationVMList = new ObservableCollection<RelationViewModel>();
-                    reader.ExecWholeRow((count, record) => {
-                        int itemId = record.ToInt("item_id");
-                        string name = string.Format(@"{0} > {1}", record["category_name"], record["item_name"]);
-                        bool isRelated = !record.ToBoolean("is_not_related");
+            reader.ExecWholeRow((count, record) => {
+                int itemId = record.ToInt("item_id");
+                string name = string.Format(@"{0} > {1}", record["category_name"], record["item_name"]);
+                bool isRelated = !record.ToBoolean("is_not_related");
 
-                        vm.RelationVMList.Add(new RelationViewModel() {
-                            Id = itemId,
-                            Name = name,
-                            IsRelated = isRelated
-                        });
-                        return true;
-                    });
-                }
-            }
-
-            return settingVMList;
+                RelationViewModel rvm = new RelationViewModel() {
+                    Id = itemId,
+                    Name = name,
+                    IsRelated = isRelated
+                };
+                rvmList.Add(rvm);
+                return true;
+            });
+            return rvmList;
         }
-        
+
         /// <summary>
         /// 店舗VMリストを取得する
         /// </summary>
         /// <param name="dao">DAO</param>
         /// <param name="itemId">項目ID</param>
-        /// <returns></returns>
+        /// <returns>店舗VMリスト</returns>
         private async Task<ObservableCollection<ShopViewModel>> LoadShopViewModelListAsync(DaoBase dao, int itemId)
         {
             ObservableCollection<ShopViewModel> svmList = new ObservableCollection<ShopViewModel>();
@@ -1544,7 +1673,7 @@ ORDER BY sort_time DESC, shop_count DESC;", itemId);
         /// </summary>
         /// <param name="dao">DAO</param>
         /// <param name="itemId">項目ID</param>
-        /// <returns></returns>
+        /// <returns>備考VMリスト</returns>
         private async Task<ObservableCollection<RemarkViewModel>> LoadRemarkViewModelListAsync(DaoBase dao, int itemId)
         {
             ObservableCollection<RemarkViewModel> rvmList = new ObservableCollection<RemarkViewModel>();
@@ -1603,5 +1732,29 @@ ORDER BY sort_time DESC, remark_count DESC;", itemId);
             }
         }
         #endregion
+
+        /// <summary>
+        /// イベントハンドラをWVMに登録する
+        /// </summary>
+        private void RegisterEventHandlerToWVM()
+        {
+            this.WVM.SelectedHierarchicalVMChanged += async (e) => {
+                if (e.Value != null) {
+                    await this.UpdateItemSettingsTabInputDataAsync(HierarchicalSettingViewModel.GetHierarchicalKind(e.Value).Value, e.Value.Id);
+                }
+                else {
+                    this.WVM.DisplayedHierarchicalSettingVM = null;
+                }
+            };
+
+            this.WVM.SelectedBookVMChanged += async (e) => {
+                if (e.Value != null) {
+                    await this.UpdateBookSettingTabInputDataAsync(e.Value.Id.Value);
+                }
+                else {
+                    this.WVM.DisplayedBookSettingVM = null;
+                }
+            };
+        }
     }
 }

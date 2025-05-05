@@ -541,9 +541,9 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
                         Id = record.ToInt("book_id"),
                         Name = record["book_name"],
                         CsvFolderPath = jsonObj?.CsvFolderPath == string.Empty ? null : jsonObj?.CsvFolderPath,
-                        ActDateIndex = jsonObj?.CsvActDateIndex,
-                        OutgoIndex = jsonObj?.CsvOutgoIndex,
-                        ItemNameIndex = jsonObj?.CsvItemNameIndex
+                        ActDateIndex = jsonObj?.CsvActDateIndex + 1,
+                        OutgoIndex = jsonObj?.CsvOutgoIndex + 1,
+                        ItemNameIndex = jsonObj?.CsvItemNameIndex + 1
                     };
                     bookCompVMList.Add(vm);
 
@@ -592,14 +592,14 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
                     List<CsvComparisonViewModel> tmpVMList2 = new List<CsvComparisonViewModel>();
                     while (reader.Read()) {
                         try {
-                            if (!reader.TryGetField(actDateIndex.Value, out DateTime date)) {
+                            if (!reader.TryGetField(actDateIndex.Value - 1, out DateTime date)) {
                                 continue;
                             }
-                            if (!itemNameIndex.HasValue || !reader.TryGetField(itemNameIndex.Value, out string name)) {
+                            if (!itemNameIndex.HasValue || !reader.TryGetField(itemNameIndex.Value - 1, out string name)) {
                                 // 項目名は読込みに失敗してもOK
                                 name = null;
                             }
-                            if (!reader.TryGetField(outgoIndex.Value, out string valueStr) ||
+                            if (!reader.TryGetField(outgoIndex.Value - 1, out string valueStr) ||
                                 !int.TryParse(valueStr, NumberStyles.Any, NumberFormatInfo.CurrentInfo, out int value)) {
                                 continue;
                             }

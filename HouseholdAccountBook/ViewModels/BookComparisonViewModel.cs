@@ -22,17 +22,17 @@
         public string CsvFolderPath { get; set; }
 
         /// <summary>
-        /// 日付インデックス
+        /// 日付 位置(1開始)
         /// </summary>
         public int? ActDateIndex { get; set; }
 
         /// <summary>
-        /// 支出インデックス
+        /// 支出 位置(1開始)
         /// </summary>
         public int? OutgoIndex { get; set; }
 
         /// <summary>
-        /// 項目名インデックス
+        /// 項目名 位置(1開始)
         /// </summary>
         public int? ItemNameIndex { get; set; }
         #endregion

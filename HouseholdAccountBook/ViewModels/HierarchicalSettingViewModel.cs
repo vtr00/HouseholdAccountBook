@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.Interfaces;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
 using System.Collections.ObjectModel;
 
 namespace HouseholdAccountBook.ViewModels
@@ -7,7 +6,7 @@ namespace HouseholdAccountBook.ViewModels
     /// <summary>
     /// 階層構造設定VM
     /// </summary>
-    public class HierarchicalSettingViewModel : BindableBase, ISelectable
+    public class HierarchicalSettingViewModel : BindableBase
     {
         /// <summary>
         /// 階層種別
@@ -15,13 +14,9 @@ namespace HouseholdAccountBook.ViewModels
         public enum HierarchicalKind
         {
             /// <summary>
-            /// 帳簿
-            /// </summary>
-            Book,
-            /// <summary>
             /// 収支
             /// </summary>
-            Balance,
+            Balance = 0,
             /// <summary>
             /// 種別
             /// </summary>
@@ -42,11 +37,6 @@ namespace HouseholdAccountBook.ViewModels
         /// ID
         /// </summary>
         public int Id { get; set; }
-
-        /// <summary>
-        /// 親要素VM
-        /// </summary>
-        public HierarchicalSettingViewModel ParentVM { get; set; }
 
         /// <summary>
         /// ソート順
@@ -70,30 +60,6 @@ namespace HouseholdAccountBook.ViewModels
             set => this.SetProperty(ref this._Name, value);
         }
         private string _Name = default;
-        #endregion
-
-        /// <summary>
-        /// 選択されているか
-        /// </summary>
-        #region IsSelected
-        public bool SelectFlag
-        {
-            get => this._SelectFlag;
-            set => this.SetProperty(ref this._SelectFlag, value);
-        }
-        private bool _SelectFlag = default;
-        #endregion
-
-        /// <summary>
-        /// 子要素VMリスト
-        /// </summary>
-        #region ChildrenVMList
-        public ObservableCollection<HierarchicalSettingViewModel> ChildrenVMList
-        {
-            get => this._ChildrenVMList;
-            set => this.SetProperty(ref this._ChildrenVMList, value);
-        }
-        private ObservableCollection<HierarchicalSettingViewModel> _ChildrenVMList = default;
         #endregion
 
         /// <summary>
@@ -166,18 +132,28 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// リネーム不可能か
+        /// リネーム可能か
         /// </summary>
-        #region CantRename
-        public bool CantRename => this.Kind == HierarchicalKind.Balance;
+        #region IsRenamable
+        public bool IsRenamable => this.Kind != HierarchicalKind.Balance;
         #endregion
 
         /// <summary>
         /// 設定可能か
         /// </summary>
-        #region IsEnabled
-        public bool IsEnabled => this.Kind == HierarchicalKind.Item;
+        #region IsSettable
+        public bool IsSettable => this.Kind == HierarchicalKind.Item;
         #endregion
         #endregion
+
+        /// <summary>
+        /// 階層構造VMから階層種別を取得する
+        /// </summary>
+        /// <param name="vm">階層構造VM</param>
+        /// <returns>階層種別</returns>
+        static public HierarchicalKind? GetHierarchicalKind(HierarchicalViewModel vm)
+        {
+            return (HierarchicalKind?)vm?.Depth;
+        }
     }
 }

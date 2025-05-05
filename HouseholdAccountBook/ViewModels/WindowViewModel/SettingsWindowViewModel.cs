@@ -1,4 +1,6 @@
-﻿using Prism.Mvvm;
+﻿using HouseholdAccountBook.UserEventArgs;
+using Prism.Mvvm;
+using System;
 using System.Collections.ObjectModel;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
@@ -13,6 +15,17 @@ namespace HouseholdAccountBook.ViewModels
         /// 設定
         /// </summary>
         private readonly Properties.Settings settings;
+
+        #region フィールド
+        /// <summary>
+        /// 選択された項目VM変更時のイベント
+        /// </summary>
+        public event Action<EventArgs<HierarchicalViewModel>> SelectedHierarchicalVMChanged;
+        /// <summary>
+        /// 選択された帳簿VM変更時のイベント
+        /// </summary>
+        public event Action<EventArgs<BookViewModel>> SelectedBookVMChanged;
+        #endregion
 
         #region プロパティ
         /// <summary>
@@ -59,25 +72,38 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 階層構造設定VMリスト
         /// </summary>
-        #region HierachicalSettingVMList
-        public ObservableCollection<HierarchicalSettingViewModel> HierachicalSettingVMList
+        #region HierarchicalVMList
+        public ObservableCollection<HierarchicalViewModel> HierarchicalVMList
         {
-            get => this._HierachicalSettingVMList;
-            set => this.SetProperty(ref this._HierachicalSettingVMList, value);
+            get => this._HierarchicalVMList;
+            set => this.SetProperty(ref this._HierarchicalVMList, value);
         }
-        private ObservableCollection<HierarchicalSettingViewModel> _HierachicalSettingVMList = default;
+        private ObservableCollection<HierarchicalViewModel> _HierarchicalVMList = default;
         #endregion
         /// <summary>
-        /// 選択された項目VM
+        /// 選択された階層構造設定VM
         /// </summary>
-        /// <remarks>Not Binded</remarks>
-        #region SelectedItemVM
-        public HierarchicalSettingViewModel SelectedItemVM
+        #region SelectedHierarchicalVM
+        public HierarchicalViewModel SelectedHierarchicalVM
         {
-            get => this._SelectedItemVM;
-            set => this.SetProperty(ref this._SelectedItemVM, value);
+            get => this._SelectedHierarchicalVM;
+            set {
+                this.SetProperty(ref this._SelectedHierarchicalVM, value);
+                this.SelectedHierarchicalVMChanged?.Invoke(new EventArgs<HierarchicalViewModel>(value));
+            }
         }
-        private HierarchicalSettingViewModel _SelectedItemVM = default;
+        private HierarchicalViewModel _SelectedHierarchicalVM = default;
+        #endregion
+        /// <summary>
+        /// 表示された階層構造設定VM
+        /// </summary>
+        #region DisplayedHierarchicalSettingVM
+        public HierarchicalSettingViewModel DisplayedHierarchicalSettingVM
+        {
+            get => this._DisplayedHierarchicalSettingVM;
+            set => this.SetProperty(ref this._DisplayedHierarchicalSettingVM, value);
+        }
+        private HierarchicalSettingViewModel _DisplayedHierarchicalSettingVM = default;
         #endregion
         #endregion
 
@@ -86,29 +112,43 @@ namespace HouseholdAccountBook.ViewModels
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
-        public ObservableCollection<BookSettingViewModel> BookVMList
+        public ObservableCollection<BookViewModel> BookVMList
         {
             get => this._BookVMList;
             set {
                 this._BookVMList.Clear();
-                foreach (BookSettingViewModel vm in value) {
+                foreach (BookViewModel vm in value) {
                     this._BookVMList.Add(vm);
                 }
                 this.RaisePropertyChanged(nameof(this.BookVMList));
             }
         }
-        private readonly ObservableCollection<BookSettingViewModel> _BookVMList = new ObservableCollection<BookSettingViewModel>();
+        private readonly ObservableCollection<BookViewModel> _BookVMList = new ObservableCollection<BookViewModel>();
         #endregion
         /// <summary>
         /// 選択された帳簿VM
         /// </summary>
         #region SelectedBookVM
-        public BookSettingViewModel SelectedBookVM
+        public BookViewModel SelectedBookVM
         {
             get => this._SelectedBookVM;
-            set => this.SetProperty(ref this._SelectedBookVM, value);
+            set {
+                this.SetProperty(ref this._SelectedBookVM, value);
+                this.SelectedBookVMChanged?.Invoke(new EventArgs<BookViewModel>(value));
+            }
         }
-        private BookSettingViewModel _SelectedBookVM = default;
+        private BookViewModel _SelectedBookVM = default;
+        #endregion
+        /// <summary>
+        /// 表示された帳簿設定VM
+        /// </summary>
+        #region DisplayedBookSettingVM
+        public BookSettingViewModel DisplayedBookSettingVM
+        {
+            get => this._DisplayedBookSettingVM;
+            set => this.SetProperty(ref this._DisplayedBookSettingVM, value);
+        }
+        private BookSettingViewModel _DisplayedBookSettingVM = default;
         #endregion
         #endregion
 
@@ -290,7 +330,7 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// 国民の祝日CSV 日付位置(0開始)
+        /// 国民の祝日CSV 日付インデックス(1開始)
         /// </summary>
         #region NationalHolidayCsvDateIndex
         public int NationalHolidayCsvDateIndex
@@ -298,7 +338,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._NationalHolidayCsvDateIndex;
             set {
                 if (this.SetProperty(ref this._NationalHolidayCsvDateIndex, value) && this.WithSave) {
-                    this.settings.App_NationalHolidayCsv_DateIndex = value;
+                    this.settings.App_NationalHolidayCsv_DateIndex = value - 1;
                     this.settings.Save();
                 }
             }
@@ -386,7 +426,7 @@ namespace HouseholdAccountBook.ViewModels
             this.PasswordInput = (PostgresPasswordInput)this.settings.App_Postgres_Password_Input;
             this.StartMonth = this.settings.App_StartMonth;
             this.NationalHolidayCsvURI = this.settings.App_NationalHolidayCsv_Uri;
-            this.NationalHolidayCsvDateIndex = this.settings.App_NationalHolidayCsv_DateIndex;
+            this.NationalHolidayCsvDateIndex = this.settings.App_NationalHolidayCsv_DateIndex + 1;
             this.IsPositionSaved = this.settings.App_IsPositionSaved;
 
             this.DebugMode = this.settings.App_IsDebug;
