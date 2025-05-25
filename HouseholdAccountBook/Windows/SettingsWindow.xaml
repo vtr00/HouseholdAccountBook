@@ -350,8 +350,7 @@
                                                         ItemsSource="{Binding BookKindDic}" SelectedValue="{Binding SelectedBookKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
 
                                 <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" Text="初期残高"/>
-                                <controls:NumericUpDown Grid.Row="4" Grid.Column="1" Margin="5" 
-                                                                    Value="{Binding InitialValue}"/>
+                                <controls:NumericUpDown Grid.Row="4" Grid.Column="1" Margin="5" Value="{Binding InitialValue}"/>
 
                                 <GroupBox Grid.Row="5" Grid.ColumnSpan="4" Header="期間情報">
                                     <Grid>
@@ -523,7 +522,7 @@
                                         </Grid.ColumnDefinitions>
                                         
                                         <TextBlock Grid.Row="3" Grid.Column="0" Text="インターバル" Margin="5" VerticalAlignment="Center"/>
-                                        <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" MinValue="0" MaxValue="100" Value="{Binding BackUpIntervalAtMinimizing}"/>
+                                        <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" MinValue="0" Value="{Binding BackUpIntervalAtMinimizing}"/>
                                         <TextBlock Grid.Row="3" Grid.Column="2" Text="分" Margin="5" VerticalAlignment="Center"/>
                                     </Grid>
                                 </GroupBox>

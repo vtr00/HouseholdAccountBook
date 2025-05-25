@@ -1258,7 +1258,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 }
 
                 // 何も選択されていないなら1番上の項目を選択する
-                if (selectedVM != null && this.WVM.HierarchicalVMList.Count != 0) {
+                if (selectedVM == null && this.WVM.HierarchicalVMList.Count != 0) {
                     selectedVM = this.WVM.HierarchicalVMList[0];
                 }
                 this.WVM.SelectedHierarchicalVM = selectedVM;
@@ -1621,16 +1621,20 @@ ORDER BY B.sort_order;", itemId);
         {
             ObservableCollection<RelationViewModel> rvmList = new ObservableCollection<RelationViewModel>();
             DaoReader reader = await dao.ExecQueryAsync(@"
-SELECT I.item_id AS item_id, I.item_name AS item_name, C.category_name AS category_name, RBI.item_id IS NULL AS is_not_related
+SELECT I.item_id AS item_id, C.balance_kind AS balance_kind, C.category_name AS category_name, I.item_name AS item_name, RBI.item_id IS NULL AS is_not_related
 FROM mst_item I
-INNER JOIN (SELECT category_id, category_name FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
+INNER JOIN (SELECT category_id, category_name, balance_kind, sort_order FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
 LEFT JOIN (SELECT item_id FROM rel_book_item WHERE del_flg = 0 AND book_id = @{0}) RBI ON RBI.item_id = I.item_id
 WHERE del_flg = 0 AND move_flg = 0
-ORDER BY I.sort_order;", bookId);
+ORDER BY C.balance_kind, C.sort_order, I.sort_order;
+", bookId);
 
             reader.ExecWholeRow((count, record) => {
                 int itemId = record.ToInt("item_id");
-                string name = string.Format(@"{0} > {1}", record["category_name"], record["item_name"]);
+                int balanceKind = record.ToInt("balance_kind");
+                string categoryName = record["category_name"];
+                string itemName = record["item_name"];
+                string name = string.Format(@"{0} > {1} > {2}", BalanceKindStr[(BalanceKind)balanceKind], categoryName, itemName);
                 bool isRelated = !record.ToBoolean("is_not_related");
 
                 RelationViewModel rvm = new RelationViewModel() {

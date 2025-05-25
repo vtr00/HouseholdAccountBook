@@ -9,6 +9,7 @@
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Behaviors"
         xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
         xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
+        xmlns:system="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d"
         Title="Household Account Book" Height="700" Width="1050"
         Initialized="MainWindow_Initialized" Loaded="MainWindow_Loaded"

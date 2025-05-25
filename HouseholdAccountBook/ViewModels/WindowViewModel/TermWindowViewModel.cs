@@ -4,7 +4,7 @@ using System;
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
-    /// VM
+    /// 期間指定ウィンドウVM
     /// </summary>
     public class TermWindowViewModel : BindableBase
     {
