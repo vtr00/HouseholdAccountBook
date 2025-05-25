@@ -150,6 +150,10 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
+        /// <summary>
+        /// 今日
+        /// </summary>
+        public DateTime ToDay => DateTime.Now;
         #endregion
 
         #region プロパティ(グラフ)

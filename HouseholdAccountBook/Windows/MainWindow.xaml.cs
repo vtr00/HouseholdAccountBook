@@ -1784,7 +1784,9 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
                     
                     if (1 <= col && col <= 12) {
                         // 選択された月の帳簿タブを開く
+                        Log.Info($"{this.WVM.DisplayedYear:yyyy-MM-dd} + month:{col - 1}");
                         this.WVM.DisplayedMonth = this.WVM.DisplayedYear.AddMonths(col - 1);
+                        Log.Info($"{this.WVM.DisplayedMonth:yyyy-MM-dd}");
                         this.WVM.SelectedTab = Tabs.BooksTab;
                         e.Handled = true;
                     }
@@ -2758,7 +2760,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     foreach (SeriesViewModel tmpVM in this.WVM.DailyGraphSeriesVMList) {
                         CustomBarSeries wholeSeries = new CustomBarSeries() {
                             IsStacked = true,
-                            Title = tmpVM.Name,
+                            Title = tmpVM.DisplayedName,
                             ItemsSource = tmpVM.Values.Select((value, index) => {
                                 return new GraphDatumViewModel {
                                     Value = value,
@@ -2772,7 +2774,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                             XAxisKey = "Value",
                             YAxisKey = "Category"
                         };
-                        // 全項目日別グラフの項目を選択した時のイベントを登録する
+                        // 全項目日別グラフの項目をマウスオーバーした時のイベントを登録する
                         wholeSeries.TrackerHitResultChanged += (sender, e) => {
                             if (e.Value == null) return;
 
@@ -2853,7 +2855,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             if (vm != null) {
                 CustomBarSeries slectedSeries = new CustomBarSeries() {
                     IsStacked = true,
-                    Title = vm.Name,
+                    Title = vm.DisplayedName,
                     FillColor = (this.WVM.DailyGraphPlotModel.Series.FirstOrDefault((s) => {
                         List<GraphDatumViewModel> datumVMList = new List<GraphDatumViewModel>((s as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
                         return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
@@ -2945,7 +2947,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             horizontalAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する月の文字列を作成する
             for (int i = startMonth; i < startMonth + 12; ++i) {
-                horizontalAxis1.Labels.Add(string.Format("{0}", (i - 1) % 12 + 1));
+                horizontalAxis1.Labels.Add($"{(i - 1) % 12 + 1}");
             }
             this.WVM.MonthlyGraphPlotModel.Axes.Add(horizontalAxis1);
 
@@ -2977,7 +2979,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             horizontalAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する月の文字列を作成する
             for (int i = startMonth; i < startMonth + 12; ++i) {
-                horizontalAxis2.Labels.Add(string.Format("{0}", (i - 1) % 12 + 1));
+                horizontalAxis2.Labels.Add($"{(i - 1) % 12 + 1}");
             }
             this.WVM.SelectedMonthlyGraphPlotModel.Axes.Add(horizontalAxis2);
 
@@ -3036,19 +3038,9 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     // グラフ表示データを設定する
                     this.WVM.MonthlyGraphPlotModel.Series.Clear();
                     foreach (SeriesViewModel tmpVM in this.WVM.MonthlyGraphSeriesVMList) {
-                        string title = string.Empty;
-                        switch (this.WVM.SelectedGraphKind2) {
-                            case GraphKind2.CategoryGraph:
-                                title = tmpVM.CategoryName;
-                                break;
-                            case GraphKind2.ItemGraph:
-                                title = tmpVM.ItemName;
-                                break;
-                        }
-
                         CustomBarSeries wholeSeries = new CustomBarSeries() {
                             IsStacked = true,
-                            Title = title,
+                            Title = tmpVM.DisplayedName,
                             ItemsSource = tmpVM.Values.Select((value, index) => new GraphDatumViewModel {
                                 Value = value,
                                 Number = index + startMonth,
@@ -3060,7 +3052,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                             XAxisKey = "Value",
                             YAxisKey = "Category"
                         };
-                        // 全項目年間グラフの項目を選択した時のイベントを登録する
+                        // 全項目年間グラフの項目をマウスオーバーした時のイベントを登録する
                         wholeSeries.TrackerHitResultChanged += (sender, e) => {
                             if (e.Value == null) return;
 
@@ -3134,7 +3126,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             if (vm != null) {
                 CustomBarSeries selectedSeries = new CustomBarSeries() {
                     IsStacked = true,
-                    Title = vm.Name,
+                    Title = vm.DisplayedName,
                     FillColor = (this.WVM.MonthlyGraphPlotModel.Series.FirstOrDefault((s) => {
                         List<GraphDatumViewModel> datumVMList = new List<GraphDatumViewModel>((s as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
                         return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
@@ -3227,7 +3219,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             horizontalAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する年の文字列を作成する
             for (int i = startYear; i < startYear + 10; ++i) {
-                horizontalAxis1.Labels.Add(string.Format("{0}", i));
+                horizontalAxis1.Labels.Add($"{i}");
             }
             this.WVM.YearlyGraphPlotModel.Axes.Add(horizontalAxis1);
 
@@ -3259,7 +3251,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             horizontalAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する年の文字列を作成する
             for (int i = startYear; i < startYear + 10; ++i) {
-                horizontalAxis2.Labels.Add(string.Format("{0}", i));
+                horizontalAxis2.Labels.Add($"{i}");
             }
             this.WVM.SelectedYearlyGraphPlotModel.Axes.Add(horizontalAxis2);
 
@@ -3320,7 +3312,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     foreach (SeriesViewModel tmpVM in this.WVM.YearlyGraphSeriesVMList) {
                         CustomBarSeries wholeSeries = new CustomBarSeries() {
                             IsStacked = true,
-                            Title = tmpVM.Name,
+                            Title = tmpVM.DisplayedName,
                             ItemsSource = tmpVM.Values.Select((value, index) => new GraphDatumViewModel {
                                 Value = value,
                                 Number = index + startYear,
@@ -3406,7 +3398,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             if (vm != null) {
                 CustomBarSeries selectedSeries = new CustomBarSeries() {
                     IsStacked = true,
-                    Title = vm.Name,
+                    Title = vm.DisplayedName,
                     FillColor = (this.WVM.YearlyGraphPlotModel.Series.FirstOrDefault((s) => {
                         List<GraphDatumViewModel> datumVMList = new List<GraphDatumViewModel>((s as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
                         return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;

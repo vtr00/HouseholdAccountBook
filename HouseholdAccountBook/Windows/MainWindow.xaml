@@ -331,8 +331,12 @@
                                 </ToolTipService.ToolTip>
                             </Button>
                             <Button Width="20" Content="▶" Command="{StaticResource GoToNextMonthCommand}"/>
-                            <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}"/>
-                            
+                            <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}">
+                                <ToolTipService.ToolTip>
+                                    <TextBlock Text="{Binding ToDay, Converter={StaticResource DateTimeToDisplayedMonthConverter}}"/>
+                                </ToolTipService.ToolTip>
+                            </Button>
+
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
                         </StackPanel>
@@ -580,7 +584,11 @@
                                 </ToolTipService.ToolTip>
                             </Button>
                             <Button Width="20" Content="▶" Command="{StaticResource GoToNextMonthCommand}"/>
-                            <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}"/>
+                            <Button Width="40" Content="今月" Command="{StaticResource GoToThisMonthCommand}">
+                                <ToolTipService.ToolTip>
+                                    <TextBlock Text="{Binding ToDay, Converter={StaticResource DateTimeToDisplayedMonthConverter}}"/>
+                                </ToolTipService.ToolTip>
+                            </Button>
                             
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
@@ -632,7 +640,7 @@
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="200"
-                                          ItemsSource="{Binding DailyGraphSeriesVMList}" SelectedItem="{Binding SelectedDailyGraphSeriesVM}" DisplayMemberPath="SelectedName"/>
+                                          ItemsSource="{Binding DailyGraphSeriesVMList}" SelectedItem="{Binding SelectedDailyGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
                             </StackPanel>
                         </Grid>
                         <oxy:PlotView Grid.Row="1" Model="{Binding SelectedDailyGraphPlotModel}" Controller="{Binding Controller}"/>
@@ -656,10 +664,13 @@
                     <Grid Grid.Row="0" Margin="2">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="◀" Width="20" Command="{StaticResource GoToLastYearCommand}"/>
-                            <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}" Width="120"
-                                    Command="{StaticResource UpdateCommand}"/>
+                            <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}" Width="120"/>
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
-                            <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
+                            <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}">
+                                <ToolTipService.ToolTip>
+                                    <TextBlock Text="{Binding ToDay, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                </ToolTipService.ToolTip>
+                            </Button>
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
                                           ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
                         </StackPanel>
@@ -750,7 +761,12 @@
                             <Button Content="◀" Width="20" Command="{StaticResource GoToLastYearCommand}"/>
                             <Button Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}" Width="120"/>
                             <Button Content="▶" Width="20" Command="{StaticResource GoToNextYearCommand}"/>
-                            <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}"/>
+                            <Button Content="今年" Width="40" Command="{StaticResource GoToThisYearCommand}">
+                                <ToolTipService.ToolTip>
+                                    <TextBlock Text="{Binding ToDay, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                </ToolTipService.ToolTip>
+                            </Button>
+                            
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
                             <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
@@ -801,7 +817,7 @@
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox HorizontalAlignment="Stretch" MinWidth="200"
-                                          ItemsSource="{Binding MonthlyGraphSeriesVMList}" SelectedItem="{Binding SelectedMonthlyGraphSeriesVM}" DisplayMemberPath="SelectedName"/>
+                                          ItemsSource="{Binding MonthlyGraphSeriesVMList}" SelectedItem="{Binding SelectedMonthlyGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
                             </StackPanel>
                         </Grid>
                         <oxy:PlotView Grid.Row="1" Model="{Binding SelectedMonthlyGraphPlotModel}" Controller="{Binding Controller}"/>
@@ -907,6 +923,7 @@
                             <Button Content="-" Width="120" IsEnabled="False"/>
                             <Button Content="▶" Width="20" IsEnabled="False"/>
                             <Button Content="-" Width="40" IsEnabled="False"/>
+                            
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
@@ -957,7 +974,7 @@
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox HorizontalAlignment="Stretch" MinWidth="200"
-                                          ItemsSource="{Binding YearlyGraphSeriesVMList}" SelectedItem="{Binding SelectedYearlyGraphSeriesVM}" DisplayMemberPath="SelectedName"/>
+                                          ItemsSource="{Binding YearlyGraphSeriesVMList}" SelectedItem="{Binding SelectedYearlyGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
                             </StackPanel>
                         </Grid>
                         

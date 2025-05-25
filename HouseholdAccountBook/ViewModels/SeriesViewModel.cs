@@ -54,37 +54,22 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 表示名
         /// </summary>
-        public string Name
+        public string DisplayedName
         {
             get {
-                if (this.ItemName != string.Empty) return this.ItemName;
-                if (this.CategoryName != string.Empty) return this.CategoryName;
-                if (this.BalanceName != string.Empty) return this.BalanceName;
+                if (this.BalanceName != string.Empty && this.CategoryName != string.Empty && this.ItemName != string.Empty) return $"{this.BalanceName} > {this.CategoryName} > {this.ItemName}";
+                if (this.BalanceName != string.Empty && this.CategoryName != string.Empty) return $"{this.BalanceName} > {this.CategoryName}";
                 return this.OtherName;
             }
             private set { }
         }
         /// <summary>
-        /// 一覧表示名
+        /// 一覧表示名(サマリーや一覧に表示する名称)
         /// </summary>
         public string ListName
         {
             get {
                 if (this.ItemName != string.Empty) return "  " + this.ItemName;
-                if (this.CategoryName != string.Empty) return this.CategoryName;
-                if (this.BalanceName != string.Empty) return this.BalanceName;
-                return this.OtherName;
-            }
-            private set { }
-        }
-        /// <summary>
-        /// 選択項目表示名
-        /// </summary>
-        public string SelectedName
-        {
-            get {
-                if (this.ItemName != string.Empty && this.CategoryName != string.Empty) return this.CategoryName + " > " + this.ItemName;
-                if (this.ItemName != string.Empty) return this.ItemName;
                 if (this.CategoryName != string.Empty) return this.CategoryName;
                 if (this.BalanceName != string.Empty) return this.BalanceName;
                 return this.OtherName;
