@@ -89,7 +89,7 @@ namespace HouseholdAccountBook.Windows
 
             this.InitializeComponent();
 
-            this.WVM.RegMode = RegistrationMode.Add;
+            this.WVM.RegMode = RegistrationKind.Add;
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace HouseholdAccountBook.Windows
 
             this.InitializeComponent();
 
-            this.WVM.RegMode = RegistrationMode.Add;
+            this.WVM.RegMode = RegistrationKind.Add;
         }
 
         /// <summary>
@@ -117,16 +117,16 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="builder">DAOビルダ</param>
         /// <param name="selectedGroupId">選択されたグループID</param>
-        /// <param name="mode">登録モード</param>
-        public ActionListRegistrationWindow(DaoBuilder builder, int selectedGroupId, RegistrationMode mode = RegistrationMode.Edit)
+        /// <param name="mode">登録種別</param>
+        public ActionListRegistrationWindow(DaoBuilder builder, int selectedGroupId, RegistrationKind mode = RegistrationKind.Edit)
         {
             this.builder = builder;
             this.selectedBookId = null;
             this.selectedMonth = null;
             this.selectedDate = null;
             switch (mode) {
-                case RegistrationMode.Edit:
-                case RegistrationMode.Copy:
+                case RegistrationKind.Edit:
+                case RegistrationKind.Copy:
                     this.selectedGroupId = selectedGroupId;
                     break;
             }
@@ -271,7 +271,7 @@ namespace HouseholdAccountBook.Windows
         private async void ActionListRegistrationWindow_Loaded(object sender, RoutedEventArgs e)
         {
             int? bookId = null;
-            BalanceKind balanceKind = BalanceKind.Outgo;
+            BalanceKind balanceKind = BalanceKind.Expenses;
 
             int? itemId = null;
             string shopName = null;
@@ -279,9 +279,9 @@ namespace HouseholdAccountBook.Windows
 
             // DBから値を読み込む
             switch (this.WVM.RegMode) {
-                case RegistrationMode.Add: {
+                case RegistrationKind.Add: {
                     bookId = this.selectedBookId;
-                    balanceKind = BalanceKind.Outgo;
+                    balanceKind = BalanceKind.Expenses;
                     DateTime actDate = this.selectedDate ?? ((this.selectedMonth == null || this.selectedMonth?.Month == DateTime.Today.Month) ? DateTime.Today : this.selectedMonth.Value);
 
                     if (this.selectedRecordList == null) {
@@ -294,8 +294,8 @@ namespace HouseholdAccountBook.Windows
                     }
                 }
                 break;
-                case RegistrationMode.Edit:
-                case RegistrationMode.Copy: {
+                case RegistrationKind.Edit:
+                case RegistrationKind.Copy: {
                     using (DaoBase dao = this.builder.Build()) {
                         DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT book_id, item_id, action_id, act_time, act_value, shop_name, remark
@@ -320,7 +320,7 @@ WHERE del_flg = 0 AND group_id = @{0};", this.selectedGroupId);
                                 ActValue = Math.Abs(actValue)
                             };
 
-                            balanceKind = Math.Sign(actValue) > 0 ? BalanceKind.Income : BalanceKind.Outgo; // 収入 / 支出
+                            balanceKind = Math.Sign(actValue) > 0 ? BalanceKind.Income : BalanceKind.Expenses; // 収入 / 支出
 
                             this.groupedActionIdList.Add(vm.ActionId.Value);
                             this.WVM.DateValueVMList.Add(vm);
@@ -332,7 +332,7 @@ WHERE del_flg = 0 AND group_id = @{0};", this.selectedGroupId);
             }
 
             // WVMに値を設定する
-            this.WVM.GroupId = this.WVM.RegMode == RegistrationMode.Edit ? this.selectedGroupId : null;
+            this.WVM.GroupId = this.WVM.RegMode == RegistrationKind.Edit ? this.selectedGroupId : null;
             this.WVM.SelectedBalanceKind = balanceKind;
 
             // リストを更新する
@@ -489,7 +489,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         private async Task UpdateCategoryListAsync(int? categoryId = null)
         {
             ObservableCollection<CategoryViewModel> categoryVMList = new ObservableCollection<CategoryViewModel>() {
-                new CategoryViewModel() { Id = -1, Name = "(指定なし)" }
+                new CategoryViewModel() { Id = -1, Name = Properties.Resources.ListName_NoSpecification }
             };
             int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryVM?.Id ?? categoryVMList[0].Id;
             CategoryViewModel selectedCategoryVM = categoryVMList[0];
@@ -690,7 +690,7 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
             DateTime lastActTime = this.WVM.DateValueVMList.Max((tmp) => tmp.ActDate);
             using (DaoBase dao = this.builder.Build()) {
                 switch (this.WVM.RegMode) {
-                    case RegistrationMode.Add: {
+                    case RegistrationKind.Add: {
                         #region 帳簿項目を追加する
                         await dao.ExecTransactionAsync(async () => {
                             int tmpGroupId = -1;
@@ -720,7 +720,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 'now', @{7}, 'now', @{8}) R
                         #endregion
                         break;
                     }
-                    case RegistrationMode.Edit: {
+                    case RegistrationKind.Edit: {
                         #region 帳簿項目を編集する
                         await dao.ExecTransactionAsync(async () => {
                             foreach (DateValueViewModel vm in this.WVM.DateValueVMList) {

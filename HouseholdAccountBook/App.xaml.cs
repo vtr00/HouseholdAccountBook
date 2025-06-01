@@ -5,7 +5,9 @@ using Newtonsoft.Json;
 using Notifications.Wpf;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -50,13 +52,21 @@ namespace HouseholdAccountBook
         /// <param name="e"></param>
         private async void App_Startup(object sender, StartupEventArgs e)
         {
-            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
-
 #if DEBUG
             Debug.Listeners.Add(new ConsoleTraceListener());
 #endif
 
             Log.Info("Application Startup");
+
+            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
+
+            // 言語設定
+            System.Globalization.CultureInfo cultureInfo = new System.Globalization.CultureInfo(settings.App_CultureName);
+            HouseholdAccountBook.Properties.Resources.Culture = cultureInfo;
+            Thread.CurrentThread.CurrentCulture = cultureInfo;
+            Thread.CurrentThread.CurrentUICulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 #if !DEBUG
             // 多重起動を抑止する
@@ -73,7 +83,7 @@ namespace HouseholdAccountBook
                     }
                 }
 
-                MessageBox.Show("同時に複数起動することはできません。", MessageTitle.Exclamation);
+                MessageBox.Show(HouseholdAccountBook.Properties.Resources.Message_DoNotDuplicateProcess, HouseholdAccountBook.Properties.Resources.Title_Warning);
                 this.Shutdown();
                 return;
             }
@@ -99,7 +109,7 @@ namespace HouseholdAccountBook
                 this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
                 // データベース接続を設定する
-                DbSettingWindow dsw = new DbSettingWindow("DB接続設定を入力してください。");
+                DbSettingWindow dsw = new DbSettingWindow(HouseholdAccountBook.Properties.Resources.Message_PleaseInputDbSetting);
                 bool? result = dsw.ShowDialog();
 
                 if (result != true) {
@@ -143,7 +153,7 @@ namespace HouseholdAccountBook
                 }
                 else {
                     // データベース接続を設定する
-                    DbSettingWindow dsw = new DbSettingWindow("接続に失敗しました。接続設定を見直してください。");
+                    DbSettingWindow dsw = new DbSettingWindow(HouseholdAccountBook.Properties.Resources.Message_FoultToConnectDb);
                     bool? result = dsw.ShowDialog();
 
                     if (result != true) {
@@ -158,7 +168,7 @@ namespace HouseholdAccountBook
             await DateTimeExtensions.DownloadHolidayListAsync();
 
             // 設定をリソースに登録する
-            this.RegisterSettingsToResource();
+            this.RegisterToResource();
 
             // DBに接続できる場合だけメインウィンドウを開く
             MainWindow mw = new MainWindow(builder);
@@ -194,7 +204,7 @@ namespace HouseholdAccountBook
                 NotificationManager nm = new NotificationManager();
                 NotificationContent nc = new NotificationContent() {
                     Title = Current.MainWindow?.Title ?? "",
-                    Message = MessageText.UnhandledExceptionOccurred,
+                    Message = HouseholdAccountBook.Properties.Resources.Message_UnhandledExceptionOccurred,
                     Type = NotificationType.Warning
                 };
                 nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
@@ -223,12 +233,15 @@ namespace HouseholdAccountBook
         /// <summary>
         /// 設定をリソースに登録する
         /// </summary>
-        public void RegisterSettingsToResource()
+        public void RegisterToResource()
         {
-            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
             ResourceDictionary rd = Current.Resources;
             if (rd.Contains("Settings")) {
+                Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
                 rd["Settings"] = settings;
+            }
+            if (rd.Contains("AppCulture")) {
+                rd["AppCulture"] = HouseholdAccountBook.Properties.Resources.Culture;
             }
         }
 

@@ -3,11 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         mc:Ignorable="d" 
         Height="430" Width="300" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize"
-        Title="期間選択 - Household Account Book"
+        Title="{x:Static properties:Resources.Title_TermSelectionWindow}"
         Loaded="TermWindow_Loaded"
         Closed="TermWindow_Closed">
     
@@ -43,12 +44,11 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <GroupBox Grid.Row="0">
                 <GroupBox.Header>
-                    <RadioButton x:Name="selectedMonthRadioButton" Content="指定月" GroupName="TermKind" IsChecked="True" Command="{StaticResource CheckSelectedMonthCommand}"/>
+                    <RadioButton x:Name="selectedMonthRadioButton" Content="{x:Static properties:Resources.GroupHeader_MonthSelection}" GroupName="TermKind" IsChecked="True" Command="{StaticResource CheckSelectedMonthCommand}"/>
                 </GroupBox.Header>
                 
                 <Grid IsEnabled="{Binding IsChecked, ElementName=selectedMonthRadioButton}">
@@ -57,7 +57,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Button Grid.Row="0" Margin="5" Content="今月" Command="{StaticResource ThisMonthCommand}"/>
+                    <Button Grid.Row="0" Margin="5" Content="{x:Static properties:Resources.Button_ThisMonth}" Command="{StaticResource ThisMonthCommand}"/>
                     <Calendar Grid.Row="1" x:Name="calendar" DisplayDate="{Binding StartDate, Mode=TwoWay}" SelectedDate="{Binding StartDate, Mode=TwoWay}" 
                               DisplayModeChanged="Calendar_DisplayModeChanged"/>
                 </Grid>
@@ -65,7 +65,7 @@
             
             <GroupBox Grid.Row="1">
                 <GroupBox.Header>
-                    <RadioButton x:Name="selectedTermRadioButton" Content="指定期間" GroupName="TermKind" Command="{StaticResource CheckSelectedTeamCommand}"/>
+                    <RadioButton x:Name="selectedTermRadioButton" Content="{x:Static properties:Resources.GroupHeader_TermSelection}" GroupName="TermKind" Command="{StaticResource CheckSelectedTeamCommand}"/>
                 </GroupBox.Header>
                 
                 <Grid IsEnabled="{Binding IsChecked, ElementName=selectedTermRadioButton}">
@@ -79,11 +79,15 @@
                         <ColumnDefinition Width="0.5*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Row="0" Grid.ColumnSpan="2" Margin="5" Content="全期間" Command="{StaticResource AllTermCommand}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="開始：" VerticalAlignment="Center"/>
+                    <Button Grid.Row="0" Grid.ColumnSpan="2" Margin="5" Content="{x:Static properties:Resources.Button_AllTerm}" Command="{StaticResource AllTermCommand}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center">
+                        <TextBlock Text="{x:Static properties:Resources.TextBlock_StartDate}"/>:
+                    </TextBlock>
                     <controls:DateTimePicker Grid.Row="1" Grid.Column="1" Margin="5" DateFormat="yyyy-MM-dd" 
                                              SelectedDate="{Binding StartDate}"/>
-                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="終了：" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" VerticalAlignment="Center">
+                        <TextBlock Text="{x:Static properties:Resources.TextBlock_EndDate}"/>:
+                    </TextBlock>
                     <controls:DateTimePicker Grid.Row="2" Grid.Column="1" Margin="5" DateFormat="yyyy-MM-dd" 
                                              SelectedDate="{Binding EndDate}"/>
                 </Grid>
@@ -96,8 +100,8 @@
                 <ColumnDefinition Width="0.5*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Margin="5" Content="OK" Command="{StaticResource OKCommand}"/>
-            <Button Grid.Column="1" Margin="5" Content="キャンセル" Command="{StaticResource CancelCommand}"/>
+            <Button Grid.Column="0" Margin="5" Content="{x:Static properties:Resources.Button_OK}" Command="{StaticResource OKCommand}"/>
+            <Button Grid.Column="1" Margin="5" Content="{x:Static properties:Resources.Button_Cancel}" Command="{StaticResource CancelCommand}"/>
         </Grid>
     </Grid>
 </Window>

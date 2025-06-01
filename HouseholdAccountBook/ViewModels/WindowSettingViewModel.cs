@@ -8,9 +8,9 @@ namespace HouseholdAccountBook.ViewModels
     public class WindowSettingViewModel
     {
         /// <summary>
-        /// ウィンドウ種別
+        /// ウィンドウタイトル
         /// </summary>
-        public String Kind { get; set; }
+        public String Title { get; set; }
 
         /// <summary>
         /// 左位置

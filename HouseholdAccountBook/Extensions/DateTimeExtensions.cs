@@ -175,5 +175,16 @@ namespace HouseholdAccountBook.Extensions
             }
             return true;
         }
+
+        /// <summary>
+        /// 設定に応じた年の単位を取得する
+        /// </summary>
+        /// <returns>年の単位</returns>
+        public static string GetYearUnit()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            return settings.App_StartMonth == 1 ? Properties.Resources.Unit_Year : Properties.Resources.Unit_FiscalYear;
+        }
     }
 }

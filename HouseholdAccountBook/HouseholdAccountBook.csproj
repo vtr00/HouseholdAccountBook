@@ -376,11 +376,11 @@
     <Compile Include="Windows\CsvComparisonWindow.xaml.cs">
       <DependentUpon>CsvComparisonWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\TermWindow.xaml.cs">
-      <DependentUpon>TermWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Windows\DbSettingWindow.xaml.cs">
       <DependentUpon>DbSettingWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\TermWindow.xaml.cs">
+      <DependentUpon>TermWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\VersionWindow.xaml.cs">
       <DependentUpon>VersionWindow.xaml</DependentUpon>
@@ -411,11 +411,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\TermWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Windows\DbSettingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Windows\TermWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -471,6 +471,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="Properties\Resources.en-001.resx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

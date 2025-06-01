@@ -5,9 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
-        xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="バージョン情報 - Household Account Book"
+        Title="{x:Static properties:Resources.Title_VersionWindow}"
         Height="600" Width="500" ShowInTaskbar="False" WindowStyle="ToolWindow"
         Loaded="VersionWindow_Loaded">
 
@@ -17,8 +16,6 @@
     
     <Window.Resources>
         <RoutedCommand x:Key="CloseWindowCommand"/>
-
-        <system:DateTime x:Key="DateTime"/>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -41,7 +38,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Image Source="/Resources/resheet.ico"/>
+        <Image Grid.Row="0" Grid.Column="0" Source="/Resources/resheet.ico"/>
         <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center" Text="Household Account Book" FontSize="18" FontWeight="Bold"/>
         <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" TextAlignment="Right" VerticalAlignment="Bottom">
             Ver.
@@ -54,20 +51,26 @@
             All rights reserved.
         </TextBlock>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="サポート:"/>
+        <TextBlock Grid.Row="2" Grid.Column="0">
+            <TextBlock Text="{x:Static properties:Resources.TextBlock_Support}"/>:
+        </TextBlock>
         <TextBlock Grid.Row="2" Grid.Column="1">
-            <Hyperlink NavigateUri="{Binding SupportSiteUri}" ToolTip="{Binding SupportSiteUri}" RequestNavigate="Hyperlink_RequestNavigate">https://github.com/vtr00/</Hyperlink>
+            <Hyperlink NavigateUri="{Binding SupportSiteUri}" ToolTip="{Binding SupportSiteUri}" RequestNavigate="Hyperlink_RequestNavigate">Github</Hyperlink>
         </TextBlock>
 
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="SNS:"/>
+        <TextBlock Grid.Row="3" Grid.Column="0">
+            <TextBlock Text="{x:Static properties:Resources.TextBlock_SNS}"/>:
+        </TextBlock>
         <TextBlock Grid.Row="3" Grid.Column="1">
             <Hyperlink NavigateUri="{Binding SnsSiteUri}" ToolTip="{Binding SnsSiteUri}" RequestNavigate="Hyperlink_RequestNavigate">@toresebu</Hyperlink>
         </TextBlock>
 
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="履歴:"/>
+        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2">
+            <TextBlock Text="{x:Static properties:Resources.TextBlock_UpdateHistory}"/>:
+        </TextBlock>
         <TextBox x:Name="HistoryLog" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="3" Text="{x:Static properties:Resources.UpdateLog}"
                  AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" IsReadOnly="True"/>
 
-        <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="5" Width="100" Content="閉じる" Command="{StaticResource CloseWindowCommand}"/>
+        <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="5" Width="100" Content="{x:Static properties:Resources.Button_Close}" Command="{StaticResource CloseWindowCommand}"/>
     </Grid>
 </Window>

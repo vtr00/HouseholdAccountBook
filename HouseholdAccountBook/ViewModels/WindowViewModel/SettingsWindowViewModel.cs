@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.UserEventArgs;
 using Prism.Mvvm;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
@@ -186,6 +187,24 @@ namespace HouseholdAccountBook.ViewModels
             }
         }
         private string _RestoreExePath = default;
+        #endregion
+        #endregion
+
+        #region 言語
+        /// <summary>
+        /// 言語種別辞書
+        /// </summary>
+        public Dictionary<string, string> CultureNameDic { get; } = CultureNameStr;
+        /// <summary>
+        /// 選択された言語種別
+        /// </summary>
+        #region SelectedCultureName
+        public string SelectedCultureName
+        {
+            get => this._SelectedCultureName;
+            set => this.SetProperty(ref this._SelectedCultureName, value);
+        }
+        private string _SelectedCultureName = "ja-JP";
         #endregion
         #endregion
 
@@ -392,7 +411,7 @@ namespace HouseholdAccountBook.ViewModels
 
                     // リソースを更新して他ウィンドウの項目の表示/非表示を切り替える
                     App app = System.Windows.Application.Current as App;
-                    app.RegisterSettingsToResource();
+                    app.RegisterToResource();
                 }
             }
         }
@@ -418,6 +437,7 @@ namespace HouseholdAccountBook.ViewModels
 
             this.DumpExePath = this.settings.App_Postgres_DumpExePath;
             this.RestoreExePath = this.settings.App_Postgres_RestoreExePath;
+            this.SelectedCultureName = this.settings.App_CultureName;
             this.BackUpNum = this.settings.App_BackUpNum;
             this.BackUpFolderPath = this.settings.App_BackUpFolderPath;
             this.BackUpFlagAtMinimizing = this.settings.App_BackUpFlagAtMinimizing;
@@ -443,31 +463,31 @@ namespace HouseholdAccountBook.ViewModels
         {
             ObservableCollection<WindowSettingViewModel> list = new ObservableCollection<WindowSettingViewModel>() {
                 new WindowSettingViewModel(){
-                    Kind = "メイン",
+                    Title = Properties.Resources.Title_MainWindow,
                     Left = this.settings.MainWindow_Left, Top = this.settings.MainWindow_Top,
                     Width = this.settings.MainWindow_Width, Height = this.settings.MainWindow_Height },
                 new WindowSettingViewModel(){
-                    Kind = "移動",
+                    Title = Properties.Resources.Title_AddMoveWindow,
                     Left = this.settings.MoveRegistrationWindow_Left, Top = this.settings.MoveRegistrationWindow_Top,
                     Width = this.settings.MoveRegistrationWindow_Width, Height = this.settings.MoveRegistrationWindow_Height },
                 new WindowSettingViewModel(){
-                    Kind = "追加・変更",
+                    Title = Properties.Resources.Title_AddWindow,
                     Left = this.settings.ActionRegistrationWindow_Left, Top = this.settings.ActionRegistrationWindow_Top,
                     Width = this.settings.ActionRegistrationWindow_Width, Height = this.settings.ActionRegistrationWindow_Height },
                 new WindowSettingViewModel(){
-                    Kind = "リスト追加",
+                    Title = Properties.Resources.Title_AddListWindow,
                     Left = this.settings.ActionListRegistrationWindow_Left, Top = this.settings.ActionListRegistrationWindow_Top,
                     Width = this.settings.ActionListRegistrationWindow_Width, Height = this.settings.ActionListRegistrationWindow_Height },
                 new WindowSettingViewModel(){
-                    Kind = "CSV比較",
+                    Title = Properties.Resources.Title_CsvComparisonWindow,
                     Left = this.settings.CsvComparisonWindow_Left, Top = this.settings.CsvComparisonWindow_Top,
                     Width = this.settings.CsvComparisonWindow_Width, Height = this.settings.CsvComparisonWindow_Height },
                 new WindowSettingViewModel(){
-                    Kind = "設定",
+                    Title = Properties.Resources.Title_SettingsWindow,
                     Left = this.settings.SettingsWindow_Left, Top = this.settings.SettingsWindow_Top,
                     Width = this.settings.SettingsWindow_Width, Height = this.settings.SettingsWindow_Height },
                 new WindowSettingViewModel(){
-                    Kind = "期間選択",
+                    Title = Properties.Resources.Title_TermSelectionWindow,
                     Left = this.settings.TermWindow_Left, Top = this.settings.TermWindow_Top,
                     Width = -1, Height = -1 }
 

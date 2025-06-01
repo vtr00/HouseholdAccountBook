@@ -57,7 +57,7 @@ namespace HouseholdAccountBook.Windows
                 CheckFileExists = true,
                 InitialDirectory = directory,
                 FileName = fileName,
-                Title = "ファイル選択",
+                Title = Properties.Resources.Title_FileSelection,
                 Filter = "pg_dump.exe|pg_dump.exe"
             };
 
@@ -84,7 +84,7 @@ namespace HouseholdAccountBook.Windows
                 CheckFileExists = true,
                 InitialDirectory = directory,
                 FileName = fileName,
-                Title = "ファイル選択",
+                Title = Properties.Resources.Title_FileSelection,
                 Filter = "pg_restore.exe|pg_restore.exe"
             };
 
@@ -94,7 +94,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// OKボタン押下時
+        /// OKボタン押下可能か
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -104,7 +104,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// 
+        /// OKボタン押下時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

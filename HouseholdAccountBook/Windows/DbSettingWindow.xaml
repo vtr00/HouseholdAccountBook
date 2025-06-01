@@ -3,9 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:project="clr-namespace:HouseholdAccountBook"
+        xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         mc:Ignorable="d"
-        Title="初期設定 - Household Account Book" Height="300" Width="400" WindowStyle="ToolWindow">
+        Title="{x:Static properties:Resources.Title_DbSettingWindow}" Height="300" Width="400" WindowStyle="ToolWindow">
     <Window.DataContext>
         <viewmodels:DbSettingWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
@@ -64,23 +66,23 @@
                 <RowDefinition Height="0.1*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="ホスト" Margin="5" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Host}" Margin="5" VerticalAlignment="Center"/>
             <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding Host}"/>
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="ポート" Margin="5" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Port}" Margin="5" VerticalAlignment="Center"/>
             <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding Port}" 
                      PreviewTextInput="TextBox_PreviewTextInput"/>
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="ユーザ名" Margin="5" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_UserName}" Margin="5" VerticalAlignment="Center"/>
             <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding UserName}"/>
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="パスワード" Margin="5" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Password}" Margin="5" VerticalAlignment="Center"/>
             <PasswordBox x:Name="passwordBox" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="1"/>
 
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="DB名" Margin="5" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_DbName}" Margin="5" VerticalAlignment="Center"/>
             <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding DatabaseName}"/>
 
-            <TextBlock Grid.Row="5" Grid.Column="0" Text="ロール" Margin="5" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Roll}" Margin="5" VerticalAlignment="Center"/>
             <TextBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding Role}"/>
         
             <TextBlock Grid.Row="6" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
@@ -98,8 +100,8 @@
                 <ColumnDefinition Width="0.5*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Margin="5" Content="OK" Command="{StaticResource OKCommand}"/>
-            <Button Grid.Column="1" Margin="5" Content="キャンセル" Command="{StaticResource CancelCommand}"/>
+            <Button Grid.Column="0" Margin="5" Content="{x:Static properties:Resources.Button_OK}" Command="{StaticResource OKCommand}"/>
+            <Button Grid.Column="1" Margin="5" Content="{x:Static properties:Resources.Button_Cancel}" Command="{StaticResource CancelCommand}"/>
         </Grid>
     </Grid>
 </Window>

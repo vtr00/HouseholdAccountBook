@@ -200,13 +200,13 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 支出 位置(1開始)
         /// </summary>
-        #region OutgoIndex
-        public int? OutgoIndex
+        #region ExpensesIndex
+        public int? ExpensesIndex
         {
-            get => this._OutgoIndex;
-            set => this.SetProperty(ref this._OutgoIndex, value);
+            get => this._ExpensesIndex;
+            set => this.SetProperty(ref this._ExpensesIndex, value);
         }
-        private int? _OutgoIndex = default;
+        private int? _ExpensesIndex = default;
         #endregion
 
         /// <summary>

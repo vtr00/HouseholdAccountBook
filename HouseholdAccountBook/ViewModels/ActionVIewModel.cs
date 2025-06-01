@@ -54,7 +54,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 支出
         /// </summary>
-        public int? Outgo { get; set; }
+        public int? Expenses { get; set; }
         /// <summary>
         /// 残高
         /// </summary>

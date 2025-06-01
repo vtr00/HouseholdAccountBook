@@ -147,13 +147,13 @@ namespace HouseholdAccountBook.Windows
                 CheckFileExists = true,
                 InitialDirectory = directory,
                 FileName = fileName,
-                Title = "ファイル選択",
-                Filter = "MDBファイル|*.mdb"
+                Title = Properties.Resources.Title_FileSelection,
+                Filter = Properties.Resources.FileSelectFilter_MdbFile + "|*.mdb"
             };
 
             if (ofd.ShowDialog(this) == false) return;
 
-            if (MessageBox.Show(MessageText.DeleteOldDataNotification, MessageTitle.Comformation,
+            if (MessageBox.Show(Properties.Resources.Message_DeleteOldDataNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
                 return;
             }
@@ -344,10 +344,10 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             }
 
             if (isOpen) {
-                MessageBox.Show(MessageText.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
 
@@ -384,14 +384,14 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
                 CheckFileExists = true,
                 InitialDirectory = directory,
                 FileName = fileName,
-                Title = "ファイル選択",
-                Filter = "カスタム形式ファイル|*.*",
+                Title = Properties.Resources.Title_FileSelection,
+                Filter = Properties.Resources.FileSelectFilter_CustomFormatFile + "|*.*",
                 CheckPathExists = true
             };
 
             if (ofd.ShowDialog(this) == false) return;
 
-            if (MessageBox.Show(MessageText.DeleteOldDataNotification, MessageTitle.Comformation,
+            if (MessageBox.Show(Properties.Resources.Message_DeleteOldDataNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
                 return;
             }
@@ -421,10 +421,10 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             }
 
             if (exitCode == 0) {
-                MessageBox.Show(MessageText.FinishToImport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                MessageBox.Show(MessageText.FoultToImport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
 
@@ -463,8 +463,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             SaveFileDialog sfd = new SaveFileDialog() {
                 InitialDirectory = directory,
                 FileName = fileName,
-                Title = "ファイル選択",
-                Filter = "カスタム形式ファイル|*.*"
+                Title = Properties.Resources.Title_FileSelection,
+                Filter = Properties.Resources.FileSelectFilter_CustomFormatFile + "|*.*"
             };
 
             if (sfd.ShowDialog(this) == false) return;
@@ -478,10 +478,10 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             }
 
             if (exitCode == 0) {
-                MessageBox.Show(MessageText.FinishToExport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                MessageBox.Show(MessageText.FoultToExport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
 
@@ -520,8 +520,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             SaveFileDialog sfd = new SaveFileDialog() {
                 InitialDirectory = directory,
                 FileName = fileName,
-                Title = "ファイル選択",
-                Filter = "SQLファイル|*.sql"
+                Title = Properties.Resources.Title_FileSelection,
+                Filter = Properties.Resources.FileSelectFilter_SqlFile + "|*.sql"
             };
 
             if (sfd.ShowDialog(this) == false) return;
@@ -535,10 +535,10 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             }
 
             if (exitCode == 0) {
-                MessageBox.Show(MessageText.FinishToExport, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                MessageBox.Show(MessageText.FoultToExport, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
 
@@ -568,10 +568,10 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
             }
 
             if (result) {
-                MessageBox.Show(MessageText.FinishToBackup, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                MessageBox.Show(Properties.Resources.Message_FinishToBackup, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                MessageBox.Show(MessageText.FoultToBackup, MessageTitle.Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                MessageBox.Show(Properties.Resources.Message_FoultToBackup, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
 
@@ -901,7 +901,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
 
             if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
                 // 移動以外の帳簿項目の複製時の処理
-                this.arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId, RegistrationMode.Copy) { Owner = this };
+                this.arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId, RegistrationKind.Copy) { Owner = this };
                 this.arw.LoadWindowSetting();
 
                 // 登録時イベントを登録する
@@ -918,7 +918,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
             }
             else {
                 // 移動の複製時の処理
-                this.mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationMode.Copy) { Owner = this };
+                this.mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationKind.Copy) { Owner = this };
                 this.mrw.LoadWindowSetting();
 
                 // 登録時イベントを登録する
@@ -956,7 +956,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
         {
             Log.Info();
 
-            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Comformation, 
+            if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Conformation, 
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 // 帳簿項目IDが0を超える項目についてループ
                 foreach (ActionViewModel vm in this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; })) {
@@ -1571,7 +1571,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
 
             this.WVM.FindText = this.WVM.FindInputText;
 
-            if (MessageBox.Show(string.Format(MessageText.ReplaceShopNameRemarkNotification, this.WVM.FindText, this.WVM.ReplaceText), MessageTitle.Comformation,
+            if (MessageBox.Show(string.Format(Properties.Resources.Message_ReplaceShopNameRemarkNotification, this.WVM.FindText, this.WVM.ReplaceText), Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
                 this.WVM.FindText = string.Empty; // 検索をクリアしておく
                 return;
@@ -1872,7 +1872,7 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
             Log.Info($"tmpBookId:{tmpBookId}");
 
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>() {
-                new BookViewModel() { Id = null, Name = "一覧" }
+                new BookViewModel() { Id = null, Name = Properties.Resources.ListName_AllBooks }
             };
             BookViewModel selectedBookVM = bookVMList[0];
             using (DaoBase dao = this.builder.Build()) {
@@ -1957,7 +1957,7 @@ ORDER BY sort_order;");
                     reader = await dao.ExecQueryAsync(@"
 -- 繰越残高
 SELECT -1 AS action_id, @{1} AS act_time, -1 AS book_id, -1 AS category_id, -1 AS item_id, 
-       '' AS book_name, '' AS category_name, '繰越残高' AS item_name, 0 AS act_value, (
+       '' AS book_name, '' AS category_name, '" + Properties.Resources.ListName_CarryForward + @"' AS item_name, 0 AS act_value, (
            -- 残高
            SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0)
            FROM hst_action AA
@@ -1989,7 +1989,7 @@ ORDER BY act_time, balance_kind, c_order, i_order, b_order, action_id;", null, s
                     reader = await dao.ExecQueryAsync(@"
 -- 繰越残高
 SELECT -1 AS action_id, @{1} AS act_time, -1 AS book_id, -1 AS category_id, -1 AS item_id, 
-       '' AS book_name, '' AS category_name, '繰越残高' AS item_name, 0 AS act_value, (
+       '' AS book_name, '' AS category_name, '" + Properties.Resources.ListName_CarryForward + @"' AS item_name, 0 AS act_value, (
            -- 残高
            SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0})
            FROM hst_action AA
@@ -2032,21 +2032,21 @@ ORDER BY act_time, balance_kind, c_order, i_order, action_id;", targetBookId, st
 
                     BalanceKind balanceKind = BalanceKind.Others;
                     int? income = null;
-                    int? outgo = null;
+                    int? expenses = null;
                     if (actValue == 0) {
                         balanceKind = BalanceKind.Others;
                         income = null;
-                        outgo = null;
+                        expenses = null;
                     }
                     else if (actValue < 0) {
-                        balanceKind = BalanceKind.Outgo;
+                        balanceKind = BalanceKind.Expenses;
                         income = null;
-                        outgo = -actValue;
+                        expenses = -actValue;
                     }
                     else {
                         balanceKind = BalanceKind.Income;
                         income = actValue;
-                        outgo = null;
+                        expenses = null;
                     }
 
                     if (actionId == -1) {
@@ -2064,7 +2064,7 @@ ORDER BY act_time, balance_kind, c_order, i_order, action_id;", targetBookId, st
                         ItemName = itemName,
                         BalanceKind = balanceKind,
                         Income = income,
-                        Outgo = outgo,
+                        Expenses = expenses,
                         Balance = balance,
                         ShopName = shopName,
                         GroupId = groupId,
@@ -2157,14 +2157,14 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                         CategoryName = categoryName,
                         ItemId = itemId,
                         ItemName = itemName,
-                        Summary = summary
+                        Total = summary
                     });
                     return true;
                 });
             }
 
             // 差引損益
-            int total = summaryVMList.Sum((obj) => obj.Summary);
+            int total = summaryVMList.Sum((obj) => obj.Total);
             // 収入/支出
             List<SummaryViewModel> totalAsBalanceKindList = new List<SummaryViewModel>();
             // 分類小計
@@ -2176,7 +2176,7 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                 totalAsBalanceKindList.Add(new SummaryViewModel() {
                     BalanceKind = g1.Key,
                     BalanceName = BalanceKindStr[(BalanceKind)g1.Key],
-                    Summary = g1.Sum((obj) => obj.Summary)
+                    Total = g1.Sum((obj) => obj.Total)
                 });
                 // 分類別の小計を計算する
                 foreach (var g2 in g1.GroupBy((obj) => obj.CategoryId)) {
@@ -2185,15 +2185,15 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
                         BalanceName = BalanceKindStr[(BalanceKind)g1.Key],
                         CategoryId = g2.Key,
                         CategoryName = g2.First().CategoryName,
-                        Summary = g2.Sum((obj) => obj.Summary)
+                        Total = g2.Sum((obj) => obj.Total)
                     });
                 }
             }
 
             // 差引損益を追加する
             summaryVMList.Insert(0, new SummaryViewModel() {
-                OtherName = "差引損益",
-                Summary = total
+                OtherName = Properties.Resources.ListName_profitAndLoss,
+                Total = total
             });
             // 収入/支出の小計を追加する
             foreach (SummaryViewModel svm in totalAsBalanceKindList) {
@@ -2263,7 +2263,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             // 系列データ
             ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel> {
                 new SeriesViewModel() {
-                    OtherName = "残高",
+                    OtherName = Properties.Resources.ListName_Balance,
                     Values = new List<int>()
                 }
             };
@@ -2273,14 +2273,14 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             DateTime tmpStartTime = startTime;
             DateTime tmpEndTime = tmpStartTime.AddDays(1).AddMilliseconds(-1);
             ObservableCollection<SummaryViewModel> summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
-            balance += summaryVMList[0].Summary;
+            balance += summaryVMList[0].Total;
             vmList[0].Values.Add(balance); // 残高
 
             foreach (SummaryViewModel summaryVM in summaryVMList) {
-                int value = summaryVM.Summary;
+                int value = summaryVM.Total;
                 SeriesViewModel vm = new SeriesViewModel(summaryVM) {
                     Values = new List<int>(),
-                    Summary = value
+                    Total = value
                 };
                 // 平均値は過去のデータのみで計算する
                 if (endTime < DateTime.Now) {
@@ -2303,17 +2303,17 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 tmpEndTime = tmpStartTime.AddDays(1).AddMilliseconds(-1);
 
                 summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
-                balance += summaryVMList[0].Summary;
+                balance += summaryVMList[0].Total;
                 vmList[0].Values.Add(balance); // 残高
                 for (int j = 0; j < summaryVMList.Count; ++j) {
-                    int value = summaryVMList[j].Summary;
+                    int value = summaryVMList[j].Total;
 
                     vmList[j + 1].Values.Add(value);
 
                     if (tmpEndTime < DateTime.Now) {
                         vmList[j + 1].Average += value;
                     }
-                    vmList[j + 1].Summary += value;
+                    vmList[j + 1].Total += value;
                 }
                 if (tmpEndTime < DateTime.Now) {
                     ++averageCount;
@@ -2376,7 +2376,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel> {
                 new SeriesViewModel() {
-                    OtherName = "残高",
+                    OtherName = Properties.Resources.ListName_Balance,
                     Values = new List<int>()
                 }
             };
@@ -2386,13 +2386,13 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             DateTime tmpStartTime = startTime;
             DateTime tmpEndTime = tmpStartTime.GetLastDateOfMonth();
             ObservableCollection<SummaryViewModel> summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
-            balance += summaryVMList[0].Summary;
+            balance += summaryVMList[0].Total;
             vmList[0].Values.Add(balance); // 残高
             foreach (SummaryViewModel summaryVM in summaryVMList) {
-                int value = summaryVM.Summary;
+                int value = summaryVM.Total;
                 SeriesViewModel vm = new SeriesViewModel(summaryVM) {
                     Values = new List<int>(),
-                    Summary = value
+                    Total = value
                 };
                 if (tmpEndTime < DateTime.Now) {
                     vm.Average = value;
@@ -2414,17 +2414,17 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 tmpEndTime = tmpStartTime.GetLastDateOfMonth();
 
                 summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
-                balance += summaryVMList[0].Summary;
+                balance += summaryVMList[0].Total;
                 vmList[0].Values.Add(balance); // 残高
                 for (int j = 0; j < summaryVMList.Count; ++j) {
-                    int value = summaryVMList[j].Summary;
+                    int value = summaryVMList[j].Total;
 
                     vmList[j + 1].Values.Add(value);
 
                     if (tmpEndTime < DateTime.Now) {
                         vmList[j + 1].Average += value;
                     }
-                    vmList[j + 1].Summary += value;
+                    vmList[j + 1].Total += value;
                 }
                 if (tmpEndTime < DateTime.Now) {
                     ++averageCount;
@@ -2487,7 +2487,7 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel> {
                 new SeriesViewModel() {
-                    OtherName = "残高",
+                    OtherName = Properties.Resources.ListName_Balance,
                     Values = new List<int>()
                 }
             };
@@ -2497,13 +2497,13 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             DateTime tmpStartTime = startTime;
             DateTime tmpEndTime = tmpStartTime.GetLastDateOfFiscalYear(settings.App_StartMonth);
             ObservableCollection<SummaryViewModel> summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
-            balance += summaryVMList[0].Summary;
+            balance += summaryVMList[0].Total;
             vmList[0].Values.Add(balance); // 残高
             foreach (SummaryViewModel summaryVM in summaryVMList) {
-                int value = summaryVM.Summary;
+                int value = summaryVM.Total;
                 SeriesViewModel vm = new SeriesViewModel(summaryVM) {
                     Values = new List<int>(),
-                    Summary = value
+                    Total = value
                 };
                 if (tmpEndTime < DateTime.Now) {
                     vm.Average = value;
@@ -2525,17 +2525,17 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
                 tmpEndTime = tmpStartTime.GetLastDateOfFiscalYear(settings.App_StartMonth);
 
                 summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
-                balance += summaryVMList[0].Summary;
+                balance += summaryVMList[0].Total;
                 vmList[0].Values.Add(balance); // 残高
                 for (int j = 0; j < summaryVMList.Count; ++j) {
-                    int value = summaryVMList[j].Summary;
+                    int value = summaryVMList[j].Total;
 
                     vmList[j + 1].Values.Add(value);
 
                     if (tmpEndTime < DateTime.Now) {
                         vmList[j + 1].Average += value;
                     }
-                    vmList[j + 1].Summary += value;
+                    vmList[j + 1].Total += value;
                 }
                 if (tmpEndTime < DateTime.Now) {
                     ++averageCount;
@@ -2655,7 +2655,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 横軸 - 日軸
             CategoryAxis horizontalAxis1 = new CategoryAxis() {
-                Unit = "日",
+                Unit = Properties.Resources.Unit_Day,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
@@ -2668,7 +2668,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 縦軸 - 線形軸
             LinearAxis verticalAxis1 = new LinearAxis() {
-                Unit = "円",
+                Unit = Properties.Resources.Unit_Money,
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
@@ -2687,7 +2687,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 横軸 - 日軸
             CategoryAxis horizontalAxis2 = new CategoryAxis() {
-                Unit = "日",
+                Unit = Properties.Resources.Unit_Day,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
@@ -2700,7 +2700,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 縦軸 - 線形軸
             LinearAxis verticalAxis2 = new LinearAxis() {
-                Unit = "円",
+                Unit = Properties.Resources.Unit_Money,
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
@@ -2730,7 +2730,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             Log.Info($"tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
 
             switch (this.WVM.SelectedGraphKind1) {
-                case GraphKind1.IncomeAndOutgoGraph: {
+                case GraphKind1.IncomeAndExpensesGraph: {
                     List<int> sumPlus = new List<int>(); // 日ごとの合計収入(Y軸範囲の計算に使用)
                     List<int> sumMinus = new List<int>(); // 日ごとの合計支出(Y軸範囲の計算に使用)
 
@@ -2770,7 +2770,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                 };
                             }),
                             ValueField = "Value",
-                            TrackerFormatString = "{0}\n{1}日: {2:#,0}", //日付: 金額
+                            TrackerFormatString = "{0}\n{1}" + Properties.Resources.Unit_Day + ": {2:#,0}", //日付: 金額
                             XAxisKey = "Value",
                             YAxisKey = "Category"
                         };
@@ -2818,8 +2818,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     // グラフ表示データを設定する
                     this.WVM.DailyGraphPlotModel.Series.Clear();
                     LineSeries series = new LineSeries() {
-                        Title = "残高",
-                        TrackerFormatString = "{2}日: {4:#,0}" //日付: 金額
+                        Title = Properties.Resources.GraphKind1_BalanceGraph,
+                        TrackerFormatString = "{2}" + Properties.Resources.Unit_Day + ": {4:#,0}" //日付: 金額
                     };
                     series.Points.AddRange(new List<int>(this.WVM.DailyGraphSeriesVMList[0].Values).Select((value, index) => new DataPoint(index, value)));
                     this.WVM.DailyGraphPlotModel.Series.Add(series);
@@ -2844,7 +2844,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// </summary>
         private void UpdateSelectedDailyGraph()
         {
-            if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndOutgoGraph) return;
+            if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndExpensesGraph) return;
 
             Log.Info();
 
@@ -2869,7 +2869,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                         };
                     }),
                     ValueField = "Value",
-                    TrackerFormatString = "{1}日: {2:#,0}", //日付: 金額
+                    TrackerFormatString = "{1}" + Properties.Resources.Unit_Day + ": {2:#,0}", //日付: 金額
                     XAxisKey = "Value",
                     YAxisKey = "Category"
                 };
@@ -2940,7 +2940,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 横軸 - 月軸
             CategoryAxis horizontalAxis1 = new CategoryAxis() {
-                Unit = "月",
+                Unit = Properties.Resources.Unit_Month,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
@@ -2953,7 +2953,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 縦軸 - 線形軸
             LinearAxis verticalAxis1 = new LinearAxis() {
-                Unit = "円",
+                Unit = Properties.Resources.Unit_Money,
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
@@ -2972,7 +2972,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 横軸 - 月軸
             CategoryAxis horizontalAxis2 = new CategoryAxis() {
-                Unit = "月",
+                Unit = Properties.Resources.Unit_Month,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
@@ -2985,7 +2985,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 縦軸 - 線形軸
             LinearAxis verticalAxis2 = new LinearAxis() {
-                Unit = "円",
+                Unit = Properties.Resources.Unit_Money,
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
@@ -3018,7 +3018,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             int startMonth = settings.App_StartMonth;
 
             switch (this.WVM.SelectedGraphKind1) {
-                case GraphKind1.IncomeAndOutgoGraph: {
+                case GraphKind1.IncomeAndExpensesGraph: {
                     List<int> sumPlus = new List<int>(); // 月ごとの合計収入
                     List<int> sumMinus = new List<int>(); // 月ごとの合計支出
 
@@ -3048,7 +3048,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                 CategoryId = tmpVM.CategoryId
                             }),
                             ValueField = "Value",
-                            TrackerFormatString = "{0}\n{1}月: {2:#,0}", //月: 金額
+                            TrackerFormatString = "{0}\n{1}" + Properties.Resources.Unit_Month + ": {2:#,0}", //月: 金額
                             XAxisKey = "Value",
                             YAxisKey = "Category"
                         };
@@ -3086,8 +3086,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     // グラフ表示データを設定する
                     this.WVM.MonthlyGraphPlotModel.Series.Clear();
                     LineSeries series = new LineSeries() {
-                        Title = "残高",
-                        TrackerFormatString = "{2}月: {4:#,0}" //月: 金額
+                        Title = Properties.Resources.GraphKind1_BalanceGraph,
+                        TrackerFormatString = "{2}" + Properties.Resources.Unit_Month + ": {4:#,0}" //月: 金額
                     };
                     series.Points.AddRange(new List<int>(this.WVM.MonthlyGraphSeriesVMList[0].Values).Select((value, index) => new DataPoint(index, value)));
                     this.WVM.MonthlyGraphPlotModel.Series.Add(series);
@@ -3112,7 +3112,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// </summary>
         private void UpdateSelectedMonthlyGraph()
         {
-            if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndOutgoGraph) return;
+            if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndExpensesGraph) return;
 
             Log.Info();
 
@@ -3138,7 +3138,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                         CategoryId = vm.CategoryId
                     }),
                     ValueField = "Value",
-                    TrackerFormatString = "{1}月: {2:#,0}", //月: 金額
+                    TrackerFormatString = "{1}" + Properties.Resources.Unit_Month + ": {2:#,0}", //月: 金額
                     XAxisKey = "Value",
                     YAxisKey = "Category"
                 };
@@ -3212,7 +3212,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 横軸 - 年軸
             CategoryAxis horizontalAxis1 = new CategoryAxis() {
-                Unit = "年度",
+                Unit = Properties.Resources.Unit_FiscalYear,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
@@ -3225,7 +3225,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 縦軸 - 線形軸
             LinearAxis verticalAxis1 = new LinearAxis() {
-                Unit = "円",
+                Unit = Properties.Resources.Unit_Money,
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
@@ -3244,7 +3244,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 横軸 - 年軸
             CategoryAxis horizontalAxis2 = new CategoryAxis() {
-                Unit = "年度",
+                Unit = Properties.Resources.Unit_FiscalYear,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
@@ -3257,7 +3257,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             // 縦軸 - 線形軸
             LinearAxis verticalAxis2 = new LinearAxis() {
-                Unit = "円",
+                Unit = Properties.Resources.Unit_Money,
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
@@ -3290,7 +3290,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
 
             switch (this.WVM.SelectedGraphKind1) {
-                case GraphKind1.IncomeAndOutgoGraph: {
+                case GraphKind1.IncomeAndExpensesGraph: {
                     List<int> sumPlus = new List<int>(); // 年ごとの合計収入
                     List<int> sumMinus = new List<int>(); // 年ごとの合計支出
 
@@ -3320,7 +3320,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                                 CategoryId = tmpVM.CategoryId
                             }),
                             ValueField = "Value",
-                            TrackerFormatString = "{0}\n{1}年度: {2:#,0}", //年度: 金額
+                            TrackerFormatString = "{0}\n{1}" + Properties.Resources.Unit_FiscalYear + ": {2:#,0}", //年度: 金額
                             XAxisKey = "Value",
                             YAxisKey = "Category"
                         };
@@ -3358,8 +3358,8 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     // グラフ表示データを設定する
                     this.WVM.YearlyGraphPlotModel.Series.Clear();
                     LineSeries series = new LineSeries() {
-                        Title = "残高",
-                        TrackerFormatString = "{2}年度: {4:#,0}" //年度: 金額
+                        Title = Properties.Resources.GraphKind1_BalanceGraph,
+                        TrackerFormatString = "{2}" + Properties.Resources.Unit_FiscalYear + ": {4:#,0}" //年度: 金額
                     };
                     series.Points.AddRange(new List<int>(this.WVM.YearlyGraphSeriesVMList[0].Values).Select((value, index) => new DataPoint(index, value)));
                     this.WVM.YearlyGraphPlotModel.Series.Add(series);
@@ -3384,7 +3384,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
         /// </summary>
         private void UpdateSelectedYearlyGraph()
         {
-            if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndOutgoGraph) return;
+            if (this.WVM.SelectedGraphKind1 != GraphKind1.IncomeAndExpensesGraph) return;
 
             Log.Info();
 
@@ -3410,7 +3410,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                         CategoryId = vm.CategoryId
                     }),
                     ValueField = "Value",
-                    TrackerFormatString = "{1}年度: {2:#,0}", //年度: 金額
+                    TrackerFormatString = "{1}" + Properties.Resources.Unit_FiscalYear + ": {2:#,0}", //年度: 金額
                     XAxisKey = "Value",
                     YAxisKey = "Category"
                 };
@@ -3644,6 +3644,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
             return ret;
         }
 
+        #region ダンプ/リストア
         /// <summary>
         /// バックアップファイルを作成する
         /// </summary>
@@ -3770,7 +3771,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     NotificationManager nm = new NotificationManager();
                     NotificationContent nc = new NotificationContent() {
                         Title = this.Title,
-                        Message = MessageText.FinishToBackup,
+                        Message = Properties.Resources.Message_FinishToBackup,
                         Type = NotificationType.Success
                     };
                     nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
@@ -3779,7 +3780,7 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
                     NotificationManager nm = new NotificationManager();
                     NotificationContent nc = new NotificationContent() {
                         Title = this.Title,
-                        Message = MessageText.FoultToBackup,
+                        Message = Properties.Resources.Message_FoultToBackup,
                         Type = NotificationType.Error
                     };
                     nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
@@ -3848,5 +3849,6 @@ SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", action
 
             return exitCode;
         }
+        #endregion
     }
 }

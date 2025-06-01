@@ -12,11 +12,11 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// 更新者
         /// </summary>
-        public static string Updater { get; } = "";
+        public static string Updater { get; } = string.Empty;
         /// <summary>
         /// 挿入者
         /// </summary>
-        public static string Inserter { get; } = "";
+        public static string Inserter { get; } = string.Empty;
         /// <summary>
         /// PostgreSQL パスワード入力方法
         /// </summary>
@@ -198,7 +198,7 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// 株式口座
             /// </summary>
-            Stock = 4
+            BrokerageAccount = 4
         }
         /// <summary>
         /// 収支種別
@@ -212,7 +212,7 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// 支出
             /// </summary>
-            Outgo = 1,
+            Expenses = 1,
             /// <summary>
             /// その他(残高、差引損益)
             /// </summary>
@@ -262,11 +262,11 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// 支払元負担
             /// </summary>
-            FromBook = 0,
+            MoveFrom = 0,
             /// <summary>
             /// 支払先負担
             /// </summary>
-            ToBook = 1
+            MoveTo = 1
         }
         /// <summary>
         /// 検索種別
@@ -294,7 +294,7 @@ namespace HouseholdAccountBook.ConstValue
             /// <summary>
             /// 収支グラフ
             /// </summary>
-            IncomeAndOutgoGraph = 0,
+            IncomeAndExpensesGraph = 0,
             /// <summary>
             /// 残高グラフ
             /// </summary>
@@ -314,61 +314,10 @@ namespace HouseholdAccountBook.ConstValue
             /// </summary>
             ItemGraph = 1
         }
-        #endregion
-
-        #region 種別文字列
         /// <summary>
-        /// 帳簿種別文字列
+        /// 登録種別
         /// </summary>
-        public static Dictionary<BookKind, string> BookKindStr { get; } = new Dictionary<BookKind, string>() {
-            { BookKind.Uncategorized,   "未分類" },
-            { BookKind.Wallet,          "財布" },
-            { BookKind.BankAccount,     "銀行口座" },
-            { BookKind.CreditCard,      "クレジットカード" },
-            { BookKind.Stock,           "証券口座" }
-        };
-        /// <summary>
-        /// 収支種別文字列
-        /// </summary>
-        public static Dictionary<BalanceKind, string> BalanceKindStr { get; } = new Dictionary<BalanceKind, string>() {
-            { BalanceKind.Income,   "収入" },
-            { BalanceKind.Outgo,    "支出" }
-        };
-        /// <summary>
-        /// 休日設定種別文字列
-        /// </summary>
-        public static Dictionary<HolidaySettingKind, string> HolidaySettingKindStr { get; } = new Dictionary<HolidaySettingKind, string>() {
-            { HolidaySettingKind.Nothing,       "なし" },
-            { HolidaySettingKind.BeforeHoliday, "休日前" },
-            { HolidaySettingKind.AfterHoliday,  "休日後" }
-        };
-        /// <summary>
-        /// 手数料種別文字列
-        /// </summary>
-        public static Dictionary<CommissionKind, string> CommissionKindStr { get; } = new Dictionary<CommissionKind, string>() {
-            { CommissionKind.FromBook,  "移動元" },
-            { CommissionKind.ToBook,    "移動先" }
-        };
-        /// <summary>
-        /// グラフ種別1文字列
-        /// </summary>
-        public static Dictionary<GraphKind1, string> GraphKind1Str { get; } = new Dictionary<GraphKind1, string>() {
-            { GraphKind1.IncomeAndOutgoGraph, "収支" },
-            { GraphKind1.BalanceGraph,        "残高" }
-        };
-        /// <summary>
-        /// グラフ種別2文字列
-        /// </summary>
-        public static Dictionary<GraphKind2, string> GraphKind2Str { get; } = new Dictionary<GraphKind2, string>() {
-            { GraphKind2.CategoryGraph, "分類" },
-            { GraphKind2.ItemGraph,     "項目" }
-        };
-        #endregion
-
-        /// <summary>
-        /// 登録モード
-        /// </summary>
-        public enum RegistrationMode
+        public enum RegistrationKind
         {
             /// <summary>
             /// 追加
@@ -383,87 +332,62 @@ namespace HouseholdAccountBook.ConstValue
             /// </summary>
             Copy,
         }
+        #endregion
 
+        #region 種別文字列
         /// <summary>
-        /// メッセージタイトル
+        /// 帳簿種別文字列
         /// </summary>
-        public static class MessageTitle
-        {
-            /// <summary>
-            /// 情報
-            /// </summary>
-            public static string Information { get; } = "情報";
-            /// <summary>
-            /// 警告
-            /// </summary>
-            public static string Exclamation { get; } = "警告";
-            /// <summary>
-            /// エラー
-            /// </summary>
-            public static string Error { get; } = "エラー";
-            /// <summary>
-            /// 確認
-            /// </summary>
-            public static string Comformation { get; } = "確認";
-        }
-
+        public static Dictionary<BookKind, string> BookKindStr { get; } = new Dictionary<BookKind, string>() {
+            { BookKind.Uncategorized,       Properties.Resources.BookKind_Uncategorized },
+            { BookKind.Wallet,              Properties.Resources.BookKind_Wallet },
+            { BookKind.BankAccount,         Properties.Resources.BookKind_BankAccount },
+            { BookKind.CreditCard,          Properties.Resources.BookKind_CreditCard },
+            { BookKind.BrokerageAccount,    Properties.Resources.BookKind_BrokerageAccount }
+        };
         /// <summary>
-        /// メッセージテキスト
+        /// 収支種別文字列
         /// </summary>
-        public static class MessageText
-        {
-            /// <summary>
-            /// インポートが完了しました。
-            /// </summary>
-            public static string FinishToSave { get; } = "保存が完了しました。";
-            /// <summary>
-            /// インポートが完了しました。
-            /// </summary>
-            public static string FinishToImport { get; } = "インポートが完了しました。";
-            /// <summary>
-            /// インポートに失敗しました。
-            /// </summary>
-            public static string FoultToImport { get; } = "インポートに失敗しました。";
-            /// <summary>
-            /// エクスポートが完了しました。
-            /// </summary>
-            public static string FinishToExport { get; } = "エクスポートが完了しました。";
-            /// <summary>
-            /// エクスポートに失敗しました。
-            /// </summary>
-            public static string FoultToExport { get; } = "エクスポートに失敗しました。";
-            /// <summary>
-            /// バックアップが完了しました。
-            /// </summary>
-            public static string FinishToBackup { get; } = "バックアップが完了しました。";
-            /// <summary>
-            /// バックアップに失敗しました。
-            /// </summary>
-            public static string FoultToBackup { get; } = "バックアップに失敗しました。";
-            /// <summary>
-            /// 選択した項目を削除します。よろしいですか？
-            /// </summary>
-            public static string DeleteNotification { get; } = "選択した項目を削除します。よろしいですか？";
-            /// <summary>
-            /// 既存のデータを削除します。よろしいですか？
-            /// </summary>
-            public static string DeleteOldDataNotification { get; } = "既存のデータを削除します。よろしいですか？";
-            /// <summary>
-            /// {0} を {1} に置き換えます。よろしいですか？
-            /// </summary>
-            public static string ReplaceShopNameRemarkNotification { get; } = @"{0} を {1} に置き換えます。よろしいですか？";
-            /// <summary>
-            /// 再起動します。よろしいですか？
-            /// </summary>
-            public static string RestartNotification { get; } = "再起動します。よろしいですか？";
-            /// <summary>
-            /// ハンドルされていない例外が発生しました。クリックで例外の情報を確認できます。
-            /// </summary>
-            public static string UnhandledExceptionOccurred { get; } = "ハンドルされていない例外が発生しました。クリックで例外の情報を確認できます。";
-            /// <summary>
-            /// CSVファイルの移動に失敗しました。
-            /// </summary>
-            public static string FoultToMoveCsv { get; } = "CSVファイルの移動に失敗しました。";
-        }
+        public static Dictionary<BalanceKind, string> BalanceKindStr { get; } = new Dictionary<BalanceKind, string>() {
+            { BalanceKind.Income,   Properties.Resources.BalanceKind_Income },
+            { BalanceKind.Expenses, Properties.Resources.BalanceKind_Expenses }
+        };
+        /// <summary>
+        /// 休日設定種別文字列
+        /// </summary>
+        public static Dictionary<HolidaySettingKind, string> HolidaySettingKindStr { get; } = new Dictionary<HolidaySettingKind, string>() {
+            { HolidaySettingKind.Nothing,       Properties.Resources.HolidaySettingKind_Nothing },
+            { HolidaySettingKind.BeforeHoliday, Properties.Resources.HolidaySettingKind_BeforeHoliday },
+            { HolidaySettingKind.AfterHoliday,  Properties.Resources.HolidaySettingKind_AfterHoliday }
+        };
+        /// <summary>
+        /// 手数料種別文字列
+        /// </summary>
+        public static Dictionary<CommissionKind, string> CommissionKindStr { get; } = new Dictionary<CommissionKind, string>() {
+            { CommissionKind.MoveFrom,  Properties.Resources.CommissionKind_MoveFrom },
+            { CommissionKind.MoveTo,    Properties.Resources.CommissionKind_MoveTo }
+        };
+        /// <summary>
+        /// グラフ種別1文字列
+        /// </summary>
+        public static Dictionary<GraphKind1, string> GraphKind1Str { get; } = new Dictionary<GraphKind1, string>() {
+            { GraphKind1.IncomeAndExpensesGraph,    Properties.Resources.GraphKind1_IncomeAndExpensesGraph },
+            { GraphKind1.BalanceGraph,              Properties.Resources.GraphKind1_BalanceGraph }
+        };
+        /// <summary>
+        /// グラフ種別2文字列
+        /// </summary>
+        public static Dictionary<GraphKind2, string> GraphKind2Str { get; } = new Dictionary<GraphKind2, string>() {
+            { GraphKind2.CategoryGraph, Properties.Resources.GraphKind2_CategoryGraph },
+            { GraphKind2.ItemGraph,     Properties.Resources.GraphKind2_ItemGraph }
+        };
+        /// <summary>
+        /// 言語名文字列
+        /// </summary>
+        public static Dictionary<string, string> CultureNameStr { get; } = new Dictionary<string, string>() {
+            { "ja-JP",  Properties.Resources.CultureName_ja_JP },
+            { "en-001", Properties.Resources.CultureName_en_001 }
+        };
+        #endregion
     }
 }

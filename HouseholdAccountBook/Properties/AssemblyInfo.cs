@@ -10,8 +10,8 @@ using System.Windows;
 [assembly: AssemblyTitle("HouseholdAccountBook")]
 [assembly: AssemblyDescription("家計簿ソフトです。")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("PoliteMusic")]
-[assembly: AssemblyProduct("HouseholdAccountBook")]
+[assembly: AssemblyCompany("PoliteMusic")] // 変更すると設定ファイルが引き継がれない
+[assembly: AssemblyProduct("Household Account Book")]
 [assembly: AssemblyCopyright("Copyright © 2017 toresebu")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

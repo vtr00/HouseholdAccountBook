@@ -83,7 +83,7 @@ namespace HouseholdAccountBook.Windows
 
             this.InitializeComponent();
 
-            this.WVM.RegMode = RegistrationMode.Add;
+            this.WVM.RegMode = RegistrationKind.Add;
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace HouseholdAccountBook.Windows
 
             this.InitializeComponent();
 
-            this.WVM.RegMode = RegistrationMode.Add;
+            this.WVM.RegMode = RegistrationKind.Add;
             this.WVM.AddedByCsvComparison = true;
         }
 
@@ -113,15 +113,15 @@ namespace HouseholdAccountBook.Windows
         /// <param name="builder">DAOビルダ</param>
         /// <param name="selectedActionId">帳簿項目ID</param>
         /// <param name="mode">登録モード</param>
-        public ActionRegistrationWindow(DaoBuilder builder, int selectedActionId, RegistrationMode mode = RegistrationMode.Edit)
+        public ActionRegistrationWindow(DaoBuilder builder, int selectedActionId, RegistrationKind mode = RegistrationKind.Edit)
         {
             this.builder = builder;
             this.selectedBookId = null;
             this.selectedMonth = null;
             this.selectedDate = null;
             switch (mode) {
-                case RegistrationMode.Edit:
-                case RegistrationMode.Copy:
+                case RegistrationKind.Edit:
+                case RegistrationKind.Copy:
                     this.selectedActionId = selectedActionId;
                     break;
             }
@@ -161,7 +161,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void ContinueToRegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.RegMode != RegistrationMode.Edit && this.WVM.Value.HasValue && 0 < this.WVM.Value;
+            e.CanExecute = this.WVM.RegMode != RegistrationKind.Edit && this.WVM.Value.HasValue && 0 < this.WVM.Value;
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace HouseholdAccountBook.Windows
         {
             int? bookId = null;
             DateTime actDate = DateTime.Now;
-            BalanceKind balanceKind = BalanceKind.Outgo;
+            BalanceKind balanceKind = BalanceKind.Expenses;
 
             int? itemId = null;
             int? actValue = null;
@@ -255,9 +255,9 @@ namespace HouseholdAccountBook.Windows
 
             // DBから値を読み込む
             switch (this.WVM.RegMode) {
-                case RegistrationMode.Add: {
+                case RegistrationKind.Add: {
                     bookId = this.selectedBookId;
-                    balanceKind = BalanceKind.Outgo;
+                    balanceKind = BalanceKind.Expenses;
                     if (this.selectedRecord == null) {
                         actDate = this.selectedDate ?? ((this.selectedMonth == null || this.selectedMonth?.Month == DateTime.Today.Month) ? DateTime.Today : this.selectedMonth.Value);
                     }
@@ -267,8 +267,8 @@ namespace HouseholdAccountBook.Windows
                     }
                     break;
                 }
-                case RegistrationMode.Edit:
-                case RegistrationMode.Copy: {
+                case RegistrationKind.Edit:
+                case RegistrationKind.Copy: {
                     using (DaoBase dao = this.builder.Build()) {
                         DaoReader reader = await dao.ExecQueryAsync(@"
 SELECT book_id, item_id, act_time, act_value, group_id, shop_name, remark, is_match
@@ -285,7 +285,7 @@ WHERE del_flg = 0 AND action_id = @{0};", this.selectedActionId);
                             isMatch = record.ToInt("is_match") == 1;
                         });
                     }
-                    balanceKind = Math.Sign(actValue.Value) > 0 ? BalanceKind.Income : BalanceKind.Outgo; // 収入 / 支出
+                    balanceKind = Math.Sign(actValue.Value) > 0 ? BalanceKind.Income : BalanceKind.Expenses; // 収入 / 支出
 
                     // 回数の表示
                     int count = 1;
@@ -305,7 +305,7 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
             }
 
             // WVMに値を設定する
-            if (this.WVM.RegMode == RegistrationMode.Edit) {
+            if (this.WVM.RegMode == RegistrationKind.Edit) {
                 this.WVM.ActionId = this.selectedActionId;
                 this.WVM.GroupId = this.groupId;
             }
@@ -372,7 +372,7 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
         private async Task UpdateCategoryListAsync(int? categoryId = null)
         {
             ObservableCollection<CategoryViewModel> categoryVMList = new ObservableCollection<CategoryViewModel>() {
-                new CategoryViewModel() { Id = -1, Name = "(指定なし)" }
+                new CategoryViewModel() { Id = -1, Name = Properties.Resources.ListName_NoSpecification }
             };
             int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryVM?.Id ?? categoryVMList[0].Id;
             CategoryViewModel selectedCategoryVM = categoryVMList[0];
@@ -598,8 +598,8 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
             using (DaoBase dao = this.builder.Build()) {
                 await dao.ExecTransactionAsync(async () => {
                     switch (this.WVM.RegMode) {
-                        case RegistrationMode.Add:
-                        case RegistrationMode.Copy: {
+                        case RegistrationKind.Add:
+                        case RegistrationKind.Copy: {
                             #region 帳簿項目を追加する
                             if (count == 1) { // 繰返し回数が1回(繰返しなし)
                                 DaoReader reader = await dao.ExecQueryAsync(@"
@@ -641,7 +641,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8}
                             #endregion
                             break;
                         }
-                        case RegistrationMode.Edit: {
+                        case RegistrationKind.Edit: {
                             #region 帳簿項目を編集する
                             if (count == 1) {
                                 #region 繰返し回数が1回

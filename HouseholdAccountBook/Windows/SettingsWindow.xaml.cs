@@ -181,7 +181,7 @@ INNER JOIN (SELECT item_id FROM mst_item WHERE del_flg = 0 AND category_id = @{0
 WHERE A.del_flg = 0;", id);
 
                                 if (reader.Count != 0) {
-                                    MessageBox.Show("分類内に帳簿項目が存在するので削除できません。"); // TODO
+                                    MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInCategory, Properties.Resources.Title_Error);
                                     return;
                                 }
 
@@ -200,7 +200,7 @@ FROM hst_action
 WHERE del_flg = 0 AND item_id = @{0};", id);
 
                                 if (reader.Count != 0) {
-                                    MessageBox.Show("項目内に帳簿項目が存在するので削除できません。"); // TODO
+                                    MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItem, Properties.Resources.Title_Error);
                                     return;
                                 }
 
@@ -510,7 +510,7 @@ WHERE item_id = @{2};", vm.Name, Updater, vm.Id);
                 }
 
                 await this.UpdateItemSettingsTabDataAsync(vm.Kind, vm.Id);
-                MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(Properties.Resources.Message_FinishToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
                 this.needToUpdate = true;
             }
         }
@@ -549,7 +549,7 @@ FROM hst_action
 WHERE book_id = @{0} AND item_id = @{1} AND del_flg = 0;", vm.SelectedRelationVM.Id, vm.Id);
 
                             if (reader.Count != 0) {
-                                MessageBox.Show("帳簿内の該当する項目に帳簿項目が存在するので削除できません。"); // TODO
+                                MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
                                 e.Handled = true;
                                 return;
                             }
@@ -583,7 +583,7 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private async void DeleteShopNameCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information,
+            if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                     Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
@@ -617,7 +617,7 @@ WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.DisplayedHierarch
         /// <param name="e"></param>
         private async void DeleteRemarkCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.DeleteNotification, MessageTitle.Information,
+            if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                     Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
@@ -686,7 +686,7 @@ SELECT * FROM hst_action
 WHERE book_id = @{0} AND del_flg = 0;", this.WVM.SelectedBookVM.Id);
 
                         if (reader.Count != 0) {
-                            MessageBox.Show("帳簿内に帳簿項目が存在するので削除できません。"); // TODO
+                            MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInBook, Properties.Resources.Title_Error);
                             return;
                         }
 
@@ -833,7 +833,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
                 IsFolderPicker = true,
                 InitialDirectory = folderPath,
                 DefaultFileName = fileName,
-                Title = "CSVフォルダ選択"
+                Title = Properties.Resources.Title_CsvFolderSelection,
             };
 
             if (ofd.ShowDialog() == CommonFileDialogResult.Ok) {
@@ -866,7 +866,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
                         EndDate = vm.EndDateExists ? (DateTime?)vm.EndDate : null,
                         CsvFolderPath = vm.CsvFolderPath != string.Empty ? vm.CsvFolderPath : null,
                         CsvActDateIndex = vm.ActDateIndex - 1,
-                        CsvOutgoIndex = vm.OutgoIndex - 1,
+                        CsvOutgoIndex = vm.ExpensesIndex - 1,
                         CsvItemNameIndex = vm.ItemNameIndex - 1
                     };
                     string jsonCode = JsonConvert.SerializeObject(jsonObj);
@@ -878,7 +878,7 @@ WHERE book_id = @{7};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.S
                 }
 
                 await this.UpdateBookSettingTabDataAsync(vm.Id);
-                MessageBox.Show(MessageText.FinishToSave, MessageTitle.Information, MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(Properties.Resources.Message_FinishToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
                 this.needToUpdate = true;
             }
         }
@@ -915,7 +915,7 @@ FROM hst_action
 WHERE book_id = @{0} AND item_id = @{1} AND del_flg = 0;", vm.Id, vm.SelectedRelationVM.Id);
 
                             if (reader.Count != 0) {
-                                MessageBox.Show("帳簿内の該当する項目に帳簿項目が存在するので削除できません。"); // TODO
+                                MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
                                 e.Handled = true;
                                 return;
                             }
@@ -952,7 +952,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 CheckFileExists = true,
                 InitialDirectory = folderPath,
                 FileName = fileName,
-                Title = "ファイル選択",
+                Title = Properties.Resources.Title_FileSelection,
                 Filter = "pg_dump.exe|pg_dump.exe"
             };
 
@@ -979,7 +979,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 CheckFileExists = true,
                 InitialDirectory = folderPath,
                 FileName = fileName,
-                Title = "ファイル選択",
+                Title = Properties.Resources.Title_FileSelection,
                 Filter = "pg_restore.exe|pg_restore.exe"
             };
 
@@ -995,9 +995,25 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void RestartForDbSettingCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.RestartNotification, MessageTitle.Comformation,
+            if (MessageBox.Show(Properties.Resources.Message_RestartNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Properties.Settings.Default.App_InitFlag = true;
+                Properties.Settings.Default.Save();
+
+                ((App)Application.Current).Restart();
+            }
+        }
+
+        /// <summary>
+        /// 言語設定を行うために再起動する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RestartForLanguageCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (MessageBox.Show(Properties.Resources.Message_RestartNotification, Properties.Resources.Title_Conformation,
+                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
+                Properties.Settings.Default.App_CultureName = this.WVM.SelectedCultureName;
                 Properties.Settings.Default.Save();
 
                 ((App)Application.Current).Restart();
@@ -1023,7 +1039,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 IsFolderPicker = true,
                 InitialDirectory = folderPath,
                 DefaultFileName = fileName,
-                Title = "バックアップフォルダ選択"
+                Title = Properties.Resources.Title_BackupFolderSelection
             };
 
             if (ofd.ShowDialog() == CommonFileDialogResult.Ok) {
@@ -1053,7 +1069,7 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
         /// <param name="e"></param>
         private void InitializeWindowSettingCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (MessageBox.Show(MessageText.RestartNotification, MessageTitle.Comformation,
+            if (MessageBox.Show(Properties.Resources.Message_RestartNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Properties.Settings settings = Properties.Settings.Default;
 
@@ -1379,7 +1395,7 @@ ORDER BY sort_order;", id);
             BookSettingViewModel vm = null;
 
             ObservableCollection<BookViewModel> vmList = new ObservableCollection<BookViewModel>() {
-                new BookViewModel(){ Id = -1, Name = "なし" }
+                new BookViewModel(){ Id = -1, Name = Properties.Resources.ListName_None }
             };
 
             using (DaoBase dao = this.builder.Build()) {
@@ -1437,7 +1453,7 @@ ORDER BY B.sort_order;", bookId);
                         PayDay = payDay,
                         CsvFolderPath = jsonObj?.CsvFolderPath,
                         ActDateIndex = jsonObj?.CsvActDateIndex + 1,
-                        OutgoIndex = jsonObj?.CsvOutgoIndex + 1,
+                        ExpensesIndex = jsonObj?.CsvOutgoIndex + 1,
                         ItemNameIndex = jsonObj?.CsvItemNameIndex + 1
                     };
                     vm.SelectedDebitBookVM = vm.DebitBookVMList.FirstOrDefault((tmpVM) => { return tmpVM.Id == debitBookId; }) ?? vm.DebitBookVMList[0];
@@ -1473,21 +1489,21 @@ ORDER BY B.sort_order;", bookId);
                 Depth = (int)HierarchicalKind.Balance,
                 Id = (int)BalanceKind.Income,
                 SortOrder = -1,
-                Name = "収入項目",
+                Name = Properties.Resources.BalanceKind_Income,
                 ParentVM = null,
                 ChildrenVMList = new ObservableCollection<HierarchicalViewModel>()
             };
             vmList.Add(incomeVM);
 
-            HierarchicalViewModel outgoVM = new HierarchicalViewModel() {
+            HierarchicalViewModel expensesVM = new HierarchicalViewModel() {
                 Depth = (int)HierarchicalKind.Balance,
-                Id = (int)BalanceKind.Outgo,
+                Id = (int)BalanceKind.Expenses,
                 SortOrder = -1,
-                Name = "支出項目",
+                Name = Properties.Resources.BalanceKind_Expenses,
                 ParentVM = null,
                 ChildrenVMList = new ObservableCollection<HierarchicalViewModel>()
             };
-            vmList.Add(outgoVM);
+            vmList.Add(expensesVM);
 
             foreach (HierarchicalViewModel vm in vmList) {
                 // 分類

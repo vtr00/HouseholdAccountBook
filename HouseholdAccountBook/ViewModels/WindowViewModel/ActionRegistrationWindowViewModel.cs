@@ -70,12 +70,12 @@ namespace HouseholdAccountBook.ViewModels
         /// 登録モード
         /// </summary>
         #region RegMode
-        public RegistrationMode RegMode
+        public RegistrationKind RegMode
         {
             get => this._RegMode;
             set => this.SetProperty(ref this._RegMode, value);
         }
-        private RegistrationMode _RegMode = RegistrationMode.Add;
+        private RegistrationKind _RegMode = RegistrationKind.Add;
         #endregion
         /// <summary>
         /// CSV比較からの追加

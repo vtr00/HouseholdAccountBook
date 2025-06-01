@@ -102,8 +102,8 @@ namespace HouseholdAccountBook.Windows
                 CheckFileExists = true,
                 InitialDirectory = folderPath,
                 FileName = fileName,
-                Title = "ファイル選択",
-                Filter = "CSVファイル|*.csv",
+                Title = Properties.Resources.Title_FileSelection,
+                Filter = Properties.Resources.FileSelectFilter_CsvFile + "|*.csv",
                 Multiselect = true
             };
 
@@ -180,7 +180,7 @@ namespace HouseholdAccountBook.Windows
                         tmpCsvFilePathList.Add(dstFilePath);
                     }
                     catch (Exception exp) {
-                        MessageBox.Show(MessageText.FoultToMoveCsv + "(" + exp.Message + ")", MessageTitle.Error);
+                        MessageBox.Show(Properties.Resources.Message_FoultToMoveCsv + "(" + exp.Message + ")", Properties.Resources.Title_Conformation);
                     }
                 }
 
@@ -542,7 +542,7 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
                         Name = record["book_name"],
                         CsvFolderPath = jsonObj?.CsvFolderPath == string.Empty ? null : jsonObj?.CsvFolderPath,
                         ActDateIndex = jsonObj?.CsvActDateIndex + 1,
-                        OutgoIndex = jsonObj?.CsvOutgoIndex + 1,
+                        ExpensesIndex = jsonObj?.CsvOutgoIndex + 1,
                         ItemNameIndex = jsonObj?.CsvItemNameIndex + 1
                     };
                     bookCompVMList.Add(vm);
@@ -577,9 +577,9 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
             // CSVファイル上の対象インデックスを取得する
             int? actDateIndex = this.WVM.SelectedBookVM.ActDateIndex;
             int? itemNameIndex = this.WVM.SelectedBookVM.ItemNameIndex;
-            int? outgoIndex = this.WVM.SelectedBookVM.OutgoIndex;
+            int? expensesIndex = this.WVM.SelectedBookVM.ExpensesIndex;
 
-            if (!actDateIndex.HasValue || !outgoIndex.HasValue) return;
+            if (!actDateIndex.HasValue || !expensesIndex.HasValue) return;
 
             // CSVファイルを読み込む
             CsvConfiguration csvConfig = new CsvConfiguration(System.Globalization.CultureInfo.CurrentCulture) {
@@ -599,7 +599,7 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
                                 // 項目名は読込みに失敗してもOK
                                 name = null;
                             }
-                            if (!reader.TryGetField(outgoIndex.Value - 1, out string valueStr) ||
+                            if (!reader.TryGetField(expensesIndex.Value - 1, out string valueStr) ||
                                 !int.TryParse(valueStr, NumberStyles.Any, NumberFormatInfo.CurrentInfo, out int value)) {
                                 continue;
                             }
@@ -646,7 +646,7 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
                     reader.ExecWholeRow((count, record) => {
                         int actionId = record.ToInt("action_id");
                         string itemName = record["item_name"];
-                        int outgo = Math.Abs(record.ToInt("act_value"));
+                        int Expenses = Math.Abs(record.ToInt("act_value"));
                         string shopName = record["shop_name"];
                         string remark = record["remark"];
                         bool isMatch = record.ToInt("is_match") == 1;

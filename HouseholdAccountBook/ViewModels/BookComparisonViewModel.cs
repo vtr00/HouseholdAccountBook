@@ -29,7 +29,7 @@
         /// <summary>
         /// 支出 位置(1開始)
         /// </summary>
-        public int? OutgoIndex { get; set; }
+        public int? ExpensesIndex { get; set; }
 
         /// <summary>
         /// 項目名 位置(1開始)

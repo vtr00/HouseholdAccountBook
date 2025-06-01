@@ -18,7 +18,7 @@ namespace HouseholdAccountBook.ViewModels
             /// </summary>
             Balance = 0,
             /// <summary>
-            /// 種別
+            /// 分類
             /// </summary>
             Category,
             /// <summary>

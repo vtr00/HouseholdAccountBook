@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -118,458 +118,451 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BookKind_Uncategorized" xml:space="preserve">
-    <value>未分類</value>
+    <value>Uncategorized</value>
   </data>
   <data name="BookKind_Wallet" xml:space="preserve">
-    <value>財布</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="UpdateLog" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\UpdateLog.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="AppIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\resheet.ico;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Wallet</value>
   </data>
   <data name="BalanceKind_Income" xml:space="preserve">
-    <value>収入</value>
+    <value>Income</value>
   </data>
   <data name="BalanceKind_Expenses" xml:space="preserve">
-    <value>支出</value>
+    <value>Expenses</value>
   </data>
   <data name="ColumnHeader_Expenses" xml:space="preserve">
-    <value>支出</value>
+    <value>Expenses</value>
   </data>
   <data name="TextBlock_Interval" xml:space="preserve">
-    <value>インターバル</value>
+    <value>Interval</value>
   </data>
   <data name="TextBlock_MinutesUnit" xml:space="preserve">
-    <value>分</value>
+    <value>Min</value>
   </data>
   <data name="CheckBox_DateAutoIncrement" xml:space="preserve">
-    <value>日付の自動インクリメント</value>
+    <value>Automatic date increment</value>
   </data>
   <data name="CheckBox_Setting" xml:space="preserve">
-    <value>設定</value>
+    <value>Setting</value>
   </data>
   <data name="ColumnHeader_Income" xml:space="preserve">
-    <value>収入</value>
+    <value>Income</value>
   </data>
   <data name="ColumnHeader_Balance" xml:space="preserve">
-    <value>残高</value>
+    <value>Balance</value>
   </data>
   <data name="BookKind_BankAccount" xml:space="preserve">
-    <value>銀行口座</value>
+    <value>Bank account</value>
   </data>
   <data name="BookKind_BrokerageAccount" xml:space="preserve">
-    <value>証券口座</value>
+    <value>Securities account</value>
   </data>
   <data name="BookKind_CreditCard" xml:space="preserve">
-    <value>クレジットカード</value>
+    <value>Credit card</value>
   </data>
   <data name="Message_DeleteNotification" xml:space="preserve">
-    <value>選択した項目を削除します。よろしいですか？</value>
+    <value>Deletes the selected item. Is that okay?</value>
   </data>
   <data name="Message_DeleteOldDataNotification" xml:space="preserve">
-    <value>既存のデータを削除します。よろしいですか？</value>
+    <value>Deletes existing data. Is that okay?</value>
   </data>
   <data name="Message_FinishToBackup" xml:space="preserve">
-    <value>バックアップが完了しました。</value>
+    <value>The backup is complete.</value>
   </data>
   <data name="Message_FinishToExport" xml:space="preserve">
-    <value>エクスポートが完了しました。</value>
+    <value>The export is complete.</value>
   </data>
   <data name="Message_FinishToImport" xml:space="preserve">
-    <value>インポートが完了しました。</value>
+    <value>The import is complete.</value>
   </data>
   <data name="Message_FinishToSave" xml:space="preserve">
-    <value>保存が完了しました。</value>
+    <value>The saving is complete.</value>
   </data>
   <data name="Message_FoultToBackup" xml:space="preserve">
-    <value>バックアップに失敗しました。</value>
+    <value>Failed to backup.</value>
   </data>
   <data name="Message_FoultToExport" xml:space="preserve">
-    <value>エクスポートに失敗しました。</value>
+    <value>Failed to export.</value>
   </data>
   <data name="Message_FoultToImport" xml:space="preserve">
-    <value>インポートに失敗しました。</value>
+    <value>Failed to import.</value>
   </data>
   <data name="Message_FoultToMoveCsv" xml:space="preserve">
-    <value>CSVファイルの移動に失敗しました。</value>
+    <value>Failed to move CSV file.</value>
   </data>
   <data name="Message_ReplaceShopNameRemarkNotification" xml:space="preserve">
-    <value>{0} を {1} に置き換えます。よろしいですか？</value>
+    <value>Replace {0} with {1}. Is that okay?</value>
   </data>
   <data name="Message_RestartNotification" xml:space="preserve">
-    <value>再起動します。よろしいですか？</value>
+    <value>Reboot. Is that okay?</value>
   </data>
   <data name="Message_UnhandledExceptionOccurred" xml:space="preserve">
-    <value>ハンドルされていない例外が発生しました。クリックで例外の情報を確認できます。</value>
+    <value>An unhandled exception occurred. Click to see the exception information.</value>
   </data>
   <data name="Title_Conformation" xml:space="preserve">
-    <value>確認</value>
+    <value>Confirmation</value>
   </data>
   <data name="Title_Error" xml:space="preserve">
-    <value>エラー</value>
+    <value>Error</value>
   </data>
   <data name="Title_FileSelection" xml:space="preserve">
-    <value>ファイル選択</value>
+    <value>File selection</value>
   </data>
   <data name="Title_Information" xml:space="preserve">
-    <value>情報</value>
+    <value>Information</value>
   </data>
   <data name="Title_Warning" xml:space="preserve">
-    <value>警告</value>
+    <value>Warning</value>
   </data>
   <data name="HolidaySettingKind_Nothing" xml:space="preserve">
-    <value>なし</value>
+    <value>None</value>
   </data>
   <data name="HolidaySettingKind_BeforeHoliday" xml:space="preserve">
-    <value>休日前</value>
+    <value>Before holidays</value>
   </data>
   <data name="HolidaySettingKind_AfterHoliday" xml:space="preserve">
-    <value>休日後</value>
+    <value>After holidays</value>
   </data>
   <data name="CommissionKind_MoveFrom" xml:space="preserve">
-    <value>移動元</value>
+    <value>Moved from</value>
   </data>
   <data name="CommissionKind_MoveTo" xml:space="preserve">
-    <value>移動先</value>
+    <value>Move to</value>
   </data>
   <data name="GraphKind1_IncomeAndExpensesGraph" xml:space="preserve">
-    <value>収支</value>
+    <value>Expenses</value>
   </data>
   <data name="GraphKind1_BalanceGraph" xml:space="preserve">
-    <value>残高</value>
+    <value>Balance</value>
   </data>
   <data name="GraphKind2_CategoryGraph" xml:space="preserve">
-    <value>分類</value>
+    <value>Category</value>
   </data>
   <data name="GraphKind2_ItemGraph" xml:space="preserve">
-    <value>項目</value>
+    <value>Item</value>
   </data>
   <data name="GroupHeader_ItemList" xml:space="preserve">
-    <value>項目一覧</value>
+    <value>Item list</value>
   </data>
   <data name="GroupHeader_BookList" xml:space="preserve">
-    <value>帳簿一覧</value>
+    <value>Book list</value>
   </data>
   <data name="GroupHeader_MonthSelection" xml:space="preserve">
-    <value>指定月</value>
+    <value>Month selection</value>
   </data>
   <data name="GroupHeader_TermSelection" xml:space="preserve">
-    <value>指定期間</value>
+    <value>Period selection</value>
   </data>
   <data name="GroupHeader_BookInformation" xml:space="preserve">
-    <value>帳簿情報</value>
+    <value>Book information</value>
   </data>
   <data name="GroupHeader_WindowInformation" xml:space="preserve">
-    <value>ウィンドウ情報</value>
+    <value>Window information</value>
   </data>
   <data name="GroupHeader_DataBaseInformation" xml:space="preserve">
-    <value>データベース情報</value>
+    <value>Database information</value>
   </data>
   <data name="GroupHeader_Debug" xml:space="preserve">
-    <value>デバッグ</value>
+    <value>Debug</value>
   </data>
   <data name="GroupHeader_BackUpInformation" xml:space="preserve">
-    <value>バックアップ情報</value>
+    <value>Backup information</value>
   </data>
   <data name="GroupHeader_PaymentInformation" xml:space="preserve">
-    <value>支払情報</value>
+    <value>Payment information</value>
   </data>
   <data name="GroupHeader_CSVInformation" xml:space="preserve">
-    <value>CSV情報</value>
+    <value>CSV information</value>
   </data>
   <data name="GroupHeader_CalendarInformation" xml:space="preserve">
-    <value>カレンダー情報</value>
+    <value>Calendar information</value>
   </data>
   <data name="GroupHeader_ColumnIndex" xml:space="preserve">
-    <value>列番号</value>
+    <value>Column No</value>
   </data>
   <data name="GroupHeader_TermInformation" xml:space="preserve">
-    <value>期間情報</value>
+    <value>Period information</value>
   </data>
   <data name="GroupHeader_Linkage" xml:space="preserve">
-    <value>関連付け</value>
+    <value>Association</value>
   </data>
   <data name="GroupHeader_Shop" xml:space="preserve">
-    <value>店舗</value>
+    <value>Store</value>
   </data>
   <data name="GroupHeader_Remark" xml:space="preserve">
-    <value>備考</value>
+    <value>Remarks</value>
   </data>
   <data name="GroupHeader_ItemInformation" xml:space="preserve">
-    <value>項目情報</value>
+    <value>Item information</value>
   </data>
   <data name="Message_FoultToConnectDb" xml:space="preserve">
-    <value>接続に失敗しました。接続設定を見直してください。</value>
+    <value>Failed to Connect. Please review your connection settings.</value>
   </data>
   <data name="Message_PleaseInputDbSetting" xml:space="preserve">
-    <value>DB接続設定を入力してください。</value>
+    <value>Please enter the DB connection settings.</value>
   </data>
   <data name="Message_DoNotDuplicateProcess" xml:space="preserve">
-    <value>同時に複数起動することはできません。</value>
+    <value>Multiple launches cannot be performed at the same time.</value>
   </data>
   <data name="ListName_NoSpecification" xml:space="preserve">
-    <value>(指定なし)</value>
+    <value>(No specification)</value>
   </data>
   <data name="FileSelectFilter_CsvFile" xml:space="preserve">
-    <value>CSVファイル</value>
+    <value>CSV file</value>
   </data>
   <data name="TextBlock_ColumnUnit" xml:space="preserve">
-    <value>列目</value>
+    <value>column</value>
   </data>
   <data name="TextBlock_CsvFiles" xml:space="preserve">
-    <value>CSVファイル</value>
+    <value>CSV files</value>
   </data>
   <data name="TextBlock_CsvFolder" xml:space="preserve">
-    <value>CSVフォルダ</value>
+    <value>CSV folder</value>
   </data>
   <data name="Unit_Money" xml:space="preserve">
-    <value>円</value>
+    <value>Yen</value>
   </data>
   <data name="Unit_FiscalYear" xml:space="preserve">
-    <value>年度</value>
+    <value>Fiscal year</value>
   </data>
   <data name="Unit_Year" xml:space="preserve">
-    <value>年</value>
+    <value>Year</value>
   </data>
   <data name="Unit_Month" xml:space="preserve">
-    <value>月</value>
+    <value>Month</value>
   </data>
   <data name="Unit_Day" xml:space="preserve">
-    <value>日</value>
+    <value>Day</value>
   </data>
   <data name="ListName_profitAndLoss" xml:space="preserve">
-    <value>差引損益</value>
+    <value>Profit and loss</value>
   </data>
   <data name="ListName_Balance" xml:space="preserve">
-    <value>残高</value>
+    <value>Balance</value>
   </data>
   <data name="ListName_CarryForward" xml:space="preserve">
-    <value>繰越残高</value>
+    <value>Carrying over</value>
   </data>
   <data name="ListName_AllBooks" xml:space="preserve">
-    <value>一覧</value>
+    <value>All books</value>
   </data>
   <data name="ListName_None" xml:space="preserve">
-    <value>なし</value>
+    <value>None</value>
   </data>
   <data name="FileSelectFilter_MdbFile" xml:space="preserve">
-    <value>MDBファイル</value>
+    <value>MDB files</value>
   </data>
   <data name="FileSelectFilter_CustomFormatFile" xml:space="preserve">
-    <value>カスタム形式ファイル</value>
+    <value>Custom format files</value>
   </data>
   <data name="FileSelectFilter_SqlFile" xml:space="preserve">
-    <value>SQLファイル</value>
+    <value>SQL files</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInCategory" xml:space="preserve">
-    <value>分類内に帳簿項目が存在するので削除できません。</value>
+    <value>The book items are in the classification so they cannot be deleted.</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInItem" xml:space="preserve">
-    <value>項目内に帳簿項目が存在するので削除できません。</value>
+    <value>The booking item exists within the item, so it cannot be deleted.</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInItemWithinBook" xml:space="preserve">
-    <value>帳簿内の該当する項目に帳簿項目が存在するので削除できません。</value>
+    <value>The book item cannot be deleted because it exists in the relevant item in the book.</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInBook" xml:space="preserve">
-    <value>帳簿内に帳簿項目が存在するので削除できません。</value>
+    <value>Book items cannot be deleted because they exist in the books.</value>
   </data>
   <data name="Title_CsvFolderSelection" xml:space="preserve">
-    <value>CSVフォルダ選択</value>
+    <value>Select CSV folder</value>
   </data>
   <data name="Title_BackupFolderSelection" xml:space="preserve">
-    <value>バックアップフォルダ選択</value>
+    <value>Select a backup folder</value>
   </data>
   <data name="Title_MainWindow" xml:space="preserve">
     <value>Household Account Book</value>
   </data>
   <data name="Title_DbSettingWindow" xml:space="preserve">
-    <value>初期設定</value>
+    <value>Initial settings</value>
   </data>
   <data name="Title_CsvComparisonWindow" xml:space="preserve">
-    <value>CSV比較</value>
+    <value>CSV comparison</value>
   </data>
   <data name="Menu_File" xml:space="preserve">
-    <value>ファイル(_F)</value>
+    <value>File (_F)</value>
   </data>
   <data name="Menu_File_Close" xml:space="preserve">
-    <value>閉じる(_C)</value>
+    <value>Close (_C)</value>
   </data>
   <data name="Menu_File_Move" xml:space="preserve">
-    <value>移動(_M)</value>
+    <value>Move (_M)</value>
   </data>
   <data name="Menu_File_Open" xml:space="preserve">
-    <value>開く(_O)...</value>
+    <value>Open (_O)...</value>
   </data>
   <data name="Menu_Edit" xml:space="preserve">
-    <value>編集(_E)</value>
+    <value>Edit (_E)</value>
   </data>
   <data name="Menu_Tool" xml:space="preserve">
-    <value>ツール(_T)</value>
+    <value>Tool (_T)</value>
   </data>
   <data name="Menu_Tool_Settings" xml:space="preserve">
-    <value>設定(_S)...</value>
+    <value>Settings (_S)...</value>
   </data>
   <data name="Menu_Help" xml:space="preserve">
-    <value>ヘルプ(_H)</value>
+    <value>Help (_H)</value>
   </data>
   <data name="Menu_Help_VersionInfo" xml:space="preserve">
-    <value>バージョン情報(_V)...</value>
+    <value>Version information (_V)...</value>
   </data>
   <data name="Menu_Tool_Book" xml:space="preserve">
-    <value>帳簿(_B)</value>
+    <value>Books (_B)</value>
   </data>
   <data name="Menu_Tool_Book_Filter" xml:space="preserve">
-    <value>フィルタ(_F)</value>
+    <value>Filter (_F)</value>
   </data>
   <data name="Menu_Tool_CsvComparison" xml:space="preserve">
-    <value>CSV比較(_C)...</value>
+    <value>CSV comparison (_C)...</value>
   </data>
   <data name="Menu_View" xml:space="preserve">
-    <value>表示(_V)</value>
+    <value>View (_V)</value>
   </data>
   <data name="Menu_View_Update" xml:space="preserve">
-    <value>更新(_U)</value>
+    <value>Update (_U)</value>
   </data>
   <data name="Menu_View_Monthly" xml:space="preserve">
-    <value>月別(_M)</value>
+    <value>Monthly (_M)</value>
   </data>
   <data name="Menu_View_Yearly" xml:space="preserve">
-    <value>年別(_Y)</value>
+    <value>Yearly (_Y)</value>
   </data>
   <data name="Menu_View_YearlyList" xml:space="preserve">
-    <value>一覧(_L)</value>
+    <value>List (_L)</value>
   </data>
   <data name="Menu_View_YearlyList_Change" xml:space="preserve">
-    <value>切替(_C)</value>
+    <value>Switching (_C)</value>
   </data>
   <data name="Menu_View_YearlyGraph" xml:space="preserve">
-    <value>グラフ(_G)</value>
+    <value>Graph (_G)</value>
   </data>
   <data name="Menu_View_YearlyGraph_Change" xml:space="preserve">
-    <value>切替(_C)</value>
+    <value>Switching (_C)</value>
   </data>
   <data name="Menu_View_MonthlyList" xml:space="preserve">
-    <value>一覧(_L)</value>
+    <value>List (_L)</value>
   </data>
   <data name="Menu_View_MonthlyGraph" xml:space="preserve">
-    <value>グラフ(_G)</value>
+    <value>Graph (_G)</value>
   </data>
   <data name="Menu_View_MonthlyList_Change" xml:space="preserve">
-    <value>切替(_C)</value>
+    <value>Switching (_C)</value>
   </data>
   <data name="Menu_View_MonthlyGraph_Change" xml:space="preserve">
-    <value>切替(_C)</value>
+    <value>Switching (_C)</value>
   </data>
   <data name="Menu_View_MonthlyList_LastYear" xml:space="preserve">
-    <value>去年(_L)</value>
+    <value>Last year (_L)</value>
   </data>
   <data name="Menu_View_MonthlyGraph_LastYear" xml:space="preserve">
-    <value>去年(_L)</value>
+    <value>Last year (_L)</value>
   </data>
   <data name="Menu_View_MonthlyList_ThisYear" xml:space="preserve">
-    <value>今年(_T)</value>
+    <value>This year (_T)</value>
   </data>
   <data name="Menu_View_MonthlyGraph_ThisYear" xml:space="preserve">
-    <value>今年(_T)</value>
+    <value>This year (_T)</value>
   </data>
   <data name="Menu_View_MonthlyList_NextYear" xml:space="preserve">
-    <value>来年(_N)</value>
+    <value>Next year (_N)</value>
   </data>
   <data name="Menu_View_MonthlyGraph_NextYear" xml:space="preserve">
-    <value>来年(_N)</value>
+    <value>Next year (_N)</value>
   </data>
   <data name="Menu_View_DailyGraph" xml:space="preserve">
-    <value>日別グラフ(_G)</value>
+    <value>Daily graph (_G)</value>
   </data>
   <data name="Menu_View_DailyGraph_Change" xml:space="preserve">
-    <value>切替(_C)</value>
+    <value>Switching (_C)</value>
   </data>
   <data name="Menu_View_DailyGraph_LastMonth" xml:space="preserve">
-    <value>先月(_L)</value>
+    <value>Last month (_L)</value>
   </data>
   <data name="Menu_View_DailyGraph_ThisMonth" xml:space="preserve">
-    <value>今月(_T)</value>
+    <value>This month (_T)</value>
   </data>
   <data name="Menu_View_DailyGraph_DailyTermSelection" xml:space="preserve">
-    <value>期間指定...(_S)</value>
+    <value>Specify the period (_S)...</value>
   </data>
   <data name="Menu_View_DailyGraph_NextMonth" xml:space="preserve">
-    <value>来月(_N)</value>
+    <value>Next month (_N)</value>
   </data>
   <data name="Menu_View_Book" xml:space="preserve">
-    <value>帳簿(_B)</value>
+    <value>Books (_B)</value>
   </data>
   <data name="Menu_View_Book_Change" xml:space="preserve">
-    <value>切替(_C)</value>
+    <value>Switching (_C)</value>
   </data>
   <data name="Menu_View_Book_LastMonth" xml:space="preserve">
-    <value>先月(_L)</value>
+    <value>Last month (_L)</value>
   </data>
   <data name="Menu_View_Book_ThisMonth" xml:space="preserve">
-    <value>今月(_T)</value>
+    <value>This month (_T)</value>
   </data>
   <data name="Menu_View_Book_DailyTermSelection" xml:space="preserve">
-    <value>期間指定(_S)...</value>
+    <value>Specify the period (_S)...</value>
   </data>
   <data name="Menu_View_Book_NextMonth" xml:space="preserve">
-    <value>来月(_N)</value>
+    <value>Next month (_N)</value>
   </data>
   <data name="Menu_Edit_Edit" xml:space="preserve">
-    <value>編集(_E)...</value>
+    <value>Edit (_E)...</value>
   </data>
   <data name="Menu_Edit_Delete" xml:space="preserve">
-    <value>削除(_D)</value>
+    <value>Delete (_D)</value>
   </data>
   <data name="Menu_Edit_Move" xml:space="preserve">
-    <value>移動(_T)...</value>
+    <value>Move (_T)...</value>
   </data>
   <data name="Menu_Edit_Add" xml:space="preserve">
-    <value>追加(_A)...</value>
+    <value>Add (_A)...</value>
   </data>
   <data name="Menu_Edit_AddList" xml:space="preserve">
-    <value>リスト追加(_W)...</value>
+    <value>Add list (_W)...</value>
   </data>
   <data name="Menu_Edit_BulkCheck" xml:space="preserve">
-    <value>一括チェック(_B)</value>
+    <value>Bulk check (_B)</value>
   </data>
   <data name="Menu_Edit_Copy" xml:space="preserve">
-    <value>複製(_C)...</value>
+    <value>Copy (_C)...</value>
   </data>
   <data name="Menu_Edit_Find" xml:space="preserve">
-    <value>検索(_F)</value>
+    <value>Search (_F)</value>
   </data>
   <data name="Menu_Edit_Replace" xml:space="preserve">
-    <value>置換(_H)</value>
+    <value>Replace (_H)</value>
   </data>
   <data name="Menu_File_Import" xml:space="preserve">
-    <value>インポート(_I)</value>
+    <value>Import (_I)</value>
   </data>
   <data name="Menu_File_Export" xml:space="preserve">
-    <value>エクスポート(_E)</value>
+    <value>Export (_E)</value>
   </data>
   <data name="Menu_File_Backup" xml:space="preserve">
-    <value>バックアップ(_B)</value>
+    <value>Backup (_B)</value>
   </data>
   <data name="Menu_File_Exit" xml:space="preserve">
-    <value>終了(_F)</value>
+    <value>Finish (_F)</value>
   </data>
   <data name="Menu_File_Import_KichoFugetsu" xml:space="preserve">
-    <value>記帳風月(_K)...</value>
+    <value>Kichohugetsu (_K)...</value>
   </data>
   <data name="Menu_File_Import_CustomFormatFile" xml:space="preserve">
-    <value>カスタム形式ファイル(_C)...</value>
+    <value>Custom format file (_C)...</value>
   </data>
   <data name="Menu_File_Export_CustomFormatFile" xml:space="preserve">
-    <value>カスタム形式ファイル(_C)...</value>
+    <value>Custom format file (_C)...</value>
   </data>
   <data name="Menu_File_Export_SQLFile" xml:space="preserve">
-    <value>SQLファイル(_S)...</value>
+    <value>SQL file (_S)...</value>
   </data>
   <data name="Menu_File_Export_Excel" xml:space="preserve">
-    <value>Excel(_E)...</value>
+    <value>Excel (_E)...</value>
   </data>
   <data name="Button_Forward" xml:space="preserve">
     <value>▶</value>
@@ -578,25 +571,25 @@
     <value>◀</value>
   </data>
   <data name="Button_BulkCheck" xml:space="preserve">
-    <value>一括チェック</value>
+    <value>Bulk check</value>
   </data>
   <data name="Button_Today" xml:space="preserve">
-    <value>今日</value>
+    <value>Today</value>
   </data>
   <data name="Button_ApplyLanguage" xml:space="preserve">
-    <value>言語を適用する(再起動)</value>
+    <value>Apply language (restart)</value>
   </data>
   <data name="Button_Move" xml:space="preserve">
-    <value>移動</value>
+    <value>Move</value>
   </data>
   <data name="Button_Add" xml:space="preserve">
-    <value>追加</value>
+    <value>Add</value>
   </data>
   <data name="Button_AddCategory" xml:space="preserve">
-    <value>分類追加</value>
+    <value>Add category</value>
   </data>
   <data name="Button_AddItem" xml:space="preserve">
-    <value>項目追加</value>
+    <value>Add item</value>
   </data>
   <data name="Button_HideReplace" xml:space="preserve">
     <value>▲</value>
@@ -605,368 +598,368 @@
     <value>✕</value>
   </data>
   <data name="Button_AddList" xml:space="preserve">
-    <value>まとめて追加</value>
+    <value>Add list</value>
   </data>
   <data name="Button_Copy" xml:space="preserve">
-    <value>複製</value>
+    <value>Copy</value>
   </data>
   <data name="Button_Delete" xml:space="preserve">
-    <value>削除</value>
+    <value>Delete</value>
   </data>
   <data name="Button_Edit" xml:space="preserve">
-    <value>編集</value>
+    <value>Edit</value>
   </data>
   <data name="Button_Save" xml:space="preserve">
-    <value>保存</value>
+    <value>Save</value>
   </data>
   <data name="Button_ThisMonth" xml:space="preserve">
-    <value>今月</value>
+    <value>This month</value>
   </data>
   <data name="Button_ThisYear" xml:space="preserve">
-    <value>今年</value>
+    <value>This year</value>
   </data>
   <data name="ColumnHeader_Total" xml:space="preserve">
-    <value>合計</value>
+    <value>Total</value>
   </data>
   <data name="ColumnHeader_Day" xml:space="preserve">
-    <value>曜日</value>
+    <value>Day</value>
   </data>
   <data name="ColumnHeader_Date" xml:space="preserve">
-    <value>日付</value>
+    <value>Date</value>
   </data>
   <data name="ColumnHeader_ItemName" xml:space="preserve">
-    <value>項目名</value>
+    <value>Item name</value>
   </data>
   <data name="ColumnHeader_CSVItemName" xml:space="preserve">
-    <value>CSV項目名</value>
+    <value>CSV item name</value>
   </data>
   <data name="ColumnHeader_Average" xml:space="preserve">
-    <value>平均</value>
+    <value>Average</value>
   </data>
   <data name="ColumnHeader_UsageCount" xml:space="preserve">
-    <value>使用回数</value>
+    <value>Usage count</value>
   </data>
   <data name="ColumnHeader_LastUsageDate" xml:space="preserve">
-    <value>最終使用日</value>
+    <value>Last used date</value>
   </data>
   <data name="TabHeader_AccountBook" xml:space="preserve">
-    <value>帳簿</value>
+    <value>Books</value>
   </data>
   <data name="TabHeader_ItemSettings" xml:space="preserve">
-    <value>項目設定</value>
+    <value>Item settings</value>
   </data>
   <data name="TabHeader_BookSettings" xml:space="preserve">
-    <value>帳簿設定</value>
+    <value>Book settings</value>
   </data>
   <data name="TabHeader_OtherSettings" xml:space="preserve">
-    <value>その他</value>
+    <value>Others</value>
   </data>
   <data name="TabHeader_DailyGraph" xml:space="preserve">
-    <value>日別
-グラフ</value>
+    <value>Daily
+graph</value>
   </data>
   <data name="TabHeader_MonthlyGraph" xml:space="preserve">
-    <value>月別
-グラフ</value>
+    <value>Monthly
+graph</value>
   </data>
   <data name="TabHeader_MonthlySummary" xml:space="preserve">
-    <value>月別
-一覧</value>
+    <value>Monthly
+list</value>
   </data>
   <data name="TabHeader_YearlyGraph" xml:space="preserve">
-    <value>年別
-グラフ</value>
+    <value>Yearly
+graph</value>
   </data>
   <data name="TabHeader_YearlySummary" xml:space="preserve">
-    <value>年別
-一覧</value>
+    <value>Yearly
+list</value>
   </data>
   <data name="Button_DateRange" xml:space="preserve">
-    <value>期間指定</value>
+    <value>Specify the period</value>
   </data>
   <data name="ToolTip_CheckIsMatch" xml:space="preserve">
-    <value>CSV一致チェック</value>
+    <value>CSV match check</value>
   </data>
   <data name="ColumnHeader_BookName" xml:space="preserve">
-    <value>帳簿名</value>
+    <value>Book name</value>
   </data>
   <data name="ColumnHeader_ShopName" xml:space="preserve">
-    <value>店名</value>
+    <value>Store name</value>
   </data>
   <data name="ColumnHeader_Match" xml:space="preserve">
-    <value>一致</value>
+    <value>Match</value>
   </data>
   <data name="ColumnHeader_Remark" xml:space="preserve">
-    <value>備考</value>
+    <value>Remarks</value>
   </data>
   <data name="ColumnHeader_CategoryName" xml:space="preserve">
-    <value>分類名</value>
+    <value>Category name</value>
   </data>
   <data name="Button_Open" xml:space="preserve">
-    <value>開く</value>
+    <value>Open</value>
   </data>
   <data name="Button_Close" xml:space="preserve">
-    <value>閉じる</value>
+    <value>Close</value>
   </data>
   <data name="Button_OK" xml:space="preserve">
     <value>OK</value>
   </data>
   <data name="Button_Cancel" xml:space="preserve">
-    <value>キャンセル</value>
+    <value>Cancel</value>
   </data>
   <data name="Button_Registration" xml:space="preserve">
-    <value>登録</value>
+    <value>Registration</value>
   </data>
   <data name="Button_RaiseSortOrder" xml:space="preserve">
     <value>↑</value>
   </data>
   <data name="Button_ReregisterDatabaseSetting" xml:space="preserve">
-    <value>データベース通信設定を再登録する(再起動)</value>
+    <value>Re-register database communication settings (restart)</value>
   </data>
   <data name="Button_InitializeWindowPositionAndSize" xml:space="preserve">
-    <value>位置・サイズを初期化する(再起動)</value>
+    <value>Initialize the position and size (restart)</value>
   </data>
   <data name="Button_DropSortOrder" xml:space="preserve">
     <value>↓</value>
   </data>
   <data name="Button_Continue" xml:space="preserve">
-    <value>続けて入力</value>
+    <value>Continue input</value>
   </data>
   <data name="Title_AddWindow" xml:space="preserve">
-    <value>追加</value>
+    <value>Add</value>
   </data>
   <data name="Title_SettingsWindow" xml:space="preserve">
-    <value>設定</value>
+    <value>Setting</value>
   </data>
   <data name="Title_AddListWindow" xml:space="preserve">
-    <value>リスト追加</value>
+    <value>Add list</value>
   </data>
   <data name="Title_AddMoveWindow" xml:space="preserve">
-    <value>移動追加</value>
+    <value>Add move</value>
   </data>
   <data name="Title_EditWindow" xml:space="preserve">
-    <value>編集</value>
+    <value>Edit</value>
   </data>
   <data name="Title_EditListWindow" xml:space="preserve">
-    <value>リスト編集</value>
+    <value>List edit</value>
   </data>
   <data name="Title_EditMoveWindow" xml:space="preserve">
-    <value>移動編集</value>
+    <value>Move edit</value>
   </data>
   <data name="Title_TermSelectionWindow" xml:space="preserve">
-    <value>期間選択</value>
+    <value>Select period</value>
   </data>
   <data name="Button_AllTerm" xml:space="preserve">
-    <value>全期間</value>
+    <value>All period</value>
   </data>
   <data name="Title_VersionWindow" xml:space="preserve">
-    <value>バージョン情報</value>
+    <value>Version information</value>
   </data>
   <data name="Button_ShowReplace" xml:space="preserve">
     <value>▼</value>
   </data>
   <data name="TextBlock_Search" xml:space="preserve">
-    <value>検索</value>
+    <value>Search</value>
   </data>
   <data name="TextBlock_SaveTarget" xml:space="preserve">
-    <value>保存対象</value>
+    <value>To be saved</value>
   </data>
   <data name="TextBlock_Filter" xml:space="preserve">
-    <value>絞り込み</value>
+    <value>Narrow down</value>
   </data>
   <data name="TextBlock_UpdateHistory" xml:space="preserve">
-    <value>更新履歴</value>
+    <value>Update history(Japanese only)</value>
   </data>
   <data name="TextBlock_SNS" xml:space="preserve">
     <value>SNS</value>
   </data>
   <data name="TextBlock_Support" xml:space="preserve">
-    <value>サポート</value>
+    <value>Support</value>
   </data>
   <data name="TextBlock_Average" xml:space="preserve">
-    <value>平均</value>
+    <value>Average</value>
   </data>
   <data name="TextBlock_Sum" xml:space="preserve">
-    <value>合計</value>
+    <value>Sum</value>
   </data>
   <data name="TextBlock_Book" xml:space="preserve">
-    <value>帳簿</value>
+    <value>Book</value>
   </data>
   <data name="TextBlock_Books" xml:space="preserve">
-    <value>帳簿</value>
+    <value>Books</value>
   </data>
   <data name="TextBlock_BookName" xml:space="preserve">
-    <value>帳簿名</value>
+    <value>Book name</value>
   </data>
   <data name="TextBlock_BookKind" xml:space="preserve">
-    <value>帳簿種別</value>
+    <value>Book type</value>
   </data>
   <data name="TextBlock_InitialBalance" xml:space="preserve">
-    <value>初期残高</value>
+    <value>Initial balance</value>
   </data>
   <data name="TextBlock_SortOrder" xml:space="preserve">
-    <value>ソート順</value>
+    <value>Sort order</value>
   </data>
   <data name="TextBlock_Date" xml:space="preserve">
-    <value>日付</value>
+    <value>Date</value>
   </data>
   <data name="TextBlock_Npgsql_Host" xml:space="preserve">
-    <value>ホスト</value>
+    <value>Host</value>
   </data>
   <data name="TextBlock_Npgsql_Port" xml:space="preserve">
-    <value>ポート</value>
+    <value>Port</value>
   </data>
   <data name="TextBlock_Npgsql_UserName" xml:space="preserve">
-    <value>ユーザ名</value>
+    <value>User name</value>
   </data>
   <data name="TextBlock_Npgsql_Password" xml:space="preserve">
-    <value>パスワード</value>
+    <value>Password</value>
   </data>
   <data name="TextBlock_Npgsql_DbName" xml:space="preserve">
-    <value>DB名</value>
+    <value>DB name</value>
   </data>
   <data name="TextBlock_Npgsql_Roll" xml:space="preserve">
-    <value>ロール</value>
+    <value>Roll</value>
   </data>
   <data name="TextBlock_Category" xml:space="preserve">
-    <value>分類</value>
+    <value>Category</value>
   </data>
   <data name="TextBlock_Checked" xml:space="preserve">
-    <value>チェック済</value>
+    <value>Checked</value>
   </data>
   <data name="TextBlock_Item" xml:space="preserve">
-    <value>項目</value>
+    <value>Item</value>
   </data>
   <data name="TextBlock_ItemName" xml:space="preserve">
-    <value>項目名</value>
+    <value>Item name</value>
   </data>
   <data name="TextBlock_CategoryName" xml:space="preserve">
-    <value>分類名</value>
+    <value>Category name</value>
   </data>
   <data name="TextBlock_ShopName" xml:space="preserve">
-    <value>店名</value>
+    <value>Store name</value>
   </data>
   <data name="TextBlock_Remark" xml:space="preserve">
-    <value>備考</value>
+    <value>Remarks</value>
   </data>
   <data name="TextBlock_AmountOfMoney" xml:space="preserve">
-    <value>金額</value>
+    <value>Amount</value>
   </data>
   <data name="TextBlock_Language" xml:space="preserve">
-    <value>言語</value>
+    <value>Language</value>
   </data>
   <data name="TextBlock_Selection" xml:space="preserve">
-    <value>選択</value>
+    <value>Choice</value>
   </data>
   <data name="TextBlock_Count" xml:space="preserve">
-    <value>個数</value>
+    <value>Count</value>
   </data>
   <data name="TextBlock_FolderPath" xml:space="preserve">
-    <value>フォルダパス</value>
+    <value>Folder path</value>
   </data>
   <data name="TextBlock_Timing" xml:space="preserve">
-    <value>タイミング</value>
+    <value>Timing</value>
   </data>
   <data name="TextBlock_DataCount" xml:space="preserve">
-    <value>データの個数</value>
+    <value>Number of data</value>
   </data>
   <data name="TextBlock_Repeat_Count" xml:space="preserve">
-    <value>回数</value>
+    <value>Times</value>
   </data>
   <data name="TextBlock_Repeat_Holiday" xml:space="preserve">
-    <value>休日設定</value>
+    <value>Holiday setting</value>
   </data>
   <data name="TextBlock_Comission" xml:space="preserve">
-    <value>手数料</value>
+    <value>Commission</value>
   </data>
   <data name="TextBlock_Repeat_BulkEdit" xml:space="preserve">
-    <value>まとめて編集</value>
+    <value>Edit all at once</value>
   </data>
   <data name="TextBlock_Repeat" xml:space="preserve">
-    <value>繰り返し</value>
+    <value>Repetition</value>
   </data>
   <data name="TextBlock_LastOperatedBookItem" xml:space="preserve">
-    <value>最後に操作した帳簿項目</value>
+    <value>Last book item operated</value>
   </data>
   <data name="TextBlock_Burden" xml:space="preserve">
-    <value>負担</value>
+    <value>Burden</value>
   </data>
   <data name="TextBlock_Replace" xml:space="preserve">
-    <value>置換</value>
+    <value>Replace</value>
   </data>
   <data name="TextBlock_Expenses" xml:space="preserve">
-    <value>支出</value>
+    <value>Expenses</value>
   </data>
   <data name="TextBlock_MoveFrom" xml:space="preserve">
-    <value>移動元</value>
+    <value>Moved from</value>
   </data>
   <data name="TextBlock_MoveTo" xml:space="preserve">
-    <value>移動先</value>
+    <value>Move to</value>
   </data>
   <data name="TextBlock_StartDate" xml:space="preserve">
-    <value>開始日</value>
+    <value>Start date</value>
   </data>
   <data name="TextBlock_StartMonth" xml:space="preserve">
-    <value>開始月</value>
+    <value>Start month</value>
   </data>
   <data name="TextBlock_EndDate" xml:space="preserve">
-    <value>終了日</value>
+    <value>End date</value>
   </data>
   <data name="TextBlock_PaymentDate" xml:space="preserve">
-    <value>支払日</value>
+    <value>Payment date</value>
   </data>
   <data name="TextBlock_PaymentBook" xml:space="preserve">
-    <value>支払元帳簿</value>
+    <value>Payment book</value>
   </data>
   <data name="TextBlock_Password" xml:space="preserve">
-    <value>パスワード</value>
+    <value>Password</value>
   </data>
   <data name="GroupHeader_Holiday" xml:space="preserve">
-    <value>祝日</value>
+    <value>Holiday</value>
   </data>
   <data name="CheckBox_Timing_MinimizingMainWindow" xml:space="preserve">
-    <value>メインウィンドウ最小化時</value>
+    <value>When minimizing the main window</value>
   </data>
   <data name="CheckBox_SaveTarget_PositionWithoutMainWindow" xml:space="preserve">
-    <value>メインウィンドウ以外の位置</value>
+    <value>Locations other than the main window</value>
   </data>
   <data name="CheckBox_Timing_ClosingMainWindow" xml:space="preserve">
-    <value>メインウィンドウクローズ時</value>
+    <value>When the main window is closed</value>
   </data>
   <data name="RadioButton_Password_ShowInputWindow" xml:space="preserve">
-    <value>入力ウィンドウを表示する</value>
+    <value>Show input window</value>
   </data>
   <data name="RadioButton_Password_SpecifyPgpassConf" xml:space="preserve">
-    <value>pgpass.conf を指定する</value>
+    <value>Specify pgpass.conf</value>
   </data>
   <data name="TextBlock_IncomeOrExpenses" xml:space="preserve">
-    <value>収支</value>
+    <value>In or out</value>
   </data>
   <data name="ColumnHeader_AmountOfMoney" xml:space="preserve">
-    <value>金額</value>
+    <value>Amount</value>
   </data>
   <data name="GraphTitle_YearlyGraph" xml:space="preserve">
-    <value>年別グラフ</value>
+    <value>Yearly graph</value>
   </data>
   <data name="GraphTitle_MonthlyGraph" xml:space="preserve">
-    <value>月別グラフ</value>
+    <value>Monthly graph</value>
   </data>
   <data name="GraphTitle_DailyGraph" xml:space="preserve">
-    <value>日別グラフ</value>
+    <value>Daily graph</value>
   </data>
   <data name="GraphTitle_SeparetelyGraph" xml:space="preserve">
-    <value>個別グラフ</value>
+    <value>Separetely graph</value>
   </data>
   <data name="TextBlock_Whole" xml:space="preserve">
-    <value>全体</value>
+    <value>Whole</value>
   </data>
   <data name="CultureName_ja_JP" xml:space="preserve">
-    <value>日本語(ja-JP)</value>
+    <value>Japanese(ja-JP)</value>
   </data>
   <data name="CultureName_en_001" xml:space="preserve">
-    <value>英語(en-001)</value>
+    <value>English(en-001)</value>
   </data>
   <data name="GroupHeader_LanguageInformation" xml:space="preserve">
-    <value>言語情報</value>
+    <value>Language information</value>
   </data>
 </root>

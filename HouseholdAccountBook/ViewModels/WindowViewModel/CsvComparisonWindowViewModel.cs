@@ -76,10 +76,10 @@ namespace HouseholdAccountBook.ViewModels
         private ObservableCollection<CsvComparisonViewModel> _CsvComparisonVMList = new ObservableCollection<CsvComparisonViewModel>();
         #endregion
         /// <summary>
-        /// CSV比較VMの未チェック数
+        /// CSV比較VMのチェック数
         /// </summary>
-        #region UncheckedNum
-        public int AllUncheckedCount => this.CsvComparisonVMList.Count((vm) => !vm.IsMatch);
+        #region AllCheckedNum
+        public int AllCheckedCount => this.CsvComparisonVMList.Count((vm) => vm.IsMatch);
         #endregion
         /// <summary>
         /// CSV比較VMの個数
@@ -112,10 +112,10 @@ namespace HouseholdAccountBook.ViewModels
         public ObservableCollection<CsvComparisonViewModel> SelectedCsvComparisonVMList { get; } = new ObservableCollection<CsvComparisonViewModel>();
         #endregion
         /// <summary>
-        /// 選択されたCSV比較VMの未チェック数
+        /// 選択されたCSV比較VMのチェック数
         /// </summary>
-        #region UncheckedNum
-        public int SelectedUncheckedCount => this.SelectedCsvComparisonVMList.Count((vm) => !vm.IsMatch);
+        #region SelectedCheckedNum
+        public int SelectedCheckedCount => this.SelectedCsvComparisonVMList.Count((vm) => vm.IsMatch);
         #endregion
         /// <summary>
         /// 選択されたCSV比較VMの個数
@@ -141,39 +141,39 @@ namespace HouseholdAccountBook.ViewModels
             };
 
             this.CsvComparisonVMList.CollectionChanged += (sender, args) => {
-                this.RaisePropertyChanged(nameof(this.AllUncheckedCount));
+                this.RaisePropertyChanged(nameof(this.AllCheckedCount));
                 this.RaisePropertyChanged(nameof(this.AllCount));
                 this.RaisePropertyChanged(nameof(this.AllSumValue));
 
                 if (args.OldItems != null) {
                     foreach (object tmp in args.OldItems) {
                         if (tmp is CsvComparisonViewModel vm) {
-                            vm.IsMatchChanged -= this.RaiseUncheckedCountChanged;
+                            vm.IsMatchChanged -= this.RaiseCheckedCountChanged;
                         }
                     }
                 }
                 if (args.NewItems != null) {
                     foreach (object tmp in args.NewItems) {
                         if (tmp is CsvComparisonViewModel vm) {
-                            vm.IsMatchChanged += this.RaiseUncheckedCountChanged;
+                            vm.IsMatchChanged += this.RaiseCheckedCountChanged;
                         }
                     }
                 }
             };
             this.SelectedCsvComparisonVMList.CollectionChanged += (sender, args) => {
-                this.RaisePropertyChanged(nameof(this.SelectedUncheckedCount));
+                this.RaisePropertyChanged(nameof(this.SelectedCheckedCount));
                 this.RaisePropertyChanged(nameof(this.SelectedCount));
                 this.RaisePropertyChanged(nameof(this.SelectedSumValue));
             };
         }
 
         /// <summary>
-        /// 未チェック数変更を通知する
+        /// チェック数変更を通知する
         /// </summary>
-        public void RaiseUncheckedCountChanged(EventArgs<int?, bool> e)
+        public void RaiseCheckedCountChanged(EventArgs<int?, bool> e)
         {
-            this.RaisePropertyChanged(nameof(this.AllUncheckedCount));
-            this.RaisePropertyChanged(nameof(this.SelectedUncheckedCount));
+            this.RaisePropertyChanged(nameof(this.AllCheckedCount));
+            this.RaisePropertyChanged(nameof(this.SelectedCheckedCount));
         }
     }
 }

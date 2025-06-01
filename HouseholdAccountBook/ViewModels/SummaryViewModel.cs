@@ -51,7 +51,7 @@
         /// <summary>
         /// 合計
         /// </summary>
-        public int Summary { get; set; }
+        public int Total { get; set; }
         #endregion
     }
 }

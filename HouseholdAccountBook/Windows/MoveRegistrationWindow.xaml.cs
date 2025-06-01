@@ -95,7 +95,7 @@ namespace HouseholdAccountBook.Windows
 
             this.InitializeComponent();
 
-            this.WVM.RegMode = RegistrationMode.Add;
+            this.WVM.RegMode = RegistrationKind.Add;
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="selectedBookId">選択された帳簿ID</param>
         /// <param name="selectedGroupId">グループID</param>
         /// <param name="mode">登録モード</param>
-        public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, int selectedGroupId, RegistrationMode mode = RegistrationMode.Edit)
+        public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, int selectedGroupId, RegistrationKind mode = RegistrationKind.Edit)
         {
             this.builder = builder;
             this.selectedBookId = selectedBookId;
@@ -209,14 +209,14 @@ namespace HouseholdAccountBook.Windows
 
             // DBから値を読み込む
             switch (this.WVM.RegMode) {
-                case RegistrationMode.Add:
+                case RegistrationKind.Add:
                     // 追加時の日時、金額は帳簿リスト更新時に取得する
                     break;
-                case RegistrationMode.Edit:
-                case RegistrationMode.Copy: {
+                case RegistrationKind.Edit:
+                case RegistrationKind.Copy: {
                     DateTime fromDate = DateTime.Now;
                     DateTime toDate = DateTime.Now;
-                    CommissionKind commissionKind = CommissionKind.FromBook;
+                    CommissionKind commissionKind = CommissionKind.MoveFrom;
                     int moveValue = -1;
                     int commissionValue = 0;
 
@@ -252,10 +252,10 @@ ORDER BY move_flg DESC;", this.selectedGroupId);
                             }
                             else { // 手数料
                                 if (bookId == fromBookId) { // 移動元負担
-                                    commissionKind = CommissionKind.FromBook;
+                                    commissionKind = CommissionKind.MoveFrom;
                                 }
                                 else if (bookId == toBookId) { // 移動先負担
-                                    commissionKind = CommissionKind.ToBook;
+                                    commissionKind = CommissionKind.MoveTo;
                                 }
                                 this.commissionActionId = actionId;
                                 commissionItemId = itemId;
@@ -267,7 +267,7 @@ ORDER BY move_flg DESC;", this.selectedGroupId);
                     }
 
                     // WVMに値を設定する
-                    if (this.WVM.RegMode == RegistrationMode.Edit) {
+                    if (this.WVM.RegMode == RegistrationKind.Edit) {
                         this.WVM.FromId = this.fromActionId;
                         this.WVM.ToId = this.toActionId;
                         this.WVM.GroupId = this.selectedGroupId;
@@ -330,7 +330,7 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
                         fromBookVM = vm;
 
                         switch (this.WVM.RegMode) {
-                            case RegistrationMode.Add: {
+                            case RegistrationKind.Add: {
                                 if (record.ToInt("book_kind") == (int)BookKind.CreditCard) {
                                     debitBookId = record.ToNullableInt("debit_book_id");
                                     payDay = record.ToNullableInt("pay_day");
@@ -351,7 +351,7 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
             this.WVM.SelectedToBookVM = toBookVM;
 
             switch (this.WVM.RegMode) {
-                case RegistrationMode.Add: {
+                case RegistrationKind.Add: {
                     if (debitBookId != null) {
                         this.WVM.SelectedFromBookVM = bookVMList.FirstOrDefault((vm) => { return vm.Id == debitBookId; });
                     }
@@ -360,7 +360,7 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
                         this.WVM.FromDate = this.WVM.FromDate.GetDateInMonth(payDay.Value);
                     }
                     this.WVM.IsLink = true;
-                    this.WVM.SelectedCommissionKind = CommissionKind.FromBook;
+                    this.WVM.SelectedCommissionKind = CommissionKind.MoveFrom;
                 }
                 break;
             };
@@ -380,10 +380,10 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
             using (DaoBase dao = this.builder.Build()) {
                 int bookId = -1;
                 switch (this.WVM.SelectedCommissionKind) {
-                    case CommissionKind.FromBook:
+                    case CommissionKind.MoveFrom:
                         bookId = this.WVM.SelectedFromBookVM.Id.Value;
                         break;
-                    case CommissionKind.ToBook:
+                    case CommissionKind.MoveTo:
                         bookId = this.WVM.SelectedToBookVM.Id.Value;
                         break;
                 }
@@ -393,7 +393,7 @@ FROM mst_item I
 INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
 WHERE I.del_flg = 0 AND C.balance_kind = @{0} AND
       EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{1} AND RBI.item_id = I.item_id AND del_flg = 0)
-ORDER BY C.sort_order, I.sort_order;", (int)BalanceKind.Outgo, bookId);
+ORDER BY C.sort_order, I.sort_order;", (int)BalanceKind.Expenses, bookId);
 
                 reader.ExecWholeRow((count, record) => {
                     ItemViewModel vm = new ItemViewModel() {
@@ -509,8 +509,8 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
             using (DaoBase dao = this.builder.Build()) {
                 await dao.ExecTransactionAsync(async () => {
                     switch (this.WVM.RegMode) {
-                        case RegistrationMode.Add:
-                        case RegistrationMode.Copy: {
+                        case RegistrationKind.Add:
+                        case RegistrationKind.Copy: {
                             #region 帳簿項目を追加する
                             // グループIDを取得する
                             DaoReader reader = await dao.ExecQueryAsync(@"
@@ -528,7 +528,7 @@ VALUES (@{0}, (
   INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @{6}) C ON C.category_id = I.category_id
   WHERE move_flg = 1
 ), @{1}, @{2}, @{3}, 0, 'now', @{4}, 'now', @{5}) RETURNING action_id;",
-                                fromBookId, fromDate, -actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Outgo);
+                                fromBookId, fromDate, -actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Expenses);
                             if (this.selectedBookId == fromBookId) {
                                 reader.ExecARow((record) => {
                                     resActionIdList.Add(record.ToInt("action_id"));
@@ -552,7 +552,7 @@ VALUES (@{0}, (
                             #endregion
                             break;
                         }
-                        case RegistrationMode.Edit: {
+                        case RegistrationKind.Edit: {
                             #region 帳簿項目を変更する
                             tmpGroupId = this.selectedGroupId.Value;
                             await dao.ExecNonQueryAsync(@"
@@ -582,11 +582,11 @@ WHERE action_id = @{4};", toBookId, toDate, actValue, Updater, this.toActionId);
                         int bookId = -1;
                         DateTime actTime = DateTime.Now;
                         switch (commissionKind) {
-                            case CommissionKind.FromBook:
+                            case CommissionKind.MoveFrom:
                                 bookId = fromBookId;
                                 actTime = fromDate;
                                 break;
-                            case CommissionKind.ToBook:
+                            case CommissionKind.MoveTo:
                                 bookId = toBookId;
                                 actTime = toDate;
                                 break;

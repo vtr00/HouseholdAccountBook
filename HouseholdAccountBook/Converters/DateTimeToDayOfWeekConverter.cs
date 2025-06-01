@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Data;
+using System.Windows.Forms;
 
 namespace HouseholdAccountBook.Converters
 {
@@ -10,23 +11,13 @@ namespace HouseholdAccountBook.Converters
     /// </summary>
     public class DateTimeToDayOfWeekConverter : IValueConverter
     {
-        private static readonly Dictionary<DayOfWeek, string> dictionary = new Dictionary<DayOfWeek, string>() {
-            {DayOfWeek.Sunday, "日"},
-            {DayOfWeek.Monday, "月"},
-            {DayOfWeek.Tuesday, "火"},
-            {DayOfWeek.Wednesday, "水"},
-            {DayOfWeek.Thursday, "木"},
-            {DayOfWeek.Friday, "金"},
-            {DayOfWeek.Saturday, "土"}
-        };
-
         /// <summary>
         /// DateTime -> 曜日変換
         /// </summary>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is DateTime dateTime) {
-                return dictionary[dateTime.DayOfWeek];
+                return culture.DateTimeFormat.GetAbbreviatedDayName(dateTime.DayOfWeek);
             }
             else {
                 throw new NotImplementedException();

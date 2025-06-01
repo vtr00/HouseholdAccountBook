@@ -423,13 +423,13 @@ namespace HouseholdAccountBook.ViewModels
         /// 選択されたデータの個数
         /// </summary>
         #region Count
-        public int Count => this.SelectedActionVMList.Count((vm) => { return vm.Income != null || vm.Outgo != null; });
+        public int Count => this.SelectedActionVMList.Count((vm) => { return vm.Income != null || vm.Expenses != null; });
         #endregion
         /// <summary>
         /// 選択されたデータの合計値
         /// </summary>
         #region SumValue
-        public int SumValue => this.IncomeSumValue + this.OutgoSumValue;
+        public int SumValue => this.IncomeSumValue + this.ExpensesSumValue;
         #endregion
         /// <summary>
         /// 選択されたデータの収入合計値
@@ -440,8 +440,8 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 選択されたデータの支出合計値
         /// </summary>
-        #region OutgoSumValue
-        public int OutgoSumValue => this.SelectedActionVMList.Sum((vm) => -vm.Outgo ?? 0);
+        #region ExpensesSumValue
+        public int ExpensesSumValue => this.SelectedActionVMList.Sum((vm) => -vm.Expenses ?? 0);
         #endregion
 
         /// <summary>
@@ -602,7 +602,7 @@ namespace HouseholdAccountBook.ViewModels
             set => this.SetProperty(ref this._DailyGraphPlotModel, value);
         }
         private PlotModel _DailyGraphPlotModel = new PlotModel() {
-            Title = "日別グラフ",
+            Title = Properties.Resources.GraphTitle_DailyGraph,
             IsLegendVisible = false
         };
         #endregion
@@ -617,7 +617,7 @@ namespace HouseholdAccountBook.ViewModels
             set => this.SetProperty(ref this._SelectedDailyGraphPlotModel, value);
         }
         private PlotModel _SelectedDailyGraphPlotModel = new PlotModel() {
-            Title = "個別グラフ",
+            Title = Properties.Resources.GraphTitle_SeparetelyGraph,
             IsLegendVisible = false
         };
         #endregion
@@ -739,7 +739,7 @@ namespace HouseholdAccountBook.ViewModels
             set => this.SetProperty(ref this._MonthlyGraphPlotModel, value);
         }
         private PlotModel _MonthlyGraphPlotModel = new PlotModel() {
-            Title = "月別グラフ",
+            Title = Properties.Resources.GraphTitle_MonthlyGraph,
             IsLegendVisible = false
         };
         #endregion
@@ -754,7 +754,7 @@ namespace HouseholdAccountBook.ViewModels
             set => this.SetProperty(ref this._SelectedMonthlyGraphPlotModel, value);
         }
         private PlotModel _SelectedMonthlyGraphPlotModel = new PlotModel() {
-            Title = "個別グラフ",
+            Title = Properties.Resources.GraphTitle_SeparetelyGraph,
             IsLegendVisible = false
         };
         #endregion
@@ -849,7 +849,7 @@ namespace HouseholdAccountBook.ViewModels
             set => this.SetProperty(ref this._YearlyGraphPlotModel, value);
         }
         private PlotModel _YearlyGraphPlotModel = new PlotModel() {
-            Title = "年別グラフ",
+            Title = Properties.Resources.GraphTitle_YearlyGraph,
             IsLegendVisible = false
         };
         #endregion
@@ -864,7 +864,7 @@ namespace HouseholdAccountBook.ViewModels
             set => this.SetProperty(ref this._SelectedYearlyGraphPlotModel, value);
         }
         private PlotModel _SelectedYearlyGraphPlotModel = new PlotModel() {
-            Title = "個別グラフ",
+            Title = Properties.Resources.GraphTitle_SeparetelyGraph,
             IsLegendVisible = false
         };
         #endregion
@@ -914,7 +914,7 @@ namespace HouseholdAccountBook.ViewModels
             this.RaisePropertyChanged(nameof(this.Count));
             this.RaisePropertyChanged(nameof(this.SumValue));
             this.RaisePropertyChanged(nameof(this.IncomeSumValue));
-            this.RaisePropertyChanged(nameof(this.OutgoSumValue));
+            this.RaisePropertyChanged(nameof(this.ExpensesSumValue));
 
             this.RaisePropertyChanged(nameof(this.IsMatch));
         }

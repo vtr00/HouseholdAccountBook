@@ -77,8 +77,6 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Log.Info();
-
             TextBox textBox = sender as TextBox;
             textBox.SelectionStart = textBox.Text.Length;
         }

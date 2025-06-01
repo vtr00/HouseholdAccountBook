@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HouseholdAccountBook", "HouseholdAccountBook\HouseholdAccountBook.csproj", "{EB3FE09F-77F7-461A-B4E4-7B48E227AB6E}"
 EndProject
@@ -18,5 +18,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		RESX_ShowPerformanceTraces = True
+		RESX_AutoApplyExistingTranslations = True
+		RESX_NeutralResourcesLanguage = ja-JP
+		SolutionGuid = {E811E6F2-58D5-4EC4-923C-2602BABE7F5B}
+		RESX_CultureCountyOverrides = en=en-CC
 	EndGlobalSection
 EndGlobal

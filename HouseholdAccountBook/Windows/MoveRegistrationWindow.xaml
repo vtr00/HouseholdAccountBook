@@ -3,12 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         mc:Ignorable="d"
         Height="Auto" Width="350" ShowInTaskbar="False" WindowStyle="ToolWindow"
         Loaded="MoveRegistrationWindow_Loaded"
         Closed="MoveRegistrationWindow_Closed">
+    
     <Window.DataContext>
         <viewmodels:MoveRegistrationWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
@@ -39,13 +41,13 @@
         <Style TargetType="Window">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding RegMode}" Value="Add">
-                    <Setter Property="Title" Value="移動 - 追加"/>
+                    <Setter Property="Title" Value="{x:Static properties:Resources.Title_AddMoveWindow}"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding RegMode}" Value="Edit">
-                    <Setter Property="Title" Value="移動 - 編集"/>
+                    <Setter Property="Title" Value="{x:Static properties:Resources.Title_EditMoveWindow}"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding RegMode}" Value="Copy">
-                    <Setter Property="Title" Value="移動 - 追加"/>
+                    <Setter Property="Title" Value="{x:Static properties:Resources.Title_AddMoveWindow}"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -82,7 +84,7 @@
                            Text="{Binding GroupId, TargetNullValue='--'}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Grid>
 
-            <GroupBox Grid.Row="1" Header="移動元">
+            <GroupBox Grid.Row="1" Header="{x:Static properties:Resources.TextBlock_MoveFrom}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -102,19 +104,19 @@
                     <TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                 Text="{Binding FromId, TargetNullValue='--'}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
-                                Text="帳簿" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                Text="{x:Static properties:Resources.TextBlock_Book}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"  Grid.ColumnSpan="2"
                                 ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedFromBookVM}" DisplayMemberPath="Name"/>
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
-                                Text="日付" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                Text="{x:Static properties:Resources.TextBlock_Date}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <controls:DateTimePicker Grid.Row="2" Grid.Column="1" Margin="5"
                                 DateFormat="yyyy-MM-dd" SelectedDate="{Binding FromDate}"/>
                     <Button Grid.Row="2" Grid.Column="3" Margin="5"
-                            Content="今日" Command="{StaticResource TodayCommand}"/>
+                            Content="{x:Static properties:Resources.Button_Today}" Command="{StaticResource TodayCommand}"/>
                 </Grid>
             </GroupBox>
 
-            <GroupBox Grid.Row="2" Header="移動先">
+            <GroupBox Grid.Row="2" Header="{x:Static properties:Resources.TextBlock_MoveTo}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -133,13 +135,13 @@
                     <TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                Text="{Binding ToId, TargetNullValue='--'}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
-                               Text="帳簿" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                               Text="{x:Static properties:Resources.TextBlock_Book}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"  Grid.ColumnSpan="2"
                               ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedToBookVM}" DisplayMemberPath="Name"/>
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
-                               Text="日付" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <CheckBox Grid.Row="2" Grid.Column="3" Margin="5"
-                              VerticalAlignment="Center" HorizontalAlignment="Center" Content="設定" IsChecked="{Binding IsEnabled, ElementName=movingDateTimePicker}"/>
+                               Text="{x:Static properties:Resources.TextBlock_Date}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <CheckBox Grid.Row="2" Grid.Column="3" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                              Content="{x:Static properties:Resources.CheckBox_Setting}" IsChecked="{Binding IsEnabled, ElementName=movingDateTimePicker}"/>
                     <controls:DateTimePicker x:Name="movingDateTimePicker" Grid.Row="6" Grid.Column="1" Margin="5"
                                 DateFormat="yyyy-MM-dd" SelectedDate="{Binding ToDate}" IsEnabled="{Binding IsLink, Converter={StaticResource NegationConverter}, Mode=TwoWay}"/>
 
@@ -157,12 +159,12 @@
                 </Grid.ColumnDefinitions>
                 
                 <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
-                           Text="金額" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                           Text="{x:Static properties:Resources.TextBlock_AmountOfMoney}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <controls:NumericUpDown Grid.Row="7" Grid.Column="1" Margin="5"
                            Value="{Binding Value, TargetNullValue=''}" MinValue="1"/>
             </Grid>
 
-            <GroupBox Grid.Row="4" Header="手数料">
+            <GroupBox Grid.Row="4" Header="{x:Static properties:Resources.TextBlock_Comission}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -183,21 +185,21 @@
                     <TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                            Text="{Binding CommissionId, TargetNullValue='--'}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
-                           Text="負担" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                           Text="{x:Static properties:Resources.TextBlock_Burden}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ListBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
-                         ItemsSource="{Binding CommissionKindDic}" SelectedValue="{Binding SelectedCommissionKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                           ItemsSource="{Binding CommissionKindDic}" SelectedValue="{Binding SelectedCommissionKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
-                           Text="項目" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                           Text="{x:Static properties:Resources.TextBlock_Item}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ListBox Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" 
-                         ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="NameWithCategory"/>
+                           ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="NameWithCategory"/>
                     <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
-                           Text="金額" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                           Text="{x:Static properties:Resources.TextBlock_Expenses}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5"
-                                        Value="{Binding Commission, TargetNullValue=''}" MinValue="0"/>
+                           Value="{Binding Commission, TargetNullValue=''}" MinValue="0"/>
                     <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
-                           Text="備考" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                           Text="{x:Static properties:Resources.TextBlock_Remark}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsEditable="True"
-                          ItemsSource="{Binding RemarkVMList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
+                           ItemsSource="{Binding RemarkVMList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
                 </Grid>
             </GroupBox>
         </Grid>
@@ -208,8 +210,8 @@
                 <ColumnDefinition Width="0.5*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="登録" Command="{StaticResource RegisterCommand}"/>
-            <Button Grid.Column="1" Content="キャンセル" Command="{StaticResource CancelCommand}"/>
+            <Button Grid.Column="0" Content="{x:Static properties:Resources.Button_Registration}" Command="{StaticResource RegisterCommand}"/>
+            <Button Grid.Column="1" Content="{x:Static properties:Resources.Button_Cancel}" Command="{StaticResource CancelCommand}"/>
         </Grid>
     </Grid>
 </Window>

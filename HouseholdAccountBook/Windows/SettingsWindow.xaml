@@ -4,13 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:controls="clr-namespace:HouseholdAccountBook.UserControls"
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Behaviors"
         mc:Ignorable="d"
-        Title="設定 - Household Account Book" Height="700" Width="1050" WindowStyle="ToolWindow"
+        Title="{x:Static properties:Resources.Title_SettingsWindow}" Height="700" Width="1050" WindowStyle="ToolWindow"
         Loaded="SettingsWindow_Loaded"
         Closing="SettingsWindow_Closing" Closed="SettingsWindow_Closed">
+    
     <Window.DataContext>
         <viewmodels:SettingsWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
@@ -41,6 +43,7 @@
         <!-- その他設定操作コマンド -->
         <RoutedCommand x:Key="DumpExePathDialogCommand"/>
         <RoutedCommand x:Key="RestoreExePathDialogCommand"/>
+        <RoutedCommand x:Key="RestartForLanguageCommand"/>
         <RoutedCommand x:Key="RestartForDbSettingCommand"/>
         <RoutedCommand x:Key="BackUpFolderPathDialogCommand"/>
         <RoutedCommand x:Key="ReloadWindowSettingCommand"/>
@@ -74,6 +77,7 @@
         <!-- その他設定操作コマンド -->
         <CommandBinding Command="{StaticResource DumpExePathDialogCommand}" Executed="DumpExePathDialogCommand_Executed"/>
         <CommandBinding Command="{StaticResource RestoreExePathDialogCommand}" Executed="RestorePathDialogCommand_Executed"/>
+        <CommandBinding Command="{StaticResource RestartForLanguageCommand}" Executed="RestartForLanguageCommand_Executed"/>
         <CommandBinding Command="{StaticResource RestartForDbSettingCommand}" Executed="RestartForDbSettingCommand_Executed"/>
         <CommandBinding Command="{StaticResource BackUpFolderPathDialogCommand}" Executed="BackUpFolderPathDialogCommand_Executed"/>
         <CommandBinding Command="{StaticResource ReloadWindowSettingCommand}" Executed="ReloadWindowSettingCommand_Executed"/>
@@ -91,8 +95,8 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
-            <MenuItem Header="ファイル(_F)">
-                <MenuItem Header="終了(_X)" Command="{StaticResource ExitWindowCommand}" InputGestureText="Alt+F4"/>
+            <MenuItem Header="{x:Static properties:Resources.Menu_File}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_File_Exit}" Command="{StaticResource ExitWindowCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>
         </Menu>
         
@@ -103,7 +107,9 @@
                     <Setter Property="Height" Value="75"/>
                 </Style>
             </TabControl.ItemContainerStyle>
-            <TabItem Header="項目設定">
+            
+            <!-- 項目設定 -->
+            <TabItem Header="{x:Static properties:Resources.TabHeader_ItemSettings}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.3*"/>
@@ -111,7 +117,7 @@
                         <ColumnDefinition Width="0.6*"/>
                     </Grid.ColumnDefinitions>
 
-                    <GroupBox Grid.Column="0" Header="項目一覧">
+                    <GroupBox Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_ItemList}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -119,11 +125,11 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Grid.Row="0" Margin="5" Orientation="Horizontal">
-                                <Button Content="分類追加" Width="75" Command="{StaticResource AddCategoryCommand}" ToolTip="Shift+Ctrl++"/>
-                                <Button Content="項目追加" Width="75" Command="{StaticResource AddItemCommand}" ToolTip="Ctrl++"/>
-                                <Button Content="削除" Width="50" Command="{StaticResource DeleteItemCommand}" ToolTip="Delete"/>
-                                <Button Content="↑" Width="25" Command="{StaticResource RaiseItemSortOrderCommand}" ToolTip="Ctrl+↑"/>
-                                <Button Content="↓" Width="25" Command="{StaticResource DropItemSortOrderCommand}" ToolTip="Ctrl+↓"/>
+                                <Button Width="80" Content="{x:Static properties:Resources.Button_AddCategory}" Command="{StaticResource AddCategoryCommand}" ToolTip="Shift+Ctrl++"/>
+                                <Button Width="80" Content="{x:Static properties:Resources.Button_AddItem}" Command="{StaticResource AddItemCommand}" ToolTip="Ctrl++"/>
+                                <Button Width="50" Content="{x:Static properties:Resources.Button_Delete}" Command="{StaticResource DeleteItemCommand}" ToolTip="Delete"/>
+                                <Button Width="25" Content="{x:Static properties:Resources.Button_RaiseSortOrder}" Command="{StaticResource RaiseItemSortOrderCommand}" ToolTip="Ctrl+↑"/>
+                                <Button Width="25" Content="{x:Static properties:Resources.Button_DropSortOrder}" Command="{StaticResource DropItemSortOrderCommand}" ToolTip="Ctrl+↓"/>
                             </StackPanel>
 
                             <TreeView x:Name="hierarchicalTreeView" Grid.Row="1" Margin="5" ItemsSource="{Binding HierarchicalVMList}"
@@ -166,7 +172,7 @@
                             <RowDefinition Height="0.3*"/>
                         </Grid.RowDefinitions>
 
-                        <GroupBox Grid.Row="0" Header="項目情報">
+                        <GroupBox Grid.Row="0" Header="{x:Static properties:Resources.GroupHeader_ItemInformation}">
                             <GroupBox.InputBindings>
                                 <KeyBinding Gesture="Ctrl+S" Command="{StaticResource SaveItemInfoCommand}"/>
                             </GroupBox.InputBindings>
@@ -187,18 +193,43 @@
                                 <TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                            Text="{Binding Id, TargetNullValue='--'}"/>
                                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
-                                           Text="ソート順"/>
+                                           Text="{x:Static properties:Resources.TextBlock_SortOrder}"/>
                                 <TextBlock Grid.Row="1" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                            Text="{Binding SortOrder}"/>
                                 <TextBlock Grid.Row="2" Grid.Column="0" Margin="5"
-                                           Text="項目名"/>
+                                           Text="{x:Static properties:Resources.TextBlock_ItemName}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Kind}" Value="Item">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5"
+                                           Text="{x:Static properties:Resources.TextBlock_CategoryName}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Kind}" Value="Category">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                                 <TextBox Grid.Row="2" Grid.Column="1" Margin="5" 
                                                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsRenamable, Converter={StaticResource NegationConverter}}"/>
-                                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Content="確定" Command="{StaticResource SaveItemInfoCommand}" ToolTip="Ctrl+S"/>
+                                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" 
+                                        Content="{x:Static properties:Resources.Button_Save}" Command="{StaticResource SaveItemInfoCommand}" ToolTip="Ctrl+S"/>
                             </Grid>
                         </GroupBox>
 
-                        <GroupBox Grid.Row="1" Header="関連付け">
+                        <GroupBox Grid.Row="1" Header="{x:Static properties:Resources.GroupHeader_Linkage}">
                             <ListBox Margin="5" ItemsSource="{Binding RelationVMList}" SelectedItem="{Binding SelectedRelationVM}" IsEnabled="{Binding IsSettable}">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
@@ -207,6 +238,7 @@
                                                 <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
+                                            
                                             <CheckBox Grid.Column="0" IsChecked="{Binding IsRelated}" Command="{StaticResource ChangeItemRelationCommand}"/>
                                             <TextBlock Grid.Column="1" Text="{Binding Name}"/>
                                         </Grid>
@@ -215,7 +247,7 @@
                             </ListBox>
                         </GroupBox>
 
-                        <GroupBox Grid.Row="2" Header="店舗">
+                        <GroupBox Grid.Row="2" Header="{x:Static properties:Resources.GroupHeader_Shop}">
                             <DataGrid Margin="5" x:Name="shopDataGrid" 
                                       ItemsSource="{Binding ShopVMList}" SelectedItem="{Binding SelectedShopVM}" IsEnabled="{Binding IsSettable}"
                                       IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
@@ -232,14 +264,14 @@
                                     <KeyBinding Gesture="Delete" Command="{StaticResource DeleteShopNameCommand}"/>
                                 </DataGrid.InputBindings>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="店名" Width="*" Binding="{Binding Name}"/>
-                                    <DataGridTextColumn Header="使用回数" Width="*" Binding="{Binding UsedCount}"/>
-                                    <DataGridTextColumn Header="最終使用日" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_UsageCount}" Width="*" Binding="{Binding UsedCount}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>
 
-                        <GroupBox Grid.Row="3" Header="備考">
+                        <GroupBox Grid.Row="3" Header="{x:Static properties:Resources.GroupHeader_Remark}">
                             <DataGrid Margin="5" x:Name="remarkDataGrid" 
                                       ItemsSource="{Binding RemarkVMList}" SelectedItem="{Binding SelectedRemarkVM}" IsEnabled="{Binding IsSettable}"
                                       IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
@@ -256,16 +288,17 @@
                                     <KeyBinding Gesture="Delete" Command="{StaticResource DeleteRemarkCommand}"/>
                                 </DataGrid.InputBindings>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="備考" Width="*" Binding="{Binding Remark}"/>
-                                    <DataGridTextColumn Header="使用回数" Width="*" Binding="{Binding UsedCount}"/>
-                                    <DataGridTextColumn Header="最終使用日" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Remark}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_UsageCount}" Width="*" Binding="{Binding UsedCount}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>
                     </Grid>
                 </Grid>
             </TabItem>
-            <TabItem Header="帳簿設定">
+            <!-- 帳簿設定 -->
+            <TabItem Header="{x:Static properties:Resources.TabHeader_BookSettings}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.3*"/>
@@ -273,7 +306,7 @@
                         <ColumnDefinition Width="0.6*"/>
                     </Grid.ColumnDefinitions>
 
-                    <GroupBox Grid.Column="0" Header="帳簿一覧">
+                    <GroupBox Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_BookList}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -281,10 +314,10 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Grid.Row="0" Margin="5" Orientation="Horizontal">
-                                <Button Content="追加" Width="50" Command="{StaticResource AddBookCommand}" ToolTip="Ctrl++"/>
-                                <Button Content="削除" Width="50" Command="{StaticResource DeleteBookCommand}" ToolTip="Del"/>
-                                <Button Content="↑" Width="25" Command="{StaticResource RaiseBookSortOrderCommand}" ToolTip="Ctrl+↑"/>
-                                <Button Content="↓" Width="25" Command="{StaticResource DropBookSortOrderCommand}" ToolTip="Ctrl+↓"/>
+                                <Button Content="{x:Static properties:Resources.Button_Add}" Width="50" Command="{StaticResource AddBookCommand}" ToolTip="Ctrl++"/>
+                                <Button Content="{x:Static properties:Resources.Button_Delete}" Width="50" Command="{StaticResource DeleteBookCommand}" ToolTip="Del"/>
+                                <Button Content="{x:Static properties:Resources.Button_RaiseSortOrder}" Width="25" Command="{StaticResource RaiseBookSortOrderCommand}" ToolTip="Ctrl+↑"/>
+                                <Button Content="{x:Static properties:Resources.Button_DropSortOrder}" Width="25" Command="{StaticResource DropBookSortOrderCommand}" ToolTip="Ctrl+↓"/>
                             </StackPanel>
 
                             <ListBox Grid.Row="1" Margin="5" 
@@ -308,7 +341,7 @@
                             <RowDefinition Height="1.0*"/>
                         </Grid.RowDefinitions>
 
-                        <GroupBox Grid.Row="0" Header="帳簿情報">
+                        <GroupBox Grid.Row="0" Header="{x:Static properties:Resources.GroupHeader_BookInformation}">
                             <GroupBox.InputBindings>
                                 <KeyBinding Gesture="Ctrl+S" Command="{StaticResource SaveBookInfoCommand}"/>
                             </GroupBox.InputBindings>
@@ -337,22 +370,25 @@
                                            Text="{Binding Id, TargetNullValue='--'}"/>
                                 
                                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
-                                           Text="ソート順"/>
+                                           Text="{x:Static properties:Resources.TextBlock_SortOrder}"/>
                                 <TextBlock Grid.Row="1" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                            Text="{Binding SortOrder}"/>
 
-                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="帳簿名"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
+                                           Text="{x:Static properties:Resources.TextBlock_BookName}"/>
                                 <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Text="帳簿種別"/>
+                                <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
+                                           Text="{x:Static properties:Resources.TextBlock_BookKind}"/>
                                 <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                         ItemsSource="{Binding BookKindDic}" SelectedValue="{Binding SelectedBookKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
 
-                                <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" Text="初期残高"/>
+                                <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
+                                           Text="{x:Static properties:Resources.TextBlock_InitialBalance}"/>
                                 <controls:NumericUpDown Grid.Row="4" Grid.Column="1" Margin="5" Value="{Binding InitialValue}"/>
 
-                                <GroupBox Grid.Row="5" Grid.ColumnSpan="4" Header="期間情報">
+                                <GroupBox Grid.Row="5" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_TermInformation}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
@@ -367,19 +403,23 @@
                                             <ColumnDefinition SharedSizeGroup="Button"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="開始日"/>
-                                        <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" Content="指定" IsChecked="{Binding StartDateExists}"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
+                                                   Text="{x:Static properties:Resources.TextBlock_StartDate}"/>
+                                        <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" 
+                                                  Content="{x:Static properties:Resources.CheckBox_Setting}" IsChecked="{Binding StartDateExists}"/>
                                         <controls:DateTimePicker Grid.Row="0" Grid.Column="2" Margin="1" IsEnabled="{Binding StartDateExists}"
                                                                  DateFormat="yyyy-MM-dd" SelectedDate="{Binding StartDate}"/>
 
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="終了日"/>
-                                        <CheckBox Grid.Row="1" Grid.Column="1" Margin="5" Content="指定" IsChecked="{Binding EndDateExists}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
+                                                   Text="{x:Static properties:Resources.TextBlock_EndDate}"/>
+                                        <CheckBox Grid.Row="1" Grid.Column="1" Margin="5" 
+                                                  Content="{x:Static properties:Resources.CheckBox_Setting}" IsChecked="{Binding EndDateExists}"/>
                                         <controls:DateTimePicker Grid.Row="1" Grid.Column="2" Margin="1" IsEnabled="{Binding EndDateExists}"
                                                                  DateFormat="yyyy-MM-dd" SelectedDate="{Binding EndDate}"/>
                                     </Grid>
                                 </GroupBox>
                                 
-                                <GroupBox Grid.Row="6" Grid.ColumnSpan="4" Header="支払情報" IsEnabled="{Binding NeedToPay}">
+                                <GroupBox Grid.Row="6" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_PaymentInformation}" IsEnabled="{Binding NeedToPay}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
@@ -391,22 +431,20 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition SharedSizeGroup="Button"/>
                                         </Grid.ColumnDefinitions>
-                                        
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="支払元帳簿"/>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_PaymentBook}"/>
                                         <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                                 ItemsSource="{Binding DebitBookVMList}" SelectedItem="{Binding SelectedDebitBookVM}" DisplayMemberPath="Name"/>
 
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="支払日"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_PaymentDate}"/>
                                         <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" 
                                                                 MinValue="1" MaxValue="31" Value="{Binding PayDay, TargetNullValue=''}"/>
                                     </Grid>
                                 </GroupBox>
 
-                                <GroupBox Grid.Row="7" Grid.ColumnSpan="4" Header="CSV情報" IsEnabled="{Binding CsvDataExists}">
+                                <GroupBox Grid.Row="7" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_CSVInformation}" IsEnabled="{Binding CsvDataExists}">
                                     <Grid>
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
@@ -417,26 +455,49 @@
                                             <ColumnDefinition SharedSizeGroup="Button"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="フォルダパス"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5"
+                                                   Text="{x:Static properties:Resources.TextBlock_FolderPath}"/>
                                         <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                  Text="{Binding CsvFolderPath, UpdateSourceTrigger=PropertyChanged}"/>
                                         <Button Grid.Row="0" Grid.Column="3" Margin="5" Content="..." Command="{StaticResource CsvFolderPathDialogCommand}"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="日付位置(1開始)"/>
-                                        <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" MinValue="0"
-                                                                            Value="{Binding ActDateIndex, TargetNullValue=''}"/>
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="支出位置(1開始)"/>
-                                        <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" MinValue="0"
-                                                                            Value="{Binding OutgoIndex, TargetNullValue=''}"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Text="項目名位置(1開始)"/>
-                                        <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" MinValue="0"
-                                                                            Value="{Binding ItemNameIndex, TargetNullValue=''}"/>
+
+                                        <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" 
+                                                  Header="{x:Static properties:Resources.GroupHeader_ColumnIndex}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition SharedSizeGroup="Header"/>
+                                                    <ColumnDefinition SharedSizeGroup="Number"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition SharedSizeGroup="Button"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
+                                                           Text="{x:Static properties:Resources.TextBlock_Date}"/>
+                                                <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="1"
+                                                                                Value="{Binding ActDateIndex, TargetNullValue=''}"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
+                                                           Text="{x:Static properties:Resources.TextBlock_Expenses}"/>
+                                                <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" MinValue="1"
+                                                                                Value="{Binding ExpensesIndex, TargetNullValue=''}"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
+                                                           Text="{x:Static properties:Resources.TextBlock_ItemName}"/>
+                                                <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" MinValue="1"
+                                                                                Value="{Binding ItemNameIndex, TargetNullValue=''}"/>
+                                            </Grid>
+                                        </GroupBox>
                                     </Grid>
                                 </GroupBox>
-                                <Button Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" Content="確定" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
+                                <Button Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" 
+                                        Content="{x:Static properties:Resources.Button_Save}" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
                             </Grid>
                         </GroupBox>
 
-                        <GroupBox Grid.Row="1" Header="関連付け">
+                        <GroupBox Grid.Row="1" Header="{x:Static properties:Resources.GroupHeader_Linkage}">
                             <Grid>
                                 <ListBox Margin="5" ItemsSource="{Binding RelationVMList}" SelectedItem="{Binding SelectedRelationVM}">
                                     <ListBox.ItemTemplate>
@@ -457,10 +518,11 @@
                     </Grid>
                 </Grid>
             </TabItem>
-            <TabItem Header="その他">
+            <!-- その他 -->
+            <TabItem Header="{x:Static properties:Resources.TabHeader_OtherSettings}">
                 <ScrollViewer>
                     <StackPanel Grid.IsSharedSizeScope="True" Margin="0,0,5,0">
-                        <GroupBox Header="データベース">
+                        <GroupBox Header="{x:Static properties:Resources.GroupHeader_DataBaseInformation}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
@@ -481,11 +543,33 @@
                                 <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding RestoreExePath}" IsReadOnly="True"/>
                                 <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource RestoreExePathDialogCommand}"/>
 
-                                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Content="データベース通信設定を再登録する(再起動)"
+                                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" 
+                                        Content="{x:Static properties:Resources.Button_ReregisterDatabaseSetting}"
                                         Command="{StaticResource RestartForDbSettingCommand}"/>
                             </Grid>
                         </GroupBox>
-                        <GroupBox Header="バックアップ">
+                        <GroupBox Header="{x:Static properties:Resources.GroupHeader_LanguageInformation}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition SharedSizeGroup="Header"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
+                                           Text="{x:Static properties:Resources.TextBlock_Language}"/>
+                                <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
+                                          ItemsSource="{Binding CultureNameDic}" SelectedValue="{Binding SelectedCultureName}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5"
+                                        Content="{x:Static properties:Resources.Button_ApplyLanguage}"
+                                        Command="{StaticResource RestartForLanguageCommand}"/>
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Header="{x:Static properties:Resources.GroupHeader_BackUpInformation}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
@@ -502,17 +586,21 @@
                                     <ColumnDefinition SharedSizeGroup="Button"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="個数" Margin="5" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
+                                           Text="{x:Static properties:Resources.TextBlock_Count}"/>
                                 <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="0" MaxValue="100" Value="{Binding BackUpNum}"/>
 
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="フォルダ" Margin="5" VerticalAlignment="Center"/>
-                                <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" Text="{Binding BackUpFolderPath}" IsReadOnly="True"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
+                                           Text="{x:Static properties:Resources.TextBlock_FolderPath}"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsReadOnly="True" 
+                                         Text="{Binding BackUpFolderPath}"/>
                                 <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="..." Command="{StaticResource BackUpFolderPathDialogCommand}"/>
 
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="タイミング" Margin="5"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
+                                           Text="{x:Static properties:Resources.TextBlock_Timing}"/>
                                 <GroupBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="5">
                                     <GroupBox.Header>
-                                        <CheckBox Content="メインウィンドウ最小化時" IsChecked="{Binding BackUpFlagAtMinimizing}"/>
+                                        <CheckBox Content="{x:Static properties:Resources.CheckBox_Timing_MinimizingMainWindow}" IsChecked="{Binding BackUpFlagAtMinimizing}"/>
                                     </GroupBox.Header>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -521,21 +609,27 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         
-                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="インターバル" Margin="5" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
+                                                   Text="{x:Static properties:Resources.TextBlock_Interval}"/>
                                         <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" MinValue="0" Value="{Binding BackUpIntervalAtMinimizing}"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="2" Text="分" Margin="5" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="2" Margin="5" VerticalAlignment="Center" 
+                                                   Text="{x:Static properties:Resources.TextBlock_MinutesUnit}"/>
                                     </Grid>
                                 </GroupBox>
-                                <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="メインウィンドウクローズ時" IsChecked="{Binding BackUpFlagAtClosing}"/>
+                                <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
+                                          Content="{x:Static properties:Resources.CheckBox_Timing_ClosingMainWindow}" IsChecked="{Binding BackUpFlagAtClosing}"/>
 
-                                <TextBlock Grid.Row="4" Grid.Column="0" Text="パスワード" Margin="5"/>
-                                <RadioButton Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_input" Content="入力ウィンドウを表示する" Margin="5"
+                                <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
+                                           Text="{x:Static properties:Resources.TextBlock_Password}"/>
+                                <RadioButton Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_input" Margin="5" 
+                                             Content="{x:Static properties:Resources.RadioButton_Password_ShowInputWindow}"
                                              IsChecked="{Binding PasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=InputWindow}"/>
-                                <RadioButton Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_pgpass" Content="pgpass.conf を指定する" Margin="5"
+                                <RadioButton Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_pgpass" Margin="5" 
+                                             Content="{x:Static properties:Resources.RadioButton_Password_SpecifyPgpassConf}"
                                              IsChecked="{Binding PasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=PgPassConf}"/>
                             </Grid>
                         </GroupBox>
-                        <GroupBox Header="カレンダー">
+                        <GroupBox Header="{x:Static properties:Resources.GroupHeader_CalendarInformation}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
@@ -548,9 +642,11 @@
                                     <ColumnDefinition SharedSizeGroup="Button"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="開始月" Margin="5" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
+                                           Text="{x:Static properties:Resources.TextBlock_StartMonth}"/>
                                 <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="1" MaxValue="12" Value="{Binding StartMonth}"/>
-                                <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Header="国民の祝日" Margin="5">
+                                <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" 
+                                          Header="{x:Static properties:Resources.GroupHeader_Holiday}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
@@ -566,13 +662,30 @@
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="URI" Margin="5" VerticalAlignment="Center"/>
                                         <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Text="{Binding NationalHolidayCsvURI}"/>
 
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="日付位置(1開始)" Margin="5" VerticalAlignment="Center"/>
-                                        <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" MinValue="0" Value="{Binding NationalHolidayCsvDateIndex}"/>
+                                        <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
+                                                  Header="{x:Static properties:Resources.GroupHeader_ColumnIndex}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition SharedSizeGroup="Header"/>
+                                                    <ColumnDefinition SharedSizeGroup="Number"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition SharedSizeGroup="Button"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
+                                                           Text="{x:Static properties:Resources.TextBlock_Date}"/>
+                                                <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="1" Value="{Binding NationalHolidayCsvDateIndex}"/>
+                                            </Grid>
+                                            
+                                        </GroupBox>
                                     </Grid>
                                 </GroupBox>
                             </Grid>
                         </GroupBox>
-                        <GroupBox Header="ウィンドウ">
+                        <GroupBox Header="{x:Static properties:Resources.GroupHeader_WindowInformation}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
@@ -584,9 +697,10 @@
                                     <ColumnDefinition SharedSizeGroup="Button"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="保存対象" Margin="5" VerticalAlignment="Center"/>
-                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" Content="メインウィンドウ以外の位置" IsChecked="{Binding IsPositionSaved}" />
-
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
+                                           Text="{x:Static properties:Resources.TextBlock_SaveTarget}"/>
+                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" 
+                                          Content="{x:Static properties:Resources.CheckBox_SaveTarget_PositionWithoutMainWindow}" IsChecked="{Binding IsPositionSaved}"/>
 
                                 <DataGrid Grid.Row="1" Grid.ColumnSpan="3" Margin="5" ItemsSource="{Binding WindowSettingVMList}"
                                                   IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
@@ -600,7 +714,7 @@
                                         </Style>
                                     </DataGrid.ColumnHeaderStyle>
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="種別" Width="*" Binding="{Binding Kind}"/>
+                                        <DataGridTextColumn Header="Title" Width="*" Binding="{Binding Title}"/>
                                         <DataGridTextColumn Header="Left" Width="*" Binding="{Binding Left}"/>
                                         <DataGridTextColumn Header="Top" Width="*" Binding="{Binding Top}"/>
                                         <DataGridTextColumn Header="Width" Width="*" Binding="{Binding Width}"/>
@@ -612,7 +726,7 @@
                         
                         <GroupBox>
                             <GroupBox.Header>
-                                <CheckBox Content="デバッグ" IsChecked="{Binding DebugMode}"/>
+                                <CheckBox Content="{x:Static properties:Resources.GroupHeader_Debug}" IsChecked="{Binding DebugMode}"/>
                             </GroupBox.Header>
 
                             <Grid Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}">
@@ -625,7 +739,8 @@
                                     <ColumnDefinition SharedSizeGroup="Button"/>
                                 </Grid.ColumnDefinitions>
 
-                                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Content="位置・サイズを初期化する(再起動)"
+                                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" 
+                                        Content="{x:Static properties:Resources.Button_InitializeWindowPositionAndSize}"
                                         Command="{StaticResource InitializeWindowSettingCommand}"/>
                             </Grid>
                         </GroupBox>

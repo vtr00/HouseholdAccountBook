@@ -4,6 +4,8 @@
              xmlns:local="clr-namespace:HouseholdAccountBook"
              xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
              xmlns:converters="clr-namespace:HouseholdAccountBook.Converters"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:sysglb="clr-namespace:System.Globalization;assembly=mscorlib"
              Startup="App_Startup">
 
     <Application.Resources>
@@ -24,5 +26,10 @@
 
         <!-- 設定 -->
         <properties:Settings x:Key="Settings"/>
+        <!-- 言語 -->
+        <sysglb:CultureInfo x:Key="AppCulture">ja-JP</sysglb:CultureInfo>
+
+        <!-- 日時 -->
+        <system:DateTime x:Key="DateTime"/>
     </Application.Resources>
 </Application>

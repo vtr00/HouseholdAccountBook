@@ -44,7 +44,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 合計
         /// </summary>
-        public int? Summary { get; set; } = null;
+        public int? Total { get; set; } = null;
 
         /// <summary>
         /// その他名称
@@ -96,7 +96,7 @@ namespace HouseholdAccountBook.ViewModels
             this.ItemName = summary.ItemName;
             this.OtherName = summary.OtherName;
 
-            this.Summary = summary.Summary;
+            this.Total = summary.Total;
         }
     }
 }
