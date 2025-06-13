@@ -1,25 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace HouseholdAccountBook.Dao
+namespace HouseholdAccountBook.DbHandler.Abstract
 {
     /// <summary>
-    /// Data Access Object
+    /// Db Handler Base クラス
     /// </summary>
-    public abstract partial class DaoBase : IDisposable
+    public abstract class DbHandlerBase : IDisposable
     {
+        /// <summary>
+        /// 接続情報
+        /// </summary>
+        public abstract class ConnectInfo { }
+
         /// <summary>
         /// DB接続
         /// </summary>
         protected DbConnection connection;
 
         /// <summary>
-        /// <see cref="DaoBase"/> クラスの新しいインスタンスを初期化します。
+        /// <see cref="DbHandlerBase"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="connection">DB接続</param>
-        public DaoBase(DbConnection connection)
+        public DbHandlerBase(DbConnection connection)
         {
             this.connection = connection;
             this.Open();
@@ -66,20 +72,70 @@ namespace HouseholdAccountBook.Dao
         }
 
         /// <summary>
+        /// [非同期]クエリを実行する
+        /// </summary>
+        /// <param name="sql">SQL</param>
+        /// <param name="objects">SQLパラメータ</param>
+        /// <returns>DBデータリーダ</returns>
+        protected abstract Task<DbDataReader> ExecuteReaderAsync(string sql, params object[] objects);
+
+        /// <summary>
         /// [非同期]非クエリを実行する
         /// </summary>
         /// <param name="sql">SQL</param>
         /// <param name="objects">引数リスト</param>
         /// <returns>更新レコード数</returns>
-        public abstract Task<int> ExecNonQueryAsync(string sql, params object[] objects);
+        public async Task<int> ExecNonQueryAsync(string sql, params object[] objects)
+        {
+            try {
+                return await this.CreateCommand(sql, objects).ExecuteNonQueryAsync();
+            }
+            catch (Exception e) {
+                throw e;
+            }
+        }
 
         /// <summary>
         /// [非同期]クエリを実行する
         /// </summary>
         /// <param name="sql">SQL</param>
-        /// <param name="objects">引数リスト</param>
+        /// <param name="objects">SQLパラメータ</param>
         /// <returns>DAOリーダ</returns>
-        public abstract Task<DaoReader> ExecQueryAsync(string sql, params object[] objects);
+        public async Task<DbReader> ExecQueryAsync(string sql, params object[] objects)
+        {
+            try {
+                LinkedList<Dictionary<string, object>> resultSet = new LinkedList<Dictionary<string, object>>();
+
+                using (DbDataReader reader = await this.ExecuteReaderAsync(sql, objects)) {
+                    // フィールド名の取得
+                    List<string> fieldList = new List<string>();
+                    for (int i = 0; i < reader.FieldCount; ++i) {
+                        fieldList.Add(reader.GetName(i));
+                    }
+
+                    // レコードの取得
+                    while (reader.Read()) {
+                        Dictionary<string, object> result = new Dictionary<string, object>();
+                        foreach (string fieldName in fieldList) {
+                            result.Add(fieldName, reader[fieldName]);
+                        }
+                        resultSet.AddLast(result);
+                    }
+                }
+                return new DbReader(sql, resultSet);
+            }
+            catch (Exception e) {
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// DBコマンドを生成する
+        /// </summary>
+        /// <param name="sql">SQL</param>
+        /// <param name="objects">引数リスト</param>
+        /// <returns>DBコマンド</returns>
+        protected abstract DbCommand CreateCommand(string sql, params object[] objects);
 
         /// <summary>
         /// [同期]トランザクション内の処理

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace HouseholdAccountBook.Dao
+namespace HouseholdAccountBook.DbHandler
 {
     /// <summary>
     /// クエリ実行結果の処理
     /// </summary>
-    public partial class DaoReader
+    public partial class DbReader
     {
         /// <summary>
         /// 実行されたSQL(デバッグ用)
@@ -34,7 +33,7 @@ namespace HouseholdAccountBook.Dao
         /// </summary>
         /// <param name="sql">実行SQL</param>
         /// <param name="resultSet">実行結果</param>
-        public DaoReader(string sql, LinkedList<Dictionary<string, object>> resultSet)
+        public DbReader(string sql, LinkedList<Dictionary<string, object>> resultSet)
         {
             this.sql = sql;
             this.resultSet = resultSet;
@@ -79,12 +78,6 @@ namespace HouseholdAccountBook.Dao
         public delegate void ExectionARow(Record record);
 
         /// <summary>
-        /// [非同期]1レコードだけの処理
-        /// </summary>
-        /// <param name="record">レコード</param>
-        public delegate Task ExectionARowAsync(Record record);
-
-        /// <summary>
         /// [同期]1レコードだけ読み込む
         /// </summary>
         /// <param name="exection">レコードの処理</param>
@@ -98,6 +91,12 @@ namespace HouseholdAccountBook.Dao
                 throw new InvalidOperationException("有効なレコードがありません。");
             }
         }
+
+        /// <summary>
+        /// [非同期]1レコードだけの処理
+        /// </summary>
+        /// <param name="record">レコード</param>
+        public delegate Task ExectionARowAsync(Record record);
 
         /// <summary>
         /// [非同期]1レコードだけ読み込む
@@ -123,14 +122,6 @@ namespace HouseholdAccountBook.Dao
         public delegate bool ExectionWholeRow(int count, Record record);
 
         /// <summary>
-        /// [非同期]複数行の処理
-        /// </summary>
-        /// <param name="count">現在の行数</param>
-        /// <param name="record">レコード</param>
-        /// <returns>継続の有無</returns>
-        public delegate Task<bool> ExectionWholeRowAsync(int count, Record record);
-
-        /// <summary>
         /// [同期]複数レコードを読み込む
         /// </summary>
         /// <param name="exection">レコードの処理</param>
@@ -151,6 +142,14 @@ namespace HouseholdAccountBook.Dao
                 ;
             }
         }
+
+        /// <summary>
+        /// [非同期]複数行の処理
+        /// </summary>
+        /// <param name="count">現在の行数</param>
+        /// <param name="record">レコード</param>
+        /// <returns>継続の有無</returns>
+        public delegate Task<bool> ExectionWholeRowAsync(int count, Record record);
 
         /// <summary>
         /// [非同期]複数レコードを読み込む

@@ -3,7 +3,7 @@
 namespace HouseholdAccountBook.UserEventArgs
 {
     /// <summary>
-    /// イベントのデータを含み、イベント データを含むイベントに使用する値を提供するクラスを表します。
+    /// イベントに使用する値を提供するクラスを表します。
     /// </summary>
     /// <typeparam name="TType1">イベントデータの型1</typeparam>
     /// <typeparam name="TType2">イベントデータの型2</typeparam>

@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Dao;
+﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.DbHandler.Abstract;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
@@ -21,9 +22,9 @@ namespace HouseholdAccountBook.Windows
     {
         #region フィールド
         /// <summary>
-        /// DAOビルダ
+        /// DBハンドラファクトリ
         /// </summary>
-        private readonly DaoBuilder builder;
+        private readonly DbHandlerFactory dbHandlerFactory;
         /// <summary>
         /// <see cref="MainWindow"/>で選択された帳簿ID
         /// </summary>
@@ -81,13 +82,13 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// 帳簿項目(移動)の新規登録のために <see cref="MoveRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="builder">DAOビルダ</param>
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="selectedBookId">帳簿ID</param>
         /// <param name="selectedMonth">選択された年月</param>
         /// <param name="selectedDate">選択された日付</param>
-        public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate)
+        public MoveRegistrationWindow(DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate)
         {
-            this.builder = builder;
+            this.dbHandlerFactory = dbHandlerFactory;
             this.selectedBookId = selectedBookId;
             this.selectedMonth = selectedMonth;
             this.selectedDate = selectedDate;
@@ -101,13 +102,13 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// 帳簿項目(移動)の編集(複製)のために <see cref="MoveRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="builder">DAOビルダ</param>
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="selectedBookId">選択された帳簿ID</param>
         /// <param name="selectedGroupId">グループID</param>
         /// <param name="mode">登録モード</param>
-        public MoveRegistrationWindow(DaoBuilder builder, int? selectedBookId, int selectedGroupId, RegistrationKind mode = RegistrationKind.Edit)
+        public MoveRegistrationWindow(DbHandlerFactory dbHandlerFactory, int? selectedBookId, int selectedGroupId, RegistrationKind mode = RegistrationKind.Edit)
         {
-            this.builder = builder;
+            this.dbHandlerFactory = dbHandlerFactory;
             this.selectedBookId = selectedBookId;
             this.selectedMonth = null;
             this.selectedDate = null;
@@ -220,8 +221,8 @@ namespace HouseholdAccountBook.Windows
                     int moveValue = -1;
                     int commissionValue = 0;
 
-                    using (DaoBase dao = this.builder.Build()) {
-                        DaoReader reader = await dao.ExecQueryAsync(@"
+                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                        DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT A.book_id, A.action_id, A.item_id, A.act_time, A.act_value, A.remark, I.move_flg
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
@@ -319,8 +320,8 @@ ORDER BY move_flg DESC;", this.selectedGroupId);
 
             int? debitBookId = null;
             int? payDay = null;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
                 reader.ExecWholeRow((count, record) => {
                     BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
@@ -377,7 +378,7 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
             ObservableCollection<ItemViewModel> itemVMList = new ObservableCollection<ItemViewModel>();
             ItemViewModel selectedItemVM = null;
 
-            using (DaoBase dao = this.builder.Build()) {
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                 int bookId = -1;
                 switch (this.WVM.SelectedCommissionKind) {
                     case CommissionKind.MoveFrom:
@@ -387,7 +388,7 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
                         bookId = this.WVM.SelectedToBookVM.Id.Value;
                         break;
                 }
-                DaoReader reader = await dao.ExecQueryAsync(@"
+                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT I.item_id, I.item_name, C.category_name
 FROM mst_item I
 INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
@@ -426,8 +427,8 @@ ORDER BY C.sort_order, I.sort_order;", (int)BalanceKind.Expenses, bookId);
             };
             string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0].Remark;
             RemarkViewModel selectedRemarkVM = remarkVMList[0]; // UNUSED
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT R.remark, COUNT(A.remark) AS remark_count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
 FROM hst_remark R
 LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.remark = R.remark AND A.item_id = R.item_id
@@ -506,21 +507,21 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
             string remark = this.WVM.SelectedRemark;
 
             int tmpGroupId = -1; // ローカル用
-            using (DaoBase dao = this.builder.Build()) {
-                await dao.ExecTransactionAsync(async () => {
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await dbHandler.ExecTransactionAsync(async () => {
                     switch (this.WVM.RegMode) {
                         case RegistrationKind.Add:
                         case RegistrationKind.Copy: {
                             #region 帳簿項目を追加する
                             // グループIDを取得する
-                            DaoReader reader = await dao.ExecQueryAsync(@"
+                            DbReader reader = await dbHandler.ExecQueryAsync(@"
 INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.Move, Updater, Inserter);
                             reader.ExecARow((record) => {
                                 tmpGroupId = record.ToInt("group_id");
                             });
 
-                            reader = await dao.ExecQueryAsync(@"
+                            reader = await dbHandler.ExecQueryAsync(@"
 -- 移動元
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, (
@@ -535,7 +536,7 @@ VALUES (@{0}, (
                                 });
                             }
 
-                            reader = await dao.ExecQueryAsync(@"
+                            reader = await dbHandler.ExecQueryAsync(@"
 -- 移動先
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, (
@@ -555,7 +556,7 @@ VALUES (@{0}, (
                         case RegistrationKind.Edit: {
                             #region 帳簿項目を変更する
                             tmpGroupId = this.selectedGroupId.Value;
-                            await dao.ExecNonQueryAsync(@"
+                            await dbHandler.ExecNonQueryAsync(@"
 -- 移動元
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
@@ -564,7 +565,7 @@ WHERE action_id = @{4};", fromBookId, fromDate, -actValue, Updater, this.fromAct
                                 resActionIdList.Add(this.fromActionId.Value);
                             }
 
-                            await dao.ExecNonQueryAsync(@"
+                            await dbHandler.ExecNonQueryAsync(@"
 -- 移動先
 UPDATE hst_action
 SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
@@ -592,16 +593,16 @@ WHERE action_id = @{4};", toBookId, toDate, actValue, Updater, this.toActionId);
                                 break;
                         }
 
-                        DaoReader reader = null;
+                        DbReader reader = null;
                         if (this.commissionActionId != null) {
-                            await dao.ExecNonQueryAsync(@"
+                            await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, remark = @{4}, update_time = 'now', updater = @{5}
 WHERE action_id = @{6};", bookId, commissionItemId, actTime, -commission, remark, Updater, this.commissionActionId);
                             resActionIdList.Add(this.commissionActionId.Value);
                         }
                         else {
-                            reader = await dao.ExecQueryAsync(@"
+                            reader = await dbHandler.ExecQueryAsync(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7}) RETURNING action_id;", bookId, commissionItemId, actTime, -commission, tmpGroupId, remark, Updater, Inserter);
                             reader.ExecARow((record) => {
@@ -613,7 +614,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7}) RETURNI
                     else {
                         #region 手数料なし
                         if (this.commissionActionId != null) {
-                            await dao.ExecNonQueryAsync(@"
+                            await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action
 SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE action_id = @{1};", Updater, this.commissionActionId);
@@ -624,17 +625,17 @@ WHERE action_id = @{1};", Updater, this.commissionActionId);
 
                 if (remark != string.Empty) {
                     #region 備考を追加する
-                    DaoReader reader = await dao.ExecQueryAsync(@"
+                    DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT remark FROM hst_remark
 WHERE item_id = @{0} AND remark = @{1};", commissionItemId, remark);
 
                     if (reader.Count == 0) {
-                        await dao.ExecNonQueryAsync(@"
+                        await dbHandler.ExecNonQueryAsync(@"
 INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, 0, @{2}, 0, 'now', @{3}, 'now', @{4});", commissionItemId, remark, fromDate > toDate ? fromDate : toDate, Updater, Inserter);
                     }
                     else {
-                        await dao.ExecNonQueryAsync(@"
+                        await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_remark
 SET used_time = @{0}, del_flg = 0, update_time = 'now', updater = @{1}
 WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", fromDate > toDate ? fromDate : toDate, Updater, commissionItemId, remark);

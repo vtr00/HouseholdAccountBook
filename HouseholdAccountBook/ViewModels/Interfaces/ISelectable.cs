@@ -1,4 +1,4 @@
-﻿namespace HouseholdAccountBook.Interfaces
+﻿namespace HouseholdAccountBook.ViewModels.Interfaces
 {
     /// <summary>
     /// 項目選択が可能なコントロールにバインドするViewModelのためのインターフェイス

@@ -1,7 +1,9 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
-using HouseholdAccountBook.Dao;
+using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.DbHandler.Abstract;
 using HouseholdAccountBook.Dto;
+using HouseholdAccountBook.Dto.Json;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
@@ -32,9 +34,9 @@ namespace HouseholdAccountBook.Windows
     {
         #region フィールド
         /// <summary>
-        /// DAOビルダ
+        /// DBハンドラファクトリ
         /// </summary>
-        private readonly DaoBuilder builder;
+        private readonly DbHandlerFactory dbHandlerFactory;
         /// <summary>
         /// 選択された帳簿ID
         /// </summary>
@@ -59,11 +61,11 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// <see cref="CsvComparisonWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="builder">DAOビルダ</param>
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="selectedBookId">選択された帳簿ID</param>
-        public CsvComparisonWindow(DaoBuilder builder, int? selectedBookId)
+        public CsvComparisonWindow(DbHandlerFactory dbHandlerFactory, int? selectedBookId)
         {
-            this.builder = builder;
+            this.dbHandlerFactory = dbHandlerFactory;
             this.selectedBookId = selectedBookId;
 
             this.InitializeComponent();
@@ -262,14 +264,14 @@ namespace HouseholdAccountBook.Windows
 
             if (recordList.Count() == 1) {
                 CsvComparisonViewModel.CsvRecord record = recordList[0];
-                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, record) { Owner = this };
+                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id.Value, record) { Owner = this };
                 arw.LoadWindowSetting();
 
                 arw.Registrated += func;
                 arw.ShowDialog();
             }
             else {
-                ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id.Value, recordList) { Owner = this };
+                ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id.Value, recordList) { Owner = this };
                 alrw.LoadWindowSetting();
 
                 alrw.Registrated += func;
@@ -297,8 +299,8 @@ namespace HouseholdAccountBook.Windows
         {
             // グループ種別を特定する
             int? groupKind = null;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT A.group_id, G.group_kind
 FROM hst_action A
 LEFT JOIN (SELECT * FROM hst_group WHERE del_flg = 0) G ON G.group_id = A.group_id
@@ -315,7 +317,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedCsvComparisonVM.A
                     break;
                 case (int)GroupKind.ListReg:
                     // リスト登録された帳簿項目の編集時の処理
-                    ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedCsvComparisonVM.GroupId.Value) { Owner = this };
+                    ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedCsvComparisonVM.GroupId.Value) { Owner = this };
                     alrw.LoadWindowSetting();
 
                     // 登録時イベントを登録する
@@ -329,7 +331,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedCsvComparisonVM.A
                 case (int)GroupKind.Repeat:
                 default:
                     // 移動・リスト登録以外の帳簿項目の編集時の処理
-                    ActionRegistrationWindow arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedCsvComparisonVM.ActionId.Value) { Owner = this };
+                    ActionRegistrationWindow arw = new ActionRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedCsvComparisonVM.ActionId.Value) { Owner = this };
                     arw.LoadWindowSetting();
 
                     // 登録時イベントを登録する
@@ -527,15 +529,15 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedCsvComparisonVM.A
 
             ObservableCollection<BookComparisonViewModel> bookCompVMList = new ObservableCollection<BookComparisonViewModel>();
             BookComparisonViewModel selectedBookCompVM = null;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT * 
 FROM mst_book 
 WHERE del_flg = 0 AND book_kind <> @{0}
 ORDER BY sort_order;", (int)BookKind.Wallet);
                 reader.ExecWholeRow((count, record) => {
                     string jsonCode = record["json_code"];
-                    MstBookJsonObject jsonObj = JsonConvert.DeserializeObject<MstBookJsonObject>(jsonCode);
+                    MstBookJsonDto jsonObj = JsonConvert.DeserializeObject<MstBookJsonDto>(jsonCode);
 
                     BookComparisonViewModel vm = new BookComparisonViewModel() {
                         Id = record.ToInt("book_id"),
@@ -632,12 +634,12 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
         private async Task UpdateComparisonVMListAsync(bool isScroll = false)
         {
             // 指定された帳簿内で、日付、金額が一致する帳簿項目を探す
-            using (DaoBase dao = this.builder.Build()) {
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                 foreach (var vm in this.WVM.CsvComparisonVMList) {
                     // 前回の帳簿項目情報をクリアする
                     vm.ClearActionInfo();
 
-                    DaoReader reader = await dao.ExecQueryAsync(@"
+                    DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT A.action_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match, A.group_id
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
@@ -747,8 +749,8 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         /// <returns></returns>
         private async Task SaveIsMatchAsync(int actionId, bool isMatch)
         {
-            using (DaoBase dao = this.builder.Build()) {
-                await dao.ExecNonQueryAsync(@"
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action
 SET is_match = @{0}, update_time = 'now', updater = @{1}
 WHERE action_id = @{2} and is_match <> @{0};", isMatch ? 1 : 0, Updater, actionId);

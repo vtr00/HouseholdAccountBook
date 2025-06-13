@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Dao;
+﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.DbHandler.Abstract;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Windows;
 using Newtonsoft.Json;
@@ -7,7 +8,6 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -31,7 +31,7 @@ namespace HouseholdAccountBook
         /// <summary>
         /// 接続情報
         /// </summary>
-        private DaoNpgsql.ConnectInfo connectInfo = null;
+        private DbHandlerNpgsql.ConnectInfo connectInfo = null;
 #if !DEBUG
         /// <summary>
         /// 多重起動抑止用Mutex
@@ -122,10 +122,10 @@ namespace HouseholdAccountBook
                 settings.Save();
             }
 
-            DaoBuilder builder = null;
+            DbHandlerFactory dbHandlerFactory = null;
             while (true) {
                 // 接続設定を読み込む
-                this.connectInfo = new DaoNpgsql.ConnectInfo() {
+                this.connectInfo = new DbHandlerNpgsql.ConnectInfo() {
                     Host = settings.App_Postgres_Host,
                     Port = settings.App_Postgres_Port,
                     UserName = settings.App_Postgres_UserName,
@@ -137,13 +137,13 @@ namespace HouseholdAccountBook
 #endif
                     Role = settings.App_Postgres_Role
                 };
-                builder = new DaoBuilder(this.connectInfo);
+                dbHandlerFactory = new DbHandlerFactory(this.connectInfo);
 
                 // 接続を試行する
                 bool isOpen = false;
                 try {
-                    using (DaoBase dao = builder.Build()) {
-                        isOpen = dao.IsOpen;
+                    using (DbHandlerBase dbHandler = dbHandlerFactory.Create()) {
+                        isOpen = dbHandler.IsOpen;
                     }
                 }
                 catch (TimeoutException) { }
@@ -171,7 +171,7 @@ namespace HouseholdAccountBook
             this.RegisterToResource();
 
             // DBに接続できる場合だけメインウィンドウを開く
-            MainWindow mw = new MainWindow(builder);
+            MainWindow mw = new MainWindow(dbHandlerFactory);
             this.MainWindow = mw;
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             mw.Show();

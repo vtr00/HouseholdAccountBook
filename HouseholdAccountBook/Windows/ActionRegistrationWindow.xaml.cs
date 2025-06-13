@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Dao;
+﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.DbHandler.Abstract;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
@@ -21,9 +22,9 @@ namespace HouseholdAccountBook.Windows
     {
         #region フィールド
         /// <summary>
-        /// DAOビルダ
+        /// DBハンドラファクトリ
         /// </summary>
-        private readonly DaoBuilder builder;
+        private readonly DbHandlerFactory dbHandler;
         /// <summary>
         /// <see cref="MainWindow"/>で選択された帳簿ID
         /// </summary>
@@ -69,13 +70,13 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// 帳簿項目の新規登録のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="builder">DAOビルダ</param>
+        /// <param name="dbHandler">DBハンドラファクトリ</param>
         /// <param name="selectedBookId">選択された帳簿ID</param>
         /// <param name="selectedMonth">選択された年月</param>
         /// <param name="selectedDate">選択された日付</param>
-        public ActionRegistrationWindow(DaoBuilder builder, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate)
+        public ActionRegistrationWindow(DbHandlerFactory dbHandler, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate)
         {
-            this.builder = builder;
+            this.dbHandler = dbHandler;
             this.selectedBookId = selectedBookId;
             this.selectedMonth = selectedMonth;
             this.selectedDate = selectedDate;
@@ -89,12 +90,12 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// 帳簿項目の新規登録のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="builder">DAOビルダ</param>
+        /// <param name="dbHandler">DBハンドラファクトリ</param>
         /// <param name="selectedBookId">選択された帳簿ID</param>
         /// <param name="selectedRecord">選択されたCSVレコード</param>
-        public ActionRegistrationWindow(DaoBuilder builder, int selectedBookId, CsvComparisonViewModel.CsvRecord selectedRecord)
+        public ActionRegistrationWindow(DbHandlerFactory dbHandler, int selectedBookId, CsvComparisonViewModel.CsvRecord selectedRecord)
         {
-            this.builder = builder;
+            this.dbHandler = dbHandler;
             this.selectedBookId = selectedBookId;
             this.selectedMonth = null;
             this.selectedDate = null;
@@ -110,12 +111,12 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// 帳簿項目の編集(複製)のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="builder">DAOビルダ</param>
+        /// <param name="dbHandler">DBハンドラファクトリ</param>
         /// <param name="selectedActionId">帳簿項目ID</param>
         /// <param name="mode">登録モード</param>
-        public ActionRegistrationWindow(DaoBuilder builder, int selectedActionId, RegistrationKind mode = RegistrationKind.Edit)
+        public ActionRegistrationWindow(DbHandlerFactory dbHandler, int selectedActionId, RegistrationKind mode = RegistrationKind.Edit)
         {
-            this.builder = builder;
+            this.dbHandler = dbHandler;
             this.selectedBookId = null;
             this.selectedMonth = null;
             this.selectedDate = null;
@@ -269,8 +270,8 @@ namespace HouseholdAccountBook.Windows
                 }
                 case RegistrationKind.Edit:
                 case RegistrationKind.Copy: {
-                    using (DaoBase dao = this.builder.Build()) {
-                        DaoReader reader = await dao.ExecQueryAsync(@"
+                    using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                        DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT book_id, item_id, act_time, act_value, group_id, shop_name, remark, is_match
 FROM hst_action 
 WHERE del_flg = 0 AND action_id = @{0};", this.selectedActionId);
@@ -290,8 +291,8 @@ WHERE del_flg = 0 AND action_id = @{0};", this.selectedActionId);
                     // 回数の表示
                     int count = 1;
                     if (this.groupId != null) {
-                        using (DaoBase dao = this.builder.Build()) {
-                            DaoReader reader = await dao.ExecQueryAsync(@"
+                        using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                            DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT COUNT(action_id) count FROM hst_action 
 WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_action WHERE action_id = @{1});", this.groupId, this.selectedActionId);
                             reader.ExecARow((record) => {
@@ -348,8 +349,8 @@ WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_
             // 帳簿を取得する
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
             BookViewModel selectedBookVM = null;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+            using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
                 reader.ExecWholeRow((count, record) => {
                     BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
@@ -376,8 +377,8 @@ SELECT book_id, book_name FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;")
             };
             int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryVM?.Id ?? categoryVMList[0].Id;
             CategoryViewModel selectedCategoryVM = categoryVMList[0];
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+            using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT category_id, category_name FROM mst_category C 
 WHERE del_flg = 0 AND EXISTS (SELECT * FROM mst_item I WHERE I.category_id = C.category_id AND balance_kind = @{0} AND del_flg = 0 
   AND EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{1} AND RBI.item_id = I.item_id)) 
@@ -407,10 +408,10 @@ ORDER BY sort_order;", (int)this.WVM.SelectedBalanceKind, this.WVM.SelectedBookV
             ObservableCollection<ItemViewModel> itemVMList = new ObservableCollection<ItemViewModel>();
             int? tmpItemId = itemId ?? this.WVM.SelectedItemVM?.Id;
             ItemViewModel selectedItemVM = null;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader;
+            using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                DbReader reader;
                 if (this.WVM.SelectedCategoryVM.Id == -1) {
-                    reader = await dao.ExecQueryAsync(@"
+                    reader = await dbHandler.ExecQueryAsync(@"
 SELECT I.item_id, I.item_name, C.category_name
 FROM mst_item I
 INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
@@ -419,7 +420,7 @@ WHERE I.del_flg = 0 AND C.balance_kind = @{0} AND
 ORDER BY C.sort_order, I.sort_order;", (int)this.WVM.SelectedBalanceKind, this.WVM.SelectedBookVM.Id);
                 }
                 else {
-                    reader = await dao.ExecQueryAsync(@"
+                    reader = await dbHandler.ExecQueryAsync(@"
 SELECT I.item_id, I.item_name, C.category_name
 FROM mst_item I
 INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
@@ -458,8 +459,8 @@ ORDER BY I.sort_order;", (int)this.WVM.SelectedCategoryVM.Id, this.WVM.SelectedB
             };
             string selectedShopName = shopName ?? this.WVM.SelectedShopName ?? shopNameVMList[0].Name;
             ShopViewModel selectedShopVM = shopNameVMList[0]; // UNUSED
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+            using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT S.shop_name, COUNT(A.shop_name) AS shop_count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
 FROM hst_shop S
 LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.shop_name = S.shop_name AND A.item_id = S.item_id
@@ -494,8 +495,8 @@ ORDER BY sort_time DESC, shop_count DESC;", this.WVM.SelectedItemVM.Id);
             };
             string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0].Remark;
             RemarkViewModel selectedRemarkVM = remarkVMList[0]; // UNUSED
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+            using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT R.remark, COUNT(A.remark) AS remark_count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
 FROM hst_remark R
 LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.remark = R.remark AND A.item_id = R.item_id
@@ -595,14 +596,14 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
                 return tmpDateTime;
             }
 
-            using (DaoBase dao = this.builder.Build()) {
-                await dao.ExecTransactionAsync(async () => {
+            using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                await dbHandler.ExecTransactionAsync(async () => {
                     switch (this.WVM.RegMode) {
                         case RegistrationKind.Add:
                         case RegistrationKind.Copy: {
                             #region 帳簿項目を追加する
                             if (count == 1) { // 繰返し回数が1回(繰返しなし)
-                                DaoReader reader = await dao.ExecQueryAsync(@"
+                                DbReader reader = await dbHandler.ExecQueryAsync(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 0, 'now', @{6}, 'now', @{7}) RETURNING action_id;",
                                     bookId, itemId, actTime, actValue, shopName, remark, Updater, Inserter);
@@ -614,7 +615,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 0, 'now', @{6}, 'now', @{7}) RETU
                             else { // 繰返し回数が2回以上(繰返しあり)
                                 int tmpGroupId = -1;
                                 // 新規グループIDを取得する
-                                DaoReader reader = await dao.ExecQueryAsync(@"
+                                DbReader reader = await dbHandler.ExecQueryAsync(@"
 INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.Repeat, Updater, Inserter);
                                 reader.ExecARow((record) => {
@@ -623,7 +624,7 @@ VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.
 
                                 DateTime tmpActTime = getDateTimeWithHolidaySettingKind(actTime); // 登録日付
                                 for (int i = 0; i < count; ++i) {
-                                    reader = await dao.ExecQueryAsync(@"
+                                    reader = await dbHandler.ExecQueryAsync(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8}) RETURNING action_id;",
                                         bookId, itemId, tmpActTime, actValue, shopName, tmpGroupId, remark, Updater, Inserter);
@@ -647,7 +648,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8}
                                 #region 繰返し回数が1回
                                 if (this.groupId == null) {
                                     #region グループに属していない
-                                    await dao.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
 WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, this.selectedActionId);
@@ -656,26 +657,26 @@ WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, i
                                 else {
                                     #region グループに属している
                                     // この帳簿項目以降の繰返し分のレコードを削除する
-                                    await dao.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action
 SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE del_flg = 0 AND group_id = @{1} AND act_time > (SELECT act_time FROM hst_action WHERE action_id = @{2});", Updater, this.groupId, this.selectedActionId);
 
                                     // グループに属する項目の個数を調べる
-                                    DaoReader reader = await dao.ExecQueryAsync(@"
+                                    DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT action_id FROM hst_action
 WHERE del_flg = 0 AND group_id = @{0};", this.groupId);
 
                                     if (reader.Count <= 1) {
                                         #region グループに属する項目が1項目以下
                                         // この帳簿項目のグループIDをクリアする
-                                        await dao.ExecNonQueryAsync(@"
+                                        await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = null, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
 WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, this.selectedActionId);
 
                                         // グループを削除する
-                                        await dao.ExecNonQueryAsync(@"
+                                        await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_group
 SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE del_flg = 0 AND group_id = @{1};", Updater, this.groupId);
@@ -684,7 +685,7 @@ WHERE del_flg = 0 AND group_id = @{1};", Updater, this.groupId);
                                     else {
                                         #region グループに属する項目が2項目以上
                                         // この帳簿項目のグループIDをクリアせずに残す
-                                        await dao.ExecNonQueryAsync(@"
+                                        await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, remark = @{5}, is_match = @{6}, update_time = 'now', updater = @{7}
 WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, isMatch, Updater, this.selectedActionId);
@@ -698,11 +699,11 @@ WHERE action_id = @{8};", bookId, itemId, actTime, actValue, shopName, remark, i
                                 #region 繰返し回数が2回以上
                                 List<int> actionIdList = new List<int>();
 
-                                DaoReader reader;
+                                DbReader reader;
                                 if (this.groupId == null) {
                                     #region グループIDが未割当て
                                     // グループIDを取得する
-                                    reader = await dao.ExecQueryAsync(@"
+                                    reader = await dbHandler.ExecQueryAsync(@"
 INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.Repeat, Updater, Inserter);
                                     reader.ExecARow((record) => {
@@ -714,7 +715,7 @@ VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.
                                 else {
                                     #region グループIDが割当て済
                                     // 変更の対象となる帳簿項目を洗い出す
-                                    reader = await dao.ExecQueryAsync(@"
+                                    reader = await dbHandler.ExecQueryAsync(@"
 SELECT action_id FROM hst_action 
 WHERE del_flg = 0 AND group_id = @{0} AND act_time >= (SELECT act_time FROM hst_action WHERE action_id = @{1})
 ORDER BY act_time ASC;", this.groupId, this.selectedActionId);
@@ -729,7 +730,7 @@ ORDER BY act_time ASC;", this.groupId, this.selectedActionId);
 
                                 // この帳簿項目にだけis_matchを反映する
                                 Debug.Assert(actionIdList[0] == this.selectedActionId);
-                                await dao.ExecNonQueryAsync(@"
+                                await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = @{5}, remark = @{6}, is_match = @{7}, update_time = 'now', updater = @{8}
 WHERE action_id = @{9};", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, isMatch, Updater, this.selectedActionId);
@@ -741,14 +742,14 @@ WHERE action_id = @{9};", bookId, itemId, tmpActTime, actValue, shopName, this.g
                                     if (i < count) { // 繰返し回数の範囲内のレコードを更新する
                                         // 連動して編集時のみ変更する
                                         if (isLink) {
-                                            await dao.ExecNonQueryAsync(@"
+                                            await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action
 SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, shop_name = @{4}, group_id = @{5}, remark = @{6}, update_time = 'now', updater = @{7}
 WHERE action_id = @{8};", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, Updater, targetActionId);
                                         }
                                     }
                                     else { // 繰返し回数が帳簿項目数を下回っていた場合に、越えたレコードを削除する
-                                        await dao.ExecNonQueryAsync(@"
+                                        await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action
 SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE action_id = @{1};", Updater, targetActionId);
@@ -759,7 +760,7 @@ WHERE action_id = @{1};", Updater, targetActionId);
 
                                 // 繰返し回数が帳簿項目数を越えていた場合に、新規レコードを追加する
                                 for (int i = actionIdList.Count; i < count; ++i) {
-                                    await dao.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecNonQueryAsync(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8});", bookId, itemId, tmpActTime, actValue, shopName, this.groupId, remark, Updater, Inserter);
 
@@ -777,18 +778,18 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 0, 0, 'now', @{7}, 'now', @{8}
 
                 if (shopName != string.Empty) {
                     #region 店舗を追加する
-                    await dao.ExecTransactionAsync(async () => {
-                        DaoReader reader = await dao.ExecQueryAsync(@"
+                    await dbHandler.ExecTransactionAsync(async () => {
+                        DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT shop_name FROM hst_shop
 WHERE item_id = @{0} AND shop_name = @{1};", itemId, shopName);
 
                         if (reader.Count == 0) {
-                            await dao.ExecNonQueryAsync(@"
+                            await dbHandler.ExecNonQueryAsync(@"
 INSERT INTO hst_shop (item_id, shop_name, used_time, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, 0, 'now', @{3}, 'now', @{4});", itemId, shopName, actTime, Updater, Inserter);
                         }
                         else {
-                            await dao.ExecNonQueryAsync(@"
+                            await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_shop
 SET used_time = @{0}, del_flg = 0, update_time = 'now', updater = @{1}
 WHERE item_id = @{2} AND shop_name = @{3} AND used_time < @{0};", actTime, Updater, itemId, shopName);
@@ -799,18 +800,18 @@ WHERE item_id = @{2} AND shop_name = @{3} AND used_time < @{0};", actTime, Updat
 
                 if (remark != string.Empty) {
                     #region 備考を追加する
-                    await dao.ExecTransactionAsync(async () => {
-                        DaoReader reader = await dao.ExecQueryAsync(@"
+                    await dbHandler.ExecTransactionAsync(async () => {
+                        DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT remark FROM hst_remark
 WHERE item_id = @{0} AND remark = @{1};", itemId, remark);
 
                         if (reader.Count == 0) {
-                            await dao.ExecNonQueryAsync(@"
+                            await dbHandler.ExecNonQueryAsync(@"
 INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, 0, @{2}, 0, 'now', @{3}, 'now', @{4});", itemId, remark, actTime, Updater, Inserter);
                         }
                         else {
-                            await dao.ExecNonQueryAsync(@"
+                            await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_remark
 SET used_time = @{0}, del_flg = 0, update_time = 'now', updater = @{1}
 WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", actTime, Updater, itemId, remark);

@@ -1,5 +1,7 @@
-﻿using HouseholdAccountBook.Dao;
+﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.DbHandler.Abstract;
 using HouseholdAccountBook.Dto;
+using HouseholdAccountBook.Dto.Json;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.Properties;
@@ -35,7 +37,7 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// DAOビルダ
         /// </summary>
-        private readonly DaoBuilder builder;
+        private readonly DbHandlerFactory dbHandlerFactory;
 
         /// <summary>
         /// 移動登録ウィンドウ
@@ -89,11 +91,11 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// <see cref="MainWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="builder">DAOビルダ</param>
-        public MainWindow(DaoBuilder builder)
+        /// <param name="dbHandlerFactory">DAOハンドラファクトリ</param>
+        public MainWindow(DbHandlerFactory dbHandlerFactory)
         {
             this.Name = "Main";
-            this.builder = builder;
+            this.dbHandlerFactory = dbHandlerFactory;
 
             this.windowLog = new WindowLog(this);
             this.windowLog.Log("Constructor", true);
@@ -163,35 +165,35 @@ namespace HouseholdAccountBook.Windows
 
             bool isOpen = false;
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                using (DaoOle daoOle = new DaoOle(ofd.FileName)) {
-                    isOpen = daoOle.IsOpen;
+                using (DbHandlerOle dbHandlerOle = new DbHandlerOle(ofd.FileName)) {
+                    isOpen = dbHandlerOle.IsOpen;
 
                     if (isOpen) {
-                        using (DaoBase dao = this.builder.Build()) {
-                            await dao.ExecTransactionAsync(async () => {
+                        using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                            await dbHandler.ExecTransactionAsync(async () => {
                                 // 既存のデータを削除する
-                                await dao.ExecNonQueryAsync(@"DELETE FROM mst_book;");
-                                await dao.ExecNonQueryAsync(@"DELETE FROM mst_category;");
-                                await dao.ExecNonQueryAsync(@"DELETE FROM mst_item;");
-                                await dao.ExecNonQueryAsync(@"DELETE FROM hst_action;");
-                                await dao.ExecNonQueryAsync(@"DELETE FROM hst_group;");
-                                await dao.ExecNonQueryAsync(@"DELETE FROM hst_shop;");
-                                await dao.ExecNonQueryAsync(@"DELETE FROM hst_remark;");
-                                await dao.ExecNonQueryAsync(@"DELETE FROM rel_book_item;");
+                                await dbHandler.ExecNonQueryAsync(@"DELETE FROM mst_book;");
+                                await dbHandler.ExecNonQueryAsync(@"DELETE FROM mst_category;");
+                                await dbHandler.ExecNonQueryAsync(@"DELETE FROM mst_item;");
+                                await dbHandler.ExecNonQueryAsync(@"DELETE FROM hst_action;");
+                                await dbHandler.ExecNonQueryAsync(@"DELETE FROM hst_group;");
+                                await dbHandler.ExecNonQueryAsync(@"DELETE FROM hst_shop;");
+                                await dbHandler.ExecNonQueryAsync(@"DELETE FROM hst_remark;");
+                                await dbHandler.ExecNonQueryAsync(@"DELETE FROM rel_book_item;");
 
-                                DaoReader reader;
+                                DbReader reader;
                                 // 帳簿IDのシーケンスを更新する
-                                reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBM_BOOK ORDER BY BOOK_ID;");
-                                await dao.ExecNonQueryAsync("SELECT setval('mst_book_book_id_seq', @{0});", reader[reader.Count - 1].ToInt("BOOK_ID"));
+                                reader = await dbHandlerOle.ExecQueryAsync(@"SELECT * FROM CBM_BOOK ORDER BY BOOK_ID;");
+                                await dbHandler.ExecNonQueryAsync("SELECT setval('mst_book_book_id_seq', @{0});", reader[reader.Count - 1].ToInt("BOOK_ID"));
                                 // 帳簿テーブルのレコードを作成する
-                                reader.ExecWholeRow((count, record) => {
+                                await reader.ExecWholeRowAsync(async (count, record) => {
                                     int bookId = record.ToInt("BOOK_ID");
                                     string bookName = record["BOOK_NAME"];
                                     int balance = record.ToInt("BALANCE");
                                     int sortKey = record.ToInt("SORT_KEY");
                                     int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                    dao.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecNonQueryAsync(@"
 INSERT INTO mst_book 
 (book_id, book_name, initial_value, book_kind, pay_day, sort_order, del_flg, update_time, updater, insert_time, inserter) 
 VALUES (@{0}, @{1}, @{2}, 0, NULL, @{3}, @{4}, 'now', @{5}, 'now', @{6});",
@@ -200,17 +202,17 @@ VALUES (@{0}, @{1}, @{2}, 0, NULL, @{3}, @{4}, 'now', @{5}, 'now', @{6});",
                                 });
 
                                 // 分類IDのシーケンスを更新する
-                                reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBM_CATEGORY ORDER BY CATEGORY_ID;");
-                                await dao.ExecNonQueryAsync("SELECT setval('mst_category_category_id_seq', @{0});", reader[reader.Count - 1].ToInt("CATEGORY_ID"));
+                                reader = await dbHandlerOle.ExecQueryAsync(@"SELECT * FROM CBM_CATEGORY ORDER BY CATEGORY_ID;");
+                                await dbHandler.ExecNonQueryAsync("SELECT setval('mst_category_category_id_seq', @{0});", reader[reader.Count - 1].ToInt("CATEGORY_ID"));
                                 // 分類テーブルのレコードを作成する
-                                reader.ExecWholeRow((count, record) => {
+                                await reader.ExecWholeRowAsync(async (count, record) => {
                                     int categoryId = record.ToInt("CATEGORY_ID");
                                     string categoryName = record["CATEGORY_NAME"];
                                     int rexpDiv = record.ToInt("REXP_DIV") - 1;
                                     int sortKey = record.ToInt("SORT_KEY");
                                     int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                    dao.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecNonQueryAsync(@"
 INSERT INTO mst_category
 (category_id, category_name, balance_kind, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, 'now', @{5}, 'now', @{6});",
@@ -219,10 +221,10 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, 'now', @{5}, 'now', @{6});",
                                 });
 
                                 // 項目IDのシーケンスを更新する
-                                reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBM_ITEM ORDER BY ITEM_ID;");
-                                await dao.ExecNonQueryAsync("SELECT setval('mst_item_item_id_seq', @{0});", reader[reader.Count - 1].ToInt("ITEM_ID"));
+                                reader = await dbHandlerOle.ExecQueryAsync(@"SELECT * FROM CBM_ITEM ORDER BY ITEM_ID;");
+                                await dbHandler.ExecNonQueryAsync("SELECT setval('mst_item_item_id_seq', @{0});", reader[reader.Count - 1].ToInt("ITEM_ID"));
                                 // 項目テーブルのレコードを作成する
-                                reader.ExecWholeRow((count, record) => {
+                                await reader.ExecWholeRowAsync(async (count, record) => {
                                     int itemId = record.ToInt("ITEM_ID");
                                     string itemName = record["ITEM_NAME"];
                                     int moveFlg = record.ToBoolean("MOVE_FLG") ? 1 : 0;
@@ -230,7 +232,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, 'now', @{5}, 'now', @{6});",
                                     int sortKey = record.ToInt("SORT_KEY");
                                     int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                    dao.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecNonQueryAsync(@"
 INSERT INTO mst_item
 (item_id, item_name, category_id, move_flg, advance_flg, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 'now', @{7}, 'now', @{8});",
@@ -239,8 +241,8 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 'now', @{7}, 'now', @{8});",
                                 });
 
                                 // 帳簿項目IDのシーケンスを更新する
-                                reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBT_ACT ORDER BY ACT_ID;");
-                                await dao.ExecNonQueryAsync("SELECT setval('hst_action_action_id_seq', @{0});", reader[reader.Count - 1].ToInt("ACT_ID"));
+                                reader = await dbHandlerOle.ExecQueryAsync(@"SELECT * FROM CBT_ACT ORDER BY ACT_ID;");
+                                await dbHandler.ExecNonQueryAsync("SELECT setval('hst_action_action_id_seq', @{0});", reader[reader.Count - 1].ToInt("ACT_ID"));
                                 int maxGroupId = 0; // グループIDの最大値
                                                     // 帳簿テーブルのレコードを作成する
                                 await reader.ExecWholeRowAsync(async (count, record) => {
@@ -254,7 +256,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, @{6}, 'now', @{7}, 'now', @{8});",
                                     string noteName = record["NOTE_NAME"];
                                     int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                    await dao.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecNonQueryAsync(@"
 INSERT INTO hst_action
 (action_id, book_id, item_id, act_time, act_value, shop_name, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, NULL, @{5}, @{6}, @{7}, 'now', @{8}, 'now', @{9});",
@@ -266,11 +268,11 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, NULL, @{5}, @{6}, @{7}, 'now', @{8}, 'now'
                                         // グループIDの最大値を更新する
                                         if (maxGroupId < groupId) { maxGroupId = groupId.Value; }
 
-                                        reader = await dao.ExecQueryAsync("SELECT * FROM hst_group WHERE group_id = @{0};", groupId);
+                                        reader = await dbHandler.ExecQueryAsync("SELECT * FROM hst_group WHERE group_id = @{0};", groupId);
                                         // groupId のレコードが登録されていないとき
                                         if (reader.Count == 0) {
                                             // グループの種類を調べる
-                                            reader = await daoOle.ExecQueryAsync("SELECT * FROM CBT_ACT WHERE GROUP_ID = @{0};", groupId);
+                                            reader = await dbHandlerOle.ExecQueryAsync("SELECT * FROM CBT_ACT WHERE GROUP_ID = @{0};", groupId);
                                             GroupKind groupKind = GroupKind.Repeat;
                                             int? tmpBookId = null;
                                             reader.ExecWholeRow((count2, record2) => {
@@ -292,7 +294,7 @@ VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, NULL, @{5}, @{6}, @{7}, 'now', @{8}, 'now'
                                             });
 
                                             // グループテーブルのレコードを作成する
-                                            await dao.ExecNonQueryAsync(@"
+                                            await dbHandler.ExecNonQueryAsync(@"
 INSERT INTO hst_group
 (group_id, group_kind, remark, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, NULL, 0, 'now', @{2}, 'now', @{3});",
@@ -302,16 +304,16 @@ VALUES (@{0}, @{1}, NULL, 0, 'now', @{2}, 'now', @{3});",
                                     return true;
                                 });
                                 // グループIDのシーケンスを更新する
-                                await dao.ExecNonQueryAsync("SELECT setval('hst_group_group_id_seq', @{0});", maxGroupId);
+                                await dbHandler.ExecNonQueryAsync("SELECT setval('hst_group_group_id_seq', @{0});", maxGroupId);
 
                                 // 備考テーブルのレコードを作成する
-                                reader = await daoOle.ExecQueryAsync(@"SELECT * FROM CBT_NOTE;");
-                                reader.ExecWholeRow((count, record) => {
+                                reader = await dbHandlerOle.ExecQueryAsync(@"SELECT * FROM CBT_NOTE;");
+                                await reader.ExecWholeRowAsync(async (count, record) => {
                                     int itemId = record.ToInt("ITEM_ID");
                                     string noteName = record["NOTE_NAME"];
                                     int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                    dao.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecNonQueryAsync(@"
 INSERT INTO hst_remark
 (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, 0, 'now', @{2}, 'now', @{3}, 'now', @{4});",
@@ -320,13 +322,13 @@ VALUES (@{0}, @{1}, 0, 'now', @{2}, 'now', @{3}, 'now', @{4});",
                                 });
 
                                 // 帳簿-項目テーブルのレコードを作成する
-                                reader = await daoOle.ExecQueryAsync("SELECT * FROM CBR_BOOK;");
-                                reader.ExecWholeRow((count, record) => {
+                                reader = await dbHandlerOle.ExecQueryAsync("SELECT * FROM CBR_BOOK;");
+                                await reader.ExecWholeRowAsync(async (count, record) => {
                                     int bookId = record.ToInt("BOOK_ID");
                                     int itemId = record.ToInt("ITEM_ID");
                                     int delFlg = record.ToBoolean("DEL_FLG") ? 1 : 0;
 
-                                    dao.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecNonQueryAsync(@"
 INSERT INTO rel_book_item
 (book_id, item_id, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
@@ -401,16 +403,16 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
             int exitCode = -1;
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                using (DaoBase dao = this.builder.Build()) {
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                     // 既存のデータを削除する
-                    await dao.ExecNonQueryAsync(@"DELETE FROM mst_book;");
-                    await dao.ExecNonQueryAsync(@"DELETE FROM mst_category;");
-                    await dao.ExecNonQueryAsync(@"DELETE FROM mst_item;");
-                    await dao.ExecNonQueryAsync(@"DELETE FROM hst_action;");
-                    await dao.ExecNonQueryAsync(@"DELETE FROM hst_group;");
-                    await dao.ExecNonQueryAsync(@"DELETE FROM hst_shop;");
-                    await dao.ExecNonQueryAsync(@"DELETE FROM hst_remark;");
-                    await dao.ExecNonQueryAsync(@"DELETE FROM rel_book_item;");
+                    await dbHandler.ExecNonQueryAsync(@"DELETE FROM mst_book;");
+                    await dbHandler.ExecNonQueryAsync(@"DELETE FROM mst_category;");
+                    await dbHandler.ExecNonQueryAsync(@"DELETE FROM mst_item;");
+                    await dbHandler.ExecNonQueryAsync(@"DELETE FROM hst_action;");
+                    await dbHandler.ExecNonQueryAsync(@"DELETE FROM hst_group;");
+                    await dbHandler.ExecNonQueryAsync(@"DELETE FROM hst_shop;");
+                    await dbHandler.ExecNonQueryAsync(@"DELETE FROM hst_remark;");
+                    await dbHandler.ExecNonQueryAsync(@"DELETE FROM rel_book_item;");
                 }
 
                 exitCode = await this.ExecuteRestore(ofd.FileName);
@@ -676,7 +678,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         {
             Log.Info();
 
-            this.mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
+            this.mrw = new MoveRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             this.mrw.LoadWindowSetting();
 
@@ -714,7 +716,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         {
             Log.Info();
 
-            this.arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
+            this.arw = new ActionRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             this.arw.LoadWindowSetting();
 
@@ -752,7 +754,7 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
         {
             Log.Info();
 
-            this.alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id,
+            this.alrw = new ActionListRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             this.alrw.LoadWindowSetting();
 
@@ -793,8 +795,8 @@ VALUES (@{0}, @{1}, @{2}, 'now', @{3}, 'now', @{4});",
 
             // グループ種別を特定する
             int? groupKind = null;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT A.group_id, G.group_kind
 FROM hst_action A
 LEFT JOIN (SELECT * FROM hst_group WHERE del_flg = 0) G ON G.group_id = A.group_id
@@ -808,7 +810,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
             switch (groupKind) {
                 case (int)GroupKind.Move:
                     // 移動の編集時の処理
-                    this.mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
+                    this.mrw = new MoveRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
                     this.mrw.LoadWindowSetting();
 
                     // 登録時イベントを登録する
@@ -826,7 +828,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                     break;
                 case (int)GroupKind.ListReg:
                     // リスト登録された帳簿項目の編集時の処理
-                    this.alrw = new ActionListRegistrationWindow(this.builder, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
+                    this.alrw = new ActionListRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
                     this.alrw.LoadWindowSetting();
 
                     // 登録時イベントを登録する
@@ -845,7 +847,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                 case (int)GroupKind.Repeat:
                 default:
                     // 移動・リスト登録以外の帳簿項目の編集時の処理
-                    this.arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId) { Owner = this };
+                    this.arw = new ActionRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedActionVM.ActionId) { Owner = this };
                     this.arw.LoadWindowSetting();
 
                     // 登録時イベントを登録する
@@ -887,8 +889,8 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
 
             // グループ種別を特定する
             int? groupKind = null;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT A.group_id, G.group_kind
 FROM hst_action A
 LEFT JOIN (SELECT * FROM hst_group WHERE del_flg = 0) G ON G.group_id = A.group_id
@@ -901,7 +903,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
 
             if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
                 // 移動以外の帳簿項目の複製時の処理
-                this.arw = new ActionRegistrationWindow(this.builder, this.WVM.SelectedActionVM.ActionId, RegistrationKind.Copy) { Owner = this };
+                this.arw = new ActionRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedActionVM.ActionId, RegistrationKind.Copy) { Owner = this };
                 this.arw.LoadWindowSetting();
 
                 // 登録時イベントを登録する
@@ -918,7 +920,7 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
             }
             else {
                 // 移動の複製時の処理
-                this.mrw = new MoveRegistrationWindow(this.builder, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationKind.Copy) { Owner = this };
+                this.mrw = new MoveRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationKind.Copy) { Owner = this };
                 this.mrw.LoadWindowSetting();
 
                 // 登録時イベントを登録する
@@ -963,15 +965,15 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedActionVM.ActionId
                     int actionId = vm.ActionId;
                     int? groupId = vm.GroupId;
 
-                    using (DaoBase dao = this.builder.Build()) {
-                        await dao.ExecTransactionAsync(async () => {
+                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                        await dbHandler.ExecTransactionAsync(async () => {
                             // 対象となる帳簿項目を削除する
-                            await dao.ExecNonQueryAsync(@"
+                            await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{1} 
 WHERE action_id = @{0};", actionId, Updater);
 
                             if (groupId.HasValue) {
-                                DaoReader reader = await dao.ExecQueryAsync(@"
+                                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT group_kind FROM hst_group
 WHERE group_id = @{0} AND del_flg = 0;", groupId);
 
@@ -981,28 +983,28 @@ WHERE group_id = @{0} AND del_flg = 0;", groupId);
                                 switch (groupKind) {
                                     case (int)GroupKind.Move: {
                                             // 移動の場合、削除項目と同じグループIDを持つ帳簿項目を削除する
-                                            await dao.ExecNonQueryAsync(@"
+                                            await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{0}
 WHERE group_id = @{1};", Updater, groupId);
                                         }
                                         break;
                                     case (int)GroupKind.Repeat: {
                                             // 繰返しの場合、削除項目の日時以降の同じグループIDを持つ帳簿項目を削除する
-                                            await dao.ExecNonQueryAsync(@"
+                                            await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action SET del_flg = 1, update_time = 'now', updater = @{1}
 WHERE group_id = @{2} AND act_time >= (SELECT act_time FROM hst_action WHERE action_id = @{0});", actionId, Updater, groupId);
                                         }
                                         break;
                                 }
 
-                                reader = await dao.ExecQueryAsync(@"
+                                reader = await dbHandler.ExecQueryAsync(@"
 SELECT action_id FROM hst_action
 WHERE group_id = @{0} AND del_flg = 0;", groupId);
 
                                 // 同じグループIDを持つ帳簿項目が1つだけの場合にグループIDをクリアする
                                 if (reader.Count == 1) {
                                     await reader.ExecARowAsync(async (record) => {
-                                        await dao.ExecNonQueryAsync(@"
+                                        await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action SET group_id = null, update_time = 'now', updater = @{1}
 WHERE action_id = @{0} AND del_flg = 0;", record.ToInt("action_id"), Updater);
                                     });
@@ -1010,7 +1012,7 @@ WHERE action_id = @{0} AND del_flg = 0;", record.ToInt("action_id"), Updater);
 
                                 // 同じグループIDを持つ帳簿項目が存在しなくなる場合にグループを削除する
                                 if (reader.Count <= 1) {
-                                    await dao.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_group SET del_flg = 1, update_time = 'now', updater = @{1}
 WHERE group_id = @{0} AND del_flg = 0;", groupId, Updater);
                                 }
@@ -1045,10 +1047,10 @@ WHERE group_id = @{0} AND del_flg = 0;", groupId, Updater);
         {
             Log.Info();
 
-            using (DaoBase dao = this.builder.Build()) {
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                 // 帳簿項目IDが0を超える項目についてループ
                 foreach (ActionViewModel vm in this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; })) {
-                    await dao.ExecNonQueryAsync(@"
+                    await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action
 SET is_match = @{0}, update_time = 'now', updater = @{1}
 WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.ActionId);
@@ -1285,10 +1287,10 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
             TermWindow stw = null;
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
-                    stw = new TermWindow(builder, this.WVM.DisplayedMonth.Value) { Owner = this };
+                    stw = new TermWindow(dbHandlerFactory, this.WVM.DisplayedMonth.Value) { Owner = this };
                     break;
                 case TermKind.Selected:
-                    stw = new TermWindow(builder, this.WVM.StartDate, this.WVM.EndDate) { Owner = this };
+                    stw = new TermWindow(dbHandlerFactory, this.WVM.StartDate, this.WVM.EndDate) { Owner = this };
                     break;
             }
             stw.LoadWindowSetting();
@@ -1432,7 +1434,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         {
             Log.Info();
 
-            SettingsWindow sw = new SettingsWindow(this.builder) { Owner = this };
+            SettingsWindow sw = new SettingsWindow(this.dbHandlerFactory) { Owner = this };
             sw.LoadWindowSetting();
 
             if (sw.ShowDialog() == true) {
@@ -1473,7 +1475,7 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
         {
             Log.Info();
 
-            this.ccw = new CsvComparisonWindow(this.builder, this.WVM.SelectedBookVM.Id) { Owner = this };
+            this.ccw = new CsvComparisonWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id) { Owner = this };
             this.ccw.LoadWindowSetting();
 
             // 帳簿項目の一致フラグ変更時のイベントを登録する
@@ -1584,8 +1586,8 @@ WHERE action_id = @{2} and is_match <> @{0};", vm.IsMatch ? 1 : 0, Updater, vm.A
                 string shopName = vm.ShopName.Replace(this.WVM.FindText, this.WVM.ReplaceText);
                 string remark = vm.Remark.Replace(this.WVM.FindText, this.WVM.ReplaceText);
 
-                using (DaoBase dao = this.builder.Build()) {
-                    await dao.ExecNonQueryAsync(@"
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    await dbHandler.ExecNonQueryAsync(@"
 UPDATE hst_action SET shop_name = @{1}, remark = @{2}, update_time = 'now', updater = @{3}
 WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater);
                 }
@@ -1875,8 +1877,8 @@ WHERE action_id = @{0} AND del_flg = 0;", vm.ActionId, shopName, remark, Updater
                 new BookViewModel() { Id = null, Name = Properties.Resources.ListName_AllBooks }
             };
             BookViewModel selectedBookVM = bookVMList[0];
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT *
 FROM mst_book 
 WHERE del_flg = 0 
@@ -1884,7 +1886,7 @@ ORDER BY sort_order;");
 
                 reader.ExecWholeRow((count, record) => {
                     string jsonCode = record["json_code"];
-                    MstBookJsonObject jsonObj = JsonConvert.DeserializeObject<MstBookJsonObject>(jsonCode);
+                    MstBookJsonDto jsonObj = JsonConvert.DeserializeObject<MstBookJsonDto>(jsonCode);
 
                     if (DateTimeExtensions.IsWithIn(this.WVM.DisplayedStartDate, this.WVM.DisplayedEndDate, jsonObj?.StartDate, jsonObj?.EndDate)) {
                         BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
@@ -1950,11 +1952,11 @@ ORDER BY sort_order;");
             Log.Info($"targetBookId:{targetBookId} startTime:{startTime:yyyy-MM-dd} endTime:{endTime:yyyy-MM-dd}");
 
             ObservableCollection<ActionViewModel> actionVMList = new ObservableCollection<ActionViewModel>();
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader;
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                DbReader reader;
                 if (targetBookId == null) {
                     // 全帳簿
-                    reader = await dao.ExecQueryAsync(@"
+                    reader = await dbHandler.ExecQueryAsync(@"
 -- 繰越残高
 SELECT -1 AS action_id, @{1} AS act_time, -1 AS book_id, -1 AS category_id, -1 AS item_id, 
        '' AS book_name, '' AS category_name, '" + Properties.Resources.ListName_CarryForward + @"' AS item_name, 0 AS act_value, (
@@ -1986,7 +1988,7 @@ ORDER BY act_time, balance_kind, c_order, i_order, b_order, action_id;", null, s
                 }
                 else {
                     // 各帳簿
-                    reader = await dao.ExecQueryAsync(@"
+                    reader = await dbHandler.ExecQueryAsync(@"
 -- 繰越残高
 SELECT -1 AS action_id, @{1} AS act_time, -1 AS book_id, -1 AS category_id, -1 AS item_id, 
        '' AS book_name, '' AS category_name, '" + Properties.Resources.ListName_CarryForward + @"' AS item_name, 0 AS act_value, (
@@ -2108,11 +2110,11 @@ ORDER BY act_time, balance_kind, c_order, i_order, action_id;", targetBookId, st
 
             ObservableCollection<SummaryViewModel> summaryVMList = new ObservableCollection<SummaryViewModel>();
 
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader;
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                DbReader reader;
 
                 if (bookId == null) {
-                    reader = await dao.ExecQueryAsync(@"
+                    reader = await dbHandler.ExecQueryAsync(@"
 -- 全帳簿が対象
 SELECT C.balance_kind AS balance_kind, C.category_id AS category_id, C.category_name AS category_name, SQ.item_id AS item_id, I.item_name AS item_name, SQ.sum AS sum
 FROM (
@@ -2127,7 +2129,7 @@ INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I
 ORDER BY C.balance_kind, C.sort_order, I.sort_order;", null, startTime, endTime);
                 }
                 else {
-                    reader = await dao.ExecQueryAsync(@"
+                    reader = await dbHandler.ExecQueryAsync(@"
 -- 特定の帳簿が対象
 SELECT C.balance_kind AS balance_kind, C.category_id AS category_id, C.category_name AS category_name, SQ.item_id AS item_id, I.item_name AS item_name, SQ.sum AS sum
 FROM (
@@ -2236,11 +2238,11 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;", bookId, startTime, endTim
 
             // 開始日までの収支を取得する
             int balance = 0;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader;
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                DbReader reader;
                 if (bookId == null) {
                     // 全帳簿
-                    reader = await dao.ExecQueryAsync(@"
+                    reader = await dbHandler.ExecQueryAsync(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0) AS sum
 FROM hst_action AA
 INNER JOIN(SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -2248,7 +2250,7 @@ WHERE AA.del_flg = 0 AND AA.act_time < @{1};", null, startTime);
                 }
                 else {
                     // 各帳簿
-                    reader = await dao.ExecQueryAsync(@"
+                    reader = await dbHandler.ExecQueryAsync(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0}) AS sum
 FROM hst_action AA
 INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -2350,11 +2352,11 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             // 開始月までの収支を取得する
             int balance = 0;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader;
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                DbReader reader;
                 if (bookId == null) {
                     // 全帳簿
-                    reader = await dao.ExecQueryAsync(@"
+                    reader = await dbHandler.ExecQueryAsync(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0) AS sum
 FROM hst_action AA
 INNER JOIN(SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -2362,7 +2364,7 @@ WHERE AA.del_flg = 0 AND AA.act_time < @{1};", null, startTime);
                 }
                 else {
                     // 各帳簿
-                    reader = await dao.ExecQueryAsync(@"
+                    reader = await dbHandler.ExecQueryAsync(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0}) AS sum
 FROM hst_action AA
 INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -2461,11 +2463,11 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
 
             // 開始年までの収支を取得する
             int balance = 0;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader;
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                DbReader reader;
                 if (bookId == null) {
                     // 全帳簿
-                    reader = await dao.ExecQueryAsync(@"
+                    reader = await dbHandler.ExecQueryAsync(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0) AS sum
 FROM hst_action AA
 INNER JOIN(SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -2473,7 +2475,7 @@ WHERE AA.del_flg = 0 AND AA.act_time < @{1};", null, startTime);
                 }
                 else {
                     // 各帳簿
-                    reader = await dao.ExecQueryAsync(@"
+                    reader = await dbHandler.ExecQueryAsync(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @{0}) AS sum
 FROM hst_action AA
 INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -2623,8 +2625,8 @@ WHERE AA.book_id = @{0} AND AA.del_flg = 0 AND AA.act_time < @{1};", bookId, sta
             // 最後に操作した帳簿項目の日付を更新する
             if (isUpdateActDateLastEdited) {
                 if (actionIdList != null && actionIdList.Count != 0) {
-                    using (DaoBase dao = this.builder.Build()) {
-                        DaoReader reader = await dao.ExecQueryAsync(@"
+                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                        DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT act_time FROM hst_action WHERE action_id = @{0} AND del_flg = 0;", actionIdList[0]);
 
                         reader.ExecARow((record) => {

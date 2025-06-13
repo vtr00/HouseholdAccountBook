@@ -1,10 +1,11 @@
-﻿using System;
+﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.DbHandler.Abstract;
+using HouseholdAccountBook.Extensions;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using HouseholdAccountBook.Dao;
-using HouseholdAccountBook.Extensions;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.Windows
@@ -16,9 +17,9 @@ namespace HouseholdAccountBook.Windows
     {
         #region フィールド
         /// <summary>
-        /// DAOビルダ
+        /// DBハンドラファクトリ
         /// </summary>
-        private readonly DaoBuilder builder;
+        private readonly DbHandlerFactory dbHandlerFactory;
         /// <summary>
         /// 選択された開始日
         /// </summary>
@@ -37,11 +38,11 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// <see cref="TermWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="builder">DAOビルダ</param>
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="dateWithinMonth">月内日付</param>
-        public TermWindow(DaoBuilder builder, DateTime dateWithinMonth)
+        public TermWindow(DbHandlerFactory dbHandlerFactory, DateTime dateWithinMonth)
         {
-            this.builder = builder;
+            this.dbHandlerFactory = dbHandlerFactory;
 
             this.InitializeComponent();
 
@@ -53,12 +54,12 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// <see cref="TermWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="builder">DAOビルダ</param>
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="startDate">開始日</param>
         /// <param name="endDate">終了日</param>
-        public TermWindow(DaoBuilder builder, DateTime startDate, DateTime endDate)
+        public TermWindow(DbHandlerFactory dbHandlerFactory, DateTime startDate, DateTime endDate)
         {
-            this.builder = builder;
+            this.dbHandlerFactory = dbHandlerFactory;
 
             this.InitializeComponent();
 
@@ -235,8 +236,8 @@ namespace HouseholdAccountBook.Windows
         {
             DateTime firstTime = DateTime.Today;
             DateTime lastTime = DateTime.Today;
-            using (DaoBase dao = this.builder.Build()) {
-                DaoReader reader = await dao.ExecQueryAsync(@"
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                DbReader reader = await dbHandler.ExecQueryAsync(@"
 SELECT MIN(act_time) as first_time, MAX(act_time) as last_time
 FROM hst_action
 WHERE del_flg = 0;");

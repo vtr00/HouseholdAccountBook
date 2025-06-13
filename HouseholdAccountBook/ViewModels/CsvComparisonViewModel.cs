@@ -1,5 +1,5 @@
-﻿using HouseholdAccountBook.Interfaces;
-using HouseholdAccountBook.UserEventArgs;
+﻿using HouseholdAccountBook.UserEventArgs;
+using HouseholdAccountBook.ViewModels.Interfaces;
 using Prism.Mvvm;
 using System;
 

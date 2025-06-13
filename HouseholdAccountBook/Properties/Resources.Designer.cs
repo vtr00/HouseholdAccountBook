@@ -1367,7 +1367,7 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
-        ///   期間指定...(_S) に類似しているローカライズされた文字列を検索します。
+        ///   期間指定(_S)... に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Menu_View_DailyGraph_DailyTermSelection {
             get {

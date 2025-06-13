@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Interfaces;
+﻿using HouseholdAccountBook.ViewModels.Interfaces;
 using Prism.Mvvm;
 using System.Collections.ObjectModel;
 

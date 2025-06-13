@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace HouseholdAccountBook.Dto
+namespace HouseholdAccountBook.Dto.Json
 {
     /// <summary>
-    /// mst_bookテーブルでのJsonCodeに対応するオブジェクト
+    /// mst_bookテーブルでのJsonCodeに対応するDTO
     /// </summary>
-    public class MstBookJsonObject
+    public class MstBookJsonDto
     {
         /// <summary>
         /// 開始日

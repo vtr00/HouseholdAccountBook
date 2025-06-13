@@ -311,17 +311,15 @@
     <Compile Include="Converters\DateTimeToIsNationalHolidayConverter.cs" />
     <Compile Include="Converters\DateTimeToDisplayedYearConverter.cs" />
     <Compile Include="Converters\NegationConverter.cs" />
-    <Compile Include="Dao\DaoBase.ConnectInfo.cs" />
-    <Compile Include="Dao\DaoBuilder.Target.cs" />
-    <Compile Include="Dao\DaoNpgsql.ConnectInfo.cs" />
-    <Compile Include="Dao\DaoOle.ConnectInfo.cs" />
-    <Compile Include="Dao\DaoReader.Record.cs" />
-    <Compile Include="Dao\DaoSQLite.ConnectInfo.cs" />
-    <Compile Include="Dto\MstBookJsonObject.cs" />
+    <Compile Include="DbHandler\DbHandlerNpgsql.ConnectInfo.cs" />
+    <Compile Include="DbHandler\DbHandlerOle.ConnectInfo.cs" />
+    <Compile Include="DbHandler\DbReader.Record.cs" />
+    <Compile Include="DbHandler\DbHandlerSQLite.ConnectInfo.cs" />
+    <Compile Include="Dto\Json\MstBookJsonDto.cs" />
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Extensions\ValueTuppleExtensions.cs" />
-    <Compile Include="Interfaces\ISelectable.cs" />
+    <Compile Include="ViewModels\Interfaces\ISelectable.cs" />
     <Compile Include="Others\Log.cs" />
     <Compile Include="Others\PropertyName.cs" />
     <Compile Include="Others\WindowLog.cs" />
@@ -341,7 +339,7 @@
     <Compile Include="UserControls\NumericUpDown.xaml.cs">
       <DependentUpon>NumericUpDown.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dao\DaoBuilder.cs" />
+    <Compile Include="DbHandler\DbHandlerFactory.cs" />
     <Compile Include="ViewModels\HierarchicalViewModel.cs" />
     <Compile Include="ViewModels\RemarkViewModel.cs" />
     <Compile Include="ViewModels\ShopViewModel.cs" />
@@ -435,11 +433,11 @@
     <Compile Include="Converters\DateTimeToDayOfWeekConverter.cs" />
     <Compile Include="Converters\DateTimeToDisplayedMonthConverter.cs" />
     <Compile Include="Converters\IntToMoneyDisplayConverter.cs" />
-    <Compile Include="Dao\DaoBase.cs" />
-    <Compile Include="Dao\DaoNpgsql.cs" />
-    <Compile Include="Dao\DaoOle.cs" />
-    <Compile Include="Dao\DaoReader.cs" />
-    <Compile Include="Dao\DaoSQLite.cs" />
+    <Compile Include="DbHandler\Abstract\DbHandlerBase.cs" />
+    <Compile Include="DbHandler\DbHandlerNpgsql.cs" />
+    <Compile Include="DbHandler\DbHandlerOle.cs" />
+    <Compile Include="DbHandler\DbReader.cs" />
+    <Compile Include="DbHandler\DbHandlerSQLite.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Windows\ActionRegistrationWindow.xaml.cs">
       <DependentUpon>ActionRegistrationWindow.xaml</DependentUpon>
@@ -504,6 +502,7 @@
   <ItemGroup>
     <Resource Include="Resources\resheet.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

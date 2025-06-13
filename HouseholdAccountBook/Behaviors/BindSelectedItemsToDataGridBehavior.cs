@@ -1,9 +1,9 @@
-﻿using System.Windows.Controls;
-using System.Windows;
+﻿using HouseholdAccountBook.ViewModels.Interfaces;
+using Microsoft.Xaml.Behaviors;
 using System.Collections;
 using System.Collections.Specialized;
-using HouseholdAccountBook.Interfaces;
-using Microsoft.Xaml.Behaviors;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace HouseholdAccountBook.Behaviors
 {

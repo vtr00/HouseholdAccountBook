@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HouseholdAccountBook.Dao
+namespace HouseholdAccountBook.DbHandler
 {
-    public partial class DaoReader
+    public partial class DbReader
     {
         /// <summary>
         /// 取得レコード
@@ -125,8 +125,7 @@ namespace HouseholdAccountBook.Dao
                 key = key.ToLower();
                 if (this._record.ContainsKey(key)) {
                     object tmp = this._record[key];
-                    if (tmp == DBNull.Value) return null;
-                    return DateTime.Parse(tmp.ToString());
+                    return tmp == DBNull.Value ? null : (DateTime?)DateTime.Parse(tmp.ToString());
                 }
                 else {
                     throw new KeyNotFoundException();

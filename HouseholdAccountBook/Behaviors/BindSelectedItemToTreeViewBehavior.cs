@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Interfaces;
+﻿using HouseholdAccountBook.ViewModels.Interfaces;
 using Microsoft.Xaml.Behaviors;
 using System.Windows;
 using System.Windows.Controls;

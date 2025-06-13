@@ -1,11 +1,13 @@
-﻿namespace HouseholdAccountBook.Dao
+﻿using HouseholdAccountBook.DbHandler.Abstract;
+
+namespace HouseholdAccountBook.DbHandler
 {
-    public partial class DaoSQLite : DaoBase
+    public partial class DbHanderSQLite : DbHandlerBase
     {
         /// <summary>
         /// 接続情報
         /// </summary>
-        public new class ConnectInfo : DaoBase.ConnectInfo
+        public new class ConnectInfo : DbHandlerBase.ConnectInfo
         {
             /// <summary>
             /// ファイルパス

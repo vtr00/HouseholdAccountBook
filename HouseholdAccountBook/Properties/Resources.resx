@@ -494,7 +494,7 @@
     <value>今月(_T)</value>
   </data>
   <data name="Menu_View_DailyGraph_DailyTermSelection" xml:space="preserve">
-    <value>期間指定...(_S)</value>
+    <value>期間指定(_S)...</value>
   </data>
   <data name="Menu_View_DailyGraph_NextMonth" xml:space="preserve">
     <value>来月(_N)</value>
