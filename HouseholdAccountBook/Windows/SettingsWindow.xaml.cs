@@ -863,14 +863,14 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 BookSettingViewModel vm = this.WVM.DisplayedBookSettingVM;
                 using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                    MstBookJsonDto jsonObj = new MstBookJsonDto() {
-                        StartDate = vm.StartDateExists ? (DateTime?)vm.StartDate : null,
-                        EndDate = vm.EndDateExists ? (DateTime?)vm.EndDate : null,
-                        CsvFolderPath = vm.CsvFolderPath != string.Empty ? vm.CsvFolderPath : null,
-                        CsvActDateIndex = vm.ActDateIndex - 1,
-                        CsvOutgoIndex = vm.ExpensesIndex - 1,
-                        CsvItemNameIndex = vm.ItemNameIndex - 1
-                    };
+                    MstBookJsonDto jsonObj = new MstBookJsonDto(
+                        vm.StartDateExists ? (DateTime?)vm.StartDate : null,
+                        vm.EndDateExists ? (DateTime?)vm.EndDate : null,
+                        vm.CsvFolderPath != string.Empty ? vm.CsvFolderPath : null,
+                        vm.ActDateIndex - 1,
+                        vm.ExpensesIndex - 1,
+                        vm.ItemNameIndex - 1
+                    );
                     string jsonCode = JsonConvert.SerializeObject(jsonObj);
 
                     await dbHandler.ExecNonQueryAsync(@"
