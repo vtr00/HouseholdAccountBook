@@ -58,10 +58,15 @@ namespace HouseholdAccountBook
 
             Log.Info("Application Startup");
 
+            this.DispatcherUnhandledException += this.App_DispatcherUnhandledException;
+            this.Exit += this.App_Exit;
+
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
 
             // 言語設定
+            Log.Info($"Application Culture: {settings.App_CultureName}");
             System.Globalization.CultureInfo cultureInfo = new System.Globalization.CultureInfo(settings.App_CultureName);
+
             HouseholdAccountBook.Properties.Resources.Culture = cultureInfo;
             Thread.CurrentThread.CurrentCulture = cultureInfo;
             Thread.CurrentThread.CurrentUICulture = cultureInfo;
@@ -89,9 +94,6 @@ namespace HouseholdAccountBook
             }
 #endif
 
-            this.DispatcherUnhandledException += this.App_DispatcherUnhandledException;
-            this.Exit += this.App_Exit;
-
             // 前バージョンからのUpgradeを実行していないときはUpgradeを実施する
             Version assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             if (!Version.TryParse(settings.App_Version, out Version preVersion) || preVersion < assemblyVersion) {
@@ -100,6 +102,7 @@ namespace HouseholdAccountBook
             }
 
             // 初回起動時
+            Log.Debug("App_InitFlag: " + settings.App_InitFlag);
             if (settings.App_InitFlag) {
 #if !DEBUG
                 // リリースビルドの初回起動時デバッグモードはOFF

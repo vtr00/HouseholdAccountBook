@@ -183,7 +183,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="App_CultureName" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">ja-JP</Value>
     </Setting>
   </Settings>
 </SettingsFile>

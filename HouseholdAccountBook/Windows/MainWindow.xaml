@@ -516,7 +516,7 @@
                                 </DataGrid.Columns>
                             </DataGrid>
 
-                            <Grid Grid.Row="1" Background="GhostWhite" Visibility="{Binding UseFilter, Converter={StaticResource BoolVisibilityConverter}}">
+                            <Grid Grid.Row="1" Background="GhostWhite">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="1.0*"/>
                                     <ColumnDefinition Width="Auto"/>

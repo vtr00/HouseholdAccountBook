@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Data;
-using System.Windows.Forms;
 
 namespace HouseholdAccountBook.Converters
 {
@@ -17,7 +15,7 @@ namespace HouseholdAccountBook.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is DateTime dateTime) {
-                return culture.DateTimeFormat.GetAbbreviatedDayName(dateTime.DayOfWeek);
+                return (object)culture.DateTimeFormat.GetAbbreviatedDayName(dateTime.DayOfWeek);
             }
             else {
                 throw new NotImplementedException();

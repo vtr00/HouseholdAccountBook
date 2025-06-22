@@ -745,7 +745,7 @@ namespace HouseholdAccountBook.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ja-JP")]
         public string App_CultureName {
             get {
                 return ((string)(this["App_CultureName"]));

@@ -438,6 +438,8 @@ namespace HouseholdAccountBook.ViewModels
             this.DumpExePath = this.settings.App_Postgres_DumpExePath;
             this.RestoreExePath = this.settings.App_Postgres_RestoreExePath;
             this.SelectedCultureName = this.settings.App_CultureName;
+            Log.Debug($"App_CultureName: {this.settings.App_CultureName}");
+            Log.Debug($"SelectedCultureName: {this.SelectedCultureName}");
             this.BackUpNum = this.settings.App_BackUpNum;
             this.BackUpFolderPath = this.settings.App_BackUpFolderPath;
             this.BackUpFlagAtMinimizing = this.settings.App_BackUpFlagAtMinimizing;
