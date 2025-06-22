@@ -818,6 +818,12 @@ list</value>
   <data name="TextBlock_Npgsql_DbName" xml:space="preserve">
     <value>DB name</value>
   </data>
+  <data name="TextBlock_OleDB_DBFilePath" xml:space="preserve">
+    <value>DB file name</value>
+  </data>
+  <data name="TextBlock_SQLite_DBFilePath" xml:space="preserve">
+    <value>DB file name</value>
+  </data>
   <data name="TextBlock_Npgsql_Roll" xml:space="preserve">
     <value>Roll</value>
   </data>
@@ -961,5 +967,8 @@ list</value>
   </data>
   <data name="GroupHeader_LanguageInformation" xml:space="preserve">
     <value>Language information</value>
+  </data>
+  <data name="TextBlock_DBKind" xml:space="preserve">
+    <value>DB Kind</value>
   </data>
 </root>

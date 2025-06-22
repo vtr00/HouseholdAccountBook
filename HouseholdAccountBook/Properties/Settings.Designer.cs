@@ -754,5 +754,41 @@ namespace HouseholdAccountBook.Properties {
                 this["App_CultureName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string App_OleDB_DBFilePath {
+            get {
+                return ((string)(this["App_OleDB_DBFilePath"]));
+            }
+            set {
+                this["App_OleDB_DBFilePath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string App_SQLite_DBFilePath {
+            get {
+                return ((string)(this["App_SQLite_DBFilePath"]));
+            }
+            set {
+                this["App_SQLite_DBFilePath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int App_SelectedDBKind {
+            get {
+                return ((int)(this["App_SelectedDBKind"]));
+            }
+            set {
+                this["App_SelectedDBKind"] = value;
+            }
+        }
     }
 }

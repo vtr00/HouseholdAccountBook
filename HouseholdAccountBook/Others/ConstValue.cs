@@ -161,6 +161,25 @@ namespace HouseholdAccountBook.ConstValue
 
         #region 種別
         /// <summary>
+        /// SQLデータベース種別
+        /// </summary>
+        public enum  DBKind
+        {
+            /// <summary>
+            /// PostgreSQL
+            /// </summary>
+            PostgreSQL,
+            /// <summary>
+            /// OLE DB
+            /// </summary>
+            OleDb,
+            /// <summary>
+            /// SQL Server
+            /// </summary>
+            SQLite
+        }
+
+        /// <summary>
         /// 期間種別
         /// </summary>
         public enum TermKind
@@ -335,6 +354,14 @@ namespace HouseholdAccountBook.ConstValue
         #endregion
 
         #region 種別文字列
+        /// <summary>
+        /// DB種別文字列
+        /// </summary>
+        public static Dictionary<DBKind, string> DBKindStr => new Dictionary<DBKind, string>() {
+            { DBKind.PostgreSQL,    "PostgreSQL" },
+            { DBKind.OleDb,         "Ole DB" },
+            { DBKind.SQLite,        "SQLite" }
+        };
         /// <summary>
         /// 帳簿種別文字列
         /// </summary>

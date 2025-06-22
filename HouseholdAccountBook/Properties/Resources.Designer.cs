@@ -1993,6 +1993,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   DB種別 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TextBlock_DBKind {
+            get {
+                return ResourceManager.GetString("TextBlock_DBKind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   終了日 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TextBlock_EndDate {
@@ -2173,6 +2182,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   DBファイル名 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TextBlock_OleDB_DBFilePath {
+            get {
+                return ResourceManager.GetString("TextBlock_OleDB_DBFilePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   パスワード に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TextBlock_Password {
@@ -2304,6 +2322,15 @@ namespace HouseholdAccountBook.Properties {
         public static string TextBlock_SortOrder {
             get {
                 return ResourceManager.GetString("TextBlock_SortOrder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   DBファイル名 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TextBlock_SQLite_DBFilePath {
+            get {
+                return ResourceManager.GetString("TextBlock_SQLite_DBFilePath", resourceCulture);
             }
         }
         

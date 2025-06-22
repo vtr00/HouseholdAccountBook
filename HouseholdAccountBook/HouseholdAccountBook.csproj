@@ -312,7 +312,7 @@
     <Compile Include="Converters\DateTimeToDisplayedYearConverter.cs" />
     <Compile Include="Converters\NegationConverter.cs" />
     <Compile Include="DbHandler\DbHandlerNpgsql.ConnectInfo.cs" />
-    <Compile Include="DbHandler\DbHandlerOle.ConnectInfo.cs" />
+    <Compile Include="DbHandler\DbHandlerOleDb.ConnectInfo.cs" />
     <Compile Include="DbHandler\DbReader.Record.cs" />
     <Compile Include="DbHandler\DbHandlerSQLite.ConnectInfo.cs" />
     <Compile Include="Dto\Json\MstBookJsonDto.cs" />
@@ -341,9 +341,11 @@
     </Compile>
     <Compile Include="DbHandler\DbHandlerFactory.cs" />
     <Compile Include="ViewModels\HierarchicalViewModel.cs" />
+    <Compile Include="ViewModels\SettingViewModel\FileDbSettingViewModel.cs" />
+    <Compile Include="ViewModels\SettingViewModel\PostgreSQLDBSettingViewModel.cs" />
     <Compile Include="ViewModels\RemarkViewModel.cs" />
     <Compile Include="ViewModels\ShopViewModel.cs" />
-    <Compile Include="ViewModels\WindowSettingViewModel.cs" />
+    <Compile Include="ViewModels\SettingViewModel\WindowSettingViewModel.cs" />
     <Compile Include="ViewModels\CsvComparisonViewModel.CsvRecord.cs" />
     <Compile Include="ViewModels\WindowViewModel\TermWindowViewModel.cs" />
     <Compile Include="ViewModels\DateValueViewModel.cs" />
@@ -351,14 +353,14 @@
     <Compile Include="ViewModels\WindowViewModel\ActionListRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel\ActionRegistrationWindowViewModel.cs" />
     <Compile Include="ViewModels\ActionViewModel.cs" />
-    <Compile Include="ViewModels\BookSettingViewModel.cs" />
+    <Compile Include="ViewModels\SettingViewModel\BookSettingViewModel.cs" />
     <Compile Include="ViewModels\BookComparisonViewModel.cs" />
     <Compile Include="ViewModels\BookViewModel.cs" />
     <Compile Include="ViewModels\CategoryViewModel.cs" />
     <Compile Include="ViewModels\CsvComparisonViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel\CsvComparisonWindowViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel\DbSettingWindowViewModel.cs" />
-    <Compile Include="ViewModels\HierarchicalSettingViewModel.cs" />
+    <Compile Include="ViewModels\SettingViewModel\HierarchicalSettingViewModel.cs" />
     <Compile Include="ViewModels\ItemViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel\MoveRegistrationWindowViewModel.cs" />
@@ -435,7 +437,7 @@
     <Compile Include="Converters\IntToMoneyDisplayConverter.cs" />
     <Compile Include="DbHandler\Abstract\DbHandlerBase.cs" />
     <Compile Include="DbHandler\DbHandlerNpgsql.cs" />
-    <Compile Include="DbHandler\DbHandlerOle.cs" />
+    <Compile Include="DbHandler\DbHandlerOleDb.cs" />
     <Compile Include="DbHandler\DbReader.cs" />
     <Compile Include="DbHandler\DbHandlerSQLite.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />

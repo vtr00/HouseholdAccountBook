@@ -825,6 +825,12 @@
   <data name="TextBlock_Npgsql_DbName" xml:space="preserve">
     <value>DB名</value>
   </data>
+  <data name="TextBlock_OleDB_DBFilePath" xml:space="preserve">
+    <value>DBファイル名</value>
+  </data>
+  <data name="TextBlock_SQLite_DBFilePath" xml:space="preserve">
+    <value>DBファイル名</value>
+  </data>
   <data name="TextBlock_Npgsql_Roll" xml:space="preserve">
     <value>ロール</value>
   </data>
@@ -968,5 +974,8 @@
   </data>
   <data name="GroupHeader_LanguageInformation" xml:space="preserve">
     <value>言語情報</value>
+  </data>
+  <data name="TextBlock_DBKind" xml:space="preserve">
+    <value>DB種別</value>
   </data>
 </root>

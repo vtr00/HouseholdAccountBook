@@ -165,7 +165,7 @@ namespace HouseholdAccountBook.Windows
 
             bool isOpen = false;
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                using (DbHandlerOle dbHandlerOle = new DbHandlerOle(ofd.FileName)) {
+                using (DbHandlerOleDb dbHandlerOle = new DbHandlerOleDb(ofd.FileName)) {
                     isOpen = dbHandlerOle.IsOpen;
 
                     if (isOpen) {

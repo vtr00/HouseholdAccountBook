@@ -51,7 +51,7 @@ namespace HouseholdAccountBook.DbHandler
                 return;
             }
 
-            if (info is DbHandlerOle.ConnectInfo) {
+            if (info is DbHandlerOleDb.ConnectInfo) {
                 this.target = DatabaseType.OleDb;
                 this.info = info;
                 return;
@@ -83,7 +83,7 @@ namespace HouseholdAccountBook.DbHandler
                         daoBase = new DbHandlerNpgsql(this.info as DbHandlerNpgsql.ConnectInfo);
                         break;
                     case DatabaseType.OleDb:
-                        daoBase = new DbHandlerOle(this.info as DbHandlerOle.ConnectInfo);
+                        daoBase = new DbHandlerOleDb(this.info as DbHandlerOleDb.ConnectInfo);
                         break;
                     default:
                         daoBase = null;

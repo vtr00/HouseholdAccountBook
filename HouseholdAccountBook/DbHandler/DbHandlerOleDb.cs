@@ -8,7 +8,7 @@ namespace HouseholdAccountBook.DbHandler
     /// <summary>
     /// Ole Db Handler
     /// </summary>
-    public partial class DbHandlerOle : DbHandlerBase
+    public partial class DbHandlerOleDb : DbHandlerBase
     {
         /// <summary>
         /// 接続文字列
@@ -16,16 +16,16 @@ namespace HouseholdAccountBook.DbHandler
         private const string stringFormat = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0}";
 
         /// <summary>
-        /// <see cref="DbHandlerOle"/> クラスの新しいインスタンスを初期化します。
+        /// <see cref="DbHandlerOleDb"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public DbHandlerOle(ConnectInfo info) : this(info.FilePath) { }
+        public DbHandlerOleDb(ConnectInfo info) : this(info.FilePath) { }
 
         /// <summary>
-        /// <see cref="DbHandlerOle"/> クラスの新しいインスタンスを初期化します。
+        /// <see cref="DbHandlerOleDb"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
-        public DbHandlerOle(string filePath) : base(new OleDbConnection(string.Format(stringFormat, filePath))) { }
+        public DbHandlerOleDb(string filePath) : base(new OleDbConnection(string.Format(stringFormat, filePath))) { }
 
         /// <summary>
         /// [非同期]クエリを実行する

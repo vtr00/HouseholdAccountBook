@@ -23,18 +23,24 @@ namespace HouseholdAccountBook.Windows
             Properties.Settings settings = Properties.Settings.Default;
             this.WVM.Message = message;
 
-            this.WVM.Host = settings.App_Postgres_Host;
-            this.WVM.Port = settings.App_Postgres_Port;
-            this.WVM.UserName = settings.App_Postgres_UserName;
+            this.WVM.SelectedDBKind = (ConstValue.ConstValue.DBKind)settings.App_SelectedDBKind;
+
+            this.WVM.PostgreSQLDBSettingVM.Host = settings.App_Postgres_Host;
+            this.WVM.PostgreSQLDBSettingVM.Port = settings.App_Postgres_Port;
+            this.WVM.PostgreSQLDBSettingVM.UserName = settings.App_Postgres_UserName;
             this.passwordBox.Password = settings.App_Postgres_Password;
 #if DEBUG
-            this.WVM.DatabaseName = settings.App_Postgres_DatabaseName_Debug;
+            this.WVM.PostgreSQLDBSettingVM.DatabaseName = settings.App_Postgres_DatabaseName_Debug;
 #else
-            this.WVM.DatabaseName = settings.App_Postgres_DatabaseName;
+            this.WVM.PostgreSQLDBSettingVM.DatabaseName = settings.App_Postgres_DatabaseName;
 #endif
-            this.WVM.Role = settings.App_Postgres_Role;
-            this.WVM.DumpExePath = settings.App_Postgres_DumpExePath;
-            this.WVM.RestoreExePath = settings.App_Postgres_RestoreExePath;
+            this.WVM.PostgreSQLDBSettingVM.Role = settings.App_Postgres_Role;
+            this.WVM.PostgreSQLDBSettingVM.DumpExePath = settings.App_Postgres_DumpExePath;
+            this.WVM.PostgreSQLDBSettingVM.RestoreExePath = settings.App_Postgres_RestoreExePath;
+
+            this.WVM.OleDBSettingVM.DBFilePath = settings.App_OleDB_DBFilePath;
+
+            this.WVM.SQLiteSettingVM.DBFilePath = settings.App_SQLite_DBFilePath;
         }
 
         #region イベントハンドラ
@@ -48,9 +54,9 @@ namespace HouseholdAccountBook.Windows
         {
             string directory = string.Empty;
             string fileName = string.Empty;
-            if (this.WVM.DumpExePath != string.Empty) {
-                directory = Path.GetDirectoryName(this.WVM.DumpExePath);
-                fileName = Path.GetFileName(this.WVM.DumpExePath);
+            if (this.WVM.PostgreSQLDBSettingVM.DumpExePath != string.Empty) {
+                directory = Path.GetDirectoryName(this.WVM.PostgreSQLDBSettingVM.DumpExePath);
+                fileName = Path.GetFileName(this.WVM.PostgreSQLDBSettingVM.DumpExePath);
             }
 
             OpenFileDialog ofd = new OpenFileDialog() {
@@ -62,7 +68,7 @@ namespace HouseholdAccountBook.Windows
             };
 
             if (ofd.ShowDialog() == true) {
-                this.WVM.DumpExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                this.WVM.PostgreSQLDBSettingVM.DumpExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             }
         }
 
@@ -75,9 +81,9 @@ namespace HouseholdAccountBook.Windows
         {
             string directory = string.Empty;
             string fileName = string.Empty;
-            if (this.WVM.RestoreExePath != string.Empty) {
-                directory = Path.GetDirectoryName(this.WVM.RestoreExePath);
-                fileName = Path.GetFileName(this.WVM.RestoreExePath);
+            if (this.WVM.PostgreSQLDBSettingVM.RestoreExePath != string.Empty) {
+                directory = Path.GetDirectoryName(this.WVM.PostgreSQLDBSettingVM.RestoreExePath);
+                fileName = Path.GetFileName(this.WVM.PostgreSQLDBSettingVM.RestoreExePath);
             }
 
             OpenFileDialog ofd = new OpenFileDialog() {
@@ -89,7 +95,56 @@ namespace HouseholdAccountBook.Windows
             };
 
             if (ofd.ShowDialog() == true) {
-                this.WVM.RestoreExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                this.WVM.PostgreSQLDBSettingVM.RestoreExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            }
+        }
+
+        /// <summary>
+        /// DBファイルパスを指定するダイアログを表示する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DBFilePathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        { 
+            switch (this.WVM.SelectedDBKind) {
+                case ConstValue.ConstValue.DBKind.OleDb: {
+                    string directory = string.Empty;
+                    string fileName = string.Empty;
+                    if (this.WVM.OleDBSettingVM.DBFilePath != string.Empty) {
+                        directory = Path.GetDirectoryName(this.WVM.OleDBSettingVM.DBFilePath);
+                        fileName = Path.GetFileName(this.WVM.OleDBSettingVM.DBFilePath);
+                    }
+                    OpenFileDialog ofd = new OpenFileDialog() {
+                        CheckFileExists = true,
+                        InitialDirectory = directory,
+                        FileName = fileName,
+                        Title = Properties.Resources.Title_FileSelection,
+                        Filter = "Access DBファイル|*.mdb;*.accdb"
+                    };
+                    if (ofd.ShowDialog() == true) {
+                        this.WVM.OleDBSettingVM.DBFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                    }
+                    break;
+                }
+                case ConstValue.ConstValue.DBKind.SQLite: {
+                    string directory = string.Empty;
+                    string fileName = string.Empty;
+                    if (this.WVM.SQLiteSettingVM.DBFilePath != string.Empty) {
+                        directory = Path.GetDirectoryName(this.WVM.SQLiteSettingVM.DBFilePath);
+                        fileName = Path.GetFileName(this.WVM.SQLiteSettingVM.DBFilePath);
+                    }
+                    OpenFileDialog ofd = new OpenFileDialog() {
+                        CheckFileExists = true,
+                        InitialDirectory = directory,
+                        FileName = fileName,
+                        Title = Properties.Resources.Title_FileSelection,
+                        Filter = "SQLite DBファイル|*.db;*.sqlite;*.sqlite3"
+                    };
+                    if (ofd.ShowDialog() == true) {
+                        this.WVM.SQLiteSettingVM.DBFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                    }
+                    break;
+                }
             }
         }
 
@@ -111,14 +166,29 @@ namespace HouseholdAccountBook.Windows
         private void OKCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Properties.Settings settings = Properties.Settings.Default;
-            settings.App_Postgres_Host = this.WVM.Host;
-            settings.App_Postgres_Port = this.WVM.Port;
-            settings.App_Postgres_UserName = this.WVM.UserName;
-            settings.App_Postgres_Password = this.passwordBox.Password;
-            settings.App_Postgres_DatabaseName = this.WVM.DatabaseName;
-            settings.App_Postgres_Role = this.WVM.Role;
-            settings.App_Postgres_DumpExePath = this.WVM.DumpExePath;
-            settings.App_Postgres_RestoreExePath = this.WVM.RestoreExePath;
+            settings.App_SelectedDBKind = (int)this.WVM.SelectedDBKind;
+
+            switch (this.WVM.SelectedDBKind) {
+                case ConstValue.ConstValue.DBKind.PostgreSQL: {
+                    settings.App_Postgres_Host = this.WVM.PostgreSQLDBSettingVM.Host;
+                    settings.App_Postgres_Port = this.WVM.PostgreSQLDBSettingVM.Port;
+                    settings.App_Postgres_UserName = this.WVM.PostgreSQLDBSettingVM.UserName;
+                    settings.App_Postgres_Password = this.passwordBox.Password;
+                    settings.App_Postgres_DatabaseName = this.WVM.PostgreSQLDBSettingVM.DatabaseName;
+                    settings.App_Postgres_Role = this.WVM.PostgreSQLDBSettingVM.Role;
+                    settings.App_Postgres_DumpExePath = this.WVM.PostgreSQLDBSettingVM.DumpExePath;
+                    settings.App_Postgres_RestoreExePath = this.WVM.PostgreSQLDBSettingVM.RestoreExePath;
+                    break;
+                }
+                case ConstValue.ConstValue.DBKind.OleDb: {
+                    settings.App_OleDB_DBFilePath = this.WVM.OleDBSettingVM.DBFilePath;
+                    break;
+                }
+                case ConstValue.ConstValue.DBKind.SQLite: {
+                    settings.App_SQLite_DBFilePath = this.WVM.SQLiteSettingVM.DBFilePath;
+                    break;
+                }
+            }
             settings.Save();
 
             this.DialogResult = true;
