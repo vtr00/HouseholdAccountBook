@@ -3,7 +3,7 @@ using CsvHelper.Configuration;
 using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
 using HouseholdAccountBook.Dto;
-using HouseholdAccountBook.Dto.Json;
+using HouseholdAccountBook.Dto.DbTable;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
@@ -300,15 +300,13 @@ namespace HouseholdAccountBook.Windows
             // グループ種別を特定する
             int? groupKind = null;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                DbReader reader = await dbHandler.ExecQueryAsync(@"
+                var dto = await dbHandler.QuerySingleAsync<GroupInfoDto>(@"
 SELECT A.group_id, G.group_kind
 FROM hst_action A
 LEFT JOIN (SELECT * FROM hst_group WHERE del_flg = 0) G ON G.group_id = A.group_id
-WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedCsvComparisonVM.ActionId);
-
-                reader.ExecARow((record) => {
-                    groupKind = record.ToNullableInt("group_kind");
-                });
+WHERE A.action_id = @ActionId AND A.del_flg = 0;",
+new { ActionId = this.WVM.SelectedCsvComparisonVM.ActionId });
+                groupKind = dto.GroupKind;
             }
 
             switch (groupKind) {
@@ -530,18 +528,18 @@ WHERE A.action_id = @{0} AND A.del_flg = 0;", this.WVM.SelectedCsvComparisonVM.A
             ObservableCollection<BookComparisonViewModel> bookCompVMList = new ObservableCollection<BookComparisonViewModel>();
             BookComparisonViewModel selectedBookCompVM = null;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                DbReader reader = await dbHandler.ExecQueryAsync(@"
+                var dtoList = await dbHandler.QueryAsync<MstBookDto>(@"
 SELECT * 
 FROM mst_book 
-WHERE del_flg = 0 AND book_kind <> @{0}
-ORDER BY sort_order;", (int)BookKind.Wallet);
-                reader.ExecWholeRow((count, record) => {
-                    string jsonCode = record["json_code"];
-                    MstBookJsonDto jsonObj = JsonConvert.DeserializeObject<MstBookJsonDto>(jsonCode);
+WHERE del_flg = 0 AND book_kind <> @BookKind
+ORDER BY sort_order;",
+new { BookKind = (int)BookKind.Wallet });
+                foreach (MstBookDto dto in dtoList) {
+                    MstBookDto.JsonDto jsonObj = JsonConvert.DeserializeObject<MstBookDto.JsonDto>(dto.JsonCode);
 
                     BookComparisonViewModel vm = new BookComparisonViewModel() {
-                        Id = record.ToInt("book_id"),
-                        Name = record["book_name"],
+                        Id = dto.BookId,
+                        Name = dto.BookName,
                         CsvFolderPath = jsonObj?.CsvFolderPath == string.Empty ? null : jsonObj?.CsvFolderPath,
                         ActDateIndex = jsonObj?.CsvActDateIndex + 1,
                         ExpensesIndex = jsonObj?.CsvOutgoIndex + 1,
@@ -552,8 +550,7 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
                     if (vm.Id == tmpBookId) {
                         selectedBookCompVM = vm;
                     }
-                    return true;
-                });
+                }
             }
             this.WVM.BookVMList = bookCompVMList;
             this.WVM.SelectedBookVM = selectedBookCompVM ?? bookCompVMList[0];
@@ -639,34 +636,28 @@ ORDER BY sort_order;", (int)BookKind.Wallet);
                     // 前回の帳簿項目情報をクリアする
                     vm.ClearActionInfo();
 
-                    DbReader reader = await dbHandler.ExecQueryAsync(@"
+                    var dtoList = await dbHandler.QueryAsync<ActionCompInfoDto>(@"
 SELECT A.action_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match, A.group_id
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
-WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_value = -@{1} AND book_id = @{2} AND A.del_flg = 0;", vm.Record.Date, vm.Record.Value, this.WVM.SelectedBookVM.Id);
+WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @Date AND A.act_value = -@Value AND book_id = @BookId AND A.del_flg = 0;",
+new { Date = vm.Record.Date, Value = vm.Record.Value, BookId = this.WVM.SelectedBookVM.Id });
 
-                    reader.ExecWholeRow((count, record) => {
-                        int actionId = record.ToInt("action_id");
-                        string itemName = record["item_name"];
-                        int Expenses = Math.Abs(record.ToInt("act_value"));
-                        string shopName = record["shop_name"];
-                        string remark = record["remark"];
-                        bool isMatch = record.ToInt("is_match") == 1;
-                        int? groupId = record.ToNullableInt("group_id");
-
+                    foreach (ActionCompInfoDto dto in dtoList) {
                         // 帳簿項目IDが使用済なら次のレコードを調べるようにする
-                        bool checkNext = this.WVM.CsvComparisonVMList.Where((tmpVM) => { return tmpVM.ActionId == actionId; }).Count() != 0;
+                        bool checkNext = this.WVM.CsvComparisonVMList.Where((tmpVM) => { return tmpVM.ActionId == dto.ActionId; }).Count() != 0;
                         // 帳簿項目情報を紐付ける
                         if (!checkNext) {
-                            vm.ActionId = actionId;
-                            vm.ItemName = itemName;
-                            vm.ShopName = shopName;
-                            vm.Remark = remark;
-                            vm.IsMatch = isMatch;
-                            vm.GroupId = groupId;
+                            vm.ActionId = dto.ActionId;
+                            vm.ItemName = dto.ItemName;
+                            vm.ShopName = dto.ShopName;
+                            vm.Remark = dto.Remark;
+                            vm.IsMatch = dto.IsMatch == 1;
+                            vm.GroupId = dto.GroupId;
+
+                            break;
                         }
-                        return checkNext;
-                    });
+                    }
                 }
             }
 
@@ -750,10 +741,11 @@ WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @{0} AND A.act_va
         private async Task SaveIsMatchAsync(int actionId, bool isMatch)
         {
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                await dbHandler.ExecNonQueryAsync(@"
+                await dbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET is_match = @{0}, update_time = 'now', updater = @{1}
-WHERE action_id = @{2} and is_match <> @{0};", isMatch ? 1 : 0, Updater, actionId);
+SET is_match = @IsMatch, update_time = 'now', updater = @Updater
+WHERE action_id = @ActionId and is_match <> @IsMatch;", 
+new HstActionDto { IsMatch = isMatch ? 1 : 0, ActionId = actionId });
             }
         }
     }

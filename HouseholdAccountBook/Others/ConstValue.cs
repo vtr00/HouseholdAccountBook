@@ -55,7 +55,7 @@ namespace HouseholdAccountBook.ConstValue
         {
             get {
                 DateTime dt = App.StartupTime;
-                return string.Format(@"{0}\{1}.txt", LogFolderPath, dt.ToString("yyyyMMdd_HHmmss"));
+                return string.Format($@"{LogFolderPath}\{dt:yyyyMMdd_HHmmss}.txt");
             }
         }
         #endregion
@@ -68,7 +68,7 @@ namespace HouseholdAccountBook.ConstValue
         {
             get {
                 DateTime dt = DateTime.Now;
-                return string.Format("{0}.backup", dt.ToString("yyyyMMdd_HHmmss"));
+                return string.Format($"{dt:yyyyMMdd_HHmmss}.backup");
             }
         }
         #endregion
@@ -85,7 +85,7 @@ namespace HouseholdAccountBook.ConstValue
         {
             get {
                 DateTime dt = DateTime.Now;
-                return string.Format(@"{0}\{1}.txt", UnhandledExceptionInfoFolderPath, dt.ToString("yyyyMMdd_HHmmss"));
+                return string.Format($@"{UnhandledExceptionInfoFolderPath}\{dt:yyyyMMdd_HHmmss}.txt");
             }
         }
         #endregion
@@ -101,7 +101,7 @@ namespace HouseholdAccountBook.ConstValue
         public static string WindowLocationFilePath(String windowName)
         {
             DateTime dt = App.StartupTime;
-            return string.Format(@"{0}\{1}_{2}.txt", WindowLocationFolderPath, windowName, dt.ToString("yyyyMMdd_HHmmss"));
+            return string.Format($@"{WindowLocationFolderPath}\{windowName}_{dt:yyyyMMdd_HHmmss}.txt");
         }
         #endregion
 
@@ -178,7 +178,6 @@ namespace HouseholdAccountBook.ConstValue
             /// </summary>
             SQLite
         }
-
         /// <summary>
         /// 期間種別
         /// </summary>

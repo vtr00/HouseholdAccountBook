@@ -50,6 +50,7 @@ namespace HouseholdAccountBook.DbHandler
             SQLiteCommand command = ((SQLiteConnection)this.connection).CreateCommand();
 
             sql = sql.Replace("{", "_").Replace("}", "_");
+            command.Transaction = this.dbTransaction as SQLiteTransaction;
             command.CommandText = sql;
 
             int cnt = 0;

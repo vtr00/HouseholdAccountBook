@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
+using HouseholdAccountBook.Dto;
 using HouseholdAccountBook.Extensions;
 using System;
 using System.Threading.Tasks;
@@ -237,14 +238,12 @@ namespace HouseholdAccountBook.Windows
             DateTime firstTime = DateTime.Today;
             DateTime lastTime = DateTime.Today;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                DbReader reader = await dbHandler.ExecQueryAsync(@"
+                TermInfoDto dto = await dbHandler.QuerySingleAsync<TermInfoDto>(@"
 SELECT MIN(act_time) as first_time, MAX(act_time) as last_time
 FROM hst_action
 WHERE del_flg = 0;");
-                reader.ExecARow((record) => {
-                    firstTime = record.ToDateTime("first_time");
-                    lastTime = record.ToDateTime("last_time");
-                });
+                firstTime = dto.FirstTime;
+                lastTime = dto.LastTime;
             }
             return new Tuple<DateTime, DateTime>(firstTime, lastTime);
         }

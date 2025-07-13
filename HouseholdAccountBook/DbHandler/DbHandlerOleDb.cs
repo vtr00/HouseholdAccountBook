@@ -50,6 +50,7 @@ namespace HouseholdAccountBook.DbHandler
             OleDbCommand command = ((OleDbConnection)this.connection).CreateCommand();
 
             sql = sql.Replace("{", "_").Replace("}", "_");
+            command.Transaction = this.dbTransaction as OleDbTransaction;
             command.CommandText = sql;
 
             int cnt = 0;

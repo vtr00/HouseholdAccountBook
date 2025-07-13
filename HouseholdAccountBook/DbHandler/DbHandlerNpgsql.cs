@@ -53,6 +53,7 @@ namespace HouseholdAccountBook.DbHandler
             NpgsqlCommand command = ((NpgsqlConnection)this.connection).CreateCommand();
 
             sql = sql.Replace("{", "_").Replace("}", "_");
+            command.Transaction = this.dbTransaction as NpgsqlTransaction;
             command.CommandText = sql;
 
             int cnt = 0;

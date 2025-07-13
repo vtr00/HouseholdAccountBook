@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
 
 namespace HouseholdAccountBook.DbHandler.Abstract
 {
@@ -19,7 +20,11 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         /// <summary>
         /// DB接続
         /// </summary>
-        protected DbConnection connection;
+        protected DbConnection connection = null;
+        /// <summary>
+        /// DBトランザクション
+        /// </summary>
+        protected DbTransaction dbTransaction = null;
 
         /// <summary>
         /// <see cref="DbHandlerBase"/> クラスの新しいインスタンスを初期化します。
@@ -27,6 +32,8 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         /// <param name="connection">DB接続</param>
         public DbHandlerBase(DbConnection connection)
         {
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
             this.connection = connection;
             this.Open();
         }
@@ -80,20 +87,12 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         protected abstract Task<DbDataReader> ExecuteReaderAsync(string sql, params object[] objects);
 
         /// <summary>
-        /// [非同期]非クエリを実行する
+        /// DBコマンドを生成する
         /// </summary>
         /// <param name="sql">SQL</param>
         /// <param name="objects">引数リスト</param>
-        /// <returns>更新レコード数</returns>
-        public async Task<int> ExecNonQueryAsync(string sql, params object[] objects)
-        {
-            try {
-                return await this.CreateCommand(sql, objects).ExecuteNonQueryAsync();
-            }
-            catch (Exception e) {
-                throw e;
-            }
-        }
+        /// <returns>DBコマンド</returns>
+        protected abstract DbCommand CreateCommand(string sql, params object[] objects);
 
         /// <summary>
         /// [非同期]クエリを実行する
@@ -130,12 +129,71 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         }
 
         /// <summary>
-        /// DBコマンドを生成する
+        /// [非同期]クエリを実行する
+        /// </summary>
+        /// <typeparam name="T">DTO</typeparam>
+        /// <param name="sql">SQL</param>
+        /// <param name="obj">SQLパラメータ</param>
+        /// <returns>クエリ結果リスト</returns>
+        public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object obj = null)
+        {
+            try {
+                return await this.connection.QueryAsync<T>(sql, obj, this.dbTransaction);
+            }
+            catch (Exception e) {
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// [非同期]1行クエリを実行する
+        /// </summary>
+        /// <typeparam name="T">DTO</typeparam>
+        /// <param name="sql">SQL</param>
+        /// <param name="obj">SQLパラメータ</param>
+        /// <returns>クエリ結果 または デフォルト値</returns>
+        public async Task<T> QueryFirstOrDefaultAsync<T>(string sql, object obj = null)
+        {
+            try {
+                return await this.connection.QueryFirstOrDefaultAsync<T>(sql, obj, this.dbTransaction);
+            }
+            catch (Exception e) {
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// [非同期]1行クエリを実行する
+        /// </summary>
+        /// <typeparam name="T">DTO</typeparam>
+        /// <param name="sql">SQL</param>
+        /// <param name="obj">SQLパラメータ</param>
+        /// <returns>クエリ結果</returns>
+        public async Task<T> QuerySingleAsync<T>(string sql, object obj = null)
+        {
+            try {
+                return await this.connection.QuerySingleAsync<T>(sql, obj, this.dbTransaction);
+            }
+            catch (Exception e) {
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// [非同期]非クエリを実行する
         /// </summary>
         /// <param name="sql">SQL</param>
-        /// <param name="objects">引数リスト</param>
-        /// <returns>DBコマンド</returns>
-        protected abstract DbCommand CreateCommand(string sql, params object[] objects);
+        /// <param name="obj">SQLパラメータ</param>
+        /// <returns>変更行数</returns>
+        public async Task<int> ExecuteAsync(string sql, object obj = null)
+        {
+            try {
+                return await this.connection.ExecuteAsync(sql, obj, this.dbTransaction);
+            }
+            catch (Exception e) {
+                throw e;
+            }
+        }
 
         /// <summary>
         /// [同期]トランザクション内の処理
@@ -153,49 +211,53 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         /// <param name="transaction">トランザクション内の処理</param>
         public void ExecTransaction(Transaction transaction)
         {
-            DbTransaction dbTransaction = null;
+            this.dbTransaction = this.connection.BeginTransaction();
             try {
-                dbTransaction = this.connection.BeginTransaction();
-
                 transaction();
 
                 dbTransaction.Commit();
             }
             catch (DbException e) {
                 Console.WriteLine(e.Message);
-                dbTransaction?.Rollback();
+                this.dbTransaction.Rollback();
                 throw;
             }
             catch (Exception e) {
                 Console.WriteLine(e.Message);
-                dbTransaction?.Rollback();
+                this.dbTransaction.Rollback();
                 throw;
+            }
+            finally {
+                this.dbTransaction.Dispose();
+                this.dbTransaction = null;
             }
         }
 
         /// <summary>
         /// [非同期]トランザクション処理を行う
         /// </summary>
-        /// <param name="transaction">トランザクション内の処理</param>
-        public async Task ExecTransactionAsync(TransactionAsync transaction)
+        /// <param name="transactionAsync">トランザクション内の処理</param>
+        public async Task ExecTransactionAsync(TransactionAsync transactionAsync)
         {
-            DbTransaction dbTransaction = null;
+            this.dbTransaction = this.connection.BeginTransaction();
             try {
-                dbTransaction = this.connection.BeginTransaction();
+                await transactionAsync();
 
-                await transaction();
-
-                await Task.Run(() => dbTransaction.Commit());
+                await Task.Run(() => this.dbTransaction.Commit());
             }
             catch (DbException e) {
                 Console.WriteLine(e.Message);
-                await Task.Run(() => dbTransaction?.Rollback());
+                await Task.Run(() => this.dbTransaction.Rollback());
                 throw;
             }
             catch (Exception e) {
                 Console.WriteLine(e.Message);
-                await Task.Run(() => dbTransaction?.Rollback());
+                await Task.Run(() => this.dbTransaction.Rollback());
                 throw;
+            }
+            finally {
+                await Task.Run(() => this.dbTransaction.Dispose());
+                this.dbTransaction = null;
             }
         }
     }

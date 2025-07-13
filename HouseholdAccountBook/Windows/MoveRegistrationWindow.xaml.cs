@@ -1,5 +1,7 @@
 ﻿using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
+using HouseholdAccountBook.Dto;
+using HouseholdAccountBook.Dto.DbTable;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
@@ -222,49 +224,41 @@ namespace HouseholdAccountBook.Windows
                     int commissionValue = 0;
 
                     using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                        DbReader reader = await dbHandler.ExecQueryAsync(@"
+                        var dtoList = await dbHandler.QueryAsync<MoveActionInfoDto>(@"
 SELECT A.book_id, A.action_id, A.item_id, A.act_time, A.act_value, A.remark, I.move_flg
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
-WHERE A.del_flg = 0 AND A.group_id = @{0}
-ORDER BY move_flg DESC;", this.selectedGroupId);
+WHERE A.del_flg = 0 AND A.group_id = @GroupId
+ORDER BY I.move_flg DESC;",
+new { GroupId = this.selectedGroupId });
 
-                        reader.ExecWholeRow((count, record) => {
-                            int bookId = record.ToInt("book_id");
-                            DateTime dateTime = record.ToDateTime("act_time");
-                            int actionId = record.ToInt("action_id");
-                            int itemId = record.ToInt("item_id");
-                            int actValue = record.ToInt("act_value");
-                            int moveFlg = record.ToInt("move_flg");
-                            string remark = record["remark"];
-
-                            if (moveFlg == 1) {
-                                if (actValue < 0) {
-                                    fromBookId = bookId;
-                                    fromDate = dateTime;
-                                    this.fromActionId = actionId;
+                        foreach (MoveActionInfoDto dto in dtoList) {
+                            if (dto.MoveFlg == 1) {
+                                if (dto.ActValue < 0) {
+                                    fromBookId = dto.BookId;
+                                    fromDate = dto.ActTime;
+                                    this.fromActionId = dto.ActionId;
                                 }
                                 else {
-                                    toBookId = bookId;
-                                    toDate = dateTime;
-                                    this.toActionId = actionId;
-                                    moveValue = actValue;
+                                    toBookId = dto.BookId;
+                                    toDate = dto.ActTime;
+                                    this.toActionId = dto.ActionId;
+                                    moveValue = dto.ActValue;
                                 }
                             }
                             else { // 手数料
-                                if (bookId == fromBookId) { // 移動元負担
+                                if (dto.BookId == fromBookId) { // 移動元負担
                                     commissionKind = CommissionKind.MoveFrom;
                                 }
-                                else if (bookId == toBookId) { // 移動先負担
+                                else if (dto.BookId == toBookId) { // 移動先負担
                                     commissionKind = CommissionKind.MoveTo;
                                 }
-                                this.commissionActionId = actionId;
-                                commissionItemId = itemId;
-                                commissionValue = Math.Abs(actValue);
-                                commissionRemark = remark;
+                                this.commissionActionId = dto.ActionId;
+                                commissionItemId = dto.ItemId;
+                                commissionValue = Math.Abs(dto.ActValue);
+                                commissionRemark = dto.Remark;
                             }
-                            return true;
-                        });
+                        }
                     }
 
                     // WVMに値を設定する
@@ -321,20 +315,21 @@ ORDER BY move_flg DESC;", this.selectedGroupId);
             int? debitBookId = null;
             int? payDay = null;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                DbReader reader = await dbHandler.ExecQueryAsync(@"
-SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE del_flg = 0 ORDER BY sort_order;");
-                reader.ExecWholeRow((count, record) => {
-                    BookViewModel vm = new BookViewModel() { Id = record.ToInt("book_id"), Name = record["book_name"] };
+                var dtoList = await dbHandler.QueryAsync<MstBookDto>(@"
+SELECT book_id, book_name, book_kind, debit_book_id, pay_day
+FROM mst_book
+WHERE del_flg = 0
+ORDER BY sort_order;");
+                foreach (MstBookDto dto in dtoList) {
+                    BookViewModel vm = new BookViewModel() { Id = dto.BookId, Name = dto.BookName };
                     bookVMList.Add(vm);
-
                     if (fromBookVM == null || fromBookId == vm.Id) {
                         fromBookVM = vm;
-
                         switch (this.WVM.RegMode) {
                             case RegistrationKind.Add: {
-                                if (record.ToInt("book_kind") == (int)BookKind.CreditCard) {
-                                    debitBookId = record.ToNullableInt("debit_book_id");
-                                    payDay = record.ToNullableInt("pay_day");
+                                if (dto.BookKind == (int)BookKind.CreditCard) {
+                                    debitBookId = dto.DebitBookId;
+                                    payDay = dto.PayDay;
                                 }
                             }
                             break;
@@ -343,8 +338,7 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
                     if (toBookVM == null || toBookId == vm.Id) {
                         toBookVM = vm;
                     }
-                    return true;
-                });
+                }
             }
 
             this.WVM.BookVMList = bookVMList;
@@ -388,26 +382,26 @@ SELECT book_id, book_name, book_kind, debit_book_id, pay_day FROM mst_book WHERE
                         bookId = this.WVM.SelectedToBookVM.Id.Value;
                         break;
                 }
-                DbReader reader = await dbHandler.ExecQueryAsync(@"
+                var dtoList = await dbHandler.QueryAsync<CategoryItemInfoDto>(@"
 SELECT I.item_id, I.item_name, C.category_name
 FROM mst_item I
 INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
-WHERE I.del_flg = 0 AND C.balance_kind = @{0} AND
-      EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @{1} AND RBI.item_id = I.item_id AND del_flg = 0)
-ORDER BY C.sort_order, I.sort_order;", (int)BalanceKind.Expenses, bookId);
+WHERE I.del_flg = 0 AND C.balance_kind = @BalanceKind AND
+      EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @BookId AND RBI.item_id = I.item_id AND del_flg = 0)
+ORDER BY C.sort_order, I.sort_order;",
+new { BalanceKind = (int)BalanceKind.Expenses, BookId = bookId });
 
-                reader.ExecWholeRow((count, record) => {
+                foreach (CategoryItemInfoDto dto in dtoList) {
                     ItemViewModel vm = new ItemViewModel() {
-                        Id = record.ToInt("item_id"),
-                        Name = record["item_name"],
-                        CategoryName = record["category_name"]
+                        Id = dto.ItemId,
+                        Name = dto.ItemName,
+                        CategoryName = dto.CategoryName
                     };
                     itemVMList.Add(vm);
                     if (selectedItemVM == null || vm.Id == itemId) {
                         selectedItemVM = vm;
                     }
-                    return true;
-                });
+                }
             }
             this.WVM.ItemVMList = itemVMList;
             this.WVM.SelectedItemVM = selectedItemVM;
@@ -428,21 +422,25 @@ ORDER BY C.sort_order, I.sort_order;", (int)BalanceKind.Expenses, bookId);
             string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0].Remark;
             RemarkViewModel selectedRemarkVM = remarkVMList[0]; // UNUSED
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                DbReader reader = await dbHandler.ExecQueryAsync(@"
-SELECT R.remark, COUNT(A.remark) AS remark_count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
+                var dtoList = await dbHandler.QueryAsync<RemarkInfoDto>(@"
+SELECT R.remark, COUNT(A.remark) AS count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
 FROM hst_remark R
 LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.remark = R.remark AND A.item_id = R.item_id
-WHERE R.del_flg = 0 AND R.item_id = @{0}
+WHERE R.del_flg = 0 AND R.item_id = @ItemId
 GROUP BY R.remark
-ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
-                reader.ExecWholeRow((count, record) => {
-                    RemarkViewModel rvm = new RemarkViewModel() { Remark = record["remark"], UsedCount = record.ToInt("remark_count"), UsedTime = record.ToNullableDateTime("used_time") };
+ORDER BY sort_time DESC, remark_count DESC;",
+new { ItemId = this.WVM.SelectedItemVM.Id });
+                foreach (RemarkInfoDto dto in dtoList) {
+                    RemarkViewModel rvm = new RemarkViewModel() {
+                        Remark = dto.Remark,
+                        UsedCount = dto.Count,
+                        UsedTime = dto.UsedTime
+                    };
                     remarkVMList.Add(rvm);
                     if (selectedRemarkVM == null || rvm.Remark == selectedRemark) {
                         selectedRemarkVM = rvm;
                     }
-                    return true;
-                });
+                }
             }
 
             this.WVM.RemarkVMList = remarkVMList;
@@ -514,41 +512,39 @@ ORDER BY sort_time DESC, remark_count DESC;", this.WVM.SelectedItemVM.Id);
                         case RegistrationKind.Copy: {
                             #region 帳簿項目を追加する
                             // グループIDを取得する
-                            DbReader reader = await dbHandler.ExecQueryAsync(@"
+                            var dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
 INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, 0, 'now', @{1}, 'now', @{2}) RETURNING group_id;", (int)GroupKind.Move, Updater, Inserter);
-                            reader.ExecARow((record) => {
-                                tmpGroupId = record.ToInt("group_id");
-                            });
+VALUES (@GroupKind, 0, 'now', @Updater, 'now', @Inserter)
+RETURNING group_id AS Id;",
+new HstGroupDto { GroupKind = (int)GroupKind.Move });
+                            tmpGroupId = dto.Id;
 
-                            reader = await dbHandler.ExecQueryAsync(@"
+                            dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
 -- 移動元
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, (
+VALUES (@BookId, (
   SELECT item_id FROM mst_item I 
-  INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @{6}) C ON C.category_id = I.category_id
+  INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @BalanceKind) C ON C.category_id = I.category_id
   WHERE move_flg = 1
-), @{1}, @{2}, @{3}, 0, 'now', @{4}, 'now', @{5}) RETURNING action_id;",
-                                fromBookId, fromDate, -actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Expenses);
+), @ActTime, @ActValue, @GroupId, 0, 'now', @Updater, 'now', @Inserter)
+RETURNING action_id AS Id;",
+new { BookId = fromBookId, ActTime = fromDate, ActValue = -actValue, GroupId = tmpGroupId, Updater, Inserter, BalanceKind = (int)BalanceKind.Expenses });
                             if (this.selectedBookId == fromBookId) {
-                                reader.ExecARow((record) => {
-                                    resActionIdList.Add(record.ToInt("action_id"));
-                                });
+                                resActionIdList.Add(dto.Id);
                             }
 
-                            reader = await dbHandler.ExecQueryAsync(@"
+                            dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
 -- 移動先
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, (
+VALUES (@BookId, (
   SELECT item_id FROM mst_item I
-  INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @{6}) C ON C.category_id = I.category_id
+  INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @BalanceKind) C ON C.category_id = I.category_id
   WHERE move_flg = 1
-), @{1}, @{2}, @{3}, 0, 'now', @{4}, 'now', @{5}) RETURNING action_id;",
-                                toBookId, toDate, actValue, tmpGroupId, Updater, Inserter, (int)BalanceKind.Income);
+), @ActTime, @ActValue, @GroupId, 0, 'now', @Updater, 'now', @Inserter)
+RETURNING action_id AS Id;",
+new { BookId = toBookId, ActTime = toDate, ActValue = actValue, GroupId = tmpGroupId, Updater, Inserter, BalanceKind = (int)BalanceKind.Income });
                             if (this.selectedBookId == toBookId) {
-                                reader.ExecARow((record) => {
-                                    resActionIdList.Add(record.ToInt("action_id"));
-                                });
+                                resActionIdList.Add(dto.Id);
                             }
                             #endregion
                             break;
@@ -556,20 +552,22 @@ VALUES (@{0}, (
                         case RegistrationKind.Edit: {
                             #region 帳簿項目を変更する
                             tmpGroupId = this.selectedGroupId.Value;
-                            await dbHandler.ExecNonQueryAsync(@"
+                            await dbHandler.ExecuteAsync(@"
 -- 移動元
 UPDATE hst_action
-SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
-WHERE action_id = @{4};", fromBookId, fromDate, -actValue, Updater, this.fromActionId);
+SET book_id = @BookId, act_time = @ActTime, act_value = @ActValue, update_time = 'now', updater = @Updater
+WHERE action_id = @ActionId;",
+new HstActionDto { BookId = fromBookId, ActTime = fromDate, ActValue = -actValue, ActionId = this.fromActionId.Value });
                             if (this.selectedBookId == fromBookId) {
                                 resActionIdList.Add(this.fromActionId.Value);
                             }
 
-                            await dbHandler.ExecNonQueryAsync(@"
+                            await dbHandler.ExecuteAsync(@"
 -- 移動先
 UPDATE hst_action
-SET book_id = @{0}, act_time = @{1}, act_value = @{2}, update_time = 'now', updater = @{3}
-WHERE action_id = @{4};", toBookId, toDate, actValue, Updater, this.toActionId);
+SET book_id = @BookId, act_time = @ActTime, act_value = @ActValue, update_time = 'now', updater = @Updater
+WHERE action_id = @ActionId;",
+new HstActionDto { BookId = toBookId, ActTime = toDate, ActValue = actValue, ActionId = this.toActionId.Value });
                             if (this.selectedBookId == toBookId) {
                                 resActionIdList.Add(this.toActionId.Value);
                             }
@@ -593,31 +591,32 @@ WHERE action_id = @{4};", toBookId, toDate, actValue, Updater, this.toActionId);
                                 break;
                         }
 
-                        DbReader reader = null;
                         if (this.commissionActionId != null) {
-                            await dbHandler.ExecNonQueryAsync(@"
+                            await dbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET book_id = @{0}, item_id = @{1}, act_time = @{2}, act_value = @{3}, remark = @{4}, update_time = 'now', updater = @{5}
-WHERE action_id = @{6};", bookId, commissionItemId, actTime, -commission, remark, Updater, this.commissionActionId);
+SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, remark = @Remark, update_time = 'now', updater = @Updater
+WHERE action_id = @ActionId;",
+new HstActionDto { BookId = bookId, ItemId = commissionItemId, ActTime = actTime, ActValue = -commission, Remark = remark, ActionId = this.commissionActionId.Value });
                             resActionIdList.Add(this.commissionActionId.Value);
                         }
                         else {
-                            reader = await dbHandler.ExecQueryAsync(@"
+                            var dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, @{2}, @{3}, @{4}, @{5}, 0, 'now', @{6}, 'now', @{7}) RETURNING action_id;", bookId, commissionItemId, actTime, -commission, tmpGroupId, remark, Updater, Inserter);
-                            reader.ExecARow((record) => {
-                                resActionIdList.Add(record.ToInt("action_id"));
-                            });
+VALUES (@BookId, @ItemId, @ActTime, @ActValue, @GroupId, @Remark, 0, 'now', @Updater, 'now', @Inserter)
+RETURNING action_id AS Id;",
+new HstActionDto { BookId = bookId, ItemId = commissionItemId, ActTime = actTime, ActValue = -commission, GroupId = tmpGroupId, Remark = remark });
+                            resActionIdList.Add(dto.Id);
                         }
                         #endregion
                     }
                     else {
                         #region 手数料なし
                         if (this.commissionActionId != null) {
-                            await dbHandler.ExecNonQueryAsync(@"
+                            await dbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE action_id = @{1};", Updater, this.commissionActionId);
+SET del_flg = 1, update_time = 'now', updater = @Updater
+WHERE action_id = @ActionId;",
+new HstActionDto { ActionId = this.commissionActionId.Value });
                         }
                         #endregion
                     }
@@ -625,20 +624,23 @@ WHERE action_id = @{1};", Updater, this.commissionActionId);
 
                 if (remark != string.Empty) {
                     #region 備考を追加する
-                    DbReader reader = await dbHandler.ExecQueryAsync(@"
+                    var dtoList = await dbHandler.QueryAsync<HstRemarkDto>(@"
 SELECT remark FROM hst_remark
-WHERE item_id = @{0} AND remark = @{1};", commissionItemId, remark);
+WHERE item_id = @ItemId AND remark = @Remark;",
+new HstRemarkDto { ItemId = commissionItemId, Remark = remark });
 
-                    if (reader.Count == 0) {
-                        await dbHandler.ExecNonQueryAsync(@"
+                    if (dtoList.Count() == 0) {
+                        await dbHandler.ExecuteAsync(@"
 INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@{0}, @{1}, 0, @{2}, 0, 'now', @{3}, 'now', @{4});", commissionItemId, remark, fromDate > toDate ? fromDate : toDate, Updater, Inserter);
+VALUES (@ItemId, @Remark, 0, @UsedTime, 0, 'now', @Updater, 'now', @Inserter);",
+new HstRemarkDto { ItemId = commissionItemId, Remark = remark, UsedTime = fromDate > toDate ? fromDate : toDate });
                     }
                     else {
-                        await dbHandler.ExecNonQueryAsync(@"
+                        await dbHandler.ExecuteAsync(@"
 UPDATE hst_remark
-SET used_time = @{0}, del_flg = 0, update_time = 'now', updater = @{1}
-WHERE item_id = @{2} AND remark = @{3} AND used_time < @{0};", fromDate > toDate ? fromDate : toDate, Updater, commissionItemId, remark);
+SET used_time = @UsedTime, del_flg = 0, update_time = 'now', updater = @Updater
+WHERE item_id = @ItemId AND remark = @Remark AND used_time < @UsedTime;",
+new HstRemarkDto { UsedTime = fromDate > toDate ? fromDate : toDate, ItemId = commissionItemId, Remark = remark });
                     }
                     #endregion
                 }

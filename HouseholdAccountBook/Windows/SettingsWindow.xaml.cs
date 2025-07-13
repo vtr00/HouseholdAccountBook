@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
 using HouseholdAccountBook.Dto;
-using HouseholdAccountBook.Dto.Json;
+using HouseholdAccountBook.Dto.DbTable;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
@@ -97,14 +97,12 @@ namespace HouseholdAccountBook.Windows
 
                 int categoryId = -1;
                 using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                    DbReader reader = await dbHandler.ExecQueryAsync(@"
+                    var dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
 INSERT INTO mst_category (category_name, balance_kind, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES ('(no name)', @{0}, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_category), 0, 'now', @{1}, 'now', @{2})
-RETURNING category_id;", (int)kind, Updater, Inserter);
-
-                    reader.ExecARow((record) => {
-                        categoryId = record.ToInt("category_id");
-                    });
+VALUES ('(no name)', @BalanceKind, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_category), 0, 'now', @Updater, 'now', @Inserter)
+RETURNING category_id AS Id;",
+new MstCategoryDto { BalanceKind = (int)kind });
+                    categoryId = dto.Id;
                 }
                 await this.UpdateItemSettingsTabDataAsync(HierarchicalKind.Category, categoryId);
                 this.needToUpdate = true;
@@ -137,14 +135,12 @@ RETURNING category_id;", (int)kind, Updater, Inserter);
 
                 int itemId = -1;
                 using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                    DbReader reader = await dbHandler.ExecQueryAsync(@"
+                    var dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
 INSERT INTO mst_item (item_name, category_id, advance_flg, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES ('(no name)', @{0}, 0, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), 0, 'now', @{1}, 'now', @{2})
-RETURNING item_id;", categoryId, Updater, Inserter);
-
-                    reader.ExecARow((record) => {
-                        itemId = record.ToInt("item_id");
-                    });
+VALUES ('(no name)', @CategoryId, 0, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), 0, 'now', @Updater, 'now', @Inserter)
+RETURNING item_id AS Id;",
+new MstItemDto { CategoryId = categoryId });
+                    itemId = dto.Id;
                 }
                 await this.UpdateItemSettingsTabDataAsync(HierarchicalKind.Item, itemId);
                 this.needToUpdate = true;
@@ -176,40 +172,44 @@ RETURNING item_id;", categoryId, Updater, Inserter);
                     switch (kind) {
                         case HierarchicalKind.Category: {
                             await dbHandler.ExecTransactionAsync(async () => {
-                                DbReader reader = await dbHandler.ExecQueryAsync(@"
-SELECT 1
+                                var dtoList = await dbHandler.QueryAsync<HstActionDto>(@"
+SELECT *
 FROM hst_action A
-INNER JOIN (SELECT item_id FROM mst_item WHERE del_flg = 0 AND category_id = @{0}) I ON A.item_id = I.item_id
-WHERE A.del_flg = 0;", id);
+INNER JOIN (SELECT item_id FROM mst_item WHERE del_flg = 0 AND category_id = @CategoryId) I ON A.item_id = I.item_id
+WHERE A.del_flg = 0;",
+new { CategoryId = id });
 
-                                if (reader.Count != 0) {
+                                if (dtoList.Count() != 0) {
                                     MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInCategory, Properties.Resources.Title_Error);
                                     return;
                                 }
 
-                                await dbHandler.ExecNonQueryAsync(@"
+                                await dbHandler.ExecuteAsync(@"
 UPDATE mst_category
-SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE category_id = @{1};", Updater, id);
+SET del_flg = 1, update_time = 'now', updater = @Updater
+WHERE category_id = @CategoryId;",
+new MstCategoryDto { CategoryId = id });
                             });
                         }
                         break;
                         case HierarchicalKind.Item: {
                             await dbHandler.ExecTransactionAsync(async () => {
-                                DbReader reader = await dbHandler.ExecQueryAsync(@"
+                                var dtoList = await dbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
-WHERE del_flg = 0 AND item_id = @{0};", id);
+WHERE del_flg = 0 AND item_id = @ItemId;",
+new HstActionDto { ItemId = id });
 
-                                if (reader.Count != 0) {
+                                if (dtoList.Count() != 0) {
                                     MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItem, Properties.Resources.Title_Error);
                                     return;
                                 }
 
-                                await dbHandler.ExecNonQueryAsync(@"
+                                await dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE item_id = @{1};", Updater, id);
+SET del_flg = 1, update_time = 'now', updater = @Updater
+WHERE item_id = @ItemId;",
+new MstItemDto { ItemId = id });
                             });
                         }
                         break;
@@ -262,49 +262,45 @@ WHERE item_id = @{1};", Updater, id);
                         switch (HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM)) {
                             case HierarchicalKind.Category: {
                                 await dbHandler.ExecTransactionAsync(async () => {
-                                    DbReader reader = await dbHandler.ExecQueryAsync(@"
-SELECT sort_order
+                                    var dto = await dbHandler.QuerySingleAsync<MstCategoryDto>(@"
+SELECT *
 FROM mst_category
-WHERE category_id = @{0};", changedId);
+WHERE category_id = @CategoryId;",
+new MstCategoryDto { CategoryId = changedId });
 
-                                    int tmpOrder = -1;
-                                    reader.ExecARow((record) => {
-                                        tmpOrder = record.ToInt("sort_order");
-                                    });
-
-                                    await dbHandler.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecuteAsync(@"
 UPDATE mst_category
-SET sort_order = (SELECT sort_order FROM mst_category WHERE category_id = @{0}), update_time = 'now', updater = @{1}
-WHERE category_id = @{2};", changingId, Updater, changedId);
+SET sort_order = (SELECT sort_order FROM mst_category WHERE category_id = @CategoryId1), update_time = 'now', updater = @Updater
+WHERE category_id = @CategoryId2;",
+new { CategoryId1 = changingId, Updater, CategoryId2 = changedId });
 
-                                    await dbHandler.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecuteAsync(@"
 UPDATE mst_category
-SET sort_order = @{0}, update_time = 'now', updater = @{1}
-WHERE category_id = @{2};", tmpOrder, Updater, changingId);
+SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
+WHERE category_id = @CategoryId;",
+new MstCategoryDto { SortOrder = dto.SortOrder, CategoryId = changingId });
                                 });
                             }
                             break;
                             case HierarchicalKind.Item: {
                                 await dbHandler.ExecTransactionAsync(async () => {
-                                    DbReader reader = await dbHandler.ExecQueryAsync(@"
+                                    var dto = await dbHandler.QuerySingleAsync<MstItemDto>(@"
 SELECT sort_order
 FROM mst_item
-WHERE item_id = @{0};", changedId);
+WHERE item_id = @ItemId;",
+new MstItemDto { ItemId = changedId });
 
-                                    int tmpOrder = -1;
-                                    reader.ExecARow((record) => {
-                                        tmpOrder = record.ToInt("sort_order");
-                                    });
-
-                                    await dbHandler.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET sort_order = (SELECT sort_order FROM mst_item WHERE item_id = @{0}), update_time = 'now', updater = @{1}
-WHERE item_id = @{2};", changingId, Updater, changedId);
+SET sort_order = (SELECT sort_order FROM mst_item WHERE item_id = @ItemId1), update_time = 'now', updater = @Updater
+WHERE item_id = @ItemId2;",
+new { ItemId1 = changingId, Updater, ItemId2 = changedId });
 
-                                    await dbHandler.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET sort_order = @{0}, update_time = 'now', updater = @{1}
-WHERE item_id = @{2};", tmpOrder, Updater, changingId);
+SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
+WHERE item_id = @ItemId;",
+new MstItemDto { SortOrder = dto.SortOrder, ItemId = changingId });
                                 });
                             }
                             break;
@@ -318,10 +314,11 @@ WHERE item_id = @{2};", tmpOrder, Updater, changingId);
                     int toCategoryId = grandparentVM.ChildrenVMList[index2 - 1].Id;
 
                     using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                        await dbHandler.ExecNonQueryAsync(@"
+                        await dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET category_id = @{0}, sort_order = (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), update_time = 'now', updater = @{1}
-WHERE item_id = @{2};", toCategoryId, Updater, changingId);
+SET category_id = @CategoryId, sort_order = (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), update_time = 'now', updater = @Updater
+WHERE item_id = @ItemId;",
+new MstItemDto { CategoryId = toCategoryId, ItemId = changingId });
                     }
                 }
 
@@ -372,49 +369,45 @@ WHERE item_id = @{2};", toCategoryId, Updater, changingId);
                         switch (HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM)) {
                             case HierarchicalKind.Category: {
                                 await dbHandler.ExecTransactionAsync(async () => {
-                                    DbReader reader = await dbHandler.ExecQueryAsync(@"
+                                    var dto = await dbHandler.QuerySingleAsync<MstCategoryDto>(@"
 SELECT sort_order
 FROM mst_category
-WHERE category_id = @{0};", changedId);
+WHERE category_id = @CategoryId;",
+new MstCategoryDto { CategoryId = changedId });
 
-                                    int tmpOrder = -1;
-                                    reader.ExecARow((record) => {
-                                        tmpOrder = record.ToInt("sort_order");
-                                    });
-
-                                    await dbHandler.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecuteAsync(@"
 UPDATE mst_category
-SET sort_order = (SELECT sort_order FROM mst_category WHERE category_id = @{0}), update_time = 'now', updater = @{1}
-WHERE category_id = @{2};", changingId, Updater, changedId);
+SET sort_order = (SELECT sort_order FROM mst_category WHERE category_id = @CategoryId1), update_time = 'now', updater = @Updater
+WHERE category_id = @CategoryId2;",
+new { CategoryId1 = changingId, Updater, CategoryId2 = changedId });
 
-                                    await dbHandler.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecuteAsync(@"
 UPDATE mst_category
-SET sort_order = @{0}, update_time = 'now', updater = @{1}
-WHERE category_id = @{2};", tmpOrder, Updater, changingId);
+SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
+WHERE category_id = @CategoryId;",
+new MstCategoryDto { SortOrder = dto.SortOrder, CategoryId = changingId });
                                 });
                             }
                             break;
                             case HierarchicalKind.Item: {
                                 await dbHandler.ExecTransactionAsync(async () => {
-                                    DbReader reader = await dbHandler.ExecQueryAsync(@"
+                                    var dto = await dbHandler.QuerySingleAsync<MstItemDto>(@"
 SELECT sort_order
 FROM mst_item
-WHERE item_id = @{0};", changedId);
+WHERE item_id = @ItemId;",
+new MstItemDto { ItemId = changedId });
 
-                                    int tmpOrder = -1;
-                                    reader.ExecARow((record) => {
-                                        tmpOrder = record.ToInt("sort_order");
-                                    });
-
-                                    await dbHandler.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET sort_order = (SELECT sort_order FROM mst_item WHERE item_id = @{0}), update_time = 'now', updater = @{1}
-WHERE item_id = @{2};", changingId, Updater, changedId);
+SET sort_order = (SELECT sort_order FROM mst_item WHERE item_id = @ItemId1), update_time = 'now', updater = @Updater
+WHERE item_id = @ItemId2;",
+new { ItemId1 = changingId, Updater, ItemId2 = changedId });
 
-                                    await dbHandler.ExecNonQueryAsync(@"
+                                    await dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET sort_order = @{0}, update_time = 'now', updater = @{1}
-WHERE item_id = @{2};", tmpOrder, Updater, changingId);
+SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
+WHERE item_id = @ItemId;",
+new MstItemDto { SortOrder = dto.SortOrder, ItemId = changingId });
                                 });
                             }
                             break;
@@ -429,37 +422,38 @@ WHERE item_id = @{2};", tmpOrder, Updater, changingId);
 
                     using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
                         await dbHandler.ExecTransactionAsync(async () => {
-                            // 種別IDを更新する
-                            await dbHandler.ExecNonQueryAsync(@"
+                            // 分類IDを更新する
+                            await dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET category_id = @{0}, update_time = 'now', updater = @{1}
-WHERE item_id = @{2};", toCategoryId, Updater, changingId);
+SET category_id = @CategoryId, update_time = 'now', updater = @Updater
+WHERE item_id = @ItemId;",
+new MstItemDto { CategoryId = toCategoryId, ItemId = changingId });
 
                             // 移動対象のソート順を取得する
-                            int tmpOrder = -1;
-                            DbReader reader = await dbHandler.ExecQueryAsync(@"
+                            var dto = await dbHandler.QuerySingleAsync<MstItemDto>(@"
 SELECT sort_order
 FROM mst_item
-WHERE item_id = @{0};", changingId);
-                            reader.ExecARow((record) => {
-                                tmpOrder = record.ToInt("sort_order");
-                            });
+WHERE item_id = @ItemId;",
+new MstItemDto { ItemId = changingId });
+
                             foreach (var vm in grandparentVM.ChildrenVMList[index2 + 1].ChildrenVMList) {
                                 int changedId = vm.Id;
 
                                 // ソート順が若ければ、移動対象のソート順を移動先のソート順に変更する
-                                int num = await dbHandler.ExecNonQueryAsync(@"
+                                int num = await dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET sort_order = (SELECT sort_order FROM mst_item WHERE item_id = @{0}), update_time = 'now', updater = @{1}
-WHERE item_id = @{2} AND (SELECT sort_order FROM mst_item WHERE item_id = @{0}) < @{3};", changedId, Updater, changingId, tmpOrder);
+SET sort_order = (SELECT sort_order FROM mst_item WHERE item_id = @ItemId1), update_time = 'now', updater = @Updater
+WHERE item_id = @ItemId2 AND (SELECT sort_order FROM mst_item WHERE item_id = @ItemId1) < @SortOrder;",
+new { ItemId1 = changedId, Updater, ItemId2 = changingId, SortOrder = dto.SortOrder });
 
                                 if (num == 0) { break; }
 
                                 // 移動先のソート順を移動対象のソート順に変更する
-                                await dbHandler.ExecNonQueryAsync(@"
+                                await dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET sort_order = @{0}, update_time = 'now', updater = @{1}
-WHERE item_id = @{2};", tmpOrder, Updater, changedId);
+SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
+WHERE item_id = @ItemId;",
+new MstItemDto { SortOrder = dto.SortOrder, ItemId = changedId });
                                 changingId = changedId;
                             }
                         });
@@ -495,17 +489,19 @@ WHERE item_id = @{2};", tmpOrder, Updater, changedId);
                 using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
                     switch (vm.Kind) {
                         case HierarchicalKind.Category: {
-                            await dbHandler.ExecNonQueryAsync(@"
+                            await dbHandler.ExecuteAsync(@"
 UPDATE mst_category
-SET category_name = @{0}, update_time = 'now', updater = @{1}
-WHERE category_id = @{2};", vm.Name, Updater, vm.Id);
+SET category_name = @CategoryName, update_time = 'now', updater = @Updater
+WHERE category_id = @CategoryId;",
+new MstCategoryDto { CategoryName = vm.Name, CategoryId = vm.Id });
                         }
                         break;
                         case HierarchicalKind.Item: {
-                            await dbHandler.ExecNonQueryAsync(@"
+                            await dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET item_name = @{0}, update_time = 'now', updater = @{1}
-WHERE item_id = @{2};", vm.Name, Updater, vm.Id);
+SET item_name = @ItemName, update_time = 'now', updater = @Updater
+WHERE item_id = @ItemId;",
+new MstItemDto { ItemName = vm.Name, ItemId = vm.Id });
                         }
                         break;
                     }
@@ -533,34 +529,38 @@ WHERE item_id = @{2};", vm.Name, Updater, vm.Id);
 
                 using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
                     await dbHandler.ExecTransactionAsync(async () => {
-                        DbReader reader = await dbHandler.ExecQueryAsync(@"
+                        var dtoList = await dbHandler.QueryAsync<RelBookItemDto>(@"
 SELECT *
 FROM rel_book_item
-WHERE item_id = @{0} AND book_id = @{1};", vm.Id, vm.SelectedRelationVM.Id);
+WHERE item_id = @ItemId AND book_id = @BookId;",
+new RelBookItemDto { ItemId = vm.Id, BookId = vm.SelectedRelationVM.Id });
 
-                        if (reader.Count == 0) {
-                            await dbHandler.ExecNonQueryAsync(@"
+                        if (dtoList.Count() == 0) {
+                            await dbHandler.ExecuteAsync(@"
 INSERT INTO rel_book_item (book_id, item_id, del_flg, insert_time, inserter, update_time, updater)
-VALUES (@{0}, @{1}, 0, 'now', @{2}, 'now', @{3});", vm.SelectedRelationVM.Id, vm.Id, Inserter, Updater);
+VALUES (@BookId, @ItemId, 0, 'now', @Inserter, 'now', @Updater);",
+new RelBookItemDto { BookId = vm.SelectedRelationVM.Id, ItemId = vm.Id });
                             vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
                         }
                         else {
-                            reader = await dbHandler.ExecQueryAsync(@"
+                            dtoList = await dbHandler.QueryAsync<RelBookItemDto>(@"
 SELECT *
 FROM hst_action
-WHERE book_id = @{0} AND item_id = @{1} AND del_flg = 0;", vm.SelectedRelationVM.Id, vm.Id);
+WHERE book_id = @BookId AND item_id = @ItemId AND del_flg = 0;",
+new RelBookItemDto { BookId = vm.SelectedRelationVM.Id, ItemId = vm.Id });
 
-                            if (reader.Count != 0) {
+                            if (dtoList.Count() != 0) {
                                 MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
                                 e.Handled = true;
                                 return;
                             }
 
                             vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
-                            await dbHandler.ExecNonQueryAsync(@"
+                            await dbHandler.ExecuteAsync(@"
 UPDATE rel_book_item
-SET del_flg = @{0}, update_time = 'now', updater = @{1}
-WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 : 1, Updater, vm.Id, vm.SelectedRelationVM.Id);
+SET del_flg = @DelFlg, update_time = 'now', updater = @Updater
+WHERE item_id = @ItemId AND book_id = @BookId;",
+new RelBookItemDto { DelFlg = vm.SelectedRelationVM.IsRelated ? 1 : 0, ItemId = vm.Id, BookId = vm.SelectedRelationVM.Id });
                         }
                     });
                 }
@@ -591,9 +591,10 @@ WHERE item_id = @{2} AND book_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                     Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
                     using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                        await dbHandler.ExecNonQueryAsync(@"
-UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.DisplayedHierarchicalSettingVM.SelectedShopVM.Name, this.WVM.DisplayedHierarchicalSettingVM.Id);
+                        await dbHandler.ExecuteAsync(@"
+UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @Updater
+WHERE shop_name = @ShopName AND item_id = @ItemId;",
+new HstShopDto { ShopName = this.WVM.DisplayedHierarchicalSettingVM.SelectedShopVM.Name, ItemId = this.WVM.DisplayedHierarchicalSettingVM.Id });
 
                         // 店舗名を更新する
                         this.WVM.DisplayedHierarchicalSettingVM.ShopVMList = await this.LoadShopViewModelListAsync(dbHandler, this.WVM.DisplayedHierarchicalSettingVM.Id);
@@ -625,9 +626,10 @@ WHERE shop_name = @{1} AND item_id = @{2};", Updater, this.WVM.DisplayedHierarch
                     Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
                     using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                        await dbHandler.ExecNonQueryAsync(@"
-UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE remark = @{1} AND item_id = @{2};", Updater, this.WVM.DisplayedHierarchicalSettingVM.SelectedRemarkVM.Remark, this.WVM.DisplayedHierarchicalSettingVM.Id);
+                        await dbHandler.ExecuteAsync(@"
+UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @Updater
+WHERE remark = @Remark AND item_id = @ItemId;",
+new HstRemarkDto { Remark = this.WVM.DisplayedHierarchicalSettingVM.SelectedRemarkVM.Remark, ItemId = this.WVM.DisplayedHierarchicalSettingVM.Id });
 
                         // 備考欄の表示を更新する
                         this.WVM.DisplayedHierarchicalSettingVM.RemarkVMList = await this.LoadRemarkViewModelListAsync(dbHandler, this.WVM.DisplayedHierarchicalSettingVM.Id);
@@ -648,14 +650,12 @@ WHERE remark = @{1} AND item_id = @{2};", Updater, this.WVM.DisplayedHierarchica
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 int bookId = -1;
                 using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                    DbReader reader = await dbHandler.ExecQueryAsync(@"
+                    var dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
 INSERT INTO mst_book (book_name, book_kind, pay_day, initial_value, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES ('(no name)', 0, null, 0, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), 0, 'now', @{0}, 'now', @{1})
-RETURNING book_id;", Updater, Inserter);
-
-                    reader.ExecARow((record) => {
-                        bookId = record.ToInt("book_id");
-                    });
+VALUES ('(no name)', 0, null, 0, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), 0, 'now', @Updater, 'now', @Inserter)
+RETURNING book_id AS Id;",
+new MstBookDto { });
+                    bookId = dto.Id;
                 }
 
                 await this.UpdateBookSettingTabDataAsync(bookId);
@@ -683,19 +683,21 @@ RETURNING book_id;", Updater, Inserter);
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
                     await dbHandler.ExecTransactionAsync(async () => {
-                        DbReader reader = await dbHandler.ExecQueryAsync(@"
+                        var dtoList = await dbHandler.QueryAsync<HstActionDto>(@"
 SELECT * FROM hst_action
-WHERE book_id = @{0} AND del_flg = 0;", this.WVM.SelectedBookVM.Id);
+WHERE book_id = @BookId AND del_flg = 0;",
+new HstActionDto { BookId = this.WVM.SelectedBookVM.Id.Value });
 
-                        if (reader.Count != 0) {
+                        if (dtoList.Count() != 0) {
                             MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInBook, Properties.Resources.Title_Error);
                             return;
                         }
 
-                        await dbHandler.ExecNonQueryAsync(@"
+                        await dbHandler.ExecuteAsync(@"
 UPDATE mst_book
-SET del_flg = 1, update_time = 'now', updater = @{0}
-WHERE book_id = @{1};", Updater, this.WVM.SelectedBookVM.Id);
+SET del_flg = 1, update_time = 'now', updater = @Updater
+WHERE book_id = @BookId;",
+new MstBookDto { BookId = this.WVM.SelectedBookVM.Id.Value });
                     });
                 }
 
@@ -732,25 +734,23 @@ WHERE book_id = @{1};", Updater, this.WVM.SelectedBookVM.Id);
 
                 using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
                     await dbHandler.ExecTransactionAsync(async () => {
-                        DbReader reader = await dbHandler.ExecQueryAsync(@"
-SELECT sort_order
+                        var dto = await dbHandler.QuerySingleAsync<MstBookDto>(@"
+SELECT *
 FROM mst_book
-WHERE book_id = @{0};", changedId);
+WHERE book_id = @BookId;",
+new MstBookDto { BookId = changedId });
 
-                        int tmpOrder = -1;
-                        reader.ExecARow((record) => {
-                            tmpOrder = record.ToInt("sort_order");
-                        });
-
-                        await dbHandler.ExecNonQueryAsync(@"
+                        await dbHandler.ExecuteAsync(@"
 UPDATE mst_book
-SET sort_order = (SELECT sort_order FROM mst_book WHERE book_id = @{0}), update_time = 'now', updater = @{1}
-WHERE book_id = @{2};", changingId, Updater, changedId);
+SET sort_order = (SELECT sort_order FROM mst_book WHERE book_id = @BookId1), update_time = 'now', updater = @Updater
+WHERE book_id = @BookId2;",
+new { BookId1 = changingId, Updater, BookId2 = changedId });
 
-                        await dbHandler.ExecNonQueryAsync(@"
+                        await dbHandler.ExecuteAsync(@"
 UPDATE mst_book
-SET sort_order = @{0}, update_time = 'now', updater = @{1}
-WHERE book_id = @{2};", tmpOrder, Updater, changingId);
+SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
+WHERE book_id = @BookId;",
+new MstBookDto { SortOrder = dto.SortOrder, BookId = changingId });
                     });
                 }
 
@@ -787,25 +787,23 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
 
                 using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
                     await dbHandler.ExecTransactionAsync(async () => {
-                        DbReader reader = await dbHandler.ExecQueryAsync(@"
+                        var dto = await dbHandler.QuerySingleAsync<MstBookDto>(@"
 SELECT sort_order
 FROM mst_book
-WHERE book_id = @{0};", changedId);
+WHERE book_id = @BookId;",
+new MstBookDto { BookId = changedId });
 
-                        int tmpOrder = -1;
-                        reader.ExecARow((record) => {
-                            tmpOrder = record.ToInt("sort_order");
-                        });
-
-                        await dbHandler.ExecNonQueryAsync(@"
+                        await dbHandler.ExecuteAsync(@"
 UPDATE mst_book
-SET sort_order = (SELECT sort_order FROM mst_book WHERE book_id = @{0}), update_time = 'now', updater = @{1}
-WHERE book_id = @{2};", changingId, Updater, changedId);
+SET sort_order = (SELECT sort_order FROM mst_book WHERE book_id = @BookId1), update_time = 'now', updater = @Updater
+WHERE book_id = @BookId2;",
+new { BookId1 = changingId, Updater, BookId2 = changedId });
 
-                        await dbHandler.ExecNonQueryAsync(@"
+                        await dbHandler.ExecuteAsync(@"
 UPDATE mst_book
-SET sort_order = @{0}, update_time = 'now', updater = @{1}
-WHERE book_id = @{2};", tmpOrder, Updater, changingId);
+SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
+WHERE book_id = @BookId;",
+new MstBookDto { SortOrder = dto.SortOrder, BookId = changingId });
                     });
                 }
 
@@ -863,7 +861,7 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 BookSettingViewModel vm = this.WVM.DisplayedBookSettingVM;
                 using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                    MstBookJsonDto jsonObj = new MstBookJsonDto() {
+                    MstBookDto.JsonDto jsonObj = new MstBookDto.JsonDto() {
                         StartDate = vm.StartDateExists ? (DateTime?)vm.StartDate : null,
                         EndDate = vm.EndDateExists ? (DateTime?)vm.EndDate : null,
                         CsvFolderPath = vm.CsvFolderPath != string.Empty ? vm.CsvFolderPath : null,
@@ -873,10 +871,12 @@ WHERE book_id = @{2};", tmpOrder, Updater, changingId);
                     };
                     string jsonCode = JsonConvert.SerializeObject(jsonObj);
 
-                    await dbHandler.ExecNonQueryAsync(@"
+                    await dbHandler.ExecuteAsync(@"
 UPDATE mst_book
-SET book_name = @{0}, book_kind = @{1}, initial_value = @{2}, debit_book_id = @{3}, pay_day = @{4}, json_code = @{5}, update_time = 'now', updater = @{6}
-WHERE book_id = @{7};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.SelectedDebitBookVM.Id == -1 ? null : vm.SelectedDebitBookVM.Id, vm.PayDay, jsonCode, Updater, vm.Id);
+SET book_name = @BookName, book_kind = @BookKind, initial_value = @InitialValue, debit_book_id = @DebitBookId, pay_day = @PayDay, json_code = @JsonCode, update_time = 'now', updater = @Updater
+WHERE book_id = @BookId;",
+new MstBookDto { BookName = vm.Name, BookKind = (int)vm.SelectedBookKind, InitialValue = vm.InitialValue, DebitBookId = vm.SelectedDebitBookVM.Id == -1 ? null : vm.SelectedDebitBookVM.Id, 
+                 PayDay = vm.PayDay, JsonCode = jsonCode, BookId = vm.Id.Value });
                 }
 
                 await this.UpdateBookSettingTabDataAsync(vm.Id);
@@ -899,34 +899,38 @@ WHERE book_id = @{7};", vm.Name, (int)vm.SelectedBookKind, vm.InitialValue, vm.S
 
                 using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
                     await dbHandler.ExecTransactionAsync(async () => {
-                        DbReader reader = await dbHandler.ExecQueryAsync(@"
+                        var dtoList = await dbHandler.QueryAsync<RelBookItemDto>(@"
 SELECT *
 FROM rel_book_item
-WHERE book_id = @{0} AND item_id = @{1};", vm.Id, vm.SelectedRelationVM.Id);
+WHERE book_id = @BookId AND item_id = @ItemId;",
+new RelBookItemDto { BookId = vm.Id.Value, ItemId = vm.SelectedRelationVM.Id });
 
-                        if (reader.Count == 0) {
-                            await dbHandler.ExecNonQueryAsync(@"
+                        if (dtoList.Count() == 0) {
+                            await dbHandler.ExecuteAsync(@"
 INSERT INTO rel_book_item (book_id, item_id, del_flg, insert_time, inserter, update_time, updater)
-VALUES (@{0}, @{1}, 0, 'now', @{2}, 'now', @{3});", vm.Id, vm.SelectedRelationVM.Id, Inserter, Updater);
+VALUES (@BookId, @ItemId, 0, 'now', @Inserter, 'now', @Updater);",
+new { BookId = vm.Id, ItemId = vm.SelectedRelationVM.Id, Inserter, Updater });
                             vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
                         }
                         else {
-                            reader = await dbHandler.ExecQueryAsync(@"
+                            var dtoList2 = await dbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
-WHERE book_id = @{0} AND item_id = @{1} AND del_flg = 0;", vm.Id, vm.SelectedRelationVM.Id);
+WHERE book_id = @BookId AND item_id = @ItemId AND del_flg = 0;",
+new HstActionDto { BookId = vm.Id.Value, ItemId = vm.SelectedRelationVM.Id });
 
-                            if (reader.Count != 0) {
+                            if (dtoList2.Count() != 0) {
                                 MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
                                 e.Handled = true;
                                 return;
                             }
 
                             vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
-                            await dbHandler.ExecNonQueryAsync(@"
+                            await dbHandler.ExecuteAsync(@"
 UPDATE rel_book_item
-SET del_flg = @{0}, update_time = 'now', updater = @{1}
-WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 : 1, Updater, vm.Id, vm.SelectedRelationVM.Id);
+SET del_flg = @DelFlg, update_time = 'now', updater = @Updater
+WHERE book_id = @BookId AND item_id = @ItemId;",
+new RelBookItemDto { DelFlg = vm.SelectedRelationVM.IsRelated ? 1 : 0, BookId = vm.Id.Value, ItemId = vm.SelectedRelationVM.Id });
                         }
                     });
                 }
@@ -1305,49 +1309,41 @@ WHERE book_id = @{2} AND item_id = @{3};", vm.SelectedRelationVM.IsRelated ? 0 :
                 case HierarchicalKind.Category: {
                     // 分類
                     using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                        DbReader reader = await dbHandler.ExecQueryAsync(@"
-SELECT category_name, sort_order
+                        var dto = await dbHandler.QuerySingleAsync<MstCategoryDto>(@"
+SELECT *
 FROM mst_category
-WHERE category_id = @{0} AND del_flg = 0 AND sort_order <> 0
-ORDER BY sort_order;", id);
+WHERE category_id = @CategoryId AND del_flg = 0 AND sort_order <> 0
+ORDER BY sort_order;",
+new MstCategoryDto { CategoryId = id });
 
-                        reader.ExecARow((record) => {
-                            int sortOrder = record.ToInt("sort_order");
-                            string categoryName = record["category_name"];
-
-                            vm = new HierarchicalSettingViewModel() {
-                                Kind = HierarchicalKind.Category,
-                                Id = id,
-                                SortOrder = sortOrder,
-                                Name = categoryName
-                            };
-                        });
+                        vm = new HierarchicalSettingViewModel() {
+                            Kind = HierarchicalKind.Category,
+                            Id = id,
+                            SortOrder = dto.SortOrder,
+                            Name = dto.CategoryName
+                        };
                     }
                     break;
                 }
                 case HierarchicalKind.Item: {
                     // 項目
                     using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                        DbReader reader = await dbHandler.ExecQueryAsync(@"
-SELECT item_name, sort_order
+                        var dto = await dbHandler.QuerySingleAsync<MstItemDto>(@"
+SELECT *
 FROM mst_item
-WHERE item_id = @{0} AND del_flg = 0
-ORDER BY sort_order;", id);
+WHERE item_id = @ItemId AND del_flg = 0
+ORDER BY sort_order;",
+new MstItemDto { ItemId = id });
 
-                        reader.ExecARow((record) => {
-                            int sortOrder = record.ToInt("sort_order");
-                            string itemName = record["item_name"];
-
-                            vm = new HierarchicalSettingViewModel() {
-                                Kind = HierarchicalKind.Item,
-                                Id = id,
-                                SortOrder = sortOrder,
-                                Name = itemName
-                            };
-                        });
-                        vm.RelationVMList = await this.LoadRelationViewModelList1Async(dbHandler, id);
-                        vm.ShopVMList = await this.LoadShopViewModelListAsync(dbHandler, id);
-                        vm.RemarkVMList = await this.LoadRemarkViewModelListAsync(dbHandler, id);
+                        vm = new HierarchicalSettingViewModel {
+                            Kind = HierarchicalKind.Item,
+                            Id = id,
+                            SortOrder = dto.SortOrder,
+                            Name = dto.ItemName,
+                            RelationVMList = await this.LoadRelationViewModelList1Async(dbHandler, id),
+                            ShopVMList = await this.LoadShopViewModelListAsync(dbHandler, id),
+                            RemarkVMList = await this.LoadRemarkViewModelListAsync(dbHandler, id)
+                        };
                     }
                     break;
                 }
@@ -1402,64 +1398,50 @@ ORDER BY sort_order;", id);
 
             using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
                 // 帳簿一覧を取得する(支払元選択用)
-                DbReader reader = await dbHandler.ExecQueryAsync(@"
-SELECT book_id, book_name
+                var dtoList = await dbHandler.QueryAsync<MstBookDto>(@"
+SELECT *
 FROM mst_book
 WHERE del_flg = 0
 ORDER BY sort_order;");
 
-                reader.ExecWholeRow((count, record) => {
-                    int tmpBookId = record.ToInt("book_id");
-                    string tmpBookName = record["book_name"];
-
+                foreach (MstBookDto tmpDto in dtoList) {
                     vmList.Add(new BookViewModel() {
-                        Id = tmpBookId,
-                        Name = tmpBookName
+                        Id = tmpDto.BookId,
+                        Name = tmpDto.BookName
                     });
-                    return true;
-                });
+                }
 
                 // 帳簿一覧を取得する
-                reader = await dbHandler.ExecQueryAsync(@"
+                BookInfoDto dto = await dbHandler.QuerySingleAsync<BookInfoDto>(@"
 SELECT B.book_name, B.book_kind, B.debit_book_id, B.pay_day, B.initial_value, B.json_code, B.sort_order, MIN(A.act_time) AS start_date, MAX(A.act_time) AS end_date
 FROM mst_book B
 LEFT OUTER JOIN hst_action A ON A.book_id = B.book_id AND A.del_flg = 0
-WHERE B.book_id = @{0} AND B.del_flg = 0
+WHERE B.book_id = @BookId AND B.del_flg = 0
 GROUP BY B.book_id
-ORDER BY B.sort_order;", bookId);
+ORDER BY B.sort_order;",
+new { BookId = bookId });
 
-                reader.ExecARow((record) => {
-                    int sortOrder = record.ToInt("sort_order");
-                    string bookName = record["book_name"];
-                    BookKind bookKind = (BookKind)record.ToInt("book_kind");
-                    int initialValue = record.ToInt("initial_value");
-                    int? debitBookId = record.ToNullableInt("debit_book_id");
-                    int? payDay = record.ToNullableInt("pay_day");
-                    DateTime? startDate = record.ToNullableDateTime("start_date");
-                    DateTime? endDate = record.ToNullableDateTime("end_date");
+                MstBookDto.JsonDto jsonObj = dto.JsonCode != null ? JsonConvert.DeserializeObject<MstBookDto.JsonDto>(dto.JsonCode) : null;
 
-                    string jsonCode = record["json_code"];
-                    MstBookJsonDto jsonObj = JsonConvert.DeserializeObject<MstBookJsonDto>(jsonCode);
+                vm = new BookSettingViewModel() {
+                    Id = bookId,
+                    SortOrder = dto.SortOrder,
+                    Name = dto.BookName,
+                    SelectedBookKind = (BookKind)dto.BookKind,
+                    InitialValue = dto.InitialValue,
+                    StartDateExists = jsonObj?.StartDate != null,
+                    StartDate = jsonObj?.StartDate ?? dto.StartDate ?? DateTime.Today,
+                    EndDateExists = jsonObj?.EndDate != null,
+                    EndDate = jsonObj?.EndDate ?? dto.EndDate ?? DateTime.Today,
+                    DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((tmpVM) => { return tmpVM.Id != bookId; })),
+                    PayDay = dto.PayDay,
+                    CsvFolderPath = jsonObj?.CsvFolderPath,
+                    ActDateIndex = jsonObj?.CsvActDateIndex + 1,
+                    ExpensesIndex = jsonObj?.CsvOutgoIndex + 1,
+                    ItemNameIndex = jsonObj?.CsvItemNameIndex + 1
+                };
+                vm.SelectedDebitBookVM = vm.DebitBookVMList.FirstOrDefault((tmpVM) => { return tmpVM.Id == dto.DebitBookId; }) ?? vm.DebitBookVMList[0];
 
-                    vm = new BookSettingViewModel() {
-                        Id = bookId,
-                        SortOrder = sortOrder,
-                        Name = bookName,
-                        SelectedBookKind = bookKind,
-                        InitialValue = initialValue,
-                        StartDateExists = jsonObj?.StartDate != null,
-                        StartDate = jsonObj?.StartDate ?? startDate ?? DateTime.Today,
-                        EndDateExists = jsonObj?.EndDate != null,
-                        EndDate = jsonObj?.EndDate ?? endDate ?? DateTime.Today,
-                        DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((tmpVM) => { return tmpVM.Id != bookId; })),
-                        PayDay = payDay,
-                        CsvFolderPath = jsonObj?.CsvFolderPath,
-                        ActDateIndex = jsonObj?.CsvActDateIndex + 1,
-                        ExpensesIndex = jsonObj?.CsvOutgoIndex + 1,
-                        ItemNameIndex = jsonObj?.CsvItemNameIndex + 1
-                    };
-                    vm.SelectedDebitBookVM = vm.DebitBookVMList.FirstOrDefault((tmpVM) => { return tmpVM.Id == debitBookId; }) ?? vm.DebitBookVMList[0];
-                });
                 vm.RelationVMList = await this.LoadRelationViewModelList2Async(dbHandler, bookId);
             }
 
@@ -1510,51 +1492,42 @@ ORDER BY B.sort_order;", bookId);
             foreach (HierarchicalViewModel vm in vmList) {
                 // 分類
                 using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                    DbReader reader = await dbHandler.ExecQueryAsync(@"
+                    var cDtoList = await dbHandler.QueryAsync<MstCategoryDto>(@"
 SELECT category_id, category_name, sort_order 
 FROM mst_category
-WHERE balance_kind = @{0} AND del_flg = 0 AND sort_order <> 0
-ORDER BY sort_order;", vm.Id);
+WHERE balance_kind = @BalanceKind AND del_flg = 0 AND sort_order <> 0
+ORDER BY sort_order;",
+new MstCategoryDto { BalanceKind = vm.Id });
 
-                    reader.ExecWholeRow((count, record) => {
-                        int categoryId = record.ToInt("category_id");
-                        int sortOrder = record.ToInt("sort_order");
-                        string categoryName = record["category_name"];
-
+                    foreach (MstCategoryDto dto in cDtoList) {
                         vm.ChildrenVMList.Add(new HierarchicalViewModel() {
                             Depth = (int)HierarchicalKind.Category,
-                            Id = categoryId,
-                            SortOrder = sortOrder,
-                            Name = categoryName,
+                            Id = dto.CategoryId,
+                            SortOrder = dto.SortOrder,
+                            Name = dto.CategoryName,
                             ParentVM = vm,
                             ChildrenVMList = new ObservableCollection<HierarchicalViewModel>()
                         });
-                        return true;
-                    });
+                    }
 
-                    foreach (HierarchicalViewModel categocyVM in vm.ChildrenVMList) {
+                    foreach (HierarchicalViewModel categoryVM in vm.ChildrenVMList) {
                         // 項目
-                        reader = await dbHandler.ExecQueryAsync(@"
+                        var iDtoList = await dbHandler.QueryAsync<MstItemDto>(@"
 SELECT item_id, item_name, advance_flg, sort_order
 FROM mst_item
-WHERE category_id = @{0} AND del_flg = 0
-ORDER BY sort_order;", categocyVM.Id);
+WHERE category_id = @CategoryId AND del_flg = 0
+ORDER BY sort_order;",
+new MstItemDto { CategoryId = categoryVM.Id });
 
-                        reader.ExecWholeRow((count, record) => {
-                            int itemId = record.ToInt("item_id");
-                            int sortOrder = record.ToInt("sort_order");
-                            string itemName = record["item_name"];
-                            int advanceFlg = record.ToInt("advance_flg");
-
-                            categocyVM.ChildrenVMList.Add(new HierarchicalViewModel() {
+                        foreach (MstItemDto dto in iDtoList) {
+                            categoryVM.ChildrenVMList.Add(new HierarchicalViewModel() {
                                 Depth = (int)HierarchicalKind.Item,
-                                Id = itemId,
-                                SortOrder = sortOrder,
-                                Name = itemName,
-                                ParentVM = categocyVM,
+                                Id = dto.ItemId,
+                                SortOrder = dto.SortOrder,
+                                Name = dto.ItemName,
+                                ParentVM = categoryVM
                             });
-                            return true;
-                        });
+                        }
                     }
                 }
             }
@@ -1574,24 +1547,18 @@ ORDER BY sort_order;", categocyVM.Id);
 
             using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
                 // 帳簿一覧を取得する
-                DbReader reader = await dbHandler.ExecQueryAsync(@"
+                var dtoList = await dbHandler.QueryAsync<MstBookDto>(@"
 SELECT book_id, book_name
 FROM mst_book
 WHERE del_flg = 0
 ORDER BY sort_order;");
 
-                reader.ExecWholeRow((count, record) => {
-                    int bookId = record.ToInt("book_id");
-                    string bookName = record["book_name"];
-
-                    BookViewModel tmpVM = new BookViewModel() {
-                        Id = bookId,
-                        Name = bookName
-                    };
-
-                    bookVMList.Add(tmpVM);
-                    return true;
-                });
+                foreach (MstBookDto dto in dtoList) {
+                    bookVMList.Add(new BookViewModel() {
+                        Id = dto.BookId,
+                        Name = dto.BookName
+                    });
+                }
             }
 
             return bookVMList;
@@ -1606,26 +1573,22 @@ ORDER BY sort_order;");
         private async Task<ObservableCollection<RelationViewModel>> LoadRelationViewModelList1Async(DbHandlerBase dbHandler, int itemId)
         {
             ObservableCollection<RelationViewModel> rvmList = new ObservableCollection<RelationViewModel>();
-            DbReader reader = await dbHandler.ExecQueryAsync(@"
-SELECT B.book_id AS book_id, B.book_name, RBI.book_id IS NULL AS is_not_related
+            var dtoList = await dbHandler.QueryAsync<BookRelFromItemInfoDto>(@"
+SELECT B.book_id AS book_id, B.book_name, RBI.book_id IS NOT NULL AS is_related
 FROM mst_book B
-LEFT JOIN (SELECT book_id FROM rel_book_item WHERE del_flg = 0 AND item_id = @{0}) RBI ON RBI.book_id = B.book_id
+LEFT JOIN (SELECT book_id FROM rel_book_item WHERE del_flg = 0 AND item_id = @ItemId) RBI ON RBI.book_id = B.book_id
 WHERE del_flg = 0
-ORDER BY B.sort_order;", itemId);
+ORDER BY B.sort_order;",
+new { ItemId = itemId });
 
-            reader.ExecWholeRow((count, record) => {
-                int bookId = record.ToInt("book_id");
-                string bookName = record["book_name"];
-                bool isRelated = !record.ToBoolean("is_not_related");
-
+            foreach (BookRelFromItemInfoDto dto in dtoList) {
                 RelationViewModel rvm = new RelationViewModel() {
-                    Id = bookId,
-                    Name = bookName,
-                    IsRelated = isRelated
+                    Id = dto.BookId,
+                    Name = dto.BookName,
+                    IsRelated = dto.IsRelated
                 };
                 rvmList.Add(rvm);
-                return true;
-            });
+            }
             return rvmList;
         }
 
@@ -1638,31 +1601,23 @@ ORDER BY B.sort_order;", itemId);
         private async Task<ObservableCollection<RelationViewModel>> LoadRelationViewModelList2Async(DbHandlerBase dbHandler, int bookId)
         {
             ObservableCollection<RelationViewModel> rvmList = new ObservableCollection<RelationViewModel>();
-            DbReader reader = await dbHandler.ExecQueryAsync(@"
-SELECT I.item_id AS item_id, C.balance_kind AS balance_kind, C.category_name AS category_name, I.item_name AS item_name, RBI.item_id IS NULL AS is_not_related
+            var dtoList = await dbHandler.QueryAsync<ItemRelFromBookInfoDto>(@"
+SELECT I.item_id AS item_id, C.balance_kind AS balance_kind, C.category_name AS category_name, I.item_name AS item_name, RBI.item_id IS NOT NULL AS is_related
 FROM mst_item I
 INNER JOIN (SELECT category_id, category_name, balance_kind, sort_order FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
-LEFT JOIN (SELECT item_id FROM rel_book_item WHERE del_flg = 0 AND book_id = @{0}) RBI ON RBI.item_id = I.item_id
+LEFT JOIN (SELECT item_id FROM rel_book_item WHERE del_flg = 0 AND book_id = @BookId) RBI ON RBI.item_id = I.item_id
 WHERE del_flg = 0 AND move_flg = 0
-ORDER BY C.balance_kind, C.sort_order, I.sort_order;
-", bookId);
+ORDER BY C.balance_kind, C.sort_order, I.sort_order;",
+new { BookId = bookId });
 
-            reader.ExecWholeRow((count, record) => {
-                int itemId = record.ToInt("item_id");
-                int balanceKind = record.ToInt("balance_kind");
-                string categoryName = record["category_name"];
-                string itemName = record["item_name"];
-                string name = string.Format(@"{0} > {1} > {2}", BalanceKindStr[(BalanceKind)balanceKind], categoryName, itemName);
-                bool isRelated = !record.ToBoolean("is_not_related");
-
+            foreach (ItemRelFromBookInfoDto dto in dtoList) {
                 RelationViewModel rvm = new RelationViewModel() {
-                    Id = itemId,
-                    Name = name,
-                    IsRelated = isRelated
+                    Id = dto.ItemId,
+                    Name = $"{BalanceKindStr[(BalanceKind)dto.BalanceKind]} > {dto.CategoryName} > {dto.ItemName}",
+                    IsRelated = dto.IsRelated
                 };
                 rvmList.Add(rvm);
-                return true;
-            });
+            }
             return rvmList;
         }
 
@@ -1675,18 +1630,23 @@ ORDER BY C.balance_kind, C.sort_order, I.sort_order;
         private async Task<ObservableCollection<ShopViewModel>> LoadShopViewModelListAsync(DbHandlerBase dbHandler, int itemId)
         {
             ObservableCollection<ShopViewModel> svmList = new ObservableCollection<ShopViewModel>();
-            DbReader reader = await dbHandler.ExecQueryAsync(@"
-SELECT S.shop_name, COUNT(A.shop_name) AS shop_count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
+            var dtoList = await dbHandler.QueryAsync<ShopInfoDto>(@"
+SELECT S.shop_name, COUNT(A.shop_name) AS count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
 FROM hst_shop S
 LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.shop_name = S.shop_name AND A.item_id = S.item_id
-WHERE S.del_flg = 0 AND S.item_id = @{0}
+WHERE S.del_flg = 0 AND S.item_id = @ItemId
 GROUP BY S.shop_name
-ORDER BY sort_time DESC, shop_count DESC;", itemId);
-            reader.ExecWholeRow((count, record) => {
-                ShopViewModel svm = new ShopViewModel() { Name = record["shop_name"], UsedCount = record.ToInt("shop_count"), UsedTime = record.ToNullableDateTime("used_time") };
+ORDER BY sort_time DESC, count DESC;",
+new { ItemId = itemId });
+
+            foreach (ShopInfoDto dto in dtoList) {
+                ShopViewModel svm = new ShopViewModel() {
+                    Name = dto.ShopName,
+                    UsedCount = dto.Count,
+                    UsedTime = dto.UsedTime
+                };
                 svmList.Add(svm);
-                return true;
-            });
+            }
             return svmList;
         }
 
@@ -1699,18 +1659,23 @@ ORDER BY sort_time DESC, shop_count DESC;", itemId);
         private async Task<ObservableCollection<RemarkViewModel>> LoadRemarkViewModelListAsync(DbHandlerBase dbHandler, int itemId)
         {
             ObservableCollection<RemarkViewModel> rvmList = new ObservableCollection<RemarkViewModel>();
-            DbReader reader = await dbHandler.ExecQueryAsync(@"
-SELECT R.remark, COUNT(A.remark) AS remark_count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
+            var dtoList = await dbHandler.QueryAsync<RemarkInfoDto>(@"
+SELECT R.remark, COUNT(A.remark) AS count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
 FROM hst_remark R
 LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.remark = R.remark AND A.item_id = R.item_id
-WHERE R.del_flg = 0 AND R.item_id = @{0}
+WHERE R.del_flg = 0 AND R.item_id = @ItemId
 GROUP BY R.remark
-ORDER BY sort_time DESC, remark_count DESC;", itemId);
-            reader.ExecWholeRow((count, record) => {
-                RemarkViewModel rvm = new RemarkViewModel() { Remark = record["remark"], UsedCount = record.ToInt("remark_count"), UsedTime = record.ToNullableDateTime("used_time") };
+ORDER BY sort_time DESC, count DESC;",
+new { ItemId = itemId });
+
+            foreach (RemarkInfoDto dto in dtoList) {
+                RemarkViewModel rvm = new RemarkViewModel() {
+                    Remark = dto.Remark,
+                    UsedCount = dto.Count,
+                    UsedTime = dto.UsedTime
+                };
                 rvmList.Add(rvm);
-                return true;
-            });
+            }
             return rvmList;
         }
         #endregion
