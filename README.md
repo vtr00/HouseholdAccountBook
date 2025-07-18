@@ -4,12 +4,11 @@
 It is for your household accounts book via PostgreSQL.  
 Currently, the binary file is unscheduled to be published.  
 It is for who can set PostgreSQL environments and build the project yourself.  
-It is supported for Japanese Language/Location only.  
+It is supported for Japanese and English Language, and for Japanese Location only.  
 
 ## __概要__
 本ソフトは PostgreSQL を用いた家計簿ソフトです。  
-家計簿ソフト [記帳風月](http://hp.vector.co.jp/authors/VA024866/s_kicho.html) から多くのデータの移行が可能です。  
-[![K Life](http://hp.vector.co.jp/authors/VA024866/img/bunner.gif)](http://hp.vector.co.jp/authors/VA024866/)  
+家計簿ソフト [記帳風月](https://www.vector.co.jp/magazine/softnews/061024/n0610242.html?srsltid=AfmBOoqAWe3KIwVaToJ0SYY-HNEI3e8p86AA2RxxBJ52WTH5YZwydP1I) から多くのデータの移行が可能です。
 現在、バイナリの公開は予定しておりません。  
 自力で環境設定、ビルドできる方向けです。
 
@@ -17,9 +16,9 @@ It is supported for Japanese Language/Location only.
 * IDE  
   [Visual Studio Community](https://www.microsoft.com/ja-jp/dev/products/community.aspx) 2022  
 * DB  
-  [PostgreSQL](https://www.postgresql.org/) 9.6   
+  [PostgreSQL](https://www.postgresql.org/) 17
 * 言語  
-  C# (.NET Framework 4.7.2)
+  C# (.NET Framework 4.8)
 
 ## __機能__
 ### 実装済
@@ -28,7 +27,7 @@ It is supported for Japanese Language/Location only.
 	* 記帳風月の「記帳」機能に加え、以下をサポートしています。
 		* 一覧表示
 			* 土日祝の強調表示
-			* 「月別一覧」機能の表示年と、表示月の連動
+			* 「月別一覧」機能の表示年と表示月の連動
 			* 「今月」表示
 			* 選択した帳簿項目の個数、金額の合計値/平均値の表示
 			* 選択した帳簿項目の一括削除
@@ -56,19 +55,19 @@ It is supported for Japanese Language/Location only.
 				* 「移動」クリック時に選択していた帳簿項目の日付と、初期「日付」の連動
 				* 「移動元」(支払元帳簿)、「日」(支払日)のデフォルト値の設定(クレジットカードのみ)
 * 「日別グラフ」機能
-	* 選択した帳簿における全項目の指定期間内(日単位)の収支の推移
-	* 選択した帳簿における選択項目の指定期間内(日単位)の収支の推移
-	* 選択した帳簿における指定期間内(日単位)の残高の推移
+	* 全帳簿または選択した帳簿における全項目の指定期間内(日単位)の収支の推移
+	* 全帳簿または選択した帳簿における選択項目の指定期間内(日単位)の収支の推移
+	* 全帳簿または選択した帳簿における指定期間内(日単位)の残高の推移
 * 「月別一覧」機能
 	* 記帳風月の「年間一覧」機能に加え、以下をサポートしています。
 		* 「記帳」機能の表示月と、表示年の連動
 		* 「今年」表示
 * 「月別グラフ」機能
 	* 記帳風月の「グラフ」機能を一部サポートしています。
-		* 選択した帳簿における全項目の年間(月単位)の収支の推移
-		* 選択した帳簿における選択項目の年間(月単位)の収支の推移
+		* 全帳簿または選択した帳簿における全項目の年間(月単位)の収支の推移
+		* 全帳簿または選択した帳簿における選択項目の年間(月単位)の収支の推移
 	* また、以下をサポートしています。
-		* 選択した帳簿における年間(月単位)の残高の推移
+		* 全帳簿または選択した帳簿における年間(月単位)の残高の推移
 * 「年別一覧」機能
 	* 「月別一覧」機能の年別版です。過去10年間(年単位)の一覧を表示できます。
 * 「年別グラフ」機能
@@ -90,6 +89,8 @@ It is supported for Japanese Language/Location only.
 			* 編集
 	* 操作関連
 		* ショートカットキーの充実
+	* 言語関連
+	    * 日本語/英語対応
 
 ### 未実装
 記帳風月にある以下の機能は実装の予定がありません。
@@ -102,7 +103,7 @@ It is supported for Japanese Language/Location only.
 1. PostgreSQLの環境を構築します。
 1. [create_account_book.backup](https://github.com/vtr00/HouseholdAccountBook/blob/master/db/create_account_book.backup) を用いて、データベースを構築します(owner:postgres name:account_book)。
    1. CREATE DATABASE までのコマンドを実行します。
-   1. DATABASE を選択して、CREATE DATABASE 以降のコマンドを実行します。(connectは不要)
+   1. DATABASE を選択して、CREATE DATABASE 以降のコマンドを実行します(connectは不要)。
 1. 本ソフトを起動し、構築したデータベースの接続設定を行います(初回のみ)。
 1. 「ツール」>「設定」で、必要なマスタデータの作成を行います。 - 帳簿、分類、項目、帳簿と項目の関連付け
 1. さあ、記帳しましょう。
