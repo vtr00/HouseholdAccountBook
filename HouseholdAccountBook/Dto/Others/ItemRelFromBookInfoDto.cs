@@ -1,4 +1,4 @@
-﻿namespace HouseholdAccountBook.Dto
+﻿namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
     /// 帳簿-項目関連情報DTO

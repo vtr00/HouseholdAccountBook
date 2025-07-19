@@ -1,6 +1,6 @@
 ﻿using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
-using HouseholdAccountBook.Dto;
+using HouseholdAccountBook.Dto.Others;
 using HouseholdAccountBook.Extensions;
 using System;
 using System.Threading.Tasks;

@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
-using HouseholdAccountBook.Dto;
 using HouseholdAccountBook.Dto.DbTable;
+using HouseholdAccountBook.Dto.Others;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
@@ -1567,7 +1567,7 @@ ORDER BY sort_order;");
         /// <summary>
         /// 関連VMリスト1(項目主体)を取得する
         /// </summary>
-        /// <param name="dbHandler">DAO</param>
+        /// <param name="dbHandler">DBハンドラ</param>
         /// <param name="itemId">項目ID</param>
         /// <returns>関連VMリスト</returns>
         private async Task<ObservableCollection<RelationViewModel>> LoadRelationViewModelList1Async(DbHandlerBase dbHandler, int itemId)
@@ -1595,7 +1595,7 @@ new { ItemId = itemId });
         /// <summary>
         /// 関連VMリスト2(帳簿主体)を取得する
         /// </summary>
-        /// <param name="dbHandler">DAO</param>
+        /// <param name="dbHandler">DBハンドラ</param>
         /// <param name="bookId">帳簿ID</param>
         /// <returns>関連VMリスト</returns>
         private async Task<ObservableCollection<RelationViewModel>> LoadRelationViewModelList2Async(DbHandlerBase dbHandler, int bookId)
@@ -1624,7 +1624,7 @@ new { BookId = bookId });
         /// <summary>
         /// 店舗VMリストを取得する
         /// </summary>
-        /// <param name="dbHandler">DAO</param>
+        /// <param name="dbHandler">DBハンドラ</param>
         /// <param name="itemId">項目ID</param>
         /// <returns>店舗VMリスト</returns>
         private async Task<ObservableCollection<ShopViewModel>> LoadShopViewModelListAsync(DbHandlerBase dbHandler, int itemId)
@@ -1653,7 +1653,7 @@ new { ItemId = itemId });
         /// <summary>
         /// 備考VMリストを取得する
         /// </summary>
-        /// <param name="dbHandler">DAO</param>
+        /// <param name="dbHandler">DBハンドラ</param>
         /// <param name="itemId">項目ID</param>
         /// <returns>備考VMリスト</returns>
         private async Task<ObservableCollection<RemarkViewModel>> LoadRemarkViewModelListAsync(DbHandlerBase dbHandler, int itemId)

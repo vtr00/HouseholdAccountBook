@@ -10,13 +10,27 @@ namespace HouseholdAccountBook.ConstValue
     {
         #region DB
         /// <summary>
-        /// 更新者
+        /// データベース種別
         /// </summary>
-        public static string Updater { get; } = string.Empty;
-        /// <summary>
-        /// 挿入者
-        /// </summary>
-        public static string Inserter { get; } = string.Empty;
+        public enum DatabaseType
+        {
+            /// <summary>
+            /// SQLite
+            /// </summary>
+            SQLite,
+            /// <summary>
+            /// PostgreSQL
+            /// </summary>
+            PostgreSQL,
+            /// <summary>
+            /// OleDb
+            /// </summary>
+            OleDb,
+            /// <summary>
+            /// 未定義
+            /// </summary>
+            Undefined
+        }
         /// <summary>
         /// PostgreSQL パスワード入力方法
         /// </summary>
@@ -41,6 +55,14 @@ namespace HouseholdAccountBook.ConstValue
             Dictionary = 2,
             Tar = 3
         }
+        /// <summary>
+        /// 更新者
+        /// </summary>
+        public static string Updater { get; } = string.Empty;
+        /// <summary>
+        /// 挿入者
+        /// </summary>
+        public static string Inserter { get; } = string.Empty;
         #endregion
 
         #region ログ

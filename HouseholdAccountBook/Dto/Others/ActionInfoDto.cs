@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HouseholdAccountBook.Dto
+namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
     /// 帳簿項目情報DTO

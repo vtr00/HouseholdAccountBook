@@ -2,7 +2,7 @@
 
 namespace HouseholdAccountBook.DbHandler
 {
-    public partial class DbHandlerOleDb : DbHandlerBase
+    public partial class SQLiteDbHandler : DbHandlerBase
     {
         /// <summary>
         /// 接続情報

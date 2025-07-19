@@ -1,8 +1,8 @@
 ﻿using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
-using HouseholdAccountBook.Dto;
 using HouseholdAccountBook.Dto.DbTable;
 using HouseholdAccountBook.Dto.KHDbTable;
+using HouseholdAccountBook.Dto.Others;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.Properties;
@@ -166,7 +166,7 @@ namespace HouseholdAccountBook.Windows
 
             bool isOpen = false;
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                using (DbHandlerOleDb dbHandlerOle = new DbHandlerOleDb(ofd.FileName)) {
+                using (OleDbHandler dbHandlerOle = new OleDbHandler(ofd.FileName)) {
                     isOpen = dbHandlerOle.IsOpen;
 
                     if (isOpen) {

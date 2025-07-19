@@ -1,4 +1,4 @@
-﻿namespace HouseholdAccountBook.Dto
+﻿namespace HouseholdAccountBook.Dto.Others
 {
     public class SummaryInfoDto
     {

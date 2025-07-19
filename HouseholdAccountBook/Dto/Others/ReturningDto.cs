@@ -1,4 +1,4 @@
-﻿namespace HouseholdAccountBook.Dto
+﻿namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
     /// INSERT/UPDATE/DELETE時のRETURNINGの結果を格納するDTO

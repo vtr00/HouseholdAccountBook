@@ -2,7 +2,7 @@
 
 namespace HouseholdAccountBook.DbHandler
 {
-    public partial class DbHandlerNpgsql : DbHandlerBase
+    public partial class NpgsqlDbHandler : DbHandlerBase
     {
         /// <summary>
         /// 接続情報

@@ -1,7 +1,10 @@
 ﻿using System;
 
-namespace HouseholdAccountBook.Dto
+namespace HouseholdAccountBook.Dto.Others
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class MoveActionInfoDto
     {
         /// <summary>

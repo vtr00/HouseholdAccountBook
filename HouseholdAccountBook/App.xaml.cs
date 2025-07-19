@@ -31,7 +31,7 @@ namespace HouseholdAccountBook
         /// <summary>
         /// 接続情報
         /// </summary>
-        private DbHandlerNpgsql.ConnectInfo connectInfo = null;
+        private NpgsqlDbHandler.ConnectInfo connectInfo = null;
 #if !DEBUG
         /// <summary>
         /// 多重起動抑止用Mutex
@@ -128,7 +128,7 @@ namespace HouseholdAccountBook
             DbHandlerFactory dbHandlerFactory = null;
             while (true) {
                 // 接続設定を読み込む
-                this.connectInfo = new DbHandlerNpgsql.ConnectInfo() {
+                this.connectInfo = new NpgsqlDbHandler.ConnectInfo() {
                     Host = settings.App_Postgres_Host,
                     Port = settings.App_Postgres_Port,
                     UserName = settings.App_Postgres_UserName,

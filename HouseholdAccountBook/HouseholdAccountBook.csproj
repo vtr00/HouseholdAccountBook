@@ -310,11 +310,11 @@
     <Compile Include="Converters\BoolToEnumConverter.cs" />
     <Compile Include="Dto\Abstract\DtoBase.cs" />
     <Compile Include="Dto\Abstract\MstDtoBase.cs" />
-    <Compile Include="Dto\ActionCompInfoDto.cs" />
-    <Compile Include="Dto\ActionInfoDto.cs" />
-    <Compile Include="Dto\BookInfoDto.cs" />
-    <Compile Include="Dto\BookRelFromItemInfoDto.cs" />
-    <Compile Include="Dto\CategoryItemInfoDto.cs" />
+    <Compile Include="Dto\Others\ActionCompInfoDto.cs" />
+    <Compile Include="Dto\Others\ActionInfoDto.cs" />
+    <Compile Include="Dto\Others\BookInfoDto.cs" />
+    <Compile Include="Dto\Others\BookRelFromItemInfoDto.cs" />
+    <Compile Include="Dto\Others\CategoryItemInfoDto.cs" />
     <Compile Include="Dto\DbTable\HstActionDto.cs" />
     <Compile Include="Dto\DbTable\HstGroupDto.cs" />
     <Compile Include="Dto\DbTable\HstShopDto.cs" />
@@ -323,31 +323,30 @@
     <Compile Include="Dto\DbTable\MstItemDto.cs" />
     <Compile Include="Dto\DbTable\HstRemarkDto.cs" />
     <Compile Include="Dto\DbTable\RelBookItemDto.cs" />
-    <Compile Include="Dto\EndingBalanceInfoDto.cs" />
-    <Compile Include="Dto\GroupInfoDto.cs" />
-    <Compile Include="Dto\ItemRelFromBookInfoDto.cs" />
+    <Compile Include="Dto\Others\EndingBalanceInfoDto.cs" />
+    <Compile Include="Dto\Others\GroupInfoDto.cs" />
+    <Compile Include="Dto\Others\ItemRelFromBookInfoDto.cs" />
     <Compile Include="Dto\KHDbTable\CbmBookDto.cs" />
     <Compile Include="Dto\KHDbTable\CbmCategoryDto.cs" />
     <Compile Include="Dto\KHDbTable\CbmItemDto.cs" />
     <Compile Include="Dto\KHDbTable\CbrBookDto.cs" />
     <Compile Include="Dto\KHDbTable\CbtActDto.cs" />
     <Compile Include="Dto\KHDbTable\CbtNoteDto.cs" />
-    <Compile Include="Dto\MoveActionInfoDto.cs" />
-    <Compile Include="Dto\RemarkInfoDto.cs" />
-    <Compile Include="Dto\ReturningDto.cs" />
-    <Compile Include="Dto\ShopInfoDto.cs" />
-    <Compile Include="Dto\SummaryInfoDto.cs" />
-    <Compile Include="Dto\TermInfoDto.cs" />
+    <Compile Include="Dto\Others\MoveActionInfoDto.cs" />
+    <Compile Include="Dto\Others\RemarkInfoDto.cs" />
+    <Compile Include="Dto\Others\ReturningDto.cs" />
+    <Compile Include="Dto\Others\ShopInfoDto.cs" />
+    <Compile Include="Dto\Others\SummaryInfoDto.cs" />
+    <Compile Include="Dto\Others\TermInfoDto.cs" />
     <Compile Include="Extensions\FrameworkElementExtensions.cs" />
     <Compile Include="Extensions\WindowExtentions.cs" />
     <Compile Include="Others\BindingProxy.cs" />
     <Compile Include="Converters\DateTimeToIsNationalHolidayConverter.cs" />
     <Compile Include="Converters\DateTimeToDisplayedYearConverter.cs" />
     <Compile Include="Converters\NegationConverter.cs" />
-    <Compile Include="DbHandler\DbHandlerNpgsql.ConnectInfo.cs" />
-    <Compile Include="DbHandler\DbHandlerOleDb.ConnectInfo.cs" />
-    <Compile Include="DbHandler\DbReader.Record.cs" />
-    <Compile Include="DbHandler\DbHandlerSQLite.ConnectInfo.cs" />
+    <Compile Include="DbHandler\NpgsqlDbHandler.ConnectInfo.cs" />
+    <Compile Include="DbHandler\OleDbHandler.ConnectInfo.cs" />
+    <Compile Include="DbHandler\SQLiteDbHandler.ConnectInfo.cs" />
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Extensions\ValueTuppleExtensions.cs" />
@@ -468,10 +467,9 @@
     <Compile Include="Converters\DateTimeToDisplayedMonthConverter.cs" />
     <Compile Include="Converters\IntToMoneyDisplayConverter.cs" />
     <Compile Include="DbHandler\Abstract\DbHandlerBase.cs" />
-    <Compile Include="DbHandler\DbHandlerNpgsql.cs" />
-    <Compile Include="DbHandler\DbHandlerOleDb.cs" />
-    <Compile Include="DbHandler\DbReader.cs" />
-    <Compile Include="DbHandler\DbHandlerSQLite.cs" />
+    <Compile Include="DbHandler\NpgsqlDbHandler.cs" />
+    <Compile Include="DbHandler\OleDbHandler.cs" />
+    <Compile Include="DbHandler\SQLiteDbHandler.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Windows\ActionRegistrationWindow.xaml.cs">
       <DependentUpon>ActionRegistrationWindow.xaml</DependentUpon>
@@ -537,7 +535,8 @@
     <Resource Include="Resources\resheet.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Dao\" />
+    <Folder Include="Dao\KHDbTable\" />
+    <Folder Include="Dao\Others\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

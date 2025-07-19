@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
+using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.DbHandler.Abstract
 {
@@ -12,6 +13,11 @@ namespace HouseholdAccountBook.DbHandler.Abstract
     /// </summary>
     public abstract class DbHandlerBase : IDisposable
     {
+        /// <summary>
+        /// 接続対象データベース
+        /// </summary>
+        public DatabaseType Type { get; protected set; } = DatabaseType.Undefined;
+
         /// <summary>
         /// 接続情報
         /// </summary>
@@ -76,56 +82,6 @@ namespace HouseholdAccountBook.DbHandler.Abstract
                 this.connection.Dispose();
             }
             this.connection = null;
-        }
-
-        /// <summary>
-        /// [非同期]クエリを実行する
-        /// </summary>
-        /// <param name="sql">SQL</param>
-        /// <param name="objects">SQLパラメータ</param>
-        /// <returns>DBデータリーダ</returns>
-        protected abstract Task<DbDataReader> ExecuteReaderAsync(string sql, params object[] objects);
-
-        /// <summary>
-        /// DBコマンドを生成する
-        /// </summary>
-        /// <param name="sql">SQL</param>
-        /// <param name="objects">引数リスト</param>
-        /// <returns>DBコマンド</returns>
-        protected abstract DbCommand CreateCommand(string sql, params object[] objects);
-
-        /// <summary>
-        /// [非同期]クエリを実行する
-        /// </summary>
-        /// <param name="sql">SQL</param>
-        /// <param name="objects">SQLパラメータ</param>
-        /// <returns>DAOリーダ</returns>
-        public async Task<DbReader> ExecQueryAsync(string sql, params object[] objects)
-        {
-            try {
-                LinkedList<Dictionary<string, object>> resultSet = new LinkedList<Dictionary<string, object>>();
-
-                using (DbDataReader reader = await this.ExecuteReaderAsync(sql, objects)) {
-                    // フィールド名の取得
-                    List<string> fieldList = new List<string>();
-                    for (int i = 0; i < reader.FieldCount; ++i) {
-                        fieldList.Add(reader.GetName(i));
-                    }
-
-                    // レコードの取得
-                    while (reader.Read()) {
-                        Dictionary<string, object> result = new Dictionary<string, object>();
-                        foreach (string fieldName in fieldList) {
-                            result.Add(fieldName, reader[fieldName]);
-                        }
-                        resultSet.AddLast(result);
-                    }
-                }
-                return new DbReader(sql, resultSet);
-            }
-            catch (Exception e) {
-                throw e;
-            }
         }
 
         /// <summary>

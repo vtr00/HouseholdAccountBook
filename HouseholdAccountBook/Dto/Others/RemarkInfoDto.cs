@@ -1,21 +1,21 @@
 ﻿using System;
 
-namespace HouseholdAccountBook.Dto
+namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
-    /// 店舗情報DTO
+    /// 備考情報DTO
     /// </summary>
-    public class ShopInfoDto
+    public class RemarkInfoDto
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public ShopInfoDto() { }
+        public RemarkInfoDto() { }
 
         /// <summary>
-        /// 店名
+        /// 備考
         /// </summary>
-        public string ShopName { get; set; } = string.Empty;
+        public string Remark { get; set; } = string.Empty;
         /// <summary>
         /// 使用回数
         /// </summary>

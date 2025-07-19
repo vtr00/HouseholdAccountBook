@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HouseholdAccountBook.Dto
+namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
     /// 期間情報DTO

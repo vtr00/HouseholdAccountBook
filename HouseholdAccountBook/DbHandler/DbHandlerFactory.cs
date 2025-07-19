@@ -1,39 +1,17 @@
 ﻿using HouseholdAccountBook.DbHandler.Abstract;
+using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.DbHandler
 {
     /// <summary>
-    /// DAOファクトリ
+    /// DBハンドラファクトリ
     /// </summary>
     public class DbHandlerFactory
     {
         /// <summary>
-        /// データベース種別
-        /// </summary>
-        private enum DatabaseType
-        {
-            /// <summary>
-            /// SQLite
-            /// </summary>
-            SQLite,
-            /// <summary>
-            /// PostgreSQL
-            /// </summary>
-            PostgreSQL,
-            /// <summary>
-            /// OleDb
-            /// </summary>
-            OleDb,
-            /// <summary>
-            /// 未定義
-            /// </summary>
-            Undefined
-        }
-
-        /// <summary>
         /// 接続対象データベース
         /// </summary>
-        private readonly DatabaseType target;
+        public DatabaseType Type { get; private set; } = DatabaseType.Undefined;
         /// <summary>
         /// 接続情報
         /// </summary>
@@ -45,25 +23,25 @@ namespace HouseholdAccountBook.DbHandler
         /// <param name="info">接続情報</param>
         public DbHandlerFactory(DbHandlerBase.ConnectInfo info)
         {
-            if (info is DbHandlerNpgsql.ConnectInfo) {
-                this.target = DatabaseType.PostgreSQL;
+            if (info is NpgsqlDbHandler.ConnectInfo) {
+                this.Type = DatabaseType.PostgreSQL;
                 this.info = info;
                 return;
             }
 
-            if (info is DbHandlerOleDb.ConnectInfo) {
-                this.target = DatabaseType.OleDb;
+            if (info is OleDbHandler.ConnectInfo) {
+                this.Type = DatabaseType.OleDb;
                 this.info = info;
                 return;
             }
 
-            if (info is DbHanderSQLite.ConnectInfo) {
-                this.target = DatabaseType.SQLite;
+            if (info is SQLiteDbHandler.ConnectInfo) {
+                this.Type = DatabaseType.SQLite;
                 this.info = info;
                 return;
             }
 
-            this.target = DatabaseType.Undefined;
+            this.Type = DatabaseType.Undefined;
             this.info = null;
         }
 
@@ -74,22 +52,22 @@ namespace HouseholdAccountBook.DbHandler
         public DbHandlerBase Create()
         {
             try {
-                DbHandlerBase daoBase;
-                switch (this.target) {
+                DbHandlerBase dbHandler;
+                switch (this.Type) {
                     case DatabaseType.SQLite:
-                        daoBase = new DbHanderSQLite(this.info as DbHanderSQLite.ConnectInfo);
+                        dbHandler = new SQLiteDbHandler(this.info as SQLiteDbHandler.ConnectInfo);
                         break;
                     case DatabaseType.PostgreSQL:
-                        daoBase = new DbHandlerNpgsql(this.info as DbHandlerNpgsql.ConnectInfo);
+                        dbHandler = new NpgsqlDbHandler(this.info as NpgsqlDbHandler.ConnectInfo);
                         break;
                     case DatabaseType.OleDb:
-                        daoBase = new DbHandlerOleDb(this.info as DbHandlerOleDb.ConnectInfo);
+                        dbHandler = new OleDbHandler(this.info as OleDbHandler.ConnectInfo);
                         break;
                     default:
-                        daoBase = null;
+                        dbHandler = null;
                         break;
                 }
-                return daoBase;
+                return dbHandler;
             }
             catch (System.TimeoutException e) {
                 throw e;

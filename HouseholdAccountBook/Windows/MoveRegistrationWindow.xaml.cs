@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
-using HouseholdAccountBook.Dto;
 using HouseholdAccountBook.Dto.DbTable;
+using HouseholdAccountBook.Dto.Others;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
