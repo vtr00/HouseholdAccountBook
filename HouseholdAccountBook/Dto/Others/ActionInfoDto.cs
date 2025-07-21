@@ -1,16 +1,17 @@
-﻿using System;
+﻿using HouseholdAccountBook.Dto.Abstract;
+using System;
 
 namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
     /// 帳簿項目情報DTO
     /// </summary>
-    public class ActionInfoDto
+    public class ActionInfoDto : DtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public ActionInfoDto() { }
+        public ActionInfoDto() : base() { }
 
         /// <summary>
         /// 帳簿項目ID

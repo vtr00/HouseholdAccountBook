@@ -1,9 +1,10 @@
 ﻿using HouseholdAccountBook.Dto.Abstract;
+using HouseholdAccountBook.Dto.KHDbTable;
 
 namespace HouseholdAccountBook.Dto.DbTable
 {
     /// <summary>
-    /// MstItemDto
+    /// 項目テーブルDTO
     /// </summary>
     public class MstItemDto : MstDtoBase
     {
@@ -12,6 +13,14 @@ namespace HouseholdAccountBook.Dto.DbTable
         /// </summary>
         public MstItemDto() : base() { }
 
+        public MstItemDto(CbmItemDto dto) : base(dto) {
+            this.ItemId = dto.ITEM_ID;
+            this.ItemName = dto.ITEM_NAME;
+            this.CategoryId = dto.CATEGORY_ID;
+            this.MoveFlg = dto.MOVE_FLG ? 1 : 0;
+            this.AdvanceFlg = 0;
+        }
+
         /// <summary>
         /// 項目ID
         /// </summary>
@@ -19,7 +28,7 @@ namespace HouseholdAccountBook.Dto.DbTable
         /// <summary>
         /// 項目名
         /// </summary>
-        public string ItemName { get; set; } = string.Empty;
+        public string ItemName { get; set; } = "(no name)";
         /// <summary>
         /// 分類ID
         /// </summary>

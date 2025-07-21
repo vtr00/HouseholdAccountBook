@@ -1,9 +1,10 @@
 ﻿using HouseholdAccountBook.Dto.Abstract;
+using HouseholdAccountBook.Dto.KHDbTable;
 
 namespace HouseholdAccountBook.Dto.DbTable
 {
     /// <summary>
-    /// MstCategoryDto
+    /// 分類テーブルDTO
     /// </summary>
     public class MstCategoryDto : MstDtoBase
     {
@@ -12,6 +13,14 @@ namespace HouseholdAccountBook.Dto.DbTable
         /// </summary>
         public MstCategoryDto() : base() { }
 
+        public MstCategoryDto(CbmCategoryDto dto) : base(dto)
+        {
+            this.CategoryId = dto.CATEGORY_ID;
+            this.CategoryName = dto.CATEGORY_NAME;
+            this.BalanceKind = dto.REXP_DIV - 1;
+            this.SortOrder = dto.SORT_KEY;
+        }
+
         /// <summary>
         /// 種別ID
         /// </summary>
@@ -19,7 +28,7 @@ namespace HouseholdAccountBook.Dto.DbTable
         /// <summary>
         /// 種別名
         /// </summary>
-        public string CategoryName { get; set; } = string.Empty;
+        public string CategoryName { get; set; } = "(no name)";
         /// <summary>
         /// 収支種別
         /// </summary>

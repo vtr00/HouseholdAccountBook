@@ -185,7 +185,7 @@
     <Setting Name="App_CultureName" Type="System.String" Scope="User">
       <Value Profile="(Default)">ja-JP</Value>
     </Setting>
-    <Setting Name="App_OleDB_DBFilePath" Type="System.String" Scope="User">
+    <Setting Name="App_Access_DBFilePath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="App_SQLite_DBFilePath" Type="System.String" Scope="User">
@@ -193,6 +193,9 @@
     </Setting>
     <Setting Name="App_SelectedDBKind" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="App_Access_Provider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Microsoft.ACE.OLEDB.16.0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -1,6 +1,6 @@
-﻿using HouseholdAccountBook.DbHandler;
+﻿using HouseholdAccountBook.Dao.Compositions;
+using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
-using HouseholdAccountBook.Dto.Others;
 using HouseholdAccountBook.Extensions;
 using System;
 using System.Threading.Tasks;
@@ -238,10 +238,8 @@ namespace HouseholdAccountBook.Windows
             DateTime firstTime = DateTime.Today;
             DateTime lastTime = DateTime.Today;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                TermInfoDto dto = await dbHandler.QuerySingleAsync<TermInfoDto>(@"
-SELECT MIN(act_time) as first_time, MAX(act_time) as last_time
-FROM hst_action
-WHERE del_flg = 0;");
+                TermInfoDao termInfoDao = new TermInfoDao(dbHandler);
+                var dto = await termInfoDao.Find();
                 firstTime = dto.FirstTime;
                 lastTime = dto.LastTime;
             }

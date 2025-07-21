@@ -1,14 +1,16 @@
-﻿namespace HouseholdAccountBook.Dto.Others
+﻿using HouseholdAccountBook.Dto.Abstract;
+
+namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
     /// グループ情報DTO
     /// </summary>
-    public class GroupInfoDto
+    public class GroupInfoDto : DtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public GroupInfoDto() { }
+        public GroupInfoDto() : base() { }
 
         /// <summary>
         /// グループID

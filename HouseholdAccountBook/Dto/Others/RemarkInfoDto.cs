@@ -1,16 +1,17 @@
-﻿using System;
+﻿using HouseholdAccountBook.Dto.Abstract;
+using System;
 
 namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
     /// 備考情報DTO
     /// </summary>
-    public class RemarkInfoDto
+    public class RemarkInfoDto : DtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public RemarkInfoDto() { }
+        public RemarkInfoDto() : base() { }
 
         /// <summary>
         /// 備考

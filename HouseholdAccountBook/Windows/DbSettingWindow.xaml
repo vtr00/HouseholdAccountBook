@@ -74,7 +74,7 @@
                 </Style>
             </Grid.Style>
 
-            <GroupBox Header="PostgreSQL" DataContext="{Binding PostgreSQLDBSettingVM}">
+            <GroupBox Header="{x:Static properties:Resources.GroupHeader_PostgreSQL}" DataContext="{Binding PostgreSQLDBSettingVM}">
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Header"/>
@@ -129,14 +129,14 @@
                 <Style TargetType="Grid">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding SelectedDBKind}" Value="OleDb">
+                        <DataTrigger Binding="{Binding SelectedDBKind}" Value="Access">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
 
-            <GroupBox Header="Ole DB" DataContext="{Binding OleDBSettingVM}">
+            <GroupBox Header="{x:Static properties:Resources.GroupHeader_Access}" DataContext="{Binding AccessSettingVM}">
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Header"/>
@@ -155,9 +155,14 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_OleDB_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="0" Grid.Column="1" Margin="1" Text="{Binding DBFilePath}" IsReadOnly="True"/>
-                    <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="..." Command="{StaticResource DBFilePathDialogCommand}"/>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
+                               Text="{x:Static properties:Resources.TextBlock_Access_Provider}"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
+                               ItemsSource="{Binding ProviderNameDic}" SelectedValue="{Binding SelectedProviderName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Access_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="1" Text="{Binding DBFilePath}" IsReadOnly="True"/>
+                    <Button Grid.Row="1" Grid.Column="2" Margin="1" Content="..." Command="{StaticResource DBFilePathDialogCommand}"/>
                 </Grid>
             </GroupBox>
         </Grid>

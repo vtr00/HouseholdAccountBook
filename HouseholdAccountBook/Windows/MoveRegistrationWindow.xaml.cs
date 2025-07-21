@@ -1,4 +1,6 @@
-﻿using HouseholdAccountBook.DbHandler;
+﻿using HouseholdAccountBook.Dao.Compositions;
+using HouseholdAccountBook.Dao.DbTable;
+using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
 using HouseholdAccountBook.Dto.DbTable;
 using HouseholdAccountBook.Dto.Others;
@@ -221,17 +223,11 @@ namespace HouseholdAccountBook.Windows
                     DateTime toDate = DateTime.Now;
                     CommissionKind commissionKind = CommissionKind.MoveFrom;
                     int moveValue = -1;
-                    int commissionValue = 0;
+                    int? commissionValue = null;
 
                     using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                        var dtoList = await dbHandler.QueryAsync<MoveActionInfoDto>(@"
-SELECT A.book_id, A.action_id, A.item_id, A.act_time, A.act_value, A.remark, I.move_flg
-FROM hst_action A
-INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
-WHERE A.del_flg = 0 AND A.group_id = @GroupId
-ORDER BY I.move_flg DESC;",
-new { GroupId = this.selectedGroupId });
-
+                        MoveActionInfoDao moveActionInfoDao = new MoveActionInfoDao(dbHandler);
+                        var dtoList = await moveActionInfoDao.GetAllAsync(this.selectedGroupId.Value);
                         foreach (MoveActionInfoDto dto in dtoList) {
                             if (dto.MoveFlg == 1) {
                                 if (dto.ActValue < 0) {
@@ -315,12 +311,9 @@ new { GroupId = this.selectedGroupId });
             int? debitBookId = null;
             int? payDay = null;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                var dtoList = await dbHandler.QueryAsync<MstBookDto>(@"
-SELECT book_id, book_name, book_kind, debit_book_id, pay_day
-FROM mst_book
-WHERE del_flg = 0
-ORDER BY sort_order;");
-                foreach (MstBookDto dto in dtoList) {
+                MstBookDao mstBookDao = new MstBookDao(dbHandler);
+                var dtoList = await mstBookDao.FindAllAsync();
+                foreach (var dto in dtoList) {
                     BookViewModel vm = new BookViewModel() { Id = dto.BookId, Name = dto.BookName };
                     bookVMList.Add(vm);
                     if (fromBookVM == null || fromBookId == vm.Id) {
@@ -382,15 +375,9 @@ ORDER BY sort_order;");
                         bookId = this.WVM.SelectedToBookVM.Id.Value;
                         break;
                 }
-                var dtoList = await dbHandler.QueryAsync<CategoryItemInfoDto>(@"
-SELECT I.item_id, I.item_name, C.category_name
-FROM mst_item I
-INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
-WHERE I.del_flg = 0 AND C.balance_kind = @BalanceKind AND
-      EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @BookId AND RBI.item_id = I.item_id AND del_flg = 0)
-ORDER BY C.sort_order, I.sort_order;",
-new { BalanceKind = (int)BalanceKind.Expenses, BookId = bookId });
 
+                CategoryItemInfoDao categoryItemInfoDao = new CategoryItemInfoDao(dbHandler);
+                var dtoList = await categoryItemInfoDao.FindByBookIdAndBalanceKindAsync(bookId, (int)BalanceKind.Expenses);
                 foreach (CategoryItemInfoDto dto in dtoList) {
                     ItemViewModel vm = new ItemViewModel() {
                         Id = dto.ItemId,
@@ -422,14 +409,8 @@ new { BalanceKind = (int)BalanceKind.Expenses, BookId = bookId });
             string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0].Remark;
             RemarkViewModel selectedRemarkVM = remarkVMList[0]; // UNUSED
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                var dtoList = await dbHandler.QueryAsync<RemarkInfoDto>(@"
-SELECT R.remark, COUNT(A.remark) AS count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
-FROM hst_remark R
-LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.remark = R.remark AND A.item_id = R.item_id
-WHERE R.del_flg = 0 AND R.item_id = @ItemId
-GROUP BY R.remark
-ORDER BY sort_time DESC, remark_count DESC;",
-new { ItemId = this.WVM.SelectedItemVM.Id });
+                RemarkInfoDao remarkInfoDao = new RemarkInfoDao(dbHandler);
+                var dtoList = await remarkInfoDao.FindByItemIdAsync(this.WVM.SelectedItemVM.Id);
                 foreach (RemarkInfoDto dto in dtoList) {
                     RemarkViewModel rvm = new RemarkViewModel() {
                         Remark = dto.Remark,
@@ -512,39 +493,28 @@ new { ItemId = this.WVM.SelectedItemVM.Id });
                         case RegistrationKind.Copy: {
                             #region 帳簿項目を追加する
                             // グループIDを取得する
-                            var dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
-INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@GroupKind, 0, 'now', @Updater, 'now', @Inserter)
-RETURNING group_id AS Id;",
-new HstGroupDto { GroupKind = (int)GroupKind.Move });
-                            tmpGroupId = dto.Id;
+                            HstGroupDao hstGroupDao = new HstGroupDao(dbHandler);
+                            tmpGroupId = await hstGroupDao.InsertReturningIdAsync(new HstGroupDto { GroupKind = (int)GroupKind.Move });
 
-                            dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
--- 移動元
-INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@BookId, (
-  SELECT item_id FROM mst_item I 
-  INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @BalanceKind) C ON C.category_id = I.category_id
-  WHERE move_flg = 1
-), @ActTime, @ActValue, @GroupId, 0, 'now', @Updater, 'now', @Inserter)
-RETURNING action_id AS Id;",
-new { BookId = fromBookId, ActTime = fromDate, ActValue = -actValue, GroupId = tmpGroupId, Updater, Inserter, BalanceKind = (int)BalanceKind.Expenses });
+                            HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                            int id = await hstActionDao.InsertMoveActionReturningIdAsync(new HstActionDto {
+                                BookId = fromBookId,
+                                ActTime = fromDate,
+                                ActValue = -actValue,
+                                GroupId = tmpGroupId
+                            }, (int)BalanceKind.Expenses);
                             if (this.selectedBookId == fromBookId) {
-                                resActionIdList.Add(dto.Id);
+                                resActionIdList.Add(id);
                             }
 
-                            dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
--- 移動先
-INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@BookId, (
-  SELECT item_id FROM mst_item I
-  INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @BalanceKind) C ON C.category_id = I.category_id
-  WHERE move_flg = 1
-), @ActTime, @ActValue, @GroupId, 0, 'now', @Updater, 'now', @Inserter)
-RETURNING action_id AS Id;",
-new { BookId = toBookId, ActTime = toDate, ActValue = actValue, GroupId = tmpGroupId, Updater, Inserter, BalanceKind = (int)BalanceKind.Income });
+                            id = await hstActionDao.InsertMoveActionReturningIdAsync(new HstActionDto {
+                                BookId = toBookId,
+                                ActTime = toDate,
+                                ActValue = actValue,
+                                GroupId = tmpGroupId
+                            }, (int)BalanceKind.Income);
                             if (this.selectedBookId == toBookId) {
-                                resActionIdList.Add(dto.Id);
+                                resActionIdList.Add(id);
                             }
                             #endregion
                             break;
@@ -552,22 +522,24 @@ new { BookId = toBookId, ActTime = toDate, ActValue = actValue, GroupId = tmpGro
                         case RegistrationKind.Edit: {
                             #region 帳簿項目を変更する
                             tmpGroupId = this.selectedGroupId.Value;
-                            await dbHandler.ExecuteAsync(@"
--- 移動元
-UPDATE hst_action
-SET book_id = @BookId, act_time = @ActTime, act_value = @ActValue, update_time = 'now', updater = @Updater
-WHERE action_id = @ActionId;",
-new HstActionDto { BookId = fromBookId, ActTime = fromDate, ActValue = -actValue, ActionId = this.fromActionId.Value });
+
+                            HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                            _ = await hstActionDao.UpdateMoveActionAsync(new HstActionDto {
+                                BookId = fromBookId,
+                                ActTime = fromDate,
+                                ActValue = -actValue,
+                                ActionId = this.fromActionId.Value
+                            });
                             if (this.selectedBookId == fromBookId) {
                                 resActionIdList.Add(this.fromActionId.Value);
                             }
 
-                            await dbHandler.ExecuteAsync(@"
--- 移動先
-UPDATE hst_action
-SET book_id = @BookId, act_time = @ActTime, act_value = @ActValue, update_time = 'now', updater = @Updater
-WHERE action_id = @ActionId;",
-new HstActionDto { BookId = toBookId, ActTime = toDate, ActValue = actValue, ActionId = this.toActionId.Value });
+                            _ = await hstActionDao.UpdateMoveActionAsync(new HstActionDto {
+                                BookId = toBookId,
+                                ActTime = toDate,
+                                ActValue = actValue,
+                                ActionId = this.toActionId.Value
+                            });
                             if (this.selectedBookId == toBookId) {
                                 resActionIdList.Add(this.toActionId.Value);
                             }
@@ -592,58 +564,50 @@ new HstActionDto { BookId = toBookId, ActTime = toDate, ActValue = actValue, Act
                         }
 
                         if (this.commissionActionId != null) {
-                            await dbHandler.ExecuteAsync(@"
-UPDATE hst_action
-SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, remark = @Remark, update_time = 'now', updater = @Updater
-WHERE action_id = @ActionId;",
-new HstActionDto { BookId = bookId, ItemId = commissionItemId, ActTime = actTime, ActValue = -commission, Remark = remark, ActionId = this.commissionActionId.Value });
+                            HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                            _ = await hstActionDao.UpdateAsync(new HstActionDto {
+                                BookId = bookId,
+                                ItemId = commissionItemId,
+                                ActTime = actTime,
+                                ActValue = -commission,
+                                Remark = remark,
+                                ActionId = this.commissionActionId.Value
+                            });
                             resActionIdList.Add(this.commissionActionId.Value);
                         }
                         else {
-                            var dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
-INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@BookId, @ItemId, @ActTime, @ActValue, @GroupId, @Remark, 0, 'now', @Updater, 'now', @Inserter)
-RETURNING action_id AS Id;",
-new HstActionDto { BookId = bookId, ItemId = commissionItemId, ActTime = actTime, ActValue = -commission, GroupId = tmpGroupId, Remark = remark });
-                            resActionIdList.Add(dto.Id);
+                            HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                            int id = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
+                                BookId = bookId,
+                                ItemId = commissionItemId,
+                                ActTime = actTime,
+                                ActValue = -commission,
+                                GroupId = tmpGroupId,
+                                Remark = remark
+                            });
+                            resActionIdList.Add(id);
+                        }
+
+                        if (remark != string.Empty) {
+                            // 備考を追加する
+                            HstRemarkDao hstRemarkDao = new HstRemarkDao(dbHandler);
+                            _ = await hstRemarkDao.UpsertAsync(new HstRemarkDto {
+                                ItemId = commissionItemId,
+                                Remark = remark,
+                                UsedTime = actTime
+                            });
                         }
                         #endregion
                     }
                     else {
                         #region 手数料なし
                         if (this.commissionActionId != null) {
-                            await dbHandler.ExecuteAsync(@"
-UPDATE hst_action
-SET del_flg = 1, update_time = 'now', updater = @Updater
-WHERE action_id = @ActionId;",
-new HstActionDto { ActionId = this.commissionActionId.Value });
+                            HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                            _ = await hstActionDao.DeleteByIdAsync(this.commissionActionId.Value);
                         }
                         #endregion
                     }
                 });
-
-                if (remark != string.Empty) {
-                    #region 備考を追加する
-                    var dtoList = await dbHandler.QueryAsync<HstRemarkDto>(@"
-SELECT remark FROM hst_remark
-WHERE item_id = @ItemId AND remark = @Remark;",
-new HstRemarkDto { ItemId = commissionItemId, Remark = remark });
-
-                    if (dtoList.Count() == 0) {
-                        await dbHandler.ExecuteAsync(@"
-INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @Remark, 0, @UsedTime, 0, 'now', @Updater, 'now', @Inserter);",
-new HstRemarkDto { ItemId = commissionItemId, Remark = remark, UsedTime = fromDate > toDate ? fromDate : toDate });
-                    }
-                    else {
-                        await dbHandler.ExecuteAsync(@"
-UPDATE hst_remark
-SET used_time = @UsedTime, del_flg = 0, update_time = 'now', updater = @Updater
-WHERE item_id = @ItemId AND remark = @Remark AND used_time < @UsedTime;",
-new HstRemarkDto { UsedTime = fromDate > toDate ? fromDate : toDate, ItemId = commissionItemId, Remark = remark });
-                    }
-                    #endregion
-                }
 
                 return resActionIdList;
             }

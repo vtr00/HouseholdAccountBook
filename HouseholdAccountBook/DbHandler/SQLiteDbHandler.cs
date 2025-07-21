@@ -18,14 +18,15 @@ namespace HouseholdAccountBook.DbHandler
         /// <see cref="SQLiteDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public SQLiteDbHandler(ConnectInfo info) : this(info.FilePath) {
-            this.Type = DatabaseType.SQLite;
-        }
+        public SQLiteDbHandler(ConnectInfo info) : this(info.FilePath) { }
 
         /// <summary>
         /// <see cref="SQLiteDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
-        public SQLiteDbHandler(string filePath) : base(new SQLiteConnection(string.Format(stringFormat, filePath))) { }
+        public SQLiteDbHandler(string filePath) : base(new SQLiteConnection(string.Format(stringFormat, filePath)))
+        {
+            this.LibKind = DBLibraryKind.SQLite;
+        }
     }
 }

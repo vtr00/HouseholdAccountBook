@@ -1,4 +1,6 @@
-﻿using HouseholdAccountBook.DbHandler;
+﻿using HouseholdAccountBook.Dao.Compositions;
+using HouseholdAccountBook.Dao.DbTable;
+using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
 using HouseholdAccountBook.Dto.DbTable;
 using HouseholdAccountBook.Dto.Others;
@@ -34,7 +36,7 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// DBハンドラファクトリ
         /// </summary>
-        private readonly DbHandlerFactory dbHandler;
+        private readonly DbHandlerFactory dbHandlerFactory;
         /// <summary>
         /// 前回選択していた設定タブ
         /// </summary>
@@ -48,10 +50,10 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// <see cref="SettingsWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="dbHandler">DBハンドラファクトリ</param>
-        public SettingsWindow(DbHandlerFactory dbHandler)
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
+        public SettingsWindow(DbHandlerFactory dbHandlerFactory)
         {
-            this.dbHandler = dbHandler;
+            this.dbHandlerFactory = dbHandlerFactory;
 
             this.InitializeComponent();
         }
@@ -96,13 +98,9 @@ namespace HouseholdAccountBook.Windows
                 BalanceKind kind = (BalanceKind)vm.Id;
 
                 int categoryId = -1;
-                using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                    var dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
-INSERT INTO mst_category (category_name, balance_kind, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES ('(no name)', @BalanceKind, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_category), 0, 'now', @Updater, 'now', @Inserter)
-RETURNING category_id AS Id;",
-new MstCategoryDto { BalanceKind = (int)kind });
-                    categoryId = dto.Id;
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    MstCategoryDao dao = new MstCategoryDao(dbHandler);
+                    categoryId = await dao.InsertReturningIdAsync(new MstCategoryDto { BalanceKind = (int)kind });
                 }
                 await this.UpdateItemSettingsTabDataAsync(HierarchicalKind.Category, categoryId);
                 this.needToUpdate = true;
@@ -134,13 +132,9 @@ new MstCategoryDto { BalanceKind = (int)kind });
                 int categoryId = vm.Id;
 
                 int itemId = -1;
-                using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                    var dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
-INSERT INTO mst_item (item_name, category_id, advance_flg, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES ('(no name)', @CategoryId, 0, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), 0, 'now', @Updater, 'now', @Inserter)
-RETURNING item_id AS Id;",
-new MstItemDto { CategoryId = categoryId });
-                    itemId = dto.Id;
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    MstItemDao mstItemDao = new MstItemDao(dbHandler);
+                    _ = await mstItemDao.InsertReturningIdAsync(new MstItemDto { CategoryId = categoryId });
                 }
                 await this.UpdateItemSettingsTabDataAsync(HierarchicalKind.Item, itemId);
                 this.needToUpdate = true;
@@ -168,48 +162,36 @@ new MstItemDto { CategoryId = categoryId });
                 HierarchicalKind? kind = HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM);
                 int id = this.WVM.SelectedHierarchicalVM.Id;
 
-                using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                     switch (kind) {
                         case HierarchicalKind.Category: {
                             await dbHandler.ExecTransactionAsync(async () => {
-                                var dtoList = await dbHandler.QueryAsync<HstActionDto>(@"
-SELECT *
-FROM hst_action A
-INNER JOIN (SELECT item_id FROM mst_item WHERE del_flg = 0 AND category_id = @CategoryId) I ON A.item_id = I.item_id
-WHERE A.del_flg = 0;",
-new { CategoryId = id });
+                                HstActionWithHstItemDao hstActionWithHstItemDao = new HstActionWithHstItemDao(dbHandler);
+
+                                var dtoList = await hstActionWithHstItemDao.FindByCategoryIdAsync(id);
 
                                 if (dtoList.Count() != 0) {
                                     MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInCategory, Properties.Resources.Title_Error);
                                     return;
                                 }
 
-                                await dbHandler.ExecuteAsync(@"
-UPDATE mst_category
-SET del_flg = 1, update_time = 'now', updater = @Updater
-WHERE category_id = @CategoryId;",
-new MstCategoryDto { CategoryId = id });
+                                MstCategoryDao mstCategoryDao = new MstCategoryDao(dbHandler);
+                                _ = await mstCategoryDao.DeleteByIdAsync(id);
                             });
                         }
                         break;
                         case HierarchicalKind.Item: {
                             await dbHandler.ExecTransactionAsync(async () => {
-                                var dtoList = await dbHandler.QueryAsync<HstActionDto>(@"
-SELECT *
-FROM hst_action
-WHERE del_flg = 0 AND item_id = @ItemId;",
-new HstActionDto { ItemId = id });
+                                HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                                var dtoList = await hstActionDao.FindByItemIdAsync(id);
 
                                 if (dtoList.Count() != 0) {
                                     MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItem, Properties.Resources.Title_Error);
                                     return;
                                 }
 
-                                await dbHandler.ExecuteAsync(@"
-UPDATE mst_item
-SET del_flg = 1, update_time = 'now', updater = @Updater
-WHERE item_id = @ItemId;",
-new MstItemDto { ItemId = id });
+                                MstItemDao mstItemDao = new MstItemDao(dbHandler);
+                                _ = await mstItemDao.DeleteByIdAsync(id);
                             });
                         }
                         break;
@@ -258,50 +240,16 @@ new MstItemDto { ItemId = id });
                 if (0 < index) {
                     int changedId = parentVM.ChildrenVMList[index - 1].Id; // 入れ替え対象の項目のID
 
-                    using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                         switch (HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM)) {
                             case HierarchicalKind.Category: {
-                                await dbHandler.ExecTransactionAsync(async () => {
-                                    var dto = await dbHandler.QuerySingleAsync<MstCategoryDto>(@"
-SELECT *
-FROM mst_category
-WHERE category_id = @CategoryId;",
-new MstCategoryDto { CategoryId = changedId });
-
-                                    await dbHandler.ExecuteAsync(@"
-UPDATE mst_category
-SET sort_order = (SELECT sort_order FROM mst_category WHERE category_id = @CategoryId1), update_time = 'now', updater = @Updater
-WHERE category_id = @CategoryId2;",
-new { CategoryId1 = changingId, Updater, CategoryId2 = changedId });
-
-                                    await dbHandler.ExecuteAsync(@"
-UPDATE mst_category
-SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
-WHERE category_id = @CategoryId;",
-new MstCategoryDto { SortOrder = dto.SortOrder, CategoryId = changingId });
-                                });
+                                MstCategoryDao mstCategoryDao = new MstCategoryDao(dbHandler);
+                                await mstCategoryDao.SwapSortOrderAsync(changingId, changedId);
                             }
                             break;
                             case HierarchicalKind.Item: {
-                                await dbHandler.ExecTransactionAsync(async () => {
-                                    var dto = await dbHandler.QuerySingleAsync<MstItemDto>(@"
-SELECT sort_order
-FROM mst_item
-WHERE item_id = @ItemId;",
-new MstItemDto { ItemId = changedId });
-
-                                    await dbHandler.ExecuteAsync(@"
-UPDATE mst_item
-SET sort_order = (SELECT sort_order FROM mst_item WHERE item_id = @ItemId1), update_time = 'now', updater = @Updater
-WHERE item_id = @ItemId2;",
-new { ItemId1 = changingId, Updater, ItemId2 = changedId });
-
-                                    await dbHandler.ExecuteAsync(@"
-UPDATE mst_item
-SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
-WHERE item_id = @ItemId;",
-new MstItemDto { SortOrder = dto.SortOrder, ItemId = changingId });
-                                });
+                                MstItemDao mstItemDao = new MstItemDao(dbHandler);
+                                await mstItemDao.SwapSortOrderAsync(changingId, changedId);
                             }
                             break;
                         }
@@ -313,12 +261,9 @@ new MstItemDto { SortOrder = dto.SortOrder, ItemId = changingId });
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     int toCategoryId = grandparentVM.ChildrenVMList[index2 - 1].Id;
 
-                    using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                        await dbHandler.ExecuteAsync(@"
-UPDATE mst_item
-SET category_id = @CategoryId, sort_order = (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), update_time = 'now', updater = @Updater
-WHERE item_id = @ItemId;",
-new MstItemDto { CategoryId = toCategoryId, ItemId = changingId });
+                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                        MstItemDao mstItemDao = new MstItemDao(dbHandler);
+                        _ = await mstItemDao.UpdateSortOrderToMaximumAsync(toCategoryId, changingId);
                     }
                 }
 
@@ -365,50 +310,16 @@ new MstItemDto { CategoryId = toCategoryId, ItemId = changingId });
                 if (parentVM.ChildrenVMList.Count - 1 > index) {
                     int changedId = parentVM.ChildrenVMList[index + 1].Id; // 入れ替え対象の項目のID
 
-                    using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                         switch (HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM)) {
                             case HierarchicalKind.Category: {
-                                await dbHandler.ExecTransactionAsync(async () => {
-                                    var dto = await dbHandler.QuerySingleAsync<MstCategoryDto>(@"
-SELECT sort_order
-FROM mst_category
-WHERE category_id = @CategoryId;",
-new MstCategoryDto { CategoryId = changedId });
-
-                                    await dbHandler.ExecuteAsync(@"
-UPDATE mst_category
-SET sort_order = (SELECT sort_order FROM mst_category WHERE category_id = @CategoryId1), update_time = 'now', updater = @Updater
-WHERE category_id = @CategoryId2;",
-new { CategoryId1 = changingId, Updater, CategoryId2 = changedId });
-
-                                    await dbHandler.ExecuteAsync(@"
-UPDATE mst_category
-SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
-WHERE category_id = @CategoryId;",
-new MstCategoryDto { SortOrder = dto.SortOrder, CategoryId = changingId });
-                                });
+                                MstCategoryDao mstCategoryDao = new MstCategoryDao(dbHandler);
+                                await mstCategoryDao.SwapSortOrderAsync(changingId, changedId);
                             }
                             break;
                             case HierarchicalKind.Item: {
-                                await dbHandler.ExecTransactionAsync(async () => {
-                                    var dto = await dbHandler.QuerySingleAsync<MstItemDto>(@"
-SELECT sort_order
-FROM mst_item
-WHERE item_id = @ItemId;",
-new MstItemDto { ItemId = changedId });
-
-                                    await dbHandler.ExecuteAsync(@"
-UPDATE mst_item
-SET sort_order = (SELECT sort_order FROM mst_item WHERE item_id = @ItemId1), update_time = 'now', updater = @Updater
-WHERE item_id = @ItemId2;",
-new { ItemId1 = changingId, Updater, ItemId2 = changedId });
-
-                                    await dbHandler.ExecuteAsync(@"
-UPDATE mst_item
-SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
-WHERE item_id = @ItemId;",
-new MstItemDto { SortOrder = dto.SortOrder, ItemId = changingId });
-                                });
+                                MstItemDao mstItemDao = new MstItemDao(dbHandler);
+                                await mstItemDao.SwapSortOrderAsync(changingId, changedId);
                             }
                             break;
                         }
@@ -420,43 +331,9 @@ new MstItemDto { SortOrder = dto.SortOrder, ItemId = changingId });
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     int toCategoryId = grandparentVM.ChildrenVMList[index2 + 1].Id;
 
-                    using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                        await dbHandler.ExecTransactionAsync(async () => {
-                            // 分類IDを更新する
-                            await dbHandler.ExecuteAsync(@"
-UPDATE mst_item
-SET category_id = @CategoryId, update_time = 'now', updater = @Updater
-WHERE item_id = @ItemId;",
-new MstItemDto { CategoryId = toCategoryId, ItemId = changingId });
-
-                            // 移動対象のソート順を取得する
-                            var dto = await dbHandler.QuerySingleAsync<MstItemDto>(@"
-SELECT sort_order
-FROM mst_item
-WHERE item_id = @ItemId;",
-new MstItemDto { ItemId = changingId });
-
-                            foreach (var vm in grandparentVM.ChildrenVMList[index2 + 1].ChildrenVMList) {
-                                int changedId = vm.Id;
-
-                                // ソート順が若ければ、移動対象のソート順を移動先のソート順に変更する
-                                int num = await dbHandler.ExecuteAsync(@"
-UPDATE mst_item
-SET sort_order = (SELECT sort_order FROM mst_item WHERE item_id = @ItemId1), update_time = 'now', updater = @Updater
-WHERE item_id = @ItemId2 AND (SELECT sort_order FROM mst_item WHERE item_id = @ItemId1) < @SortOrder;",
-new { ItemId1 = changedId, Updater, ItemId2 = changingId, SortOrder = dto.SortOrder });
-
-                                if (num == 0) { break; }
-
-                                // 移動先のソート順を移動対象のソート順に変更する
-                                await dbHandler.ExecuteAsync(@"
-UPDATE mst_item
-SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
-WHERE item_id = @ItemId;",
-new MstItemDto { SortOrder = dto.SortOrder, ItemId = changedId });
-                                changingId = changedId;
-                            }
-                        });
+                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                        MstItemDao mstItemDao = new MstItemDao(dbHandler);
+                        _ = await mstItemDao.UpdateSortOrderToMinimumAsync(toCategoryId, changingId);
                     }
                 }
 
@@ -486,22 +363,16 @@ new MstItemDto { SortOrder = dto.SortOrder, ItemId = changedId });
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 HierarchicalSettingViewModel vm = this.WVM.DisplayedHierarchicalSettingVM;
 
-                using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                     switch (vm.Kind) {
                         case HierarchicalKind.Category: {
-                            await dbHandler.ExecuteAsync(@"
-UPDATE mst_category
-SET category_name = @CategoryName, update_time = 'now', updater = @Updater
-WHERE category_id = @CategoryId;",
-new MstCategoryDto { CategoryName = vm.Name, CategoryId = vm.Id });
+                            MstCategoryDao mstCategoryDao = new MstCategoryDao(dbHandler);
+                            _ = await mstCategoryDao.UpdateSetableAsync(new MstCategoryDto { CategoryName = vm.Name, CategoryId = vm.Id });
                         }
                         break;
                         case HierarchicalKind.Item: {
-                            await dbHandler.ExecuteAsync(@"
-UPDATE mst_item
-SET item_name = @ItemName, update_time = 'now', updater = @Updater
-WHERE item_id = @ItemId;",
-new MstItemDto { ItemName = vm.Name, ItemId = vm.Id });
+                            MstItemDao mstItemDao = new MstItemDao(dbHandler);
+                            _ = await mstItemDao.UpdateSetableAsync(new MstItemDto { ItemName = vm.Name, ItemId = vm.Id });
                         }
                         break;
                     }
@@ -525,43 +396,25 @@ new MstItemDto { ItemName = vm.Name, ItemId = vm.Id });
 
                 HierarchicalSettingViewModel vm = this.WVM.DisplayedHierarchicalSettingVM;
                 vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
-                vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
 
-                using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                    var actionDtoList = await hstActionDao.FindByBookIdAndItemIdAsync(vm.SelectedRelationVM.Id, vm.Id);
+
+                    if (actionDtoList.Count() != 0) {
+                        vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
+                        MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
+                        e.Handled = true;
+                        return;
+                    }
+
                     await dbHandler.ExecTransactionAsync(async () => {
-                        var dtoList = await dbHandler.QueryAsync<RelBookItemDto>(@"
-SELECT *
-FROM rel_book_item
-WHERE item_id = @ItemId AND book_id = @BookId;",
-new RelBookItemDto { ItemId = vm.Id, BookId = vm.SelectedRelationVM.Id });
-
-                        if (dtoList.Count() == 0) {
-                            await dbHandler.ExecuteAsync(@"
-INSERT INTO rel_book_item (book_id, item_id, del_flg, insert_time, inserter, update_time, updater)
-VALUES (@BookId, @ItemId, 0, 'now', @Inserter, 'now', @Updater);",
-new RelBookItemDto { BookId = vm.SelectedRelationVM.Id, ItemId = vm.Id });
-                            vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
-                        }
-                        else {
-                            dtoList = await dbHandler.QueryAsync<RelBookItemDto>(@"
-SELECT *
-FROM hst_action
-WHERE book_id = @BookId AND item_id = @ItemId AND del_flg = 0;",
-new RelBookItemDto { BookId = vm.SelectedRelationVM.Id, ItemId = vm.Id });
-
-                            if (dtoList.Count() != 0) {
-                                MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
-                                e.Handled = true;
-                                return;
-                            }
-
-                            vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
-                            await dbHandler.ExecuteAsync(@"
-UPDATE rel_book_item
-SET del_flg = @DelFlg, update_time = 'now', updater = @Updater
-WHERE item_id = @ItemId AND book_id = @BookId;",
-new RelBookItemDto { DelFlg = vm.SelectedRelationVM.IsRelated ? 1 : 0, ItemId = vm.Id, BookId = vm.SelectedRelationVM.Id });
-                        }
+                        RelBookItemDao relBookItemDao = new RelBookItemDao(dbHandler);
+                        var dtoList = await relBookItemDao.UpsertAsync(new RelBookItemDto {
+                            BookId = vm.SelectedRelationVM.Id,
+                            ItemId = vm.Id,
+                            DelFlg = vm.SelectedRelationVM.IsRelated ? 0 : 1
+                        });
                     });
                 }
                 this.needToUpdate = true;
@@ -590,11 +443,12 @@ new RelBookItemDto { DelFlg = vm.SelectedRelationVM.IsRelated ? 1 : 0, ItemId = 
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                     Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
-                    using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                        await dbHandler.ExecuteAsync(@"
-UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @Updater
-WHERE shop_name = @ShopName AND item_id = @ItemId;",
-new HstShopDto { ShopName = this.WVM.DisplayedHierarchicalSettingVM.SelectedShopVM.Name, ItemId = this.WVM.DisplayedHierarchicalSettingVM.Id });
+                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                        HstShopDao hstShopDao = new HstShopDao(dbHandler);
+                        _ = await hstShopDao.DeleteAsync(new HstShopDto {
+                            ShopName = this.WVM.DisplayedHierarchicalSettingVM.SelectedShopVM.Name,
+                            ItemId = this.WVM.DisplayedHierarchicalSettingVM.Id
+                        });
 
                         // 店舗名を更新する
                         this.WVM.DisplayedHierarchicalSettingVM.ShopVMList = await this.LoadShopViewModelListAsync(dbHandler, this.WVM.DisplayedHierarchicalSettingVM.Id);
@@ -625,11 +479,12 @@ new HstShopDto { ShopName = this.WVM.DisplayedHierarchicalSettingVM.SelectedShop
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                     Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
-                    using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                        await dbHandler.ExecuteAsync(@"
-UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @Updater
-WHERE remark = @Remark AND item_id = @ItemId;",
-new HstRemarkDto { Remark = this.WVM.DisplayedHierarchicalSettingVM.SelectedRemarkVM.Remark, ItemId = this.WVM.DisplayedHierarchicalSettingVM.Id });
+                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                        HstRemarkDao hstRemarkDao = new HstRemarkDao(dbHandler);
+                        _ = await hstRemarkDao.DeleteAsync(new HstRemarkDto {
+                            Remark = this.WVM.DisplayedHierarchicalSettingVM.SelectedRemarkVM.Remark,
+                            ItemId = this.WVM.DisplayedHierarchicalSettingVM.Id
+                        });
 
                         // 備考欄の表示を更新する
                         this.WVM.DisplayedHierarchicalSettingVM.RemarkVMList = await this.LoadRemarkViewModelListAsync(dbHandler, this.WVM.DisplayedHierarchicalSettingVM.Id);
@@ -649,13 +504,9 @@ new HstRemarkDto { Remark = this.WVM.DisplayedHierarchicalSettingVM.SelectedRema
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 int bookId = -1;
-                using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                    var dto = await dbHandler.QuerySingleAsync<ReturningDto>(@"
-INSERT INTO mst_book (book_name, book_kind, pay_day, initial_value, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES ('(no name)', 0, null, 0, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), 0, 'now', @Updater, 'now', @Inserter)
-RETURNING book_id AS Id;",
-new MstBookDto { });
-                    bookId = dto.Id;
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    MstBookDao mstBookDao = new MstBookDao(dbHandler);
+                    bookId = await mstBookDao.InsertReturningIdAsync(new MstBookDto { });
                 }
 
                 await this.UpdateBookSettingTabDataAsync(bookId);
@@ -681,23 +532,17 @@ new MstBookDto { });
         private async void DeleteBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                     await dbHandler.ExecTransactionAsync(async () => {
-                        var dtoList = await dbHandler.QueryAsync<HstActionDto>(@"
-SELECT * FROM hst_action
-WHERE book_id = @BookId AND del_flg = 0;",
-new HstActionDto { BookId = this.WVM.SelectedBookVM.Id.Value });
-
+                        HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                        var dtoList = await hstActionDao.FindByBookIdAsync(this.WVM.SelectedBookVM.Id.Value);
                         if (dtoList.Count() != 0) {
                             MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInBook, Properties.Resources.Title_Error);
                             return;
                         }
 
-                        await dbHandler.ExecuteAsync(@"
-UPDATE mst_book
-SET del_flg = 1, update_time = 'now', updater = @Updater
-WHERE book_id = @BookId;",
-new MstBookDto { BookId = this.WVM.SelectedBookVM.Id.Value });
+                        MstBookDao hstBookDao = new MstBookDao(dbHandler);
+                        _ = await hstBookDao.DeleteByIdAsync(this.WVM.SelectedBookVM.Id.Value);
                     });
                 }
 
@@ -729,29 +574,12 @@ new MstBookDto { BookId = this.WVM.SelectedBookVM.Id.Value });
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 int index = this.WVM.BookVMList.IndexOf(this.WVM.SelectedBookVM);
-                int changedId = this.WVM.BookVMList[index - 1].Id.Value;
                 int changingId = this.WVM.BookVMList[index].Id.Value;
+                int changedId = this.WVM.BookVMList[index - 1].Id.Value;
 
-                using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                    await dbHandler.ExecTransactionAsync(async () => {
-                        var dto = await dbHandler.QuerySingleAsync<MstBookDto>(@"
-SELECT *
-FROM mst_book
-WHERE book_id = @BookId;",
-new MstBookDto { BookId = changedId });
-
-                        await dbHandler.ExecuteAsync(@"
-UPDATE mst_book
-SET sort_order = (SELECT sort_order FROM mst_book WHERE book_id = @BookId1), update_time = 'now', updater = @Updater
-WHERE book_id = @BookId2;",
-new { BookId1 = changingId, Updater, BookId2 = changedId });
-
-                        await dbHandler.ExecuteAsync(@"
-UPDATE mst_book
-SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
-WHERE book_id = @BookId;",
-new MstBookDto { SortOrder = dto.SortOrder, BookId = changingId });
-                    });
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    MstBookDao mstBookDao = new MstBookDao(dbHandler);
+                    await mstBookDao.SwapSortOrderAsync(changingId, changedId);
                 }
 
                 await this.UpdateBookSettingTabDataAsync(changingId);
@@ -782,29 +610,12 @@ new MstBookDto { SortOrder = dto.SortOrder, BookId = changingId });
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 int index = this.WVM.BookVMList.IndexOf(this.WVM.SelectedBookVM);
-                int changedId = this.WVM.BookVMList[index + 1].Id.Value;
                 int changingId = this.WVM.BookVMList[index].Id.Value;
+                int changedId = this.WVM.BookVMList[index + 1].Id.Value;
 
-                using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                    await dbHandler.ExecTransactionAsync(async () => {
-                        var dto = await dbHandler.QuerySingleAsync<MstBookDto>(@"
-SELECT sort_order
-FROM mst_book
-WHERE book_id = @BookId;",
-new MstBookDto { BookId = changedId });
-
-                        await dbHandler.ExecuteAsync(@"
-UPDATE mst_book
-SET sort_order = (SELECT sort_order FROM mst_book WHERE book_id = @BookId1), update_time = 'now', updater = @Updater
-WHERE book_id = @BookId2;",
-new { BookId1 = changingId, Updater, BookId2 = changedId });
-
-                        await dbHandler.ExecuteAsync(@"
-UPDATE mst_book
-SET sort_order = @SortOrder, update_time = 'now', updater = @Updater
-WHERE book_id = @BookId;",
-new MstBookDto { SortOrder = dto.SortOrder, BookId = changingId });
-                    });
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    MstBookDao mstBookDao = new MstBookDao(dbHandler);
+                    await mstBookDao.SwapSortOrderAsync(changingId, changedId);
                 }
 
                 await this.UpdateBookSettingTabDataAsync(changingId);
@@ -860,7 +671,7 @@ new MstBookDto { SortOrder = dto.SortOrder, BookId = changingId });
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 BookSettingViewModel vm = this.WVM.DisplayedBookSettingVM;
-                using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                     MstBookDto.JsonDto jsonObj = new MstBookDto.JsonDto() {
                         StartDate = vm.StartDateExists ? (DateTime?)vm.StartDate : null,
                         EndDate = vm.EndDateExists ? (DateTime?)vm.EndDate : null,
@@ -871,12 +682,16 @@ new MstBookDto { SortOrder = dto.SortOrder, BookId = changingId });
                     };
                     string jsonCode = JsonConvert.SerializeObject(jsonObj);
 
-                    await dbHandler.ExecuteAsync(@"
-UPDATE mst_book
-SET book_name = @BookName, book_kind = @BookKind, initial_value = @InitialValue, debit_book_id = @DebitBookId, pay_day = @PayDay, json_code = @JsonCode, update_time = 'now', updater = @Updater
-WHERE book_id = @BookId;",
-new MstBookDto { BookName = vm.Name, BookKind = (int)vm.SelectedBookKind, InitialValue = vm.InitialValue, DebitBookId = vm.SelectedDebitBookVM.Id == -1 ? null : vm.SelectedDebitBookVM.Id, 
-                 PayDay = vm.PayDay, JsonCode = jsonCode, BookId = vm.Id.Value });
+                    MstBookDao mstBookDao = new MstBookDao(dbHandler);
+                    _ = await mstBookDao.UpdateSetableAsync(new MstBookDto {
+                        BookName = vm.Name,
+                        BookKind = (int)vm.SelectedBookKind,
+                        InitialValue = vm.InitialValue,
+                        DebitBookId = vm.SelectedDebitBookVM.Id == -1 ? null : vm.SelectedDebitBookVM.Id,
+                        PayDay = vm.PayDay,
+                        JsonCode = jsonCode,
+                        BookId = vm.Id.Value
+                    });
                 }
 
                 await this.UpdateBookSettingTabDataAsync(vm.Id);
@@ -895,43 +710,25 @@ new MstBookDto { BookName = vm.Name, BookKind = (int)vm.SelectedBookKind, Initia
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 BookSettingViewModel vm = this.WVM.DisplayedBookSettingVM;
                 vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
-                vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
 
-                using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                     await dbHandler.ExecTransactionAsync(async () => {
-                        var dtoList = await dbHandler.QueryAsync<RelBookItemDto>(@"
-SELECT *
-FROM rel_book_item
-WHERE book_id = @BookId AND item_id = @ItemId;",
-new RelBookItemDto { BookId = vm.Id.Value, ItemId = vm.SelectedRelationVM.Id });
+                        HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                        var hstActionDtoList = await hstActionDao.FindByBookIdAndItemIdAsync(vm.Id.Value, vm.SelectedRelationVM.Id);
 
-                        if (dtoList.Count() == 0) {
-                            await dbHandler.ExecuteAsync(@"
-INSERT INTO rel_book_item (book_id, item_id, del_flg, insert_time, inserter, update_time, updater)
-VALUES (@BookId, @ItemId, 0, 'now', @Inserter, 'now', @Updater);",
-new { BookId = vm.Id, ItemId = vm.SelectedRelationVM.Id, Inserter, Updater });
-                            vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
+                        if (hstActionDtoList.Count() != 0) {
+                            vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
+                            MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
+                            e.Handled = true;
+                            return;
                         }
-                        else {
-                            var dtoList2 = await dbHandler.QueryAsync<HstActionDto>(@"
-SELECT *
-FROM hst_action
-WHERE book_id = @BookId AND item_id = @ItemId AND del_flg = 0;",
-new HstActionDto { BookId = vm.Id.Value, ItemId = vm.SelectedRelationVM.Id });
 
-                            if (dtoList2.Count() != 0) {
-                                MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
-                                e.Handled = true;
-                                return;
-                            }
-
-                            vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated;
-                            await dbHandler.ExecuteAsync(@"
-UPDATE rel_book_item
-SET del_flg = @DelFlg, update_time = 'now', updater = @Updater
-WHERE book_id = @BookId AND item_id = @ItemId;",
-new RelBookItemDto { DelFlg = vm.SelectedRelationVM.IsRelated ? 1 : 0, BookId = vm.Id.Value, ItemId = vm.SelectedRelationVM.Id });
-                        }
+                        RelBookItemDao relBookItemDao = new RelBookItemDao(dbHandler);
+                        var dtoList = await relBookItemDao.UpsertAsync(new RelBookItemDto {
+                            BookId = vm.Id.Value,
+                            ItemId = vm.SelectedRelationVM.Id,
+                            DelFlg = vm.SelectedRelationVM.IsRelated ? 0 : 1
+                        });
                     });
                 }
                 this.needToUpdate = true;
@@ -1308,13 +1105,9 @@ new RelBookItemDto { DelFlg = vm.SelectedRelationVM.IsRelated ? 1 : 0, BookId = 
                 }
                 case HierarchicalKind.Category: {
                     // 分類
-                    using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                        var dto = await dbHandler.QuerySingleAsync<MstCategoryDto>(@"
-SELECT *
-FROM mst_category
-WHERE category_id = @CategoryId AND del_flg = 0 AND sort_order <> 0
-ORDER BY sort_order;",
-new MstCategoryDto { CategoryId = id });
+                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                        MstCategoryDao mstCategoryDao = new MstCategoryDao(dbHandler);
+                        var dto = await mstCategoryDao.FindByIdAsync(id);
 
                         vm = new HierarchicalSettingViewModel() {
                             Kind = HierarchicalKind.Category,
@@ -1327,13 +1120,9 @@ new MstCategoryDto { CategoryId = id });
                 }
                 case HierarchicalKind.Item: {
                     // 項目
-                    using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                        var dto = await dbHandler.QuerySingleAsync<MstItemDto>(@"
-SELECT *
-FROM mst_item
-WHERE item_id = @ItemId AND del_flg = 0
-ORDER BY sort_order;",
-new MstItemDto { ItemId = id });
+                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                        MstItemDao mstItemDao = new MstItemDao(dbHandler);
+                        var dto = await mstItemDao.FindByIdAsync(id);
 
                         vm = new HierarchicalSettingViewModel {
                             Kind = HierarchicalKind.Item,
@@ -1396,14 +1185,10 @@ new MstItemDto { ItemId = id });
                 new BookViewModel(){ Id = -1, Name = Properties.Resources.ListName_None }
             };
 
-            using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                 // 帳簿一覧を取得する(支払元選択用)
-                var dtoList = await dbHandler.QueryAsync<MstBookDto>(@"
-SELECT *
-FROM mst_book
-WHERE del_flg = 0
-ORDER BY sort_order;");
-
+                MstBookDao mstBookDao = new MstBookDao(dbHandler);
+                var dtoList = await mstBookDao.FindAllAsync();
                 foreach (MstBookDto tmpDto in dtoList) {
                     vmList.Add(new BookViewModel() {
                         Id = tmpDto.BookId,
@@ -1412,14 +1197,8 @@ ORDER BY sort_order;");
                 }
 
                 // 帳簿一覧を取得する
-                BookInfoDto dto = await dbHandler.QuerySingleAsync<BookInfoDto>(@"
-SELECT B.book_name, B.book_kind, B.debit_book_id, B.pay_day, B.initial_value, B.json_code, B.sort_order, MIN(A.act_time) AS start_date, MAX(A.act_time) AS end_date
-FROM mst_book B
-LEFT OUTER JOIN hst_action A ON A.book_id = B.book_id AND A.del_flg = 0
-WHERE B.book_id = @BookId AND B.del_flg = 0
-GROUP BY B.book_id
-ORDER BY B.sort_order;",
-new { BookId = bookId });
+                BookInfoDao bookInfoDao = new BookInfoDao(dbHandler);
+                var dto = await bookInfoDao.FindByBookId(bookId);
 
                 MstBookDto.JsonDto jsonObj = dto.JsonCode != null ? JsonConvert.DeserializeObject<MstBookDto.JsonDto>(dto.JsonCode) : null;
 
@@ -1490,14 +1269,10 @@ new { BookId = bookId });
             vmList.Add(expensesVM);
 
             foreach (HierarchicalViewModel vm in vmList) {
-                // 分類
-                using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
-                    var cDtoList = await dbHandler.QueryAsync<MstCategoryDto>(@"
-SELECT category_id, category_name, sort_order 
-FROM mst_category
-WHERE balance_kind = @BalanceKind AND del_flg = 0 AND sort_order <> 0
-ORDER BY sort_order;",
-new MstCategoryDto { BalanceKind = vm.Id });
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    // 分類
+                    MstCategoryDao mstCategoryDao = new MstCategoryDao(dbHandler);
+                    var cDtoList = await mstCategoryDao.FindByBalanceKindAsync(vm.Id);
 
                     foreach (MstCategoryDto dto in cDtoList) {
                         vm.ChildrenVMList.Add(new HierarchicalViewModel() {
@@ -1510,14 +1285,10 @@ new MstCategoryDto { BalanceKind = vm.Id });
                         });
                     }
 
+                    // 項目
+                    MstItemDao mstItemDao = new MstItemDao(dbHandler);
                     foreach (HierarchicalViewModel categoryVM in vm.ChildrenVMList) {
-                        // 項目
-                        var iDtoList = await dbHandler.QueryAsync<MstItemDto>(@"
-SELECT item_id, item_name, advance_flg, sort_order
-FROM mst_item
-WHERE category_id = @CategoryId AND del_flg = 0
-ORDER BY sort_order;",
-new MstItemDto { CategoryId = categoryVM.Id });
+                        var iDtoList = await mstItemDao.FindByCategoryIdAsync(categoryVM.Id);
 
                         foreach (MstItemDto dto in iDtoList) {
                             categoryVM.ChildrenVMList.Add(new HierarchicalViewModel() {
@@ -1545,14 +1316,10 @@ new MstItemDto { CategoryId = categoryVM.Id });
 
             ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
 
-            using (DbHandlerBase dbHandler = this.dbHandler.Create()) {
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                 // 帳簿一覧を取得する
-                var dtoList = await dbHandler.QueryAsync<MstBookDto>(@"
-SELECT book_id, book_name
-FROM mst_book
-WHERE del_flg = 0
-ORDER BY sort_order;");
-
+                MstBookDao mstBookDao = new MstBookDao(dbHandler);
+                var dtoList = await mstBookDao.FindAllAsync();
                 foreach (MstBookDto dto in dtoList) {
                     bookVMList.Add(new BookViewModel() {
                         Id = dto.BookId,
@@ -1572,15 +1339,10 @@ ORDER BY sort_order;");
         /// <returns>関連VMリスト</returns>
         private async Task<ObservableCollection<RelationViewModel>> LoadRelationViewModelList1Async(DbHandlerBase dbHandler, int itemId)
         {
-            ObservableCollection<RelationViewModel> rvmList = new ObservableCollection<RelationViewModel>();
-            var dtoList = await dbHandler.QueryAsync<BookRelFromItemInfoDto>(@"
-SELECT B.book_id AS book_id, B.book_name, RBI.book_id IS NOT NULL AS is_related
-FROM mst_book B
-LEFT JOIN (SELECT book_id FROM rel_book_item WHERE del_flg = 0 AND item_id = @ItemId) RBI ON RBI.book_id = B.book_id
-WHERE del_flg = 0
-ORDER BY B.sort_order;",
-new { ItemId = itemId });
+            BookRelFromItemInfoDao bookRelFromItemInfoDao = new BookRelFromItemInfoDao(dbHandler);
+            var dtoList = await bookRelFromItemInfoDao.FindByItemIdAsync(itemId);
 
+            ObservableCollection<RelationViewModel> rvmList = new ObservableCollection<RelationViewModel>();
             foreach (BookRelFromItemInfoDto dto in dtoList) {
                 RelationViewModel rvm = new RelationViewModel() {
                     Id = dto.BookId,
@@ -1600,16 +1362,10 @@ new { ItemId = itemId });
         /// <returns>関連VMリスト</returns>
         private async Task<ObservableCollection<RelationViewModel>> LoadRelationViewModelList2Async(DbHandlerBase dbHandler, int bookId)
         {
-            ObservableCollection<RelationViewModel> rvmList = new ObservableCollection<RelationViewModel>();
-            var dtoList = await dbHandler.QueryAsync<ItemRelFromBookInfoDto>(@"
-SELECT I.item_id AS item_id, C.balance_kind AS balance_kind, C.category_name AS category_name, I.item_name AS item_name, RBI.item_id IS NOT NULL AS is_related
-FROM mst_item I
-INNER JOIN (SELECT category_id, category_name, balance_kind, sort_order FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
-LEFT JOIN (SELECT item_id FROM rel_book_item WHERE del_flg = 0 AND book_id = @BookId) RBI ON RBI.item_id = I.item_id
-WHERE del_flg = 0 AND move_flg = 0
-ORDER BY C.balance_kind, C.sort_order, I.sort_order;",
-new { BookId = bookId });
+            ItemRelFromBookInfoDao itemRelFromBookInfoDao = new ItemRelFromBookInfoDao(dbHandler);
+            var dtoList = await itemRelFromBookInfoDao.FindByBookIdAsync(bookId);
 
+            ObservableCollection<RelationViewModel> rvmList = new ObservableCollection<RelationViewModel>();
             foreach (ItemRelFromBookInfoDto dto in dtoList) {
                 RelationViewModel rvm = new RelationViewModel() {
                     Id = dto.ItemId,
@@ -1630,14 +1386,8 @@ new { BookId = bookId });
         private async Task<ObservableCollection<ShopViewModel>> LoadShopViewModelListAsync(DbHandlerBase dbHandler, int itemId)
         {
             ObservableCollection<ShopViewModel> svmList = new ObservableCollection<ShopViewModel>();
-            var dtoList = await dbHandler.QueryAsync<ShopInfoDto>(@"
-SELECT S.shop_name, COUNT(A.shop_name) AS count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
-FROM hst_shop S
-LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.shop_name = S.shop_name AND A.item_id = S.item_id
-WHERE S.del_flg = 0 AND S.item_id = @ItemId
-GROUP BY S.shop_name
-ORDER BY sort_time DESC, count DESC;",
-new { ItemId = itemId });
+            ShopInfoDao shopInfoDao = new ShopInfoDao(dbHandler);
+            var dtoList = await shopInfoDao.FindByItemIdAsync(itemId);
 
             foreach (ShopInfoDto dto in dtoList) {
                 ShopViewModel svm = new ShopViewModel() {
@@ -1659,14 +1409,8 @@ new { ItemId = itemId });
         private async Task<ObservableCollection<RemarkViewModel>> LoadRemarkViewModelListAsync(DbHandlerBase dbHandler, int itemId)
         {
             ObservableCollection<RemarkViewModel> rvmList = new ObservableCollection<RemarkViewModel>();
-            var dtoList = await dbHandler.QueryAsync<RemarkInfoDto>(@"
-SELECT R.remark, COUNT(A.remark) AS count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
-FROM hst_remark R
-LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.remark = R.remark AND A.item_id = R.item_id
-WHERE R.del_flg = 0 AND R.item_id = @ItemId
-GROUP BY R.remark
-ORDER BY sort_time DESC, count DESC;",
-new { ItemId = itemId });
+            RemarkInfoDao remarkInfoDao = new RemarkInfoDao(dbHandler);
+            var dtoList = await remarkInfoDao.FindByItemIdAsync(itemId);
 
             foreach (RemarkInfoDto dto in dtoList) {
                 RemarkViewModel rvm = new RemarkViewModel() {

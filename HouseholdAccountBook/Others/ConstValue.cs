@@ -10,28 +10,6 @@ namespace HouseholdAccountBook.ConstValue
     {
         #region DB
         /// <summary>
-        /// データベース種別
-        /// </summary>
-        public enum DatabaseType
-        {
-            /// <summary>
-            /// SQLite
-            /// </summary>
-            SQLite,
-            /// <summary>
-            /// PostgreSQL
-            /// </summary>
-            PostgreSQL,
-            /// <summary>
-            /// OleDb
-            /// </summary>
-            OleDb,
-            /// <summary>
-            /// 未定義
-            /// </summary>
-            Undefined
-        }
-        /// <summary>
         /// PostgreSQL パスワード入力方法
         /// </summary>
         public enum PostgresPasswordInput
@@ -65,7 +43,7 @@ namespace HouseholdAccountBook.ConstValue
         public static string Inserter { get; } = string.Empty;
         #endregion
 
-        #region ログ
+        #region ログファイル
         /// <summary>
         /// ログファイルのフォルダパス
         /// </summary>
@@ -120,7 +98,7 @@ namespace HouseholdAccountBook.ConstValue
         /// <summary>
         /// ウィンドウ情報のファイルパス
         /// </summary>
-        public static string WindowLocationFilePath(String windowName)
+        public static string WindowLocationFilePath(string windowName)
         {
             DateTime dt = App.StartupTime;
             return string.Format($@"{WindowLocationFolderPath}\{windowName}_{dt:yyyyMMdd_HHmmss}.txt");
@@ -183,20 +161,46 @@ namespace HouseholdAccountBook.ConstValue
 
         #region 種別
         /// <summary>
-        /// SQLデータベース種別
+        /// SQL DB種別
         /// </summary>
-        public enum  DBKind
+        public enum DBKind
         {
+            /// <summary>
+            /// 未定義
+            /// </summary>
+            Undefined = -1,
             /// <summary>
             /// PostgreSQL
             /// </summary>
-            PostgreSQL,
+            PostgreSQL = 0,
             /// <summary>
-            /// OLE DB
+            /// Access
+            /// </summary>
+            Access,
+            /// <summary>
+            /// SQLite
+            /// </summary>
+            SQLite
+        }
+        /// <summary>
+        /// SQL DBライブラリ種別
+        /// </summary>
+        public enum DBLibraryKind
+        {
+            /// <summary>
+            /// 未定義
+            /// </summary>
+            Undefined = -1,
+            /// <summary>
+            /// PostgreSQL
+            /// </summary>
+            PostgreSQL = 0,
+            /// <summary>
+            /// Ole DB
             /// </summary>
             OleDb,
             /// <summary>
-            /// SQL Server
+            /// SQLite
             /// </summary>
             SQLite
         }
@@ -380,7 +384,7 @@ namespace HouseholdAccountBook.ConstValue
         /// </summary>
         public static Dictionary<DBKind, string> DBKindStr => new Dictionary<DBKind, string>() {
             { DBKind.PostgreSQL,    "PostgreSQL" },
-            { DBKind.OleDb,         "Ole DB" },
+            { DBKind.Access,        "Access" },
             { DBKind.SQLite,        "SQLite" }
         };
         /// <summary>

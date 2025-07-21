@@ -1,10 +1,11 @@
 ﻿using HouseholdAccountBook.Dto.Abstract;
+using HouseholdAccountBook.Dto.KHDbTable;
 using System;
 
 namespace HouseholdAccountBook.Dto.DbTable
 {
     /// <summary>
-    /// MstBookDto
+    /// 帳簿テーブルDTO
     /// </summary>
     public class MstBookDto : MstDtoBase
     {
@@ -14,13 +15,25 @@ namespace HouseholdAccountBook.Dto.DbTable
         public MstBookDto() : base() { }
 
         /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="dto">記帳風月DTO</param>
+        public MstBookDto(CbmBookDto dto) : base(dto)
+        {
+            this.BookId = dto.BOOK_ID;
+            this.BookName = dto.BOOK_NAME;
+            this.InitialValue = dto.BALANCE;
+            this.SortOrder = dto.SORT_KEY;
+        }
+
+        /// <summary>
         /// 帳簿ID
         /// </summary>
         public int BookId { get; set; } = 0;
         /// <summary>
         /// 帳簿名
         /// </summary>
-        public string BookName { get; set; } = "";
+        public string BookName { get; set; } = "(no name)";
         /// <summary>
         /// 初期値
         /// </summary>

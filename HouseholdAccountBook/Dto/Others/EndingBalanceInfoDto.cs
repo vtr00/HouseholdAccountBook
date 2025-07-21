@@ -1,14 +1,16 @@
-﻿namespace HouseholdAccountBook.Dto.Others
+﻿using HouseholdAccountBook.Dto.Abstract;
+
+namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
     /// 繰越残高情報DTO
     /// </summary>
-    internal class EndingBalanceInfoDto
+    public class EndingBalanceInfoDto : DtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public EndingBalanceInfoDto() { }
+        public EndingBalanceInfoDto() : base() { }
 
         /// <summary>
         /// 繰越残高

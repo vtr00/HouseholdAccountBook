@@ -10,6 +10,10 @@ namespace HouseholdAccountBook.DbHandler
         public new class ConnectInfo : DbHandlerBase.ConnectInfo
         {
             /// <summary>
+            /// プロバイダ
+            /// </summary>
+            public string Provider { get; set; }
+            /// <summary>
             /// ファイルパス
             /// </summary>
             public string FilePath { get; set; }

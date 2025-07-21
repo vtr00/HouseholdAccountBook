@@ -1,11 +1,16 @@
-﻿namespace HouseholdAccountBook.Dto.Others
+﻿using HouseholdAccountBook.Dto.Abstract;
+
+namespace HouseholdAccountBook.Dto.Others
 {
-    public class SummaryInfoDto
+    /// <summary>
+    /// 概要情報DTO
+    /// </summary>
+    public class SummaryInfoDto : DtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public SummaryInfoDto() { }
+        public SummaryInfoDto() : base() { }
 
         /// <summary>
         /// 収支種別

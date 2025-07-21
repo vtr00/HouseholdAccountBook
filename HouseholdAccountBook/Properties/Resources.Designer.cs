@@ -755,6 +755,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   Microsoft Access(記帳風月) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string GroupHeader_Access {
+            get {
+                return ResourceManager.GetString("GroupHeader_Access", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   バックアップ情報 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string GroupHeader_BackUpInformation {
@@ -886,6 +895,15 @@ namespace HouseholdAccountBook.Properties {
         public static string GroupHeader_PaymentInformation {
             get {
                 return ResourceManager.GetString("GroupHeader_PaymentInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   PostgreSQL に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string GroupHeader_PostgreSQL {
+            get {
+                return ResourceManager.GetString("GroupHeader_PostgreSQL", resourceCulture);
             }
         }
         
@@ -1840,6 +1858,24 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   DBファイル名 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TextBlock_Access_DBFilePath {
+            get {
+                return ResourceManager.GetString("TextBlock_Access_DBFilePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   プロバイダ に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TextBlock_Access_Provider {
+            get {
+                return ResourceManager.GetString("TextBlock_Access_Provider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   金額 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TextBlock_AmountOfMoney {
@@ -2178,15 +2214,6 @@ namespace HouseholdAccountBook.Properties {
         public static string TextBlock_Npgsql_UserName {
             get {
                 return ResourceManager.GetString("TextBlock_Npgsql_UserName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   DBファイル名 に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string TextBlock_OleDB_DBFilePath {
-            get {
-                return ResourceManager.GetString("TextBlock_OleDB_DBFilePath", resourceCulture);
             }
         }
         

@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Dto.Abstract;
+using HouseholdAccountBook.Dto.KHDbTable;
 using System;
 
 namespace HouseholdAccountBook.Dto.DbTable
@@ -6,12 +7,23 @@ namespace HouseholdAccountBook.Dto.DbTable
     /// <summary>
     /// HstActionDto
     /// </summary>
-    public class HstActionDto : DtoBase
+    public class HstActionDto : TableDtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
         public HstActionDto() : base() { }
+
+        public HstActionDto(CbtActDto dto) : base(dto)
+        {
+            this.ActionId = dto.ACT_ID;
+            this.BookId = dto.BOOK_ID;
+            this.ItemId = dto.ITEM_ID;
+            this.ActTime = dto.ACT_DT;
+            this.ActValue = (dto.INCOME != 0 ? dto.INCOME : -dto.EXPENSE);
+            this.GroupId = dto.GROUP_ID == 0 ? null : (int?)dto.GROUP_ID;
+            this.Remark = dto.NOTE_NAME;
+        }
 
         /// <summary>
         /// 帳簿項目ID

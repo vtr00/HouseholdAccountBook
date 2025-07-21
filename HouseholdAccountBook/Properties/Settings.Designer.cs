@@ -758,12 +758,12 @@ namespace HouseholdAccountBook.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string App_OleDB_DBFilePath {
+        public string App_Access_DBFilePath {
             get {
-                return ((string)(this["App_OleDB_DBFilePath"]));
+                return ((string)(this["App_Access_DBFilePath"]));
             }
             set {
-                this["App_OleDB_DBFilePath"] = value;
+                this["App_Access_DBFilePath"] = value;
             }
         }
         
@@ -788,6 +788,18 @@ namespace HouseholdAccountBook.Properties {
             }
             set {
                 this["App_SelectedDBKind"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Microsoft.ACE.OLEDB.16.0")]
+        public string App_Access_Provider {
+            get {
+                return ((string)(this["App_Access_Provider"]));
+            }
+            set {
+                this["App_Access_Provider"] = value;
             }
         }
     }

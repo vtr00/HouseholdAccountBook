@@ -825,7 +825,7 @@
   <data name="TextBlock_Npgsql_DbName" xml:space="preserve">
     <value>DB名</value>
   </data>
-  <data name="TextBlock_OleDB_DBFilePath" xml:space="preserve">
+  <data name="TextBlock_Access_DBFilePath" xml:space="preserve">
     <value>DBファイル名</value>
   </data>
   <data name="TextBlock_SQLite_DBFilePath" xml:space="preserve">
@@ -977,5 +977,14 @@
   </data>
   <data name="TextBlock_DBKind" xml:space="preserve">
     <value>DB種別</value>
+  </data>
+  <data name="TextBlock_Access_Provider" xml:space="preserve">
+    <value>プロバイダ</value>
+  </data>
+  <data name="GroupHeader_PostgreSQL" xml:space="preserve">
+    <value>PostgreSQL</value>
+  </data>
+  <data name="GroupHeader_Access" xml:space="preserve">
+    <value>Microsoft Access(記帳風月)</value>
   </data>
 </root>

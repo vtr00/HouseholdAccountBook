@@ -1,14 +1,16 @@
-﻿namespace HouseholdAccountBook.Dto.Others
+﻿using HouseholdAccountBook.Dto.Abstract;
+
+namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
     /// 帳簿項目比較情報DTO
     /// </summary>
-    public class ActionCompInfoDto
+    public class ActionCompInfoDto : DtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public ActionCompInfoDto() { }
+        public ActionCompInfoDto() : base() { }
 
         /// <summary>
         /// 帳簿ID
@@ -25,11 +27,11 @@
         /// <summary>
         /// 店舗名
         /// </summary>
-        public string ShopName { get; set; } = string.Empty;
+        public string ShopName { get; set; } = null;
         /// <summary>
         /// 備考
         /// </summary>
-        public string Remark { get; set; } = string.Empty;
+        public string Remark { get; set; } = null;
         /// <summary>
         /// 一致フラグ
         /// </summary>
@@ -37,6 +39,6 @@
         /// <summary>
         /// グループID
         /// </summary>
-        public int GroupId { get; set; } = -1;
+        public int? GroupId { get; set; } = null;
     }
 }

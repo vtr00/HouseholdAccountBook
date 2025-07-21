@@ -1,16 +1,17 @@
-﻿using System;
+﻿using HouseholdAccountBook.Dto.Abstract;
+using System;
 
 namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
     /// 期間情報DTO
     /// </summary>
-    public class TermInfoDto
+    public class TermInfoDto : DtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public TermInfoDto() { }
+        public TermInfoDto() : base() { }
 
         /// <summary>
         /// 最初の日時

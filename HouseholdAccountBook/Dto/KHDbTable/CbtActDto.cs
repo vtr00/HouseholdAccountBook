@@ -1,8 +1,9 @@
-﻿using System;
+﻿using HouseholdAccountBook.Dto.Abstract;
+using System;
 
 namespace HouseholdAccountBook.Dto.KHDbTable
 {
-    public class CbtActDto
+    public class CbtActDto : KHDtoBase
     {
         public CbtActDto() { }
 
@@ -15,6 +16,5 @@ namespace HouseholdAccountBook.Dto.KHDbTable
         public string NOTE_NAME { get; set; }
         public int GROUP_ID { get; set; }
         public int FREQUENCY { get; set; }
-        public bool DEL_FLG { get; set; }
     }
 }

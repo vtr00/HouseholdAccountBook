@@ -12,20 +12,21 @@ namespace HouseholdAccountBook.DbHandler
         /// <summary>
         /// 接続文字列
         /// </summary>
-        private const string stringFormat = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0}";
+        private const string stringFormat = @"Provider={0};Data Source={1}";
 
         /// <summary>
         /// <see cref="OleDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public OleDbHandler(ConnectInfo info) : this(info.FilePath) {
-            this.Type = DatabaseType.OleDb;
-        }
+        public OleDbHandler(ConnectInfo info) : this(info.Provider, info.FilePath) { }
 
         /// <summary>
         /// <see cref="OleDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
-        public OleDbHandler(string filePath) : base(new OleDbConnection(string.Format(stringFormat, filePath))) { }
+        public OleDbHandler(string provider, string filePath) : base(new OleDbConnection(string.Format(stringFormat, provider, filePath)))
+        {
+            this.LibKind = DBLibraryKind.OleDb;
+        }
     }
 }

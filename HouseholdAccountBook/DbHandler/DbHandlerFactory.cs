@@ -9,9 +9,9 @@ namespace HouseholdAccountBook.DbHandler
     public class DbHandlerFactory
     {
         /// <summary>
-        /// 接続対象データベース
+        /// ライブラリ種別
         /// </summary>
-        public DatabaseType Type { get; private set; } = DatabaseType.Undefined;
+        public DBLibraryKind LibKind { get; private set; } = DBLibraryKind.Undefined;
         /// <summary>
         /// 接続情報
         /// </summary>
@@ -24,24 +24,24 @@ namespace HouseholdAccountBook.DbHandler
         public DbHandlerFactory(DbHandlerBase.ConnectInfo info)
         {
             if (info is NpgsqlDbHandler.ConnectInfo) {
-                this.Type = DatabaseType.PostgreSQL;
-                this.info = info;
-                return;
-            }
-
-            if (info is OleDbHandler.ConnectInfo) {
-                this.Type = DatabaseType.OleDb;
+                this.LibKind = DBLibraryKind.PostgreSQL;
                 this.info = info;
                 return;
             }
 
             if (info is SQLiteDbHandler.ConnectInfo) {
-                this.Type = DatabaseType.SQLite;
+                this.LibKind = DBLibraryKind.SQLite;
                 this.info = info;
                 return;
             }
 
-            this.Type = DatabaseType.Undefined;
+            if (info is OleDbHandler.ConnectInfo) {
+                this.LibKind = DBLibraryKind.OleDb;
+                this.info = info;
+                return;
+            }
+
+            this.LibKind = DBLibraryKind.Undefined;
             this.info = null;
         }
 
@@ -53,14 +53,14 @@ namespace HouseholdAccountBook.DbHandler
         {
             try {
                 DbHandlerBase dbHandler;
-                switch (this.Type) {
-                    case DatabaseType.SQLite:
+                switch (this.LibKind) {
+                    case DBLibraryKind.SQLite:
                         dbHandler = new SQLiteDbHandler(this.info as SQLiteDbHandler.ConnectInfo);
                         break;
-                    case DatabaseType.PostgreSQL:
+                    case DBLibraryKind.PostgreSQL:
                         dbHandler = new NpgsqlDbHandler(this.info as NpgsqlDbHandler.ConnectInfo);
                         break;
-                    case DatabaseType.OleDb:
+                    case DBLibraryKind.OleDb:
                         dbHandler = new OleDbHandler(this.info as OleDbHandler.ConnectInfo);
                         break;
                     default:

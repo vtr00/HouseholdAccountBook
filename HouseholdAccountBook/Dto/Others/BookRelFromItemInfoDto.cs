@@ -1,14 +1,16 @@
-﻿namespace HouseholdAccountBook.Dto.Others
+﻿using HouseholdAccountBook.Dto.Abstract;
+
+namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
     /// 項目-帳簿関連情報DTO
     /// </summary>
-    public class BookRelFromItemInfoDto
+    public class BookRelFromItemInfoDto : DtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public BookRelFromItemInfoDto() { }
+        public BookRelFromItemInfoDto() : base() { }
 
         /// <summary>
         /// 帳簿ID

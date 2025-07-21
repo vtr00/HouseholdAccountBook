@@ -31,7 +31,7 @@ namespace HouseholdAccountBook
         /// <summary>
         /// 接続情報
         /// </summary>
-        private NpgsqlDbHandler.ConnectInfo connectInfo = null;
+        private DbHandlerBase.ConnectInfo connectInfo = null;
 #if !DEBUG
         /// <summary>
         /// 多重起動抑止用Mutex

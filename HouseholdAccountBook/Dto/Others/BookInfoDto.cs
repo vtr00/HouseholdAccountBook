@@ -1,37 +1,40 @@
-﻿using System;
+﻿using HouseholdAccountBook.Dto.Abstract;
+using HouseholdAccountBook.Dto.DbTable;
+using System;
 
 namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
     /// 帳簿情報DTO
     /// </summary>
-    public class BookInfoDto
+    /// <remarks><see cref="MstBookDto"/></remarks>
+    public class BookInfoDto : DtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public BookInfoDto() { }
+        public BookInfoDto() : base() { }
 
         /// <summary>
         /// 帳簿名
         /// </summary>
         public string BookName { get; set; } = string.Empty;
         /// <summary>
-        /// 帳簿種別
-        /// </summary>
-        public int BookKind { get; set; } = (int)ConstValue.ConstValue.BookKind.Uncategorized;
-        /// <summary>
-        /// 支払帳簿ID
-        /// </summary>
-        public int DebitBookId { get; set; } = -1;
-        /// <summary>
-        /// 支払日
-        /// </summary>
-        public int PayDay { get; set; } = 0;
-        /// <summary>
         /// 初期値
         /// </summary>
         public int InitialValue { get; set; } = 0;
+        /// <summary>
+        /// 帳簿種別
+        /// </summary>
+        public int BookKind { get; set; } = 0;
+        /// <summary>
+        /// 支払日
+        /// </summary>
+        public int? PayDay { get; set; } = null;
+        /// <summary>
+        /// 支払帳簿ID
+        /// </summary>
+        public int? DebitBookId { get; set; } = null;
         /// <summary>
         /// JsonCode
         /// </summary>

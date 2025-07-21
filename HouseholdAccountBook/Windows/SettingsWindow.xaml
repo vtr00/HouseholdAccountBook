@@ -529,21 +529,56 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="30" SharedSizeGroup="Button"/>
-                                </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
-                                <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding DumpExePath}" IsReadOnly="True"/>
-                                <Button Grid.Row="0" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource DumpExePathDialogCommand}"/>
+                                <GroupBox Grid.Row="0" Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_PostgreSQL}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="30" SharedSizeGroup="Button"/>
+                                        </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
-                                <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding RestoreExePath}" IsReadOnly="True"/>
-                                <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource RestoreExePathDialogCommand}"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding DumpExePath}" IsReadOnly="True"/>
+                                        <Button Grid.Row="0" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource DumpExePathDialogCommand}"/>
 
-                                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" 
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding RestoreExePath}" IsReadOnly="True"/>
+                                        <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource RestoreExePathDialogCommand}"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
+                                           Text="{x:Static properties:Resources.TextBlock_Password}"/>
+                                        <RadioButton Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_input" Margin="5" 
+                                             Content="{x:Static properties:Resources.RadioButton_Password_ShowInputWindow}"
+                                             IsChecked="{Binding PasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=InputWindow}"/>
+                                        <RadioButton Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_pgpass" Margin="5" 
+                                             Content="{x:Static properties:Resources.RadioButton_Password_SpecifyPgpassConf}"
+                                             IsChecked="{Binding PasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=PgPassConf}"/>
+
+
+                                    </Grid>
+                                </GroupBox>
+                                <GroupBox Grid.Row="1" Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_Access}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition SharedSizeGroup="Header"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
+                                                   Text="{x:Static properties:Resources.TextBlock_Access_Provider}"/>
+                                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
+                                                  ItemsSource="{Binding AccessProviderNameDic}" SelectedValue="{Binding SelectedAccessProviderName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                    </Grid>
+                                </GroupBox>
+                                
+                                <Button Grid.Row="2" Grid.Column="0" Margin="5" 
                                         Content="{x:Static properties:Resources.Button_ReregisterDatabaseSetting}"
                                         Command="{StaticResource RestartForDbSettingCommand}"/>
                             </Grid>
@@ -563,7 +598,7 @@
                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                                            Text="{x:Static properties:Resources.TextBlock_Language}"/>
                                 <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                                          ItemsSource="{Binding CultureNameDic}" SelectedValue="{Binding SelectedCultureName}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                          ItemsSource="{Binding CultureNameDic}" SelectedValue="{Binding SelectedCultureName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
                                 <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5"
                                         Content="{x:Static properties:Resources.Button_ApplyLanguage}"
                                         Command="{StaticResource RestartForLanguageCommand}"/>
@@ -618,15 +653,6 @@
                                 </GroupBox>
                                 <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                           Content="{x:Static properties:Resources.CheckBox_Timing_ClosingMainWindow}" IsChecked="{Binding BackUpFlagAtClosing}"/>
-
-                                <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
-                                           Text="{x:Static properties:Resources.TextBlock_Password}"/>
-                                <RadioButton Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_input" Margin="5" 
-                                             Content="{x:Static properties:Resources.RadioButton_Password_ShowInputWindow}"
-                                             IsChecked="{Binding PasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=InputWindow}"/>
-                                <RadioButton Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_pgpass" Margin="5" 
-                                             Content="{x:Static properties:Resources.RadioButton_Password_SpecifyPgpassConf}"
-                                             IsChecked="{Binding PasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=PgPassConf}"/>
                             </Grid>
                         </GroupBox>
                         <GroupBox Header="{x:Static properties:Resources.GroupHeader_CalendarInformation}">

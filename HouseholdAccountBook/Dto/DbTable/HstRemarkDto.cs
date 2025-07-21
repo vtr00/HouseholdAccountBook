@@ -1,17 +1,28 @@
 ﻿using HouseholdAccountBook.Dto.Abstract;
+using HouseholdAccountBook.Dto.KHDbTable;
 using System;
 
 namespace HouseholdAccountBook.Dto.DbTable
 {
     /// <summary>
-    /// HstRemarkDto
+    /// 備考テーブルDTO
     /// </summary>
-    public class HstRemarkDto : DtoBase
+    public class HstRemarkDto : TableDtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
         public HstRemarkDto() { }
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="dto">記帳風月DTO</param>
+        public HstRemarkDto(CbtNoteDto dto) : base(dto)
+        {
+            this.ItemId = dto.ITEM_ID;
+            this.Remark = dto.NOTE_NAME;
+        }
 
         /// <summary>
         /// 項目ID
@@ -22,7 +33,7 @@ namespace HouseholdAccountBook.Dto.DbTable
         /// </summary>
         public string Remark { get; set; } = string.Empty;
         /// <summary>
-        /// 備考種別
+        /// 備考種別(未使用)
         /// </summary>
         public int RemarkKind { get; set; } = 0;
         /// <summary>

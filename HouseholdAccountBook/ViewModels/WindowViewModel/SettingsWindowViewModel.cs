@@ -3,6 +3,8 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
+using System.Data.OleDb;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.ViewModels
@@ -187,6 +189,28 @@ namespace HouseholdAccountBook.ViewModels
             }
         }
         private string _RestoreExePath = default;
+        #endregion
+
+        /// <summary>
+        /// Accessプロバイダ名
+        /// </summary>
+        /// <remarks>動的に指定するため<see cref="ObservableCollection{T}"/>を用いる</remarks>
+        public ObservableCollection<KeyValuePair<string, string>> AccessProviderNameDic { get; } = new ObservableCollection<KeyValuePair<string, string>>();
+        /// <summary>
+        /// 選択されたAccessプロバイダ名
+        /// </summary>
+        #region SelectedAccessProviderName
+        public string SelectedAccessProviderName
+        {
+            get => this._SelectedAccessProviderName;
+            set {
+                if (this.SetProperty(ref this._SelectedAccessProviderName, value) && this.WithSave) {
+                    this.settings.App_Access_Provider = value;
+                    this.settings.Save();
+                }
+            }
+        }
+        private string _SelectedAccessProviderName = "Microsoft.ACE.OLEDB.16.0";
         #endregion
         #endregion
 
@@ -437,9 +461,19 @@ namespace HouseholdAccountBook.ViewModels
 
             this.DumpExePath = this.settings.App_Postgres_DumpExePath;
             this.RestoreExePath = this.settings.App_Postgres_RestoreExePath;
+
+            this.AccessProviderNameDic.Clear();
+            OleDbEnumerator enumerator = new OleDbEnumerator();
+            DataTable table = enumerator.GetElements();
+            foreach (DataRow row in table.Rows) {
+                string sourcesName = row["SOURCES_NAME"].ToString();
+                string sourcesDescription = row["SOURCES_DESCRIPTION"].ToString();
+
+                this.AccessProviderNameDic.Add(new KeyValuePair<string, string>(sourcesName, $"{sourcesName} ({sourcesDescription})"));
+            }
+            this.SelectedAccessProviderName = this.settings.App_Access_Provider;
+
             this.SelectedCultureName = this.settings.App_CultureName;
-            Log.Debug($"App_CultureName: {this.settings.App_CultureName}");
-            Log.Debug($"SelectedCultureName: {this.SelectedCultureName}");
             this.BackUpNum = this.settings.App_BackUpNum;
             this.BackUpFolderPath = this.settings.App_BackUpFolderPath;
             this.BackUpFlagAtMinimizing = this.settings.App_BackUpFlagAtMinimizing;

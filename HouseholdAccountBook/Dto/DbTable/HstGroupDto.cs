@@ -3,9 +3,9 @@
 namespace HouseholdAccountBook.Dto.DbTable
 {
     /// <summary>
-    /// HstGroupDto
+    /// グループテーブルDTO
     /// </summary>
-    public class HstGroupDto : DtoBase
+    public class HstGroupDto : TableDtoBase
     {
         /// <summary>
         /// コンストラクタ
@@ -21,7 +21,7 @@ namespace HouseholdAccountBook.Dto.DbTable
         /// </summary>
         public int GroupKind { get; set; } = 0;
         /// <summary>
-        /// 備考
+        /// 備考(未使用)
         /// </summary>
         public string Remark { get; set; } = null;
     }

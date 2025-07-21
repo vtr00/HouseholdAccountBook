@@ -1,9 +1,13 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.OleDb;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -23,8 +27,9 @@ namespace HouseholdAccountBook.Windows
             Properties.Settings settings = Properties.Settings.Default;
             this.WVM.Message = message;
 
-            this.WVM.SelectedDBKind = (ConstValue.ConstValue.DBKind)settings.App_SelectedDBKind;
+            this.WVM.SelectedDBKind = (DBKind)settings.App_SelectedDBKind;
 
+            // PostgreSQL
             this.WVM.PostgreSQLDBSettingVM.Host = settings.App_Postgres_Host;
             this.WVM.PostgreSQLDBSettingVM.Port = settings.App_Postgres_Port;
             this.WVM.PostgreSQLDBSettingVM.UserName = settings.App_Postgres_UserName;
@@ -38,8 +43,20 @@ namespace HouseholdAccountBook.Windows
             this.WVM.PostgreSQLDBSettingVM.DumpExePath = settings.App_Postgres_DumpExePath;
             this.WVM.PostgreSQLDBSettingVM.RestoreExePath = settings.App_Postgres_RestoreExePath;
 
-            this.WVM.OleDBSettingVM.DBFilePath = settings.App_OleDB_DBFilePath;
+            // Access
+            this.WVM.AccessSettingVM.ProviderNameDic.Clear();
+            OleDbEnumerator enumerator = new OleDbEnumerator();
+            DataTable table = enumerator.GetElements();
+            foreach (DataRow row in table.Rows) {
+                string sourcesName = row["SOURCES_NAME"].ToString();
+                string sourcesDescription = row["SOURCES_DESCRIPTION"].ToString();
 
+                this.WVM.AccessSettingVM.ProviderNameDic.Add(new KeyValuePair<string, string>(sourcesName, $"{sourcesName} ({sourcesDescription})"));
+            }
+            this.WVM.AccessSettingVM.SelectedProviderName = settings.App_Access_Provider;
+            this.WVM.AccessSettingVM.DBFilePath = settings.App_Access_DBFilePath;
+
+            // SQLite
             this.WVM.SQLiteSettingVM.DBFilePath = settings.App_SQLite_DBFilePath;
         }
 
@@ -107,12 +124,12 @@ namespace HouseholdAccountBook.Windows
         private void DBFilePathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         { 
             switch (this.WVM.SelectedDBKind) {
-                case ConstValue.ConstValue.DBKind.OleDb: {
+                case DBKind.Access: {
                     string directory = string.Empty;
                     string fileName = string.Empty;
-                    if (this.WVM.OleDBSettingVM.DBFilePath != string.Empty) {
-                        directory = Path.GetDirectoryName(this.WVM.OleDBSettingVM.DBFilePath);
-                        fileName = Path.GetFileName(this.WVM.OleDBSettingVM.DBFilePath);
+                    if (this.WVM.AccessSettingVM.DBFilePath != string.Empty) {
+                        directory = Path.GetDirectoryName(this.WVM.AccessSettingVM.DBFilePath);
+                        fileName = Path.GetFileName(this.WVM.AccessSettingVM.DBFilePath);
                     }
                     OpenFileDialog ofd = new OpenFileDialog() {
                         CheckFileExists = true,
@@ -122,11 +139,11 @@ namespace HouseholdAccountBook.Windows
                         Filter = "Access DBファイル|*.mdb;*.accdb"
                     };
                     if (ofd.ShowDialog() == true) {
-                        this.WVM.OleDBSettingVM.DBFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                        this.WVM.AccessSettingVM.DBFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
                     }
                     break;
                 }
-                case ConstValue.ConstValue.DBKind.SQLite: {
+                case DBKind.SQLite: {
                     string directory = string.Empty;
                     string fileName = string.Empty;
                     if (this.WVM.SQLiteSettingVM.DBFilePath != string.Empty) {
@@ -169,7 +186,7 @@ namespace HouseholdAccountBook.Windows
             settings.App_SelectedDBKind = (int)this.WVM.SelectedDBKind;
 
             switch (this.WVM.SelectedDBKind) {
-                case ConstValue.ConstValue.DBKind.PostgreSQL: {
+                case DBKind.PostgreSQL: {
                     settings.App_Postgres_Host = this.WVM.PostgreSQLDBSettingVM.Host;
                     settings.App_Postgres_Port = this.WVM.PostgreSQLDBSettingVM.Port;
                     settings.App_Postgres_UserName = this.WVM.PostgreSQLDBSettingVM.UserName;
@@ -180,11 +197,11 @@ namespace HouseholdAccountBook.Windows
                     settings.App_Postgres_RestoreExePath = this.WVM.PostgreSQLDBSettingVM.RestoreExePath;
                     break;
                 }
-                case ConstValue.ConstValue.DBKind.OleDb: {
-                    settings.App_OleDB_DBFilePath = this.WVM.OleDBSettingVM.DBFilePath;
+                case DBKind.Access: {
+                    settings.App_Access_DBFilePath = this.WVM.AccessSettingVM.DBFilePath;
                     break;
                 }
-                case ConstValue.ConstValue.DBKind.SQLite: {
+                case DBKind.SQLite: {
                     settings.App_SQLite_DBFilePath = this.WVM.SQLiteSettingVM.DBFilePath;
                     break;
                 }

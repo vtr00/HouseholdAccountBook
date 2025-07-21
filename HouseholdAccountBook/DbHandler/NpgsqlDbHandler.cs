@@ -1,8 +1,5 @@
 ﻿using HouseholdAccountBook.DbHandler.Abstract;
 using Npgsql;
-using System;
-using System.Data.Common;
-using System.Threading.Tasks;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook.DbHandler
@@ -18,9 +15,7 @@ namespace HouseholdAccountBook.DbHandler
         /// <see cref="NpgsqlDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public NpgsqlDbHandler(ConnectInfo info) : this(info.Host, info.Port, info.UserName, info.Password, info.DatabaseName) {
-            this.Type = DatabaseType.PostgreSQL;
-        }
+        public NpgsqlDbHandler(ConnectInfo info) : this(info.Host, info.Port, info.UserName, info.Password, info.DatabaseName) { }
 
         /// <summary>
         /// <see cref="NpgsqlDbHandler"/> クラスの新しいインスタンスを初期化します。
@@ -31,6 +26,9 @@ namespace HouseholdAccountBook.DbHandler
         /// <param name="password">パスワード</param>
         /// <param name="databaseName">データベース名</param>
         public NpgsqlDbHandler(string uri, int port, string userName, string password, string databaseName)
-            : base(new NpgsqlConnection(string.Format(stringFormat, uri, port, userName, password, databaseName))) { }
+            : base(new NpgsqlConnection(string.Format(stringFormat, uri, port, userName, password, databaseName)))
+        {
+            this.LibKind = DBLibraryKind.PostgreSQL;
+        }
     }
 }

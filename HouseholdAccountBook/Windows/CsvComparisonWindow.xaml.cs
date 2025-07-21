@@ -1,5 +1,7 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using HouseholdAccountBook.Dao.Compositions;
+using HouseholdAccountBook.Dao.DbTable;
 using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
 using HouseholdAccountBook.Dto.DbTable;
@@ -300,12 +302,8 @@ namespace HouseholdAccountBook.Windows
             // グループ種別を特定する
             int? groupKind = null;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                var dto = await dbHandler.QuerySingleAsync<GroupInfoDto>(@"
-SELECT A.group_id, G.group_kind
-FROM hst_action A
-LEFT JOIN (SELECT * FROM hst_group WHERE del_flg = 0) G ON G.group_id = A.group_id
-WHERE A.action_id = @ActionId AND A.del_flg = 0;",
-new { ActionId = this.WVM.SelectedCsvComparisonVM.ActionId });
+                GroupInfoDao groupInfoDao = new GroupInfoDao(dbHandler);
+                var dto = await groupInfoDao.FindByActionId(this.WVM.SelectedCsvComparisonVM.ActionId.Value);
                 groupKind = dto.GroupKind;
             }
 
@@ -528,12 +526,9 @@ new { ActionId = this.WVM.SelectedCsvComparisonVM.ActionId });
             ObservableCollection<BookComparisonViewModel> bookCompVMList = new ObservableCollection<BookComparisonViewModel>();
             BookComparisonViewModel selectedBookCompVM = null;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                var dtoList = await dbHandler.QueryAsync<MstBookDto>(@"
-SELECT * 
-FROM mst_book 
-WHERE del_flg = 0 AND book_kind <> @BookKind
-ORDER BY sort_order;",
-new { BookKind = (int)BookKind.Wallet });
+                MstBookDao mstBookDao = new MstBookDao(dbHandler);
+
+                var dtoList = await mstBookDao.FindIfJsonCodeExistsAsync();
                 foreach (MstBookDto dto in dtoList) {
                     MstBookDto.JsonDto jsonObj = JsonConvert.DeserializeObject<MstBookDto.JsonDto>(dto.JsonCode);
 
@@ -545,6 +540,8 @@ new { BookKind = (int)BookKind.Wallet });
                         ExpensesIndex = jsonObj?.CsvOutgoIndex + 1,
                         ItemNameIndex = jsonObj?.CsvItemNameIndex + 1
                     };
+                    if (vm.CsvFolderPath == null || vm.ActDateIndex == null || vm.ExpensesIndex == null || vm.ItemNameIndex == null) continue;
+
                     bookCompVMList.Add(vm);
 
                     if (vm.Id == tmpBookId) {
@@ -636,13 +633,8 @@ new { BookKind = (int)BookKind.Wallet });
                     // 前回の帳簿項目情報をクリアする
                     vm.ClearActionInfo();
 
-                    var dtoList = await dbHandler.QueryAsync<ActionCompInfoDto>(@"
-SELECT A.action_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match, A.group_id
-FROM hst_action A
-INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
-WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @Date AND A.act_value = -@Value AND book_id = @BookId AND A.del_flg = 0;",
-new { Date = vm.Record.Date, Value = vm.Record.Value, BookId = this.WVM.SelectedBookVM.Id });
-
+                    ActionCompInfoDao actionCompInfoDao = new ActionCompInfoDao(dbHandler);
+                    var dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(this.WVM.SelectedBookVM.Id.Value, vm.Record.Date, vm.Record.Value);
                     foreach (ActionCompInfoDto dto in dtoList) {
                         // 帳簿項目IDが使用済なら次のレコードを調べるようにする
                         bool checkNext = this.WVM.CsvComparisonVMList.Where((tmpVM) => { return tmpVM.ActionId == dto.ActionId; }).Count() != 0;
@@ -741,11 +733,8 @@ new { Date = vm.Record.Date, Value = vm.Record.Value, BookId = this.WVM.Selected
         private async Task SaveIsMatchAsync(int actionId, bool isMatch)
         {
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                await dbHandler.ExecuteAsync(@"
-UPDATE hst_action
-SET is_match = @IsMatch, update_time = 'now', updater = @Updater
-WHERE action_id = @ActionId and is_match <> @IsMatch;", 
-new HstActionDto { IsMatch = isMatch ? 1 : 0, ActionId = actionId });
+                HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                _ = await hstActionDao.UpdateIsMatchByIdAsync(actionId, isMatch ? 1 : 0);
             }
         }
     }

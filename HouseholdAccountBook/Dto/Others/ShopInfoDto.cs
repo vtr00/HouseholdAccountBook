@@ -1,16 +1,17 @@
-﻿using System;
+﻿using HouseholdAccountBook.Dto.Abstract;
+using System;
 
 namespace HouseholdAccountBook.Dto.Others
 {
     /// <summary>
     /// 店舗情報DTO
     /// </summary>
-    public class ShopInfoDto
+    public class ShopInfoDto : DtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public ShopInfoDto() { }
+        public ShopInfoDto() : base() { }
 
         /// <summary>
         /// 店名

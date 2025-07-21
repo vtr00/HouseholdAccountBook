@@ -308,8 +308,45 @@
     <Compile Include="Behaviors\BindSelectedItemsToDataGridBehavior.cs" />
     <Compile Include="Behaviors\BindSelectedItemToTreeViewBehavior.cs" />
     <Compile Include="Converters\BoolToEnumConverter.cs" />
+    <Compile Include="Dao\Abstract\ReadDaoBase.cs" />
+    <Compile Include="Dao\Abstract\ReadWriteDaoBase.cs" />
+    <Compile Include="DaoFactory\Abstract\ReadDaoFactoryBase.cs" />
+    <Compile Include="Dao\Abstract\PrimaryKeyDaoBase.cs" />
+    <Compile Include="Dao\Compositions\ActionCompInfoDao.cs" />
+    <Compile Include="Dao\Compositions\ActionInfoDao.cs" />
+    <Compile Include="Dao\Compositions\BookInfoDao.cs" />
+    <Compile Include="Dao\Compositions\BookRelFromItemInfoDao.cs" />
+    <Compile Include="Dao\Compositions\CategoryItemInfoDao.cs" />
+    <Compile Include="Dao\Compositions\EndingBalanceInfoDao.cs" />
+    <Compile Include="Dao\Compositions\GroupInfoDao.cs" />
+    <Compile Include="Dao\Compositions\ItemRelFromBookInfoDao.cs" />
+    <Compile Include="Dao\Compositions\MoveActionInfoDao.cs" />
+    <Compile Include="Dao\Compositions\MstCategoryWithinBookDao.cs" />
+    <Compile Include="Dao\Compositions\RemarkInfoDao.cs" />
+    <Compile Include="Dao\Compositions\ShopInfoDao.cs" />
+    <Compile Include="Dao\Compositions\SummaryInfoDao.cs" />
+    <Compile Include="Dao\Compositions\TermInfoDao.cs" />
+    <Compile Include="Dao\DbTable\HstActionDao.cs" />
+    <Compile Include="Dao\DbTable\HstGroupDao.cs" />
+    <Compile Include="Dao\DbTable\MstCategoryDao.cs" />
+    <Compile Include="Dao\DbTable\HstShopDao.cs" />
+    <Compile Include="Dao\DbTable\HstRemarkDao.cs" />
+    <Compile Include="Dao\DbTable\MstBookDao.cs" />
+    <Compile Include="Dao\DbTable\MstItemDao.cs" />
+    <Compile Include="Dao\DbTable\RelBookItemDao.cs" />
+    <Compile Include="Dao\Compositions\HstActionWithHstItemDao.cs" />
+    <Compile Include="Dao\KHDbTable\CbmBookDao.cs" />
+    <Compile Include="Dao\KHDbTable\CbmCategoryDao.cs" />
+    <Compile Include="Dao\KHDbTable\CbmItemDao.cs" />
+    <Compile Include="Dao\KHDbTable\CbrBookDao.cs" />
+    <Compile Include="Dao\KHDbTable\CbtActDao.cs" />
+    <Compile Include="Dao\KHDbTable\CbtNoteDao.cs" />
+    <Compile Include="Dao\Abstract\KHReadDaoBase.cs" />
     <Compile Include="Dto\Abstract\DtoBase.cs" />
+    <Compile Include="Dto\Abstract\TableDtoBase.cs" />
+    <Compile Include="Dto\Abstract\KHCbmDtoBase.cs" />
     <Compile Include="Dto\Abstract\MstDtoBase.cs" />
+    <Compile Include="Dto\Abstract\KHDtoBase.cs" />
     <Compile Include="Dto\Others\ActionCompInfoDto.cs" />
     <Compile Include="Dto\Others\ActionInfoDto.cs" />
     <Compile Include="Dto\Others\BookInfoDto.cs" />
@@ -334,7 +371,6 @@
     <Compile Include="Dto\KHDbTable\CbtNoteDto.cs" />
     <Compile Include="Dto\Others\MoveActionInfoDto.cs" />
     <Compile Include="Dto\Others\RemarkInfoDto.cs" />
-    <Compile Include="Dto\Others\ReturningDto.cs" />
     <Compile Include="Dto\Others\ShopInfoDto.cs" />
     <Compile Include="Dto\Others\SummaryInfoDto.cs" />
     <Compile Include="Dto\Others\TermInfoDto.cs" />
@@ -372,6 +408,7 @@
     </Compile>
     <Compile Include="DbHandler\DbHandlerFactory.cs" />
     <Compile Include="ViewModels\HierarchicalViewModel.cs" />
+    <Compile Include="ViewModels\SettingViewModel\OleDbSettingViewModel.cs" />
     <Compile Include="ViewModels\SettingViewModel\FileDbSettingViewModel.cs" />
     <Compile Include="ViewModels\SettingViewModel\PostgreSQLDBSettingViewModel.cs" />
     <Compile Include="ViewModels\RemarkViewModel.cs" />
@@ -534,10 +571,7 @@
   <ItemGroup>
     <Resource Include="Resources\resheet.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Dao\KHDbTable\" />
-    <Folder Include="Dao\Others\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

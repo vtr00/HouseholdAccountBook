@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// PostgreSQL DB設定
+        /// PostgreSQL設定
         /// </summary>
         #region PostgreSQLDBSettingVM
         public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM
@@ -53,15 +53,15 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// Ole DB設定
+        /// Access設定
         /// </summary>
-        #region OleDBSettingVM
-        public FileDbSettingViewModel OleDBSettingVM
+        #region AccessSettingVM
+        public OleDbSettingViewModel AccessSettingVM
         {
-            get => this._OleDBSettingVM;
-            set => this.SetProperty(ref this._OleDBSettingVM, value);
+            get => this._AccessSettingVM;
+            set => this.SetProperty(ref this._AccessSettingVM, value);
         }
-        private FileDbSettingViewModel _OleDBSettingVM = new FileDbSettingViewModel();
+        private OleDbSettingViewModel _AccessSettingVM = new OleDbSettingViewModel();
         #endregion
 
         /// <summary>

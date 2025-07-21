@@ -1,16 +1,23 @@
 ﻿using HouseholdAccountBook.Dto.Abstract;
+using HouseholdAccountBook.Dto.KHDbTable;
 
 namespace HouseholdAccountBook.Dto.DbTable
 {
     /// <summary>
-    /// RelBookItemDto
+    /// 帳簿-項目関連テーブルDTO
     /// </summary>
-    public class RelBookItemDto : DtoBase
+    public class RelBookItemDto : TableDtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
         public RelBookItemDto() : base() { }
+
+        public RelBookItemDto(CbrBookDto dto) : base(dto)
+        {
+            this.BookId = dto.BOOK_ID;
+            this.ItemId = dto.ITEM_ID;
+        }
 
         /// <summary>
         /// 帳簿ID

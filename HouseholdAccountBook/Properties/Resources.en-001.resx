@@ -818,7 +818,7 @@ list</value>
   <data name="TextBlock_Npgsql_DbName" xml:space="preserve">
     <value>DB name</value>
   </data>
-  <data name="TextBlock_OleDB_DBFilePath" xml:space="preserve">
+  <data name="TextBlock_Access_DBFilePath" xml:space="preserve">
     <value>DB file name</value>
   </data>
   <data name="TextBlock_SQLite_DBFilePath" xml:space="preserve">
@@ -970,5 +970,14 @@ list</value>
   </data>
   <data name="TextBlock_DBKind" xml:space="preserve">
     <value>DB Kind</value>
+  </data>
+  <data name="TextBlock_Access_Provider" xml:space="preserve">
+    <value>Provider</value>
+  </data>
+  <data name="GroupHeader_PostgreSQL" xml:space="preserve">
+    <value>PostgreSQL</value>
+  </data>
+  <data name="GroupHeader_Access" xml:space="preserve">
+    <value>Microsoft Access</value>
   </data>
 </root>

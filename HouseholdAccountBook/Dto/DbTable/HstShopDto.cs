@@ -4,9 +4,9 @@ using System;
 namespace HouseholdAccountBook.Dto.DbTable
 {
     /// <summary>
-    /// HstShopDto
+    /// 店舗名テーブルDTO
     /// </summary>
-    public class HstShopDto : DtoBase
+    public class HstShopDto : TableDtoBase
     {
         /// <summary>
         /// コンストラクタ

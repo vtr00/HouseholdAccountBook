@@ -4,7 +4,7 @@ using System.IO;
 using System.Windows;
 using static HouseholdAccountBook.ConstValue.ConstValue;
 
-namespace HouseholdAccountBook.Others
+namespace HouseholdAccountBook
 {
     internal class WindowLog
     {
