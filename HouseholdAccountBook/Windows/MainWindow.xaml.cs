@@ -26,8 +26,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using static HouseholdAccountBook.ConstValue.ConstValue;
 using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
+using static HouseholdAccountBook.Others.DbConstants;
+using static HouseholdAccountBook.Others.FileConstants;
+using static HouseholdAccountBook.Others.LogicConstants;
+using static HouseholdAccountBook.Others.UiConstants;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -3500,85 +3503,36 @@ namespace HouseholdAccountBook.Windows
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            // 起動情報を設定する
-            ProcessStartInfo info = new ProcessStartInfo() {
-                FileName = settings.App_Postgres_DumpExePath,
-                Arguments = string.Format(
-                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" {4} --format {5} --data-only --verbose --column-inserts --file \"{6}\" \"{7}\"",
-                    settings.App_Postgres_Host,
-                    settings.App_Postgres_Port,
-                    settings.App_Postgres_UserName,
-                    settings.App_Postgres_Role,
-                    settings.App_Postgres_Password_Input == (int)PostgresPasswordInput.PgPassConf ? "--no-password" : "--password",
-                    format.ToString().ToLower(),
-                    backupFilePath,
-#if DEBUG
-                    settings.App_Postgres_DatabaseName_Debug
-#else
-                    settings.App_Postgres_DatabaseName
-#endif
-                ),
-                WindowStyle = ProcessWindowStyle.Hidden,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = true,
-                UseShellExecute = false
-            };
-#if DEBUG
-            Console.WriteLine(string.Format("Dump: \"{0}\" {1}", info.FileName, info.Arguments));
-#endif
-
-            // バックアップする
-            int? exitCode = await Task.Run(() => {
-                int? localExitCode = -1;
-                Log.Info("Start Backup");
-
-                Process process = Process.Start(info);
-                Log.Info("Process executing...");
-                if (waitForFinish) {
-                    if (process.WaitForExit(10 * 1000)) {
-                        localExitCode = process.ExitCode;
-                        if (localExitCode != 0) {
-                            using (StreamReader r = process.StandardError) {
-                                string errorMessage = r.ReadToEnd();
-                                Log.Error(errorMessage);
-                            }
-                        }
-                        Log.Info("Process exit");
-                    }
-                    else {
-                        Log.Error("Process timeout");
-                    }
-                }
-                else {
-                    localExitCode = null;
-                }
-                return localExitCode;
-            });
-
-            if (notifyResult) {
-                // ダンプ結果を通知する
-                if (exitCode == 0) {
-                    NotificationManager nm = new NotificationManager();
-                    NotificationContent nc = new NotificationContent() {
-                        Title = this.Title,
-                        Message = Properties.Resources.Message_FinishToBackup,
-                        Type = NotificationType.Success
-                    };
-                    nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
-                }
-                else if (exitCode != null) {
-                    NotificationManager nm = new NotificationManager();
-                    NotificationContent nc = new NotificationContent() {
-                        Title = this.Title,
-                        Message = Properties.Resources.Message_FoultToBackup,
-                        Type = NotificationType.Error
-                    };
-                    nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+            int? result = -1;
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
+                    result = notifyResult 
+                        ? await npgsqlDbHandler.ExecuteDump(backupFilePath, settings.App_Postgres_DumpExePath, (PostgresPasswordInput)settings.App_Postgres_Password_Input, format,
+                                                              (exitCode) => {
+                                                                  // ダンプ結果を通知する
+                                                                  if (exitCode == 0) {
+                                                                      NotificationManager nm = new NotificationManager();
+                                                                      NotificationContent nc = new NotificationContent() {
+                                                                          Title = this.Title,
+                                                                          Message = Properties.Resources.Message_FinishToBackup,
+                                                                          Type = NotificationType.Success
+                                                                      };
+                                                                      nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+                                                                  }
+                                                                  else if (exitCode != null) {
+                                                                      NotificationManager nm = new NotificationManager();
+                                                                      NotificationContent nc = new NotificationContent() {
+                                                                          Title = this.Title,
+                                                                          Message = Properties.Resources.Message_FoultToBackup,
+                                                                          Type = NotificationType.Error
+                                                                      };
+                                                                      nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+                                                                  }
+                                                              }, waitForFinish)
+                        : await npgsqlDbHandler.ExecuteDump(backupFilePath, settings.App_Postgres_DumpExePath, (PostgresPasswordInput)settings.App_Postgres_Password_Input, format, null, waitForFinish);
                 }
             }
-
-            return exitCode;
+            return result;
         }
 
         /// <summary>
@@ -3590,55 +3544,13 @@ namespace HouseholdAccountBook.Windows
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            // 起動情報を設定する
-            ProcessStartInfo info = new ProcessStartInfo() {
-                FileName = settings.App_Postgres_RestoreExePath,
-                Arguments = string.Format(
-                    "--host {0} --port {1} --username \"{2}\" --role \"{3}\" {4} --data-only --verbose --dbname \"{5}\" \"{6}\"",
-                    settings.App_Postgres_Host,
-                    settings.App_Postgres_Port,
-                    settings.App_Postgres_UserName,
-                    settings.App_Postgres_Role,
-                    settings.App_Postgres_Password_Input == (int)PostgresPasswordInput.PgPassConf ? "--no-password" : "--password",
-#if DEBUG
-                    settings.App_Postgres_DatabaseName_Debug,
-#else
-                    settings.App_Postgres_DatabaseName,
-#endif
-                    backupFilePath
-                ),
-                WindowStyle = ProcessWindowStyle.Hidden,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = true,
-                UseShellExecute = false
-            };
-#if DEBUG
-            Console.WriteLine(string.Format("Restore: \"{0}\" {1}", info.FileName, info.Arguments));
-#endif
-
-            // リストアする
-            int exitCode = await Task.Run(() => {
-                int localExitCode = -1;
-                Log.Info("Start Restore");
-
-                Process process = Process.Start(info);
-                if (process.WaitForExit(10 * 1000)) {
-                    localExitCode = process.ExitCode;
-                    if (localExitCode != 0) {
-                        using (StreamReader r = process.StandardError) {
-                            string errorMessage = r.ReadToEnd();
-                            Log.Error(errorMessage);
-                        }
-                    }
+            int result = -1;
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
+                    result = await npgsqlDbHandler.ExecuteRestore(backupFilePath, settings.App_Postgres_RestoreExePath, (PostgresPasswordInput)settings.App_Postgres_Password_Input);
                 }
-                else {
-                    Log.Error("Process timeout");
-                }
-                return localExitCode;
-            });
-
-            return exitCode;
+            }
+            return result;
         }
         #endregion
     }

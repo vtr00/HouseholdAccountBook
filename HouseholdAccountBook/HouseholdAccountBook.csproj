@@ -386,6 +386,10 @@
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Extensions\ValueTuppleExtensions.cs" />
+    <Compile Include="Others\DbConstants.cs" />
+    <Compile Include="Others\ExceptionLog.cs" />
+    <Compile Include="Others\FileConstants.cs" />
+    <Compile Include="Others\UiConstants.cs" />
     <Compile Include="ViewModels\Interfaces\ISelectable.cs" />
     <Compile Include="Others\Log.cs" />
     <Compile Include="Others\PropertyName.cs" />
@@ -499,7 +503,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Others\ConstValue.cs" />
+    <Compile Include="Others\LogicConstants.cs" />
     <Compile Include="Converters\DateTimeToDayOfWeekConverter.cs" />
     <Compile Include="Converters\DateTimeToDisplayedMonthConverter.cs" />
     <Compile Include="Converters\IntToMoneyDisplayConverter.cs" />

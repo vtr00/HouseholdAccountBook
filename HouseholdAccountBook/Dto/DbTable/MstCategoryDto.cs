@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Dto.Abstract;
 using HouseholdAccountBook.Dto.KHDbTable;
+using HouseholdAccountBook.Others;
 
 namespace HouseholdAccountBook.Dto.DbTable
 {
@@ -32,6 +33,6 @@ namespace HouseholdAccountBook.Dto.DbTable
         /// <summary>
         /// 収支種別
         /// </summary>
-        public int BalanceKind { get; set; } = 0;
+        public int BalanceKind { get; set; } = (int)DbConstants.BalanceKind.Income;
     }
 }

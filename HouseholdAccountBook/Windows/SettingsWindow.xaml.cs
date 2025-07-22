@@ -21,7 +21,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Others.DbConstants;
+using static HouseholdAccountBook.Others.UiConstants;
 using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 using static HouseholdAccountBook.ViewModels.HierarchicalSettingViewModel;
 

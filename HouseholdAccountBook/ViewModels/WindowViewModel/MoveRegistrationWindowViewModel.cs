@@ -3,7 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Others.LogicConstants;
+using static HouseholdAccountBook.Others.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels
 {

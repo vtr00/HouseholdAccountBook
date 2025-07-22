@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.ViewModels.Interfaces;
 using Prism.Mvvm;
 using System;
-using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.ViewModels
 {

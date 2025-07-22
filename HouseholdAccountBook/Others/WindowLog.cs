@@ -2,11 +2,11 @@
 using System;
 using System.IO;
 using System.Windows;
-using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Others.FileConstants;
 
 namespace HouseholdAccountBook
 {
-    internal class WindowLog
+    public class WindowLog
     {
         /// <summary>
         /// 保存対象のウィンドウ
@@ -103,7 +103,7 @@ namespace HouseholdAccountBook
             /// ディレクトリ生成
             if (!Directory.Exists(WindowLocationFolderPath)) Directory.CreateDirectory(WindowLocationFolderPath);
 
-            using (FileStream fs = new FileStream(ConstValue.ConstValue.WindowLocationFilePath(this.window.Name), FileMode.Append)) {
+            using (FileStream fs = new FileStream(WindowLocationFilePath(this.window.Name), FileMode.Append)) {
                 using (StreamWriter sw = new StreamWriter(fs)) {
                     if (fs.Length == 0) {
                         sw.WriteLine("yyyy-MM-dd HH:mm:ss.ffff\tState\tLeft\tTop\tHeight\tWidth");

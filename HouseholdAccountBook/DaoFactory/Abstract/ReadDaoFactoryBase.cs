@@ -2,7 +2,7 @@
 using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
 using System;
-using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.DaoFactory.Abstract
 {

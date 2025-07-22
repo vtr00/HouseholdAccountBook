@@ -24,7 +24,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Others.DbConstants;
 using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Windows

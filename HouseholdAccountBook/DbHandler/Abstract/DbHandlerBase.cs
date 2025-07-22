@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
-using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.DbHandler.Abstract
 {
@@ -188,7 +188,7 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         {
             this.dbTransaction = this.connection.BeginTransaction();
             try {
-                action();
+                action?.Invoke();
 
                 dbTransaction.Commit();
             }
@@ -216,7 +216,7 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         {
             this.dbTransaction = this.connection.BeginTransaction();
             try {
-                await actionAsync();
+                await actionAsync?.Invoke();
 
                 await Task.Run(() => this.dbTransaction.Commit());
             }

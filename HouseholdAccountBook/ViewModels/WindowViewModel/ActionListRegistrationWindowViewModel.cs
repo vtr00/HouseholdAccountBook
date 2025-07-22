@@ -3,7 +3,9 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Others.DbConstants;
+using static HouseholdAccountBook.Others.LogicConstants;
+using static HouseholdAccountBook.Others.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels
 {

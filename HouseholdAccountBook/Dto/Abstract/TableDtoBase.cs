@@ -1,4 +1,5 @@
 ﻿using System;
+using HouseholdAccountBook.Others;
 
 namespace HouseholdAccountBook.Dto.Abstract
 {
@@ -32,7 +33,7 @@ namespace HouseholdAccountBook.Dto.Abstract
         /// <summary>
         /// 更新者
         /// </summary>
-        public string Updater { get; set; } = ConstValue.ConstValue.Updater;
+        public string Updater { get; set; } = DbConstants.Updater;
         /// <summary>
         /// 挿入日
         /// </summary>
@@ -40,6 +41,6 @@ namespace HouseholdAccountBook.Dto.Abstract
         /// <summary>
         /// 挿入者
         /// </summary>
-        public string Inserter { get; set; } = ConstValue.ConstValue.Inserter;
+        public string Inserter { get; set; } = DbConstants.Inserter;
     }
 }

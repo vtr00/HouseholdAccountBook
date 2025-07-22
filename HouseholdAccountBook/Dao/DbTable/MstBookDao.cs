@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.Dao.DbTable
 {
@@ -117,8 +118,8 @@ SET sort_order = CASE
   ELSE sort_order
 END, update_time = 'now', updater = @Updater
 WHERE book_id IN (@BookId1, @BookId2);",
-new { BookId1 = bookId1, BookId2 = bookId2, ConstValue.ConstValue.Updater });
-
+new { BookId1 = bookId1, BookId2 = bookId2, Updater });
+            
             return count;
         }
 

@@ -14,7 +14,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Others.DbConstants;
+using static HouseholdAccountBook.Others.LogicConstants;
 using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Windows

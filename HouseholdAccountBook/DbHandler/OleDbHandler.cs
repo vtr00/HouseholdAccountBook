@@ -1,6 +1,6 @@
 ﻿using HouseholdAccountBook.DbHandler.Abstract;
 using System.Data.OleDb;
-using static HouseholdAccountBook.ConstValue.ConstValue;
+using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.DbHandler
 {

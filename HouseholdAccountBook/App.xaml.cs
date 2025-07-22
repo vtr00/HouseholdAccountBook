@@ -11,7 +11,6 @@ using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
-using static HouseholdAccountBook.ConstValue.ConstValue;
 
 namespace HouseholdAccountBook
 {
@@ -192,16 +191,10 @@ namespace HouseholdAccountBook
 
                 e.Handled = true;
 
-                if (!Directory.Exists(UnhandledExceptionInfoFolderPath)) Directory.CreateDirectory(UnhandledExceptionInfoFolderPath);
-                string filePath = UnhandledExceptionInfoFilePath;
                 // 例外情報をファイルに保存する
-                string jsonCode = JsonConvert.SerializeObject(e.Exception, Formatting.Indented);
-                using (FileStream fs = new FileStream(filePath, FileMode.Create)) {
-                    using (StreamWriter sw = new StreamWriter(fs)) {
-                        sw.WriteLine(jsonCode);
-                    }
-                }
-                Log.Info("Create Unhandled Exception Info File:" + filePath);
+                ExceptionLog log = new ExceptionLog();
+                log.Log(e.Exception);
+                Log.Info("Create Unhandled Exception Info File:" + log.RelatedFilePath);
 
                 // ハンドルされない例外の発生を通知する
                 NotificationManager nm = new NotificationManager();
@@ -211,10 +204,9 @@ namespace HouseholdAccountBook
                     Type = NotificationType.Warning
                 };
                 nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
-                    string absoluteFilePath = GetCurrentDir() + filePath;
+                    string absoluteFilePath = Path.Combine(GetCurrentDir(), log.RelatedFilePath);
                     Log.Info("Create Unhandled Exception Info Absolute File:" + absoluteFilePath);
                     Process.Start(absoluteFilePath);
-                    Application.Current.Shutdown();
                 });
             }
             catch (Exception) { }
