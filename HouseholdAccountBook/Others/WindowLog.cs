@@ -18,21 +18,9 @@ namespace HouseholdAccountBook
         /// </summary>
         private WindowState lastSavedWindowState = default;
         /// <summary>
-        /// ウィンドウの位置の上端(最終保存値)
+        /// ウィンドウの境界(最終保存値)
         /// </summary>
-        private double lastSavedTop = default;
-        /// <summary>
-        /// ウィンドウの位置の左端(最終保存値)
-        /// </summary>
-        private double lastSavedLeft = default;
-        /// <summary>
-        /// ウィンドウの高さ(最終保存値)
-        /// </summary>
-        private double lastSavedHeight = default;
-        /// <summary>
-        /// ウィンドウの幅(最終保存値)
-        /// </summary>
-        private double lastSavedWidth = default;
+        private Rect lastSavedRect = new Rect();
 
         /// <summary>
         /// <see cref="WindowLog"/> クラスの新しいインスタンスを初期化します。
@@ -75,14 +63,10 @@ namespace HouseholdAccountBook
         {
             if (!forceLog &&
                 this.lastSavedWindowState == this.window.WindowState &&
-                this.lastSavedLeft == this.window.Left && this.lastSavedTop == this.window.Top &&
-                this.lastSavedHeight == this.window.Height && this.lastSavedWidth == this.window.Width) return;
+                this.lastSavedRect == this.window.RestoreBounds) return;
 
             this.lastSavedWindowState = this.window.WindowState;
-            this.lastSavedTop = this.window.Top;
-            this.lastSavedLeft = this.window.Left;
-            this.lastSavedWidth = this.window.Width;
-            this.lastSavedHeight = this.window.Height;
+            this.lastSavedRect = this.window.RestoreBounds;
 
             string windowState;
             switch (this.window.WindowState) {

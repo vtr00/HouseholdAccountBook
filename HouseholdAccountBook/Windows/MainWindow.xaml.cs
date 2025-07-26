@@ -63,21 +63,9 @@ namespace HouseholdAccountBook.Windows
         private CsvComparisonWindow ccw;
 
         /// <summary>
-        /// ウィンドウの位置の上端(最終補正値)
+        /// ウィンドウの境界(最終補正値)
         /// </summary>
-        private double lastModTop = default;
-        /// <summary>
-        /// ウィンドウの位置の左端(最終補正値)
-        /// </summary>
-        private double lastModLeft = default;
-        /// <summary>
-        /// ウィンドウの高さ(最終補正値)
-        /// </summary>
-        private double lastModHeight = default;
-        /// <summary>
-        /// ウィンドウの幅(最終補正値)
-        /// </summary>
-        private double lastModWidth = default;
+        private Rect lastBounds = new Rect();
 
         /// <summary>
         /// ウィンドウログ
@@ -1582,10 +1570,7 @@ namespace HouseholdAccountBook.Windows
         {
             this.windowLog.Log("Initialized", true);
 
-            this.lastModTop = this.Top;
-            this.lastModLeft = this.Left;
-            this.lastModWidth = this.Width;
-            this.lastModHeight = this.Height;
+            this.lastBounds = this.RestoreBounds;
 
             this.LoadWindowSetting();
         }
@@ -1713,7 +1698,7 @@ namespace HouseholdAccountBook.Windows
             this.windowLog.Log("WindowSizeChanged", true);
             this.ModifyLocationOrSize();
         }
-#endregion
+        #endregion
 
         /// <summary>
         /// 月別一覧ダブルクリック時
@@ -3387,9 +3372,9 @@ namespace HouseholdAccountBook.Windows
                 if (30000 < Math.Max(Math.Abs(this.Left), Math.Abs(this.Top))) {
                     double tmpTop = this.Top;
                     double tmpLeft = this.Left;
-                    if (30000 < Math.Max(Math.Abs(this.lastModLeft), Math.Abs(this.lastModTop))) {
-                        this.Top = this.lastModTop;
-                        this.Left = this.lastModLeft;
+                    if (30000 < Math.Max(Math.Abs(this.lastBounds.Left), Math.Abs(this.lastBounds.Top))) {
+                        this.Left = this.lastBounds.Left;
+                        this.Top = this.lastBounds.Top;
                     }
                     else {
                         // ディスプレイの中央に移動する
@@ -3409,9 +3394,9 @@ namespace HouseholdAccountBook.Windows
                 if (this.Height < 40 || this.Width < 40) {
                     double tmpHeight = this.Height;
                     double tmpWidth = this.Width;
-                    if (40 < this.lastModHeight && 40 < this.lastModWidth) {
-                        this.Height = this.lastModHeight;
-                        this.Width = this.lastModWidth;
+                    if (40 < this.lastBounds.Height && 40 < this.lastBounds.Width) {
+                        this.Height = this.lastBounds.Height;
+                        this.Width = this.lastBounds.Width;
                     }
                     else {
                         this.Height = 700;
@@ -3430,10 +3415,7 @@ namespace HouseholdAccountBook.Windows
                 return ret2;
             });
 
-            this.lastModTop = this.Top;
-            this.lastModLeft = this.Left;
-            this.lastModWidth = this.Width;
-            this.lastModHeight = this.Height;
+            this.lastBounds = this.RestoreBounds;
 
             return ret;
         }
@@ -3508,27 +3490,27 @@ namespace HouseholdAccountBook.Windows
                 if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
                     result = notifyResult 
                         ? await npgsqlDbHandler.ExecuteDump(backupFilePath, settings.App_Postgres_DumpExePath, (PostgresPasswordInput)settings.App_Postgres_Password_Input, format,
-                                                              (exitCode) => {
-                                                                  // ダンプ結果を通知する
-                                                                  if (exitCode == 0) {
-                                                                      NotificationManager nm = new NotificationManager();
-                                                                      NotificationContent nc = new NotificationContent() {
-                                                                          Title = this.Title,
-                                                                          Message = Properties.Resources.Message_FinishToBackup,
-                                                                          Type = NotificationType.Success
-                                                                      };
-                                                                      nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
-                                                                  }
-                                                                  else if (exitCode != null) {
-                                                                      NotificationManager nm = new NotificationManager();
-                                                                      NotificationContent nc = new NotificationContent() {
-                                                                          Title = this.Title,
-                                                                          Message = Properties.Resources.Message_FoultToBackup,
-                                                                          Type = NotificationType.Error
-                                                                      };
-                                                                      nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
-                                                                  }
-                                                              }, waitForFinish)
+                            (exitCode) => {
+                                // ダンプ結果を通知する
+                                if (exitCode == 0) {
+                                    NotificationManager nm = new NotificationManager();
+                                    NotificationContent nc = new NotificationContent() {
+                                        Title = this.Title,
+                                        Message = Properties.Resources.Message_FinishToBackup,
+                                        Type = NotificationType.Success
+                                    };
+                                    nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+                                }
+                                else if (exitCode != null) {
+                                    NotificationManager nm = new NotificationManager();
+                                    NotificationContent nc = new NotificationContent() {
+                                        Title = this.Title,
+                                        Message = Properties.Resources.Message_FoultToBackup,
+                                        Type = NotificationType.Error
+                                    };
+                                    nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+                                }
+                            }, waitForFinish)
                         : await npgsqlDbHandler.ExecuteDump(backupFilePath, settings.App_Postgres_DumpExePath, (PostgresPasswordInput)settings.App_Postgres_Password_Input, format, null, waitForFinish);
                 }
             }
