@@ -245,16 +245,11 @@ namespace HouseholdAccountBook.ViewModels
         #region DisplayedMonth
         public DateTime? DisplayedMonth
         {
-            get {
-                switch (this.DisplayedTermKind) {
-                    case TermKind.Monthly:
-                        return this.StartDate;
-                    case TermKind.Selected:
-                        return null;
-                    default:
-                        return null;
-                }
-            }
+            get => this.DisplayedTermKind switch {
+                TermKind.Monthly => (DateTime?)this.StartDate,
+                TermKind.Selected => null,
+                _ => null,
+            };
             set {
                 DateTime? oldDisplayedMonth = this.DisplayedMonth;
                 if (value != null) {
@@ -354,8 +349,8 @@ namespace HouseholdAccountBook.ViewModels
                     //Log.Debug($"Old SelectedActionVMList.Count: {this._SelectedActionVMList.Count}");
                     //Log.Debug($"New SelectedActionVMList.Count: {value.Count}");
 
-                    List<ActionViewModel> added = new List<ActionViewModel>(value.Except(this._SelectedActionVMList));
-                    List<ActionViewModel> removed = new List<ActionViewModel>(this._SelectedActionVMList.Except(value));
+                    List<ActionViewModel> added = new(value.Except(this._SelectedActionVMList));
+                    List<ActionViewModel> removed = new(this._SelectedActionVMList.Except(value));
 
                     //Log.Debug($"added.Count: {added.Count}");
                     //Log.Debug($"removed.Count: {removed.Count}");
@@ -378,7 +373,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private readonly ObservableCollection<ActionViewModel> _SelectedActionVMList = new ObservableCollection<ActionViewModel>();
+        private readonly ObservableCollection<ActionViewModel> _SelectedActionVMList = [];
         #endregion
 
         /// <summary>
@@ -390,7 +385,7 @@ namespace HouseholdAccountBook.ViewModels
             get {
                 int count = this.SelectedActionVMList.Count((vm) => vm.IsMatch);
                 if (count == 0) return false;
-                else if (count == this.SelectedActionVMList.Count()) return true;
+                else if (count == this.SelectedActionVMList.Count) return true;
                 return null;
             }
             set {
@@ -603,7 +598,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._DailyGraphPlotModel;
             set => this.SetProperty(ref this._DailyGraphPlotModel, value);
         }
-        private PlotModel _DailyGraphPlotModel = new PlotModel() {
+        private PlotModel _DailyGraphPlotModel = new() {
             Title = Properties.Resources.GraphTitle_DailyGraph,
             IsLegendVisible = false
         };
@@ -618,7 +613,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedDailyGraphPlotModel;
             set => this.SetProperty(ref this._SelectedDailyGraphPlotModel, value);
         }
-        private PlotModel _SelectedDailyGraphPlotModel = new PlotModel() {
+        private PlotModel _SelectedDailyGraphPlotModel = new() {
             Title = Properties.Resources.GraphTitle_SeparetelyGraph,
             IsLegendVisible = false
         };
@@ -740,7 +735,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._MonthlyGraphPlotModel;
             set => this.SetProperty(ref this._MonthlyGraphPlotModel, value);
         }
-        private PlotModel _MonthlyGraphPlotModel = new PlotModel() {
+        private PlotModel _MonthlyGraphPlotModel = new() {
             Title = Properties.Resources.GraphTitle_MonthlyGraph,
             IsLegendVisible = false
         };
@@ -755,7 +750,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedMonthlyGraphPlotModel;
             set => this.SetProperty(ref this._SelectedMonthlyGraphPlotModel, value);
         }
-        private PlotModel _SelectedMonthlyGraphPlotModel = new PlotModel() {
+        private PlotModel _SelectedMonthlyGraphPlotModel = new() {
             Title = Properties.Resources.GraphTitle_SeparetelyGraph,
             IsLegendVisible = false
         };
@@ -850,7 +845,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._YearlyGraphPlotModel;
             set => this.SetProperty(ref this._YearlyGraphPlotModel, value);
         }
-        private PlotModel _YearlyGraphPlotModel = new PlotModel() {
+        private PlotModel _YearlyGraphPlotModel = new() {
             Title = Properties.Resources.GraphTitle_YearlyGraph,
             IsLegendVisible = false
         };
@@ -865,7 +860,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SelectedYearlyGraphPlotModel;
             set => this.SetProperty(ref this._SelectedYearlyGraphPlotModel, value);
         }
-        private PlotModel _SelectedYearlyGraphPlotModel = new PlotModel() {
+        private PlotModel _SelectedYearlyGraphPlotModel = new() {
             Title = Properties.Resources.GraphTitle_SeparetelyGraph,
             IsLegendVisible = false
         };
@@ -882,7 +877,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._Controller;
             set => this.SetProperty(ref this._Controller, value);
         }
-        private PlotController _Controller = new PlotController();
+        private PlotController _Controller = new();
         #endregion
         #endregion
         #endregion

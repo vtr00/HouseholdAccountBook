@@ -1,13 +1,14 @@
 ﻿using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
 using HouseholdAccountBook.Extensions;
+using HouseholdAccountBook.Others;
 using HouseholdAccountBook.Windows;
-using Newtonsoft.Json;
-using Notifications.Wpf;
+using Notification.Wpf;
 using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -23,7 +24,10 @@ namespace HouseholdAccountBook
         /// <summary>
         /// 起動時刻
         /// </summary>
-        static public DateTime StartupTime = DateTime.Now;
+#pragma warning disable IDE0032 // 自動プロパティを使用する
+        public DateTime StartupTime => this._startupTime;
+        private readonly DateTime _startupTime = DateTime.Now;
+#pragma warning restore IDE0032 // 自動プロパティを使用する
         #endregion
 
         #region フィールド
@@ -52,7 +56,7 @@ namespace HouseholdAccountBook
         private async void App_Startup(object sender, StartupEventArgs e)
         {
 #if DEBUG
-            Debug.Listeners.Add(new ConsoleTraceListener());
+            Trace.Listeners.Add(new ConsoleTraceListener());
 #endif
 
             Log.Info("Application Startup");
@@ -60,11 +64,13 @@ namespace HouseholdAccountBook
             this.DispatcherUnhandledException += this.App_DispatcherUnhandledException;
             this.Exit += this.App_Exit;
 
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
 
             // 言語設定
             Log.Info($"Application Culture: {settings.App_CultureName}");
-            System.Globalization.CultureInfo cultureInfo = new System.Globalization.CultureInfo(settings.App_CultureName);
+            CultureInfo cultureInfo = new(settings.App_CultureName);
 
             HouseholdAccountBook.Properties.Resources.Culture = cultureInfo;
             Thread.CurrentThread.CurrentCulture = cultureInfo;
@@ -74,7 +80,7 @@ namespace HouseholdAccountBook
 
 #if !DEBUG
             // 多重起動を抑止する
-            App.mutex = new Mutex(false, this.GetType().Assembly.GetName().Name);
+            App.mutex = new(false, this.GetType().Assembly.GetName().Name);
             if (!mutex.WaitOne(TimeSpan.Zero, false)) {
                 Process curProcess = Process.GetCurrentProcess();
                 Process[] processList = Process.GetProcessesByName(curProcess.ProcessName);
@@ -111,7 +117,7 @@ namespace HouseholdAccountBook
                 this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
                 // データベース接続を設定する
-                DbSettingWindow dsw = new DbSettingWindow(HouseholdAccountBook.Properties.Resources.Message_PleaseInputDbSetting);
+                DbSettingWindow dsw = new(HouseholdAccountBook.Properties.Resources.Message_PleaseInputDbSetting);
                 bool? result = dsw.ShowDialog();
 
                 if (result != true) {
@@ -127,19 +133,28 @@ namespace HouseholdAccountBook
             DbHandlerFactory dbHandlerFactory = null;
             while (true) {
                 // 接続設定を読み込む
-                this.connectInfo = new NpgsqlDbHandler.ConnectInfo() {
-                    Host = settings.App_Postgres_Host,
-                    Port = settings.App_Postgres_Port,
-                    UserName = settings.App_Postgres_UserName,
-                    Password = settings.App_Postgres_Password,
+                switch ((DbConstants.DBKind)settings.App_SelectedDBKind) {
+                    case DbConstants.DBKind.PostgreSQL: {
+                        this.connectInfo = new NpgsqlDbHandler.ConnectInfo() {
+                            Host = settings.App_Postgres_Host,
+                            Port = settings.App_Postgres_Port,
+                            UserName = settings.App_Postgres_UserName,
+                            Password = settings.App_Postgres_Password,
 #if DEBUG
-                    DatabaseName = settings.App_Postgres_DatabaseName_Debug,
+                            DatabaseName = settings.App_Postgres_DatabaseName_Debug,
 #else
-                    DatabaseName = settings.App_Postgres_DatabaseName,
+                            DatabaseName = settings.App_Postgres_DatabaseName,
 #endif
-                    Role = settings.App_Postgres_Role
-                };
-                dbHandlerFactory = new DbHandlerFactory(this.connectInfo);
+                            Role = settings.App_Postgres_Role
+                        };
+                        break;
+                    }
+                    case DbConstants.DBKind.SQLite:
+                    case DbConstants.DBKind.Access:
+                    default:
+                        throw new NotSupportedException();
+                }
+                dbHandlerFactory = new(this.connectInfo);
 
                 // 接続を試行する
                 bool isOpen = false;
@@ -155,7 +170,7 @@ namespace HouseholdAccountBook
                 }
                 else {
                     // データベース接続を設定する
-                    DbSettingWindow dsw = new DbSettingWindow(HouseholdAccountBook.Properties.Resources.Message_FoultToConnectDb);
+                    DbSettingWindow dsw = new(HouseholdAccountBook.Properties.Resources.Message_FoultToConnectDb);
                     bool? result = dsw.ShowDialog();
 
                     if (result != true) {
@@ -170,10 +185,10 @@ namespace HouseholdAccountBook
             await DateTimeExtensions.DownloadHolidayListAsync();
 
             // 設定をリソースに登録する
-            this.RegisterToResource();
+            App.RegisterToResource();
 
             // DBに接続できる場合だけメインウィンドウを開く
-            MainWindow mw = new MainWindow(dbHandlerFactory);
+            MainWindow mw = new(dbHandlerFactory);
             this.MainWindow = mw;
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             mw.Show();
@@ -192,13 +207,13 @@ namespace HouseholdAccountBook
                 e.Handled = true;
 
                 // 例外情報をファイルに保存する
-                ExceptionLog log = new ExceptionLog();
+                ExceptionLog log = new();
                 log.Log(e.Exception);
                 Log.Info("Create Unhandled Exception Info File:" + log.RelatedFilePath);
 
                 // ハンドルされない例外の発生を通知する
-                NotificationManager nm = new NotificationManager();
-                NotificationContent nc = new NotificationContent() {
+                NotificationManager nm = new();
+                NotificationContent nc = new() {
                     Title = Current.MainWindow?.Title ?? "",
                     Message = HouseholdAccountBook.Properties.Resources.Message_UnhandledExceptionOccurred,
                     Type = NotificationType.Warning
@@ -221,19 +236,18 @@ namespace HouseholdAccountBook
         {
             Log.Info("Application End");
 
-            this.ReleaseMutex();
+            ReleaseMutex();
             Log.Close();
         }
 
         /// <summary>
         /// 設定をリソースに登録する
         /// </summary>
-        public void RegisterToResource()
+        public static void RegisterToResource()
         {
             ResourceDictionary rd = Current.Resources;
             if (rd.Contains("Settings")) {
-                Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
-                rd["Settings"] = settings;
+                rd["Settings"] = HouseholdAccountBook.Properties.Settings.Default;
             }
             if (rd.Contains("AppCulture")) {
                 rd["AppCulture"] = HouseholdAccountBook.Properties.Resources.Culture;
@@ -243,7 +257,7 @@ namespace HouseholdAccountBook
         /// <summary>
         /// 多重起動防止用のMutexを開放する
         /// </summary>
-        public void ReleaseMutex()
+        public static void ReleaseMutex()
         {
 #if !DEBUG
             if (mutex != null) {
@@ -261,12 +275,24 @@ namespace HouseholdAccountBook
         {
             Log.Info("Application Restart");
 
-            this.ReleaseMutex();
+            string targetExe = GetCurrentExe();
+            Log.Debug($"target: {targetExe}");
+
+            App.ReleaseMutex();
             Log.Close();
 
-            Process.Start(Application.ResourceAssembly.Location);
+            Process.Start(targetExe);
 
             this.Shutdown();
+        }
+
+        /// <summary>
+        /// 実行ファイルのパスを取得する
+        /// </summary>
+        /// <returns>実行ファイルのパス</returns>
+        public static string GetCurrentExe()
+        {
+            return Environment.ProcessPath;
         }
 
         /// <summary>
@@ -275,7 +301,7 @@ namespace HouseholdAccountBook
         /// <returns>実行ファイルの存在するフォルダのパス</returns>
         public static string GetCurrentDir()
         {
-            return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            return Path.GetDirectoryName(GetCurrentExe());
         }
     }
 }

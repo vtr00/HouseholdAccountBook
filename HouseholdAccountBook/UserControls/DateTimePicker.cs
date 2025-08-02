@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -251,7 +250,7 @@ namespace HouseholdAccountBook.UserControls
         private static void ApplyDateFormat(DateTimePicker dateTimePicker)
         {
             // 選択された日付をフォーマットを適用してテキストボックスに表示する
-            Binding binding = new Binding(SelectedDateProperty.Name) {
+            Binding binding = new(SelectedDateProperty.Name) {
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
                 RelativeSource = new RelativeSource { AncestorType = typeof(DateTimePicker) },
                 Converter = new DatePickerDateTimeConverter(),
@@ -340,16 +339,16 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="textBox">テキストボックス</param>
         private static void SelectAsRange(TextBox textBox)
         {
-            List<char> charList = new List<char>();
+            List<char> charList = [];
             if (-1 != textBox.Text.LastIndexOf('/')) charList.Add('/');
             if (-1 != textBox.Text.LastIndexOf('-')) charList.Add('-');
             char separetor = charList.Count == 1 ? charList[0] : '-';
 
-            string forward = textBox.Text.Substring(0, textBox.SelectionStart);
-            string backward = textBox.Text.Substring(textBox.SelectionStart, textBox.Text.Length - textBox.SelectionStart);
+            string forward = textBox.Text[..textBox.SelectionStart];
+            string backward = textBox.Text[textBox.SelectionStart..];
 
             int start = forward.LastIndexOf(separetor) + 1;
-            int end = forward.Length + (backward.IndexOf(separetor) >= 0 ? backward.IndexOf(separetor) : backward.Length);
+            int end = forward.Length + (backward.Contains(separetor) ? backward.IndexOf(separetor) : backward.Length);
 
             textBox.SelectionStart = start;
             textBox.SelectionLength = end - start;

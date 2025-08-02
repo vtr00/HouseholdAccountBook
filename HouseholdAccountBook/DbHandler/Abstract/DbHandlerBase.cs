@@ -77,6 +77,8 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         /// </summary>
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
+
             if (this.connection != null) {
                 this.connection.Close();
                 this.connection.Dispose();
@@ -96,8 +98,8 @@ namespace HouseholdAccountBook.DbHandler.Abstract
             try {
                 return await this.connection.QueryAsync<T>(sql, param, this.dbTransaction);
             }
-            catch (Exception e) {
-                throw e;
+            catch (Exception) {
+                throw;
             }
         }
 
@@ -113,8 +115,8 @@ namespace HouseholdAccountBook.DbHandler.Abstract
             try {
                 return await this.connection.QueryFirstOrDefaultAsync<T>(sql, param, this.dbTransaction);
             }
-            catch (Exception e) {
-                throw e;
+            catch (Exception) {
+                throw;
             }
         }
 
@@ -131,8 +133,8 @@ namespace HouseholdAccountBook.DbHandler.Abstract
             try {
                 return await this.connection.QuerySingleAsync<T>(sql, param, this.dbTransaction);
             }
-            catch (Exception e) {
-                throw e;
+            catch (Exception) {
+                throw;
             }
         }
 
@@ -149,8 +151,8 @@ namespace HouseholdAccountBook.DbHandler.Abstract
             try {
                 return await this.connection.QuerySingleOrDefaultAsync<T>(sql, param, this.dbTransaction);
             }
-            catch (Exception e) {
-                throw e;
+            catch (Exception) {
+                throw;
             }
         }
 
@@ -165,8 +167,8 @@ namespace HouseholdAccountBook.DbHandler.Abstract
             try {
                 return await this.connection.ExecuteAsync(sql, param, this.dbTransaction);
             }
-            catch (Exception e) {
-                throw e;
+            catch (Exception) {
+                throw;
             }
         }
 

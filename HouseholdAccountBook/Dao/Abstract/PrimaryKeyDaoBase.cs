@@ -9,10 +9,8 @@ namespace HouseholdAccountBook.Dao.Abstract
     /// </summary>
     /// <typeparam name="DTO"><see cref="TableDtoBase"/>の派生クラス</typeparam>
     /// <typeparam name="T">主キーの型</typeparam>
-    public abstract class PrimaryKeyDaoBase<DTO, T> : ReadWriteDaoBase<DTO> where DTO : TableDtoBase
+    public abstract class PrimaryKeyDaoBase<DTO, T>(DbHandlerBase dbHandler) : ReadWriteDaoBase<DTO>(dbHandler) where DTO : TableDtoBase
     {
-        protected PrimaryKeyDaoBase(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         /// <summary>
         /// 主キーでレコードを取得する
         /// </summary>

@@ -10,14 +10,9 @@ namespace HouseholdAccountBook.Dao.DbTable
     /// <summary>
     /// 備考テーブルDAO
     /// </summary>
-    public class HstRemarkDao : ReadWriteDaoBase<HstRemarkDto>
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class HstRemarkDao(DbHandlerBase dbHandler) : ReadWriteDaoBase<HstRemarkDto>(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public HstRemarkDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         public override async Task<IEnumerable<HstRemarkDto>> FindAllAsync()
         {
             var dtoList = await this.dbHandler.QueryAsync<HstRemarkDto>(@"

@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.Converters
         /// <returns></returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (!(parameter is string paramStr)) {
+            if (parameter is not string paramStr) {
                 return DependencyProperty.UnsetValue;
             }
 
@@ -40,11 +40,11 @@ namespace HouseholdAccountBook.Converters
         /// <returns></returns>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (!(parameter is string paramStr)) {
+            if (parameter is not string paramStr) {
                 return DependencyProperty.UnsetValue;
             }
 
-            if (!(value is bool isChecked)) {
+            if (value is not bool isChecked) {
                 return DependencyProperty.UnsetValue;
             }
 

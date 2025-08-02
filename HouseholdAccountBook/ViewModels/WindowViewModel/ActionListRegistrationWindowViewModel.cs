@@ -193,7 +193,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._DateValueVMList;
             set => this.SetProperty(ref this._DateValueVMList, value);
         }
-        private ObservableCollection<DateValueViewModel> _DateValueVMList = new ObservableCollection<DateValueViewModel>();
+        private ObservableCollection<DateValueViewModel> _DateValueVMList = [];
         #endregion
 
         /// <summary>

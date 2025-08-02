@@ -34,56 +34,56 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private static void IsOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (!(d is FollowablePopup ctrl)) {
+            if (d is not FollowablePopup followablePopup) {
                 return;
             }
 
-            var target = ctrl.PlacementTarget;
+            var target = followablePopup.PlacementTarget;
             if (target == null) {
                 return;
             }
 
-            var win = Window.GetWindow(target);
+            var window = Window.GetWindow(target);
             // Popup の Placement の親要素にScrollViewer要素があれば取得する
             var scrollViewer = GetDependencyObjectFromVisualTree(target, typeof(ScrollViewer)) as ScrollViewer;
 
             // 更新前のIsOpenプロパティがtrueだったので、登録済みのイベントハンドラを解除する
             if (e.OldValue != null && (bool)e.OldValue == true) {
-                if (win != null) {
+                if (window != null) {
                     // ウィンドウの移動/リサイズ時の処理を解除
-                    win.LocationChanged -= ctrl.OnFollowWindowChanged;
-                    win.SizeChanged -= ctrl.OnFollowWindowChanged;
+                    window.LocationChanged -= followablePopup.OnFollowWindowRectChanged;
+                    window.SizeChanged -= followablePopup.OnFollowWindowRectChanged;
 
-                    if (win.IsActive) {
+                    if (window.IsActive) {
                         // ウィンドウがアクティブのときのみ、ウィンドウのアクティベート変更時の処理を解除
-                        win.Activated -= ctrl.OnFollowWindowActivated;
-                        win.Deactivated -= ctrl.OnFollowWindowDiactivated;
+                        window.Activated -= followablePopup.OnFollowWindowActivated;
+                        window.Deactivated -= followablePopup.OnFollowWindowDiactivated;
                     }
                 }
 
                 if (scrollViewer != null) {
                     // ListBoxなどのようなScrollViewerを持った要素内に設定された場合の動作
-                    scrollViewer.ScrollChanged -= ctrl.OnScrollChanged;
+                    scrollViewer.ScrollChanged -= followablePopup.OnScrollChanged;
                 }
             }
 
             // IsOpenプロパティをtrueに変更したので、各種イベントハンドラを登録する
             if (e.NewValue != null && (bool)e.NewValue == true) {
-                if (win != null) {
+                if (window != null) {
                     // ウィンドウの移動/リサイズ時の処理を設定
-                    win.LocationChanged += ctrl.OnFollowWindowChanged;
-                    win.SizeChanged += ctrl.OnFollowWindowChanged;
+                    window.LocationChanged += followablePopup.OnFollowWindowRectChanged;
+                    window.SizeChanged += followablePopup.OnFollowWindowRectChanged;
 
                     // ウィンドウのアクティベート変更時の処理を再設定
-                    win.Activated -= ctrl.OnFollowWindowActivated;
-                    win.Deactivated -= ctrl.OnFollowWindowDiactivated;
-                    win.Activated += ctrl.OnFollowWindowActivated;
-                    win.Deactivated += ctrl.OnFollowWindowDiactivated;
+                    window.Activated -= followablePopup.OnFollowWindowActivated;
+                    window.Deactivated -= followablePopup.OnFollowWindowDiactivated;
+                    window.Activated += followablePopup.OnFollowWindowActivated;
+                    window.Deactivated += followablePopup.OnFollowWindowDiactivated;
                 }
 
                 if (scrollViewer != null) {
                     // ListBoxなどのようなScrollViewerを持った要素内に設定された場合の動作
-                    scrollViewer.ScrollChanged += ctrl.OnScrollChanged;
+                    scrollViewer.ScrollChanged += followablePopup.OnScrollChanged;
                 }
             }
         }
@@ -93,7 +93,7 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnFollowWindowChanged(object sender, EventArgs e)
+        private void OnFollowWindowRectChanged(object sender, EventArgs e)
         {
             var offset = this.HorizontalOffset;
             // HorizontalOffsetなどのプロパティを一度変更しないと、ポップアップの位置が更新されないため、同一プロパティに2回値をセットしている

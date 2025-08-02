@@ -63,14 +63,15 @@ namespace HouseholdAccountBook.DbHandler
                     case DBLibraryKind.OleDb:
                         dbHandler = new OleDbHandler(this.info as OleDbHandler.ConnectInfo);
                         break;
+                    case DBLibraryKind.Undefined:
                     default:
                         dbHandler = null;
                         break;
                 }
                 return dbHandler;
             }
-            catch (System.TimeoutException e) {
-                throw e;
+            catch (System.TimeoutException) {
+                throw;
             }
         }
     }

@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Dao.KHDbTable
 {
-    public class CbtActDao : KHReadDaoBase<CbtActDto>
+    public class CbtActDao(OleDbHandler dbHandler) : KHReadDaoBase<CbtActDto>(dbHandler)
     {
-        public CbtActDao(OleDbHandler dbHandler) : base(dbHandler) { }
-
         public override async Task<IEnumerable<CbtActDto>> FindAllAsync()
         {
             return await this.dbHandler.QueryAsync<CbtActDto>(@"SELECT * FROM CBT_ACT ORDER BY ACT_ID;");

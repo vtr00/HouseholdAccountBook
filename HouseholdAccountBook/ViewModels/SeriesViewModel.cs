@@ -57,8 +57,10 @@ namespace HouseholdAccountBook.ViewModels
         public string DisplayedName
         {
             get {
-                if (this.BalanceName != string.Empty && this.CategoryName != string.Empty && this.ItemName != string.Empty) return $"{this.BalanceName} > {this.CategoryName} > {this.ItemName}";
-                if (this.BalanceName != string.Empty && this.CategoryName != string.Empty) return $"{this.BalanceName} > {this.CategoryName}";
+                if (this.BalanceName != string.Empty && this.CategoryName != string.Empty && this.ItemName != string.Empty)
+                    return $"{this.BalanceName} > {this.CategoryName} > {this.ItemName}";
+                if (this.BalanceName != string.Empty && this.CategoryName != string.Empty)
+                    return $"{this.BalanceName} > {this.CategoryName}";
                 return this.OtherName;
             }
             private set { }
@@ -69,9 +71,12 @@ namespace HouseholdAccountBook.ViewModels
         public string ListName
         {
             get {
-                if (this.ItemName != string.Empty) return "  " + this.ItemName;
-                if (this.CategoryName != string.Empty) return this.CategoryName;
-                if (this.BalanceName != string.Empty) return this.BalanceName;
+                if (this.ItemName != string.Empty)
+                    return "  " + this.ItemName;
+                if (this.CategoryName != string.Empty)
+                    return this.CategoryName;
+                if (this.BalanceName != string.Empty)
+                    return this.BalanceName;
                 return this.OtherName;
             }
             private set { }

@@ -11,14 +11,9 @@ namespace HouseholdAccountBook.Dao.Compositions
     /// <summary>
     /// 帳簿項目比較情報DAO
     /// </summary>
-    public class ActionCompInfoDao : ReadDaoBase
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class ActionCompInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public ActionCompInfoDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         /// <summary>
         /// <see cref="MstBookDto.BookId"/> と日付、値に基づいて、<see cref="ActionCompInfoDto"/> リストを取得する
         /// </summary>

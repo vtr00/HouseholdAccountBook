@@ -184,9 +184,9 @@ namespace HouseholdAccountBook.Windows
                 id = await this.RegisterToDbAsync();
             }
 
-            // MainWindow更新
-            List<int> value = id != null ? new List<int>() { id.Value } : new List<int>();
-            Registrated?.Invoke(this, new EventArgs<List<int>>(value));
+            // 呼び出し元更新
+            List<int> value = id != null ? [id.Value] : [];
+            this.Registrated?.Invoke(this, new EventArgs<List<int>>(value));
 
             // 表示クリア
             this.WVM.Value = null;
@@ -216,9 +216,9 @@ namespace HouseholdAccountBook.Windows
                 id = await this.RegisterToDbAsync();
             }
 
-            // MainWindow更新
-            List<int> value = id != null ? new List<int>() { id.Value } : new List<int>();
-            Registrated?.Invoke(this, new EventArgs<List<int>>(value));
+            // 呼び出し元更新
+            List<int> value = id != null ? [id.Value] : [];
+            this.Registrated?.Invoke(this, new EventArgs<List<int>>(value));
 
             try {
                 this.DialogResult = true;
@@ -252,7 +252,7 @@ namespace HouseholdAccountBook.Windows
         {
             BalanceKind balanceKind = BalanceKind.Expenses;
 
-            HstActionDto dto = new HstActionDto();
+            HstActionDto dto = new();
             switch (this.WVM.RegMode) {
                 case RegistrationKind.Add: {
                     dto.BookId = this.selectedBookId ?? -1;
@@ -270,7 +270,7 @@ namespace HouseholdAccountBook.Windows
                 case RegistrationKind.Copy: {
                     // DBから値を読み込む
                     using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                        HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                        HstActionDao hstActionDao = new(dbHandler);
                         dto = await hstActionDao.FindByIdAsync(this.selectedActionId.Value);
                     }
                     balanceKind = Math.Sign(dto.ActValue) > 0 ? BalanceKind.Income : BalanceKind.Expenses; // 収入 / 支出
@@ -280,7 +280,7 @@ namespace HouseholdAccountBook.Windows
                     int count = 1;
                     if (this.groupId != null) {
                         using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                            HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                            HstActionDao hstActionDao = new(dbHandler);
                             var dtoList = await hstActionDao.FindInGroupAfterDateByIdAsync(this.selectedActionId.Value);
                             count = dtoList.Count();
                         }
@@ -332,13 +332,13 @@ namespace HouseholdAccountBook.Windows
         private async Task UpdateBookListAsync(int? bookId = null)
         {
             // 帳簿を取得する
-            ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
+            ObservableCollection<BookViewModel> bookVMList = [];
             BookViewModel selectedBookVM = null;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                MstBookDao mstBookDao = new MstBookDao(dbHandler);
+                MstBookDao mstBookDao = new(dbHandler);
                 var dtoList = await mstBookDao.FindAllAsync();
                 foreach (var dto in dtoList) {
-                    BookViewModel vm = new BookViewModel() { Id = dto.BookId, Name = dto.BookName };
+                    BookViewModel vm = new() { Id = dto.BookId, Name = dto.BookName };
                     bookVMList.Add(vm);
                     if (selectedBookVM == null || bookId == vm.Id) {
                         selectedBookVM = vm;
@@ -356,16 +356,16 @@ namespace HouseholdAccountBook.Windows
         /// <returns></returns>
         private async Task UpdateCategoryListAsync(int? categoryId = null)
         {
-            ObservableCollection<CategoryViewModel> categoryVMList = new ObservableCollection<CategoryViewModel>() {
+            ObservableCollection<CategoryViewModel> categoryVMList = [
                 new CategoryViewModel() { Id = -1, Name = Properties.Resources.ListName_NoSpecification }
-            };
+            ];
             int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryVM?.Id ?? categoryVMList[0].Id;
             CategoryViewModel selectedCategoryVM = categoryVMList[0];
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                MstCategoryWithinBookDao mstCategoryWithinBookDao = new MstCategoryWithinBookDao(dbHandler);
+                MstCategoryWithinBookDao mstCategoryWithinBookDao = new(dbHandler);
                 var dtoList = await mstCategoryWithinBookDao.FindByBookIdAndBalanceKindAsync(this.WVM.SelectedBookVM.Id.Value, (int)this.WVM.SelectedBalanceKind);
                 foreach (var dto in dtoList) {
-                    CategoryViewModel vm = new CategoryViewModel() { Id = dto.CategoryId, Name = dto.CategoryName };
+                    CategoryViewModel vm = new() { Id = dto.CategoryId, Name = dto.CategoryName };
                     categoryVMList.Add(vm);
                     if (selectedCategoryVM == null || vm.Id == tmpCategoryId) {
                         selectedCategoryVM = vm;
@@ -385,16 +385,16 @@ namespace HouseholdAccountBook.Windows
         {
             if (this.WVM.SelectedCategoryVM == null) return;
 
-            ObservableCollection<ItemViewModel> itemVMList = new ObservableCollection<ItemViewModel>();
+            ObservableCollection<ItemViewModel> itemVMList = [];
             int? tmpItemId = itemId ?? this.WVM.SelectedItemVM?.Id;
             ItemViewModel selectedItemVM = null;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                CategoryItemInfoDao categoryItemInfoDao = new CategoryItemInfoDao(dbHandler);
+                CategoryItemInfoDao categoryItemInfoDao = new(dbHandler);
                 var dtoList = this.WVM.SelectedCategoryVM.Id == -1
                     ? await categoryItemInfoDao.FindByBookIdAndBalanceKindAsync(this.WVM.SelectedBookVM.Id.Value, (int)this.WVM.SelectedBalanceKind)
                     : await categoryItemInfoDao.FindByBookIdAndCategoryIdAsync(this.WVM.SelectedBookVM.Id.Value, (int)this.WVM.SelectedCategoryVM.Id);
                 foreach (CategoryItemInfoDto dto in dtoList) {
-                    ItemViewModel vm = new ItemViewModel() {
+                    ItemViewModel vm = new() {
                         Id = dto.ItemId,
                         Name = dto.ItemName,
                         CategoryName = this.WVM.SelectedCategoryVM.Id == -1 ? dto.CategoryName : ""
@@ -418,16 +418,16 @@ namespace HouseholdAccountBook.Windows
         {
             if (this.WVM.SelectedItemVM == null) return;
 
-            ObservableCollection<ShopViewModel> shopNameVMList = new ObservableCollection<ShopViewModel>() {
+            ObservableCollection<ShopViewModel> shopNameVMList = [
                 new ShopViewModel() { Name = String.Empty }
-            };
+            ];
             string selectedShopName = shopName ?? this.WVM.SelectedShopName ?? shopNameVMList[0].Name;
             ShopViewModel selectedShopVM = shopNameVMList[0]; // UNUSED
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                ShopInfoDao shopInfoDao = new ShopInfoDao(dbHandler);
+                ShopInfoDao shopInfoDao = new(dbHandler);
                 var dtoList = await shopInfoDao.FindByItemIdAsync(this.WVM.SelectedItemVM.Id);
                 foreach (ShopInfoDto dto in dtoList) {
-                    ShopViewModel svm = new ShopViewModel() {
+                    ShopViewModel svm = new() {
                         Name = dto.ShopName,
                         UsedCount = dto.Count,
                         UsedTime = dto.UsedTime
@@ -452,16 +452,16 @@ namespace HouseholdAccountBook.Windows
         {
             if (this.WVM.SelectedItemVM == null) return;
 
-            ObservableCollection<RemarkViewModel> remarkVMList = new ObservableCollection<RemarkViewModel>() {
+            ObservableCollection<RemarkViewModel> remarkVMList = [
                     new RemarkViewModel() { Remark = string.Empty }
-            };
+            ];
             string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0].Remark;
             RemarkViewModel selectedRemarkVM = remarkVMList[0]; // UNUSED
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                RemarkInfoDao remarkInfoDao = new RemarkInfoDao(dbHandler);
+                RemarkInfoDao remarkInfoDao = new(dbHandler);
                 var dtoList = await remarkInfoDao.FindByItemIdAsync(this.WVM.SelectedItemVM.Id);
                 foreach (RemarkInfoDto dto in dtoList) {
-                    RemarkViewModel rvm = new RemarkViewModel() {
+                    RemarkViewModel rvm = new() {
                         Remark = dto.Remark,
                         UsedCount = dto.Count,
                         UsedTime = dto.UsedTime
@@ -558,8 +558,8 @@ namespace HouseholdAccountBook.Windows
 
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                 await dbHandler.ExecTransactionAsync(async () => {
-                    HstActionDao hstActionDao = new HstActionDao(dbHandler);
-                    HstGroupDao hstGroupDao = new HstGroupDao(dbHandler);
+                    HstActionDao hstActionDao = new(dbHandler);
+                    HstGroupDao hstGroupDao = new(dbHandler);
 
                     switch (this.WVM.RegMode) {
                         case RegistrationKind.Add:
@@ -675,7 +675,7 @@ namespace HouseholdAccountBook.Windows
                             }
                             else {
                                 #region 繰返し回数が2回以上
-                                List<int> actionIdList = new List<int>();
+                                List<int> actionIdList = [];
 
                                 if (this.groupId == null) {
                                     #region グループIDが未割当て
@@ -764,7 +764,7 @@ namespace HouseholdAccountBook.Windows
 
                 if (shopName != string.Empty) {
                     // 店舗を追加する
-                    HstShopDao hstShopDao = new HstShopDao(dbHandler);
+                    HstShopDao hstShopDao = new(dbHandler);
                     _ = await hstShopDao.UpsertAsync(new HstShopDto {
                         ItemId = itemId,
                         ShopName = shopName,
@@ -774,7 +774,7 @@ namespace HouseholdAccountBook.Windows
 
                 if (remark != string.Empty) {
                     // 備考を追加する
-                    HstRemarkDao hstRemarkDao = new HstRemarkDao(dbHandler);
+                    HstRemarkDao hstRemarkDao = new(dbHandler);
                     _ = await hstRemarkDao.UpsertAsync(new HstRemarkDto {
                         ItemId = itemId,
                         Remark = remark,

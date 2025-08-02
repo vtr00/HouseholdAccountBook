@@ -134,12 +134,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void TodayCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            if ((string)e.Parameter == "1") {
-                e.CanExecute = this.WVM.FromDate != DateTime.Today;
-            }
-            else {
-                e.CanExecute = this.WVM.ToDate != DateTime.Today;
-            }
+            e.CanExecute = (string)e.Parameter == "1" ? this.WVM.FromDate != DateTime.Today : this.WVM.ToDate != DateTime.Today;
         }
 
         /// <summary>
@@ -176,7 +171,7 @@ namespace HouseholdAccountBook.Windows
             }
 
             // MainWindow更新
-            Registrated?.Invoke(this, new EventArgs<List<int>>(idList ?? new List<int>()));
+            Registrated?.Invoke(this, new EventArgs<List<int>>(idList ?? []));
 
             try {
                 this.DialogResult = true;
@@ -227,7 +222,7 @@ namespace HouseholdAccountBook.Windows
                     int? commissionValue = null;
 
                     using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                        MoveActionInfoDao moveActionInfoDao = new MoveActionInfoDao(dbHandler);
+                        MoveActionInfoDao moveActionInfoDao = new(dbHandler);
                         var dtoList = await moveActionInfoDao.GetAllAsync(this.selectedGroupId.Value);
                         foreach (MoveActionInfoDto dto in dtoList) {
                             if (dto.MoveFlg == 1) {
@@ -305,17 +300,17 @@ namespace HouseholdAccountBook.Windows
         /// <returns></returns>
         private async Task UpdateBookListAsync(int? fromBookId = null, int? toBookId = null)
         {
-            ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>();
+            ObservableCollection<BookViewModel> bookVMList = [];
             BookViewModel fromBookVM = null;
             BookViewModel toBookVM = null;
 
             int? debitBookId = null;
             int? payDay = null;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                MstBookDao mstBookDao = new MstBookDao(dbHandler);
+                MstBookDao mstBookDao = new(dbHandler);
                 var dtoList = await mstBookDao.FindAllAsync();
                 foreach (var dto in dtoList) {
-                    BookViewModel vm = new BookViewModel() { Id = dto.BookId, Name = dto.BookName };
+                    BookViewModel vm = new() { Id = dto.BookId, Name = dto.BookName };
                     bookVMList.Add(vm);
                     if (fromBookVM == null || fromBookId == vm.Id) {
                         fromBookVM = vm;
@@ -363,7 +358,7 @@ namespace HouseholdAccountBook.Windows
         /// <returns></returns>
         private async Task UpdateItemListAsync(int? itemId = null)
         {
-            ObservableCollection<ItemViewModel> itemVMList = new ObservableCollection<ItemViewModel>();
+            ObservableCollection<ItemViewModel> itemVMList = [];
             ItemViewModel selectedItemVM = null;
 
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
@@ -377,10 +372,10 @@ namespace HouseholdAccountBook.Windows
                         break;
                 }
 
-                CategoryItemInfoDao categoryItemInfoDao = new CategoryItemInfoDao(dbHandler);
+                CategoryItemInfoDao categoryItemInfoDao = new(dbHandler);
                 var dtoList = await categoryItemInfoDao.FindByBookIdAndBalanceKindAsync(bookId, (int)BalanceKind.Expenses);
                 foreach (CategoryItemInfoDto dto in dtoList) {
-                    ItemViewModel vm = new ItemViewModel() {
+                    ItemViewModel vm = new() {
                         Id = dto.ItemId,
                         Name = dto.ItemName,
                         CategoryName = dto.CategoryName
@@ -404,16 +399,16 @@ namespace HouseholdAccountBook.Windows
         {
             if (this.WVM?.SelectedItemVM?.Id == null) return;
 
-            ObservableCollection<RemarkViewModel> remarkVMList = new ObservableCollection<RemarkViewModel>() {
+            ObservableCollection<RemarkViewModel> remarkVMList = [
                 new RemarkViewModel(){ Remark = string.Empty }
-            };
+            ];
             string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0].Remark;
             RemarkViewModel selectedRemarkVM = remarkVMList[0]; // UNUSED
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                RemarkInfoDao remarkInfoDao = new RemarkInfoDao(dbHandler);
+                RemarkInfoDao remarkInfoDao = new(dbHandler);
                 var dtoList = await remarkInfoDao.FindByItemIdAsync(this.WVM.SelectedItemVM.Id);
                 foreach (RemarkInfoDto dto in dtoList) {
-                    RemarkViewModel rvm = new RemarkViewModel() {
+                    RemarkViewModel rvm = new() {
                         Remark = dto.Remark,
                         UsedCount = dto.Count,
                         UsedTime = dto.UsedTime
@@ -474,7 +469,7 @@ namespace HouseholdAccountBook.Windows
         /// <returns>登録された帳簿項目ID</returns>
         private async Task<List<int>> RegisterToDbAsync()
         {
-            List<int> resActionIdList = new List<int>();
+            List<int> resActionIdList = [];
 
             DateTime fromDate = this.WVM.FromDate;
             DateTime toDate = this.WVM.ToDate;
@@ -494,10 +489,10 @@ namespace HouseholdAccountBook.Windows
                         case RegistrationKind.Copy: {
                             #region 帳簿項目を追加する
                             // グループIDを取得する
-                            HstGroupDao hstGroupDao = new HstGroupDao(dbHandler);
+                            HstGroupDao hstGroupDao = new(dbHandler);
                             tmpGroupId = await hstGroupDao.InsertReturningIdAsync(new HstGroupDto { GroupKind = (int)GroupKind.Move });
 
-                            HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                            HstActionDao hstActionDao = new(dbHandler);
                             int id = await hstActionDao.InsertMoveActionReturningIdAsync(new HstActionDto {
                                 BookId = fromBookId,
                                 ActTime = fromDate,
@@ -524,7 +519,7 @@ namespace HouseholdAccountBook.Windows
                             #region 帳簿項目を変更する
                             tmpGroupId = this.selectedGroupId.Value;
 
-                            HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                            HstActionDao hstActionDao = new(dbHandler);
                             _ = await hstActionDao.UpdateMoveActionAsync(new HstActionDto {
                                 BookId = fromBookId,
                                 ActTime = fromDate,
@@ -565,7 +560,7 @@ namespace HouseholdAccountBook.Windows
                         }
 
                         if (this.commissionActionId != null) {
-                            HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                            HstActionDao hstActionDao = new(dbHandler);
                             _ = await hstActionDao.UpdateAsync(new HstActionDto {
                                 BookId = bookId,
                                 ItemId = commissionItemId,
@@ -577,7 +572,7 @@ namespace HouseholdAccountBook.Windows
                             resActionIdList.Add(this.commissionActionId.Value);
                         }
                         else {
-                            HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                            HstActionDao hstActionDao = new(dbHandler);
                             int id = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
                                 BookId = bookId,
                                 ItemId = commissionItemId,
@@ -591,7 +586,7 @@ namespace HouseholdAccountBook.Windows
 
                         if (remark != string.Empty) {
                             // 備考を追加する
-                            HstRemarkDao hstRemarkDao = new HstRemarkDao(dbHandler);
+                            HstRemarkDao hstRemarkDao = new(dbHandler);
                             _ = await hstRemarkDao.UpsertAsync(new HstRemarkDto {
                                 ItemId = commissionItemId,
                                 Remark = remark,
@@ -603,7 +598,7 @@ namespace HouseholdAccountBook.Windows
                     else {
                         #region 手数料なし
                         if (this.commissionActionId != null) {
-                            HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                            HstActionDao hstActionDao = new(dbHandler);
                             _ = await hstActionDao.DeleteByIdAsync(this.commissionActionId.Value);
                         }
                         #endregion

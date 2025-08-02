@@ -9,14 +9,9 @@ namespace HouseholdAccountBook.Dao.Abstract
     /// 読み書き可能なDTO向けのDAOのベースクラス
     /// </summary>
     /// <typeparam name="DTO"><see cref="TableDtoBase"/>の派生クラス</typeparam>
-    public abstract class ReadWriteDaoBase<DTO> : ReadDaoBase where DTO : TableDtoBase
+    /// <param name="dbHandler">DBハンドラ</param>
+    public abstract class ReadWriteDaoBase<DTO>(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler) where DTO : TableDtoBase
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public ReadWriteDaoBase(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         /// <summary>
         /// テーブルの全てのレコードを取得する
         /// </summary>

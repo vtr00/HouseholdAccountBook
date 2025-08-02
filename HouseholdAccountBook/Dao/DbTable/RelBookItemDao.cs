@@ -9,14 +9,9 @@ namespace HouseholdAccountBook.Dao.DbTable
     /// <summary>
     /// 帳簿-項目関連テーブルDAO
     /// </summary>
-    public class RelBookItemDao : ReadWriteDaoBase<RelBookItemDto>
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class RelBookItemDao(DbHandlerBase dbHandler) : ReadWriteDaoBase<RelBookItemDto>(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public RelBookItemDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         /// <summary>
         /// 全レコードを取得する
         /// </summary>

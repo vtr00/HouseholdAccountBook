@@ -20,7 +20,7 @@ namespace HouseholdAccountBook
         /// <summary>
         /// ウィンドウの境界(最終保存値)
         /// </summary>
-        private Rect lastSavedRect = new Rect();
+        private Rect lastSavedRect = new();
 
         /// <summary>
         /// <see cref="WindowLog"/> クラスの新しいインスタンスを初期化します。
@@ -67,28 +67,17 @@ namespace HouseholdAccountBook
 
             this.lastSavedWindowState = this.window.WindowState;
             this.lastSavedRect = this.window.RestoreBounds;
-
-            string windowState;
-            switch (this.window.WindowState) {
-                case WindowState.Maximized:
-                    windowState = "Max";
-                    break;
-                case WindowState.Minimized:
-                    windowState = "Min";
-                    break;
-                case WindowState.Normal:
-                    windowState = "Normal";
-                    break;
-                default:
-                    windowState = "---";
-                    break;
-            }
-
+            string windowState = this.window.WindowState switch {
+                WindowState.Maximized => "Max",
+                WindowState.Minimized => "Min",
+                WindowState.Normal => "Normal",
+                _ => "---",
+            };
             /// ディレクトリ生成
             if (!Directory.Exists(WindowLocationFolderPath)) Directory.CreateDirectory(WindowLocationFolderPath);
 
-            using (FileStream fs = new FileStream(WindowLocationFilePath(this.window.Name), FileMode.Append)) {
-                using (StreamWriter sw = new StreamWriter(fs)) {
+            using (FileStream fs = new(WindowLocationFilePath(this.window.Name), FileMode.Append)) {
+                using (StreamWriter sw = new(fs)) {
                     if (fs.Length == 0) {
                         sw.WriteLine("yyyy-MM-dd HH:mm:ss.ffff\tState\tLeft\tTop\tHeight\tWidth");
                     }

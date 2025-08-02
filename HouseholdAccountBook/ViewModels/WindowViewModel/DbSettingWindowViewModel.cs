@@ -50,7 +50,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._PostgreSQLDBSettingVM;
             set => this.SetProperty(ref this._PostgreSQLDBSettingVM, value);
         }
-        private PostgreSQLDBSettingViewModel _PostgreSQLDBSettingVM = new PostgreSQLDBSettingViewModel();
+        private PostgreSQLDBSettingViewModel _PostgreSQLDBSettingVM = new();
         #endregion
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._AccessSettingVM;
             set => this.SetProperty(ref this._AccessSettingVM, value);
         }
-        private OleDbSettingViewModel _AccessSettingVM = new OleDbSettingViewModel();
+        private OleDbSettingViewModel _AccessSettingVM = new();
         #endregion
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._SQLiteSettingVM;
             set => this.SetProperty(ref this._SQLiteSettingVM, value);
         }
-        private FileDbSettingViewModel _SQLiteSettingVM = new FileDbSettingViewModel();
+        private FileDbSettingViewModel _SQLiteSettingVM = new();
         #endregion
         #endregion
     }

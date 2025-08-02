@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -217,10 +216,10 @@ namespace HouseholdAccountBook.UserControls
                     else {
                         int selectionStart = textBox.SelectionStart;
                         int selectionEnd = selectionStart + textBox.SelectionLength;
-                        string forwardText = textBox.Text.Substring(0, selectionStart);
-                        string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
+                        string forwardText = textBox.Text[..selectionStart];
+                        string backwardText = textBox.Text[selectionEnd..];
 
-                        if (int.TryParse(string.Format("{0}{1}{2}", forwardText, value, backwardText), out int outValue)) {
+                        if (int.TryParse(string.Format($"{forwardText}{value}{backwardText}"), out int outValue)) {
                             tmpValue = outValue;
                             tmpSelectionStart = selectionStart + 1;
                         }
@@ -234,17 +233,17 @@ namespace HouseholdAccountBook.UserControls
                         int selectionStart = textBox.SelectionStart;
                         int selectionLength = textBox.SelectionLength;
                         int selectionEnd = selectionStart + textBox.SelectionLength;
-                        string forwardText = textBox.Text.Substring(0, selectionStart);
-                        string backwardText = textBox.Text.Substring(selectionEnd, textBox.Text.Length - selectionEnd);
+                        string forwardText = textBox.Text[..selectionStart];
+                        string backwardText = textBox.Text[selectionEnd..];
 
                         if (selectionLength != 0) {
-                            if (int.TryParse(string.Format("{0}{1}", forwardText, backwardText), out int outValue)) {
+                            if (int.TryParse(string.Format($"{forwardText}{backwardText}"), out int outValue)) {
                                 tmpValue = outValue;
                                 tmpSelectionStart = selectionStart;
                             }
                         }
                         else if (selectionStart != 0) {
-                            string newText = string.Format("{0}{1}", forwardText.Substring(0, selectionStart - 1), backwardText);
+                            string newText = string.Format($"{forwardText[..(selectionStart - 1)]}{backwardText}");
                             if (string.Empty == newText) {
                                 tmpValue = null;
                                 tmpSelectionStart = selectionStart - 1;

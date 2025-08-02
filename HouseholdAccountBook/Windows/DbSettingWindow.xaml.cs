@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using HouseholdAccountBook.DbHandler;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -45,14 +46,7 @@ namespace HouseholdAccountBook.Windows
 
             // Access
             this.WVM.AccessSettingVM.ProviderNameDic.Clear();
-            OleDbEnumerator enumerator = new OleDbEnumerator();
-            DataTable table = enumerator.GetElements();
-            foreach (DataRow row in table.Rows) {
-                string sourcesName = row["SOURCES_NAME"].ToString();
-                string sourcesDescription = row["SOURCES_DESCRIPTION"].ToString();
-
-                this.WVM.AccessSettingVM.ProviderNameDic.Add(new KeyValuePair<string, string>(sourcesName, $"{sourcesName} ({sourcesDescription})"));
-            }
+            OleDbHandler.GetOleDbProvider().ForEach(this.WVM.AccessSettingVM.ProviderNameDic.Add);
             this.WVM.AccessSettingVM.SelectedProviderName = settings.App_Access_Provider;
             this.WVM.AccessSettingVM.DBFilePath = settings.App_Access_DBFilePath;
 
@@ -76,7 +70,7 @@ namespace HouseholdAccountBook.Windows
                 fileName = Path.GetFileName(this.WVM.PostgreSQLDBSettingVM.DumpExePath);
             }
 
-            OpenFileDialog ofd = new OpenFileDialog() {
+            OpenFileDialog ofd = new() {
                 CheckFileExists = true,
                 InitialDirectory = directory,
                 FileName = fileName,
@@ -103,7 +97,7 @@ namespace HouseholdAccountBook.Windows
                 fileName = Path.GetFileName(this.WVM.PostgreSQLDBSettingVM.RestoreExePath);
             }
 
-            OpenFileDialog ofd = new OpenFileDialog() {
+            OpenFileDialog ofd = new() {
                 CheckFileExists = true,
                 InitialDirectory = directory,
                 FileName = fileName,
@@ -131,7 +125,7 @@ namespace HouseholdAccountBook.Windows
                         directory = Path.GetDirectoryName(this.WVM.AccessSettingVM.DBFilePath);
                         fileName = Path.GetFileName(this.WVM.AccessSettingVM.DBFilePath);
                     }
-                    OpenFileDialog ofd = new OpenFileDialog() {
+                    OpenFileDialog ofd = new() {
                         CheckFileExists = true,
                         InitialDirectory = directory,
                         FileName = fileName,
@@ -150,7 +144,7 @@ namespace HouseholdAccountBook.Windows
                         directory = Path.GetDirectoryName(this.WVM.SQLiteSettingVM.DBFilePath);
                         fileName = Path.GetFileName(this.WVM.SQLiteSettingVM.DBFilePath);
                     }
-                    OpenFileDialog ofd = new OpenFileDialog() {
+                    OpenFileDialog ofd = new() {
                         CheckFileExists = true,
                         InitialDirectory = directory,
                         FileName = fileName,

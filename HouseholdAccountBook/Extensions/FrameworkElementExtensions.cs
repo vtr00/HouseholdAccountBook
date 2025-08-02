@@ -15,11 +15,11 @@ namespace HouseholdAccountBook.Extensions
         /// <summary>
         /// カウンタ排他用Mutex
         /// </summary>
-        private static readonly Mutex _mutex = new Mutex(false);
+        private static readonly Mutex _mutex = new(false);
         /// <summary>
         /// <see cref="FrameworkElement"/> 毎のカウンタ
         /// </summary>
-        private static readonly Dictionary<FrameworkElement, int> _counter = new Dictionary<FrameworkElement, int>();
+        private static readonly Dictionary<FrameworkElement, int> _counter = [];
 
         /// <summary>
         /// <see cref="WaitCursorUseObject"/> を生成します
@@ -68,6 +68,7 @@ namespace HouseholdAccountBook.Extensions
 
             public void Dispose()
             {
+                GC.SuppressFinalize(this);
                 this.Decrease();
             }
 

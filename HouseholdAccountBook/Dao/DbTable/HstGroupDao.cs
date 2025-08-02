@@ -11,14 +11,9 @@ namespace HouseholdAccountBook.Dao.DbTable
     /// <summary>
     /// グループテーブルDAO
     /// </summary>
-    public class HstGroupDao : PrimaryKeyDaoBase<HstGroupDto, int>
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class HstGroupDao(DbHandlerBase dbHandler) : PrimaryKeyDaoBase<HstGroupDto, int>(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public HstGroupDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         public override async Task<IEnumerable<HstGroupDto>> FindAllAsync()
         {
             var dtoList = await this.dbHandler.QueryAsync<HstGroupDto>(@"

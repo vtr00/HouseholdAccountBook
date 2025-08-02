@@ -102,7 +102,7 @@ namespace HouseholdAccountBook.Windows
                 fileName = Path.GetFileName(settings.App_CsvFilePath);
             }
 
-            OpenFileDialog ofd = new OpenFileDialog() {
+            OpenFileDialog ofd = new() {
                 CheckFileExists = true,
                 InitialDirectory = folderPath,
                 FileName = fileName,
@@ -162,7 +162,7 @@ namespace HouseholdAccountBook.Windows
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 // ファイルの移動を試みる
-                List<string> tmpCsvFilePathList = new List<string>();
+                List<string> tmpCsvFilePathList = [];
                 string dstFolderPath = this.WVM.SelectedBookVM.CsvFolderPath;
                 foreach (string srcFilePath in this.WVM.CsvFilePathList) {
                     if (!File.Exists(srcFilePath)) continue;
@@ -240,7 +240,7 @@ namespace HouseholdAccountBook.Windows
         private void AddActionCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             // 選択されている帳簿項目が1つ以上存在していて、値を持たない帳簿項目IDが1つ以上ある
-            e.CanExecute = this.WVM.SelectedCsvComparisonVMList.Count != 0 && this.WVM.SelectedCsvComparisonVMList.Count((vm) => !vm.ActionId.HasValue) > 0;
+            e.CanExecute = this.WVM.SelectedCsvComparisonVMList.Count != 0 && this.WVM.SelectedCsvComparisonVMList.Any((vm) => !vm.ActionId.HasValue);
         }
 
         /// <summary>
@@ -250,8 +250,8 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void AddActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            List<CsvComparisonViewModel> vmList = new List<CsvComparisonViewModel>(this.WVM.SelectedCsvComparisonVMList.Where((vm) => !vm.ActionId.HasValue));
-            List<CsvComparisonViewModel.CsvRecord> recordList = new List<CsvComparisonViewModel.CsvRecord>(vmList.Select((vm) => vm.Record));
+            List<CsvComparisonViewModel> vmList = new(this.WVM.SelectedCsvComparisonVMList.Where((vm) => !vm.ActionId.HasValue));
+            List<CsvComparisonViewModel.CsvRecord> recordList = new(vmList.Select((vm) => vm.Record));
             async void func(object sender2, EventArgs<List<int>> e2)
             {
                 // CSVの項目をベースに追加したので既定で一致フラグを立てる
@@ -264,16 +264,16 @@ namespace HouseholdAccountBook.Windows
                 await this.UpdateComparisonVMListAsync();
             }
 
-            if (recordList.Count() == 1) {
+            if (recordList.Count == 1) {
                 CsvComparisonViewModel.CsvRecord record = recordList[0];
-                ActionRegistrationWindow arw = new ActionRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id.Value, record) { Owner = this };
+                ActionRegistrationWindow arw = new(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id.Value, record) { Owner = this };
                 arw.LoadWindowSetting();
 
                 arw.Registrated += func;
                 arw.ShowDialog();
             }
             else {
-                ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id.Value, recordList) { Owner = this };
+                ActionListRegistrationWindow alrw = new(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id.Value, recordList) { Owner = this };
                 alrw.LoadWindowSetting();
 
                 alrw.Registrated += func;
@@ -302,7 +302,7 @@ namespace HouseholdAccountBook.Windows
             // グループ種別を特定する
             int? groupKind = null;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                GroupInfoDao groupInfoDao = new GroupInfoDao(dbHandler);
+                GroupInfoDao groupInfoDao = new(dbHandler);
                 var dto = await groupInfoDao.FindByActionId(this.WVM.SelectedCsvComparisonVM.ActionId.Value);
                 groupKind = dto.GroupKind;
             }
@@ -313,7 +313,7 @@ namespace HouseholdAccountBook.Windows
                     break;
                 case (int)GroupKind.ListReg:
                     // リスト登録された帳簿項目の編集時の処理
-                    ActionListRegistrationWindow alrw = new ActionListRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedCsvComparisonVM.GroupId.Value) { Owner = this };
+                    ActionListRegistrationWindow alrw = new(this.dbHandlerFactory, this.WVM.SelectedCsvComparisonVM.GroupId.Value) { Owner = this };
                     alrw.LoadWindowSetting();
 
                     // 登録時イベントを登録する
@@ -327,7 +327,7 @@ namespace HouseholdAccountBook.Windows
                 case (int)GroupKind.Repeat:
                 default:
                     // 移動・リスト登録以外の帳簿項目の編集時の処理
-                    ActionRegistrationWindow arw = new ActionRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedCsvComparisonVM.ActionId.Value) { Owner = this };
+                    ActionRegistrationWindow arw = new(this.dbHandlerFactory, this.WVM.SelectedCsvComparisonVM.ActionId.Value) { Owner = this };
                     arw.LoadWindowSetting();
 
                     // 登録時イベントを登録する
@@ -363,7 +363,7 @@ namespace HouseholdAccountBook.Windows
         private void AddOrEditActionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             // 選択されている帳簿項目が1つ以上存在していて、値を持たない帳簿項目IDが1つ以上ある
-            if (0 < this.WVM.SelectedCsvComparisonVMList.Count && 0 < this.WVM.SelectedCsvComparisonVMList.Count((vm) => !vm.ActionId.HasValue)) {
+            if (0 < this.WVM.SelectedCsvComparisonVMList.Count && this.WVM.SelectedCsvComparisonVMList.Any((vm) => !vm.ActionId.HasValue)) {
                 this.AddActionCommand_Executed(sender, e);
             }
             else {
@@ -523,16 +523,16 @@ namespace HouseholdAccountBook.Windows
         {
             int? tmpBookId = bookId ?? this.WVM.SelectedBookVM?.Id;
 
-            ObservableCollection<BookComparisonViewModel> bookCompVMList = new ObservableCollection<BookComparisonViewModel>();
+            ObservableCollection<BookComparisonViewModel> bookCompVMList = [];
             BookComparisonViewModel selectedBookCompVM = null;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                MstBookDao mstBookDao = new MstBookDao(dbHandler);
+                MstBookDao mstBookDao = new(dbHandler);
 
                 var dtoList = await mstBookDao.FindIfJsonCodeExistsAsync();
                 foreach (MstBookDto dto in dtoList) {
                     MstBookDto.JsonDto jsonObj = JsonConvert.DeserializeObject<MstBookDto.JsonDto>(dto.JsonCode);
 
-                    BookComparisonViewModel vm = new BookComparisonViewModel() {
+                    BookComparisonViewModel vm = new() {
                         Id = dto.BookId,
                         Name = dto.BookName,
                         CsvFolderPath = jsonObj?.CsvFolderPath == string.Empty ? null : jsonObj?.CsvFolderPath,
@@ -578,14 +578,14 @@ namespace HouseholdAccountBook.Windows
             if (!actDateIndex.HasValue || !expensesIndex.HasValue) return;
 
             // CSVファイルを読み込む
-            CsvConfiguration csvConfig = new CsvConfiguration(System.Globalization.CultureInfo.CurrentCulture) {
+            CsvConfiguration csvConfig = new(CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,
                 MissingFieldFound = (mffa) => { }
             };
-            List<CsvComparisonViewModel> tmpVMList = new List<CsvComparisonViewModel>();
+            List<CsvComparisonViewModel> tmpVMList = [];
             foreach (string tmpFileName in csvFilePathList) {
-                using (CsvReader reader = new CsvReader(new StreamReader(tmpFileName, Encoding.GetEncoding("Shift_JIS")), csvConfig)) {
-                    List<CsvComparisonViewModel> tmpVMList2 = new List<CsvComparisonViewModel>();
+                using (CsvReader reader = new(new StreamReader(tmpFileName, Encoding.GetEncoding("utf-8")), csvConfig)) {
+                    List<CsvComparisonViewModel> tmpVMList2 = [];
                     while (reader.Read()) {
                         try {
                             if (!reader.TryGetField(actDateIndex.Value - 1, out DateTime date)) {
@@ -633,11 +633,11 @@ namespace HouseholdAccountBook.Windows
                     // 前回の帳簿項目情報をクリアする
                     vm.ClearActionInfo();
 
-                    ActionCompInfoDao actionCompInfoDao = new ActionCompInfoDao(dbHandler);
+                    ActionCompInfoDao actionCompInfoDao = new(dbHandler);
                     var dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(this.WVM.SelectedBookVM.Id.Value, vm.Record.Date, vm.Record.Value);
                     foreach (ActionCompInfoDto dto in dtoList) {
                         // 帳簿項目IDが使用済なら次のレコードを調べるようにする
-                        bool checkNext = this.WVM.CsvComparisonVMList.Where((tmpVM) => { return tmpVM.ActionId == dto.ActionId; }).Count() != 0;
+                        bool checkNext = this.WVM.CsvComparisonVMList.Where((tmpVM) => { return tmpVM.ActionId == dto.ActionId; }).Any();
                         // 帳簿項目情報を紐付ける
                         if (!checkNext) {
                             vm.ActionId = dto.ActionId;
@@ -733,7 +733,7 @@ namespace HouseholdAccountBook.Windows
         private async Task SaveIsMatchAsync(int actionId, bool isMatch)
         {
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                HstActionDao hstActionDao = new(dbHandler);
                 _ = await hstActionDao.UpdateIsMatchByIdAsync(actionId, isMatch ? 1 : 0);
             }
         }

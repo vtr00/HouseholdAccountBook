@@ -9,21 +9,13 @@ namespace HouseholdAccountBook.Dao.Abstract
     /// 記帳風月のDTO向けのDAOのベースクラス(読み込み専用)
     /// </summary>
     /// <typeparam name="DTO"><see cref="KHDtoBase"/>の派生クラス</typeparam>
-    public abstract class KHReadDaoBase<DTO> where DTO : KHDtoBase
+    /// <param name="dbHandler">Ole DBハンドラ</param>
+    public abstract class KHReadDaoBase<DTO>(OleDbHandler dbHandler) where DTO : KHDtoBase
     {
         /// <summary>
         /// Ole DBハンドラ
         /// </summary>
-        protected readonly OleDbHandler dbHandler;
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">Ole DBハンドラ</param>
-        public KHReadDaoBase(OleDbHandler dbHandler)
-        {
-            this.dbHandler = dbHandler;
-        }
+        protected readonly OleDbHandler dbHandler = dbHandler;
 
         /// <summary>
         /// <see cref="DTO"/> の全てのレコードを取得する

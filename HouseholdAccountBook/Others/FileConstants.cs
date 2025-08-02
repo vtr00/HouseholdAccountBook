@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 
 namespace HouseholdAccountBook.Others
 {
@@ -11,14 +12,15 @@ namespace HouseholdAccountBook.Others
         /// <summary>
         /// ログファイルのフォルダパス
         /// </summary>
-        public static string LogFolderPath = @".\Logs";
+        public const string LogFolderPath = @".\Logs";
         /// <summary>
         /// ログファイルパス
         /// </summary>
         public static string LogFilePath
         {
             get {
-                DateTime dt = App.StartupTime;
+                App app = Application.Current as App;
+                DateTime dt = app.StartupTime;
                 return string.Format($@"{LogFolderPath}\{dt:yyyyMMdd_HHmmss}.txt");
             }
         }
@@ -41,7 +43,7 @@ namespace HouseholdAccountBook.Others
         /// <summary>
         /// 捕捉されない例外情報のファイルのフォルダパス
         /// </summary>
-        public static string UnhandledExceptionInfoFolderPath = @".\UnhandledExceptions";
+        public const string UnhandledExceptionInfoFolderPath = @".\UnhandledExceptions";
         /// <summary>
         /// 捕捉されない例外情報のファイルパス
         /// </summary>
@@ -58,13 +60,14 @@ namespace HouseholdAccountBook.Others
         /// <summary>
         /// ウィンドウ情報のファイルのフォルダパス
         /// </summary>
-        public static string WindowLocationFolderPath = @".\WindowLocations";
+        public const string WindowLocationFolderPath = @".\WindowLocations";
         /// <summary>
         /// ウィンドウ情報のファイルパス
         /// </summary>
         public static string WindowLocationFilePath(string windowName)
         {
-            DateTime dt = App.StartupTime;
+            App app = Application.Current as App;
+            DateTime dt = app.StartupTime;
             return string.Format($@"{WindowLocationFolderPath}\{windowName}_{dt:yyyyMMdd_HHmmss}.txt");
         }
         #endregion

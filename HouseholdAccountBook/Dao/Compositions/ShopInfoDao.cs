@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Dao.Abstract;
 using HouseholdAccountBook.DbHandler.Abstract;
-using HouseholdAccountBook.Dto.Others;
 using HouseholdAccountBook.Dto.DbTable;
+using HouseholdAccountBook.Dto.Others;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,14 +10,9 @@ namespace HouseholdAccountBook.Dao.Compositions
     /// <summary>
     /// 店舗情報DAO
     /// </summary>
-    public class ShopInfoDao : ReadDaoBase
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class ShopInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public ShopInfoDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         /// <summary>
         /// <see cref="HstShopDto.ItemId"> に基づいて、<see cref="ShopInfoDto"/> リストを取得する
         /// </summary>

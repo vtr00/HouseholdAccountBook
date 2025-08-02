@@ -40,9 +40,12 @@
         /// </summary>
         public string Name {
             get {
-                if (this.ItemName != string.Empty) return "  " + this.ItemName;
-                if (this.CategoryName != string.Empty) return this.CategoryName;
-                if (this.BalanceName != string.Empty) return this.BalanceName;
+                if (this.ItemName != string.Empty)
+                    return "  " + this.ItemName;
+                if (this.CategoryName != string.Empty)
+                    return this.CategoryName;
+                if (this.BalanceName != string.Empty)
+                    return this.BalanceName;
                 return this.OtherName;
             }
             private set { }

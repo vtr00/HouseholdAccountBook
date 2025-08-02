@@ -13,12 +13,9 @@ namespace HouseholdAccountBook.Extensions
         /// <param name="window"></param>
         public static void MoveOwnersCenter(this Window window)
         {
-            if (window.Owner != null && window.Owner.WindowState == WindowState.Normal) {
-                window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            }
-            else {
-                window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            }
+            window.WindowStartupLocation = window.Owner != null && window.Owner.WindowState == WindowState.Normal
+                ? WindowStartupLocation.CenterOwner
+                : WindowStartupLocation.CenterScreen;
 
             double right = window.Left + window.Width;
             double bottom = window.Top + window.Height;

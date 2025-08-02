@@ -10,14 +10,9 @@ namespace HouseholdAccountBook.Dao.Compositions
     /// <summary>
     /// 移動情報DAO
     /// </summary>
-    public class MoveActionInfoDao : ReadDaoBase
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class MoveActionInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public MoveActionInfoDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         /// <summary>
         /// <see cref="HstGroupDto.GroupId"/> に基づいて、<see cref="MoveActionInfoDto"/> リストを取得する
         /// </summary>

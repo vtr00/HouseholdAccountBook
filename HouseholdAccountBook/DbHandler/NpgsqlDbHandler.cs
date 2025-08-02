@@ -1,11 +1,9 @@
 ﻿using HouseholdAccountBook.DbHandler.Abstract;
 using Npgsql;
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using static HouseholdAccountBook.Others.DbConstants;
-using static HouseholdAccountBook.Others.LogicConstants;
 
 namespace HouseholdAccountBook.DbHandler
 {
@@ -61,7 +59,7 @@ namespace HouseholdAccountBook.DbHandler
                                             NotifyResult notifyResultAsync = null, bool waitForFinish = true)
         {
             // 起動情報を設定する
-            ProcessStartInfo info = new ProcessStartInfo() {
+            ProcessStartInfo info = new() {
                 FileName = dumpExePath,
                 Arguments = string.Format(
                     "--host {0} --port {1} --username \"{2}\" --role \"{3}\" {4} --format {5} --data-only --verbose --column-inserts --file \"{6}\" \"{7}\"",
@@ -81,7 +79,7 @@ namespace HouseholdAccountBook.DbHandler
                 UseShellExecute = false
             };
 #if DEBUG
-            Console.WriteLine(string.Format("Dump: \"{0}\" {1}", info.FileName, info.Arguments));
+            Log.Debug(string.Format($"Dump: \"{info.FileName}\" {info.Arguments}"));
 #endif
 
             // バックアップする
@@ -126,7 +124,7 @@ namespace HouseholdAccountBook.DbHandler
         public async Task<int> ExecuteRestore(string backupFilePath, string restoreExePath, PostgresPasswordInput passwordInput)
         {
             // 起動情報を設定する
-            ProcessStartInfo info = new ProcessStartInfo() {
+            ProcessStartInfo info = new() {
                 FileName = restoreExePath,
                 Arguments = string.Format(
                     "--host {0} --port {1} --username \"{2}\" --role \"{3}\" {4} --data-only --verbose --dbname \"{5}\" \"{6}\"",
@@ -145,7 +143,7 @@ namespace HouseholdAccountBook.DbHandler
                 UseShellExecute = false
             };
 #if DEBUG
-            Console.WriteLine(string.Format("Restore: \"{0}\" {1}", info.FileName, info.Arguments));
+            Log.Debug(string.Format($"Restore: \"{info.FileName}\" {info.Arguments}"));
 #endif
 
             // リストアする

@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Dao.Abstract;
 using HouseholdAccountBook.DbHandler.Abstract;
-using HouseholdAccountBook.Dto.Others;
 using HouseholdAccountBook.Dto.DbTable;
+using HouseholdAccountBook.Dto.Others;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,14 +10,9 @@ namespace HouseholdAccountBook.Dao.Compositions
     /// <summary>
     /// 備考情報DAO
     /// </summary>
-    public class RemarkInfoDao : ReadDaoBase
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class RemarkInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public RemarkInfoDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         /// <summary>
         /// <see cref="HstRemarkDto.ItemId"/> に基づいて、<see cref="RemarkInfoDto"/> リストを取得する
         /// </summary>

@@ -7,16 +7,11 @@ using System.Threading.Tasks;
 namespace HouseholdAccountBook.Dao.Compositions
 {
     /// <summary>
-    /// 
+    /// 分類内帳簿項目DTO
     /// </summary>
-    public class HstActionWithHstItemDao : ReadDaoBase
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class HstActionWithHstItemDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public HstActionWithHstItemDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         /// <summary>
         /// <see cref="MstCategoryDto.CategoryId"/> に基づいて、<see cref="HstActionDto"/> リストを取得します
         /// </summary>

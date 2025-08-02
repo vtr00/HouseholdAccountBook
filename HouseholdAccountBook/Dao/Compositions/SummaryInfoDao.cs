@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Dao.Abstract;
 using HouseholdAccountBook.DbHandler.Abstract;
-using HouseholdAccountBook.Dto.Others;
 using HouseholdAccountBook.Dto.DbTable;
+using HouseholdAccountBook.Dto.Others;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,14 +11,9 @@ namespace HouseholdAccountBook.Dao.Compositions
     /// <summary>
     /// 帳簿情報DAO
     /// </summary>
-    public class SummaryInfoDao : ReadDaoBase
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class SummaryInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public SummaryInfoDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         /// <summary>
         /// 全帳簿の <see cref="SummaryInfoDto"> リストを取得する
         /// </summary>

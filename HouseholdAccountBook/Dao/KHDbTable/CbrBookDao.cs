@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Dao.KHDbTable
 {
-    public class CbrBookDao : KHReadDaoBase<CbrBookDto>
+    public class CbrBookDao(OleDbHandler dbHandler) : KHReadDaoBase<CbrBookDto>(dbHandler)
     {
-        public CbrBookDao(OleDbHandler dbHandler) : base(dbHandler) { }
-
         public override async Task<IEnumerable<CbrBookDto>> FindAllAsync()
         {
             return await this.dbHandler.QueryAsync<CbrBookDto>(@"SELECT * FROM CBR_BOOK;");

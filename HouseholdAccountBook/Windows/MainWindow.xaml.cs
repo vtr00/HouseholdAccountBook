@@ -12,7 +12,7 @@ using HouseholdAccountBook.UserControls;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
 using Newtonsoft.Json;
-using Notifications.Wpf;
+using Notification.Wpf;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
@@ -65,7 +65,7 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// ウィンドウの境界(最終補正値)
         /// </summary>
-        private Rect lastBounds = new Rect();
+        private Rect lastBounds = new();
 
         /// <summary>
         /// ウィンドウログ
@@ -139,7 +139,7 @@ namespace HouseholdAccountBook.Windows
                 fileName = Path.GetFileName(settings.App_KichoDBFilePath);
             }
 
-            OpenFileDialog ofd = new OpenFileDialog() {
+            OpenFileDialog ofd = new() {
                 CheckFileExists = true,
                 InitialDirectory = directory,
                 FileName = fileName,
@@ -159,21 +159,21 @@ namespace HouseholdAccountBook.Windows
 
             bool isOpen = false;
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                OleDbHandler.ConnectInfo info = new OleDbHandler.ConnectInfo {
+                OleDbHandler.ConnectInfo info = new() {
                     Provider = settings.App_Access_Provider,
                     FilePath = ofd.FileName
                 };
 
-                using (OleDbHandler dbHandlerOle = new OleDbHandler(info)) {
+                using (OleDbHandler dbHandlerOle = new(info)) {
                     isOpen = dbHandlerOle.IsOpen;
 
                     if (isOpen) {
-                        CbmBookDao cbmBookDao = new CbmBookDao(dbHandlerOle);
-                        CbmCategoryDao cbmCategoryDao = new CbmCategoryDao(dbHandlerOle);
-                        CbmItemDao cbmItemDao = new CbmItemDao(dbHandlerOle);
-                        CbtActDao cbtActDao = new CbtActDao(dbHandlerOle);
-                        CbtNoteDao cbtNoteDao = new CbtNoteDao(dbHandlerOle);
-                        CbrBookDao cbrBookDao = new CbrBookDao(dbHandlerOle);
+                        CbmBookDao cbmBookDao = new(dbHandlerOle);
+                        CbmCategoryDao cbmCategoryDao = new(dbHandlerOle);
+                        CbmItemDao cbmItemDao = new(dbHandlerOle);
+                        CbtActDao cbtActDao = new(dbHandlerOle);
+                        CbtNoteDao cbtNoteDao = new(dbHandlerOle);
+                        CbrBookDao cbrBookDao = new(dbHandlerOle);
 
                         var cbmBookDtoList = await cbmBookDao.FindAllAsync();
                         var cbmCategoryDtoList = await cbmCategoryDao.FindAllAsync();
@@ -184,14 +184,14 @@ namespace HouseholdAccountBook.Windows
 
                         using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                             await dbHandler.ExecTransactionAsync(async () => {
-                                var mstBookDao = new MstBookDao(dbHandler);
-                                var mstCategoryDao = new MstCategoryDao(dbHandler);
-                                var mstItemDao = new MstItemDao(dbHandler);
-                                var hstActionDao = new HstActionDao(dbHandler);
-                                var hstGroupDao = new HstGroupDao(dbHandler);
-                                var hstShopDao = new HstShopDao(dbHandler);
-                                var hstRemarkDao = new HstRemarkDao(dbHandler);
-                                var relBookItemDao = new RelBookItemDao(dbHandler);
+                                MstBookDao mstBookDao = new(dbHandler);
+                                MstCategoryDao mstCategoryDao = new(dbHandler);
+                                MstItemDao mstItemDao = new(dbHandler);
+                                HstActionDao hstActionDao = new(dbHandler);
+                                HstGroupDao hstGroupDao = new(dbHandler);
+                                HstShopDao hstShopDao = new(dbHandler);
+                                HstRemarkDao hstRemarkDao = new(dbHandler);
+                                RelBookItemDao relBookItemDao = new(dbHandler);
 
                                 // 既存のデータを削除する
                                 _ = await mstBookDao.DeleteAllAsync();
@@ -229,7 +229,7 @@ namespace HouseholdAccountBook.Windows
                                 int maxGroupId = 0; // グループIDの最大値
                                 // 帳簿テーブルのレコードを作成する
                                 foreach (CbtActDto cbtActDto in cbtActDtoList) {
-                                    HstActionDto dto = new HstActionDto(cbtActDto);
+                                    HstActionDto dto = new(cbtActDto);
                                     _ = await hstActionDao.InsertAsync(dto);
 
                                     // groupId が存在しないなら次のレコードへ
@@ -329,7 +329,7 @@ namespace HouseholdAccountBook.Windows
                 fileName = Path.GetFileName(settings.App_CustomFormatFilePath);
             }
 
-            OpenFileDialog ofd = new OpenFileDialog() {
+            OpenFileDialog ofd = new() {
                 CheckFileExists = true,
                 InitialDirectory = directory,
                 FileName = fileName,
@@ -407,7 +407,7 @@ namespace HouseholdAccountBook.Windows
 
             Properties.Settings settings = Properties.Settings.Default;
 
-            string directory = string.Empty;
+            string directory;
             string fileName = string.Empty;
             // 過去に読み込んだときのフォルダとファイルをデフォルトにする
             if (settings.App_CustomFormatFilePath != string.Empty) {
@@ -418,7 +418,7 @@ namespace HouseholdAccountBook.Windows
                 directory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
             }
 
-            SaveFileDialog sfd = new SaveFileDialog() {
+            SaveFileDialog sfd = new() {
                 InitialDirectory = directory,
                 FileName = fileName,
                 Title = Properties.Resources.Title_FileSelection,
@@ -464,7 +464,7 @@ namespace HouseholdAccountBook.Windows
 
             Properties.Settings settings = Properties.Settings.Default;
 
-            string directory = string.Empty;
+            string directory;
             string fileName = string.Empty;
             // 過去に読み込んだときのフォルダとファイルをデフォルトにする
             if (settings.App_SQLFilePath != string.Empty) {
@@ -475,7 +475,7 @@ namespace HouseholdAccountBook.Windows
                 directory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
             }
 
-            SaveFileDialog sfd = new SaveFileDialog() {
+            SaveFileDialog sfd = new() {
                 InitialDirectory = directory,
                 FileName = fileName,
                 Title = Properties.Resources.Title_FileSelection,
@@ -752,7 +752,7 @@ namespace HouseholdAccountBook.Windows
             // グループ種別を特定する
             int? groupKind = null;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                GroupInfoDao groupInfoDao = new GroupInfoDao(dbHandler);
+                GroupInfoDao groupInfoDao = new(dbHandler);
                 var dto = await groupInfoDao.FindByActionId(this.WVM.SelectedActionVM.ActionId);
                 groupKind = dto.GroupKind;
             }
@@ -840,7 +840,7 @@ namespace HouseholdAccountBook.Windows
             // グループ種別を特定する
             int? groupKind = null;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                GroupInfoDao groupInfoDao = new GroupInfoDao(dbHandler);
+                GroupInfoDao groupInfoDao = new(dbHandler);
                 var dto = await groupInfoDao.FindByActionId(this.WVM.SelectedActionVM.ActionId);
                 groupKind = dto.GroupKind;
             }
@@ -890,7 +890,7 @@ namespace HouseholdAccountBook.Windows
         {
             // 帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 子ウィンドウが開いていない
             e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab &&
-                           this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0 && !this.ChildrenWindowOpened;
+                           this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Any() && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -906,10 +906,10 @@ namespace HouseholdAccountBook.Windows
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                     await dbHandler.ExecTransactionAsync(async () => {
-                        HstActionDao hstActionDao = new HstActionDao(dbHandler);
-                        HstGroupDao hstGroupDao = new HstGroupDao(dbHandler);
+                        HstActionDao hstActionDao = new(dbHandler);
+                        HstGroupDao hstGroupDao = new(dbHandler);
 
-                        List<int> groupIdList = new List<int>();
+                        List<int> groupIdList = [];
                         // 帳簿項目IDが0を超える項目についてループ
                         foreach (ActionViewModel vm in this.WVM.SelectedActionVMList.Where((vm) => { return 0 < vm.ActionId; })) {
                             int actionId = vm.ActionId;
@@ -948,7 +948,7 @@ namespace HouseholdAccountBook.Windows
                         foreach (int groupId in groupIdList) {
                             // 同じグループIDを持つ帳簿項目が存在しなくなる場合にグループを削除する
                             var actionDtoList = await hstActionDao.FindByGroupIdAsync(groupId);
-                            if (actionDtoList.Count() == 0) {
+                            if (!actionDtoList.Any()) {
                                 _ = await hstGroupDao.DeleteByIdAsync(groupId);
                             }
                         }
@@ -969,7 +969,7 @@ namespace HouseholdAccountBook.Windows
         {
             // 帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 登録ウィンドウが開いていない
             e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab &&
-                           this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Count() != 0 && !this.RegistrationWindowOpened;
+                           this.WVM.SelectedActionVMList.Where((vm) => { return vm.ActionId > 0; }).Any() && !this.RegistrationWindowOpened;
         }
 
         /// <summary>
@@ -983,7 +983,7 @@ namespace HouseholdAccountBook.Windows
 
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                 // 帳簿項目IDが0を超える項目についてループ
-                HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                HstActionDao hstActionDao = new(dbHandler);
                 foreach (ActionViewModel vm in this.WVM.SelectedActionVMList.Where((vm) => { return 0 < vm.ActionId; })) {
                     _ = await hstActionDao.UpdateIsMatchByIdAsync(vm.ActionId, vm.IsMatch ? 1 : 0);
                 }
@@ -1366,7 +1366,7 @@ namespace HouseholdAccountBook.Windows
         {
             Log.Info();
 
-            SettingsWindow sw = new SettingsWindow(this.dbHandlerFactory) { Owner = this };
+            SettingsWindow sw = new(this.dbHandlerFactory) { Owner = this };
             sw.LoadWindowSetting();
 
             if (sw.ShowDialog() == true) {
@@ -1451,7 +1451,7 @@ namespace HouseholdAccountBook.Windows
         {
             Log.Info();
 
-            VersionWindow vw = new VersionWindow { Owner = this };
+            VersionWindow vw = new() { Owner = this };
             vw.MoveOwnersCenter();
 
             vw.ShowDialog();
@@ -1514,7 +1514,7 @@ namespace HouseholdAccountBook.Windows
                 return;
             }
 
-            List<int> actionIdList = new List<int>();
+            List<int> actionIdList = [];
             foreach (ActionViewModel vm in this.WVM.DisplayedActionVMList) {
                 actionIdList.Add(vm.ActionId);
 
@@ -1522,7 +1522,7 @@ namespace HouseholdAccountBook.Windows
                 string remark = vm.Remark.Replace(this.WVM.FindText, this.WVM.ReplaceText);
 
                 using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                    HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                    HstActionDao hstActionDao = new(dbHandler);
                     _ = await hstActionDao.UpdateShopNameAndRemarkByIdAsync(vm.ActionId, shopName, remark);
                 }
             }
@@ -1804,18 +1804,18 @@ namespace HouseholdAccountBook.Windows
             int? tmpBookId = bookId ?? this.WVM.SelectedBookVM?.Id;
             Log.Info($"tmpBookId:{tmpBookId}");
 
-            ObservableCollection<BookViewModel> bookVMList = new ObservableCollection<BookViewModel>() {
+            ObservableCollection<BookViewModel> bookVMList = [
                 new BookViewModel() { Id = null, Name = Properties.Resources.ListName_AllBooks }
-            };
+            ];
             BookViewModel selectedBookVM = bookVMList[0];
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                MstBookDao mstBookDao = new MstBookDao(dbHandler);
+                MstBookDao mstBookDao = new(dbHandler);
                 var dtoList = await mstBookDao.FindAllAsync();
                 foreach (var dto in dtoList) {
                     MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : JsonConvert.DeserializeObject<MstBookDto.JsonDto>(dto.JsonCode);
 
                     if (DateTimeExtensions.IsWithIn(this.WVM.DisplayedStartDate, this.WVM.DisplayedEndDate, jsonObj?.StartDate, jsonObj?.EndDate)) {
-                        BookViewModel vm = new BookViewModel() { Id = dto.BookId, Name = dto.BookName };
+                        BookViewModel vm = new() { Id = dto.BookId, Name = dto.BookName };
                         bookVMList.Add(vm);
 
                         if (vm.Id == tmpBookId) {
@@ -1875,9 +1875,9 @@ namespace HouseholdAccountBook.Windows
         {
             Log.Info($"targetBookId:{targetBookId} startTime:{startTime:yyyy-MM-dd} endTime:{endTime:yyyy-MM-dd}");
 
-            ObservableCollection<ActionViewModel> actionVMList = new ObservableCollection<ActionViewModel>();
+            ObservableCollection<ActionViewModel> actionVMList = [];
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                EndingBalanceInfoDao endingBalanceInfoDao = new EndingBalanceInfoDao(dbHandler);
+                EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
                 EndingBalanceInfoDto dto = targetBookId == null
                     ? await endingBalanceInfoDao.Find(startTime) // 全帳簿の繰越残高
                     : await endingBalanceInfoDao.FindByBookId(targetBookId.Value, startTime); // 各帳簿の繰越残高
@@ -1885,7 +1885,7 @@ namespace HouseholdAccountBook.Windows
                 // 繰越残高を追加
                 int balance = dto.EndingBalance;
                 {
-                    ActionViewModel avm = new ActionViewModel() {
+                    ActionViewModel avm = new() {
                         ActionId = -1,
                         ActTime = startTime,
                         BookId = -1,
@@ -1906,7 +1906,7 @@ namespace HouseholdAccountBook.Windows
                     actionVMList.Add(avm);
                 }
 
-                ActionInfoDao actionInfoDao = new ActionInfoDao(dbHandler);
+                ActionInfoDao actionInfoDao = new(dbHandler);
                 IEnumerable<ActionInfoDto> dtoList = targetBookId == null
                     ? await actionInfoDao.FindAllWithinTerm(startTime, endTime) // 全帳簿項目
                     : await actionInfoDao.FindByBookIdWithinTerm(targetBookId.Value, startTime, endTime); // 各帳簿項目
@@ -1914,7 +1914,7 @@ namespace HouseholdAccountBook.Windows
                 foreach (ActionInfoDto aDto in dtoList) {
                     balance += aDto.ActValue;
 
-                    ActionViewModel avm = new ActionViewModel() {
+                    ActionViewModel avm = new() {
                         ActionId = aDto.ActionId,
                         ActTime = aDto.ActTime,
                         BookId = aDto.BookId,
@@ -1965,10 +1965,10 @@ namespace HouseholdAccountBook.Windows
         {
             Log.Info($"bookId:{bookId} startTime:{startTime:yyyy-MM-dd} endTime:{endTime:yyyy-MM-dd}");
 
-            ObservableCollection<SummaryViewModel> summaryVMList = new ObservableCollection<SummaryViewModel>();
+            ObservableCollection<SummaryViewModel> summaryVMList = [];
 
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                SummaryInfoDao summaryInfoDao = new SummaryInfoDao(dbHandler);
+                SummaryInfoDao summaryInfoDao = new(dbHandler);
                 IEnumerable<SummaryInfoDto> dtoList = bookId == null
                     ? await summaryInfoDao.FindAllWithinTerm(startTime, endTime)
                     : await summaryInfoDao.FindByBookIdWithinTerm(bookId.Value, startTime, endTime);
@@ -1995,9 +1995,9 @@ namespace HouseholdAccountBook.Windows
             // 差引損益
             int total = summaryVMList.Sum((obj) => obj.Total);
             // 収入/支出
-            List<SummaryViewModel> totalAsBalanceKindList = new List<SummaryViewModel>();
+            List<SummaryViewModel> totalAsBalanceKindList = [];
             // 分類小計
-            List<SummaryViewModel> totalAsCategoryList = new List<SummaryViewModel>();
+            List<SummaryViewModel> totalAsCategoryList = [];
 
             // 収支別に計算する
             foreach (var g1 in summaryVMList.GroupBy((obj) => obj.BalanceKind)) {
@@ -2066,7 +2066,7 @@ namespace HouseholdAccountBook.Windows
             // 開始日までの収支を取得する
             int balance = 0;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                EndingBalanceInfoDao endingBalanceInfoDao = new EndingBalanceInfoDao(dbHandler);
+                EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
                 EndingBalanceInfoDto dto = bookId == null
                     ? await endingBalanceInfoDao.Find(startTime) // 全帳簿
                     : await endingBalanceInfoDao.FindByBookId(bookId.Value, startTime); // 各帳簿
@@ -2074,12 +2074,12 @@ namespace HouseholdAccountBook.Windows
             }
 
             // 系列データ
-            ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel> {
+            ObservableCollection<SeriesViewModel> vmList = [
                 new SeriesViewModel() {
                     OtherName = Properties.Resources.ListName_Balance,
-                    Values = new List<int>()
+                    Values = []
                 }
-            };
+            ];
             int averageCount = 0; // 平均値計算に使用する月数(先月まで)
 
             // 最初の日の分を取得する
@@ -2091,17 +2091,11 @@ namespace HouseholdAccountBook.Windows
 
             foreach (SummaryViewModel summaryVM in summaryVMList) {
                 int value = summaryVM.Total;
-                SeriesViewModel vm = new SeriesViewModel(summaryVM) {
-                    Values = new List<int>(),
-                    Total = value
+                SeriesViewModel vm = new(summaryVM) {
+                    Values = [],
+                    Total = value,
+                    Average = endTime < DateTime.Now ? value : 0 // 平均値は過去のデータのみで計算する
                 };
-                // 平均値は過去のデータのみで計算する
-                if (endTime < DateTime.Now) {
-                    vm.Average = value;
-                }
-                else {
-                    vm.Average = 0;
-                }
                 vm.Values.Add(value);
                 vmList.Add(vm);
             }
@@ -2164,19 +2158,19 @@ namespace HouseholdAccountBook.Windows
             // 開始日までの収支を取得する
             int balance = 0;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                EndingBalanceInfoDao endingBalanceInfoDao = new EndingBalanceInfoDao(dbHandler);
+                EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
                 EndingBalanceInfoDto dto = bookId == null
                     ? await endingBalanceInfoDao.Find(startTime) // 全帳簿
                     : await endingBalanceInfoDao.FindByBookId(bookId.Value, startTime); // 各帳簿
                 balance = dto.EndingBalance;
             }
 
-            ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel> {
+            ObservableCollection<SeriesViewModel> vmList = [
                 new SeriesViewModel() {
                     OtherName = Properties.Resources.ListName_Balance,
-                    Values = new List<int>()
+                    Values = []
                 }
-            };
+            ];
             int averageCount = 0; // 平均値計算に使用する月数(先月まで)
 
             // 最初の月の分を取得する
@@ -2187,16 +2181,11 @@ namespace HouseholdAccountBook.Windows
             vmList[0].Values.Add(balance); // 残高
             foreach (SummaryViewModel summaryVM in summaryVMList) {
                 int value = summaryVM.Total;
-                SeriesViewModel vm = new SeriesViewModel(summaryVM) {
-                    Values = new List<int>(),
-                    Total = value
+                SeriesViewModel vm = new(summaryVM) {
+                    Values = [],
+                    Total = value,
+                    Average = tmpEndTime < DateTime.Now ? value : 0
                 };
-                if (tmpEndTime < DateTime.Now) {
-                    vm.Average = value;
-                }
-                else {
-                    vm.Average = 0;
-                }
                 vm.Values.Add(value);
                 vmList.Add(vm);
             }
@@ -2259,19 +2248,19 @@ namespace HouseholdAccountBook.Windows
             // 開始日までの収支を取得する
             int balance = 0;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                EndingBalanceInfoDao endingBalanceInfoDao = new EndingBalanceInfoDao(dbHandler);
+                EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
                 EndingBalanceInfoDto dto = bookId == null
                     ? await endingBalanceInfoDao.Find(startTime) // 全帳簿
                     : await endingBalanceInfoDao.FindByBookId(bookId.Value, startTime); // 各帳簿
                 balance = dto.EndingBalance;
             }
 
-            ObservableCollection<SeriesViewModel> vmList = new ObservableCollection<SeriesViewModel> {
+            ObservableCollection<SeriesViewModel> vmList = [
                 new SeriesViewModel() {
                     OtherName = Properties.Resources.ListName_Balance,
-                    Values = new List<int>()
+                    Values = []
                 }
-            };
+            ];
             int averageCount = 0; // 平均値計算に使用する年数(去年まで)
 
             // 最初の年の分を取得する
@@ -2282,16 +2271,11 @@ namespace HouseholdAccountBook.Windows
             vmList[0].Values.Add(balance); // 残高
             foreach (SummaryViewModel summaryVM in summaryVMList) {
                 int value = summaryVM.Total;
-                SeriesViewModel vm = new SeriesViewModel(summaryVM) {
-                    Values = new List<int>(),
-                    Total = value
+                SeriesViewModel vm = new(summaryVM) {
+                    Values = [],
+                    Total = value,
+                    Average = tmpEndTime < DateTime.Now ? value : 0
                 };
-                if (tmpEndTime < DateTime.Now) {
-                    vm.Average = value;
-                }
-                else {
-                    vm.Average = 0;
-                }
                 vm.Values.Add(value);
                 vmList.Add(vm);
             }
@@ -2354,11 +2338,11 @@ namespace HouseholdAccountBook.Windows
         {
             if (this.WVM.SelectedTab != Tabs.BooksTab) return;
 
-            List<int> emptyIdList = new List<int>();
+            List<int> emptyIdList = [];
             Log.Info($"actionIdList:{string.Join(",", actionIdList ?? emptyIdList)} balanceKind:{balanceKind} categoryId:{categoryId} itemId:{itemId} isScroll:{isScroll} isUpdateActDateLastEdited:{isUpdateActDateLastEdited}");
 
             // 指定がなければ、更新前の帳簿項目の選択を維持する
-            List<int> tmpActionIdList = actionIdList ?? new List<int>(this.WVM.SelectedActionVMList.Select((tmp) => tmp.ActionId));
+            List<int> tmpActionIdList = actionIdList ?? new(this.WVM.SelectedActionVMList.Select((tmp) => tmp.ActionId));
             // 指定がなければ、更新前のサマリーの選択を維持する
             int? tmpBalanceKind = balanceKind ?? this.WVM.SelectedBalanceKind;
             int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryId;
@@ -2405,7 +2389,7 @@ namespace HouseholdAccountBook.Windows
             if (isUpdateActDateLastEdited) {
                 if (actionIdList != null && actionIdList.Count != 0) {
                     using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                        HstActionDao hstActionDao = new HstActionDao(dbHandler);
+                        HstActionDao hstActionDao = new(dbHandler);
                         var dto = await hstActionDao.FindByIdAsync(actionIdList[0]);
                         this.WVM.ActDateLastEdited = dto.ActTime;
                     }
@@ -2432,7 +2416,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.DailyGraphPlotModel.Series.Clear();
 
             // 横軸 - 日軸
-            CategoryAxis horizontalAxis1 = new CategoryAxis() {
+            CategoryAxis horizontalAxis1 = new() {
                 Unit = Properties.Resources.Unit_Day,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
@@ -2445,7 +2429,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.DailyGraphPlotModel.Axes.Add(horizontalAxis1);
 
             // 縦軸 - 線形軸
-            LinearAxis verticalAxis1 = new LinearAxis() {
+            LinearAxis verticalAxis1 = new() {
                 Unit = Properties.Resources.Unit_Money,
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
@@ -2464,7 +2448,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.SelectedDailyGraphPlotModel.Series.Clear();
 
             // 横軸 - 日軸
-            CategoryAxis horizontalAxis2 = new CategoryAxis() {
+            CategoryAxis horizontalAxis2 = new() {
                 Unit = Properties.Resources.Unit_Day,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
@@ -2477,7 +2461,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.SelectedDailyGraphPlotModel.Axes.Add(horizontalAxis2);
 
             // 縦軸 - 線形軸
-            LinearAxis verticalAxis2 = new LinearAxis() {
+            LinearAxis verticalAxis2 = new() {
                 Unit = Properties.Resources.Unit_Money,
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
@@ -2509,8 +2493,8 @@ namespace HouseholdAccountBook.Windows
 
             switch (this.WVM.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
-                    List<int> sumPlus = new List<int>(); // 日ごとの合計収入(Y軸範囲の計算に使用)
-                    List<int> sumMinus = new List<int>(); // 日ごとの合計支出(Y軸範囲の計算に使用)
+                    List<int> sumPlus = []; // 日ごとの合計収入(Y軸範囲の計算に使用)
+                    List<int> sumMinus = []; // 日ごとの合計支出(Y軸範囲の計算に使用)
 
                     // グラフ表示データを取得する
                     ObservableCollection<SeriesViewModel> tmpVMList = null;
@@ -2536,7 +2520,7 @@ namespace HouseholdAccountBook.Windows
                     // グラフ表示データを設定する
                     this.WVM.DailyGraphPlotModel.Series.Clear();
                     foreach (SeriesViewModel tmpVM in this.WVM.DailyGraphSeriesVMList) {
-                        CustomBarSeries wholeSeries = new CustomBarSeries() {
+                        CustomBarSeries wholeSeries = new() {
                             IsStacked = true,
                             Title = tmpVM.DisplayedName,
                             ItemsSource = tmpVM.Values.Select((value, index) => {
@@ -2574,7 +2558,7 @@ namespace HouseholdAccountBook.Windows
                     // Y軸の範囲を設定する
                     foreach (Axis axis in this.WVM.DailyGraphPlotModel.Axes) {
                         if (axis.Position == AxisPosition.Left) {
-                            this.SetAxisRange(axis, sumMinus.Min(), sumPlus.Max(), 10, true);
+                            SetAxisRange(axis, sumMinus.Min(), sumPlus.Max(), 10, true);
                             break;
                         }
                     }
@@ -2595,7 +2579,7 @@ namespace HouseholdAccountBook.Windows
 
                     // グラフ表示データを設定する
                     this.WVM.DailyGraphPlotModel.Series.Clear();
-                    LineSeries series = new LineSeries() {
+                    LineSeries series = new() {
                         Title = Properties.Resources.GraphKind1_BalanceGraph,
                         TrackerFormatString = "{2}" + Properties.Resources.Unit_Day + ": {4:#,0}" //日付: 金額
                     };
@@ -2605,7 +2589,7 @@ namespace HouseholdAccountBook.Windows
                     // Y軸の範囲を設定する
                     foreach (Axis axis in this.WVM.DailyGraphPlotModel.Axes) {
                         if (axis.Position == AxisPosition.Left) {
-                            this.SetAxisRange(axis, series.Points.Min((value) => value.Y), series.Points.Max((value) => value.Y), 10, true);
+                            SetAxisRange(axis, series.Points.Min((value) => value.Y), series.Points.Max((value) => value.Y), 10, true);
                             break;
                         }
                     }
@@ -2631,11 +2615,11 @@ namespace HouseholdAccountBook.Windows
             // グラフ表示データを設定する
             this.WVM.SelectedDailyGraphPlotModel.Series.Clear();
             if (vm != null) {
-                CustomBarSeries slectedSeries = new CustomBarSeries() {
+                CustomBarSeries slectedSeries = new() {
                     IsStacked = true,
                     Title = vm.DisplayedName,
                     FillColor = (this.WVM.DailyGraphPlotModel.Series.FirstOrDefault((s) => {
-                        List<GraphDatumViewModel> datumVMList = new List<GraphDatumViewModel>((s as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
+                        List<GraphDatumViewModel> datumVMList = new((s as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
                         return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
                     }) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Select((value, index) => {
@@ -2656,7 +2640,7 @@ namespace HouseholdAccountBook.Windows
 
                 foreach (Axis axis in this.WVM.SelectedDailyGraphPlotModel.Axes) {
                     if (axis.Position == AxisPosition.Left) {
-                        this.SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
+                        SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
                         break;
                     }
                 }
@@ -2688,7 +2672,7 @@ namespace HouseholdAccountBook.Windows
             DateTime tmpMonth = this.WVM.DisplayedYear.GetFirstDateOfFiscalYear(startMonth);
 
             // 表示する月の文字列を作成する
-            ObservableCollection<DateTime> displayedMonths = new ObservableCollection<DateTime>();
+            ObservableCollection<DateTime> displayedMonths = [];
             for (int i = 0; i < 12; ++i) {
                 displayedMonths.Add(tmpMonth);
                 tmpMonth = tmpMonth.AddMonths(1);
@@ -2718,7 +2702,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.MonthlyGraphPlotModel.Series.Clear();
 
             // 横軸 - 月軸
-            CategoryAxis horizontalAxis1 = new CategoryAxis() {
+            CategoryAxis horizontalAxis1 = new() {
                 Unit = Properties.Resources.Unit_Month,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
@@ -2731,7 +2715,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.MonthlyGraphPlotModel.Axes.Add(horizontalAxis1);
 
             // 縦軸 - 線形軸
-            LinearAxis verticalAxis1 = new LinearAxis() {
+            LinearAxis verticalAxis1 = new() {
                 Unit = Properties.Resources.Unit_Money,
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
@@ -2750,7 +2734,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.SelectedMonthlyGraphPlotModel.Series.Clear();
 
             // 横軸 - 月軸
-            CategoryAxis horizontalAxis2 = new CategoryAxis() {
+            CategoryAxis horizontalAxis2 = new() {
                 Unit = Properties.Resources.Unit_Month,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
@@ -2763,7 +2747,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.SelectedMonthlyGraphPlotModel.Axes.Add(horizontalAxis2);
 
             // 縦軸 - 線形軸
-            LinearAxis verticalAxis2 = new LinearAxis() {
+            LinearAxis verticalAxis2 = new() {
                 Unit = Properties.Resources.Unit_Money,
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
@@ -2798,8 +2782,8 @@ namespace HouseholdAccountBook.Windows
 
             switch (this.WVM.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
-                    List<int> sumPlus = new List<int>(); // 月ごとの合計収入
-                    List<int> sumMinus = new List<int>(); // 月ごとの合計支出
+                    List<int> sumPlus = []; // 月ごとの合計収入
+                    List<int> sumMinus = []; // 月ごとの合計支出
 
                     // グラフ表示データを取得する
                     ObservableCollection<SeriesViewModel> tmpVMList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedYear);
@@ -2817,7 +2801,7 @@ namespace HouseholdAccountBook.Windows
                     // グラフ表示データを設定する
                     this.WVM.MonthlyGraphPlotModel.Series.Clear();
                     foreach (SeriesViewModel tmpVM in this.WVM.MonthlyGraphSeriesVMList) {
-                        CustomBarSeries wholeSeries = new CustomBarSeries() {
+                        CustomBarSeries wholeSeries = new() {
                             IsStacked = true,
                             Title = tmpVM.DisplayedName,
                             ItemsSource = tmpVM.Values.Select((value, index) => new GraphDatumViewModel {
@@ -2852,7 +2836,7 @@ namespace HouseholdAccountBook.Windows
                     // Y軸の範囲を設定する
                     foreach (Axis axis in this.WVM.MonthlyGraphPlotModel.Axes) {
                         if (axis.Position == AxisPosition.Left) {
-                            this.SetAxisRange(axis, sumMinus.Min(), sumPlus.Max(), 10, true);
+                            SetAxisRange(axis, sumMinus.Min(), sumPlus.Max(), 10, true);
                             break;
                         }
                     }
@@ -2864,7 +2848,7 @@ namespace HouseholdAccountBook.Windows
 
                     // グラフ表示データを設定する
                     this.WVM.MonthlyGraphPlotModel.Series.Clear();
-                    LineSeries series = new LineSeries() {
+                    LineSeries series = new() {
                         Title = Properties.Resources.GraphKind1_BalanceGraph,
                         TrackerFormatString = "{2}" + Properties.Resources.Unit_Month + ": {4:#,0}" //月: 金額
                     };
@@ -2874,7 +2858,7 @@ namespace HouseholdAccountBook.Windows
                     // Y軸の範囲を設定する
                     foreach (Axis axis in this.WVM.MonthlyGraphPlotModel.Axes) {
                         if (axis.Position == AxisPosition.Left) {
-                            this.SetAxisRange(axis, series.Points.Min((value) => value.Y), series.Points.Max((value) => value.Y), 10, true);
+                            SetAxisRange(axis, series.Points.Min((value) => value.Y), series.Points.Max((value) => value.Y), 10, true);
                             break;
                         }
                     }
@@ -2903,11 +2887,11 @@ namespace HouseholdAccountBook.Windows
             // グラフ表示データを設定する
             this.WVM.SelectedMonthlyGraphPlotModel.Series.Clear();
             if (vm != null) {
-                CustomBarSeries selectedSeries = new CustomBarSeries() {
+                CustomBarSeries selectedSeries = new() {
                     IsStacked = true,
                     Title = vm.DisplayedName,
-                    FillColor = (this.WVM.MonthlyGraphPlotModel.Series.FirstOrDefault((s) => {
-                        List<GraphDatumViewModel> datumVMList = new List<GraphDatumViewModel>((s as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
+                    FillColor = (this.WVM.MonthlyGraphPlotModel.Series.FirstOrDefault((series) => {
+                        List<GraphDatumViewModel> datumVMList = new((series as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
                         return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
                     }) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Select((value, index) => new GraphDatumViewModel {
@@ -2926,7 +2910,7 @@ namespace HouseholdAccountBook.Windows
                 // Y軸の範囲を設定する
                 foreach (Axis axis in this.WVM.SelectedMonthlyGraphPlotModel.Axes) {
                     if (axis.Position == AxisPosition.Left) {
-                        this.SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
+                        SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
                         break;
                     }
                 }
@@ -2959,7 +2943,7 @@ namespace HouseholdAccountBook.Windows
             DateTime tmpYear = DateTime.Now.GetFirstDateOfFiscalYear(startMonth).AddYears(-9);
 
             // 表示する月の文字列を作成する
-            ObservableCollection<DateTime> displayedYears = new ObservableCollection<DateTime>();
+            ObservableCollection<DateTime> displayedYears = [];
             for (int i = 0; i < 10; ++i) {
                 displayedYears.Add(tmpYear);
                 tmpYear = tmpYear.AddYears(1);
@@ -2990,7 +2974,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.YearlyGraphPlotModel.Series.Clear();
 
             // 横軸 - 年軸
-            CategoryAxis horizontalAxis1 = new CategoryAxis() {
+            CategoryAxis horizontalAxis1 = new() {
                 Unit = Properties.Resources.Unit_FiscalYear,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
@@ -3003,7 +2987,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.YearlyGraphPlotModel.Axes.Add(horizontalAxis1);
 
             // 縦軸 - 線形軸
-            LinearAxis verticalAxis1 = new LinearAxis() {
+            LinearAxis verticalAxis1 = new() {
                 Unit = Properties.Resources.Unit_Money,
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
@@ -3022,7 +3006,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.SelectedYearlyGraphPlotModel.Series.Clear();
 
             // 横軸 - 年軸
-            CategoryAxis horizontalAxis2 = new CategoryAxis() {
+            CategoryAxis horizontalAxis2 = new() {
                 Unit = Properties.Resources.Unit_FiscalYear,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
@@ -3035,7 +3019,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.SelectedYearlyGraphPlotModel.Axes.Add(horizontalAxis2);
 
             // 縦軸 - 線形軸
-            LinearAxis verticalAxis2 = new LinearAxis() {
+            LinearAxis verticalAxis2 = new() {
                 Unit = Properties.Resources.Unit_Money,
                 Position = AxisPosition.Left,
                 MajorGridlineStyle = LineStyle.Solid,
@@ -3070,8 +3054,8 @@ namespace HouseholdAccountBook.Windows
 
             switch (this.WVM.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
-                    List<int> sumPlus = new List<int>(); // 年ごとの合計収入
-                    List<int> sumMinus = new List<int>(); // 年ごとの合計支出
+                    List<int> sumPlus = []; // 年ごとの合計収入
+                    List<int> sumMinus = []; // 年ごとの合計支出
 
                     // グラフ表示データを取得する
                     ObservableCollection<SeriesViewModel> tmpVMList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM?.Id);
@@ -3089,7 +3073,7 @@ namespace HouseholdAccountBook.Windows
                     // グラフ表示データを設定する
                     this.WVM.YearlyGraphPlotModel.Series.Clear();
                     foreach (SeriesViewModel tmpVM in this.WVM.YearlyGraphSeriesVMList) {
-                        CustomBarSeries wholeSeries = new CustomBarSeries() {
+                        CustomBarSeries wholeSeries = new() {
                             IsStacked = true,
                             Title = tmpVM.DisplayedName,
                             ItemsSource = tmpVM.Values.Select((value, index) => new GraphDatumViewModel {
@@ -3124,7 +3108,7 @@ namespace HouseholdAccountBook.Windows
                     // Y軸の範囲を設定する
                     foreach (Axis axis in this.WVM.YearlyGraphPlotModel.Axes) {
                         if (axis.Position == AxisPosition.Left) {
-                            this.SetAxisRange(axis, sumMinus.Min(), sumPlus.Max(), 10, true);
+                            SetAxisRange(axis, sumMinus.Min(), sumPlus.Max(), 10, true);
                             break;
                         }
                     }
@@ -3136,7 +3120,7 @@ namespace HouseholdAccountBook.Windows
 
                     // グラフ表示データを設定する
                     this.WVM.YearlyGraphPlotModel.Series.Clear();
-                    LineSeries series = new LineSeries() {
+                    LineSeries series = new() {
                         Title = Properties.Resources.GraphKind1_BalanceGraph,
                         TrackerFormatString = "{2}" + Properties.Resources.Unit_FiscalYear + ": {4:#,0}" //年度: 金額
                     };
@@ -3146,7 +3130,7 @@ namespace HouseholdAccountBook.Windows
                     // Y軸の範囲を設定する
                     foreach (Axis axis in this.WVM.YearlyGraphPlotModel.Axes) {
                         if (axis.Position == AxisPosition.Left) {
-                            this.SetAxisRange(axis, series.Points.Min((value) => value.Y), series.Points.Max((value) => value.Y), 10, true);
+                            SetAxisRange(axis, series.Points.Min((value) => value.Y), series.Points.Max((value) => value.Y), 10, true);
                             break;
                         }
                     }
@@ -3175,11 +3159,11 @@ namespace HouseholdAccountBook.Windows
             // グラフ表示データを設定する
             this.WVM.SelectedYearlyGraphPlotModel.Series.Clear();
             if (vm != null) {
-                CustomBarSeries selectedSeries = new CustomBarSeries() {
+                CustomBarSeries selectedSeries = new() {
                     IsStacked = true,
                     Title = vm.DisplayedName,
-                    FillColor = (this.WVM.YearlyGraphPlotModel.Series.FirstOrDefault((s) => {
-                        List<GraphDatumViewModel> datumVMList = new List<GraphDatumViewModel>((s as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
+                    FillColor = (this.WVM.YearlyGraphPlotModel.Series.FirstOrDefault((series) => {
+                        List<GraphDatumViewModel> datumVMList = new((series as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
                         return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
                     }) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Select((value, index) => new GraphDatumViewModel {
@@ -3198,7 +3182,7 @@ namespace HouseholdAccountBook.Windows
                 // Y軸の範囲を設定する
                 foreach (Axis axis in this.WVM.SelectedYearlyGraphPlotModel.Axes) {
                     if (axis.Position == AxisPosition.Left) {
-                        this.SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
+                        SetAxisRange(axis, vm.Values.Min(), vm.Values.Max(), 4, true);
                         break;
                     }
                 }
@@ -3216,7 +3200,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="maxValue">最大値</param>
         /// <param name="divNum">目盛幅分割数(基準値)</param>
         /// <param name="isDisplayZero">0を表示するか</param>
-        private void SetAxisRange(Axis axis, double minValue, double maxValue, int divNum, bool isDisplayZero)
+        private static void SetAxisRange(Axis axis, double minValue, double maxValue, int divNum, bool isDisplayZero)
         {
             double unit = 0.25; // 最大値/最小値の求める単位(1以下の値)
             Debug.Assert(0 < unit && unit <= 1);
@@ -3441,7 +3425,7 @@ namespace HouseholdAccountBook.Windows
             // 古いバックアップを削除する
             if (tmpBackUpFolderPath != string.Empty) {
                 if (Directory.Exists(tmpBackUpFolderPath)) {
-                    List<string> fileList = new List<string>(Directory.GetFiles(tmpBackUpFolderPath, "*.backup", SearchOption.TopDirectoryOnly));
+                    List<string> fileList = new(Directory.GetFiles(tmpBackUpFolderPath, "*.backup", SearchOption.TopDirectoryOnly));
                     if (fileList.Count >= tmpBackUpNum) {
                         fileList.Sort();
 
@@ -3493,8 +3477,8 @@ namespace HouseholdAccountBook.Windows
                             (exitCode) => {
                                 // ダンプ結果を通知する
                                 if (exitCode == 0) {
-                                    NotificationManager nm = new NotificationManager();
-                                    NotificationContent nc = new NotificationContent() {
+                                    NotificationManager nm = new();
+                                    NotificationContent nc = new() {
                                         Title = this.Title,
                                         Message = Properties.Resources.Message_FinishToBackup,
                                         Type = NotificationType.Success
@@ -3502,8 +3486,8 @@ namespace HouseholdAccountBook.Windows
                                     nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
                                 }
                                 else if (exitCode != null) {
-                                    NotificationManager nm = new NotificationManager();
-                                    NotificationContent nc = new NotificationContent() {
+                                    NotificationManager nm = new();
+                                    NotificationContent nc = new() {
                                         Title = this.Title,
                                         Message = Properties.Resources.Message_FoultToBackup,
                                         Type = NotificationType.Error

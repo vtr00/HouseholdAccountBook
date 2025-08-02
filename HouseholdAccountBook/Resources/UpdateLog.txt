@@ -1021,6 +1021,8 @@
   MainWindow
     △ウィンドウ領域情報の保持を簡略に変更した
 2025/08/02
+  全体
+    △.NET 8.0に変更した
   MstActionDao
     ↑帳簿項目追加時に帳簿項目IDが取得できないのを修正した
 
@@ -1035,8 +1037,8 @@
 修正案:
   ・帳簿が一定額を下回ったら通知する
   ・SQLiteに対応する
-  ・DAOを作成する
   　・DAOはPostgreSQL、SQLiteで共通か？ - SQLiteにもRETURNINGは存在する。UPSERTを共通文にできるかを確認したい
     ・DAOFactoryはDTO単位で作成する。一旦PostgreSQLのDAO化を実装してから対応する
   ・DTO/ViewModelのMappingExtensionを作成する
   ・DisplaySettingsChanged後、Left/Top=-32000でFailedToModifyLocationしたら位置を保存せずに再起動する
+  ・年別一覧の表示年を変更できるようにする

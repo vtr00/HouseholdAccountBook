@@ -1,4 +1,6 @@
 ﻿using HouseholdAccountBook.DbHandler.Abstract;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.OleDb;
 using static HouseholdAccountBook.Others.DbConstants;
 
@@ -27,6 +29,21 @@ namespace HouseholdAccountBook.DbHandler
         public OleDbHandler(string provider, string filePath) : base(new OleDbConnection(string.Format(stringFormat, provider, filePath)))
         {
             this.LibKind = DBLibraryKind.OleDb;
+        }
+
+        public static List<KeyValuePair<string, string>> GetOleDbProvider()
+        {
+            List<KeyValuePair<string, string>> list = [];
+
+            OleDbEnumerator enumerator = new();
+            DataTable table = enumerator.GetElements();
+            foreach (DataRow row in table.Rows) {
+                string sourcesName = row["SOURCES_NAME"].ToString();
+                string sourcesDescription = row["SOURCES_DESCRIPTION"].ToString();
+
+                list.Add(new KeyValuePair<string, string>(sourcesName, sourcesDescription));
+            }
+            return list;
         }
     }
 }

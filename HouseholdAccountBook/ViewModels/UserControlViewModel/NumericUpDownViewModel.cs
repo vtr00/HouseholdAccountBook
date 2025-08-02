@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
-    /// VM
+    /// <see cref="NumericInputButton"/> VM
     /// </summary>
-    class NumericUpDownViewModel : BindableBase
+    public class NumericUpDownViewModel : BindableBase
     {
         /// <summary>
         /// IsOpenの瞬時値

@@ -34,7 +34,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._CsvFilePathList;
             set => this.SetProperty(ref this._CsvFilePathList, value);
         }
-        private ObservableCollection<string> _CsvFilePathList = new ObservableCollection<string>();
+        private ObservableCollection<string> _CsvFilePathList = [];
         #endregion
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
-        private BookComparisonViewModel _SelectedBookVM = new BookComparisonViewModel() { };
+        private BookComparisonViewModel _SelectedBookVM = new() { };
         #endregion
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace HouseholdAccountBook.ViewModels
             get => this._CsvComparisonVMList;
             set => this.SetProperty(ref this._CsvComparisonVMList, value);
         }
-        private ObservableCollection<CsvComparisonViewModel> _CsvComparisonVMList = new ObservableCollection<CsvComparisonViewModel>();
+        private ObservableCollection<CsvComparisonViewModel> _CsvComparisonVMList = [];
         #endregion
         /// <summary>
         /// CSV比較VMのチェック数
@@ -109,7 +109,7 @@ namespace HouseholdAccountBook.ViewModels
         /// 選択されたCSV比較VMリスト
         /// </summary>
         #region SelectedCsvComparisonVMList
-        public ObservableCollection<CsvComparisonViewModel> SelectedCsvComparisonVMList { get; } = new ObservableCollection<CsvComparisonViewModel>();
+        public ObservableCollection<CsvComparisonViewModel> SelectedCsvComparisonVMList { get; } = [];
         #endregion
         /// <summary>
         /// 選択されたCSV比較VMのチェック数

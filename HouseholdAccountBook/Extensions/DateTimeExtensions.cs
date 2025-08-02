@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,7 +19,7 @@ namespace HouseholdAccountBook.Extensions
         /// <summary>
         /// 国民の祝日リスト
         /// </summary>
-        private static readonly List<DateTime> holidayList = new List<DateTime>();
+        private static readonly List<DateTime> holidayList = [];
 
         /// <summary>
         /// 国民の祝日リストを取得する
@@ -27,21 +28,21 @@ namespace HouseholdAccountBook.Extensions
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            Uri uri = new Uri(settings.App_NationalHolidayCsv_Uri);
+            Uri uri = new(settings.App_NationalHolidayCsv_Uri);
 
-            CsvConfiguration csvConfig = new CsvConfiguration(System.Globalization.CultureInfo.CurrentCulture) {
+            CsvConfiguration csvConfig = new(System.Globalization.CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,
                 MissingFieldFound = (mffa) => { }
             };
 
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-            using (WebClient client = new WebClient()) {
-                Stream stream = await client.OpenReadTaskAsync(uri);
+            using (HttpClient client = new()) {
+                Stream stream = await client.GetStreamAsync(uri);
                 if (stream.CanRead) {
                     holidayList.Clear();
                     try {
                         // CSVファイルを読み込む
-                        using (CsvReader reader = new CsvReader(new StreamReader(stream, Encoding.GetEncoding("Shift_JIS")), csvConfig)) {
+                        using (CsvReader reader = new(new StreamReader(stream, Encoding.GetEncoding("shift_jis")), csvConfig)) {
                             while (reader.Read()) {
                                 if (reader.TryGetField(settings.App_NationalHolidayCsv_DateIndex, out string dateString)) {
                                     if (DateTime.TryParse(dateString, out DateTime dateTime)) {
@@ -51,7 +52,9 @@ namespace HouseholdAccountBook.Extensions
                             }
                         }
                     }
-                    catch (Exception) { }
+                    catch (Exception e) {
+                        Log.Error(e.Message);
+                    }
                 }
             }
         }
@@ -63,7 +66,7 @@ namespace HouseholdAccountBook.Extensions
         /// <returns>年始め</returns>
         public static DateTime GetFirstDateOfYear(this DateTime dateTime)
         {
-            DateTime ans = new DateTime(dateTime.Year, 1, 1);
+            DateTime ans = new(dateTime.Year, 1, 1);
             return ans;
         }
 
@@ -115,7 +118,7 @@ namespace HouseholdAccountBook.Extensions
         /// <returns>月始め</returns>
         public static DateTime GetFirstDateOfMonth(this DateTime dateTime)
         {
-            DateTime ans = new DateTime(dateTime.Year, dateTime.Month, 1);
+            DateTime ans = new(dateTime.Year, dateTime.Month, 1);
             return ans;
         }
 
@@ -139,7 +142,7 @@ namespace HouseholdAccountBook.Extensions
         public static DateTime GetDateInMonth(this DateTime dateTime, int day)
         {
             day = Math.Min(day, DateTime.DaysInMonth(dateTime.Year, dateTime.Month));
-            DateTime ans = new DateTime(dateTime.Year, dateTime.Month, day);
+            DateTime ans = new(dateTime.Year, dateTime.Month, day);
             return ans;
         }
 

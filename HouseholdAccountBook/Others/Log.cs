@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
 using static HouseholdAccountBook.Others.FileConstants;
 
 namespace HouseholdAccountBook
@@ -33,7 +32,7 @@ namespace HouseholdAccountBook
             if (listener == null) {
                 listener = new TextWriterTraceListener();
                 if (!Directory.Exists(LogFolderPath)) Directory.CreateDirectory(LogFolderPath);
-                TextWriter sw = new StreamWriter(LogFilePath, true, Encoding.GetEncoding("Shift_JIS"));
+                TextWriter sw = new StreamWriter(LogFilePath, true, Encoding.GetEncoding("utf-8"));
                 listener.Name = listenerName;
                 listener.Writer = sw;
                 listener.TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId | TraceOptions.ThreadId;
@@ -121,10 +120,10 @@ namespace HouseholdAccountBook
         {
             if (!Directory.Exists(LogFolderPath)) Directory.CreateDirectory(LogFolderPath);
 
-            int index = fileName.LastIndexOf("\\");
-            string className = fileName.Substring(index + 1, fileName.IndexOf(".", index + 1) - index - 1);
+            int index = fileName.LastIndexOf('\\');
+            string className = fileName.Substring(index + 1, fileName.IndexOf('.', index + 1) - index - 1);
 
-            Trace.WriteLine($"{DateTime.Now:yyyy-MM-dd hh:mm:ss.fff} [{Thread.CurrentThread.ManagedThreadId:000}] {type} {className}::{methodName}:{lineNumber} {message}");
+            Trace.WriteLine($"{DateTime.Now:yyyy-MM-dd hh:mm:ss.fff} [{Environment.CurrentManagedThreadId:000}] {type} {className}::{methodName}:{lineNumber} {message}");
         }
     }
 }

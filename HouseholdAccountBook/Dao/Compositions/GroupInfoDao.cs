@@ -9,14 +9,9 @@ namespace HouseholdAccountBook.Dao.Compositions
     /// <summary>
     /// グループ情報DAO
     /// </summary>
-    public class GroupInfoDao : ReadDaoBase
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class GroupInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler"></param>
-        public GroupInfoDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         /// <summary>
         /// <see cref="HstActionDto.ActionId"/>に基づいて、<see cref="GroupInfoDto"/> を取得する
         /// </summary>

@@ -5,7 +5,7 @@ using static HouseholdAccountBook.Others.FileConstants;
 
 namespace HouseholdAccountBook
 {
-    internal class ExceptionLog
+    public class ExceptionLog
     {
         public string RelatedFilePath { get; set; }
 
@@ -20,8 +20,8 @@ namespace HouseholdAccountBook
             // 例外情報をファイルに保存する
             this.RelatedFilePath = UnhandledExceptionInfoFilePath;
             string jsonCode = JsonConvert.SerializeObject(e, Formatting.Indented);
-            using (FileStream fs = new FileStream(this.RelatedFilePath, FileMode.Create)) {
-                using (StreamWriter sw = new StreamWriter(fs)) {
+            using (FileStream fs = new(this.RelatedFilePath, FileMode.Create)) {
+                using (StreamWriter sw = new(fs)) {
                     sw.WriteLine(jsonCode);
                 }
             }

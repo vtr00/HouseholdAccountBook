@@ -10,14 +10,9 @@ namespace HouseholdAccountBook.Dao.DbTable
     /// <summary>
     /// 店舗名テーブルDAO
     /// </summary>
-    public class HstShopDao : ReadWriteDaoBase<HstShopDto>
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class HstShopDao(DbHandlerBase dbHandler) : ReadWriteDaoBase<HstShopDto>(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public HstShopDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         /// <summary>
         /// 全レコードを取得する
         /// </summary>

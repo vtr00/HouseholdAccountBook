@@ -15,6 +15,5 @@ namespace HouseholdAccountBook.ViewModels
         }
         private string _DBFilePath = default;
         #endregion
-
     }
 }

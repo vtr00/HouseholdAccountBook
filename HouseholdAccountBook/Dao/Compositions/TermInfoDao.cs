@@ -8,14 +8,9 @@ namespace HouseholdAccountBook.Dao.Compositions
     /// <summary>
     /// 期間情報DAO
     /// </summary>
-    public class TermInfoDao : ReadDaoBase
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class TermInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public TermInfoDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         /// <summary>
         /// 全帳簿の <see cref="TermInfoDto"/> を取得する
         /// </summary>

@@ -9,14 +9,9 @@ namespace HouseholdAccountBook.Dao.Compositions
     /// <summary>
     /// 帳簿内分類取得DAO
     /// </summary>
-    public class MstCategoryWithinBookDao : ReadDaoBase
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class MstCategoryWithinBookDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public MstCategoryWithinBookDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         /// <summary>
         /// <see cref="RelBookItemDto.BookId"/> と <see cref="MstCategoryDto.BalanceKind"/> に基づいて、<see cref="MstCategoryDto"/> リストを取得します
         /// </summary>

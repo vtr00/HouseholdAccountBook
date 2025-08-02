@@ -16,21 +16,10 @@ namespace HouseholdAccountBook.Converters
             string param = parameter as string;
 
             if (value is int tmp) {
-                if (param == "abs") {
-                    return string.Format("{0:#,0}", Math.Abs(tmp));
-                }
-                else {
-                    return string.Format("{0:#,0}", tmp);
-                }
+                return string.Format("{0:#,0}", param == "abs" ? Math.Abs(tmp) : tmp);
             }
-
             if (value is double tmp2) {
-                if (param == "abs") {
-                    return string.Format("{0:#,0.###}", Math.Abs(tmp2));
-                }
-                else {
-                    return string.Format("{0:#,0.###}", tmp2);
-                }
+                return string.Format("{0:#,0.###}", param == "abs" ? Math.Abs(tmp2) : tmp2);
             }
 
             throw new NotImplementedException();

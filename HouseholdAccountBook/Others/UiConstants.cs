@@ -67,7 +67,7 @@ namespace HouseholdAccountBook.Others
         /// <summary>
         /// DB種別文字列
         /// </summary>
-        public static Dictionary<DBKind, string> DBKindStr => new Dictionary<DBKind, string>() {
+        public static Dictionary<DBKind, string> DBKindStr => new() {
             { DBKind.PostgreSQL,    "PostgreSQL" },
             { DBKind.Access,        "Access" },
             { DBKind.SQLite,        "SQLite" }
@@ -75,7 +75,7 @@ namespace HouseholdAccountBook.Others
         /// <summary>
         /// 帳簿種別文字列
         /// </summary>
-        public static Dictionary<BookKind, string> BookKindStr => new Dictionary<BookKind, string>() {
+        public static Dictionary<BookKind, string> BookKindStr => new() {
             { BookKind.Uncategorized,       Properties.Resources.BookKind_Uncategorized },
             { BookKind.Wallet,              Properties.Resources.BookKind_Wallet },
             { BookKind.BankAccount,         Properties.Resources.BookKind_BankAccount },
@@ -85,14 +85,14 @@ namespace HouseholdAccountBook.Others
         /// <summary>
         /// 収支種別文字列
         /// </summary>
-        public static Dictionary<BalanceKind, string> BalanceKindStr => new Dictionary<BalanceKind, string>() {
+        public static Dictionary<BalanceKind, string> BalanceKindStr => new() {
             { BalanceKind.Income,   Properties.Resources.BalanceKind_Income },
             { BalanceKind.Expenses, Properties.Resources.BalanceKind_Expenses }
         };
         /// <summary>
         /// 休日設定種別文字列
         /// </summary>
-        public static Dictionary<HolidaySettingKind, string> HolidaySettingKindStr => new Dictionary<HolidaySettingKind, string>() {
+        public static Dictionary<HolidaySettingKind, string> HolidaySettingKindStr => new() {
             { HolidaySettingKind.Nothing,       Properties.Resources.HolidaySettingKind_Nothing },
             { HolidaySettingKind.BeforeHoliday, Properties.Resources.HolidaySettingKind_BeforeHoliday },
             { HolidaySettingKind.AfterHoliday,  Properties.Resources.HolidaySettingKind_AfterHoliday }
@@ -100,28 +100,28 @@ namespace HouseholdAccountBook.Others
         /// <summary>
         /// 手数料種別文字列
         /// </summary>
-        public static Dictionary<CommissionKind, string> CommissionKindStr => new Dictionary<CommissionKind, string>() {
+        public static Dictionary<CommissionKind, string> CommissionKindStr => new() {
             { CommissionKind.MoveFrom,  Properties.Resources.CommissionKind_MoveFrom },
             { CommissionKind.MoveTo,    Properties.Resources.CommissionKind_MoveTo }
         };
         /// <summary>
         /// グラフ種別1文字列
         /// </summary>
-        public static Dictionary<GraphKind1, string> GraphKind1Str => new Dictionary<GraphKind1, string>() {
+        public static Dictionary<GraphKind1, string> GraphKind1Str => new() {
             { GraphKind1.IncomeAndExpensesGraph,    Properties.Resources.GraphKind1_IncomeAndExpensesGraph },
             { GraphKind1.BalanceGraph,              Properties.Resources.GraphKind1_BalanceGraph }
         };
         /// <summary>
         /// グラフ種別2文字列
         /// </summary>
-        public static Dictionary<GraphKind2, string> GraphKind2Str => new Dictionary<GraphKind2, string>() {
+        public static Dictionary<GraphKind2, string> GraphKind2Str => new() {
             { GraphKind2.CategoryGraph, Properties.Resources.GraphKind2_CategoryGraph },
             { GraphKind2.ItemGraph,     Properties.Resources.GraphKind2_ItemGraph }
         };
         /// <summary>
         /// 言語名文字列
         /// </summary>
-        public static Dictionary<string, string> CultureNameStr => new Dictionary<string, string>() {
+        public static Dictionary<string, string> CultureNameStr => new() {
             { "ja-JP",  Properties.Resources.CultureName_ja_JP },
             { "en-001", Properties.Resources.CultureName_en_001 }
         };

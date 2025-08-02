@@ -12,14 +12,9 @@ namespace HouseholdAccountBook.Dao.DbTable
     /// <summary>
     /// 帳簿テーブルDAO
     /// </summary>
-    public class MstBookDao : PrimaryKeyDaoBase<MstBookDto, int>
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class MstBookDao(DbHandlerBase dbHandler) : PrimaryKeyDaoBase<MstBookDto, int>(dbHandler)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        public MstBookDao(DbHandlerBase dbHandler) : base(dbHandler) { }
-
         public override async Task<IEnumerable<MstBookDto>> FindAllAsync()
         {
             var dtoList = await this.dbHandler.QueryAsync<MstBookDto>(@"

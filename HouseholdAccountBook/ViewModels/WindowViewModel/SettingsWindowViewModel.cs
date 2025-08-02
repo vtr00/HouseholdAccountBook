@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.UserEventArgs;
+﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.UserEventArgs;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -127,7 +128,7 @@ namespace HouseholdAccountBook.ViewModels
                 this.RaisePropertyChanged(nameof(this.BookVMList));
             }
         }
-        private readonly ObservableCollection<BookViewModel> _BookVMList = new ObservableCollection<BookViewModel>();
+        private readonly ObservableCollection<BookViewModel> _BookVMList = [];
         #endregion
         /// <summary>
         /// 選択された帳簿VM
@@ -196,7 +197,7 @@ namespace HouseholdAccountBook.ViewModels
         /// Accessプロバイダ名
         /// </summary>
         /// <remarks>動的に指定するため<see cref="ObservableCollection{T}"/>を用いる</remarks>
-        public ObservableCollection<KeyValuePair<string, string>> AccessProviderNameDic { get; } = new ObservableCollection<KeyValuePair<string, string>>();
+        public ObservableCollection<KeyValuePair<string, string>> AccessProviderNameDic { get; } = [];
         /// <summary>
         /// 選択されたAccessプロバイダ名
         /// </summary>
@@ -435,12 +436,11 @@ namespace HouseholdAccountBook.ViewModels
                     this.settings.Save();
 
                     // リソースを更新して他ウィンドウの項目の表示/非表示を切り替える
-                    App app = System.Windows.Application.Current as App;
-                    app.RegisterToResource();
+                    App.RegisterToResource();
                 }
             }
         }
-        private bool _DebugMode = default;
+        private bool _DebugMode;
         #endregion
         #endregion
         #endregion
@@ -464,14 +464,7 @@ namespace HouseholdAccountBook.ViewModels
             this.RestoreExePath = this.settings.App_Postgres_RestoreExePath;
 
             this.AccessProviderNameDic.Clear();
-            OleDbEnumerator enumerator = new OleDbEnumerator();
-            DataTable table = enumerator.GetElements();
-            foreach (DataRow row in table.Rows) {
-                string sourcesName = row["SOURCES_NAME"].ToString();
-                string sourcesDescription = row["SOURCES_DESCRIPTION"].ToString();
-
-                this.AccessProviderNameDic.Add(new KeyValuePair<string, string>(sourcesName, $"{sourcesName} ({sourcesDescription})"));
-            }
+            OleDbHandler.GetOleDbProvider().ForEach(this.AccessProviderNameDic.Add);
             this.SelectedAccessProviderName = this.settings.App_Access_Provider;
 
             this.SelectedCultureName = this.settings.App_CultureName;
@@ -498,7 +491,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public void LoadWindowSetting()
         {
-            ObservableCollection<WindowSettingViewModel> list = new ObservableCollection<WindowSettingViewModel>() {
+            ObservableCollection<WindowSettingViewModel> list = [
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_MainWindow,
                     Left = this.settings.MainWindow_Left, Top = this.settings.MainWindow_Top,
@@ -528,7 +521,7 @@ namespace HouseholdAccountBook.ViewModels
                     Left = this.settings.TermWindow_Left, Top = this.settings.TermWindow_Top,
                     Width = -1, Height = -1 }
 
-            };
+            ];
             this.WindowSettingVMList = list;
         }
     }

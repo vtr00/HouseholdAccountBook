@@ -4,6 +4,9 @@ using System.Collections.ObjectModel;
 
 namespace HouseholdAccountBook.ViewModels
 {
+    /// <summary>
+    /// OleDb設定VM
+    /// </summary>
     public class OleDbSettingViewModel : BindableBase
     {
         /// <summary>
@@ -15,11 +18,11 @@ namespace HouseholdAccountBook.ViewModels
         /// プロバイダ名
         /// </summary>
         /// <remarks>動的に指定するため<see cref="ObservableCollection{T}"/>を用いる</remarks>
-        public ObservableCollection<KeyValuePair<string, string>> ProviderNameDic { get; } = new ObservableCollection<KeyValuePair<string, string>>();
+        public ObservableCollection<KeyValuePair<string, string>> ProviderNameDic { get; } = [];
         /// <summary>
         /// 選択されたプロバイダ名
         /// </summary>
-        #region Provider
+        #region SelectedProviderName
         public string SelectedProviderName
         {
             get => this._SelectedProviderName;
