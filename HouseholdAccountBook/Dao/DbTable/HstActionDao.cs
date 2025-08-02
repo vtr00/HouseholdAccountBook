@@ -140,7 +140,7 @@ VALUES (@ActionId, @BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @
 
         public override async Task<int> InsertReturningIdAsync(HstActionDto dto)
         {
-            int actionId = await this.dbHandler.ExecuteAsync(@"
+            int actionId = await this.dbHandler.QuerySingleAsync<int>(@"
 INSERT INTO hst_action
 (book_id, item_id, act_time, act_value, shop_name, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @Remark, @DelFlg, 'now', @Updater, 'now', @Inserter)
