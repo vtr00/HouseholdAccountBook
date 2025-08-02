@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -24,8 +25,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using static HouseholdAccountBook.Others.DbConstants;
 using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
+using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -58,6 +59,10 @@ namespace HouseholdAccountBook.Windows
         /// 帳簿変更時のイベント
         /// </summary>
         public event EventHandler<EventArgs<int?>> BookChanged;
+        /// <summary>
+        /// ウィンドウ非表示時のイベント
+        /// </summary>
+        public event EventHandler Hided;
         #endregion
 
         /// <summary>
@@ -227,7 +232,10 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void ExitWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.Close();
+            this.Hide();
+            this.Hided?.Invoke(sender, e);
+
+            this.SaveWindowSetting();
         }
         #endregion
 
@@ -468,12 +476,31 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
+        /// ウィンドウ表示状態変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void CsvComparisonWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            bool oldValue = (bool)e.OldValue;
+            bool newValue = (bool)e.NewValue;
+            if (!oldValue && newValue) {
+                await this.UpdateComparisonVMListAsync();
+            }
+        }
+
+        /// <summary>
         /// ウィンドウ終了時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void CsvComparisonWindow_Closed(object sender, EventArgs e)
+        private void CsvComparisonWindow_Closing(object sender, CancelEventArgs e)
         {
+            e.Cancel = true;
+
+            this.Hide();
+            this.Hided?.Invoke(sender, e);
+
             this.SaveWindowSetting();
         }
         #endregion

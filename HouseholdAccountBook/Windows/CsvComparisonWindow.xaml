@@ -12,7 +12,8 @@
         Title="{x:Static properties:Resources.Title_CsvComparisonWindow}"
         Height="450" Width="600" WindowStyle="ToolWindow"
         Loaded="CsvComparisonWindow_Loaded" 
-        Closed="CsvComparisonWindow_Closed">
+        IsVisibleChanged="CsvComparisonWindow_IsVisibleChanged"
+        Closing="CsvComparisonWindow_Closing">
     <Window.DataContext>
         <viewmodels:CsvComparisonWindowViewModel x:Name="WVM"/>
     </Window.DataContext>

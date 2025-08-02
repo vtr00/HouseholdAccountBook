@@ -76,7 +76,7 @@ namespace HouseholdAccountBook.Windows
         /// <summary>
         /// 子ウィンドウを開いているか
         /// </summary>
-        private bool ChildrenWindowOpened => this.mrw != null || this.arw != null || this.alrw != null || this.ccw != null;
+        private bool ChildrenWindowOpened => this.mrw != null || this.arw != null || this.alrw != null || (this.ccw != null && this.ccw.IsVisible);
         /// <summary>
         /// 登録ウィンドウを開いているか
         /// </summary>
@@ -1407,36 +1407,38 @@ namespace HouseholdAccountBook.Windows
         {
             Log.Info();
 
-            this.ccw = new CsvComparisonWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id) { Owner = this };
-            this.ccw.LoadWindowSetting();
+            if (this.ccw is null) {
+                this.ccw = new CsvComparisonWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id) { Owner = this };
+                this.ccw.LoadWindowSetting();
 
-            // 帳簿項目の一致フラグ変更時のイベントを登録する
-            this.ccw.IsMatchChanged += (sender2, e2) => {
-                ActionViewModel vm = this.WVM.ActionVMList.FirstOrDefault((tmpVM) => { return tmpVM.ActionId == e2.Value1; });
-                if (vm != null) {
-                    // UI上の表記だけを更新する
-                    vm.IsMatch = e2.Value2;
-                }
-            };
-            // 帳簿項目変更時のイベントを登録する
-            this.ccw.ActionChanged += async (sender3, e3) => {
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                    // 帳簿一覧タブを更新する
-                    await this.UpdateBookTabDataAsync(isScroll: false, isUpdateActDateLastEdited: true);
-                }
-            };
-            // 帳簿変更時のイベントを登録する
-            this.ccw.BookChanged += (sender4, e4) => {
-                var selectedVM = this.WVM.BookVMList.FirstOrDefault((vm) => { return vm.Id == e4.Value; });
-                if (selectedVM != null) {
-                    this.WVM.SelectedBookVM = selectedVM;
-                }
-            };
-            // クローズ時イベントを登録する
-            this.ccw.Closed += (sender5, e5) => {
-                this.ccw = null;
-                this.Activate();
-            };
+                // 帳簿項目の一致フラグ変更時のイベントを登録する
+                this.ccw.IsMatchChanged += (sender2, e2) => {
+                    ActionViewModel vm = this.WVM.ActionVMList.FirstOrDefault((tmpVM) => { return tmpVM.ActionId == e2.Value1; });
+                    if (vm != null) {
+                        // UI上の表記だけを更新する
+                        vm.IsMatch = e2.Value2;
+                    }
+                };
+                // 帳簿項目変更時のイベントを登録する
+                this.ccw.ActionChanged += async (sender3, e3) => {
+                    using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                        // 帳簿一覧タブを更新する
+                        await this.UpdateBookTabDataAsync(isScroll: false, isUpdateActDateLastEdited: true);
+                    }
+                };
+                // 帳簿変更時のイベントを登録する
+                this.ccw.BookChanged += (sender4, e4) => {
+                    var selectedVM = this.WVM.BookVMList.FirstOrDefault((vm) => { return vm.Id == e4.Value; });
+                    if (selectedVM != null) {
+                        this.WVM.SelectedBookVM = selectedVM;
+                    }
+                };
+                // ウィンドウ非表示時イベントを登録する
+                this.ccw.Hided += (sender5, e5) => {
+                    this.Activate();
+                };
+            }
+
             this.ccw.Show();
         }
         #endregion
@@ -2243,7 +2245,6 @@ namespace HouseholdAccountBook.Windows
 
             Settings settings = Settings.Default;
             DateTime startTime = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).AddYears(-9);
-            DateTime endTime = startTime.AddYears(10);
 
             // 開始日までの収支を取得する
             int balance = 0;
