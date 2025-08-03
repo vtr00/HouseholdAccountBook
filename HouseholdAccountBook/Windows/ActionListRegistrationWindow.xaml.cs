@@ -16,9 +16,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 using static HouseholdAccountBook.Others.DbConstants;
 using static HouseholdAccountBook.Others.LogicConstants;
-using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -175,7 +175,7 @@ namespace HouseholdAccountBook.Windows
                 this.DialogResult = true;
             }
             catch (InvalidOperationException) { }
-            
+
             this.Close();
         }
 
@@ -260,8 +260,8 @@ namespace HouseholdAccountBook.Windows
 
             // 外れたフォーカスを元に戻す
             this.lastDataGridCell.IsEditing = true; // セルを編集モードにする - 画面がちらつくがやむを得ない？
-            textBox.Focus();
-            this.lastDataGridCell.Focus(); // Enterキーでの入力完了を有効にする
+            _ = textBox.Focus();
+            _ = this.lastDataGridCell.Focus(); // Enterキーでの入力完了を有効にする
             //Keyboard.Focus(textBox); // キーでの数値入力を有効にする - 意図した動作にならない
 
             e.Handled = true;
@@ -381,7 +381,7 @@ namespace HouseholdAccountBook.Windows
             DataGrid dataGrid = sender as DataGrid;
 
             if (dataGrid.SelectedIndex != -1) {
-                dataGrid.BeginEdit();
+                _ = dataGrid.BeginEdit();
             }
         }
 
@@ -738,7 +738,6 @@ namespace HouseholdAccountBook.Windows
                     }
                 }
 
-
                 if (shopName != string.Empty) {
                     // 店舗を追加する
                     HstShopDao hstShopDao = new(dbHandler);
@@ -776,7 +775,7 @@ namespace HouseholdAccountBook.Windows
                 this.Height = settings.ActionListRegistrationWindow_Height;
             }
 
-            if (settings.App_IsPositionSaved && (-10 <= settings.ActionListRegistrationWindow_Left && 0 <= settings.ActionListRegistrationWindow_Top)) {
+            if (settings.App_IsPositionSaved && -10 <= settings.ActionListRegistrationWindow_Left && 0 <= settings.ActionListRegistrationWindow_Top) {
                 this.Left = settings.ActionListRegistrationWindow_Left;
                 this.Top = settings.ActionListRegistrationWindow_Top;
             }

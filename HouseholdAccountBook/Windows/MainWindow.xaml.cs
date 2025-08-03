@@ -293,10 +293,10 @@ namespace HouseholdAccountBook.Windows
             }
 
             if (isOpen) {
-                MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                _ = MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
 
@@ -379,10 +379,10 @@ namespace HouseholdAccountBook.Windows
             }
 
             if (exitCode == 0) {
-                MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                _ = MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
 
@@ -436,10 +436,10 @@ namespace HouseholdAccountBook.Windows
             }
 
             if (exitCode == 0) {
-                MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                _ = MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                _ = MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
 
@@ -493,10 +493,10 @@ namespace HouseholdAccountBook.Windows
             }
 
             if (exitCode == 0) {
-                MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                _ = MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                _ = MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
 
@@ -526,10 +526,10 @@ namespace HouseholdAccountBook.Windows
             }
 
             if (result) {
-                MessageBox.Show(Properties.Resources.Message_FinishToBackup, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                _ = MessageBox.Show(Properties.Resources.Message_FinishToBackup, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
             else {
-                MessageBox.Show(Properties.Resources.Message_FoultToBackup, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                _ = MessageBox.Show(Properties.Resources.Message_FoultToBackup, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
             }
         }
 
@@ -646,8 +646,8 @@ namespace HouseholdAccountBook.Windows
             // クローズ時イベントを登録する
             this.mrw.Closed += (sender3, e3) => {
                 this.mrw = null;
-                this.Activate();
-                this.actionDataGrid.Focus();
+                _ = this.Activate();
+                _ = this.actionDataGrid.Focus();
             };
             this.mrw.Show();
         }
@@ -684,8 +684,8 @@ namespace HouseholdAccountBook.Windows
             // クローズ時イベントを登録する
             this.arw.Closed += (sender3, e3) => {
                 this.arw = null;
-                this.Activate();
-                this.actionDataGrid.Focus();
+                _ = this.Activate();
+                _ = this.actionDataGrid.Focus();
             };
             this.arw.Show();
         }
@@ -722,8 +722,8 @@ namespace HouseholdAccountBook.Windows
             // クローズ時イベントを登録する
             this.alrw.Closed += (sender3, e3) => {
                 this.alrw = null;
-                this.Activate();
-                this.actionDataGrid.Focus();
+                _ = this.Activate();
+                _ = this.actionDataGrid.Focus();
             };
             this.alrw.Show();
         }
@@ -771,8 +771,8 @@ namespace HouseholdAccountBook.Windows
                     // クローズ時イベントを登録する
                     this.mrw.Closed += (sender3, e3) => {
                         this.mrw = null;
-                        this.Activate();
-                        this.actionDataGrid.Focus();
+                        _ = this.Activate();
+                        _ = this.actionDataGrid.Focus();
                     };
                     this.mrw.Show();
                     break;
@@ -789,8 +789,8 @@ namespace HouseholdAccountBook.Windows
                     // クローズ時イベントを登録する
                     this.alrw.Closed += (sender3, e3) => {
                         this.alrw = null;
-                        this.Activate();
-                        this.actionDataGrid.Focus();
+                        _ = this.Activate();
+                        _ = this.actionDataGrid.Focus();
                     };
                     this.alrw.Show();
                     break;
@@ -808,8 +808,8 @@ namespace HouseholdAccountBook.Windows
 
                     this.arw.Closed += (sender3, e3) => {
                         this.arw = null;
-                        this.Activate();
-                        this.actionDataGrid.Focus();
+                        _ = this.Activate();
+                        _ = this.actionDataGrid.Focus();
                     };
                     this.arw.Show();
                     break;
@@ -857,8 +857,8 @@ namespace HouseholdAccountBook.Windows
                 };
                 this.arw.Closed += (sender3, e3) => {
                     this.arw = null;
-                    this.Activate();
-                    this.actionDataGrid.Focus();
+                    _ = this.Activate();
+                    _ = this.actionDataGrid.Focus();
                 };
                 this.arw.Show();
             }
@@ -874,8 +874,8 @@ namespace HouseholdAccountBook.Windows
                 };
                 this.mrw.Closed += (sender3, e3) => {
                     this.mrw = null;
-                    this.Activate();
-                    this.actionDataGrid.Focus();
+                    _ = this.Activate();
+                    _ = this.actionDataGrid.Focus();
                 };
                 this.mrw.Show();
             }
@@ -902,7 +902,7 @@ namespace HouseholdAccountBook.Windows
         {
             Log.Info();
 
-            if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Conformation, 
+            if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                     await dbHandler.ExecTransactionAsync(async () => {
@@ -927,15 +927,15 @@ namespace HouseholdAccountBook.Windows
 
                             switch (groupKind) {
                                 case (int)GroupKind.Move: {
-                                        // 移動の場合、削除項目と同じグループIDを持つ帳簿項目を削除する
-                                        _ = await hstActionDao.DeleteByGroupIdAsync(groupId.Value);
-                                    }
-                                    break;
+                                    // 移動の場合、削除項目と同じグループIDを持つ帳簿項目を削除する
+                                    _ = await hstActionDao.DeleteByGroupIdAsync(groupId.Value);
+                                }
+                                break;
                                 case (int)GroupKind.Repeat: {
-                                        // 繰返しの場合、削除項目の日時以降の同じグループIDを持つ帳簿項目を削除する
-                                        _ = await hstActionDao.DeleteInGroupAfterDateByIdAsync(actionId, false);
-                                    }
-                                    break;
+                                    // 繰返しの場合、削除項目の日時以降の同じグループIDを持つ帳簿項目を削除する
+                                    _ = await hstActionDao.DeleteInGroupAfterDateByIdAsync(actionId, false);
+                                }
+                                break;
                             }
 
                             // 削除対象と同じグループIDを持つ帳簿項目が1つだけの場合にグループIDをクリアする(移動以外の場合に該当する)
@@ -1219,10 +1219,10 @@ namespace HouseholdAccountBook.Windows
             TermWindow stw = null;
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
-                    stw = new TermWindow(dbHandlerFactory, this.WVM.DisplayedMonth.Value) { Owner = this };
+                    stw = new TermWindow(this.dbHandlerFactory, this.WVM.DisplayedMonth.Value) { Owner = this };
                     break;
                 case TermKind.Selected:
-                    stw = new TermWindow(dbHandlerFactory, this.WVM.StartDate, this.WVM.EndDate) { Owner = this };
+                    stw = new TermWindow(this.dbHandlerFactory, this.WVM.StartDate, this.WVM.EndDate) { Owner = this };
                     break;
             }
             stw.LoadWindowSetting();
@@ -1386,7 +1386,7 @@ namespace HouseholdAccountBook.Windows
         {
             e.CanExecute = this.WVM.SelectedTab == Tabs.BooksTab;
         }
-        
+
         /// <summary>
         /// CSV比較可能か
         /// </summary>
@@ -1435,7 +1435,7 @@ namespace HouseholdAccountBook.Windows
                 };
                 // ウィンドウ非表示時イベントを登録する
                 this.ccw.Hided += (sender5, e5) => {
-                    this.Activate();
+                    _ = this.Activate();
                 };
             }
 
@@ -1456,7 +1456,7 @@ namespace HouseholdAccountBook.Windows
             VersionWindow vw = new() { Owner = this };
             vw.MoveOwnersCenter();
 
-            vw.ShowDialog();
+            _ = vw.ShowDialog();
         }
         #endregion
 
@@ -1546,16 +1546,16 @@ namespace HouseholdAccountBook.Windows
         /// <param name="func">ウィンドウのサイズと位置を変更する関数</param>
         private bool ChangedLocationOrSizeWrapper(Func<bool> func)
         {
-            if (wrapperCount == 0) {
+            if (this.wrapperCount == 0) {
                 this.SizeChanged -= this.MainWindow_SizeChanged;
                 this.LocationChanged -= this.MainWindow_LocationChanged;
             }
-            wrapperCount++;
+            this.wrapperCount++;
 
             bool ret = func.Invoke();
 
-            wrapperCount--;
-            if (wrapperCount == 0) {
+            this.wrapperCount--;
+            if (this.wrapperCount == 0) {
                 this.SizeChanged += this.MainWindow_SizeChanged;
                 this.LocationChanged += this.MainWindow_LocationChanged;
             }
@@ -1634,7 +1634,7 @@ namespace HouseholdAccountBook.Windows
 
             if (settings.App_BackUpFlagAtClosing) {
                 // 通知しても即座に終了するため通知しない
-                await this.CreateBackUpFileAsync();
+                _ = await this.CreateBackUpFileAsync();
             }
         }
 
@@ -1677,7 +1677,7 @@ namespace HouseholdAccountBook.Windows
             }
 
             this.windowLog.Log("WindowStateChanged", true);
-            this.ModifyLocationOrSize();
+            _ = this.ModifyLocationOrSize();
         }
 
         /// <summary>
@@ -1688,7 +1688,7 @@ namespace HouseholdAccountBook.Windows
         private void MainWindow_LocationChanged(object sender, EventArgs e)
         {
             this.windowLog.Log("WindowLocationChanged", true);
-            this.ModifyLocationOrSize();
+            _ = this.ModifyLocationOrSize();
         }
 
         /// <summary>
@@ -1699,7 +1699,7 @@ namespace HouseholdAccountBook.Windows
         private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             this.windowLog.Log("WindowSizeChanged", true);
-            this.ModifyLocationOrSize();
+            _ = this.ModifyLocationOrSize();
         }
         #endregion
 
@@ -1717,7 +1717,7 @@ namespace HouseholdAccountBook.Windows
             if (e.MouseDevice.DirectlyOver is FrameworkElement fe) {
                 if (fe.Parent is DataGridCell cell) {
                     int col = cell.Column.DisplayIndex;
-                    
+
                     if (1 <= col && col <= 12) {
                         // 選択された月の帳簿タブを開く
                         Log.Info($"{this.WVM.DisplayedYear:yyyy-MM-dd} + month:{col - 1}");
@@ -1976,7 +1976,7 @@ namespace HouseholdAccountBook.Windows
                     ? await summaryInfoDao.FindAllWithinTerm(startTime, endTime)
                     : await summaryInfoDao.FindByBookIdWithinTerm(bookId.Value, startTime, endTime);
 
-                foreach(SummaryInfoDto dto in dtoList) {
+                foreach (SummaryInfoDto dto in dtoList) {
                     int balanceKind = dto.BalanceKind;
                     int categoryId = dto.CategoryId;
                     string categoryName = dto.CategoryName;
@@ -2197,7 +2197,7 @@ namespace HouseholdAccountBook.Windows
             }
 
             // 最初以外の月の分を取得する
-            int monthes = (endTime.Year * 12 + endTime.Month) - (startTime.Year * 12 + startTime.Month - 1);
+            int monthes = (endTime.Year * 12) + endTime.Month - ((startTime.Year * 12) + startTime.Month - 1);
             for (int i = 1; i < monthes; ++i) {
                 tmpStartTime = tmpStartTime.AddMonths(1);
                 tmpEndTime = tmpStartTime.GetLastDateOfMonth();
@@ -2334,7 +2334,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="itemId">選択対象の項目ID</param>
         /// <param name="isScroll">帳簿項目一覧をスクロールするか</param>
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
-        private async Task UpdateBookTabDataAsync(List<int> actionIdList = null, int? balanceKind = null, int? categoryId = null, int? itemId = null, 
+        private async Task UpdateBookTabDataAsync(List<int> actionIdList = null, int? balanceKind = null, int? categoryId = null, int? itemId = null,
                                                   bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
             if (this.WVM.SelectedTab != Tabs.BooksTab) return;
@@ -2372,7 +2372,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this.WVM.ActionVMList.Where((vm) => tmpActionIdList.Contains(vm.ActionId)));
 
             // サマリーを選択する
-            this.WVM.SelectedSummaryVM = this.WVM.SummaryVMList.FirstOrDefault((vm) => (vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
+            this.WVM.SelectedSummaryVM = this.WVM.SummaryVMList.FirstOrDefault((vm) => vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId);
 
             if (isScroll) {
                 if (this.WVM.DisplayedTermKind == TermKind.Monthly &&
@@ -2510,10 +2510,10 @@ namespace HouseholdAccountBook.Windows
                     // グラフ表示データを設定用に絞り込む
                     switch (this.WVM.SelectedGraphKind2) {
                         case GraphKind2.CategoryGraph:
-                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => (vm.CategoryId != -1 && vm.ItemId == -1) ));
+                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => vm.CategoryId != -1 && vm.ItemId == -1));
                             break;
                         case GraphKind2.ItemGraph:
-                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => (vm.ItemId != -1) ));
+                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => vm.ItemId != -1));
                             break;
                     }
                     this.WVM.DailyGraphSeriesVMList = tmpVMList;
@@ -2542,7 +2542,7 @@ namespace HouseholdAccountBook.Windows
                             if (e.Value == null) return;
 
                             GraphDatumViewModel datumVM = e.Value.Item as GraphDatumViewModel;
-                            this.WVM.SelectedDailyGraphSeriesVM = this.WVM.DailyGraphSeriesVMList.FirstOrDefault((tmp) => (tmp.CategoryId == datumVM.CategoryId && tmp.ItemId == datumVM.ItemId));
+                            this.WVM.SelectedDailyGraphSeriesVM = this.WVM.DailyGraphSeriesVMList.FirstOrDefault((tmp) => tmp.CategoryId == datumVM.CategoryId && tmp.ItemId == datumVM.ItemId);
                         };
 
                         this.WVM.DailyGraphPlotModel.Series.Add(wholeSeries);
@@ -2599,7 +2599,7 @@ namespace HouseholdAccountBook.Windows
             }
             this.WVM.DailyGraphPlotModel.InvalidatePlot(true);
 
-            this.WVM.SelectedDailyGraphSeriesVM = this.WVM.DailyGraphSeriesVMList.FirstOrDefault((vm) => (vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
+            this.WVM.SelectedDailyGraphSeriesVM = this.WVM.DailyGraphSeriesVMList.FirstOrDefault((vm) => vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId);
         }
 
         /// <summary>
@@ -2671,7 +2671,7 @@ namespace HouseholdAccountBook.Windows
 
             this.WVM.MonthlySeriesVMList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedYear);
 
-            this.WVM.SelectedMonthlySeriesVM = this.WVM.MonthlySeriesVMList.FirstOrDefault((vm) => (vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
+            this.WVM.SelectedMonthlySeriesVM = this.WVM.MonthlySeriesVMList.FirstOrDefault((vm) => vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId);
         }
         #endregion
 
@@ -2700,7 +2700,7 @@ namespace HouseholdAccountBook.Windows
             horizontalAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する月の文字列を作成する
             for (int i = startMonth; i < startMonth + 12; ++i) {
-                horizontalAxis1.Labels.Add($"{(i - 1) % 12 + 1}");
+                horizontalAxis1.Labels.Add($"{((i - 1) % 12) + 1}");
             }
             this.WVM.MonthlyGraphPlotModel.Axes.Add(horizontalAxis1);
 
@@ -2732,7 +2732,7 @@ namespace HouseholdAccountBook.Windows
             horizontalAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する月の文字列を作成する
             for (int i = startMonth; i < startMonth + 12; ++i) {
-                horizontalAxis2.Labels.Add($"{(i - 1) % 12 + 1}");
+                horizontalAxis2.Labels.Add($"{((i - 1) % 12) + 1}");
             }
             this.WVM.SelectedMonthlyGraphPlotModel.Axes.Add(horizontalAxis2);
 
@@ -2780,10 +2780,10 @@ namespace HouseholdAccountBook.Windows
                     // グラフ表示データを設定用に絞り込む
                     switch (this.WVM.SelectedGraphKind2) {
                         case GraphKind2.CategoryGraph:
-                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => (vm.CategoryId != -1 && vm.ItemId == -1)));
+                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => vm.CategoryId != -1 && vm.ItemId == -1));
                             break;
                         case GraphKind2.ItemGraph:
-                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => (vm.ItemId != -1)));
+                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => vm.ItemId != -1));
                             break;
                     }
                     this.WVM.MonthlyGraphSeriesVMList = tmpVMList;
@@ -2810,7 +2810,7 @@ namespace HouseholdAccountBook.Windows
                             if (e.Value == null) return;
 
                             GraphDatumViewModel datumVM = e.Value.Item as GraphDatumViewModel;
-                            this.WVM.SelectedMonthlyGraphSeriesVM = this.WVM.MonthlyGraphSeriesVMList.FirstOrDefault((tmp) => (tmp.CategoryId == datumVM.CategoryId && tmp.ItemId == datumVM.ItemId));
+                            this.WVM.SelectedMonthlyGraphSeriesVM = this.WVM.MonthlyGraphSeriesVMList.FirstOrDefault((tmp) => tmp.CategoryId == datumVM.CategoryId && tmp.ItemId == datumVM.ItemId);
                         };
                         this.WVM.MonthlyGraphPlotModel.Series.Add(wholeSeries);
 
@@ -2857,9 +2857,9 @@ namespace HouseholdAccountBook.Windows
             }
             this.WVM.MonthlyGraphPlotModel.InvalidatePlot(true);
 
-            this.WVM.SelectedMonthlyGraphSeriesVM = this.WVM.MonthlyGraphSeriesVMList.FirstOrDefault((vm) => (vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
+            this.WVM.SelectedMonthlyGraphSeriesVM = this.WVM.MonthlyGraphSeriesVMList.FirstOrDefault((vm) => vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId);
         }
-        
+
         /// <summary>
         /// 選択項目月別グラフを更新する
         /// </summary>
@@ -2929,7 +2929,7 @@ namespace HouseholdAccountBook.Windows
             Log.Info($"tmpBalanceKind:{tmpBalanceKind} tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
 
             this.WVM.YearlySeriesVMList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM?.Id);
-            this.WVM.SelectedYearlySeriesVM = this.WVM.YearlySeriesVMList.FirstOrDefault((vm) => (vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
+            this.WVM.SelectedYearlySeriesVM = this.WVM.YearlySeriesVMList.FirstOrDefault((vm) => vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId);
         }
         #endregion
 
@@ -3037,10 +3037,10 @@ namespace HouseholdAccountBook.Windows
                     // グラフ表示データを設定用に絞り込む
                     switch (this.WVM.SelectedGraphKind2) {
                         case GraphKind2.CategoryGraph:
-                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => (vm.CategoryId != -1 && vm.ItemId == -1)));
+                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => vm.CategoryId != -1 && vm.ItemId == -1));
                             break;
                         case GraphKind2.ItemGraph:
-                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => (vm.ItemId != -1)));
+                            tmpVMList = new ObservableCollection<SeriesViewModel>(tmpVMList.Where((vm) => vm.ItemId != -1));
                             break;
                     }
                     this.WVM.YearlyGraphSeriesVMList = tmpVMList;
@@ -3067,7 +3067,7 @@ namespace HouseholdAccountBook.Windows
                             if (e.Value == null) return;
 
                             GraphDatumViewModel datumVM = e.Value.Item as GraphDatumViewModel;
-                            this.WVM.SelectedYearlyGraphSeriesVM = this.WVM.YearlyGraphSeriesVMList.FirstOrDefault((tmp) => (tmp.CategoryId == datumVM.CategoryId && tmp.ItemId == datumVM.ItemId));
+                            this.WVM.SelectedYearlyGraphSeriesVM = this.WVM.YearlyGraphSeriesVMList.FirstOrDefault((tmp) => tmp.CategoryId == datumVM.CategoryId && tmp.ItemId == datumVM.ItemId);
                         };
                         this.WVM.YearlyGraphPlotModel.Series.Add(wholeSeries);
 
@@ -3114,9 +3114,9 @@ namespace HouseholdAccountBook.Windows
             }
             this.WVM.YearlyGraphPlotModel.InvalidatePlot(true);
 
-            this.WVM.SelectedYearlyGraphSeriesVM = this.WVM.YearlyGraphSeriesVMList.FirstOrDefault((vm) => (vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
+            this.WVM.SelectedYearlyGraphSeriesVM = this.WVM.YearlyGraphSeriesVMList.FirstOrDefault((vm) => vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId);
         }
-        
+
         /// <summary>
         /// 選択項目年別グラフを更新する
         /// </summary>
@@ -3217,7 +3217,7 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         public void LoadWindowSetting()
         {
-            this.ChangedLocationOrSizeWrapper(() => {
+            _ = this.ChangedLocationOrSizeWrapper(() => {
                 Properties.Settings settings = Properties.Settings.Default;
                 settings.App_InitSizeFlag = false;
                 settings.Save();
@@ -3235,7 +3235,7 @@ namespace HouseholdAccountBook.Windows
                 }
 
                 this.windowLog.Log("SettingLoaded", true);
-                this.ModifyLocationOrSize();
+                _ = this.ModifyLocationOrSize();
 
                 return true;
             });
@@ -3415,7 +3415,7 @@ namespace HouseholdAccountBook.Windows
                 if (tmpBackUpFolderPath != string.Empty) {
                     // フォルダが存在しなければ作成する
                     if (!Directory.Exists(tmpBackUpFolderPath)) {
-                        Directory.CreateDirectory(tmpBackUpFolderPath);
+                        _ = Directory.CreateDirectory(tmpBackUpFolderPath);
                     }
 
                     if (settings.App_Postgres_DumpExePath != string.Empty) {
@@ -3447,7 +3447,7 @@ namespace HouseholdAccountBook.Windows
             int? result = -1;
             using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                 if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
-                    result = notifyResult 
+                    result = notifyResult
                         ? await npgsqlDbHandler.ExecuteDump(backupFilePath, settings.App_Postgres_DumpExePath, (PostgresPasswordInput)settings.App_Postgres_Password_Input, format,
                             (exitCode) => {
                                 // ダンプ結果を通知する

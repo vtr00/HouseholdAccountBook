@@ -285,7 +285,7 @@ namespace HouseholdAccountBook
             App.ReleaseMutex();
             Log.Close();
 
-            Process.Start(targetExe);
+            _ = Process.Start(targetExe);
 
             this.Shutdown();
         }

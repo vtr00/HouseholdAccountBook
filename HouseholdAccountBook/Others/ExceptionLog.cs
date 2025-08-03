@@ -14,7 +14,7 @@ namespace HouseholdAccountBook
         public void Log(Exception e)
         {
             if (!Directory.Exists(UnhandledExceptionInfoFolderPath)) {
-                Directory.CreateDirectory(UnhandledExceptionInfoFolderPath);
+                _ = Directory.CreateDirectory(UnhandledExceptionInfoFolderPath);
             }
 
             // 例外情報をファイルに保存する

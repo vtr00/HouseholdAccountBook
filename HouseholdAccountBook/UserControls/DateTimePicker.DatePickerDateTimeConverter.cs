@@ -37,7 +37,7 @@ namespace HouseholdAccountBook.UserControls
             /// <returns></returns>
             public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             {
-                var tupleParam = ((Tuple<DateTimePicker, string>)parameter);
+                var tupleParam = (Tuple<DateTimePicker, string>)parameter;
                 var dateStr = (string)value;
                 return StringToDateTime(tupleParam.Item1, tupleParam.Item2, dateStr);
             }

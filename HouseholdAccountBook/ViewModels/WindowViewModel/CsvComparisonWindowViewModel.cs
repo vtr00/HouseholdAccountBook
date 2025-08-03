@@ -93,7 +93,7 @@ namespace HouseholdAccountBook.ViewModels
         #region AllSumValue
         public int AllSumValue => this.CsvComparisonVMList.Sum((vm) => vm.Record.Value);
         #endregion
-        
+
         /// <summary>
         /// 選択されたCSV比較VM(先頭)
         /// </summary>

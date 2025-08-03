@@ -120,7 +120,7 @@ new HstActionDto { BookId = bookId, ItemId = itemId });
 
         public override async Task SetIdSequenceAsync(int idSeq)
         {
-            await this.dbHandler.ExecuteAsync(@"SELECT setval('hst_action_action_id_seq', @ActionIdSeq);", new { ActionIdSeq = idSeq });
+            _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('hst_action_action_id_seq', @ActionIdSeq);", new { ActionIdSeq = idSeq });
         }
 
         public override async Task<int> InsertAsync(HstActionDto dto)
@@ -152,7 +152,6 @@ RETURNING action_id;", dto);
         /// <returns>帳簿項目ID</returns>
         public async Task<int> InsertMoveActionReturningIdAsync(HstActionDto dto, int balanceKind)
         {
-            
             int actionId = await this.dbHandler.QuerySingleAsync<int>(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@BookId, (

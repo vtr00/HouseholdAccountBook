@@ -74,7 +74,7 @@ namespace HouseholdAccountBook
                 _ => "---",
             };
             /// ディレクトリ生成
-            if (!Directory.Exists(WindowLocationFolderPath)) Directory.CreateDirectory(WindowLocationFolderPath);
+            if (!Directory.Exists(WindowLocationFolderPath)) _ = Directory.CreateDirectory(WindowLocationFolderPath);
 
             using (FileStream fs = new(WindowLocationFilePath(this.window.Name), FileMode.Append)) {
                 using (StreamWriter sw = new(fs)) {

@@ -14,9 +14,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 using static HouseholdAccountBook.Others.DbConstants;
 using static HouseholdAccountBook.Others.LogicConstants;
-using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -260,7 +260,7 @@ namespace HouseholdAccountBook.Windows
                         this.WVM.GroupId = this.selectedGroupId;
                         this.WVM.CommissionId = this.commissionActionId;
                     }
-                    this.WVM.IsLink = (fromDate == toDate);
+                    this.WVM.IsLink = fromDate == toDate;
                     this.WVM.FromDate = fromDate;
                     this.WVM.ToDate = toDate;
                     this.WVM.SelectedCommissionKind = commissionKind;
@@ -322,7 +322,7 @@ namespace HouseholdAccountBook.Windows
                                 }
                             }
                             break;
-                        };
+                        }
                     }
                     if (toBookVM == null || toBookId == vm.Id) {
                         toBookVM = vm;
@@ -347,8 +347,7 @@ namespace HouseholdAccountBook.Windows
                     this.WVM.SelectedCommissionKind = CommissionKind.MoveFrom;
                 }
                 break;
-            };
-
+            }
         }
 
         /// <summary>
@@ -622,7 +621,7 @@ namespace HouseholdAccountBook.Windows
                 this.Height = settings.MoveRegistrationWindow_Height;
             }
 
-            if (settings.App_IsPositionSaved && (-10 <= settings.MoveRegistrationWindow_Left && 0 <= settings.MoveRegistrationWindow_Top)) {
+            if (settings.App_IsPositionSaved && -10 <= settings.MoveRegistrationWindow_Left && 0 <= settings.MoveRegistrationWindow_Top) {
                 this.Left = settings.MoveRegistrationWindow_Left;
                 this.Top = settings.MoveRegistrationWindow_Top;
             }

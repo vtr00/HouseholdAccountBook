@@ -77,7 +77,7 @@ namespace HouseholdAccountBook.Extensions
             /// </summary>
             public void Increase()
             {
-                _mutex.WaitOne();
+                _ = _mutex.WaitOne();
                 if (!_counter.ContainsKey(this._fe)) {
                     _counter.Add(this._fe, 0);
                     this._fe.Cursor = Cursors.Wait;
@@ -94,14 +94,14 @@ namespace HouseholdAccountBook.Extensions
             /// <remarks>カウンタが0になったら<see cref="null"/>に戻す</remarks>
             public void Decrease()
             {
-                _mutex.WaitOne();
+                _ = _mutex.WaitOne();
                 if (_counter.ContainsKey(this._fe)) {
                     _counter[this._fe]--;
                     Log.Debug(string.Format($"Decrease WaitCounter count:{_counter[this._fe]} from:{this._methodName}:{this._lineNumber}"));
 
                     if (_counter[this._fe] <= 0) {
                         this._fe.Cursor = null;
-                        _counter.Remove(this._fe);
+                        _ = _counter.Remove(this._fe);
                     }
                 }
                 else {

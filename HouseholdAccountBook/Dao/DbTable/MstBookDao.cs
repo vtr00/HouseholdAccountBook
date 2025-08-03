@@ -54,7 +54,7 @@ ORDER BY sort_order;");
 
         public override async Task SetIdSequenceAsync(int idSeq)
         {
-            await this.dbHandler.ExecuteAsync(@"SELECT setval('mst_book_book_id_seq', @BookIdSeq);", new { BookIdSeq = idSeq });
+            _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('mst_book_book_id_seq', @BookIdSeq);", new { BookIdSeq = idSeq });
         }
 
         public override async Task<int> InsertAsync(MstBookDto dto)
@@ -114,7 +114,7 @@ SET sort_order = CASE
 END, update_time = 'now', updater = @Updater
 WHERE book_id IN (@BookId1, @BookId2);",
 new { BookId1 = bookId1, BookId2 = bookId2, Updater });
-            
+
             return count;
         }
 

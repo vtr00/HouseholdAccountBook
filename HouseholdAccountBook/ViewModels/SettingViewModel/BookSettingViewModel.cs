@@ -54,7 +54,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._SelectedBookKind;
             set {
-                this.SetProperty(ref this._SelectedBookKind, value);
+                _ = this.SetProperty(ref this._SelectedBookKind, value);
                 this.RaisePropertyChanged(nameof(this.NeedToPay));
                 this.RaisePropertyChanged(nameof(this.CsvDataExists));
             }

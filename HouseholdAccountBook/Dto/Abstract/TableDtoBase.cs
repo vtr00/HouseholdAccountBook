@@ -1,5 +1,5 @@
-﻿using System;
-using HouseholdAccountBook.Others;
+﻿using HouseholdAccountBook.Others;
+using System;
 
 namespace HouseholdAccountBook.Dto.Abstract
 {

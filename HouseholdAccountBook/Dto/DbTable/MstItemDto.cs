@@ -13,7 +13,8 @@ namespace HouseholdAccountBook.Dto.DbTable
         /// </summary>
         public MstItemDto() : base() { }
 
-        public MstItemDto(CbmItemDto dto) : base(dto) {
+        public MstItemDto(CbmItemDto dto) : base(dto)
+        {
             this.ItemId = dto.ITEM_ID;
             this.ItemName = dto.ITEM_NAME;
             this.CategoryId = dto.CATEGORY_ID;

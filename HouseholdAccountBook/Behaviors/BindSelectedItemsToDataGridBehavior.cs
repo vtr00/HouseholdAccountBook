@@ -95,7 +95,7 @@ namespace HouseholdAccountBook.Behaviors
             //新たに選択されたアイテムをリストに追加する
             foreach (object addedItem in e.AddedItems) {
                 if (!this.SelectedItems.Contains(addedItem)) {
-                    this.SelectedItems.Add(addedItem);
+                    _ = this.SelectedItems.Add(addedItem);
                 }
             }
             //選択が解除されたアイテムをリストから削除する

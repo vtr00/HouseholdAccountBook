@@ -11,8 +11,8 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 店舗名
         /// </summary>
-        public string Name { get;set; }
-        
+        public string Name { get; set; }
+
         /// <summary>
         /// 使用回数
         /// </summary>

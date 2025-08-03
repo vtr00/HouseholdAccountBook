@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.DbHandler.Abstract
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             this.connection = connection;
-            this.Open();
+            _ = this.Open();
         }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace HouseholdAccountBook.DbHandler.Abstract
             try {
                 action?.Invoke();
 
-                dbTransaction.Commit();
+                this.dbTransaction.Commit();
             }
             catch (DbException e) {
                 Console.WriteLine(e.Message);

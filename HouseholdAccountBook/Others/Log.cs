@@ -31,13 +31,13 @@ namespace HouseholdAccountBook
         {
             if (listener == null) {
                 listener = new TextWriterTraceListener();
-                if (!Directory.Exists(LogFolderPath)) Directory.CreateDirectory(LogFolderPath);
+                if (!Directory.Exists(LogFolderPath)) _ = Directory.CreateDirectory(LogFolderPath);
                 TextWriter sw = new StreamWriter(LogFilePath, true, Encoding.GetEncoding("utf-8"));
                 listener.Name = listenerName;
                 listener.Writer = sw;
                 listener.TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId | TraceOptions.ThreadId;
 
-                Trace.Listeners.Add(listener);
+                _ = Trace.Listeners.Add(listener);
             }
         }
 
@@ -70,7 +70,7 @@ namespace HouseholdAccountBook
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
-        static public void Error(string message = "", [CallerFilePath]string fileName = null, [CallerMemberName]string methodName = null, [CallerLineNumber]int lineNumber = 0)
+        static public void Error(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
             WriteLine("[Error  ]", message, fileName, methodName, lineNumber);
         }
@@ -118,7 +118,7 @@ namespace HouseholdAccountBook
         /// <param name="lineNumber">出力元行数</param>
         static private void WriteLine(string type, string message, string fileName, string methodName, int lineNumber)
         {
-            if (!Directory.Exists(LogFolderPath)) Directory.CreateDirectory(LogFolderPath);
+            if (!Directory.Exists(LogFolderPath)) _ = Directory.CreateDirectory(LogFolderPath);
 
             int index = fileName.LastIndexOf('\\');
             string className = fileName.Substring(index + 1, fileName.IndexOf('.', index + 1) - index - 1);

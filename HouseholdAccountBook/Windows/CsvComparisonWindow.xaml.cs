@@ -189,7 +189,7 @@ namespace HouseholdAccountBook.Windows
                         tmpCsvFilePathList.Add(dstFilePath);
                     }
                     catch (Exception exp) {
-                        MessageBox.Show(Properties.Resources.Message_FoultToMoveCsv + "(" + exp.Message + ")", Properties.Resources.Title_Conformation);
+                        _ = MessageBox.Show(Properties.Resources.Message_FoultToMoveCsv + "(" + exp.Message + ")", Properties.Resources.Title_Conformation);
                     }
                 }
 
@@ -278,14 +278,14 @@ namespace HouseholdAccountBook.Windows
                 arw.LoadWindowSetting();
 
                 arw.Registrated += func;
-                arw.ShowDialog();
+                _ = arw.ShowDialog();
             }
             else {
                 ActionListRegistrationWindow alrw = new(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id.Value, recordList) { Owner = this };
                 alrw.LoadWindowSetting();
 
                 alrw.Registrated += func;
-                alrw.ShowDialog();
+                _ = alrw.ShowDialog();
             }
         }
 
@@ -330,7 +330,7 @@ namespace HouseholdAccountBook.Windows
                         this.ActionChanged?.Invoke(this, e2);
                         await this.UpdateComparisonVMListAsync();
                     };
-                    alrw.ShowDialog();
+                    _ = alrw.ShowDialog();
                     break;
                 case (int)GroupKind.Repeat:
                 default:
@@ -344,7 +344,7 @@ namespace HouseholdAccountBook.Windows
                         this.ActionChanged?.Invoke(this, e2);
                         await this.UpdateComparisonVMListAsync();
                     };
-                    arw.ShowDialog();
+                    _ = arw.ShowDialog();
                     break;
             }
 
@@ -710,7 +710,7 @@ namespace HouseholdAccountBook.Windows
                 this.Height = settings.CsvComparisonWindow_Height;
             }
 
-            if (settings.App_IsPositionSaved && (-10 <= settings.CsvComparisonWindow_Left && 0 <= settings.CsvComparisonWindow_Top)) {
+            if (settings.App_IsPositionSaved && -10 <= settings.CsvComparisonWindow_Left && 0 <= settings.CsvComparisonWindow_Top) {
                 this.Left = settings.CsvComparisonWindow_Left;
                 this.Top = settings.CsvComparisonWindow_Top;
             }

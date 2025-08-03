@@ -13,7 +13,7 @@ namespace HouseholdAccountBook.UserControls
         /// <remarks>セルの編集時、セル内の最初の要素にフォーカスを移動するようにする</remarks>
         protected override object PrepareCellForEdit(FrameworkElement editingElement, RoutedEventArgs editingEventArgs)
         {
-            editingElement.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+            _ = editingElement.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
 
             return base.PrepareCellForEdit(editingElement, editingEventArgs);
         }

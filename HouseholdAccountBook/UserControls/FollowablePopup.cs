@@ -120,7 +120,7 @@ namespace HouseholdAccountBook.UserControls
         private void OnFollowWindowDiactivated(object sender, EventArgs e)
         {
             this.isOpenOnDeactivated = this.IsOpen; // ディアクティベート時のPopup表示状態を記憶しておく
-            this.IsOpen= false;
+            this.IsOpen = false;
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace HouseholdAccountBook.UserControls
         /// <param name="e"></param>
         private void OnScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            if (e.VerticalChange != 0 || e.HorizontalChange!= 0) {
+            if (e.VerticalChange != 0 || e.HorizontalChange != 0) {
                 this.IsOpen = false;
             }
         }

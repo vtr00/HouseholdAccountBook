@@ -56,7 +56,7 @@ new MstCategoryDto { BalanceKind = balanceKind });
 
         public override async Task SetIdSequenceAsync(int idSeq)
         {
-            await this.dbHandler.ExecuteAsync(@"SELECT setval('mst_category_category_id_seq', @CategoryIdSeq);", new { CategoryIdSeq = idSeq });
+            _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('mst_category_category_id_seq', @CategoryIdSeq);", new { CategoryIdSeq = idSeq });
         }
 
         public override async Task<int> InsertAsync(MstCategoryDto dto)

@@ -115,43 +115,21 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 表示開始
         /// </summary>
-        public DateTime DisplayedStart {
-            get {
-                switch (this.SelectedTab) {
-                    case Tabs.BooksTab:
-                    case Tabs.DailyGraphTab:
-                        return this.StartDate;
-                    case Tabs.MonthlyListTab:
-                    case Tabs.MonthlyGraphTab:
-                        return this.DisplayedStartMonth;
-                    case Tabs.YearlyGraphTab:
-                    case Tabs.YearlyListTab:
-                        return this.DisplayedStartYear;
-                    default:
-                        return this.StartDate;
-                }
-            }
-        }
+        public DateTime DisplayedStart => this.SelectedTab switch {
+            Tabs.BooksTab or Tabs.DailyGraphTab => this.StartDate,
+            Tabs.MonthlyListTab or Tabs.MonthlyGraphTab => this.DisplayedStartMonth,
+            Tabs.YearlyGraphTab or Tabs.YearlyListTab => this.DisplayedStartYear,
+            _ => this.StartDate,
+        };
         /// <summary>
         /// 表示終了
         /// </summary>
-        public DateTime DisplayedEnd {
-            get {
-                switch (this.SelectedTab) {
-                    case Tabs.BooksTab:
-                    case Tabs.DailyGraphTab:
-                        return this.EndDate;
-                    case Tabs.MonthlyListTab:
-                    case Tabs.MonthlyGraphTab:
-                        return this.DisplayedEndMonth;
-                    case Tabs.YearlyGraphTab:
-                    case Tabs.YearlyListTab:
-                        return this.DisplayedEndYear;
-                    default:
-                        return this.EndDate;
-                }
-            }
-        }
+        public DateTime DisplayedEnd => this.SelectedTab switch {
+            Tabs.BooksTab or Tabs.DailyGraphTab => this.EndDate,
+            Tabs.MonthlyListTab or Tabs.MonthlyGraphTab => this.DisplayedEndMonth,
+            Tabs.YearlyGraphTab or Tabs.YearlyListTab => this.DisplayedEndYear,
+            _ => this.EndDate,
+        };
         /// <summary>
         /// 今日
         /// </summary>
@@ -336,7 +314,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._ActionVMList;
             set {
-                this.SetProperty(ref this._ActionVMList, value);
+                _ = this.SetProperty(ref this._ActionVMList, value);
                 this.UpdateDisplayedActionVMList();
             }
         }
@@ -387,7 +365,7 @@ namespace HouseholdAccountBook.ViewModels
                         this._SelectedActionVMList.Add(vm);
                     }
                     foreach (ActionViewModel vm in removed) {
-                        this._SelectedActionVMList.Remove(vm);
+                        _ = this._SelectedActionVMList.Remove(vm);
                     }
                 }
                 else {
@@ -477,7 +455,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._SummaryVMList;
             set {
-                this.SetProperty(ref this._SummaryVMList, value);
+                _ = this.SetProperty(ref this._SummaryVMList, value);
                 this.UpdateDisplayedActionVMList();
             }
         }
@@ -523,7 +501,8 @@ namespace HouseholdAccountBook.ViewModels
         /// 選択された検索種別
         /// </summary>
         #region SelectedFindKind
-        public FindKind SelectedFindKind {
+        public FindKind SelectedFindKind
+        {
             get => this._SelectedFindKind;
             set {
                 if (this.SetProperty(ref this._SelectedFindKind, value)) {
@@ -555,7 +534,8 @@ namespace HouseholdAccountBook.ViewModels
         /// 検索テキスト(設定時に絞り込み)
         /// </summary>
         #region FindText
-        public string FindText {
+        public string FindText
+        {
             get => this._FindText;
             set {
                 if (this.SetProperty(ref this._FindText, value)) {
@@ -605,7 +585,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._SelectedDailyGraphSeriesVM;
             set {
-                if(this.SetProperty(ref this._SelectedDailyGraphSeriesVM, value)) {
+                if (this.SetProperty(ref this._SelectedDailyGraphSeriesVM, value)) {
                     this.SelectedBalanceKind = value.BalanceKind;
                     this.SelectedCategoryId = value.CategoryId;
                     this.SelectedItemId = value.ItemId;
@@ -728,7 +708,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._SelectedMonthlySeriesVM;
             set {
-                if(this.SetProperty(ref this._SelectedMonthlySeriesVM, value)) {
+                if (this.SetProperty(ref this._SelectedMonthlySeriesVM, value)) {
                     this.SelectedBalanceKind = value.BalanceKind;
                     this.SelectedCategoryId = value.CategoryId;
                     this.SelectedItemId = value.ItemId;

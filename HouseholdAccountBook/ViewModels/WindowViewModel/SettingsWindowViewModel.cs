@@ -4,8 +4,6 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data;
-using System.Data.OleDb;
 using static HouseholdAccountBook.Others.DbConstants;
 using static HouseholdAccountBook.Others.UiConstants;
 
@@ -93,8 +91,9 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._SelectedHierarchicalVM;
             set {
-                this.SetProperty(ref this._SelectedHierarchicalVM, value);
-                this.SelectedHierarchicalVMChanged?.Invoke(new EventArgs<HierarchicalViewModel>(value));
+                if (this.SetProperty(ref this._SelectedHierarchicalVM, value)) {
+                    this.SelectedHierarchicalVMChanged?.Invoke(new EventArgs<HierarchicalViewModel>(value));
+                }
             }
         }
         private HierarchicalViewModel _SelectedHierarchicalVM = default;
@@ -138,8 +137,9 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._SelectedBookVM;
             set {
-                this.SetProperty(ref this._SelectedBookVM, value);
-                this.SelectedBookVMChanged?.Invoke(new EventArgs<BookViewModel>(value));
+                if (this.SetProperty(ref this._SelectedBookVM, value)) {
+                    this.SelectedBookVMChanged?.Invoke(new EventArgs<BookViewModel>(value));
+                }
             }
         }
         private BookViewModel _SelectedBookVM = default;

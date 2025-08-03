@@ -37,7 +37,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            System.Diagnostics.Process.Start(e.Uri.AbsoluteUri);
+            _ = System.Diagnostics.Process.Start(e.Uri.AbsoluteUri);
             e.Handled = true;
         }
 
@@ -49,7 +49,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void VersionWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            HistoryLog.ScrollToEnd();
+            this.HistoryLog.ScrollToEnd();
         }
         #endregion
         #endregion

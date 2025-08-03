@@ -27,7 +27,8 @@ namespace HouseholdAccountBook.DbHandler
         /// <see cref="NpgsqlDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public NpgsqlDbHandler(ConnectInfo info) : this(info.Host, info.Port, info.UserName, info.Password, info.DatabaseName) {
+        public NpgsqlDbHandler(ConnectInfo info) : this(info.Host, info.Port, info.UserName, info.Password, info.DatabaseName)
+        {
             this.connectInfo = info;
         }
 
@@ -55,7 +56,7 @@ namespace HouseholdAccountBook.DbHandler
         /// <param name="notifyResultAsync">実行結果を通知するデリゲート</param>
         /// <param name="waitForFinish">処理の完了を待機するか</param>
         /// <returns>成功/失敗/不明</returns>
-        public async Task<int?> ExecuteDump(string backupFilePath, string dumpExePath, PostgresPasswordInput passwordInput, PostgresFormat format, 
+        public async Task<int?> ExecuteDump(string backupFilePath, string dumpExePath, PostgresPasswordInput passwordInput, PostgresFormat format,
                                             NotifyResult notifyResultAsync = null, bool waitForFinish = true)
         {
             // 起動情報を設定する

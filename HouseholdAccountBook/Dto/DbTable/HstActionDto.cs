@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.Dto.DbTable
             this.BookId = dto.BOOK_ID;
             this.ItemId = dto.ITEM_ID;
             this.ActTime = dto.ACT_DT;
-            this.ActValue = (dto.INCOME != 0 ? dto.INCOME : -dto.EXPENSE);
+            this.ActValue = dto.INCOME != 0 ? dto.INCOME : -dto.EXPENSE;
             this.GroupId = dto.GROUP_ID == 0 ? null : (int?)dto.GROUP_ID;
             this.Remark = dto.NOTE_NAME;
         }

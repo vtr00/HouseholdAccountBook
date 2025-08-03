@@ -172,7 +172,7 @@ namespace HouseholdAccountBook.Windows
                                 var dtoList = await hstActionWithHstItemDao.FindByCategoryIdAsync(id);
 
                                 if (dtoList.Any()) {
-                                    MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInCategory, Properties.Resources.Title_Error);
+                                    _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInCategory, Properties.Resources.Title_Error);
                                     return;
                                 }
 
@@ -187,7 +187,7 @@ namespace HouseholdAccountBook.Windows
                                 var dtoList = await hstActionDao.FindByItemIdAsync(id);
 
                                 if (dtoList.Any()) {
-                                    MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItem, Properties.Resources.Title_Error);
+                                    _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItem, Properties.Resources.Title_Error);
                                     return;
                                 }
 
@@ -245,12 +245,12 @@ namespace HouseholdAccountBook.Windows
                         switch (HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM)) {
                             case HierarchicalKind.Category: {
                                 MstCategoryDao mstCategoryDao = new(dbHandler);
-                                await mstCategoryDao.SwapSortOrderAsync(changingId, changedId);
+                                _ = await mstCategoryDao.SwapSortOrderAsync(changingId, changedId);
                             }
                             break;
                             case HierarchicalKind.Item: {
                                 MstItemDao mstItemDao = new(dbHandler);
-                                await mstItemDao.SwapSortOrderAsync(changingId, changedId);
+                                _ = await mstItemDao.SwapSortOrderAsync(changingId, changedId);
                             }
                             break;
                         }
@@ -315,12 +315,12 @@ namespace HouseholdAccountBook.Windows
                         switch (HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM)) {
                             case HierarchicalKind.Category: {
                                 MstCategoryDao mstCategoryDao = new(dbHandler);
-                                await mstCategoryDao.SwapSortOrderAsync(changingId, changedId);
+                                _ = await mstCategoryDao.SwapSortOrderAsync(changingId, changedId);
                             }
                             break;
                             case HierarchicalKind.Item: {
                                 MstItemDao mstItemDao = new(dbHandler);
-                                await mstItemDao.SwapSortOrderAsync(changingId, changedId);
+                                _ = await mstItemDao.SwapSortOrderAsync(changingId, changedId);
                             }
                             break;
                         }
@@ -380,7 +380,7 @@ namespace HouseholdAccountBook.Windows
                 }
 
                 await this.UpdateItemSettingsTabDataAsync(vm.Kind, vm.Id);
-                MessageBox.Show(Properties.Resources.Message_FinishToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
+                _ = MessageBox.Show(Properties.Resources.Message_FinishToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
                 this.needToUpdate = true;
             }
         }
@@ -404,7 +404,7 @@ namespace HouseholdAccountBook.Windows
 
                     if (actionDtoList.Any()) {
                         vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
-                        MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
+                        _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
                         e.Handled = true;
                         return;
                     }
@@ -538,7 +538,7 @@ namespace HouseholdAccountBook.Windows
                         HstActionDao hstActionDao = new(dbHandler);
                         var dtoList = await hstActionDao.FindByBookIdAsync(this.WVM.SelectedBookVM.Id.Value);
                         if (dtoList.Any()) {
-                            MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInBook, Properties.Resources.Title_Error);
+                            _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInBook, Properties.Resources.Title_Error);
                             return;
                         }
 
@@ -580,7 +580,7 @@ namespace HouseholdAccountBook.Windows
 
                 using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                     MstBookDao mstBookDao = new(dbHandler);
-                    await mstBookDao.SwapSortOrderAsync(changingId, changedId);
+                    _ = await mstBookDao.SwapSortOrderAsync(changingId, changedId);
                 }
 
                 await this.UpdateBookSettingTabDataAsync(changingId);
@@ -616,7 +616,7 @@ namespace HouseholdAccountBook.Windows
 
                 using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                     MstBookDao mstBookDao = new(dbHandler);
-                    await mstBookDao.SwapSortOrderAsync(changingId, changedId);
+                    _ = await mstBookDao.SwapSortOrderAsync(changingId, changedId);
                 }
 
                 await this.UpdateBookSettingTabDataAsync(changingId);
@@ -696,7 +696,7 @@ namespace HouseholdAccountBook.Windows
                 }
 
                 await this.UpdateBookSettingTabDataAsync(vm.Id);
-                MessageBox.Show(Properties.Resources.Message_FinishToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
+                _ = MessageBox.Show(Properties.Resources.Message_FinishToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
                 this.needToUpdate = true;
             }
         }
@@ -719,7 +719,7 @@ namespace HouseholdAccountBook.Windows
 
                         if (hstActionDtoList.Any()) {
                             vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
-                            MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
+                            _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
                             e.Handled = true;
                             return;
                         }
@@ -1435,7 +1435,7 @@ namespace HouseholdAccountBook.Windows
                 this.Width = settings.SettingsWindow_Width;
             }
 
-            if (settings.App_IsPositionSaved && (-10 <= settings.SettingsWindow_Left && 0 <= settings.SettingsWindow_Top)) {
+            if (settings.App_IsPositionSaved && -10 <= settings.SettingsWindow_Left && 0 <= settings.SettingsWindow_Top) {
                 this.Left = settings.SettingsWindow_Left;
                 this.Top = settings.SettingsWindow_Top;
             }

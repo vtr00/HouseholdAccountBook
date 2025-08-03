@@ -38,7 +38,8 @@
         /// <summary>
         /// 表示名
         /// </summary>
-        public string Name {
+        public string Name
+        {
             get {
                 if (this.ItemName != string.Empty)
                     return "  " + this.ItemName;

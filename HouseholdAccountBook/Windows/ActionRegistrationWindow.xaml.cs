@@ -15,9 +15,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 using static HouseholdAccountBook.Others.DbConstants;
 using static HouseholdAccountBook.Others.LogicConstants;
-using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Windows
 {
@@ -799,7 +799,7 @@ namespace HouseholdAccountBook.Windows
                 this.Height = settings.ActionRegistrationWindow_Height;
             }
 
-            if (settings.App_IsPositionSaved && (-10 <= settings.ActionRegistrationWindow_Left && 0 <= settings.ActionRegistrationWindow_Top)) {
+            if (settings.App_IsPositionSaved && -10 <= settings.ActionRegistrationWindow_Left && 0 <= settings.ActionRegistrationWindow_Top) {
                 this.Left = settings.ActionRegistrationWindow_Left;
                 this.Top = settings.ActionRegistrationWindow_Top;
             }

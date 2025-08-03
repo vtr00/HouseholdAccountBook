@@ -52,22 +52,12 @@ namespace HouseholdAccountBook.DbHandler
         public DbHandlerBase Create()
         {
             try {
-                DbHandlerBase dbHandler;
-                switch (this.LibKind) {
-                    case DBLibraryKind.SQLite:
-                        dbHandler = new SQLiteDbHandler(this.info as SQLiteDbHandler.ConnectInfo);
-                        break;
-                    case DBLibraryKind.PostgreSQL:
-                        dbHandler = new NpgsqlDbHandler(this.info as NpgsqlDbHandler.ConnectInfo);
-                        break;
-                    case DBLibraryKind.OleDb:
-                        dbHandler = new OleDbHandler(this.info as OleDbHandler.ConnectInfo);
-                        break;
-                    case DBLibraryKind.Undefined:
-                    default:
-                        dbHandler = null;
-                        break;
-                }
+                DbHandlerBase dbHandler = this.LibKind switch {
+                    DBLibraryKind.SQLite => new SQLiteDbHandler(this.info as SQLiteDbHandler.ConnectInfo),
+                    DBLibraryKind.PostgreSQL => new NpgsqlDbHandler(this.info as NpgsqlDbHandler.ConnectInfo),
+                    DBLibraryKind.OleDb => new OleDbHandler(this.info as OleDbHandler.ConnectInfo),
+                    _ => null,
+                };
                 return dbHandler;
             }
             catch (System.TimeoutException) {

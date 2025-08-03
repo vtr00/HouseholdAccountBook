@@ -55,7 +55,7 @@ new MstItemDto { CategoryId = categoryId });
 
         public override async Task SetIdSequenceAsync(int idSeq)
         {
-            await this.dbHandler.ExecuteAsync(@"SELECT setval('mst_item_item_id_seq', @ItemIdSeq);", new { ItemIdSeq = idSeq });
+            _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('mst_item_item_id_seq', @ItemIdSeq);", new { ItemIdSeq = idSeq });
         }
 
         public override async Task<int> InsertAsync(MstItemDto dto)

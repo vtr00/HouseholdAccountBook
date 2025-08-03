@@ -1,9 +1,6 @@
 ﻿using HouseholdAccountBook.DbHandler;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.OleDb;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -116,7 +113,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void DBFilePathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        { 
+        {
             switch (this.WVM.SelectedDBKind) {
                 case DBKind.Access: {
                     string directory = string.Empty;

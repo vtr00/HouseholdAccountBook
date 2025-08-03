@@ -36,7 +36,7 @@ new HstGroupDto { GroupId = pkey });
 
         public override async Task SetIdSequenceAsync(int id)
         {
-            await this.dbHandler.ExecuteAsync("SELECT setval('hst_group_group_id_seq', @GroupIdSeq);", new { GroupIdSeq = id });
+            _ = await this.dbHandler.ExecuteAsync("SELECT setval('hst_group_group_id_seq', @GroupIdSeq);", new { GroupIdSeq = id });
         }
 
         public override async Task<int> InsertAsync(HstGroupDto dto)

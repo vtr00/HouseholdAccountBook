@@ -124,9 +124,9 @@ namespace HouseholdAccountBook.UserControls
         /// </summary>
         #region IsAcceptableMouseWheelProperty
         public static readonly DependencyProperty IsAcceptableMouseWheelProperty = DependencyProperty.Register(
-                nameof(IsAcceptableMouseWheel), 
-                typeof(bool), 
-                typeof(NumericUpDown), 
+                nameof(IsAcceptableMouseWheel),
+                typeof(bool),
+                typeof(NumericUpDown),
                 new PropertyMetadata(true)
             );
         #endregion
@@ -264,7 +264,7 @@ namespace HouseholdAccountBook.UserControls
                 this.Value = tmpValue;
                 textBox.SelectionStart = tmpSelectionStart;
 
-                textBox.Focus();
+                _ = textBox.Focus();
             }
 
             e.Handled = true;

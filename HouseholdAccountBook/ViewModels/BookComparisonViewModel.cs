@@ -10,7 +10,7 @@
         /// 帳簿ID
         /// </summary>
         public int? Id { get; set; }
-        
+
         /// <summary>
         /// 帳簿名
         /// </summary>

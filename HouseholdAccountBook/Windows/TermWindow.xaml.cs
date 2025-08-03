@@ -166,11 +166,11 @@ namespace HouseholdAccountBook.Windows
         private void Calendar_DisplayModeChanged(object sender, CalendarModeChangedEventArgs e)
         {
             if (e.NewMode == CalendarMode.Month) {
-                this.WVM.StartDate = calendar.DisplayDate.GetFirstDateOfMonth();
-                this.WVM.EndDate = calendar.DisplayDate.GetLastDateOfMonth();
+                this.WVM.StartDate = this.calendar.DisplayDate.GetFirstDateOfMonth();
+                this.WVM.EndDate = this.calendar.DisplayDate.GetLastDateOfMonth();
                 this.calendar.DisplayMode = CalendarMode.Year;
 
-                Mouse.Capture(null);
+                _ = Mouse.Capture(null);
             }
         }
 
@@ -205,7 +205,7 @@ namespace HouseholdAccountBook.Windows
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            if (settings.App_IsPositionSaved && (0 <= settings.TermWindow_Left && 0 <= settings.TermWindow_Top)) {
+            if (settings.App_IsPositionSaved && 0 <= settings.TermWindow_Left && 0 <= settings.TermWindow_Top) {
                 this.Left = settings.TermWindow_Left;
                 this.Top = settings.TermWindow_Top;
             }
