@@ -692,6 +692,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   SQLiteファイル に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string FileSelectFilter_SQLiteFile {
+            get {
+                return ResourceManager.GetString("FileSelectFilter_SQLiteFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   残高 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string GraphKind1_BalanceGraph {
@@ -764,7 +773,7 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
-        ///   Microsoft Access(記帳風月) に類似しているローカライズされた文字列を検索します。
+        ///   Microsoft Access に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string GroupHeader_Access {
             get {
@@ -868,6 +877,15 @@ namespace HouseholdAccountBook.Properties {
         public static string GroupHeader_ItemList {
             get {
                 return ResourceManager.GetString("GroupHeader_ItemList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Microsoft Access(記帳風月) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string GroupHeader_KichoFugetsu {
+            get {
+                return ResourceManager.GetString("GroupHeader_KichoFugetsu", resourceCulture);
             }
         }
         
@@ -1187,7 +1205,7 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
-        ///   Excel(_E)... に類似しているローカライズされた文字列を検索します。
+        ///   Excelファイル(_E)... に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Menu_File_Export_Excel {
             get {
@@ -1223,11 +1241,20 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
-        ///   記帳風月(_K)... に類似しているローカライズされた文字列を検索します。
+        ///   記帳風月(Access)(_K)... に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Menu_File_Import_KichoFugetsu {
             get {
                 return ResourceManager.GetString("Menu_File_Import_KichoFugetsu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   SQLiteファイル(_L)... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Menu_File_Import_SQLiteFile {
+            get {
+                return ResourceManager.GetString("Menu_File_Import_SQLiteFile", resourceCulture);
             }
         }
         
@@ -1777,6 +1804,16 @@ namespace HouseholdAccountBook.Properties {
         public static string RadioButton_Password_SpecifyPgpassConf {
             get {
                 return ResourceManager.GetString("RadioButton_Password_SpecifyPgpassConf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Byte[] のローカライズされたリソースを検索します。
+        /// </summary>
+        public static byte[] SQLiteTemplateFile {
+            get {
+                object obj = ResourceManager.GetObject("SQLiteTemplateFile", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         

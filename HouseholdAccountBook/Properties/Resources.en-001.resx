@@ -307,7 +307,7 @@
     <value>(No specification)</value>
   </data>
   <data name="FileSelectFilter_CsvFile" xml:space="preserve">
-    <value>CSV file</value>
+    <value>CSV files</value>
   </data>
   <data name="TextBlock_ColumnUnit" xml:space="preserve">
     <value>column</value>
@@ -349,13 +349,13 @@
     <value>None</value>
   </data>
   <data name="FileSelectFilter_MdbFile" xml:space="preserve">
-    <value>MDB files</value>
+    <value>MDB file</value>
   </data>
   <data name="FileSelectFilter_CustomFormatFile" xml:space="preserve">
-    <value>Custom format files</value>
+    <value>Custom format file</value>
   </data>
   <data name="FileSelectFilter_SqlFile" xml:space="preserve">
-    <value>SQL files</value>
+    <value>SQL file</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInCategory" xml:space="preserve">
     <value>The book items are in the classification so they cannot be deleted.</value>
@@ -550,7 +550,10 @@
     <value>Finish (_F)</value>
   </data>
   <data name="Menu_File_Import_KichoFugetsu" xml:space="preserve">
-    <value>Kichohugetsu (_K)...</value>
+    <value>KichoFugetsu(Access) (_K)...</value>
+  </data>
+  <data name="Menu_File_Import_SQLiteFile" xml:space="preserve">
+    <value>SQLite file (_L)...</value>
   </data>
   <data name="Menu_File_Import_CustomFormatFile" xml:space="preserve">
     <value>Custom format file (_C)...</value>
@@ -562,7 +565,7 @@
     <value>SQL file (_S)...</value>
   </data>
   <data name="Menu_File_Export_Excel" xml:space="preserve">
-    <value>Excel (_E)...</value>
+    <value>Excel file(_E)...</value>
   </data>
   <data name="Button_Forward" xml:space="preserve">
     <value>▶</value>
@@ -982,5 +985,15 @@ list</value>
   </data>
   <data name="Button_LastDecade" xml:space="preserve">
     <value>Last decade</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="SQLiteTemplateFile" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="GroupHeader_KichoFugetsu" xml:space="preserve">
+    <value>Microsoft Access(KichoFugetsu)</value>
+  </data>
+  <data name="FileSelectFilter_SQLiteFile" xml:space="preserve">
+    <value>SQLite file</value>
   </data>
 </root>

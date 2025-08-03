@@ -557,7 +557,10 @@
     <value>終了(_F)</value>
   </data>
   <data name="Menu_File_Import_KichoFugetsu" xml:space="preserve">
-    <value>記帳風月(_K)...</value>
+    <value>記帳風月(Access)(_K)...</value>
+  </data>
+  <data name="Menu_File_Import_SQLiteFile" xml:space="preserve">
+    <value>SQLiteファイル(_L)...</value>
   </data>
   <data name="Menu_File_Import_CustomFormatFile" xml:space="preserve">
     <value>カスタム形式ファイル(_C)...</value>
@@ -569,7 +572,7 @@
     <value>SQLファイル(_S)...</value>
   </data>
   <data name="Menu_File_Export_Excel" xml:space="preserve">
-    <value>Excel(_E)...</value>
+    <value>Excelファイル(_E)...</value>
   </data>
   <data name="Button_Forward" xml:space="preserve">
     <value>▶</value>
@@ -985,9 +988,18 @@
     <value>PostgreSQL</value>
   </data>
   <data name="GroupHeader_Access" xml:space="preserve">
-    <value>Microsoft Access(記帳風月)</value>
+    <value>Microsoft Access</value>
   </data>
   <data name="Button_LastDecade" xml:space="preserve">
     <value>過去10年</value>
+  </data>
+  <data name="SQLiteTemplateFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\template.sqlite3;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="GroupHeader_KichoFugetsu" xml:space="preserve">
+    <value>Microsoft Access(記帳風月)</value>
+  </data>
+  <data name="FileSelectFilter_SQLiteFile" xml:space="preserve">
+    <value>SQLiteファイル</value>
   </data>
 </root>

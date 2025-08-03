@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.DbHandler.Abstract;
 using System.Data.SQLite;
+using System.IO;
 using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.DbHandler
@@ -26,7 +27,13 @@ namespace HouseholdAccountBook.DbHandler
         /// <param name="filePath">ファイルパス</param>
         public SQLiteDbHandler(string filePath) : base(new SQLiteConnection(string.Format(stringFormat, filePath)))
         {
-            this.LibKind = DBLibraryKind.SQLite;
+            this.DBLibKind = DBLibraryKind.SQLite;
+            this.DBKind = DBKind.SQLite;
+
+            // SQLiteはファイルがない状態で接続するとファイルが作成される仕様のため、ファイルがない場合は接続しない
+            if (File.Exists(filePath)) {
+                _ = this.Open();
+            }
         }
     }
 }

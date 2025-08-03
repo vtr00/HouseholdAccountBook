@@ -14,9 +14,13 @@ namespace HouseholdAccountBook.DbHandler.Abstract
     public abstract class DbHandlerBase : IDisposable
     {
         /// <summary>
+        /// 対象データベースライブラリ
+        /// </summary>
+        public DBLibraryKind DBLibKind { get; protected set; } = DBLibraryKind.Undefined;
+        /// <summary>
         /// 対象データベース
         /// </summary>
-        public DBLibraryKind LibKind { get; protected set; } = DBLibraryKind.Undefined;
+        public DBKind DBKind { get; protected set; } = DBKind.Undefined;
 
         /// <summary>
         /// 接続情報
@@ -41,14 +45,13 @@ namespace HouseholdAccountBook.DbHandler.Abstract
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             this.connection = connection;
-            _ = this.Open();
         }
 
         /// <summary>
         /// 接続を開始する
         /// </summary>
         /// <returns>接続結果</returns>
-        private bool Open()
+        protected bool Open()
         {
             try {
                 this.connection.Open();

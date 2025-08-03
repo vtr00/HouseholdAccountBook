@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.DbHandler;
-using HouseholdAccountBook.UserEventArgs;
+﻿using HouseholdAccountBook.UserEventArgs;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -160,6 +159,30 @@ namespace HouseholdAccountBook.ViewModels
         #region その他
         #region データベース
         /// <summary>
+        /// 選択されたDB種別
+        /// </summary>
+        #region SelectedDBKind
+        public DBKind SelectedDBKind
+        {
+            get => this._SelectedDBKind;
+            set {
+                if (this.SetProperty(ref this._SelectedDBKind, value)) {
+                    this.RaisePropertyChanged(nameof(this.IsPostgreSQL));
+                }
+            }
+        }
+        private DBKind _SelectedDBKind = default;
+        #endregion
+
+        /// <summary>
+        /// IsPostgreSQL
+        /// </summary>
+        #region IsPostgreSQL
+        public bool IsPostgreSQL => this.SelectedDBKind == DBKind.PostgreSQL;
+        #endregion
+
+
+        /// <summary>
         /// pg_dump.exeパス
         /// </summary>
         #region DumpExePath
@@ -194,20 +217,20 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
-        /// Accessプロバイダ名
+        /// 記帳風月Accessプロバイダ名
         /// </summary>
         /// <remarks>動的に指定するため<see cref="ObservableCollection{T}"/>を用いる</remarks>
-        public ObservableCollection<KeyValuePair<string, string>> AccessProviderNameDic { get; } = [];
+        public ObservableCollection<KeyValuePair<string, string>> KichoFugetsuProviderNameDic { get; } = [];
         /// <summary>
-        /// 選択されたAccessプロバイダ名
+        /// 選択された記帳風月Accessプロバイダ名
         /// </summary>
         #region SelectedAccessProviderName
-        public string SelectedAccessProviderName
+        public string SelectedKichoFugetsuProviderName
         {
             get => this._SelectedAccessProviderName;
             set {
                 if (this.SetProperty(ref this._SelectedAccessProviderName, value) && this.WithSave) {
-                    this.settings.App_Access_Provider = value;
+                    this.settings.App_Import_KichoFugetsu_Provider = value;
                     this.settings.Save();
                 }
             }
@@ -451,78 +474,6 @@ namespace HouseholdAccountBook.ViewModels
         public SettingsWindowViewModel()
         {
             this.settings = Properties.Settings.Default;
-        }
-
-        /// <summary>
-        /// 設定を読み込む
-        /// </summary>
-        public void LoadSettings()
-        {
-            this.WithSave = false;
-
-            this.DumpExePath = this.settings.App_Postgres_DumpExePath;
-            this.RestoreExePath = this.settings.App_Postgres_RestoreExePath;
-
-            this.AccessProviderNameDic.Clear();
-            OleDbHandler.GetOleDbProvider().FindAll((pair) => pair.Key.Contains("Microsoft.ACE.OLEDB")).ForEach(this.AccessProviderNameDic.Add);
-            this.SelectedAccessProviderName = this.settings.App_Access_Provider;
-
-            this.SelectedCultureName = this.settings.App_CultureName;
-            this.BackUpNum = this.settings.App_BackUpNum;
-            this.BackUpFolderPath = this.settings.App_BackUpFolderPath;
-            this.BackUpFlagAtMinimizing = this.settings.App_BackUpFlagAtMinimizing;
-            this.BackUpIntervalAtMinimizing = this.settings.App_BackUpIntervalMinAtMinimizing;
-            this.BackUpFlagAtClosing = this.settings.App_BackUpFlagAtClosing;
-            this.PasswordInput = (PostgresPasswordInput)this.settings.App_Postgres_Password_Input;
-            this.StartMonth = this.settings.App_StartMonth;
-            this.NationalHolidayCsvURI = this.settings.App_NationalHolidayCsv_Uri;
-            this.NationalHolidayCsvDateIndex = this.settings.App_NationalHolidayCsv_DateIndex + 1;
-            this.IsPositionSaved = this.settings.App_IsPositionSaved;
-
-            this.DebugMode = this.settings.App_IsDebug;
-
-            this.WithSave = true;
-
-            this.LoadWindowSetting();
-        }
-
-        /// <summary>
-        /// ウィンドウ設定を読み込む
-        /// </summary>
-        public void LoadWindowSetting()
-        {
-            ObservableCollection<WindowSettingViewModel> list = [
-                new WindowSettingViewModel(){
-                    Title = Properties.Resources.Title_MainWindow,
-                    Left = this.settings.MainWindow_Left, Top = this.settings.MainWindow_Top,
-                    Width = this.settings.MainWindow_Width, Height = this.settings.MainWindow_Height },
-                new WindowSettingViewModel(){
-                    Title = Properties.Resources.Title_AddMoveWindow,
-                    Left = this.settings.MoveRegistrationWindow_Left, Top = this.settings.MoveRegistrationWindow_Top,
-                    Width = this.settings.MoveRegistrationWindow_Width, Height = this.settings.MoveRegistrationWindow_Height },
-                new WindowSettingViewModel(){
-                    Title = Properties.Resources.Title_AddWindow,
-                    Left = this.settings.ActionRegistrationWindow_Left, Top = this.settings.ActionRegistrationWindow_Top,
-                    Width = this.settings.ActionRegistrationWindow_Width, Height = this.settings.ActionRegistrationWindow_Height },
-                new WindowSettingViewModel(){
-                    Title = Properties.Resources.Title_AddListWindow,
-                    Left = this.settings.ActionListRegistrationWindow_Left, Top = this.settings.ActionListRegistrationWindow_Top,
-                    Width = this.settings.ActionListRegistrationWindow_Width, Height = this.settings.ActionListRegistrationWindow_Height },
-                new WindowSettingViewModel(){
-                    Title = Properties.Resources.Title_CsvComparisonWindow,
-                    Left = this.settings.CsvComparisonWindow_Left, Top = this.settings.CsvComparisonWindow_Top,
-                    Width = this.settings.CsvComparisonWindow_Width, Height = this.settings.CsvComparisonWindow_Height },
-                new WindowSettingViewModel(){
-                    Title = Properties.Resources.Title_SettingsWindow,
-                    Left = this.settings.SettingsWindow_Left, Top = this.settings.SettingsWindow_Top,
-                    Width = this.settings.SettingsWindow_Width, Height = this.settings.SettingsWindow_Height },
-                new WindowSettingViewModel(){
-                    Title = Properties.Resources.Title_TermSelectionWindow,
-                    Left = this.settings.TermWindow_Left, Top = this.settings.TermWindow_Top,
-                    Width = -1, Height = -1 }
-
-            ];
-            this.WindowSettingVMList = list;
         }
     }
 }

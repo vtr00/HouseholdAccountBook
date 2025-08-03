@@ -28,9 +28,21 @@ namespace HouseholdAccountBook.DbHandler
         /// <param name="filePath">ファイルパス</param>
         public OleDbHandler(string provider, string filePath) : base(new OleDbConnection(string.Format(stringFormat, provider, filePath)))
         {
-            this.LibKind = DBLibraryKind.OleDb;
+            this.DBLibKind = DBLibraryKind.OleDb;
+            if (provider.Contains("Macrosoft.ACE.OLEDB")) {
+                this.DBKind = DBKind.Access;
+
+                _ = this.Open();
+            }
+            else {
+                this.DBKind = DBKind.Undefined;
+            }
         }
 
+        /// <summary>
+        /// Ole DBプロバイダの一覧を取得する
+        /// </summary>
+        /// <returns></returns>
         public static List<KeyValuePair<string, string>> GetOleDbProvider()
         {
             List<KeyValuePair<string, string>> list = [];

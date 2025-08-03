@@ -55,6 +55,10 @@ new MstItemDto { CategoryId = categoryId });
 
         public override async Task SetIdSequenceAsync(int idSeq)
         {
+            if (this.dbHandler.DBKind == DBKind.SQLite) {
+                throw new NotSupportedException();
+            }
+
             _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('mst_item_item_id_seq', @ItemIdSeq);", new { ItemIdSeq = idSeq });
         }
 
@@ -63,7 +67,7 @@ new MstItemDto { CategoryId = categoryId });
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO mst_item
 (item_id, item_name, category_id, move_flg, advance_flg, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @ItemName, @CategoryId, @MoveFlg, @AdvanceFlg, @SortOrder, @DelFlg, 'now', @Updater, 'now', @Inserter);", dto);
+VALUES (@ItemId, @ItemName, @CategoryId, @MoveFlg, @AdvanceFlg, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -73,7 +77,7 @@ VALUES (@ItemId, @ItemName, @CategoryId, @MoveFlg, @AdvanceFlg, @SortOrder, @Del
             int itemId = await this.dbHandler.QuerySingleAsync<int>(@"
 INSERT INTO mst_item
 (item_name, category_id, move_flg, advance_flg, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES ('(no name)', @CategoryId, @MoveFlg, @AdvanceFlg, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), @DelFlg, 'now', @Updater, 'now', @Inserter)
+VALUES ('(no name)', @CategoryId, @MoveFlg, @AdvanceFlg, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING item_id;", dto);
 
             return itemId;
@@ -93,7 +97,7 @@ RETURNING item_id;", dto);
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET item_name = @ItemName, update_time = 'now', updater = @Updater
+SET item_name = @ItemName, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId;", dto);
 
             return count;
@@ -109,7 +113,7 @@ WHERE item_id = @ItemId;", dto);
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET category_id = @CategoryId, sort_order = (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), update_time = 'now', updater = @Updater
+SET category_id = @CategoryId, sort_order = (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId;",
 new MstItemDto { CategoryId = categoryId, ItemId = itemId });
 
@@ -126,7 +130,7 @@ new MstItemDto { CategoryId = categoryId, ItemId = itemId });
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET category_id = @CategoryId, sort_order = (SELECT COALESCE(MAX(sort_order) - 1, 1) FROM mst_item), update_time = 'now', updater = @Updater
+SET category_id = @CategoryId, sort_order = (SELECT COALESCE(MAX(sort_order) - 1, 1) FROM mst_item), update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId;",
 new MstItemDto { CategoryId = categoryId, ItemId = itemId });
 
@@ -142,14 +146,19 @@ new MstItemDto { CategoryId = categoryId, ItemId = itemId });
         public async Task<int> SwapSortOrderAsync(int itemId1, int itemId2)
         {
             int count = await this.dbHandler.ExecuteAsync(@" 
+WITH original AS (
+  SELECT
+    (SELECT sort_order FROM mst_item WHERE item_id = @ItemId1) AS sort_order1,
+    (SELECT sort_order FROM mst_item WHERE item_id = @ItemId2) AS sort_order2
+)
 UPDATE mst_item
 SET sort_order = CASE
-  WHEN item_id = @ItemId1 THEN (SELECT sort_order FROM mst_item WHERE item_id = @ItemId2)
-  WHEN item_id = @ItemId2 THEN (SELECT sort_order FROM mst_item WHERE item_id = @ItemId1)
+  WHEN item_id = @ItemId1 THEN (SELECT sort_order2 FROM original)
+  WHEN item_id = @ItemId2 THEN (SELECT sort_order1 FROM original)
   ELSE sort_order
-END, update_time = 'now', updater = @Updater
+END, update_time = @UpdateTime, updater = @Updater
 WHERE item_id IN (@ItemId1, @ItemId2);",
-new { ItemId1 = itemId1, ItemId2 = itemId2, Updater });
+new { ItemId1 = itemId1, ItemId2 = itemId2, UpdateTime = DateTime.Now, Updater });
 
             return count;
         }
@@ -170,7 +179,7 @@ new { ItemId1 = itemId1, ItemId2 = itemId2, Updater });
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET del_flg = 1, update_time = 'now', updater = @Updater
+SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId;",
 new MstItemDto { ItemId = pkey });
 

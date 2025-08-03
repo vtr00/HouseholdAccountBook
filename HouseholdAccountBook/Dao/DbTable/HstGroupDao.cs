@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.Dao.DbTable
 {
@@ -36,6 +37,10 @@ new HstGroupDto { GroupId = pkey });
 
         public override async Task SetIdSequenceAsync(int id)
         {
+            if (this.dbHandler.DBLibKind == DBLibraryKind.SQLite) {
+                throw new NotSupportedException();
+            }
+
             _ = await this.dbHandler.ExecuteAsync("SELECT setval('hst_group_group_id_seq', @GroupIdSeq);", new { GroupIdSeq = id });
         }
 
@@ -44,7 +49,7 @@ new HstGroupDto { GroupId = pkey });
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO hst_group
 (group_id, group_kind, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@GroupId, @GroupKind, @Remark, @DelFlg, 'now', @Updater, 'now', @Inserter);", dto);
+VALUES (@GroupId, @GroupKind, @Remark, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -53,7 +58,7 @@ VALUES (@GroupId, @GroupKind, @Remark, @DelFlg, 'now', @Updater, 'now', @Inserte
         {
             int groupId = await this.dbHandler.QuerySingleAsync<int>(@"
 INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@GroupKind, 0, 'now', @Updater, 'now', @Inserter)
+VALUES (@GroupKind, 0, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING group_id;", dto);
 
             return groupId;
@@ -79,7 +84,7 @@ RETURNING group_id;", dto);
         public override async Task<int> DeleteByIdAsync(int pkey)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
-UPDATE hst_group SET del_flg = 1, update_time = 'now', updater = @Updater
+UPDATE hst_group SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE group_id = @GroupId AND del_flg = 0;",
 new HstGroupDto { GroupId = pkey });
 

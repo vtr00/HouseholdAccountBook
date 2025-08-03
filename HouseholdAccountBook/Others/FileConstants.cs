@@ -28,13 +28,31 @@ namespace HouseholdAccountBook.Others
 
         #region バックアップファイル
         /// <summary>
-        /// バックアップファイル名
+        /// PostgreSQL バックアップファイル ポストフィックス
         /// </summary>
-        public static string BackupFileName
+        public static string PostgreSQLBackupFileExt => "backup";
+        /// <summary>
+        /// PostgreSQL バックアップファイル名
+        /// </summary>
+        public static string PostgreSQLBackupFileName
         {
             get {
                 DateTime dt = DateTime.Now;
-                return string.Format($"{dt:yyyyMMdd_HHmmss}.backup");
+                return string.Format($"{dt:yyyyMMdd_HHmmss}.{PostgreSQLBackupFileExt}");
+            }
+        }
+        /// <summary>
+        /// SQLite バックアップファイル ポストフィックス
+        /// </summary>
+        public static string SQLiteBackupFileExt => "sqlite3";
+        /// <summary>
+        /// SQLite バックアップファイル名
+        /// </summary>
+        public static string SQLiteBackupFileName
+        {
+            get {
+                DateTime dt = DateTime.Now;
+                return string.Format($"{dt:yyyyMMdd_HHmmss}.{SQLiteBackupFileExt}");
             }
         }
         #endregion

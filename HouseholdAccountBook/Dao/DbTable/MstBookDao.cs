@@ -54,6 +54,10 @@ ORDER BY sort_order;");
 
         public override async Task SetIdSequenceAsync(int idSeq)
         {
+            if (this.dbHandler.DBKind == DBKind.SQLite) {
+                throw new NotSupportedException();
+            }
+
             _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('mst_book_book_id_seq', @BookIdSeq);", new { BookIdSeq = idSeq });
         }
 
@@ -62,7 +66,7 @@ ORDER BY sort_order;");
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO mst_book 
 (book_id, book_name, book_kind, initial_value, pay_day, debit_book_id, sort_order, del_flg, update_time, updater, insert_time, inserter) 
-VALUES (@BookId, @BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @SortOrder, @DelFlg, 'now', @Updater, 'now', @Inserter);", dto);
+VALUES (@BookId, @BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -71,7 +75,7 @@ VALUES (@BookId, @BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @So
         {
             int bookId = await this.dbHandler.QuerySingleAsync<int>(@"
 INSERT INTO mst_book (book_name, book_kind, initial_value, pay_day, debit_book_id, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), @DelFlg, 'now', @Updater, 'now', @Inserter)
+VALUES (@BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING book_id;", dto);
 
             return bookId;
@@ -86,7 +90,7 @@ RETURNING book_id;", dto);
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE mst_book
-SET book_name = @BookName, book_kind = @BookKind, initial_value = @InitialValue, debit_book_id = @DebitBookId, pay_day = @PayDay, json_code = @JsonCode, update_time = 'now', updater = @Updater
+SET book_name = @BookName, book_kind = @BookKind, initial_value = @InitialValue, debit_book_id = @DebitBookId, pay_day = @PayDay, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE book_id = @BookId;", dto);
 
             return count;
@@ -106,14 +110,19 @@ WHERE book_id = @BookId;", dto);
         public async Task<int> SwapSortOrderAsync(int bookId1, int bookId2)
         {
             int count = await this.dbHandler.ExecuteAsync(@" 
+WITH original AS (
+  SELECT
+    (SELECT sort_order FROM mst_book WHERE book_id = @BookId1) AS sort_order1,
+    (SELECT sort_order FROM mst_book WHERE book_id = @BookId2) AS sort_order2
+)
 UPDATE mst_book
 SET sort_order = CASE
-  WHEN book_id = @BookId1 THEN (SELECT sort_order FROM mst_book WHERE book_id = @BookId2)
-  WHEN book_id = @BookId2 THEN (SELECT sort_order FROM mst_book WHERE book_id = @BookId1)
+  WHEN book_id = @BookId1 THEN (SELECT sort_order2 FROM original)
+  WHEN book_id = @BookId2 THEN (SELECT sort_order1 FROM original)
   ELSE sort_order
-END, update_time = 'now', updater = @Updater
+END, update_time = @UpdateTime, updater = @Updater
 WHERE book_id IN (@BookId1, @BookId2);",
-new { BookId1 = bookId1, BookId2 = bookId2, Updater });
+new { BookId1 = bookId1, BookId2 = bookId2, UpdateTime = DateTime.Now, Updater });
 
             return count;
         }
@@ -134,7 +143,7 @@ new { BookId1 = bookId1, BookId2 = bookId2, Updater });
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE mst_book
-SET del_flg = 1, update_time = 'now', updater = @Updater
+SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE book_id = @BookId;",
 new MstBookDto { BookId = pkey });
 

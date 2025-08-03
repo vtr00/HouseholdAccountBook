@@ -27,20 +27,36 @@ namespace HouseholdAccountBook.Dto.Abstract
         /// </summary>
         public int DelFlg { get; set; } = 0;
         /// <summary>
-        /// 更新日
+        /// 更新日時
         /// </summary>
-        public DateTime UpdateTime { get; set; } = DateTime.Now;
+        public DateTime UpdateTime
+        {
+            get => this._UpdateTime ??= this.Now;
+            set => this._UpdateTime = value;
+        }
+        private DateTime? _UpdateTime;
         /// <summary>
         /// 更新者
         /// </summary>
         public string Updater { get; set; } = DbConstants.Updater;
         /// <summary>
-        /// 挿入日
+        /// 挿入日時
         /// </summary>
-        public DateTime InsertTime { get; set; } = DateTime.Now;
+        public DateTime InsertTime
+        { 
+            get => this._InsertTime ??= this.Now;
+            set => this._InsertTime = value;
+        }
+        private DateTime? _InsertTime;
         /// <summary>
         /// 挿入者
         /// </summary>
         public string Inserter { get; set; } = DbConstants.Inserter;
+
+        /// <summary>
+        /// <see cref="UpdateTime"/> か <see cref="InsertTime"/> を取得した時刻
+        /// </summary>
+        private DateTime Now => this._Now ??= DateTime.Now;
+        private DateTime? _Now = null;
     }
 }

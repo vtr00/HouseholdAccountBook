@@ -64,6 +64,7 @@ namespace HouseholdAccountBook
             this.DispatcherUnhandledException += this.App_DispatcherUnhandledException;
             this.Exit += this.App_Exit;
 
+            // shift-jis を使用するために必要
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
@@ -77,6 +78,9 @@ namespace HouseholdAccountBook
             Thread.CurrentThread.CurrentUICulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
+            // 設定をリソースに登録する
+            App.RegisterToResource();
 
 #if !DEBUG
             // 多重起動を抑止する
@@ -113,27 +117,31 @@ namespace HouseholdAccountBook
                 // リリースビルドの初回起動時デバッグモードはOFF
                 settings.App_IsDebug = false;
 #endif
-                // DB設定ダイアログ終了時に閉じないように設定する(明示的なシャットダウンが必要)
-                this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-
-                // データベース接続を設定する
-                DbSettingWindow dsw = new(HouseholdAccountBook.Properties.Resources.Message_PleaseInputDbSetting);
-                bool? result = dsw.ShowDialog();
-
-                if (result != true) {
-                    this.connectInfo = null;
-                    this.Shutdown();
-                    return;
-                }
-
-                settings.App_InitFlag = false;
-                settings.Save();
             }
 
+            // DB設定ダイアログ終了時に閉じないように設定する(明示的なシャットダウンが必要)
+            this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             DbHandlerFactory dbHandlerFactory = null;
-            while (true) {
+            bool isOpen = false;
+            while (!isOpen) {
+                // 初回起動時、またはDB接続に失敗した時
+                if (settings.App_InitFlag || dbHandlerFactory is not null) {
+                    // データベース接続を設定する
+                    string message = dbHandlerFactory is not null 
+                        ? HouseholdAccountBook.Properties.Resources.Message_FoultToConnectDb 
+                        : HouseholdAccountBook.Properties.Resources.Message_PleaseInputDbSetting;
+                    DbSettingWindow dsw = new(message);
+                    bool? result = dsw.ShowDialog();
+
+                    if (result != true) {
+                        this.connectInfo = null;
+                        this.Shutdown();
+                        return;
+                    }
+                }
+
                 // 接続設定を読み込む
-                settings.App_SelectedDBKind = (int)DbConstants.DBKind.PostgreSQL;
                 switch ((DbConstants.DBKind)settings.App_SelectedDBKind) {
                     case DbConstants.DBKind.PostgreSQL: {
                         this.connectInfo = new NpgsqlDbHandler.ConnectInfo() {
@@ -151,42 +159,32 @@ namespace HouseholdAccountBook
                         break;
                     }
                     case DbConstants.DBKind.SQLite:
+                        this.connectInfo = new SQLiteDbHandler.ConnectInfo() {
+                            FilePath = settings.App_SQLite_DBFilePath
+                        };
+                        break;
                     case DbConstants.DBKind.Access:
+                    case DbConstants.DBKind.Undefined:
                     default:
                         throw new NotSupportedException();
                 }
                 dbHandlerFactory = new(this.connectInfo);
 
                 // 接続を試行する
-                bool isOpen = false;
                 try {
                     using (DbHandlerBase dbHandler = dbHandlerFactory.Create()) {
                         isOpen = dbHandler.IsOpen;
                     }
                 }
                 catch (TimeoutException) { }
-
-                if (isOpen) {
-                    break;
-                }
-                else {
-                    // データベース接続を設定する
-                    DbSettingWindow dsw = new(HouseholdAccountBook.Properties.Resources.Message_FoultToConnectDb);
-                    bool? result = dsw.ShowDialog();
-
-                    if (result != true) {
-                        this.connectInfo = null;
-                        this.Shutdown();
-                        return;
-                    }
-                }
             }
+
+            // 初回起動を解除する
+            settings.App_InitFlag = false;
+            settings.Save();
 
             // 休日リストを取得する
             await DateTimeExtensions.DownloadHolidayListAsync();
-
-            // 設定をリソースに登録する
-            App.RegisterToResource();
 
             // DBに接続できる場合だけメインウィンドウを開く
             MainWindow mw = new(dbHandlerFactory);
@@ -287,6 +285,7 @@ namespace HouseholdAccountBook
 
             _ = Process.Start(targetExe);
 
+            this.Exit -= this.App_Exit;
             this.Shutdown();
         }
 

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.Dao.DbTable
 {
@@ -120,6 +121,10 @@ new HstActionDto { BookId = bookId, ItemId = itemId });
 
         public override async Task SetIdSequenceAsync(int idSeq)
         {
+            if (this.dbHandler.DBKind == DBKind.SQLite) {
+                throw new NotSupportedException();
+            }
+
             _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('hst_action_action_id_seq', @ActionIdSeq);", new { ActionIdSeq = idSeq });
         }
 
@@ -128,7 +133,7 @@ new HstActionDto { BookId = bookId, ItemId = itemId });
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO hst_action
 (action_id, book_id, item_id, act_time, act_value, shop_name, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ActionId, @BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @Remark, @DelFlg, 'now', @Updater, 'now', @Inserter);", dto);
+VALUES (@ActionId, @BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @Remark, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -138,7 +143,7 @@ VALUES (@ActionId, @BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @
             int actionId = await this.dbHandler.QuerySingleAsync<int>(@"
 INSERT INTO hst_action
 (book_id, item_id, act_time, act_value, shop_name, group_id, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @Remark, @DelFlg, 'now', @Updater, 'now', @Inserter)
+VALUES (@BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @Remark, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING action_id;", dto);
 
             return actionId;
@@ -158,9 +163,9 @@ VALUES (@BookId, (
   SELECT item_id FROM mst_item I
   INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @BalanceKind) C ON C.category_id = I.category_id
   WHERE move_flg = 1
-), @ActTime, @ActValue, @GroupId, @DelFlg, 'now', @Updater, 'now', @Inserter)
+), @ActTime, @ActValue, @GroupId, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING action_id;",
-new { dto.BookId, dto.ActTime, dto.ActValue, dto.GroupId, dto.DelFlg, dto.Updater, dto.Inserter, BalanceKind = balanceKind });
+new { dto.BookId, dto.ActTime, dto.ActValue, dto.GroupId, dto.DelFlg, dto.UpdateTime, dto.Updater, dto.InsertTime, dto.Inserter, BalanceKind = balanceKind });
 
             return actionId;
         }
@@ -169,7 +174,7 @@ new { dto.BookId, dto.ActTime, dto.ActValue, dto.GroupId, dto.DelFlg, dto.Update
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, is_match = @IsMatch, update_time = 'now', updater = @Updater
+SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, is_match = @IsMatch, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
 
             return count;
@@ -184,7 +189,7 @@ WHERE action_id = @ActionId;", dto);
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET book_id = @BookId, act_time = @ActTime, act_value = @ActValue, update_time = 'now', updater = @Updater
+SET book_id = @BookId, act_time = @ActTime, act_value = @ActValue, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
 
             return count;
@@ -199,7 +204,7 @@ WHERE action_id = @ActionId;", dto);
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, update_time = 'now', updater = @Updater
+SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
 
             return count;
@@ -215,7 +220,7 @@ WHERE action_id = @ActionId;", dto);
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET is_match = @IsMatch, update_time = 'now', updater = @Updater
+SET is_match = @IsMatch, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId and is_match <> @IsMatch;",
 new HstActionDto { IsMatch = isMatch, ActionId = actionId });
 
@@ -232,7 +237,7 @@ new HstActionDto { IsMatch = isMatch, ActionId = actionId });
         public async Task<int> UpdateShopNameAndRemarkByIdAsync(int actionId, string shopName, string remark)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
-UPDATE hst_action SET shop_name = @ShopName, remark = @Remark, update_time = 'now', updater = @Updater
+UPDATE hst_action SET shop_name = @ShopName, remark = @Remark, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId AND del_flg = 0;",
 new HstActionDto { ActionId = actionId, ShopName = shopName, Remark = remark });
 
@@ -248,7 +253,7 @@ new HstActionDto { ActionId = actionId, ShopName = shopName, Remark = remark });
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET group_id = null, update_time = 'now', updater = @Updater
+SET group_id = null, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId AND del_flg = 0;",
 new HstActionDto { ActionId = actionId });
 
@@ -276,7 +281,7 @@ new HstActionDto { ActionId = actionId });
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET del_flg = 1, update_time = 'now', updater = @Updater
+SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;",
 new HstActionDto { ActionId = pkey });
 
@@ -292,7 +297,7 @@ new HstActionDto { ActionId = pkey });
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET del_flg = 1, update_time = 'now', updater = @Updater
+SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE group_id = @GroupId;",
 new HstActionDto { GroupId = groupId });
 
@@ -310,12 +315,12 @@ new HstActionDto { GroupId = groupId });
             int count = withInTarget
                 ? await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET del_flg = 1, update_time = 'now', updater = @Updater
+SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE group_id = (SELECT group_id FROM hst_action WHERE action_id = @ActionId) AND (SELECT act_time FROM hst_action WHERE action_id = @ActionId) <= act_time;",
 new HstActionDto { ActionId = actionId })
                 : await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET del_flg = 1, update_time = 'now', updater = @Updater
+SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE group_id = (SELECT group_id FROM hst_action WHERE action_id = @ActionId) AND (SELECT act_time FROM hst_action WHERE action_id = @ActionId) < act_time;",
 new HstActionDto { ActionId = actionId });
 

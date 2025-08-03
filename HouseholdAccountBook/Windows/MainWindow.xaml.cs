@@ -115,7 +115,7 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ImportKichoHugetsuDbCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void ImportKichoFugetsuDbCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = !this.ChildrenWindowOpened;
         }
@@ -125,7 +125,7 @@ namespace HouseholdAccountBook.Windows
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void ImportKichoHugetsuDbCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void ImportKichoFugetsuDbCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Log.Info();
 
@@ -134,9 +134,9 @@ namespace HouseholdAccountBook.Windows
             string directory = string.Empty; // ディレクトリ
             string fileName = string.Empty; // ファイル名
             // 過去に読み込んだときのフォルダとファイルをデフォルトにする
-            if (settings.App_KichoDBFilePath != string.Empty) {
-                directory = Path.GetDirectoryName(settings.App_KichoDBFilePath);
-                fileName = Path.GetFileName(settings.App_KichoDBFilePath);
+            if (settings.App_Import_KichoFugetsu_FilePath != string.Empty) {
+                directory = Path.GetDirectoryName(settings.App_Import_KichoFugetsu_FilePath);
+                fileName = Path.GetFileName(settings.App_Import_KichoFugetsu_FilePath);
             }
 
             OpenFileDialog ofd = new() {
@@ -154,7 +154,7 @@ namespace HouseholdAccountBook.Windows
                 return;
             }
 
-            settings.App_KichoDBFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            settings.App_Import_KichoFugetsu_FilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             settings.Save();
 
             bool isOpen = false;
@@ -203,29 +203,37 @@ namespace HouseholdAccountBook.Windows
                                 _ = await hstRemarkDao.DeleteAllAsync();
                                 _ = await relBookItemDao.DeleteAllAsync();
 
-                                // 帳簿IDのシーケンスを更新する
-                                await mstBookDao.SetIdSequenceAsync(cbmBookDtoList.Last().BOOK_ID);
+                                if (dbHandler.DBLibKind == DBLibraryKind.PostgreSQL) {
+                                    // 帳簿IDのシーケンスを更新する
+                                    await mstBookDao.SetIdSequenceAsync(cbmBookDtoList.Last().BOOK_ID);
+                                }
                                 // 帳簿テーブルのレコードを作成する
                                 foreach (CbmBookDto cbmBookDto in cbmBookDtoList) {
                                     _ = await mstBookDao.InsertAsync(new MstBookDto(cbmBookDto));
                                 }
 
-                                // 分類IDのシーケンスを更新する
-                                await mstCategoryDao.SetIdSequenceAsync(cbmCategoryDtoList.Last().CATEGORY_ID);
+                                if (dbHandler.DBLibKind == DBLibraryKind.PostgreSQL) {
+                                    // 分類IDのシーケンスを更新する
+                                    await mstCategoryDao.SetIdSequenceAsync(cbmCategoryDtoList.Last().CATEGORY_ID);
+                                }
                                 // 分類テーブルのレコードを作成する
                                 foreach (CbmCategoryDto dto in cbmCategoryDtoList) {
                                     _ = await mstCategoryDao.InsertAsync(new MstCategoryDto(dto));
                                 }
 
-                                // 項目IDのシーケンスを更新する
-                                await mstItemDao.SetIdSequenceAsync(cbmItemDtoList.Last().ITEM_ID);
+                                if (dbHandler.DBLibKind == DBLibraryKind.PostgreSQL) {
+                                    // 項目IDのシーケンスを更新する
+                                    await mstItemDao.SetIdSequenceAsync(cbmItemDtoList.Last().ITEM_ID);
+                                }
                                 // 項目テーブルのレコードを作成する
                                 foreach (CbmItemDto dto in cbmItemDtoList) {
                                     _ = await mstItemDao.InsertAsync(new MstItemDto(dto));
                                 }
 
-                                // 帳簿項目IDのシーケンスを更新する
-                                await hstActionDao.SetIdSequenceAsync(cbtActDtoList.Last().ACT_ID);
+                                if (dbHandler.DBLibKind == DBLibraryKind.PostgreSQL) {
+                                    // 帳簿項目IDのシーケンスを更新する
+                                    await hstActionDao.SetIdSequenceAsync(cbtActDtoList.Last().ACT_ID);
+                                }
                                 int maxGroupId = 0; // グループIDの最大値
                                 // 帳簿テーブルのレコードを作成する
                                 foreach (CbtActDto cbtActDto in cbtActDtoList) {
@@ -270,8 +278,10 @@ namespace HouseholdAccountBook.Windows
                                         });
                                     }
                                 }
-                                // グループIDのシーケンスを更新する
-                                await hstGroupDao.SetIdSequenceAsync(maxGroupId);
+                                if (dbHandler.DBLibKind == DBLibraryKind.PostgreSQL) {
+                                    // グループIDのシーケンスを更新する
+                                    await hstGroupDao.SetIdSequenceAsync(maxGroupId);
+                                }
 
                                 // 備考テーブルのレコードを作成する
                                 foreach (CbtNoteDto dto in cbtNoteDtoList) {
@@ -301,13 +311,16 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// カスタムファイル形式入力可能か
+        /// カスタムファイル形式を取り込み可能か
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void ImportCustomFileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = Properties.Settings.Default.App_Postgres_RestoreExePath != string.Empty && !this.ChildrenWindowOpened;
+            Properties.Settings settings = Properties.Settings.Default;
+
+            e.CanExecute = settings.App_SelectedDBKind == (int)DBKind.PostgreSQL &&
+                           settings.App_Postgres_RestoreExePath != string.Empty && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -324,9 +337,9 @@ namespace HouseholdAccountBook.Windows
             string directory = string.Empty;
             string fileName = string.Empty;
             // 過去に読み込んだときのフォルダとファイルをデフォルトにする
-            if (settings.App_CustomFormatFilePath != string.Empty) {
-                directory = Path.GetDirectoryName(settings.App_CustomFormatFilePath);
-                fileName = Path.GetFileName(settings.App_CustomFormatFilePath);
+            if (settings.App_Import_CustomFormat_FilePath != string.Empty) {
+                directory = Path.GetDirectoryName(settings.App_Import_CustomFormat_FilePath);
+                fileName = Path.GetFileName(settings.App_Import_CustomFormat_FilePath);
             }
 
             OpenFileDialog ofd = new() {
@@ -345,7 +358,7 @@ namespace HouseholdAccountBook.Windows
                 return;
             }
 
-            settings.App_CustomFormatFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            settings.App_Import_CustomFormat_FilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             settings.Save();
 
             int exitCode = -1;
@@ -371,7 +384,7 @@ namespace HouseholdAccountBook.Windows
                     _ = await relBookItemDao.DeleteAllAsync();
                 }
 
-                exitCode = await this.ExecuteRestore(ofd.FileName);
+                exitCode = await this.ExecuteRestorePostgreSQL(ofd.FileName);
 
                 if (exitCode == 0) {
                     await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
@@ -387,13 +400,85 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
+        /// SQLiteファイル形式を取り込み可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ImportSQLiteFileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            e.CanExecute = settings.App_SelectedDBKind == (int)DBKind.SQLite && !this.ChildrenWindowOpened;
+        }
+
+        /// <summary>
+        /// SQLiteファイルを取り込む
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ImportSQLiteFileCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Log.Info();
+
+            Properties.Settings settings = Properties.Settings.Default;
+
+            string directory = string.Empty;
+            string fileName = string.Empty;
+            // 過去に読み込んだときのフォルダとファイルをデフォルトにする
+            if (settings.App_Import_SQLite_FilePath != string.Empty) {
+                directory = Path.GetDirectoryName(settings.App_Import_SQLite_FilePath);
+                fileName = Path.GetFileName(settings.App_Import_SQLite_FilePath);
+            }
+
+            OpenFileDialog ofd = new() {
+                CheckFileExists = true,
+                InitialDirectory = directory,
+                FileName = fileName,
+                Title = Properties.Resources.Title_FileSelection,
+                Filter = Properties.Resources.FileSelectFilter_SQLiteFile + "|*.db;*.sqlite;*.sqlite3",
+                CheckPathExists = true
+            };
+
+            if (ofd.ShowDialog(this) == false) return;
+
+            if (MessageBox.Show(Properties.Resources.Message_DeleteOldDataNotification, Properties.Resources.Title_Conformation,
+                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
+                return;
+            }
+
+            settings.App_Import_SQLite_FilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            settings.Save();
+
+            bool result = false;
+            try {
+                File.Copy(ofd.FileName, settings.App_SQLite_DBFilePath, true);
+                result = true;
+            }
+            catch (Exception) { }
+
+            if (result) {
+                await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
+            }
+
+            if (result) {
+                _ = MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+            }
+            else {
+                _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            }
+        }
+
+        /// <summary>
         /// カスタム形式ファイル出力可能か
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void ExportCustomFileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = Properties.Settings.Default.App_Postgres_DumpExePath != string.Empty && !this.ChildrenWindowOpened;
+            Properties.Settings settings = Properties.Settings.Default;
+
+            e.CanExecute = settings.App_SelectedDBKind == (int)DBKind.PostgreSQL &&
+                           settings.App_Postgres_DumpExePath != string.Empty && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -410,9 +495,9 @@ namespace HouseholdAccountBook.Windows
             string directory;
             string fileName = string.Empty;
             // 過去に読み込んだときのフォルダとファイルをデフォルトにする
-            if (settings.App_CustomFormatFilePath != string.Empty) {
-                directory = Path.GetDirectoryName(settings.App_CustomFormatFilePath);
-                fileName = Path.GetFileName(settings.App_CustomFormatFilePath);
+            if (settings.App_Export_CustomFormat_FilePath != string.Empty) {
+                directory = Path.GetDirectoryName(settings.App_Export_CustomFormat_FilePath);
+                fileName = Path.GetFileName(settings.App_Export_CustomFormat_FilePath);
             }
             else {
                 directory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -427,12 +512,12 @@ namespace HouseholdAccountBook.Windows
 
             if (sfd.ShowDialog(this) == false) return;
 
-            settings.App_CustomFormatFilePath = Path.Combine(sfd.InitialDirectory, sfd.FileName);
+            settings.App_Export_CustomFormat_FilePath = Path.Combine(sfd.InitialDirectory, sfd.FileName);
             settings.Save();
 
             int? exitCode = -1;
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                exitCode = await this.ExecuteDump(sfd.FileName, PostgresFormat.Custom);
+                exitCode = await this.ExecuteDumpPostgreSQL(sfd.FileName, PostgresFormat.Custom);
             }
 
             if (exitCode == 0) {
@@ -450,7 +535,10 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void ExportSQLFileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = Properties.Settings.Default.App_Postgres_DumpExePath != string.Empty && !this.ChildrenWindowOpened;
+            Properties.Settings settings = Properties.Settings.Default;
+
+            e.CanExecute = settings.App_SelectedDBKind == (int)DBKind.PostgreSQL &&
+                           settings.App_Postgres_DumpExePath != string.Empty && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -467,9 +555,9 @@ namespace HouseholdAccountBook.Windows
             string directory;
             string fileName = string.Empty;
             // 過去に読み込んだときのフォルダとファイルをデフォルトにする
-            if (settings.App_SQLFilePath != string.Empty) {
-                directory = Path.GetDirectoryName(settings.App_SQLFilePath);
-                fileName = Path.GetFileName(settings.App_SQLFilePath);
+            if (settings.App_Export_SQLFilePath != string.Empty) {
+                directory = Path.GetDirectoryName(settings.App_Export_SQLFilePath);
+                fileName = Path.GetFileName(settings.App_Export_SQLFilePath);
             }
             else {
                 directory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -484,12 +572,12 @@ namespace HouseholdAccountBook.Windows
 
             if (sfd.ShowDialog(this) == false) return;
 
-            settings.App_SQLFilePath = Path.Combine(sfd.InitialDirectory, sfd.FileName);
+            settings.App_Export_SQLFilePath = Path.Combine(sfd.InitialDirectory, sfd.FileName);
             settings.Save();
 
             int? exitCode = -1;
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                exitCode = await this.ExecuteDump(sfd.FileName, PostgresFormat.Plain);
+                exitCode = await this.ExecuteDumpPostgreSQL(sfd.FileName, PostgresFormat.Plain);
             }
 
             if (exitCode == 0) {
@@ -3401,52 +3489,86 @@ namespace HouseholdAccountBook.Windows
             int tmpBackUpNum = backUpNum ?? settings.App_BackUpNum;
             string tmpBackUpFolderPath = backUpFolderPath ?? settings.App_BackUpFolderPath;
 
-            int? exitCode = null;
-
-            // 古いバックアップを削除する
-            if (tmpBackUpFolderPath != string.Empty) {
-                if (Directory.Exists(tmpBackUpFolderPath)) {
-                    List<string> fileList = new(Directory.GetFiles(tmpBackUpFolderPath, "*.backup", SearchOption.TopDirectoryOnly));
-                    if (fileList.Count >= tmpBackUpNum) {
-                        fileList.Sort();
-
-                        for (int i = 0; i <= fileList.Count - tmpBackUpNum; ++i) {
-                            File.Delete(fileList[i]);
-                        }
-                    }
-                }
+            if (tmpBackUpFolderPath == string.Empty) {
+                return false;
             }
 
+            bool result;
+            string backUpFileExt = PostgreSQLBackupFileExt;
             if (0 < tmpBackUpNum) {
-                if (tmpBackUpFolderPath != string.Empty) {
-                    // フォルダが存在しなければ作成する
-                    if (!Directory.Exists(tmpBackUpFolderPath)) {
-                        _ = Directory.CreateDirectory(tmpBackUpFolderPath);
-                    }
+                // フォルダが存在しなければ作成する
+                if (!Directory.Exists(tmpBackUpFolderPath)) {
+                    _ = Directory.CreateDirectory(tmpBackUpFolderPath);
+                }
 
-                    if (settings.App_Postgres_DumpExePath != string.Empty) {
-                        string backupFilePath = Path.Combine(tmpBackUpFolderPath, BackupFileName);
-                        exitCode = await this.ExecuteDump(backupFilePath, PostgresFormat.Custom, notifyResult, waitForFinish);
+                DBKind selectedDBKind = (DBKind)settings.App_SelectedDBKind;
+                switch (selectedDBKind) {
+                    case DBKind.PostgreSQL: {
+                        string backupFilePath = Path.Combine(tmpBackUpFolderPath, PostgreSQLBackupFileName);
+                        backUpFileExt = PostgreSQLBackupFileExt;
+                        int? exitCode = null;
+
+                        if (settings.App_Postgres_DumpExePath != string.Empty) {
+                            exitCode = await this.ExecuteDumpPostgreSQL(backupFilePath, PostgresFormat.Custom, notifyResult, waitForFinish);
+                        }
+
+                        result = exitCode == 0;
+                        break;
                     }
+                    case DBKind.SQLite: {
+                        string backupFilePath = Path.Combine(tmpBackUpFolderPath, SQLiteBackupFileName);
+                        backUpFileExt = SQLiteBackupFileExt;
+                        try {
+                            File.Copy(settings.App_SQLite_DBFilePath, backupFilePath, true);
+                            result = true;
+                        }
+                        catch {
+                            result = false;
+                        }
+                        break;
+                    }
+                    default:
+                        result = false;
+                        break;
                 }
             }
             else {
-                // バックアップ不要
-                exitCode = 0;
+                result = true;
             }
 
-            return exitCode == 0;
+            if (Directory.Exists(tmpBackUpFolderPath)) {
+                // サイズ0のバックアップを削除する
+                List<string> filePathList = new(Directory.GetFiles(tmpBackUpFolderPath, $"*.{backUpFileExt}", SearchOption.TopDirectoryOnly));
+                foreach (string filePath in filePathList) {
+                    FileInfo fileInfo = new(filePath);
+                    if (fileInfo.Length == 0) {
+                        fileInfo.Delete();
+                    }
+                }
+
+                // 古いバックアップを削除する
+                filePathList = new(Directory.GetFiles(tmpBackUpFolderPath, $"*.{backUpFileExt}", SearchOption.TopDirectoryOnly));
+                if (filePathList.Count > tmpBackUpNum) {
+                    filePathList.Sort();
+
+                    for (int i = 0; i < filePathList.Count - tmpBackUpNum; ++i) {
+                        File.Delete(filePathList[i]);
+                    }
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
-        /// ダンプを実行する
+        /// PostgreSQLのダンプを実行する
         /// </summary>
         /// <param name="backupFilePath">バックアップファイルパス</param>
         /// <param name="format">ダンプフォーマット</param>
         /// <param name="notifyResult">実行結果を通知する</param>
         /// <param name="waitForFinish">処理の完了を待機する</param>
         /// <returns>成功/失敗/不明</returns>
-        private async Task<int?> ExecuteDump(string backupFilePath, PostgresFormat format, bool notifyResult = false, bool waitForFinish = true)
+        private async Task<int?> ExecuteDumpPostgreSQL(string backupFilePath, PostgresFormat format, bool notifyResult = false, bool waitForFinish = true)
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -3483,11 +3605,11 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// リストアを実行する
+        /// PostgreSQLのリストアを実行する
         /// </summary>
         /// <param name="backupFilePath">バックアップファイルパス</param>
         /// <returns>成功/失敗</returns>
-        private async Task<int> ExecuteRestore(string backupFilePath)
+        private async Task<int> ExecuteRestorePostgreSQL(string backupFilePath)
         {
             Properties.Settings settings = Properties.Settings.Default;
 

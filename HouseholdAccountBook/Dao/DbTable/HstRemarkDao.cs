@@ -34,10 +34,12 @@ WHERE del_flg = 0;");
             var dto = includeDeleted
                 ? await this.dbHandler.QuerySingleOrDefaultAsync<HstRemarkDto>(@"
 SELECT * FROM hst_remark
-WHERE item_id = @ItemId AND remark = @Remark;", new HstRemarkDto { Remark = remark, ItemId = itemId })
+WHERE item_id = @ItemId AND remark = @Remark;",
+new HstRemarkDto { Remark = remark, ItemId = itemId })
                 : await this.dbHandler.QuerySingleOrDefaultAsync<HstRemarkDto>(@"
 SELECT * FROM hst_remark
-WHERE item_id = @ItemId AND remark = @Remark AND del_flg = 0;", new HstRemarkDto { Remark = remark, ItemId = itemId });
+WHERE item_id = @ItemId AND remark = @Remark AND del_flg = 0;",
+new HstRemarkDto { Remark = remark, ItemId = itemId });
 
             return dto;
         }
@@ -46,7 +48,7 @@ WHERE item_id = @ItemId AND remark = @Remark AND del_flg = 0;", new HstRemarkDto
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @DelFlg, 'now', @Updater, 'now', @Inserter);", dto);
+VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -60,7 +62,7 @@ VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @DelFlg, 'now', @Updater, 'now
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_remark
-SET used_time = @UsedTime, del_flg = @DelFlg, update_time = 'now', updater = @Updater
+SET used_time = @UsedTime, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId AND remark = @Remark AND used_time < @UsedTime;", dto);
 
             return count;
@@ -70,9 +72,9 @@ WHERE item_id = @ItemId AND remark = @Remark AND used_time < @UsedTime;", dto);
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @DelFlg, 'now', @Updater, 'now', @Inserter)
+VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 ON CONFLICT (item_id, remark) DO UPDATE
-SET used_time = @UsedTime, del_flg = @DelFlg, update_time = 'now', updater = @Updater
+SET used_time = @UsedTime, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE hst_remark.item_id = @ItemId AND hst_remark.remark = @Remark AND hst_remark.used_time < @UsedTime;", dto);
 
             return count;
@@ -93,7 +95,7 @@ WHERE hst_remark.item_id = @ItemId AND hst_remark.remark = @Remark AND hst_remar
         public async Task<int> DeleteAsync(HstRemarkDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
-UPDATE hst_remark SET del_flg = 1, update_time = 'now', updater = @Updater
+UPDATE hst_remark SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE remark = @Remark AND item_id = @ItemId;", dto);
 
             return count;

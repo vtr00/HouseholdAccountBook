@@ -530,7 +530,8 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
-                                <GroupBox Grid.Row="0" Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_PostgreSQL}">
+                                <GroupBox Grid.Row="0" Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_PostgreSQL}"
+                                          Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
@@ -564,7 +565,7 @@
 
                                     </Grid>
                                 </GroupBox>
-                                <GroupBox Grid.Row="1" Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_Access}">
+                                <GroupBox Grid.Row="1" Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_KichoFugetsu}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition SharedSizeGroup="Header"/>
@@ -574,7 +575,7 @@
                                         <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_Access_Provider}"/>
                                         <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                                                  ItemsSource="{Binding AccessProviderNameDic}" SelectedValue="{Binding SelectedAccessProviderName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                                  ItemsSource="{Binding KichoFugetsuProviderNameDic}" SelectedValue="{Binding SelectedKichoFugetsuProviderName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
                                     </Grid>
                                 </GroupBox>
                                 

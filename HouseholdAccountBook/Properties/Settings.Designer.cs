@@ -290,24 +290,24 @@ namespace HouseholdAccountBook.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string App_KichoDBFilePath {
+        public string App_Import_KichoFugetsu_FilePath {
             get {
-                return ((string)(this["App_KichoDBFilePath"]));
+                return ((string)(this["App_Import_KichoFugetsu_FilePath"]));
             }
             set {
-                this["App_KichoDBFilePath"] = value;
+                this["App_Import_KichoFugetsu_FilePath"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string App_CustomFormatFilePath {
+        public string App_Import_CustomFormat_FilePath {
             get {
-                return ((string)(this["App_CustomFormatFilePath"]));
+                return ((string)(this["App_Import_CustomFormat_FilePath"]));
             }
             set {
-                this["App_CustomFormatFilePath"] = value;
+                this["App_Import_CustomFormat_FilePath"] = value;
             }
         }
         
@@ -734,12 +734,12 @@ namespace HouseholdAccountBook.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string App_SQLFilePath {
+        public string App_Export_SQLFilePath {
             get {
-                return ((string)(this["App_SQLFilePath"]));
+                return ((string)(this["App_Export_SQLFilePath"]));
             }
             set {
-                this["App_SQLFilePath"] = value;
+                this["App_Export_SQLFilePath"] = value;
             }
         }
         
@@ -800,6 +800,42 @@ namespace HouseholdAccountBook.Properties {
             }
             set {
                 this["App_Access_Provider"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Microsoft.ACE.OLEDB.16.0")]
+        public string App_Import_KichoFugetsu_Provider {
+            get {
+                return ((string)(this["App_Import_KichoFugetsu_Provider"]));
+            }
+            set {
+                this["App_Import_KichoFugetsu_Provider"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string App_Import_SQLite_FilePath {
+            get {
+                return ((string)(this["App_Import_SQLite_FilePath"]));
+            }
+            set {
+                this["App_Import_SQLite_FilePath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string App_Export_CustomFormat_FilePath {
+            get {
+                return ((string)(this["App_Export_CustomFormat_FilePath"]));
+            }
+            set {
+                this["App_Export_CustomFormat_FilePath"] = value;
             }
         }
     }

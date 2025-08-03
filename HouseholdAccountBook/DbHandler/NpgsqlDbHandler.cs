@@ -43,7 +43,10 @@ namespace HouseholdAccountBook.DbHandler
         private NpgsqlDbHandler(string uri, int port, string userName, string password, string databaseName)
             : base(new NpgsqlConnection(string.Format(stringFormat, uri, port, userName, password, databaseName)))
         {
-            this.LibKind = DBLibraryKind.PostgreSQL;
+            this.DBLibKind = DBLibraryKind.PostgreSQL;
+            this.DBKind = DBKind.PostgreSQL;
+
+            _ = this.Open();
         }
 
         /// <summary>

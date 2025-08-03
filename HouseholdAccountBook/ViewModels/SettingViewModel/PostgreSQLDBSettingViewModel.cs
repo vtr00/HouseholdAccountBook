@@ -24,12 +24,12 @@ namespace HouseholdAccountBook.ViewModels
         /// ポート
         /// </summary>
         #region Port
-        public int Port
+        public int? Port
         {
             get => this._Port;
             set => this.SetProperty(ref this._Port, value);
         }
-        private int _Port = default;
+        private int? _Port = default;
         #endregion
 
         /// <summary>

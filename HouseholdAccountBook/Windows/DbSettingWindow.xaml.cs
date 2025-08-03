@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.Properties;
 using Microsoft.Win32;
 using System;
 using System.IO;
@@ -41,14 +42,14 @@ namespace HouseholdAccountBook.Windows
             this.WVM.PostgreSQLDBSettingVM.DumpExePath = settings.App_Postgres_DumpExePath;
             this.WVM.PostgreSQLDBSettingVM.RestoreExePath = settings.App_Postgres_RestoreExePath;
 
+            // SQLite
+            this.WVM.SQLiteSettingVM.DBFilePath = settings.App_SQLite_DBFilePath;
+
             // Access
             this.WVM.AccessSettingVM.ProviderNameDic.Clear();
             OleDbHandler.GetOleDbProvider().ForEach(this.WVM.AccessSettingVM.ProviderNameDic.Add);
             this.WVM.AccessSettingVM.SelectedProviderName = settings.App_Access_Provider;
             this.WVM.AccessSettingVM.DBFilePath = settings.App_Access_DBFilePath;
-
-            // SQLite
-            this.WVM.SQLiteSettingVM.DBFilePath = settings.App_SQLite_DBFilePath;
         }
 
         #region イベントハンドラ
@@ -123,11 +124,11 @@ namespace HouseholdAccountBook.Windows
                         fileName = Path.GetFileName(this.WVM.AccessSettingVM.DBFilePath);
                     }
                     OpenFileDialog ofd = new() {
-                        CheckFileExists = true,
+                        CheckFileExists = false,
                         InitialDirectory = directory,
                         FileName = fileName,
                         Title = Properties.Resources.Title_FileSelection,
-                        Filter = "Access DBファイル|*.mdb;*.accdb"
+                        Filter = "Accessファイル|*.mdb;*.accdb"
                     };
                     if (ofd.ShowDialog() == true) {
                         this.WVM.AccessSettingVM.DBFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
@@ -142,11 +143,11 @@ namespace HouseholdAccountBook.Windows
                         fileName = Path.GetFileName(this.WVM.SQLiteSettingVM.DBFilePath);
                     }
                     OpenFileDialog ofd = new() {
-                        CheckFileExists = true,
+                        CheckFileExists = false,
                         InitialDirectory = directory,
                         FileName = fileName,
                         Title = Properties.Resources.Title_FileSelection,
-                        Filter = "SQLite DBファイル|*.db;*.sqlite;*.sqlite3"
+                        Filter = Properties.Resources.FileSelectFilter_SQLiteFile + "|*.db;*.sqlite;*.sqlite3"
                     };
                     if (ofd.ShowDialog() == true) {
                         this.WVM.SQLiteSettingVM.DBFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
@@ -163,7 +164,23 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void OKCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            switch (this.WVM.SelectedDBKind) {
+                case DBKind.SQLite: {
+                    e.CanExecute = this.WVM.SQLiteSettingVM.DBFilePath != string.Empty;
+                    break;
+                }
+                case DBKind.PostgreSQL: {
+                    e.CanExecute = this.WVM.PostgreSQLDBSettingVM.Host != string.Empty && this.WVM.PostgreSQLDBSettingVM.Port != null &&
+                                   this.WVM.PostgreSQLDBSettingVM.UserName != string.Empty && this.passwordBox.Password != string.Empty &&
+                                   this.WVM.PostgreSQLDBSettingVM.DatabaseName != string.Empty && this.WVM.PostgreSQLDBSettingVM.Role != string.Empty;
+                    break;
+                }
+                case DBKind.Access:
+                case DBKind.Undefined:
+                default:
+                    e.CanExecute = false;
+                    break;
+            }
         }
 
         /// <summary>
@@ -179,7 +196,7 @@ namespace HouseholdAccountBook.Windows
             switch (this.WVM.SelectedDBKind) {
                 case DBKind.PostgreSQL: {
                     settings.App_Postgres_Host = this.WVM.PostgreSQLDBSettingVM.Host;
-                    settings.App_Postgres_Port = this.WVM.PostgreSQLDBSettingVM.Port;
+                    settings.App_Postgres_Port = this.WVM.PostgreSQLDBSettingVM.Port.Value;
                     settings.App_Postgres_UserName = this.WVM.PostgreSQLDBSettingVM.UserName;
                     settings.App_Postgres_Password = this.passwordBox.Password;
                     settings.App_Postgres_DatabaseName = this.WVM.PostgreSQLDBSettingVM.DatabaseName;
@@ -188,12 +205,17 @@ namespace HouseholdAccountBook.Windows
                     settings.App_Postgres_RestoreExePath = this.WVM.PostgreSQLDBSettingVM.RestoreExePath;
                     break;
                 }
-                case DBKind.Access: {
-                    settings.App_Access_DBFilePath = this.WVM.AccessSettingVM.DBFilePath;
-                    break;
-                }
                 case DBKind.SQLite: {
                     settings.App_SQLite_DBFilePath = this.WVM.SQLiteSettingVM.DBFilePath;
+
+                    if (!File.Exists(settings.App_SQLite_DBFilePath)) {
+                        byte[] sqliteBynary = Properties.Resources.SQLiteTemplateFile;
+                        File.WriteAllBytes(settings.App_SQLite_DBFilePath, sqliteBynary);
+                    }
+                    break;
+                }
+                case DBKind.Access: {
+                    settings.App_Access_DBFilePath = this.WVM.AccessSettingVM.DBFilePath;
                     break;
                 }
             }

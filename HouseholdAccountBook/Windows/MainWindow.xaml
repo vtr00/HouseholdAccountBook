@@ -25,11 +25,15 @@
     <Window.Resources>
         <!-- ファイルコマンド -->
         <RoutedCommand x:Key="FileCommand"/>
-        <RoutedCommand x:Key="ImportKichoHugetsuDbCommand"/>
+        
+        <RoutedCommand x:Key="ImportKichoFugetsuDbCommand"/>
         <RoutedCommand x:Key="ImportCustomFileCommand"/>
+        <RoutedCommand x:Key="ImportSQLiteFileCommand"/>
+
         <RoutedCommand x:Key="ExportCustomFileCommand"/>
         <RoutedCommand x:Key="ExportSQLFileCommand"/>
         <RoutedCommand x:Key="ExportExcelFileCommand"/>
+        
         <RoutedCommand x:Key="BackUpCommand"/>
         <RoutedCommand x:Key="ExitWindowCommand"/>
 
@@ -114,11 +118,15 @@
     <Window.CommandBindings>
         <!-- ファイルコマンド -->
         <CommandBinding Command="{StaticResource FileCommand}" CanExecute="FileCommand_CanExecute"/>
-        <CommandBinding Command="{StaticResource ImportKichoHugetsuDbCommand}" CanExecute="ImportKichoHugetsuDbCommand_CanExecute" Executed="ImportKichoHugetsuDbCommand_Executed"/>
+        
+        <CommandBinding Command="{StaticResource ImportKichoFugetsuDbCommand}" CanExecute="ImportKichoFugetsuDbCommand_CanExecute" Executed="ImportKichoFugetsuDbCommand_Executed"/>
         <CommandBinding Command="{StaticResource ImportCustomFileCommand}" CanExecute="ImportCustomFileCommand_CanExecute" Executed="ImportCustomFileCommand_Excuted"/>
+        <CommandBinding Command="{StaticResource ImportSQLiteFileCommand}" CanExecute="ImportSQLiteFileCommand_CanExecute" Executed="ImportSQLiteFileCommand_Executed"/>
+
         <CommandBinding Command="{StaticResource ExportCustomFileCommand}" CanExecute="ExportCustomFileCommand_CanExecute" Executed="ExportCustomFileCommand_Excuted"/>
         <CommandBinding Command="{StaticResource ExportSQLFileCommand}" CanExecute="ExportSQLFileCommand_CanExecute" Executed="ExportSQLFileCommand_Executed"/>
         <CommandBinding Command="{StaticResource ExportExcelFileCommand}"/>
+        
         <CommandBinding Command="{StaticResource BackUpCommand}" CanExecute="BackUpCommand_CanExecute" Executed="BackUpCommand_Executed"/>
         <CommandBinding Command="{StaticResource ExitWindowCommand}" CanExecute="ExitWindowCommand_CanExecute" Executed="ExitWindowCommand_Executed"/>
 
@@ -190,9 +198,11 @@
             <!-- ファイル -->
             <MenuItem Header="{x:Static properties:Resources.Menu_File}" Command="{StaticResource FileCommand}">
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Import}">
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_KichoFugetsu}" Command="{StaticResource ImportKichoHugetsuDbCommand}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_KichoFugetsu}" Command="{StaticResource ImportKichoFugetsuDbCommand}"/>
                     <Separator/>
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_CustomFormatFile}" Command="{StaticResource ImportCustomFileCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{StaticResource ImportSQLiteFileCommand}"/>
                 </MenuItem>
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Export}">
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_CustomFormatFile}" Command="{StaticResource ExportCustomFileCommand}"/>

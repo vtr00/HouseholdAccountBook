@@ -59,7 +59,7 @@
 
         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
                    Text="{x:Static properties:Resources.TextBlock_DBKind}"/>
-        <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalAlignment="Center" IsEnabled="False"
+        <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalAlignment="Center"
                   ItemsSource="{Binding DBKindDic}" SelectedValue="{Binding SelectedDBKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
 
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
@@ -145,7 +145,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>

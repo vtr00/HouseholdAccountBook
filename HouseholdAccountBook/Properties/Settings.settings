@@ -68,10 +68,10 @@
     <Setting Name="MainWindow_SelectedBookId" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">-1</Value>
     </Setting>
-    <Setting Name="App_KichoDBFilePath" Type="System.String" Scope="User">
+    <Setting Name="App_Import_KichoFugetsu_FilePath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="App_CustomFormatFilePath" Type="System.String" Scope="User">
+    <Setting Name="App_Import_CustomFormat_FilePath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="App_Postgres_DumpExePath" Type="System.String" Scope="User">
@@ -179,7 +179,7 @@
     <Setting Name="App_Postgres_Password_Input" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="App_SQLFilePath" Type="System.String" Scope="User">
+    <Setting Name="App_Export_SQLFilePath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="App_CultureName" Type="System.String" Scope="User">
@@ -196,6 +196,15 @@
     </Setting>
     <Setting Name="App_Access_Provider" Type="System.String" Scope="User">
       <Value Profile="(Default)">Microsoft.ACE.OLEDB.16.0</Value>
+    </Setting>
+    <Setting Name="App_Import_KichoFugetsu_Provider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Microsoft.ACE.OLEDB.16.0</Value>
+    </Setting>
+    <Setting Name="App_Import_SQLite_FilePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="App_Export_CustomFormat_FilePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

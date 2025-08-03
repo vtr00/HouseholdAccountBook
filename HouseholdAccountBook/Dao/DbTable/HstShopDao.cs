@@ -38,10 +38,12 @@ WHERE del_flg = 0;");
             var dto = includeDeleted
                 ? await this.dbHandler.QuerySingleOrDefaultAsync<HstShopDto>(@"
 SELECT * FROM hst_shop
-WHERE item_id = @ItemId AND shop_name = @ShopName;", new HstShopDto { ShopName = shopName, ItemId = itemId })
+WHERE item_id = @ItemId AND shop_name = @ShopName;",
+new HstShopDto { ShopName = shopName, ItemId = itemId })
                 : await this.dbHandler.QuerySingleOrDefaultAsync<HstShopDto>(@"
 SELECT * FROM hst_shop
-WHERE item_id = @ItemId AND shop_name = @ShopName AND del_flg = 0;", new HstShopDto { ShopName = shopName, ItemId = itemId });
+WHERE item_id = @ItemId AND shop_name = @ShopName AND del_flg = 0;",
+new HstShopDto { ShopName = shopName, ItemId = itemId });
 
             return dto;
         }
@@ -55,7 +57,7 @@ WHERE item_id = @ItemId AND shop_name = @ShopName AND del_flg = 0;", new HstShop
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO hst_shop (item_id, shop_name, used_time, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @ShopName, @UsedTime, @UsedTime, @DelFlg, 'now', @Updater, 'now', @Inserter);", dto);
+VALUES (@ItemId, @ShopName, @UsedTime, @UsedTime, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -69,7 +71,7 @@ VALUES (@ItemId, @ShopName, @UsedTime, @UsedTime, @DelFlg, 'now', @Updater, 'now
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_shop
-SET used_time = @UsedTime, del_flg = @DelFlg, update_time = 'now', updater = @Updater
+SET used_time = @UsedTime, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId AND shop_name = @ShopName AND used_time < @UsedTime;", dto);
 
             return count;
@@ -84,9 +86,9 @@ WHERE item_id = @ItemId AND shop_name = @ShopName AND used_time < @UsedTime;", d
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO hst_shop (item_id, shop_name, used_time, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @ShopName, @UsedTime, @DelFlg, 'now', @Updater, 'now', @Inserter)
+VALUES (@ItemId, @ShopName, @UsedTime, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 ON CONFLICT (item_id, shop_name) DO UPDATE
-SET used_time = @UsedTime, del_flg = @DelFlg, update_time = 'now', updater = @Updater
+SET used_time = @UsedTime, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE hst_shop.item_id = @ItemId AND hst_shop.shop_name = @ShopName AND hst_shop.used_time < @UsedTime;", dto);
 
             return count;
@@ -111,7 +113,7 @@ WHERE hst_shop.item_id = @ItemId AND hst_shop.shop_name = @ShopName AND hst_shop
         public async Task<int> DeleteAsync(HstShopDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
-UPDATE hst_shop SET del_flg = 1, update_time = 'now', updater = @Updater
+UPDATE hst_shop SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE shop_name = @ShopName AND item_id = @ItemId;", dto);
 
             return count;

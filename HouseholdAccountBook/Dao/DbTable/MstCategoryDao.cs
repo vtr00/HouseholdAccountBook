@@ -56,6 +56,10 @@ new MstCategoryDto { BalanceKind = balanceKind });
 
         public override async Task SetIdSequenceAsync(int idSeq)
         {
+            if (this.dbHandler.DBKind == DBKind.SQLite) {
+                throw new NotSupportedException();
+            }
+
             _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('mst_category_category_id_seq', @CategoryIdSeq);", new { CategoryIdSeq = idSeq });
         }
 
@@ -64,7 +68,7 @@ new MstCategoryDto { BalanceKind = balanceKind });
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO mst_category
 (category_id, category_name, balance_kind, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@CategoryId, @CategoryName, @BalanceKind, @SortOrder, @DelFlg, 'now', @Updater, 'now', @Inserter);", dto);
+VALUES (@CategoryId, @CategoryName, @BalanceKind, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -74,7 +78,7 @@ VALUES (@CategoryId, @CategoryName, @BalanceKind, @SortOrder, @DelFlg, 'now', @U
             int categoryId = await this.dbHandler.QuerySingleAsync<int>(@"
 INSERT INTO mst_category
 (category_name, balance_kind, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@CategoryName, @BalanceKind, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_category), @DelFlg, 'now', @Updater, 'now', @Inserter)
+VALUES (@CategoryName, @BalanceKind, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_category), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING category_id;", dto);
 
             return categoryId;
@@ -94,7 +98,7 @@ RETURNING category_id;", dto);
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE mst_category
-SET category_name = @CategoryName, update_time = 'now', updater = @Updater
+SET category_name = @CategoryName, update_time = @UpdateTime, updater = @Updater
 WHERE category_id = @CategoryId;", dto);
 
             return count;
@@ -109,14 +113,19 @@ WHERE category_id = @CategoryId;", dto);
         public async Task<int> SwapSortOrderAsync(int categoryId1, int categoryId2)
         {
             int count = await this.dbHandler.ExecuteAsync(@" 
+WITH original AS (
+  SELECT
+    (SELECT sort_order FROM mst_category WHERE category_id = @CategoryId1) AS sort_order1,
+    (SELECT sort_order FROM mst_category WHERE category_id = @CategoryId2) AS sort_order2
+)
 UPDATE mst_category
 SET sort_order = CASE
-  WHEN category_id = @CategoryId1 THEN (SELECT sort_order FROM mst_category WHERE category_id = @CategoryId2)
-  WHEN category_id = @CategoryId2 THEN (SELECT sort_order FROM mst_category WHERE category_id = @CategoryId1)
+  WHEN category_id = @CategoryId1 THEN (SELECT sort_order2 FROM original)
+  WHEN category_id = @CategoryId2 THEN (SELECT sort_order1 FROM original)
   ELSE sort_order
-END, update_time = 'now', updater = @Updater
+END, update_time = @UpdateTime, updater = @Updater
 WHERE category_id IN (@CategoryId1, @CategoryId2);",
-new { CategoryId1 = categoryId1, CategoryId2 = categoryId2, Updater });
+new { CategoryId1 = categoryId1, CategoryId2 = categoryId2, UpdateTime = DateTime.Now, Updater });
 
             return count;
         }
@@ -137,7 +146,7 @@ new { CategoryId1 = categoryId1, CategoryId2 = categoryId2, Updater });
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE mst_category
-SET del_flg = 1, update_time = 'now', updater = @Updater
+SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE category_id = @CategoryId;",
 new MstCategoryDto { CategoryId = pkey });
 

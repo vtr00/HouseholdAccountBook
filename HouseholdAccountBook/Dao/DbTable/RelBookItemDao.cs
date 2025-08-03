@@ -40,7 +40,8 @@ SELECT * FROM rel_book_item
 WHERE item_id = @ItemId AND book_id = @BookId;", new RelBookItemDto { BookId = bookId, ItemId = itemId })
                 : await this.dbHandler.QuerySingleOrDefaultAsync<RelBookItemDto>(@"
 SELECT * FROM rel_book_item
-WHERE item_id = @ItemId AND book_id = @BookId AND del_flg = 0;", new RelBookItemDto { BookId = bookId, ItemId = itemId });
+WHERE item_id = @ItemId AND book_id = @BookId AND del_flg = 0;",
+new RelBookItemDto { BookId = bookId, ItemId = itemId });
 
             return dto;
         }
@@ -55,7 +56,7 @@ WHERE item_id = @ItemId AND book_id = @BookId AND del_flg = 0;", new RelBookItem
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO rel_book_item
 (item_id, book_id, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @BookId, @DelFlg, 'now', @Updater, 'now', @Inserter);", dto);
+VALUES (@ItemId, @BookId, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -69,7 +70,7 @@ VALUES (@ItemId, @BookId, @DelFlg, 'now', @Updater, 'now', @Inserter);", dto);
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE rel_book_item
-SET del_flg = @DelFlg, update_time = 'now', updater = @Updater
+SET del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId AND book_id = @BookId;", dto);
 
             return count;
@@ -84,9 +85,9 @@ WHERE item_id = @ItemId AND book_id = @BookId;", dto);
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO rel_book_item (item_id, book_id, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @BookId, @DelFlg, 'now', @Updater, 'now', @Inserter)
+VALUES (@ItemId, @BookId, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 ON CONFLICT (item_id, book_id) DO UPDATE
-SET del_flg = @DelFlg, update_time = 'now', updater = @Updater
+SET del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE rel_book_item.item_id = @ItemId AND rel_book_item.book_id = @BookId;", dto);
 
             return count;
@@ -111,7 +112,7 @@ WHERE rel_book_item.item_id = @ItemId AND rel_book_item.book_id = @BookId;", dto
         public async Task<int> DeleteAsync(RelBookItemDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
-UPDATE rel_book_item SET del_flg = 1, update_time = 'now', updater = @Updater
+UPDATE rel_book_item SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId AND book_id = @BookId;", dto);
 
             return count;

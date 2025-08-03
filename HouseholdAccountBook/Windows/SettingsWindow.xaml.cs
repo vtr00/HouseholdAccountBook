@@ -860,7 +860,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void ReloadWindowSettingCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.WVM.LoadWindowSetting();
+            this.LoadOthersWindowSettings();
         }
 
         /// <summary>
@@ -933,6 +933,9 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void SettingsWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                this.WVM.SelectedDBKind = dbHandler.DBKind;
+            }
             await this.UpdateSettingWindowDataAsync();
 
             this.RegisterEventHandlerToWVM();
@@ -1233,7 +1236,7 @@ namespace HouseholdAccountBook.Windows
             if (this.WVM.SelectedTab == SettingsTabs.OtherSettingsTab) {
                 Log.Info();
 
-                this.WVM.LoadSettings();
+                this.LoadOthersSettings();
             }
         }
 
@@ -1442,6 +1445,82 @@ namespace HouseholdAccountBook.Windows
             else {
                 this.MoveOwnersCenter();
             }
+        }
+
+        /// <summary>
+        /// その他設定を読み込む
+        /// </summary>
+        public void LoadOthersSettings()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            this.WVM.WithSave = false;
+
+            this.WVM.DumpExePath = settings.App_Postgres_DumpExePath;
+            this.WVM.RestoreExePath = settings.App_Postgres_RestoreExePath;
+
+            this.WVM.KichoFugetsuProviderNameDic.Clear();
+            OleDbHandler.GetOleDbProvider().FindAll((pair) => pair.Key.Contains("Microsoft.ACE.OLEDB")).ForEach(this.WVM.KichoFugetsuProviderNameDic.Add);
+            this.WVM.SelectedKichoFugetsuProviderName = settings.App_Import_KichoFugetsu_Provider;
+
+            this.WVM.SelectedCultureName = settings.App_CultureName;
+            this.WVM.BackUpNum = settings.App_BackUpNum;
+            this.WVM.BackUpFolderPath = settings.App_BackUpFolderPath;
+            this.WVM.BackUpFlagAtMinimizing = settings.App_BackUpFlagAtMinimizing;
+            this.WVM.BackUpIntervalAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
+            this.WVM.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
+            this.WVM.PasswordInput = (PostgresPasswordInput)settings.App_Postgres_Password_Input;
+            this.WVM.StartMonth = settings.App_StartMonth;
+            this.WVM.NationalHolidayCsvURI = settings.App_NationalHolidayCsv_Uri;
+            this.WVM.NationalHolidayCsvDateIndex = settings.App_NationalHolidayCsv_DateIndex + 1;
+            this.WVM.IsPositionSaved = settings.App_IsPositionSaved;
+
+            this.WVM.DebugMode = settings.App_IsDebug;
+
+            this.WVM.WithSave = true;
+
+            this.LoadOthersWindowSettings();
+        }
+
+        /// <summary>
+        /// 各ウィンドウの矩形領域設定を読み込む
+        /// </summary>
+        public void LoadOthersWindowSettings()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            ObservableCollection<WindowSettingViewModel> list = [
+                new WindowSettingViewModel(){
+                    Title = Properties.Resources.Title_MainWindow,
+                    Left = settings.MainWindow_Left, Top = settings.MainWindow_Top,
+                    Width = settings.MainWindow_Width, Height = settings.MainWindow_Height },
+                new WindowSettingViewModel(){
+                    Title = Properties.Resources.Title_AddMoveWindow,
+                    Left = settings.MoveRegistrationWindow_Left, Top = settings.MoveRegistrationWindow_Top,
+                    Width = settings.MoveRegistrationWindow_Width, Height = settings.MoveRegistrationWindow_Height },
+                new WindowSettingViewModel(){
+                    Title = Properties.Resources.Title_AddWindow,
+                    Left = settings.ActionRegistrationWindow_Left, Top = settings.ActionRegistrationWindow_Top,
+                    Width = settings.ActionRegistrationWindow_Width, Height = settings.ActionRegistrationWindow_Height },
+                new WindowSettingViewModel(){
+                    Title = Properties.Resources.Title_AddListWindow,
+                    Left = settings.ActionListRegistrationWindow_Left, Top = settings.ActionListRegistrationWindow_Top,
+                    Width = settings.ActionListRegistrationWindow_Width, Height = settings.ActionListRegistrationWindow_Height },
+                new WindowSettingViewModel(){
+                    Title = Properties.Resources.Title_CsvComparisonWindow,
+                    Left = settings.CsvComparisonWindow_Left, Top = settings.CsvComparisonWindow_Top,
+                    Width = settings.CsvComparisonWindow_Width, Height = settings.CsvComparisonWindow_Height },
+                new WindowSettingViewModel(){
+                    Title = Properties.Resources.Title_SettingsWindow,
+                    Left = settings.SettingsWindow_Left, Top = settings.SettingsWindow_Top,
+                    Width = settings.SettingsWindow_Width, Height = settings.SettingsWindow_Height },
+                new WindowSettingViewModel(){
+                    Title = Properties.Resources.Title_TermSelectionWindow,
+                    Left = settings.TermWindow_Left, Top = settings.TermWindow_Top,
+                    Width = -1, Height = -1 }
+
+            ];
+            this.WVM.WindowSettingVMList = list;
         }
 
         /// <summary>
