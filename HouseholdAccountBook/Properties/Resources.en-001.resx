@@ -980,4 +980,7 @@ list</value>
   <data name="GroupHeader_Access" xml:space="preserve">
     <value>Microsoft Access</value>
   </data>
+  <data name="Button_LastDecade" xml:space="preserve">
+    <value>Last decade</value>
+  </data>
 </root>

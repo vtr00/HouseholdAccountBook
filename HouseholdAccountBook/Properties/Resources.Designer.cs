@@ -314,6 +314,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   過去10年 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_LastDecade {
+            get {
+                return ResourceManager.GetString("Button_LastDecade", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   移動 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Button_Move {

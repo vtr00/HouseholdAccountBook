@@ -187,6 +187,7 @@
 
         <!-- メニュー -->
         <Menu Grid.Row="0" Grid.Column="0">
+            <!-- ファイル -->
             <MenuItem Header="{x:Static properties:Resources.Menu_File}" Command="{StaticResource FileCommand}">
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Import}">
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_KichoFugetsu}" Command="{StaticResource ImportKichoHugetsuDbCommand}"/>
@@ -204,6 +205,7 @@
                 <Separator/>
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Exit}" Command="{StaticResource ExitWindowCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>
+            <!-- 編集 -->
             <MenuItem Header="{x:Static properties:Resources.Menu_Edit}" Command="{StaticResource EditCommand}">
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Find}" Command="{StaticResource ShowFindBoxCommand}" InputGestureText="Ctrl+F"/>
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Replace}" Command="{StaticResource ShowReplaceBoxCommand}" InputGestureText="Ctrl+H"/>
@@ -218,6 +220,7 @@
                 <Separator/>
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Delete}" Command="{StaticResource DeleteActionCommand}" InputGestureText="Del"/>
             </MenuItem>
+            <!-- 表示 -->
             <MenuItem Header="{x:Static properties:Resources.Menu_View}">
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Book}">
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_Change}" Command="{StaticResource ShowBookTabCommand}"/>
@@ -256,14 +259,23 @@
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Yearly}">
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyList}">
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyList_Change}" Command="{StaticResource ShowYearlyListTabCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Alt+→"/>
                     </MenuItem>
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyGraph}">
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyGraph_Change}" Command="{StaticResource ShowYearlyGraphTabCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Alt+→"/>
                     </MenuItem>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Update}" Command="{StaticResource UpdateCommand}" InputGestureText="F5"/>
             </MenuItem>
+            <!-- ツール -->
             <MenuItem Header="{x:Static properties:Resources.Menu_Tool}" Command="{StaticResource ToolCommand}">
                 <MenuItem Header="{x:Static properties:Resources.Menu_Tool_CsvComparison}" Command="{StaticResource OpenCsvComparisonWindowCommand}"/>
                 <Separator/>
@@ -273,6 +285,7 @@
                 <Separator/>
                 <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Settings}" Command="{StaticResource OpenSettingsWindowCommand}"/>
             </MenuItem>
+            <!-- ヘルプ -->
             <MenuItem Header="{x:Static properties:Resources.Menu_Help}">
                 <MenuItem Header="{x:Static properties:Resources.Menu_Help_VersionInfo}" Command="{x:Static ApplicationCommands.Help}" InputGestureText="F1"/>
             </MenuItem>
@@ -584,9 +597,9 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Column="0" Text="{Binding StartDate, StringFormat='yyyy-MM-dd'}"/>
+                                        <TextBlock Grid.Column="0" Text="{Binding DisplayedStart, StringFormat='yyyy-MM-dd'}"/>
                                         <TextBlock Grid.Column="1" Text=" - "/>
-                                        <TextBlock Grid.Column="2" Text="{Binding EndDate, StringFormat='yyyy-MM-dd'}"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding DisplayedEnd, StringFormat='yyyy-MM-dd'}"/>
                                     </Grid>
                                 </ToolTipService.ToolTip>
                             </Button>
@@ -672,7 +685,21 @@
                     <Grid Grid.Row="0" Margin="2">
                         <StackPanel Orientation="Horizontal">
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastYearCommand}"/>
-                            <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                            <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}">
+                                <ToolTipService.ToolTip>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="{Binding DisplayedStart, StringFormat='yyyy-MM'}"/>
+                                        <TextBlock Grid.Column="1" Text=" - "/>
+                                        <TextBlock Grid.Column="2" Text="{Binding DisplayedEnd, StringFormat='yyyy-MM'}"/>
+                                    </Grid>
+                                </ToolTipService.ToolTip>
+                            </Button>
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextYearCommand}"/>
                             <Button Width="80" Content="{x:Static properties:Resources.Button_ThisYear}" Command="{StaticResource GoToThisYearCommand}">
                                 <ToolTipService.ToolTip>
@@ -768,7 +795,21 @@
                     <Grid Grid.Row="0" Margin="2">
                         <StackPanel Orientation="Horizontal">
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastYearCommand}"/>
-                            <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                            <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}">
+                                <ToolTipService.ToolTip>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="{Binding DisplayedStart, StringFormat='yyyy-MM'}"/>
+                                        <TextBlock Grid.Column="1" Text=" - "/>
+                                        <TextBlock Grid.Column="2" Text="{Binding DisplayedEnd, StringFormat='yyyy-MM'}"/>
+                                    </Grid>
+                                </ToolTipService.ToolTip>
+                            </Button>
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextYearCommand}"/>
                             <Button Width="80" Content="{x:Static properties:Resources.Button_ThisYear}" Command="{StaticResource GoToThisYearCommand}">
                                 <ToolTipService.ToolTip>
@@ -837,6 +878,9 @@
             <TabItem Header="{x:Static properties:Resources.TabHeader_YearlySummary}">
                 <TabItem.InputBindings>
                     <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextYearCommand}"/>
                 </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -847,10 +891,18 @@
                     <!-- 中央メニュー -->
                     <Grid Grid.Row="0" Margin="2">
                         <StackPanel Orientation="Horizontal">
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" IsEnabled="False"/>
-                            <Button Width="120" Content="-" IsEnabled="False"/>
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" IsEnabled="False"/>
-                            <Button Width="80" Content="-" IsEnabled="False"/>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastYearCommand}"/>
+                            <Button Width="120">
+                                <Button.Content>
+                                    <TextBlock>
+                                        <TextBlock Text="{Binding DisplayedStart, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                        <TextBlock Text=" - "/>
+                                        <TextBlock Text="{Binding DisplayedEnd, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                    </TextBlock>
+                                </Button.Content>
+                            </Button>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextYearCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_LastDecade}" Command="{StaticResource GoToThisYearCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                         </StackPanel>
@@ -918,6 +970,9 @@
             <TabItem Header="{x:Static properties:Resources.TabHeader_YearlyGraph}">
                 <TabItem.InputBindings>
                     <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextYearCommand}"/>
                 </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -930,10 +985,18 @@
                     <!-- 中央メニュー -->
                     <Grid Grid.Row="0" Margin="2">
                         <StackPanel Orientation="Horizontal">
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" IsEnabled="False"/>
-                            <Button Width="120" Content="-" IsEnabled="False"/>
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" IsEnabled="False"/>
-                            <Button Width="80" Content="-" IsEnabled="False"/>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastYearCommand}"/>
+                            <Button Width="120">
+                                <Button.Content>
+                                    <TextBlock>
+                                        <TextBlock Text="{Binding DisplayedStart, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                        <TextBlock Text=" - "/>
+                                        <TextBlock Text="{Binding DisplayedEnd, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                    </TextBlock>
+                                </Button.Content>
+                            </Button>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextYearCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_LastDecade}" Command="{StaticResource GoToThisYearCommand}"/>
                             
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>

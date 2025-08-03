@@ -16,11 +16,7 @@ namespace HouseholdAccountBook.Converters
             }
             else if (value is DateTime dateTime) {
                 Properties.Settings settings = Properties.Settings.Default;
-                if (settings.App_StartMonth == 1) {
-                    return dateTime.ToString("yyyy");
-                } else {
-                    return "'" + dateTime.ToString("yyyy");
-                }
+                return settings.App_StartMonth == 1 ? new string($"{dateTime:yyyy}") : new string($"'{dateTime:yyyy}");
 
             }
             throw new NotImplementedException();

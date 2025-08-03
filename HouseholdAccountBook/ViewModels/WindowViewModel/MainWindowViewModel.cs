@@ -54,6 +54,8 @@ namespace HouseholdAccountBook.ViewModels
             set {
                 if (this.SetProperty(ref this._SelectedTabIndex, value)) {
                     this.SelectedTabChanged?.Invoke();
+                    this.RaisePropertyChanged(nameof(this.DisplayedStart));
+                    this.RaisePropertyChanged(nameof(this.DisplayedEnd));
                 }
             }
         }
@@ -111,42 +113,40 @@ namespace HouseholdAccountBook.ViewModels
         public int? SelectedItemId { get; set; } = default;
 
         /// <summary>
-        /// 表示開始日
+        /// 表示開始
         /// </summary>
-        public DateTime DisplayedStartDate {
+        public DateTime DisplayedStart {
             get {
-                int startMonth = Properties.Settings.Default.App_StartMonth;
                 switch (this.SelectedTab) {
                     case Tabs.BooksTab:
                     case Tabs.DailyGraphTab:
                         return this.StartDate;
                     case Tabs.MonthlyListTab:
                     case Tabs.MonthlyGraphTab:
-                        return this.DisplayedYear.GetFirstDateOfFiscalYear(startMonth);
+                        return this.DisplayedStartMonth;
                     case Tabs.YearlyGraphTab:
                     case Tabs.YearlyListTab:
-                        return DateTime.Now.GetFirstDateOfFiscalYear(startMonth).AddYears(-10);
+                        return this.DisplayedStartYear;
                     default:
                         return this.StartDate;
                 }
             }
         }
         /// <summary>
-        /// 表示終了日
+        /// 表示終了
         /// </summary>
-        public DateTime DisplayedEndDate {
+        public DateTime DisplayedEnd {
             get {
-                int startMonth = Properties.Settings.Default.App_StartMonth;
                 switch (this.SelectedTab) {
                     case Tabs.BooksTab:
                     case Tabs.DailyGraphTab:
                         return this.EndDate;
                     case Tabs.MonthlyListTab:
                     case Tabs.MonthlyGraphTab:
-                        return this.DisplayedYear.GetLastDateOfFiscalYear(startMonth);
+                        return this.DisplayedEndMonth;
                     case Tabs.YearlyGraphTab:
                     case Tabs.YearlyListTab:
-                        return DateTime.Now.GetLastDateOfFiscalYear(startMonth);
+                        return this.DisplayedEndYear;
                     default:
                         return this.EndDate;
                 }
@@ -156,6 +156,27 @@ namespace HouseholdAccountBook.ViewModels
         /// 今日
         /// </summary>
         public DateTime ToDay => DateTime.Now;
+
+        /// <summary>
+        /// 会計開始月
+        /// </summary>
+        #region FiscalStartMonth
+        public int FiscalStartMonth
+        {
+            get => this._fiscalStartMonth;
+            set {
+                if (this.SetProperty(ref this._fiscalStartMonth, value)) {
+                    this.RaisePropertyChanged(nameof(this.DisplayedStart));
+                    this.RaisePropertyChanged(nameof(this.DisplayedEnd));
+                    this.RaisePropertyChanged(nameof(this.DisplayedMonth));
+                    this.RaisePropertyChanged(nameof(this.DisplayedMonths));
+                    this.RaisePropertyChanged(nameof(this.DisplayedYear));
+                    this.RaisePropertyChanged(nameof(this.DisplayedYears));
+                }
+            }
+        }
+        private int _fiscalStartMonth = 4;
+        #endregion
         #endregion
 
         #region プロパティ(グラフ)
@@ -260,12 +281,17 @@ namespace HouseholdAccountBook.ViewModels
                     if (!this.onUpdateDisplayedDate) {
                         this.onUpdateDisplayedDate = true;
                         // 表示月の年度の最初の月を表示年とする
-                        this.DisplayedYear = value.Value.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
+                        this.DisplayedYear = value.Value.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
                         this.onUpdateDisplayedDate = false;
                     }
                 }
                 if (oldDisplayedMonth != this.DisplayedMonth) {
-                    this.RaisePropertyChanged();
+                    this.RaisePropertyChanged(nameof(this.DisplayedStart));
+                    this.RaisePropertyChanged(nameof(this.DisplayedEnd));
+                    this.RaisePropertyChanged(nameof(this.DisplayedMonth));
+                    this.RaisePropertyChanged(nameof(this.DisplayedMonths));
+                    this.RaisePropertyChanged(nameof(this.DisplayedYear));
+                    this.RaisePropertyChanged(nameof(this.DisplayedYears));
                 }
             }
         }
@@ -279,8 +305,9 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._StartDate;
             set {
-                this.SetProperty(ref this._StartDate, value);
-                this.RaisePropertyChanged(nameof(this.DisplayedMonth));
+                if (this.SetProperty(ref this._StartDate, value)) {
+                    this.RaisePropertyChanged(nameof(this.DisplayedMonth));
+                }
             }
         }
         private DateTime _StartDate = DateTime.Now.GetFirstDateOfMonth();
@@ -293,8 +320,9 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._EndDate;
             set {
-                this.SetProperty(ref this._EndDate, value);
-                this.RaisePropertyChanged(nameof(this.DisplayedMonth));
+                if (this.SetProperty(ref this._EndDate, value)) {
+                    this.RaisePropertyChanged(nameof(this.DisplayedMonth));
+                }
             }
         }
         private DateTime _EndDate = DateTime.Now.GetLastDateOfMonth();
@@ -633,15 +661,18 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._DisplayedYear, value)) {
                     if (!this.onUpdateDisplayedDate) {
                         this.onUpdateDisplayedDate = true;
-                        int startMonth = Properties.Settings.Default.App_StartMonth;
-                        int yearDiff = value.GetFirstDateOfFiscalYear(startMonth).Year - oldDisplayedYear.GetFirstDateOfFiscalYear(startMonth).Year;
-
+                        int yearDiff = value.GetFirstDateOfFiscalYear(this.FiscalStartMonth).Year - oldDisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth).Year;
                         if (this.DisplayedMonth != null) {
                             // 表示年の差分を表示月に反映する
                             this.DisplayedMonth = this.DisplayedMonth.Value.AddYears(yearDiff);
                         }
                         this.onUpdateDisplayedDate = false;
                     }
+                }
+                if (this.DisplayedYear != oldDisplayedYear) {
+                    this.RaisePropertyChanged(nameof(this.DisplayedStart));
+                    this.RaisePropertyChanged(nameof(this.DisplayedEnd));
+                    this.RaisePropertyChanged(nameof(this.DisplayedYears));
                 }
             }
         }
@@ -654,11 +685,28 @@ namespace HouseholdAccountBook.ViewModels
         #region DisplayedMonths
         public ObservableCollection<DateTime> DisplayedMonths
         {
-            get => this._DisplayedMonths;
-            set => this.SetProperty(ref this._DisplayedMonths, value);
+            get {
+                DateTime tmpMonth = this.DisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
+
+                // 表示する月の文字列を作成する
+                ObservableCollection<DateTime> displayedMonths = [];
+                for (int i = 0; i < 12; ++i) {
+                    displayedMonths.Add(tmpMonth);
+                    tmpMonth = tmpMonth.AddMonths(1);
+                }
+                return displayedMonths;
+            }
         }
-        private ObservableCollection<DateTime> _DisplayedMonths = default;
         #endregion
+
+        /// <summary>
+        /// 表示開始月
+        /// </summary>
+        public DateTime DisplayedStartMonth => this.DisplayedMonths.First();
+        /// <summary>
+        /// 表示終了月
+        /// </summary>
+        public DateTime DisplayedEndMonth => this.DisplayedMonths.Last();
 
         /// <summary>
         /// 月別系列VMリスト
@@ -764,11 +812,26 @@ namespace HouseholdAccountBook.ViewModels
         #region DisplayedYears
         public ObservableCollection<DateTime> DisplayedYears
         {
-            get => this._DisplayedYears;
-            set => this.SetProperty(ref this._DisplayedYears, value);
+            get {
+                DateTime tmpYear = this.DisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth).AddYears(-9);
+                ObservableCollection<DateTime> displayedYears = [];
+                for (int i = 0; i < 10; ++i) {
+                    displayedYears.Add(tmpYear);
+                    tmpYear = tmpYear.AddYears(1);
+                }
+                return displayedYears;
+            }
         }
-        private ObservableCollection<DateTime> _DisplayedYears = default;
         #endregion
+
+        /// <summary>
+        /// 表示開始年
+        /// </summary>
+        public DateTime DisplayedStartYear => this.DisplayedYears.First();
+        /// <summary>
+        /// 表示終了年
+        /// </summary>
+        public DateTime DisplayedEndYear => this.DisplayedYears.Last();
 
         /// <summary>
         /// 年別系列VMリスト
@@ -785,7 +848,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 選択された年別系列VM
         /// </summary>
-        #region SelectedYearlySummaryVM
+        #region SelectedYearlySeriesVM
         public SeriesViewModel SelectedYearlySeriesVM
         {
             get => this._SelectedYearlySeriesVM;
@@ -895,17 +958,9 @@ namespace HouseholdAccountBook.ViewModels
         }
 
         /// <summary>
-        /// 表示年変更を通知する
-        /// </summary>
-        public void RaiseDisplayedYearChanged()
-        {
-            this.RaisePropertyChanged(nameof(this.DisplayedYear));
-        }
-
-        /// <summary>
         /// 選択帳簿項目変更を通知する
         /// </summary>
-        public void RaiseSelectedActionVMListChanged()
+        private void RaiseSelectedActionVMListChanged()
         {
             this.RaisePropertyChanged(nameof(this.AverageValue));
             this.RaisePropertyChanged(nameof(this.Count));

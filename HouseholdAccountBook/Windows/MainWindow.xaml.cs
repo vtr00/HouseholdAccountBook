@@ -1246,8 +1246,8 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void GoToLastYearCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 年間一覧/年間グラフタブを選択している
-            e.CanExecute = this.WVM.SelectedTab == Tabs.MonthlyListTab || this.WVM.SelectedTab == Tabs.MonthlyGraphTab;
+            // 月別一覧/月別グラフ/年別一覧/年別グラフタブを選択している
+            e.CanExecute = this.WVM.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab;
         }
 
         /// <summary>
@@ -1272,9 +1272,9 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void GoToThisYearCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            DateTime thisYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
-            // 年間一覧/年間グラフタブを選択している かつ 今年が表示されていない
-            e.CanExecute = (this.WVM.SelectedTab == Tabs.MonthlyListTab || this.WVM.SelectedTab == Tabs.MonthlyGraphTab) &&
+            DateTime thisYear = DateTime.Now.GetFirstDateOfFiscalYear(this.WVM.FiscalStartMonth);
+            // 月別一覧/月別グラフ/年別一覧/年別グラフタブを選択している かつ 今年が表示されていない
+            e.CanExecute = (this.WVM.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab) &&
                            !(thisYear <= this.WVM.DisplayedYear && this.WVM.DisplayedYear < thisYear.AddYears(1));
         }
 
@@ -1288,7 +1288,7 @@ namespace HouseholdAccountBook.Windows
             Log.Info();
 
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
+                this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(this.WVM.FiscalStartMonth);
                 await this.UpdateAsync(isUpdateBookList: true);
             }
         }
@@ -1300,8 +1300,8 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void GoToNextYearCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            // 年間一覧/年間グラフタブを選択している
-            e.CanExecute = this.WVM.SelectedTab == Tabs.MonthlyListTab || this.WVM.SelectedTab == Tabs.MonthlyGraphTab;
+            // 月別一覧/月別グラフ/年別一覧/年別グラフタブを選択している
+            e.CanExecute = this.WVM.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab;
         }
 
         /// <summary>
@@ -1371,8 +1371,8 @@ namespace HouseholdAccountBook.Windows
 
             if (sw.ShowDialog() == true) {
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    this.WVM.FiscalStartMonth = Properties.Settings.Default.App_StartMonth;
                     await this.UpdateAsync(isUpdateBookList: true);
-                    this.WVM.RaiseDisplayedYearChanged();
                 }
             }
         }
@@ -1589,6 +1589,7 @@ namespace HouseholdAccountBook.Windows
             this.windowLog.Log("WindowLoaded", true);
 
             Properties.Settings settings = Properties.Settings.Default;
+            this.WVM.FiscalStartMonth = settings.App_StartMonth;
 
             // 帳簿リスト更新
             await this.UpdateBookListAsync(settings.MainWindow_SelectedBookId);
@@ -1816,7 +1817,7 @@ namespace HouseholdAccountBook.Windows
                 foreach (var dto in dtoList) {
                     MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : JsonConvert.DeserializeObject<MstBookDto.JsonDto>(dto.JsonCode);
 
-                    if (DateTimeExtensions.IsWithIn(this.WVM.DisplayedStartDate, this.WVM.DisplayedEndDate, jsonObj?.StartDate, jsonObj?.EndDate)) {
+                    if (DateTimeExtensions.IsWithIn(this.WVM.DisplayedStart, this.WVM.DisplayedEnd, jsonObj?.StartDate, jsonObj?.EndDate)) {
                         BookViewModel vm = new() { Id = dto.BookId, Name = dto.BookName };
                         bookVMList.Add(vm);
 
@@ -2148,14 +2149,14 @@ namespace HouseholdAccountBook.Windows
         /// 年度内月別系列VMリストを取得する(月別一覧/月別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
-        /// <param name="includedTime">年度内の時間</param>
+        /// <param name="includedTime">年度内の日付</param>
         /// <returns>年度内月別系列VMリスト</returns>
         private async Task<ObservableCollection<SeriesViewModel>> LoadMonthlySeriesViewModelListWithinYearAsync(int? bookId, DateTime includedTime)
         {
             Log.Info($"bookId:{bookId} includedTime:{includedTime:yyyy-MM-dd}");
 
-            DateTime startTime = includedTime.GetFirstDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
-            DateTime endTime = startTime.GetLastDateOfFiscalYear(Properties.Settings.Default.App_StartMonth);
+            DateTime startTime = includedTime.GetFirstDateOfFiscalYear(this.WVM.FiscalStartMonth);
+            DateTime endTime = startTime.GetLastDateOfFiscalYear(this.WVM.FiscalStartMonth);
 
             // 開始日までの収支を取得する
             int balance = 0;
@@ -2243,8 +2244,7 @@ namespace HouseholdAccountBook.Windows
         {
             Log.Info($"bookId:{bookId}");
 
-            Settings settings = Settings.Default;
-            DateTime startTime = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).AddYears(-9);
+            DateTime startTime = this.WVM.DisplayedStartYear;
 
             // 開始日までの収支を取得する
             int balance = 0;
@@ -2266,7 +2266,7 @@ namespace HouseholdAccountBook.Windows
 
             // 最初の年の分を取得する
             DateTime tmpStartTime = startTime;
-            DateTime tmpEndTime = tmpStartTime.GetLastDateOfFiscalYear(settings.App_StartMonth);
+            DateTime tmpEndTime = tmpStartTime.GetLastDateOfFiscalYear(this.WVM.FiscalStartMonth);
             ObservableCollection<SummaryViewModel> summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
             balance += summaryVMList[0].Total;
             vmList[0].Values.Add(balance); // 残高
@@ -2288,7 +2288,7 @@ namespace HouseholdAccountBook.Windows
             int years = 10;
             for (int i = 1; i < years; ++i) {
                 tmpStartTime = tmpStartTime.AddYears(1);
-                tmpEndTime = tmpStartTime.GetLastDateOfFiscalYear(settings.App_StartMonth);
+                tmpEndTime = tmpStartTime.GetLastDateOfFiscalYear(this.WVM.FiscalStartMonth);
 
                 summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
                 balance += summaryVMList[0].Total;
@@ -2669,16 +2669,6 @@ namespace HouseholdAccountBook.Windows
             int? tmpItemId = itemId ?? this.WVM.SelectedItemId;
             Log.Info($"tmpBalanceKind:{tmpBalanceKind} tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
 
-            int startMonth = Properties.Settings.Default.App_StartMonth;
-            DateTime tmpMonth = this.WVM.DisplayedYear.GetFirstDateOfFiscalYear(startMonth);
-
-            // 表示する月の文字列を作成する
-            ObservableCollection<DateTime> displayedMonths = [];
-            for (int i = 0; i < 12; ++i) {
-                displayedMonths.Add(tmpMonth);
-                tmpMonth = tmpMonth.AddMonths(1);
-            }
-            this.WVM.DisplayedMonths = displayedMonths;
             this.WVM.MonthlySeriesVMList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedYear);
 
             this.WVM.SelectedMonthlySeriesVM = this.WVM.MonthlySeriesVMList.FirstOrDefault((vm) => (vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
@@ -2695,8 +2685,7 @@ namespace HouseholdAccountBook.Windows
 
             Log.Info();
 
-            Settings settings = Settings.Default;
-            int startMonth = settings.App_StartMonth;
+            int startMonth = this.WVM.FiscalStartMonth;
 
             #region 全項目
             this.WVM.MonthlyGraphPlotModel.Axes.Clear();
@@ -2939,20 +2928,7 @@ namespace HouseholdAccountBook.Windows
             int? tmpItemId = itemId ?? this.WVM.SelectedItemId;
             Log.Info($"tmpBalanceKind:{tmpBalanceKind} tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
 
-            Settings settings = Settings.Default;
-            int startMonth = settings.App_StartMonth;
-            DateTime tmpYear = DateTime.Now.GetFirstDateOfFiscalYear(startMonth).AddYears(-9);
-
-            // 表示する月の文字列を作成する
-            ObservableCollection<DateTime> displayedYears = [];
-            for (int i = 0; i < 10; ++i) {
-                displayedYears.Add(tmpYear);
-                tmpYear = tmpYear.AddYears(1);
-            }
-
-            this.WVM.DisplayedYears = displayedYears;
             this.WVM.YearlySeriesVMList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM?.Id);
-
             this.WVM.SelectedYearlySeriesVM = this.WVM.YearlySeriesVMList.FirstOrDefault((vm) => (vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId));
         }
         #endregion
@@ -2967,8 +2943,7 @@ namespace HouseholdAccountBook.Windows
 
             Log.Info();
 
-            Settings settings = Settings.Default;
-            int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
+            int startYear = this.WVM.DisplayedStartYear.Year;
 
             #region 全項目
             this.WVM.YearlyGraphPlotModel.Axes.Clear();
@@ -2976,14 +2951,14 @@ namespace HouseholdAccountBook.Windows
 
             // 横軸 - 年軸
             CategoryAxis horizontalAxis1 = new() {
-                Unit = Properties.Resources.Unit_FiscalYear,
+                Unit = this.WVM.FiscalStartMonth == 1 ? Properties.Resources.Unit_Year : Properties.Resources.Unit_FiscalYear,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
             horizontalAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する年の文字列を作成する
             for (int i = startYear; i < startYear + 10; ++i) {
-                horizontalAxis1.Labels.Add($"{i}");
+                horizontalAxis1.Labels.Add(this.WVM.FiscalStartMonth == 1 ? $"{i}" : $"'{i}");
             }
             this.WVM.YearlyGraphPlotModel.Axes.Add(horizontalAxis1);
 
@@ -3008,14 +2983,14 @@ namespace HouseholdAccountBook.Windows
 
             // 横軸 - 年軸
             CategoryAxis horizontalAxis2 = new() {
-                Unit = Properties.Resources.Unit_FiscalYear,
+                Unit = this.WVM.FiscalStartMonth == 1 ? Properties.Resources.Unit_Year : Properties.Resources.Unit_FiscalYear,
                 Position = AxisPosition.Bottom,
                 Key = "Category"
             };
             horizontalAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
             // 表示する年の文字列を作成する
             for (int i = startYear; i < startYear + 10; ++i) {
-                horizontalAxis2.Labels.Add($"{i}");
+                horizontalAxis2.Labels.Add(this.WVM.FiscalStartMonth == 1 ? $"{i}" : $"'{i}");
             }
             this.WVM.SelectedYearlyGraphPlotModel.Axes.Add(horizontalAxis2);
 
@@ -3050,8 +3025,7 @@ namespace HouseholdAccountBook.Windows
             int? tmpItemId = itemId ?? this.WVM.SelectedItemId;
             Log.Info($"tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
 
-            Settings settings = Settings.Default;
-            int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
+            int startYear = this.WVM.DisplayedStartYear.Year;
 
             switch (this.WVM.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
@@ -3153,7 +3127,7 @@ namespace HouseholdAccountBook.Windows
             Log.Info();
 
             Settings settings = Settings.Default;
-            int startYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).Year - 9;
+            int startYear = this.WVM.DisplayedStartYear.Year;
 
             SeriesViewModel vm = this.WVM.SelectedYearlyGraphSeriesVM;
 

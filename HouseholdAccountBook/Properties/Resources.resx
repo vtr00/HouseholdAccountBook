@@ -987,4 +987,7 @@
   <data name="GroupHeader_Access" xml:space="preserve">
     <value>Microsoft Access(記帳風月)</value>
   </data>
+  <data name="Button_LastDecade" xml:space="preserve">
+    <value>過去10年</value>
+  </data>
 </root>
