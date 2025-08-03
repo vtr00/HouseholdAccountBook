@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.DbHandler
                 string sourcesName = row["SOURCES_NAME"].ToString();
                 string sourcesDescription = row["SOURCES_DESCRIPTION"].ToString();
 
-                list.Add(new KeyValuePair<string, string>(sourcesName, sourcesDescription));
+                list.Add(new KeyValuePair<string, string>(sourcesName, $"{sourcesName} ({sourcesDescription})"));
             }
             return list;
         }

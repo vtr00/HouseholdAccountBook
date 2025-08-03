@@ -1038,6 +1038,10 @@
   ActionRegistrationWindow
   ActionListRegistrationWindow
     △項目が未選択の場合に登録できないように変更した
+2025/08/04
+  SettingWindow
+    ↑Accessのプロバイダ選択で.NET 8.0対応のときにDescriptionのみの表記になっていたのを修正した
+    △Accessのプロバイダ選択でAccess以外の項目を非表示に変更した
 
 ---------------------------------------------------------------------------------------------------------------------
 凡例：＋追加 △変更 ×削除 ↑バグ修正
@@ -1046,11 +1050,8 @@
   ・CSV比較をスクロールしたときに一致列の有効無効が更新されない
     一致列の有効無効判定を行わなくても無効の表示になる
     適当な行を選択すると、表示している範囲だけ更新される
+  ・PostgreSQLのバックアップでパスワード入力の場合に入力ダイアログが表示されない
 
 修正案:
   ・帳簿が一定額を下回ったら通知する
   ・SQLiteに対応する
-  　・DAOはPostgreSQL、SQLiteで共通か？ - SQLiteにもRETURNINGは存在する。UPSERTを共通文にできるかを確認したい
-    ・DAOFactoryはDTO単位で作成する。一旦PostgreSQLのDAO化を実装してから対応する
-  ・DTO/ViewModelのMappingExtensionを作成する
-  ・DisplaySettingsChanged後、Left/Top=-32000でFailedToModifyLocationしたら位置を保存せずに再起動する
