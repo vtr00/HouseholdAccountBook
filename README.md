@@ -8,7 +8,7 @@ It is supported for Japanese and English Language, and for Japanese Location onl
 
 ## __概要__
 本ソフトは PostgreSQL を用いた家計簿ソフトです。  
-家計簿ソフト [記帳風月](https://www.vector.co.jp/magazine/softnews/061024/n0610242.html?srsltid=AfmBOoqAWe3KIwVaToJ0SYY-HNEI3e8p86AA2RxxBJ52WTH5YZwydP1I) から多くのデータの移行が可能です。
+家計簿ソフト [記帳風月](https://www.vector.co.jp/magazine/softnews/061024/n0610242.html?srsltid=AfmBOoqAWe3KIwVaToJ0SYY-HNEI3e8p86AA2RxxBJ52WTH5YZwydP1I) から多くのデータの移行が可能です。   
 現在、バイナリの公開は予定しておりません。  
 自力で環境設定、ビルドできる方向けです。
 
@@ -16,9 +16,10 @@ It is supported for Japanese and English Language, and for Japanese Location onl
 * IDE  
   [Visual Studio Community](https://www.microsoft.com/ja-jp/dev/products/community.aspx) 2022  
 * DB  
-  [PostgreSQL](https://www.postgresql.org/) 17
+  [PostgreSQL](https://www.postgresql.org/) 17  
+  SQLite - 対応予定
 * 言語  
-  C# (.NET Framework 4.8)
+  C# (.NET 8.0)
 
 ## __機能__
 ### 実装済
@@ -69,9 +70,9 @@ It is supported for Japanese and English Language, and for Japanese Location onl
 	* また、以下をサポートしています。
 		* 全帳簿または選択した帳簿における年間(月単位)の残高の推移
 * 「年別一覧」機能
-	* 「月別一覧」機能の年別版です。過去10年間(年単位)の一覧を表示できます。
+	* 「月別一覧」機能の年別版です。指定した10年間(年単位)の一覧を表示できます。
 * 「年別グラフ」機能
-	* 「月別グラフ」機能の年別版です。過去10年間(年単位)の推移を表示できます。
+	* 「月別グラフ」機能の年別版です。指定した10年間(年単位)の推移を表示できます。
 * その他の機能
 	* ファイル関連
 		* 記帳風月からのインポート
@@ -99,13 +100,14 @@ It is supported for Japanese and English Language, and for Japanese Location onl
 * 「グラフ」機能における月内の支出項目の割合を示す円グラフの表示
 * Excelファイル出力
 
-## __使用方法__
+## __PostgreSQLでの使用方法__
 1. PostgreSQLの環境を構築します。
 1. [create_account_book.backup](https://github.com/vtr00/HouseholdAccountBook/blob/master/db/create_account_book.backup) を用いて、データベースを構築します(owner:postgres name:account_book)。
    1. CREATE DATABASE までのコマンドを実行します。
    1. DATABASE を選択して、CREATE DATABASE 以降のコマンドを実行します(connectは不要)。
 1. 本ソフトを起動し、構築したデータベースの接続設定を行います(初回のみ)。
-1. 「ツール」>「設定」で、必要なマスタデータの作成を行います。 - 帳簿、分類、項目、帳簿と項目の関連付け
+1. 「ツール」>「設定」で、必要なマスタデータの作成を行います。   
+   - 帳簿、分類、項目、帳簿と項目の関連付け
 1. さあ、記帳しましょう。
 
 ※ 「ファイル」>「インポート」>「記帳風月からインポート」を行うことで、マスタデータを含めて、記帳風月のデータをインポートできます。
