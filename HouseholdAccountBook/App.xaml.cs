@@ -133,6 +133,7 @@ namespace HouseholdAccountBook
             DbHandlerFactory dbHandlerFactory = null;
             while (true) {
                 // 接続設定を読み込む
+                settings.App_SelectedDBKind = (int)DbConstants.DBKind.PostgreSQL;
                 switch ((DbConstants.DBKind)settings.App_SelectedDBKind) {
                     case DbConstants.DBKind.PostgreSQL: {
                         this.connectInfo = new NpgsqlDbHandler.ConnectInfo() {
@@ -221,7 +222,10 @@ namespace HouseholdAccountBook
                 nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
                     string absoluteFilePath = Path.Combine(GetCurrentDir(), log.RelatedFilePath);
                     Log.Info("Create Unhandled Exception Info Absolute File:" + absoluteFilePath);
-                    Process.Start(absoluteFilePath);
+                    _ = Process.Start(new ProcessStartInfo() {
+                        FileName = absoluteFilePath,
+                        UseShellExecute = true
+                    });
                 });
             }
             catch (Exception) { }
