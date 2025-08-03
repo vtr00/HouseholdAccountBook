@@ -38,7 +38,7 @@ namespace HouseholdAccountBook.Properties
             #region 設定の変更を引き継ぐ
             try {
                 // 前回保存時のバージョンを取得する
-                string versionText = (string)this.GetPreviousVersion("App_Version");
+                string versionText = (string)this.GetPreviousVersion(nameof(this.App_Version));
                 if (!Version.TryParse(versionText, out Version preVer)) {
                     // 初回起動時、またはバージョン番号保存以前の場合
                 }

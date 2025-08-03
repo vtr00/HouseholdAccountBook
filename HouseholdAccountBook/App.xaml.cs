@@ -100,7 +100,7 @@ namespace HouseholdAccountBook
 #endif
 
             // 前バージョンからのUpgradeを実行していないときはUpgradeを実施する
-            Version assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            Version assemblyVersion = GetAssemblyVersion();
             if (!Version.TryParse(settings.App_Version, out Version preVersion) || preVersion < assemblyVersion) {
                 // Upgradeを実行する
                 settings.Upgrade();
@@ -302,6 +302,15 @@ namespace HouseholdAccountBook
         public static string GetCurrentDir()
         {
             return Path.GetDirectoryName(GetCurrentExe());
+        }
+
+        /// <summary>
+        /// アセンブリバージョンを取得する
+        /// </summary>
+        /// <returns></returns>
+        public static Version GetAssemblyVersion()
+        {
+            return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
         }
     }
 }
