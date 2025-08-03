@@ -152,7 +152,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void RegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.DateValueVMList.Any((vm) => vm.ActValue.HasValue);
+            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.DateValueVMList.Any((vm) => vm.ActValue.HasValue);
         }
 
         /// <summary>

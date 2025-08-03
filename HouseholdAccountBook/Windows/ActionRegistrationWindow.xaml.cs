@@ -168,7 +168,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void ContinueToRegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.RegMode != RegistrationKind.Edit && this.WVM.Value.HasValue && 0 < this.WVM.Value;
+            e.CanExecute = this.WVM.RegMode != RegistrationKind.Edit && this.WVM.SelectedItemVM != null && this.WVM.Value.HasValue && 0 < this.WVM.Value;
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void RegisterCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this.WVM.Value.HasValue && 0 < this.WVM.Value;
+            e.CanExecute = this.WVM.SelectedItemVM != null && this.WVM.Value.HasValue && 0 < this.WVM.Value;
         }
 
         /// <summary>

@@ -2494,8 +2494,8 @@ namespace HouseholdAccountBook.Windows
 
             switch (this.WVM.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
-                    List<int> sumPlus = []; // 日ごとの合計収入(Y軸範囲の計算に使用)
-                    List<int> sumMinus = []; // 日ごとの合計支出(Y軸範囲の計算に使用)
+                    List<int> sumPlus = Enumerable.Repeat(0, 31).ToList(); // 日ごとの合計収入(Y軸範囲の計算に使用)
+                    List<int> sumMinus = Enumerable.Repeat(0, 31).ToList(); // 日ごとの合計支出(Y軸範囲の計算に使用)
 
                     // グラフ表示データを取得する
                     ObservableCollection<SeriesViewModel> tmpVMList = null;
@@ -2549,10 +2549,12 @@ namespace HouseholdAccountBook.Windows
 
                         // 全項目の日毎の合計を計算する
                         for (int i = 0; i < tmpVM.Values.Count; ++i) {
-                            if (sumPlus.Count <= i) { sumPlus.Add(0); sumMinus.Add(0); }
-
-                            if (tmpVM.Values[i] < 0) sumMinus[i] += tmpVM.Values[i];
-                            else sumPlus[i] += tmpVM.Values[i];
+                            if (tmpVM.Values[i] < 0) {
+                                sumMinus[i] += tmpVM.Values[i];
+                            }
+                            else {
+                                sumPlus[i] += tmpVM.Values[i];
+                            }
                         }
                     }
 
@@ -2772,8 +2774,8 @@ namespace HouseholdAccountBook.Windows
 
             switch (this.WVM.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
-                    List<int> sumPlus = []; // 月ごとの合計収入
-                    List<int> sumMinus = []; // 月ごとの合計支出
+                    List<int> sumPlus = Enumerable.Repeat(0, 12).ToList(); // 月ごとの合計収入
+                    List<int> sumMinus = Enumerable.Repeat(0, 12).ToList(); // 月ごとの合計支出
 
                     // グラフ表示データを取得する
                     ObservableCollection<SeriesViewModel> tmpVMList = await this.LoadMonthlySeriesViewModelListWithinYearAsync(this.WVM.SelectedBookVM?.Id, this.WVM.DisplayedYear);
@@ -2816,10 +2818,12 @@ namespace HouseholdAccountBook.Windows
 
                         // 全項目の月毎の合計を計算する
                         for (int i = 0; i < tmpVM.Values.Count; ++i) {
-                            if (sumPlus.Count <= i) { sumPlus.Add(0); sumMinus.Add(0); }
-
-                            if (tmpVM.Values[i] < 0) sumMinus[i] += tmpVM.Values[i];
-                            else sumPlus[i] += tmpVM.Values[i];
+                            if (tmpVM.Values[i] < 0) {
+                                sumMinus[i] += tmpVM.Values[i];
+                            }
+                            else {
+                                sumPlus[i] += tmpVM.Values[i];
+                            }
                         }
                     }
 
@@ -3029,8 +3033,8 @@ namespace HouseholdAccountBook.Windows
 
             switch (this.WVM.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
-                    List<int> sumPlus = []; // 年ごとの合計収入
-                    List<int> sumMinus = []; // 年ごとの合計支出
+                    List<int> sumPlus = Enumerable.Repeat(0, 10).ToList(); // 年ごとの合計収入
+                    List<int> sumMinus = Enumerable.Repeat(0, 10).ToList(); // 年ごとの合計支出
 
                     // グラフ表示データを取得する
                     ObservableCollection<SeriesViewModel> tmpVMList = await this.LoadYearlySeriesViewModelListWithinDecadeAsync(this.WVM.SelectedBookVM?.Id);
@@ -3073,10 +3077,12 @@ namespace HouseholdAccountBook.Windows
 
                         // 全項目の月毎の合計を計算する
                         for (int i = 0; i < tmpVM.Values.Count; ++i) {
-                            if (sumPlus.Count <= i) { sumPlus.Add(0); sumMinus.Add(0); }
-
-                            if (tmpVM.Values[i] < 0) sumMinus[i] += tmpVM.Values[i];
-                            else sumPlus[i] += tmpVM.Values[i];
+                            if (tmpVM.Values[i] < 0) {
+                                sumMinus[i] += tmpVM.Values[i];
+                            }
+                            else {
+                                sumPlus[i] += tmpVM.Values[i];
+                            }
                         }
                     }
 
