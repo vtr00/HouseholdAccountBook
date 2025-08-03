@@ -464,7 +464,7 @@ namespace HouseholdAccountBook.ViewModels
             this.RestoreExePath = this.settings.App_Postgres_RestoreExePath;
 
             this.AccessProviderNameDic.Clear();
-            OleDbHandler.GetOleDbProvider().FindAll((pair) => pair.Key.Contains("Macrosoft.ACE.OLEDB")).ForEach(this.AccessProviderNameDic.Add);
+            OleDbHandler.GetOleDbProvider().FindAll((pair) => pair.Key.Contains("Microsoft.ACE.OLEDB")).ForEach(this.AccessProviderNameDic.Add);
             this.SelectedAccessProviderName = this.settings.App_Access_Provider;
 
             this.SelectedCultureName = this.settings.App_CultureName;
