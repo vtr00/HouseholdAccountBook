@@ -151,7 +151,7 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="..\resheet.png">
+    <None Include="..\Materials\resheet.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
