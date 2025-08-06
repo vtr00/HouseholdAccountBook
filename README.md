@@ -1,13 +1,13 @@
-# __HouseholdAccountBook__
+# __Household Account Book__
 
 ## __Abstract__
-It is for your household accounts book via PostgreSQL.  
+It is for your household accounts book via PostgreSQL or SQLite.  
 Currently, the binary file is unscheduled to be published.  
-It is for who can set PostgreSQL environments and build the project yourself.  
+It is for who can build the project yourself.  
 It is supported for Japanese and English Language, and for Japanese Location only.  
 
 ## __概要__
-本ソフトは PostgreSQL を用いた家計簿ソフトです。  
+本ソフトは PostgreSQL、SQLite を用いた家計簿ソフトです。  
 家計簿ソフト [記帳風月](https://www.vector.co.jp/magazine/softnews/061024/n0610242.html?srsltid=AfmBOoqAWe3KIwVaToJ0SYY-HNEI3e8p86AA2RxxBJ52WTH5YZwydP1I) から多くのデータの移行が可能です。   
 現在、バイナリの公開は予定しておりません。  
 自力で環境設定、ビルドできる方向けです。
@@ -17,7 +17,7 @@ It is supported for Japanese and English Language, and for Japanese Location onl
   [Visual Studio Community](https://www.microsoft.com/ja-jp/dev/products/community.aspx) 2022  
 * DB  
   [PostgreSQL](https://www.postgresql.org/) 17  
-  SQLite - 対応予定
+  [SQLite](https://sqlite.org/)
 * 言語  
   C# (.NET 8.0)
 
@@ -102,20 +102,32 @@ It is supported for Japanese and English Language, and for Japanese Location onl
 
 ## __PostgreSQLでの使用方法__
 1. PostgreSQLの環境を構築します。
-1. [create_account_book.backup](https://github.com/vtr00/HouseholdAccountBook/blob/master/db/create_account_book.backup) を用いて、データベースを構築します(owner:postgres name:account_book)。
+1. [create_account_book.backup](./Materials/DB/create_account_book.backup) を用いて、データベースを構築します(owner:postgres name:account_book)。
    1. CREATE DATABASE までのコマンドを実行します。
    1. DATABASE を選択して、CREATE DATABASE 以降のコマンドを実行します(connectは不要)。
-1. 本ソフトを起動し、構築したデータベースの接続設定を行います(初回のみ)。
+1. 本ソフトを起動し、PostgreSQLを選択した上で、構築したデータベースの接続設定を行います(初回のみ)。
 1. 「ツール」>「設定」で、必要なマスタデータの作成を行います。   
-   - 帳簿、分類、項目、帳簿と項目の関連付け
+    - 帳簿、分類、項目、帳簿と項目の関連付け
+1. さあ、記帳しましょう。
+
+※ 「ファイル」>「インポート」>「記帳風月からインポート」を行うことで、マスタデータを含めて、記帳風月のデータをインポートできます。
+
+## __SQLiteでの使用方法__
+1. 本ソフトを起動し、SQLiteを選択した上で、ファイルの保存場所を設定します(初回のみ)。
+1. 「ツール」>「設定」で、必要なマスタデータの作成を行います。
+    - 帳簿、分類、項目、帳簿と項目の関連付け
 1. さあ、記帳しましょう。
 
 ※ 「ファイル」>「インポート」>「記帳風月からインポート」を行うことで、マスタデータを含めて、記帳風月のデータをインポートできます。
 
 ## __スクリーンショット__
-公開予定
+### 日本語
+![JP](./Materials/ScreenShot_jp.bmp)
+
+### English
+![EN](./Materials/ScreenShot_en.bmp)
 
 ## __免責事項__
 * 本ソフトは、すべてのリビジョンにおいて不安定版です。
 * データベース仕様は予告なく変更することがあります。
-	* データベース仕様の変更時に、必ずしも [データベース仕様書](https://github.com/vtr00/HouseholdAccountBook/blob/master/db/DbSpecifications.xlsx) や [create_account_book.backup](https://github.com/vtr00/HouseholdAccountBook/blob/master/db/create_account_book.backup) が更新されるとは限りません。
+	* データベース仕様の変更時に、必ずしも [データベース仕様書](./Materials/DB/DbSpecifications.xlsx) や [create_account_book.backup](./Materials/DB/create_account_book.backup) が更新されるとは限りません。
