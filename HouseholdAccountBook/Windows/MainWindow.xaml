@@ -200,14 +200,17 @@
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Import}">
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_KichoFugetsu}" Command="{StaticResource ImportKichoFugetsuDbCommand}"/>
                     <Separator/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_CustomFormatFile}" Command="{StaticResource ImportCustomFileCommand}"/>
-                    <Separator/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{StaticResource ImportSQLiteFileCommand}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_CustomFormatFile}" Command="{StaticResource ImportCustomFileCommand}"
+                              Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{StaticResource ImportSQLiteFileCommand}"
+                              Visibility="{Binding IsSQLite, Converter={StaticResource BoolVisibilityConverter}}"/>
                 </MenuItem>
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Export}">
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_CustomFormatFile}" Command="{StaticResource ExportCustomFileCommand}"/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_SQLFile}" Command="{StaticResource ExportSQLFileCommand}"/>
-                    <Separator/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_CustomFormatFile}" Command="{StaticResource ExportCustomFileCommand}"
+                              Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_SQLFile}" Command="{StaticResource ExportSQLFileCommand}"
+                              Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <Separator Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_Excel}" Command="{StaticResource ExportExcelFileCommand}" IsEnabled="False"/>
                 </MenuItem>
                 <Separator/>

@@ -62,6 +62,8 @@ namespace HouseholdAccountBook.DbHandler
         public async Task<int?> ExecuteDump(string backupFilePath, string dumpExePath, PostgresPasswordInput passwordInput, PostgresFormat format,
                                             NotifyResult notifyResultAsync = null, bool waitForFinish = true)
         {
+            bool pgPassConf = passwordInput == PostgresPasswordInput.PgPassConf;
+
             // 起動情報を設定する
             ProcessStartInfo info = new() {
                 FileName = dumpExePath,
@@ -71,12 +73,12 @@ namespace HouseholdAccountBook.DbHandler
                     this.connectInfo.Port,
                     this.connectInfo.UserName,
                     this.connectInfo.Role,
-                    passwordInput == PostgresPasswordInput.PgPassConf ? "--no-password" : "--password",
+                    pgPassConf ? "--no-password" : "--password",
                     format.ToString().ToLower(),
                     backupFilePath,
                     this.connectInfo.DatabaseName
                 ),
-                WindowStyle = ProcessWindowStyle.Hidden,
+                WindowStyle = pgPassConf ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 RedirectStandardInput = true,
@@ -94,7 +96,7 @@ namespace HouseholdAccountBook.DbHandler
                 Process process = Process.Start(info);
                 Log.Info("Process executing...");
                 if (waitForFinish) {
-                    if (process.WaitForExit(10 * 1000)) {
+                    if (process.WaitForExit(pgPassConf ? 10 * 1000 : -1)) {
                         localExitCode = process.ExitCode;
                         if (localExitCode != 0) {
                             using (StreamReader r = process.StandardError) {
@@ -127,6 +129,8 @@ namespace HouseholdAccountBook.DbHandler
         /// <returns>成功/失敗</returns>
         public async Task<int> ExecuteRestore(string backupFilePath, string restoreExePath, PostgresPasswordInput passwordInput)
         {
+            bool pgPassConf = passwordInput == PostgresPasswordInput.PgPassConf;
+
             // 起動情報を設定する
             ProcessStartInfo info = new() {
                 FileName = restoreExePath,
@@ -136,11 +140,11 @@ namespace HouseholdAccountBook.DbHandler
                     this.connectInfo.Port,
                     this.connectInfo.UserName,
                     this.connectInfo.Role,
-                    passwordInput == PostgresPasswordInput.PgPassConf ? "--no-password" : "--password",
+                    pgPassConf ? "--no-password" : "--password",
                     this.connectInfo.DatabaseName,
                     backupFilePath
                 ),
-                WindowStyle = ProcessWindowStyle.Hidden,
+                WindowStyle = pgPassConf ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 RedirectStandardInput = true,
@@ -156,7 +160,7 @@ namespace HouseholdAccountBook.DbHandler
                 Log.Info("Start Restore");
 
                 Process process = Process.Start(info);
-                if (process.WaitForExit(10 * 1000)) {
+                if (process.WaitForExit(pgPassConf ? 10 * 1000 : -1)) {
                     localExitCode = process.ExitCode;
                     if (localExitCode != 0) {
                         using (StreamReader r = process.StandardError) {

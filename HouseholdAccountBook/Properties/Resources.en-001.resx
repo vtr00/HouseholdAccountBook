@@ -379,7 +379,7 @@
     <value>Household Account Book</value>
   </data>
   <data name="Title_DbSettingWindow" xml:space="preserve">
-    <value>Initial settings</value>
+    <value>Database settings</value>
   </data>
   <data name="Title_CsvComparisonWindow" xml:space="preserve">
     <value>CSV comparison</value>
@@ -995,5 +995,11 @@ list</value>
   </data>
   <data name="FileSelectFilter_SQLiteFile" xml:space="preserve">
     <value>SQLite file</value>
+  </data>
+  <data name="FileSelectFilter_AccessFile" xml:space="preserve">
+    <value>Access file</value>
+  </data>
+  <data name="Message_NotFoundFileDoYouCreateNew" xml:space="preserve">
+    <value>Not found the specified file. Do you create new file?</value>
   </data>
 </root>

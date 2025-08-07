@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.DbHandler.Abstract;
 using System.Data.SQLite;
 using System.IO;
+using System.Threading.Tasks;
 using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.DbHandler
@@ -34,6 +35,25 @@ namespace HouseholdAccountBook.DbHandler
             if (File.Exists(filePath)) {
                 _ = this.Open();
             }
+        }
+
+        /// <summary>
+        /// スキーマバージョンを取得する
+        /// </summary>
+        /// <returns>スキーマバージョン</returns>
+        public async Task<int> GetUserVersion()
+        {
+            return await this.QuerySingleAsync<int>($"PRAGMA USER_VERSION;");
+        }
+
+        /// <summary>
+        /// スキーマバージョンを設定する
+        /// </summary>
+        /// <param name="version">スキーマバージョン</param>
+        /// <returns></returns>
+        public async Task<int> SetUserVersion(int version)
+        {
+            return await this.ExecuteAsync($"PRAGMA USER_VERSION = @UserVersion;", new { UserVersion = version });
         }
     }
 }

@@ -838,5 +838,53 @@ namespace HouseholdAccountBook.Properties {
                 this["App_Export_CustomFormat_FilePath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double DbSettingWindow_Height {
+            get {
+                return ((double)(this["DbSettingWindow_Height"]));
+            }
+            set {
+                this["DbSettingWindow_Height"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double DbSettingWindow_Left {
+            get {
+                return ((double)(this["DbSettingWindow_Left"]));
+            }
+            set {
+                this["DbSettingWindow_Left"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double DbSettingWindow_Top {
+            get {
+                return ((double)(this["DbSettingWindow_Top"]));
+            }
+            set {
+                this["DbSettingWindow_Top"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double DbSettingWindow_Width {
+            get {
+                return ((double)(this["DbSettingWindow_Width"]));
+            }
+            set {
+                this["DbSettingWindow_Width"] = value;
+            }
+        }
     }
 }

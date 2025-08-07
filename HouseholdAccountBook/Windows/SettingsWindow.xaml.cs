@@ -1491,33 +1491,45 @@ namespace HouseholdAccountBook.Windows
 
             ObservableCollection<WindowSettingViewModel> list = [
                 new WindowSettingViewModel(){
+                    Title = Properties.Resources.Title_DbSettingWindow,
+                    Left = settings.DbSettingWindow_Left, Top = settings.DbSettingWindow_Top,
+                    Width = settings.DbSettingWindow_Width, Height = settings.DbSettingWindow_Height
+                },
+                new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_MainWindow,
                     Left = settings.MainWindow_Left, Top = settings.MainWindow_Top,
-                    Width = settings.MainWindow_Width, Height = settings.MainWindow_Height },
+                    Width = settings.MainWindow_Width, Height = settings.MainWindow_Height
+                },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_AddMoveWindow,
                     Left = settings.MoveRegistrationWindow_Left, Top = settings.MoveRegistrationWindow_Top,
-                    Width = settings.MoveRegistrationWindow_Width, Height = settings.MoveRegistrationWindow_Height },
+                    Width = settings.MoveRegistrationWindow_Width, Height = settings.MoveRegistrationWindow_Height
+                },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_AddWindow,
                     Left = settings.ActionRegistrationWindow_Left, Top = settings.ActionRegistrationWindow_Top,
-                    Width = settings.ActionRegistrationWindow_Width, Height = settings.ActionRegistrationWindow_Height },
+                    Width = settings.ActionRegistrationWindow_Width, Height = settings.ActionRegistrationWindow_Height
+                },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_AddListWindow,
                     Left = settings.ActionListRegistrationWindow_Left, Top = settings.ActionListRegistrationWindow_Top,
-                    Width = settings.ActionListRegistrationWindow_Width, Height = settings.ActionListRegistrationWindow_Height },
+                    Width = settings.ActionListRegistrationWindow_Width, Height = settings.ActionListRegistrationWindow_Height
+                },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_CsvComparisonWindow,
                     Left = settings.CsvComparisonWindow_Left, Top = settings.CsvComparisonWindow_Top,
-                    Width = settings.CsvComparisonWindow_Width, Height = settings.CsvComparisonWindow_Height },
+                    Width = settings.CsvComparisonWindow_Width, Height = settings.CsvComparisonWindow_Height
+                },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_SettingsWindow,
                     Left = settings.SettingsWindow_Left, Top = settings.SettingsWindow_Top,
-                    Width = settings.SettingsWindow_Width, Height = settings.SettingsWindow_Height },
+                    Width = settings.SettingsWindow_Width, Height = settings.SettingsWindow_Height
+                },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_TermSelectionWindow,
                     Left = settings.TermWindow_Left, Top = settings.TermWindow_Top,
-                    Width = -1, Height = -1 }
+                    Width = -1, Height = -1
+                }
 
             ];
             this.WVM.WindowSettingVMList = list;

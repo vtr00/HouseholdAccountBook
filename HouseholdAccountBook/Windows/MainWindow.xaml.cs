@@ -73,6 +73,7 @@ namespace HouseholdAccountBook.Windows
         private readonly WindowLog windowLog = null;
         #endregion
 
+        #region プロパティ
         /// <summary>
         /// 子ウィンドウを開いているか
         /// </summary>
@@ -81,6 +82,7 @@ namespace HouseholdAccountBook.Windows
         /// 登録ウィンドウを開いているか
         /// </summary>
         private bool RegistrationWindowOpened => this.mrw != null || this.arw != null || this.alrw != null;
+        #endregion
 
         /// <summary>
         /// <see cref="MainWindow"/> クラスの新しいインスタンスを初期化します。
@@ -1678,6 +1680,10 @@ namespace HouseholdAccountBook.Windows
 
             Properties.Settings settings = Properties.Settings.Default;
             this.WVM.FiscalStartMonth = settings.App_StartMonth;
+
+            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                this.WVM.SelectedDBKind = dbHandler.DBKind;
+            }
 
             // 帳簿リスト更新
             await this.UpdateBookListAsync(settings.MainWindow_SelectedBookId);

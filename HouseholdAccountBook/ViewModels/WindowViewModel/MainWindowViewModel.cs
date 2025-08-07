@@ -45,6 +45,36 @@ namespace HouseholdAccountBook.ViewModels
         #region プロパティ
         #region プロパティ(共通)
         /// <summary>
+        /// 選択されたDB種別
+        /// </summary>
+        #region SelectedDBKind
+        public DBKind SelectedDBKind
+        {
+            get => this._SelectedDBKind;
+            set {
+                if (this.SetProperty(ref this._SelectedDBKind, value)) {
+                    this.RaisePropertyChanged(nameof(this.IsPostgreSQL));
+                    this.RaisePropertyChanged(nameof(this.IsSQLite));
+                }
+            }
+        }
+        private DBKind _SelectedDBKind = default;
+        #endregion
+
+        /// <summary>
+        /// PostgreSQLか
+        /// </summary>
+        #region IsPostgreSQL
+        public bool IsPostgreSQL => this.SelectedDBKind == DBKind.PostgreSQL;
+        #endregion
+        /// <summary>
+        /// SQLiteか
+        /// </summary>
+        #region IsSQLite
+        public bool IsSQLite => this.SelectedDBKind == DBKind.SQLite;
+        #endregion
+
+        /// <summary>
         /// 選択されたタブインデックス
         /// </summary>
         #region SelectedTabIndex

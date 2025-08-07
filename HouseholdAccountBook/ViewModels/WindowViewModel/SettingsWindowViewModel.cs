@@ -181,7 +181,6 @@ namespace HouseholdAccountBook.ViewModels
         public bool IsPostgreSQL => this.SelectedDBKind == DBKind.PostgreSQL;
         #endregion
 
-
         /// <summary>
         /// pg_dump.exeパス
         /// </summary>

@@ -1,5 +1,5 @@
 ﻿using HouseholdAccountBook.DbHandler;
-using HouseholdAccountBook.Properties;
+using HouseholdAccountBook.Extensions;
 using Microsoft.Win32;
 using System;
 using System.IO;
@@ -128,7 +128,7 @@ namespace HouseholdAccountBook.Windows
                         InitialDirectory = directory,
                         FileName = fileName,
                         Title = Properties.Resources.Title_FileSelection,
-                        Filter = "Accessファイル|*.mdb;*.accdb"
+                        Filter = $"{Properties.Resources.FileSelectFilter_AccessFile}|*.mdb;*.accdb"
                     };
                     if (ofd.ShowDialog() == true) {
                         this.WVM.AccessSettingVM.DBFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
@@ -147,7 +147,7 @@ namespace HouseholdAccountBook.Windows
                         InitialDirectory = directory,
                         FileName = fileName,
                         Title = Properties.Resources.Title_FileSelection,
-                        Filter = Properties.Resources.FileSelectFilter_SQLiteFile + "|*.db;*.sqlite;*.sqlite3"
+                        Filter = $"{Properties.Resources.FileSelectFilter_SQLiteFile}|*.db;*.sqlite;*.sqlite3"
                     };
                     if (ofd.ShowDialog() == true) {
                         this.WVM.SQLiteSettingVM.DBFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
@@ -190,6 +190,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void OKCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            bool result = false;
             Properties.Settings settings = Properties.Settings.Default;
             settings.App_SelectedDBKind = (int)this.WVM.SelectedDBKind;
 
@@ -203,26 +204,41 @@ namespace HouseholdAccountBook.Windows
                     settings.App_Postgres_Role = this.WVM.PostgreSQLDBSettingVM.Role;
                     settings.App_Postgres_DumpExePath = this.WVM.PostgreSQLDBSettingVM.DumpExePath;
                     settings.App_Postgres_RestoreExePath = this.WVM.PostgreSQLDBSettingVM.RestoreExePath;
+
+                    result = true;
                     break;
                 }
                 case DBKind.SQLite: {
-                    settings.App_SQLite_DBFilePath = this.WVM.SQLiteSettingVM.DBFilePath;
+                    if (!File.Exists(this.WVM.SQLiteSettingVM.DBFilePath)) {
+                        if (MessageBox.Show(Properties.Resources.Message_NotFoundFileDoYouCreateNew, Properties.Resources.Title_Conformation, MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
+                            byte[] sqliteBynary = Properties.Resources.SQLiteTemplateFile;
+                            try {
+                                File.WriteAllBytes(this.WVM.SQLiteSettingVM.DBFilePath, sqliteBynary);
 
-                    if (!File.Exists(settings.App_SQLite_DBFilePath)) {
-                        byte[] sqliteBynary = Properties.Resources.SQLiteTemplateFile;
-                        File.WriteAllBytes(settings.App_SQLite_DBFilePath, sqliteBynary);
+                                settings.App_SQLite_DBFilePath = this.WVM.SQLiteSettingVM.DBFilePath;
+                                result = true;
+                            }
+                            catch { }
+                        }
+                    }
+                    else {
+                        settings.App_SQLite_DBFilePath = this.WVM.SQLiteSettingVM.DBFilePath;
+                        result = true;
                     }
                     break;
                 }
                 case DBKind.Access: {
                     settings.App_Access_DBFilePath = this.WVM.AccessSettingVM.DBFilePath;
+                    result = true;
                     break;
                 }
             }
-            settings.Save();
 
-            this.DialogResult = true;
-            this.Close();
+            if (result) {
+                settings.Save();
+                this.DialogResult = true;
+                this.Close();
+            }
         }
 
         /// <summary>
@@ -236,6 +252,26 @@ namespace HouseholdAccountBook.Windows
             this.Close();
         }
         #endregion
+
+        /// <summary>
+        /// ウィンドウ初期化完了時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DbSettingWindow_Initialized(object sender, EventArgs e)
+        {
+            this.LoadWindowSetting();
+        }
+
+        /// <summary>
+        /// ウィンドウクローズ後
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DbSettingWindow_Closed(object sender, EventArgs e)
+        {
+            this.SaveWindowSetting();
+        }
 
         /// <summary>
         /// 入力された値を表示前にチェックする
@@ -267,6 +303,47 @@ namespace HouseholdAccountBook.Windows
             }
             // 更新したい場合は false, 更新したくない場合は true
             e.Handled = !yes_parse;
+        }
+        #endregion
+
+        #region 設定反映用の関数
+        /// <summary>
+        /// ウィンドウ設定を読み込む
+        /// </summary>
+        public void LoadWindowSetting()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            if (settings.DbSettingWindow_Width != -1 && settings.DbSettingWindow_Height != -1) {
+                this.Width = settings.DbSettingWindow_Width;
+                this.Height = settings.DbSettingWindow_Height;
+            }
+
+            if (settings.App_IsPositionSaved && -10 <= settings.DbSettingWindow_Left && 0 <= settings.DbSettingWindow_Top) {
+                this.Left = settings.DbSettingWindow_Left;
+                this.Top = settings.DbSettingWindow_Top;
+            }
+            else {
+                this.MoveOwnersCenter();
+            }
+        }
+
+        /// <summary>
+        /// ウィンドウ設定を保存する
+        /// </summary>
+        public void SaveWindowSetting()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            if (this.WindowState == WindowState.Normal) {
+                if (settings.App_IsPositionSaved) {
+                    settings.DbSettingWindow_Left = this.Left;
+                    settings.DbSettingWindow_Top = this.Top;
+                }
+                settings.DbSettingWindow_Width = this.Width;
+                settings.DbSettingWindow_Height = this.Height;
+                settings.Save();
+            }
         }
         #endregion
     }

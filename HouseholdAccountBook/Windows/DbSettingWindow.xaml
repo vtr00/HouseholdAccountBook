@@ -7,7 +7,9 @@
         xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:viewmodels="clr-namespace:HouseholdAccountBook.ViewModels"
         mc:Ignorable="d"
-        Title="{x:Static properties:Resources.Title_DbSettingWindow}" Height="370" Width="400" WindowStyle="ToolWindow">
+        Title="{x:Static properties:Resources.Title_DbSettingWindow}" Height="370" Width="400" WindowStyle="ToolWindow"
+        Initialized="DbSettingWindow_Initialized"
+        Closed="DbSettingWindow_Closed">
     <Window.DataContext>
         <viewmodels:DbSettingWindowViewModel x:Name="WVM"/>
     </Window.DataContext>

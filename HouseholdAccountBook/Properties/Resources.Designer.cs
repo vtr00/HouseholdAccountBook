@@ -656,6 +656,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   Accessファイル に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string FileSelectFilter_AccessFile {
+            get {
+                return ResourceManager.GetString("FileSelectFilter_AccessFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   CSVファイル に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string FileSelectFilter_CsvFile {
@@ -1754,6 +1763,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   指定されたファイルが存在しません。新規に作成しますか？ に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Message_NotFoundFileDoYouCreateNew {
+            get {
+                return ResourceManager.GetString("Message_NotFoundFileDoYouCreateNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   DB接続設定を入力してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Message_PleaseInputDbSetting {
@@ -2534,7 +2552,7 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
-        ///   初期設定 に類似しているローカライズされた文字列を検索します。
+        ///   DB設定 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Title_DbSettingWindow {
             get {
