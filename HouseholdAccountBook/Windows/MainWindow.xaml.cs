@@ -1462,6 +1462,7 @@ namespace HouseholdAccountBook.Windows
             if (sw.ShowDialog() == true) {
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                     this.WVM.FiscalStartMonth = Properties.Settings.Default.App_StartMonth;
+                    await DateTimeExtensions.DownloadHolidayListAsync();
                     await this.UpdateAsync(isUpdateBookList: true);
                 }
             }

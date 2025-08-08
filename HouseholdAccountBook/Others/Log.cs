@@ -32,7 +32,7 @@ namespace HouseholdAccountBook
             if (listener == null) {
                 listener = new TextWriterTraceListener();
                 if (!Directory.Exists(LogFolderPath)) _ = Directory.CreateDirectory(LogFolderPath);
-                TextWriter sw = new StreamWriter(LogFilePath, true, Encoding.GetEncoding("utf-8"));
+                TextWriter sw = new StreamWriter(LogFilePath, true, Encoding.UTF8);
                 listener.Name = listenerName;
                 listener.Writer = sw;
                 listener.TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId | TraceOptions.ThreadId;

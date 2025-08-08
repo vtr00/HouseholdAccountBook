@@ -2462,6 +2462,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   エンコード に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TextBlock_TextEncoding {
+            get {
+                return ResourceManager.GetString("TextBlock_TextEncoding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   タイミング に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TextBlock_Timing {

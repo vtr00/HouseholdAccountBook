@@ -22,6 +22,11 @@
         public string CsvFolderPath { get; set; }
 
         /// <summary>
+        /// 文字エンコーディング
+        /// </summary>
+        public int TextEncoding { get; set; }
+
+        /// <summary>
         /// 日付 位置(1開始)
         /// </summary>
         public int? ActDateIndex { get; set; }

@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Dto.Abstract;
 using HouseholdAccountBook.Dto.KHDbTable;
 using System;
+using System.Text;
 
 namespace HouseholdAccountBook.Dto.DbTable
 {
@@ -69,6 +70,10 @@ namespace HouseholdAccountBook.Dto.DbTable
             /// CSVフォルダパス
             /// </summary>
             public string CsvFolderPath { get; set; } = null;
+            /// <summary>
+            /// テキストエンコーディング
+            /// </summary>
+            public int TextEncoding { get; set; } = Encoding.UTF8.CodePage;
 
             /// <summary>
             /// CSV内での日付のインデックス

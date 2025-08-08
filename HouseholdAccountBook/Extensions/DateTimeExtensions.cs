@@ -42,7 +42,7 @@ namespace HouseholdAccountBook.Extensions
                     holidayList.Clear();
                     try {
                         // CSVファイルを読み込む
-                        using (CsvReader reader = new(new StreamReader(stream, Encoding.GetEncoding("shift_jis")), csvConfig)) {
+                        using (CsvReader reader = new(new StreamReader(stream, Encoding.GetEncoding(settings.App_NationalHolidayCsv_TextEncoding)), csvConfig)) {
                             while (reader.Read()) {
                                 if (reader.TryGetField(settings.App_NationalHolidayCsv_DateIndex, out string dateString)) {
                                     if (DateTime.TryParse(dateString, out DateTime dateTime)) {

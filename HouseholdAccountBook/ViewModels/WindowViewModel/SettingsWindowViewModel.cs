@@ -397,6 +397,34 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// 国民の祝日CSV 文字エンコーディング
+        /// </summary>
+        #region NatioalHolidayTextEncodingList
+        public ObservableCollection<KeyValuePair<int, string>> NationalHolidayTextEncodingList
+        {
+            get => this._NationalHolidayTextEncodingList;
+            set => this.SetProperty(ref this._NationalHolidayTextEncodingList, value);
+        }
+        private ObservableCollection<KeyValuePair<int, string>> _NationalHolidayTextEncodingList = default;
+        #endregion
+        /// <summary>
+        /// 国民の祝日CSV 選択された文字エンコーディング
+        /// </summary>
+        #region SelectedNationalHolidayTextEncoding
+        public int SelectedNationalHolidayTextEncoding
+        {
+            get => this._SelectedNationalHolidayTextEncoding;
+            set {
+                if (this.SetProperty(ref this._SelectedNationalHolidayTextEncoding, value)) {
+                    this.settings.App_NationalHolidayCsv_TextEncoding = value;
+                    this.settings.Save();
+                }
+            }
+        }
+        private int _SelectedNationalHolidayTextEncoding = default;
+        #endregion
+
+        /// <summary>
         /// 国民の祝日CSV 日付インデックス(1開始)
         /// </summary>
         #region NationalHolidayCsvDateIndex

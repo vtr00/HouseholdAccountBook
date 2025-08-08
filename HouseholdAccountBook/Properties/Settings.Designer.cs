@@ -601,7 +601,7 @@ namespace HouseholdAccountBook.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://www8.cao.go.jp/chosei/shukujitsu/syukujitsu_kyujitsu.csv")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://www8.cao.go.jp/chosei/shukujitsu/syukujitsu.csv")]
         public string App_NationalHolidayCsv_Uri {
             get {
                 return ((string)(this["App_NationalHolidayCsv_Uri"]));
@@ -884,6 +884,18 @@ namespace HouseholdAccountBook.Properties {
             }
             set {
                 this["DbSettingWindow_Width"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("65001")]
+        public int App_NationalHolidayCsv_TextEncoding {
+            get {
+                return ((int)(this["App_NationalHolidayCsv_TextEncoding"]));
+            }
+            set {
+                this["App_NationalHolidayCsv_TextEncoding"] = value;
             }
         }
     }

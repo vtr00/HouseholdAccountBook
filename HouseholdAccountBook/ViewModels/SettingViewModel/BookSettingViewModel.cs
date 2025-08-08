@@ -187,6 +187,29 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         /// <summary>
+        /// 文字エンコーディング
+        /// </summary>
+        #region TextEncodingList
+        public ObservableCollection<KeyValuePair<int, string>> TextEncodingList
+        {
+            get => this._TextEncodingList;
+            set => this.SetProperty(ref this._TextEncodingList, value);
+        }
+        private ObservableCollection<KeyValuePair<int, string>> _TextEncodingList = default;
+        #endregion
+        /// <summary>
+        /// 選択された文字エンコーディング
+        /// </summary>
+        #region SelectedTextEncoding
+        public int SelectedTextEncoding
+        {
+            get => this._SelectedTextEncoding;
+            set => this.SetProperty(ref this._SelectedTextEncoding, value);
+        }
+        private int _SelectedTextEncoding = default;
+        #endregion
+
+        /// <summary>
         /// 日付 位置(1開始)
         /// </summary>
         #region ActDateIndex

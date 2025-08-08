@@ -558,14 +558,16 @@ namespace HouseholdAccountBook.Windows
                 var dtoList = await mstBookDao.FindIfJsonCodeExistsAsync();
                 foreach (MstBookDto dto in dtoList) {
                     MstBookDto.JsonDto jsonObj = JsonConvert.DeserializeObject<MstBookDto.JsonDto>(dto.JsonCode);
+                    if (jsonObj is null) continue;
 
                     BookComparisonViewModel vm = new() {
                         Id = dto.BookId,
                         Name = dto.BookName,
-                        CsvFolderPath = jsonObj?.CsvFolderPath == string.Empty ? null : jsonObj?.CsvFolderPath,
-                        ActDateIndex = jsonObj?.CsvActDateIndex + 1,
-                        ExpensesIndex = jsonObj?.CsvOutgoIndex + 1,
-                        ItemNameIndex = jsonObj?.CsvItemNameIndex + 1
+                        CsvFolderPath = jsonObj.CsvFolderPath == string.Empty ? null : jsonObj.CsvFolderPath,
+                        TextEncoding = jsonObj.TextEncoding,
+                        ActDateIndex = jsonObj.CsvActDateIndex + 1,
+                        ExpensesIndex = jsonObj.CsvOutgoIndex + 1,
+                        ItemNameIndex = jsonObj.CsvItemNameIndex + 1
                     };
                     if (vm.CsvFolderPath == null || vm.ActDateIndex == null || vm.ExpensesIndex == null || vm.ItemNameIndex == null) continue;
 
@@ -598,11 +600,9 @@ namespace HouseholdAccountBook.Windows
         private void LoadCsvFiles(IList<string> csvFilePathList)
         {
             // CSVファイル上の対象インデックスを取得する
-            int? actDateIndex = this.WVM.SelectedBookVM.ActDateIndex;
-            int? itemNameIndex = this.WVM.SelectedBookVM.ItemNameIndex;
-            int? expensesIndex = this.WVM.SelectedBookVM.ExpensesIndex;
-
-            if (!actDateIndex.HasValue || !expensesIndex.HasValue) return;
+            int actDateIndex = this.WVM.SelectedBookVM.ActDateIndex.Value;
+            int itemNameIndex = this.WVM.SelectedBookVM.ItemNameIndex.Value;
+            int expensesIndex = this.WVM.SelectedBookVM.ExpensesIndex.Value;
 
             // CSVファイルを読み込む
             CsvConfiguration csvConfig = new(CultureInfo.CurrentCulture) {
@@ -611,18 +611,18 @@ namespace HouseholdAccountBook.Windows
             };
             List<CsvComparisonViewModel> tmpVMList = [];
             foreach (string tmpFileName in csvFilePathList) {
-                using (CsvReader reader = new(new StreamReader(tmpFileName, Encoding.GetEncoding("utf-8")), csvConfig)) {
+                using (CsvReader reader = new(new StreamReader(tmpFileName, Encoding.GetEncoding(this.WVM.SelectedBookVM.TextEncoding)), csvConfig)) {
                     List<CsvComparisonViewModel> tmpVMList2 = [];
                     while (reader.Read()) {
                         try {
-                            if (!reader.TryGetField(actDateIndex.Value - 1, out DateTime date)) {
+                            if (!reader.TryGetField(actDateIndex - 1, out DateTime date)) {
                                 continue;
                             }
-                            if (!itemNameIndex.HasValue || !reader.TryGetField(itemNameIndex.Value - 1, out string name)) {
+                            if (!reader.TryGetField(itemNameIndex - 1, out string name)) {
                                 // 項目名は読込みに失敗してもOK
                                 name = null;
                             }
-                            if (!reader.TryGetField(expensesIndex.Value - 1, out string valueStr) ||
+                            if (!reader.TryGetField(expensesIndex - 1, out string valueStr) ||
                                 !int.TryParse(valueStr, NumberStyles.Any, NumberFormatInfo.CurrentInfo, out int value)) {
                                 continue;
                             }

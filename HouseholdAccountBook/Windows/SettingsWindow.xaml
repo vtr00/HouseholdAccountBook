@@ -447,6 +447,7 @@
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition SharedSizeGroup="Header"/>
@@ -461,7 +462,12 @@
                                                  Text="{Binding CsvFolderPath, UpdateSourceTrigger=PropertyChanged}"/>
                                         <Button Grid.Row="0" Grid.Column="3" Margin="5" Content="..." Command="{StaticResource CsvFolderPathDialogCommand}"/>
 
-                                        <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" 
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
+                                                   Text="{x:Static properties:Resources.TextBlock_TextEncoding}"/>
+                                        <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
+                                                  ItemsSource="{Binding TextEncodingList}" SelectedValue="{Binding SelectedTextEncoding}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+
+                                        <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" 
                                                   Header="{x:Static properties:Resources.GroupHeader_ColumnIndex}">
                                             <Grid>
                                                 <Grid.RowDefinitions>
@@ -678,6 +684,7 @@
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition SharedSizeGroup="Header"/>
@@ -689,7 +696,12 @@
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="URI" Margin="5" VerticalAlignment="Center"/>
                                         <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Text="{Binding NationalHolidayCsvURI}"/>
 
-                                        <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
+                                                   Text="{x:Static properties:Resources.TextBlock_TextEncoding}"/>
+                                        <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
+                                                  ItemsSource="{Binding NationalHolidayTextEncodingList}" SelectedValue="{Binding SelectedNationalHolidayTextEncoding}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+
+                                        <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
                                                   Header="{x:Static properties:Resources.GroupHeader_ColumnIndex}">
                                             <Grid>
                                                 <Grid.RowDefinitions>

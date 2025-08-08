@@ -1002,4 +1002,7 @@ list</value>
   <data name="Message_NotFoundFileDoYouCreateNew" xml:space="preserve">
     <value>Not found the specified file. Do you create new file?</value>
   </data>
+  <data name="TextBlock_TextEncoding" xml:space="preserve">
+    <value>Encoding</value>
+  </data>
 </root>

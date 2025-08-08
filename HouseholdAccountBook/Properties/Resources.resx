@@ -1008,4 +1008,7 @@
   <data name="Message_NotFoundFileDoYouCreateNew" xml:space="preserve">
     <value>指定されたファイルが存在しません。新規に作成しますか？</value>
   </data>
+  <data name="TextBlock_TextEncoding" xml:space="preserve">
+    <value>エンコード</value>
+  </data>
 </root>

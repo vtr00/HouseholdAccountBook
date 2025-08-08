@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -677,6 +678,7 @@ namespace HouseholdAccountBook.Windows
                         StartDate = vm.StartDateExists ? vm.StartDate : null,
                         EndDate = vm.EndDateExists ? vm.EndDate : null,
                         CsvFolderPath = vm.CsvFolderPath != string.Empty ? vm.CsvFolderPath : null,
+                        TextEncoding = vm.SelectedTextEncoding,
                         CsvActDateIndex = vm.ActDateIndex - 1,
                         CsvOutgoIndex = vm.ExpensesIndex - 1,
                         CsvItemNameIndex = vm.ItemNameIndex - 1
@@ -1216,6 +1218,8 @@ namespace HouseholdAccountBook.Windows
                     DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((tmpVM) => { return tmpVM.Id != bookId; })),
                     PayDay = dto.PayDay,
                     CsvFolderPath = jsonObj?.CsvFolderPath,
+                    TextEncodingList = GetTextEncodingList(),
+                    SelectedTextEncoding = jsonObj?.TextEncoding ?? Encoding.UTF8.CodePage,
                     ActDateIndex = jsonObj?.CsvActDateIndex + 1,
                     ExpensesIndex = jsonObj?.CsvOutgoIndex + 1,
                     ItemNameIndex = jsonObj?.CsvItemNameIndex + 1
@@ -1472,6 +1476,8 @@ namespace HouseholdAccountBook.Windows
             this.WVM.PasswordInput = (PostgresPasswordInput)settings.App_Postgres_Password_Input;
             this.WVM.StartMonth = settings.App_StartMonth;
             this.WVM.NationalHolidayCsvURI = settings.App_NationalHolidayCsv_Uri;
+            this.WVM.NationalHolidayTextEncodingList = GetTextEncodingList();
+            this.WVM.SelectedNationalHolidayTextEncoding = settings.App_NationalHolidayCsv_TextEncoding;
             this.WVM.NationalHolidayCsvDateIndex = settings.App_NationalHolidayCsv_DateIndex + 1;
             this.WVM.IsPositionSaved = settings.App_IsPositionSaved;
 
@@ -1552,6 +1558,21 @@ namespace HouseholdAccountBook.Windows
             }
         }
         #endregion
+
+        /// <summary>
+        /// 文字エンコーディング一覧を取得する
+        /// </summary>
+        /// <returns></returns>
+        public static ObservableCollection<KeyValuePair<int, string>> GetTextEncodingList()
+        {
+            List<EncodingInfo> encodingInfos = new(Encoding.GetEncodings());
+            encodingInfos.Sort(static (info1, info2) => { return string.Compare(info1.Name, info2.Name, StringComparison.Ordinal); });
+
+            var encodingList = new ObservableCollection<KeyValuePair<int, string>>(encodingInfos.Select(static (info) => {
+                return new KeyValuePair<int, string>(info.CodePage, $"{info.Name.ToUpper(System.Globalization.CultureInfo.CurrentCulture)} ({info.DisplayName})");
+            }));
+            return encodingList;
+        }
 
         /// <summary>
         /// イベントハンドラをWVMに登録する
