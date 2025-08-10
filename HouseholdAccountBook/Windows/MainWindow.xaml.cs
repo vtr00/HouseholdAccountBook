@@ -1844,7 +1844,9 @@ namespace HouseholdAccountBook.Windows
                         // 選択された年の月別一覧タブを開く
                         Properties.Settings settings = Properties.Settings.Default;
 
-                        this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(settings.App_StartMonth).AddYears(col - 10);
+                        Log.Info($"{this.WVM.DisplayedStartYear:yyyy-MM-dd} + year:{col - 1}");
+                        this.WVM.DisplayedYear = this.WVM.DisplayedStartYear.GetFirstDateOfFiscalYear(settings.App_StartMonth).AddYears(col - 1);
+                        Log.Info($"{this.WVM.DisplayedYear:yyyy-MM-dd}");
                         this.WVM.SelectedTab = Tabs.MonthlyListTab;
                         e.Handled = true;
                     }
@@ -3417,6 +3419,12 @@ namespace HouseholdAccountBook.Windows
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                     this.UpdateSelectedGraph();
                 }
+            };
+            // 帳簿項目選択変更時
+            this.WVM.SelectedActionVMList.CollectionChanged += (sender, e) => {
+                Log.Debug("SelectedActionVMListCollectionChanged");
+
+                this.WVM.RaiseSelectedActionVMListChanged();
             };
         }
 

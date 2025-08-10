@@ -26,7 +26,7 @@
     <PackageIcon>resheet.png</PackageIcon>
     <PackageProjectUrl>https://github.com/vtr00/HouseholdAccountBook</PackageProjectUrl>
     <Title>Household Account Book</Title>
-    <Copyright>toresebu (c) All right reserved</Copyright>
+    <Copyright>Copyright (c) toresebu All rights reserved</Copyright>
     <Description>Your household accounts book</Description>
     <RepositoryUrl>https://github.com/vtr00/HouseholdAccountBook</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

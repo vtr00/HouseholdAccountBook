@@ -961,16 +961,12 @@ namespace HouseholdAccountBook.ViewModels
         public MainWindowViewModel()
         {
             this.Controller.BindMouseEnter(PlotCommands.HoverPointsOnlyTrack);
-
-            this.SelectedActionVMList.CollectionChanged += (sender, e) => {
-                this.RaiseSelectedActionVMListChanged();
-            };
         }
 
         /// <summary>
         /// 選択帳簿項目変更を通知する
         /// </summary>
-        private void RaiseSelectedActionVMListChanged()
+        public void RaiseSelectedActionVMListChanged()
         {
             this.RaisePropertyChanged(nameof(this.AverageValue));
             this.RaisePropertyChanged(nameof(this.Count));
