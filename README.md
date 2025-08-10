@@ -1,10 +1,10 @@
-# __Household Account Book__
+# __歳時記帳(Household Account Book)__
 
 ## __Abstract__
 It is for your household accounts book via PostgreSQL or SQLite.  
 Currently, the binary file is unscheduled to be published.  
 It is for who can build the project yourself.  
-It is supported for Japanese and English Language, and for Japanese Location only.  
+It is supported for Japanese and English Language, and for Japanese Calcure only.  
 
 ## __概要__
 本ソフトは PostgreSQL、SQLite を用いた家計簿ソフトです。  
@@ -28,7 +28,7 @@ It is supported for Japanese and English Language, and for Japanese Location onl
 	* 記帳風月の「記帳」機能に加え、以下をサポートしています。
 		* 一覧表示
 			* 土日祝の強調表示
-			* 「月別一覧」機能の表示年と表示月の連動
+			* 表示月の「月別一覧」機能の表示年との連動
 			* 「今月」表示
 			* 選択した帳簿項目の個数、金額の合計値/平均値の表示
 			* 選択した帳簿項目の一括削除
@@ -37,23 +37,23 @@ It is supported for Japanese and English Language, and for Japanese Location onl
 		* 帳簿項目の「追加」/「編集」
 			* 共通
 				* 「店舗」情報の登録
-				* 「帳簿」変更時の可能な範囲での分類、項目の維持
+				* 「帳簿」変更時、可能な範囲での分類/項目の選択の維持
 				* 日付の「今日」表示
 				* 繰返し回数が2回以上の場合
 					* 土日祝であった場合に前後の平日への変更
 					* 「編集」時に2回目以降のデータを連動して変更するかどうかの選択
 			* 「追加」
-				* 「追加」クリック時に選択していた帳簿項目の日付と、初期「日付」の連動
+				* 「追加」クリック時に選択していた帳簿項目の日付と、初期表示「日付」の連動
 				* 「続けて入力」クリック時の選択項目の維持、一覧表示の更新
-				* 同一の「項目」「店舗」「備考」を持つデータの一括登録(リスト追加)
+				* 同一の「項目」「店舗」「備考」を持つデータの一括登録(まとめて追加)
 		* 帳簿項目の「複製」
 		* 「移動」の追加/編集
 			* 共通
-				* 「移動」登録時の「手数料」の移動元/移動先での負担
+				* 「移動」登録時の「手数料」の負担の移動元/移動先の選択
 				* 移動元と移動先の別の日付での登録
 				* 日付の「今日」表示
 			* 追加
-				* 「移動」クリック時に選択していた帳簿項目の日付と、初期「日付」の連動
+				* 「移動」クリック時に選択していた帳簿項目の日付と、初期表示「日付」の連動
 				* 「移動元」(支払元帳簿)、「日」(支払日)のデフォルト値の設定(クレジットカードのみ)
 * 「日別グラフ」機能
 	* 全帳簿または選択した帳簿における全項目の指定期間内(日単位)の収支の推移
@@ -61,7 +61,7 @@ It is supported for Japanese and English Language, and for Japanese Location onl
 	* 全帳簿または選択した帳簿における指定期間内(日単位)の残高の推移
 * 「月別一覧」機能
 	* 記帳風月の「年間一覧」機能に加え、以下をサポートしています。
-		* 「記帳」機能の表示月と、表示年の連動
+		* 表示年の「記帳」機能の表示月との連動
 		* 「今年」表示
 * 「月別グラフ」機能
 	* 記帳風月の「グラフ」機能を一部サポートしています。
@@ -86,8 +86,7 @@ It is supported for Japanese and English Language, and for Japanese Location onl
 		* 所属する帳簿項目が存在するときに、「帳簿」「分類」「項目」及び帳簿と項目の関連設定の削除抑止
 		* csvファイル
 			* 照合
-			* 追加
-			* 編集
+			* 追加/編集
 	* 操作関連
 		* ショートカットキーの充実
 	* 言語関連

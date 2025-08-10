@@ -383,10 +383,10 @@
     <value>バックアップフォルダ選択</value>
   </data>
   <data name="Title_MainWindow" xml:space="preserve">
-    <value>Household Account Book</value>
+    <value>歳時記帳</value>
   </data>
   <data name="Title_DbSettingWindow" xml:space="preserve">
-    <value>DB設定</value>
+    <value>歳時記帳 - DB設定</value>
   </data>
   <data name="Title_CsvComparisonWindow" xml:space="preserve">
     <value>CSV比較</value>
@@ -1010,5 +1010,8 @@
   </data>
   <data name="TextBlock_TextEncoding" xml:space="preserve">
     <value>エンコード</value>
+  </data>
+  <data name="TextBlock_ApplicationName" xml:space="preserve">
+    <value>歳時記帳</value>
   </data>
 </root>

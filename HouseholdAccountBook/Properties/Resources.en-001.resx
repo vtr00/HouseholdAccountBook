@@ -1005,4 +1005,7 @@ list</value>
   <data name="TextBlock_TextEncoding" xml:space="preserve">
     <value>Encoding</value>
   </data>
+  <data name="TextBlock_ApplicationName" xml:space="preserve">
+    <value>Household Account Book</value>
+  </data>
 </root>

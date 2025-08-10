@@ -39,7 +39,8 @@
         </Grid.ColumnDefinitions>
 
         <Image Grid.Row="0" Grid.Column="0" Source="/Resources/resheet.ico"/>
-        <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center" Text="Household Account Book" FontSize="18" FontWeight="Bold"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center"
+                   Text="{x:Static properties:Resources.TextBlock_ApplicationName}" FontSize="18" FontWeight="Bold"/>
         <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" TextAlignment="Right" VerticalAlignment="Bottom">
             Ver.
             <TextBlock Text="{Binding App_Version, Source={StaticResource Settings}}"/>

@@ -1949,6 +1949,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   歳時記帳 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TextBlock_ApplicationName {
+            get {
+                return ResourceManager.GetString("TextBlock_ApplicationName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   平均 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TextBlock_Average {
@@ -2561,7 +2570,7 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
-        ///   DB設定 に類似しているローカライズされた文字列を検索します。
+        ///   歳時記帳 - DB設定 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Title_DbSettingWindow {
             get {
@@ -2624,7 +2633,7 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
-        ///   Household Account Book に類似しているローカライズされた文字列を検索します。
+        ///   歳時記帳 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Title_MainWindow {
             get {
