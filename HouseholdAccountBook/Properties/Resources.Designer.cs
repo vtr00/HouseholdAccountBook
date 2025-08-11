@@ -1745,6 +1745,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   祝日の一覧の取得に失敗しました。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Message_FoultToGetHolidayList {
+            get {
+                return ResourceManager.GetString("Message_FoultToGetHolidayList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   インポートに失敗しました。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Message_FoultToImport {

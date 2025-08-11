@@ -1008,4 +1008,7 @@ list</value>
   <data name="TextBlock_ApplicationName" xml:space="preserve">
     <value>Household Account Book</value>
   </data>
+  <data name="Message_FoultToGetHolidayList" xml:space="preserve">
+    <value>Failed to get holoday list.</value>
+  </data>
 </root>

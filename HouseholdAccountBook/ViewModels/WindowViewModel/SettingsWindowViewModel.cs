@@ -35,7 +35,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         public bool WithSave { get; set; } = true;
         /// <summary>
-        /// 表示更新の必要があるか
+        /// 設定を閉じたときに表示を更新する必要があるか
         /// </summary>
         public bool NeedToUpdate { get; set; } = false;
 
@@ -390,6 +390,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._NationalHolidayCsvURI, value) && this.WithSave) {
                     this.settings.App_NationalHolidayCsv_Uri = value;
                     this.settings.Save();
+                    this.NeedToUpdate = true;
                 }
             }
         }
@@ -418,6 +419,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._SelectedNationalHolidayTextEncoding, value)) {
                     this.settings.App_NationalHolidayCsv_TextEncoding = value;
                     this.settings.Save();
+                    this.NeedToUpdate = true;
                 }
             }
         }
@@ -435,6 +437,7 @@ namespace HouseholdAccountBook.ViewModels
                 if (this.SetProperty(ref this._NationalHolidayCsvDateIndex, value) && this.WithSave) {
                     this.settings.App_NationalHolidayCsv_DateIndex = value - 1;
                     this.settings.Save();
+                    this.NeedToUpdate = true;
                 }
             }
         }

@@ -1014,4 +1014,7 @@
   <data name="TextBlock_ApplicationName" xml:space="preserve">
     <value>歳時記帳</value>
   </data>
+  <data name="Message_FoultToGetHolidayList" xml:space="preserve">
+    <value>祝日の一覧の取得に失敗しました。</value>
+  </data>
 </root>

@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using Notification.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace HouseholdAccountBook.Extensions
 {
@@ -27,34 +29,46 @@ namespace HouseholdAccountBook.Extensions
         public static async Task DownloadHolidayListAsync()
         {
             Properties.Settings settings = Properties.Settings.Default;
+            if (settings.App_NationalHolidayCsv_Uri != string.Empty) {
+                Uri uri = new(settings.App_NationalHolidayCsv_Uri);
 
-            Uri uri = new(settings.App_NationalHolidayCsv_Uri);
+                CsvConfiguration csvConfig = new(System.Globalization.CultureInfo.CurrentCulture) {
+                    HasHeaderRecord = true,
+                    MissingFieldFound = (mffa) => { }
+                };
 
-            CsvConfiguration csvConfig = new(System.Globalization.CultureInfo.CurrentCulture) {
-                HasHeaderRecord = true,
-                MissingFieldFound = (mffa) => { }
-            };
-
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-            using (HttpClient client = new()) {
-                Stream stream = await client.GetStreamAsync(uri);
-                if (stream.CanRead) {
-                    holidayList.Clear();
-                    try {
-                        // CSVファイルを読み込む
-                        using (CsvReader reader = new(new StreamReader(stream, Encoding.GetEncoding(settings.App_NationalHolidayCsv_TextEncoding)), csvConfig)) {
-                            while (reader.Read()) {
-                                if (reader.TryGetField(settings.App_NationalHolidayCsv_DateIndex, out string dateString)) {
-                                    if (DateTime.TryParse(dateString, out DateTime dateTime)) {
-                                        holidayList.Add(dateTime);
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+                try {
+                    using (HttpClient client = new()) {
+                        Stream stream = await client.GetStreamAsync(uri);
+                        if (stream.CanRead) {
+                            holidayList.Clear();
+                            // CSVファイルを読み込む
+                            using (CsvReader reader = new(new StreamReader(stream, Encoding.GetEncoding(settings.App_NationalHolidayCsv_TextEncoding)), csvConfig)) {
+                                while (reader.Read()) {
+                                    if (reader.TryGetField(settings.App_NationalHolidayCsv_DateIndex, out string dateString)) {
+                                        if (DateTime.TryParse(dateString, out DateTime dateTime)) {
+                                            holidayList.Add(dateTime);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    catch (Exception e) {
-                        Log.Error(e.Message);
-                    }
+                }
+                catch (Exception e) {
+                    Log.Error(e.Message);
+                }
+
+                if (holidayList.Count == 0) {
+                    // ハンドルされない例外の発生を通知する
+                    NotificationManager nm = new();
+                    NotificationContent nc = new() {
+                        Title = Application.Current.MainWindow?.Title ?? "",
+                        Message = Properties.Resources.Message_FoultToGetHolidayList,
+                        Type = NotificationType.Warning
+                    };
+                    nm.Show(nc);
                 }
             }
         }
