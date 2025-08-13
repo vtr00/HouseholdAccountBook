@@ -192,7 +192,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="App_SelectedDBKind" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="App_Access_Provider" Type="System.String" Scope="User">
       <Value Profile="(Default)">Microsoft.ACE.OLEDB.16.0</Value>

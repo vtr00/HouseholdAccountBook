@@ -68,8 +68,8 @@ namespace HouseholdAccountBook.Others
         /// DB種別文字列
         /// </summary>
         public static Dictionary<DBKind, string> DBKindStr => new() {
-            { DBKind.PostgreSQL,    "PostgreSQL" },
             { DBKind.SQLite,        "SQLite" },
+            { DBKind.PostgreSQL,    "PostgreSQL" },
 //            { DBKind.Access,        "Access" },
         };
         /// <summary>
