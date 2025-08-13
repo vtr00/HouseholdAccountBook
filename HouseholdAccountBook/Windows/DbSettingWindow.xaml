@@ -64,6 +64,7 @@
         <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalAlignment="Center"
                   ItemsSource="{Binding DBKindDic}" SelectedValue="{Binding SelectedDBKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
 
+        <!-- PostgreSQL -->
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.Style>
                 <Style TargetType="Grid">
@@ -126,6 +127,7 @@
             </GroupBox>
         </Grid>
 
+        <!-- Access -->
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.Style>
                 <Style TargetType="Grid">
@@ -169,6 +171,7 @@
             </GroupBox>
         </Grid>
 
+        <!-- SQLite -->
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.Style>
                 <Style TargetType="Grid">

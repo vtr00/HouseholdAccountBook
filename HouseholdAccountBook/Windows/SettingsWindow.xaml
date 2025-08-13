@@ -48,6 +48,8 @@
         <RoutedCommand x:Key="BackUpFolderPathDialogCommand"/>
         <RoutedCommand x:Key="ReloadWindowSettingCommand"/>
         <RoutedCommand x:Key="InitializeWindowSettingCommand"/>
+        
+        <RoutedCommand x:Key="SaveOtherSettingsCommand"/>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -82,6 +84,8 @@
         <CommandBinding Command="{StaticResource BackUpFolderPathDialogCommand}" Executed="BackUpFolderPathDialogCommand_Executed"/>
         <CommandBinding Command="{StaticResource ReloadWindowSettingCommand}" Executed="ReloadWindowSettingCommand_Executed"/>
         <CommandBinding Command="{StaticResource InitializeWindowSettingCommand}" Executed="InitializeWindowSettingCommand_Executed"/>
+
+        <CommandBinding Command="{StaticResource SaveOtherSettingsCommand}" Executed="SaveOtherSettingsCommand_Executed"/>
     </Window.CommandBindings>
     
     <Window.InputBindings>
@@ -526,265 +530,295 @@
             </TabItem>
             <!-- その他 -->
             <TabItem Header="{x:Static properties:Resources.TabHeader_OtherSettings}">
-                <ScrollViewer>
-                    <StackPanel Grid.IsSharedSizeScope="True" Margin="0,0,5,0">
-                        <GroupBox Header="{x:Static properties:Resources.GroupHeader_DataBaseInformation}">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                                <GroupBox Grid.Row="0" Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_PostgreSQL}"
-                                          Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="30" SharedSizeGroup="Button"/>
-                                        </Grid.ColumnDefinitions>
+                    <ScrollViewer Grid.Row="0">
+                        <StackPanel Grid.IsSharedSizeScope="True" Margin="0,0,5,0">
+                            <!-- データベース情報 -->
+                            <GroupBox Header="{x:Static properties:Resources.GroupHeader_DataBaseInformation}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
 
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
-                                        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding DumpExePath}" IsReadOnly="True"/>
-                                        <Button Grid.Row="0" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource DumpExePathDialogCommand}"/>
+                                    <!-- PostgreSQL -->
+                                    <GroupBox Grid.Row="0" Grid.Column="0">
+                                        <GroupBox.Header>
+                                            <RadioButton Content="{x:Static properties:Resources.GroupHeader_PostgreSQL}" 
+                                                         IsChecked="{Binding SelectedDBKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=PostgreSQL}"
+                                                         GroupName="DBKindGroup" IsEnabled="False"/>
+                                        </GroupBox.Header>
+                                        <Grid DataContext="{Binding PostgreSQLDBSettingVM}">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="30" SharedSizeGroup="Button"/>
+                                            </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
-                                        <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding RestoreExePath}" IsReadOnly="True"/>
-                                        <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource RestoreExePathDialogCommand}"/>
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding DumpExePath}" IsReadOnly="True"/>
+                                            <Button Grid.Row="0" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource DumpExePathDialogCommand}"/>
 
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
-                                           Text="{x:Static properties:Resources.TextBlock_Password}"/>
-                                        <RadioButton Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_input" Margin="5" 
-                                             Content="{x:Static properties:Resources.RadioButton_Password_ShowInputWindow}"
-                                             IsChecked="{Binding PasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=InputWindow}"/>
-                                        <RadioButton Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_pgpass" Margin="5" 
-                                             Content="{x:Static properties:Resources.RadioButton_Password_SpecifyPgpassConf}"
-                                             IsChecked="{Binding PasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=PgPassConf}"/>
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
+                                            <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding RestoreExePath}" IsReadOnly="True"/>
+                                            <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource RestoreExePathDialogCommand}"/>
 
+                                            <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Password}"/>
+                                            <RadioButton Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_input" Margin="5" 
+                                                         Content="{x:Static properties:Resources.RadioButton_Password_ShowInputWindow}"
+                                                         IsChecked="{Binding PasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=InputWindow}"/>
+                                            <RadioButton Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_pgpass" Margin="5" 
+                                                         Content="{x:Static properties:Resources.RadioButton_Password_SpecifyPgpassConf}"
+                                                         IsChecked="{Binding PasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=PgPassConf}"/>
+                                        </Grid>
+                                    </GroupBox>
+                                    <!-- SQLite -->
+                                    <GroupBox Grid.Row="1" Grid.Column="0">
+                                        <GroupBox.Header>
+                                            <RadioButton Content="{x:Static properties:Resources.GroupHeader_SQLite}" 
+                                                         IsChecked="{Binding SelectedDBKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=SQLite}"
+                                                         GroupName="DBkindGroup" IsEnabled="False"/>
+                                        </GroupBox.Header>
+                                        <Grid DataContext="{Binding SQLiteSettingVM}">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="30" SharedSizeGroup="Button"/>
+                                            </Grid.ColumnDefinitions>
 
-                                    </Grid>
-                                </GroupBox>
-                                <GroupBox Grid.Row="1" Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_KichoFugetsu}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition SharedSizeGroup="Header"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
-                                                   Text="{x:Static properties:Resources.TextBlock_Access_Provider}"/>
-                                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                                                  ItemsSource="{Binding KichoFugetsuProviderNameDic}" SelectedValue="{Binding SelectedKichoFugetsuProviderName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
-                                    </Grid>
-                                </GroupBox>
-                                
-                                <Button Grid.Row="2" Grid.Column="0" Margin="5" 
-                                        Content="{x:Static properties:Resources.Button_ReregisterDatabaseSetting}"
-                                        Command="{StaticResource RestartForDbSettingCommand}"/>
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox Header="{x:Static properties:Resources.GroupHeader_LanguageInformation}">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition SharedSizeGroup="Header"/>
-                                    <ColumnDefinition Width="200"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_SQLite_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Margin="1" Text="{Binding DBFilePath}" IsReadOnly="True"/>
+                                        </Grid>
+                                    </GroupBox>
+                                    <!-- Microsoft Access -->
+                                    <GroupBox Grid.Row="2" Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_KichoFugetsu}" DataContext="{Binding AccessSettingVM}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="Header"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
-                                           Text="{x:Static properties:Resources.TextBlock_Language}"/>
-                                <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                                          ItemsSource="{Binding CultureNameDic}" SelectedValue="{Binding SelectedCultureName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
-                                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5"
-                                        Content="{x:Static properties:Resources.Button_ApplyLanguage}"
-                                        Command="{StaticResource RestartForLanguageCommand}"/>
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox Header="{x:Static properties:Resources.GroupHeader_BackUpInformation}">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition SharedSizeGroup="Header"/>
-                                    <ColumnDefinition Width="100" SharedSizeGroup="Number"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition SharedSizeGroup="Button"/>
-                                </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
+                                                       Text="{x:Static properties:Resources.TextBlock_Access_Provider}"/>
+                                            <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
+                                                      ItemsSource="{Binding ProviderNameDic}" SelectedValue="{Binding SelectedProviderName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                        </Grid>
+                                    </GroupBox>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
-                                           Text="{x:Static properties:Resources.TextBlock_Count}"/>
-                                <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="0" MaxValue="100" Value="{Binding BackUpNum}"/>
+                                    <Button Grid.Row="3" Grid.Column="0" Margin="5" 
+                                            Content="{x:Static properties:Resources.Button_ReregisterDatabaseSetting}"
+                                            Command="{StaticResource RestartForDbSettingCommand}"/>
+                                </Grid>
+                            </GroupBox>
+                            <!-- 言語情報 -->
+                            <GroupBox Header="{x:Static properties:Resources.GroupHeader_LanguageInformation}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition SharedSizeGroup="Header"/>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
-                                           Text="{x:Static properties:Resources.TextBlock_FolderPath}"/>
-                                <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsReadOnly="True" 
-                                         Text="{Binding BackUpFolderPath}"/>
-                                <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="..." Command="{StaticResource BackUpFolderPathDialogCommand}"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Language}"/>
+                                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" ItemsSource="{Binding CultureNameDic}" 
+                                              SelectedValue="{Binding SelectedCultureName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                    <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5"
+                                            Content="{x:Static properties:Resources.Button_ApplyLanguage}" Command="{StaticResource RestartForLanguageCommand}"/>
+                                </Grid>
+                            </GroupBox>
+                            <!-- バックアップ情報 -->
+                            <GroupBox Header="{x:Static properties:Resources.GroupHeader_BackUpInformation}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition SharedSizeGroup="Header"/>
+                                        <ColumnDefinition Width="100" SharedSizeGroup="Number"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition SharedSizeGroup="Button"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
-                                           Text="{x:Static properties:Resources.TextBlock_Timing}"/>
-                                <GroupBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="5">
-                                    <GroupBox.Header>
-                                        <CheckBox Content="{x:Static properties:Resources.CheckBox_Timing_MinimizingMainWindow}" IsChecked="{Binding BackUpFlagAtMinimizing}"/>
-                                    </GroupBox.Header>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition SharedSizeGroup="Header"/>
-                                            <ColumnDefinition SharedSizeGroup="Number"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        
-                                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
-                                                   Text="{x:Static properties:Resources.TextBlock_Interval}"/>
-                                        <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" MinValue="0" Value="{Binding BackUpIntervalAtMinimizing}"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="2" Margin="5" VerticalAlignment="Center" 
-                                                   Text="{x:Static properties:Resources.TextBlock_MinutesUnit}"/>
-                                    </Grid>
-                                </GroupBox>
-                                <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                          Content="{x:Static properties:Resources.CheckBox_Timing_ClosingMainWindow}" IsChecked="{Binding BackUpFlagAtClosing}"/>
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox Header="{x:Static properties:Resources.GroupHeader_CalendarInformation}">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition SharedSizeGroup="Header"/>
-                                    <ColumnDefinition SharedSizeGroup="Number"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition SharedSizeGroup="Button"/>
-                                </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
+                                               Text="{x:Static properties:Resources.TextBlock_Count}"/>
+                                    <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="0" MaxValue="100" Value="{Binding BackUpNum}"/>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
-                                           Text="{x:Static properties:Resources.TextBlock_StartMonth}"/>
-                                <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="1" MaxValue="12" Value="{Binding StartMonth}"/>
-                                <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" 
-                                          Header="{x:Static properties:Resources.GroupHeader_Holiday}">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition SharedSizeGroup="Header"/>
-                                            <ColumnDefinition SharedSizeGroup="Number"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition SharedSizeGroup="Button"/>
-                                        </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
+                                               Text="{x:Static properties:Resources.TextBlock_FolderPath}"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsReadOnly="True" Text="{Binding BackUpFolderPath}"/>
+                                    <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="..." Command="{StaticResource BackUpFolderPathDialogCommand}"/>
 
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="URI" Margin="5" VerticalAlignment="Center"/>
-                                        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Text="{Binding NationalHolidayCsvURI}"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Timing}"/>
+                                    <GroupBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="5">
+                                        <GroupBox.Header>
+                                            <CheckBox Content="{x:Static properties:Resources.CheckBox_Timing_MinimizingMainWindow}" IsChecked="{Binding BackUpFlagAtMinimizing}"/>
+                                        </GroupBox.Header>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="Header"/>
+                                                <ColumnDefinition SharedSizeGroup="Number"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
-                                                   Text="{x:Static properties:Resources.TextBlock_TextEncoding}"/>
-                                        <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
-                                                  ItemsSource="{Binding NationalHolidayTextEncodingList}" SelectedValue="{Binding SelectedNationalHolidayTextEncoding}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                            <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" VerticalAlignment="Center" Text="{x:Static properties:Resources.TextBlock_Interval}"/>
+                                            <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" MinValue="0" Value="{Binding BackUpIntervalAtMinimizing}"/>
+                                            <TextBlock Grid.Row="3" Grid.Column="2" Margin="5" VerticalAlignment="Center" Text="{x:Static properties:Resources.TextBlock_MinutesUnit}"/>
+                                        </Grid>
+                                    </GroupBox>
+                                    <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
+                                              Content="{x:Static properties:Resources.CheckBox_Timing_ClosingMainWindow}" IsChecked="{Binding BackUpFlagAtClosing}"/>
+                                </Grid>
+                            </GroupBox>
+                            <!-- カレンダー情報 -->
+                            <GroupBox Header="{x:Static properties:Resources.GroupHeader_CalendarInformation}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition SharedSizeGroup="Header"/>
+                                        <ColumnDefinition SharedSizeGroup="Number"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition SharedSizeGroup="Button"/>
+                                    </Grid.ColumnDefinitions>
 
-                                        <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
-                                                  Header="{x:Static properties:Resources.GroupHeader_ColumnIndex}">
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto"/>
-                                                </Grid.RowDefinitions>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition SharedSizeGroup="Header"/>
-                                                    <ColumnDefinition SharedSizeGroup="Number"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition SharedSizeGroup="Button"/>
-                                                </Grid.ColumnDefinitions>
-                                                
-                                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
-                                                           Text="{x:Static properties:Resources.TextBlock_Date}"/>
-                                                <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="1" Value="{Binding NationalHolidayCsvDateIndex}"/>
-                                            </Grid>
-                                            
-                                        </GroupBox>
-                                    </Grid>
-                                </GroupBox>
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox Header="{x:Static properties:Resources.GroupHeader_WindowInformation}">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition SharedSizeGroup="Header"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition SharedSizeGroup="Button"/>
-                                </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center" Text="{x:Static properties:Resources.TextBlock_StartMonth}"/>
+                                    <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="1" MaxValue="12" Value="{Binding StartMonth}"/>
+                                    <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" Header="{x:Static properties:Resources.GroupHeader_Holiday}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="Header"/>
+                                                <ColumnDefinition SharedSizeGroup="Number"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition SharedSizeGroup="Button"/>
+                                            </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
-                                           Text="{x:Static properties:Resources.TextBlock_SaveTarget}"/>
-                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                                          Content="{x:Static properties:Resources.CheckBox_SaveTarget_PositionWithoutMainWindow}" IsChecked="{Binding IsPositionSaved}"/>
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="URI" Margin="5" VerticalAlignment="Center"/>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Text="{Binding NationalHolidayCsvURI}"/>
 
-                                <DataGrid Grid.Row="1" Grid.ColumnSpan="3" Margin="5" ItemsSource="{Binding WindowSettingVMList}"
-                                                  IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
-                                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
-                                                  AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
-                                                  HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_TextEncoding}"/>
+                                            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding NationalHolidayTextEncodingList}" 
+                                                      SelectedValue="{Binding SelectedNationalHolidayTextEncoding}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
 
-                                    <DataGrid.ColumnHeaderStyle>
-                                        <Style TargetType="DataGridColumnHeader">
-                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                        </Style>
-                                    </DataGrid.ColumnHeaderStyle>
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Title" Width="*" Binding="{Binding Title}"/>
-                                        <DataGridTextColumn Header="Left" Width="*" Binding="{Binding Left}"/>
-                                        <DataGridTextColumn Header="Top" Width="*" Binding="{Binding Top}"/>
-                                        <DataGridTextColumn Header="Width" Width="*" Binding="{Binding Width}"/>
-                                        <DataGridTextColumn Header="Height" Width="*" Binding="{Binding Height}"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Grid>
-                        </GroupBox>
-                        
-                        <GroupBox>
-                            <GroupBox.Header>
-                                <CheckBox Content="{x:Static properties:Resources.GroupHeader_Debug}" IsChecked="{Binding DebugMode}"/>
-                            </GroupBox.Header>
+                                            <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
+                                                      Header="{x:Static properties:Resources.GroupHeader_ColumnIndex}">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition SharedSizeGroup="Header"/>
+                                                        <ColumnDefinition SharedSizeGroup="Number"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition SharedSizeGroup="Button"/>
+                                                    </Grid.ColumnDefinitions>
 
-                            <Grid Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition SharedSizeGroup="Header"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition SharedSizeGroup="Button"/>
-                                </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
+                                                               Text="{x:Static properties:Resources.TextBlock_Date}"/>
+                                                    <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="1" Value="{Binding NationalHolidayCsvDateIndex}"/>
+                                                </Grid>
 
-                                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" 
-                                        Content="{x:Static properties:Resources.Button_InitializeWindowPositionAndSize}"
-                                        Command="{StaticResource InitializeWindowSettingCommand}"/>
-                            </Grid>
-                        </GroupBox>
-                    </StackPanel>
-                </ScrollViewer>
+                                            </GroupBox>
+                                        </Grid>
+                                    </GroupBox>
+                                </Grid>
+                            </GroupBox>
+                            <!-- ウィンドウ情報 -->
+                            <GroupBox Header="{x:Static properties:Resources.GroupHeader_WindowInformation}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition SharedSizeGroup="Header"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition SharedSizeGroup="Button"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
+                                               Text="{x:Static properties:Resources.TextBlock_SaveTarget}"/>
+                                    <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" 
+                                              Content="{x:Static properties:Resources.CheckBox_SaveTarget_PositionWithoutMainWindow}" IsChecked="{Binding IsPositionSaved}"/>
+
+                                    <DataGrid Grid.Row="1" Grid.ColumnSpan="3" Margin="5" ItemsSource="{Binding WindowSettingVMList}"
+                                              IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
+                                              CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
+                                              AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
+                                              HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
+
+                                        <DataGrid.ColumnHeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader">
+                                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                            </Style>
+                                        </DataGrid.ColumnHeaderStyle>
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Title" Width="*" Binding="{Binding Title}"/>
+                                            <DataGridTextColumn Header="Left" Width="*" Binding="{Binding Left}"/>
+                                            <DataGridTextColumn Header="Top" Width="*" Binding="{Binding Top}"/>
+                                            <DataGridTextColumn Header="Width" Width="*" Binding="{Binding Width}"/>
+                                            <DataGridTextColumn Header="Height" Width="*" Binding="{Binding Height}"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
+                            </GroupBox>
+                            <!-- デバッグ -->
+                            <GroupBox>
+                                <GroupBox.Header>
+                                    <CheckBox Content="{x:Static properties:Resources.GroupHeader_Debug}" IsChecked="{Binding DebugMode}"/>
+                                </GroupBox.Header>
+
+                                <Grid Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition SharedSizeGroup="Header"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition SharedSizeGroup="Button"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" 
+                                            Content="{x:Static properties:Resources.Button_InitializeWindowPositionAndSize}"
+                                            Command="{StaticResource InitializeWindowSettingCommand}"/>
+                                </Grid>
+                            </GroupBox>
+                        </StackPanel>
+                    </ScrollViewer>
+                    
+                    <Button Grid.Row="1" Margin="5" Content="{x:Static properties:Resources.Button_Save}" Command="{StaticResource SaveOtherSettingsCommand}"/>
+                </Grid>
             </TabItem>
         </TabControl>
     </Grid>

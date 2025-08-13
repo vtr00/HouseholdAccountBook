@@ -749,9 +749,9 @@ namespace HouseholdAccountBook.Windows
         {
             string folderPath = string.Empty;
             string fileName = string.Empty;
-            if (this.WVM.DumpExePath != string.Empty) {
-                folderPath = Path.GetDirectoryName(this.WVM.DumpExePath);
-                fileName = Path.GetFileName(this.WVM.DumpExePath);
+            if (this.WVM.PostgreSQLDBSettingVM.DumpExePath != string.Empty) {
+                folderPath = Path.GetDirectoryName(this.WVM.PostgreSQLDBSettingVM.DumpExePath);
+                fileName = Path.GetFileName(this.WVM.PostgreSQLDBSettingVM.DumpExePath);
             }
 
             OpenFileDialog ofd = new() {
@@ -763,7 +763,7 @@ namespace HouseholdAccountBook.Windows
             };
 
             if (ofd.ShowDialog() == true) {
-                this.WVM.DumpExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                this.WVM.PostgreSQLDBSettingVM.DumpExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             }
         }
 
@@ -776,9 +776,9 @@ namespace HouseholdAccountBook.Windows
         {
             string folderPath = string.Empty;
             string fileName = string.Empty;
-            if (this.WVM.RestoreExePath != string.Empty) {
-                folderPath = Path.GetDirectoryName(this.WVM.RestoreExePath);
-                fileName = Path.GetFileName(this.WVM.RestoreExePath);
+            if (this.WVM.PostgreSQLDBSettingVM.RestoreExePath != string.Empty) {
+                folderPath = Path.GetDirectoryName(this.WVM.PostgreSQLDBSettingVM.RestoreExePath);
+                fileName = Path.GetFileName(this.WVM.PostgreSQLDBSettingVM.RestoreExePath);
             }
 
             OpenFileDialog ofd = new() {
@@ -790,7 +790,7 @@ namespace HouseholdAccountBook.Windows
             };
 
             if (ofd.ShowDialog() == true) {
-                this.WVM.RestoreExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+                this.WVM.PostgreSQLDBSettingVM.RestoreExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
             }
         }
 
@@ -811,7 +811,7 @@ namespace HouseholdAccountBook.Windows
         }
 
         /// <summary>
-        /// 言語設定を行うために再起動する
+        /// 言語設定を適用するために再起動する
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -924,6 +924,17 @@ namespace HouseholdAccountBook.Windows
                 ((App)Application.Current).Restart();
             }
         }
+        
+        /// <summary>
+        /// その他設定を保存する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveOtherSettingsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.SaveOthersSettings();
+            this.needToUpdate = true;
+        }
         #endregion
         #endregion
 
@@ -950,7 +961,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void SettingsWindow_Closing(object sender, CancelEventArgs e)
         {
-            this.DialogResult = this.needToUpdate || this.WVM.NeedToUpdate;
+            this.DialogResult = this.needToUpdate;
         }
 
         /// <summary>
@@ -1458,32 +1469,47 @@ namespace HouseholdAccountBook.Windows
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            this.WVM.WithSave = false;
+            this.WVM.SelectedDBKind = (DBKind)settings.App_SelectedDBKind;
 
-            this.WVM.DumpExePath = settings.App_Postgres_DumpExePath;
-            this.WVM.RestoreExePath = settings.App_Postgres_RestoreExePath;
+            // PostgreSQL
+            this.WVM.PostgreSQLDBSettingVM.Host = settings.App_Postgres_Host;
+            this.WVM.PostgreSQLDBSettingVM.Port = settings.App_Postgres_Port;
+            this.WVM.PostgreSQLDBSettingVM.UserName = settings.App_Postgres_UserName;
+#if DEBUG
+            this.WVM.PostgreSQLDBSettingVM.DatabaseName = settings.App_Postgres_DatabaseName_Debug;
+#else
+            this.WVM.PostgreSQLDBSettingVM.DatabaseName = settings.App_Postgres_DatabaseName;
+#endif
+            this.WVM.PostgreSQLDBSettingVM.Role = settings.App_Postgres_Role;
+            this.WVM.PostgreSQLDBSettingVM.DumpExePath = settings.App_Postgres_DumpExePath;
+            this.WVM.PostgreSQLDBSettingVM.RestoreExePath = settings.App_Postgres_RestoreExePath;
+            this.WVM.PostgreSQLDBSettingVM.PasswordInput = (PostgresPasswordInput)settings.App_Postgres_Password_Input;
 
-            this.WVM.KichoFugetsuProviderNameDic.Clear();
-            OleDbHandler.GetOleDbProvider().FindAll((pair) => pair.Key.Contains(AccessProviderHeader)).ForEach(this.WVM.KichoFugetsuProviderNameDic.Add);
-            this.WVM.SelectedKichoFugetsuProviderName = settings.App_Import_KichoFugetsu_Provider;
+            // SQLite
+            this.WVM.SQLiteSettingVM.DBFilePath = settings.App_SQLite_DBFilePath;
+
+            // Access
+            this.WVM.AccessSettingVM.ProviderNameDic.Clear();
+            OleDbHandler.GetOleDbProvider().FindAll((pair) => pair.Key.Contains(AccessProviderHeader)).ForEach(this.WVM.AccessSettingVM.ProviderNameDic.Add);
+            this.WVM.AccessSettingVM.SelectedProviderName = settings.App_Import_KichoFugetsu_Provider;
 
             this.WVM.SelectedCultureName = settings.App_CultureName;
+
             this.WVM.BackUpNum = settings.App_BackUpNum;
             this.WVM.BackUpFolderPath = settings.App_BackUpFolderPath;
             this.WVM.BackUpFlagAtMinimizing = settings.App_BackUpFlagAtMinimizing;
             this.WVM.BackUpIntervalAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
             this.WVM.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
-            this.WVM.PasswordInput = (PostgresPasswordInput)settings.App_Postgres_Password_Input;
+
             this.WVM.StartMonth = settings.App_StartMonth;
             this.WVM.NationalHolidayCsvURI = settings.App_NationalHolidayCsv_Uri;
             this.WVM.NationalHolidayTextEncodingList = GetTextEncodingList();
             this.WVM.SelectedNationalHolidayTextEncoding = settings.App_NationalHolidayCsv_TextEncoding;
             this.WVM.NationalHolidayCsvDateIndex = settings.App_NationalHolidayCsv_DateIndex + 1;
+
             this.WVM.IsPositionSaved = settings.App_IsPositionSaved;
 
             this.WVM.DebugMode = settings.App_IsDebug;
-
-            this.WVM.WithSave = true;
 
             this.LoadOthersWindowSettings();
         }
@@ -1556,6 +1582,39 @@ namespace HouseholdAccountBook.Windows
                 settings.SettingsWindow_Width = this.Width;
                 settings.Save();
             }
+        }
+
+        /// <summary>
+        /// その他設定を保存する
+        /// </summary>
+        public void SaveOthersSettings()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            settings.App_Postgres_DumpExePath = this.WVM.PostgreSQLDBSettingVM.DumpExePath;
+            settings.App_Postgres_RestoreExePath = this.WVM.PostgreSQLDBSettingVM.RestoreExePath;
+            settings.App_Postgres_Password_Input = (int)this.WVM.PostgreSQLDBSettingVM.PasswordInput;
+
+            settings.App_Import_KichoFugetsu_Provider = this.WVM.AccessSettingVM.SelectedProviderName;
+
+            settings.App_CultureName = this.WVM.SelectedCultureName;
+
+            settings.App_BackUpNum = this.WVM.BackUpNum;
+            settings.App_BackUpFolderPath = this.WVM.BackUpFolderPath;
+            settings.App_BackUpFlagAtMinimizing = this.WVM.BackUpFlagAtMinimizing;
+            settings.App_BackUpIntervalMinAtMinimizing = this.WVM.BackUpIntervalAtMinimizing;
+            settings.App_BackUpFlagAtClosing = this.WVM.BackUpFlagAtClosing;
+
+            settings.App_StartMonth = this.WVM.StartMonth;
+            settings.App_NationalHolidayCsv_Uri = this.WVM.NationalHolidayCsvURI;
+            settings.App_NationalHolidayCsv_TextEncoding = this.WVM.SelectedNationalHolidayTextEncoding;
+            settings.App_NationalHolidayCsv_DateIndex = this.WVM.NationalHolidayCsvDateIndex - 1;
+
+            settings.App_IsPositionSaved = this.WVM.IsPositionSaved;
+
+            settings.App_IsDebug = this.WVM.DebugMode;
+
+            settings.Save();
         }
         #endregion
 

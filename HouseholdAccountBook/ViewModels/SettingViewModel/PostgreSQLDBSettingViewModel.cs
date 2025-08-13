@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.ViewModels
 {
@@ -102,6 +103,18 @@ namespace HouseholdAccountBook.ViewModels
             set => this.SetProperty(ref this._RestoreExePath, value);
         }
         private string _RestoreExePath = default;
+        #endregion
+
+        /// <summary>
+        /// パスワード入力方法
+        /// </summary>
+        #region PasswordInput
+        public PostgresPasswordInput PasswordInput
+        {
+            get => this._PasswordInput;
+            set => this.SetProperty(ref this._PasswordInput, value);
+        }
+        private PostgresPasswordInput _PasswordInput = PostgresPasswordInput.InputWindow;
         #endregion
         #endregion
     }

@@ -13,11 +13,6 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     public class SettingsWindowViewModel : BindableBase
     {
-        /// <summary>
-        /// 設定
-        /// </summary>
-        private readonly Properties.Settings settings;
-
         #region フィールド
         /// <summary>
         /// 選択された項目VM変更時のイベント
@@ -30,15 +25,6 @@ namespace HouseholdAccountBook.ViewModels
         #endregion
 
         #region プロパティ
-        /// <summary>
-        /// 設定を保存するか
-        /// </summary>
-        public bool WithSave { get; set; } = true;
-        /// <summary>
-        /// 設定を閉じたときに表示を更新する必要があるか
-        /// </summary>
-        public bool NeedToUpdate { get; set; } = false;
-
         /// <summary>
         /// 選択された設定タブインデックス
         /// </summary>
@@ -165,76 +151,45 @@ namespace HouseholdAccountBook.ViewModels
         public DBKind SelectedDBKind
         {
             get => this._SelectedDBKind;
-            set {
-                if (this.SetProperty(ref this._SelectedDBKind, value)) {
-                    this.RaisePropertyChanged(nameof(this.IsPostgreSQL));
-                }
-            }
+            set => this.SetProperty(ref this._SelectedDBKind, value);
         }
         private DBKind _SelectedDBKind = default;
         #endregion
 
         /// <summary>
-        /// IsPostgreSQL
+        /// PostgreSQL設定
         /// </summary>
-        #region IsPostgreSQL
-        public bool IsPostgreSQL => this.SelectedDBKind == DBKind.PostgreSQL;
+        #region PostgreSQLDBSettingVM
+        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM
+        {
+            get => this._PostgreSQLDBSettingVM;
+            set => this.SetProperty(ref this._PostgreSQLDBSettingVM, value);
+        }
+        private PostgreSQLDBSettingViewModel _PostgreSQLDBSettingVM = new();
         #endregion
 
         /// <summary>
-        /// pg_dump.exeパス
+        /// Access設定
         /// </summary>
-        #region DumpExePath
-        public string DumpExePath
+        #region AccessSettingVM
+        public OleDbSettingViewModel AccessSettingVM
         {
-            get => this._DumpExePath;
-            set {
-                if (this.SetProperty(ref this._DumpExePath, value) && this.WithSave) {
-                    this.settings.App_Postgres_DumpExePath = value;
-                    this.settings.Save();
-                }
-            }
+            get => this._AccessSettingVM;
+            set => this.SetProperty(ref this._AccessSettingVM, value);
         }
-        private string _DumpExePath = default;
+        private OleDbSettingViewModel _AccessSettingVM = new();
         #endregion
 
         /// <summary>
-        /// pg_restore.exeパス
+        /// SQLite設定
         /// </summary>
-        #region RestoreExePath
-        public string RestoreExePath
+        #region SQLiteSettingVM
+        public FileDbSettingViewModel SQLiteSettingVM
         {
-            get => this._RestoreExePath;
-            set {
-                if (this.SetProperty(ref this._RestoreExePath, value) && this.WithSave) {
-                    this.settings.App_Postgres_RestoreExePath = value;
-                    this.settings.Save();
-                }
-            }
+            get => this._SQLiteSettingVM;
+            set => this.SetProperty(ref this._SQLiteSettingVM, value);
         }
-        private string _RestoreExePath = default;
-        #endregion
-
-        /// <summary>
-        /// 記帳風月Accessプロバイダ名
-        /// </summary>
-        /// <remarks>動的に指定するため<see cref="ObservableCollection{T}"/>を用いる</remarks>
-        public ObservableCollection<KeyValuePair<string, string>> KichoFugetsuProviderNameDic { get; } = [];
-        /// <summary>
-        /// 選択された記帳風月Accessプロバイダ名
-        /// </summary>
-        #region SelectedAccessProviderName
-        public string SelectedKichoFugetsuProviderName
-        {
-            get => this._SelectedAccessProviderName;
-            set {
-                if (this.SetProperty(ref this._SelectedAccessProviderName, value) && this.WithSave) {
-                    this.settings.App_Import_KichoFugetsu_Provider = value;
-                    this.settings.Save();
-                }
-            }
-        }
-        private string _SelectedAccessProviderName = "Microsoft.ACE.OLEDB.16.0";
+        private FileDbSettingViewModel _SQLiteSettingVM = new();
         #endregion
         #endregion
 
@@ -264,12 +219,7 @@ namespace HouseholdAccountBook.ViewModels
         public int BackUpNum
         {
             get => this._BackUpNum;
-            set {
-                if (this.SetProperty(ref this._BackUpNum, value) && this.WithSave) {
-                    this.settings.App_BackUpNum = value;
-                    this.settings.Save();
-                }
-            }
+            set => this.SetProperty(ref this._BackUpNum, value);
         }
         private int _BackUpNum = default;
         #endregion
@@ -281,12 +231,7 @@ namespace HouseholdAccountBook.ViewModels
         public string BackUpFolderPath
         {
             get => this._BackUpFolderPath;
-            set {
-                if (this.SetProperty(ref this._BackUpFolderPath, value) && this.WithSave) {
-                    this.settings.App_BackUpFolderPath = value;
-                    this.settings.Save();
-                }
-            }
+            set => this.SetProperty(ref this._BackUpFolderPath, value);
         }
         private string _BackUpFolderPath = default;
         #endregion
@@ -298,12 +243,7 @@ namespace HouseholdAccountBook.ViewModels
         public bool BackUpFlagAtMinimizing
         {
             get => this._BackUpFlagAtMinimizing;
-            set {
-                if (this.SetProperty(ref this._BackUpFlagAtMinimizing, value) && this.WithSave) {
-                    this.settings.App_BackUpFlagAtMinimizing = value;
-                    this.settings.Save();
-                }
-            }
+            set => this.SetProperty(ref this._BackUpFlagAtMinimizing, value);
         }
         private bool _BackUpFlagAtMinimizing = default;
         #endregion
@@ -315,12 +255,7 @@ namespace HouseholdAccountBook.ViewModels
         public int BackUpIntervalAtMinimizing
         {
             get => this._BackUpIntervalAtMinimizing;
-            set {
-                if (this.SetProperty(ref this._BackUpIntervalAtMinimizing, value) && this.WithSave) {
-                    this.settings.App_BackUpIntervalMinAtMinimizing = value;
-                    this.settings.Save();
-                }
-            }
+            set => this.SetProperty(ref this._BackUpIntervalAtMinimizing, value);
         }
         private int _BackUpIntervalAtMinimizing = default;
         #endregion
@@ -332,31 +267,9 @@ namespace HouseholdAccountBook.ViewModels
         public bool BackUpFlagAtClosing
         {
             get => this._BackUpFlagAtClosing;
-            set {
-                if (this.SetProperty(ref this._BackUpFlagAtClosing, value) && this.WithSave) {
-                    this.settings.App_BackUpFlagAtClosing = value;
-                    this.settings.Save();
-                }
-            }
+            set => this.SetProperty(ref this._BackUpFlagAtClosing, value);
         }
         private bool _BackUpFlagAtClosing = default;
-        #endregion
-
-        /// <summary>
-        /// パスワード入力方法
-        /// </summary>
-        #region PasswordInput
-        public PostgresPasswordInput PasswordInput
-        {
-            get => this._PasswordInput;
-            set {
-                if (this.SetProperty(ref this._PasswordInput, value) && this.WithSave) {
-                    this.settings.App_Postgres_Password_Input = (int)value;
-                    this.settings.Save();
-                }
-            }
-        }
-        private PostgresPasswordInput _PasswordInput = PostgresPasswordInput.InputWindow;
         #endregion
         #endregion
 
@@ -368,13 +281,7 @@ namespace HouseholdAccountBook.ViewModels
         public int StartMonth
         {
             get => this._StartMonth;
-            set {
-                if (this.SetProperty(ref this._StartMonth, value) && this.WithSave) {
-                    this.settings.App_StartMonth = value;
-                    this.settings.Save();
-                    this.NeedToUpdate = true;
-                }
-            }
+            set => this.SetProperty(ref this._StartMonth, value);
         }
         private int _StartMonth = default;
         #endregion
@@ -386,13 +293,7 @@ namespace HouseholdAccountBook.ViewModels
         public string NationalHolidayCsvURI
         {
             get => this._NationalHolidayCsvURI;
-            set {
-                if (this.SetProperty(ref this._NationalHolidayCsvURI, value) && this.WithSave) {
-                    this.settings.App_NationalHolidayCsv_Uri = value;
-                    this.settings.Save();
-                    this.NeedToUpdate = true;
-                }
-            }
+            set => this.SetProperty(ref this._NationalHolidayCsvURI, value);
         }
         private string _NationalHolidayCsvURI = default;
         #endregion
@@ -415,13 +316,7 @@ namespace HouseholdAccountBook.ViewModels
         public int SelectedNationalHolidayTextEncoding
         {
             get => this._SelectedNationalHolidayTextEncoding;
-            set {
-                if (this.SetProperty(ref this._SelectedNationalHolidayTextEncoding, value)) {
-                    this.settings.App_NationalHolidayCsv_TextEncoding = value;
-                    this.settings.Save();
-                    this.NeedToUpdate = true;
-                }
-            }
+            set => this.SetProperty(ref this._SelectedNationalHolidayTextEncoding, value);
         }
         private int _SelectedNationalHolidayTextEncoding = default;
         #endregion
@@ -433,13 +328,7 @@ namespace HouseholdAccountBook.ViewModels
         public int NationalHolidayCsvDateIndex
         {
             get => this._NationalHolidayCsvDateIndex;
-            set {
-                if (this.SetProperty(ref this._NationalHolidayCsvDateIndex, value) && this.WithSave) {
-                    this.settings.App_NationalHolidayCsv_DateIndex = value - 1;
-                    this.settings.Save();
-                    this.NeedToUpdate = true;
-                }
-            }
+            set => this.SetProperty(ref this._NationalHolidayCsvDateIndex, value);
         }
         private int _NationalHolidayCsvDateIndex = default;
         #endregion
@@ -453,12 +342,7 @@ namespace HouseholdAccountBook.ViewModels
         public bool IsPositionSaved
         {
             get => this._IsPositionSaved;
-            set {
-                if (this.SetProperty(ref this._IsPositionSaved, value) && this.WithSave) {
-                    this.settings.App_IsPositionSaved = value;
-                    this.settings.Save();
-                }
-            }
+            set => this.SetProperty(ref this._IsPositionSaved, value);
         }
         private bool _IsPositionSaved = default;
         #endregion
@@ -484,10 +368,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get => this._DebugMode;
             set {
-                if (this.SetProperty(ref this._DebugMode, value) && this.WithSave) {
-                    this.settings.App_IsDebug = value;
-                    this.settings.Save();
-
+                if (this.SetProperty(ref this._DebugMode, value)) {
                     // リソースを更新して他ウィンドウの項目の表示/非表示を切り替える
                     App.RegisterToResource();
                 }
@@ -501,9 +382,6 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// <see cref="SettingsWindowViewModel"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        public SettingsWindowViewModel()
-        {
-            this.settings = Properties.Settings.Default;
-        }
+        public SettingsWindowViewModel() { }
     }
 }
