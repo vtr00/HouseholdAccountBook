@@ -82,6 +82,7 @@ WHERE item_id = @ItemId AND shop_name = @ShopName AND used_time < @UsedTime;", d
         /// </summary>
         /// <param name="dto"><see cref="HstShopDto"/></param>
         /// <returns>挿入/更新行数</returns>
+        /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public override async Task<int> UpsertAsync(HstShopDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"

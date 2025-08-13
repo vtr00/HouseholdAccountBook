@@ -898,5 +898,17 @@ namespace HouseholdAccountBook.Properties {
                 this["App_NationalHolidayCsv_TextEncoding"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string App_Postgres_EncryptedPassword {
+            get {
+                return ((string)(this["App_Postgres_EncryptedPassword"]));
+            }
+            set {
+                this["App_Postgres_EncryptedPassword"] = value;
+            }
+        }
     }
 }

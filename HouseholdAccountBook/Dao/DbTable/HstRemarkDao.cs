@@ -68,6 +68,12 @@ WHERE item_id = @ItemId AND remark = @Remark AND used_time < @UsedTime;", dto);
             return count;
         }
 
+        /// <summary>
+        /// <see cref="HstRemarkDto"/> を挿入または更新する
+        /// </summary>
+        /// <param name="dto"><see cref="HstRemarkDto"/></param>
+        /// <returns>挿入/更新行数</returns>
+        /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public override async Task<int> UpsertAsync(HstRemarkDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"

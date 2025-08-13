@@ -32,7 +32,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.PostgreSQLDBSettingVM.Host = settings.App_Postgres_Host;
             this.WVM.PostgreSQLDBSettingVM.Port = settings.App_Postgres_Port;
             this.WVM.PostgreSQLDBSettingVM.UserName = settings.App_Postgres_UserName;
-            this.passwordBox.Password = settings.App_Postgres_Password;
+            this.passwordBox.Password = settings.App_Postgres_Password == string.Empty ? ProtectedDataExtension.DecryptPassword(settings.App_Postgres_EncryptedPassword) : settings.App_Postgres_Password;
 #if DEBUG
             this.WVM.PostgreSQLDBSettingVM.DatabaseName = settings.App_Postgres_DatabaseName_Debug;
 #else
@@ -199,7 +199,8 @@ namespace HouseholdAccountBook.Windows
                     settings.App_Postgres_Host = this.WVM.PostgreSQLDBSettingVM.Host;
                     settings.App_Postgres_Port = this.WVM.PostgreSQLDBSettingVM.Port.Value;
                     settings.App_Postgres_UserName = this.WVM.PostgreSQLDBSettingVM.UserName;
-                    settings.App_Postgres_Password = this.passwordBox.Password;
+                    settings.App_Postgres_Password = string.Empty; // パスワードは暗号化して保存するので、空にしておく
+                    settings.App_Postgres_EncryptedPassword = ProtectedDataExtension.EncryptPassword(this.passwordBox.Password);
                     settings.App_Postgres_DatabaseName = this.WVM.PostgreSQLDBSettingVM.DatabaseName;
                     settings.App_Postgres_Role = this.WVM.PostgreSQLDBSettingVM.Role;
                     settings.App_Postgres_DumpExePath = this.WVM.PostgreSQLDBSettingVM.DumpExePath;

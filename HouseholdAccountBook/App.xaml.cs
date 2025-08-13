@@ -144,7 +144,7 @@ namespace HouseholdAccountBook
                 // 接続設定を読み込む
                 switch ((DbConstants.DBKind)settings.App_SelectedDBKind) {
                     case DbConstants.DBKind.PostgreSQL: {
-                        this.connectInfo = new NpgsqlDbHandler.ConnectInfo() {
+                        NpgsqlDbHandler.ConnectInfo connectInfo = new() {
                             Host = settings.App_Postgres_Host,
                             Port = settings.App_Postgres_Port,
                             UserName = settings.App_Postgres_UserName,
@@ -156,6 +156,15 @@ namespace HouseholdAccountBook
 #endif
                             Role = settings.App_Postgres_Role
                         };
+                        if (settings.App_Postgres_Password == string.Empty) {
+                            connectInfo.EncryptedPassword = settings.App_Postgres_EncryptedPassword;
+                        } else {
+                            connectInfo.Password = settings.App_Postgres_Password;
+                            settings.App_Postgres_EncryptedPassword = connectInfo.EncryptedPassword;
+                            settings.App_Postgres_Password = string.Empty; // パスワードは保存しない
+                            settings.Save();
+                        }
+                        this.connectInfo = connectInfo;
                         break;
                     }
                     case DbConstants.DBKind.SQLite:

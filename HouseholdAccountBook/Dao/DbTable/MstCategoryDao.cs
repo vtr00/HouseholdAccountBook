@@ -109,7 +109,8 @@ WHERE category_id = @CategoryId;", dto);
         /// </summary>
         /// <param name="categoryId1">分類ID1</param>
         /// <param name="categoryId2">分類ID2</param>
-        /// <returns></returns>
+        /// <returns>更新行数</returns>
+        /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public async Task<int> SwapSortOrderAsync(int categoryId1, int categoryId2)
         {
             int count = await this.dbHandler.ExecuteAsync(@" 

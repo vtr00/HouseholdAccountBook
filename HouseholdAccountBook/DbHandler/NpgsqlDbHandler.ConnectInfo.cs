@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.DbHandler.Abstract;
+using HouseholdAccountBook.Extensions;
 
 namespace HouseholdAccountBook.DbHandler
 {
@@ -24,7 +25,11 @@ namespace HouseholdAccountBook.DbHandler
             /// <summary>
             /// パスワード
             /// </summary>
-            public string Password { get; set; }
+            public string Password
+            {
+                get => ProtectedDataExtension.DecryptPassword(this.EncryptedPassword);
+                set => this.EncryptedPassword = ProtectedDataExtension.EncryptPassword(value);
+            }
             /// <summary>
             /// データベース名
             /// </summary>
@@ -33,6 +38,11 @@ namespace HouseholdAccountBook.DbHandler
             /// ロール名
             /// </summary>
             public string Role { get; set; }
+
+            /// <summary>
+            /// 暗号化済パスワード
+            /// </summary>
+            public string EncryptedPassword { get; set; }
         }
     }
 }

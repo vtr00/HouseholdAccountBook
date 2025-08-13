@@ -142,7 +142,8 @@ new MstItemDto { CategoryId = categoryId, ItemId = itemId });
         /// </summary>
         /// <param name="itemId1">項目ID1</param>
         /// <param name="itemId2">項目ID2</param>
-        /// <returns></returns>
+        /// <returns>更新行数</returns>
+        /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public async Task<int> SwapSortOrderAsync(int itemId1, int itemId2)
         {
             int count = await this.dbHandler.ExecuteAsync(@" 

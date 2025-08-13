@@ -221,5 +221,8 @@
     <Setting Name="App_NationalHolidayCsv_TextEncoding" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">65001</Value>
     </Setting>
+    <Setting Name="App_Postgres_EncryptedPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

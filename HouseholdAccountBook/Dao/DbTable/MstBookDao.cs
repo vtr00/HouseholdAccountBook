@@ -106,7 +106,8 @@ WHERE book_id = @BookId;", dto);
         /// </summary>
         /// <param name="bookId1">帳簿ID1</param>
         /// <param name="bookId2">帳簿ID2</param>
-        /// <returns></returns>
+        /// <returns>更新行数</returns>
+        /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public async Task<int> SwapSortOrderAsync(int bookId1, int bookId2)
         {
             int count = await this.dbHandler.ExecuteAsync(@" 

@@ -81,6 +81,7 @@ WHERE item_id = @ItemId AND book_id = @BookId;", dto);
         /// </summary>
         /// <param name="dto"><see cref="HstRemarkDto"/></param>
         /// <returns>挿入/更新行数</returns>
+        /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public override async Task<int> UpsertAsync(RelBookItemDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
