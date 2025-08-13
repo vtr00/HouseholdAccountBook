@@ -152,5 +152,10 @@
         /// 挿入者
         /// </summary>
         public static string Inserter { get; } = string.Empty;
+
+        /// <summary>
+        /// Accessプロバイダヘッダ
+        /// </summary>
+        public static string AccessProviderHeader { get; } = "Microsoft.ACE.OLEDB";
     }
 }

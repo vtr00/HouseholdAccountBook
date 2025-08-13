@@ -5,12 +5,17 @@ namespace HouseholdAccountBook.Dto.DbTable
     /// <summary>
     /// グループテーブルDTO
     /// </summary>
-    public class HstGroupDto : TableDtoBase
+    public class HstGroupDto : TableDtoBase, ISequentialIDDto
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
         public HstGroupDto() { }
+
+        public int GetId()
+        {
+            return this.GroupId;
+        }
 
         /// <summary>
         /// グループID

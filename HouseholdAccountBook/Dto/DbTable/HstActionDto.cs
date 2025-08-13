@@ -7,7 +7,7 @@ namespace HouseholdAccountBook.Dto.DbTable
     /// <summary>
     /// HstActionDto
     /// </summary>
-    public class HstActionDto : TableDtoBase
+    public class HstActionDto : TableDtoBase, ISequentialIDDto
     {
         /// <summary>
         /// コンストラクタ
@@ -23,6 +23,11 @@ namespace HouseholdAccountBook.Dto.DbTable
             this.ActValue = dto.INCOME != 0 ? dto.INCOME : -dto.EXPENSE;
             this.GroupId = dto.GROUP_ID == 0 ? null : (int?)dto.GROUP_ID;
             this.Remark = dto.NOTE_NAME;
+        }
+
+        public int GetId()
+        {
+            return this.ActionId;
         }
 
         /// <summary>

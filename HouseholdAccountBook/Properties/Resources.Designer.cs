@@ -161,7 +161,7 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
-        ///   まとめて追加 に類似しているローカライズされた文字列を検索します。
+        ///   リスト追加 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Button_AddList {
             get {
@@ -962,6 +962,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   SQLite に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string GroupHeader_SQLite {
+            get {
+                return ResourceManager.GetString("GroupHeader_SQLite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   期間情報 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string GroupHeader_TermInformation {
@@ -1255,6 +1264,15 @@ namespace HouseholdAccountBook.Properties {
         public static string Menu_File_Import_KichoFugetsu {
             get {
                 return ResourceManager.GetString("Menu_File_Import_KichoFugetsu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   PostgreSQL(_P) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Menu_File_Import_PostgreSQL {
+            get {
+                return ResourceManager.GetString("Menu_File_Import_PostgreSQL", resourceCulture);
             }
         }
         

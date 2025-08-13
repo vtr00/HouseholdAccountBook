@@ -55,7 +55,7 @@ ORDER BY sort_order;");
         public override async Task SetIdSequenceAsync(int idSeq)
         {
             if (this.dbHandler.DBKind == DBKind.SQLite) {
-                throw new NotSupportedException();
+                return;
             }
 
             _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('mst_book_book_id_seq', @BookIdSeq);", new { BookIdSeq = idSeq });

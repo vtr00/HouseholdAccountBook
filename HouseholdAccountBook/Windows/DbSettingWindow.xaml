@@ -181,7 +181,7 @@
                 </Style>
             </Grid.Style>
 
-            <GroupBox Header="SQLite" DataContext="{Binding SQLiteSettingVM}">
+            <GroupBox Header="{x:Static properties:Resources.GroupHeader_SQLite}" DataContext="{Binding SQLiteSettingVM}">
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Header"/>

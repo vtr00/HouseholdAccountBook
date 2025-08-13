@@ -10,17 +10,13 @@ namespace HouseholdAccountBook.Dao.Abstract
     /// </summary>
     /// <typeparam name="DTO"><see cref="KHDtoBase"/>の派生クラス</typeparam>
     /// <param name="dbHandler">Ole DBハンドラ</param>
-    public abstract class KHReadDaoBase<DTO>(OleDbHandler dbHandler) where DTO : KHDtoBase
+    public abstract class KHReadDaoBase<DTO>(OleDbHandler dbHandler) : IReadTableDao<DTO> where DTO : KHDtoBase
     {
         /// <summary>
         /// Ole DBハンドラ
         /// </summary>
         protected readonly OleDbHandler dbHandler = dbHandler;
 
-        /// <summary>
-        /// <see cref="DTO"/> の全てのレコードを取得する
-        /// </summary>
-        /// <returns>DTOリスト</returns>
         public abstract Task<IEnumerable<DTO>> FindAllAsync();
     }
 }

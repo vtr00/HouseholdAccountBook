@@ -1464,7 +1464,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.RestoreExePath = settings.App_Postgres_RestoreExePath;
 
             this.WVM.KichoFugetsuProviderNameDic.Clear();
-            OleDbHandler.GetOleDbProvider().FindAll((pair) => pair.Key.Contains("Microsoft.ACE.OLEDB")).ForEach(this.WVM.KichoFugetsuProviderNameDic.Add);
+            OleDbHandler.GetOleDbProvider().FindAll((pair) => pair.Key.Contains(AccessProviderHeader)).ForEach(this.WVM.KichoFugetsuProviderNameDic.Add);
             this.WVM.SelectedKichoFugetsuProviderName = settings.App_Import_KichoFugetsu_Provider;
 
             this.WVM.SelectedCultureName = settings.App_CultureName;

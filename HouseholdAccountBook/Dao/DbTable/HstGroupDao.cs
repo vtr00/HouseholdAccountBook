@@ -38,7 +38,7 @@ new HstGroupDto { GroupId = pkey });
         public override async Task SetIdSequenceAsync(int id)
         {
             if (this.dbHandler.DBLibKind == DBLibraryKind.SQLite) {
-                throw new NotSupportedException();
+                return;
             }
 
             _ = await this.dbHandler.ExecuteAsync("SELECT setval('hst_group_group_id_seq', @GroupIdSeq);", new { GroupIdSeq = id });

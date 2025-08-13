@@ -1,8 +1,13 @@
 ﻿namespace HouseholdAccountBook.Dto.Abstract
 {
-    public class KHCbmDtoBase : KHDtoBase
+    /// <summary>
+    /// 記帳風月のマスタテーブル向けのDTOのベースクラス
+    /// </summary>
+    public abstract class KHCbmDtoBase : KHDtoBase, ISequentialIDDto
     {
         public KHCbmDtoBase() { }
+
+        public abstract int GetId();
 
         public int SORT_KEY { get; set; }
     }

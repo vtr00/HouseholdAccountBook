@@ -122,7 +122,7 @@ new HstActionDto { BookId = bookId, ItemId = itemId });
         public override async Task SetIdSequenceAsync(int idSeq)
         {
             if (this.dbHandler.DBKind == DBKind.SQLite) {
-                throw new NotSupportedException();
+                return;
             }
 
             _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('hst_action_action_id_seq', @ActionIdSeq);", new { ActionIdSeq = idSeq });

@@ -1,8 +1,10 @@
-﻿using HouseholdAccountBook.Dao.Compositions;
+﻿using HouseholdAccountBook.Dao.Abstract;
+using HouseholdAccountBook.Dao.Compositions;
 using HouseholdAccountBook.Dao.DbTable;
 using HouseholdAccountBook.Dao.KHDbTable;
 using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.DbHandler.Abstract;
+using HouseholdAccountBook.Dto.Abstract;
 using HouseholdAccountBook.Dto.DbTable;
 using HouseholdAccountBook.Dto.KHDbTable;
 using HouseholdAccountBook.Dto.Others;
@@ -166,136 +168,96 @@ namespace HouseholdAccountBook.Windows
                     FilePath = ofd.FileName
                 };
 
-                using (OleDbHandler dbHandlerOle = new(info)) {
+                using (OleDbHandler dbHandlerOle = new(info))
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                     isOpen = dbHandlerOle.IsOpen;
 
                     if (isOpen) {
-                        CbmBookDao cbmBookDao = new(dbHandlerOle);
-                        CbmCategoryDao cbmCategoryDao = new(dbHandlerOle);
-                        CbmItemDao cbmItemDao = new(dbHandlerOle);
-                        CbtActDao cbtActDao = new(dbHandlerOle);
-                        CbtNoteDao cbtNoteDao = new(dbHandlerOle);
-                        CbrBookDao cbrBookDao = new(dbHandlerOle);
+                        static async Task Mapping<DTO1, DTO2>(IReadTableDao<DTO1> src, IWriteTableDao<DTO2> dest, Func<IEnumerable<DTO1>, IEnumerable<DTO2>> converter) where DTO1 : DtoBase where DTO2 : DtoBase
+                        {
+                            var srcDtoList = await src.FindAllAsync();
+                            _ = await dest.DeleteAllAsync();
+                            if (srcDtoList is IEnumerable<ISequentialIDDto> srcSeqDtoList && dest is ISequentialIDDao<ISequentialIDDto> destSeq) {
+                                // シーケンスを更新する
+                                await destSeq.SetIdSequenceAsync(srcSeqDtoList);
+                            }
+                            _ = await dest.BulkInsertAsync(converter(srcDtoList));
+                        }
 
-                        var cbmBookDtoList = await cbmBookDao.FindAllAsync();
-                        var cbmCategoryDtoList = await cbmCategoryDao.FindAllAsync();
-                        var cbmItemDtoList = await cbmItemDao.FindAllAsync();
-                        var cbtActDtoList = await cbtActDao.FindAllAsync();
-                        var cbtNoteDtoList = await cbtNoteDao.FindAllAsync();
-                        var cbrBookDtoList = await cbrBookDao.FindAllAsync();
+                        await dbHandler.ExecTransactionAsync(async () => {
+                            CbmBookDao cbmBookDao = new(dbHandlerOle);
+                            MstBookDao mstBookDao = new(dbHandler);
+                            await Mapping(cbmBookDao, mstBookDao, src => src.Select(dto => new MstBookDto(dto)));
 
-                        using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
-                            await dbHandler.ExecTransactionAsync(async () => {
-                                MstBookDao mstBookDao = new(dbHandler);
-                                MstCategoryDao mstCategoryDao = new(dbHandler);
-                                MstItemDao mstItemDao = new(dbHandler);
-                                HstActionDao hstActionDao = new(dbHandler);
-                                HstGroupDao hstGroupDao = new(dbHandler);
-                                HstShopDao hstShopDao = new(dbHandler);
-                                HstRemarkDao hstRemarkDao = new(dbHandler);
-                                RelBookItemDao relBookItemDao = new(dbHandler);
+                            CbmCategoryDao cbmCategoryDao = new(dbHandlerOle);
+                            MstCategoryDao mstCategoryDao = new(dbHandler);
+                            await Mapping(cbmCategoryDao, mstCategoryDao, src => src.Select(dto => new MstCategoryDto(dto)));
 
-                                // 既存のデータを削除する
-                                _ = await mstBookDao.DeleteAllAsync();
-                                _ = await mstCategoryDao.DeleteAllAsync();
-                                _ = await mstItemDao.DeleteAllAsync();
-                                _ = await hstActionDao.DeleteAllAsync();
-                                _ = await hstGroupDao.DeleteAllAsync();
-                                _ = await hstShopDao.DeleteAllAsync();
-                                _ = await hstRemarkDao.DeleteAllAsync();
-                                _ = await relBookItemDao.DeleteAllAsync();
+                            CbmItemDao cbmItemDao = new(dbHandlerOle);
+                            MstItemDao mstItemDao = new(dbHandler);
+                            await Mapping(cbmItemDao, mstItemDao, src => src.Select(dto => new MstItemDto(dto)));
 
-                                if (dbHandler.DBLibKind == DBLibraryKind.PostgreSQL) {
-                                    // 帳簿IDのシーケンスを更新する
-                                    await mstBookDao.SetIdSequenceAsync(cbmBookDtoList.Last().BOOK_ID);
-                                }
-                                // 帳簿テーブルのレコードを作成する
-                                foreach (CbmBookDto cbmBookDto in cbmBookDtoList) {
-                                    _ = await mstBookDao.InsertAsync(new MstBookDto(cbmBookDto));
-                                }
+                            CbtActDao cbtActDao = new(dbHandlerOle);
+                            HstActionDao hstActionDao = new(dbHandler);
+                            await Mapping(cbtActDao, hstActionDao, src => src.Select(dto => new HstActionDto(dto)));
 
-                                if (dbHandler.DBLibKind == DBLibraryKind.PostgreSQL) {
-                                    // 分類IDのシーケンスを更新する
-                                    await mstCategoryDao.SetIdSequenceAsync(cbmCategoryDtoList.Last().CATEGORY_ID);
-                                }
-                                // 分類テーブルのレコードを作成する
-                                foreach (CbmCategoryDto dto in cbmCategoryDtoList) {
-                                    _ = await mstCategoryDao.InsertAsync(new MstCategoryDto(dto));
-                                }
+                            HstGroupDao hstGroupDao = new(dbHandler);
+                            var cbtActDtoList = await cbtActDao.FindAllAsync();
+                            _ = await hstGroupDao.DeleteAllAsync();
+                            int maxGroupId = 0; // グループIDの最大値
+                            IEnumerable<HstGroupDto> hstGroupDtoList = [];
+                            foreach (CbtActDto cbtActDto in cbtActDtoList) {
+                                // groupId が存在しないなら次のレコードへ
+                                if (cbtActDto.GROUP_ID == 0) { continue; }
+                                int groupId = cbtActDto.GROUP_ID;
 
-                                if (dbHandler.DBLibKind == DBLibraryKind.PostgreSQL) {
-                                    // 項目IDのシーケンスを更新する
-                                    await mstItemDao.SetIdSequenceAsync(cbmItemDtoList.Last().ITEM_ID);
-                                }
-                                // 項目テーブルのレコードを作成する
-                                foreach (CbmItemDto dto in cbmItemDtoList) {
-                                    _ = await mstItemDao.InsertAsync(new MstItemDto(dto));
-                                }
-
-                                if (dbHandler.DBLibKind == DBLibraryKind.PostgreSQL) {
-                                    // 帳簿項目IDのシーケンスを更新する
-                                    await hstActionDao.SetIdSequenceAsync(cbtActDtoList.Last().ACT_ID);
-                                }
-                                int maxGroupId = 0; // グループIDの最大値
-                                // 帳簿テーブルのレコードを作成する
-                                foreach (CbtActDto cbtActDto in cbtActDtoList) {
-                                    HstActionDto dto = new(cbtActDto);
-                                    _ = await hstActionDao.InsertAsync(dto);
-
-                                    // groupId が存在しないなら次のレコードへ
-                                    if (dto.GroupId == null) { continue; }
-                                    int groupId = dto.GroupId.Value;
-
+                                // groupId のレコードが存在しないとき
+                                if (!hstGroupDtoList.Any(dto => dto.GroupId == groupId)) {
                                     // グループIDの最大値を更新する
                                     if (maxGroupId < groupId) { maxGroupId = groupId; }
 
-                                    var gDto = await hstGroupDao.FindByIdAsync(groupId);
-                                    // groupId のレコードが登録されていないとき
-                                    if (gDto is null) {
-                                        // グループの種類を調べる
-                                        var cbtActDtoList2 = await cbtActDao.FindByGroupIdAsync(groupId);
-                                        GroupKind groupKind = GroupKind.Repeat;
-                                        int? tmpBookId = null;
-                                        foreach (CbtActDto cbtActDto2 in cbtActDtoList2) {
-                                            if (tmpBookId == null) { // 1つ目のレコードの帳簿IDを記録する
-                                                tmpBookId = cbtActDto2.BOOK_ID;
-                                            }
-                                            else { // 2つ目のレコードの帳簿IDが1つ目と一致するか
-                                                if (tmpBookId != cbtActDto2.BOOK_ID) {
-                                                    // 帳簿が一致しない場合は移動
-                                                    groupKind = GroupKind.Move;
-                                                }
-                                                else {
-                                                    // 帳簿が一致する場合は繰り返し
-                                                    groupKind = GroupKind.Repeat;
-                                                }
-                                                break;
-                                            }
+                                    // グループの種類を調べる
+                                    var cbtActDtoList2 = cbtActDtoList.Where(dto => dto.GROUP_ID == groupId);
+                                    GroupKind groupKind = GroupKind.Repeat;
+                                    int? tmpBookId = null;
+                                    foreach (CbtActDto cbtActDto2 in cbtActDtoList2) {
+                                        if (tmpBookId == null) { // 1つ目のレコードの帳簿IDを記録する
+                                            tmpBookId = cbtActDto2.BOOK_ID;
                                         }
-
-                                        // グループテーブルのレコードを作成する
-                                        _ = await hstGroupDao.InsertAsync(new HstGroupDto {
-                                            GroupId = groupId,
-                                            GroupKind = (int)groupKind
-                                        });
+                                        else { // 2つ目のレコードの帳簿IDが1つ目と一致するか
+                                            if (tmpBookId != cbtActDto2.BOOK_ID) {
+                                                // 帳簿が一致しない場合は移動
+                                                groupKind = GroupKind.Move;
+                                            }
+                                            else {
+                                                // 帳簿が一致する場合は繰り返し
+                                                groupKind = GroupKind.Repeat;
+                                            }
+                                            break;
+                                        }
                                     }
-                                }
-                                if (dbHandler.DBLibKind == DBLibraryKind.PostgreSQL) {
-                                    // グループIDのシーケンスを更新する
-                                    await hstGroupDao.SetIdSequenceAsync(maxGroupId);
-                                }
 
-                                // 備考テーブルのレコードを作成する
-                                foreach (CbtNoteDto dto in cbtNoteDtoList) {
-                                    _ = await hstRemarkDao.InsertAsync(new HstRemarkDto(dto));
+                                    // グループテーブルのレコードを追加する
+                                    hstGroupDtoList = hstGroupDtoList.Append(new HstGroupDto {
+                                        GroupId = groupId,
+                                        GroupKind = (int)groupKind
+                                    });
                                 }
+                            }
+                            await hstGroupDao.SetIdSequenceAsync(maxGroupId);
+                            _ = await hstGroupDao.BulkInsertAsync(hstGroupDtoList);
 
-                                // 帳簿-項目テーブルのレコードを作成する
-                                foreach (CbrBookDto dto in cbrBookDtoList) {
-                                    _ = await relBookItemDao.InsertAsync(new RelBookItemDto(dto));
-                                }
-                            });
-                        }
+                            HstShopDao hstShopDao = new(dbHandler);
+                            _ = await hstShopDao.DeleteAllAsync();
+
+                            CbtNoteDao cbtNoteDao = new(dbHandlerOle);
+                            HstRemarkDao hstRemarkDao = new(dbHandler);
+                            await Mapping(cbtNoteDao, hstRemarkDao, src => src.Select(dto => new HstRemarkDto(dto)));
+
+                            CbrBookDao cbrBookDao = new(dbHandlerOle);
+                            RelBookItemDao relBookItemDao = new(dbHandler);
+                            await Mapping(cbrBookDao, relBookItemDao, src => src.Select(dto => new RelBookItemDto(dto)));
+                        });
                     }
                 }
 
@@ -410,7 +372,7 @@ namespace HouseholdAccountBook.Windows
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            e.CanExecute = settings.App_SelectedDBKind == (int)DBKind.SQLite && !this.ChildrenWindowOpened;
+            e.CanExecute = settings.App_SelectedDBKind is (int)DBKind.SQLite or (int)DBKind.PostgreSQL && !this.ChildrenWindowOpened;
         }
 
         /// <summary>
@@ -452,14 +414,189 @@ namespace HouseholdAccountBook.Windows
             settings.Save();
 
             bool result = false;
-            try {
-                File.Copy(ofd.FileName, settings.App_SQLite_DBFilePath, true);
-                result = true;
+            switch (settings.App_SelectedDBKind) {
+                case (int)DBKind.SQLite: {
+                    try {
+                        // ファイルをコピーするだけ
+                        File.Copy(ofd.FileName, settings.App_SQLite_DBFilePath, true);
+                        result = true;
+                    }
+                    catch (Exception) { }
+                    break;
+                }
+                case (int)DBKind.PostgreSQL: {
+                    using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                        SQLiteDbHandler.ConnectInfo info = new() {
+                            FilePath = ofd.FileName
+                        };
+                        using (SQLiteDbHandler dbHandlerSqlite = new(info))
+                        using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                            result = dbHandlerSqlite.IsOpen;
+
+                            if (result) {
+                                static async Task Mapping<DTO>(IReadTableDao<DTO> src, IWriteTableDao<DTO> dest) where DTO : DtoBase
+                                {
+                                    var srcDtoList = await src.FindAllAsync();
+                                    _ = await dest.DeleteAllAsync();
+                                    if (srcDtoList is IEnumerable<ISequentialIDDto> srcSeqDtoList && dest is ISequentialIDDao<ISequentialIDDto> destSeq) {
+                                        // シーケンスを更新する
+                                        await destSeq.SetIdSequenceAsync(srcSeqDtoList);
+                                    }
+                                    _ = await dest.BulkInsertAsync(srcDtoList);
+                                }
+
+                                await dbHandler.ExecTransactionAsync(async () => {
+                                    MstBookDao mstBookDao1 = new(dbHandlerSqlite);
+                                    MstBookDao mstBookDao2 = new(dbHandler);
+                                    await Mapping(mstBookDao1, mstBookDao2);
+
+                                    MstCategoryDao mstCategoryDao1 = new(dbHandlerSqlite);
+                                    MstCategoryDao mstCategoryDao2 = new(dbHandler);
+                                    await Mapping(mstCategoryDao1, mstCategoryDao2);
+
+                                    MstItemDao mstItemDao1 = new(dbHandlerSqlite);
+                                    MstItemDao mstItemDao2 = new(dbHandler);
+                                    await Mapping(mstItemDao1, mstItemDao2);
+
+                                    HstActionDao hstActionDao1 = new(dbHandlerSqlite);
+                                    HstActionDao hstActionDao2 = new(dbHandler);
+                                    await Mapping(hstActionDao1, hstActionDao2);
+
+                                    HstGroupDao hstGroupDao1 = new(dbHandlerSqlite);
+                                    HstGroupDao hstGroupDao2 = new(dbHandler);
+                                    await Mapping(hstGroupDao1, hstGroupDao2);
+
+                                    HstShopDao hstShopDao1 = new(dbHandlerSqlite);
+                                    HstShopDao hstShopDao2 = new(dbHandler);
+                                    await Mapping(hstShopDao1, hstShopDao2);
+
+                                    HstRemarkDao hstRemarkDao1 = new(dbHandlerSqlite);
+                                    HstRemarkDao hstRemarkDao2 = new(dbHandler);
+                                    await Mapping(hstRemarkDao1, hstRemarkDao2);
+
+                                    RelBookItemDao relBookItemDao1 = new(dbHandlerSqlite);
+                                    RelBookItemDao relBookItemDao2 = new(dbHandler);
+                                    await Mapping(relBookItemDao1, relBookItemDao2);
+                                });
+                            }
+                        }
+                    }
+                    break;
+                }
+                default:
+                    break;
             }
-            catch (Exception) { }
 
             if (result) {
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
+            }
+
+            if (result) {
+                _ = MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+            }
+            else {
+                _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            }
+        }
+
+        /// <summary>
+        /// PostgreSQLを取り込み可能か
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ImportPostgreSQLCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            e.CanExecute = settings.App_SelectedDBKind == (int)DBKind.SQLite && !this.ChildrenWindowOpened;
+        }
+
+        /// <summary>
+        /// PostgreSQLを取り込む
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ImportPostgreSQLCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Log.Info();
+
+            Properties.Settings settings = Properties.Settings.Default;
+
+            if (MessageBox.Show(Properties.Resources.Message_DeleteOldDataNotification, Properties.Resources.Title_Conformation,
+                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
+                return;
+            }
+
+            bool result = false;
+            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                NpgsqlDbHandler.ConnectInfo info = new() {
+                    Host = settings.App_Postgres_Host,
+                    Port = settings.App_Postgres_Port,
+                    UserName = settings.App_Postgres_UserName,
+                    Password = settings.App_Postgres_Password,
+#if DEBUG
+                    DatabaseName = settings.App_Postgres_DatabaseName_Debug,
+#else
+                    DatabaseName = settings.App_Postgres_DatabaseName,
+#endif
+                    Role = settings.App_Postgres_Role
+                };
+
+                using (NpgsqlDbHandler dbHandlerNpgsql = new(info))
+                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    result = dbHandlerNpgsql.IsOpen;
+
+                    if (result) {
+                        static async Task Mapping<DTO>(IReadTableDao<DTO> src, IWriteTableDao<DTO> dest) where DTO : DtoBase
+                        {
+                            var srcDtoList = await src.FindAllAsync();
+                            _ = await dest.DeleteAllAsync();
+                            if (srcDtoList is IEnumerable<ISequentialIDDto> srcSeqDtoList && dest is ISequentialIDDao<ISequentialIDDto> destSeq) {
+                                // シーケンスを更新する
+                                await destSeq.SetIdSequenceAsync(srcSeqDtoList);
+                            }
+                            _ = await dest.BulkInsertAsync(srcDtoList);
+                        }
+
+                        await dbHandler.ExecTransactionAsync(async () => {
+                            MstBookDao mstBookDao1 = new(dbHandlerNpgsql);
+                            MstBookDao mstBookDao2 = new(dbHandler);
+                            await Mapping(mstBookDao1, mstBookDao2);
+
+                            MstCategoryDao mstCategoryDao1 = new(dbHandlerNpgsql);
+                            MstCategoryDao mstCategoryDao2 = new(dbHandler);
+                            await Mapping(mstCategoryDao1, mstCategoryDao2);
+
+                            MstItemDao mstItemDao1 = new(dbHandlerNpgsql);
+                            MstItemDao mstItemDao2 = new(dbHandler);
+                            await Mapping(mstItemDao1, mstItemDao2);
+
+                            HstActionDao hstActionDao1 = new(dbHandlerNpgsql);
+                            HstActionDao hstActionDao2 = new(dbHandler);
+                            await Mapping(hstActionDao1, hstActionDao2);
+
+                            HstGroupDao hstGroupDao1 = new(dbHandlerNpgsql);
+                            HstGroupDao hstGroupDao2 = new(dbHandler);
+                            await Mapping(hstGroupDao1, hstGroupDao2);
+
+                            HstShopDao hstShopDao1 = new(dbHandlerNpgsql);
+                            HstShopDao hstShopDao2 = new(dbHandler);
+                            await Mapping(hstShopDao1, hstShopDao2);
+
+                            HstRemarkDao hstRemarkDao1 = new(dbHandlerNpgsql);
+                            HstRemarkDao hstRemarkDao2 = new(dbHandler);
+                            await Mapping(hstRemarkDao1, hstRemarkDao2);
+
+                            RelBookItemDao relBookItemDao1 = new(dbHandlerNpgsql);
+                            RelBookItemDao relBookItemDao2 = new(dbHandler);
+                            await Mapping(relBookItemDao1, relBookItemDao2);
+                        });
+                    }
+                }
+
+                if (result) {
+                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
+                }
             }
 
             if (result) {

@@ -22,6 +22,11 @@ namespace HouseholdAccountBook.Dto.DbTable
             this.SortOrder = dto.SORT_KEY;
         }
 
+        public override int GetId()
+        {
+            return this.CategoryId;
+        }
+
         /// <summary>
         /// 種別ID
         /// </summary>

@@ -27,6 +27,7 @@
         <RoutedCommand x:Key="FileCommand"/>
         
         <RoutedCommand x:Key="ImportKichoFugetsuDbCommand"/>
+        <RoutedCommand x:Key="ImportPostgreSQLFileCommand"/>
         <RoutedCommand x:Key="ImportCustomFileCommand"/>
         <RoutedCommand x:Key="ImportSQLiteFileCommand"/>
 
@@ -120,6 +121,7 @@
         <CommandBinding Command="{StaticResource FileCommand}" CanExecute="FileCommand_CanExecute"/>
         
         <CommandBinding Command="{StaticResource ImportKichoFugetsuDbCommand}" CanExecute="ImportKichoFugetsuDbCommand_CanExecute" Executed="ImportKichoFugetsuDbCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ImportPostgreSQLFileCommand}" CanExecute="ImportPostgreSQLCommand_CanExecute" Executed="ImportPostgreSQLCommand_Executed"/>
         <CommandBinding Command="{StaticResource ImportCustomFileCommand}" CanExecute="ImportCustomFileCommand_CanExecute" Executed="ImportCustomFileCommand_Excuted"/>
         <CommandBinding Command="{StaticResource ImportSQLiteFileCommand}" CanExecute="ImportSQLiteFileCommand_CanExecute" Executed="ImportSQLiteFileCommand_Executed"/>
 
@@ -199,6 +201,11 @@
             <MenuItem Header="{x:Static properties:Resources.Menu_File}" Command="{StaticResource FileCommand}">
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Import}">
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_KichoFugetsu}" Command="{StaticResource ImportKichoFugetsuDbCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{StaticResource ImportSQLiteFileCommand}"
+                              Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_PostgreSQL}" Command="{StaticResource ImportPostgreSQLFileCommand}"
+                              Visibility="{Binding IsSQLite, Converter={StaticResource BoolVisibilityConverter}}"/>
                     <Separator/>
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_CustomFormatFile}" Command="{StaticResource ImportCustomFileCommand}"
                               Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>

@@ -3,9 +3,14 @@ using System;
 
 namespace HouseholdAccountBook.Dto.KHDbTable
 {
-    public class CbtActDto : KHDtoBase
+    public class CbtActDto : KHDtoBase, ISequentialIDDto
     {
         public CbtActDto() { }
+
+        public int GetId()
+        {
+            return this.ACT_ID;
+        }
 
         public int ACT_ID { get; set; }
         public int BOOK_ID { get; set; }

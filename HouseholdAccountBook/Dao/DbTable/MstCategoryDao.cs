@@ -57,7 +57,7 @@ new MstCategoryDto { BalanceKind = balanceKind });
         public override async Task SetIdSequenceAsync(int idSeq)
         {
             if (this.dbHandler.DBKind == DBKind.SQLite) {
-                throw new NotSupportedException();
+                return;
             }
 
             _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('mst_category_category_id_seq', @CategoryIdSeq);", new { CategoryIdSeq = idSeq });

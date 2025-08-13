@@ -540,6 +540,9 @@
   <data name="Menu_File_Import" xml:space="preserve">
     <value>Import (_I)</value>
   </data>
+  <data name="Menu_File_Import_PostgreSQL" xml:space="preserve">
+    <value>PostgreSQL (_P)</value>
+  </data>
   <data name="Menu_File_Export" xml:space="preserve">
     <value>Export (_E)</value>
   </data>
@@ -979,6 +982,9 @@ list</value>
   </data>
   <data name="GroupHeader_PostgreSQL" xml:space="preserve">
     <value>PostgreSQL</value>
+  </data>
+  <data name="GroupHeader_SQLite" xml:space="preserve">
+    <value>SQLite</value>
   </data>
   <data name="GroupHeader_Access" xml:space="preserve">
     <value>Microsoft Access</value>

@@ -3,7 +3,7 @@
     /// <summary>
     /// マスタテーブルのDTOのベースクラス
     /// </summary>
-    public class MstDtoBase : TableDtoBase
+    public abstract class MstDtoBase : TableDtoBase, ISequentialIDDto
     {
         /// <summary>
         /// コンストラクタ
@@ -14,6 +14,8 @@
         {
             this.SortOrder = dto.SORT_KEY;
         }
+
+        public abstract int GetId();
 
         /// <summary>
         /// ソート順

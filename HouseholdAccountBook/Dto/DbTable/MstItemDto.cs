@@ -22,6 +22,11 @@ namespace HouseholdAccountBook.Dto.DbTable
             this.AdvanceFlg = 0;
         }
 
+        public override int GetId()
+        {
+            return this.ItemId;
+        }
+
         /// <summary>
         /// 項目ID
         /// </summary>

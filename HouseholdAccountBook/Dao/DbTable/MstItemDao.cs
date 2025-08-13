@@ -56,7 +56,7 @@ new MstItemDto { CategoryId = categoryId });
         public override async Task SetIdSequenceAsync(int idSeq)
         {
             if (this.dbHandler.DBKind == DBKind.SQLite) {
-                throw new NotSupportedException();
+                return;
             }
 
             _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('mst_item_item_id_seq', @ItemIdSeq);", new { ItemIdSeq = idSeq });

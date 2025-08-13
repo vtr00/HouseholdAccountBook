@@ -11,7 +11,7 @@ namespace HouseholdAccountBook.Dao.DbTable
     /// 店舗名テーブルDAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class HstShopDao(DbHandlerBase dbHandler) : ReadWriteDaoBase<HstShopDto>(dbHandler)
+    public class HstShopDao(DbHandlerBase dbHandler) : ReadWriteTableDaoBase<HstShopDto>(dbHandler)
     {
         /// <summary>
         /// 全レコードを取得する
@@ -57,7 +57,7 @@ new HstShopDto { ShopName = shopName, ItemId = itemId });
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO hst_shop (item_id, shop_name, used_time, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @ShopName, @UsedTime, @UsedTime, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
+VALUES (@ItemId, @ShopName, @UsedTime, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }

@@ -1,16 +1,25 @@
 ﻿using HouseholdAccountBook.DbHandler.Abstract;
 using HouseholdAccountBook.Dto.Abstract;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Dao.Abstract
 {
     /// <summary>
-    /// 単一の主キーを持つDTO向けのDAOのベースクラス
+    /// 単一の主キーを持つテーブル向けのDAOのベースクラス
     /// </summary>
     /// <typeparam name="DTO"><see cref="TableDtoBase"/>の派生クラス</typeparam>
     /// <typeparam name="T">主キーの型</typeparam>
-    public abstract class PrimaryKeyDaoBase<DTO, T>(DbHandlerBase dbHandler) : ReadWriteDaoBase<DTO>(dbHandler) where DTO : TableDtoBase
+    public abstract class PrimaryKeyDaoBase<DTO, T>(DbHandlerBase dbHandler) : ReadWriteTableDaoBase<DTO>(dbHandler), ISequentialIDDao<DTO> where DTO : TableDtoBase, ISequentialIDDto
     {
+        public async Task SetIdSequenceAsync(IEnumerable<DTO> dtoList)
+        {
+            await this.SetIdSequenceAsync(dtoList.Max(d => d.GetId()));
+        }
+
+        public abstract Task SetIdSequenceAsync(int idSeq);
+
         /// <summary>
         /// 主キーでレコードを取得する
         /// </summary>
@@ -24,13 +33,6 @@ namespace HouseholdAccountBook.Dao.Abstract
         /// <param name="dto">DTO</param>
         /// <returns>主キー</returns>
         public abstract Task<T> InsertReturningIdAsync(DTO dto);
-
-        /// <summary>
-        /// シーケンスを更新する
-        /// </summary>
-        /// <param name="idSeq">シーケンスID</param>
-        /// <returns>-</returns>
-        public abstract Task SetIdSequenceAsync(int idSeq);
 
         /// <summary>
         /// 主キーでレコードを削除する

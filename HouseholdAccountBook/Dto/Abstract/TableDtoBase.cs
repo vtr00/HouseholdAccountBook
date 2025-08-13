@@ -43,7 +43,7 @@ namespace HouseholdAccountBook.Dto.Abstract
         /// 挿入日時
         /// </summary>
         public DateTime InsertTime
-        { 
+        {
             get => this._InsertTime ??= this.Now;
             set => this._InsertTime = value;
         }

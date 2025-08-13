@@ -29,7 +29,7 @@ namespace HouseholdAccountBook.DbHandler
         public OleDbHandler(string provider, string filePath) : base(new OleDbConnection(string.Format(stringFormat, provider, filePath)))
         {
             this.DBLibKind = DBLibraryKind.OleDb;
-            if (provider.Contains("Macrosoft.ACE.OLEDB")) {
+            if (provider.Contains(AccessProviderHeader)) {
                 this.DBKind = DBKind.Access;
 
                 _ = this.Open();

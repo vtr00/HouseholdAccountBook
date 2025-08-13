@@ -11,7 +11,7 @@ namespace HouseholdAccountBook.Dao.DbTable
     /// 備考テーブルDAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class HstRemarkDao(DbHandlerBase dbHandler) : ReadWriteDaoBase<HstRemarkDto>(dbHandler)
+    public class HstRemarkDao(DbHandlerBase dbHandler) : ReadWriteTableDaoBase<HstRemarkDto>(dbHandler)
     {
         public override async Task<IEnumerable<HstRemarkDto>> FindAllAsync()
         {

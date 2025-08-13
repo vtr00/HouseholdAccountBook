@@ -6,24 +6,26 @@ using System.Threading.Tasks;
 namespace HouseholdAccountBook.Dao.Abstract
 {
     /// <summary>
-    /// 読み書き可能なDTO向けのDAOのベースクラス
+    /// 読み書き可能なテーブル向けのDAOのベースクラス
     /// </summary>
     /// <typeparam name="DTO"><see cref="TableDtoBase"/>の派生クラス</typeparam>
     /// <param name="dbHandler">DBハンドラ</param>
-    public abstract class ReadWriteDaoBase<DTO>(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler) where DTO : TableDtoBase
+    public abstract class ReadWriteTableDaoBase<DTO>(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler), IReadTableDao<DTO>, IWriteTableDao<DTO> where DTO : TableDtoBase
     {
-        /// <summary>
-        /// テーブルの全てのレコードを取得する
-        /// </summary>
-        /// <returns>DTOリスト</returns>
         public abstract Task<IEnumerable<DTO>> FindAllAsync();
 
-        /// <summary>
-        /// レコードを挿入する
-        /// </summary>
-        /// <param name="dto">DTO</param>
-        /// <returns>挿入行数</returns>
         public abstract Task<int> InsertAsync(DTO dto);
+
+        public abstract Task<int> DeleteAllAsync();
+
+        public async Task<int> BulkInsertAsync(IEnumerable<DTO> dtoList)
+        {
+            int count = 0;
+            foreach (var dto in dtoList) {
+                count += await this.InsertAsync(dto);
+            }
+            return count;
+        }
 
         /// <summary>
         /// レコードを更新する
@@ -38,11 +40,5 @@ namespace HouseholdAccountBook.Dao.Abstract
         /// <param name="dto">DTO</param>
         /// <returns>挿入/更新行数</returns>
         public abstract Task<int> UpsertAsync(DTO dto);
-
-        /// <summary>
-        /// テーブルの全てのレコードを削除する
-        /// </summary>
-        /// <returns>削除行数</returns>
-        public abstract Task<int> DeleteAllAsync();
     }
 }

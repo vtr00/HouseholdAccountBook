@@ -6,6 +6,11 @@ namespace HouseholdAccountBook.Dto.KHDbTable
     {
         public CbmItemDto() { }
 
+        public override int GetId()
+        {
+            return this.ITEM_ID;
+        }
+
         public int ITEM_ID { get; set; }
         public string ITEM_NAME { get; set; }
         public int CATEGORY_ID { get; set; }
