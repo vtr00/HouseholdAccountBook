@@ -55,8 +55,8 @@ new RelBookItemDto { BookId = bookId, ItemId = itemId });
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO rel_book_item
-(item_id, book_id, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @BookId, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
+(item_id, book_id, json_code, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@ItemId, @BookId, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -70,7 +70,7 @@ VALUES (@ItemId, @BookId, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE rel_book_item
-SET del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
+SET json_code = @JsonCode, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId AND book_id = @BookId;", dto);
 
             return count;
@@ -85,10 +85,10 @@ WHERE item_id = @ItemId AND book_id = @BookId;", dto);
         public override async Task<int> UpsertAsync(RelBookItemDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
-INSERT INTO rel_book_item (item_id, book_id, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @BookId, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
+INSERT INTO rel_book_item (item_id, book_id, json_code, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@ItemId, @BookId, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 ON CONFLICT (item_id, book_id) DO UPDATE
-SET del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
+SET json_code = @JsonCode, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE rel_book_item.item_id = @ItemId AND rel_book_item.book_id = @BookId;", dto);
 
             return count;

@@ -67,8 +67,8 @@ new MstCategoryDto { BalanceKind = balanceKind });
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO mst_category
-(category_id, category_name, balance_kind, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@CategoryId, @CategoryName, @BalanceKind, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
+(category_id, category_name, balance_kind, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@CategoryId, @CategoryName, @BalanceKind, @JsonCode, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -77,8 +77,8 @@ VALUES (@CategoryId, @CategoryName, @BalanceKind, @SortOrder, @DelFlg, @UpdateTi
         {
             int categoryId = await this.dbHandler.QuerySingleAsync<int>(@"
 INSERT INTO mst_category
-(category_name, balance_kind, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@CategoryName, @BalanceKind, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_category), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
+(category_name, balance_kind, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@CategoryName, @BalanceKind, @JsonCode, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_category), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING category_id;", dto);
 
             return categoryId;

@@ -47,14 +47,14 @@ new HstRemarkDto { Remark = remark, ItemId = itemId });
         public override async Task<int> InsertAsync(HstRemarkDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
-INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
+INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, json_code, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
 
         /// <summary>
-        /// <see cref="HstRemarkDto.ItemId"/> と <see cref="HstRemarkDto.Remark"/> が一致するレコードの <see cref="HstRemarkDto.UsedTime"/> を更新する
+        /// <see cref="HstRemarkDto.ItemId"/> と <see cref="HstRemarkDto.Remark"/> が一致するレコードを更新する
         /// </summary>
         /// <param name="dto"><see cref="HstRemarkDto"/></param>
         /// <returns>更新行数</returns>
@@ -62,7 +62,7 @@ VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @DelFlg, @UpdateTime, @Updater
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_remark
-SET used_time = @UsedTime, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
+SET used_time = @UsedTime, json_code = @JsonCode, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId AND remark = @Remark AND used_time < @UsedTime;", dto);
 
             return count;
@@ -77,10 +77,10 @@ WHERE item_id = @ItemId AND remark = @Remark AND used_time < @UsedTime;", dto);
         public override async Task<int> UpsertAsync(HstRemarkDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
-INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
+INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, json_code, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 ON CONFLICT (item_id, remark) DO UPDATE
-SET used_time = @UsedTime, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
+SET used_time = @UsedTime, json_code = @JsonCode, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE hst_remark.item_id = @ItemId AND hst_remark.remark = @Remark AND hst_remark.used_time < @UsedTime;", dto);
 
             return count;

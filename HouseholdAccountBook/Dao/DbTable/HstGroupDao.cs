@@ -48,8 +48,8 @@ new HstGroupDto { GroupId = pkey });
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO hst_group
-(group_id, group_kind, remark, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@GroupId, @GroupKind, @Remark, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
+(group_id, group_kind, remark, json_code, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@GroupId, @GroupKind, @Remark, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -57,8 +57,9 @@ VALUES (@GroupId, @GroupKind, @Remark, @DelFlg, @UpdateTime, @Updater, @InsertTi
         public override async Task<int> InsertReturningIdAsync(HstGroupDto dto)
         {
             int groupId = await this.dbHandler.QuerySingleAsync<int>(@"
-INSERT INTO hst_group (group_kind, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@GroupKind, 0, @UpdateTime, @Updater, @InsertTime, @Inserter)
+INSERT INTO hst_group
+(group_kind, remark, json_code, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@GroupKind, @Remark, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING group_id;", dto);
 
             return groupId;

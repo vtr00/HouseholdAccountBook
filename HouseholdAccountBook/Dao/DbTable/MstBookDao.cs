@@ -38,7 +38,7 @@ new MstBookDto { BookId = pkey });
         }
 
         /// <summary>
-        /// <see cref="MstBookDto.BookKind"/> を除外して全てのレコードを取得する
+        /// <see cref="MstBookDto.JsonCode"/> が空ではない全てのレコードを取得する
         /// </summary>
         /// <returns>DTO</returns>
         public async Task<IEnumerable<MstBookDto>> FindIfJsonCodeExistsAsync()
@@ -65,8 +65,8 @@ ORDER BY sort_order;");
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO mst_book 
-(book_id, book_name, book_kind, initial_value, pay_day, debit_book_id, sort_order, del_flg, update_time, updater, insert_time, inserter) 
-VALUES (@BookId, @BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
+(book_id, book_name, book_kind, initial_value, pay_day, debit_book_id, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter) 
+VALUES (@BookId, @BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @JsonCode, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -74,8 +74,8 @@ VALUES (@BookId, @BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @So
         public override async Task<int> InsertReturningIdAsync(MstBookDto dto)
         {
             int bookId = await this.dbHandler.QuerySingleAsync<int>(@"
-INSERT INTO mst_book (book_name, book_kind, initial_value, pay_day, debit_book_id, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
+INSERT INTO mst_book (book_name, book_kind, initial_value, pay_day, debit_book_id, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @JsonCode, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING book_id;", dto);
 
             return bookId;

@@ -56,14 +56,14 @@ new HstShopDto { ShopName = shopName, ItemId = itemId });
         public override async Task<int> InsertAsync(HstShopDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
-INSERT INTO hst_shop (item_id, shop_name, used_time, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @ShopName, @UsedTime, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
+INSERT INTO hst_shop (item_id, shop_name, used_time, json_code, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@ItemId, @ShopName, @UsedTime, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
 
         /// <summary>
-        /// <see cref="HstShopDto.ItemId"/> と <see cref="HstShopDto.ShopName"/> が一致するレコードの <see cref="HstShopDto.UsedTime"/> を更新する
+        /// <see cref="HstShopDto.ItemId"/> と <see cref="HstShopDto.ShopName"/> が一致するレコードを更新する
         /// </summary>
         /// <param name="dto"><see cref="HstShopDto"/></param>
         /// <returns>更新行数</returns>
@@ -71,7 +71,7 @@ VALUES (@ItemId, @ShopName, @UsedTime, @DelFlg, @UpdateTime, @Updater, @InsertTi
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_shop
-SET used_time = @UsedTime, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
+SET used_time = @UsedTime, json_code = @JsonCode, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId AND shop_name = @ShopName AND used_time < @UsedTime;", dto);
 
             return count;
@@ -86,10 +86,10 @@ WHERE item_id = @ItemId AND shop_name = @ShopName AND used_time < @UsedTime;", d
         public override async Task<int> UpsertAsync(HstShopDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
-INSERT INTO hst_shop (item_id, shop_name, used_time, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @ShopName, @UsedTime, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
+INSERT INTO hst_shop (item_id, shop_name, used_time, json_code, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@ItemId, @ShopName, @UsedTime, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 ON CONFLICT (item_id, shop_name) DO UPDATE
-SET used_time = @UsedTime, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
+SET used_time = @UsedTime, json_code = @JsonCode, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE hst_shop.item_id = @ItemId AND hst_shop.shop_name = @ShopName AND hst_shop.used_time < @UsedTime;", dto);
 
             return count;

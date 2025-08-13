@@ -66,8 +66,8 @@ new MstItemDto { CategoryId = categoryId });
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 INSERT INTO mst_item
-(item_id, item_name, category_id, move_flg, advance_flg, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @ItemName, @CategoryId, @MoveFlg, @AdvanceFlg, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
+(item_id, item_name, category_id, move_flg, advance_flg, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@ItemId, @ItemName, @CategoryId, @MoveFlg, @AdvanceFlg, @JsonCode, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -76,8 +76,8 @@ VALUES (@ItemId, @ItemName, @CategoryId, @MoveFlg, @AdvanceFlg, @SortOrder, @Del
         {
             int itemId = await this.dbHandler.QuerySingleAsync<int>(@"
 INSERT INTO mst_item
-(item_name, category_id, move_flg, advance_flg, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES ('(no name)', @CategoryId, @MoveFlg, @AdvanceFlg, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
+(item_name, category_id, move_flg, advance_flg, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@ItemName, @CategoryId, @MoveFlg, @AdvanceFlg, @JsonCode, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING item_id;", dto);
 
             return itemId;
