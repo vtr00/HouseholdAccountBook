@@ -1,16 +1,14 @@
 # __歳時記帳(Household Account Book)__
 
 ## __Abstract__
-It is for your household accounts book via PostgreSQL or SQLite.  
-Currently, the binary file is unscheduled to be published.  
-It is for who can build the project yourself.  
+This software is for your household accounts book via PostgreSQL or SQLite.  
 It is supported for Japanese and English Language, and for Japanese Calcure only.  
 
 ## __概要__
-本ソフトは PostgreSQL、SQLite を用いた家計簿ソフトです。  
-家計簿ソフト [記帳風月](https://www.vector.co.jp/magazine/softnews/061024/n0610242.html?srsltid=AfmBOoqAWe3KIwVaToJ0SYY-HNEI3e8p86AA2RxxBJ52WTH5YZwydP1I) から多くのデータの移行が可能です。   
-現在、バイナリの公開は予定しておりません。  
-自力で環境設定、ビルドできる方向けです。
+本ソフトは家計簿ソフトです。  
+家計簿ソフト [記帳風月](https://www.vector.co.jp/magazine/softnews/061024/n0610242.html) から多くのデータの移行が可能です。  
+データベースとして、SQLiteおよびPostgreSQLに対応しています。また、それらの相互乗り換えも可能です。  
+DBアクセスを高速に実行したいのであれば、PostgreSQLの使用をお勧めしますが、環境の作成に手間が掛かるため、手軽に利用したい場合はSQLiteをお勧めします。
 
 ## __開発環境__
 * IDE  
@@ -99,6 +97,14 @@ It is supported for Japanese and English Language, and for Japanese Calcure only
 * 「グラフ」機能における月内の支出項目の割合を示す円グラフの表示
 * Excelファイル出力
 
+## __SQLiteでの使用方法__
+1. 本ソフトを起動し、SQLiteを選択した上で、ファイルの保存場所を設定します(初回のみ)。
+1. 「ツール」>「設定」で、必要なマスタデータの作成を行います。
+    - 帳簿、分類、項目、帳簿と項目の関連付け
+1. さあ、記帳しましょう。
+
+※ 「ファイル」>「インポート」>「記帳風月からインポート」を行うことで、マスタデータを含めて、記帳風月のデータをインポートできます。
+
 ## __PostgreSQLでの使用方法__
 1. PostgreSQLの環境を構築します。
 1. [create_account_book.backup](./Materials/DB/create_account_book.backup) を用いて、データベースを構築します(owner:postgres name:account_book)。
@@ -106,14 +112,6 @@ It is supported for Japanese and English Language, and for Japanese Calcure only
    1. DATABASE を選択して、CREATE DATABASE 以降のコマンドを実行します(connectは不要)。
 1. 本ソフトを起動し、PostgreSQLを選択した上で、構築したデータベースの接続設定を行います(初回のみ)。
 1. 「ツール」>「設定」で、必要なマスタデータの作成を行います。   
-    - 帳簿、分類、項目、帳簿と項目の関連付け
-1. さあ、記帳しましょう。
-
-※ 「ファイル」>「インポート」>「記帳風月からインポート」を行うことで、マスタデータを含めて、記帳風月のデータをインポートできます。
-
-## __SQLiteでの使用方法__
-1. 本ソフトを起動し、SQLiteを選択した上で、ファイルの保存場所を設定します(初回のみ)。
-1. 「ツール」>「設定」で、必要なマスタデータの作成を行います。
     - 帳簿、分類、項目、帳簿と項目の関連付け
 1. さあ、記帳しましょう。
 
