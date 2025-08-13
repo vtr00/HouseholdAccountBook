@@ -183,7 +183,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="App_CultureName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">ja-JP</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="App_Access_DBFilePath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />

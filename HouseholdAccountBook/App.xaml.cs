@@ -69,8 +69,16 @@ namespace HouseholdAccountBook
 
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
 
-            // 言語設定
+            Log.Info($"Current Culture: {CultureInfo.CurrentCulture.Name}");
             Log.Info($"Application Culture: {settings.App_CultureName}");
+            // 言語の初期設定がない場合
+            if (string.IsNullOrEmpty(settings.App_CultureName)) {
+                settings.App_CultureName = CultureInfo.CurrentCulture.Name switch {
+                    "ja-JP" => "ja-JP", // 日本語
+                    _ => "en-001", // 英語
+                };
+                settings.Save();
+            }
             CultureInfo cultureInfo = new(settings.App_CultureName);
 
             HouseholdAccountBook.Properties.Resources.Culture = cultureInfo;

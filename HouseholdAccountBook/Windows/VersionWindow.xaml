@@ -56,7 +56,7 @@
             <TextBlock Text="{x:Static properties:Resources.TextBlock_Support}"/>:
         </TextBlock>
         <TextBlock Grid.Row="2" Grid.Column="1">
-            <Hyperlink NavigateUri="{Binding SupportSiteUri}" ToolTip="{Binding SupportSiteUri}" RequestNavigate="Hyperlink_RequestNavigate">Github</Hyperlink>
+            <Hyperlink NavigateUri="{Binding SupportSiteUri}" ToolTip="{Binding SupportSiteUri}" RequestNavigate="Hyperlink_RequestNavigate">GitHub</Hyperlink>
         </TextBlock>
 
         <TextBlock Grid.Row="3" Grid.Column="0">
