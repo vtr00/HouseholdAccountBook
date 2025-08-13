@@ -136,7 +136,7 @@ namespace HouseholdAccountBook.Windows
                 int itemId = -1;
                 using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
                     MstItemDao mstItemDao = new(dbHandler);
-                    _ = await mstItemDao.InsertReturningIdAsync(new MstItemDto { CategoryId = categoryId });
+                    itemId = await mstItemDao.InsertReturningIdAsync(new MstItemDto { CategoryId = categoryId });
                 }
                 await this.UpdateItemSettingsTabDataAsync(HierarchicalKind.Item, itemId);
                 this.needToUpdate = true;
@@ -1066,12 +1066,12 @@ namespace HouseholdAccountBook.Windows
                 HierarchicalViewModel selectedVM = null;
                 if (kind != null && id != null) {
                     // 収支から探す
-                    IEnumerable<HierarchicalViewModel> query = this.WVM.HierarchicalVMList.Where((vm) => { return HierarchicalSettingViewModel.GetHierarchicalKind(vm) == kind && vm.Id == id; });
+                    IEnumerable<HierarchicalViewModel> query = this.WVM.HierarchicalVMList.Where((vm) => HierarchicalSettingViewModel.GetHierarchicalKind(vm) == kind && vm.Id == id);
 
                     if (!query.Any()) {
                         // 分類から探す
                         foreach (HierarchicalViewModel tmpVM in this.WVM.HierarchicalVMList) {
-                            query = tmpVM.ChildrenVMList.Where((vm) => { return HierarchicalSettingViewModel.GetHierarchicalKind(vm) == kind && vm.Id == id; });
+                            query = tmpVM.ChildrenVMList.Where((vm) => HierarchicalSettingViewModel.GetHierarchicalKind(vm) == kind && vm.Id == id);
                             if (query.Any()) { break; }
                         }
                     }
@@ -1080,7 +1080,7 @@ namespace HouseholdAccountBook.Windows
                         // 項目から探す
                         foreach (HierarchicalViewModel tmpVM in this.WVM.HierarchicalVMList) {
                             foreach (HierarchicalViewModel tmpVM2 in tmpVM.ChildrenVMList) {
-                                query = tmpVM2.ChildrenVMList.Where((vm) => { return HierarchicalSettingViewModel.GetHierarchicalKind(vm) == kind && vm.Id == id; });
+                                query = tmpVM2.ChildrenVMList.Where((vm) => HierarchicalSettingViewModel.GetHierarchicalKind(vm) == kind && vm.Id == id);
                                 if (query.Any()) { break; }
                             }
                             if (query.Any()) { break; }
@@ -1091,7 +1091,7 @@ namespace HouseholdAccountBook.Windows
                 }
 
                 // 何も選択されていないなら1番上の項目を選択する
-                if (selectedVM == null && this.WVM.HierarchicalVMList.Count != 0) {
+                if (selectedVM == null && this.WVM.HierarchicalVMList.Any()) {
                     selectedVM = this.WVM.HierarchicalVMList[0];
                 }
                 this.WVM.SelectedHierarchicalVM = selectedVM;
