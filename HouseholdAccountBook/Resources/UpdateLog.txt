@@ -1109,8 +1109,9 @@
     △Prism.Mvvmを排除してローカルで実装するように変更した
   ExceptionLog, ViewModel
     △Newtonsoft.Jsonを排除してローカルで実装するように変更した
-2025/08/19
+2025/08/19 - v1.2.1.0
   全体
+    ＋発行パッケージにLICENSEファイル、ThirdPartyNotices.txt を追加した
     ＋補足されない例外の処理時に例外のメッセージのログへの出力を追加した
     ＋補足されない例外の処理に失敗した場合に例外情報のログへの出力を追加した
   ExceptionLog
