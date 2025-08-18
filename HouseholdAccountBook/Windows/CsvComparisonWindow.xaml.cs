@@ -10,7 +10,6 @@ using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -557,7 +556,7 @@ namespace HouseholdAccountBook.Windows
 
                 var dtoList = await mstBookDao.FindIfJsonCodeExistsAsync();
                 foreach (MstBookDto dto in dtoList) {
-                    MstBookDto.JsonDto jsonObj = JsonConvert.DeserializeObject<MstBookDto.JsonDto>(dto.JsonCode);
+                    MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
                     if (jsonObj is null) continue;
 
                     BookComparisonViewModel vm = new() {

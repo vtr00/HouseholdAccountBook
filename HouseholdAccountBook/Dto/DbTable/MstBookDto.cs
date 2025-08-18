@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Dto.KHDbTable;
 using System;
 using System.Text;
+using System.Text.Json;
 
 namespace HouseholdAccountBook.Dto.DbTable
 {
@@ -92,6 +93,37 @@ namespace HouseholdAccountBook.Dto.DbTable
             /// CSV内での項目名のインデックス
             /// </summary>
             public int? CsvItemNameIndex { get; set; } = null;
+
+            public JsonDto() { }
+
+            public JsonDto(string jsonCode)
+            {
+                if (string.IsNullOrEmpty(jsonCode)) return;
+                try {
+                    JsonDto dto = JsonSerializer.Deserialize<JsonDto>(jsonCode);
+                    if (dto != null) {
+                        this.Copy(dto);
+                    }
+                } catch (Exception) {
+                    // 例外が発生した場合は何もしない
+                }
+            }
+
+            protected void Copy(JsonDto org)
+            {
+                this.StartDate = org.StartDate;
+                this.EndDate = org.EndDate;
+                this.CsvFolderPath = org.CsvFolderPath;
+                this.TextEncoding = org.TextEncoding;
+                this.CsvActDateIndex = org.CsvActDateIndex;
+                this.CsvOutgoIndex = org.CsvOutgoIndex;
+                this.CsvItemNameIndex = org.CsvItemNameIndex;
+            }
+
+            public string ToJson()
+            {
+                return JsonSerializer.Serialize(this);
+            }
         }
     }
 }

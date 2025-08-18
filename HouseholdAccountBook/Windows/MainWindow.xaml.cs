@@ -13,7 +13,6 @@ using HouseholdAccountBook.Properties;
 using HouseholdAccountBook.UserControls;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
-using Newtonsoft.Json;
 using Notification.Wpf;
 using OxyPlot;
 using OxyPlot.Axes;
@@ -2049,7 +2048,7 @@ namespace HouseholdAccountBook.Windows
                 MstBookDao mstBookDao = new(dbHandler);
                 var dtoList = await mstBookDao.FindAllAsync();
                 foreach (var dto in dtoList) {
-                    MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : JsonConvert.DeserializeObject<MstBookDto.JsonDto>(dto.JsonCode);
+                    MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
 
                     if (DateTimeExtensions.IsWithIn(this.WVM.DisplayedStart, this.WVM.DisplayedEnd, jsonObj?.StartDate, jsonObj?.EndDate)) {
                         BookViewModel vm = new() { Id = dto.BookId, Name = dto.BookName };

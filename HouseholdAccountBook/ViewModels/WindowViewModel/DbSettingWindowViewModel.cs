@@ -1,5 +1,4 @@
-﻿using Prism.Mvvm;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using static HouseholdAccountBook.Others.DbConstants;
 using static HouseholdAccountBook.Others.UiConstants;
 

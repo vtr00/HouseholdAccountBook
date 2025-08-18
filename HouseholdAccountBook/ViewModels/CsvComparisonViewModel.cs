@@ -1,6 +1,5 @@
 ﻿using HouseholdAccountBook.UserEventArgs;
 using HouseholdAccountBook.ViewModels.Interfaces;
-using Prism.Mvvm;
 using System;
 
 namespace HouseholdAccountBook.ViewModels

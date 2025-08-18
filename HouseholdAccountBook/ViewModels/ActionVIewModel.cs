@@ -1,5 +1,4 @@
 ﻿using HouseholdAccountBook.ViewModels.Interfaces;
-using Prism.Mvvm;
 using System;
 using static HouseholdAccountBook.Others.DbConstants;
 

@@ -1,6 +1,4 @@
-﻿using Prism.Mvvm;
-
-namespace HouseholdAccountBook.ViewModels
+﻿namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
     /// バージョンウィンドウVM

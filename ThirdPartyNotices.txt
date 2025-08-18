@@ -1,0 +1,244 @@
+﻿THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+
+This project incorporates material from the following third-party projects:
+
+# CalcBinding 2.5.2
+   License: Apache-2.0
+   Copyright © Alexander Zinchenko 2014-2019
+   https://github.com/Alex141/CalcBinding
+
+# CsvHelper 33.1.0
+   License: MS-PL OR Apache-2.0
+   Copyright © 2009-2024 Josh Close
+   https://joshclose.github.io/CsvHelper/
+
+# Dapper 2.1.66
+   License: Apache-2.0
+   2019 Stack Exchange, Inc.
+   https://github.com/DapperLib/Dapper
+
+# DynamicExpresso.Core 2.19.2
+   License: MIT
+   Davide Icardi
+   https://github.com/dynamicexpresso/DynamicExpresso
+
+# EntityFramework 6.5.1
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   http://go.microsoft.com/fwlink/?LinkID=263480
+
+# Microsoft-WindowsAPICodePack-Core 1.1.5
+   License: Custom License
+   Copyright © 2020
+   https://github.com/contre/Windows-API-Code-Pack-1.1
+
+# Microsoft-WindowsAPICodePack-Shell 1.1.5
+   License: Custom License
+   Copyright © 2020
+   https://github.com/contre/Windows-API-Code-Pack-1.1
+
+# Microsoft.CSharp 4.7.0
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://github.com/dotnet/corefx
+
+# Microsoft.Extensions.DependencyInjection.Abstractions 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# Microsoft.Extensions.Logging.Abstractions 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# Microsoft.NETCore.Platforms 7.0.4
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# Microsoft.Xaml.Behaviors.Wpf 1.1.135
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://github.com/Microsoft/XamlBehaviorsWpf
+
+# Notification.Wpf 8.0.0
+   License: MIT
+   https://github.com/Platonenkov
+   https://github.com/Platonenkov/Notification.Wpf
+
+# Npgsql 9.0.3
+   License: PostgreSQL
+   Copyright 2024 © The Npgsql Development Team
+   https://github.com/npgsql/npgsql
+
+# OxyPlot.Core 2.1.0
+   License: MIT
+   Copyright (c) 2014 OxyPlot contributors
+   https://oxyplot.github.io/
+
+# OxyPlot.Wpf 2.1.0
+   License: MIT
+   OxyPlot contributors
+   https://oxyplot.github.io/
+
+# OxyPlot.Wpf.Shared 2.1.0
+   License: MIT
+   OxyPlot contributors
+   https://oxyplot.github.io/
+
+# runtime.native.System.Data.SqlClient.sni 4.7.0
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://github.com/dotnet/corefx
+
+# runtime.win-arm64.runtime.native.System.Data.SqlClient.sni 4.4.0
+   License: MIT
+   © Microsoft Corporation.  All rights reserved.
+   https://dot.net/
+
+# runtime.win-x64.runtime.native.System.Data.SqlClient.sni 4.4.0
+   License: MIT
+   © Microsoft Corporation.  All rights reserved.
+   https://dot.net/
+
+# runtime.win-x86.runtime.native.System.Data.SqlClient.sni 4.4.0
+   License: MIT
+   © Microsoft Corporation.  All rights reserved.
+   https://dot.net/
+
+# Stub.System.Data.SQLite.Core.NetStandard 1.0.119
+   License: Public Domain
+   Copyright © 2004-2008 Hipp, Wyrick & Company, Inc.
+   https://system.data.sqlite.org/
+
+# System.Buffers 4.6.1
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://github.com/dotnet/maintenance-packages
+
+# System.CodeDom 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.Collections.Immutable 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.ComponentModel.Annotations 5.0.0
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://github.com/dotnet/runtime
+
+# System.Configuration.ConfigurationManager 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.Data.OleDb 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.Data.SqlClient 4.9.0
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://github.com/dotnet/maintenance-packages
+
+# System.Data.SQLite 1.0.119
+   License: Public Domain
+   Copyright © 2004-2008 Hipp, Wyrick & Company, Inc.
+   https://system.data.sqlite.org/
+
+# System.Data.SQLite.Core 1.0.119
+   License: Public Domain
+   Copyright © 2004-2008 Hipp, Wyrick & Company, Inc.
+   https://system.data.sqlite.org/
+
+# System.Data.SQLite.EF6 1.0.119
+   License: Public Domain
+   Copyright © 2004-2008 Hipp, Wyrick & Company, Inc.
+   https://system.data.sqlite.org/
+
+# System.Diagnostics.DiagnosticSource 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.Diagnostics.EventLog 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.Diagnostics.PerformanceCounter 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.IO.Pipelines 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.Memory 4.6.3
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://github.com/dotnet/maintenance-packages
+
+# System.Numerics.Vectors 4.6.1
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://github.com/dotnet/maintenance-packages
+
+# System.Runtime.CompilerServices.Unsafe 6.1.2
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://github.com/dotnet/maintenance-packages
+
+# System.Security.AccessControl 6.0.1
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.Security.Cryptography.ProtectedData 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.Security.Principal.Windows 5.0.0
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://github.com/dotnet/runtime
+
+# System.Text.Encoding.CodePages 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.Text.Encodings.Web 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.Text.Json 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.Threading.Channels 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.Threading.Tasks.Extensions 4.6.3
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://github.com/dotnet/maintenance-packages
+
+# System.ValueTuple 4.6.1
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://github.com/dotnet/maintenance-packages
+

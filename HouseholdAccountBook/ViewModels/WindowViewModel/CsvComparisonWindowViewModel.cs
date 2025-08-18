@@ -1,5 +1,4 @@
 ﻿using HouseholdAccountBook.UserEventArgs;
-using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;

@@ -8,7 +8,6 @@ using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -683,7 +682,7 @@ namespace HouseholdAccountBook.Windows
                         CsvOutgoIndex = vm.ExpensesIndex - 1,
                         CsvItemNameIndex = vm.ItemNameIndex - 1
                     };
-                    string jsonCode = JsonConvert.SerializeObject(jsonObj);
+                    string jsonCode = jsonObj.ToJson();
 
                     MstBookDao mstBookDao = new(dbHandler);
                     _ = await mstBookDao.UpdateSetableAsync(new MstBookDto {
@@ -1214,7 +1213,7 @@ namespace HouseholdAccountBook.Windows
                 BookInfoDao bookInfoDao = new(dbHandler);
                 var dto = await bookInfoDao.FindByBookId(bookId);
 
-                MstBookDto.JsonDto jsonObj = dto.JsonCode != null ? JsonConvert.DeserializeObject<MstBookDto.JsonDto>(dto.JsonCode) : null;
+                MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
 
                 vm = new BookSettingViewModel() {
                     Id = bookId,

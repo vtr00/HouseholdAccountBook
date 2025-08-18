@@ -1,5 +1,4 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Windows.Input;
 
 namespace HouseholdAccountBook.ViewModels

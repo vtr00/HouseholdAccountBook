@@ -1,5 +1,4 @@
-﻿using Prism.Mvvm;
-using static HouseholdAccountBook.Others.DbConstants;
+﻿using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.ViewModels
 {
