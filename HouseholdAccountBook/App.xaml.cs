@@ -222,6 +222,7 @@ namespace HouseholdAccountBook
                 Log.Error("Unhandled Exception Occured.");
 
                 e.Handled = true;
+                Log.Error($"Unhandled Exception Message:" + e.Exception.Message);
 
                 // 例外情報をファイルに保存する
                 ExceptionLog log = new();
@@ -244,7 +245,10 @@ namespace HouseholdAccountBook
                     });
                 });
             }
-            catch (Exception) { }
+            catch (Exception ex) {
+                Log.Error("Exception Occured in Unhandled Exception Handler:" + ex.Message);
+                Current.Shutdown(1); // 例外処理中に例外が発生した場合は強制終了
+            }
         }
 
         /// <summary>

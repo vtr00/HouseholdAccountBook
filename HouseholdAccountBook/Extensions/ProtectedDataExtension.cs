@@ -14,10 +14,14 @@ namespace HouseholdAccountBook.Extensions
         public static string EncryptPassword(string password)
         {
             // 暗号化（CurrentUserスコープ）
-            byte[] encryptedBytes = ProtectedData.Protect(
-                Encoding.UTF8.GetBytes(password),
-                null,
-                DataProtectionScope.CurrentUser);
+            byte[] encryptedBytes = [];
+            try {
+                encryptedBytes = ProtectedData.Protect(
+                    Encoding.UTF8.GetBytes(password),
+                    null,
+                    DataProtectionScope.CurrentUser);
+            }
+            catch (CryptographicException) { }
 
             // バイト配列からBase64に変換
             return Convert.ToBase64String(encryptedBytes);
@@ -34,10 +38,15 @@ namespace HouseholdAccountBook.Extensions
             byte[] encryptedBytes = Convert.FromBase64String(encryptedPassword);
 
             // 復号化（CurrentUserスコープ）
-            byte[] decryptedBytes = ProtectedData.Unprotect(
-                encryptedBytes,
-                null,
-                DataProtectionScope.CurrentUser);
+            byte[] decryptedBytes = [];
+            try {
+                decryptedBytes = ProtectedData.Unprotect(
+                    encryptedBytes,
+                    null,
+                    DataProtectionScope.CurrentUser);
+            }
+            catch (CryptographicException) { }
+
             return Encoding.UTF8.GetString(decryptedBytes);
         }
     }
