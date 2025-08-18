@@ -136,8 +136,8 @@ namespace HouseholdAccountBook
                 // 初回起動時、またはDB接続に失敗した時
                 if (settings.App_InitFlag || dbHandlerFactory is not null) {
                     // データベース接続を設定する
-                    string message = dbHandlerFactory is not null 
-                        ? HouseholdAccountBook.Properties.Resources.Message_FoultToConnectDb 
+                    string message = dbHandlerFactory is not null
+                        ? HouseholdAccountBook.Properties.Resources.Message_FoultToConnectDb
                         : HouseholdAccountBook.Properties.Resources.Message_PleaseInputDbSetting;
                     DbSettingWindow dsw = new(message);
                     bool? result = dsw.ShowDialog();
@@ -166,7 +166,8 @@ namespace HouseholdAccountBook
                         };
                         if (settings.App_Postgres_Password == string.Empty) {
                             connectInfo.EncryptedPassword = settings.App_Postgres_EncryptedPassword;
-                        } else {
+                        }
+                        else {
                             connectInfo.Password = settings.App_Postgres_Password;
                             settings.App_Postgres_EncryptedPassword = connectInfo.EncryptedPassword;
                             settings.App_Postgres_Password = string.Empty; // パスワードは保存しない

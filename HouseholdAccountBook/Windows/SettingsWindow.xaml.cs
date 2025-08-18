@@ -832,7 +832,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void BackUpFolderPathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            string folderPath = Path.GetDirectoryName(Application.ResourceAssembly.Location);
+            string folderPath = App.GetCurrentDir();
             string fileName = string.Empty;
             if (this.WVM.BackUpFolderPath != string.Empty) {
                 folderPath = Path.GetDirectoryName(this.WVM.BackUpFolderPath);
@@ -848,7 +848,7 @@ namespace HouseholdAccountBook.Windows
             };
 
             if (ofd.ShowDialog() == CommonFileDialogResult.Ok) {
-                this.WVM.BackUpFolderPath = Path.GetDirectoryName(Application.ResourceAssembly.Location).CompareTo(ofd.InitialDirectory) == 0
+                this.WVM.BackUpFolderPath = App.GetCurrentDir().CompareTo(ofd.InitialDirectory) == 0
                     ? Path.GetFileName(ofd.FileName)
                     : Path.Combine(ofd.InitialDirectory, ofd.FileName);
             }
@@ -923,7 +923,7 @@ namespace HouseholdAccountBook.Windows
                 ((App)Application.Current).Restart();
             }
         }
-        
+
         /// <summary>
         /// その他設定を保存する
         /// </summary>

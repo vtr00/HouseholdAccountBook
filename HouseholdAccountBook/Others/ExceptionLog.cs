@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
-using System.Text.Json;
 using static HouseholdAccountBook.Others.FileConstants;
 
 namespace HouseholdAccountBook
@@ -8,10 +8,6 @@ namespace HouseholdAccountBook
     public class ExceptionLog
     {
         public string RelatedFilePath { get; set; }
-
-        private static JsonSerializerOptions JsonSerializerOptions => new() {
-            WriteIndented = true
-        };
 
         public ExceptionLog() { }
 
@@ -23,7 +19,7 @@ namespace HouseholdAccountBook
 
             // 例外情報をファイルに保存する
             this.RelatedFilePath = UnhandledExceptionInfoFilePath;
-            string jsonCode = JsonSerializer.Serialize(e, JsonSerializerOptions);
+            string jsonCode = JsonConvert.SerializeObject(e, Formatting.Indented);
             using (FileStream fs = new(this.RelatedFilePath, FileMode.Create)) {
                 using (StreamWriter sw = new(fs)) {
                     sw.WriteLine(jsonCode);
