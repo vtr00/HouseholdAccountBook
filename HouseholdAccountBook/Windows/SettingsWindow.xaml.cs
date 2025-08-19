@@ -633,11 +633,9 @@ namespace HouseholdAccountBook.Windows
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            string folderPath = Path.GetDirectoryName(settings.App_CsvFilePath);
-            string fileName = string.Empty;
-            if (this.WVM.DisplayedBookSettingVM.CsvFolderPath != null && this.WVM.DisplayedBookSettingVM.CsvFolderPath != string.Empty) {
-                folderPath = Path.GetDirectoryName(this.WVM.DisplayedBookSettingVM.CsvFolderPath);
-                fileName = Path.GetFileName(this.WVM.DisplayedBookSettingVM.CsvFolderPath);
+            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.WVM.DisplayedBookSettingVM.CsvFolderPath, App.GetCurrentDir());
+            if (string.IsNullOrWhiteSpace(folderPath)) {
+                (folderPath, fileName) = PathExtensions.GetSeparatedPath(Path.GetDirectoryName(settings.App_CsvFilePath), App.GetCurrentDir());
             }
 
             CommonOpenFileDialog ofd = new() {
@@ -648,8 +646,8 @@ namespace HouseholdAccountBook.Windows
                 Title = Properties.Resources.Title_CsvFolderSelection,
             };
 
-            if (ofd.ShowDialog() == CommonFileDialogResult.Ok) {
-                this.WVM.DisplayedBookSettingVM.CsvFolderPath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            if (ofd.ShowDialog(this) == CommonFileDialogResult.Ok) {
+                this.WVM.DisplayedBookSettingVM.CsvFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), ofd.FileName);
             }
         }
 
@@ -676,7 +674,7 @@ namespace HouseholdAccountBook.Windows
                     MstBookDto.JsonDto jsonObj = new() {
                         StartDate = vm.StartDateExists ? vm.StartDate : null,
                         EndDate = vm.EndDateExists ? vm.EndDate : null,
-                        CsvFolderPath = vm.CsvFolderPath != string.Empty ? vm.CsvFolderPath : null,
+                        CsvFolderPath = vm.CsvFolderPath != string.Empty ? Path.GetFullPath(vm.CsvFolderPath, App.GetCurrentDir()) : null,
                         TextEncoding = vm.SelectedTextEncoding,
                         CsvActDateIndex = vm.ActDateIndex - 1,
                         CsvOutgoIndex = vm.ExpensesIndex - 1,
@@ -746,11 +744,9 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void DumpExePathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            string folderPath = string.Empty;
-            string fileName = string.Empty;
-            if (this.WVM.PostgreSQLDBSettingVM.DumpExePath != string.Empty) {
-                folderPath = Path.GetDirectoryName(this.WVM.PostgreSQLDBSettingVM.DumpExePath);
-                fileName = Path.GetFileName(this.WVM.PostgreSQLDBSettingVM.DumpExePath);
+            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.WVM.PostgreSQLDBSettingVM.DumpExePath, App.GetCurrentDir());
+            if (string.IsNullOrWhiteSpace(folderPath)) {
+                folderPath = App.GetCurrentDir();
             }
 
             OpenFileDialog ofd = new() {
@@ -761,8 +757,8 @@ namespace HouseholdAccountBook.Windows
                 Filter = "pg_dump.exe|pg_dump.exe"
             };
 
-            if (ofd.ShowDialog() == true) {
-                this.WVM.PostgreSQLDBSettingVM.DumpExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            if (ofd.ShowDialog(this) == true) {
+                this.WVM.PostgreSQLDBSettingVM.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), ofd.FileName);
             }
         }
 
@@ -773,11 +769,9 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void RestorePathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            string folderPath = string.Empty;
-            string fileName = string.Empty;
-            if (this.WVM.PostgreSQLDBSettingVM.RestoreExePath != string.Empty) {
-                folderPath = Path.GetDirectoryName(this.WVM.PostgreSQLDBSettingVM.RestoreExePath);
-                fileName = Path.GetFileName(this.WVM.PostgreSQLDBSettingVM.RestoreExePath);
+            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.WVM.PostgreSQLDBSettingVM.RestoreExePath, App.GetCurrentDir());
+            if (string.IsNullOrWhiteSpace(folderPath)) {
+                folderPath = App.GetCurrentDir();
             }
 
             OpenFileDialog ofd = new() {
@@ -788,8 +782,8 @@ namespace HouseholdAccountBook.Windows
                 Filter = "pg_restore.exe|pg_restore.exe"
             };
 
-            if (ofd.ShowDialog() == true) {
-                this.WVM.PostgreSQLDBSettingVM.RestoreExePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            if (ofd.ShowDialog(this) == true) {
+                this.WVM.PostgreSQLDBSettingVM.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), ofd.FileName);
             }
         }
 
@@ -832,11 +826,9 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void BackUpFolderPathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            string folderPath = App.GetCurrentDir();
-            string fileName = string.Empty;
-            if (this.WVM.BackUpFolderPath != string.Empty) {
-                folderPath = Path.GetDirectoryName(this.WVM.BackUpFolderPath);
-                fileName = Path.GetFileName(this.WVM.BackUpFolderPath);
+            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.WVM.BackUpFolderPath, App.GetCurrentDir());
+            if (string.IsNullOrWhiteSpace(folderPath)) {
+                folderPath = App.GetCurrentDir();
             }
 
             CommonOpenFileDialog ofd = new() {
@@ -847,10 +839,8 @@ namespace HouseholdAccountBook.Windows
                 Title = Properties.Resources.Title_BackupFolderSelection
             };
 
-            if (ofd.ShowDialog() == CommonFileDialogResult.Ok) {
-                this.WVM.BackUpFolderPath = App.GetCurrentDir().CompareTo(ofd.InitialDirectory) == 0
-                    ? Path.GetFileName(ofd.FileName)
-                    : Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            if (ofd.ShowDialog(this) == CommonFileDialogResult.Ok) {
+                this.WVM.BackUpFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), ofd.FileName);
             }
         }
 
@@ -1227,7 +1217,7 @@ namespace HouseholdAccountBook.Windows
                     EndDate = jsonObj?.EndDate ?? dto.EndDate ?? DateTime.Today,
                     DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((tmpVM) => { return tmpVM.Id != bookId; })),
                     PayDay = dto.PayDay,
-                    CsvFolderPath = jsonObj?.CsvFolderPath,
+                    CsvFolderPath = jsonObj is null ? "" : PathExtensions.GetSmartPath(App.GetCurrentDir(), jsonObj.CsvFolderPath),
                     TextEncodingList = GetTextEncodingList(),
                     SelectedTextEncoding = jsonObj?.TextEncoding ?? Encoding.UTF8.CodePage,
                     ActDateIndex = jsonObj?.CsvActDateIndex + 1,
@@ -1480,12 +1470,12 @@ namespace HouseholdAccountBook.Windows
             this.WVM.PostgreSQLDBSettingVM.DatabaseName = settings.App_Postgres_DatabaseName;
 #endif
             this.WVM.PostgreSQLDBSettingVM.Role = settings.App_Postgres_Role;
-            this.WVM.PostgreSQLDBSettingVM.DumpExePath = settings.App_Postgres_DumpExePath;
-            this.WVM.PostgreSQLDBSettingVM.RestoreExePath = settings.App_Postgres_RestoreExePath;
+            this.WVM.PostgreSQLDBSettingVM.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_DumpExePath);
+            this.WVM.PostgreSQLDBSettingVM.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_RestoreExePath);
             this.WVM.PostgreSQLDBSettingVM.PasswordInput = (PostgresPasswordInput)settings.App_Postgres_Password_Input;
 
             // SQLite
-            this.WVM.SQLiteSettingVM.DBFilePath = settings.App_SQLite_DBFilePath;
+            this.WVM.SQLiteSettingVM.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_SQLite_DBFilePath);
 
             // Access
             this.WVM.AccessSettingVM.ProviderNameDic.Clear();
@@ -1495,7 +1485,7 @@ namespace HouseholdAccountBook.Windows
             this.WVM.SelectedCultureName = settings.App_CultureName;
 
             this.WVM.BackUpNum = settings.App_BackUpNum;
-            this.WVM.BackUpFolderPath = settings.App_BackUpFolderPath;
+            this.WVM.BackUpFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_BackUpFolderPath);
             this.WVM.BackUpFlagAtMinimizing = settings.App_BackUpFlagAtMinimizing;
             this.WVM.BackUpIntervalAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
             this.WVM.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
@@ -1590,8 +1580,8 @@ namespace HouseholdAccountBook.Windows
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            settings.App_Postgres_DumpExePath = this.WVM.PostgreSQLDBSettingVM.DumpExePath;
-            settings.App_Postgres_RestoreExePath = this.WVM.PostgreSQLDBSettingVM.RestoreExePath;
+            settings.App_Postgres_DumpExePath = Path.GetFullPath(this.WVM.PostgreSQLDBSettingVM.DumpExePath, App.GetCurrentDir());
+            settings.App_Postgres_RestoreExePath = Path.GetFullPath(this.WVM.PostgreSQLDBSettingVM.RestoreExePath, App.GetCurrentDir());
             settings.App_Postgres_Password_Input = (int)this.WVM.PostgreSQLDBSettingVM.PasswordInput;
 
             settings.App_Import_KichoFugetsu_Provider = this.WVM.AccessSettingVM.SelectedProviderName;
@@ -1599,7 +1589,7 @@ namespace HouseholdAccountBook.Windows
             settings.App_CultureName = this.WVM.SelectedCultureName;
 
             settings.App_BackUpNum = this.WVM.BackUpNum;
-            settings.App_BackUpFolderPath = this.WVM.BackUpFolderPath;
+            settings.App_BackUpFolderPath = Path.GetFullPath(this.WVM.BackUpFolderPath, App.GetCurrentDir());
             settings.App_BackUpFlagAtMinimizing = this.WVM.BackUpFlagAtMinimizing;
             settings.App_BackUpIntervalMinAtMinimizing = this.WVM.BackUpIntervalAtMinimizing;
             settings.App_BackUpFlagAtClosing = this.WVM.BackUpFlagAtClosing;

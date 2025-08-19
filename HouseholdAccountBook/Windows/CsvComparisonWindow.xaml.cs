@@ -98,13 +98,7 @@ namespace HouseholdAccountBook.Windows
         private async void OpenCsvFilesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Properties.Settings settings = Properties.Settings.Default;
-
-            string folderPath = string.Empty;
-            string fileName = string.Empty;
-            if (settings.App_CsvFilePath != string.Empty) {
-                folderPath = Path.GetDirectoryName(settings.App_CsvFilePath);
-                fileName = Path.GetFileName(settings.App_CsvFilePath);
-            }
+            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(settings.App_CsvFilePath, App.GetCurrentDir());
 
             OpenFileDialog ofd = new() {
                 CheckFileExists = true,
@@ -115,11 +109,10 @@ namespace HouseholdAccountBook.Windows
                 Multiselect = true
             };
 
-            if (ofd.ShowDialog() == true) {
+            if (ofd.ShowDialog(this) == true) {
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                     // 開いたCSVファイルのパスを設定として保存する(複数存在する場合は先頭のみ)
-                    string csvFilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
-                    settings.App_CsvFilePath = csvFilePath;
+                    settings.App_CsvFilePath = ofd.FileName;
                     settings.Save();
 
                     foreach (string tmpFileName in ofd.FileNames) {

@@ -133,14 +133,7 @@ namespace HouseholdAccountBook.Windows
             Log.Info();
 
             Properties.Settings settings = Properties.Settings.Default;
-
-            string directory = string.Empty; // ディレクトリ
-            string fileName = string.Empty; // ファイル名
-            // 過去に読み込んだときのフォルダとファイルをデフォルトにする
-            if (settings.App_Import_KichoFugetsu_FilePath != string.Empty) {
-                directory = Path.GetDirectoryName(settings.App_Import_KichoFugetsu_FilePath);
-                fileName = Path.GetFileName(settings.App_Import_KichoFugetsu_FilePath);
-            }
+            (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Import_KichoFugetsu_FilePath, App.GetCurrentDir());
 
             OpenFileDialog ofd = new() {
                 CheckFileExists = true,
@@ -157,7 +150,7 @@ namespace HouseholdAccountBook.Windows
                 return;
             }
 
-            settings.App_Import_KichoFugetsu_FilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            settings.App_Import_KichoFugetsu_FilePath = ofd.FileName;
             settings.Save();
 
             bool isOpen = false;
@@ -296,14 +289,7 @@ namespace HouseholdAccountBook.Windows
             Log.Info();
 
             Properties.Settings settings = Properties.Settings.Default;
-
-            string directory = string.Empty;
-            string fileName = string.Empty;
-            // 過去に読み込んだときのフォルダとファイルをデフォルトにする
-            if (settings.App_Import_CustomFormat_FilePath != string.Empty) {
-                directory = Path.GetDirectoryName(settings.App_Import_CustomFormat_FilePath);
-                fileName = Path.GetFileName(settings.App_Import_CustomFormat_FilePath);
-            }
+            (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Import_CustomFormat_FilePath, App.GetCurrentDir());
 
             OpenFileDialog ofd = new() {
                 CheckFileExists = true,
@@ -321,7 +307,7 @@ namespace HouseholdAccountBook.Windows
                 return;
             }
 
-            settings.App_Import_CustomFormat_FilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            settings.App_Import_CustomFormat_FilePath = ofd.FileName;
             settings.Save();
 
             int exitCode = -1;
@@ -384,14 +370,7 @@ namespace HouseholdAccountBook.Windows
             Log.Info();
 
             Properties.Settings settings = Properties.Settings.Default;
-
-            string directory = string.Empty;
-            string fileName = string.Empty;
-            // 過去に読み込んだときのフォルダとファイルをデフォルトにする
-            if (settings.App_Import_SQLite_FilePath != string.Empty) {
-                directory = Path.GetDirectoryName(settings.App_Import_SQLite_FilePath);
-                fileName = Path.GetFileName(settings.App_Import_SQLite_FilePath);
-            }
+            (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_SQLite_DBFilePath, App.GetCurrentDir());
 
             OpenFileDialog ofd = new() {
                 CheckFileExists = true,
@@ -409,7 +388,7 @@ namespace HouseholdAccountBook.Windows
                 return;
             }
 
-            settings.App_Import_SQLite_FilePath = Path.Combine(ofd.InitialDirectory, ofd.FileName);
+            settings.App_Import_SQLite_FilePath = ofd.FileName;
             settings.Save();
 
             bool result = false;
@@ -629,17 +608,7 @@ namespace HouseholdAccountBook.Windows
             Log.Info();
 
             Properties.Settings settings = Properties.Settings.Default;
-
-            string directory;
-            string fileName = string.Empty;
-            // 過去に読み込んだときのフォルダとファイルをデフォルトにする
-            if (settings.App_Export_CustomFormat_FilePath != string.Empty) {
-                directory = Path.GetDirectoryName(settings.App_Export_CustomFormat_FilePath);
-                fileName = Path.GetFileName(settings.App_Export_CustomFormat_FilePath);
-            }
-            else {
-                directory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            }
+            (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Export_CustomFormat_FilePath, App.GetCurrentDir());
 
             SaveFileDialog sfd = new() {
                 InitialDirectory = directory,
@@ -650,7 +619,7 @@ namespace HouseholdAccountBook.Windows
 
             if (sfd.ShowDialog(this) == false) return;
 
-            settings.App_Export_CustomFormat_FilePath = Path.Combine(sfd.InitialDirectory, sfd.FileName);
+            settings.App_Export_CustomFormat_FilePath = sfd.FileName;
             settings.Save();
 
             int? exitCode = -1;
@@ -690,16 +659,7 @@ namespace HouseholdAccountBook.Windows
 
             Properties.Settings settings = Properties.Settings.Default;
 
-            string directory;
-            string fileName = string.Empty;
-            // 過去に読み込んだときのフォルダとファイルをデフォルトにする
-            if (settings.App_Export_SQLFilePath != string.Empty) {
-                directory = Path.GetDirectoryName(settings.App_Export_SQLFilePath);
-                fileName = Path.GetFileName(settings.App_Export_SQLFilePath);
-            }
-            else {
-                directory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            }
+            (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Export_SQLFilePath, App.GetCurrentDir());
 
             SaveFileDialog sfd = new() {
                 InitialDirectory = directory,
@@ -710,7 +670,7 @@ namespace HouseholdAccountBook.Windows
 
             if (sfd.ShowDialog(this) == false) return;
 
-            settings.App_Export_SQLFilePath = Path.Combine(sfd.InitialDirectory, sfd.FileName);
+            settings.App_Export_SQLFilePath = sfd.FileName;
             settings.Save();
 
             int? exitCode = -1;
@@ -3639,7 +3599,7 @@ namespace HouseholdAccountBook.Windows
 
             int tmpBackUpNum = backUpNum ?? settings.App_BackUpNum;
             string tmpBackUpFolderPath = backUpFolderPath ?? settings.App_BackUpFolderPath;
-
+            
             if (tmpBackUpFolderPath == string.Empty) {
                 return false;
             }
