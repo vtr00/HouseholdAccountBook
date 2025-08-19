@@ -799,7 +799,7 @@
                                     <CheckBox Content="{x:Static properties:Resources.GroupHeader_Debug}" IsChecked="{Binding DebugMode}"/>
                                 </GroupBox.Header>
 
-                                <Grid Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}">
+                                <Grid Visibility="{Binding DebugMode, Converter={StaticResource BoolVisibilityConverter}}">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
