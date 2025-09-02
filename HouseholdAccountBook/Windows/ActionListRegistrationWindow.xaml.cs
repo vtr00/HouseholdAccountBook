@@ -302,7 +302,7 @@ namespace HouseholdAccountBook.Windows
                 case RegistrationKind.Edit:
                 case RegistrationKind.Copy: {
                     // DBから値を読み込む
-                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                         HstActionDao hstActionDao = new(dbHandler);
                         var dtoList = await hstActionDao.FindByGroupIdAsync(this.selectedGroupId.Value);
                         foreach (HstActionDto dto in dtoList) {
@@ -461,7 +461,7 @@ namespace HouseholdAccountBook.Windows
         {
             ObservableCollection<BookViewModel> bookVMList = [];
             BookViewModel selectedBookVM = null;
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 MstBookDao mstBookDao = new(dbHandler);
                 var dtoList = await mstBookDao.FindAllAsync();
                 foreach (MstBookDto dto in dtoList) {
@@ -489,7 +489,7 @@ namespace HouseholdAccountBook.Windows
             ];
             int? tmpCategoryId = categoryId ?? this.WVM.SelectedCategoryVM?.Id ?? categoryVMList[0].Id;
             CategoryViewModel selectedCategoryVM = categoryVMList[0];
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 MstCategoryWithinBookDao mstCategoryWithinBookDao = new(dbHandler);
                 var dtoList = await mstCategoryWithinBookDao.FindByBookIdAndBalanceKindAsync(this.WVM.SelectedBookVM.Id.Value, (int)this.WVM.SelectedBalanceKind);
                 foreach (MstCategoryDto dto in dtoList) {
@@ -517,7 +517,7 @@ namespace HouseholdAccountBook.Windows
             ObservableCollection<ItemViewModel> itemVMList = [];
             int? tmpItemId = itemId ?? this.WVM.SelectedItemVM?.Id;
             ItemViewModel selectedItemVM = null;
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 CategoryItemInfoDao categoryItemInfoDao = new(dbHandler);
                 var dtoList = this.WVM.SelectedCategoryVM.Id == -1
                     ? await categoryItemInfoDao.FindByBookIdAndBalanceKindAsync(this.WVM.SelectedBookVM.Id.Value, (int)this.WVM.SelectedBalanceKind)
@@ -553,7 +553,7 @@ namespace HouseholdAccountBook.Windows
             ];
             string selectedShopName = shopName ?? this.WVM.SelectedShopName ?? shopVMList[0].Name;
             ShopViewModel selectedShopVM = shopVMList[0]; // UNUSED
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 ShopInfoDao shopInfoDao = new(dbHandler);
                 var dtoList = await shopInfoDao.FindByItemIdAsync(this.WVM.SelectedItemVM.Id);
                 foreach (ShopInfoDto dto in dtoList) {
@@ -587,7 +587,7 @@ namespace HouseholdAccountBook.Windows
             ];
             string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0].Remark;
             RemarkViewModel selectedRemarkVM = remarkVMList[0]; // UNUSED
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 RemarkInfoDao remarkInfoDao = new(dbHandler);
                 var dtoList = await remarkInfoDao.FindByItemIdAsync(this.WVM.SelectedItemVM.Id);
                 foreach (RemarkInfoDto dto in dtoList) {
@@ -660,7 +660,7 @@ namespace HouseholdAccountBook.Windows
             string remark = this.WVM.SelectedRemark;                // 備考
 
             DateTime lastActTime = this.WVM.DateValueVMList.Max((tmp) => tmp.ActDate);
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 switch (this.WVM.RegMode) {
                     case RegistrationKind.Add: {
                         #region 帳簿項目を追加する

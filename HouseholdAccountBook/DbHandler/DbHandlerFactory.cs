@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.DbHandler.Abstract;
+using System.Threading.Tasks;
 using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.DbHandler
@@ -47,10 +48,10 @@ namespace HouseholdAccountBook.DbHandler
         }
 
         /// <summary>
-        /// <see cref="DbHandlerBase"/> 生成
+        /// [非同期] <see cref="DbHandlerBase"/> 生成
         /// </summary>
         /// <returns>DbHandler</returns>
-        public DbHandlerBase Create()
+        public async Task<DbHandlerBase> CreateAsync()
         {
             try {
                 DbHandlerBase dbHandler = this.DBLibKind switch {
@@ -59,7 +60,9 @@ namespace HouseholdAccountBook.DbHandler
                     DBLibraryKind.OleDb => new OleDbHandler(this.info as OleDbHandler.ConnectInfo),
                     _ => null,
                 };
-                return dbHandler;
+
+                _ = await dbHandler.OpenAsync();
+                ; return dbHandler;
             }
             catch (System.TimeoutException) {
                 throw;

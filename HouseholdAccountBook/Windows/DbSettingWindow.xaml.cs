@@ -201,9 +201,9 @@ namespace HouseholdAccountBook.Windows
                     bool exists = File.Exists(sqliteFilePath);
                     if (!exists) {
                         if (MessageBox.Show(Properties.Resources.Message_NotFoundFileDoYouCreateNew, Properties.Resources.Title_Conformation, MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
-                            byte[] sqliteBynary = Properties.Resources.SQLiteTemplateFile;
+                            byte[] sqliteBinary = Properties.Resources.SQLiteTemplateFile;
                             try {
-                                File.WriteAllBytes(sqliteFilePath, sqliteBynary);
+                                File.WriteAllBytes(sqliteFilePath, sqliteBinary);
                                 exists = true;
                             }
                             catch { }

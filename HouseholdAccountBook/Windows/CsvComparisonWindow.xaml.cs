@@ -301,7 +301,7 @@ namespace HouseholdAccountBook.Windows
         {
             // グループ種別を特定する
             int? groupKind = null;
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 GroupInfoDao groupInfoDao = new(dbHandler);
                 var dto = await groupInfoDao.FindByActionId(this.WVM.SelectedCsvComparisonVM.ActionId.Value);
                 groupKind = dto.GroupKind;
@@ -544,7 +544,7 @@ namespace HouseholdAccountBook.Windows
 
             ObservableCollection<BookComparisonViewModel> bookCompVMList = [];
             BookComparisonViewModel selectedBookCompVM = null;
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 MstBookDao mstBookDao = new(dbHandler);
 
                 var dtoList = await mstBookDao.FindIfJsonCodeExistsAsync();
@@ -647,7 +647,7 @@ namespace HouseholdAccountBook.Windows
         private async Task UpdateComparisonVMListAsync(bool isScroll = false)
         {
             // 指定された帳簿内で、日付、金額が一致する帳簿項目を探す
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 foreach (var vm in this.WVM.CsvComparisonVMList) {
                     // 前回の帳簿項目情報をクリアする
                     vm.ClearActionInfo();
@@ -751,7 +751,7 @@ namespace HouseholdAccountBook.Windows
         /// <returns></returns>
         private async Task SaveIsMatchAsync(int actionId, bool isMatch)
         {
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 HstActionDao hstActionDao = new(dbHandler);
                 _ = await hstActionDao.UpdateIsMatchByIdAsync(actionId, isMatch ? 1 : 0);
             }

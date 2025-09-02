@@ -160,8 +160,8 @@ namespace HouseholdAccountBook.Windows
                     FilePath = ofd.FileName
                 };
 
-                using (OleDbHandler dbHandlerOle = new(info))
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (OleDbHandler dbHandlerOle = await new DbHandlerFactory(info).CreateAsync() as OleDbHandler)
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     isOpen = dbHandlerOle.IsOpen;
 
                     if (isOpen) {
@@ -312,7 +312,7 @@ namespace HouseholdAccountBook.Windows
 
             int exitCode = -1;
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     var mstBookDao = new MstBookDao(dbHandler);
                     var mstCategoryDao = new MstCategoryDao(dbHandler);
                     var mstItemDao = new MstItemDao(dbHandler);
@@ -407,8 +407,8 @@ namespace HouseholdAccountBook.Windows
                         SQLiteDbHandler.ConnectInfo info = new() {
                             FilePath = ofd.FileName
                         };
-                        using (SQLiteDbHandler dbHandlerSqlite = new(info))
-                        using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                        await using (SQLiteDbHandler dbHandlerSqlite = await new DbHandlerFactory(info).CreateAsync() as SQLiteDbHandler)
+                        await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                             result = dbHandlerSqlite.IsOpen;
 
                             if (result) {
@@ -520,8 +520,8 @@ namespace HouseholdAccountBook.Windows
                     Role = settings.App_Postgres_Role
                 };
 
-                using (NpgsqlDbHandler dbHandlerNpgsql = new(info))
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (NpgsqlDbHandler dbHandlerNpgsql = await new DbHandlerFactory(info).CreateAsync() as NpgsqlDbHandler)
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     result = dbHandlerNpgsql.IsOpen;
 
                     if (result) {
@@ -937,7 +937,7 @@ namespace HouseholdAccountBook.Windows
 
             // グループ種別を特定する
             int? groupKind = null;
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 GroupInfoDao groupInfoDao = new(dbHandler);
                 var dto = await groupInfoDao.FindByActionId(this.WVM.SelectedActionVM.ActionId);
                 groupKind = dto.GroupKind;
@@ -1025,7 +1025,7 @@ namespace HouseholdAccountBook.Windows
 
             // グループ種別を特定する
             int? groupKind = null;
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 GroupInfoDao groupInfoDao = new(dbHandler);
                 var dto = await groupInfoDao.FindByActionId(this.WVM.SelectedActionVM.ActionId);
                 groupKind = dto.GroupKind;
@@ -1090,7 +1090,7 @@ namespace HouseholdAccountBook.Windows
 
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     await dbHandler.ExecTransactionAsync(async () => {
                         HstActionDao hstActionDao = new(dbHandler);
                         HstGroupDao hstGroupDao = new(dbHandler);
@@ -1167,7 +1167,7 @@ namespace HouseholdAccountBook.Windows
         {
             Log.Info();
 
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 // 帳簿項目IDが0を超える項目についてループ
                 HstActionDao hstActionDao = new(dbHandler);
                 foreach (ActionViewModel vm in this.WVM.SelectedActionVMList.Where((vm) => { return 0 < vm.ActionId; })) {
@@ -1710,7 +1710,7 @@ namespace HouseholdAccountBook.Windows
                 string shopName = vm.ShopName.Replace(this.WVM.FindText, this.WVM.ReplaceText);
                 string remark = vm.Remark.Replace(this.WVM.FindText, this.WVM.ReplaceText);
 
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     HstActionDao hstActionDao = new(dbHandler);
                     _ = await hstActionDao.UpdateShopNameAndRemarkByIdAsync(vm.ActionId, shopName, remark);
                 }
@@ -1778,7 +1778,7 @@ namespace HouseholdAccountBook.Windows
             Properties.Settings settings = Properties.Settings.Default;
             this.WVM.FiscalStartMonth = settings.App_StartMonth;
 
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 this.WVM.SelectedDBKind = dbHandler.DBKind;
             }
 
@@ -2004,7 +2004,7 @@ namespace HouseholdAccountBook.Windows
                 new BookViewModel() { Id = null, Name = Properties.Resources.ListName_AllBooks }
             ];
             BookViewModel selectedBookVM = bookVMList[0];
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 MstBookDao mstBookDao = new(dbHandler);
                 var dtoList = await mstBookDao.FindAllAsync();
                 foreach (var dto in dtoList) {
@@ -2072,7 +2072,7 @@ namespace HouseholdAccountBook.Windows
             Log.Info($"targetBookId:{targetBookId} startTime:{startTime:yyyy-MM-dd} endTime:{endTime:yyyy-MM-dd}");
 
             ObservableCollection<ActionViewModel> actionVMList = [];
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
                 EndingBalanceInfoDto dto = targetBookId == null
                     ? await endingBalanceInfoDao.Find(startTime) // 全帳簿の繰越残高
@@ -2162,8 +2162,7 @@ namespace HouseholdAccountBook.Windows
             Log.Info($"bookId:{bookId} startTime:{startTime:yyyy-MM-dd} endTime:{endTime:yyyy-MM-dd}");
 
             ObservableCollection<SummaryViewModel> summaryVMList = [];
-
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 SummaryInfoDao summaryInfoDao = new(dbHandler);
                 IEnumerable<SummaryInfoDto> dtoList = bookId == null
                     ? await summaryInfoDao.FindAllWithinTerm(startTime, endTime)
@@ -2261,7 +2260,7 @@ namespace HouseholdAccountBook.Windows
 
             // 開始日までの収支を取得する
             int balance = 0;
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
                 EndingBalanceInfoDto dto = bookId == null
                     ? await endingBalanceInfoDao.Find(startTime) // 全帳簿
@@ -2353,7 +2352,7 @@ namespace HouseholdAccountBook.Windows
 
             // 開始日までの収支を取得する
             int balance = 0;
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
                 EndingBalanceInfoDto dto = bookId == null
                     ? await endingBalanceInfoDao.Find(startTime) // 全帳簿
@@ -2441,7 +2440,7 @@ namespace HouseholdAccountBook.Windows
 
             // 開始日までの収支を取得する
             int balance = 0;
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
                 EndingBalanceInfoDto dto = bookId == null
                     ? await endingBalanceInfoDao.Find(startTime) // 全帳簿
@@ -2582,7 +2581,7 @@ namespace HouseholdAccountBook.Windows
             // 最後に操作した帳簿項目の日付を更新する
             if (isUpdateActDateLastEdited) {
                 if (actionIdList != null && actionIdList.Count != 0) {
-                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                         HstActionDao hstActionDao = new(dbHandler);
                         var dto = await hstActionDao.FindByIdAsync(actionIdList[0]);
                         this.WVM.ActDateLastEdited = dto.ActTime;
@@ -3684,7 +3683,7 @@ namespace HouseholdAccountBook.Windows
             Properties.Settings settings = Properties.Settings.Default;
 
             int? result = -1;
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
                     result = notifyResult
                         ? await npgsqlDbHandler.ExecuteDump(backupFilePath, settings.App_Postgres_DumpExePath, (PostgresPasswordInput)settings.App_Postgres_Password_Input, format,
@@ -3725,7 +3724,7 @@ namespace HouseholdAccountBook.Windows
             Properties.Settings settings = Properties.Settings.Default;
 
             int result = -1;
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
                     result = await npgsqlDbHandler.ExecuteRestore(backupFilePath, settings.App_Postgres_RestoreExePath, (PostgresPasswordInput)settings.App_Postgres_Password_Input);
                 }

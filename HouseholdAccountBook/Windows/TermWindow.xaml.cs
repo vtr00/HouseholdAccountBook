@@ -237,7 +237,7 @@ namespace HouseholdAccountBook.Windows
         {
             DateTime firstTime = DateTime.Today;
             DateTime lastTime = DateTime.Today;
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 TermInfoDao termInfoDao = new(dbHandler);
                 var dto = await termInfoDao.Find();
                 firstTime = dto.FirstTime;

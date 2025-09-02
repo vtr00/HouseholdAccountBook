@@ -221,7 +221,7 @@ namespace HouseholdAccountBook.Windows
                     int moveValue = -1;
                     int? commissionValue = null;
 
-                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                         MoveActionInfoDao moveActionInfoDao = new(dbHandler);
                         var dtoList = await moveActionInfoDao.GetAllAsync(this.selectedGroupId.Value);
                         foreach (MoveActionInfoDto dto in dtoList) {
@@ -306,7 +306,7 @@ namespace HouseholdAccountBook.Windows
 
             int? debitBookId = null;
             int? payDay = null;
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 MstBookDao mstBookDao = new(dbHandler);
                 var dtoList = await mstBookDao.FindAllAsync();
                 foreach (var dto in dtoList) {
@@ -360,7 +360,7 @@ namespace HouseholdAccountBook.Windows
             ObservableCollection<ItemViewModel> itemVMList = [];
             ItemViewModel selectedItemVM = null;
 
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 int bookId = -1;
                 switch (this.WVM.SelectedCommissionKind) {
                     case CommissionKind.MoveFrom:
@@ -403,7 +403,7 @@ namespace HouseholdAccountBook.Windows
             ];
             string selectedRemark = remark ?? this.WVM.SelectedRemark ?? remarkVMList[0].Remark;
             RemarkViewModel selectedRemarkVM = remarkVMList[0]; // UNUSED
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 RemarkInfoDao remarkInfoDao = new(dbHandler);
                 var dtoList = await remarkInfoDao.FindByItemIdAsync(this.WVM.SelectedItemVM.Id);
                 foreach (RemarkInfoDto dto in dtoList) {
@@ -481,7 +481,7 @@ namespace HouseholdAccountBook.Windows
             string remark = this.WVM.SelectedRemark;
 
             int tmpGroupId = -1; // ローカル用
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 await dbHandler.ExecTransactionAsync(async () => {
                     switch (this.WVM.RegMode) {
                         case RegistrationKind.Add:

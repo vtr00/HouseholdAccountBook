@@ -31,10 +31,6 @@ namespace HouseholdAccountBook
         #endregion
 
         #region フィールド
-        /// <summary>
-        /// 接続情報
-        /// </summary>
-        private DbHandlerBase.ConnectInfo connectInfo = null;
 #if !DEBUG
         /// <summary>
         /// 多重起動抑止用Mutex
@@ -143,13 +139,13 @@ namespace HouseholdAccountBook
                     bool? result = dsw.ShowDialog();
 
                     if (result != true) {
-                        this.connectInfo = null;
                         this.Shutdown();
                         return;
                     }
                 }
 
                 // 接続設定を読み込む
+                DbHandlerBase.ConnectInfo connInfo = null;
                 switch ((DbConstants.DBKind)settings.App_SelectedDBKind) {
                     case DbConstants.DBKind.PostgreSQL: {
                         NpgsqlDbHandler.ConnectInfo connectInfo = new() {
@@ -173,11 +169,11 @@ namespace HouseholdAccountBook
                             settings.App_Postgres_Password = string.Empty; // パスワードは保存しない
                             settings.Save();
                         }
-                        this.connectInfo = connectInfo;
+                        connInfo = connectInfo;
                         break;
                     }
                     case DbConstants.DBKind.SQLite:
-                        this.connectInfo = new SQLiteDbHandler.ConnectInfo() {
+                        connInfo = new SQLiteDbHandler.ConnectInfo() {
                             FilePath = settings.App_SQLite_DBFilePath
                         };
                         break;
@@ -186,11 +182,11 @@ namespace HouseholdAccountBook
                     default:
                         throw new NotSupportedException();
                 }
-                dbHandlerFactory = new(this.connectInfo);
+                dbHandlerFactory = new(connInfo);
 
                 // 接続を試行する
                 try {
-                    using (DbHandlerBase dbHandler = dbHandlerFactory.Create()) {
+                    await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
                         isOpen = dbHandler.IsOpen;
                     }
                 }

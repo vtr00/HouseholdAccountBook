@@ -11,7 +11,7 @@ namespace HouseholdAccountBook.DbHandler.Abstract
     /// <summary>
     /// Db Handler Base クラス
     /// </summary>
-    public abstract class DbHandlerBase : IDisposable
+    public abstract class DbHandlerBase : IAsyncDisposable
     {
         /// <summary>
         /// 対象データベースライブラリ
@@ -21,6 +21,15 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         /// 対象データベース
         /// </summary>
         public DBKind DBKind { get; protected set; } = DBKind.Undefined;
+        /// <summary>
+        /// 接続可能か
+        /// </summary>
+        public bool CanOpen { get; protected set; } = true;
+        /// <summary>
+        /// 接続状態を取得する
+        /// </summary>
+        /// <returns>接続状態</returns>
+        public bool IsOpen => this.connection != null && this.connection.State == System.Data.ConnectionState.Open;
 
         /// <summary>
         /// 接続情報
@@ -31,6 +40,7 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         /// DB接続
         /// </summary>
         protected DbConnection connection = null;
+
         /// <summary>
         /// DBトランザクション
         /// </summary>
@@ -48,13 +58,17 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         }
 
         /// <summary>
-        /// 接続を開始する
+        /// [非同期]接続を開始する
         /// </summary>
         /// <returns>接続結果</returns>
-        protected bool Open()
+        public async Task<bool> OpenAsync()
         {
+            if (this.CanOpen == false) {
+                return false;
+            }
+
             try {
-                this.connection.Open();
+                await this.connection.OpenAsync();
                 while (this.connection.State == System.Data.ConnectionState.Connecting) {
                     Thread.Sleep(100);
                 }
@@ -70,21 +84,15 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         }
 
         /// <summary>
-        /// 接続状態を取得する
+        /// [非同期]接続を終了する
         /// </summary>
-        /// <returns>接続状態</returns>
-        public bool IsOpen => this.connection != null && this.connection.State == System.Data.ConnectionState.Open;
-
-        /// <summary>
-        /// 接続を終了する
-        /// </summary>
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             GC.SuppressFinalize(this);
 
             if (this.connection != null) {
-                this.connection.Close();
-                this.connection.Dispose();
+                await this.connection.CloseAsync();
+                await this.connection.DisposeAsync();
             }
             this.connection = null;
         }
@@ -176,42 +184,9 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         }
 
         /// <summary>
-        /// [同期]トランザクション内の処理
-        /// </summary>
-        public delegate void TxAction();
-
-        /// <summary>
         /// [非同期]トランザクション内の処理
         /// </summary>
         public delegate Task AxActionAsync();
-
-        /// <summary>
-        /// [同期]トランザクション処理を行う
-        /// </summary>
-        /// <param name="action">トランザクション内の処理</param>
-        public void ExecTransaction(TxAction action)
-        {
-            this.dbTransaction = this.connection.BeginTransaction();
-            try {
-                action?.Invoke();
-
-                this.dbTransaction.Commit();
-            }
-            catch (DbException e) {
-                Console.WriteLine(e.Message);
-                this.dbTransaction.Rollback();
-                throw;
-            }
-            catch (Exception e) {
-                Console.WriteLine(e.Message);
-                this.dbTransaction.Rollback();
-                throw;
-            }
-            finally {
-                this.dbTransaction.Dispose();
-                this.dbTransaction = null;
-            }
-        }
 
         /// <summary>
         /// [非同期]トランザクション処理を行う
@@ -219,24 +194,24 @@ namespace HouseholdAccountBook.DbHandler.Abstract
         /// <param name="actionAsync">トランザクション内の処理</param>
         public async Task ExecTransactionAsync(AxActionAsync actionAsync)
         {
-            this.dbTransaction = this.connection.BeginTransaction();
+            this.dbTransaction = await this.connection.BeginTransactionAsync();
             try {
                 await actionAsync?.Invoke();
 
-                await Task.Run(() => this.dbTransaction.Commit());
+                await this.dbTransaction.CommitAsync();
             }
             catch (DbException e) {
                 Console.WriteLine(e.Message);
-                await Task.Run(() => this.dbTransaction.Rollback());
+                await this.dbTransaction.RollbackAsync();
                 throw;
             }
             catch (Exception e) {
                 Console.WriteLine(e.Message);
-                await Task.Run(() => this.dbTransaction.Rollback());
+                await this.dbTransaction.RollbackAsync();
                 throw;
             }
             finally {
-                await Task.Run(() => this.dbTransaction.Dispose());
+                await this.dbTransaction.DisposeAsync();
                 this.dbTransaction = null;
             }
         }

@@ -42,6 +42,16 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://github.com/dotnet/corefx
 
+# Microsoft.Data.Sqlite 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://docs.microsoft.com/dotnet/standard/data/sqlite/
+
+# Microsoft.Data.Sqlite.Core 9.0.8
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://docs.microsoft.com/dotnet/standard/data/sqlite/
+
 # Microsoft.Extensions.DependencyInjection.Abstractions 9.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
@@ -61,6 +71,11 @@ This project incorporates material from the following third-party projects:
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/Microsoft/XamlBehaviorsWpf
+
+# Newtonsoft.Json 13.0.3
+   License: MIT
+   Copyright © James Newton-King 2008
+   https://www.newtonsoft.com/json
 
 # Notification.Wpf 8.0.0
    License: MIT
@@ -107,10 +122,21 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation.  All rights reserved.
    https://dot.net/
 
-# Stub.System.Data.SQLite.Core.NetStandard 1.0.119
-   License: Public Domain
-   Copyright © 2004-2008 Hipp, Wyrick & Company, Inc.
-   https://system.data.sqlite.org/
+# SQLitePCLRaw.bundle_e_sqlite3 2.1.10
+   License: Apache-2.0
+   Copyright 2014-2024 SourceGear, LLC
+
+# SQLitePCLRaw.core 2.1.10
+   License: Apache-2.0
+   Copyright 2014-2024 SourceGear, LLC
+
+# SQLitePCLRaw.lib.e_sqlite3 2.1.10
+   License: Apache-2.0
+   Copyright 2014-2024 SourceGear, LLC
+
+# SQLitePCLRaw.provider.e_sqlite3 2.1.10
+   License: Apache-2.0
+   Copyright 2014-2024 SourceGear, LLC
 
 # System.Buffers 4.6.1
    License: MIT
@@ -146,21 +172,6 @@ This project incorporates material from the following third-party projects:
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/dotnet/maintenance-packages
-
-# System.Data.SQLite 1.0.119
-   License: Public Domain
-   Copyright © 2004-2008 Hipp, Wyrick & Company, Inc.
-   https://system.data.sqlite.org/
-
-# System.Data.SQLite.Core 1.0.119
-   License: Public Domain
-   Copyright © 2004-2008 Hipp, Wyrick & Company, Inc.
-   https://system.data.sqlite.org/
-
-# System.Data.SQLite.EF6 1.0.119
-   License: Public Domain
-   Copyright © 2004-2008 Hipp, Wyrick & Company, Inc.
-   https://system.data.sqlite.org/
 
 # System.Diagnostics.DiagnosticSource 9.0.8
    License: MIT

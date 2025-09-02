@@ -7,6 +7,9 @@ using static HouseholdAccountBook.Others.DbConstants;
 
 namespace HouseholdAccountBook.DbHandler
 {
+    /// <summary>
+    /// Npgsql DB Handler
+    /// </summary>
     public partial class NpgsqlDbHandler : DbHandlerBase
     {
         /// <summary>
@@ -45,8 +48,6 @@ namespace HouseholdAccountBook.DbHandler
         {
             this.DBLibKind = DBLibraryKind.PostgreSQL;
             this.DBKind = DBKind.PostgreSQL;
-
-            _ = this.Open();
         }
 
         /// <summary>

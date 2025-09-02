@@ -18,13 +18,13 @@ namespace HouseholdAccountBook.Extensions
                 return string.Empty;
             }
             if (!Path.IsPathFullyQualified(fullRootPath)) {
-                throw new Exception("fullRootPath must be an absolute path.");
+                throw new ArgumentException("fullRootPath must be an absolute path.");
             }
             if (string.IsNullOrEmpty(fullBasePath)) {
                 fullBasePath = fullRootPath;
             }
             if (!Path.IsPathFullyQualified(fullBasePath)) {
-                throw new Exception("fullBasePath must be an absolute path.");
+                throw new ArgumentException("fullBasePath must be an absolute path.");
             }
 
             // 絶対パスに変換
@@ -51,7 +51,7 @@ namespace HouseholdAccountBook.Extensions
                 return (fullBasePath, string.Empty);
             }
             if (!Path.IsPathFullyQualified(fullBasePath)) {
-                throw new Exception("fullBasePath must be an absolute path.");
+                throw new ArgumentException("fullBasePath must be an absolute path.");
             }
 
             // 絶対パスに変換

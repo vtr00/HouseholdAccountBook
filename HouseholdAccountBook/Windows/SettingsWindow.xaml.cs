@@ -99,7 +99,7 @@ namespace HouseholdAccountBook.Windows
                 BalanceKind kind = (BalanceKind)vm.Id;
 
                 int categoryId = -1;
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     MstCategoryDao dao = new(dbHandler);
                     categoryId = await dao.InsertReturningIdAsync(new MstCategoryDto { BalanceKind = (int)kind });
                 }
@@ -133,7 +133,7 @@ namespace HouseholdAccountBook.Windows
                 int categoryId = vm.Id;
 
                 int itemId = -1;
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     MstItemDao mstItemDao = new(dbHandler);
                     itemId = await mstItemDao.InsertReturningIdAsync(new MstItemDto { CategoryId = categoryId });
                 }
@@ -163,7 +163,7 @@ namespace HouseholdAccountBook.Windows
                 HierarchicalKind? kind = HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM);
                 int id = this.WVM.SelectedHierarchicalVM.Id;
 
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     switch (kind) {
                         case HierarchicalKind.Category: {
                             await dbHandler.ExecTransactionAsync(async () => {
@@ -241,7 +241,7 @@ namespace HouseholdAccountBook.Windows
                 if (0 < index) {
                     int changedId = parentVM.ChildrenVMList[index - 1].Id; // 入れ替え対象の項目のID
 
-                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                         switch (HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM)) {
                             case HierarchicalKind.Category: {
                                 MstCategoryDao mstCategoryDao = new(dbHandler);
@@ -262,7 +262,7 @@ namespace HouseholdAccountBook.Windows
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     int toCategoryId = grandparentVM.ChildrenVMList[index2 - 1].Id;
 
-                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                         MstItemDao mstItemDao = new(dbHandler);
                         _ = await mstItemDao.UpdateSortOrderToMaximumAsync(toCategoryId, changingId);
                     }
@@ -311,7 +311,7 @@ namespace HouseholdAccountBook.Windows
                 if (parentVM.ChildrenVMList.Count - 1 > index) {
                     int changedId = parentVM.ChildrenVMList[index + 1].Id; // 入れ替え対象の項目のID
 
-                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                         switch (HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM)) {
                             case HierarchicalKind.Category: {
                                 MstCategoryDao mstCategoryDao = new(dbHandler);
@@ -332,7 +332,7 @@ namespace HouseholdAccountBook.Windows
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     int toCategoryId = grandparentVM.ChildrenVMList[index2 + 1].Id;
 
-                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                         MstItemDao mstItemDao = new(dbHandler);
                         _ = await mstItemDao.UpdateSortOrderToMinimumAsync(toCategoryId, changingId);
                     }
@@ -364,7 +364,7 @@ namespace HouseholdAccountBook.Windows
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 HierarchicalSettingViewModel vm = this.WVM.DisplayedHierarchicalSettingVM;
 
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     switch (vm.Kind) {
                         case HierarchicalKind.Category: {
                             MstCategoryDao mstCategoryDao = new(dbHandler);
@@ -398,7 +398,7 @@ namespace HouseholdAccountBook.Windows
                 HierarchicalSettingViewModel vm = this.WVM.DisplayedHierarchicalSettingVM;
                 vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
 
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     HstActionDao hstActionDao = new(dbHandler);
                     var actionDtoList = await hstActionDao.FindByBookIdAndItemIdAsync(vm.SelectedRelationVM.Id, vm.Id);
 
@@ -444,7 +444,7 @@ namespace HouseholdAccountBook.Windows
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                     Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
-                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                         HstShopDao hstShopDao = new(dbHandler);
                         _ = await hstShopDao.DeleteAsync(new HstShopDto {
                             ShopName = this.WVM.DisplayedHierarchicalSettingVM.SelectedShopVM.Name,
@@ -480,7 +480,7 @@ namespace HouseholdAccountBook.Windows
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                     Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
-                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                         HstRemarkDao hstRemarkDao = new(dbHandler);
                         _ = await hstRemarkDao.DeleteAsync(new HstRemarkDto {
                             Remark = this.WVM.DisplayedHierarchicalSettingVM.SelectedRemarkVM.Remark,
@@ -505,7 +505,7 @@ namespace HouseholdAccountBook.Windows
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 int bookId = -1;
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     MstBookDao mstBookDao = new(dbHandler);
                     bookId = await mstBookDao.InsertReturningIdAsync(new MstBookDto { });
                 }
@@ -533,7 +533,7 @@ namespace HouseholdAccountBook.Windows
         private async void DeleteBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     await dbHandler.ExecTransactionAsync(async () => {
                         HstActionDao hstActionDao = new(dbHandler);
                         var dtoList = await hstActionDao.FindByBookIdAsync(this.WVM.SelectedBookVM.Id.Value);
@@ -578,7 +578,7 @@ namespace HouseholdAccountBook.Windows
                 int changingId = this.WVM.BookVMList[index].Id.Value;
                 int changedId = this.WVM.BookVMList[index - 1].Id.Value;
 
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     MstBookDao mstBookDao = new(dbHandler);
                     _ = await mstBookDao.SwapSortOrderAsync(changingId, changedId);
                 }
@@ -614,7 +614,7 @@ namespace HouseholdAccountBook.Windows
                 int changingId = this.WVM.BookVMList[index].Id.Value;
                 int changedId = this.WVM.BookVMList[index + 1].Id.Value;
 
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     MstBookDao mstBookDao = new(dbHandler);
                     _ = await mstBookDao.SwapSortOrderAsync(changingId, changedId);
                 }
@@ -670,7 +670,7 @@ namespace HouseholdAccountBook.Windows
         {
             using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
                 BookSettingViewModel vm = this.WVM.DisplayedBookSettingVM;
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     MstBookDto.JsonDto jsonObj = new() {
                         StartDate = vm.StartDateExists ? vm.StartDate : null,
                         EndDate = vm.EndDateExists ? vm.EndDate : null,
@@ -711,7 +711,7 @@ namespace HouseholdAccountBook.Windows
                 BookSettingViewModel vm = this.WVM.DisplayedBookSettingVM;
                 vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
 
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     await dbHandler.ExecTransactionAsync(async () => {
                         HstActionDao hstActionDao = new(dbHandler);
                         var hstActionDtoList = await hstActionDao.FindByBookIdAndItemIdAsync(vm.Id.Value, vm.SelectedRelationVM.Id);
@@ -935,7 +935,7 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private async void SettingsWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 this.WVM.SelectedDBKind = dbHandler.DBKind;
             }
             await this.UpdateSettingWindowDataAsync();
@@ -1108,7 +1108,7 @@ namespace HouseholdAccountBook.Windows
                 }
                 case HierarchicalKind.Category: {
                     // 分類
-                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                         MstCategoryDao mstCategoryDao = new(dbHandler);
                         var dto = await mstCategoryDao.FindByIdAsync(id);
 
@@ -1123,7 +1123,7 @@ namespace HouseholdAccountBook.Windows
                 }
                 case HierarchicalKind.Item: {
                     // 項目
-                    using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                         MstItemDao mstItemDao = new(dbHandler);
                         var dto = await mstItemDao.FindByIdAsync(id);
 
@@ -1188,7 +1188,7 @@ namespace HouseholdAccountBook.Windows
                 new BookViewModel(){ Id = -1, Name = Properties.Resources.ListName_None }
             ];
 
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 // 帳簿一覧を取得する(支払元選択用)
                 MstBookDao mstBookDao = new(dbHandler);
                 var dtoList = await mstBookDao.FindAllAsync();
@@ -1274,7 +1274,7 @@ namespace HouseholdAccountBook.Windows
             vmList.Add(expensesVM);
 
             foreach (HierarchicalViewModel vm in vmList) {
-                using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     // 分類
                     MstCategoryDao mstCategoryDao = new(dbHandler);
                     var cDtoList = await mstCategoryDao.FindByBalanceKindAsync(vm.Id);
@@ -1321,7 +1321,7 @@ namespace HouseholdAccountBook.Windows
 
             ObservableCollection<BookViewModel> bookVMList = [];
 
-            using (DbHandlerBase dbHandler = this.dbHandlerFactory.Create()) {
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 // 帳簿一覧を取得する
                 MstBookDao mstBookDao = new(dbHandler);
                 var dtoList = await mstBookDao.FindAllAsync();

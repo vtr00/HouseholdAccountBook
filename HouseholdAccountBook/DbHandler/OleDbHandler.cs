@@ -31,8 +31,6 @@ namespace HouseholdAccountBook.DbHandler
             this.DBLibKind = DBLibraryKind.OleDb;
             if (provider.Contains(AccessProviderHeader)) {
                 this.DBKind = DBKind.Access;
-
-                _ = this.Open();
             }
             else {
                 this.DBKind = DBKind.Undefined;
