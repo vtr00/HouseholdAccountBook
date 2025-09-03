@@ -181,7 +181,7 @@ namespace HouseholdAccountBook.Windows
                         tmpCsvFilePathList.Add(dstFilePath);
                     }
                     catch (Exception exp) {
-                        _ = MessageBox.Show(Properties.Resources.Message_FoultToMoveCsv + "(" + exp.Message + ")", Properties.Resources.Title_Conformation);
+                        _ = MessageBox.Show($"{Properties.Resources.Message_FoultToMoveCsv}({exp.Message})", Properties.Resources.Title_Conformation);
                     }
                 }
 

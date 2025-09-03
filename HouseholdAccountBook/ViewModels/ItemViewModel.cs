@@ -24,7 +24,7 @@
         /// <summary>
         /// 分類併記名
         /// </summary>
-        public string NameWithCategory => this.CategoryName != "" ? this.CategoryName + " > " + this.Name : this.Name;
+        public string NameWithCategory => this.CategoryName != "" ? $"{this.CategoryName} > {this.Name}" : this.Name;
         #endregion
     }
 }

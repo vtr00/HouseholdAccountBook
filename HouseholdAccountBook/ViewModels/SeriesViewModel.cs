@@ -72,7 +72,7 @@ namespace HouseholdAccountBook.ViewModels
         {
             get {
                 if (this.ItemName != string.Empty)
-                    return "  " + this.ItemName;
+                    return $"  {this.ItemName}";
                 if (this.CategoryName != string.Empty)
                     return this.CategoryName;
                 if (this.BalanceName != string.Empty)

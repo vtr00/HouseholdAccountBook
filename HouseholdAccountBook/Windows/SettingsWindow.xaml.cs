@@ -7,7 +7,6 @@ using HouseholdAccountBook.Dto.Others;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels;
 using Microsoft.Win32;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -633,21 +632,22 @@ namespace HouseholdAccountBook.Windows
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.WVM.DisplayedBookSettingVM.CsvFolderPath, App.GetCurrentDir());
-            if (string.IsNullOrWhiteSpace(folderPath)) {
-                (folderPath, fileName) = PathExtensions.GetSeparatedPath(Path.GetDirectoryName(settings.App_CsvFilePath), App.GetCurrentDir());
+            string folderFullPath;
+            if (string.IsNullOrWhiteSpace(this.WVM.DisplayedBookSettingVM.CsvFolderPath)) {
+                folderFullPath = Path.GetDirectoryName(settings.App_CsvFilePath);
+            }
+            else {
+                (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.WVM.DisplayedBookSettingVM.CsvFolderPath, App.GetCurrentDir());
+                folderFullPath = Path.Combine(folderPath, fileName);
             }
 
-            CommonOpenFileDialog ofd = new() {
-                EnsureFileExists = true,
-                IsFolderPicker = true,
-                InitialDirectory = folderPath,
-                DefaultFileName = fileName,
+            OpenFolderDialog ofd = new() {
+                InitialDirectory = folderFullPath,
                 Title = Properties.Resources.Title_CsvFolderSelection,
             };
 
-            if (ofd.ShowDialog(this) == CommonFileDialogResult.Ok) {
-                this.WVM.DisplayedBookSettingVM.CsvFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), ofd.FileName);
+            if (ofd.ShowDialog(this) == true) {
+                this.WVM.DisplayedBookSettingVM.CsvFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), ofd.FolderName);
             }
         }
 
@@ -826,21 +826,22 @@ namespace HouseholdAccountBook.Windows
         /// <param name="e"></param>
         private void BackUpFolderPathDialogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.WVM.BackUpFolderPath, App.GetCurrentDir());
-            if (string.IsNullOrWhiteSpace(folderPath)) {
-                folderPath = App.GetCurrentDir();
+            string folderFullPath;
+            if (string.IsNullOrWhiteSpace(this.WVM.BackUpFolderPath)) {
+                folderFullPath = App.GetCurrentDir();
+            }
+            else {
+                (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.WVM.BackUpFolderPath, App.GetCurrentDir());
+                folderFullPath = Path.Combine(folderPath, fileName);
             }
 
-            CommonOpenFileDialog ofd = new() {
-                EnsureFileExists = true,
-                IsFolderPicker = true,
-                InitialDirectory = folderPath,
-                DefaultFileName = fileName,
+            OpenFolderDialog ofd = new() {
+                InitialDirectory = folderFullPath,
                 Title = Properties.Resources.Title_BackupFolderSelection
             };
 
-            if (ofd.ShowDialog(this) == CommonFileDialogResult.Ok) {
-                this.WVM.BackUpFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), ofd.FileName);
+            if (ofd.ShowDialog(this) == true) {
+                this.WVM.BackUpFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), ofd.FolderName);
             }
         }
 
