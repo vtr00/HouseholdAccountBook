@@ -319,7 +319,10 @@
                 </Style>
             </TabControl.ItemContainerStyle>
             <!-- 帳簿 -->
-            <TabItem Header="{x:Static properties:Resources.TabHeader_AccountBook}">
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_AccountBook}" TextAlignment="Center"/>
+                </TabItem.Header>
                 <TabItem.InputBindings>
                     <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
                     <KeyBinding Gesture="Alt+Up" Command="{StaticResource ShowMonthlyListTabCommand}"/>
@@ -587,7 +590,10 @@
                 </Grid>
             </TabItem>
             <!-- 日別グラフ -->
-            <TabItem Header="{x:Static properties:Resources.TabHeader_DailyGraph}">
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_DailyGraph}" TextAlignment="Center"/>
+                </TabItem.Header>
                 <TabItem.InputBindings>
                     <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
                     <KeyBinding Gesture="Alt+Up" Command="{StaticResource ShowMonthlyGraphTabCommand}"/>
@@ -688,7 +694,10 @@
                 </Grid>
             </TabItem>
             <!-- 月別一覧 -->
-            <TabItem Header="{x:Static properties:Resources.TabHeader_MonthlySummary}">
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_MonthlySummary}" TextAlignment="Center"/>
+                </TabItem.Header>
                 <TabItem.InputBindings>
                     <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
                     <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
@@ -796,7 +805,10 @@
                 </Grid>
             </TabItem>
             <!-- 月別グラフ -->
-            <TabItem Header="{x:Static properties:Resources.TabHeader_MonthlyGraph}">
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_MonthlyGraph}" TextAlignment="Center"/>
+                </TabItem.Header>
                 <TabItem.InputBindings>
                     <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
                     <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
@@ -895,7 +907,10 @@
                 </Grid>
             </TabItem>
             <!-- 年別一覧 -->
-            <TabItem Header="{x:Static properties:Resources.TabHeader_YearlySummary}">
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_YearlySummary}" TextAlignment="Center"/>
+                </TabItem.Header>
                 <TabItem.InputBindings>
                     <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
                     <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
@@ -987,7 +1002,10 @@
                 </Grid>
             </TabItem>
             <!-- 年別グラフ -->
-            <TabItem Header="{x:Static properties:Resources.TabHeader_YearlyGraph}">
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_YearlyGraph}" TextAlignment="Center"/>
+                </TabItem.Header>
                 <TabItem.InputBindings>
                     <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
                     <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>

@@ -2156,7 +2156,7 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
-        ///   絞り込み に類似しているローカライズされた文字列を検索します。
+        ///   フィルタ に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TextBlock_Filter {
             get {

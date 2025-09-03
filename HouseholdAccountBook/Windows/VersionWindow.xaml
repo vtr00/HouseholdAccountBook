@@ -47,9 +47,9 @@
         </TextBlock>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center">
-            Copyright (c) toresebu 
+            Copyright (c) 
             <TextBlock Text="{Binding Now, Source={StaticResource DateTime}, StringFormat={}{0:yyyy}}"/>
-            All rights reserved.
+            toresebu. All rights reserved.
         </TextBlock>
 
         <TextBlock Grid.Row="2" Grid.Column="0">

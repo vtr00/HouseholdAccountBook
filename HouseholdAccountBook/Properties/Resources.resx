@@ -778,7 +778,7 @@
     <value>保存対象</value>
   </data>
   <data name="TextBlock_Filter" xml:space="preserve">
-    <value>絞り込み</value>
+    <value>フィルタ</value>
   </data>
   <data name="TextBlock_UpdateHistory" xml:space="preserve">
     <value>更新履歴</value>

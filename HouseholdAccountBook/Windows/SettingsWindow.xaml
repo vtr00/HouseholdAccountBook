@@ -113,7 +113,10 @@
             </TabControl.ItemContainerStyle>
             
             <!-- 項目設定 -->
-            <TabItem Header="{x:Static properties:Resources.TabHeader_ItemSettings}">
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_ItemSettings}" TextAlignment="Center"/>
+                </TabItem.Header>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.3*"/>
@@ -302,7 +305,10 @@
                 </Grid>
             </TabItem>
             <!-- 帳簿設定 -->
-            <TabItem Header="{x:Static properties:Resources.TabHeader_BookSettings}">
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_BookSettings}" TextAlignment="Center"/>
+                </TabItem.Header>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.3*"/>
@@ -529,7 +535,10 @@
                 </Grid>
             </TabItem>
             <!-- その他 -->
-            <TabItem Header="{x:Static properties:Resources.TabHeader_OtherSettings}">
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_OtherSettings}" HorizontalAlignment="Center"/>
+                </TabItem.Header>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>

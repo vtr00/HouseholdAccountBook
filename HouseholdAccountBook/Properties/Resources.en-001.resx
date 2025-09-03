@@ -235,10 +235,10 @@
     <value>Balance</value>
   </data>
   <data name="GraphKind2_CategoryGraph" xml:space="preserve">
-    <value>Category</value>
+    <value>Categories</value>
   </data>
   <data name="GraphKind2_ItemGraph" xml:space="preserve">
-    <value>Item</value>
+    <value>Items</value>
   </data>
   <data name="GroupHeader_ItemList" xml:space="preserve">
     <value>Item list</value>
@@ -286,7 +286,7 @@
     <value>Association</value>
   </data>
   <data name="GroupHeader_Shop" xml:space="preserve">
-    <value>Store</value>
+    <value>Stores</value>
   </data>
   <data name="GroupHeader_Remark" xml:space="preserve">
     <value>Remarks</value>
@@ -322,13 +322,13 @@
     <value>Yen</value>
   </data>
   <data name="Unit_FiscalYear" xml:space="preserve">
-    <value>Fiscal year</value>
+    <value>Fiscal years</value>
   </data>
   <data name="Unit_Year" xml:space="preserve">
-    <value>Year</value>
+    <value>Years</value>
   </data>
   <data name="Unit_Month" xml:space="preserve">
-    <value>Month</value>
+    <value>Months</value>
   </data>
   <data name="Unit_Day" xml:space="preserve">
     <value>Day</value>
@@ -400,7 +400,7 @@
     <value>Edit (_E)</value>
   </data>
   <data name="Menu_Tool" xml:space="preserve">
-    <value>Tool (_T)</value>
+    <value>Tools (_T)</value>
   </data>
   <data name="Menu_Tool_Settings" xml:space="preserve">
     <value>Settings (_S)...</value>
@@ -634,10 +634,10 @@
     <value>Date</value>
   </data>
   <data name="ColumnHeader_ItemName" xml:space="preserve">
-    <value>Item name</value>
+    <value>Item names</value>
   </data>
   <data name="ColumnHeader_CSVItemName" xml:space="preserve">
-    <value>CSV item name</value>
+    <value>CSV item names</value>
   </data>
   <data name="ColumnHeader_Average" xml:space="preserve">
     <value>Average</value>
@@ -652,10 +652,12 @@
     <value>Books</value>
   </data>
   <data name="TabHeader_ItemSettings" xml:space="preserve">
-    <value>Item settings</value>
+    <value>Item
+settings</value>
   </data>
   <data name="TabHeader_BookSettings" xml:space="preserve">
-    <value>Book settings</value>
+    <value>Book
+settings</value>
   </data>
   <data name="TabHeader_OtherSettings" xml:space="preserve">
     <value>Others</value>
@@ -687,10 +689,10 @@ list</value>
     <value>CSV match check</value>
   </data>
   <data name="ColumnHeader_BookName" xml:space="preserve">
-    <value>Book name</value>
+    <value>Book names</value>
   </data>
   <data name="ColumnHeader_ShopName" xml:space="preserve">
-    <value>Store name</value>
+    <value>Store names</value>
   </data>
   <data name="ColumnHeader_Match" xml:space="preserve">
     <value>Match</value>
@@ -699,7 +701,7 @@ list</value>
     <value>Remarks</value>
   </data>
   <data name="ColumnHeader_CategoryName" xml:space="preserve">
-    <value>Category name</value>
+    <value>Category names</value>
   </data>
   <data name="Button_Open" xml:space="preserve">
     <value>Open</value>
@@ -771,7 +773,7 @@ list</value>
     <value>To be saved</value>
   </data>
   <data name="TextBlock_Filter" xml:space="preserve">
-    <value>Narrow down</value>
+    <value>Filter</value>
   </data>
   <data name="TextBlock_UpdateHistory" xml:space="preserve">
     <value>Update history(Japanese only)</value>
@@ -834,19 +836,19 @@ list</value>
     <value>Roll</value>
   </data>
   <data name="TextBlock_Category" xml:space="preserve">
-    <value>Category</value>
+    <value>Categories</value>
   </data>
   <data name="TextBlock_Checked" xml:space="preserve">
     <value>Checked</value>
   </data>
   <data name="TextBlock_Item" xml:space="preserve">
-    <value>Item</value>
+    <value>Items</value>
   </data>
   <data name="TextBlock_ItemName" xml:space="preserve">
-    <value>Item name</value>
+    <value>Item names</value>
   </data>
   <data name="TextBlock_CategoryName" xml:space="preserve">
-    <value>Category name</value>
+    <value>Category names</value>
   </data>
   <data name="TextBlock_ShopName" xml:space="preserve">
     <value>Store name</value>
@@ -930,10 +932,10 @@ list</value>
     <value>Holiday</value>
   </data>
   <data name="CheckBox_Timing_MinimizingMainWindow" xml:space="preserve">
-    <value>When minimizing the main window</value>
+    <value>When the main window is minimized</value>
   </data>
   <data name="CheckBox_SaveTarget_PositionWithoutMainWindow" xml:space="preserve">
-    <value>Locations other than the main window</value>
+    <value>Locations without the main window</value>
   </data>
   <data name="CheckBox_Timing_ClosingMainWindow" xml:space="preserve">
     <value>When the main window is closed</value>
