@@ -107,7 +107,7 @@ DBアクセスを高速に実行したいのであれば、PostgreSQLの使用�
 
 ## __PostgreSQLでの使用方法__
 1. PostgreSQLの環境を構築します。
-1. [create_account_book.backup](./Materials/DB/create_account_book.backup) を用いて、データベースを構築します(owner:postgres name:account_book)。
+1. [create_account_book.backup](./docs/DB/create_account_book.backup) を用いて、データベースを構築します(owner:postgres name:account_book)。
    1. CREATE DATABASE までのコマンドを実行します。
    1. DATABASE を選択して、CREATE DATABASE 以降のコマンドを実行します(connectは不要)。
 1. 本ソフトを起動し、PostgreSQLを選択した上で、構築したデータベースの接続設定を行います(初回のみ)。
@@ -119,12 +119,12 @@ DBアクセスを高速に実行したいのであれば、PostgreSQLの使用�
 
 ## __スクリーンショット__
 ### 日本語
-![JP](./Materials/ScreenShot_jp.bmp)
+![JP](./docs/ScreenShot_jp.bmp)
 
 ### English
-![EN](./Materials/ScreenShot_en.bmp)
+![EN](./docs/ScreenShot_en.bmp)
 
 ## __免責事項__
 * 本ソフトは、すべてのリビジョンにおいて不安定版です。
 * データベース仕様は予告なく変更することがあります。
-	* データベース仕様の変更時に、必ずしも [データベース仕様書](./Materials/DB/DbSpecifications.xlsx) や [create_account_book.backup](./Materials/DB/create_account_book.backup) が更新されるとは限りません。
+	* データベース仕様の変更時に、必ずしも [データベース仕様書](./docs/DB/DbSpecifications.xlsx) や [create_account_book.backup](./docs/DB/create_account_book.backup) が更新されるとは限りません。
