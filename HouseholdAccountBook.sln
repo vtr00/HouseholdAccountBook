@@ -20,8 +20,8 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		RESX_CultureCountyOverrides = en=en-CC
-		SolutionGuid = {E811E6F2-58D5-4EC4-923C-2602BABE7F5B}
 		RESX_AutoApplyExistingTranslations = True
+		SolutionGuid = {E811E6F2-58D5-4EC4-923C-2602BABE7F5B}
+		RESX_CultureCountyOverrides = en=en-CC
 	EndGlobalSection
 EndGlobal

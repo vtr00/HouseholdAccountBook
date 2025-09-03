@@ -33,9 +33,9 @@
     <NeutralLanguage>ja-JP</NeutralLanguage>
     <Authors>toresebu</Authors>
     <Company>PoliteMusic</Company>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+    <AssemblyVersion>1.2.2.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
-    <Version>0.0.0</Version>
+    <Version>1.2.2</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
@@ -131,7 +131,7 @@
     </None>
   </ItemGroup>
   <Target Name="RemoveUnwantedCultureFolders" AfterTargets="Publish">
-    <!-- OutputPath の直下のフォルダを列挙 -->
+    <!-- PublishDir の直下のフォルダを列挙 -->
     <ItemGroup>
       <CultureDirs Include="$([System.IO.Directory]::GetDirectories('$(PublishDir)'))" />
     </ItemGroup>
@@ -143,6 +143,9 @@
     <Message Text="削除対象フォルダ: @(UnwantedDirs)" Importance="High" />
     <!-- フォルダ削除 -->
     <RemoveDir Directories="@(UnwantedDirs)" />
+  </Target>
+  <Target Name="RemoveNonWinFolders" AfterTargets="Publish">
+    <Exec Command="powershell -Command &quot;Get-ChildItem '$(PublishDir)\runtimes' -Directory | Where-Object { $_.Name -notlike 'win*' } | Remove-Item -Recurse -Force&quot;" />
   </Target>
   <Target Name="CopyFiles" AfterTargets="Publish">
     <Message Text="コピー処理を開始します(LICENSE)..." Importance="high" />
