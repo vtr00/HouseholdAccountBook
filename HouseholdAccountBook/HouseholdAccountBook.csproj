@@ -91,7 +91,7 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="..\Materials\resheet.png">
+    <None Include="..\docs\resheet.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
@@ -126,7 +126,21 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <Target Name="CopyFilesAfterPublish" AfterTargets="Publish">
+  <Target Name="RemoveUnwantedCultureFolders" AfterTargets="Publish">
+    <!-- OutputPath の直下のフォルダを列挙 -->
+    <ItemGroup>
+      <CultureDirs Include="$([System.IO.Directory]::GetDirectories('$(PublishDir)'))" />
+    </ItemGroup>
+    <!-- ja と en-001 以外を抽出 -->
+    <ItemGroup>
+      <UnwantedDirs Include="@(CultureDirs)" Condition="Exists('%(CultureDirs.Identity)\Microsoft.Data.SqlClient.resources.dll') AND '%(Filename)' != 'ja' AND '%(Filename)' != 'en-001'" />
+    </ItemGroup>
+    <!-- デバッグ出力 -->
+    <Message Text="削除対象フォルダ: @(UnwantedDirs)" Importance="High" />
+    <!-- フォルダ削除 -->
+    <RemoveDir Directories="@(UnwantedDirs)" />
+  </Target>
+  <Target Name="CopyFiles" AfterTargets="Publish">
     <Message Text="コピー処理を開始します(LICENSE)..." Importance="high" />
     <Copy SourceFiles="$(MSBuildProjectDirectory)/../LICENSE" DestinationFolder="$(PublishDir)" />
     <Message Text="コピー処理を開始します(ThirdPartyNotices.txt)..." Importance="high" />
