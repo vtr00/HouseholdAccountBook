@@ -115,7 +115,7 @@ namespace HouseholdAccountBook
             }
 
             // 初回起動時
-            Log.Debug("App_InitFlag: " + settings.App_InitFlag);
+            Log.Debug($"App_InitFlag: {settings.App_InitFlag}");
             if (settings.App_InitFlag) {
 #if !DEBUG
                 // リリースビルドの初回起動時デバッグモードはOFF
@@ -218,12 +218,12 @@ namespace HouseholdAccountBook
                 Log.Error("Unhandled Exception Occured.");
 
                 e.Handled = true;
-                Log.Error($"Unhandled Exception Message:" + e.Exception.Message);
+                Log.Error($"Unhandled Exception Message: {e.Exception.Message}");
 
                 // 例外情報をファイルに保存する
                 ExceptionLog log = new();
                 log.Log(e.Exception);
-                Log.Info("Create Unhandled Exception Info File:" + log.RelatedFilePath);
+                Log.Info($"Create Unhandled Exception Info File: {log.RelatedFilePath}");
 
                 // ハンドルされない例外の発生を通知する
                 NotificationManager nm = new();
@@ -234,15 +234,18 @@ namespace HouseholdAccountBook
                 };
                 nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
                     string absoluteFilePath = Path.Combine(GetCurrentDir(), log.RelatedFilePath);
-                    Log.Info("Create Unhandled Exception Info Absolute File:" + absoluteFilePath);
+                    Log.Info($"Create Unhandled Exception Info Absolute File: {absoluteFilePath}");
                     _ = Process.Start(new ProcessStartInfo() {
                         FileName = absoluteFilePath,
                         UseShellExecute = true
                     });
+                    if (Current.MainWindow == null) {
+                        Current.Shutdown(1); // メインウィンドウがない場合は強制終了
+                    }
                 });
             }
             catch (Exception ex) {
-                Log.Error("Exception Occured in Unhandled Exception Handler:" + ex.Message);
+                Log.Error($"Exception Occured in Unhandled Exception Handler: {ex.Message}");
                 Current.Shutdown(1); // 例外処理中に例外が発生した場合は強制終了
             }
         }
