@@ -1,0 +1,1099 @@
+﻿<Window x:Class="HouseholdAccountBook.Views.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:HouseholdAccountBook.ViewModels"
+        xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
+        xmlns:vmw="clr-namespace:HouseholdAccountBook.ViewModels.Windows"
+        xmlns:behaviors="clr-namespace:HouseholdAccountBook.Views.Behaviors"
+        xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
+        xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
+        mc:Ignorable="d"
+        Title="{x:Static properties:Resources.Title_MainWindow}" Height="700" Width="1050"
+        Initialized="MainWindow_Initialized" Loaded="MainWindow_Loaded"
+        Closing="MainWindow_Closing" Closed="MainWindow_Closed"
+        StateChanged="MainWindow_StateChanged"
+        LocationChanged="MainWindow_LocationChanged"
+        SizeChanged="MainWindow_SizeChanged">
+    
+    <Window.DataContext>
+        <vmw:MainWindowViewModel x:Name="WVM"/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <!-- ファイルコマンド -->
+        <RoutedCommand x:Key="FileCommand"/>
+        
+        <RoutedCommand x:Key="ImportKichoFugetsuDbCommand"/>
+        <RoutedCommand x:Key="ImportPostgreSQLFileCommand"/>
+        <RoutedCommand x:Key="ImportCustomFileCommand"/>
+        <RoutedCommand x:Key="ImportSQLiteFileCommand"/>
+
+        <RoutedCommand x:Key="ExportCustomFileCommand"/>
+        <RoutedCommand x:Key="ExportSQLFileCommand"/>
+        <RoutedCommand x:Key="ExportExcelFileCommand"/>
+        
+        <RoutedCommand x:Key="BackUpCommand"/>
+        <RoutedCommand x:Key="ExitWindowCommand"/>
+
+        <!-- 編集コマンド -->
+        <RoutedCommand x:Key="EditCommand"/>
+        <RoutedCommand x:Key="ShowFindBoxCommand"/>
+        <RoutedCommand x:Key="ShowReplaceBoxCommand"/>
+        <RoutedCommand x:Key="MoveToBookCommand"/>
+        <RoutedCommand x:Key="AddActionCommand"/>
+        <RoutedCommand x:Key="AddActionListCommand"/>
+        <RoutedCommand x:Key="CopyActionCommand"/>
+        <RoutedCommand x:Key="EditActionCommand"/>
+        <RoutedCommand x:Key="DeleteActionCommand"/>
+        <RoutedCommand x:Key="ChangeIsMatchCommand"/>
+
+        <!-- 表示コマンド -->
+        <RoutedCommand x:Key="ShowBookTabCommand"/>
+        <RoutedCommand x:Key="ShowDailyGraphTabCommand"/>
+        <RoutedCommand x:Key="ShowMonthlyListTabCommand"/>
+        <RoutedCommand x:Key="ShowMonthlyGraphTabCommand"/>
+        <RoutedCommand x:Key="ShowYearlyListTabCommand"/>
+        <RoutedCommand x:Key="ShowYearlyGraphTabCommand"/>
+        <RoutedCommand x:Key="UpdateCommand"/>
+        
+        <!-- 帳簿表示操作コマンド -->
+        <RoutedCommand x:Key="GoToLastMonthCommand"/>
+        <RoutedCommand x:Key="OpenSelectingDailyTermWindowCommand"/>
+        <RoutedCommand x:Key="GoToNextMonthCommand"/>
+        <RoutedCommand x:Key="GoToThisMonthCommand"/>
+
+        <!-- 年間一覧表示操作コマンド -->
+        <RoutedCommand x:Key="GoToLastYearCommand"/>
+        <RoutedCommand x:Key="GoToNextYearCommand"/>
+        <RoutedCommand x:Key="GoToThisYearCommand"/>
+
+        <!-- ツールコマンド -->
+        <RoutedCommand x:Key="ToolCommand"/>
+        <RoutedCommand x:Key="OpenSettingsWindowCommand"/>
+        <RoutedCommand x:Key="ToolInBookCommand"/>
+        <RoutedCommand x:Key="OpenCsvComparisonWindowCommand"/>
+
+        <!-- 検索欄 -->
+        <RoutedCommand x:Key="HideFindBoxCommand"/>
+        <RoutedCommand x:Key="HideReplaceBoxCommand"/>
+        <RoutedCommand x:Key="FindActionCommand"/>
+        <RoutedCommand x:Key="ReplaceActionCommand"/>
+
+        <!-- スタイル -->
+        <Style x:Key="SummaryStyle" TargetType="DataGridRow">
+            <Setter Property="Background" Value="#FFEEE3FB"/>
+            <Style.Triggers>
+                <!-- 分類小計 -->
+                <DataTrigger Binding="{Binding ItemId}" Value="-1">
+                    <Setter Property="Background" Value="#FFFFFFB0"/>
+                </DataTrigger>
+                <!-- 収支小計 -->
+                <DataTrigger Binding="{Binding CategoryId}" Value="-1">
+                    <Setter Property="Background" Value="#FFB0FFB0"/>
+                </DataTrigger>
+                <!-- 差引損益/残高 -->
+                <DataTrigger Binding="{Binding BalanceKind}" Value="-1">
+                    <Setter Property="Background" Value="#FFFFB0B0"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DayOfWeekStyle" TargetType="DataGridCell">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ActTime.DayOfWeek}" Value="Saturday">
+                    <Setter Property="Foreground" Value="Blue"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ActTime.DayOfWeek}" Value="Sunday">
+                    <Setter Property="Foreground" Value="Red"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ActTime, Converter={StaticResource DateTimeToIsNationalHolidayConverter}}" Value="true">
+                    <Setter Property="Foreground" Value="Red"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Window.CommandBindings>
+        <!-- ファイルコマンド -->
+        <CommandBinding Command="{StaticResource FileCommand}" CanExecute="FileCommand_CanExecute"/>
+        
+        <CommandBinding Command="{StaticResource ImportKichoFugetsuDbCommand}" CanExecute="ImportKichoFugetsuDbCommand_CanExecute" Executed="ImportKichoFugetsuDbCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ImportPostgreSQLFileCommand}" CanExecute="ImportPostgreSQLCommand_CanExecute" Executed="ImportPostgreSQLCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ImportCustomFileCommand}" CanExecute="ImportCustomFileCommand_CanExecute" Executed="ImportCustomFileCommand_Excuted"/>
+        <CommandBinding Command="{StaticResource ImportSQLiteFileCommand}" CanExecute="ImportSQLiteFileCommand_CanExecute" Executed="ImportSQLiteFileCommand_Executed"/>
+
+        <CommandBinding Command="{StaticResource ExportCustomFileCommand}" CanExecute="ExportCustomFileCommand_CanExecute" Executed="ExportCustomFileCommand_Excuted"/>
+        <CommandBinding Command="{StaticResource ExportSQLFileCommand}" CanExecute="ExportSQLFileCommand_CanExecute" Executed="ExportSQLFileCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ExportExcelFileCommand}"/>
+        
+        <CommandBinding Command="{StaticResource BackUpCommand}" CanExecute="BackUpCommand_CanExecute" Executed="BackUpCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ExitWindowCommand}" CanExecute="ExitWindowCommand_CanExecute" Executed="ExitWindowCommand_Executed"/>
+
+        <!-- 編集コマンド -->
+        <CommandBinding Command="{StaticResource EditCommand}" CanExecute="EditCommand_CanExecute"/>
+        <CommandBinding Command="{StaticResource ShowFindBoxCommand}" CanExecute="ShowFindBoxCommand_CanExecute" Executed="ShowFindBoxCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ShowReplaceBoxCommand}" CanExecute="ShowReplaceBoxCommand_CanExecute" Executed="ShowReplaceBoxCommand_Executed"/>
+        <CommandBinding Command="{StaticResource MoveToBookCommand}" CanExecute="MoveToBookCommand_CanExecute" Executed="MoveToBookCommand_Executed"/>
+        <CommandBinding Command="{StaticResource AddActionCommand}" CanExecute="AddActionCommand_CanExecute" Executed="AddActionCommand_Executed"/>
+        <CommandBinding Command="{StaticResource EditActionCommand}" CanExecute="EditActionCommand_CanExecute" Executed="EditActionCommand_Executed"/>
+        <CommandBinding Command="{StaticResource AddActionListCommand}" CanExecute="AddActionListCommand_CanExecute" Executed="AddActionListCommand_Executed"/>
+        <CommandBinding Command="{StaticResource CopyActionCommand}" CanExecute="CopyActionCommand_CanExecute" Executed="CopyActionCommand_Executed"/>
+        <CommandBinding Command="{StaticResource DeleteActionCommand}" CanExecute="DeleteActionCommand_CanExecute" Executed="DeleteActionCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ChangeIsMatchCommand}" CanExecute="ChangeIsMatchCommand_CanExecute" Executed="ChangeIsMatchCommand_Executed"/>
+
+        <!-- 表示コマンド -->
+        <CommandBinding Command="{StaticResource ShowBookTabCommand}" CanExecute="ShowBookTabCommand_CanExecute" Executed="ShowBookTabCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ShowDailyGraphTabCommand}" CanExecute="ShowDailyGraphTabCommand_CanExecute" Executed="ShowDailyGraphTabCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ShowMonthlyListTabCommand}" CanExecute="ShowMonthlyListTabCommand_CanExecute" Executed="ShowMonthlyListTabCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ShowMonthlyGraphTabCommand}" CanExecute="ShowMonthlyGraphTabCommand_CanExecute" Executed="ShowMonthlyGraphTabCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ShowYearlyListTabCommand}" CanExecute="ShowYearlyListTabCommand_CanExecute" Executed="ShowYearlyListTabCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ShowYearlyGraphTabCommand}" CanExecute="ShowYearlyGraphTabCommand_CanExecute" Executed="ShowYearlyGraphTabCommand_Executed"/>
+        <CommandBinding Command="{StaticResource UpdateCommand}" Executed="UpdateCommand_Executed"/>
+        
+        <!-- 帳簿表示コマンド -->
+        <CommandBinding Command="{StaticResource GoToLastMonthCommand}" CanExecute="GoToLastMonthCommand_CanExecute" Executed="GoToLastMonthCommand_Executed"/>
+        <CommandBinding Command="{StaticResource OpenSelectingDailyTermWindowCommand}" Executed="OpenSelectingDailyTermWindowCommand_Executed"/>
+        <CommandBinding Command="{StaticResource GoToNextMonthCommand}" CanExecute="GoToNextMonthCommand_CanExecute" Executed="GoToNextMonthCommand_Executed"/>
+        <CommandBinding Command="{StaticResource GoToThisMonthCommand}" CanExecute="GoToThisMonthCommand_CanExecute" Executed="GoToThisMonthCommand_Executed"/>
+
+        <!-- 年間一覧表示コマンド -->
+        <CommandBinding Command="{StaticResource GoToLastYearCommand}" CanExecute="GoToLastYearCommand_CanExecute" Executed="GoToLastYearCommand_Executed"/>
+        <CommandBinding Command="{StaticResource GoToNextYearCommand}" CanExecute="GoToNextYearCommand_CanExecute" Executed="GoToNextYearCommand_Executed"/>
+        <CommandBinding Command="{StaticResource GoToThisYearCommand}" CanExecute="GoToThisYearCommand_CanExecute" Executed="GoToThisYearCommand_Executed"/>
+
+        <!-- ツールコマンド -->
+        <CommandBinding Command="{StaticResource ToolCommand}" CanExecute="ToolCommand_CanExecute"/>
+        <CommandBinding Command="{StaticResource OpenSettingsWindowCommand}" CanExecute="OpenSettingsWindowCommand_CanExecute" Executed="OpenSettingsWindowCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ToolInBookCommand}" CanExecute="ToolInBookCommand_CanExecute"/>
+        <CommandBinding Command="{StaticResource OpenCsvComparisonWindowCommand}" CanExecute="OpenCsvComparisonWindowCommand_CanExecute" Executed="OpenCsvComparisonWindowCommand_Executed"/>
+        
+        <!-- ヘルプコマンド -->
+        <CommandBinding Command="{x:Static ApplicationCommands.Help}" Executed="OpenVersionWindowCommand_Executed"/>
+
+        <!-- 検索欄 -->
+        <CommandBinding Command="{StaticResource HideFindBoxCommand}" Executed="HideFindBoxCommand_Executed"/>
+        <CommandBinding Command="{StaticResource HideReplaceBoxCommand}" Executed="HideReplaceBoxCommand_Executed"/>
+        <CommandBinding Command="{StaticResource FindActionCommand}" Executed="FindActionCommand_Executed"/>
+        <CommandBinding Command="{StaticResource ReplaceActionCommand}" Executed="ReplaceActionCommand_Executed"/>
+    </Window.CommandBindings>
+
+    <Window.InputBindings>
+        <KeyBinding Gesture="Alt+F4" Command="{StaticResource ExitWindowCommand}"/>
+        <KeyBinding Gesture="F1" Command="{x:Static ApplicationCommands.Help}"/>
+    </Window.InputBindings>
+    
+    <Grid Background="WhiteSmoke">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.0*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- メニュー -->
+        <Menu Grid.Row="0" Grid.Column="0">
+            <!-- ファイル -->
+            <MenuItem Header="{x:Static properties:Resources.Menu_File}" Command="{StaticResource FileCommand}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_File_Import}">
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_KichoFugetsu}" Command="{StaticResource ImportKichoFugetsuDbCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{StaticResource ImportSQLiteFileCommand}"
+                              Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_PostgreSQL}" Command="{StaticResource ImportPostgreSQLFileCommand}"
+                              Visibility="{Binding IsSQLite, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <Separator/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_CustomFormatFile}" Command="{StaticResource ImportCustomFileCommand}"
+                              Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{StaticResource ImportSQLiteFileCommand}"
+                              Visibility="{Binding IsSQLite, Converter={StaticResource BoolVisibilityConverter}}"/>
+                </MenuItem>
+                <MenuItem Header="{x:Static properties:Resources.Menu_File_Export}">
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_CustomFormatFile}" Command="{StaticResource ExportCustomFileCommand}"
+                              Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_SQLFile}" Command="{StaticResource ExportSQLFileCommand}"
+                              Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <Separator Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_Excel}" Command="{StaticResource ExportExcelFileCommand}" IsEnabled="False"/>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_File_Backup}" Command="{StaticResource BackUpCommand}"/>
+                <Separator/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_File_Exit}" Command="{StaticResource ExitWindowCommand}" InputGestureText="Alt+F4"/>
+            </MenuItem>
+            <!-- 編集 -->
+            <MenuItem Header="{x:Static properties:Resources.Menu_Edit}" Command="{StaticResource EditCommand}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Find}" Command="{StaticResource ShowFindBoxCommand}" InputGestureText="Ctrl+F"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Replace}" Command="{StaticResource ShowReplaceBoxCommand}" InputGestureText="Ctrl+H"/>
+                <Separator/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Move}" Command="{StaticResource MoveToBookCommand}" InputGestureText="Ctrl+M"/>
+                <Separator/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Add}" Command="{StaticResource AddActionCommand}" InputGestureText="Ctrl++"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_AddList}" Command="{StaticResource AddActionListCommand}" InputGestureText="Ctrl+Shift++"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Copy}" Command="{StaticResource CopyActionCommand}" InputGestureText="Ctrl+Shift+C"/>
+                <Separator/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Edit}" Command="{StaticResource EditActionCommand}" InputGestureText="F2"/>
+                <Separator/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Delete}" Command="{StaticResource DeleteActionCommand}" InputGestureText="Del"/>
+            </MenuItem>
+            <!-- 表示 -->
+            <MenuItem Header="{x:Static properties:Resources.Menu_View}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_View_Book}">
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_Change}" Command="{StaticResource ShowBookTabCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_LastMonth}" Command="{StaticResource GoToLastMonthCommand}" InputGestureText="Alt+←"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_ThisMonth}" Command="{StaticResource GoToThisMonthCommand}" InputGestureText="Alt+↓"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_NextMonth}" Command="{StaticResource GoToNextMonthCommand}" InputGestureText="Alt+→"/>
+                    <Separator/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_DailyTermSelection}" Command="{StaticResource OpenSelectingDailyTermWindowCommand}"/>
+                </MenuItem>
+                <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph}">
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_Change}" Command="{StaticResource ShowDailyGraphTabCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_LastMonth}" Command="{StaticResource GoToLastMonthCommand}" InputGestureText="Alt+←"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_ThisMonth}" Command="{StaticResource GoToThisMonthCommand}" InputGestureText="Alt+↓"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_NextMonth}" Command="{StaticResource GoToNextMonthCommand}" InputGestureText="Alt+→"/>
+                    <Separator/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_DailyTermSelection}" Command="{StaticResource OpenSelectingDailyTermWindowCommand}"/>
+                </MenuItem>
+                <MenuItem Header="{x:Static properties:Resources.Menu_View_Monthly}">
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList}">
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_Change}" Command="{StaticResource ShowMonthlyListTabCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Alt+→"/>
+                    </MenuItem>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph}">
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_Change}" Command="{StaticResource ShowMonthlyGraphTabCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_LastYear}" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_ThisYear}" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_NextYear}" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Alt+→"/>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="{x:Static properties:Resources.Menu_View_Yearly}">
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyList}">
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyList_Change}" Command="{StaticResource ShowYearlyListTabCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Alt+→"/>
+                    </MenuItem>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyGraph}">
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyGraph_Change}" Command="{StaticResource ShowYearlyGraphTabCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Alt+→"/>
+                    </MenuItem>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_View_Update}" Command="{StaticResource UpdateCommand}" InputGestureText="F5"/>
+            </MenuItem>
+            <!-- ツール -->
+            <MenuItem Header="{x:Static properties:Resources.Menu_Tool}" Command="{StaticResource ToolCommand}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_Tool_CsvComparison}" Command="{StaticResource OpenCsvComparisonWindowCommand}"/>
+                <Separator/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Book}" Command="{StaticResource ToolInBookCommand}">
+                    <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Book_Filter}" IsCheckable="True" IsChecked="{Binding UseFilter}"/>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Settings}" Command="{StaticResource OpenSettingsWindowCommand}"/>
+            </MenuItem>
+            <!-- ヘルプ -->
+            <MenuItem Header="{x:Static properties:Resources.Menu_Help}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_Help_VersionInfo}" Command="{x:Static ApplicationCommands.Help}" InputGestureText="F1"/>
+            </MenuItem>
+        </Menu>
+
+        <TabControl Grid.Row="1" Grid.Column="0" Margin="5" Width="Auto" Height="Auto" TabStripPlacement="Left"
+                    SelectedIndex="{Binding SelectedTabIndex}">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter Property="Height" Value="75"/>
+                </Style>
+            </TabControl.ItemContainerStyle>
+            <!-- 帳簿 -->
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_AccountBook}" TextAlignment="Center"/>
+                </TabItem.Header>
+                <TabItem.InputBindings>
+                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Up" Command="{StaticResource ShowMonthlyListTabCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisMonthCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastMonthCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextMonthCommand}"/>
+
+                    <KeyBinding Gesture="Ctrl+F" Command="{StaticResource ShowFindBoxCommand}"/>
+                    <KeyBinding Gesture="Ctrl+H" Command="{StaticResource ShowReplaceBoxCommand}"/>
+                </TabItem.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="1.0*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 上部メニュー -->
+                    <Grid Grid.Row="0" Grid.Column="0" Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="1.0*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastMonthCommand}"/>
+                            <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToDisplayedMonthConverter}, TargetNullValue={x:Static properties:Resources.Button_DateRange}}"
+                                    Command="{StaticResource OpenSelectingDailyTermWindowCommand}">
+                                <ToolTipService.ToolTip>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="{Binding StartDate, StringFormat='yyyy-MM-dd'}"/>
+                                        <TextBlock Grid.Column="1" Text=" - "/>
+                                        <TextBlock Grid.Column="2" Text="{Binding EndDate, StringFormat='yyyy-MM-dd'}"/>
+                                    </Grid>
+                                </ToolTipService.ToolTip>
+                            </Button>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextMonthCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_ThisMonth}" Command="{StaticResource GoToThisMonthCommand}">
+                                <ToolTipService.ToolTip>
+                                    <TextBlock Text="{Binding Now, Source={StaticResource DateTime}, StringFormat={}{0:yyyy-MM}}"/>
+                                </ToolTipService.ToolTip>
+                            </Button>
+
+                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
+                        </StackPanel>
+                            
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button Width="50" Margin="0,0,3,0" Content="{x:Static properties:Resources.Button_Move}" Command="{StaticResource MoveToBookCommand}"/>
+                            <Button Width="50" Content="{x:Static properties:Resources.Button_Add}" Command="{StaticResource AddActionCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_AddList}" Command="{StaticResource AddActionListCommand}"/>
+                            <Button Width="50" Content="{x:Static properties:Resources.Button_Copy}" Command="{StaticResource CopyActionCommand}"/>
+                            <Button Width="50" Margin="3,0,0,0" Content="{x:Static properties:Resources.Button_Edit}" Command="{StaticResource EditActionCommand}"/>
+                            <Button Width="50" Margin="3,0,0,0" Content="{x:Static properties:Resources.Button_Delete}" Command="{StaticResource DeleteActionCommand}"/>
+                            <CheckBox Margin="3,3,0,3" ToolTip="{x:Static properties:Resources.ToolTip_CheckIsMatch}" VerticalAlignment="Center"
+                                      IsChecked="{Binding IsMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{StaticResource ChangeIsMatchCommand}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- データリスト -->
+                    <Grid Grid.Row="1" Grid.Column="0" Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.0*" MinWidth="200"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="Auto" MinWidth="150"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 帳簿項目リスト -->
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1.0*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <DataGrid x:Name="actionDataGrid" Grid.Row="0" SelectionMode="Extended"
+                                  ItemsSource="{Binding DisplayedActionVMList}" SelectedItem="{Binding SelectedActionVM}" IsReadOnly="True" SelectionUnit="FullRow"
+                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="4"
+                                  AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
+                                  HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
+                                <DataGrid.Resources>
+                                    <vm:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
+                                </DataGrid.Resources>
+                                <DataGrid.InputBindings>
+                                    <KeyBinding Gesture="Ctrl+M" Command="{StaticResource MoveToBookCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{StaticResource AddActionCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+Add" Command="{StaticResource AddActionCommand}"/>
+                                    <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{StaticResource AddActionListCommand}"/>
+                                    <KeyBinding Gesture="Shift+Ctrl+Add" Command="{StaticResource AddActionListCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+Shift+C" Command="{StaticResource CopyActionCommand}"/>
+                                    <KeyBinding Gesture="F2" Command="{StaticResource EditActionCommand}"/>
+                                    <KeyBinding Gesture="Enter" Command="{StaticResource EditActionCommand}"/>
+                                    <KeyBinding Gesture="Delete" Command="{StaticResource DeleteActionCommand}"/>
+                                    
+                                    <MouseBinding Gesture="LeftDoubleClick" Command="{StaticResource EditActionCommand}"/>
+                                </DataGrid.InputBindings>
+                                <i:Interaction.Behaviors>
+                                    <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding SelectedActionVMList}"/>
+                                </i:Interaction.Behaviors>
+                                <DataGrid.ItemContainerStyle>
+                                    <Style TargetType="DataGridRow">
+                                        <Setter Property="IsSelected" Value="{Binding SelectFlag, Mode=TwoWay}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsMatch}" Value="True">
+                                                <Setter Property="Foreground" Value="Green"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsFuture}" Value="True">
+                                                <Setter Property="Foreground" Value="Gray"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.ItemContainerStyle>
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.Columns>
+                                    <DataGridCheckBoxColumn Header="" Binding="{Binding SelectFlag}"
+                                                    Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                    <DataGridTextColumn Header="Id" Binding="{Binding ActionId}"
+                                                    Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                    <DataGridTextColumn Header="GId" Binding="{Binding GroupId}"
+                                                    Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Date}" Binding="{Binding ActTime, StringFormat='yyyy-MM-dd'}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Day}" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}, ConverterCulture={StaticResource AppCulture}}"
+                                                    CellStyle="{StaticResource DayOfWeekStyle}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_BookName}" MinWidth="70" Binding="{Binding BookName}"
+                                                    Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_CategoryName}" MinWidth="70" Binding="{Binding CategoryName}"
+                                                    Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" MinWidth="70" Binding="{Binding ItemName}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Income}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Income, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                    ElementStyle="{StaticResource TextAlignRight}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Expenses}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Expenses, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                    ElementStyle="{StaticResource TextAlignRight}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Balance}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Balance, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                    ElementStyle="{StaticResource TextAlignRight}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding ShopName}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Remark}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <!-- 検索エリア -->
+                            <Grid Grid.Row="1" Background="GhostWhite" Visibility="{c:Binding ShowFindBox, FalseToVisibility=Collapsed}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1.0*"/>
+                                    <RowDefinition Height="1.0*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="1.0*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Button Grid.Column="0" Margin="3" Height="20" Width="20" Content="{x:Static properties:Resources.Button_HideReplace}" Command="{StaticResource HideReplaceBoxCommand}" 
+                                        Visibility="{c:Binding ShowReplaceBox, FalseToVisibility=Hidden}"/>
+                                <Button Grid.Column="0" Margin="3" Height="20" Width="20" Content="{x:Static properties:Resources.Button_ShowReplace}" Command="{StaticResource ShowReplaceBoxCommand}"
+                                        Visibility="{c:Binding !ShowReplaceBox, FalseToVisibility=Hidden}"/>
+                                
+                                <Grid Grid.Row="0" Grid.Column="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="FindText"/>
+                                        <ColumnDefinition Width="1.0*" SharedSizeGroup="FindInput"/>
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="FindButton"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Margin="0,3,3,3">
+                                        <TextBlock Text="{x:Static properties:Resources.TextBlock_Search}"/>:
+                                    </TextBlock>
+                                    <TextBox Grid.Column="1" Margin="0,3,3,3" Text="{Binding FindInputText}"/>
+                                    <Button Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" Content="▶️" Command="{StaticResource FindActionCommand}"/>
+                                </Grid>
+                                
+                                <Button Grid.Row="0" Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="{x:Static properties:Resources.Button_HideFind}" Command="{StaticResource HideFindBoxCommand}"/>
+
+                                <Grid Grid.Row="1" Grid.Column="1" Visibility="{c:Binding ShowReplaceBox, FalseToVisibility=Collapsed}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="FindText"/>
+                                        <ColumnDefinition Width="1.0*" SharedSizeGroup="FindInput"/>
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="FindButton"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Margin="0,3,3,3">
+                                        <TextBlock Text="{x:Static properties:Resources.TextBlock_Replace}"/>:
+                                    </TextBlock>
+                                    <TextBox Grid.Column="1" Margin="0,3,3,3" Text="{Binding ReplaceText}"/>
+                                    <Button Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" Content="▶" Command="{StaticResource ReplaceActionCommand}"/>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+
+                        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
+
+                        <!-- サマリーリスト -->
+                        <Grid Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1.0*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <DataGrid Grid.Row="0" ItemsSource="{Binding SummaryVMList}" SelectedItem="{Binding SelectedSummaryVM}" 
+                                      IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
+                                      CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
+                                      AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
+                                      HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
+                                      ItemContainerStyle="{StaticResource SummaryStyle}">
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="CId" Binding="{Binding CategoryId}"
+                                                         Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                    <DataGridTextColumn Header="IId" Binding="{Binding ItemId}"
+                                                         Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Total}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Total, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                        ElementStyle="{StaticResource TextAlignRight}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <Grid Grid.Row="1" Background="GhostWhite">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.0*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" Margin="3">
+                                    <TextBlock Text="{x:Static properties:Resources.TextBlock_Filter}"/>: 
+                                </TextBlock>
+                                <CheckBox Grid.Column="1" Margin="3,3,0,3" IsChecked="{Binding UseFilter}"/>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <!-- ステータスバー -->
+                    <StatusBar Grid.Row="2" Grid.Column="0" Margin="2" Background="White">
+                        <StatusBarItem HorizontalAlignment="Left">
+                            <TextBlock>
+                                <TextBlock Text="{x:Static properties:Resources.TextBlock_LastOperatedBookItem}"/>:
+                                <TextBlock Text="{Binding ActDateLastEdited, TargetNullValue='-', StringFormat='yyyy-MM-dd'}"/>
+                            </TextBlock>
+                        </StatusBarItem>
+                        <StatusBarItem HorizontalAlignment="Right">
+                            <TextBlock>
+                                [<TextBlock Text="{x:Static properties:Resources.TextBlock_Selection}"/>] <TextBlock Text="{x:Static properties:Resources.TextBlock_Average}"/>: 
+                                <TextBlock Text="{Binding AverageValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/><TextBlock Text="  "/>
+                                <TextBlock Text="{x:Static properties:Resources.TextBlock_DataCount}"/>: 
+                                <TextBlock Text="{Binding Count, TargetNullValue='--'}"/><TextBlock Text="  "/>
+                                <TextBlock Text="{x:Static properties:Resources.TextBlock_Sum}"/>: 
+                                <TextBlock Text="{Binding SumValue, Converter={StaticResource IntToMoneyDisplayConverter}}"/>
+                                 (<TextBlock Text="{Binding IncomeSumValue, Converter={StaticResource IntToMoneyDisplayConverter}}"/>, 
+                                <TextBlock Text="{Binding ExpensesSumValue, Converter={StaticResource IntToMoneyDisplayConverter}}"/>)
+                            </TextBlock>
+                        </StatusBarItem>
+                    </StatusBar>
+                </Grid>
+            </TabItem>
+            <!-- 日別グラフ -->
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_DailyGraph}" TextAlignment="Center"/>
+                </TabItem.Header>
+                <TabItem.InputBindings>
+                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Up" Command="{StaticResource ShowMonthlyGraphTabCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisMonthCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastMonthCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextMonthCommand}"/>
+                </TabItem.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="0.7*" MinHeight="200"/>
+                        <RowDefinition Height="5"/>
+                        <RowDefinition Height="0.3*" MinHeight="200"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 中央メニュー -->
+                    <Grid Grid.Row="0" Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastMonthCommand}"/>
+                            <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToDisplayedMonthConverter}, TargetNullValue={x:Static properties:Resources.Button_DateRange}}"
+                                    Command="{StaticResource OpenSelectingDailyTermWindowCommand}">
+                                <ToolTipService.ToolTip>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="{Binding DisplayedStart, StringFormat='yyyy-MM-dd'}"/>
+                                        <TextBlock Grid.Column="1" Text=" - "/>
+                                        <TextBlock Grid.Column="2" Text="{Binding DisplayedEnd, StringFormat='yyyy-MM-dd'}"/>
+                                    </Grid>
+                                </ToolTipService.ToolTip>
+                            </Button>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextMonthCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_ThisMonth}" Command="{StaticResource GoToThisMonthCommand}">
+                                <ToolTipService.ToolTip>
+                                    <TextBlock Text="{Binding ToDay, Converter={StaticResource DateTimeToDisplayedMonthConverter}}"/>
+                                </ToolTipService.ToolTip>
+                            </Button>
+                            
+                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
+                                      ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
+                                      ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
+                                <ComboBox.Style>
+                                    <Style TargetType="ComboBox">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ComboBox.Style>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 全体グラフ -->
+                    <Grid Grid.Row="1" Margin="2" Background="White">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <oxy:PlotView Grid.Row="0" Model="{Binding DailyGraphPlotModel}" Controller="{Binding Controller}"/>
+                    </Grid>
+
+                    <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Background="GhostWhite"/>
+
+                    <!-- 個別グラフ -->
+                    <Grid Grid.Row="3" Margin="2" Background="White">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="200"
+                                          ItemsSource="{Binding DailyGraphSeriesVMList}" SelectedItem="{Binding SelectedDailyGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
+                            </StackPanel>
+                        </Grid>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedDailyGraphPlotModel}" Controller="{Binding Controller}"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <!-- 月別一覧 -->
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_MonthlySummary}" TextAlignment="Center"/>
+                </TabItem.Header>
+                <TabItem.InputBindings>
+                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextYearCommand}"/>
+                </TabItem.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 中央メニュー -->
+                    <Grid Grid.Row="0" Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastYearCommand}"/>
+                            <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}">
+                                <ToolTipService.ToolTip>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="{Binding DisplayedStart, StringFormat='yyyy-MM'}"/>
+                                        <TextBlock Grid.Column="1" Text=" - "/>
+                                        <TextBlock Grid.Column="2" Text="{Binding DisplayedEnd, StringFormat='yyyy-MM'}"/>
+                                    </Grid>
+                                </ToolTipService.ToolTip>
+                            </Button>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextYearCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_ThisYear}" Command="{StaticResource GoToThisYearCommand}">
+                                <ToolTipService.ToolTip>
+                                    <TextBlock Text="{Binding Now, Source={StaticResource DateTime}, StringFormat={}{0:yyyy}}"/>
+                                </ToolTipService.ToolTip>
+                            </Button>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
+                                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- データリスト -->
+                    <Grid Grid.Row="1" Margin="2" Background="White">
+                        <DataGrid Grid.Column="1"
+                                  ItemsSource="{Binding MonthlySeriesVMList}" SelectedItem="{Binding SelectedMonthlySeriesVM}" IsReadOnly="True" SelectionUnit="FullRow"
+                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
+                                  AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
+                                  HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
+                                  ItemContainerStyle="{StaticResource SummaryStyle}" MouseDoubleClick="MonthlyListDataGrid_MouseDoubleClick">
+                            <DataGrid.Resources>
+                                <vm:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
+                            </DataGrid.Resources>
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <!-- 参考：http://oita.oika.me/2014/05/31/binding-datagridcolumn/ -->
+                                <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" Binding="{Binding ListName}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[0], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
+                                                    Binding="{Binding Values[0], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[1], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
+                                                    Binding="{Binding Values[1], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[2], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
+                                                    Binding="{Binding Values[2], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[3], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
+                                                    Binding="{Binding Values[3], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[4], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
+                                                    Binding="{Binding Values[4], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[5], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
+                                                    Binding="{Binding Values[5], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[6], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
+                                                    Binding="{Binding Values[6], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[7], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
+                                                    Binding="{Binding Values[7], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[8], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
+                                                    Binding="{Binding Values[8], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[9], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
+                                                    Binding="{Binding Values[9], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[10], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
+                                                    Binding="{Binding Values[10], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedMonths[11], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}" 
+                                                    Binding="{Binding Values[11], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Average}" Binding="{Binding Average, Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Total}" Binding="{Binding Total, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <!-- 月別グラフ -->
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_MonthlyGraph}" TextAlignment="Center"/>
+                </TabItem.Header>
+                <TabItem.InputBindings>
+                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextYearCommand}"/>
+                </TabItem.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="0.7*" MinHeight="200"/>
+                        <RowDefinition Height="5"/>
+                        <RowDefinition Height="0.3*" MinHeight="200"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 中央メニュー -->
+                    <Grid Grid.Row="0" Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastYearCommand}"/>
+                            <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}">
+                                <ToolTipService.ToolTip>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="{Binding DisplayedStart, StringFormat='yyyy-MM'}"/>
+                                        <TextBlock Grid.Column="1" Text=" - "/>
+                                        <TextBlock Grid.Column="2" Text="{Binding DisplayedEnd, StringFormat='yyyy-MM'}"/>
+                                    </Grid>
+                                </ToolTipService.ToolTip>
+                            </Button>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextYearCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_ThisYear}" Command="{StaticResource GoToThisYearCommand}">
+                                <ToolTipService.ToolTip>
+                                    <TextBlock Text="{Binding ToDay, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                </ToolTipService.ToolTip>
+                            </Button>
+                            
+                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
+                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
+                                      ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
+                                      ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
+                                <ComboBox.Style>
+                                    <Style TargetType="ComboBox">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ComboBox.Style>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 全体グラフ -->
+                    <Grid Grid.Row="1" Margin="2" Background="White">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <oxy:PlotView Grid.Row="0" Model="{Binding MonthlyGraphPlotModel}" Controller="{Binding Controller}"/>
+                    </Grid>
+
+                    <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Background="GhostWhite"/>
+                    
+                    <!-- 個別グラフ -->
+                    <Grid Grid.Row="3" Margin="2" Background="White">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox HorizontalAlignment="Stretch" MinWidth="200"
+                                          ItemsSource="{Binding MonthlyGraphSeriesVMList}" SelectedItem="{Binding SelectedMonthlyGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
+                            </StackPanel>
+                        </Grid>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedMonthlyGraphPlotModel}" Controller="{Binding Controller}"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <!-- 年別一覧 -->
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_YearlySummary}" TextAlignment="Center"/>
+                </TabItem.Header>
+                <TabItem.InputBindings>
+                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextYearCommand}"/>
+                </TabItem.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 中央メニュー -->
+                    <Grid Grid.Row="0" Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastYearCommand}"/>
+                            <Button Width="120">
+                                <Button.Content>
+                                    <TextBlock>
+                                        <TextBlock Text="{Binding DisplayedStart, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                        <TextBlock Text=" - "/>
+                                        <TextBlock Text="{Binding DisplayedEnd, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                    </TextBlock>
+                                </Button.Content>
+                            </Button>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextYearCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_LastDecade}" Command="{StaticResource GoToThisYearCommand}"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- データリスト -->
+                    <Grid Grid.Row="1" Margin="2" Background="White">
+                        <DataGrid Grid.Column="1"
+                                  ItemsSource="{Binding YearlySeriesVMList}" SelectedItem="{Binding SelectedYearlySeriesVM}" IsReadOnly="True" SelectionUnit="FullRow"
+                                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
+                                  AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
+                                  HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
+                                  ItemContainerStyle="{StaticResource SummaryStyle}" MouseDoubleClick="YearlyListDataGrid_MouseDoubleClick">
+                            <DataGrid.Resources>
+                                <vm:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
+                            </DataGrid.Resources>
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <!-- 参考：http://oita.oika.me/2014/05/31/binding-datagridcolumn/ -->
+                                <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" Binding="{Binding ListName}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[0], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                                    Binding="{Binding Values[0], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[1], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                                    Binding="{Binding Values[1], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[2], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                                    Binding="{Binding Values[2], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[3], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                                    Binding="{Binding Values[3], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[4], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                                    Binding="{Binding Values[4], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[5], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                                    Binding="{Binding Values[5], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[6], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                                    Binding="{Binding Values[6], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[7], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                                    Binding="{Binding Values[7], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[8], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                                    Binding="{Binding Values[8], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[9], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                                    Binding="{Binding Values[9], Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Average}" Binding="{Binding Average, Converter={StaticResource IntToMoneyDisplayConverter}}"
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                                <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Total}" Binding="{Binding Total, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                    ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <!-- 年別グラフ -->
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_YearlyGraph}" TextAlignment="Center"/>
+                </TabItem.Header>
+                <TabItem.InputBindings>
+                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextYearCommand}"/>
+                </TabItem.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="0.7*" MinHeight="200"/>
+                        <RowDefinition Height="5"/>
+                        <RowDefinition Height="0.3*" MinHeight="200"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 中央メニュー -->
+                    <Grid Grid.Row="0" Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastYearCommand}"/>
+                            <Button Width="120">
+                                <Button.Content>
+                                    <TextBlock>
+                                        <TextBlock Text="{Binding DisplayedStart, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                        <TextBlock Text=" - "/>
+                                        <TextBlock Text="{Binding DisplayedEnd, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                    </TextBlock>
+                                </Button.Content>
+                            </Button>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextYearCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_LastDecade}" Command="{StaticResource GoToThisYearCommand}"/>
+                            
+                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
+                                      ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
+                                      ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
+                                <ComboBox.Style>
+                                    <Style TargetType="ComboBox">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ComboBox.Style>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 全体グラフ -->
+                    <Grid Grid.Row="1" Margin="2" Background="White">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <oxy:PlotView Grid.Row="0" Model="{Binding YearlyGraphPlotModel}" Controller="{Binding Controller}"/>
+                    </Grid>
+
+                    <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Background="GhostWhite"/>
+                    
+                    <!-- 個別グラフ -->
+                    <Grid Grid.Row="3" Margin="2" Background="White">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox HorizontalAlignment="Stretch" MinWidth="200"
+                                          ItemsSource="{Binding YearlyGraphSeriesVMList}" SelectedItem="{Binding SelectedYearlyGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
+                            </StackPanel>
+                        </Grid>
+                        
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedYearlyGraphPlotModel}" Controller="{Binding Controller}"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

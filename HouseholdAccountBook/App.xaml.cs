@@ -1,8 +1,10 @@
 ﻿using HouseholdAccountBook.DbHandler;
-using HouseholdAccountBook.DbHandler.Abstract;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Others;
-using HouseholdAccountBook.Windows;
+using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.DbHandler;
+using HouseholdAccountBook.Models.DbHandler.Abstract;
+using HouseholdAccountBook.Models.Logger;
+using HouseholdAccountBook.Views.Windows;
 using Notification.Wpf;
 using System;
 using System.Diagnostics;

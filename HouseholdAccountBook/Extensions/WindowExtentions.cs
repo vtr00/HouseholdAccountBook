@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using HouseholdAccountBook.Models.Logger;
+using System.Windows;
 
 namespace HouseholdAccountBook.Extensions
 {

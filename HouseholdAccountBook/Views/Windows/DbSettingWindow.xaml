@@ -1,0 +1,223 @@
+﻿<Window x:Class="HouseholdAccountBook.Views.Windows.DbSettingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:project="clr-namespace:HouseholdAccountBook"
+        xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
+        xmlns:vmw="clr-namespace:HouseholdAccountBook.ViewModels.Windows"
+        mc:Ignorable="d"
+        Title="{x:Static properties:Resources.Title_DbSettingWindow}" Height="370" Width="400" WindowStyle="ToolWindow"
+        Initialized="DbSettingWindow_Initialized"
+        Closed="DbSettingWindow_Closed">
+    <Window.DataContext>
+        <vmw:DbSettingWindowViewModel x:Name="WVM"/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <!-- パス入力コマンド -->
+        <RoutedCommand x:Key="DumpExePathDialogCommand"/>
+        <RoutedCommand x:Key="RestoreExePathDialogCommand"/>
+        <RoutedCommand x:Key="DBFilePathDialogCommand"/>
+
+        <!-- 登録コマンド -->
+        <RoutedCommand x:Key="OKCommand"/>
+        <RoutedCommand x:Key="CancelCommand"/>
+    </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding Gesture="Enter" Command="{StaticResource OKCommand}"/>
+        <KeyBinding Gesture="Esc" Command="{StaticResource CancelCommand}"/>
+    </Window.InputBindings>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource DumpExePathDialogCommand}"
+                        Executed="DumpExePathDialogCommand_Executed"/>
+        <CommandBinding Command="{StaticResource RestoreExePathDialogCommand}"
+                        Executed="RestorePathDialogCommand_Executed"/>
+        <CommandBinding Command="{StaticResource DBFilePathDialogCommand}"
+                        Executed="DBFilePathDialogCommand_Executed"/>
+        <CommandBinding Command="{StaticResource OKCommand}" CanExecute="OKCommand_CanExecute"
+                        Executed="OKCommand_Executed"/>
+        <CommandBinding Command="{StaticResource CancelCommand}" 
+                        Executed="CancelCommand_Executed"/>
+    </Window.CommandBindings>
+
+    <Grid Margin="5" Grid.IsSharedSizeScope="True">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition SharedSizeGroup="Header"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" VerticalAlignment="Center"
+                       Text="{Binding Message}"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
+                   Text="{x:Static properties:Resources.TextBlock_DBKind}"/>
+        <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalAlignment="Center"
+                  ItemsSource="{Binding DBKindDic}" SelectedValue="{Binding SelectedDBKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+
+        <!-- PostgreSQL -->
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedDBKind}" Value="PostgreSQL">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
+            <GroupBox Header="{x:Static properties:Resources.GroupHeader_PostgreSQL}" DataContext="{Binding PostgreSQLDBSettingVM}">
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Header"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="25" SharedSizeGroup="Button"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Host}" Margin="5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding Host}"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Port}" Margin="5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding Port}" 
+                         PreviewTextInput="TextBox_PreviewTextInput"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_UserName}" Margin="5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding UserName}"/>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Password}" Margin="5" VerticalAlignment="Center"/>
+                    <PasswordBox x:Name="passwordBox" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="1"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_DbName}" Margin="5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding DatabaseName}"/>
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Roll}" Margin="5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding Role}"/>
+
+                    <TextBlock Grid.Row="6" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="6" Grid.Column="1" Margin="1" Text="{Binding DumpExePath}" IsReadOnly="True"/>
+                    <Button Grid.Row="6" Grid.Column="2" Margin="1" Content="..." Command="{StaticResource DumpExePathDialogCommand}"/>
+
+                    <TextBlock Grid.Row="7" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="7" Grid.Column="1" Margin="1" Text="{Binding RestoreExePath}" IsReadOnly="True"/>
+                    <Button Grid.Row="7" Grid.Column="2" Margin="1" Content="..." Command="{StaticResource RestoreExePathDialogCommand}"/>
+
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <!-- Access -->
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedDBKind}" Value="Access">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
+            <GroupBox Header="{x:Static properties:Resources.GroupHeader_Access}" DataContext="{Binding AccessSettingVM}">
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Header"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition SharedSizeGroup="Button"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
+                               Text="{x:Static properties:Resources.TextBlock_Access_Provider}"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
+                               ItemsSource="{Binding ProviderNameDic}" SelectedValue="{Binding SelectedProviderName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Access_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="1" Text="{Binding DBFilePath}" IsReadOnly="True"/>
+                    <Button Grid.Row="1" Grid.Column="2" Margin="1" Content="..." Command="{StaticResource DBFilePathDialogCommand}"/>
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <!-- SQLite -->
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedDBKind}" Value="SQLite">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
+            <GroupBox Header="{x:Static properties:Resources.GroupHeader_SQLite}" DataContext="{Binding SQLiteSettingVM}">
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Header"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition SharedSizeGroup="Button"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_SQLite_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Margin="1" Text="{Binding DBFilePath}" IsReadOnly="True"/>
+                    <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="..." Command="{StaticResource DBFilePathDialogCommand}"/>
+                </Grid>
+            </GroupBox>
+        </Grid>
+        
+        <Grid Grid.Row="3" Grid.ColumnSpan="3" Margin="0,5,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.5*"/>
+                <ColumnDefinition Width="0.5*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Margin="5" Content="{x:Static properties:Resources.Button_OK}" Command="{StaticResource OKCommand}"/>
+            <Button Grid.Column="1" Margin="5" Content="{x:Static properties:Resources.Button_Cancel}" Command="{StaticResource CancelCommand}"/>
+        </Grid>
+    </Grid>
+</Window>

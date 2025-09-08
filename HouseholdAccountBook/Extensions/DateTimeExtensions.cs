@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using HouseholdAccountBook.Models.Logger;
 using Notification.Wpf;
 using System;
 using System.Collections.Generic;
