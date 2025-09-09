@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Models.Dao.Abstract;
+﻿using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.Models.Dao.Abstract;
 using HouseholdAccountBook.Models.DbHandler.Abstract;
 using HouseholdAccountBook.Models.Dto.DbTable;
 using System;
@@ -37,7 +38,7 @@ new HstGroupDto { GroupId = pkey });
 
         public override async Task SetIdSequenceAsync(int id)
         {
-            if (this.dbHandler.DBLibKind == DBLibraryKind.SQLite) {
+            if (this.dbHandler.DBKind == DBKind.SQLite) {
                 return;
             }
 

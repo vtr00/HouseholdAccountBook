@@ -1,5 +1,5 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
-using static HouseholdAccountBook.Models.DbConstants;
+﻿using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.ViewModels.Abstract;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {

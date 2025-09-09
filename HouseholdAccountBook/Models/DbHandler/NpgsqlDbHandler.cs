@@ -1,10 +1,10 @@
-﻿using HouseholdAccountBook.Models.DbHandler.Abstract;
+﻿using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.Models.DbHandler.Abstract;
 using HouseholdAccountBook.Models.Logger;
 using Npgsql;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using static HouseholdAccountBook.Models.DbConstants;
 
 namespace HouseholdAccountBook.DbHandler
 {

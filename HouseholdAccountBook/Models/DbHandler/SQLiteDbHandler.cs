@@ -1,8 +1,8 @@
-﻿using HouseholdAccountBook.Models.DbHandler.Abstract;
+﻿using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.Models.DbHandler.Abstract;
 using Microsoft.Data.Sqlite;
 using System.IO;
 using System.Threading.Tasks;
-using static HouseholdAccountBook.Models.DbConstants;
 
 namespace HouseholdAccountBook.DbHandler
 {

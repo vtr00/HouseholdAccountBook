@@ -37,6 +37,6 @@ namespace HouseholdAccountBook.Models.Dto.DbTable
         /// <summary>
         /// 収支種別
         /// </summary>
-        public int BalanceKind { get; set; } = (int)DbConstants.BalanceKind.Income;
+        public int BalanceKind { get; set; } = (int)Enums.BalanceKind.Income;
     }
 }

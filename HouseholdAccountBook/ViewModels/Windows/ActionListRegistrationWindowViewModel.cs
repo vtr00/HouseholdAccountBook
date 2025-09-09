@@ -1,11 +1,10 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
+﻿using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views.UserControls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using static HouseholdAccountBook.Models.DbConstants;
-using static HouseholdAccountBook.ViewModels.LogicConstants;
 using static HouseholdAccountBook.Views.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.Windows

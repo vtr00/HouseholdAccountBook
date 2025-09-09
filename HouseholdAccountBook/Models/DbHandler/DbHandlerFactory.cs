@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Models.DbHandler.Abstract;
 using System.Threading.Tasks;
-using static HouseholdAccountBook.Models.DbConstants;
 
 namespace HouseholdAccountBook.Models.DbHandler
 {

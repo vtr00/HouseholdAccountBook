@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Extensions;
+﻿using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Models.Dao.Compositions;
 using HouseholdAccountBook.Models.Dao.DbTable;
 using HouseholdAccountBook.Models.DbHandler;
@@ -16,8 +17,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
-using static HouseholdAccountBook.Models.DbConstants;
-using static HouseholdAccountBook.ViewModels.LogicConstants;
 
 namespace HouseholdAccountBook.Views.Windows
 {

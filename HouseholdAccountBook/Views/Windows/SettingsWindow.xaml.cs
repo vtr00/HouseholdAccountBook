@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Models.Dao.Compositions;
 using HouseholdAccountBook.Models.Dao.DbTable;

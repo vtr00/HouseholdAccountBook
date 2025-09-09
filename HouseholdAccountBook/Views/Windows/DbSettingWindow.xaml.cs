@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using Microsoft.Win32;
 using System;
@@ -6,7 +7,6 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using static HouseholdAccountBook.Models.DbConstants;
 
 namespace HouseholdAccountBook.Views.Windows
 {
@@ -32,7 +32,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.PostgreSQLDBSettingVM.Host = settings.App_Postgres_Host;
             this.WVM.PostgreSQLDBSettingVM.Port = settings.App_Postgres_Port;
             this.WVM.PostgreSQLDBSettingVM.UserName = settings.App_Postgres_UserName;
-            this.passwordBox.Password = settings.App_Postgres_Password == string.Empty ? 
+            this.passwordBox.Password = settings.App_Postgres_Password == string.Empty ?
                 ProtectedDataExtension.DecryptPassword(settings.App_Postgres_EncryptedPassword) : settings.App_Postgres_Password;
 #if DEBUG
             this.WVM.PostgreSQLDBSettingVM.DatabaseName = settings.App_Postgres_DatabaseName_Debug;

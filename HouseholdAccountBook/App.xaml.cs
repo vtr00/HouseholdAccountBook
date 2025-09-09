@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.DbHandler;
@@ -148,8 +149,8 @@ namespace HouseholdAccountBook
 
                 // 接続設定を読み込む
                 DbHandlerBase.ConnectInfo connInfo = null;
-                switch ((DbConstants.DBKind)settings.App_SelectedDBKind) {
-                    case DbConstants.DBKind.PostgreSQL: {
+                switch ((DBKind)settings.App_SelectedDBKind) {
+                    case DBKind.PostgreSQL: {
                         NpgsqlDbHandler.ConnectInfo connectInfo = new() {
                             Host = settings.App_Postgres_Host,
                             Port = settings.App_Postgres_Port,
@@ -174,13 +175,13 @@ namespace HouseholdAccountBook
                         connInfo = connectInfo;
                         break;
                     }
-                    case DbConstants.DBKind.SQLite:
+                    case DBKind.SQLite:
                         connInfo = new SQLiteDbHandler.ConnectInfo() {
                             FilePath = settings.App_SQLite_DBFilePath
                         };
                         break;
-                    case DbConstants.DBKind.Access:
-                    case DbConstants.DBKind.Undefined:
+                    case DBKind.Access:
+                    case DBKind.Undefined:
                     default:
                         throw new NotSupportedException();
                 }

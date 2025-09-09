@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Extensions;
+﻿using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using OxyPlot;
@@ -6,8 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using static HouseholdAccountBook.Models.DbConstants;
-using static HouseholdAccountBook.ViewModels.LogicConstants;
 using static HouseholdAccountBook.Views.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.Windows

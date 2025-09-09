@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using static HouseholdAccountBook.ViewModels.LogicConstants;
-using static HouseholdAccountBook.Models.DbConstants;
+﻿using HouseholdAccountBook.Enums;
+using System.Collections.Generic;
 
 namespace HouseholdAccountBook.Views
 {
@@ -9,60 +8,6 @@ namespace HouseholdAccountBook.Views
     /// </summary>
     public static class UiConstants
     {
-        #region タブ
-        /// <summary>
-        /// タブ
-        /// </summary>
-        /// <remarks>数字はタブのインデックスと対応付けること</remarks>
-        public enum Tabs
-        {
-            /// <summary>
-            /// 帳簿タブ
-            /// </summary>
-            BooksTab = 0,
-            /// <summary>
-            /// 日別グラフタブ
-            /// </summary>
-            DailyGraphTab = 1,
-            /// <summary>
-            /// 月別一覧タブ
-            /// </summary>
-            MonthlyListTab = 2,
-            /// <summary>
-            /// 月別グラフタブ
-            /// </summary>
-            MonthlyGraphTab = 3,
-            /// <summary>
-            /// 年別一覧タブ
-            /// </summary>
-            YearlyListTab = 4,
-            /// <summary>
-            /// 年別グラフタブ
-            /// </summary>
-            YearlyGraphTab = 5
-        }
-
-        /// <summary>
-        /// 設定タブ
-        /// </summary>
-        /// <remarks>数字は設定タブのインデックスと対応付けること</remarks>
-        public enum SettingsTabs
-        {
-            /// <summary>
-            /// 項目設定タブ
-            /// </summary>
-            ItemSettingsTab = 0,
-            /// <summary>
-            /// 帳簿設定タブ
-            /// </summary>
-            BookSettingsTab = 1,
-            /// <summary>
-            /// その他タブ
-            /// </summary>
-            OtherSettingsTab = 2
-        }
-        #endregion
-
         #region 種別表示文字列
         /// <summary>
         /// DB種別文字列

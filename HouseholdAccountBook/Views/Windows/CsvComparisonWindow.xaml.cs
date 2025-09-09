@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Models.Dao.Compositions;
 using HouseholdAccountBook.Models.Dao.DbTable;
@@ -25,7 +26,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
-using static HouseholdAccountBook.Models.DbConstants;
 
 namespace HouseholdAccountBook.Views.Windows
 {

@@ -10,7 +10,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// ウィンドウタイトル
         /// </summary>
-        public String Title { get; set; }
+        public string Title { get; set; }
 
         /// <summary>
         /// 左位置

@@ -15,7 +15,7 @@ namespace HouseholdAccountBook.Models.Dto.Others
         /// <summary>
         /// 収支種別
         /// </summary>
-        public int BalanceKind { get; set; } = (int)DbConstants.BalanceKind.Others;
+        public int BalanceKind { get; set; } = (int)Enums.BalanceKind.Others;
         /// <summary>
         /// 分類ID
         /// </summary>
