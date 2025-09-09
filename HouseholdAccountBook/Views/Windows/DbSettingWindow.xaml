@@ -6,42 +6,17 @@
         xmlns:project="clr-namespace:HouseholdAccountBook"
         xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:vmw="clr-namespace:HouseholdAccountBook.ViewModels.Windows"
+        xmlns:enums="clr-namespace:HouseholdAccountBook.Enums"
         mc:Ignorable="d"
-        Title="{x:Static properties:Resources.Title_DbSettingWindow}" Height="370" Width="400" WindowStyle="ToolWindow"
-        Initialized="DbSettingWindow_Initialized"
-        Closed="DbSettingWindow_Closed">
+        Title="{x:Static properties:Resources.Title_DbSettingWindow}" Height="370" Width="400" WindowStyle="ToolWindow">
     <Window.DataContext>
         <vmw:DbSettingWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
 
-    <Window.Resources>
-        <!-- パス入力コマンド -->
-        <RoutedCommand x:Key="DumpExePathDialogCommand"/>
-        <RoutedCommand x:Key="RestoreExePathDialogCommand"/>
-        <RoutedCommand x:Key="DBFilePathDialogCommand"/>
-
-        <!-- 登録コマンド -->
-        <RoutedCommand x:Key="OKCommand"/>
-        <RoutedCommand x:Key="CancelCommand"/>
-    </Window.Resources>
-
     <Window.InputBindings>
-        <KeyBinding Gesture="Enter" Command="{StaticResource OKCommand}"/>
-        <KeyBinding Gesture="Esc" Command="{StaticResource CancelCommand}"/>
+        <KeyBinding Gesture="Enter" Command="{Binding OKCommand}"/>
+        <KeyBinding Gesture="Esc" Command="{Binding CancelCommand}"/>
     </Window.InputBindings>
-
-    <Window.CommandBindings>
-        <CommandBinding Command="{StaticResource DumpExePathDialogCommand}"
-                        Executed="DumpExePathDialogCommand_Executed"/>
-        <CommandBinding Command="{StaticResource RestoreExePathDialogCommand}"
-                        Executed="RestorePathDialogCommand_Executed"/>
-        <CommandBinding Command="{StaticResource DBFilePathDialogCommand}"
-                        Executed="DBFilePathDialogCommand_Executed"/>
-        <CommandBinding Command="{StaticResource OKCommand}" CanExecute="OKCommand_CanExecute"
-                        Executed="OKCommand_Executed"/>
-        <CommandBinding Command="{StaticResource CancelCommand}" 
-                        Executed="CancelCommand_Executed"/>
-    </Window.CommandBindings>
 
     <Grid Margin="5" Grid.IsSharedSizeScope="True">
         <Grid.ColumnDefinitions>
@@ -57,7 +32,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" VerticalAlignment="Center"
-                       Text="{Binding Message}"/>
+                   Text="{Binding Message}"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
                    Text="{x:Static properties:Resources.TextBlock_DBKind}"/>
@@ -117,11 +92,15 @@
 
                     <TextBlock Grid.Row="6" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
                     <TextBox Grid.Row="6" Grid.Column="1" Margin="1" Text="{Binding DumpExePath}" IsReadOnly="True"/>
-                    <Button Grid.Row="6" Grid.Column="2" Margin="1" Content="..." Command="{StaticResource DumpExePathDialogCommand}"/>
+                    <Button Grid.Row="6" Grid.Column="2" Margin="1" Content="..."
+                            Command="{Binding DataContext.SelectFilePathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                            CommandParameter="{x:Static enums:FilePathKind.DumpExeFile}"/>
 
                     <TextBlock Grid.Row="7" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
                     <TextBox Grid.Row="7" Grid.Column="1" Margin="1" Text="{Binding RestoreExePath}" IsReadOnly="True"/>
-                    <Button Grid.Row="7" Grid.Column="2" Margin="1" Content="..." Command="{StaticResource RestoreExePathDialogCommand}"/>
+                    <Button Grid.Row="7" Grid.Column="2" Margin="1" Content="..." 
+                            Command="{Binding DataContext.SelectFilePathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                            CommandParameter="{x:Static enums:FilePathKind.RestoreExeFile}"/>
 
                 </Grid>
             </GroupBox>
@@ -166,7 +145,9 @@
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Access_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
                     <TextBox Grid.Row="1" Grid.Column="1" Margin="1" Text="{Binding DBFilePath}" IsReadOnly="True"/>
-                    <Button Grid.Row="1" Grid.Column="2" Margin="1" Content="..." Command="{StaticResource DBFilePathDialogCommand}"/>
+                    <Button Grid.Row="1" Grid.Column="2" Margin="1" Content="..."
+                            Command="{Binding DataContext.SelectFilePathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                            CommandParameter="{x:Static enums:FilePathKind.DbFile}"/>
                 </Grid>
             </GroupBox>
         </Grid>
@@ -205,7 +186,9 @@
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_SQLite_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
                     <TextBox Grid.Row="0" Grid.Column="1" Margin="1" Text="{Binding DBFilePath}" IsReadOnly="True"/>
-                    <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="..." Command="{StaticResource DBFilePathDialogCommand}"/>
+                    <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="..." 
+                            Command="{Binding DataContext.SelectFilePathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                            CommandParameter="{x:Static enums:FilePathKind.DbFile}"/>
                 </Grid>
             </GroupBox>
         </Grid>
@@ -216,8 +199,8 @@
                 <ColumnDefinition Width="0.5*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Margin="5" Content="{x:Static properties:Resources.Button_OK}" Command="{StaticResource OKCommand}"/>
-            <Button Grid.Column="1" Margin="5" Content="{x:Static properties:Resources.Button_Cancel}" Command="{StaticResource CancelCommand}"/>
+            <Button Grid.Column="0" Margin="5" Content="{x:Static properties:Resources.Button_OK}" Command="{Binding OKCommand}"/>
+            <Button Grid.Column="1" Margin="5" Content="{x:Static properties:Resources.Button_Cancel}" Command="{Binding CancelCommand}"/>
         </Grid>
     </Grid>
 </Window>

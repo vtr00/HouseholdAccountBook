@@ -418,7 +418,7 @@ namespace HouseholdAccountBook.Views.Windows
             if (this.WVM.SelectedItemVM == null) return;
 
             ObservableCollection<ShopViewModel> shopNameVMList = [
-                new ShopViewModel() { Name = String.Empty }
+                new ShopViewModel() { Name = string.Empty }
             ];
             string selectedShopName = shopName ?? this.WVM.SelectedShopName ?? shopNameVMList[0].Name;
             ShopViewModel selectedShopVM = shopNameVMList[0]; // UNUSED

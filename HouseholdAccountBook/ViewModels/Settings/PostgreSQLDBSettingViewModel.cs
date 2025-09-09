@@ -1,5 +1,9 @@
 ﻿using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
+using System;
+using System.IO;
+using System.Windows.Navigation;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {
@@ -117,5 +121,53 @@ namespace HouseholdAccountBook.ViewModels.Settings
         private PostgresPasswordInput _PasswordInput = PostgresPasswordInput.InputWindow;
         #endregion
         #endregion
+
+        public void Load(Action<string> setPassword)
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            this.Host = settings.App_Postgres_Host;
+            this.Port = settings.App_Postgres_Port;
+            this.UserName = settings.App_Postgres_UserName;
+            setPassword?.Invoke(settings.App_Postgres_Password == string.Empty ?
+                ProtectedDataExtension.DecryptPassword(settings.App_Postgres_EncryptedPassword) : settings.App_Postgres_Password);
+#if DEBUG
+            this.DatabaseName = settings.App_Postgres_DatabaseName_Debug;
+#else
+            this.DatabaseName = settings.App_Postgres_DatabaseName;
+#endif
+            this.Role = settings.App_Postgres_Role;
+            this.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_DumpExePath);
+            this.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_RestoreExePath);
+        }
+
+        public bool Save(Func<string> getPassword)
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            settings.App_Postgres_Host = this.Host;
+            settings.App_Postgres_Port = this.Port.Value;
+            settings.App_Postgres_UserName = this.UserName;
+            settings.App_Postgres_Password = string.Empty; // パスワードは暗号化して保存するので、空にしておく
+            settings.App_Postgres_EncryptedPassword = ProtectedDataExtension.EncryptPassword(getPassword?.Invoke());
+            settings.App_Postgres_DatabaseName = this.DatabaseName;
+            settings.App_Postgres_Role = this.Role;
+            settings.App_Postgres_DumpExePath = Path.GetFullPath(this.DumpExePath, App.GetCurrentDir());
+            settings.App_Postgres_RestoreExePath = Path.GetFullPath(this.RestoreExePath, App.GetCurrentDir());
+
+            return true;
+        }
+
+        public bool CanSave(Func<string> getPassword)
+        {
+            if (string.IsNullOrWhiteSpace(this.Host)) return false;
+            if (!this.Port.HasValue || this.Port < 1 || this.Port > 65535) return false;
+            if (string.IsNullOrWhiteSpace(this.UserName)) return false;
+            if (string.IsNullOrWhiteSpace(getPassword?.Invoke())) return false;
+            if (string.IsNullOrWhiteSpace(this.DatabaseName)) return false;
+            if (string.IsNullOrWhiteSpace(this.DumpExePath) || !File.Exists(this.DumpExePath)) return false;
+            if (string.IsNullOrWhiteSpace(this.RestoreExePath) || !File.Exists(this.RestoreExePath)) return false;
+            return true;
+        }
     }
 }

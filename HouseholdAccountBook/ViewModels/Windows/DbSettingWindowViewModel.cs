@@ -1,7 +1,15 @@
-﻿using HouseholdAccountBook.Enums;
+﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.Extensions;
+using HouseholdAccountBook.Models.DbHandler;
+using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Windows;
+using System.Windows.Input;
 using static HouseholdAccountBook.Views.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.Windows
@@ -9,9 +17,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
     /// <summary>
     /// DB設定ウィンドウVM
     /// </summary>
-    public class DbSettingWindowViewModel : BindableBase
+    public class DbSettingWindowViewModel : WindowViewModelBase
     {
-        #region プロパティ
+        /// <summary>
+        /// パスワードを設定する
+        /// </summary>
+        public Action<string> SetPassword;
+        /// <summary>
+        /// パスワードを取得する
+        /// </summary>
+        public Func<string> GetPassword;
+
+        #region Bindingプロパティ
         /// <summary>
         /// 表示メッセージ
         /// </summary>
@@ -77,6 +94,188 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         private FileDbSettingViewModel _SQLiteSettingVM = new();
         #endregion
+
+        public　override ICommand SelectFilePathCommand => new RelayCommand<FilePathKind>(this.SelectFilePathCommand_Executed);
         #endregion
+
+        /// <summary>
+        /// ファイル選択ボタンクリック時のコマンド処理
+        /// </summary>
+        /// <param name="kind"></param>
+        public void SelectFilePathCommand_Executed(FilePathKind kind)
+        {
+            bool checkFileExists = true;
+            string directory = string.Empty;
+            string fileName = string.Empty;
+            string filter = string.Empty;
+            switch (kind) {
+                case FilePathKind.DumpExeFile: {
+                    (directory, fileName) = PathExtensions.GetSeparatedPath(this.PostgreSQLDBSettingVM.DumpExePath, App.GetCurrentDir());
+                    if (string.IsNullOrWhiteSpace(directory)) {
+                        directory = App.GetCurrentDir();
+                    }
+                    filter = "pg_dump.exe|pg_dump.exe";
+                    break;
+                }
+                case FilePathKind.RestoreExeFile: {
+                    (directory, fileName) = PathExtensions.GetSeparatedPath(this.PostgreSQLDBSettingVM.RestoreExePath, App.GetCurrentDir());
+                    if (string.IsNullOrWhiteSpace(directory)) {
+                        directory = App.GetCurrentDir();
+                    }
+                    filter = "pg_restore.exe|pg_restore.exe";
+                    break;
+                }
+                case FilePathKind.DbFile: {
+                    switch (this.SelectedDBKind) {
+                        case DBKind.SQLite: {
+                            checkFileExists = false;
+                            (directory, fileName) = PathExtensions.GetSeparatedPath(this.SQLiteSettingVM.DBFilePath, App.GetCurrentDir());
+                            filter = $"{Properties.Resources.FileSelectFilter_SQLiteFile}|*.db;*.sqlite;*.sqlite3";
+                            break;
+                        }
+                        case DBKind.Access: {
+                            checkFileExists = false;
+                            (directory, fileName) = PathExtensions.GetSeparatedPath(this.AccessSettingVM.DBFilePath, App.GetCurrentDir());
+                            filter = $"{Properties.Resources.FileSelectFilter_AccessFile}|*.mdb;*.accdb";
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            this.OpenFileDialogRequest(new OpenFileDialogRequestEventArgs() {
+                CheckFileExists = checkFileExists,
+                InitialDirectory = directory,
+                FileName = fileName,
+                Title = Properties.Resources.Title_FileSelection,
+                Filter = filter,
+            }, fileName => {
+                switch (kind) {
+                    case FilePathKind.DumpExeFile:
+                        this.PostgreSQLDBSettingVM.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), fileName);
+                        break;
+                    case FilePathKind.RestoreExeFile:
+                        this.PostgreSQLDBSettingVM.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), fileName);
+                        break;
+                    case FilePathKind.DbFile:
+                        switch (this.SelectedDBKind) {
+                            case DBKind.SQLite:
+                                this.SQLiteSettingVM.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), fileName);
+                                break;
+                            case DBKind.Access:
+                                this.AccessSettingVM.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), fileName);
+                                break;
+                        }
+                        break;
+                }
+            });
+        }
+
+        protected override void OKCommand_Executed()
+        {
+            bool result = false;
+            Properties.Settings settings = Properties.Settings.Default;
+            settings.App_SelectedDBKind = (int)this.SelectedDBKind;
+
+            switch (this.SelectedDBKind) {
+                case DBKind.PostgreSQL: {
+                    result = this.PostgreSQLDBSettingVM.Save(this.GetPassword);
+                    break;
+                }
+                case DBKind.SQLite: {
+                    result = this.SQLiteSettingVM.Save();
+                    break;
+                }
+                case DBKind.Access: {
+                    result = this.AccessSettingVM.Save();
+                    break;
+                }
+
+                case DBKind.Undefined:
+                default:
+                    break;
+            }
+
+            if (result) {
+                settings.Save();
+                base.OKCommand_Executed();
+            }
+        }
+
+        protected override bool OKCommand_CanExecute()
+        {
+            bool canExecute;
+            switch (this.SelectedDBKind) {
+                case DBKind.SQLite: {
+                    canExecute = this.SQLiteSettingVM.CanSave();
+                    break;
+                }
+                case DBKind.PostgreSQL: {
+                    canExecute = this.PostgreSQLDBSettingVM.CanSave(this.GetPassword);
+                    break;
+                }
+                case DBKind.Access: {
+                    canExecute = this.AccessSettingVM.CanSave();
+                    break;
+                }
+                case DBKind.Undefined:
+                default:
+                    canExecute = false;
+                    break;
+            }
+            return canExecute;
+        }
+
+        #region ウィンドウ設定プロパティ
+        public override Rect WindowRectSetting
+        {
+            set {
+                Properties.Settings settings = Properties.Settings.Default;
+
+                if (settings.App_IsPositionSaved) {
+                    settings.DbSettingWindow_Left = value.Left;
+                    settings.DbSettingWindow_Top = value.Top;
+                }
+
+                settings.DbSettingWindow_Width = value.Width;
+                settings.DbSettingWindow_Height = value.Height;
+                settings.Save();
+            }
+        }
+
+        public override Size? WindowSizeSetting
+        {
+            get {
+                Properties.Settings settings = Properties.Settings.Default;
+                return WindowSizeSettingImpl(settings.DbSettingWindow_Width, settings.DbSettingWindow_Height);
+            }
+        }
+
+        public override Point? WindowPointSetting
+        {
+            get {
+                Properties.Settings settings = Properties.Settings.Default;
+                return WindowPointSettingImpl(settings.DbSettingWindow_Left, settings.DbSettingWindow_Top, settings.App_IsPositionSaved);
+            }
+        }
+        #endregion
+
+        public override void Initialize(DbHandlerFactory dbHandlerFactory)
+        {
+            base.Initialize(dbHandlerFactory);
+
+            Properties.Settings settings = Properties.Settings.Default;
+            this.SelectedDBKind = (DBKind)settings.App_SelectedDBKind;
+
+            // PostgreSQL
+            this.PostgreSQLDBSettingVM.Load(this.SetPassword);
+
+            // SQLite
+            this.SQLiteSettingVM.Load();
+
+            // Access
+            this.AccessSettingVM.Load();
+        }
     }
 }

@@ -202,10 +202,10 @@ namespace HouseholdAccountBook.Views.UserControls
         {
             if (this.Command != null) {
                 if (this.Command is RoutedCommand command) {
-                    //this.IsEnabled = command.CanExecute(this.CommandParameter, this.CommandTarget);
+                    this.IsEnabled = command?.CanExecute(this.CommandParameter, this.CommandTarget) ?? true;
                 }
                 else {
-                    //this.IsEnabled = this.Command.CanExecute(this.CommandParameter);
+                    this.IsEnabled = this.Command?.CanExecute(this.CommandParameter) ?? true;
                 }
             }
         }

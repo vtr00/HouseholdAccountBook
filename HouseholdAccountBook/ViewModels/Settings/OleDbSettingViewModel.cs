@@ -1,6 +1,9 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
+﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.Extensions;
+using HouseholdAccountBook.ViewModels.Abstract;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {
@@ -43,5 +46,30 @@ namespace HouseholdAccountBook.ViewModels.Settings
         private string _DBFilePath = default;
         #endregion
 
+        public void Load()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            this.ProviderNameDic.Clear();
+            OleDbHandler.GetOleDbProvider().ForEach(this.ProviderNameDic.Add);
+            this.SelectedProviderName = settings.App_Access_Provider;
+            this.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Access_DBFilePath);
+        }
+
+        public bool Save()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            settings.App_Access_Provider = this.SelectedProviderName;
+            settings.App_Access_DBFilePath = Path.GetFullPath(this.DBFilePath, App.GetCurrentDir());
+            return true;
+        }
+
+        public bool CanSave()
+        {
+            if (string.IsNullOrWhiteSpace(this.SelectedProviderName)) return false;
+            if (string.IsNullOrWhiteSpace(this.DBFilePath)) return false;
+            return true;
+        }
     }
 }

@@ -8,9 +8,9 @@ namespace HouseholdAccountBook.ViewModels
         private readonly Action _execute = execute;
         private readonly Func<bool> _canExecute = canExecute;
 
-        public bool CanExecute(object parameter) => this._canExecute();
+        public bool CanExecute(object parameter) => this._canExecute?.Invoke() ?? true;
 
-        public void Execute(object parameter) => this._execute();
+        public void Execute(object parameter) => this._execute?.Invoke();
 
         public event EventHandler CanExecuteChanged
         {
@@ -30,7 +30,7 @@ namespace HouseholdAccountBook.ViewModels
 
         public bool CanExecute(object parameter) => this._canExecute?.Invoke((T)parameter) ?? true;
 
-        public void Execute(object parameter) => this._execute((T)parameter);
+        public void Execute(object parameter) => this._execute?.Invoke((T)parameter);
 
         public event EventHandler CanExecuteChanged
         {
