@@ -1,11 +1,10 @@
 ﻿using System.Windows;
 using System.Windows.Input;
-using System.Windows.Navigation;
 
 namespace HouseholdAccountBook.Views.Windows
 {
     /// <summary>
-    /// VersuinWindow.xaml の相互作用ロジック
+    /// VersionWindow.xaml の相互作用ロジック
     /// </summary>
     public partial class VersionWindow : Window
     {
@@ -29,17 +28,6 @@ namespace HouseholdAccountBook.Views.Windows
             this.Close();
         }
         #endregion
-
-        /// <summary>
-        /// ハイパーリンククリック時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
-        {
-            _ = System.Diagnostics.Process.Start(e.Uri.AbsoluteUri);
-            e.Handled = true;
-        }
 
         #region ウィンドウ
         /// <summary>

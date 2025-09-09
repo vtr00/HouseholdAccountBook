@@ -56,14 +56,14 @@
             <TextBlock Text="{x:Static properties:Resources.TextBlock_Support}"/>:
         </TextBlock>
         <TextBlock Grid.Row="2" Grid.Column="1">
-            <Hyperlink NavigateUri="{Binding SupportSiteUri}" ToolTip="{Binding SupportSiteUri}" RequestNavigate="Hyperlink_RequestNavigate">GitHub</Hyperlink>
+            <Hyperlink Command="{Binding OpenUriCommand}" CommandParameter="{Binding SupportSiteUri}" ToolTip="{Binding SupportSiteUri}">GitHub</Hyperlink>
         </TextBlock>
 
         <TextBlock Grid.Row="3" Grid.Column="0">
             <TextBlock Text="{x:Static properties:Resources.TextBlock_SNS}"/>:
         </TextBlock>
         <TextBlock Grid.Row="3" Grid.Column="1">
-            <Hyperlink NavigateUri="{Binding SnsSiteUri}" ToolTip="{Binding SnsSiteUri}" RequestNavigate="Hyperlink_RequestNavigate">@toresebu</Hyperlink>
+            <Hyperlink Command="{Binding OpenUriCommand}" CommandParameter="{Binding SnsSiteUri}" ToolTip="{Binding SnsSiteUri}">@toresebu</Hyperlink>
         </TextBlock>
 
         <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2">
