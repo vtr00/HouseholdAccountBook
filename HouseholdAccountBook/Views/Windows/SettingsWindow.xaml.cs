@@ -98,7 +98,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void AddCategoryCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 HierarchicalViewModel vm = this.WVM.SelectedHierarchicalVM;
                 while (HierarchicalSettingViewModel.GetHierarchicalKind(vm) != HierarchicalKind.Balance) {
                     vm = vm.ParentVM;
@@ -132,7 +132,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void AddItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 HierarchicalViewModel vm = this.WVM.SelectedHierarchicalVM;
                 while (HierarchicalSettingViewModel.GetHierarchicalKind(vm) != HierarchicalKind.Category) {
                     vm = vm.ParentVM;
@@ -166,7 +166,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void DeleteItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 HierarchicalKind? kind = HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM);
                 int id = this.WVM.SelectedHierarchicalVM.Id;
 
@@ -241,7 +241,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void RaiseItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 var parentVM = this.WVM.SelectedHierarchicalVM.ParentVM;
                 int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedHierarchicalVM);
                 int changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
@@ -311,7 +311,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void DropItemSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 var parentVM = this.WVM.SelectedHierarchicalVM.ParentVM;
                 int index = parentVM.ChildrenVMList.IndexOf(this.WVM.SelectedHierarchicalVM);
                 int changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
@@ -368,7 +368,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void SaveItemInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 HierarchicalSettingViewModel vm = this.WVM.DisplayedHierarchicalSettingVM;
 
                 await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
@@ -399,7 +399,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void ChangeItemRelationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
                 HierarchicalSettingViewModel vm = this.WVM.DisplayedHierarchicalSettingVM;
@@ -448,7 +448,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
                     await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
@@ -484,7 +484,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     Debug.Assert(this.WVM.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
                     await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
@@ -510,7 +510,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void AddBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 int bookId = -1;
                 await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     MstBookDao mstBookDao = new(dbHandler);
@@ -539,7 +539,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void DeleteBookCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     await dbHandler.ExecTransactionAsync(async () => {
                         HstActionDao hstActionDao = new(dbHandler);
@@ -580,7 +580,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void RaiseBookSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 int index = this.WVM.BookVMList.IndexOf(this.WVM.SelectedBookVM);
                 int changingId = this.WVM.BookVMList[index].Id.Value;
                 int changedId = this.WVM.BookVMList[index - 1].Id.Value;
@@ -616,7 +616,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void DropBookSortOrderCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 int index = this.WVM.BookVMList.IndexOf(this.WVM.SelectedBookVM);
                 int changingId = this.WVM.BookVMList[index].Id.Value;
                 int changedId = this.WVM.BookVMList[index + 1].Id.Value;
@@ -676,7 +676,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void SaveBookInfoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 BookSettingViewModel vm = this.WVM.DisplayedBookSettingVM;
                 await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     MstBookDto.JsonDto jsonObj = new() {
@@ -715,7 +715,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void ChangeBookRelationCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 BookSettingViewModel vm = this.WVM.DisplayedBookSettingVM;
                 vm.SelectedRelationVM = (e.OriginalSource as CheckBox)?.DataContext as RelationViewModel;
 
@@ -984,7 +984,7 @@ namespace HouseholdAccountBook.Views.Windows
                 Log.Info(this.WVM.SelectedTab.ToString());
 
                 this.oldSelectedSettingsTab = this.WVM.SelectedTab;
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     switch (this.WVM.SelectedTab) {
                         case SettingsTabs.ItemSettingsTab:
                             await this.UpdateItemSettingsTabDataAsync(HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.SelectedHierarchicalVM), this.WVM.SelectedHierarchicalVM?.Id);

@@ -43,12 +43,12 @@ namespace HouseholdAccountBook.Views.Windows
 
             this.AddCommonEventHandlers();
             this.Loaded += async (s, e) => {
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     await this.WVM.LoadMoveInfoAsync(selectedBookId, null, selectedMonth, selectedDate);
                 }
             };
 
-            this.WVM.Initialize(this, dbHandlerFactory);
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
             this.WVM.RegKind = RegistrationKind.Add;
         }
 
@@ -69,12 +69,12 @@ namespace HouseholdAccountBook.Views.Windows
 
             this.AddCommonEventHandlers();
             this.Loaded += async (s, e) => {
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     await this.WVM.LoadMoveInfoAsync(selectedBookId, selectedGroupId, null, null);
                 }
             };
 
-            this.WVM.Initialize(this, dbHandlerFactory);
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
             this.WVM.RegKind = regKind;
         }
         #endregion

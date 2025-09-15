@@ -12,6 +12,7 @@ using HouseholdAccountBook.Models.Dto.DbTable;
 using HouseholdAccountBook.Models.Dto.KHDbTable;
 using HouseholdAccountBook.Models.Dto.Others;
 using HouseholdAccountBook.Models.Logger;
+using HouseholdAccountBook.Others;
 using HouseholdAccountBook.Properties;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views.UserControls;
@@ -155,7 +156,7 @@ namespace HouseholdAccountBook.Views.Windows
             settings.Save();
 
             bool isOpen = false;
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 OleDbHandler.ConnectInfo info = new() {
                     Provider = settings.App_Access_Provider,
                     FilePath = ofd.FileName
@@ -312,7 +313,7 @@ namespace HouseholdAccountBook.Views.Windows
             settings.Save();
 
             int exitCode = -1;
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                     var mstBookDao = new MstBookDao(dbHandler);
                     var mstCategoryDao = new MstCategoryDao(dbHandler);
@@ -404,7 +405,7 @@ namespace HouseholdAccountBook.Views.Windows
                     break;
                 }
                 case (int)DBKind.PostgreSQL: {
-                    using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                         SQLiteDbHandler.ConnectInfo info = new() {
                             FilePath = ofd.FileName
                         };
@@ -507,7 +508,7 @@ namespace HouseholdAccountBook.Views.Windows
             }
 
             bool result = false;
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 NpgsqlDbHandler.ConnectInfo info = new() {
                     Host = settings.App_Postgres_Host,
                     Port = settings.App_Postgres_Port,
@@ -624,7 +625,7 @@ namespace HouseholdAccountBook.Views.Windows
             settings.Save();
 
             int? exitCode = -1;
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 exitCode = await this.ExecuteDumpPostgreSQL(sfd.FileName, PostgresFormat.Custom);
             }
 
@@ -675,7 +676,7 @@ namespace HouseholdAccountBook.Views.Windows
             settings.Save();
 
             int? exitCode = -1;
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 exitCode = await this.ExecuteDumpPostgreSQL(sfd.FileName, PostgresFormat.Plain);
             }
 
@@ -708,7 +709,7 @@ namespace HouseholdAccountBook.Views.Windows
             Log.Info();
 
             bool result = false;
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 result = await this.CreateBackUpFileAsync();
             }
 
@@ -1331,7 +1332,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             Log.Info();
 
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(-1);
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
             }
@@ -1359,7 +1360,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             Log.Info();
 
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 this.WVM.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
             }
@@ -1385,7 +1386,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             Log.Info();
 
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 this.WVM.DisplayedMonth = this.WVM.DisplayedMonth.Value.AddMonths(1);
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
             }
@@ -1411,7 +1412,7 @@ namespace HouseholdAccountBook.Views.Windows
             }
 
             if (stw.ShowDialog() == true) {
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     this.WVM.StartDate = stw.WVM.StartDate;
                     this.WVM.EndDate = stw.WVM.EndDate;
 
@@ -1442,7 +1443,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             Log.Info();
 
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(-1);
                 await this.UpdateAsync(isUpdateBookList: true);
             }
@@ -1470,7 +1471,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             Log.Info();
 
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 this.WVM.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(this.WVM.FiscalStartMonth);
                 await this.UpdateAsync(isUpdateBookList: true);
             }
@@ -1496,7 +1497,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             Log.Info();
 
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 this.WVM.DisplayedYear = this.WVM.DisplayedYear.AddYears(1);
                 await this.UpdateAsync(isUpdateBookList: true);
             }
@@ -1512,7 +1513,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             Log.Info();
 
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 await this.UpdateAsync(isUpdateBookList: true);
             }
         }
@@ -1553,7 +1554,7 @@ namespace HouseholdAccountBook.Views.Windows
             sw.LoadWindowSetting();
 
             if (sw.ShowDialog() == true) {
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     this.WVM.FiscalStartMonth = Properties.Settings.Default.App_StartMonth;
                     await DateTimeExtensions.DownloadHolidayListAsync();
                     await this.UpdateAsync(isUpdateBookList: true);
@@ -1605,7 +1606,7 @@ namespace HouseholdAccountBook.Views.Windows
                 };
                 // 帳簿項目変更時のイベントを登録する
                 this.ccw.ActionChanged += async (sender3, e3) => {
-                    using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                    using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                         // 帳簿一覧タブを更新する
                         await this.UpdateBookTabDataAsync(isScroll: false, isUpdateActDateLastEdited: true);
                     }
@@ -3474,7 +3475,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.SelectedTabChanged += async () => {
                 Log.Info($"SelectedTabChanged SelectedTabIndex:{this.WVM.SelectedTabIndex}");
 
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     settings.MainWindow_SelectedTabIndex = this.WVM.SelectedTabIndex;
                     settings.Save();
 
@@ -3485,7 +3486,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.SelectedBookChanged += async () => {
                 Log.Info($"SelectedBookChanged SelectedBookId:{this.WVM.SelectedBookVM?.Id}");
 
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     settings.MainWindow_SelectedBookId = this.WVM.SelectedBookVM?.Id ?? -1;
                     settings.Save();
 
@@ -3496,7 +3497,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.SelectedGraphKindChanged += async () => {
                 Log.Info($"SelectedGraphKindChanged SelectedGraphKind1Index:{this.WVM.SelectedGraphKind1Index} SelectedGraphKind2Index:{this.WVM.SelectedGraphKind2Index}");
 
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     settings.MainWindow_SelectedGraphKindIndex = this.WVM.SelectedGraphKind1Index;
                     settings.MainWindow_SelectedGraphKind2Index = this.WVM.SelectedGraphKind2Index;
                     settings.Save();
@@ -3508,7 +3509,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.SelectedSeriesChanged += () => {
                 Log.Info("SelectedSeriesChanged");
 
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     this.UpdateSelectedGraph();
                 }
             };

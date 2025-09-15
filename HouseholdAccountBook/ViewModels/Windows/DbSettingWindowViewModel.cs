@@ -258,9 +258,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        public override void Initialize(Window window, DbHandlerFactory dbHandlerFactory)
+        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
         {
-            base.Initialize(window, dbHandlerFactory);
+            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
 
             Properties.Settings settings = Properties.Settings.Default;
             this.SelectedDBKind = (DBKind)settings.App_SelectedDBKind;

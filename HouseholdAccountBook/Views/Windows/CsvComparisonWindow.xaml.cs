@@ -110,7 +110,7 @@ namespace HouseholdAccountBook.Views.Windows
             };
 
             if (ofd.ShowDialog(this) == true) {
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     // 開いたCSVファイルのパスを設定として保存する(複数存在する場合は先頭のみ)
                     settings.App_CsvFilePath = ofd.FileName;
                     settings.Save();
@@ -157,7 +157,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void MoveCsvFilesCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 // ファイルの移動を試みる
                 List<string> tmpCsvFilePathList = [];
                 string dstFolderPath = this.WVM.SelectedBookVM.CsvFolderPath;
@@ -395,7 +395,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void BulkCheckCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 foreach (CsvComparisonViewModel vm in this.WVM.CsvComparisonVMList) {
                     if (vm.ActionId.HasValue && !vm.IsMatch) {
                         vm.IsMatch = true;
@@ -425,7 +425,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void UpdateListCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 await this.UpdateComparisonVMListAsync();
             }
         }

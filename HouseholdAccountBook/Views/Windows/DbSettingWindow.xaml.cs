@@ -28,7 +28,7 @@ namespace HouseholdAccountBook.Views.Windows
 
             this.AddCommonEventHandlers();
 
-            this.WVM.Initialize(this, null);
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), null);
             this.WVM.Message = message;
         }
 

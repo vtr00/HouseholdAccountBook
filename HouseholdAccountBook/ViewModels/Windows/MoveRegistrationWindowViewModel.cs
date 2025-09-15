@@ -344,7 +344,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             // DB登録
             List<int> idList = null;
-            using (WaitCursorUseObject wcuo = this.window.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                 idList = await this.RegisterMoveInfoAsync();
             }
             this.Registrated?.Invoke(this, new EventArgs<List<int>>(idList));
@@ -610,25 +610,25 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private void AddEventHandlers()
         {
             this.FromBookChanged += async (_, _) => {
-                using (WaitCursorUseObject wcuo = this.window.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateItemListAsync();
                     await this.UpdateRemarkListAsync();
                 }
             };
             this.ToBookChanged += async (_, _) => {
-                using (WaitCursorUseObject wcuo = this.window.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateItemListAsync();
                     await this.UpdateRemarkListAsync();
                 }
             };
             this.CommissionKindChanged += async (_, _) => {
-                using (WaitCursorUseObject wcuo = this.window.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateItemListAsync();
                     await this.UpdateRemarkListAsync();
                 }
             };
             this.ItemChanged += async (_, _) => {
-                using (WaitCursorUseObject wcuo = this.window.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateRemarkListAsync();
                 }
             };

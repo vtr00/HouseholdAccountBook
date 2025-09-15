@@ -179,7 +179,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             // DB登録
             int? id = null;
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 id = await this.RegisterToDbAsync();
             }
 
@@ -211,7 +211,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             // DB登録
             int? id = null;
-            using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 id = await this.RegisterToDbAsync();
             }
 
@@ -483,7 +483,7 @@ namespace HouseholdAccountBook.Views.Windows
         private void RegisterEventHandlerToWVM()
         {
             this.WVM.BookChanged += async (bookId) => {
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     await this.UpdateCategoryListAsync();
                     await this.UpdateItemListAsync();
                     await this.UpdateShopListAsync();
@@ -495,7 +495,7 @@ namespace HouseholdAccountBook.Views.Windows
                 this.DateChanged?.Invoke(this, new EventArgs<DateTime>(date));
             };
             this.WVM.BalanceKindChanged += async (_) => {
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     await this.UpdateCategoryListAsync();
                     await this.UpdateItemListAsync();
                     await this.UpdateShopListAsync();
@@ -503,14 +503,14 @@ namespace HouseholdAccountBook.Views.Windows
                 }
             };
             this.WVM.CategoryChanged += async (_) => {
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     await this.UpdateItemListAsync();
                     await this.UpdateShopListAsync();
                     await this.UpdateRemarkListAsync();
                 }
             };
             this.WVM.ItemChanged += async (_) => {
-                using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     await this.UpdateShopListAsync();
                     await this.UpdateRemarkListAsync();
                 }

@@ -37,7 +37,7 @@ namespace HouseholdAccountBook.Views.Windows
                 this.selectedMonthRadioButton.IsChecked = true;
             };
 
-            this.WVM.Initialize(this, dbHandlerFactory);
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
 
         }
 
@@ -66,7 +66,7 @@ namespace HouseholdAccountBook.Views.Windows
                 this.selectedTermRadioButton.IsChecked = true;
             };
 
-            this.WVM.Initialize(this, dbHandlerFactory);
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
 
         }
         #endregion

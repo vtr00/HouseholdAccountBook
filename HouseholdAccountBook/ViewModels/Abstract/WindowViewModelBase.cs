@@ -9,9 +9,9 @@ namespace HouseholdAccountBook.ViewModels.Abstract
     public abstract class WindowViewModelBase : BindableBase
     {
         /// <summary>
-        /// 対象のウィンドウ
+        /// WaitCursorマネージャファクトリ
         /// </summary>
-        protected Window window;
+        protected WaitCursorManagerFactory waitCursorManagerFactory;
         /// <summary>
         /// DBハンドラファクトリ
         /// </summary>
@@ -119,12 +119,12 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// ViewModelの初期化を行う
         /// </summary>
-        /// <param name="window">ウィンドウ</param>
+        /// <param name="waitCursorManagerFactory">WaitCursorマネージャファクトリ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <remarks>コードビハインドのコンストラクタで呼び出す</remarks>
-        public virtual void Initialize(Window window, DbHandlerFactory dbHandlerFactory)
+        public virtual void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
         {
-            this.window = window;
+            this.waitCursorManagerFactory = waitCursorManagerFactory;
             this.dbHandlerFactory = dbHandlerFactory;
         }
 
