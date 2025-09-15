@@ -1593,8 +1593,7 @@ namespace HouseholdAccountBook.Views.Windows
             Log.Info();
 
             if (this.ccw is null) {
-                this.ccw = new CsvComparisonWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id) { Owner = this };
-                this.ccw.LoadWindowSetting();
+                this.ccw = new CsvComparisonWindow(this, this.dbHandlerFactory, this.WVM.SelectedBookVM.Id);
 
                 // 帳簿項目の一致フラグ変更時のイベントを登録する
                 this.ccw.IsMatchChanged += (sender2, e2) => {

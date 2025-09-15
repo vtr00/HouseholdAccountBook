@@ -22,6 +22,10 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// </summary>
         public event EventHandler<CloseRequestEventArgs> CloseRequested;
         /// <summary>
+        /// ウィンドウの非表示をリクエストする
+        /// </summary>
+        public event EventHandler<EventArgs> HideRequested;
+        /// <summary>
         /// ファイル選択ダイアログをリクエストする
         /// </summary>
         public event EventHandler<OpenFileDialogRequestEventArgs> OpenFileDialogRequested;
@@ -66,6 +70,12 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         protected virtual void CanncelCommand_Executed()
         {
             this.CloseRequest(new CloseRequestEventArgs(false));
+        }
+
+        public ICommand HideCommand => new RelayCommand(this.HideCommand_Executed);
+        protected virtual void HideCommand_Executed()
+        {
+            this.HideRequest();
         }
 
         /// <summary>
@@ -136,6 +146,13 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         {
             this.CloseRequested?.Invoke(this, e);
         }
+        /// <summary>
+        /// ウィンドウの非表示をリクエストする
+        /// </summary>
+        protected void HideRequest()
+        {
+            this.HideRequested?.Invoke(this, EventArgs.Empty);
+        }
 
         /// <summary>
         /// ファイル選択ダイアログをリクエストする
@@ -144,9 +161,24 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <param name="fileSelected"></param>
         protected void OpenFileDialogRequest(OpenFileDialogRequestEventArgs e, Action<string> fileSelected)
         {
+            e.Multiselect = false;
             this.OpenFileDialogRequested?.Invoke(this, e);
             if (e.Result == true) {
                 fileSelected?.Invoke(e.FileName);
+            }
+        }
+
+        /// <summary>
+        /// ファイル選択ダイアログをリクエストする
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="filesSelected"></param>
+        protected void OpenFilesDialogRequest(OpenFileDialogRequestEventArgs e, Action<string[]> filesSelected)
+        {
+            e.Multiselect = true;
+            this.OpenFileDialogRequested?.Invoke(this, e);
+            if (e.Result == true) {
+                filesSelected?.Invoke(e.FileNames);
             }
         }
     }

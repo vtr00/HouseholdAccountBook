@@ -14,6 +14,10 @@ namespace HouseholdAccountBook.Others
 
         public string Filter { get; set; }
 
+        public bool Multiselect { get; set; } = false;
+
+        public string[] FileNames { get; set; }
+
         public bool? Result { get; set; } = false;
     }
 }

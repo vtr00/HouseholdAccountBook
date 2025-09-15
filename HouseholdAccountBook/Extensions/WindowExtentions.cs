@@ -63,7 +63,8 @@ namespace HouseholdAccountBook.Extensions
         /// ウィンドウ設定を保存する
         /// </summary>
         /// <param name="window"></param>
-        private static void SaveWindowSetting(this Window window)
+        /// <remarks>通常ウィンドウクローズ時に呼ばれる</remarks>
+        public static void SaveWindowSetting(this Window window)
         {
             if (window.DataContext is not WindowViewModelBase wvm) {
                 return;
@@ -87,14 +88,28 @@ namespace HouseholdAccountBook.Extensions
         /// <remarks>コンストラクタで呼び出す</remarks>
         public static void AddCommonEventHandlers(this Window window)
         {
+            /// ウィンドウのイベントハンドラを登録する
             window.Closed += (sender, e) => {
                 window.SaveWindowSetting();
+            };
+            window.IsVisibleChanged += (sender, e) => {
+                bool oldValue = (bool)e.OldValue;
+                bool newValue = (bool)e.NewValue;
+                if (!oldValue && newValue) {
+                    if (newValue) {
+                        window.LoadWindowSetting();
+                    }
+                    else {
+                        window.SaveWindowSetting();
+                    }
+                }
             };
 
             if (window.DataContext is not WindowViewModelBase wvm) {
                 return;
             }
 
+            /// ViewModelのイベントハンドラを登録する
             wvm.CloseRequested += (sender, e) => {
                 if (e.IsDialog) {
                     try {
@@ -104,6 +119,9 @@ namespace HouseholdAccountBook.Extensions
                 }
                 window.Close();
             };
+            wvm.HideRequested += (sender, e) => {
+                window.Hide();
+            };
 
             wvm.OpenFileDialogRequested += (sender, e) => {
                 OpenFileDialog ofd = new() {
@@ -111,12 +129,20 @@ namespace HouseholdAccountBook.Extensions
                     InitialDirectory = e.InitialDirectory,
                     FileName = e.FileName,
                     Title = e.Title,
-                    Filter = e.Filter
+                    Filter = e.Filter,
+                    Multiselect = e.Multiselect
                 };
 
                 e.Result = ofd.ShowDialog(window);
                 if (e.Result == true) {
-                    e.FileName = ofd.FileName;
+                    switch(e.Multiselect) {
+                        case false:
+                            e.FileName = ofd.FileName;
+                            break;
+                        case true:
+                            e.FileNames = ofd.FileNames;
+                            break;
+                    }
                 }
             };
         }
