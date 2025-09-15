@@ -821,9 +821,8 @@ namespace HouseholdAccountBook.Views.Windows
         {
             Log.Info();
 
-            this.mrw = new MoveRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id,
-                this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
-            this.mrw.LoadWindowSetting();
+            this.mrw = new MoveRegistrationWindow(this, this.dbHandlerFactory, this.WVM.SelectedBookVM.Id,
+                this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime);
 
             // 登録時イベントを登録する
             this.mrw.Registrated += async (sender2, e2) => {
@@ -947,8 +946,7 @@ namespace HouseholdAccountBook.Views.Windows
             switch (groupKind) {
                 case (int)GroupKind.Move:
                     // 移動の編集時の処理
-                    this.mrw = new MoveRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
-                    this.mrw.LoadWindowSetting();
+                    this.mrw = new MoveRegistrationWindow(this, this.dbHandlerFactory, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value);
 
                     // 登録時イベントを登録する
                     this.mrw.Registrated += async (sender2, e2) => {
@@ -1051,8 +1049,7 @@ namespace HouseholdAccountBook.Views.Windows
             }
             else {
                 // 移動の複製時の処理
-                this.mrw = new MoveRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationKind.Copy) { Owner = this };
-                this.mrw.LoadWindowSetting();
+                this.mrw = new MoveRegistrationWindow(this, this.dbHandlerFactory, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value, RegistrationKind.Copy);
 
                 // 登録時イベントを登録する
                 this.mrw.Registrated += async (sender2, e2) => {
@@ -1406,13 +1403,12 @@ namespace HouseholdAccountBook.Views.Windows
             TermWindow stw = null;
             switch (this.WVM.DisplayedTermKind) {
                 case TermKind.Monthly:
-                    stw = new TermWindow(this.dbHandlerFactory, this.WVM.DisplayedMonth.Value) { Owner = this };
+                    stw = new TermWindow(this, this.dbHandlerFactory, this.WVM.DisplayedMonth.Value) { Owner = this };
                     break;
                 case TermKind.Selected:
-                    stw = new TermWindow(this.dbHandlerFactory, this.WVM.StartDate, this.WVM.EndDate) { Owner = this };
+                    stw = new TermWindow(this, this.dbHandlerFactory, this.WVM.StartDate, this.WVM.EndDate) { Owner = this };
                     break;
             }
-            stw.LoadWindowSetting();
 
             if (stw.ShowDialog() == true) {
                 using (WaitCursorUseObject wcuo = this.CreateWaitCorsorUseObject()) {

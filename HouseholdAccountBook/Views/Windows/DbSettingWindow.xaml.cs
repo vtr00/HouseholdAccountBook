@@ -16,16 +16,19 @@ namespace HouseholdAccountBook.Views.Windows
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="message">表示メッセージ</param>
-        public DbSettingWindow(string message)
+        public DbSettingWindow(Window owner, string message)
         {
             this.InitializeComponent();
+
+            this.Owner = owner;
+            this.LoadWindowSetting();
 
             this.WVM.SetPassword = password => { this.passwordBox.Password = password; };
             this.WVM.GetPassword = () => { return this.passwordBox.Password; };
 
-            this.RegisterEventHandlers(this.WVM);
+            this.AddCommonEventHandlers();
 
-            this.WVM.Initialize(null);
+            this.WVM.Initialize(this, null);
             this.WVM.Message = message;
         }
 

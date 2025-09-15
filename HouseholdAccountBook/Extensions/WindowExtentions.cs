@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Models.Logger;
 using HouseholdAccountBook.ViewModels.Abstract;
 using Microsoft.Win32;
+using System;
 using System.Windows;
 
 namespace HouseholdAccountBook.Extensions
@@ -35,9 +36,13 @@ namespace HouseholdAccountBook.Extensions
         /// ウィンドウ設定を読み込む
         /// </summary>
         /// <param name="window"></param>
-        /// <param name="wvm"></param>
-        public static void LoadWindowSetting(this Window window, WindowViewModelBase wvm)
+        /// <remarks>コンストラクタで呼び出す</remarks>
+        public static void LoadWindowSetting(this Window window)
         {
+            if (window.DataContext is not WindowViewModelBase wvm) {
+                return;
+            }
+
             Size? size = wvm.WindowSizeSetting;
             if (size is not null) {
                 window.Width = size.Value.Width;
@@ -58,9 +63,12 @@ namespace HouseholdAccountBook.Extensions
         /// ウィンドウ設定を保存する
         /// </summary>
         /// <param name="window"></param>
-        /// <param name="wvm"></param>
-        public static void SaveWindowSetting(this Window window, WindowViewModelBase wvm)
+        private static void SaveWindowSetting(this Window window)
         {
+            if (window.DataContext is not WindowViewModelBase wvm) {
+                return;
+            }
+
             if (window.WindowState == WindowState.Normal) {
                 Rect rect = new() {
                     X = window.Left,
@@ -73,24 +81,30 @@ namespace HouseholdAccountBook.Extensions
         }
 
         /// <summary>
-        /// 
+        /// 共通のイベントハンドラを登録する
         /// </summary>
         /// <param name="window"></param>
-        /// <param name="wvm"></param>
-        public static void RegisterEventHandlers(this Window window, WindowViewModelBase wvm)
+        /// <remarks>コンストラクタで呼び出す</remarks>
+        public static void AddCommonEventHandlers(this Window window)
         {
-            window.Initialized += (sender, e) => {
-                window.LoadWindowSetting(wvm);
-            };
             window.Closed += (sender, e) => {
-                window.SaveWindowSetting(wvm);
+                window.SaveWindowSetting();
             };
+
+            if (window.DataContext is not WindowViewModelBase wvm) {
+                return;
+            }
+
             wvm.CloseRequested += (sender, e) => {
                 if (e.IsDialog) {
-                    window.DialogResult = e.DialogResult;
+                    try {
+                        window.DialogResult = e.DialogResult;
+                    }
+                    catch (InvalidOperationException) { }
                 }
                 window.Close();
             };
+
             wvm.OpenFileDialogRequested += (sender, e) => {
                 OpenFileDialog ofd = new() {
                     CheckFileExists = true,

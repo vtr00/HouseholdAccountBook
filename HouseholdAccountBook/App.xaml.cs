@@ -138,10 +138,9 @@ namespace HouseholdAccountBook
                     string message = dbHandlerFactory is not null
                         ? HouseholdAccountBook.Properties.Resources.Message_FoultToConnectDb
                         : HouseholdAccountBook.Properties.Resources.Message_PleaseInputDbSetting;
-                    DbSettingWindow dsw = new(message);
-                    bool? result = dsw.ShowDialog();
+                    DbSettingWindow dsw = new(null, message);
 
-                    if (result != true) {
+                    if (dsw.ShowDialog() != true) {
                         this.Shutdown();
                         return;
                     }

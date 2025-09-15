@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.DbHandler;
-using HouseholdAccountBook.Enums;
+﻿using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Models.DbHandler;
 using HouseholdAccountBook.Others;
@@ -7,7 +6,6 @@ using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.Views.UiConstants;
@@ -95,7 +93,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private FileDbSettingViewModel _SQLiteSettingVM = new();
         #endregion
 
-        public　override ICommand SelectFilePathCommand => new RelayCommand<FilePathKind>(this.SelectFilePathCommand_Executed);
+        public override ICommand SelectFilePathCommand => new RelayCommand<FilePathKind>(this.SelectFilePathCommand_Executed);
         #endregion
 
         /// <summary>
@@ -172,37 +170,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
             });
         }
 
-        protected override void OKCommand_Executed()
-        {
-            bool result = false;
-            Properties.Settings settings = Properties.Settings.Default;
-            settings.App_SelectedDBKind = (int)this.SelectedDBKind;
-
-            switch (this.SelectedDBKind) {
-                case DBKind.PostgreSQL: {
-                    result = this.PostgreSQLDBSettingVM.Save(this.GetPassword);
-                    break;
-                }
-                case DBKind.SQLite: {
-                    result = this.SQLiteSettingVM.Save();
-                    break;
-                }
-                case DBKind.Access: {
-                    result = this.AccessSettingVM.Save();
-                    break;
-                }
-
-                case DBKind.Undefined:
-                default:
-                    break;
-            }
-
-            if (result) {
-                settings.Save();
-                base.OKCommand_Executed();
-            }
-        }
-
         protected override bool OKCommand_CanExecute()
         {
             bool canExecute;
@@ -225,6 +192,36 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     break;
             }
             return canExecute;
+        }
+
+        protected override void OKCommand_Executed()
+        {
+            bool result = false;
+            Properties.Settings settings = Properties.Settings.Default;
+            settings.App_SelectedDBKind = (int)this.SelectedDBKind;
+
+            switch (this.SelectedDBKind) {
+                case DBKind.PostgreSQL: {
+                    result = this.PostgreSQLDBSettingVM.Save(this.GetPassword);
+                    break;
+                }
+                case DBKind.SQLite: {
+                    result = this.SQLiteSettingVM.Save();
+                    break;
+                }
+                case DBKind.Access: {
+                    result = this.AccessSettingVM.Save();
+                    break;
+                }
+                case DBKind.Undefined:
+                default:
+                    break;
+            }
+
+            if (result) {
+                settings.Save();
+                base.OKCommand_Executed();
+            }
         }
 
         #region ウィンドウ設定プロパティ
@@ -261,9 +258,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        public override void Initialize(DbHandlerFactory dbHandlerFactory)
+        public override void Initialize(Window window, DbHandlerFactory dbHandlerFactory)
         {
-            base.Initialize(dbHandlerFactory);
+            base.Initialize(window, dbHandlerFactory);
 
             Properties.Settings settings = Properties.Settings.Default;
             this.SelectedDBKind = (DBKind)settings.App_SelectedDBKind;

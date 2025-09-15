@@ -9,6 +9,10 @@ namespace HouseholdAccountBook.ViewModels.Abstract
     public abstract class WindowViewModelBase : BindableBase
     {
         /// <summary>
+        /// 対象のウィンドウ
+        /// </summary>
+        protected Window window;
+        /// <summary>
         /// DBハンドラファクトリ
         /// </summary>
         protected DbHandlerFactory dbHandlerFactory;
@@ -40,13 +44,18 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// </summary>
         public ICommand OKCommand => new RelayCommand(this.OKCommand_Executed, this.OKCommand_CanExecute);
         /// <summary>
+        /// OKボタンクリックの実行可否
+        /// </summary>
+        /// <returns></returns>
+        protected virtual bool OKCommand_CanExecute() { return true; }
+        /// <summary>
         /// OKボタンクリック時のコマンド処理
         /// </summary>
         protected virtual void OKCommand_Executed()
         {
             this.CloseRequest(new CloseRequestEventArgs(true));
         }
-        protected virtual bool OKCommand_CanExecute() { return true; }
+
         /// <summary>
         /// キャンセルボタンクリック時のコマンド
         /// </summary>
@@ -58,6 +67,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         {
             this.CloseRequest(new CloseRequestEventArgs(false));
         }
+
         /// <summary>
         /// ファイル選択ボタンクリック時のコマンド
         /// </summary>
@@ -107,12 +117,14 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         }
 
         /// <summary>
-        /// ウィンドウの初期化を行う
+        /// ViewModelの初期化を行う
         /// </summary>
+        /// <param name="window">ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <remarks>コードビハインドのコンストラクタで呼ばれる</remarks>
-        public virtual void Initialize(DbHandlerFactory dbHandlerFactory)
+        /// <remarks>コードビハインドのコンストラクタで呼び出す</remarks>
+        public virtual void Initialize(Window window, DbHandlerFactory dbHandlerFactory)
         {
+            this.window = window;
             this.dbHandlerFactory = dbHandlerFactory;
         }
 

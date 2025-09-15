@@ -19,11 +19,14 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="dateWithinMonth">月内日付</param>
-        public TermWindow(DbHandlerFactory dbHandlerFactory, DateTime dateWithinMonth)
+        public TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateTime dateWithinMonth)
         {
             this.InitializeComponent();
 
-            this.RegisterEventHandlers(this.WVM);
+            this.Owner = owner;
+            this.LoadWindowSetting();
+
+            this.AddCommonEventHandlers();
             // ロード時処理はコンストラクタで設定しておく
             this.Loaded += (sender, e) => {
                 // xamlで指定するとCalendarが正しく表示されないため、ここで指定する
@@ -34,7 +37,7 @@ namespace HouseholdAccountBook.Views.Windows
                 this.selectedMonthRadioButton.IsChecked = true;
             };
 
-            this.WVM.Initialize(dbHandlerFactory);
+            this.WVM.Initialize(this, dbHandlerFactory);
 
         }
 
@@ -45,11 +48,14 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="startDate">開始日</param>
         /// <param name="endDate">終了日</param>
-        public TermWindow(DbHandlerFactory dbHandlerFactory, DateTime startDate, DateTime endDate)
+        public TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateTime startDate, DateTime endDate)
         {
             this.InitializeComponent();
 
-            this.RegisterEventHandlers(this.WVM);
+            this.Owner = owner;
+            this.LoadWindowSetting();
+
+            this.AddCommonEventHandlers();
             // ロード時処理はコンストラクタで設定しておく
             this.Loaded += (sender, e) => {
                 // xamlで指定するとCalendarが正しく表示されないため、ここで指定する
@@ -60,7 +66,7 @@ namespace HouseholdAccountBook.Views.Windows
                 this.selectedTermRadioButton.IsChecked = true;
             };
 
-            this.WVM.Initialize(dbHandlerFactory);
+            this.WVM.Initialize(this, dbHandlerFactory);
 
         }
         #endregion

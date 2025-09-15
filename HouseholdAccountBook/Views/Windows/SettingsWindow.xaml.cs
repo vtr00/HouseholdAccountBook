@@ -8,6 +8,7 @@ using HouseholdAccountBook.Models.DbHandler.Abstract;
 using HouseholdAccountBook.Models.Dto.DbTable;
 using HouseholdAccountBook.Models.Dto.Others;
 using HouseholdAccountBook.Models.Logger;
+using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Settings;
 using Microsoft.Win32;
@@ -60,6 +61,9 @@ namespace HouseholdAccountBook.Views.Windows
             this.dbHandlerFactory = dbHandlerFactory;
 
             this.InitializeComponent();
+            this.Initialized += (s, e) => {
+                this.LoadWindowSetting();
+            };
         }
 
         #region イベントハンドラ
