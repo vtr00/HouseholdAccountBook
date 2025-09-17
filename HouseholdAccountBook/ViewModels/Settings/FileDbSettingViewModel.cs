@@ -19,12 +19,19 @@ namespace HouseholdAccountBook.ViewModels.Settings
         private string _DBFilePath = default;
         #endregion
 
+        /// <summary>
+        /// 設定を読み込む
+        /// </summary>
         public void Load()
         {
             Properties.Settings settings = Properties.Settings.Default;
             this.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_SQLite_DBFilePath);
         }
 
+        /// <summary>
+        /// 設定を保存する
+        /// </summary>
+        /// <returns>設定の保存成否</returns>
         public bool Save()
         {
             bool result = false;
@@ -50,9 +57,14 @@ namespace HouseholdAccountBook.ViewModels.Settings
             return result;
         }
 
+        /// <summary>
+        /// 設定を保存可能か
+        /// </summary>
+        /// <returns>設定の保存可否</returns>
         public bool CanSave()
         {
             if (string.IsNullOrWhiteSpace(this.DBFilePath)) return false;
+
             return true;
         }
     }

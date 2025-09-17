@@ -6,6 +6,9 @@ using System.Windows.Input;
 
 namespace HouseholdAccountBook.ViewModels.Abstract
 {
+    /// <summary>
+    /// WindowViewModelの基底クラス
+    /// </summary>
     public abstract class WindowViewModelBase : BindableBase
     {
         /// <summary>
@@ -18,15 +21,15 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         protected DbHandlerFactory dbHandlerFactory;
 
         /// <summary>
-        /// ウィンドウのクローズをリクエストする
+        /// ウィンドウクローズ要求イベント
         /// </summary>
         public event EventHandler<CloseRequestEventArgs> CloseRequested;
         /// <summary>
-        /// ウィンドウの非表示をリクエストする
+        /// ウィンドウ非表示要求イベント
         /// </summary>
-        public event EventHandler<EventArgs> HideRequested;
+        public event EventHandler HideRequested;
         /// <summary>
-        /// ファイル選択ダイアログをリクエストする
+        /// ファイル選択ダイアログ要求イベント
         /// </summary>
         public event EventHandler<OpenFileDialogRequestEventArgs> OpenFileDialogRequested;
 
@@ -44,16 +47,16 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         public abstract Point? WindowPointSetting { get; }
 
         /// <summary>
-        /// OKボタンクリック時のコマンド
+        /// OKコマンド
         /// </summary>
         public ICommand OKCommand => new RelayCommand(this.OKCommand_Executed, this.OKCommand_CanExecute);
         /// <summary>
-        /// OKボタンクリックの実行可否
+        /// OKコマンド実行可能か
         /// </summary>
         /// <returns></returns>
         protected virtual bool OKCommand_CanExecute() { return true; }
         /// <summary>
-        /// OKボタンクリック時のコマンド処理
+        /// OKコマンド処理
         /// </summary>
         protected virtual void OKCommand_Executed()
         {
@@ -61,11 +64,11 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         }
 
         /// <summary>
-        /// キャンセルボタンクリック時のコマンド
+        /// キャンセルコマンド
         /// </summary>
         public ICommand CancelCommand => new RelayCommand(this.CanncelCommand_Executed);
         /// <summary>
-        /// キャンセルボタンクリック時のコマンド処理
+        /// キャンセルコマンド処理
         /// </summary>
         protected virtual void CanncelCommand_Executed()
         {
@@ -97,7 +100,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         }
 
         /// <summary>
-        /// ファイル選択ボタンクリック時のコマンド
+        /// ファイル選択コマンド
         /// </summary>
         public virtual ICommand SelectFilePathCommand { get; set; } = null;
 
@@ -157,7 +160,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         }
 
         /// <summary>
-        /// ウィンドウのクローズをリクエストする
+        /// ウィンドウクローズ要求を発行する
         /// </summary>
         /// <param name="e"></param>
         protected void CloseRequest(CloseRequestEventArgs e)
@@ -165,7 +168,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
             this.CloseRequested?.Invoke(this, e);
         }
         /// <summary>
-        /// ウィンドウの非表示をリクエストする
+        /// ウィンドウ非表示要求を発行する
         /// </summary>
         protected void HideRequest()
         {
@@ -173,7 +176,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         }
 
         /// <summary>
-        /// ファイル選択ダイアログをリクエストする
+        /// ファイル選択ダイアログ要求を発行する
         /// </summary>
         /// <param name="e"></param>
         /// <param name="fileSelected"></param>
@@ -187,7 +190,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         }
 
         /// <summary>
-        /// ファイル選択ダイアログをリクエストする
+        /// ファイル選択ダイアログ要求を発行する(複数選択版)
         /// </summary>
         /// <param name="e"></param>
         /// <param name="filesSelected"></param>

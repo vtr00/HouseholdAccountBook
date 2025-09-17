@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HouseholdAccountBook.ViewModels.Settings
+﻿namespace HouseholdAccountBook.ViewModels.Settings
 {
     /// <summary>
     /// ウィンドウ設定VM

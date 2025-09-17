@@ -3,6 +3,11 @@ using System.Windows.Input;
 
 namespace HouseholdAccountBook.ViewModels
 {
+    /// <summary>
+    /// コマンド
+    /// </summary>
+    /// <param name="execute">コマンド実行デリゲート</param>
+    /// <param name="canExecute">コマンド実行可否デリゲート</param>
     public class RelayCommand(Action execute, Func<bool> canExecute = null) : ICommand
     {
         private readonly Action _execute = execute;
@@ -23,6 +28,12 @@ namespace HouseholdAccountBook.ViewModels
         }
     }
 
+    /// <summary>
+    /// パラメータ付コマンド
+    /// </summary>
+    /// <typeparam name="T">パラメータの型</typeparam>
+    /// <param name="execute">コマンド実行デリゲート</param>
+    /// <param name="canExecute">コマンド実行可否デリゲート</param>
     public class RelayCommand<T>(Action<T> execute, Func<T, bool> canExecute = null) : ICommand
     {
         private readonly Action<T> _execute = execute;

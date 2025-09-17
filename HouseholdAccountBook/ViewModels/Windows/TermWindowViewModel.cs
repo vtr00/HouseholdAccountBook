@@ -40,17 +40,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         /// <summary>
-        /// 今月ボタンクリック時のコマンド
+        /// 今月コマンド
         /// </summary>
         public ICommand ThisMonthCommand => new RelayCommand(this.ThisMonthCommand_Executed);
         /// <summary>
-        /// 全期間ボタンクリック時のコマンド
+        /// 全期間コマンド
         /// </summary>
         public ICommand AllTermCommand => new RelayCommand(this.AllTermCommand_Executed);
         #endregion
 
         /// <summary>
-        /// 今月ボタンクリック時のコマンド処理
+        /// 今月コマンド処理
         /// </summary>
         void ThisMonthCommand_Executed()
         {
@@ -59,7 +59,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 全期間ボタンクリック時のコマンド処理
+        /// 全期間コマンド処理
         /// </summary>
         async void AllTermCommand_Executed()
         {

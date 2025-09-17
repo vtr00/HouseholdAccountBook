@@ -46,6 +46,9 @@ namespace HouseholdAccountBook.ViewModels.Settings
         private string _DBFilePath = default;
         #endregion
 
+        /// <summary>
+        /// 設定を読み込む
+        /// </summary>
         public void Load()
         {
             Properties.Settings settings = Properties.Settings.Default;
@@ -56,19 +59,29 @@ namespace HouseholdAccountBook.ViewModels.Settings
             this.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Access_DBFilePath);
         }
 
+        /// <summary>
+        /// 設定を保存する
+        /// </summary>
+        /// <returns>設定の保存成否</returns>
         public bool Save()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
             settings.App_Access_Provider = this.SelectedProviderName;
             settings.App_Access_DBFilePath = Path.GetFullPath(this.DBFilePath, App.GetCurrentDir());
+
             return true;
         }
 
+        /// <summary>
+        /// 設定を保存可能か
+        /// </summary>
+        /// <returns>設定の保存可否</returns>
         public bool CanSave()
         {
             if (string.IsNullOrWhiteSpace(this.SelectedProviderName)) return false;
             if (string.IsNullOrWhiteSpace(this.DBFilePath)) return false;
+
             return true;
         }
     }

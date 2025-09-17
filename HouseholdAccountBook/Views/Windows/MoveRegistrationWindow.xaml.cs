@@ -16,7 +16,7 @@ namespace HouseholdAccountBook.Views.Windows
     {
         #region イベント
         /// <summary>
-        /// 登録時のイベント
+        /// 登録時イベント
         /// </summary>
         public event EventHandler<EventArgs<List<int>>> Registrated
         {

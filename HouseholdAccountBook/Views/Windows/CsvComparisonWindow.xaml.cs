@@ -43,6 +43,7 @@ namespace HouseholdAccountBook.Views.Windows
             add => this.WVM.BookChanged += value;
             remove => this.WVM.BookChanged -= value;
         }
+
         /// <summary>
         /// ウィンドウ非表示時イベント
         /// </summary>

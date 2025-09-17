@@ -38,7 +38,6 @@ namespace HouseholdAccountBook.Views.Windows
             };
 
             this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
-
         }
 
         /// <summary>
@@ -67,7 +66,6 @@ namespace HouseholdAccountBook.Views.Windows
             };
 
             this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
-
         }
         #endregion
 

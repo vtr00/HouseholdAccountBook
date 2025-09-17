@@ -50,7 +50,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public event EventHandler<EventArgs<int?>> ItemChanged;
 
         /// <summary>
-        /// 登録時のイベント
+        /// 登録時イベント
         /// </summary>
         public event EventHandler<EventArgs<List<int>>> Registrated;
         #endregion
@@ -333,6 +333,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private string _SelectedRemark = default;
         #endregion
 
+        /// <summary>
+        /// 今日コマンド
+        /// </summary>
         public ICommand TodayCommand => new RelayCommand(() => { this.FromDate = DateTime.Today; }, () => { return this.FromDate != DateTime.Today; });
         #endregion
 
@@ -769,9 +772,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         #endregion
                     }
                 });
-
-                return resActionIdList;
             }
+
+            return resActionIdList;
         }
     }
 }

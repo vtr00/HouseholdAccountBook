@@ -3,7 +3,6 @@ using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 using System.IO;
-using System.Windows.Navigation;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {
@@ -122,6 +121,10 @@ namespace HouseholdAccountBook.ViewModels.Settings
         #endregion
         #endregion
 
+        /// <summary>
+        /// 設定を読み込む
+        /// </summary>
+        /// <param name="setPassword">パスワードを設定するデリゲート</param>
         public void Load(Action<string> setPassword)
         {
             Properties.Settings settings = Properties.Settings.Default;
@@ -141,6 +144,11 @@ namespace HouseholdAccountBook.ViewModels.Settings
             this.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_RestoreExePath);
         }
 
+        /// <summary>
+        /// 設定を保存する
+        /// </summary>
+        /// <param name="getPassword">パスワードを取得するデリゲート</param>
+        /// <returns>設定の保存成否</returns>
         public bool Save(Func<string> getPassword)
         {
             Properties.Settings settings = Properties.Settings.Default;
@@ -158,6 +166,11 @@ namespace HouseholdAccountBook.ViewModels.Settings
             return true;
         }
 
+        /// <summary>
+        /// 設定を保存可能か
+        /// </summary>
+        /// <param name="getPassword">パスワードを取得するデリゲート</param>
+        /// <returns>設定の保存可否</returns>
         public bool CanSave(Func<string> getPassword)
         {
             if (string.IsNullOrWhiteSpace(this.Host)) return false;
@@ -167,6 +180,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             if (string.IsNullOrWhiteSpace(this.DatabaseName)) return false;
             if (string.IsNullOrWhiteSpace(this.DumpExePath) || !File.Exists(this.DumpExePath)) return false;
             if (string.IsNullOrWhiteSpace(this.RestoreExePath) || !File.Exists(this.RestoreExePath)) return false;
+
             return true;
         }
     }
