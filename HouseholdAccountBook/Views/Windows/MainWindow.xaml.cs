@@ -1637,8 +1637,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             Log.Info();
 
-            VersionWindow vw = new() { Owner = this };
-            vw.MoveOwnersCenter();
+            VersionWindow vw = new(this);
 
             _ = vw.ShowDialog();
         }

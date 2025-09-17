@@ -72,7 +72,25 @@ namespace HouseholdAccountBook.ViewModels.Abstract
             this.CloseRequest(new CloseRequestEventArgs(false));
         }
 
+        /// <summary>
+        /// クローズコマンド
+        /// </summary>
+        public ICommand CloseCommand => new RelayCommand(this.CloseCommand_Executed);
+        /// <summary>
+        /// クローズコマンド処理
+        /// </summary>
+        protected virtual void CloseCommand_Executed()
+        {
+            this.CloseRequest(new CloseRequestEventArgs(null));
+        }
+
+        /// <summary>
+        /// 非表示コマンド
+        /// </summary>
         public ICommand HideCommand => new RelayCommand(this.HideCommand_Executed);
+        /// <summary>
+        /// 非表示コマンド処理
+        /// </summary>
         protected virtual void HideCommand_Executed()
         {
             this.HideRequest();

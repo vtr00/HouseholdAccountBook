@@ -904,17 +904,23 @@ namespace HouseholdAccountBook.Views.Windows
                 settings.CsvComparisonWindow_Width = -1;
                 settings.CsvComparisonWindow_Height = -1;
 
+                // 設定
+                settings.SettingsWindow_Left = -1;
+                settings.SettingsWindow_Top = -1;
+                settings.SettingsWindow_Width = -1;
+                settings.SettingsWindow_Height = -1;
+
                 // 期間選択
                 settings.TermWindow_Left = -1;
                 settings.TermWindow_Top = -1;
                 // settings.TermWindow_Width = -1;
                 // settings.TermWindow_Height = -1;
 
-                // 設定
-                settings.SettingsWindow_Left = -1;
-                settings.SettingsWindow_Top = -1;
-                settings.SettingsWindow_Width = -1;
-                settings.SettingsWindow_Height = -1;
+                // バージョン
+                settings.VersionWindow_Left = -1;
+                settings.VersionWindow_Top = -1;
+                // settings.VersionWindow_Width = -1;
+                // settings.VersionWindow_Height = -1;
 
                 settings.App_InitSizeFlag = true;
                 settings.Save();
@@ -1559,8 +1565,12 @@ namespace HouseholdAccountBook.Views.Windows
                     Title = Properties.Resources.Title_TermSelectionWindow,
                     Left = settings.TermWindow_Left, Top = settings.TermWindow_Top,
                     Width = -1, Height = -1
+                },
+                new WindowSettingViewModel(){
+                    Title = Properties.Resources.Title_VersionWindow,
+                    Left = settings.VersionWindow_Left, Top = settings.VersionWindow_Top,
+                    Width = -1, Height = -1
                 }
-
             ];
             this.WVM.WindowSettingVMList = list;
         }

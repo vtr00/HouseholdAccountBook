@@ -910,5 +910,29 @@ namespace HouseholdAccountBook.Properties {
                 this["App_Postgres_EncryptedPassword"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double VersionWindow_Left {
+            get {
+                return ((double)(this["VersionWindow_Left"]));
+            }
+            set {
+                this["VersionWindow_Left"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double VersionWindow_Top {
+            get {
+                return ((double)(this["VersionWindow_Top"]));
+            }
+            set {
+                this["VersionWindow_Top"] = value;
+            }
+        }
     }
 }

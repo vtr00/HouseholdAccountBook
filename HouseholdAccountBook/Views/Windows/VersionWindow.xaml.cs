@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using HouseholdAccountBook.Extensions;
+using Notification.Wpf;
+using System.Windows;
 using System.Windows.Input;
 
 namespace HouseholdAccountBook.Views.Windows
@@ -11,35 +13,16 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// <see cref="VersionWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        public VersionWindow()
+        /// <param name="owner">親ウィンドウ</param>
+        public VersionWindow(Window owner)
         {
             this.InitializeComponent();
-        }
 
-        #region イベントハンドラ
-        #region コマンド
-        /// <summary>
-        /// ウィンドウを閉じる
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CloseWindowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            this.Close();
-        }
-        #endregion
+            this.Owner = owner;
+            this.LoadWindowSetting();
+            this.Loaded += (sender, e) => this.HistoryLog.ScrollToEnd();
 
-        #region ウィンドウ
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void VersionWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            this.HistoryLog.ScrollToEnd();
+            this.AddCommonEventHandlers();
         }
-        #endregion
-        #endregion
     }
 }
