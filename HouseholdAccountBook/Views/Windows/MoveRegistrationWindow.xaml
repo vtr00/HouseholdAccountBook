@@ -84,10 +84,12 @@
                                 Text="Id" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                 Text="{Binding FromId, TargetNullValue='--'}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                                 Text="{x:Static properties:Resources.TextBlock_Book}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"  Grid.ColumnSpan="2"
                                 ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedFromBookVM}" DisplayMemberPath="Name"/>
+                    
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                                 Text="{x:Static properties:Resources.TextBlock_Date}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <controls:DateTimePicker Grid.Row="2" Grid.Column="1" Margin="5"
@@ -115,16 +117,18 @@
                                Text="Id" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                Text="{Binding ToId, TargetNullValue='--'}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                                Text="{x:Static properties:Resources.TextBlock_Book}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"  Grid.ColumnSpan="2"
                               ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedToBookVM}" DisplayMemberPath="Name"/>
+                    
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                                Text="{x:Static properties:Resources.TextBlock_Date}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <controls:DateTimePicker x:Name="movingDateTimePicker" Grid.Row="2" Grid.Column="1" Margin="5"
+                                DateFormat="yyyy-MM-dd" SelectedDate="{Binding ToDate}" IsEnabled="{Binding IsLink, Converter={StaticResource NegationConverter}, Mode=TwoWay}"/>
                     <CheckBox Grid.Row="2" Grid.Column="3" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Center" 
                               Content="{x:Static properties:Resources.CheckBox_Setting}" IsChecked="{Binding IsEnabled, ElementName=movingDateTimePicker}"/>
-                    <controls:DateTimePicker x:Name="movingDateTimePicker" Grid.Row="6" Grid.Column="1" Margin="5"
-                                DateFormat="yyyy-MM-dd" SelectedDate="{Binding ToDate}" IsEnabled="{Binding IsLink, Converter={StaticResource NegationConverter}, Mode=TwoWay}"/>
 
                 </Grid>
             </GroupBox>
@@ -165,18 +169,22 @@
                            Text="Id" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                            Text="{Binding CommissionId, TargetNullValue='--'}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
                            Text="{x:Static properties:Resources.TextBlock_Burden}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ListBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
                            ItemsSource="{Binding CommissionKindDic}" SelectedValue="{Binding SelectedCommissionKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                    
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                            Text="{x:Static properties:Resources.TextBlock_Item}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ListBox Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" 
                            ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="NameWithCategory"/>
+                    
                     <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                            Text="{x:Static properties:Resources.TextBlock_Expenses}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5"
                            Value="{Binding Commission, TargetNullValue=''}" MinValue="0"/>
+                    
                     <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                            Text="{x:Static properties:Resources.TextBlock_Remark}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsEditable="True"

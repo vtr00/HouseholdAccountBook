@@ -7,45 +7,27 @@
         xmlns:vmw="clr-namespace:HouseholdAccountBook.ViewModels.Windows"
         xmlns:controls="clr-namespace:HouseholdAccountBook.Views.UserControls"
         mc:Ignorable="d"
-        Height="Auto" Width="350" ShowInTaskbar="False" WindowStyle="ToolWindow"
-        Loaded="ActionRegistrationWindow_Loaded"
-        Closed="ActionRegistrationWindow_Closed">
+        Height="Auto" Width="350" ShowInTaskbar="False" WindowStyle="ToolWindow">
     <Window.DataContext>
         <vmw:ActionRegistrationWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
 
-    <Window.Resources>
-        <RoutedCommand x:Key="TodayCommand"/>
-
-        <!-- 登録コマンド -->
-        <RoutedCommand x:Key="ContinueToRegisterCommand"/>
-        <RoutedCommand x:Key="RegisterCommand"/>
-        <RoutedCommand x:Key="CancelCommand"/>
-    </Window.Resources>
-
-    <Window.CommandBindings>
-        <CommandBinding Command="{StaticResource TodayCommand}" CanExecute="TodayCommand_CanExecute" Executed="TodayCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ContinueToRegisterCommand}" CanExecute="ContinueToRegisterCommand_CanExecute" Executed="ContinueToRegisterCommand_Executed"/>
-        <CommandBinding Command="{StaticResource RegisterCommand}" CanExecute="RegisterCommand_CanExecute" Executed="RegisterCommand_Executed"/>
-        <CommandBinding Command="{StaticResource CancelCommand}" Executed="CancelCommand_Executed"/>
-    </Window.CommandBindings>
-
     <Window.InputBindings>
-        <KeyBinding Gesture="Enter" Command="{StaticResource RegisterCommand}"/>
-        <KeyBinding Gesture="Shift+Enter" Command="{StaticResource ContinueToRegisterCommand}"/>
-        <KeyBinding Gesture="Esc" Command="{StaticResource CancelCommand}"/>
+        <KeyBinding Gesture="Enter" Command="{Binding OKCommand}"/>
+        <KeyBinding Gesture="Shift+Enter" Command="{Binding ContinueToOKCommand}"/>
+        <KeyBinding Gesture="Esc" Command="{Binding CancelCommand}"/>
     </Window.InputBindings>
     
     <Window.Style>
         <Style TargetType="Window">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding RegMode}" Value="Add">
+                <DataTrigger Binding="{Binding RegKind}" Value="Add">
                     <Setter Property="Title" Value="{x:Static properties:Resources.Title_AddWindow}"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding RegMode}" Value="Edit">
+                <DataTrigger Binding="{Binding RegKind}" Value="Edit">
                     <Setter Property="Title" Value="{x:Static properties:Resources.Title_EditWindow}"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding RegMode}" Value="Copy">
+                <DataTrigger Binding="{Binding RegKind}" Value="Copy">
                     <Setter Property="Title" Value="{x:Static properties:Resources.Title_AddWindow}"/>
                 </DataTrigger>
             </Style.Triggers>
@@ -95,31 +77,38 @@
                        Text="{x:Static properties:Resources.TextBlock_Book}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
+            
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Date}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <controls:DateTimePicker Grid.Row="3" Grid.Column="1" Margin="5" 
                                      DateFormat="yyyy-MM-dd" SelectedDate="{Binding SelectedDate}"/>
-            <Button Grid.Row="3" Grid.Column="3" Margin="5" Content="{x:Static properties:Resources.Button_Today}" Command="{StaticResource TodayCommand}"/>
+            <Button Grid.Row="3" Grid.Column="3" Margin="5" Content="{x:Static properties:Resources.Button_Today}" Command="{Binding TodayCommand}"/>
+            
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_IncomeOrExpenses}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
                       ItemsSource="{Binding BalanceKindDic}" SelectedValue="{Binding SelectedBalanceKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+            
             <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Category}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="5" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
                      ItemsSource="{Binding CategoryVMList}" SelectedItem="{Binding SelectedCategoryVM}" DisplayMemberPath="Name"/>
+            
             <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Item}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="6" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
                      ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="NameWithCategory"/>
+            
             <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_AmountOfMoney}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <controls:NumericUpDown Grid.Row="7" Grid.Column="1" Margin="5" 
                                     Value="{Binding Value}" MinValue="1"/>
+            
             <TextBlock Grid.Row="8" Grid.Column="0" Margin="5"
                        Text="{x:Static properties:Resources.TextBlock_ShopName}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="8" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="2"
                       ItemsSource="{Binding ShopVMList}" Text="{Binding SelectedShopName, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
+            
             <TextBlock Grid.Row="9" Grid.Column="0" Margin="5"
                        Text="{x:Static properties:Resources.TextBlock_Remark}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="9" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="2"
@@ -131,7 +120,7 @@
                     <Style TargetType="TextBlock">
                         <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding RegMode}" Value="Edit">
+                            <DataTrigger Binding="{Binding RegKind}" Value="Edit">
                                 <Setter Property="Visibility" Value="Visible"/>
                             </DataTrigger>
                         </Style.Triggers>
@@ -143,7 +132,7 @@
                     <Style TargetType="CheckBox">
                         <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding RegMode}" Value="Edit">
+                            <DataTrigger Binding="{Binding RegKind}" Value="Edit">
                                 <Setter Property="Visibility" Value="Visible"/>
                             </DataTrigger>
                         </Style.Triggers>
@@ -191,7 +180,7 @@
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding RegMode}" Value="Edit">
+                                    <DataTrigger Binding="{Binding RegKind}" Value="Edit">
                                         <Setter Property="Visibility" Value="Visible"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -203,7 +192,7 @@
                             <Style TargetType="CheckBox">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding RegMode}" Value="Edit">
+                                    <DataTrigger Binding="{Binding RegKind}" Value="Edit">
                                         <Setter Property="Visibility" Value="Visible"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Count}" Value="1">
@@ -222,7 +211,7 @@
                 <Style TargetType="Grid">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding RegMode}" Value="Add">
+                        <DataTrigger Binding="{Binding RegKind}" Value="Add">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding AddedByCsvComparison}" Value="True">
@@ -237,16 +226,16 @@
                 <ColumnDefinition Width="0.3*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="{x:Static properties:Resources.Button_Continue}" Command="{StaticResource ContinueToRegisterCommand}"/>
-            <Button Grid.Column="1" Content="{x:Static properties:Resources.Button_Registration}" Command="{StaticResource RegisterCommand}"/>
-            <Button Grid.Column="2" Content="{x:Static properties:Resources.Button_Cancel}" Command="{StaticResource CancelCommand}"/>
+            <Button Grid.Column="0" Content="{x:Static properties:Resources.Button_Continue}" Command="{Binding ContinueToOKCommand}"/>
+            <Button Grid.Column="1" Content="{x:Static properties:Resources.Button_Registration}" Command="{Binding OKCommand}"/>
+            <Button Grid.Column="2" Content="{x:Static properties:Resources.Button_Cancel}" Command="{Binding CancelCommand}"/>
         </Grid>
         <Grid Grid.Row="1" Margin="0,10,0,0">
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Setter Property="Visibility" Value="Visible"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding RegMode}" Value="Add">
+                        <DataTrigger Binding="{Binding RegKind}" Value="Add">
                             <Setter Property="Visibility" Value="Collapsed"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding AddedByCsvComparison}" Value="True">
@@ -260,8 +249,8 @@
                 <ColumnDefinition Width="0.5*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="{x:Static properties:Resources.Button_Registration}" Command="{StaticResource RegisterCommand}"/>
-            <Button Grid.Column="1" Content="{x:Static properties:Resources.Button_Cancel}" Command="{StaticResource CancelCommand}"/>
+            <Button Grid.Column="0" Content="{x:Static properties:Resources.Button_Registration}" Command="{Binding OKCommand}"/>
+            <Button Grid.Column="1" Content="{x:Static properties:Resources.Button_Cancel}" Command="{Binding CancelCommand}"/>
         </Grid>
     </Grid>
 </Window>

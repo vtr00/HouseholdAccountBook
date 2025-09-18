@@ -74,7 +74,7 @@ namespace HouseholdAccountBook.Views.Windows
                     this.csvCompDataGrid.ScrollToButtom();
                 };
                 this.WVM.AddActionRequested += (sender, e) => {
-                    ActionRegistrationWindow arw = new(e.DbHandlerFactory, e.BookId, e.Record) { Owner = this };
+                    ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.BookId, e.Record) { Owner = this };
                     arw.LoadWindowSetting();
 
                     arw.Registrated += e.Registered;
@@ -88,7 +88,7 @@ namespace HouseholdAccountBook.Views.Windows
                     _ = alrw.ShowDialog();
                 };
                 this.WVM.EditActionRequested += (sender, e) => {
-                    ActionRegistrationWindow arw = new(e.DbHandlerFactory, e.ActionId) { Owner = this };
+                    ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.ActionId) { Owner = this };
                     arw.LoadWindowSetting();
 
                     arw.Registrated += e.Registered;

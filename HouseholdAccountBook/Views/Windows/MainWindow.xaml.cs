@@ -859,7 +859,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             Log.Info();
 
-            this.arw = new ActionRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id,
+            this.arw = new ActionRegistrationWindow(this, this.dbHandlerFactory, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
             this.arw.LoadWindowSetting();
 
@@ -983,7 +983,7 @@ namespace HouseholdAccountBook.Views.Windows
                 case (int)GroupKind.Repeat:
                 default:
                     // 移動・リスト登録以外の帳簿項目の編集時の処理
-                    this.arw = new ActionRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedActionVM.ActionId) { Owner = this };
+                    this.arw = new ActionRegistrationWindow(this, this.dbHandlerFactory, this.WVM.SelectedActionVM.ActionId) { Owner = this };
                     this.arw.LoadWindowSetting();
 
                     // 登録時イベントを登録する
@@ -1033,7 +1033,7 @@ namespace HouseholdAccountBook.Views.Windows
 
             if (groupKind == null || groupKind == (int)GroupKind.Repeat) {
                 // 移動以外の帳簿項目の複製時の処理
-                this.arw = new ActionRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedActionVM.ActionId, RegistrationKind.Copy) { Owner = this };
+                this.arw = new ActionRegistrationWindow(this, this.dbHandlerFactory, this.WVM.SelectedActionVM.ActionId, RegistrationKind.Copy) { Owner = this };
                 this.arw.LoadWindowSetting();
 
                 // 登録時イベントを登録する
