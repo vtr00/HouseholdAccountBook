@@ -74,30 +74,22 @@ namespace HouseholdAccountBook.Views.Windows
                     this.csvCompDataGrid.ScrollToButtom();
                 };
                 this.WVM.AddActionRequested += (sender, e) => {
-                    ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.BookId, e.Record) { Owner = this };
-                    arw.LoadWindowSetting();
-
+                    ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.BookId, e.Record);
                     arw.Registrated += e.Registered;
                     _ = arw.ShowDialog();
                 };
                 this.WVM.AddActionListRequested += (sender, e) => {
-                    ActionListRegistrationWindow alrw = new(e.DbHandlerFactory, e.BookId, e.Records) { Owner = this };
-                    alrw.LoadWindowSetting();
-
+                    ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.BookId, e.Records);
                     alrw.Registrated += e.Registered;
                     _ = alrw.ShowDialog();
                 };
                 this.WVM.EditActionRequested += (sender, e) => {
-                    ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.ActionId) { Owner = this };
-                    arw.LoadWindowSetting();
-
+                    ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.ActionId);
                     arw.Registrated += e.Registered;
                     _ = arw.ShowDialog();
                 };
                 this.WVM.EditActionListRequested += (sender, e) => {
-                    ActionListRegistrationWindow alrw = new(e.DbHandlerFactory, e.GroupId) { Owner = this };
-                    alrw.LoadWindowSetting();
-
+                    ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.GroupId);
                     alrw.Registrated += e.Registered;
                     _ = alrw.ShowDialog();
                 };

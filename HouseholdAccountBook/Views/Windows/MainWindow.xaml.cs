@@ -824,7 +824,6 @@ namespace HouseholdAccountBook.Views.Windows
 
             this.mrw = new MoveRegistrationWindow(this, this.dbHandlerFactory, this.WVM.SelectedBookVM.Id,
                 this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime);
-
             // 登録時イベントを登録する
             this.mrw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
@@ -860,9 +859,7 @@ namespace HouseholdAccountBook.Views.Windows
             Log.Info();
 
             this.arw = new ActionRegistrationWindow(this, this.dbHandlerFactory, this.WVM.SelectedBookVM.Id,
-                this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
-            this.arw.LoadWindowSetting();
-
+                this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime);
             // 登録時イベントを登録する
             this.arw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
@@ -897,10 +894,8 @@ namespace HouseholdAccountBook.Views.Windows
         {
             Log.Info();
 
-            this.alrw = new ActionListRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedBookVM.Id,
-                this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime) { Owner = this };
-            this.alrw.LoadWindowSetting();
-
+            this.alrw = new ActionListRegistrationWindow(this, this.dbHandlerFactory, this.WVM.SelectedBookVM.Id,
+                this.WVM.DisplayedTermKind == TermKind.Monthly ? this.WVM.DisplayedMonth : null, this.WVM.SelectedActionVM?.ActTime);
             // 登録時イベントを登録する
             this.alrw.Registrated += async (sender2, e2) => {
                 // 帳簿一覧タブを更新する
@@ -948,7 +943,6 @@ namespace HouseholdAccountBook.Views.Windows
                 case (int)GroupKind.Move:
                     // 移動の編集時の処理
                     this.mrw = new MoveRegistrationWindow(this, this.dbHandlerFactory, this.WVM.SelectedBookVM.Id, this.WVM.SelectedActionVM.GroupId.Value);
-
                     // 登録時イベントを登録する
                     this.mrw.Registrated += async (sender2, e2) => {
                         // 帳簿一覧タブを更新する
@@ -964,9 +958,7 @@ namespace HouseholdAccountBook.Views.Windows
                     break;
                 case (int)GroupKind.ListReg:
                     // リスト登録された帳簿項目の編集時の処理
-                    this.alrw = new ActionListRegistrationWindow(this.dbHandlerFactory, this.WVM.SelectedActionVM.GroupId.Value) { Owner = this };
-                    this.alrw.LoadWindowSetting();
-
+                    this.alrw = new ActionListRegistrationWindow(this, this.dbHandlerFactory, this.WVM.SelectedActionVM.GroupId.Value);
                     // 登録時イベントを登録する
                     this.alrw.Registrated += async (sender2, e2) => {
                         // 帳簿一覧タブを更新する
@@ -983,15 +975,13 @@ namespace HouseholdAccountBook.Views.Windows
                 case (int)GroupKind.Repeat:
                 default:
                     // 移動・リスト登録以外の帳簿項目の編集時の処理
-                    this.arw = new ActionRegistrationWindow(this, this.dbHandlerFactory, this.WVM.SelectedActionVM.ActionId) { Owner = this };
-                    this.arw.LoadWindowSetting();
-
+                    this.arw = new ActionRegistrationWindow(this, this.dbHandlerFactory, this.WVM.SelectedActionVM.ActionId);
                     // 登録時イベントを登録する
                     this.arw.Registrated += async (sender2, e2) => {
                         // 帳簿一覧タブを更新する
                         await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
                     };
-
+                    // クローズ時イベントを登録する
                     this.arw.Closed += (sender3, e3) => {
                         this.arw = null;
                         _ = this.Activate();

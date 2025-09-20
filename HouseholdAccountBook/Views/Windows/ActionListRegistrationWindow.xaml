@@ -8,44 +8,35 @@
         xmlns:vmw="clr-namespace:HouseholdAccountBook.ViewModels.Windows"
         xmlns:controls="clr-namespace:HouseholdAccountBook.Views.UserControls"
         mc:Ignorable="d"
-        Width="350" Height="Auto" ShowInTaskbar="False" WindowStyle="ToolWindow"
-        Loaded="ActionListRegistrationWindow_Loaded"
-        Closed="ActionListRegistrationWindow_Closed">
+        Width="350" Height="Auto" ShowInTaskbar="False" WindowStyle="ToolWindow">
     <Window.DataContext>
         <vmw:ActionListRegistrationWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
 
     <Window.Resources>
-        <!-- 登録コマンド -->
-        <RoutedCommand x:Key="RegisterCommand"/>
-        <RoutedCommand x:Key="CancelCommand"/>
         <RoutedCommand x:Key="ButtonInputCommand"/>
     </Window.Resources>
 
     <Window.CommandBindings>
-        <CommandBinding Command="{StaticResource RegisterCommand}" 
-                        CanExecute="RegisterCommand_CanExecute" Executed="RegisterCommand_Executed"/>
-        <CommandBinding Command="{StaticResource CancelCommand}" 
-                        Executed="CancelCommand_Executed"/>
         <CommandBinding Command="{StaticResource ButtonInputCommand}"
                         Executed="ButtonInputCommand_Executed"/>
     </Window.CommandBindings>
 
     <Window.InputBindings>
-        <KeyBinding Gesture="Enter" Command="{StaticResource RegisterCommand}"/>
-        <KeyBinding Gesture="Esc" Command="{StaticResource CancelCommand}"/>
+        <KeyBinding Gesture="Enter" Command="{Binding OKCommand}"/>
+        <KeyBinding Gesture="Esc" Command="{Binding CancelCommand}"/>
     </Window.InputBindings>
 
     <Window.Style>
         <Style TargetType="Window">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding RegMode}" Value="Add">
+                <DataTrigger Binding="{Binding RegKind}" Value="Add">
                     <Setter Property="Title" Value="{x:Static properties:Resources.Title_AddListWindow}"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding RegMode}" Value="Edit">
+                <DataTrigger Binding="{Binding RegKind}" Value="Edit">
                     <Setter Property="Title" Value="{x:Static properties:Resources.Title_EditListWindow}"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding RegMode}" Value="Copy">
+                <DataTrigger Binding="{Binding RegKind}" Value="Copy">
                     <Setter Property="Title" Value="{x:Static properties:Resources.Title_AddListWindow}"/>
                 </DataTrigger>
             </Style.Triggers>
@@ -174,8 +165,8 @@
                 <ColumnDefinition Width="0.5*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="{x:Static properties:Resources.Button_Registration}" Command="{StaticResource RegisterCommand}"/>
-            <Button Grid.Column="1" Content="{x:Static properties:Resources.Button_Cancel}" Command="{StaticResource CancelCommand}"/>
+            <Button Grid.Column="0" Content="{x:Static properties:Resources.Button_Registration}" Command="{Binding OKCommand}"/>
+            <Button Grid.Column="1" Content="{x:Static properties:Resources.Button_Cancel}" Command="{Binding CancelCommand}"/>
         </Grid>
     </Grid>
 </Window>

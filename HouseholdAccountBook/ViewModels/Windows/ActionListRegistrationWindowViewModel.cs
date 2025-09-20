@@ -1,10 +1,19 @@
 ﻿using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.Models.Dao.Compositions;
+using HouseholdAccountBook.Models.Dao.DbTable;
+using HouseholdAccountBook.Models.DbHandler.Abstract;
+using HouseholdAccountBook.Models.Dto.DbTable;
+using HouseholdAccountBook.Models.Dto.Others;
+using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views.UserControls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 using static HouseholdAccountBook.Views.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.Windows
@@ -12,7 +21,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
     /// <summary>
     /// 帳簿項目リスト登録ウィンドウVM
     /// </summary>
-    public class ActionListRegistrationWindowViewModel : BindableBase
+    public class ActionListRegistrationWindowViewModel : WindowViewModelBase
     {
         #region フィールド
         /// <summary>
@@ -25,32 +34,37 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event Action<int?> BookChanged = default;
+        public event EventHandler<EventArgs<int?>> BookChanged;
         /// <summary>
         /// 収支変更時イベント
         /// </summary>
-        public event Action<BalanceKind> BalanceKindChanged = default;
+        public event EventHandler<EventArgs<BalanceKind>> BalanceKindChanged;
         /// <summary>
         /// 分類変更時イベント
         /// </summary>
-        public event Action<int?> CategoryChanged = default;
+        public event EventHandler<EventArgs<int?>> CategoryChanged;
         /// <summary>
         /// 項目変更時イベント
         /// </summary>
-        public event Action<int?> ItemChanged = default;
+        public event EventHandler<EventArgs<int?>> ItemChanged;
+
+        /// <summary>
+        /// 登録時イベント
+        /// </summary>
+        public event EventHandler<EventArgs<List<int>>> Registrated;
         #endregion
 
         #region プロパティ
         /// <summary>
-        /// 登録モード
+        /// 登録種別
         /// </summary>
-        #region RegMode
-        public RegistrationKind RegMode
+        #region RegKind
+        public RegistrationKind RegKind
         {
-            get => this._RegMode;
-            set => this.SetProperty(ref this._RegMode, value);
+            get => this._RegKind;
+            set => this.SetProperty(ref this._RegKind, value);
         }
-        private RegistrationKind _RegMode = default;
+        private RegistrationKind _RegKind = default;
         #endregion
 
         /// <summary>
@@ -87,7 +101,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 if (this.SetProperty(ref this._SelectedBookVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        this.BookChanged?.Invoke(value?.Id);
+                        this.BookChanged?.Invoke(this, new EventArgs<int?>(value?.Id));
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -113,7 +127,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 if (this.SetProperty(ref this._SelectedBalanceKind, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        this.BalanceKindChanged?.Invoke(value);
+                        this.BalanceKindChanged?.Invoke(this, new EventArgs<BalanceKind>(value));
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -144,7 +158,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 if (this.SetProperty(ref this._SelectedCategoryVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        this.CategoryChanged?.Invoke(value?.Id);
+                        this.CategoryChanged?.Invoke(this, new EventArgs<int?>(value?.Id));
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -175,7 +189,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 if (this.SetProperty(ref this._SelectedItemVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        this.ItemChanged?.Invoke(value?.Id);
+                        this.ItemChanged?.Invoke(this, new EventArgs<int?>(value?.Id));
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -275,5 +289,444 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public NumericInputButton.InputKind InputedKind { get; set; }
         #endregion
+
+        protected override bool OKCommand_CanExecute()
+        {
+            return this.SelectedItemVM != null && this.DateValueVMList.Any((vm) => vm.ActValue.HasValue);
+        }
+        protected override async void OKCommand_Executed()
+        {
+            // DB登録
+            List<int> idList = null;
+            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                idList = await this.RegisterActionListInfoAsync();
+            }
+
+            // MainWindow更新
+            this.Registrated?.Invoke(this, new EventArgs<List<int>>(idList ?? []));
+
+            base.OKCommand_Executed();
+        }
+
+        #region ウィンドウ設定プロパティ
+        public override Rect WindowRectSetting
+        {
+            set {
+                Properties.Settings settings = Properties.Settings.Default;
+
+                if (settings.App_IsPositionSaved) {
+                    settings.ActionListRegistrationWindow_Left = value.Left;
+                    settings.ActionListRegistrationWindow_Top = value.Top;
+                }
+
+                settings.ActionListRegistrationWindow_Width = value.Width;
+                settings.ActionListRegistrationWindow_Height = value.Height;
+                settings.Save();
+            }
+        }
+
+        public override Size? WindowSizeSetting
+        {
+            get {
+                Properties.Settings settings = Properties.Settings.Default;
+                return WindowSizeSettingImpl(settings.ActionListRegistrationWindow_Width, settings.ActionListRegistrationWindow_Height);
+            }
+        }
+
+        public override Point? WindowPointSetting
+        {
+            get {
+                Properties.Settings settings = Properties.Settings.Default;
+                return WindowPointSettingImpl(settings.ActionListRegistrationWindow_Left, settings.ActionListRegistrationWindow_Top, settings.App_IsPositionSaved);
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// 帳簿リストを更新する
+        /// </summary>
+        /// <param name="bookId">選択対象の帳簿ID</param>
+        /// <returns></returns>
+        private async Task UpdateBookListAsync(int? bookId = null)
+        {
+            ObservableCollection<BookViewModel> bookVMList = [];
+            BookViewModel selectedBookVM = null;
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                MstBookDao mstBookDao = new(dbHandler);
+                var dtoList = await mstBookDao.FindAllAsync();
+                foreach (MstBookDto dto in dtoList) {
+                    BookViewModel vm = new() { Id = dto.BookId, Name = dto.BookName };
+                    bookVMList.Add(vm);
+                    if (selectedBookVM == null || bookId == vm.Id) {
+                        selectedBookVM = vm;
+                    }
+                }
+            }
+
+            this.BookVMList = bookVMList;
+            this.SelectedBookVM = selectedBookVM;
+        }
+
+        /// <summary>
+        /// 分類リストを更新する
+        /// </summary>
+        /// <param name="categoryId">選択対象の分類ID</param>
+        /// <returns></returns>
+        private async Task UpdateCategoryListAsync(int? categoryId = null)
+        {
+            ObservableCollection<CategoryViewModel> categoryVMList = [
+                new CategoryViewModel() { Id = -1, Name = Properties.Resources.ListName_NoSpecification }
+            ];
+            int? tmpCategoryId = categoryId ?? this.SelectedCategoryVM?.Id ?? categoryVMList[0].Id;
+            CategoryViewModel selectedCategoryVM = categoryVMList[0];
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                MstCategoryWithinBookDao mstCategoryWithinBookDao = new(dbHandler);
+                var dtoList = await mstCategoryWithinBookDao.FindByBookIdAndBalanceKindAsync(this.SelectedBookVM.Id.Value, (int)this.SelectedBalanceKind);
+                foreach (MstCategoryDto dto in dtoList) {
+                    CategoryViewModel vm = new() { Id = dto.CategoryId, Name = dto.CategoryName };
+                    categoryVMList.Add(vm);
+                    if (vm.Id == tmpCategoryId) {
+                        selectedCategoryVM = vm;
+                    }
+                }
+            }
+
+            this.CategoryVMList = categoryVMList;
+            this.SelectedCategoryVM = selectedCategoryVM;
+        }
+
+        /// <summary>
+        /// 項目リストを更新する
+        /// </summary>
+        /// <param name="itemId">選択対象の項目ID</param>
+        /// <returns></returns>
+        private async Task UpdateItemListAsync(int? itemId = null)
+        {
+            if (this.SelectedCategoryVM == null) return;
+
+            ObservableCollection<ItemViewModel> itemVMList = [];
+            int? tmpItemId = itemId ?? this.SelectedItemVM?.Id;
+            ItemViewModel selectedItemVM = null;
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                CategoryItemInfoDao categoryItemInfoDao = new(dbHandler);
+                var dtoList = this.SelectedCategoryVM.Id == -1
+                    ? await categoryItemInfoDao.FindByBookIdAndBalanceKindAsync(this.SelectedBookVM.Id.Value, (int)this.SelectedBalanceKind)
+                    : await categoryItemInfoDao.FindByBookIdAndCategoryIdAsync(this.SelectedBookVM.Id.Value, this.SelectedCategoryVM.Id);
+                foreach (CategoryItemInfoDto dto in dtoList) {
+                    ItemViewModel vm = new() {
+                        Id = dto.ItemId,
+                        Name = dto.ItemName,
+                        CategoryName = this.SelectedCategoryVM.Id == -1 ? dto.CategoryName : ""
+                    };
+                    itemVMList.Add(vm);
+                    if (selectedItemVM == null || vm.Id == tmpItemId) {
+                        selectedItemVM = vm;
+                    }
+                }
+            }
+
+            this.ItemVMList = itemVMList;
+            this.SelectedItemVM = selectedItemVM;
+        }
+
+        /// <summary>
+        /// 店舗リストを更新する
+        /// </summary>
+        /// <param name="shopName">選択対象の店舗名</param>
+        /// <returns></returns>
+        private async Task UpdateShopListAsync(string shopName = null)
+        {
+            if (this.SelectedItemVM == null) return;
+
+            ObservableCollection<ShopViewModel> shopVMList = [
+                new ShopViewModel() { Name = string.Empty }
+            ];
+            string selectedShopName = shopName ?? this.SelectedShopName ?? shopVMList[0].Name;
+            ShopViewModel selectedShopVM = shopVMList[0]; // UNUSED
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                ShopInfoDao shopInfoDao = new(dbHandler);
+                var dtoList = await shopInfoDao.FindByItemIdAsync(this.SelectedItemVM.Id);
+                foreach (ShopInfoDto dto in dtoList) {
+                    ShopViewModel svm = new() {
+                        Name = dto.ShopName,
+                        UsedCount = dto.Count,
+                        UsedTime = dto.UsedTime
+                    };
+                    shopVMList.Add(svm);
+                    if (selectedShopVM == null || svm.Name == selectedShopName) {
+                        selectedShopVM = svm;
+                    }
+                }
+            }
+
+            this.ShopVMList = shopVMList;
+            this.SelectedShopName = selectedShopName;
+        }
+
+        /// <summary>
+        /// 備考リストを更新する
+        /// </summary>
+        /// <param name="remark">選択対象の備考</param>
+        /// <returns></returns>
+        private async Task UpdateRemarkListAsync(string remark = null)
+        {
+            if (this.SelectedItemVM == null) return;
+
+            ObservableCollection<RemarkViewModel> remarkVMList = [
+                new RemarkViewModel() { Remark = string.Empty }
+            ];
+            string selectedRemark = remark ?? this.SelectedRemark ?? remarkVMList[0].Remark;
+            RemarkViewModel selectedRemarkVM = remarkVMList[0]; // UNUSED
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                RemarkInfoDao remarkInfoDao = new(dbHandler);
+                var dtoList = await remarkInfoDao.FindByItemIdAsync(this.SelectedItemVM.Id);
+                foreach (RemarkInfoDto dto in dtoList) {
+                    RemarkViewModel rvm = new() {
+                        Remark = dto.Remark,
+                        UsedCount = dto.Count,
+                        UsedTime = dto.UsedTime
+                    };
+                    remarkVMList.Add(rvm);
+                    if (selectedRemarkVM == null || rvm.Remark == selectedRemark) {
+                        selectedRemarkVM = rvm;
+                    }
+                }
+            }
+
+            this.RemarkVMList = remarkVMList;
+            this.SelectedRemark = selectedRemark;
+        }
+
+        /// <summary>
+        /// DBから読み込む
+        /// </summary>
+        /// <param name="selectedBookId">選択された帳簿ID</param>
+        /// <param name="selectedMonth">選択された年月</param>
+        /// <param name="selectedDate">選択された日付</param>
+        /// <param name="selectedRecordList">選択されたCSVレコードリスト</param>
+        /// <param name="selectedGroupId">選択されたグループID</param>
+        public async Task LoadActionListInfoAsync(int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate, List<CsvViewModel> selectedRecordList, int? selectedGroupId)
+        {
+            int? bookId = null;
+            BalanceKind balanceKind = BalanceKind.Expenses;
+
+            int? itemId = null;
+            string shopName = null;
+            string remark = null;
+
+            switch (this.RegKind) {
+                case RegistrationKind.Add: {
+                    bookId = selectedBookId;
+                    balanceKind = BalanceKind.Expenses;
+                    DateTime actDate = selectedDate ?? ((selectedMonth == null || selectedMonth?.Month == DateTime.Today.Month) ? DateTime.Today : selectedMonth.Value);
+
+                    if (selectedRecordList == null) {
+                        this.DateValueVMList.Add(new DateValueViewModel() { ActDate = actDate });
+                    }
+                    else {
+                        foreach (CsvViewModel record in selectedRecordList) {
+                            this.DateValueVMList.Add(new DateValueViewModel() { ActDate = record.Date, ActValue = record.Value });
+                        }
+                    }
+                }
+                break;
+                case RegistrationKind.Edit:
+                case RegistrationKind.Copy: {
+                    // DBから値を読み込む
+                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                        HstActionDao hstActionDao = new(dbHandler);
+                        var dtoList = await hstActionDao.FindByGroupIdAsync(selectedGroupId.Value);
+                        foreach (HstActionDto dto in dtoList) {
+                            // 日付金額リストに追加
+                            DateValueViewModel vm = new() {
+                                ActionId = dto.ActionId,
+                                ActDate = dto.ActTime,
+                                ActValue = Math.Abs(dto.ActValue)
+                            };
+
+                            bookId = dto.BookId;
+                            itemId = dto.ItemId;
+                            shopName = dto.ShopName;
+                            remark = dto.Remark;
+
+                            balanceKind = Math.Sign(dto.ActValue) > 0 ? BalanceKind.Income : BalanceKind.Expenses; // 収入 / 支出
+
+                            this.DateValueVMList.Add(vm);
+                        }
+                    }
+                }
+                break;
+            }
+
+            // WVMに値を設定する
+            this.GroupId = this.RegKind == RegistrationKind.Edit ? selectedGroupId : null;
+            this.SelectedBalanceKind = balanceKind;
+
+            // リストを更新する
+            await this.UpdateBookListAsync(bookId);
+            await this.UpdateCategoryListAsync();
+            await this.UpdateItemListAsync(itemId);
+            await this.UpdateShopListAsync(shopName);
+            await this.UpdateRemarkListAsync(remark);
+
+            // イベントハンドラを登録する
+            this.AddEventHandlers();
+        }
+
+        /// <summary>
+        /// イベントハンドラをWVMに登録する
+        /// </summary>
+        private void AddEventHandlers()
+        {
+            this.BookChanged += async (sender, e) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateCategoryListAsync();
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+                this.BookChanged?.Invoke(this, new EventArgs<int?>(e.Value));
+            };
+            this.BalanceKindChanged += async (sender, e) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateCategoryListAsync();
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+            this.CategoryChanged += async (sender, e) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+            this.ItemChanged += async (sender, e) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+        }
+
+        /// <summary>
+        /// DBに登録する
+        /// </summary>
+        /// <returns>登録された帳簿項目IDリスト</returns>
+        private async Task<List<int>> RegisterActionListInfoAsync()
+        {
+            List<int> resActionIdList = [];
+
+            BalanceKind balanceKind = this.SelectedBalanceKind; // 収支種別
+            int bookId = this.SelectedBookVM.Id.Value;          // 帳簿ID
+            int itemId = this.SelectedItemVM.Id;                // 帳簿項目ID
+            int groupId = this.GroupId ?? -1;                   // グループID
+            string shopName = this.SelectedShopName;            // 店舗名
+            string remark = this.SelectedRemark;                // 備考
+
+            DateTime lastActTime = this.DateValueVMList.Max((tmp) => tmp.ActDate);
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                switch (this.RegKind) {
+                    case RegistrationKind.Add: {
+                        #region 帳簿項目を追加する
+                        await dbHandler.ExecTransactionAsync(async () => {
+                            // グループIDを取得する
+                            HstGroupDao hstGroupDao = new(dbHandler);
+                            int tmpGroupId = await hstGroupDao.InsertReturningIdAsync(new HstGroupDto { GroupKind = (int)GroupKind.ListReg });
+
+                            HstActionDao hstActionDao = new(dbHandler);
+                            foreach (DateValueViewModel vm in this.DateValueVMList) {
+                                if (vm.ActValue.HasValue) {
+                                    DateTime actTime = vm.ActDate; // 日付
+                                    int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value; // 金額
+                                    int id = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
+                                        BookId = bookId,
+                                        ItemId = itemId,
+                                        ActTime = actTime,
+                                        ActValue = actValue,
+                                        ShopName = shopName,
+                                        GroupId = tmpGroupId,
+                                        Remark = remark
+                                    });
+                                    resActionIdList.Add(id);
+                                }
+                            }
+                        });
+                        #endregion
+                        break;
+                    }
+                    case RegistrationKind.Edit: {
+                        #region 帳簿項目を編集する
+                        await dbHandler.ExecTransactionAsync(async () => {
+                            HstActionDao hstActionDao = new(dbHandler);
+                            foreach (DateValueViewModel vm in this.DateValueVMList) {
+                                if (vm.ActValue.HasValue) {
+                                    int? actionId = vm.ActionId;
+                                    DateTime actTime = vm.ActDate; // 日付
+                                    int actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value; // 金額
+
+                                    if (actionId.HasValue) {
+                                        _ = await hstActionDao.UpdateWithoutIsMatchAsync(new HstActionDto {
+                                            BookId = bookId,
+                                            ItemId = itemId,
+                                            ActTime = actTime,
+                                            ActValue = actValue,
+                                            ShopName = shopName,
+                                            Remark = remark,
+                                            ActionId = actionId.Value
+                                        });
+
+                                        resActionIdList.Add(actionId.Value);
+                                    }
+                                    else {
+                                        int id = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
+                                            BookId = bookId,
+                                            ItemId = itemId,
+                                            ActTime = actTime,
+                                            ActValue = actValue,
+                                            ShopName = shopName,
+                                            GroupId = groupId,
+                                            Remark = remark
+                                        });
+                                        resActionIdList.Add(id);
+                                    }
+                                }
+                            }
+
+                            var dtoList = await hstActionDao.FindByGroupIdAsync(this.GroupId.Value);
+                            IEnumerable<int> expected = dtoList.Select((dto) => dto.ActionId).Except(resActionIdList);
+                            foreach (int actionId in expected) {
+                                _ = await hstActionDao.DeleteByIdAsync(actionId);
+                            }
+                        });
+                        #endregion
+                        break;
+                    }
+                }
+
+                if (shopName != string.Empty) {
+                    // 店舗を追加する
+                    HstShopDao hstShopDao = new(dbHandler);
+                    _ = await hstShopDao.UpsertAsync(new HstShopDto {
+                        ItemId = itemId,
+                        ShopName = shopName,
+                        UsedTime = lastActTime
+                    });
+                }
+
+                if (remark != string.Empty) {
+                    // 備考を追加する
+                    HstRemarkDao hstRemarkDao = new(dbHandler);
+                    _ = await hstRemarkDao.UpsertAsync(new HstRemarkDto {
+                        ItemId = itemId,
+                        Remark = remark,
+                        UsedTime = lastActTime
+                    });
+                }
+            }
+
+            return resActionIdList;
+        }
     }
 }
