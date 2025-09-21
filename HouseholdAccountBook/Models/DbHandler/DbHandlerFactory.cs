@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Models.DbHandler.Abstract;
+using System;
 using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Models.DbHandler
@@ -51,8 +52,9 @@ namespace HouseholdAccountBook.Models.DbHandler
         /// <summary>
         /// [非同期] <see cref="DbHandlerBase"/> 生成
         /// </summary>
+        /// <param name="timeoutMs">タイムアウト時間(ms)。0以下の場合は無制限</param>
         /// <returns>DbHandler</returns>
-        public async Task<DbHandlerBase> CreateAsync()
+        public async Task<DbHandlerBase> CreateAsync(int timeoutMs = 0)
         {
             try {
                 DbHandlerBase dbHandler = this.DBLibKind switch {
@@ -62,10 +64,10 @@ namespace HouseholdAccountBook.Models.DbHandler
                     _ => null,
                 };
 
-                _ = await dbHandler.OpenAsync();
-                ; return dbHandler;
+                _ = await dbHandler.OpenAsync(timeoutMs);
+                return dbHandler;
             }
-            catch (System.TimeoutException) {
+            catch (TimeoutException) {
                 throw;
             }
         }

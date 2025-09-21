@@ -3,9 +3,9 @@ using HouseholdAccountBook.Enums;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using static HouseholdAccountBook.Models.DbConstants;
 
 namespace HouseholdAccountBook.Models.DbHandler.Abstract
 {
@@ -61,8 +61,9 @@ namespace HouseholdAccountBook.Models.DbHandler.Abstract
         /// <summary>
         /// [非同期]接続を開始する
         /// </summary>
+        /// <param name="timeoutMs">タイムアウト時間(ms)。0以下の場合は無制限</param>
         /// <returns>接続結果</returns>
-        public async Task<bool> OpenAsync()
+        public async Task<bool> OpenAsync(int timeoutMs = 0)
         {
             if (this.CanOpen == false) {
                 return false;
@@ -70,8 +71,12 @@ namespace HouseholdAccountBook.Models.DbHandler.Abstract
 
             try {
                 await this.connection.OpenAsync();
+                Stopwatch sw = Stopwatch.StartNew();
                 while (this.connection.State == System.Data.ConnectionState.Connecting) {
-                    Thread.Sleep(100);
+                    Thread.Sleep(10);
+                    if (0 < timeoutMs && timeoutMs < sw.ElapsedMilliseconds) {
+                        throw new TimeoutException();
+                    }
                 }
 
                 return this.connection.State == System.Data.ConnectionState.Open;
