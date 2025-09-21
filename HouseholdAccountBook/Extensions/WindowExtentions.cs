@@ -145,6 +145,17 @@ namespace HouseholdAccountBook.Extensions
                     }
                 }
             };
+            wvm.OpenFolderDialogRequested += (sender, e) => {
+                OpenFolderDialog ofd = new() {
+                    InitialDirectory = e.InitialDirectory,
+                    Title = e.Title,
+                };
+
+                e.Result = ofd.ShowDialog(window);
+                if (e.Result == true) {
+                    e.FolderName = ofd.FolderName;
+                }
+            };
         }
     }
 }

@@ -1540,8 +1540,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             Log.Info();
 
-            SettingsWindow sw = new(this.dbHandlerFactory) { Owner = this };
-            sw.LoadWindowSetting();
+            SettingsWindow sw = new(this, this.dbHandlerFactory);
 
             if (sw.ShowDialog() == true) {
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {

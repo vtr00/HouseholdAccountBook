@@ -10,86 +10,14 @@
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Views.Behaviors"
         mc:Ignorable="d"
         Title="{x:Static properties:Resources.Title_SettingsWindow}" Height="700" Width="1050" WindowStyle="ToolWindow"
-        Loaded="SettingsWindow_Loaded"
-        Closing="SettingsWindow_Closing" Closed="SettingsWindow_Closed">
+        Closing="SettingsWindow_Closing">
     
     <Window.DataContext>
         <vmw:SettingsWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
-
-    <Window.Resources>
-        <RoutedCommand x:Key="ExitWindowCommand"/>
-
-        <!-- 設定操作コマンド -->
-        <RoutedCommand x:Key="AddCategoryCommand"/>
-        <RoutedCommand x:Key="AddItemCommand"/>
-        <RoutedCommand x:Key="DeleteItemCommand"/>
-        <RoutedCommand x:Key="RaiseItemSortOrderCommand"/>
-        <RoutedCommand x:Key="DropItemSortOrderCommand"/>
-        <RoutedCommand x:Key="SaveItemInfoCommand"/>
-        <RoutedCommand x:Key="ChangeItemRelationCommand"/>
-        <RoutedCommand x:Key="DeleteShopNameCommand"/>
-        <RoutedCommand x:Key="DeleteRemarkCommand"/>
-        
-        <!-- 帳簿設定操作コマンド -->
-        <RoutedCommand x:Key="AddBookCommand"/>
-        <RoutedCommand x:Key="DeleteBookCommand"/>
-        <RoutedCommand x:Key="RaiseBookSortOrderCommand"/>
-        <RoutedCommand x:Key="DropBookSortOrderCommand"/>
-        <RoutedCommand x:Key="SaveBookInfoCommand"/>
-        <RoutedCommand x:Key="ChangeBookRelationCommand"/>
-        <RoutedCommand x:Key="CsvFolderPathDialogCommand"/>
-
-        <!-- その他設定操作コマンド -->
-        <RoutedCommand x:Key="DumpExePathDialogCommand"/>
-        <RoutedCommand x:Key="RestoreExePathDialogCommand"/>
-        <RoutedCommand x:Key="RestartForLanguageCommand"/>
-        <RoutedCommand x:Key="RestartForDbSettingCommand"/>
-        <RoutedCommand x:Key="BackUpFolderPathDialogCommand"/>
-        <RoutedCommand x:Key="ReloadWindowSettingCommand"/>
-        <RoutedCommand x:Key="InitializeWindowSettingCommand"/>
-        
-        <RoutedCommand x:Key="SaveOtherSettingsCommand"/>
-    </Window.Resources>
-
-    <Window.CommandBindings>
-        <!-- ファイルコマンド -->
-        <CommandBinding Command="{StaticResource ExitWindowCommand}" Executed="ExitWindowCommand_Executed"/>
-
-        <!-- 項目設定操作コマンド -->
-        <CommandBinding Command="{StaticResource AddCategoryCommand}" CanExecute="AddCategoryCommand_CanExecute" Executed="AddCategoryCommand_Executed"/>
-        <CommandBinding Command="{StaticResource AddItemCommand}" CanExecute="AddItemCommand_CanExecute" Executed="AddItemCommand_Executed"/>
-        <CommandBinding Command="{StaticResource DeleteItemCommand}" CanExecute="DeleteItemCommand_CanExecute" Executed="DeleteItemCommand_Executed"/>
-        <CommandBinding Command="{StaticResource RaiseItemSortOrderCommand}" CanExecute="RaiseItemSortOrderCommand_CanExecute" Executed="RaiseItemSortOrderCommand_Executed"/>
-        <CommandBinding Command="{StaticResource DropItemSortOrderCommand}" CanExecute="DropItemSortOrderCommand_CanExecute" Executed="DropItemSortOrderCommand_Executed"/>
-        <CommandBinding Command="{StaticResource SaveItemInfoCommand}" CanExecute="SaveItemInfoCommand_CanExecute" Executed="SaveItemInfoCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ChangeItemRelationCommand}" Executed="ChangeItemRelationCommand_Executed"/>
-        <CommandBinding Command="{StaticResource DeleteShopNameCommand}" CanExecute="DeleteShopNameCommand_CanExecute" Executed="DeleteShopNameCommand_Executed"/>
-        <CommandBinding Command="{StaticResource DeleteRemarkCommand}" CanExecute="DeleteRemarkCommand_CanExecute" Executed="DeleteRemarkCommand_Executed"/>
-
-        <!-- 帳簿設定操作コマンド -->
-        <CommandBinding Command="{StaticResource AddBookCommand}" Executed="AddBookCommand_Executed"/>
-        <CommandBinding Command="{StaticResource DeleteBookCommand}" CanExecute="DeleteBookCommand_CanExecute" Executed="DeleteBookCommand_Executed"/>
-        <CommandBinding Command="{StaticResource RaiseBookSortOrderCommand}" CanExecute="RaiseBookSortOrderCommand_CanExecute" Executed="RaiseBookSortOrderCommand_Executed"/>
-        <CommandBinding Command="{StaticResource DropBookSortOrderCommand}" CanExecute="DropBookSortOrderCommand_CanExecute" Executed="DropBookSortOrderCommand_Executed"/>
-        <CommandBinding Command="{StaticResource SaveBookInfoCommand}" CanExecute="SaveBookInfoCommand_CanExecute" Executed="SaveBookInfoCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ChangeBookRelationCommand}" Executed="ChangeBookRelationCommand_Executed"/>
-        <CommandBinding Command="{StaticResource CsvFolderPathDialogCommand}" Executed="CsvFolderPathDialogCommand_Executed"/>
-
-        <!-- その他設定操作コマンド -->
-        <CommandBinding Command="{StaticResource DumpExePathDialogCommand}" Executed="DumpExePathDialogCommand_Executed"/>
-        <CommandBinding Command="{StaticResource RestoreExePathDialogCommand}" Executed="RestorePathDialogCommand_Executed"/>
-        <CommandBinding Command="{StaticResource RestartForLanguageCommand}" Executed="RestartForLanguageCommand_Executed"/>
-        <CommandBinding Command="{StaticResource RestartForDbSettingCommand}" Executed="RestartForDbSettingCommand_Executed"/>
-        <CommandBinding Command="{StaticResource BackUpFolderPathDialogCommand}" Executed="BackUpFolderPathDialogCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ReloadWindowSettingCommand}" Executed="ReloadWindowSettingCommand_Executed"/>
-        <CommandBinding Command="{StaticResource InitializeWindowSettingCommand}" Executed="InitializeWindowSettingCommand_Executed"/>
-
-        <CommandBinding Command="{StaticResource SaveOtherSettingsCommand}" Executed="SaveOtherSettingsCommand_Executed"/>
-    </Window.CommandBindings>
     
     <Window.InputBindings>
-        <KeyBinding Gesture="Alt+F4" Command="{StaticResource ExitWindowCommand}"/>
+        <KeyBinding Gesture="Alt+F4" Command="{Binding CloseCommand}"/>
     </Window.InputBindings>
 
     <Grid Background="WhiteSmoke">
@@ -100,7 +28,7 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="{x:Static properties:Resources.Menu_File}">
-                <MenuItem Header="{x:Static properties:Resources.Menu_File_Exit}" Command="{StaticResource ExitWindowCommand}" InputGestureText="Alt+F4"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_File_Exit}" Command="{Binding CloseCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>
         </Menu>
         
@@ -113,7 +41,7 @@
             </TabControl.ItemContainerStyle>
             
             <!-- 項目設定 -->
-            <TabItem>
+            <TabItem x:Name="_ItemTab" DataContext="{Binding ItemTabVM}">
                 <TabItem.Header>
                     <TextBlock Text="{x:Static properties:Resources.TabHeader_ItemSettings}" TextAlignment="Center"/>
                 </TabItem.Header>
@@ -132,23 +60,23 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Grid.Row="0" Margin="5" Orientation="Horizontal">
-                                <Button Width="80" Content="{x:Static properties:Resources.Button_AddCategory}" Command="{StaticResource AddCategoryCommand}" ToolTip="Shift+Ctrl++"/>
-                                <Button Width="80" Content="{x:Static properties:Resources.Button_AddItem}" Command="{StaticResource AddItemCommand}" ToolTip="Ctrl++"/>
-                                <Button Width="50" Content="{x:Static properties:Resources.Button_Delete}" Command="{StaticResource DeleteItemCommand}" ToolTip="Delete"/>
-                                <Button Width="25" Content="{x:Static properties:Resources.Button_RaiseSortOrder}" Command="{StaticResource RaiseItemSortOrderCommand}" ToolTip="Ctrl+↑"/>
-                                <Button Width="25" Content="{x:Static properties:Resources.Button_DropSortOrder}" Command="{StaticResource DropItemSortOrderCommand}" ToolTip="Ctrl+↓"/>
+                                <Button Width="80" Content="{x:Static properties:Resources.Button_AddCategory}" Command="{Binding AddCategoryCommand}" ToolTip="Shift+Ctrl++"/>
+                                <Button Width="80" Content="{x:Static properties:Resources.Button_AddItem}" Command="{Binding AddItemCommand}" ToolTip="Ctrl++"/>
+                                <Button Width="50" Content="{x:Static properties:Resources.Button_Delete}" Command="{Binding DeleteItemCommand}" ToolTip="Delete"/>
+                                <Button Width="25" Content="{x:Static properties:Resources.Button_RaiseSortOrder}" Command="{Binding RaiseItemSortOrderCommand}" ToolTip="Ctrl+↑"/>
+                                <Button Width="25" Content="{x:Static properties:Resources.Button_DropSortOrder}" Command="{Binding DropItemSortOrderCommand}" ToolTip="Ctrl+↓"/>
                             </StackPanel>
 
                             <TreeView x:Name="hierarchicalTreeView" Grid.Row="1" Margin="5" ItemsSource="{Binding HierarchicalVMList}"
                                       SelectedItemChanged="TreeView_SelectedItemChanged">
                                 <TreeView.InputBindings>
-                                    <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{StaticResource AddCategoryCommand}"/>
-                                    <KeyBinding Gesture="Shift+Ctrl+Add" Command="{StaticResource AddCategoryCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{StaticResource AddItemCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+Add" Command="{StaticResource AddItemCommand}"/>
-                                    <KeyBinding Gesture="Delete" Command="{StaticResource DeleteItemCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+Up" Command="{StaticResource RaiseItemSortOrderCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+Down" Command="{StaticResource DropItemSortOrderCommand}"/>
+                                    <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{Binding DataContext.AddCategoryCommand, ElementName=_ItemTab}"/>
+                                    <KeyBinding Gesture="Shift+Ctrl+Add" Command="{Binding DataContext.AddCategoryCommand, ElementName=_ItemTab}"/>
+                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{Binding DataContext.AddItemCommand, ElementName=_ItemTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Add" Command="{Binding DataContext.AddItemCommand, ElementName=_ItemTab}"/>
+                                    <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteItemCommand, ElementName=_ItemTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Up" Command="{Binding DataContext.RaiseItemSortOrderCommand, ElementName=_ItemTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Down" Command="{Binding DataContext.DropItemSortOrderCommand, ElementName=_ItemTab}"/>
                                 </TreeView.InputBindings>
                                 <TreeView.ItemContainerStyle>
                                     <Style TargetType="TreeViewItem">
@@ -178,10 +106,10 @@
                             <RowDefinition Height="0.3*"/>
                             <RowDefinition Height="0.3*"/>
                         </Grid.RowDefinitions>
-
+                        <!-- 項目情報 -->
                         <GroupBox Grid.Row="0" Header="{x:Static properties:Resources.GroupHeader_ItemInformation}">
                             <GroupBox.InputBindings>
-                                <KeyBinding Gesture="Ctrl+S" Command="{StaticResource SaveItemInfoCommand}"/>
+                                <KeyBinding Gesture="Ctrl+S" Command="{Binding DataContext.SaveItemInfoCommand, ElementName=_ItemTab}"/>
                             </GroupBox.InputBindings>
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -231,11 +159,11 @@
                                 </TextBlock>
                                 <TextBox Grid.Row="2" Grid.Column="1" Margin="5" 
                                                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsRenamable, Converter={StaticResource NegationConverter}}"/>
-                                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" 
-                                        Content="{x:Static properties:Resources.Button_Save}" Command="{StaticResource SaveItemInfoCommand}" ToolTip="Ctrl+S"/>
+                                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Content="{x:Static properties:Resources.Button_Save}" 
+                                        Command="{Binding DataContext.SaveItemInfoCommand, ElementName=_ItemTab}" ToolTip="Ctrl+S"/>
                             </Grid>
                         </GroupBox>
-
+                        <!-- 関連付け -->
                         <GroupBox Grid.Row="1" Header="{x:Static properties:Resources.GroupHeader_Linkage}">
                             <ListBox Margin="5" ItemsSource="{Binding RelationVMList}" SelectedItem="{Binding SelectedRelationVM}" IsEnabled="{Binding IsSettable}">
                                 <ListBox.ItemTemplate>
@@ -246,14 +174,16 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             
-                                            <CheckBox Grid.Column="0" IsChecked="{Binding IsRelated}" Command="{StaticResource ChangeItemRelationCommand}"/>
+                                            <CheckBox Grid.Column="0" IsChecked="{Binding IsRelated}"
+                                                      Command="{Binding DataContext.ChangeItemRelationCommand, ElementName=_ItemTab}"
+                                                      CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Self}}"/>
                                             <TextBlock Grid.Column="1" Text="{Binding Name}"/>
                                         </Grid>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
                         </GroupBox>
-
+                        <!-- 店舗情報 -->
                         <GroupBox Grid.Row="2" Header="{x:Static properties:Resources.GroupHeader_Shop}">
                             <DataGrid Margin="5" x:Name="shopDataGrid" 
                                       ItemsSource="{Binding ShopVMList}" SelectedItem="{Binding SelectedShopVM}" IsEnabled="{Binding IsSettable}"
@@ -268,7 +198,7 @@
                                     </Style>
                                 </DataGrid.ColumnHeaderStyle>
                                 <DataGrid.InputBindings>
-                                    <KeyBinding Gesture="Delete" Command="{StaticResource DeleteShopNameCommand}"/>
+                                    <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteShopNameCommand, ElementName=_ItemTab}"/>
                                 </DataGrid.InputBindings>
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Name}"/>
@@ -277,7 +207,7 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>
-
+                        <!-- 備考情報 -->
                         <GroupBox Grid.Row="3" Header="{x:Static properties:Resources.GroupHeader_Remark}">
                             <DataGrid Margin="5" x:Name="remarkDataGrid" 
                                       ItemsSource="{Binding RemarkVMList}" SelectedItem="{Binding SelectedRemarkVM}" IsEnabled="{Binding IsSettable}"
@@ -292,7 +222,7 @@
                                     </Style>
                                 </DataGrid.ColumnHeaderStyle>
                                 <DataGrid.InputBindings>
-                                    <KeyBinding Gesture="Delete" Command="{StaticResource DeleteRemarkCommand}"/>
+                                    <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteRemarkCommand, ElementName=_ItemTab}"/>
                                 </DataGrid.InputBindings>
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Remark}"/>
@@ -304,8 +234,9 @@
                     </Grid>
                 </Grid>
             </TabItem>
+            
             <!-- 帳簿設定 -->
-            <TabItem>
+            <TabItem x:Name="_BookTab" DataContext="{Binding BookTabVM}">
                 <TabItem.Header>
                     <TextBlock Text="{x:Static properties:Resources.TabHeader_BookSettings}" TextAlignment="Center"/>
                 </TabItem.Header>
@@ -324,20 +255,20 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Grid.Row="0" Margin="5" Orientation="Horizontal">
-                                <Button Content="{x:Static properties:Resources.Button_Add}" Width="50" Command="{StaticResource AddBookCommand}" ToolTip="Ctrl++"/>
-                                <Button Content="{x:Static properties:Resources.Button_Delete}" Width="50" Command="{StaticResource DeleteBookCommand}" ToolTip="Del"/>
-                                <Button Content="{x:Static properties:Resources.Button_RaiseSortOrder}" Width="25" Command="{StaticResource RaiseBookSortOrderCommand}" ToolTip="Ctrl+↑"/>
-                                <Button Content="{x:Static properties:Resources.Button_DropSortOrder}" Width="25" Command="{StaticResource DropBookSortOrderCommand}" ToolTip="Ctrl+↓"/>
+                                <Button Content="{x:Static properties:Resources.Button_Add}" Width="50" Command="{Binding AddBookCommand}" ToolTip="Ctrl++"/>
+                                <Button Content="{x:Static properties:Resources.Button_Delete}" Width="50" Command="{Binding DeleteBookCommand}" ToolTip="Del"/>
+                                <Button Content="{x:Static properties:Resources.Button_RaiseSortOrder}" Width="25" Command="{Binding RaiseBookSortOrderCommand}" ToolTip="Ctrl+↑"/>
+                                <Button Content="{x:Static properties:Resources.Button_DropSortOrder}" Width="25" Command="{Binding DropBookSortOrderCommand}" ToolTip="Ctrl+↓"/>
                             </StackPanel>
 
                             <ListBox Grid.Row="1" Margin="5" 
                                         ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name">
                                 <ListBox.InputBindings>
-                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{StaticResource AddBookCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+Add" Command="{StaticResource AddBookCommand}"/>
-                                    <KeyBinding Gesture="Delete" Command="{StaticResource DeleteBookCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+Up" Command="{StaticResource RaiseBookSortOrderCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+Down" Command="{StaticResource DropBookSortOrderCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{Binding DataContext.AddBookCommand, ElementName=_BookTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Add" Command="{Binding DataContext.AddBookCommand, ElementName=_BookTab}"/>
+                                    <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteBookCommand, ElementName=_BookTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Up" Command="{Binding DataContext.RaiseBookSortOrderCommand, ElementName=_BookTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Down" Command="{Binding DataContext.DropBookSortOrderCommand, ElementName=_BookTab}"/>
                                 </ListBox.InputBindings>
                             </ListBox>
                         </Grid>
@@ -353,7 +284,7 @@
 
                         <GroupBox Grid.Row="0" Header="{x:Static properties:Resources.GroupHeader_BookInformation}">
                             <GroupBox.InputBindings>
-                                <KeyBinding Gesture="Ctrl+S" Command="{StaticResource SaveBookInfoCommand}"/>
+                                <KeyBinding Gesture="Ctrl+S" Command="{Binding DataContext.SaveBookInfoCommand, ElementName=_BookTab}"/>
                             </GroupBox.InputBindings>
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -398,6 +329,7 @@
                                            Text="{x:Static properties:Resources.TextBlock_InitialBalance}"/>
                                 <controls:NumericUpDown Grid.Row="4" Grid.Column="1" Margin="5" Value="{Binding InitialValue}"/>
 
+                                <!-- 期間情報 -->
                                 <GroupBox Grid.Row="5" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_TermInformation}">
                                     <Grid>
                                         <Grid.RowDefinitions>
@@ -428,7 +360,7 @@
                                                                  DateFormat="yyyy-MM-dd" SelectedDate="{Binding EndDate}"/>
                                     </Grid>
                                 </GroupBox>
-                                
+                                <!-- 支払情報 -->
                                 <GroupBox Grid.Row="6" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_PaymentInformation}" IsEnabled="{Binding NeedToPay}">
                                     <Grid>
                                         <Grid.RowDefinitions>
@@ -451,7 +383,7 @@
                                                                 MinValue="1" MaxValue="31" Value="{Binding PayDay, TargetNullValue=''}"/>
                                     </Grid>
                                 </GroupBox>
-
+                                <!-- CSV情報 -->
                                 <GroupBox Grid.Row="7" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_CSVInformation}" IsEnabled="{Binding CsvDataExists}">
                                     <Grid>
                                         <Grid.RowDefinitions>
@@ -470,7 +402,8 @@
                                                    Text="{x:Static properties:Resources.TextBlock_FolderPath}"/>
                                         <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                  Text="{Binding CsvFolderPath, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <Button Grid.Row="0" Grid.Column="3" Margin="5" Content="..." Command="{StaticResource CsvFolderPathDialogCommand}"/>
+                                        <Button Grid.Row="0" Grid.Column="3" Margin="5" Content="..." 
+                                                Command="{Binding DataContext.SelectCsvFolderPathCommand, ElementName=_BookTab}"/>
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
                                                    Text="{x:Static properties:Resources.TextBlock_TextEncoding}"/>
@@ -509,10 +442,11 @@
                                     </Grid>
                                 </GroupBox>
                                 <Button Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" 
-                                        Content="{x:Static properties:Resources.Button_Save}" Command="{StaticResource SaveBookInfoCommand}" ToolTip="Ctrl+S"/>
+                                        Content="{x:Static properties:Resources.Button_Save}"
+                                        Command="{Binding DataContext.SaveBookInfoCommand, ElementName=_BookTab}" ToolTip="Ctrl+S"/>
                             </Grid>
                         </GroupBox>
-
+                        <!-- 関連付け -->
                         <GroupBox Grid.Row="1" Header="{x:Static properties:Resources.GroupHeader_Linkage}">
                             <Grid>
                                 <ListBox Margin="5" ItemsSource="{Binding RelationVMList}" SelectedItem="{Binding SelectedRelationVM}">
@@ -523,7 +457,9 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <CheckBox Grid.Column="0" IsChecked="{Binding IsRelated}" Command="{StaticResource ChangeBookRelationCommand}"/>
+                                                <CheckBox Grid.Column="0" IsChecked="{Binding IsRelated}"
+                                                          Command="{Binding DataContext.ChangeBookRelationCommand, ElementName=_BookTab}"
+                                                          CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Self}}"/>
                                                 <TextBlock Grid.Column="1" Text="{Binding Name}"/>
                                             </Grid>
                                         </DataTemplate>
@@ -534,8 +470,9 @@
                     </Grid>
                 </Grid>
             </TabItem>
+            
             <!-- その他 -->
-            <TabItem>
+            <TabItem x:Name="_OtherTab" DataContext="{Binding OtherTabVM}">
                 <TabItem.Header>
                     <TextBlock Text="{x:Static properties:Resources.TabHeader_OtherSettings}" HorizontalAlignment="Center"/>
                 </TabItem.Header>
@@ -579,11 +516,13 @@
 
                                             <TextBlock Grid.Row="0" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
                                             <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding DumpExePath}" IsReadOnly="True"/>
-                                            <Button Grid.Row="0" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource DumpExePathDialogCommand}"/>
+                                            <Button Grid.Row="0" Grid.Column="2" Margin="5" Content="..."
+                                                    Command="{Binding DataContext.SelectDumpExePathCommand, ElementName=_OtherTab}"/>
 
                                             <TextBlock Grid.Row="1" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
                                             <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding RestoreExePath}" IsReadOnly="True"/>
-                                            <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..." Command="{StaticResource RestoreExePathDialogCommand}"/>
+                                            <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..."
+                                                    Command="{Binding DataContext.SelectRestoreExePathCommand, ElementName=_OtherTab}"/>
 
                                             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Password}"/>
                                             <RadioButton Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_input" Margin="5" 
@@ -632,7 +571,7 @@
 
                                     <Button Grid.Row="3" Grid.Column="0" Margin="5" 
                                             Content="{x:Static properties:Resources.Button_ReregisterDatabaseSetting}"
-                                            Command="{StaticResource RestartForDbSettingCommand}"/>
+                                            Command="{Binding RestartForDbSettingCommand}"/>
                                 </Grid>
                             </GroupBox>
                             <!-- 言語情報 -->
@@ -652,7 +591,7 @@
                                     <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" ItemsSource="{Binding CultureNameDic}" 
                                               SelectedValue="{Binding SelectedCultureName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
                                     <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5"
-                                            Content="{x:Static properties:Resources.Button_ApplyLanguage}" Command="{StaticResource RestartForLanguageCommand}"/>
+                                            Content="{x:Static properties:Resources.Button_ApplyLanguage}" Command="{Binding RestartForLanguageCommand}"/>
                                 </Grid>
                             </GroupBox>
                             <!-- バックアップ情報 -->
@@ -680,7 +619,7 @@
                                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
                                                Text="{x:Static properties:Resources.TextBlock_FolderPath}"/>
                                     <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsReadOnly="True" Text="{Binding BackUpFolderPath}"/>
-                                    <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="..." Command="{StaticResource BackUpFolderPathDialogCommand}"/>
+                                    <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="..." Command="{Binding SelectBackUpFolderPathCommand}"/>
 
                                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Timing}"/>
                                     <GroupBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="5">
@@ -820,13 +759,13 @@
 
                                     <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" 
                                             Content="{x:Static properties:Resources.Button_InitializeWindowPositionAndSize}"
-                                            Command="{StaticResource InitializeWindowSettingCommand}"/>
+                                            Command="{Binding InitializeWindowSettingCommand}"/>
                                 </Grid>
                             </GroupBox>
                         </StackPanel>
                     </ScrollViewer>
                     
-                    <Button Grid.Row="1" Margin="5" Content="{x:Static properties:Resources.Button_Save}" Command="{StaticResource SaveOtherSettingsCommand}"/>
+                    <Button Grid.Row="1" Margin="5" Content="{x:Static properties:Resources.Button_Save}" Command="{Binding SaveOtherSettingsCommand}"/>
                 </Grid>
             </TabItem>
         </TabControl>
