@@ -301,46 +301,5 @@ namespace HouseholdAccountBook.Views.Windows
             e.Handled = true;
         }
         #endregion
-
-        #region 設定反映用の関数
-        /// <summary>
-        /// ウィンドウ設定を読み込む
-        /// </summary>
-        public void LoadWindowSetting()
-        {
-            Properties.Settings settings = Properties.Settings.Default;
-
-            if (settings.ActionListRegistrationWindow_Width != -1 && settings.ActionListRegistrationWindow_Height != -1) {
-                this.Width = settings.ActionListRegistrationWindow_Width;
-                this.Height = settings.ActionListRegistrationWindow_Height;
-            }
-
-            if (settings.App_IsPositionSaved && -10 <= settings.ActionListRegistrationWindow_Left && 0 <= settings.ActionListRegistrationWindow_Top) {
-                this.Left = settings.ActionListRegistrationWindow_Left;
-                this.Top = settings.ActionListRegistrationWindow_Top;
-            }
-            else {
-                this.MoveOwnersCenter();
-            }
-        }
-
-        /// <summary>
-        /// ウィンドウ設定を保存する
-        /// </summary>
-        public void SaveWindowSetting()
-        {
-            Properties.Settings settings = Properties.Settings.Default;
-
-            if (this.WindowState == WindowState.Normal) {
-                if (settings.App_IsPositionSaved) {
-                    settings.ActionListRegistrationWindow_Left = this.Left;
-                    settings.ActionListRegistrationWindow_Top = this.Top;
-                }
-                settings.ActionListRegistrationWindow_Width = this.Width;
-                settings.ActionListRegistrationWindow_Height = this.Height;
-                settings.Save();
-            }
-        }
-        #endregion
     }
 }
