@@ -297,6 +297,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public ICommand SaveOtherSettingsCommand => new RelayCommand(this.SaveOtherSettingsCommand_Executed);
         #endregion
 
+        #region コマンドイベントハンドラ
         /// <summary>
         /// pg_dump.exe選択コマンド処理
         /// </summary>
@@ -307,15 +308,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 folderPath = App.GetCurrentDir();
             }
 
-            this.OpenFileDialogRequest(new OpenFileDialogRequestEventArgs() {
+            var e = new OpenFileDialogRequestEventArgs() {
                 CheckFileExists = true,
                 InitialDirectory = folderPath,
                 FileName = fileName,
                 Title = Properties.Resources.Title_FileSelection,
                 Filter = "pg_dump.exe|pg_dump.exe"
-            }, (selectedFile) => {
-                this.PostgreSQLDBSettingVM.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), selectedFile);
-            });
+            };
+            if (this.OpenFileDialogRequest(e)) {
+                this.PostgreSQLDBSettingVM.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
+            }
         }
 
         /// <summary>
@@ -328,15 +330,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 folderPath = App.GetCurrentDir();
             }
 
-            this.OpenFileDialogRequest(new OpenFileDialogRequestEventArgs() {
+            var e = new OpenFileDialogRequestEventArgs() {
                 CheckFileExists = true,
                 InitialDirectory = folderPath,
                 FileName = fileName,
                 Title = Properties.Resources.Title_FileSelection,
                 Filter = "pg_restore.exe|pg_restore.exe"
-            }, (selectedFile) => {
-                this.PostgreSQLDBSettingVM.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), selectedFile);
-            });
+            };
+            if (this.OpenFileDialogRequest(e)) {
+                this.PostgreSQLDBSettingVM.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
+            }
         }
 
         /// <summary>
@@ -381,12 +384,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 folderFullPath = Path.Combine(folderPath, fileName);
             }
 
-            this.OpenFolderDialogRequest(new OpenFolderDialogRequestEventArgs() {
+            var e = new OpenFolderDialogRequestEventArgs() {
                 InitialDirectory = folderFullPath,
                 Title = Properties.Resources.Title_BackupFolderSelection
-            }, (selectedFolder) => {
-                this.BackUpFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), selectedFolder);
-            });
+            };
+            if (this.OpenFolderDialogRequest(e)) {
+                this.BackUpFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FolderName);
+            }
         }
 
         /// <summary>
@@ -394,7 +398,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private void ReloadWindowSettingCommand_Executed()
         {
-            this.LoadOthersWindowSettings();
+            this.LoadWindowSettings();
         }
 
         /// <summary>
@@ -466,14 +470,15 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private void SaveOtherSettingsCommand_Executed()
         {
-            this.SaveOthersSettings();
+            this.Save();
             this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
         }
+        #endregion
 
         /// <summary>
         /// その他設定を読み込む
         /// </summary>
-        public void LoadOthersSettings()
+        public void Load()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -519,13 +524,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             this.DebugMode = settings.App_IsDebug;
 
-            this.LoadOthersWindowSettings();
+            this.LoadWindowSettings();
         }
 
         /// <summary>
         /// 各ウィンドウの矩形領域設定を読み込む
         /// </summary>
-        private void LoadOthersWindowSettings()
+        private void LoadWindowSettings()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -582,7 +587,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// その他設定を保存する
         /// </summary>
-        private void SaveOthersSettings()
+        private void Save()
         {
             Properties.Settings settings = Properties.Settings.Default;
 

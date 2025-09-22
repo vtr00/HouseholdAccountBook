@@ -18,6 +18,6 @@ namespace HouseholdAccountBook.Others
 
         public string[] FileNames { get; set; }
 
-        public bool? Result { get; set; } = false;
+        public bool Result { get; set; } = false;
     }
 }

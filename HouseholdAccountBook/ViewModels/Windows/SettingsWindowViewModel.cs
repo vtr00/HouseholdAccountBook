@@ -82,35 +82,31 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         #region ウィンドウ設定プロパティ
-        public override Rect WindowRectSetting
+        public override Size WindowSizeSetting
         {
+            get {
+                Properties.Settings settings = Properties.Settings.Default;
+                return new Size(settings.SettingsWindow_Width, settings.SettingsWindow_Height);
+            }
             set {
                 Properties.Settings settings = Properties.Settings.Default;
-
-                if (settings.App_IsPositionSaved) {
-                    settings.SettingsWindow_Left = value.Left;
-                    settings.SettingsWindow_Top = value.Top;
-                }
-
                 settings.SettingsWindow_Width = value.Width;
                 settings.SettingsWindow_Height = value.Height;
                 settings.Save();
             }
         }
 
-        public override Size? WindowSizeSetting
+        public override Point WindowPointSetting
         {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
-                return WindowSizeSettingImpl(settings.SettingsWindow_Width, settings.SettingsWindow_Height);
+                return new Point(settings.SettingsWindow_Left, settings.SettingsWindow_Top);
             }
-        }
-
-        public override Point? WindowPointSetting
-        {
-            get {
+            set {
                 Properties.Settings settings = Properties.Settings.Default;
-                return WindowPointSettingImpl(settings.SettingsWindow_Left, settings.SettingsWindow_Top, settings.App_IsPositionSaved);
+                settings.SettingsWindow_Left = value.X;
+                settings.SettingsWindow_Top = value.Y;
+                settings.Save();
             }
         }
         #endregion
@@ -121,32 +117,37 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.BookTabVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
             this.OtherTabVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
 
-            this.ItemTabVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e, (folder) => { });
-            this.ItemTabVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e, (file) => { });
-            this.BookTabVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e, (folder) => { });
-            this.BookTabVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e, (file) => { });
-            this.OtherTabVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e, (folder) => { });
-            this.OtherTabVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e, (file) => { });
-
             base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
         }
 
         /// <summary>
         /// DB等から読み込む
         /// </summary>
-        public async Task LoadSettingsInfoAsync()
+        public override async Task LoadAsync()
         {
             switch (this.SelectedTab) {
                 case SettingsTabs.ItemSettingsTab:
-                    await this.ItemTabVM.LoadItemInfoAsync();
+                    await this.ItemTabVM.LoadAsync();
                     break;
                 case SettingsTabs.BookSettingsTab:
-                    await this.BookTabVM.LoadBookInfoAsync();
+                    await this.BookTabVM.LoadAsync();
                     break;
                 case SettingsTabs.OtherSettingsTab:
-                    this.OtherTabVM.LoadOthersSettings();
+                    this.OtherTabVM.Load();
                     break;
             }
+
+            this.AddEventHandlers();
+        }
+
+        protected override void AddEventHandlers()
+        {
+            this.ItemTabVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
+            this.ItemTabVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);
+            this.BookTabVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
+            this.BookTabVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);
+            this.OtherTabVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
+            this.OtherTabVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);
         }
     }
 }

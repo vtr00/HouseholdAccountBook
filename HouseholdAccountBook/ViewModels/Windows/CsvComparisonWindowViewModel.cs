@@ -177,6 +177,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public int SelectedSumValue => this.SelectedCsvComparisonVMList.Sum((vm) => vm.Record.Value);
         #endregion
 
+        #region コマンド
         /// <summary>
         /// CSVファイルオープンコマンド
         /// </summary>
@@ -214,35 +215,39 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand CheckIsMatchCommand => new RelayCommand(this.ChangeIsMatchCommand_Executed);
         #endregion
+        #endregion
 
+        #region コマンドイベントハンドラ
         /// <summary>
         /// CSVファイルを開く
         /// </summary>
-        private void OpenCsvFilesCommand_Executed()
+        private async void OpenCsvFilesCommand_Executed()
         {
             Properties.Settings settings = Properties.Settings.Default;
             (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(settings.App_CsvFilePath, App.GetCurrentDir());
 
-            this.OpenFilesDialogRequest(new OpenFileDialogRequestEventArgs {
+            var e = new OpenFileDialogRequestEventArgs {
                 CheckFileExists = true,
                 InitialDirectory = folderPath,
                 FileName = fileName,
                 Title = Properties.Resources.Title_FileSelection,
                 Filter = Properties.Resources.FileSelectFilter_CsvFile + "|*.csv",
                 Multiselect = true
-            }, async fileNames => {
+            };
+            if (this.OpenFilesDialogRequest(e)) {
                 // 開いたCSVファイルのパスを設定として保存する(複数存在する場合は先頭のみ)
-                settings.App_CsvFilePath = fileNames[0];
+                settings.App_CsvFilePath = e.FileNames[0];
                 settings.Save();
 
-                foreach (string fileName in fileNames) {
-                    if (!this.CsvFilePathList.Contains(fileName)) {
-                        this.CsvFilePathList.Add(fileName);
+                foreach (string tmpFileName in e.FileNames) {
+                    if (!this.CsvFilePathList.Contains(tmpFileName)) {
+                        this.CsvFilePathList.Add(tmpFileName);
                     }
                 }
-                this.LoadCsvFiles(fileNames);
+                this.LoadCsvFiles(e.FileNames);
                 await this.UpdateComparisonVMListAsync(true);
-            });
+            }
+
         }
 
         /// <summary>
@@ -512,47 +517,49 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 await this.SaveIsMatchAsync(this.SelectedCsvComparisonVM.ActionId.Value, this.SelectedCsvComparisonVM.IsMatch);
             }
         }
+        #endregion
 
         #region ウィンドウ設定プロパティ
-        public override Rect WindowRectSetting
+        public override Size WindowSizeSetting
         {
+            get {
+                Properties.Settings settings = Properties.Settings.Default;
+                return new Size(settings.CsvComparisonWindow_Width, settings.CsvComparisonWindow_Height);
+            }
             set {
                 Properties.Settings settings = Properties.Settings.Default;
-
-                if (settings.App_IsPositionSaved) {
-                    settings.CsvComparisonWindow_Left = value.Left;
-                    settings.CsvComparisonWindow_Top = value.Top;
-                }
-
                 settings.CsvComparisonWindow_Width = value.Width;
                 settings.CsvComparisonWindow_Height = value.Height;
                 settings.Save();
             }
         }
 
-        public override Size? WindowSizeSetting
+        public override Point WindowPointSetting
         {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
-                return WindowSizeSettingImpl(settings.CsvComparisonWindow_Width, settings.CsvComparisonWindow_Height);
+                return new Point(settings.CsvComparisonWindow_Left, settings.CsvComparisonWindow_Top);
             }
-        }
-
-        public override Point? WindowPointSetting
-        {
-            get {
+            set {
                 Properties.Settings settings = Properties.Settings.Default;
-                return WindowPointSettingImpl(settings.CsvComparisonWindow_Left, settings.CsvComparisonWindow_Top, settings.App_IsPositionSaved);
+                settings.CsvComparisonWindow_Left = value.X;
+                settings.CsvComparisonWindow_Top = value.Y;
+                settings.Save();
             }
         }
         #endregion
+
+        public override async Task LoadAsync()
+        {
+            await this.LoadAsync(null);
+        }
 
         /// <summary>
         /// DBから読み込む
         /// </summary>
         /// <param name="selectedBookId">選択された帳簿ID</param>
         /// <returns></returns>
-        public async Task LoadCsvCompInfoAsync(int? selectedBookId)
+        public async Task LoadAsync(int? selectedBookId)
         {
             await this.UpdateBookListAsync(selectedBookId);
 
@@ -602,7 +609,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// イベントハンドラを登録する
         /// </summary>
-        private void AddEventHandlers()
+        protected override void AddEventHandlers()
         {
             this.CsvFilePathList.CollectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.CsvFilePathes));

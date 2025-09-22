@@ -290,6 +290,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public NumericInputButton.InputKind InputedKind { get; set; }
         #endregion
 
+        #region コマンドイベントハンドラ
         protected override bool OKCommand_CanExecute()
         {
             return this.SelectedItemVM != null && this.DateValueVMList.Any((vm) => vm.ActValue.HasValue);
@@ -299,7 +300,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             // DB登録
             List<int> idList = null;
             using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                idList = await this.RegisterActionListInfoAsync();
+                idList = await this.SaveAsync();
             }
 
             // MainWindow更新
@@ -307,37 +308,34 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             base.OKCommand_Executed();
         }
+        #endregion
 
         #region ウィンドウ設定プロパティ
-        public override Rect WindowRectSetting
+        public override Size WindowSizeSetting
         {
+            get {
+                Properties.Settings settings = Properties.Settings.Default;
+                return new Size(settings.ActionListRegistrationWindow_Width, settings.ActionListRegistrationWindow_Height);
+            }
             set {
                 Properties.Settings settings = Properties.Settings.Default;
-
-                if (settings.App_IsPositionSaved) {
-                    settings.ActionListRegistrationWindow_Left = value.Left;
-                    settings.ActionListRegistrationWindow_Top = value.Top;
-                }
-
                 settings.ActionListRegistrationWindow_Width = value.Width;
                 settings.ActionListRegistrationWindow_Height = value.Height;
                 settings.Save();
             }
         }
 
-        public override Size? WindowSizeSetting
+        public override Point WindowPointSetting
         {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
-                return WindowSizeSettingImpl(settings.ActionListRegistrationWindow_Width, settings.ActionListRegistrationWindow_Height);
+                return new Point(settings.ActionListRegistrationWindow_Left, settings.ActionListRegistrationWindow_Top);
             }
-        }
-
-        public override Point? WindowPointSetting
-        {
-            get {
+            set {
                 Properties.Settings settings = Properties.Settings.Default;
-                return WindowPointSettingImpl(settings.ActionListRegistrationWindow_Left, settings.ActionListRegistrationWindow_Top, settings.App_IsPositionSaved);
+                settings.ActionListRegistrationWindow_Left = value.X;
+                settings.ActionListRegistrationWindow_Top = value.Y;
+                settings.Save();
             }
         }
         #endregion
@@ -497,6 +495,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedRemark = selectedRemark;
         }
 
+        public override async Task LoadAsync()
+        {
+            await this.LoadAsync(null, null, null, null, null);
+        }
+
         /// <summary>
         /// DBから読み込む
         /// </summary>
@@ -505,7 +508,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="selectedDate">選択された日付</param>
         /// <param name="selectedRecordList">選択されたCSVレコードリスト</param>
         /// <param name="selectedGroupId">選択されたグループID</param>
-        public async Task LoadActionListInfoAsync(int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate, List<CsvViewModel> selectedRecordList, int? selectedGroupId)
+        public async Task LoadAsync(int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate, List<CsvViewModel> selectedRecordList, int? selectedGroupId)
         {
             int? bookId = null;
             BalanceKind balanceKind = BalanceKind.Expenses;
@@ -573,10 +576,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.AddEventHandlers();
         }
 
-        /// <summary>
-        /// イベントハンドラをWVMに登録する
-        /// </summary>
-        private void AddEventHandlers()
+        protected override void AddEventHandlers()
         {
             this.BookChanged += async (sender, e) => {
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
@@ -614,7 +614,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// DBに登録する
         /// </summary>
         /// <returns>登録された帳簿項目IDリスト</returns>
-        private async Task<List<int>> RegisterActionListInfoAsync()
+        protected override async Task<List<int>> SaveAsync()
         {
             List<int> resActionIdList = [];
 

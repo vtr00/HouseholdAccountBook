@@ -1,11 +1,15 @@
 ﻿using HouseholdAccountBook.Models.DbHandler;
 using HouseholdAccountBook.Others;
 using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace HouseholdAccountBook.ViewModels.Abstract
 {
-    public class WindowPartViewModelBase : BindableBase
+    /// <summary>
+    /// ウィンドウ内の一部を構成するViewModelの基底クラス
+    /// </summary>
+    public abstract class WindowPartViewModelBase : BindableBase
     {
         #region フィールド
         /// <summary>
@@ -64,6 +68,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         public virtual ICommand SelectFolderPathCommand { get; set; } = null;
         #endregion
 
+        #region コマンドイベントハンドラ
         /// <summary>
         /// OKコマンド実行可能か
         /// </summary>
@@ -100,17 +105,42 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         {
             this.HideRequest();
         }
+        #endregion
 
         /// <summary>
         /// ViewModelの初期化を行う
         /// </summary>
         /// <param name="waitCursorManagerFactory">WaitCursorマネージャファクトリ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <remarks>コードビハインドのコンストラクタで最初に呼び出す</remarks>
+        /// <remarks>コードビハインドのコンストラクタで呼び出す</remarks>
         public virtual void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
         {
             this.waitCursorManagerFactory = waitCursorManagerFactory;
             this.dbHandlerFactory = dbHandlerFactory;
+        }
+
+        /// <summary>
+        /// DBから読み込む
+        /// </summary>
+        public virtual Task LoadAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// DBに保存する
+        /// </summary>
+        protected virtual Task SaveAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// イベントハンドラをWVMに登録する
+        /// </summary>
+        protected virtual void AddEventHandlers()
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -134,13 +164,11 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// </summary>
         /// <param name="e"></param>
         /// <param name="fileSelected"></param>
-        protected void OpenFileDialogRequest(OpenFileDialogRequestEventArgs e, Action<string> fileSelected)
+        protected bool OpenFileDialogRequest(OpenFileDialogRequestEventArgs e)
         {
             e.Multiselect = false;
             this.OpenFileDialogRequested?.Invoke(this, e);
-            if (e.Result == true) {
-                fileSelected?.Invoke(e.FileName);
-            }
+            return e.Result;
         }
 
         /// <summary>
@@ -148,13 +176,11 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// </summary>
         /// <param name="e"></param>
         /// <param name="filesSelected"></param>
-        protected void OpenFilesDialogRequest(OpenFileDialogRequestEventArgs e, Action<string[]> filesSelected)
+        protected bool OpenFilesDialogRequest(OpenFileDialogRequestEventArgs e)
         {
             e.Multiselect = true;
             this.OpenFileDialogRequested?.Invoke(this, e);
-            if (e.Result == true) {
-                filesSelected?.Invoke(e.FileNames);
-            }
+            return e.Result;
         }
 
         /// <summary>
@@ -162,12 +188,10 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// </summary>
         /// <param name="e"></param>
         /// <param name="folderSelected"></param>
-        protected void OpenFolderDialogRequest(OpenFolderDialogRequestEventArgs e, Action<string> folderSelected)
+        protected bool OpenFolderDialogRequest(OpenFolderDialogRequestEventArgs e)
         {
             this.OpenFolderDialogRequested?.Invoke(this, e);
-            if (e.Result == true) {
-                folderSelected?.Invoke(e.FolderName);
-            }
+            return e.Result;
         }
     }
 }

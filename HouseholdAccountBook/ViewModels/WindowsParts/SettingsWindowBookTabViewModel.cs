@@ -87,6 +87,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private BookSettingViewModel _DisplayedBookSettingVM = default;
         #endregion
 
+        #region コマンド
         /// <summary>
         /// 帳簿追加コマンド
         /// </summary>
@@ -116,7 +117,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand ChangeBookRelationCommand => new RelayCommand<object>(this.ChangeBookRelationCommand_Executed);
         #endregion
+        #endregion
 
+        #region コマンドイベントハンドラ
         /// <summary>
         /// 帳簿追加コマンド処理
         /// </summary>
@@ -129,7 +132,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     bookId = await mstBookDao.InsertReturningIdAsync(new MstBookDto { });
                 }
 
-                await this.LoadBookInfoAsync(bookId);
+                await this.LoadAsync(bookId);
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -162,7 +165,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     });
                 }
 
-                await this.LoadBookInfoAsync();
+                await this.LoadAsync();
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -195,7 +198,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     _ = await mstBookDao.SwapSortOrderAsync(changingId, changedId);
                 }
 
-                await this.LoadBookInfoAsync(changingId);
+                await this.LoadAsync(changingId);
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -228,7 +231,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     _ = await mstBookDao.SwapSortOrderAsync(changingId, changedId);
                 }
 
-                await this.LoadBookInfoAsync(changingId);
+                await this.LoadAsync(changingId);
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -272,7 +275,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     });
                 }
 
-                await this.LoadBookInfoAsync(vm.Id);
+                await this.LoadAsync(vm.Id);
                 _ = MessageBox.Show(Properties.Resources.Message_FinishToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
@@ -294,12 +297,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 folderFullPath = Path.Combine(folderPath, fileName);
             }
 
-            this.OpenFolderDialogRequest(new OpenFolderDialogRequestEventArgs() {
+            var e = new OpenFolderDialogRequestEventArgs() {
                 InitialDirectory = folderFullPath,
                 Title = Properties.Resources.Title_CsvFolderSelection
-            }, folderFullPath => {
-                this.DisplayedBookSettingVM.CsvFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), folderFullPath);
-            });
+            };
+            if (this.OpenFolderDialogRequest(e)) {
+                this.DisplayedBookSettingVM.CsvFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FolderName);
+            }
         }
 
         /// <summary>
@@ -333,6 +337,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
         }
+        #endregion
 
         /// <summary>
         /// ViewModelの初期化を行う
@@ -353,11 +358,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             };
         }
 
+        public override async Task LoadAsync()
+        {
+            await this.LoadAsync(null);
+        }
+
         /// <summary>
         /// 帳簿設定タブに表示するデータを更新する
         /// </summary>
         /// <param name="bookId">選択対象の帳簿ID</param>
-        public async Task LoadBookInfoAsync(int? bookId = null)
+        public async Task LoadAsync(int? bookId = null)
         {
             Log.Info();
 

@@ -93,9 +93,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private FileDbSettingViewModel _SQLiteSettingVM = new();
         #endregion
 
+        #region コマンド
         public override ICommand SelectFilePathCommand => new RelayCommand<FilePathKind>(this.SelectFilePathCommand_Executed);
         #endregion
+        #endregion
 
+        #region コマンドイベントハンドラ
         /// <summary>
         /// ファイル選択ボタンクリック時のコマンド処理
         /// </summary>
@@ -142,32 +145,33 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
 
-            this.OpenFileDialogRequest(new OpenFileDialogRequestEventArgs() {
+            var e = new OpenFileDialogRequestEventArgs() {
                 CheckFileExists = checkFileExists,
                 InitialDirectory = directory,
                 FileName = fileName,
                 Title = Properties.Resources.Title_FileSelection,
                 Filter = filter,
-            }, fileName => {
+            };
+            if (this.OpenFileDialogRequest(e)) {
                 switch (kind) {
                     case FilePathKind.DumpExeFile:
-                        this.PostgreSQLDBSettingVM.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), fileName);
+                        this.PostgreSQLDBSettingVM.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
                     case FilePathKind.RestoreExeFile:
-                        this.PostgreSQLDBSettingVM.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), fileName);
+                        this.PostgreSQLDBSettingVM.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
                     case FilePathKind.DbFile:
                         switch (this.SelectedDBKind) {
                             case DBKind.SQLite:
-                                this.SQLiteSettingVM.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), fileName);
+                                this.SQLiteSettingVM.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
                                 break;
                             case DBKind.Access:
-                                this.AccessSettingVM.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), fileName);
+                                this.AccessSettingVM.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
                                 break;
                         }
                         break;
                 }
-            });
+            }
         }
 
         protected override bool OKCommand_CanExecute()
@@ -223,37 +227,34 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 base.OKCommand_Executed();
             }
         }
+        #endregion
 
         #region ウィンドウ設定プロパティ
-        public override Rect WindowRectSetting
+        public override Size WindowSizeSetting
         {
+            get {
+                Properties.Settings settings = Properties.Settings.Default;
+                return new Size(settings.DbSettingWindow_Width, settings.DbSettingWindow_Height);
+            }
             set {
                 Properties.Settings settings = Properties.Settings.Default;
-
-                if (settings.App_IsPositionSaved) {
-                    settings.DbSettingWindow_Left = value.Left;
-                    settings.DbSettingWindow_Top = value.Top;
-                }
-
                 settings.DbSettingWindow_Width = value.Width;
                 settings.DbSettingWindow_Height = value.Height;
                 settings.Save();
             }
         }
 
-        public override Size? WindowSizeSetting
+        public override Point WindowPointSetting
         {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
-                return WindowSizeSettingImpl(settings.DbSettingWindow_Width, settings.DbSettingWindow_Height);
+                return new Point(settings.DbSettingWindow_Left, settings.DbSettingWindow_Top);
             }
-        }
-
-        public override Point? WindowPointSetting
-        {
-            get {
+            set {
                 Properties.Settings settings = Properties.Settings.Default;
-                return WindowPointSettingImpl(settings.DbSettingWindow_Left, settings.DbSettingWindow_Top, settings.App_IsPositionSaved);
+                settings.DbSettingWindow_Left = value.X;
+                settings.DbSettingWindow_Top = value.Y;
+                settings.Save();
             }
         }
         #endregion

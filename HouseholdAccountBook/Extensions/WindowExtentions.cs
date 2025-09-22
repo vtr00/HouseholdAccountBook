@@ -1,7 +1,9 @@
 ﻿using HouseholdAccountBook.Models.Logger;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.Views.Windows;
 using Microsoft.Win32;
 using System;
+using System.Linq;
 using System.Windows;
 
 namespace HouseholdAccountBook.Extensions
@@ -43,19 +45,28 @@ namespace HouseholdAccountBook.Extensions
                 return;
             }
 
-            Size? size = wvm.WindowSizeSetting;
-            if (size is not null) {
-                window.Width = size.Value.Width;
-                window.Height = size.Value.Height;
+            bool isMainWindow = window is MainWindow;
+
+            Properties.Settings settings = Properties.Settings.Default;
+
+            Size size = wvm.WindowSizeSetting;
+            if (40 < size.Width && 40 < size.Height) {
+                window.Width = size.Width;
+                window.Height = size.Height;
             }
 
-            Point? point = wvm.WindowPointSetting;
-            if (point is not null) {
-                window.Left = point.Value.X;
-                window.Top = point.Value.Y;
+            Point point = wvm.WindowPointSetting;
+            if ((isMainWindow || settings.App_IsPositionSaved) && 0 <= point.X && 0 <= point.Y) {
+                window.Left = point.X;
+                window.Top = point.Y;
             }
             else {
                 window.MoveOwnersCenter();
+            }
+
+            int state = wvm.WindowStateSetting;
+            if (0 < state && state <= (int)Enum.GetValues(typeof(WindowState)).Cast<WindowState>().Max()) {
+                window.WindowState = (WindowState)state;
             }
         }
 
@@ -70,14 +81,33 @@ namespace HouseholdAccountBook.Extensions
                 return;
             }
 
+            bool isMainWindow = window is MainWindow;
+
             if (window.WindowState == WindowState.Normal) {
-                Rect rect = new() {
-                    X = window.Left,
-                    Y = window.Top,
-                    Width = window.Width,
-                    Height = window.Height
-                };
-                wvm.WindowRectSetting = rect;
+                Properties.Settings settings = Properties.Settings.Default;
+                if (!settings.App_InitSizeFlag) {
+                    if (40 < window.Width && 40 < window.Height) {
+                        Size size = new() {
+                            Width = window.Width,
+                            Height = window.Height
+                        };
+                        wvm.WindowSizeSetting = size;
+                    }
+
+                    if (isMainWindow || settings.App_IsPositionSaved) {
+                        if (0 < window.Left && 0 < window.Top) {
+                            Point point = new() {
+                                X = window.Left,
+                                Y = window.Top
+                            };
+                            wvm.WindowPointSetting = point;
+                        }
+                    }
+                }
+            }
+
+            if (window.WindowState != WindowState.Minimized) {
+                wvm.WindowStateSetting = (int)window.WindowState;
             }
         }
 
@@ -133,9 +163,10 @@ namespace HouseholdAccountBook.Extensions
                     Multiselect = e.Multiselect
                 };
 
-                e.Result = ofd.ShowDialog(window);
+                bool? result = ofd.ShowDialog(window) ?? throw new InvalidOperationException();
+                e.Result = (bool)result;
                 if (e.Result == true) {
-                    switch(e.Multiselect) {
+                    switch (e.Multiselect) {
                         case false:
                             e.FileName = ofd.FileName;
                             break;
@@ -151,7 +182,8 @@ namespace HouseholdAccountBook.Extensions
                     Title = e.Title,
                 };
 
-                e.Result = ofd.ShowDialog(window);
+                bool? result = ofd.ShowDialog(window) ?? throw new InvalidOperationException();
+                e.Result = (bool)result;
                 if (e.Result == true) {
                     e.FolderName = ofd.FolderName;
                 }

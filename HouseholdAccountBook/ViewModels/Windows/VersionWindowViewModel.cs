@@ -10,6 +10,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
     /// </summary>
     public class VersionWindowViewModel : WindowViewModelBase
     {
+        #region プロパティ
         /// <summary>
         /// サポートサイト
         /// </summary>
@@ -17,39 +18,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// SNSサイト
         /// </summary>
-        public string SnsSiteUri { get; } = "https://twitter.com/toresebu";
+        public string SnsSiteUri { get; } = "https://x.com/toresebu";
+        #endregion
 
+        #region コマンド
         /// <summary>
         /// 対象のURIを開く
         /// </summary>
         public ICommand OpenUriCommand => new RelayCommand<string>(this.OpenUriCommand_Execute);
-
-        #region ウィンドウ設定プロパティ
-        public override Rect WindowRectSetting
-        {
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-
-                if (settings.App_IsPositionSaved) {
-                    settings.VersionWindow_Left = value.Left;
-                    settings.VersionWindow_Top = value.Top;
-                }
-
-                settings.Save();
-            }
-        }
-
-        public override Size? WindowSizeSetting => null;
-
-        public override Point? WindowPointSetting
-        {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                return WindowPointSettingImpl(settings.VersionWindow_Left, settings.VersionWindow_Top, settings.App_IsPositionSaved);
-            }
-        }
         #endregion
 
+        #region コマンドイベントハンドラ
         private void OpenUriCommand_Execute(string uri)
         {
             ProcessStartInfo info = new() {
@@ -58,5 +37,22 @@ namespace HouseholdAccountBook.ViewModels.Windows
             };
             _ = Process.Start(info);
         }
+        #endregion
+
+        #region ウィンドウ設定プロパティ
+        public override Point WindowPointSetting
+        {
+            get {
+                Properties.Settings settings = Properties.Settings.Default;
+                return new Point(settings.VersionWindow_Left, settings.VersionWindow_Top);
+            }
+            set {
+                Properties.Settings settings = Properties.Settings.Default;
+                settings.VersionWindow_Left = value.X;
+                settings.VersionWindow_Top = value.Y;
+                settings.Save();
+            }
+        }
+        #endregion
     }
 }

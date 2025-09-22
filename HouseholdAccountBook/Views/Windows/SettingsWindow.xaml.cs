@@ -43,7 +43,7 @@ namespace HouseholdAccountBook.Views.Windows
                     this.WVM.OtherTabVM.SelectedDBKind = dbHandler.DBKind;
                 }
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadSettingsInfoAsync();
+                    await this.WVM.LoadAsync();
                 }
 
                 this.WVM.NeedToUpdateChanged += (sender, e) => {
@@ -81,13 +81,13 @@ namespace HouseholdAccountBook.Views.Windows
             using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 switch (this.WVM.SelectedTab) {
                     case SettingsTabs.ItemSettingsTab:
-                        await this.WVM.ItemTabVM.LoadItemInfoAsync(HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.ItemTabVM.SelectedHierarchicalVM), this.WVM.ItemTabVM.SelectedHierarchicalVM?.Id);
+                        await this.WVM.ItemTabVM.LoadAsync(HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.ItemTabVM.SelectedHierarchicalVM), this.WVM.ItemTabVM.SelectedHierarchicalVM?.Id);
                         break;
                     case SettingsTabs.BookSettingsTab:
-                        await this.WVM.BookTabVM.LoadBookInfoAsync(this.WVM.BookTabVM.SelectedBookVM?.Id);
+                        await this.WVM.BookTabVM.LoadAsync(this.WVM.BookTabVM.SelectedBookVM?.Id);
                         break;
                     case SettingsTabs.OtherSettingsTab:
-                        this.WVM.OtherTabVM.LoadOthersSettings();
+                        this.WVM.OtherTabVM.Load();
                         break;
                 }
             }

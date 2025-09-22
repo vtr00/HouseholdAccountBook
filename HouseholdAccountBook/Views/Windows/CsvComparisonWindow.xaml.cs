@@ -67,7 +67,7 @@ namespace HouseholdAccountBook.Views.Windows
             // ロード時処理はコンストラクタで設定しておく
             this.Loaded += async (sender, e) => {
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadCsvCompInfoAsync(selectedBookId);
+                    await this.WVM.LoadAsync(selectedBookId);
                 }
 
                 this.WVM.ScrollToButtomRequested += (sender, e) => {

@@ -39,6 +39,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private DateTime _EndDate = DateTime.Now;
         #endregion
 
+        #region コマンド
         /// <summary>
         /// 今月コマンド
         /// </summary>
@@ -48,7 +49,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand AllTermCommand => new RelayCommand(this.AllTermCommand_Executed);
         #endregion
+        #endregion
 
+        #region コマンドイベントハンドラ
         /// <summary>
         /// 今月コマンド処理
         /// </summary>
@@ -67,29 +70,20 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.StartDate = firstLastPair.Item1;
             this.EndDate = firstLastPair.Item2;
         }
+        #endregion
 
         #region ウィンドウ設定プロパティ
-        public override Rect WindowRectSetting
-        {
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-
-                if (settings.App_IsPositionSaved) {
-                    settings.TermWindow_Left = value.Left;
-                    settings.TermWindow_Top = value.Top;
-                }
-
-                settings.Save();
-            }
-        }
-
-        public override Size? WindowSizeSetting => null;
-
-        public override Point? WindowPointSetting
+        public override Point WindowPointSetting
         {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
-                return WindowPointSettingImpl(settings.TermWindow_Left, settings.TermWindow_Top, settings.App_IsPositionSaved);
+                return new Point(settings.TermWindow_Left, settings.TermWindow_Top);
+            }
+            set {
+                Properties.Settings settings = Properties.Settings.Default;
+                settings.TermWindow_Left = value.X;
+                settings.TermWindow_Top = value.Y;
+                settings.Save();
             }
         }
         #endregion

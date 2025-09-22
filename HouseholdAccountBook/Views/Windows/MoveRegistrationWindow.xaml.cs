@@ -44,7 +44,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.AddCommonEventHandlers();
             this.Loaded += async (s, e) => {
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadMoveInfoAsync(selectedBookId, null, selectedMonth, selectedDate);
+                    await this.WVM.LoadAsync(selectedBookId, null, selectedMonth, selectedDate);
                 }
             };
 
@@ -70,7 +70,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.AddCommonEventHandlers();
             this.Loaded += async (s, e) => {
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadMoveInfoAsync(selectedBookId, selectedGroupId, null, null);
+                    await this.WVM.LoadAsync(selectedBookId, selectedGroupId, null, null);
                 }
             };
 
