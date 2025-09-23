@@ -57,10 +57,9 @@ namespace HouseholdAccountBook.Views.Windows
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="selectedBookId">選択された帳簿ID</param>
         /// <param name="selectedGroupId">選択された帳簿項目のグループID</param>
         /// <param name="regKind">登録種別</param>
-        public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, int selectedGroupId, RegistrationKind regKind = RegistrationKind.Edit)
+        public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedGroupId, RegistrationKind regKind = RegistrationKind.Edit)
         {
             this.InitializeComponent();
 
@@ -70,7 +69,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.AddCommonEventHandlers();
             this.Loaded += async (s, e) => {
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadAsync(selectedBookId, selectedGroupId, null, null);
+                    await this.WVM.LoadAsync(null, selectedGroupId, null, null);
                 }
             };
 

@@ -12,8 +12,8 @@
         xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
         mc:Ignorable="d"
         Title="{x:Static properties:Resources.Title_MainWindow}" Height="700" Width="1050"
-        Initialized="MainWindow_Initialized" Loaded="MainWindow_Loaded"
-        Closing="MainWindow_Closing" Closed="MainWindow_Closed"
+        Initialized="MainWindow_Initialized"
+        Closing="MainWindow_Closing"
         StateChanged="MainWindow_StateChanged"
         LocationChanged="MainWindow_LocationChanged"
         SizeChanged="MainWindow_SizeChanged">
@@ -23,65 +23,6 @@
     </Window.DataContext>
 
     <Window.Resources>
-        <!-- ファイルコマンド -->
-        <RoutedCommand x:Key="FileCommand"/>
-        
-        <RoutedCommand x:Key="ImportKichoFugetsuDbCommand"/>
-        <RoutedCommand x:Key="ImportPostgreSQLFileCommand"/>
-        <RoutedCommand x:Key="ImportCustomFileCommand"/>
-        <RoutedCommand x:Key="ImportSQLiteFileCommand"/>
-
-        <RoutedCommand x:Key="ExportCustomFileCommand"/>
-        <RoutedCommand x:Key="ExportSQLFileCommand"/>
-        <RoutedCommand x:Key="ExportExcelFileCommand"/>
-        
-        <RoutedCommand x:Key="BackUpCommand"/>
-        <RoutedCommand x:Key="ExitWindowCommand"/>
-
-        <!-- 編集コマンド -->
-        <RoutedCommand x:Key="EditCommand"/>
-        <RoutedCommand x:Key="ShowFindBoxCommand"/>
-        <RoutedCommand x:Key="ShowReplaceBoxCommand"/>
-        <RoutedCommand x:Key="MoveToBookCommand"/>
-        <RoutedCommand x:Key="AddActionCommand"/>
-        <RoutedCommand x:Key="AddActionListCommand"/>
-        <RoutedCommand x:Key="CopyActionCommand"/>
-        <RoutedCommand x:Key="EditActionCommand"/>
-        <RoutedCommand x:Key="DeleteActionCommand"/>
-        <RoutedCommand x:Key="ChangeIsMatchCommand"/>
-
-        <!-- 表示コマンド -->
-        <RoutedCommand x:Key="ShowBookTabCommand"/>
-        <RoutedCommand x:Key="ShowDailyGraphTabCommand"/>
-        <RoutedCommand x:Key="ShowMonthlyListTabCommand"/>
-        <RoutedCommand x:Key="ShowMonthlyGraphTabCommand"/>
-        <RoutedCommand x:Key="ShowYearlyListTabCommand"/>
-        <RoutedCommand x:Key="ShowYearlyGraphTabCommand"/>
-        <RoutedCommand x:Key="UpdateCommand"/>
-        
-        <!-- 帳簿表示操作コマンド -->
-        <RoutedCommand x:Key="GoToLastMonthCommand"/>
-        <RoutedCommand x:Key="OpenSelectingDailyTermWindowCommand"/>
-        <RoutedCommand x:Key="GoToNextMonthCommand"/>
-        <RoutedCommand x:Key="GoToThisMonthCommand"/>
-
-        <!-- 年間一覧表示操作コマンド -->
-        <RoutedCommand x:Key="GoToLastYearCommand"/>
-        <RoutedCommand x:Key="GoToNextYearCommand"/>
-        <RoutedCommand x:Key="GoToThisYearCommand"/>
-
-        <!-- ツールコマンド -->
-        <RoutedCommand x:Key="ToolCommand"/>
-        <RoutedCommand x:Key="OpenSettingsWindowCommand"/>
-        <RoutedCommand x:Key="ToolInBookCommand"/>
-        <RoutedCommand x:Key="OpenCsvComparisonWindowCommand"/>
-
-        <!-- 検索欄 -->
-        <RoutedCommand x:Key="HideFindBoxCommand"/>
-        <RoutedCommand x:Key="HideReplaceBoxCommand"/>
-        <RoutedCommand x:Key="FindActionCommand"/>
-        <RoutedCommand x:Key="ReplaceActionCommand"/>
-
         <!-- スタイル -->
         <Style x:Key="SummaryStyle" TargetType="DataGridRow">
             <Setter Property="Background" Value="#FFEEE3FB"/>
@@ -116,72 +57,8 @@
         </Style>
     </Window.Resources>
 
-    <Window.CommandBindings>
-        <!-- ファイルコマンド -->
-        <CommandBinding Command="{StaticResource FileCommand}" CanExecute="FileCommand_CanExecute"/>
-        
-        <CommandBinding Command="{StaticResource ImportKichoFugetsuDbCommand}" CanExecute="ImportKichoFugetsuDbCommand_CanExecute" Executed="ImportKichoFugetsuDbCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ImportPostgreSQLFileCommand}" CanExecute="ImportPostgreSQLCommand_CanExecute" Executed="ImportPostgreSQLCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ImportCustomFileCommand}" CanExecute="ImportCustomFileCommand_CanExecute" Executed="ImportCustomFileCommand_Excuted"/>
-        <CommandBinding Command="{StaticResource ImportSQLiteFileCommand}" CanExecute="ImportSQLiteFileCommand_CanExecute" Executed="ImportSQLiteFileCommand_Executed"/>
-
-        <CommandBinding Command="{StaticResource ExportCustomFileCommand}" CanExecute="ExportCustomFileCommand_CanExecute" Executed="ExportCustomFileCommand_Excuted"/>
-        <CommandBinding Command="{StaticResource ExportSQLFileCommand}" CanExecute="ExportSQLFileCommand_CanExecute" Executed="ExportSQLFileCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ExportExcelFileCommand}"/>
-        
-        <CommandBinding Command="{StaticResource BackUpCommand}" CanExecute="BackUpCommand_CanExecute" Executed="BackUpCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ExitWindowCommand}" CanExecute="ExitWindowCommand_CanExecute" Executed="ExitWindowCommand_Executed"/>
-
-        <!-- 編集コマンド -->
-        <CommandBinding Command="{StaticResource EditCommand}" CanExecute="EditCommand_CanExecute"/>
-        <CommandBinding Command="{StaticResource ShowFindBoxCommand}" CanExecute="ShowFindBoxCommand_CanExecute" Executed="ShowFindBoxCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ShowReplaceBoxCommand}" CanExecute="ShowReplaceBoxCommand_CanExecute" Executed="ShowReplaceBoxCommand_Executed"/>
-        <CommandBinding Command="{StaticResource MoveToBookCommand}" CanExecute="MoveToBookCommand_CanExecute" Executed="MoveToBookCommand_Executed"/>
-        <CommandBinding Command="{StaticResource AddActionCommand}" CanExecute="AddActionCommand_CanExecute" Executed="AddActionCommand_Executed"/>
-        <CommandBinding Command="{StaticResource EditActionCommand}" CanExecute="EditActionCommand_CanExecute" Executed="EditActionCommand_Executed"/>
-        <CommandBinding Command="{StaticResource AddActionListCommand}" CanExecute="AddActionListCommand_CanExecute" Executed="AddActionListCommand_Executed"/>
-        <CommandBinding Command="{StaticResource CopyActionCommand}" CanExecute="CopyActionCommand_CanExecute" Executed="CopyActionCommand_Executed"/>
-        <CommandBinding Command="{StaticResource DeleteActionCommand}" CanExecute="DeleteActionCommand_CanExecute" Executed="DeleteActionCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ChangeIsMatchCommand}" CanExecute="ChangeIsMatchCommand_CanExecute" Executed="ChangeIsMatchCommand_Executed"/>
-
-        <!-- 表示コマンド -->
-        <CommandBinding Command="{StaticResource ShowBookTabCommand}" CanExecute="ShowBookTabCommand_CanExecute" Executed="ShowBookTabCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ShowDailyGraphTabCommand}" CanExecute="ShowDailyGraphTabCommand_CanExecute" Executed="ShowDailyGraphTabCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ShowMonthlyListTabCommand}" CanExecute="ShowMonthlyListTabCommand_CanExecute" Executed="ShowMonthlyListTabCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ShowMonthlyGraphTabCommand}" CanExecute="ShowMonthlyGraphTabCommand_CanExecute" Executed="ShowMonthlyGraphTabCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ShowYearlyListTabCommand}" CanExecute="ShowYearlyListTabCommand_CanExecute" Executed="ShowYearlyListTabCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ShowYearlyGraphTabCommand}" CanExecute="ShowYearlyGraphTabCommand_CanExecute" Executed="ShowYearlyGraphTabCommand_Executed"/>
-        <CommandBinding Command="{StaticResource UpdateCommand}" Executed="UpdateCommand_Executed"/>
-        
-        <!-- 帳簿表示コマンド -->
-        <CommandBinding Command="{StaticResource GoToLastMonthCommand}" CanExecute="GoToLastMonthCommand_CanExecute" Executed="GoToLastMonthCommand_Executed"/>
-        <CommandBinding Command="{StaticResource OpenSelectingDailyTermWindowCommand}" Executed="OpenSelectingDailyTermWindowCommand_Executed"/>
-        <CommandBinding Command="{StaticResource GoToNextMonthCommand}" CanExecute="GoToNextMonthCommand_CanExecute" Executed="GoToNextMonthCommand_Executed"/>
-        <CommandBinding Command="{StaticResource GoToThisMonthCommand}" CanExecute="GoToThisMonthCommand_CanExecute" Executed="GoToThisMonthCommand_Executed"/>
-
-        <!-- 年間一覧表示コマンド -->
-        <CommandBinding Command="{StaticResource GoToLastYearCommand}" CanExecute="GoToLastYearCommand_CanExecute" Executed="GoToLastYearCommand_Executed"/>
-        <CommandBinding Command="{StaticResource GoToNextYearCommand}" CanExecute="GoToNextYearCommand_CanExecute" Executed="GoToNextYearCommand_Executed"/>
-        <CommandBinding Command="{StaticResource GoToThisYearCommand}" CanExecute="GoToThisYearCommand_CanExecute" Executed="GoToThisYearCommand_Executed"/>
-
-        <!-- ツールコマンド -->
-        <CommandBinding Command="{StaticResource ToolCommand}" CanExecute="ToolCommand_CanExecute"/>
-        <CommandBinding Command="{StaticResource OpenSettingsWindowCommand}" CanExecute="OpenSettingsWindowCommand_CanExecute" Executed="OpenSettingsWindowCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ToolInBookCommand}" CanExecute="ToolInBookCommand_CanExecute"/>
-        <CommandBinding Command="{StaticResource OpenCsvComparisonWindowCommand}" CanExecute="OpenCsvComparisonWindowCommand_CanExecute" Executed="OpenCsvComparisonWindowCommand_Executed"/>
-        
-        <!-- ヘルプコマンド -->
-        <CommandBinding Command="{x:Static ApplicationCommands.Help}" Executed="OpenVersionWindowCommand_Executed"/>
-
-        <!-- 検索欄 -->
-        <CommandBinding Command="{StaticResource HideFindBoxCommand}" Executed="HideFindBoxCommand_Executed"/>
-        <CommandBinding Command="{StaticResource HideReplaceBoxCommand}" Executed="HideReplaceBoxCommand_Executed"/>
-        <CommandBinding Command="{StaticResource FindActionCommand}" Executed="FindActionCommand_Executed"/>
-        <CommandBinding Command="{StaticResource ReplaceActionCommand}" Executed="ReplaceActionCommand_Executed"/>
-    </Window.CommandBindings>
-
     <Window.InputBindings>
-        <KeyBinding Gesture="Alt+F4" Command="{StaticResource ExitWindowCommand}"/>
+        <KeyBinding Gesture="Alt+F4" Command="{Binding ExitWindowCommand}"/>
         <KeyBinding Gesture="F1" Command="{x:Static ApplicationCommands.Help}"/>
     </Window.InputBindings>
     
@@ -198,116 +75,116 @@
         <!-- メニュー -->
         <Menu Grid.Row="0" Grid.Column="0">
             <!-- ファイル -->
-            <MenuItem Header="{x:Static properties:Resources.Menu_File}" Command="{StaticResource FileCommand}">
+            <MenuItem Header="{x:Static properties:Resources.Menu_File}" Command="{Binding FileMenuCommand}">
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Import}">
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_KichoFugetsu}" Command="{StaticResource ImportKichoFugetsuDbCommand}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_KichoFugetsu}" Command="{Binding ImportKichoFugetsuDbCommand}"/>
                     <Separator/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{StaticResource ImportSQLiteFileCommand}"
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{Binding ImportSQLiteFileCommand}"
                               Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_PostgreSQL}" Command="{StaticResource ImportPostgreSQLFileCommand}"
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_PostgreSQL}" Command="{Binding ImportPostgreSQLFileCommand}"
                               Visibility="{Binding IsSQLite, Converter={StaticResource BoolVisibilityConverter}}"/>
                     <Separator/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_CustomFormatFile}" Command="{StaticResource ImportCustomFileCommand}"
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_CustomFormatFile}" Command="{Binding ImportCustomFileCommand}"
                               Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{StaticResource ImportSQLiteFileCommand}"
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{Binding ImportSQLiteFileCommand}"
                               Visibility="{Binding IsSQLite, Converter={StaticResource BoolVisibilityConverter}}"/>
                 </MenuItem>
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Export}">
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_CustomFormatFile}" Command="{StaticResource ExportCustomFileCommand}"
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_CustomFormatFile}" Command="{Binding ExportCustomFileCommand}"
                               Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_SQLFile}" Command="{StaticResource ExportSQLFileCommand}"
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_SQLFile}" Command="{Binding ExportSQLFileCommand}"
                               Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
                     <Separator Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_Excel}" Command="{StaticResource ExportExcelFileCommand}" IsEnabled="False"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_Excel}" Command="{Binding ExportExcelFileCommand}" IsEnabled="False"/>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="{x:Static properties:Resources.Menu_File_Backup}" Command="{StaticResource BackUpCommand}"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_File_Backup}" Command="{Binding BackUpCommand}"/>
                 <Separator/>
-                <MenuItem Header="{x:Static properties:Resources.Menu_File_Exit}" Command="{StaticResource ExitWindowCommand}" InputGestureText="Alt+F4"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_File_Exit}" Command="{Binding ExitWindowCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>
             <!-- 編集 -->
-            <MenuItem Header="{x:Static properties:Resources.Menu_Edit}" Command="{StaticResource EditCommand}">
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Find}" Command="{StaticResource ShowFindBoxCommand}" InputGestureText="Ctrl+F"/>
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Replace}" Command="{StaticResource ShowReplaceBoxCommand}" InputGestureText="Ctrl+H"/>
+            <MenuItem Header="{x:Static properties:Resources.Menu_Edit}" Command="{Binding BookTabVM.EditMenuCommand}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Find}" Command="{Binding BookTabVM.ShowFindBoxCommand}" InputGestureText="Ctrl+F"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Replace}" Command="{Binding BookTabVM.ShowReplaceBoxCommand}" InputGestureText="Ctrl+H"/>
                 <Separator/>
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Move}" Command="{StaticResource MoveToBookCommand}" InputGestureText="Ctrl+M"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Move}" Command="{Binding BookTabVM.AddMoveCommand}" InputGestureText="Ctrl+M"/>
                 <Separator/>
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Add}" Command="{StaticResource AddActionCommand}" InputGestureText="Ctrl++"/>
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_AddList}" Command="{StaticResource AddActionListCommand}" InputGestureText="Ctrl+Shift++"/>
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Copy}" Command="{StaticResource CopyActionCommand}" InputGestureText="Ctrl+Shift+C"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Add}" Command="{Binding BookTabVM.AddActionCommand}" InputGestureText="Ctrl++"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_AddList}" Command="{Binding BookTabVM.AddActionListCommand}" InputGestureText="Ctrl+Shift++"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Copy}" Command="{Binding BookTabVM.CopyCommand}" InputGestureText="Ctrl+Shift+C"/>
                 <Separator/>
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Edit}" Command="{StaticResource EditActionCommand}" InputGestureText="F2"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Edit}" Command="{Binding BookTabVM.EditCommand}" InputGestureText="F2"/>
                 <Separator/>
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Delete}" Command="{StaticResource DeleteActionCommand}" InputGestureText="Del"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Delete}" Command="{Binding BookTabVM.DeleteCommand}" InputGestureText="Del"/>
             </MenuItem>
             <!-- 表示 -->
-            <MenuItem Header="{x:Static properties:Resources.Menu_View}">
+            <MenuItem Header="{x:Static properties:Resources.Menu_View}" Command="{Binding ShowMenuCommand}">
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Book}">
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_Change}" Command="{StaticResource ShowBookTabCommand}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_Change}" Command="{Binding ShowBookTabCommand}"/>
                     <Separator/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_LastMonth}" Command="{StaticResource GoToLastMonthCommand}" InputGestureText="Alt+←"/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_ThisMonth}" Command="{StaticResource GoToThisMonthCommand}" InputGestureText="Alt+↓"/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_NextMonth}" Command="{StaticResource GoToNextMonthCommand}" InputGestureText="Alt+→"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_LastMonth}" Command="{Binding GoToLastMonthCommand}" InputGestureText="Alt+←"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_ThisMonth}" Command="{Binding GoToThisMonthCommand}" InputGestureText="Alt+↓"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_NextMonth}" Command="{Binding GoToNextMonthCommand}" InputGestureText="Alt+→"/>
                     <Separator/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_DailyTermSelection}" Command="{StaticResource OpenSelectingDailyTermWindowCommand}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_DailyTermSelection}" Command="{Binding SelectTermCommand}"/>
                 </MenuItem>
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph}">
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_Change}" Command="{StaticResource ShowDailyGraphTabCommand}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_Change}" Command="{Binding ShowDailyGraphTabCommand}"/>
                     <Separator/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_LastMonth}" Command="{StaticResource GoToLastMonthCommand}" InputGestureText="Alt+←"/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_ThisMonth}" Command="{StaticResource GoToThisMonthCommand}" InputGestureText="Alt+↓"/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_NextMonth}" Command="{StaticResource GoToNextMonthCommand}" InputGestureText="Alt+→"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_LastMonth}" Command="{Binding GoToLastMonthCommand}" InputGestureText="Alt+←"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_ThisMonth}" Command="{Binding GoToThisMonthCommand}" InputGestureText="Alt+↓"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_NextMonth}" Command="{Binding GoToNextMonthCommand}" InputGestureText="Alt+→"/>
                     <Separator/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_DailyTermSelection}" Command="{StaticResource OpenSelectingDailyTermWindowCommand}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_DailyTermSelection}" Command="{Binding SelectTermCommand}"/>
                 </MenuItem>
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Monthly}">
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList}">
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_Change}" Command="{StaticResource ShowMonthlyListTabCommand}"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_Change}" Command="{Binding ShowMonthlyListTabCommand}"/>
                         <Separator/>
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Alt+←"/>
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Alt+↓"/>
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Alt+→"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{Binding GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{Binding GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{Binding GoToNextYearCommand}" InputGestureText="Alt+→"/>
                     </MenuItem>
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph}">
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_Change}" Command="{StaticResource ShowMonthlyGraphTabCommand}"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_Change}" Command="{Binding ShowMonthlyGraphTabCommand}"/>
                         <Separator/>
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_LastYear}" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Alt+←"/>
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_ThisYear}" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Alt+↓"/>
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_NextYear}" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Alt+→"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_LastYear}" Command="{Binding GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_ThisYear}" Command="{Binding GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_NextYear}" Command="{Binding GoToNextYearCommand}" InputGestureText="Alt+→"/>
                     </MenuItem>
                 </MenuItem>
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Yearly}">
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyList}">
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyList_Change}" Command="{StaticResource ShowYearlyListTabCommand}"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyList_Change}" Command="{Binding ShowYearlyListTabCommand}"/>
                         <Separator/>
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Alt+←"/>
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Alt+↓"/>
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Alt+→"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{Binding GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{Binding GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{Binding GoToNextYearCommand}" InputGestureText="Alt+→"/>
                     </MenuItem>
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyGraph}">
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyGraph_Change}" Command="{StaticResource ShowYearlyGraphTabCommand}"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyGraph_Change}" Command="{Binding ShowYearlyGraphTabCommand}"/>
                         <Separator/>
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{StaticResource GoToLastYearCommand}" InputGestureText="Alt+←"/>
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{StaticResource GoToThisYearCommand}" InputGestureText="Alt+↓"/>
-                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{StaticResource GoToNextYearCommand}" InputGestureText="Alt+→"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{Binding GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{Binding GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{Binding GoToNextYearCommand}" InputGestureText="Alt+→"/>
                     </MenuItem>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="{x:Static properties:Resources.Menu_View_Update}" Command="{StaticResource UpdateCommand}" InputGestureText="F5"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_View_Update}" Command="{Binding UpdateCommand}" InputGestureText="F5"/>
             </MenuItem>
             <!-- ツール -->
-            <MenuItem Header="{x:Static properties:Resources.Menu_Tool}" Command="{StaticResource ToolCommand}">
-                <MenuItem Header="{x:Static properties:Resources.Menu_Tool_CsvComparison}" Command="{StaticResource OpenCsvComparisonWindowCommand}"/>
+            <MenuItem Header="{x:Static properties:Resources.Menu_Tool}" Command="{Binding ToolMenuCommand}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_Tool_CsvComparison}" Command="{Binding CompareCsvFileCommand}"/>
                 <Separator/>
-                <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Book}" Command="{StaticResource ToolInBookCommand}">
-                    <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Book_Filter}" IsCheckable="True" IsChecked="{Binding UseFilter}"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Book}" Command="{Binding ToolInBookCommand}">
+                    <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Book_Filter}" IsCheckable="True" IsChecked="{Binding BookTabVM.UseFilter}"/>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Settings}" Command="{StaticResource OpenSettingsWindowCommand}"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Settings}" Command="{Binding SettingsCommand}"/>
             </MenuItem>
             <!-- ヘルプ -->
-            <MenuItem Header="{x:Static properties:Resources.Menu_Help}">
-                <MenuItem Header="{x:Static properties:Resources.Menu_Help_VersionInfo}" Command="{x:Static ApplicationCommands.Help}" InputGestureText="F1"/>
+            <MenuItem Header="{x:Static properties:Resources.Menu_Help}" Command="{Binding HelpMenuCommand}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_Help_VersionInfo}" Command="{Binding ShowVersionCommand}" InputGestureText="F1"/>
             </MenuItem>
         </Menu>
 
@@ -319,19 +196,19 @@
                 </Style>
             </TabControl.ItemContainerStyle>
             <!-- 帳簿 -->
-            <TabItem>
+            <TabItem x:Name="_BookTab">
                 <TabItem.Header>
                     <TextBlock Text="{x:Static properties:Resources.TabHeader_AccountBook}" TextAlignment="Center"/>
                 </TabItem.Header>
                 <TabItem.InputBindings>
-                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
-                    <KeyBinding Gesture="Alt+Up" Command="{StaticResource ShowMonthlyListTabCommand}"/>
-                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisMonthCommand}"/>
-                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastMonthCommand}"/>
-                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextMonthCommand}"/>
+                    <KeyBinding Gesture="F5" Command="{Binding UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Up" Command="{Binding ShowMonthlyListTabCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{Binding GoToThisMonthCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{Binding GoToLastMonthCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{Binding GoToNextMonthCommand}"/>
 
-                    <KeyBinding Gesture="Ctrl+F" Command="{StaticResource ShowFindBoxCommand}"/>
-                    <KeyBinding Gesture="Ctrl+H" Command="{StaticResource ShowReplaceBoxCommand}"/>
+                    <KeyBinding Gesture="Ctrl+F" Command="{Binding BookTabVM.ShowFindBoxCommand}"/>
+                    <KeyBinding Gesture="Ctrl+H" Command="{Binding BookTabVM.ShowReplaceBoxCommand}"/>
                 </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -349,9 +226,9 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0" Orientation="Horizontal">
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastMonthCommand}"/>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastMonthCommand}"/>
                             <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToDisplayedMonthConverter}, TargetNullValue={x:Static properties:Resources.Button_DateRange}}"
-                                    Command="{StaticResource OpenSelectingDailyTermWindowCommand}">
+                                    Command="{Binding SelectTermCommand}">
                                 <ToolTipService.ToolTip>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -366,8 +243,8 @@
                                     </Grid>
                                 </ToolTipService.ToolTip>
                             </Button>
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextMonthCommand}"/>
-                            <Button Width="80" Content="{x:Static properties:Resources.Button_ThisMonth}" Command="{StaticResource GoToThisMonthCommand}">
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{Binding GoToNextMonthCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_ThisMonth}" Command="{Binding GoToThisMonthCommand}">
                                 <ToolTipService.ToolTip>
                                     <TextBlock Text="{Binding Now, Source={StaticResource DateTime}, StringFormat={}{0:yyyy-MM}}"/>
                                 </ToolTipService.ToolTip>
@@ -378,19 +255,19 @@
                         </StackPanel>
                             
                         <StackPanel Grid.Column="2" Orientation="Horizontal">
-                            <Button Width="50" Margin="0,0,3,0" Content="{x:Static properties:Resources.Button_Move}" Command="{StaticResource MoveToBookCommand}"/>
-                            <Button Width="50" Content="{x:Static properties:Resources.Button_Add}" Command="{StaticResource AddActionCommand}"/>
-                            <Button Width="80" Content="{x:Static properties:Resources.Button_AddList}" Command="{StaticResource AddActionListCommand}"/>
-                            <Button Width="50" Content="{x:Static properties:Resources.Button_Copy}" Command="{StaticResource CopyActionCommand}"/>
-                            <Button Width="50" Margin="3,0,0,0" Content="{x:Static properties:Resources.Button_Edit}" Command="{StaticResource EditActionCommand}"/>
-                            <Button Width="50" Margin="3,0,0,0" Content="{x:Static properties:Resources.Button_Delete}" Command="{StaticResource DeleteActionCommand}"/>
+                            <Button Width="50" Margin="0,0,3,0" Content="{x:Static properties:Resources.Button_Move}" Command="{Binding BookTabVM.AddMoveCommand}"/>
+                            <Button Width="50" Content="{x:Static properties:Resources.Button_Add}" Command="{Binding BookTabVM.AddActionCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_AddList}" Command="{Binding BookTabVM.AddActionListCommand}"/>
+                            <Button Width="50" Content="{x:Static properties:Resources.Button_Copy}" Command="{Binding BookTabVM.CopyCommand}"/>
+                            <Button Width="50" Margin="3,0,0,0" Content="{x:Static properties:Resources.Button_Edit}" Command="{Binding BookTabVM.EditCommand}"/>
+                            <Button Width="50" Margin="3,0,0,0" Content="{x:Static properties:Resources.Button_Delete}" Command="{Binding BookTabVM.DeleteCommand}"/>
                             <CheckBox Margin="3,3,0,3" ToolTip="{x:Static properties:Resources.ToolTip_CheckIsMatch}" VerticalAlignment="Center"
-                                      IsChecked="{Binding IsMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{StaticResource ChangeIsMatchCommand}"/>
+                                      IsChecked="{Binding BookTabVM.IsMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding BookTabVM.ChangeIsMatchCommand}"/>
                         </StackPanel>
                     </Grid>
 
                     <!-- データリスト -->
-                    <Grid Grid.Row="1" Grid.Column="0" Margin="2">
+                    <Grid Grid.Row="1" Grid.Column="0" Margin="2" DataContext="{Binding BookTabVM}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1.0*" MinWidth="200"/>
                             <ColumnDefinition Width="5"/>
@@ -404,7 +281,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <DataGrid x:Name="actionDataGrid" Grid.Row="0" SelectionMode="Extended"
+                            <DataGrid x:Name="_actionDataGrid" Grid.Row="0" SelectionMode="Extended"
                                   ItemsSource="{Binding DisplayedActionVMList}" SelectedItem="{Binding SelectedActionVM}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="4"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
@@ -413,17 +290,17 @@
                                     <vm:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
                                 </DataGrid.Resources>
                                 <DataGrid.InputBindings>
-                                    <KeyBinding Gesture="Ctrl+M" Command="{StaticResource MoveToBookCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{StaticResource AddActionCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+Add" Command="{StaticResource AddActionCommand}"/>
-                                    <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{StaticResource AddActionListCommand}"/>
-                                    <KeyBinding Gesture="Shift+Ctrl+Add" Command="{StaticResource AddActionListCommand}"/>
-                                    <KeyBinding Gesture="Ctrl+Shift+C" Command="{StaticResource CopyActionCommand}"/>
-                                    <KeyBinding Gesture="F2" Command="{StaticResource EditActionCommand}"/>
-                                    <KeyBinding Gesture="Enter" Command="{StaticResource EditActionCommand}"/>
-                                    <KeyBinding Gesture="Delete" Command="{StaticResource DeleteActionCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+M" Command="{Binding AddMoveCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{Binding AddActionCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+Add" Command="{Binding AddActionCommand}"/>
+                                    <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{Binding AddActionListCommand}"/>
+                                    <KeyBinding Gesture="Shift+Ctrl+Add" Command="{Binding AddActionListCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+Shift+C" Command="{Binding CopyCommand}"/>
+                                    <KeyBinding Gesture="F2" Command="{Binding EditCommand}"/>
+                                    <KeyBinding Gesture="Enter" Command="{Binding EditCommand}"/>
+                                    <KeyBinding Gesture="Delete" Command="{Binding DeleteCommand}"/>
                                     
-                                    <MouseBinding Gesture="LeftDoubleClick" Command="{StaticResource EditActionCommand}"/>
+                                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding EditCommand}"/>
                                 </DataGrid.InputBindings>
                                 <i:Interaction.Behaviors>
                                     <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding SelectedActionVMList}"/>
@@ -484,9 +361,9 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <Button Grid.Column="0" Margin="3" Height="20" Width="20" Content="{x:Static properties:Resources.Button_HideReplace}" Command="{StaticResource HideReplaceBoxCommand}" 
+                                <Button Grid.Column="0" Margin="3" Height="20" Width="20" Content="{x:Static properties:Resources.Button_HideReplace}" Command="{Binding HideReplaceBoxCommand}" 
                                         Visibility="{c:Binding ShowReplaceBox, FalseToVisibility=Hidden}"/>
-                                <Button Grid.Column="0" Margin="3" Height="20" Width="20" Content="{x:Static properties:Resources.Button_ShowReplace}" Command="{StaticResource ShowReplaceBoxCommand}"
+                                <Button Grid.Column="0" Margin="3" Height="20" Width="20" Content="{x:Static properties:Resources.Button_ShowReplace}" Command="{Binding ShowReplaceBoxCommand}"
                                         Visibility="{c:Binding !ShowReplaceBox, FalseToVisibility=Hidden}"/>
                                 
                                 <Grid Grid.Row="0" Grid.Column="1">
@@ -500,10 +377,10 @@
                                         <TextBlock Text="{x:Static properties:Resources.TextBlock_Search}"/>:
                                     </TextBlock>
                                     <TextBox Grid.Column="1" Margin="0,3,3,3" Text="{Binding FindInputText}"/>
-                                    <Button Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" Content="▶️" Command="{StaticResource FindActionCommand}"/>
+                                    <Button Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" Content="▶️" Command="{Binding FindActionCommand}"/>
                                 </Grid>
                                 
-                                <Button Grid.Row="0" Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="{x:Static properties:Resources.Button_HideFind}" Command="{StaticResource HideFindBoxCommand}"/>
+                                <Button Grid.Row="0" Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="{x:Static properties:Resources.Button_HideFind}" Command="{Binding HideFindBoxCommand}"/>
 
                                 <Grid Grid.Row="1" Grid.Column="1" Visibility="{c:Binding ShowReplaceBox, FalseToVisibility=Collapsed}">
                                     <Grid.ColumnDefinitions>
@@ -516,7 +393,7 @@
                                         <TextBlock Text="{x:Static properties:Resources.TextBlock_Replace}"/>:
                                     </TextBlock>
                                     <TextBox Grid.Column="1" Margin="0,3,3,3" Text="{Binding ReplaceText}"/>
-                                    <Button Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" Content="▶" Command="{StaticResource ReplaceActionCommand}"/>
+                                    <Button Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" Content="▶" Command="{Binding ReplaceActionCommand}"/>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -567,7 +444,7 @@
                     </Grid>
 
                     <!-- ステータスバー -->
-                    <StatusBar Grid.Row="2" Grid.Column="0" Margin="2" Background="White">
+                    <StatusBar Grid.Row="2" Grid.Column="0" Margin="2" DataContext="{Binding BookTabVM}" Background="White">
                         <StatusBarItem HorizontalAlignment="Left">
                             <TextBlock>
                                 <TextBlock Text="{x:Static properties:Resources.TextBlock_LastOperatedBookItem}"/>:
@@ -590,16 +467,16 @@
                 </Grid>
             </TabItem>
             <!-- 日別グラフ -->
-            <TabItem>
+            <TabItem x:Name="_DailyGraph">
                 <TabItem.Header>
                     <TextBlock Text="{x:Static properties:Resources.TabHeader_DailyGraph}" TextAlignment="Center"/>
                 </TabItem.Header>
                 <TabItem.InputBindings>
-                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
-                    <KeyBinding Gesture="Alt+Up" Command="{StaticResource ShowMonthlyGraphTabCommand}"/>
-                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisMonthCommand}"/>
-                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastMonthCommand}"/>
-                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextMonthCommand}"/>
+                    <KeyBinding Gesture="F5" Command="{Binding UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Up" Command="{Binding ShowMonthlyGraphTabCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{Binding GoToThisMonthCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{Binding GoToLastMonthCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{Binding GoToNextMonthCommand}"/>
                 </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -612,9 +489,9 @@
                     <!-- 中央メニュー -->
                     <Grid Grid.Row="0" Margin="2">
                         <StackPanel Orientation="Horizontal">
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastMonthCommand}"/>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastMonthCommand}"/>
                             <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToDisplayedMonthConverter}, TargetNullValue={x:Static properties:Resources.Button_DateRange}}"
-                                    Command="{StaticResource OpenSelectingDailyTermWindowCommand}">
+                                    Command="{Binding SelectTermCommand}">
                                 <ToolTipService.ToolTip>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -629,10 +506,10 @@
                                     </Grid>
                                 </ToolTipService.ToolTip>
                             </Button>
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextMonthCommand}"/>
-                            <Button Width="80" Content="{x:Static properties:Resources.Button_ThisMonth}" Command="{StaticResource GoToThisMonthCommand}">
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{Binding GoToNextMonthCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_ThisMonth}" Command="{Binding GoToThisMonthCommand}">
                                 <ToolTipService.ToolTip>
-                                    <TextBlock Text="{Binding ToDay, Converter={StaticResource DateTimeToDisplayedMonthConverter}}"/>
+                                    <TextBlock Text="{Binding Now, Source={StaticResource DateTime}, Converter={StaticResource DateTimeToDisplayedMonthConverter}}"/>
                                 </ToolTipService.ToolTip>
                             </Button>
                             
@@ -656,22 +533,22 @@
                     </Grid>
 
                     <!-- 全体グラフ -->
-                    <Grid Grid.Row="1" Margin="2" Background="White">
+                    <Grid Grid.Row="1" Margin="2" Background="White" DataContext="{Binding DailyGraphTabVM}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         
-                        <oxy:PlotView Grid.Row="0" Model="{Binding DailyGraphPlotModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="0" Model="{Binding GraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
 
                     <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Background="GhostWhite"/>
 
                     <!-- 個別グラフ -->
-                    <Grid Grid.Row="3" Margin="2" Background="White">
+                    <Grid Grid.Row="3" Margin="2" Background="White" DataContext="{Binding DailyGraphTabVM}">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                    <DataTrigger Binding="{Binding SelectedGraphKind1, ElementName=WVM}" Value="BalanceGraph">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -686,23 +563,23 @@
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="200"
-                                          ItemsSource="{Binding DailyGraphSeriesVMList}" SelectedItem="{Binding SelectedDailyGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
+                                          ItemsSource="{Binding GraphSeriesVMList}" SelectedItem="{Binding SelectedGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
                             </StackPanel>
                         </Grid>
-                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedDailyGraphPlotModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedGraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
                 </Grid>
             </TabItem>
             <!-- 月別一覧 -->
-            <TabItem>
+            <TabItem x:Name="_MonthlySummary">
                 <TabItem.Header>
                     <TextBlock Text="{x:Static properties:Resources.TabHeader_MonthlySummary}" TextAlignment="Center"/>
                 </TabItem.Header>
                 <TabItem.InputBindings>
-                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
-                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
-                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastYearCommand}"/>
-                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextYearCommand}"/>
+                    <KeyBinding Gesture="F5" Command="{Binding UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{Binding GoToThisYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{Binding GoToLastYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{Binding GoToNextYearCommand}"/>
                 </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -713,7 +590,7 @@
                     <!-- 中央メニュー -->
                     <Grid Grid.Row="0" Margin="2">
                         <StackPanel Orientation="Horizontal">
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastYearCommand}"/>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastYearCommand}"/>
                             <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}">
                                 <ToolTipService.ToolTip>
                                     <Grid>
@@ -729,8 +606,8 @@
                                     </Grid>
                                 </ToolTipService.ToolTip>
                             </Button>
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextYearCommand}"/>
-                            <Button Width="80" Content="{x:Static properties:Resources.Button_ThisYear}" Command="{StaticResource GoToThisYearCommand}">
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{Binding GoToNextYearCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_ThisYear}" Command="{Binding GoToThisYearCommand}">
                                 <ToolTipService.ToolTip>
                                     <TextBlock Text="{Binding Now, Source={StaticResource DateTime}, StringFormat={}{0:yyyy}}"/>
                                 </ToolTipService.ToolTip>
@@ -741,15 +618,15 @@
                     </Grid>
 
                     <!-- データリスト -->
-                    <Grid Grid.Row="1" Margin="2" Background="White">
+                    <Grid Grid.Row="1" Margin="2" Background="White" DataContext="{Binding MonthlySummaryTabVM}">
                         <DataGrid Grid.Column="1"
-                                  ItemsSource="{Binding MonthlySeriesVMList}" SelectedItem="{Binding SelectedMonthlySeriesVM}" IsReadOnly="True" SelectionUnit="FullRow"
+                                  ItemsSource="{Binding SeriesVMList}" SelectedItem="{Binding SelectedSeriesVM}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
                                   HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
                                   ItemContainerStyle="{StaticResource SummaryStyle}" MouseDoubleClick="MonthlyListDataGrid_MouseDoubleClick">
                             <DataGrid.Resources>
-                                <vm:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
+                                <vm:BindingProxy x:Key="Proxy" DataContext="{Binding ElementName=WVM}"/>
                             </DataGrid.Resources>
                             <DataGrid.ColumnHeaderStyle>
                                 <Style TargetType="DataGridColumnHeader">
@@ -805,15 +682,15 @@
                 </Grid>
             </TabItem>
             <!-- 月別グラフ -->
-            <TabItem>
+            <TabItem x:Name="_MonthlyGraph">
                 <TabItem.Header>
                     <TextBlock Text="{x:Static properties:Resources.TabHeader_MonthlyGraph}" TextAlignment="Center"/>
                 </TabItem.Header>
                 <TabItem.InputBindings>
-                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
-                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
-                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastYearCommand}"/>
-                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextYearCommand}"/>
+                    <KeyBinding Gesture="F5" Command="{Binding UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{Binding GoToThisYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{Binding GoToLastYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{Binding GoToNextYearCommand}"/>
                 </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -826,7 +703,7 @@
                     <!-- 中央メニュー -->
                     <Grid Grid.Row="0" Margin="2">
                         <StackPanel Orientation="Horizontal">
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastYearCommand}"/>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastYearCommand}"/>
                             <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}">
                                 <ToolTipService.ToolTip>
                                     <Grid>
@@ -842,10 +719,10 @@
                                     </Grid>
                                 </ToolTipService.ToolTip>
                             </Button>
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextYearCommand}"/>
-                            <Button Width="80" Content="{x:Static properties:Resources.Button_ThisYear}" Command="{StaticResource GoToThisYearCommand}">
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{Binding GoToNextYearCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_ThisYear}" Command="{Binding GoToThisYearCommand}">
                                 <ToolTipService.ToolTip>
-                                    <TextBlock Text="{Binding ToDay, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                    <TextBlock Text="{Binding Now, Source={StaticResource DateTime}, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
                                 </ToolTipService.ToolTip>
                             </Button>
                             
@@ -869,22 +746,22 @@
                     </Grid>
 
                     <!-- 全体グラフ -->
-                    <Grid Grid.Row="1" Margin="2" Background="White">
+                    <Grid Grid.Row="1" Margin="2" DataContext="{Binding MonthlyGraphTabVM}" Background="White">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <oxy:PlotView Grid.Row="0" Model="{Binding MonthlyGraphPlotModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="0" Model="{Binding GraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
 
                     <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Background="GhostWhite"/>
                     
                     <!-- 個別グラフ -->
-                    <Grid Grid.Row="3" Margin="2" Background="White">
+                    <Grid Grid.Row="3" Margin="2" DataContext="{Binding MonthlyGraphTabVM}" Background="White">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                    <DataTrigger Binding="{Binding SelectedGraphKind1, ElementName=WVM}" Value="BalanceGraph">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -899,23 +776,23 @@
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox HorizontalAlignment="Stretch" MinWidth="200"
-                                          ItemsSource="{Binding MonthlyGraphSeriesVMList}" SelectedItem="{Binding SelectedMonthlyGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
+                                          ItemsSource="{Binding GraphSeriesVMList}" SelectedItem="{Binding SelectedGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
                             </StackPanel>
                         </Grid>
-                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedMonthlyGraphPlotModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedGraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
                 </Grid>
             </TabItem>
             <!-- 年別一覧 -->
-            <TabItem>
+            <TabItem x:Name="_YearlySummary">
                 <TabItem.Header>
                     <TextBlock Text="{x:Static properties:Resources.TabHeader_YearlySummary}" TextAlignment="Center"/>
                 </TabItem.Header>
                 <TabItem.InputBindings>
-                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
-                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
-                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastYearCommand}"/>
-                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextYearCommand}"/>
+                    <KeyBinding Gesture="F5" Command="{Binding UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{Binding GoToThisYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{Binding GoToLastYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{Binding GoToNextYearCommand}"/>
                 </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -926,7 +803,7 @@
                     <!-- 中央メニュー -->
                     <Grid Grid.Row="0" Margin="2">
                         <StackPanel Orientation="Horizontal">
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastYearCommand}"/>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastYearCommand}"/>
                             <Button Width="120">
                                 <Button.Content>
                                     <TextBlock>
@@ -936,23 +813,23 @@
                                     </TextBlock>
                                 </Button.Content>
                             </Button>
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextYearCommand}"/>
-                            <Button Width="80" Content="{x:Static properties:Resources.Button_LastDecade}" Command="{StaticResource GoToThisYearCommand}"/>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{Binding GoToNextYearCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_LastDecade}" Command="{Binding GoToThisYearCommand}"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                         </StackPanel>
                     </Grid>
 
                     <!-- データリスト -->
-                    <Grid Grid.Row="1" Margin="2" Background="White">
+                    <Grid Grid.Row="1" Margin="2" Background="White" DataContext="{Binding YearlySummaryTabVM}">
                         <DataGrid Grid.Column="1"
-                                  ItemsSource="{Binding YearlySeriesVMList}" SelectedItem="{Binding SelectedYearlySeriesVM}" IsReadOnly="True" SelectionUnit="FullRow"
+                                  ItemsSource="{Binding SeriesVMList}" SelectedItem="{Binding SelectedSeriesVM}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
                                   HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
                                   ItemContainerStyle="{StaticResource SummaryStyle}" MouseDoubleClick="YearlyListDataGrid_MouseDoubleClick">
                             <DataGrid.Resources>
-                                <vm:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
+                                <vm:BindingProxy x:Key="Proxy" DataContext="{Binding ElementName=WVM}"/>
                             </DataGrid.Resources>
                             <DataGrid.ColumnHeaderStyle>
                                 <Style TargetType="DataGridColumnHeader">
@@ -1002,15 +879,15 @@
                 </Grid>
             </TabItem>
             <!-- 年別グラフ -->
-            <TabItem>
+            <TabItem x:Name="_YearlyGraph">
                 <TabItem.Header>
                     <TextBlock Text="{x:Static properties:Resources.TabHeader_YearlyGraph}" TextAlignment="Center"/>
                 </TabItem.Header>
                 <TabItem.InputBindings>
-                    <KeyBinding Gesture="F5" Command="{StaticResource UpdateCommand}"/>
-                    <KeyBinding Gesture="Alt+Down" Command="{StaticResource GoToThisYearCommand}"/>
-                    <KeyBinding Gesture="Alt+Left" Command="{StaticResource GoToLastYearCommand}"/>
-                    <KeyBinding Gesture="Alt+Right" Command="{StaticResource GoToNextYearCommand}"/>
+                    <KeyBinding Gesture="F5" Command="{Binding UpdateCommand}"/>
+                    <KeyBinding Gesture="Alt+Down" Command="{Binding GoToThisYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Left" Command="{Binding GoToLastYearCommand}"/>
+                    <KeyBinding Gesture="Alt+Right" Command="{Binding GoToNextYearCommand}"/>
                 </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -1023,7 +900,7 @@
                     <!-- 中央メニュー -->
                     <Grid Grid.Row="0" Margin="2">
                         <StackPanel Orientation="Horizontal">
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{StaticResource GoToLastYearCommand}"/>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastYearCommand}"/>
                             <Button Width="120">
                                 <Button.Content>
                                     <TextBlock>
@@ -1033,8 +910,8 @@
                                     </TextBlock>
                                 </Button.Content>
                             </Button>
-                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{StaticResource GoToNextYearCommand}"/>
-                            <Button Width="80" Content="{x:Static properties:Resources.Button_LastDecade}" Command="{StaticResource GoToThisYearCommand}"/>
+                            <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{Binding GoToNextYearCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_LastDecade}" Command="{Binding GoToThisYearCommand}"/>
                             
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
                                       ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
@@ -1056,22 +933,22 @@
                     </Grid>
 
                     <!-- 全体グラフ -->
-                    <Grid Grid.Row="1" Margin="2" Background="White">
+                    <Grid Grid.Row="1" Margin="2" DataContext="{Binding YearlyGraphTabVM}" Background="White">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <oxy:PlotView Grid.Row="0" Model="{Binding YearlyGraphPlotModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="0" Model="{Binding GraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
 
                     <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Background="GhostWhite"/>
                     
                     <!-- 個別グラフ -->
-                    <Grid Grid.Row="3" Margin="2" Background="White">
+                    <Grid Grid.Row="3" Margin="2" DataContext="{Binding YearlyGraphTabVM}" Background="White">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                    <DataTrigger Binding="{Binding SelectedGraphKind1, ElementName=WVM}" Value="BalanceGraph">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -1086,11 +963,11 @@
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox HorizontalAlignment="Stretch" MinWidth="200"
-                                          ItemsSource="{Binding YearlyGraphSeriesVMList}" SelectedItem="{Binding SelectedYearlyGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
+                                          ItemsSource="{Binding GraphSeriesVMList}" SelectedItem="{Binding SelectedGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
                             </StackPanel>
                         </Grid>
                         
-                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedYearlyGraphPlotModel}" Controller="{Binding Controller}"/>
+                        <oxy:PlotView Grid.Row="1" Model="{Binding SelectedGraphPlotModel}" Controller="{Binding Controller}"/>
                     </Grid>
                 </Grid>
             </TabItem>

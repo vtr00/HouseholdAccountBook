@@ -77,7 +77,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="selectedBookId">選択された帳簿ID</param>
         /// <param name="selectedRecord">選択されたCSVレコード</param>
-        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedBookId, CsvViewModel selectedRecord)
+        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, CsvViewModel selectedRecord)
         {
             this.InitializeComponent();
 

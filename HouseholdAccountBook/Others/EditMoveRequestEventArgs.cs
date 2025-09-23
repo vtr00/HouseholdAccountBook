@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace HouseholdAccountBook.Others
 {
-    public class EditActionRequestEventArgs : DbRequestEventArgsBase
+    public class EditMoveRequestEventArgs : DbRequestEventArgsBase
     {
-        public int ActionId { get; set; }
+        public int GroupId { get; set; }
 
         public EventHandler<EventArgs<List<int>>> Registered { get; set; }
     }

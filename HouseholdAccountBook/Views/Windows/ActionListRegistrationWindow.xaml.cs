@@ -84,7 +84,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="selectedBookId">選択された帳簿ID</param>
         /// <param name="selectedRecordList">選択されたCSVレコードリスト</param>
-        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedBookId, List<CsvViewModel> selectedRecordList)
+        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, List<CsvViewModel> selectedRecordList)
         {
             this.InitializeComponent();
 

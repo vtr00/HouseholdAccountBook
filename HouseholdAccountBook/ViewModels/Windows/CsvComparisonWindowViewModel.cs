@@ -54,7 +54,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿項目リスト追加要求時イベント
         /// </summary>
-        public event EventHandler<AddActionRequestEventArgs> AddActionListRequested;
+        public event EventHandler<AddActionListRequestEventArgs> AddActionListRequested;
         /// <summary>
         /// 帳簿項目編集要求時イベント
         /// </summary>
@@ -62,7 +62,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿項目リスト編集要求時イベント
         /// </summary>
-        public event EventHandler<EditActionRequestEventArgs> EditActionListRequested;
+        public event EventHandler<EditActionListRequestEventArgs> EditActionListRequested;
         #endregion
 
         #region プロパティ
@@ -219,7 +219,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         #region コマンドイベントハンドラ
         /// <summary>
-        /// CSVファイルを開く
+        /// CSVファイルオープンコマンド処理
         /// </summary>
         private async void OpenCsvFilesCommand_Executed()
         {
@@ -251,7 +251,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// CSVファイルを移動可能か
+        /// CSVファイル移動コマンド実行可能か
         /// </summary>
         /// <returns></returns>
         private bool MoveCsvFilesCommand_CanExecute()
@@ -272,7 +272,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             return canExecute;
         }
         /// <summary>
-        /// CSVファイルを移動する
+        /// CSVファイル移動コマンド処理
         /// </summary>
         private async void MoveCsvFilesCommand_Executed()
         {
@@ -317,14 +317,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// CSVファイルをクローズ可能か
+        /// CSVファイルクローズコマンド実行可能か
         /// </summary>
+        /// <returns></returns>
         private bool CloseCsvFilesCommand_CanExecute()
         {
             return 0 < this.CsvFilePathList.Count;
         }
         /// <summary>
-        /// CSVファイルを閉じる
+        /// CSVファイルクローズコマンド処理
         /// </summary>
         private void CloseCsvFilesCommand_Executed()
         {
@@ -335,20 +336,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 項目追加可能か
+        /// 項目追加コマンド実行可能か
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <returns></returns>
         private bool AddActionCommand_CanExecute()
         {
             // 選択されている帳簿項目が1つ以上存在していて、値を持たない帳簿項目IDが1つ以上ある
             return this.SelectedCsvComparisonVMList.Count != 0 && this.SelectedCsvComparisonVMList.Any((vm) => !vm.ActionId.HasValue);
         }
         /// <summary>
-        /// 項目追加ウィンドウを開く
+        /// 項目追加コマンド処理
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void AddActionCommand_Executed()
         {
             List<CsvComparisonViewModel> vmList = new(this.SelectedCsvComparisonVMList.Where((vm) => !vm.ActionId.HasValue));
@@ -376,7 +374,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 });
             }
             else {
-                this.AddActionListRequested?.Invoke(this, new AddActionRequestEventArgs() {
+                this.AddActionListRequested?.Invoke(this, new AddActionListRequestEventArgs() {
                     DbHandlerFactory = this.dbHandlerFactory,
                     BookId = this.SelectedBookVM.Id.Value,
                     Records = recordList,
@@ -386,18 +384,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 項目編集可能か
+        /// 項目編集コマンド実行可能か
         /// </summary>
+        /// <returns></returns>
         private bool EditActionCommand_CanExecute()
         {
             // 選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが値を持つ
             return this.SelectedCsvComparisonVMList.Count == 1 && this.SelectedCsvComparisonVM.ActionId.HasValue;
         }
         /// <summary>
-        /// 項目編集ウィンドウを開く
+        /// 項目編集コマンド処理
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private async void EditActionCommand_Executed()
         {
             // グループ種別を特定する
@@ -420,7 +417,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     Debug.Assert(true);
                     break;
                 case (int)GroupKind.ListReg:
-                    this.EditActionListRequested?.Invoke(this, new EditActionRequestEventArgs() {
+                    this.EditActionListRequested?.Invoke(this, new EditActionListRequestEventArgs() {
                         DbHandlerFactory = this.dbHandlerFactory,
                         GroupId = this.SelectedCsvComparisonVM.GroupId.Value,
                         Registered = func
@@ -439,14 +436,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 項目追加/編集可能か
+        /// 項目追加/編集コマンド実行可能か
         /// </summary>
+        /// <returns></returns>
         private bool AddOrEditActionCommand_CanExecute()
         {
             return this.AddActionCommand_CanExecute() | this.EditActionCommand_CanExecute();
         }
         /// <summary>
-        /// 項目追加/編集ウィンドウを開く
+        /// 項目追加/編集コマンド処理
         /// </summary>
         private void AddOrEditActionCommand_Executed()
         {
@@ -460,8 +458,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 一括チェック可能か
+        /// 一括チェックコマンド実行可能か
         /// </summary>
+        /// <returns></returns>
         private bool BulkCheckCommand_CanExecute()
         {
             // 対応する帳簿項目が存在し、未チェックである
@@ -475,7 +474,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             return canExecute;
         }
         /// <summary>
-        /// 一括チェックする
+        /// 一括チェックコマンド処理
         /// </summary>
         private async void BulkCheckCommand_Executed()
         {
@@ -491,14 +490,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 比較情報を更新可能か
+        /// 更新コマンド実行可能か
         /// </summary>
+        /// <returns></returns>
         private bool UpdateListCommand_CanExecute()
         {
             return 0 < this.CsvFilePathList.Count && this.SelectedBookVM != null && 0 < this.CsvComparisonVMList.Count;
         }
         /// <summary>
-        /// 比較情報を更新する
+        /// 更新コマンド処理
         /// </summary>
         private async void UpdateListCommand_Executed()
         {
@@ -508,7 +508,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 一致チェックを変更する
+        /// 一致チェック変更コマンド処理
         /// </summary>
         private async void ChangeIsMatchCommand_Executed()
         {

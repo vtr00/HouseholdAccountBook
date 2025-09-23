@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace HouseholdAccountBook.Others
 {
-    public class EditActionRequestEventArgs : DbRequestEventArgsBase
+    public class CopyActionRequestEventArgs : DbRequestEventArgsBase
     {
         public int ActionId { get; set; }
 

@@ -155,17 +155,18 @@ namespace HouseholdAccountBook.Extensions
 
             wvm.OpenFileDialogRequested += (sender, e) => {
                 OpenFileDialog ofd = new() {
-                    CheckFileExists = true,
+                    CheckFileExists = e.CheckFileExists,
                     InitialDirectory = e.InitialDirectory,
                     FileName = e.FileName,
                     Title = e.Title,
                     Filter = e.Filter,
-                    Multiselect = e.Multiselect
+                    Multiselect = e.Multiselect,
+                    CheckPathExists = e.CheckPathExists
                 };
 
                 bool? result = ofd.ShowDialog(window) ?? throw new InvalidOperationException();
                 e.Result = (bool)result;
-                if (e.Result == true) {
+                if (e.Result) {
                     switch (e.Multiselect) {
                         case false:
                             e.FileName = ofd.FileName;
@@ -184,8 +185,22 @@ namespace HouseholdAccountBook.Extensions
 
                 bool? result = ofd.ShowDialog(window) ?? throw new InvalidOperationException();
                 e.Result = (bool)result;
-                if (e.Result == true) {
+                if (e.Result) {
                     e.FolderName = ofd.FolderName;
+                }
+            };
+            wvm.SaveFileDialogRequested += (sender, e) => {
+                SaveFileDialog ofd = new() {
+                    InitialDirectory = e.InitialDirectory,
+                    FileName = e.FileName,
+                    Title = e.Title,
+                    Filter = e.Filter,
+                };
+
+                bool? result = ofd.ShowDialog(window) ?? throw new InvalidOperationException();
+                e.Result = (bool)result;
+                if (e.Result) {
+                    e.FileName = ofd.FileName;
                 }
             };
         }

@@ -316,6 +316,9 @@ namespace HouseholdAccountBook.Enums
     }
     #endregion
 
+    /// <summary>
+    /// ファイルパス種別
+    /// </summary>
     public enum FilePathKind
     {
         DumpExeFile,

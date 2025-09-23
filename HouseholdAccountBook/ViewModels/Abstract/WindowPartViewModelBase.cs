@@ -39,6 +39,10 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// フォルダ選択ダイアログ要求イベント
         /// </summary>
         public event EventHandler<OpenFolderDialogRequestEventArgs> OpenFolderDialogRequested;
+        /// <summary>
+        /// ファイル保存ダイアログ要求イベント
+        /// </summary>
+        public event EventHandler<SaveFileDialogRequestEventArgs> SaveFileDialogRequested;
         #endregion
 
         #region Bindingプロパティ
@@ -191,6 +195,17 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         protected bool OpenFolderDialogRequest(OpenFolderDialogRequestEventArgs e)
         {
             this.OpenFolderDialogRequested?.Invoke(this, e);
+            return e.Result;
+        }
+
+        /// <summary>
+        /// ファイル保存ダイアログ要求を発行する
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        protected bool SaveFileDialogRequest(SaveFileDialogRequestEventArgs e)
+        {
+            this.SaveFileDialogRequested?.Invoke(this, e);
             return e.Result;
         }
     }

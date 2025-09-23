@@ -241,7 +241,7 @@ namespace HouseholdAccountBook
                         FileName = absoluteFilePath,
                         UseShellExecute = true
                     });
-                    if (Current.MainWindow == null) {
+                    if (Current.MainWindow == null || !Current.MainWindow.IsInitialized) {
                         Current.Shutdown(1); // メインウィンドウがない場合は強制終了
                     }
                 });

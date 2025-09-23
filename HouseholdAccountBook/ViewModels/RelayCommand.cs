@@ -6,11 +6,11 @@ namespace HouseholdAccountBook.ViewModels
     /// <summary>
     /// コマンド
     /// </summary>
-    /// <param name="execute">コマンド実行デリゲート</param>
+    /// <param name="executed">コマンド実行デリゲート</param>
     /// <param name="canExecute">コマンド実行可否デリゲート</param>
-    public class RelayCommand(Action execute, Func<bool> canExecute = null) : ICommand
+    public class RelayCommand(Action executed, Func<bool> canExecute = null) : ICommand
     {
-        private readonly Action _execute = execute;
+        private readonly Action _execute = executed;
         private readonly Func<bool> _canExecute = canExecute;
 
         public bool CanExecute(object parameter) => this._canExecute?.Invoke() ?? true;
@@ -32,11 +32,11 @@ namespace HouseholdAccountBook.ViewModels
     /// パラメータ付コマンド
     /// </summary>
     /// <typeparam name="T">パラメータの型</typeparam>
-    /// <param name="execute">コマンド実行デリゲート</param>
+    /// <param name="executed">コマンド実行デリゲート</param>
     /// <param name="canExecute">コマンド実行可否デリゲート</param>
-    public class RelayCommand<T>(Action<T> execute, Func<T, bool> canExecute = null) : ICommand
+    public class RelayCommand<T>(Action<T> executed, Func<T, bool> canExecute = null) : ICommand
     {
-        private readonly Action<T> _execute = execute;
+        private readonly Action<T> _execute = executed;
         private readonly Func<T, bool> _canExecute = canExecute;
 
         public bool CanExecute(object parameter) => this._canExecute?.Invoke((T)parameter) ?? true;
