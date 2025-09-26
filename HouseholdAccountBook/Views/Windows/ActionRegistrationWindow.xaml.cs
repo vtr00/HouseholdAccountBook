@@ -54,10 +54,11 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="selectedDate">選択された日付</param>
         public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate)
         {
-            this.InitializeComponent();
-
             this.Owner = owner;
-            this.LoadWindowSetting();
+            this.Name = "ActList";
+            WindowLocationManager.Instance.Add(this);
+
+            this.InitializeComponent();
 
             this.AddCommonEventHandlers();
             this.Loaded += async (sender, e) => {
@@ -79,10 +80,11 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="selectedRecord">選択されたCSVレコード</param>
         public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, CsvViewModel selectedRecord)
         {
-            this.InitializeComponent();
-
             this.Owner = owner;
-            this.LoadWindowSetting();
+            this.Name = "ActList";
+            WindowLocationManager.Instance.Add(this);
+
+            this.InitializeComponent();
 
             this.AddCommonEventHandlers();
             this.Loaded += async (sender, e) => {
@@ -105,10 +107,11 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="regKind">登録種別</param>
         public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedActionId, RegistrationKind regKind = RegistrationKind.Edit)
         {
-            this.InitializeComponent();
-
             this.Owner = owner;
-            this.LoadWindowSetting();
+            this.Name = "ActList";
+            WindowLocationManager.Instance.Add(this);
+
+            this.InitializeComponent();
 
             this.AddCommonEventHandlers();
             this.Loaded += async (sender, e) => {

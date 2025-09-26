@@ -35,16 +35,6 @@ namespace HouseholdAccountBook.Views.Windows
         /// CSV比較ウィンドウ
         /// </summary>
         private CsvComparisonWindow ccw;
-
-        /// <summary>
-        /// ウィンドウの境界(最終補正値)
-        /// </summary>
-        private Rect lastBounds = new();
-
-        /// <summary>
-        /// ウィンドウログ
-        /// </summary>
-        private readonly WindowLog windowLog = null;
         #endregion
 
         #region プロパティ
@@ -64,18 +54,14 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DAOハンドラファクトリ</param>
         public MainWindow(DbHandlerFactory dbHandlerFactory)
         {
-            this.windowLog = new WindowLog(this);
-            this.windowLog.Log("Constructor", true);
+            this.Name = "Main";
+            WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
 
-            this.LoadWindowSetting();
-
             this.AddCommonEventHandlers();
             this.Loaded += async (sender, e) => {
-                Log.Info();
-
-                this.windowLog.Log("WindowLoaded", true);
+                Log.Info("Loaded");
 
                 await this.WVM.LoadAsync();
                 this.WVM.ScrollRequested += (sender, e) => {
@@ -225,51 +211,10 @@ namespace HouseholdAccountBook.Views.Windows
             };
 
             this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
-
-            this.Name = "Main";
         }
 
         #region イベントハンドラ
         #region ウィンドウ
-        /// <summary>
-        /// ラッパ関数の呼び出し回数
-        /// </summary>
-        private int wrapperCount = 0;
-        /// <summary>
-        /// ウィンドウのサイズと位置を変更する際のラッパ関数
-        /// </summary>
-        /// <param name="func">ウィンドウのサイズと位置を変更する関数</param>
-        private bool ChangedLocationOrSizeWrapper(Func<bool> func)
-        {
-            if (this.wrapperCount == 0) {
-                this.SizeChanged -= this.MainWindow_SizeChanged;
-                this.LocationChanged -= this.MainWindow_LocationChanged;
-            }
-            this.wrapperCount++;
-
-            bool ret = func.Invoke();
-
-            this.wrapperCount--;
-            if (this.wrapperCount == 0) {
-                this.SizeChanged += this.MainWindow_SizeChanged;
-                this.LocationChanged += this.MainWindow_LocationChanged;
-            }
-
-            return ret;
-        }
-
-        /// <summary>
-        /// ウィンドウ初期化完了時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MainWindow_Initialized(object sender, EventArgs e)
-        {
-            this.windowLog.Log("Initialized", true);
-
-            this.lastBounds = this.RestoreBounds;
-        }
-
         /// <summary>
         /// ウィンドウクローズ時
         /// </summary>
@@ -317,31 +262,6 @@ namespace HouseholdAccountBook.Views.Windows
                     }
                 }
             }
-
-            this.windowLog.Log("WindowStateChanged", true);
-            _ = this.ModifyLocationOrSize();
-        }
-
-        /// <summary>
-        /// ウィンドウ位置変更時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MainWindow_LocationChanged(object sender, EventArgs e)
-        {
-            this.windowLog.Log("WindowLocationChanged", true);
-            _ = this.ModifyLocationOrSize();
-        }
-
-        /// <summary>
-        /// ウィンドウサイズ変更時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            this.windowLog.Log("WindowSizeChanged", true);
-            _ = this.ModifyLocationOrSize();
         }
         #endregion
 
@@ -401,65 +321,5 @@ namespace HouseholdAccountBook.Views.Windows
             }
         }
         #endregion
-
-        /// <summary>
-        /// ウィンドウ位置またはサイズを修正する
-        /// </summary>
-        private bool ModifyLocationOrSize()
-        {
-            bool ret = this.ChangedLocationOrSizeWrapper(() => {
-                bool ret2 = true;
-
-                /// 位置調整
-                if (30000 < Math.Max(Math.Abs(this.Left), Math.Abs(this.Top))) {
-                    double tmpTop = this.Top;
-                    double tmpLeft = this.Left;
-                    if (30000 < Math.Max(Math.Abs(this.lastBounds.Left), Math.Abs(this.lastBounds.Top))) {
-                        this.Left = this.lastBounds.Left;
-                        this.Top = this.lastBounds.Top;
-                    }
-                    else {
-                        // ディスプレイの中央に移動する
-                        this.MoveOwnersCenter();
-                    }
-
-                    if (tmpTop != this.Top || tmpLeft != this.Left) {
-                        this.windowLog.Log("WindowLocationModified", true);
-                    }
-                    else {
-                        this.windowLog.Log("FailedToModifyLocation", true);
-                        ret2 = false;
-                    }
-                }
-
-                /// サイズ調整
-                if (this.Height < 40 || this.Width < 40) {
-                    double tmpHeight = this.Height;
-                    double tmpWidth = this.Width;
-                    if (40 < this.lastBounds.Height && 40 < this.lastBounds.Width) {
-                        this.Height = this.lastBounds.Height;
-                        this.Width = this.lastBounds.Width;
-                    }
-                    else {
-                        this.Height = 700;
-                        this.Width = 1050;
-                    }
-
-                    if (tmpHeight != this.Height || tmpWidth != this.Width) {
-                        this.windowLog.Log("WindowSizeModified", true);
-                    }
-                    else {
-                        this.windowLog.Log("FailedToModifySize", true);
-                        ret2 = false;
-                    }
-                }
-
-                return ret2;
-            });
-
-            this.lastBounds = this.RestoreBounds;
-
-            return ret;
-        }
     }
 }

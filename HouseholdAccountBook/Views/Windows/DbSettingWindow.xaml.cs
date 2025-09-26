@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Extensions;
+using HouseholdAccountBook.Others;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,10 +19,11 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="message">表示メッセージ</param>
         public DbSettingWindow(Window owner, string message)
         {
-            this.InitializeComponent();
-
             this.Owner = owner;
-            this.LoadWindowSetting();
+            this.Name = "DbSetting";
+            WindowLocationManager.Instance.Add(this);
+
+            this.InitializeComponent();
 
             this.WVM.SetPassword = password => { this.passwordBox.Password = password; };
             this.WVM.GetPassword = () => { return this.passwordBox.Password; };

@@ -1,9 +1,7 @@
 ﻿using HouseholdAccountBook.Models.Logger;
 using HouseholdAccountBook.ViewModels.Abstract;
-using HouseholdAccountBook.Views.Windows;
 using Microsoft.Win32;
 using System;
-using System.Linq;
 using System.Windows;
 
 namespace HouseholdAccountBook.Extensions
@@ -35,106 +33,12 @@ namespace HouseholdAccountBook.Extensions
         }
 
         /// <summary>
-        /// ウィンドウ設定を読み込む
-        /// </summary>
-        /// <param name="window"></param>
-        /// <remarks>コンストラクタで呼び出す</remarks>
-        public static void LoadWindowSetting(this Window window)
-        {
-            if (window.DataContext is not WindowViewModelBase wvm) {
-                return;
-            }
-
-            bool isMainWindow = window is MainWindow;
-
-            Properties.Settings settings = Properties.Settings.Default;
-
-            Size size = wvm.WindowSizeSetting;
-            if (40 < size.Width && 40 < size.Height) {
-                window.Width = size.Width;
-                window.Height = size.Height;
-            }
-
-            Point point = wvm.WindowPointSetting;
-            if ((isMainWindow || settings.App_IsPositionSaved) && 0 <= point.X && 0 <= point.Y) {
-                window.Left = point.X;
-                window.Top = point.Y;
-            }
-            else {
-                window.MoveOwnersCenter();
-            }
-
-            int state = wvm.WindowStateSetting;
-            if (0 < state && state <= (int)Enum.GetValues(typeof(WindowState)).Cast<WindowState>().Max()) {
-                window.WindowState = (WindowState)state;
-            }
-        }
-
-        /// <summary>
-        /// ウィンドウ設定を保存する
-        /// </summary>
-        /// <param name="window"></param>
-        /// <remarks>通常ウィンドウクローズ時に呼ばれる</remarks>
-        public static void SaveWindowSetting(this Window window)
-        {
-            if (window.DataContext is not WindowViewModelBase wvm) {
-                return;
-            }
-
-            bool isMainWindow = window is MainWindow;
-
-            if (window.WindowState == WindowState.Normal) {
-                Properties.Settings settings = Properties.Settings.Default;
-                if (!settings.App_InitSizeFlag) {
-                    if (40 < window.Width && 40 < window.Height) {
-                        Size size = new() {
-                            Width = window.Width,
-                            Height = window.Height
-                        };
-                        wvm.WindowSizeSetting = size;
-                    }
-
-                    if (isMainWindow || settings.App_IsPositionSaved) {
-                        if (0 < window.Left && 0 < window.Top) {
-                            Point point = new() {
-                                X = window.Left,
-                                Y = window.Top
-                            };
-                            wvm.WindowPointSetting = point;
-                        }
-                    }
-                }
-            }
-
-            if (window.WindowState != WindowState.Minimized) {
-                wvm.WindowStateSetting = (int)window.WindowState;
-            }
-        }
-
-        /// <summary>
-        /// 共通のイベントハンドラを登録する
+        /// <see cref="WindowViewModelBase"/> に共通のイベントハンドラを登録する
         /// </summary>
         /// <param name="window"></param>
         /// <remarks>コンストラクタで呼び出す</remarks>
         public static void AddCommonEventHandlers(this Window window)
         {
-            /// ウィンドウのイベントハンドラを登録する
-            window.Closed += (sender, e) => {
-                window.SaveWindowSetting();
-            };
-            window.IsVisibleChanged += (sender, e) => {
-                bool oldValue = (bool)e.OldValue;
-                bool newValue = (bool)e.NewValue;
-                if (!oldValue && newValue) {
-                    if (newValue) {
-                        window.LoadWindowSetting();
-                    }
-                    else {
-                        window.SaveWindowSetting();
-                    }
-                }
-            };
-
             if (window.DataContext is not WindowViewModelBase wvm) {
                 return;
             }

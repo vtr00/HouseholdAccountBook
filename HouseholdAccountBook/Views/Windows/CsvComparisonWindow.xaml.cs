@@ -58,10 +58,11 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="selectedBookId">選択された帳簿ID</param>
         public CsvComparisonWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId)
         {
-            this.InitializeComponent();
-
             this.Owner = owner;
-            this.LoadWindowSetting();
+            this.Name = "CsvComp";
+            WindowLocationManager.Instance.Add(this);
+
+            this.InitializeComponent();
 
             this.AddCommonEventHandlers();
             // ロード時処理はコンストラクタで設定しておく

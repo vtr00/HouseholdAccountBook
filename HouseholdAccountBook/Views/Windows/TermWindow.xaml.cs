@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Models.DbHandler;
+using HouseholdAccountBook.Others;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,10 +22,11 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dateWithinMonth">月内日付</param>
         public TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateTime dateWithinMonth)
         {
-            this.InitializeComponent();
-
             this.Owner = owner;
-            this.LoadWindowSetting();
+            this.Name = "Term";
+            WindowLocationManager.Instance.Add(this);
+
+            this.InitializeComponent();
 
             this.AddCommonEventHandlers();
             // ロード時処理はコンストラクタで設定しておく
@@ -49,10 +51,11 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="endDate">終了日</param>
         public TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateTime startDate, DateTime endDate)
         {
-            this.InitializeComponent();
-
             this.Owner = owner;
-            this.LoadWindowSetting();
+            this.Name = "Term";
+            WindowLocationManager.Instance.Add(this);
+
+            this.InitializeComponent();
 
             this.AddCommonEventHandlers();
             // ロード時処理はコンストラクタで設定しておく

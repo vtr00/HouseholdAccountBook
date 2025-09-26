@@ -32,10 +32,11 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         public SettingsWindow(Window owner, DbHandlerFactory dbHandlerFactory)
         {
-            this.InitializeComponent();
-
             this.Owner = owner;
-            this.LoadWindowSetting();
+            this.Name = "Settings";
+            WindowLocationManager.Instance.Add(this);
+
+            this.InitializeComponent();
 
             this.AddCommonEventHandlers();
             this.Loaded += async (sender, e) => {

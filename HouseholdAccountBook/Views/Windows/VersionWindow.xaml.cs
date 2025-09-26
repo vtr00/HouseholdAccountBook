@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Extensions;
+using HouseholdAccountBook.Others;
 using System.Windows;
 
 namespace HouseholdAccountBook.Views.Windows
@@ -14,10 +15,11 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="owner">親ウィンドウ</param>
         public VersionWindow(Window owner)
         {
-            this.InitializeComponent();
-
             this.Owner = owner;
-            this.LoadWindowSetting();
+            this.Name = "Version";
+            WindowLocationManager.Instance.Add(this);
+
+            this.InitializeComponent();
             this.Loaded += (sender, e) => this.HistoryLog.ScrollToEnd();
 
             this.AddCommonEventHandlers();

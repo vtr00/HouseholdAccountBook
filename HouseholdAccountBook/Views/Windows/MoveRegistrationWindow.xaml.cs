@@ -36,10 +36,11 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="selectedDate">選択された日付</param>
         public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate)
         {
-            this.InitializeComponent();
-
             this.Owner = owner;
-            this.LoadWindowSetting();
+            this.Name = "MoveReg";
+            WindowLocationManager.Instance.Add(this);
+
+            this.InitializeComponent();
 
             this.AddCommonEventHandlers();
             this.Loaded += async (sender, e) => {
@@ -61,10 +62,11 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="regKind">登録種別</param>
         public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedGroupId, RegistrationKind regKind = RegistrationKind.Edit)
         {
-            this.InitializeComponent();
-
             this.Owner = owner;
-            this.LoadWindowSetting();
+            this.Name = "MoveReg";
+            WindowLocationManager.Instance.Add(this);
+
+            this.InitializeComponent();
 
             this.AddCommonEventHandlers();
             this.Loaded += async (sender, e) => {
