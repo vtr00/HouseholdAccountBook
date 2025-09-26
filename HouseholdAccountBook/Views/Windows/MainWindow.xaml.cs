@@ -209,6 +209,9 @@ namespace HouseholdAccountBook.Views.Windows
                             _ = this.Activate();
                         };
                     }
+                    else {
+                        this.ccw.WVM.SelectedBookVM = this.ccw.WVM.BookVMList.FirstOrDefault(vm => vm.Id == e.BookId);
+                    }
 
                     this.ccw.Show();
                 };
