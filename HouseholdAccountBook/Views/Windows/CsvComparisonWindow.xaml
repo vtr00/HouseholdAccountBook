@@ -77,14 +77,14 @@
             <Grid Grid.Row="0" Margin="5,0" VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <Button Grid.Column="0" Margin="0,5" Width="50" Content="{x:Static properties:Resources.Button_Open}" Command="{Binding OpenCsvFilesCommand}"/>
-                <Button Grid.Column="1" Margin="3,5,0,5" Width="50" Content="{x:Static properties:Resources.Button_Close}" Command="{Binding CloseCsvFilesCommand}"/>
-                <Button Grid.Column="3" Margin="0,5" Width="50" Content="{x:Static properties:Resources.Button_Move}" Command="{Binding MoveCsvFilesCommand}"/>
+                <Button Grid.Column="2" Margin="3,5" Width="50" Content="{x:Static properties:Resources.Button_Move}" Command="{Binding MoveCsvFilesCommand}"/>
+                <Button Grid.Column="3" Margin="0,5" Width="50" Content="{x:Static properties:Resources.Button_Close}" Command="{Binding CloseCsvFilesCommand}"/>
             </Grid>
 
             <Grid Grid.Row="1" Margin="25,0">
