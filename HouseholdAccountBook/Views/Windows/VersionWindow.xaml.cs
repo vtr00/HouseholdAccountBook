@@ -1,7 +1,5 @@
 ﻿using HouseholdAccountBook.Extensions;
-using Notification.Wpf;
 using System.Windows;
-using System.Windows.Input;
 
 namespace HouseholdAccountBook.Views.Windows
 {

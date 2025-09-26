@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Models.DbHandler;
 using System;
 
-namespace HouseholdAccountBook.Others
+namespace HouseholdAccountBook.Others.RequestEventArgs
 {
     public abstract class DbRequestEventArgsBase : EventArgs
     {

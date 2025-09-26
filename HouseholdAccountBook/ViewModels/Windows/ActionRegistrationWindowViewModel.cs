@@ -381,10 +381,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 続けて入力コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        protected bool ContinueToOKCommand_CanExecute()
-        {
-            return this.OKCommand_CanExecute() && this.RegKind == RegistrationKind.Add;
-        }
+        protected bool ContinueToOKCommand_CanExecute() => this.OKCommand_CanExecute() && this.RegKind == RegistrationKind.Add;
 
         /// <summary>
         /// 続けて入力コマンド処理
@@ -406,10 +403,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.Count = 1;
         }
 
-        protected override bool OKCommand_CanExecute()
-        {
-            return this.SelectedItemVM != null && this.Value.HasValue && 0 < this.Value;
-        }
+        protected override bool OKCommand_CanExecute() => this.SelectedItemVM != null && this.Value.HasValue && 0 < this.Value;
         protected override async void OKCommand_Executed()
         {
             // DB登録

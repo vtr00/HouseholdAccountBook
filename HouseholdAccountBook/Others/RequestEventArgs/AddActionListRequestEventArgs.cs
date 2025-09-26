@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace HouseholdAccountBook.Others
+namespace HouseholdAccountBook.Others.RequestEventArgs
 {
-    public class AddActionRequestEventArgs : DbRequestEventArgsBase
+    public class AddActionListRequestEventArgs : DbRequestEventArgsBase
     {
         public int? BookId { get; set; }
 
@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Others
 
         public DateTime? Date { get; set; }
 
-        public CsvViewModel Record { get; set; }
+        public List<CsvViewModel> Records { get; set; }
 
         public EventHandler<EventArgs<List<int>>> Registered { get; set; }
     }

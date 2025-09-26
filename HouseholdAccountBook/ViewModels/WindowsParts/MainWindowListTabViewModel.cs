@@ -11,6 +11,11 @@ using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
 {
+    /// <summary>
+    /// メインウィンドウ リストタブVM
+    /// </summary>
+    /// <param name="parent">親VM</param>
+    /// <param name="tab">タブ</param>
     public class MainWindowListTabViewModel(MainWindowViewModel parent, Tabs tab) : WindowPartViewModelBase
     {
         private MainWindowViewModel Parent { get; } = parent;
@@ -58,6 +63,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
         #endregion
 
+        /// <summary>
+        /// リストタブを更新する
+        /// </summary>
+        /// <param name="balanceKind">収支種別</param>
+        /// <param name="categoryId">分類ID</param>
+        /// <param name="itemId">項目ID</param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public async Task UpdateListTabDataAsync(int? balanceKind = null, int? categoryId = null, int? itemId = null)
         {
             if (this.Parent.SelectedTab != this.Tab) return;

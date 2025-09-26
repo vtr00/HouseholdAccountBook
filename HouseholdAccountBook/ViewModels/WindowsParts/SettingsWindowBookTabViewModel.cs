@@ -8,6 +8,7 @@ using HouseholdAccountBook.Models.Dto.DbTable;
 using HouseholdAccountBook.Models.Dto.Others;
 using HouseholdAccountBook.Models.Logger;
 using HouseholdAccountBook.Others;
+using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Settings;
@@ -140,10 +141,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿削除コマンド実行可能か
         /// </summary>
-        private bool DeleteBookCommand_CanExecute()
-        {
-            return this.SelectedBookVM != null;
-        }
+        /// <returns></returns>
+        private bool DeleteBookCommand_CanExecute() => this.SelectedBookVM != null;
 
         /// <summary>
         /// 帳簿削除コマンド処理
@@ -173,6 +172,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿表示順上昇コマンド実行可能か
         /// </summary>
+        /// <returns></returns>
         private bool RaiseBookSortOrderCommand_CanExecute()
         {
             bool canExecute = this.BookVMList != null;
@@ -206,6 +206,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿表示順下降コマンド実行可能か
         /// </summary>
+        /// <returns></returns>
         private bool DropBookSortOrderCommand_CanExecute()
         {
             bool canExecute = this.BookVMList != null;
@@ -239,10 +240,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿情報保存コマンド実行可能か
         /// </summary>
-        private bool SaveBookInfoCommand_CanExecute()
-        {
-            return this.SelectedBookVM != null && !string.IsNullOrWhiteSpace(this.SelectedBookVM.Name);
-        }
+        /// <returns></returns>
+        private bool SaveBookInfoCommand_CanExecute() => this.SelectedBookVM != null && !string.IsNullOrWhiteSpace(this.SelectedBookVM.Name);
 
         /// <summary>
         /// 帳簿情報保存コマンド処理

@@ -1188,4 +1188,4 @@
 
 修正案:
   ・帳簿が一定額を下回ったら通知する
-  ・コードビハインドに存在するビジネスロジックをまずはViewModelに分離する → その後Model(Service)に分離する
+  ・WindowLogを全ウィンドウに適用する(WindowExtensionsに移植する)

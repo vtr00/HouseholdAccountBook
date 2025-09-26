@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HouseholdAccountBook.Others
+namespace HouseholdAccountBook.Others.RequestEventArgs
 {
     public class CloseRequestEventArgs(bool? result, bool isDialog = true) : EventArgs
     {

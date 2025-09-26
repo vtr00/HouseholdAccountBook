@@ -1,4 +1,4 @@
-﻿namespace HouseholdAccountBook.Others
+﻿namespace HouseholdAccountBook.Others.RequestEventArgs
 {
     public class SettingsRequestEventArgs : DbRequestEventArgsBase
     {

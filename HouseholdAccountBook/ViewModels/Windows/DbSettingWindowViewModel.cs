@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Models.DbHandler;
 using HouseholdAccountBook.Others;
+using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;
@@ -100,9 +101,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         #region コマンドイベントハンドラ
         /// <summary>
-        /// ファイル選択ボタンクリック時のコマンド処理
+        /// ファイル選択コマンド処理
         /// </summary>
-        /// <param name="kind"></param>
+        /// <param name="kind">ファイルパス種別</param>
         public void SelectFilePathCommand_Executed(FilePathKind kind)
         {
             bool checkFileExists = true;

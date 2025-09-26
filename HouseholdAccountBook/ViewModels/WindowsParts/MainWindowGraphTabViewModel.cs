@@ -18,6 +18,9 @@ using static HouseholdAccountBook.Views.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
 {
+    /// <summary>
+    /// メインウィンドウ グラフタブVM
+    /// </summary>
     public class MainWindowGraphTabViewModel : WindowPartViewModelBase
     {
         private MainWindowViewModel Parent { get; set; }
@@ -107,6 +110,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
         #endregion
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="parent">親VM</param>
+        /// <param name="tab">タブ</param>
         public MainWindowGraphTabViewModel(MainWindowViewModel parent, Tabs tab)
         {
             this.Parent = parent;
@@ -122,6 +130,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.Controller.BindMouseEnter(PlotCommands.HoverPointsOnlyTrack);
         }
 
+        /// <summary>
+        /// グラフタブを更新する
+        /// </summary>
+        /// <param name="categoryId">分類ID</param>
+        /// <param name="itemId">項目ID</param>
+        /// <returns></returns>
         public async Task UpdateGraphTabDataAsync(int? categoryId = null, int? itemId = null)
         {
             if (this.Parent.SelectedTab != this.Tab) return;
@@ -151,6 +165,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
         }
 
+        /// <summary>
+        /// 個別グラフを更新する
+        /// </summary>
         public void UpdateSelectedGraph()
         {
             if (this.Parent.SelectedTab != this.Tab) return;

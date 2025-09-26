@@ -23,12 +23,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         #region コマンド
         /// <summary>
-        /// 対象のURIを開く
+        /// URIオープンコマンド
         /// </summary>
         public ICommand OpenUriCommand => new RelayCommand<string>(this.OpenUriCommand_Execute);
         #endregion
 
         #region コマンドイベントハンドラ
+        /// <summary>
+        /// URIオープンコマンド処理
+        /// </summary>
+        /// <param name="uri">対象URI</param>
         private void OpenUriCommand_Execute(string uri)
         {
             ProcessStartInfo info = new() {

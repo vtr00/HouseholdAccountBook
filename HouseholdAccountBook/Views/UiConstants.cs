@@ -63,6 +63,8 @@ namespace HouseholdAccountBook.Views
             { GraphKind2.CategoryGraph, Properties.Resources.GraphKind2_CategoryGraph },
             { GraphKind2.ItemGraph,     Properties.Resources.GraphKind2_ItemGraph }
         };
+        #endregion
+
         /// <summary>
         /// 言語名文字列
         /// </summary>
@@ -70,6 +72,5 @@ namespace HouseholdAccountBook.Views
             { "ja-JP",  Properties.Resources.CultureName_ja_JP },
             { "en-001", Properties.Resources.CultureName_en_001 }
         };
-        #endregion
     }
 }

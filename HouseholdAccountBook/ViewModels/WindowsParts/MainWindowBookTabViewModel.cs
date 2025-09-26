@@ -7,6 +7,7 @@ using HouseholdAccountBook.Models.DbHandler.Abstract;
 using HouseholdAccountBook.Models.Logger;
 using HouseholdAccountBook.Models.Services;
 using HouseholdAccountBook.Others;
+using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Windows;

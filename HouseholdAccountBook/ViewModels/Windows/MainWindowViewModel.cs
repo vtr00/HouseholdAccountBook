@@ -11,6 +11,7 @@ using HouseholdAccountBook.Models.Dto.DbTable;
 using HouseholdAccountBook.Models.Dto.KHDbTable;
 using HouseholdAccountBook.Models.Logger;
 using HouseholdAccountBook.Others;
+using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.WindowsParts;
@@ -868,10 +869,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// PostgreSQLファイルインポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool ImportPostgreSQLFileCommand_CanExecute()
-        {
-            return this.IsSQLite && !this.IsChildrenWindowOpened();
-        }
+        public bool ImportPostgreSQLFileCommand_CanExecute() => this.IsSQLite && !this.IsChildrenWindowOpened();
         /// <summary>
         /// PostgreSQLファイルインポートコマンド処理
         /// </summary>
@@ -1044,10 +1042,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// SQLiteファイルインポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool ImportSQLiteFileCommand_CanExecute()
-        {
-            return (this.IsPostgreSQL || this.IsSQLite) && !this.IsChildrenWindowOpened();
-        }
+        public bool ImportSQLiteFileCommand_CanExecute() => (this.IsPostgreSQL || this.IsSQLite) && !this.IsChildrenWindowOpened();
         /// <summary>
         /// SQLiteファイルインポートコマンド処理
         /// </summary>

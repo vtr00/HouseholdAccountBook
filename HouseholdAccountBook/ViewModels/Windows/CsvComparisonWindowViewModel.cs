@@ -8,6 +8,7 @@ using HouseholdAccountBook.Models.DbHandler.Abstract;
 using HouseholdAccountBook.Models.Dto.DbTable;
 using HouseholdAccountBook.Models.Dto.Others;
 using HouseholdAccountBook.Others;
+using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using System;
@@ -320,10 +321,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// CSVファイルクローズコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool CloseCsvFilesCommand_CanExecute()
-        {
-            return 0 < this.CsvFilePathList.Count;
-        }
+        private bool CloseCsvFilesCommand_CanExecute() => 0 < this.CsvFilePathList.Count;
         /// <summary>
         /// CSVファイルクローズコマンド処理
         /// </summary>
@@ -439,10 +437,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 項目追加/編集コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool AddOrEditActionCommand_CanExecute()
-        {
-            return this.AddActionCommand_CanExecute() | this.EditActionCommand_CanExecute();
-        }
+        private bool AddOrEditActionCommand_CanExecute() => this.AddActionCommand_CanExecute() | this.EditActionCommand_CanExecute();
         /// <summary>
         /// 項目追加/編集コマンド処理
         /// </summary>
@@ -493,10 +488,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 更新コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool UpdateListCommand_CanExecute()
-        {
-            return 0 < this.CsvFilePathList.Count && this.SelectedBookVM != null && 0 < this.CsvComparisonVMList.Count;
-        }
+        private bool UpdateListCommand_CanExecute() => 0 < this.CsvFilePathList.Count && this.SelectedBookVM != null && 0 < this.CsvComparisonVMList.Count;
         /// <summary>
         /// 更新コマンド処理
         /// </summary>

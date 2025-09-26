@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Enums;
 using System;
 
-namespace HouseholdAccountBook.Others
+namespace HouseholdAccountBook.Others.RequestEventArgs
 {
     public class SelectTermRequestEventArgs : DbRequestEventArgsBase
     {

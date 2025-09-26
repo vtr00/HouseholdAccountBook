@@ -120,9 +120,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
             base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
         }
 
-        /// <summary>
-        /// DB等から読み込む
-        /// </summary>
         public override async Task LoadAsync()
         {
             switch (this.SelectedTab) {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HouseholdAccountBook.Others
+namespace HouseholdAccountBook.Others.RequestEventArgs
 {
     public class CopyActionRequestEventArgs : DbRequestEventArgsBase
     {

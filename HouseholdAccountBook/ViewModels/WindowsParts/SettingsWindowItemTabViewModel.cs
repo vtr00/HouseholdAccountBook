@@ -121,10 +121,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 分類追加コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool AddCategoryCommand_CanExecute()
-        {
-            return this.SelectedHierarchicalVM != null;
-        }
+        private bool AddCategoryCommand_CanExecute() => this.SelectedHierarchicalVM != null;
 
         /// <summary>
         /// 分類追加コマンド処理
@@ -152,10 +149,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 項目追加コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool AddItemCommand_CanExecute()
-        {
-            return this.SelectedHierarchicalVM != null && GetHierarchicalKind(this.SelectedHierarchicalVM) != HierarchicalKind.Balance;
-        }
+        private bool AddItemCommand_CanExecute() => this.SelectedHierarchicalVM != null && GetHierarchicalKind(this.SelectedHierarchicalVM) != HierarchicalKind.Balance;
 
         /// <summary>
         /// 項目追加コマンド処理
@@ -183,10 +177,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 分類/項目削除コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool DeleteItemCommand_CanExecute()
-        {
-            return this.SelectedHierarchicalVM != null && GetHierarchicalKind(this.SelectedHierarchicalVM) != HierarchicalKind.Balance;
-        }
+        private bool DeleteItemCommand_CanExecute() => this.SelectedHierarchicalVM != null && GetHierarchicalKind(this.SelectedHierarchicalVM) != HierarchicalKind.Balance;
 
         /// <summary>
         /// 分類/項目削除コマンド処理
@@ -415,6 +406,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 項目-帳簿関係変更コマンド処理
         /// </summary>
+        /// <param name="viewModel">チェック対象に紐づくVM</param>
         private async void ChangeItemRelationCommand_Executed(object viewModel)
         {
             using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
@@ -450,10 +442,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 店名削除コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool DeleteShopNameCommand_CanExecute()
-        {
-            return this.DisplayedHierarchicalSettingVM?.SelectedShopVM != null;
-        }
+        private bool DeleteShopNameCommand_CanExecute() => this.DisplayedHierarchicalSettingVM?.SelectedShopVM != null;
 
         /// <summary>
         /// 店名削除コマンド処理
@@ -483,10 +472,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 備考削除コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool DeleteRemarkCommand_CanExecute()
-        {
-            return this.DisplayedHierarchicalSettingVM?.SelectedRemarkVM != null;
-        }
+        private bool DeleteRemarkCommand_CanExecute() => this.DisplayedHierarchicalSettingVM?.SelectedRemarkVM != null;
 
         /// <summary>
         /// 備考削除コマンド処理
