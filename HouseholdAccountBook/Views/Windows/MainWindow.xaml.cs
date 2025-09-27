@@ -75,75 +75,83 @@ namespace HouseholdAccountBook.Views.Windows
                 this.WVM.AddMoveRequested += (sender, e) => {
                     this.mrw = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
                     this.mrw.Registrated += e.Registered;
-                    _ = this.mrw.ShowDialog();
-
-                    this.mrw = null;
-                    _ = this.Activate();
-                    _ = this._actionDataGrid.Focus();
-
+                    this.mrw.Closed += (sender, e) => {
+                        this.mrw = null;
+                        _ = this.Activate();
+                        _ = this._actionDataGrid.Focus();
+                    };
+                    this.mrw.Show();
                 };
                 this.WVM.AddActionRequested += (sender, e) => {
                     this.arw = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
                     this.arw.Registrated += e.Registered;
-                    _ = this.arw.ShowDialog();
+                    this.arw.Closed += (sender, e) => {
+                        this.arw = null;
+                        _ = this.Activate();
+                        _ = this._actionDataGrid.Focus();
+                    };
+                    this.arw.Show();
 
-                    this.arw = null;
-                    _ = this.Activate();
-                    _ = this._actionDataGrid.Focus();
                 };
                 this.WVM.AddActionListRequested += (sender, e) => {
                     this.alrw = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
                     this.alrw.Registrated += e.Registered;
-                    _ = this.alrw.ShowDialog();
-
-                    this.alrw = null;
-                    _ = this.Activate();
-                    _ = this._actionDataGrid.Focus();
+                    this.alrw.Closed += (sender, e) => {
+                        this.alrw = null;
+                        _ = this.Activate();
+                        _ = this._actionDataGrid.Focus();
+                    };
+                    this.alrw.Show();
                 };
                 this.WVM.CopyMoveRequested += (sender, e) => {
                     this.mrw = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Copy);
                     this.mrw.Registrated += e.Registered;
-                    _ = this.mrw.ShowDialog();
-
-                    this.mrw = null;
-                    _ = this.Activate();
-                    _ = this._actionDataGrid.Focus();
+                    this.mrw.Closed += (sender, e) => {
+                        this.mrw = null;
+                        _ = this.Activate();
+                        _ = this._actionDataGrid.Focus();
+                    };
+                    this.mrw.Show();
                 };
                 this.WVM.CopyActionRequested += (sender, e) => {
                     this.arw = new(this, e.DbHandlerFactory, e.ActionId, RegistrationKind.Copy);
                     this.arw.Registrated += e.Registered;
-                    _ = this.arw.ShowDialog();
-
-                    this.arw = null;
-                    _ = this.Activate();
-                    _ = this._actionDataGrid.Focus();
+                    this.arw.Closed += (sender, e) => {
+                        this.arw = null;
+                        _ = this.Activate();
+                        _ = this._actionDataGrid.Focus();
+                    };
+                    this.arw.Show();
                 };
                 this.WVM.EditMoveRequested += (sender, e) => {
                     this.mrw = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Edit);
                     this.mrw.Registrated += e.Registered;
-                    _ = this.mrw.ShowDialog();
-
-                    this.mrw = null;
-                    _ = this.Activate();
-                    _ = this._actionDataGrid.Focus();
+                    this.mrw.Closed += (sender, e) => {
+                        this.mrw = null;
+                        _ = this.Activate();
+                        _ = this._actionDataGrid.Focus();
+                    };
+                    this.mrw.Show();
                 };
                 this.WVM.EditActionRequested += (sender, e) => {
                     this.arw = new(this, e.DbHandlerFactory, e.ActionId, RegistrationKind.Edit);
                     this.arw.Registrated += e.Registered;
-                    _ = this.arw.ShowDialog();
-
-                    this.arw = null;
-                    _ = this.Activate();
-                    _ = this._actionDataGrid.Focus();
+                    this.arw.Closed += (sender, e) => {
+                        this.arw = null;
+                        _ = this.Activate();
+                        _ = this._actionDataGrid.Focus();
+                    };
+                    this.arw.Show();
                 };
                 this.WVM.EditActionListRequested += (sender, e) => {
                     this.alrw = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Edit);
                     this.alrw.Registrated += e.Registered;
-                    _ = this.alrw.ShowDialog();
-
-                    this.alrw = null;
-                    _ = this.Activate();
-                    _ = this._actionDataGrid.Focus();
+                    this.alrw.Closed += (sender, e) => {
+                        this.alrw = null;
+                        _ = this.Activate();
+                        _ = this._actionDataGrid.Focus();
+                    };
+                    this.alrw.Show();
                 };
                 this.WVM.SelectTermRequested += (sender, e) => {
                     TermWindow stw = null;
