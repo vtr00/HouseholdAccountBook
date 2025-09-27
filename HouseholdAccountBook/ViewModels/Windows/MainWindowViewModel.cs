@@ -10,6 +10,7 @@ using HouseholdAccountBook.Models.Dto.Abstract;
 using HouseholdAccountBook.Models.Dto.DbTable;
 using HouseholdAccountBook.Models.Dto.KHDbTable;
 using HouseholdAccountBook.Models.Logger;
+using HouseholdAccountBook.Models.Services;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -1840,22 +1841,22 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             switch (this.SelectedTab) {
                 case Tabs.BooksTab:
-                    await this.BookTabVM.UpdateBookTabDataAsync(isScroll: isScroll, isUpdateActDateLastEdited: isUpdateActDateLastEdited);
+                    await this.BookTabVM.UpdateAsync(isScroll: isScroll, isUpdateActDateLastEdited: isUpdateActDateLastEdited);
                     break;
                 case Tabs.DailyGraphTab:
-                    await this.DailyGraphTabVM.UpdateGraphTabDataAsync();
+                    await this.DailyGraphTabVM.UpdateAsync();
                     break;
                 case Tabs.MonthlyListTab:
-                    await this.MonthlySummaryTabVM.UpdateListTabDataAsync();
+                    await this.MonthlySummaryTabVM.UpdateAsync();
                     break;
                 case Tabs.MonthlyGraphTab:
-                    await this.MonthlyGraphTabVM.UpdateGraphTabDataAsync();
+                    await this.MonthlyGraphTabVM.UpdateAsync();
                     break;
                 case Tabs.YearlyListTab:
-                    await this.YearlySummaryTabVM.UpdateListTabDataAsync();
+                    await this.YearlySummaryTabVM.UpdateAsync();
                     break;
                 case Tabs.YearlyGraphTab:
-                    await this.YearlyGraphTabVM.UpdateGraphTabDataAsync();
+                    await this.YearlyGraphTabVM.UpdateAsync();
                     break;
             }
         }
@@ -1866,34 +1867,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="bookId">選択対象の帳簿ID</param>
         public async Task UpdateBookListAsync(int? bookId = null)
         {
-            Log.Info($"bookId:{bookId}");
-
+            ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            Log.Info($"tmpBookId:{tmpBookId}");
-
-            ObservableCollection<BookViewModel> bookVMList = [
-                new BookViewModel() { Id = null, Name = Properties.Resources.ListName_AllBooks }
-            ];
-            BookViewModel selectedBookVM = bookVMList[0];
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                MstBookDao mstBookDao = new(dbHandler);
-                var dtoList = await mstBookDao.FindAllAsync();
-                foreach (var dto in dtoList) {
-                    MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
-
-                    if (DateTimeExtensions.IsWithIn(this.DisplayedStart, this.DisplayedEnd, jsonObj?.StartDate, jsonObj?.EndDate)) {
-                        BookViewModel vm = new() { Id = dto.BookId, Name = dto.BookName };
-                        bookVMList.Add(vm);
-
-                        if (vm.Id == tmpBookId) {
-                            selectedBookVM = vm;
-                            Log.Info($"select {selectedBookVM?.Id}");
-                        }
-                    }
-                }
-            }
-
-            this.SelectedBookVM = selectedBookVM; // 先に選択しておく
+            var bookVMList = await loader.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedStart, this.DisplayedEnd);
+            this.SelectedBookVM = bookVMList.FirstOrDefault(vm => vm.Id == tmpBookId, bookVMList.ElementAtOrDefault(0));
             this.BookVMList = bookVMList;
         }
 

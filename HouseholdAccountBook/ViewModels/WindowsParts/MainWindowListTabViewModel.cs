@@ -71,7 +71,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="itemId">項目ID</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task UpdateListTabDataAsync(int? balanceKind = null, int? categoryId = null, int? itemId = null)
+        public async Task UpdateAsync(int? balanceKind = null, int? categoryId = null, int? itemId = null)
         {
             if (this.Parent.SelectedTab != this.Tab) return;
 

@@ -1,16 +1,22 @@
 ﻿using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Models.Dao.Compositions;
+using HouseholdAccountBook.Models.Dao.DbTable;
 using HouseholdAccountBook.Models.DbHandler;
 using HouseholdAccountBook.Models.DbHandler.Abstract;
+using HouseholdAccountBook.Models.Dto.DbTable;
 using HouseholdAccountBook.Models.Dto.Others;
 using HouseholdAccountBook.Models.Logger;
 using HouseholdAccountBook.ViewModels.Component;
+using HouseholdAccountBook.ViewModels.Settings;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using static HouseholdAccountBook.Extensions.EncodingExtensions;
+using static HouseholdAccountBook.ViewModels.Settings.HierarchicalSettingViewModel;
 using static HouseholdAccountBook.Views.UiConstants;
 
 namespace HouseholdAccountBook.Models.Services
@@ -21,6 +27,155 @@ namespace HouseholdAccountBook.Models.Services
     public class ViewModelLoader(DbHandlerFactory dbHandlerFactory)
     {
         private DbHandlerFactory DbHandlerFactory { get; } = dbHandlerFactory;
+
+        #region RegistrationWindow
+        /// <summary>
+        /// 帳簿リストを取得する
+        /// </summary>
+        /// <param name="initialName">1番目に追加する項目の名称(空文字の場合は追加しない)</param>
+        /// <param name="start">開始日</param>
+        /// <param name="end">終了日</param>
+        public async Task<ObservableCollection<BookViewModel>> LoadBookListAsync(string initialName = "", DateTime? start = null, DateTime? end = null)
+        {
+            ObservableCollection<BookViewModel> bookVMList = [];
+
+            // 1番目に表示する項目を追加する
+            if (initialName != string.Empty) {
+                bookVMList.Add(new BookViewModel() { Id = null, Name = initialName });
+            }
+
+            await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
+                MstBookDao mstBookDao = new(dbHandler);
+                var dtoList = await mstBookDao.FindAllAsync();
+                foreach (var dto in dtoList) {
+                    MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
+
+                    if (DateTimeExtensions.IsWithIn(start, end, jsonObj?.StartDate, jsonObj?.EndDate)) {
+                        BookViewModel vm = new() {
+                            Id = dto.BookId,
+                            Name = dto.BookName,
+                            BookKind = (BookKind)dto.BookKind,
+                            DebitBookId = dto.DebitBookId,
+                            PayDay = dto.PayDay
+                        };
+                        bookVMList.Add(vm);
+                    }
+                }
+            }
+
+            return bookVMList;
+        }
+
+        /// <summary>
+        /// 分類リストを取得する
+        /// </summary>
+        /// <param name="bookId">絞り込み対象の帳簿ID</param>
+        /// <param name="balanceKind">絞り込み対象の収支種別</param>
+        /// <returns></returns>
+        public async Task<ObservableCollection<CategoryViewModel>> LoadCategoryListAsync(int bookId, BalanceKind balanceKind)
+        {
+            ObservableCollection<CategoryViewModel> categoryVMList = [
+                new CategoryViewModel() { Id = -1, Name = Properties.Resources.ListName_NoSpecification }
+            ];
+
+            await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
+                MstCategoryWithinBookDao mstCategoryWithinBookDao = new(dbHandler);
+                var dtoList = await mstCategoryWithinBookDao.FindByBookIdAndBalanceKindAsync(bookId, (int)balanceKind);
+                foreach (MstCategoryDto dto in dtoList) {
+                    CategoryViewModel vm = new() {
+                        Id = dto.CategoryId,
+                        Name = dto.CategoryName
+                    };
+                    categoryVMList.Add(vm);
+                }
+            }
+
+            return categoryVMList;
+        }
+
+        /// <summary>
+        /// 項目リストを取得する
+        /// </summary>
+        /// <param name="bookId">絞り込み対象の帳簿ID</param>
+        /// <param name="balanceKind">絞り込み対象の収支種別</param>
+        /// <param name="categoryId">絞り込み対象の分類ID</param>
+        /// <returns></returns>
+        public async Task<ObservableCollection<ItemViewModel>> LoadItemListAsync(int bookId, BalanceKind balanceKind, int categoryId)
+        {
+            ObservableCollection<ItemViewModel> itemVMList = [];
+
+            await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
+                CategoryItemInfoDao categoryItemInfoDao = new(dbHandler);
+                var dtoList = categoryId == -1
+                    ? await categoryItemInfoDao.FindByBookIdAndBalanceKindAsync(bookId, (int)balanceKind)
+                    : await categoryItemInfoDao.FindByBookIdAndCategoryIdAsync(bookId, categoryId);
+                foreach (CategoryItemInfoDto dto in dtoList) {
+                    ItemViewModel vm = new() {
+                        Id = dto.ItemId,
+                        Name = dto.ItemName,
+                        CategoryName = categoryId == -1 ? dto.CategoryName : ""
+                    };
+                    itemVMList.Add(vm);
+                }
+            }
+
+            return itemVMList;
+        }
+
+        /// <summary>
+        /// 店舗リストを取得する
+        /// </summary>
+        /// <param name="itemId">絞り込み対象の項目ID</param>
+        /// <returns></returns>
+        public async Task<ObservableCollection<ShopViewModel>> LoadShopListAsync(int itemId)
+        {
+            ObservableCollection<ShopViewModel> shopNameVMList = [
+                new ShopViewModel() { Name = string.Empty }
+            ];
+
+            await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
+                ShopInfoDao shopInfoDao = new(dbHandler);
+                var dtoList = await shopInfoDao.FindByItemIdAsync(itemId);
+                foreach (ShopInfoDto dto in dtoList) {
+                    ShopViewModel vm = new() {
+                        Name = dto.ShopName,
+                        UsedCount = dto.Count,
+                        UsedTime = dto.UsedTime
+                    };
+                    shopNameVMList.Add(vm);
+                }
+            }
+
+            return shopNameVMList;
+        }
+
+        /// <summary>
+        /// 備考リストを取得する
+        /// </summary>
+        /// <param name="itemId">絞り込み対象の項目ID</param>
+        /// <returns></returns>
+        public async Task<ObservableCollection<RemarkViewModel>> LoadRemarkListAsync(int itemId)
+        {
+            ObservableCollection<RemarkViewModel> remarkVMList = [
+                    new RemarkViewModel() { Remark = string.Empty }
+            ];
+
+            await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
+                RemarkInfoDao remarkInfoDao = new(dbHandler);
+                var dtoList = await remarkInfoDao.FindByItemIdAsync(itemId);
+                foreach (RemarkInfoDto dto in dtoList) {
+                    RemarkViewModel vm = new() {
+                        Remark = dto.Remark,
+                        UsedCount = dto.Count,
+                        UsedTime = dto.UsedTime
+                    };
+                    remarkVMList.Add(vm);
+                }
+            }
+
+            return remarkVMList;
+        }
+        #endregion
 
         #region MainWindow
         /// <summary>
@@ -491,6 +646,300 @@ namespace HouseholdAccountBook.Models.Services
             }
 
             return vmList;
+        }
+        #endregion
+
+        /// <summary>
+        /// 帳簿VM(比較用)を取得する
+        /// </summary>
+        public async Task<ObservableCollection<BookComparisonViewModel>> UpdateBookCompListAsync()
+        {
+            ObservableCollection<BookComparisonViewModel> bookCompVMList = [];
+
+            await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
+                MstBookDao mstBookDao = new(dbHandler);
+                var dtoList = await mstBookDao.FindIfJsonCodeExistsAsync();
+                foreach (MstBookDto dto in dtoList) {
+                    MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
+                    if (jsonObj is null) continue;
+
+                    BookComparisonViewModel vm = new() {
+                        Id = dto.BookId,
+                        Name = dto.BookName,
+                        CsvFolderPath = jsonObj.CsvFolderPath == string.Empty ? null : jsonObj.CsvFolderPath,
+                        TextEncoding = jsonObj.TextEncoding,
+                        ActDateIndex = jsonObj.CsvActDateIndex + 1,
+                        ExpensesIndex = jsonObj.CsvOutgoIndex + 1,
+                        ItemNameIndex = jsonObj.CsvItemNameIndex + 1
+                    };
+                    if (vm.CsvFolderPath == null || vm.ActDateIndex == null || vm.ExpensesIndex == null || vm.ItemNameIndex == null) continue;
+
+                    bookCompVMList.Add(vm);
+                }
+            }
+
+            return bookCompVMList;
+        }
+
+        #region SettingsWindow
+        /// <summary>
+        /// 帳簿設定VMを取得する
+        /// </summary>
+        /// <param name="bookId">表示対象の帳簿ID</param>
+        /// <returns>帳簿設定VM</returns>
+        public async Task<BookSettingViewModel> LoadBookSettingViewModelAsync(int bookId)
+        {
+            BookSettingViewModel vm = null;
+
+            ViewModelLoader loader = new(this.DbHandlerFactory);
+            ObservableCollection<BookViewModel> vmList = await loader.LoadBookListAsync(Properties.Resources.ListName_None);
+
+            await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
+                // 帳簿一覧を取得する
+                BookInfoDao bookInfoDao = new(dbHandler);
+                var dto = await bookInfoDao.FindByBookId(bookId);
+
+                MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
+
+                vm = new BookSettingViewModel() {
+                    Id = bookId,
+                    SortOrder = dto.SortOrder,
+                    Name = dto.BookName,
+                    SelectedBookKind = (BookKind)dto.BookKind,
+                    InitialValue = dto.InitialValue,
+                    StartDateExists = jsonObj?.StartDate != null,
+                    StartDate = jsonObj?.StartDate ?? dto.StartDate ?? DateTime.Today,
+                    EndDateExists = jsonObj?.EndDate != null,
+                    EndDate = jsonObj?.EndDate ?? dto.EndDate ?? DateTime.Today,
+                    DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((tmpVM) => { return tmpVM.Id != bookId; })),
+                    PayDay = dto.PayDay,
+                    CsvFolderPath = jsonObj is null ? "" : PathExtensions.GetSmartPath(App.GetCurrentDir(), jsonObj.CsvFolderPath),
+                    TextEncodingList = GetTextEncodingList(),
+                    SelectedTextEncoding = jsonObj?.TextEncoding ?? Encoding.UTF8.CodePage,
+                    ActDateIndex = jsonObj?.CsvActDateIndex + 1,
+                    ExpensesIndex = jsonObj?.CsvOutgoIndex + 1,
+                    ItemNameIndex = jsonObj?.CsvItemNameIndex + 1,
+                    RelationVMList = await LoadRelationViewModelListFromBookIdAsync(dbHandler, bookId)
+                };
+                vm.SelectedDebitBookVM = vm.DebitBookVMList.FirstOrDefault((tmpVM) => { return tmpVM.Id == dto.DebitBookId; }) ?? vm.DebitBookVMList[0];
+            }
+
+            return vm;
+        }
+
+        /// <summary>
+        /// 関連VMリスト(帳簿主体)を取得する
+        /// </summary>
+        /// <param name="dbHandler">DBハンドラ</param>
+        /// <param name="bookId">帳簿ID</param>
+        /// <returns>関連VMリスト</returns>
+        private static async Task<ObservableCollection<RelationViewModel>> LoadRelationViewModelListFromBookIdAsync(DbHandlerBase dbHandler, int bookId)
+        {
+            ItemRelFromBookInfoDao itemRelFromBookInfoDao = new(dbHandler);
+            var dtoList = await itemRelFromBookInfoDao.FindByBookIdAsync(bookId);
+
+            ObservableCollection<RelationViewModel> rvmList = [];
+            foreach (ItemRelFromBookInfoDto dto in dtoList) {
+                RelationViewModel rvm = new() {
+                    Id = dto.ItemId,
+                    Name = $"{BalanceKindStr[(BalanceKind)dto.BalanceKind]} > {dto.CategoryName} > {dto.ItemName}",
+                    IsRelated = dto.IsRelated
+                };
+                rvmList.Add(rvm);
+            }
+            return rvmList;
+        }
+
+        /// <summary>
+        /// 階層構造項目VMリストを取得する
+        /// </summary>
+        /// <returns>階層構造項目VMリスト</returns>
+        public async Task<ObservableCollection<HierarchicalViewModel>> LoadHierarchicalViewModelListAsync()
+        {
+            Log.Info();
+
+            ObservableCollection<HierarchicalViewModel> vmList = [
+                new () {
+                    Depth = (int)HierarchicalKind.Balance,
+                    Id = (int)BalanceKind.Income,
+                    SortOrder = -1,
+                    Name = Properties.Resources.BalanceKind_Income,
+                    ParentVM = null,
+                    ChildrenVMList = []
+                },
+                new () {
+                    Depth = (int)HierarchicalKind.Balance,
+                    Id = (int)BalanceKind.Expenses,
+                    SortOrder = -1,
+                    Name = Properties.Resources.BalanceKind_Expenses,
+                    ParentVM = null,
+                    ChildrenVMList = []
+                }
+            ];
+
+            await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
+                foreach (HierarchicalViewModel vm in vmList) {
+                    // 分類
+                    MstCategoryDao mstCategoryDao = new(dbHandler);
+                    var cDtoList = await mstCategoryDao.FindByBalanceKindAsync(vm.Id);
+
+                    foreach (MstCategoryDto dto in cDtoList) {
+                        vm.ChildrenVMList.Add(new HierarchicalViewModel() {
+                            Depth = (int)HierarchicalKind.Category,
+                            Id = dto.CategoryId,
+                            SortOrder = dto.SortOrder,
+                            Name = dto.CategoryName,
+                            ParentVM = vm,
+                            ChildrenVMList = []
+                        });
+                    }
+
+                    // 項目
+                    MstItemDao mstItemDao = new(dbHandler);
+                    foreach (HierarchicalViewModel categoryVM in vm.ChildrenVMList) {
+                        var iDtoList = await mstItemDao.FindByCategoryIdAsync(categoryVM.Id);
+
+                        foreach (MstItemDto dto in iDtoList) {
+                            categoryVM.ChildrenVMList.Add(new HierarchicalViewModel() {
+                                Depth = (int)HierarchicalKind.Item,
+                                Id = dto.ItemId,
+                                SortOrder = dto.SortOrder,
+                                Name = dto.ItemName,
+                                ParentVM = categoryVM
+                            });
+                        }
+                    }
+                }
+            }
+
+            return vmList;
+        }
+
+        /// <summary>
+        /// 階層構造設定VMを取得する
+        /// </summary>
+        /// <param name="kind">表示対象の階層種別</param>
+        /// <param name="id">表示対象のID</param>
+        /// <returns>階層構造設定VM</returns>
+        public async Task<HierarchicalSettingViewModel> LoadHierarchicalSettingViewModelAsync(HierarchicalKind kind, int id)
+        {
+            HierarchicalSettingViewModel vm = null;
+
+            switch (kind) {
+                case HierarchicalKind.Balance: {
+                    vm = new HierarchicalSettingViewModel() {
+                        Kind = HierarchicalKind.Balance,
+                        Id = -1,
+                        SortOrder = -1,
+                        Name = string.Empty
+                    };
+                    break;
+                }
+                case HierarchicalKind.Category: {
+                    // 分類
+                    await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
+                        MstCategoryDao mstCategoryDao = new(dbHandler);
+                        var dto = await mstCategoryDao.FindByIdAsync(id);
+
+                        vm = new HierarchicalSettingViewModel() {
+                            Kind = HierarchicalKind.Category,
+                            Id = id,
+                            SortOrder = dto.SortOrder,
+                            Name = dto.CategoryName
+                        };
+                    }
+                    break;
+                }
+                case HierarchicalKind.Item: {
+                    // 項目
+                    await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
+                        MstItemDao mstItemDao = new(dbHandler);
+                        var dto = await mstItemDao.FindByIdAsync(id);
+
+                        vm = new HierarchicalSettingViewModel {
+                            Kind = HierarchicalKind.Item,
+                            Id = id,
+                            SortOrder = dto.SortOrder,
+                            Name = dto.ItemName,
+                            RelationVMList = await LoadRelationViewModelListAsync(dbHandler, id),
+                            ShopVMList = await LoadShopViewModelListAsync(dbHandler, id),
+                            RemarkVMList = await LoadRemarkViewModelListAsync(dbHandler, id)
+                        };
+                    }
+                    break;
+                }
+            }
+
+            return vm;
+        }
+
+        /// <summary>
+        /// 関連VMリスト(項目主体)を取得する
+        /// </summary>
+        /// <param name="dbHandler">DBハンドラ</param>
+        /// <param name="itemId">項目ID</param>
+        /// <returns>関連VMリスト</returns>
+        private static async Task<ObservableCollection<RelationViewModel>> LoadRelationViewModelListAsync(DbHandlerBase dbHandler, int itemId)
+        {
+            BookRelFromItemInfoDao bookRelFromItemInfoDao = new(dbHandler);
+            var dtoList = await bookRelFromItemInfoDao.FindByItemIdAsync(itemId);
+
+            ObservableCollection<RelationViewModel> rvmList = [];
+            foreach (BookRelFromItemInfoDto dto in dtoList) {
+                RelationViewModel rvm = new() {
+                    Id = dto.BookId,
+                    Name = dto.BookName,
+                    IsRelated = dto.IsRelated
+                };
+                rvmList.Add(rvm);
+            }
+            return rvmList;
+        }
+
+        /// <summary>
+        /// 店舗VMリストを取得する
+        /// </summary>
+        /// <param name="dbHandler">DBハンドラ</param>
+        /// <param name="itemId">項目ID</param>
+        /// <returns>店舗VMリスト</returns>
+        private static async Task<ObservableCollection<ShopViewModel>> LoadShopViewModelListAsync(DbHandlerBase dbHandler, int itemId)
+        {
+            ObservableCollection<ShopViewModel> svmList = [];
+            ShopInfoDao shopInfoDao = new(dbHandler);
+            var dtoList = await shopInfoDao.FindByItemIdAsync(itemId);
+
+            foreach (ShopInfoDto dto in dtoList) {
+                ShopViewModel svm = new() {
+                    Name = dto.ShopName,
+                    UsedCount = dto.Count,
+                    UsedTime = dto.UsedTime
+                };
+                svmList.Add(svm);
+            }
+            return svmList;
+        }
+
+        /// <summary>
+        /// 備考VMリストを取得する
+        /// </summary>
+        /// <param name="dbHandler">DBハンドラ</param>
+        /// <param name="itemId">項目ID</param>
+        /// <returns>備考VMリスト</returns>
+        private static async Task<ObservableCollection<RemarkViewModel>> LoadRemarkViewModelListAsync(DbHandlerBase dbHandler, int itemId)
+        {
+            ObservableCollection<RemarkViewModel> rvmList = [];
+            RemarkInfoDao remarkInfoDao = new(dbHandler);
+            var dtoList = await remarkInfoDao.FindByItemIdAsync(itemId);
+
+            foreach (RemarkInfoDto dto in dtoList) {
+                RemarkViewModel rvm = new() {
+                    Remark = dto.Remark,
+                    UsedCount = dto.Count,
+                    UsedTime = dto.UsedTime
+                };
+                rvmList.Add(rvm);
+            }
+            return rvmList;
         }
         #endregion
     }

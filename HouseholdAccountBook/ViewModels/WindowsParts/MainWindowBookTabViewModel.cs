@@ -506,7 +506,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
 
             this.FindText = string.Empty; // 検索をクリアしておく
-            await this.UpdateBookTabDataAsync(actionIdList);
+            await this.UpdateAsync(actionIdList);
         }
 
         /// <summary>
@@ -532,7 +532,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Date = this.SelectedActionVM?.ActTime,
                 Registered = async (sender, e2) => {
                     // 帳簿一覧タブを更新する
-                    await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
+                    await this.UpdateAsync(e2.Value, isUpdateActDateLastEdited: true);
                 }
             };
             this.AddMoveRequested?.Invoke(this, e);
@@ -561,7 +561,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Date = this.SelectedActionVM?.ActTime,
                 Registered = async (sender, e2) => {
                     // 帳簿一覧タブを更新する
-                    await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
+                    await this.UpdateAsync(e2.Value, isUpdateActDateLastEdited: true);
                 }
             };
             this.AddActionRequested?.Invoke(this, e);
@@ -590,7 +590,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Date = this.SelectedActionVM?.ActTime,
                 Registered = async (sender, e2) => {
                     // 帳簿一覧タブを更新する
-                    await this.UpdateBookTabDataAsync(e2.Value, isUpdateActDateLastEdited: true);
+                    await this.UpdateAsync(e2.Value, isUpdateActDateLastEdited: true);
                 }
             };
             this.AddActionListRequested?.Invoke(this, e);
@@ -628,7 +628,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     ActionId = this.SelectedActionVM.ActionId,
                     Registered = async (sender, e) => {
                         // 帳簿一覧タブを更新する
-                        await this.UpdateBookTabDataAsync(e.Value, isUpdateActDateLastEdited: true);
+                        await this.UpdateAsync(e.Value, isUpdateActDateLastEdited: true);
                     }
                 };
                 this.CopyActionRequested?.Invoke(this, e);
@@ -640,7 +640,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     GroupId = this.SelectedActionVM.GroupId.Value,
                     Registered = async (sender, e) => {
                         // 帳簿一覧タブを更新する
-                        await this.UpdateBookTabDataAsync(e.Value, isUpdateActDateLastEdited: true);
+                        await this.UpdateAsync(e.Value, isUpdateActDateLastEdited: true);
                     }
                 };
                 this.CopyMoveRequested?.Invoke(this, e);
@@ -680,7 +680,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         GroupId = this.SelectedActionVM.GroupId.Value,
                         Registered = async (sender, e) => {
                             // 帳簿一覧タブを更新する
-                            await this.UpdateBookTabDataAsync(e.Value, isUpdateActDateLastEdited: true);
+                            await this.UpdateAsync(e.Value, isUpdateActDateLastEdited: true);
                         }
                     };
                     this.EditMoveRequested?.Invoke(this, e);
@@ -693,7 +693,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         GroupId = this.SelectedActionVM.GroupId.Value,
                         Registered = async (sender, e) => {
                             // 帳簿一覧タブを更新する
-                            await this.UpdateBookTabDataAsync(e.Value, isUpdateActDateLastEdited: true);
+                            await this.UpdateAsync(e.Value, isUpdateActDateLastEdited: true);
                         }
                     };
                     this.EditActionListRequested?.Invoke(this, e);
@@ -707,7 +707,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         ActionId = this.SelectedActionVM.ActionId,
                         Registered = async (sender, e) => {
                             // 帳簿一覧タブを更新する
-                            await this.UpdateBookTabDataAsync(e.Value, isUpdateActDateLastEdited: true);
+                            await this.UpdateAsync(e.Value, isUpdateActDateLastEdited: true);
                         }
                     };
                     this.EditActionRequested?.Invoke(this, e);
@@ -787,7 +787,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
 
                 // 帳簿一覧タブを更新する
-                await this.UpdateBookTabDataAsync(isUpdateActDateLastEdited: true);
+                await this.UpdateAsync(isUpdateActDateLastEdited: true);
             }
         }
 
@@ -883,9 +883,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             };
         }
 
-        #region 帳簿タブ更新用の関数
         /// <summary>
-        /// 帳簿タブに表示するデータを更新する
+        /// 帳簿タブを更新する
         /// </summary>
         /// <param name="actionIdList">選択対象の帳簿項目IDリスト</param>
         /// <param name="balanceKind">選択対象の収支種別</param>
@@ -893,8 +892,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="itemId">選択対象の項目ID</param>
         /// <param name="isScroll">帳簿項目一覧をスクロールするか</param>
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
-        public async Task UpdateBookTabDataAsync(List<int> actionIdList = null, int? balanceKind = null, int? categoryId = null, int? itemId = null,
-                                                  bool isScroll = false, bool isUpdateActDateLastEdited = false)
+        public async Task UpdateAsync(List<int> actionIdList = null, int? balanceKind = null, int? categoryId = null, int? itemId = null,
+                                      bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
             if (this.Parent.SelectedTab != Tabs.BooksTab) return;
 
@@ -960,6 +959,5 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
             }
         }
-        #endregion
     }
 }

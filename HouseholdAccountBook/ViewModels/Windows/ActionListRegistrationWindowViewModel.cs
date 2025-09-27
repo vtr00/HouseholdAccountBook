@@ -1,9 +1,8 @@
 ﻿using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Models.Dao.Compositions;
 using HouseholdAccountBook.Models.Dao.DbTable;
 using HouseholdAccountBook.Models.DbHandler.Abstract;
 using HouseholdAccountBook.Models.Dto.DbTable;
-using HouseholdAccountBook.Models.Dto.Others;
+using HouseholdAccountBook.Models.Services;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
@@ -54,7 +53,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public event EventHandler<EventArgs<List<int>>> Registrated;
         #endregion
 
-        #region プロパティ
+        #region Bindingプロパティ
         /// <summary>
         /// 登録種別
         /// </summary>
@@ -347,22 +346,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateBookListAsync(int? bookId = null)
         {
-            ObservableCollection<BookViewModel> bookVMList = [];
-            BookViewModel selectedBookVM = null;
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                MstBookDao mstBookDao = new(dbHandler);
-                var dtoList = await mstBookDao.FindAllAsync();
-                foreach (MstBookDto dto in dtoList) {
-                    BookViewModel vm = new() { Id = dto.BookId, Name = dto.BookName };
-                    bookVMList.Add(vm);
-                    if (selectedBookVM == null || bookId == vm.Id) {
-                        selectedBookVM = vm;
-                    }
-                }
-            }
-
+            ViewModelLoader loader = new(this.dbHandlerFactory);
+            int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
+            var bookVMList = await loader.LoadBookListAsync();
+            this.SelectedBookVM = bookVMList.FirstOrDefault(vm => vm.Id == tmpBookId, bookVMList.ElementAtOrDefault(0));
             this.BookVMList = bookVMList;
-            this.SelectedBookVM = selectedBookVM;
         }
 
         /// <summary>
@@ -372,25 +360,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateCategoryListAsync(int? categoryId = null)
         {
-            ObservableCollection<CategoryViewModel> categoryVMList = [
-                new CategoryViewModel() { Id = -1, Name = Properties.Resources.ListName_NoSpecification }
-            ];
-            int? tmpCategoryId = categoryId ?? this.SelectedCategoryVM?.Id ?? categoryVMList[0].Id;
-            CategoryViewModel selectedCategoryVM = categoryVMList[0];
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                MstCategoryWithinBookDao mstCategoryWithinBookDao = new(dbHandler);
-                var dtoList = await mstCategoryWithinBookDao.FindByBookIdAndBalanceKindAsync(this.SelectedBookVM.Id.Value, (int)this.SelectedBalanceKind);
-                foreach (MstCategoryDto dto in dtoList) {
-                    CategoryViewModel vm = new() { Id = dto.CategoryId, Name = dto.CategoryName };
-                    categoryVMList.Add(vm);
-                    if (vm.Id == tmpCategoryId) {
-                        selectedCategoryVM = vm;
-                    }
-                }
-            }
-
+            ViewModelLoader loader = new(this.dbHandlerFactory);
+            int? tmpCategoryId = categoryId ?? this.SelectedCategoryVM?.Id;
+            var categoryVMList = await loader.LoadCategoryListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind);
+            this.SelectedCategoryVM = categoryVMList.FirstOrDefault(vm => vm.Id == tmpCategoryId, categoryVMList.ElementAtOrDefault(0));
             this.CategoryVMList = categoryVMList;
-            this.SelectedCategoryVM = selectedCategoryVM;
         }
 
         /// <summary>
@@ -400,31 +374,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateItemListAsync(int? itemId = null)
         {
-            if (this.SelectedCategoryVM == null) return;
-
-            ObservableCollection<ItemViewModel> itemVMList = [];
+            ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpItemId = itemId ?? this.SelectedItemVM?.Id;
-            ItemViewModel selectedItemVM = null;
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                CategoryItemInfoDao categoryItemInfoDao = new(dbHandler);
-                var dtoList = this.SelectedCategoryVM.Id == -1
-                    ? await categoryItemInfoDao.FindByBookIdAndBalanceKindAsync(this.SelectedBookVM.Id.Value, (int)this.SelectedBalanceKind)
-                    : await categoryItemInfoDao.FindByBookIdAndCategoryIdAsync(this.SelectedBookVM.Id.Value, this.SelectedCategoryVM.Id);
-                foreach (CategoryItemInfoDto dto in dtoList) {
-                    ItemViewModel vm = new() {
-                        Id = dto.ItemId,
-                        Name = dto.ItemName,
-                        CategoryName = this.SelectedCategoryVM.Id == -1 ? dto.CategoryName : ""
-                    };
-                    itemVMList.Add(vm);
-                    if (selectedItemVM == null || vm.Id == tmpItemId) {
-                        selectedItemVM = vm;
-                    }
-                }
-            }
-
+            var itemVMList = await loader.LoadItemListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind, this.SelectedCategoryVM.Id);
+            this.SelectedItemVM = itemVMList.FirstOrDefault(vm => vm.Id == tmpItemId, itemVMList.ElementAtOrDefault(0));
             this.ItemVMList = itemVMList;
-            this.SelectedItemVM = selectedItemVM;
         }
 
         /// <summary>
@@ -434,31 +388,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateShopListAsync(string shopName = null)
         {
-            if (this.SelectedItemVM == null) return;
-
-            ObservableCollection<ShopViewModel> shopVMList = [
-                new ShopViewModel() { Name = string.Empty }
-            ];
-            string selectedShopName = shopName ?? this.SelectedShopName ?? shopVMList[0].Name;
-            ShopViewModel selectedShopVM = shopVMList[0]; // UNUSED
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                ShopInfoDao shopInfoDao = new(dbHandler);
-                var dtoList = await shopInfoDao.FindByItemIdAsync(this.SelectedItemVM.Id);
-                foreach (ShopInfoDto dto in dtoList) {
-                    ShopViewModel svm = new() {
-                        Name = dto.ShopName,
-                        UsedCount = dto.Count,
-                        UsedTime = dto.UsedTime
-                    };
-                    shopVMList.Add(svm);
-                    if (selectedShopVM == null || svm.Name == selectedShopName) {
-                        selectedShopVM = svm;
-                    }
-                }
-            }
-
+            ViewModelLoader loader = new(this.dbHandlerFactory);
+            string tmpShopName = shopName ?? this.SelectedShopName;
+            var shopVMList = await loader.LoadShopListAsync(this.SelectedItemVM.Id);
+            this.SelectedShopName = shopVMList.FirstOrDefault(vm => vm.Name == tmpShopName, shopVMList.ElementAtOrDefault(0)).Name;
             this.ShopVMList = shopVMList;
-            this.SelectedShopName = selectedShopName;
         }
 
         /// <summary>
@@ -468,31 +402,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateRemarkListAsync(string remark = null)
         {
-            if (this.SelectedItemVM == null) return;
-
-            ObservableCollection<RemarkViewModel> remarkVMList = [
-                new RemarkViewModel() { Remark = string.Empty }
-            ];
-            string selectedRemark = remark ?? this.SelectedRemark ?? remarkVMList[0].Remark;
-            RemarkViewModel selectedRemarkVM = remarkVMList[0]; // UNUSED
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                RemarkInfoDao remarkInfoDao = new(dbHandler);
-                var dtoList = await remarkInfoDao.FindByItemIdAsync(this.SelectedItemVM.Id);
-                foreach (RemarkInfoDto dto in dtoList) {
-                    RemarkViewModel rvm = new() {
-                        Remark = dto.Remark,
-                        UsedCount = dto.Count,
-                        UsedTime = dto.UsedTime
-                    };
-                    remarkVMList.Add(rvm);
-                    if (selectedRemarkVM == null || rvm.Remark == selectedRemark) {
-                        selectedRemarkVM = rvm;
-                    }
-                }
-            }
-
+            ViewModelLoader loader = new(this.dbHandlerFactory);
+            string tmpRemark = remark ?? this.SelectedRemark;
+            var remarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
+            this.SelectedRemark = remarkVMList.FirstOrDefault(vm => vm.Remark == tmpRemark, remarkVMList.ElementAtOrDefault(0)).Remark;
             this.RemarkVMList = remarkVMList;
-            this.SelectedRemark = selectedRemark;
         }
 
         public override async Task LoadAsync()

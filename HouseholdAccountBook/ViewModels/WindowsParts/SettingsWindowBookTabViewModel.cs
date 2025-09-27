@@ -1,28 +1,21 @@
-﻿using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Models.Dao.Compositions;
+﻿using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Models.Dao.DbTable;
-using HouseholdAccountBook.Models.DbHandler;
 using HouseholdAccountBook.Models.DbHandler.Abstract;
 using HouseholdAccountBook.Models.Dto.DbTable;
-using HouseholdAccountBook.Models.Dto.Others;
 using HouseholdAccountBook.Models.Logger;
+using HouseholdAccountBook.Models.Services;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using static HouseholdAccountBook.Extensions.EncodingExtensions;
-using static HouseholdAccountBook.Views.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
 {
@@ -267,7 +260,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         BookName = vm.Name,
                         BookKind = (int)vm.SelectedBookKind,
                         InitialValue = vm.InitialValue,
-                        DebitBookId = vm.SelectedDebitBookVM.Id == -1 ? null : vm.SelectedDebitBookVM.Id,
+                        DebitBookId = vm.SelectedDebitBookVM.Id,
                         PayDay = vm.PayDay,
                         JsonCode = jsonCode,
                         BookId = vm.Id.Value
@@ -338,25 +331,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
-        /// <summary>
-        /// ViewModelの初期化を行う
-        /// </summary>
-        /// <param name="waitCursorManagerFactory">WaitCursorマネージャファクトリ</param>
-        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
-        {
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-
-            this.SelectedBookVMChanged += async (sender, e) => {
-                if (e.Value != null) {
-                    await this.UpdateBookSettingTabInputDataAsync(e.Value.Id.Value);
-                }
-                else {
-                    this.DisplayedBookSettingVM = null;
-                }
-            };
-        }
-
         public override async Task LoadAsync()
         {
             await this.LoadAsync(null);
@@ -375,131 +349,35 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 return;
             }
 
-            // 指定がなければ現在選択中の項目を再選択する
-            if (this.SelectedBookVM != null && bookId == null) {
-                bookId = this.SelectedBookVM.Id;
-            }
+            await this.UpdateBookListAsync(bookId);
 
-            this.BookVMList = await LoadBookViewModelListAsync(this.dbHandlerFactory);
-
-            // 選択する項目を探す
-            BookViewModel selectedVM = null;
-            if (bookId != null) {
-                IEnumerable<BookViewModel> query = this.BookVMList.Where((vm) => { return vm.Id == bookId; });
-                selectedVM = query.Any() ? query.First() : null;
-            }
-
-            // 何も選択されていないなら1番上の項目を選択する
-            if (selectedVM == null && this.BookVMList.Count != 0) {
-                selectedVM = this.BookVMList[0];
-            }
-            this.SelectedBookVM = selectedVM;
+            this.AddEventHandlers();
         }
 
-        /// <summary>
-        /// 帳簿VMリストを取得する
-        /// </summary>
-        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <returns>帳簿VMリスト</returns>
-        private static async Task<ObservableCollection<BookViewModel>> LoadBookViewModelListAsync(DbHandlerFactory dbHandlerFactory)
+        protected override void AddEventHandlers()
         {
-            Log.Info();
-
-            ObservableCollection<BookViewModel> bookVMList = [];
-
-            await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
-                // 帳簿一覧を取得する
-                MstBookDao mstBookDao = new(dbHandler);
-                var dtoList = await mstBookDao.FindAllAsync();
-                foreach (MstBookDto dto in dtoList) {
-                    bookVMList.Add(new BookViewModel() {
-                        Id = dto.BookId,
-                        Name = dto.BookName
-                    });
+            this.SelectedBookVMChanged += async (sender, e) => {
+                if (e.Value != null) {
+                    ViewModelLoader loader = new(this.dbHandlerFactory);
+                    this.DisplayedBookSettingVM = await loader.LoadBookSettingViewModelAsync(e.Value.Id.Value);
                 }
-            }
-
-            return bookVMList;
-        }
-
-        /// <summary>
-        /// 帳簿設定タブの入力欄に表示するデータを更新する
-        /// </summary>
-        /// <param name="bookId">表示対象の帳簿ID</param>
-        /// <returns></returns>
-        private async Task UpdateBookSettingTabInputDataAsync(int bookId)
-        {
-            BookSettingViewModel vm = null;
-
-            ObservableCollection<BookViewModel> vmList = [
-                new BookViewModel(){ Id = -1, Name = Properties.Resources.ListName_None }
-            ];
-
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                // 帳簿一覧を取得する(支払元選択用)
-                MstBookDao mstBookDao = new(dbHandler);
-                var dtoList = await mstBookDao.FindAllAsync();
-                foreach (MstBookDto tmpDto in dtoList) {
-                    vmList.Add(new BookViewModel() {
-                        Id = tmpDto.BookId,
-                        Name = tmpDto.BookName
-                    });
+                else {
+                    this.DisplayedBookSettingVM = null;
                 }
-
-                // 帳簿一覧を取得する
-                BookInfoDao bookInfoDao = new(dbHandler);
-                var dto = await bookInfoDao.FindByBookId(bookId);
-
-                MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
-
-                vm = new BookSettingViewModel() {
-                    Id = bookId,
-                    SortOrder = dto.SortOrder,
-                    Name = dto.BookName,
-                    SelectedBookKind = (BookKind)dto.BookKind,
-                    InitialValue = dto.InitialValue,
-                    StartDateExists = jsonObj?.StartDate != null,
-                    StartDate = jsonObj?.StartDate ?? dto.StartDate ?? DateTime.Today,
-                    EndDateExists = jsonObj?.EndDate != null,
-                    EndDate = jsonObj?.EndDate ?? dto.EndDate ?? DateTime.Today,
-                    DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((tmpVM) => { return tmpVM.Id != bookId; })),
-                    PayDay = dto.PayDay,
-                    CsvFolderPath = jsonObj is null ? "" : PathExtensions.GetSmartPath(App.GetCurrentDir(), jsonObj.CsvFolderPath),
-                    TextEncodingList = GetTextEncodingList(),
-                    SelectedTextEncoding = jsonObj?.TextEncoding ?? Encoding.UTF8.CodePage,
-                    ActDateIndex = jsonObj?.CsvActDateIndex + 1,
-                    ExpensesIndex = jsonObj?.CsvOutgoIndex + 1,
-                    ItemNameIndex = jsonObj?.CsvItemNameIndex + 1
-                };
-                vm.SelectedDebitBookVM = vm.DebitBookVMList.FirstOrDefault((tmpVM) => { return tmpVM.Id == dto.DebitBookId; }) ?? vm.DebitBookVMList[0];
-
-                vm.RelationVMList = await LoadRelationViewModelListAsync(dbHandler, bookId);
-            }
-
-            this.DisplayedBookSettingVM = vm;
+            };
         }
 
         /// <summary>
-        /// 関連VMリスト(帳簿主体)を取得する
+        /// 帳簿リストを更新する
         /// </summary>
-        /// <param name="dbHandler">DBハンドラ</param>
-        /// <param name="bookId">帳簿ID</param>
-        /// <returns>関連VMリスト</returns>
-        private static async Task<ObservableCollection<RelationViewModel>> LoadRelationViewModelListAsync(DbHandlerBase dbHandler, int bookId)
+        /// <param name="bookId">選択対象の帳簿ID</param>
+        private async Task UpdateBookListAsync(int? bookId = null)
         {
-            ItemRelFromBookInfoDao itemRelFromBookInfoDao = new(dbHandler);
-            var dtoList = await itemRelFromBookInfoDao.FindByBookIdAsync(bookId);
-
-            ObservableCollection<RelationViewModel> rvmList = [];
-            foreach (ItemRelFromBookInfoDto dto in dtoList) {
-                RelationViewModel rvm = new() {
-                    Id = dto.ItemId,
-                    Name = $"{BalanceKindStr[(BalanceKind)dto.BalanceKind]} > {dto.CategoryName} > {dto.ItemName}",
-                    IsRelated = dto.IsRelated
-                };
-                rvmList.Add(rvm);
-            }
-            return rvmList;
+            ViewModelLoader loader = new(this.dbHandlerFactory);
+            int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
+            var bookVMList = await loader.LoadBookListAsync();
+            this.SelectedBookVM = bookVMList.FirstOrDefault(vm => vm.Id == tmpBookId, bookVMList.ElementAtOrDefault(0));
+            this.BookVMList = bookVMList;
         }
     }
 }

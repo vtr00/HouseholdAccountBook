@@ -1,4 +1,6 @@
-﻿namespace HouseholdAccountBook.ViewModels.Component
+﻿using HouseholdAccountBook.Enums;
+
+namespace HouseholdAccountBook.ViewModels.Component
 {
     /// <summary>
     /// 帳簿VM
@@ -16,6 +18,21 @@
         /// 帳簿名
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// 帳簿種別
+        /// </summary>
+        public BookKind BookKind { get; set; }
+
+        /// <summary>
+        /// 支払日
+        /// </summary>
+        public int? PayDay { get; set; }
+
+        /// <summary>
+        /// 支払い元帳簿ID
+        /// </summary>
+        public int? DebitBookId { get; set; }
         #endregion
     }
 }

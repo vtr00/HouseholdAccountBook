@@ -136,7 +136,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="categoryId">分類ID</param>
         /// <param name="itemId">項目ID</param>
         /// <returns></returns>
-        public async Task UpdateGraphTabDataAsync(int? categoryId = null, int? itemId = null)
+        public async Task UpdateAsync(int? categoryId = null, int? itemId = null)
         {
             if (this.Parent.SelectedTab != this.Tab) return;
 

@@ -5,6 +5,7 @@ using HouseholdAccountBook.Models.Dao.DbTable;
 using HouseholdAccountBook.Models.DbHandler.Abstract;
 using HouseholdAccountBook.Models.Dto.DbTable;
 using HouseholdAccountBook.Models.Dto.Others;
+using HouseholdAccountBook.Models.Services;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
@@ -490,47 +491,21 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateBookListAsync(int? fromBookId = null, int? toBookId = null)
         {
-            ObservableCollection<BookViewModel> bookVMList = [];
-            BookViewModel fromBookVM = null;
-            BookViewModel toBookVM = null;
-
-            int? debitBookId = null;
-            int? payDay = null;
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                MstBookDao mstBookDao = new(dbHandler);
-                var dtoList = await mstBookDao.FindAllAsync();
-                foreach (var dto in dtoList) {
-                    BookViewModel vm = new() { Id = dto.BookId, Name = dto.BookName };
-                    bookVMList.Add(vm);
-                    if (fromBookVM == null || fromBookId == vm.Id) {
-                        fromBookVM = vm;
-                        switch (this.RegKind) {
-                            case RegistrationKind.Add: {
-                                if (dto.BookKind == (int)BookKind.CreditCard) {
-                                    debitBookId = dto.DebitBookId;
-                                    payDay = dto.PayDay;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                    if (toBookVM == null || toBookId == vm.Id) {
-                        toBookVM = vm;
-                    }
-                }
-            }
-
+            ViewModelLoader loader = new(this.dbHandlerFactory);
+            var bookVMList = await loader.LoadBookListAsync();
+            this.SelectedFromBookVM = bookVMList.FirstOrDefault(vm => vm.Id == fromBookId);
+            this.SelectedToBookVM = bookVMList.FirstOrDefault(vm => vm.Id == toBookId);
             this.BookVMList = bookVMList;
-            this.SelectedFromBookVM = fromBookVM;
-            this.SelectedToBookVM = toBookVM;
 
             switch (this.RegKind) {
                 case RegistrationKind.Add: {
-                    if (debitBookId != null) {
-                        this.SelectedFromBookVM = bookVMList.FirstOrDefault((vm) => { return vm.Id == debitBookId; });
-                    }
-                    if (payDay != null) {
-                        this.FromDate = this.FromDate.GetDateInMonth(payDay.Value);
+                    if (this.SelectedFromBookVM.BookKind == BookKind.CreditCard) {
+                        if (this.SelectedFromBookVM.DebitBookId != null) {
+                            this.SelectedFromBookVM = this.BookVMList.FirstOrDefault((vm) => { return vm.Id == this.SelectedFromBookVM.DebitBookId; });
+                        }
+                        if (this.SelectedFromBookVM.PayDay != null) {
+                            this.FromDate = this.FromDate.GetDateInMonth(this.SelectedFromBookVM.PayDay.Value);
+                        }
                     }
                     this.IsLink = true;
                     this.SelectedCommissionKind = CommissionKind.MoveFrom;
@@ -546,36 +521,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateItemListAsync(int? itemId = null)
         {
-            ObservableCollection<ItemViewModel> itemVMList = [];
-            ItemViewModel selectedItemVM = null;
-
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                int bookId = -1;
-                switch (this.SelectedCommissionKind) {
-                    case CommissionKind.MoveFrom:
-                        bookId = this.SelectedFromBookVM.Id.Value;
-                        break;
-                    case CommissionKind.MoveTo:
-                        bookId = this.SelectedToBookVM.Id.Value;
-                        break;
-                }
-
-                CategoryItemInfoDao categoryItemInfoDao = new(dbHandler);
-                var dtoList = await categoryItemInfoDao.FindByBookIdAndBalanceKindAsync(bookId, (int)BalanceKind.Expenses);
-                foreach (CategoryItemInfoDto dto in dtoList) {
-                    ItemViewModel vm = new() {
-                        Id = dto.ItemId,
-                        Name = dto.ItemName,
-                        CategoryName = dto.CategoryName
-                    };
-                    itemVMList.Add(vm);
-                    if (selectedItemVM == null || vm.Id == itemId) {
-                        selectedItemVM = vm;
-                    }
-                }
-            }
+            int bookId = this.SelectedCommissionKind switch {
+                CommissionKind.MoveFrom => this.SelectedFromBookVM.Id.Value,
+                CommissionKind.MoveTo => this.SelectedToBookVM.Id.Value,
+                _ => throw new ArgumentException("SelectedComissionKind"),
+            };
+            ViewModelLoader loader = new(this.dbHandlerFactory);
+            int? tmpItemId = itemId ?? this.SelectedItemVM?.Id;
+            var itemVMList = await loader.LoadItemListAsync(bookId, BalanceKind.Expenses, -1);
+            this.SelectedItemVM = itemVMList.FirstOrDefault(vm => vm.Id == tmpItemId, itemVMList.ElementAtOrDefault(0));
             this.ItemVMList = itemVMList;
-            this.SelectedItemVM = selectedItemVM;
         }
 
         /// <summary>
@@ -585,31 +540,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateRemarkListAsync(string remark = null)
         {
-            if (this?.SelectedItemVM?.Id == null) return;
-
-            ObservableCollection<RemarkViewModel> remarkVMList = [
-                new RemarkViewModel(){ Remark = string.Empty }
-            ];
-            string selectedRemark = remark ?? this.SelectedRemark ?? remarkVMList[0].Remark;
-            RemarkViewModel selectedRemarkVM = remarkVMList[0]; // UNUSED
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                RemarkInfoDao remarkInfoDao = new(dbHandler);
-                var dtoList = await remarkInfoDao.FindByItemIdAsync(this.SelectedItemVM.Id);
-                foreach (RemarkInfoDto dto in dtoList) {
-                    RemarkViewModel rvm = new() {
-                        Remark = dto.Remark,
-                        UsedCount = dto.Count,
-                        UsedTime = dto.UsedTime
-                    };
-                    remarkVMList.Add(rvm);
-                    if (selectedRemarkVM == null || rvm.Remark == selectedRemark) {
-                        selectedRemarkVM = rvm;
-                    }
-                }
-            }
-
+            ViewModelLoader loader = new(this.dbHandlerFactory);
+            string tmpRemark = remark ?? this.SelectedRemark;
+            var remarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
+            this.SelectedRemark = remarkVMList.FirstOrDefault(vm => vm.Remark == tmpRemark, remarkVMList.ElementAtOrDefault(0)).Remark;
             this.RemarkVMList = remarkVMList;
-            this.SelectedRemark = selectedRemark;
         }
 
         protected override void AddEventHandlers()

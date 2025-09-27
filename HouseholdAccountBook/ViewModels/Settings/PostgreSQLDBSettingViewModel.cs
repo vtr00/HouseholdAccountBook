@@ -142,6 +142,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             this.Role = settings.App_Postgres_Role;
             this.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_DumpExePath);
             this.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_RestoreExePath);
+            this.PasswordInput = (PostgresPasswordInput)settings.App_Postgres_Password_Input;
         }
 
         /// <summary>
@@ -157,11 +158,14 @@ namespace HouseholdAccountBook.ViewModels.Settings
             settings.App_Postgres_Port = this.Port.Value;
             settings.App_Postgres_UserName = this.UserName;
             settings.App_Postgres_Password = string.Empty; // パスワードは暗号化して保存するので、空にしておく
-            settings.App_Postgres_EncryptedPassword = ProtectedDataExtension.EncryptPassword(getPassword?.Invoke());
+            if (getPassword != null) {
+                settings.App_Postgres_EncryptedPassword = ProtectedDataExtension.EncryptPassword(getPassword?.Invoke());
+            }
             settings.App_Postgres_DatabaseName = this.DatabaseName;
             settings.App_Postgres_Role = this.Role;
             settings.App_Postgres_DumpExePath = Path.GetFullPath(this.DumpExePath, App.GetCurrentDir());
             settings.App_Postgres_RestoreExePath = Path.GetFullPath(this.RestoreExePath, App.GetCurrentDir());
+            settings.App_Postgres_Password_Input = (int)this.PasswordInput;
 
             return true;
         }

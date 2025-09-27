@@ -7,6 +7,7 @@ using HouseholdAccountBook.Models.Dao.DbTable;
 using HouseholdAccountBook.Models.DbHandler.Abstract;
 using HouseholdAccountBook.Models.Dto.DbTable;
 using HouseholdAccountBook.Models.Dto.Others;
+using HouseholdAccountBook.Models.Services;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -553,49 +554,21 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         public async Task LoadAsync(int? selectedBookId)
         {
-            await this.UpdateBookListAsync(selectedBookId);
+            await this.UpdateBookCompListAsync(selectedBookId);
 
             this.AddEventHandlers();
         }
 
         /// <summary>
-        /// 帳簿リストを更新する
+        /// 帳簿VM(比較用)を更新する
         /// </summary>
         /// <param name="bookId">選択対象の帳簿ID</param>
-        public async Task UpdateBookListAsync(int? bookId = null)
+        public async Task UpdateBookCompListAsync(int? bookId = null)
         {
+            ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-
-            ObservableCollection<BookComparisonViewModel> bookCompVMList = [];
-            BookComparisonViewModel selectedBookCompVM = null;
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                MstBookDao mstBookDao = new(dbHandler);
-
-                var dtoList = await mstBookDao.FindIfJsonCodeExistsAsync();
-                foreach (MstBookDto dto in dtoList) {
-                    MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
-                    if (jsonObj is null) continue;
-
-                    BookComparisonViewModel vm = new() {
-                        Id = dto.BookId,
-                        Name = dto.BookName,
-                        CsvFolderPath = jsonObj.CsvFolderPath == string.Empty ? null : jsonObj.CsvFolderPath,
-                        TextEncoding = jsonObj.TextEncoding,
-                        ActDateIndex = jsonObj.CsvActDateIndex + 1,
-                        ExpensesIndex = jsonObj.CsvOutgoIndex + 1,
-                        ItemNameIndex = jsonObj.CsvItemNameIndex + 1
-                    };
-                    if (vm.CsvFolderPath == null || vm.ActDateIndex == null || vm.ExpensesIndex == null || vm.ItemNameIndex == null) continue;
-
-                    bookCompVMList.Add(vm);
-
-                    if (vm.Id == tmpBookId) {
-                        selectedBookCompVM = vm;
-                    }
-                }
-            }
-            this.BookVMList = bookCompVMList;
-            this.SelectedBookVM = selectedBookCompVM ?? bookCompVMList[0];
+            this.BookVMList = await loader.UpdateBookCompListAsync();
+            this.SelectedBookVM = this.BookVMList.FirstOrDefault(vm => vm.Id == tmpBookId, this.BookVMList.ElementAtOrDefault(0));
         }
 
         /// <summary>

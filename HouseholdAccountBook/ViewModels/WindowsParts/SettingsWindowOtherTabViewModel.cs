@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.DbHandler;
-using HouseholdAccountBook.Enums;
+﻿using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -11,7 +10,6 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.Extensions.EncodingExtensions;
-using static HouseholdAccountBook.Models.DbConstants;
 using static HouseholdAccountBook.Views.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
@@ -398,7 +396,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private void ReloadWindowSettingCommand_Executed()
         {
-            this.LoadWindowSettings();
+            this.WindowSettingVMList = LoadWindowSettings();
         }
 
         /// <summary>
@@ -485,26 +483,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.SelectedDBKind = (DBKind)settings.App_SelectedDBKind;
 
             // PostgreSQL
-            this.PostgreSQLDBSettingVM.Host = settings.App_Postgres_Host;
-            this.PostgreSQLDBSettingVM.Port = settings.App_Postgres_Port;
-            this.PostgreSQLDBSettingVM.UserName = settings.App_Postgres_UserName;
-#if DEBUG
-            this.PostgreSQLDBSettingVM.DatabaseName = settings.App_Postgres_DatabaseName_Debug;
-#else
-            this.PostgreSQLDBSettingVM.DatabaseName = settings.App_Postgres_DatabaseName;
-#endif
-            this.PostgreSQLDBSettingVM.Role = settings.App_Postgres_Role;
-            this.PostgreSQLDBSettingVM.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_DumpExePath);
-            this.PostgreSQLDBSettingVM.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_RestoreExePath);
-            this.PostgreSQLDBSettingVM.PasswordInput = (PostgresPasswordInput)settings.App_Postgres_Password_Input;
+            this.PostgreSQLDBSettingVM.Load(null);
 
             // SQLite
-            this.SQLiteSettingVM.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_SQLite_DBFilePath);
+            this.SQLiteSettingVM.Load();
 
-            // Access
-            this.AccessSettingVM.ProviderNameDic.Clear();
-            OleDbHandler.GetOleDbProvider().FindAll((pair) => pair.Key.Contains(AccessProviderHeader)).ForEach(this.AccessSettingVM.ProviderNameDic.Add);
-            this.AccessSettingVM.SelectedProviderName = settings.App_Import_KichoFugetsu_Provider;
+            // Access(記帳風月)
+            this.AccessSettingVM.LoadForKichoFugetsu();
 
             this.SelectedCultureName = settings.App_CultureName;
 
@@ -524,13 +509,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             this.DebugMode = settings.App_IsDebug;
 
-            this.LoadWindowSettings();
+            this.WindowSettingVMList = LoadWindowSettings();
         }
 
         /// <summary>
         /// 各ウィンドウの矩形領域設定を読み込む
         /// </summary>
-        private void LoadWindowSettings()
+        private static ObservableCollection<WindowSettingViewModel> LoadWindowSettings()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -581,7 +566,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     Width = -1, Height = -1
                 }
             ];
-            this.WindowSettingVMList = list;
+            return list;
         }
 
         /// <summary>
@@ -591,11 +576,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            settings.App_Postgres_DumpExePath = Path.GetFullPath(this.PostgreSQLDBSettingVM.DumpExePath, App.GetCurrentDir());
-            settings.App_Postgres_RestoreExePath = Path.GetFullPath(this.PostgreSQLDBSettingVM.RestoreExePath, App.GetCurrentDir());
-            settings.App_Postgres_Password_Input = (int)this.PostgreSQLDBSettingVM.PasswordInput;
+            // PostgreSQL
+            _ = this.PostgreSQLDBSettingVM.Save(null);
 
-            settings.App_Import_KichoFugetsu_Provider = this.AccessSettingVM.SelectedProviderName;
+            // Access(記帳風月)
+            _ = this.AccessSettingVM.SaveForKichoFugetsu();
 
             settings.App_CultureName = this.SelectedCultureName;
 

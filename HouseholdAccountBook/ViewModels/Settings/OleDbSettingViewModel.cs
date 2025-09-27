@@ -4,6 +4,7 @@ using HouseholdAccountBook.ViewModels.Abstract;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using static HouseholdAccountBook.Models.DbConstants;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {
@@ -60,6 +61,18 @@ namespace HouseholdAccountBook.ViewModels.Settings
         }
 
         /// <summary>
+        /// 記帳風月向け設定を読み込む
+        /// </summary>
+        public void LoadForKichoFugetsu()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            this.ProviderNameDic.Clear();
+            OleDbHandler.GetOleDbProvider().FindAll((pair) => pair.Key.Contains(AccessProviderHeader)).ForEach(this.ProviderNameDic.Add);
+            this.SelectedProviderName = settings.App_Import_KichoFugetsu_Provider;
+        }
+
+        /// <summary>
         /// 設定を保存する
         /// </summary>
         /// <returns>設定の保存成否</returns>
@@ -69,6 +82,19 @@ namespace HouseholdAccountBook.ViewModels.Settings
 
             settings.App_Access_Provider = this.SelectedProviderName;
             settings.App_Access_DBFilePath = Path.GetFullPath(this.DBFilePath, App.GetCurrentDir());
+
+            return true;
+        }
+
+        /// <summary>
+        /// 記帳風月向け設定を保存する
+        /// </summary>
+        /// <returns>設定の保存成否</returns>
+        public bool SaveForKichoFugetsu()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+
+            settings.App_Import_KichoFugetsu_Provider = this.SelectedProviderName;
 
             return true;
         }
