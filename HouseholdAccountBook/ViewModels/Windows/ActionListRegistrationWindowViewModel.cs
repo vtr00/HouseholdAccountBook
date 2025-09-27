@@ -499,7 +499,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     await this.UpdateShopListAsync();
                     await this.UpdateRemarkListAsync();
                 }
-                this.BookChanged?.Invoke(this, new EventArgs<int?>(e.Value));
             };
             this.BalanceKindChanged += async (sender, e) => {
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
