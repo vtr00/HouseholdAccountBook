@@ -665,8 +665,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 case HierarchicalKind.Balance: {
                     vm = new HierarchicalSettingViewModel() {
                         Kind = HierarchicalKind.Balance,
-                        Id = this.SelectedHierarchicalVM.Id,
-                        Name = this.SelectedHierarchicalVM.Name
+                        Id = -1,
+                        SortOrder = -1,
+                        Name = string.Empty
                     };
                     break;
                 }
