@@ -1,7 +1,6 @@
 ﻿using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.DbHandler;
 using HouseholdAccountBook.Models.DbHandler.Abstract;
 using HouseholdAccountBook.Models.Logger;

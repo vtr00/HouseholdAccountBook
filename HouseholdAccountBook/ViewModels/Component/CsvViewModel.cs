@@ -3,6 +3,9 @@ using System;
 
 namespace HouseholdAccountBook.ViewModels.Component
 {
+    /// <summary>
+    /// CSV VM
+    /// </summary>
     public class CsvViewModel : BindableBase
     {
         /// <summary>

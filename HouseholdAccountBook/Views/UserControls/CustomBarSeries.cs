@@ -27,7 +27,7 @@ namespace HouseholdAccountBook.Views.UserControls
             // いずれかがnullではないとき
             if (this.oldResult != null || result != null) {
                 // TrackerHitResult が変化していたとき
-                if (this.oldResult == null && result != null || this.oldResult != null && result == null) {
+                if ((this.oldResult == null && result != null) || (this.oldResult != null && result == null)) {
                     // 通知する
                     TrackerHitResultChanged?.Invoke(this, new EventArgs<TrackerHitResult>(result));
                 }

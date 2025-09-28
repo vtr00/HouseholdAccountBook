@@ -461,7 +461,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         });
                     }
 
-                    ViewModelLoader loader = new ViewModelLoader(this.dbHandlerFactory);
+                    ViewModelLoader loader = new(this.dbHandlerFactory);
                     this.DisplayedHierarchicalSettingVM = await loader.LoadHierarchicalSettingViewModelAsync(HierarchicalKind.Item, this.DisplayedHierarchicalSettingVM.Id);
                 }
             }
@@ -491,7 +491,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         });
                     }
 
-                    ViewModelLoader loader = new ViewModelLoader(this.dbHandlerFactory);
+                    ViewModelLoader loader = new(this.dbHandlerFactory);
                     this.DisplayedHierarchicalSettingVM = await loader.LoadHierarchicalSettingViewModelAsync(HierarchicalKind.Item, this.DisplayedHierarchicalSettingVM.Id);
                 }
             }

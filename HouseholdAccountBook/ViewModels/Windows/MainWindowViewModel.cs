@@ -1941,7 +1941,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             if (Directory.Exists(tmpBackUpFolderPath)) {
                 // サイズ0のバックアップを削除する
                 Log.Debug("Delete size 0 files.");
-                List<string> filePathList = new(Directory.GetFiles(tmpBackUpFolderPath, $"*.{backUpFileExt}", SearchOption.TopDirectoryOnly));
+                List<string> filePathList = [.. Directory.GetFiles(tmpBackUpFolderPath, $"*.{backUpFileExt}", SearchOption.TopDirectoryOnly)];
                 foreach (string filePath in filePathList) {
                     FileInfo fileInfo = new(filePath);
                     if (fileInfo.Length == 0) {
@@ -1951,7 +1951,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
                 // 古いバックアップを削除する
                 Log.Debug("Delete old backup files.");
-                filePathList = new(Directory.GetFiles(tmpBackUpFolderPath, $"*.{backUpFileExt}", SearchOption.TopDirectoryOnly));
+                filePathList = [.. Directory.GetFiles(tmpBackUpFolderPath, $"*.{backUpFileExt}", SearchOption.TopDirectoryOnly)];
                 if (filePathList.Count > tmpBackUpNum) {
                     filePathList.Sort();
 

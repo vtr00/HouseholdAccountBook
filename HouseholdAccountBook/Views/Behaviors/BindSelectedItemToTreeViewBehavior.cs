@@ -52,7 +52,7 @@ namespace HouseholdAccountBook.Views.Behaviors
         /// <see cref="SelectedItem"/> 依存関係プロパティを識別します。
         /// </summary>
         #region SelectedItemProperty
-        public static DependencyProperty SelectedItemProperty =
+        public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register(
                 nameof(SelectedItem),
                 typeof(object),

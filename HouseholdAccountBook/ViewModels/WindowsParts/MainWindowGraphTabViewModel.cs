@@ -274,8 +274,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             switch (this.Parent.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
-                    List<int> sumPlus = Enumerable.Repeat(0, 31).ToList(); // 日ごとの合計収入(Y軸範囲の計算に使用)
-                    List<int> sumMinus = Enumerable.Repeat(0, 31).ToList(); // 日ごとの合計支出(Y軸範囲の計算に使用)
+                    List<int> sumPlus = [.. Enumerable.Repeat(0, 31)]; // 日ごとの合計収入(Y軸範囲の計算に使用)
+                    List<int> sumMinus = [.. Enumerable.Repeat(0, 31)]; // 日ごとの合計支出(Y軸範囲の計算に使用)
 
                     // グラフ表示データを取得する
                     var loader = new ViewModelLoader(this.dbHandlerFactory);
@@ -402,7 +402,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     IsStacked = true,
                     Title = vm.DisplayedName,
                     FillColor = (this.GraphPlotModel.Series.FirstOrDefault((s) => {
-                        List<GraphDatumViewModel> datumVMList = new((s as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
+                        List<GraphDatumViewModel> datumVMList = [.. (s as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>()];
                         return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
                     }) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Select((value, index) => {
@@ -525,8 +525,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             switch (this.Parent.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
-                    List<int> sumPlus = Enumerable.Repeat(0, 12).ToList(); // 月ごとの合計収入
-                    List<int> sumMinus = Enumerable.Repeat(0, 12).ToList(); // 月ごとの合計支出
+                    List<int> sumPlus = [.. Enumerable.Repeat(0, 12)]; // 月ごとの合計収入
+                    List<int> sumMinus = [.. Enumerable.Repeat(0, 12)]; // 月ごとの合計支出
 
                     // グラフ表示データを取得する
                     var loader = new ViewModelLoader(this.dbHandlerFactory);
@@ -635,7 +635,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     IsStacked = true,
                     Title = vm.DisplayedName,
                     FillColor = (this.GraphPlotModel.Series.FirstOrDefault((series) => {
-                        List<GraphDatumViewModel> datumVMList = new((series as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
+                        List<GraphDatumViewModel> datumVMList = [.. (series as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>()];
                         return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
                     }) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Select((value, index) => new GraphDatumViewModel {
@@ -756,8 +756,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             switch (this.Parent.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
-                    List<int> sumPlus = Enumerable.Repeat(0, 10).ToList(); // 年ごとの合計収入
-                    List<int> sumMinus = Enumerable.Repeat(0, 10).ToList(); // 年ごとの合計支出
+                    List<int> sumPlus = [.. Enumerable.Repeat(0, 10)]; // 年ごとの合計収入
+                    List<int> sumMinus = [.. Enumerable.Repeat(0, 10)]; // 年ごとの合計支出
 
                     // グラフ表示データを取得する
                     var loader = new ViewModelLoader(this.dbHandlerFactory);
@@ -866,7 +866,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     IsStacked = true,
                     Title = vm.DisplayedName,
                     FillColor = (this.GraphPlotModel.Series.FirstOrDefault((series) => {
-                        List<GraphDatumViewModel> datumVMList = new((series as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>());
+                        List<GraphDatumViewModel> datumVMList = [.. (series as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>()];
                         return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
                     }) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Select((value, index) => new GraphDatumViewModel {

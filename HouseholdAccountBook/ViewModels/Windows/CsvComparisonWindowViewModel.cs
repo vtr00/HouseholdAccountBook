@@ -5,7 +5,6 @@ using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Models.Dao.Compositions;
 using HouseholdAccountBook.Models.Dao.DbTable;
 using HouseholdAccountBook.Models.DbHandler.Abstract;
-using HouseholdAccountBook.Models.Dto.DbTable;
 using HouseholdAccountBook.Models.Dto.Others;
 using HouseholdAccountBook.Models.Services;
 using HouseholdAccountBook.Others;
@@ -348,8 +347,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private void AddActionCommand_Executed()
         {
-            List<CsvComparisonViewModel> vmList = new(this.SelectedCsvComparisonVMList.Where((vm) => !vm.ActionId.HasValue));
-            List<CsvViewModel> recordList = new(vmList.Select((vm) => vm.Record));
+            List<CsvComparisonViewModel> vmList = [.. this.SelectedCsvComparisonVMList.Where((vm) => !vm.ActionId.HasValue)];
+            List<CsvViewModel> recordList = [.. vmList.Select((vm) => vm.Record)];
 
             async void func(object sender, EventArgs<List<int>> e)
             {

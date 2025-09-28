@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using static HouseholdAccountBook.Models.DbConstants;
 
 namespace HouseholdAccountBook.Models.Dao.DbTable
 {

@@ -45,17 +45,6 @@ namespace HouseholdAccountBook.Views.Behaviors
 
         #region 依存関係プロパティ
         /// <summary>
-        /// <see cref="SelectedItems"/> 依存関係プロパティを識別します。
-        /// </summary>
-        #region SelectedItemsProperty
-        public static DependencyProperty SelectedItemsProperty =
-            DependencyProperty.Register(
-                nameof(SelectedItems),
-                typeof(IList),
-                typeof(BindSelectedItemsToDataGridBehavior),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, SelectedItems_Changed));
-        #endregion
-        /// <summary>
         /// 選択されたアイテムのコレクション
         /// </summary>
         #region SelectedItems
@@ -65,6 +54,18 @@ namespace HouseholdAccountBook.Views.Behaviors
             set => this.SetValue(SelectedItemsProperty, value);
         }
         #endregion
+
+        /// <summary>
+        /// <see cref="SelectedItems"/> 依存関係プロパティを識別します。
+        /// </summary>
+        #region SelectedItemsProperty
+        public static readonly DependencyProperty SelectedItemsProperty =
+            DependencyProperty.Register(
+                nameof(SelectedItems),
+                typeof(IList),
+                typeof(BindSelectedItemsToDataGridBehavior),
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, SelectedItemsChanged));
+        #endregion
         #endregion
 
         #region イベントハンドラ
@@ -73,7 +74,7 @@ namespace HouseholdAccountBook.Views.Behaviors
         /// </summary>
         /// <param name="d"></param>
         /// <param name="e"></param>
-        private static void SelectedItems_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void SelectedItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (e.OldValue != e.NewValue) {
                 if (e.OldValue is INotifyCollectionChanged oldValue) {

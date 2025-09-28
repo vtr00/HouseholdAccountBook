@@ -117,8 +117,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     //Log.Debug($"Old SelectedActionVMList.Count: {this._SelectedActionVMList.Count}");
                     //Log.Debug($"New SelectedActionVMList.Count: {value.Count}");
 
-                    List<ActionViewModel> added = new(value.Except(this._SelectedActionVMList));
-                    List<ActionViewModel> removed = new(this._SelectedActionVMList.Except(value));
+                    List<ActionViewModel> added = [.. value.Except(this._SelectedActionVMList)];
+                    List<ActionViewModel> removed = [.. this._SelectedActionVMList.Except(value)];
 
                     //Log.Debug($"added.Count: {added.Count}");
                     //Log.Debug($"removed.Count: {removed.Count}");
@@ -901,7 +901,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             Log.Info($"actionIdList:{string.Join(",", actionIdList ?? emptyIdList)} balanceKind:{balanceKind} categoryId:{categoryId} itemId:{itemId} isScroll:{isScroll} isUpdateActDateLastEdited:{isUpdateActDateLastEdited}");
 
             // 指定がなければ、更新前の帳簿項目の選択を維持する
-            List<int> tmpActionIdList = actionIdList ?? new(this.SelectedActionVMList.Select((tmp) => tmp.ActionId));
+            List<int> tmpActionIdList = actionIdList ?? [.. this.SelectedActionVMList.Select((tmp) => tmp.ActionId)];
             // 指定がなければ、更新前のサマリーの選択を維持する
             int? tmpBalanceKind = balanceKind ?? this.Parent.SelectedBalanceKind;
             int? tmpCategoryId = categoryId ?? this.Parent.SelectedCategoryId;

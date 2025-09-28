@@ -14,7 +14,7 @@ namespace HouseholdAccountBook.Extensions
         /// <returns></returns>
         public static ObservableCollection<KeyValuePair<int, string>> GetTextEncodingList()
         {
-            List<EncodingInfo> encodingInfos = new(Encoding.GetEncodings());
+            List<EncodingInfo> encodingInfos = [.. Encoding.GetEncodings()];
             encodingInfos.Sort(static (info1, info2) => { return string.Compare(info1.Name, info2.Name, StringComparison.Ordinal); });
 
             var encodingList = new ObservableCollection<KeyValuePair<int, string>>(encodingInfos.Select(static (info) => {

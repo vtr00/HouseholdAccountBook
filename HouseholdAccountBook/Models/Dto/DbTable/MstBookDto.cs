@@ -104,7 +104,8 @@ namespace HouseholdAccountBook.Models.Dto.DbTable
                     if (dto != null) {
                         this.Copy(dto);
                     }
-                } catch (Exception) {
+                }
+                catch (Exception) {
                     // 例外が発生した場合は何もしない
                 }
             }

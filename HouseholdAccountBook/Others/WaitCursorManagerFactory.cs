@@ -81,13 +81,14 @@ namespace HouseholdAccountBook.Others
         public void Increase()
         {
             _ = _mutex.WaitOne();
-            if (!_counter.ContainsKey(this._fe)) {
-                _counter.Add(this._fe, 0);
+            if (!_counter.TryGetValue(this._fe, out int value)) {
+                value = 0;
+                _counter.Add(this._fe, value);
                 this._fe.Cursor = Cursors.Wait;
             }
 
-            _counter[this._fe]++;
-            Log.Debug(string.Format($"Increase WaitCounter count:{_counter[this._fe]} from:{this._methodName}:{this._lineNumber}"));
+            _counter[this._fe] = ++value;
+            Log.Debug(string.Format($"Increase WaitCounter count:{value} from:{this._methodName}:{this._lineNumber}"));
             _mutex.ReleaseMutex();
         }
 
@@ -98,9 +99,9 @@ namespace HouseholdAccountBook.Others
         public void Decrease()
         {
             _ = _mutex.WaitOne();
-            if (_counter.ContainsKey(this._fe)) {
-                _counter[this._fe]--;
-                Log.Debug(string.Format($"Decrease WaitCounter count:{_counter[this._fe]} from:{this._methodName}:{this._lineNumber}"));
+            if (_counter.TryGetValue(this._fe, out int value)) {
+                _counter[this._fe] = --value;
+                Log.Debug(string.Format($"Decrease WaitCounter count:{value} from:{this._methodName}:{this._lineNumber}"));
 
                 if (_counter[this._fe] <= 0) {
                     this._fe.Cursor = null;
