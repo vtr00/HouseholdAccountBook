@@ -405,7 +405,9 @@ namespace HouseholdAccountBook.Models.Services
             ObservableCollection<SeriesViewModel> vmList = [
                 new SeriesViewModel() {
                     OtherName = Properties.Resources.ListName_Balance,
-                    Values = []
+                    Values = [],
+                    StartDates = [],
+                    EndDates = []
                 }
             ];
             int averageCount = 0; // 平均値計算に使用する月数(先月まで)
@@ -416,15 +418,21 @@ namespace HouseholdAccountBook.Models.Services
             ObservableCollection<SummaryViewModel> summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
             balance += summaryVMList[0].Total;
             vmList[0].Values.Add(balance); // 残高
+            vmList[0].StartDates.Add(tmpStartTime);
+            vmList[0].EndDates.Add(tmpEndTime);
 
             foreach (SummaryViewModel summaryVM in summaryVMList) {
                 int value = summaryVM.Total;
                 SeriesViewModel vm = new(summaryVM) {
                     Values = [],
+                    StartDates = [],
+                    EndDates = [],
                     Total = value,
                     Average = endTime < DateTime.Now ? value : 0 // 平均値は過去のデータのみで計算する
                 };
                 vm.Values.Add(value);
+                vm.StartDates.Add(tmpStartTime);
+                vm.EndDates.Add(tmpEndTime);
                 vmList.Add(vm);
             }
             if (endTime < DateTime.Now) {
@@ -440,10 +448,14 @@ namespace HouseholdAccountBook.Models.Services
                 summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
                 balance += summaryVMList[0].Total;
                 vmList[0].Values.Add(balance); // 残高
+                vmList[0].StartDates.Add(tmpStartTime);
+                vmList[0].EndDates.Add(tmpEndTime);
                 for (int j = 0; j < summaryVMList.Count; ++j) {
                     int value = summaryVMList[j].Total;
 
                     vmList[j + 1].Values.Add(value);
+                    vmList[j + 1].StartDates.Add(tmpStartTime);
+                    vmList[j + 1].EndDates.Add(tmpEndTime);
 
                     if (tmpEndTime < DateTime.Now) {
                         vmList[j + 1].Average += value;
@@ -496,7 +508,9 @@ namespace HouseholdAccountBook.Models.Services
             ObservableCollection<SeriesViewModel> vmList = [
                 new SeriesViewModel() {
                     OtherName = Properties.Resources.ListName_Balance,
-                    Values = []
+                    Values = [],
+                    StartDates = [],
+                    EndDates = []
                 }
             ];
             int averageCount = 0; // 平均値計算に使用する月数(先月まで)
@@ -507,14 +521,20 @@ namespace HouseholdAccountBook.Models.Services
             ObservableCollection<SummaryViewModel> summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
             balance += summaryVMList[0].Total;
             vmList[0].Values.Add(balance); // 残高
+            vmList[0].StartDates.Add(tmpStartTime);
+            vmList[0].EndDates.Add(tmpEndTime);
             foreach (SummaryViewModel summaryVM in summaryVMList) {
                 int value = summaryVM.Total;
                 SeriesViewModel vm = new(summaryVM) {
                     Values = [],
+                    StartDates = [],
+                    EndDates = [],
                     Total = value,
                     Average = tmpEndTime < DateTime.Now ? value : 0
                 };
                 vm.Values.Add(value);
+                vm.StartDates.Add(tmpStartTime);
+                vm.EndDates.Add(tmpEndTime);
                 vmList.Add(vm);
             }
             if (tmpEndTime < DateTime.Now) {
@@ -530,10 +550,14 @@ namespace HouseholdAccountBook.Models.Services
                 summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
                 balance += summaryVMList[0].Total;
                 vmList[0].Values.Add(balance); // 残高
+                vmList[0].StartDates.Add(tmpStartTime);
+                vmList[0].EndDates.Add(tmpEndTime);
                 for (int j = 0; j < summaryVMList.Count; ++j) {
                     int value = summaryVMList[j].Total;
 
                     vmList[j + 1].Values.Add(value);
+                    vmList[j + 1].StartDates.Add(tmpStartTime);
+                    vmList[j + 1].EndDates.Add(tmpEndTime);
 
                     if (tmpEndTime < DateTime.Now) {
                         vmList[j + 1].Average += value;
@@ -584,7 +608,9 @@ namespace HouseholdAccountBook.Models.Services
             ObservableCollection<SeriesViewModel> vmList = [
                 new SeriesViewModel() {
                     OtherName = Properties.Resources.ListName_Balance,
-                    Values = []
+                    Values = [],
+                    StartDates = [],
+                    EndDates = []
                 }
             ];
             int averageCount = 0; // 平均値計算に使用する年数(去年まで)
@@ -595,14 +621,20 @@ namespace HouseholdAccountBook.Models.Services
             ObservableCollection<SummaryViewModel> summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
             balance += summaryVMList[0].Total;
             vmList[0].Values.Add(balance); // 残高
+            vmList[0].StartDates.Add(tmpStartTime);
+            vmList[0].EndDates.Add(tmpEndTime);
             foreach (SummaryViewModel summaryVM in summaryVMList) {
                 int value = summaryVM.Total;
                 SeriesViewModel vm = new(summaryVM) {
                     Values = [],
+                    StartDates = [],
+                    EndDates = [],
                     Total = value,
                     Average = tmpEndTime < DateTime.Now ? value : 0
                 };
                 vm.Values.Add(value);
+                vm.StartDates.Add(tmpStartTime);
+                vm.EndDates.Add(tmpEndTime);
                 vmList.Add(vm);
             }
             if (tmpEndTime < DateTime.Now) {
@@ -618,10 +650,14 @@ namespace HouseholdAccountBook.Models.Services
                 summaryVMList = await this.LoadSummaryViewModelListAsync(bookId, tmpStartTime, tmpEndTime);
                 balance += summaryVMList[0].Total;
                 vmList[0].Values.Add(balance); // 残高
+                vmList[0].StartDates.Add(tmpStartTime);
+                vmList[0].EndDates.Add(tmpEndTime);
                 for (int j = 0; j < summaryVMList.Count; ++j) {
                     int value = summaryVMList[j].Total;
 
                     vmList[j + 1].Values.Add(value);
+                    vmList[j + 1].StartDates.Add(tmpStartTime);
+                    vmList[j + 1].EndDates.Add(tmpEndTime);
 
                     if (tmpEndTime < DateTime.Now) {
                         vmList[j + 1].Average += value;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace HouseholdAccountBook.ViewModels.Component
 {
@@ -36,6 +37,14 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// 値
         /// </summary>
         public List<int> Values { get; set; }
+        /// <summary>
+        /// 開始日
+        /// </summary>
+        public List<DateTime> StartDates { get; set; }
+        /// <summary>
+        /// 終了日
+        /// </summary>
+        public List<DateTime> EndDates { get; set; }
 
         /// <summary>
         /// 平均

@@ -2732,6 +2732,24 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   年度 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Unit_FiscalYear_Post {
+            get {
+                return ResourceManager.GetString("Unit_FiscalYear_Post", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Unit_FiscalYear_Pre {
+            get {
+                return ResourceManager.GetString("Unit_FiscalYear_Pre", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   円 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Unit_Money {

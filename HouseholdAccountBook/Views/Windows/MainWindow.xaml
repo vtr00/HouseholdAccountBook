@@ -587,7 +587,7 @@
                     <Grid Grid.Row="0" Margin="2">
                         <StackPanel Orientation="Horizontal">
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastYearCommand}"/>
-                            <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}">
+                            <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}">
                                 <ToolTipService.ToolTip>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -700,7 +700,7 @@
                     <Grid Grid.Row="0" Margin="2">
                         <StackPanel Orientation="Horizontal">
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastYearCommand}"/>
-                            <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedYearConverter}}">
+                            <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}">
                                 <ToolTipService.ToolTip>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -805,7 +805,7 @@
                                     <TextBlock>
                                         <TextBlock Text="{Binding DisplayedStart, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
                                         <TextBlock Text=" - "/>
-                                        <TextBlock Text="{Binding DisplayedEnd, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                        <TextBlock Text="{Binding DisplayedEnd, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}"/>
                                     </TextBlock>
                                 </Button.Content>
                             </Button>
@@ -835,34 +835,34 @@
                             <DataGrid.Columns>
                                 <!-- 参考：http://oita.oika.me/2014/05/31/binding-datagridcolumn/ -->
                                 <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" Binding="{Binding ListName}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[0], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[0], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}" 
                                                     Binding="{Binding Values[0], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[1], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[1], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}" 
                                                     Binding="{Binding Values[1], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[2], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[2], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}" 
                                                     Binding="{Binding Values[2], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[3], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[3], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}" 
                                                     Binding="{Binding Values[3], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[4], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[4], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}" 
                                                     Binding="{Binding Values[4], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[5], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[5], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}" 
                                                     Binding="{Binding Values[5], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[6], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[6], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}" 
                                                     Binding="{Binding Values[6], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[7], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[7], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}" 
                                                     Binding="{Binding Values[7], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[8], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[8], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}" 
                                                     Binding="{Binding Values[8], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
-                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[9], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedYearConverter}}" 
+                                <DataGridTextColumn Header="{Binding DataContext.DisplayedYears[9], Source={StaticResource Proxy}, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}" 
                                                     Binding="{Binding Values[9], Converter={StaticResource IntToMoneyDisplayConverter}}"
                                                     ElementStyle="{StaticResource TextAlignRight}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}"/>
                                 <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Average}" Binding="{Binding Average, Converter={StaticResource IntToMoneyDisplayConverter}}"

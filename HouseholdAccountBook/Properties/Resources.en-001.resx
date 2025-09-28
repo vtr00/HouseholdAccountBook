@@ -123,6 +123,10 @@
   <data name="BookKind_Wallet" xml:space="preserve">
     <value>Wallet</value>
   </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="AppIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\resheet.ico;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="BalanceKind_Income" xml:space="preserve">
     <value>Income</value>
   </data>
@@ -324,6 +328,9 @@
   <data name="Unit_FiscalYear" xml:space="preserve">
     <value>Fiscal years</value>
   </data>
+  <data name="Unit_FiscalYear_Post" xml:space="preserve">
+    <value />
+  </data>
   <data name="Unit_Year" xml:space="preserve">
     <value>Years</value>
   </data>
@@ -331,7 +338,7 @@
     <value>Months</value>
   </data>
   <data name="Unit_Day" xml:space="preserve">
-    <value>Day</value>
+    <value>Days</value>
   </data>
   <data name="ListName_profitAndLoss" xml:space="preserve">
     <value>Profit and loss</value>
@@ -994,9 +1001,8 @@ list</value>
   <data name="Button_LastDecade" xml:space="preserve">
     <value>Last decade</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="SQLiteTemplateFile" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="SQLiteTemplateFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\template.sqlite3;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="GroupHeader_KichoFugetsu" xml:space="preserve">
     <value>Microsoft Access(KichoFugetsu)</value>
@@ -1018,5 +1024,8 @@ list</value>
   </data>
   <data name="Message_FoultToGetHolidayList" xml:space="preserve">
     <value>Failed to get holoday list.</value>
+  </data>
+  <data name="Unit_FiscalYear_Pre" xml:space="preserve">
+    <value>FY</value>
   </data>
 </root>

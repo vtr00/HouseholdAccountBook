@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.ViewModels.Abstract;
+using System;
 
 namespace HouseholdAccountBook.ViewModels.Component
 {
@@ -9,7 +10,7 @@ namespace HouseholdAccountBook.ViewModels.Component
     {
         #region プロパティ
         /// <summary>
-        /// 値
+        /// 値(Y軸用)
         /// </summary>
         #region Value
         public int Value
@@ -21,15 +22,27 @@ namespace HouseholdAccountBook.ViewModels.Component
         #endregion
 
         /// <summary>
-        /// 番号(月 or 日)
+        /// 日付(Tracker用)
         /// </summary>
-        #region Number
-        public int Number
+        #region Date
+        public DateTime Date
         {
-            get => this._Number;
-            set => this.SetProperty(ref this._Number, value);
+            get => this._Date;
+            set => this.SetProperty(ref this._Date, value);
         }
-        private int _Number = default;
+        private DateTime _Date = default;
+        #endregion
+
+        /// <summary>
+        /// インデックス(LineSeriesのX軸用)
+        /// </summary>
+        #region Index
+        public int Index
+        {
+            get => this._Index;
+            set => this.SetProperty(ref this._Index, value);
+        }
+        private int _Index = default;
         #endregion
 
         /// <summary>

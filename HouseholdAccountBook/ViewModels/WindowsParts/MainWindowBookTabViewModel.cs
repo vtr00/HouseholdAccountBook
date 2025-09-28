@@ -832,19 +832,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     // 収支が選択されている場合
                     if ((BalanceKind)this.SelectedSummaryVM.BalanceKind != BalanceKind.Others) {
                         if (this._SelectedSummaryVM.ItemId != -1) {             // 項目名が選択されている
-                            tmp = new ObservableCollection<ActionViewModel>(tmp.Where((vm) => {
-                                return vm.ItemId == this.SelectedSummaryVM.ItemId || vm.ActionId == -1;
-                            }));
+                            tmp = [.. tmp.Where(vm => vm.ItemId == this.SelectedSummaryVM.ItemId || vm.ActionId == -1)];
                         }
                         else if (this._SelectedSummaryVM.CategoryId != -1) {    // 分類名が選択されている
-                            tmp = new ObservableCollection<ActionViewModel>(tmp.Where((vm) => {
-                                return vm.CategoryId == this.SelectedSummaryVM.CategoryId || vm.ActionId == -1;
-                            }));
+                            tmp = [.. tmp.Where(vm => vm.CategoryId == this.SelectedSummaryVM.CategoryId || vm.ActionId == -1)];
                         }
                         else {                                                  // 収支種別が選択されている
-                            tmp = new ObservableCollection<ActionViewModel>(tmp.Where((vm) => {
-                                return vm.BalanceKind == (BalanceKind)this.SelectedSummaryVM.BalanceKind || vm.ActionId == -1;
-                            }));
+                            tmp = [.. tmp.Where(vm => vm.BalanceKind == (BalanceKind)this.SelectedSummaryVM.BalanceKind || vm.ActionId == -1)];
                         }
                     }
                 }
@@ -852,17 +846,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             // 検索テキストで絞り込む
             if (this.FindText != string.Empty) {
-                tmp = new ObservableCollection<ActionViewModel>(tmp.Where((vm) => {
-                    return vm.ShopName.Contains(this.FindText) || vm.Remark.Contains(this.FindText);
-                }));
+                tmp = [.. tmp.Where(vm => (vm.ShopName?.Contains(this.FindText) ?? false) || (vm.Remark?.Contains(this.FindText) ?? false))];
             }
 
             this.DisplayedActionVMList = tmp;
 
             // 選択項目を表示項目に限定する
-            this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this._SelectedActionVMList.Where((vm) => {
-                return this.DisplayedActionVMList.Contains(vm);
-            }));
+            this.SelectedActionVMList = [.. this.SelectedActionVMList.Where(vm => this.DisplayedActionVMList.Contains(vm))];
         }
 
         public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)

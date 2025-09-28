@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Values xmlns="urn:tom-englert.de/Configuration/1/0">
   <Value Key="NeutralResourcesLanguage">ja-JP</Value>
+  <Value Key="CultureCountyOverrides">en=en-CC</Value>
+  <Value Key="AutoApplyExistingTranslations">True</Value>
 </Values>
