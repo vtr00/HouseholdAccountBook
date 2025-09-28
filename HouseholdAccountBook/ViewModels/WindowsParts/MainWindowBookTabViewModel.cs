@@ -475,7 +475,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <returns></returns>
         private bool ReplaceActionCommand_CanExecute()
         {
-            return !string.IsNullOrWhiteSpace(this.FindInputText) && !string.IsNullOrWhiteSpace(this.ReplaceText) && this.FindInputText != this.ReplaceText;
+            return !string.IsNullOrWhiteSpace(this.FindInputText) && this.FindInputText != this.ReplaceText;
         }
         /// <summary>
         /// 帳簿項目置換コマンド処理

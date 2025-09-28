@@ -372,7 +372,7 @@
                                     <TextBlock Grid.Column="0" Margin="0,3,3,3">
                                         <TextBlock Text="{x:Static properties:Resources.TextBlock_Search}"/>:
                                     </TextBlock>
-                                    <TextBox Grid.Column="1" Margin="0,3,3,3" Text="{Binding FindInputText}"/>
+                                    <TextBox Grid.Column="1" Margin="0,3,3,3" Text="{Binding FindInputText, UpdateSourceTrigger=PropertyChanged}"/>
                                     <Button Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" Content="▶️" Command="{Binding FindActionCommand}"/>
                                 </Grid>
                                 
@@ -388,7 +388,7 @@
                                     <TextBlock Grid.Column="0" Margin="0,3,3,3">
                                         <TextBlock Text="{x:Static properties:Resources.TextBlock_Replace}"/>:
                                     </TextBlock>
-                                    <TextBox Grid.Column="1" Margin="0,3,3,3" Text="{Binding ReplaceText}"/>
+                                    <TextBox Grid.Column="1" Margin="0,3,3,3" Text="{Binding ReplaceText, UpdateSourceTrigger=PropertyChanged}"/>
                                     <Button Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" Content="▶" Command="{Binding ReplaceActionCommand}"/>
                                 </Grid>
                             </Grid>
