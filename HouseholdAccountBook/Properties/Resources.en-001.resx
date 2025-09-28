@@ -1002,7 +1002,7 @@ list</value>
     <value>Last decade</value>
   </data>
   <data name="SQLiteTemplateFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\template.sqlite3;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\template_en.sqlite3;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="GroupHeader_KichoFugetsu" xml:space="preserve">
     <value>Microsoft Access(KichoFugetsu)</value>
