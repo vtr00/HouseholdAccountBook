@@ -1897,6 +1897,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             bool result;
             string backUpFileExt = PostgreSQLBackupFileExt;
             if (0 < tmpBackUpNum) {
+                Log.Debug("Create backup file.");
                 // フォルダが存在しなければ作成する
                 if (!Directory.Exists(tmpBackUpFolderPath)) {
                     _ = Directory.CreateDirectory(tmpBackUpFolderPath);
@@ -1939,6 +1940,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             if (Directory.Exists(tmpBackUpFolderPath)) {
                 // サイズ0のバックアップを削除する
+                Log.Debug("Delete size 0 files.");
                 List<string> filePathList = new(Directory.GetFiles(tmpBackUpFolderPath, $"*.{backUpFileExt}", SearchOption.TopDirectoryOnly));
                 foreach (string filePath in filePathList) {
                     FileInfo fileInfo = new(filePath);
@@ -1948,6 +1950,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
 
                 // 古いバックアップを削除する
+                Log.Debug("Delete old backup files.");
                 filePathList = new(Directory.GetFiles(tmpBackUpFolderPath, $"*.{backUpFileExt}", SearchOption.TopDirectoryOnly));
                 if (filePathList.Count > tmpBackUpNum) {
                     filePathList.Sort();

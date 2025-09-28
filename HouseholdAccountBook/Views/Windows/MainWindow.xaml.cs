@@ -5,6 +5,7 @@ using HouseholdAccountBook.Models.Logger;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Component;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -228,14 +229,16 @@ namespace HouseholdAccountBook.Views.Windows
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void MainWindow_Closing(object sender, CancelEventArgs e)
         {
+            e.Cancel = true;
+
             // 他のウィンドウを開いているときは閉じない
             if (this.ChildrenWindowOpened) {
-                e.Cancel = true;
                 return;
             }
 
+            this.Closing -= this.MainWindow_Closing;
             this.Hide();
 
             Properties.Settings settings = Properties.Settings.Default;
@@ -244,6 +247,8 @@ namespace HouseholdAccountBook.Views.Windows
                 // 通知しても即座に終了するため通知しない
                 _ = await this.WVM.CreateBackUpFileAsync();
             }
+
+            this.Close();
         }
 
         /// <summary>

@@ -12,7 +12,7 @@
         xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
         mc:Ignorable="d"
         Title="{x:Static properties:Resources.Title_MainWindow}" Height="700" Width="1050"
-        Closing="MainWindow_Closing">
+        Closing="MainWindow_Closing" StateChanged="MainWindow_StateChanged">
     
     <Window.DataContext>
         <vmw:MainWindowViewModel x:Name="WVM"/>
