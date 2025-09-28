@@ -1481,6 +1481,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             SelectTermRequestEventArgs e = new() {
                 DbHandlerFactory = this.dbHandlerFactory,
+                TermKind = this.DisplayedTermKind,
                 Month = this.DisplayedMonth,
                 StartDate = this.StartDate,
                 EndDate = this.EndDate,
