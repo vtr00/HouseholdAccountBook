@@ -293,7 +293,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #region コマンドイベントハンドラ
         protected override bool OKCommand_CanExecute()
         {
-            return this.SelectedItemVM != null && this.DateValueVMList.Any((vm) => vm.ActValue.HasValue);
+            return this.SelectedItemVM != null && this.DateValueVMList.Any(vm => vm.ActValue.HasValue);
         }
         protected override async void OKCommand_Executed()
         {
@@ -339,6 +339,39 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
         #endregion
+
+        protected override void AddEventHandlers()
+        {
+            this.BookChanged += async (sender, e) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateCategoryListAsync();
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+            this.BalanceKindChanged += async (sender, e) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateCategoryListAsync();
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+            this.CategoryChanged += async (sender, e) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+            this.ItemChanged += async (sender, e) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+        }
 
         /// <summary>
         /// 帳簿リストを更新する
@@ -491,39 +524,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.UpdateRemarkListAsync(remark);
         }
 
-        protected override void AddEventHandlers()
-        {
-            this.BookChanged += async (sender, e) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateCategoryListAsync();
-                    await this.UpdateItemListAsync();
-                    await this.UpdateShopListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-            this.BalanceKindChanged += async (sender, e) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateCategoryListAsync();
-                    await this.UpdateItemListAsync();
-                    await this.UpdateShopListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-            this.CategoryChanged += async (sender, e) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateItemListAsync();
-                    await this.UpdateShopListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-            this.ItemChanged += async (sender, e) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateShopListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-        }
-
         /// <summary>
         /// DBに登録する
         /// </summary>
@@ -539,7 +539,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             string shopName = this.SelectedShopName;            // 店舗名
             string remark = this.SelectedRemark;                // 備考
 
-            DateTime lastActTime = this.DateValueVMList.Max((tmp) => tmp.ActDate);
+            DateTime lastActTime = this.DateValueVMList.Max(tmp => tmp.ActDate);
             await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 switch (this.RegKind) {
                     case RegistrationKind.Add: {
@@ -609,7 +609,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                             }
 
                             var dtoList = await hstActionDao.FindByGroupIdAsync(this.GroupId.Value);
-                            IEnumerable<int> expected = dtoList.Select((dto) => dto.ActionId).Except(resActionIdList);
+                            IEnumerable<int> expected = dtoList.Select(dto => dto.ActionId).Except(resActionIdList);
                             foreach (int actionId in expected) {
                                 _ = await hstActionDao.DeleteByIdAsync(actionId);
                             }

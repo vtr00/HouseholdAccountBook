@@ -526,9 +526,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             Log.Info();
 
             // InitializeComponent内で呼ばれる場合があるため、nullチェックを行う
-            if (this.dbHandlerFactory == null) {
-                return;
-            }
+            if (this.dbHandlerFactory == null) { return; }
 
             // 指定がなければ現在選択中の項目を再選択する
             if (this.SelectedHierarchicalVM != null && kind == null && id == null) {
@@ -543,12 +541,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             HierarchicalViewModel selectedVM = null;
             if (kind != null && id != null) {
                 // 収支から探す
-                IEnumerable<HierarchicalViewModel> query = this.HierarchicalVMList.Where((vm) => GetHierarchicalKind(vm) == kind && vm.Id == id);
+                IEnumerable<HierarchicalViewModel> query = this.HierarchicalVMList.Where(vm => GetHierarchicalKind(vm) == kind && vm.Id == id);
 
                 if (!query.Any()) {
                     // 分類から探す
                     foreach (HierarchicalViewModel tmpVM in this.HierarchicalVMList) {
-                        query = tmpVM.ChildrenVMList.Where((vm) => GetHierarchicalKind(vm) == kind && vm.Id == id);
+                        query = tmpVM.ChildrenVMList.Where(vm => GetHierarchicalKind(vm) == kind && vm.Id == id);
                         if (query.Any()) { break; }
                     }
                 }
@@ -557,14 +555,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     // 項目から探す
                     foreach (HierarchicalViewModel tmpVM in this.HierarchicalVMList) {
                         foreach (HierarchicalViewModel tmpVM2 in tmpVM.ChildrenVMList) {
-                            query = tmpVM2.ChildrenVMList.Where((vm) => GetHierarchicalKind(vm) == kind && vm.Id == id);
+                            query = tmpVM2.ChildrenVMList.Where(vm => GetHierarchicalKind(vm) == kind && vm.Id == id);
                             if (query.Any()) { break; }
                         }
                         if (query.Any()) { break; }
                     }
                 }
 
-                selectedVM = query.Any() ? query.First() : null;
+                selectedVM = query.FirstOrDefault();
             }
 
             // 何も選択されていないなら1番上の項目を選択する

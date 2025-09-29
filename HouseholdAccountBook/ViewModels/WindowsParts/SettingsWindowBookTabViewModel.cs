@@ -373,9 +373,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            var bookVMList = await loader.LoadBookListAsync();
-            this.BookVMList = bookVMList;
-            this.SelectedBookVM = bookVMList.FirstOrDefault(vm => vm.Id == tmpBookId, bookVMList.ElementAtOrDefault(0));
+            this.BookVMList = await loader.LoadBookListAsync();
+            this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
     }
 }

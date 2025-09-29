@@ -1867,9 +1867,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            var bookVMList = await loader.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedStart, this.DisplayedEnd);
-            this.SelectedBookVM = bookVMList.FirstOrDefault(vm => vm.Id == tmpBookId, bookVMList.ElementAtOrDefault(0));
-            this.BookVMList = bookVMList;
+            this.BookVMList = await loader.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedStart, this.DisplayedEnd);
+            this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
 
         #region ダンプ/リストア
@@ -1979,7 +1978,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
                     result = notifyResult
                         ? await npgsqlDbHandler.ExecuteDump(backupFilePath, settings.App_Postgres_DumpExePath, (PostgresPasswordInput)settings.App_Postgres_Password_Input, format,
-                            (exitCode) => {
+                            exitCode => {
                                 // ダンプ結果を通知する
                                 if (exitCode == 0) {
                                     NotificationManager nm = new();

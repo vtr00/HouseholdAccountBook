@@ -367,7 +367,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 今日コマンド
         /// </summary>
-        public ICommand TodayCommand => new RelayCommand(() => { this.SelectedDate = DateTime.Today; }, () => { return this.SelectedDate != DateTime.Today; });
+        public ICommand TodayCommand => new RelayCommand(() => this.SelectedDate = DateTime.Today, () => this.SelectedDate != DateTime.Today);
         /// <summary>
         /// 続けて入力コマンド
         /// </summary>
@@ -448,6 +448,39 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
         #endregion
+
+        protected override void AddEventHandlers()
+        {
+            this.BookChanged += async (sender, e) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateCategoryListAsync();
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+            this.BalanceKindChanged += async (sender, e) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateCategoryListAsync();
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+            this.CategoryChanged += async (sender, e) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateItemListAsync();
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+            this.ItemChanged += async (sender, e) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+        }
 
         /// <summary>
         /// 帳簿リストを更新する
@@ -593,39 +626,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.UpdateItemListAsync(dto.ItemId);
             await this.UpdateShopListAsync(dto.ShopName);
             await this.UpdateRemarkListAsync(dto.Remark);
-        }
-
-        protected override void AddEventHandlers()
-        {
-            this.BookChanged += async (sender, e) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateCategoryListAsync();
-                    await this.UpdateItemListAsync();
-                    await this.UpdateShopListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-            this.BalanceKindChanged += async (sender, e) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateCategoryListAsync();
-                    await this.UpdateItemListAsync();
-                    await this.UpdateShopListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-            this.CategoryChanged += async (sender, e) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateItemListAsync();
-                    await this.UpdateShopListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-            this.ItemChanged += async (sender, e) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateShopListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
         }
 
         /// <summary>

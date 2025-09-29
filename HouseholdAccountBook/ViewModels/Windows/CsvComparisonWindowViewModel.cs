@@ -127,7 +127,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// CSV比較VMのチェック数
         /// </summary>
         #region AllCheckedNum
-        public int AllCheckedCount => this.CsvComparisonVMList.Count((vm) => vm.IsMatch);
+        public int AllCheckedCount => this.CsvComparisonVMList.Count(vm => vm.IsMatch);
         #endregion
         /// <summary>
         /// CSV比較VMの個数
@@ -139,7 +139,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// CSV比較VMの合計値
         /// </summary>
         #region AllSumValue
-        public int AllSumValue => this.CsvComparisonVMList.Sum((vm) => vm.Record.Value);
+        public int AllSumValue => this.CsvComparisonVMList.Sum(vm => vm.Record.Value);
         #endregion
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択されたCSV比較VMのチェック数
         /// </summary>
         #region SelectedCheckedNum
-        public int SelectedCheckedCount => this.SelectedCsvComparisonVMList.Count((vm) => vm.IsMatch);
+        public int SelectedCheckedCount => this.SelectedCsvComparisonVMList.Count(vm => vm.IsMatch);
         #endregion
         /// <summary>
         /// 選択されたCSV比較VMの個数
@@ -175,7 +175,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択されたCSV比較VMの合計値
         /// </summary>
         #region SelectedSumValue
-        public int SelectedSumValue => this.SelectedCsvComparisonVMList.Sum((vm) => vm.Record.Value);
+        public int SelectedSumValue => this.SelectedCsvComparisonVMList.Sum(vm => vm.Record.Value);
         #endregion
 
         #region コマンド
@@ -340,15 +340,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private bool AddActionCommand_CanExecute()
         {
             // 選択されている帳簿項目が1つ以上存在していて、値を持たない帳簿項目IDが1つ以上ある
-            return this.SelectedCsvComparisonVMList.Count != 0 && this.SelectedCsvComparisonVMList.Any((vm) => !vm.ActionId.HasValue);
+            return this.SelectedCsvComparisonVMList.Count != 0 && this.SelectedCsvComparisonVMList.Any(vm => !vm.ActionId.HasValue);
         }
         /// <summary>
         /// 項目追加コマンド処理
         /// </summary>
         private void AddActionCommand_Executed()
         {
-            List<CsvComparisonViewModel> vmList = [.. this.SelectedCsvComparisonVMList.Where((vm) => !vm.ActionId.HasValue)];
-            List<CsvViewModel> recordList = [.. vmList.Select((vm) => vm.Record)];
+            List<CsvComparisonViewModel> vmList = [.. this.SelectedCsvComparisonVMList.Where(vm => !vm.ActionId.HasValue)];
+            List<CsvViewModel> recordList = [.. vmList.Select(vm => vm.Record)];
 
             async void func(object sender, EventArgs<List<int>> e)
             {
@@ -444,7 +444,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private void AddOrEditActionCommand_Executed()
         {
             // 選択されている帳簿項目が1つ以上存在していて、値を持たない帳簿項目IDが1つ以上ある
-            if (0 < this.SelectedCsvComparisonVMList.Count && this.SelectedCsvComparisonVMList.Any((vm) => !vm.ActionId.HasValue)) {
+            if (0 < this.SelectedCsvComparisonVMList.Count && this.SelectedCsvComparisonVMList.Any(vm => !vm.ActionId.HasValue)) {
                 this.AddActionCommand_Executed();
             }
             else {
@@ -565,7 +565,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             this.BookVMList = await loader.UpdateBookCompListAsync();
-            this.SelectedBookVM = this.BookVMList.FirstOrDefault(vm => vm.Id == tmpBookId, this.BookVMList.ElementAtOrDefault(0));
+            this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
 
         /// <summary>
@@ -630,7 +630,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             // CSVファイルを読み込む
             CsvConfiguration csvConfig = new(CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,
-                MissingFieldFound = (mffa) => { }
+                MissingFieldFound = mffa => { }
             };
             List<CsvComparisonViewModel> tmpVMList = [];
             foreach (string tmpFileName in csvFilePathList) {
@@ -664,7 +664,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             // 有効な行があればリストに追加する(日付昇順)
             if (0 < tmpVMList.Count) {
-                tmpVMList.Sort((tmp1, tmp2) => { return (int)(tmp1.Record.Date - tmp2.Record.Date).TotalDays; });
+                tmpVMList.Sort((tmp1, tmp2) => (int)(tmp1.Record.Date - tmp2.Record.Date).TotalDays);
                 foreach (CsvComparisonViewModel vm in tmpVMList) {
                     this.CsvComparisonVMList.Add(vm);
                 }
@@ -713,7 +713,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     var dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(this.SelectedBookVM.Id.Value, vm.Record.Date, vm.Record.Value);
                     foreach (ActionCompInfoDto dto in dtoList) {
                         // 帳簿項目IDが使用済なら次のレコードを調べるようにする
-                        bool checkNext = this.CsvComparisonVMList.Where((tmpVM) => { return tmpVM.ActionId == dto.ActionId; }).Any();
+                        bool checkNext = this.CsvComparisonVMList.Where(tmpVM => tmpVM.ActionId == dto.ActionId).Any();
                         // 帳簿項目情報を紐付ける
                         if (!checkNext) {
                             vm.ActionId = dto.ActionId;

@@ -12,7 +12,6 @@ using HouseholdAccountBook.ViewModels.Component;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -338,7 +337,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 今日コマンド
         /// </summary>
-        public ICommand TodayCommand => new RelayCommand(() => { this.FromDate = DateTime.Today; }, () => { return this.FromDate != DateTime.Today; });
+        public ICommand TodayCommand => new RelayCommand(() => this.FromDate = DateTime.Today, () => this.FromDate != DateTime.Today);
         #endregion
         #endregion
 
@@ -390,11 +389,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        public override async Task LoadAsync()
-        {
-            await this.LoadAsync(null, null, null, null);
-        }
-
         protected override void AddEventHandlers()
         {
             this.FromBookChanged += async (_, _) => {
@@ -420,6 +414,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     await this.UpdateRemarkListAsync();
                 }
             };
+        }
+
+        public override async Task LoadAsync()
+        {
+            await this.LoadAsync(null, null, null, null);
         }
 
         /// <summary>

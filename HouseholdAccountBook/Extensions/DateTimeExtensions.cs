@@ -35,7 +35,7 @@ namespace HouseholdAccountBook.Extensions
 
                 CsvConfiguration csvConfig = new(System.Globalization.CultureInfo.CurrentCulture) {
                     HasHeaderRecord = true,
-                    MissingFieldFound = (mffa) => { }
+                    MissingFieldFound = mffa => { }
                 };
 
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;

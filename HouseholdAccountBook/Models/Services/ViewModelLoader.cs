@@ -253,8 +253,8 @@ namespace HouseholdAccountBook.Models.Services
                         CategoryName = aDto.CategoryName,
                         ItemName = aDto.ItemName,
                         BalanceKind = aDto.ActValue < 0 ? BalanceKind.Expenses : BalanceKind.Income,
-                        Income = aDto.ActValue < 0 ? (int?)null : aDto.ActValue,
-                        Expenses = aDto.ActValue < 0 ? -aDto.ActValue : (int?)null,
+                        Income = aDto.ActValue < 0 ? null : aDto.ActValue,
+                        Expenses = aDto.ActValue < 0 ? -aDto.ActValue : null,
                         Balance = balance,
                         ShopName = aDto.ShopName,
                         GroupId = aDto.GroupId,
@@ -321,28 +321,28 @@ namespace HouseholdAccountBook.Models.Services
             }
 
             // 差引損益
-            int total = summaryVMList.Sum((obj) => obj.Total);
+            int total = summaryVMList.Sum(obj => obj.Total);
             // 収入/支出
             List<SummaryViewModel> totalAsBalanceKindList = [];
             // 分類小計
             List<SummaryViewModel> totalAsCategoryList = [];
 
             // 収支別に計算する
-            foreach (var g1 in summaryVMList.GroupBy((obj) => obj.BalanceKind)) {
+            foreach (var g1 in summaryVMList.GroupBy(obj => obj.BalanceKind)) {
                 // 収入/支出の小計を計算する
                 totalAsBalanceKindList.Add(new SummaryViewModel() {
                     BalanceKind = g1.Key,
                     BalanceName = BalanceKindStr[(BalanceKind)g1.Key],
-                    Total = g1.Sum((obj) => obj.Total)
+                    Total = g1.Sum(obj => obj.Total)
                 });
                 // 分類別の小計を計算する
-                foreach (var g2 in g1.GroupBy((obj) => obj.CategoryId)) {
+                foreach (var g2 in g1.GroupBy(obj => obj.CategoryId)) {
                     totalAsCategoryList.Add(new SummaryViewModel() {
                         BalanceKind = g1.Key,
                         BalanceName = BalanceKindStr[(BalanceKind)g1.Key],
                         CategoryId = g2.Key,
                         CategoryName = g2.First().CategoryName,
-                        Total = g2.Sum((obj) => obj.Total)
+                        Total = g2.Sum(obj => obj.Total)
                     });
                 }
             }
@@ -747,7 +747,7 @@ namespace HouseholdAccountBook.Models.Services
                     StartDate = jsonObj?.StartDate ?? dto.StartDate ?? DateTime.Today,
                     EndDateExists = jsonObj?.EndDate != null,
                     EndDate = jsonObj?.EndDate ?? dto.EndDate ?? DateTime.Today,
-                    DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where((tmpVM) => { return tmpVM.Id != bookId; })),
+                    DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where(tmpVM => tmpVM.Id != bookId)),
                     PayDay = dto.PayDay,
                     CsvFolderPath = jsonObj is null ? "" : PathExtensions.GetSmartPath(App.GetCurrentDir(), jsonObj.CsvFolderPath),
                     TextEncodingList = GetTextEncodingList(),
@@ -757,7 +757,7 @@ namespace HouseholdAccountBook.Models.Services
                     ItemNameIndex = jsonObj?.CsvItemNameIndex + 1,
                     RelationVMList = await LoadRelationViewModelListFromBookIdAsync(dbHandler, bookId)
                 };
-                vm.SelectedDebitBookVM = vm.DebitBookVMList.FirstOrDefault((tmpVM) => { return tmpVM.Id == dto.DebitBookId; }) ?? vm.DebitBookVMList[0];
+                vm.SelectedDebitBookVM = vm.DebitBookVMList.FirstOrElementAtOrDefault(tmpVM => tmpVM.Id == dto.DebitBookId, 0);
             }
 
             return vm;

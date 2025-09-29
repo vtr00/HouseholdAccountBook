@@ -30,8 +30,8 @@ namespace HouseholdAccountBook.Views.Windows
                 }
             };
 
-            this.WVM.SetPassword = password => { this.passwordBox.Password = password; };
-            this.WVM.GetPassword = () => { return this.passwordBox.Password; };
+            this.WVM.SetPassword = password => this.passwordBox.Password = password;
+            this.WVM.GetPassword = () => this.passwordBox.Password;
 
             this.AddCommonEventHandlers();
 

@@ -178,29 +178,29 @@ namespace HouseholdAccountBook.Views.Windows
                     if (this.ccw is null) {
                         this.ccw = new CsvComparisonWindow(this, e.DbHandlerFactory, e.BookId);
                         // 帳簿項目の一致フラグ変更時のイベントを登録する
-                        this.ccw.IsMatchChanged += (sender2, e2) => {
-                            ActionViewModel vm = this.WVM.BookTabVM.ActionVMList.FirstOrDefault(tmpVM => tmpVM.ActionId == e2.Value1);
+                        this.ccw.IsMatchChanged += (sender, e) => {
+                            ActionViewModel vm = this.WVM.BookTabVM.ActionVMList.FirstOrDefault(tmpVM => tmpVM.ActionId == e.Value1);
                             if (vm != null) {
                                 // UI上の表記だけを更新する
-                                vm.IsMatch = e2.Value2;
+                                vm.IsMatch = e.Value2;
                             }
                         };
                         // 帳簿項目変更時のイベントを登録する
-                        this.ccw.ActionChanged += async (sender3, e3) => {
+                        this.ccw.ActionChanged += async (sender, e) => {
                             using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                                 // 帳簿一覧タブを更新する
                                 await this.WVM.BookTabVM.LoadAsync(isScroll: false, isUpdateActDateLastEdited: true);
                             }
                         };
                         // 帳簿変更時のイベントを登録する
-                        this.ccw.BookChanged += (sender4, e4) => {
-                            var selectedVM = this.WVM.BookVMList.FirstOrDefault(vm => vm.Id == e4.Value);
+                        this.ccw.BookChanged += (sender, e) => {
+                            var selectedVM = this.WVM.BookVMList.FirstOrDefault(vm => vm.Id == e.Value);
                             if (selectedVM != null) {
                                 this.WVM.SelectedBookVM = selectedVM;
                             }
                         };
                         // ウィンドウ非表示時イベントを登録する
-                        this.ccw.Hided += (sender5, e5) => {
+                        this.ccw.Hided += (sender, e) => {
                             _ = this.Activate();
                         };
                     }

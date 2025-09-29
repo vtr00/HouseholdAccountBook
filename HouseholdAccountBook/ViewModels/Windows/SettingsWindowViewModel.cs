@@ -31,7 +31,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        #region プロパティ
+        #region Bindingプロパティ
         /// <summary>
         /// 選択された設定タブインデックス
         /// </summary>

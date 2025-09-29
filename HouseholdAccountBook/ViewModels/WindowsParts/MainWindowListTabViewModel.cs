@@ -98,7 +98,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Tabs.YearlyListTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
                 _ => throw new NotImplementedException(),
             };
-            this.SelectedSeriesVM = this.SeriesVMList?.FirstOrDefault((vm) => vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId);
+            this.SelectedSeriesVM = this.SeriesVMList?.FirstOrDefault(vm => vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId);
         }
     }
 }
