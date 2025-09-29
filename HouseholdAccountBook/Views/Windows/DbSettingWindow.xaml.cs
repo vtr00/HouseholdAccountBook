@@ -24,6 +24,11 @@ namespace HouseholdAccountBook.Views.Windows
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
+            this.Loaded += (sender, e) => {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
+                    this.WVM.Load();
+                }
+            };
 
             this.WVM.SetPassword = password => { this.passwordBox.Password = password; };
             this.WVM.GetPassword = () => { return this.passwordBox.Password; };

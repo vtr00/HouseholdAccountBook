@@ -554,8 +554,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public async Task LoadAsync(int? selectedBookId)
         {
             await this.UpdateBookCompListAsync(selectedBookId);
-
-            this.AddEventHandlers();
         }
 
         /// <summary>

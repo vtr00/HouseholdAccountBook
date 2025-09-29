@@ -1,6 +1,4 @@
 ﻿using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Models.DbHandler;
-using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.WindowsParts;
 using System;
@@ -111,13 +109,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        public SettingsWindowViewModel()
         {
-            this.ItemTabVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-            this.BookTabVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-            this.OtherTabVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+            this.childrenVM.AddRange(
+                [
+                    this.ItemTabVM,
+                    this.BookTabVM,
+                    this.OtherTabVM
+                ]
+            );
         }
 
         public override async Task LoadAsync()
@@ -133,8 +133,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     this.OtherTabVM.Load();
                     break;
             }
-
-            this.AddEventHandlers();
         }
 
         protected override void AddEventHandlers()

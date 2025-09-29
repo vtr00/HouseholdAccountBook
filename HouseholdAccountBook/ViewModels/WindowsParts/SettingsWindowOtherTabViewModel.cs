@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.Extensions.EncodingExtensions;
@@ -472,6 +473,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
         }
         #endregion
+
+        protected override void AddEventHandlers()
+        {
+            // NOP
+        }
+
+        public override Task LoadAsync()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// その他設定を読み込む

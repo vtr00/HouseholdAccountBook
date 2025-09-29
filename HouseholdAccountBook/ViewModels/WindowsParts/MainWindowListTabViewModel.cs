@@ -63,15 +63,25 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
         #endregion
 
+        protected override void AddEventHandlers()
+        {
+            // NOP
+        }
+
+        public override async Task LoadAsync()
+        {
+            await this.LoadAsync(null, null, null);
+        }
+
         /// <summary>
-        /// リストタブを更新する
+        /// リストタブに表示するデータを読み込む
         /// </summary>
         /// <param name="balanceKind">収支種別</param>
         /// <param name="categoryId">分類ID</param>
         /// <param name="itemId">項目ID</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task UpdateAsync(int? balanceKind = null, int? categoryId = null, int? itemId = null)
+        public async Task LoadAsync(int? balanceKind = null, int? categoryId = null, int? itemId = null)
         {
             if (this.Parent.SelectedTab != this.Tab) return;
 

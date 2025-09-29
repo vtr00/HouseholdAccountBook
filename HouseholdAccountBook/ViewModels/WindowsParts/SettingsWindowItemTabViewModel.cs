@@ -498,13 +498,26 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
+        protected override void AddEventHandlers()
+        {
+            this.SelectedHierarchicalVMChanged += async (sender, e) => {
+                if (e.Value != null) {
+                    ViewModelLoader loader = new(this.dbHandlerFactory);
+                    this.DisplayedHierarchicalSettingVM = await loader.LoadHierarchicalSettingViewModelAsync(GetHierarchicalKind(e.Value).Value, e.Value.Id);
+                }
+                else {
+                    this.DisplayedHierarchicalSettingVM = null;
+                }
+            };
+        }
+
         public override async Task LoadAsync()
         {
             await this.LoadAsync(null, null);
         }
 
         /// <summary>
-        /// 項目設定タブに表示するデータを更新する
+        /// 項目設定タブに表示するデータを読み込む
         /// </summary>
         /// <param name="kind">選択対象の階層種別</param>
         /// <param name="id">選択対象のID</param>
@@ -559,21 +572,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 selectedVM = this.HierarchicalVMList[0];
             }
             this.SelectedHierarchicalVM = selectedVM;
-
-            this.AddEventHandlers();
-        }
-
-        protected override void AddEventHandlers()
-        {
-            this.SelectedHierarchicalVMChanged += async (sender, e) => {
-                if (e.Value != null) {
-                    ViewModelLoader loader = new(this.dbHandlerFactory);
-                    this.DisplayedHierarchicalSettingVM = await loader.LoadHierarchicalSettingViewModelAsync(GetHierarchicalKind(e.Value).Value, e.Value.Id);
-                }
-                else {
-                    this.DisplayedHierarchicalSettingVM = null;
-                }
-            };
         }
     }
 }

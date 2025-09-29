@@ -1,12 +1,11 @@
 ﻿using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Models.DbHandler;
-using HouseholdAccountBook.Others;
 using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.Views.UiConstants;
@@ -260,10 +259,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        protected override void AddEventHandlers()
         {
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+            // LOP
+        }
 
+        public override Task LoadAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Load()
+        {
             Properties.Settings settings = Properties.Settings.Default;
             this.SelectedDBKind = (DBKind)settings.App_SelectedDBKind;
 

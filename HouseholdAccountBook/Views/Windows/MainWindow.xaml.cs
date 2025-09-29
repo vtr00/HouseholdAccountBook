@@ -189,7 +189,7 @@ namespace HouseholdAccountBook.Views.Windows
                         this.ccw.ActionChanged += async (sender3, e3) => {
                             using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                                 // 帳簿一覧タブを更新する
-                                await this.WVM.BookTabVM.UpdateAsync(isScroll: false, isUpdateActDateLastEdited: true);
+                                await this.WVM.BookTabVM.LoadAsync(isScroll: false, isUpdateActDateLastEdited: true);
                             }
                         };
                         // 帳簿変更時のイベントを登録する

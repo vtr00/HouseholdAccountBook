@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.ViewModels.Abstract;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -10,7 +11,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
     /// </summary>
     public class VersionWindowViewModel : WindowViewModelBase
     {
-        #region プロパティ
+        #region Bindingプロパティ
         /// <summary>
         /// サポートサイト
         /// </summary>
@@ -58,5 +59,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
         #endregion
+
+        protected override void AddEventHandlers()
+        {
+            // NOP
+        }
+
+        public override Task LoadAsync()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

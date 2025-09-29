@@ -331,29 +331,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
-        public override async Task LoadAsync()
-        {
-            await this.LoadAsync(null);
-        }
-
-        /// <summary>
-        /// 帳簿設定タブに表示するデータを更新する
-        /// </summary>
-        /// <param name="bookId">選択対象の帳簿ID</param>
-        public async Task LoadAsync(int? bookId = null)
-        {
-            Log.Info();
-
-            // InitializeComponent内で呼ばれる場合があるため、nullチェックを行う
-            if (this.dbHandlerFactory == null) {
-                return;
-            }
-
-            await this.UpdateBookListAsync(bookId);
-
-            this.AddEventHandlers();
-        }
-
         protected override void AddEventHandlers()
         {
             this.SelectedBookVMChanged += async (sender, e) => {
@@ -367,6 +344,27 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             };
         }
 
+        public override async Task LoadAsync()
+        {
+            await this.LoadAsync(null);
+        }
+
+        /// <summary>
+        /// 帳簿設定タブに表示するデータを読み込む
+        /// </summary>
+        /// <param name="bookId">選択対象の帳簿ID</param>
+        public async Task LoadAsync(int? bookId = null)
+        {
+            Log.Info();
+
+            // InitializeComponent内で呼ばれる場合があるため、nullチェックを行う
+            if (this.dbHandlerFactory == null) {
+                return;
+            }
+
+            await this.UpdateBookListAsync(bookId);
+        }
+
         /// <summary>
         /// 帳簿リストを更新する
         /// </summary>
@@ -376,8 +374,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             var bookVMList = await loader.LoadBookListAsync();
-            this.SelectedBookVM = bookVMList.FirstOrDefault(vm => vm.Id == tmpBookId, bookVMList.ElementAtOrDefault(0));
             this.BookVMList = bookVMList;
+            this.SelectedBookVM = bookVMList.FirstOrDefault(vm => vm.Id == tmpBookId, bookVMList.ElementAtOrDefault(0));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Models.Dao.DbTable;
 using HouseholdAccountBook.Models.DbHandler.Abstract;
 using HouseholdAccountBook.Models.Dto.DbTable;
@@ -348,9 +349,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            var bookVMList = await loader.LoadBookListAsync();
-            this.SelectedBookVM = bookVMList.FirstOrDefault(vm => vm.Id == tmpBookId, bookVMList.ElementAtOrDefault(0));
-            this.BookVMList = bookVMList;
+            this.BookVMList = await loader.LoadBookListAsync();
+            this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
 
         /// <summary>
@@ -360,11 +360,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateCategoryListAsync(int? categoryId = null)
         {
+            if (this.SelectedBookVM == null) return;
+
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpCategoryId = categoryId ?? this.SelectedCategoryVM?.Id;
-            var categoryVMList = await loader.LoadCategoryListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind);
-            this.SelectedCategoryVM = categoryVMList.FirstOrDefault(vm => vm.Id == tmpCategoryId, categoryVMList.ElementAtOrDefault(0));
-            this.CategoryVMList = categoryVMList;
+            this.CategoryVMList = await loader.LoadCategoryListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind);
+            this.SelectedCategoryVM = this.CategoryVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpCategoryId, 0);
         }
 
         /// <summary>
@@ -374,11 +375,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateItemListAsync(int? itemId = null)
         {
+            if (this.SelectedBookVM == null || this.SelectedCategoryVM == null) return;
+
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpItemId = itemId ?? this.SelectedItemVM?.Id;
-            var itemVMList = await loader.LoadItemListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind, this.SelectedCategoryVM.Id);
-            this.SelectedItemVM = itemVMList.FirstOrDefault(vm => vm.Id == tmpItemId, itemVMList.ElementAtOrDefault(0));
-            this.ItemVMList = itemVMList;
+            this.ItemVMList = await loader.LoadItemListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind, this.SelectedCategoryVM.Id);
+            this.SelectedItemVM = this.ItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0);
         }
 
         /// <summary>
@@ -388,11 +390,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateShopListAsync(string shopName = null)
         {
+            if (this.SelectedItemVM == null) return;
+
             ViewModelLoader loader = new(this.dbHandlerFactory);
             string tmpShopName = shopName ?? this.SelectedShopName;
-            var shopVMList = await loader.LoadShopListAsync(this.SelectedItemVM.Id);
-            this.SelectedShopName = shopVMList.FirstOrDefault(vm => vm.Name == tmpShopName, shopVMList.ElementAtOrDefault(0)).Name;
-            this.ShopVMList = shopVMList;
+            this.ShopVMList = await loader.LoadShopListAsync(this.SelectedItemVM.Id); ;
+            this.SelectedShopName = this.ShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name;
         }
 
         /// <summary>
@@ -402,11 +405,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateRemarkListAsync(string remark = null)
         {
+            if (this.SelectedItemVM == null) return;
+
             ViewModelLoader loader = new(this.dbHandlerFactory);
             string tmpRemark = remark ?? this.SelectedRemark;
-            var remarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
-            this.SelectedRemark = remarkVMList.FirstOrDefault(vm => vm.Remark == tmpRemark, remarkVMList.ElementAtOrDefault(0)).Remark;
-            this.RemarkVMList = remarkVMList;
+            this.RemarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
+            this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
         }
 
         public override async Task LoadAsync()
@@ -485,9 +489,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.UpdateItemListAsync(itemId);
             await this.UpdateShopListAsync(shopName);
             await this.UpdateRemarkListAsync(remark);
-
-            // イベントハンドラを登録する
-            this.AddEventHandlers();
         }
 
         protected override void AddEventHandlers()

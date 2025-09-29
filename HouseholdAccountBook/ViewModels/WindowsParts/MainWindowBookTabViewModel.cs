@@ -2,7 +2,6 @@
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Models.Dao.Compositions;
 using HouseholdAccountBook.Models.Dao.DbTable;
-using HouseholdAccountBook.Models.DbHandler;
 using HouseholdAccountBook.Models.DbHandler.Abstract;
 using HouseholdAccountBook.Models.Logger;
 using HouseholdAccountBook.Models.Services;
@@ -506,7 +505,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
 
             this.FindText = string.Empty; // 検索をクリアしておく
-            await this.UpdateAsync(actionIdList);
+            await this.LoadAsync(actionIdList);
         }
 
         /// <summary>
@@ -532,7 +531,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Date = this.SelectedActionVM?.ActTime,
                 Registered = async (sender, e2) => {
                     // 帳簿一覧タブを更新する
-                    await this.UpdateAsync(e2.Value, isUpdateActDateLastEdited: true);
+                    await this.LoadAsync(e2.Value, isUpdateActDateLastEdited: true);
                 }
             };
             this.AddMoveRequested?.Invoke(this, e);
@@ -561,7 +560,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Date = this.SelectedActionVM?.ActTime,
                 Registered = async (sender, e2) => {
                     // 帳簿一覧タブを更新する
-                    await this.UpdateAsync(e2.Value, isUpdateActDateLastEdited: true);
+                    await this.LoadAsync(e2.Value, isUpdateActDateLastEdited: true);
                 }
             };
             this.AddActionRequested?.Invoke(this, e);
@@ -590,7 +589,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Date = this.SelectedActionVM?.ActTime,
                 Registered = async (sender, e2) => {
                     // 帳簿一覧タブを更新する
-                    await this.UpdateAsync(e2.Value, isUpdateActDateLastEdited: true);
+                    await this.LoadAsync(e2.Value, isUpdateActDateLastEdited: true);
                 }
             };
             this.AddActionListRequested?.Invoke(this, e);
@@ -628,7 +627,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     ActionId = this.SelectedActionVM.ActionId,
                     Registered = async (sender, e) => {
                         // 帳簿一覧タブを更新する
-                        await this.UpdateAsync(e.Value, isUpdateActDateLastEdited: true);
+                        await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true);
                     }
                 };
                 this.CopyActionRequested?.Invoke(this, e);
@@ -640,7 +639,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     GroupId = this.SelectedActionVM.GroupId.Value,
                     Registered = async (sender, e) => {
                         // 帳簿一覧タブを更新する
-                        await this.UpdateAsync(e.Value, isUpdateActDateLastEdited: true);
+                        await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true);
                     }
                 };
                 this.CopyMoveRequested?.Invoke(this, e);
@@ -680,7 +679,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         GroupId = this.SelectedActionVM.GroupId.Value,
                         Registered = async (sender, e) => {
                             // 帳簿一覧タブを更新する
-                            await this.UpdateAsync(e.Value, isUpdateActDateLastEdited: true);
+                            await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true);
                         }
                     };
                     this.EditMoveRequested?.Invoke(this, e);
@@ -693,7 +692,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         GroupId = this.SelectedActionVM.GroupId.Value,
                         Registered = async (sender, e) => {
                             // 帳簿一覧タブを更新する
-                            await this.UpdateAsync(e.Value, isUpdateActDateLastEdited: true);
+                            await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true);
                         }
                     };
                     this.EditActionListRequested?.Invoke(this, e);
@@ -707,7 +706,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         ActionId = this.SelectedActionVM.ActionId,
                         Registered = async (sender, e) => {
                             // 帳簿一覧タブを更新する
-                            await this.UpdateAsync(e.Value, isUpdateActDateLastEdited: true);
+                            await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true);
                         }
                     };
                     this.EditActionRequested?.Invoke(this, e);
@@ -787,7 +786,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
 
                 // 帳簿一覧タブを更新する
-                await this.UpdateAsync(isUpdateActDateLastEdited: true);
+                await this.LoadAsync(isUpdateActDateLastEdited: true);
             }
         }
 
@@ -855,13 +854,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.SelectedActionVMList = [.. this.SelectedActionVMList.Where(vm => this.DisplayedActionVMList.Contains(vm))];
         }
 
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        protected override void AddEventHandlers()
         {
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-
             // 帳簿項目選択変更時
             this.SelectedActionVMList.CollectionChanged += (sender, e) => {
-                Log.Debug("SelectedActionVMListCollectionChanged");
+                Log.Debug("SelectedActionVMList_CollectionChanged");
 
                 this.RaisePropertyChanged(nameof(this.AverageValue));
                 this.RaisePropertyChanged(nameof(this.Count));
@@ -873,8 +870,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             };
         }
 
+        public override async Task LoadAsync()
+        {
+            await this.LoadAsync(null, null, null, null, false, false);
+        }
+
         /// <summary>
-        /// 帳簿タブを更新する
+        /// 帳簿タブに表示するデータを読み込む
         /// </summary>
         /// <param name="actionIdList">選択対象の帳簿項目IDリスト</param>
         /// <param name="balanceKind">選択対象の収支種別</param>
@@ -882,7 +884,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="itemId">選択対象の項目ID</param>
         /// <param name="isScroll">帳簿項目一覧をスクロールするか</param>
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
-        public async Task UpdateAsync(List<int> actionIdList = null, int? balanceKind = null, int? categoryId = null, int? itemId = null,
+        public async Task LoadAsync(List<int> actionIdList = null, int? balanceKind = null, int? categoryId = null, int? itemId = null,
                                       bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
             if (this.Parent.SelectedTab != Tabs.BooksTab) return;
@@ -918,10 +920,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
 
             // 帳簿項目を選択する(サマリーの選択はこの段階では無視して処理する)
-            this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this.ActionVMList.Where((vm) => tmpActionIdList.Contains(vm.ActionId)));
+            this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this.ActionVMList.Where(vm => tmpActionIdList.Contains(vm.ActionId)));
 
             // サマリーを選択する
-            this.SelectedSummaryVM = this.SummaryVMList.FirstOrDefault((vm) => vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId);
+            this.SelectedSummaryVM = this.SummaryVMList.FirstOrDefault(vm => vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId);
 
             if (isScroll) {
                 if (this.Parent.DisplayedTermKind == TermKind.Monthly &&

@@ -88,6 +88,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
+        protected override void AddEventHandlers()
+        {
+            // NOP
+        }
+
+        public override Task LoadAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// 帳簿項目の初日/最終日を取得する
         /// </summary>

@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.Others.RequestEventArgs;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -12,6 +13,8 @@ namespace HouseholdAccountBook.ViewModels.Abstract
     /// </summary>
     public abstract class WindowPartViewModelBase : BindableBase
     {
+        protected readonly List<WindowPartViewModelBase> childrenVM = [];
+
         #region フィールド
         /// <summary>
         /// WaitCursorマネージャファクトリ
@@ -118,32 +121,33 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <param name="waitCursorManagerFactory">WaitCursorマネージャファクトリ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <remarks>コードビハインドのコンストラクタで呼び出す</remarks>
-        public virtual void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        public void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
         {
             this.waitCursorManagerFactory = waitCursorManagerFactory;
             this.dbHandlerFactory = dbHandlerFactory;
-        }
 
-        /// <summary>
-        /// DBから読み込む
-        /// </summary>
-        public virtual Task LoadAsync()
-        {
-            throw new NotImplementedException();
-        }
+            foreach (WindowPartViewModelBase childVM in this.childrenVM) {
+                childVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+            }
 
-        /// <summary>
-        /// DBに保存する
-        /// </summary>
-        protected virtual Task SaveAsync()
-        {
-            throw new NotImplementedException();
+            this.AddEventHandlers();
         }
 
         /// <summary>
         /// イベントハンドラをWVMに登録する
         /// </summary>
-        protected virtual void AddEventHandlers()
+        /// <remarks><see cref="Initialize(WaitCursorManagerFactory, DbHandlerFactory)"/> で呼び出す</remarks>
+        protected abstract void AddEventHandlers();
+
+        /// <summary>
+        /// 表示する情報を読み込む
+        /// </summary>
+        public abstract Task LoadAsync();
+
+        /// <summary>
+        /// 表示する情報を保存する
+        /// </summary>
+        protected virtual Task SaveAsync()
         {
             throw new NotImplementedException();
         }

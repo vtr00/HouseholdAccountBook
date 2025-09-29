@@ -395,6 +395,33 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.LoadAsync(null, null, null, null);
         }
 
+        protected override void AddEventHandlers()
+        {
+            this.FromBookChanged += async (_, _) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateItemListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+            this.ToBookChanged += async (_, _) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateItemListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+            this.CommissionKindChanged += async (_, _) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateItemListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+            this.ItemChanged += async (_, _) => {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateRemarkListAsync();
+                }
+            };
+        }
+
         /// <summary>
         /// DBから読み込む
         /// </summary>
@@ -479,8 +506,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.UpdateBookListAsync(fromBookId, toBookId);
             await this.UpdateItemListAsync(commissionItemId);
             await this.UpdateRemarkListAsync(commissionRemark);
-
-            this.AddEventHandlers();
         }
 
         /// <summary>
@@ -492,16 +517,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async Task UpdateBookListAsync(int? fromBookId = null, int? toBookId = null)
         {
             ViewModelLoader loader = new(this.dbHandlerFactory);
-            var bookVMList = await loader.LoadBookListAsync();
-            this.SelectedFromBookVM = bookVMList.FirstOrDefault(vm => vm.Id == fromBookId);
-            this.SelectedToBookVM = bookVMList.FirstOrDefault(vm => vm.Id == toBookId);
-            this.BookVMList = bookVMList;
+            this.BookVMList = await loader.LoadBookListAsync();
+            this.SelectedFromBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == fromBookId, 0);
+            this.SelectedToBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == toBookId, 0);
 
             switch (this.RegKind) {
                 case RegistrationKind.Add: {
                     if (this.SelectedFromBookVM.BookKind == BookKind.CreditCard) {
                         if (this.SelectedFromBookVM.DebitBookId != null) {
-                            this.SelectedFromBookVM = this.BookVMList.FirstOrDefault((vm) => { return vm.Id == this.SelectedFromBookVM.DebitBookId; });
+                            this.SelectedFromBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == this.SelectedFromBookVM.DebitBookId, 0);
                         }
                         if (this.SelectedFromBookVM.PayDay != null) {
                             this.FromDate = this.FromDate.GetDateInMonth(this.SelectedFromBookVM.PayDay.Value);
@@ -521,6 +545,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateItemListAsync(int? itemId = null)
         {
+            if (this.SelectedFromBookVM == null || this.SelectedToBookVM == null) return;
+
             int bookId = this.SelectedCommissionKind switch {
                 CommissionKind.MoveFrom => this.SelectedFromBookVM.Id.Value,
                 CommissionKind.MoveTo => this.SelectedToBookVM.Id.Value,
@@ -528,9 +554,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             };
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpItemId = itemId ?? this.SelectedItemVM?.Id;
-            var itemVMList = await loader.LoadItemListAsync(bookId, BalanceKind.Expenses, -1);
-            this.SelectedItemVM = itemVMList.FirstOrDefault(vm => vm.Id == tmpItemId, itemVMList.ElementAtOrDefault(0));
-            this.ItemVMList = itemVMList;
+            this.ItemVMList = await loader.LoadItemListAsync(bookId, BalanceKind.Expenses, -1);
+            this.SelectedItemVM = this.ItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0);
         }
 
         /// <summary>
@@ -540,38 +565,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateRemarkListAsync(string remark = null)
         {
+            if (this.SelectedItemVM == null) return;
+
             ViewModelLoader loader = new(this.dbHandlerFactory);
             string tmpRemark = remark ?? this.SelectedRemark;
-            var remarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
-            this.SelectedRemark = remarkVMList.FirstOrDefault(vm => vm.Remark == tmpRemark, remarkVMList.ElementAtOrDefault(0)).Remark;
-            this.RemarkVMList = remarkVMList;
-        }
-
-        protected override void AddEventHandlers()
-        {
-            this.FromBookChanged += async (_, _) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateItemListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-            this.ToBookChanged += async (_, _) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateItemListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-            this.CommissionKindChanged += async (_, _) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateItemListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-            this.ItemChanged += async (_, _) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateRemarkListAsync();
-                }
-            };
+            this.RemarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
+            this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
         }
 
         /// <summary>

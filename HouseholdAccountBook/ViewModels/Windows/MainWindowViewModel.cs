@@ -1681,50 +1681,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.MonthlyGraphTabVM = new(this, Tabs.MonthlyGraphTab);
             this.YearlySummaryTabVM = new(this, Tabs.YearlyListTab);
             this.YearlyGraphTabVM = new(this, Tabs.YearlyGraphTab);
-        }
 
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
-        {
-            this.BookTabVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-            this.DailyGraphTabVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-            this.MonthlySummaryTabVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-            this.MonthlyGraphTabVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-            this.YearlySummaryTabVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-            this.YearlyGraphTabVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-        }
-
-        public override async Task LoadAsync()
-        {
-            Properties.Settings settings = Properties.Settings.Default;
-            this.FiscalStartMonth = settings.App_StartMonth;
-
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                this.SelectedDBKind = dbHandler.DBKind;
-            }
-
-            // 帳簿リスト更新
-            await this.UpdateBookListAsync(settings.MainWindow_SelectedBookId);
-
-            // タブ選択
-            if (settings.MainWindow_SelectedTabIndex != -1) {
-                this.SelectedTabIndex = settings.MainWindow_SelectedTabIndex;
-            }
-            // グラフ種別1選択
-            if (settings.MainWindow_SelectedGraphKindIndex != -1) {
-                this.SelectedGraphKind1Index = settings.MainWindow_SelectedGraphKindIndex;
-            }
-            // グラフ種別2選択
-            if (settings.MainWindow_SelectedGraphKind2Index != -1) {
-                this.SelectedGraphKind2Index = settings.MainWindow_SelectedGraphKind2Index;
-            }
-
-            Log.Info($"SelectedTabIndex:{this.SelectedTabIndex} SelectedGraphKind1Index:{this.SelectedGraphKind1Index} SelectedGraphKind2Index:{this.SelectedGraphKind2Index}");
-
-            await this.UpdateAsync(isScroll: true, isUpdateActDateLastEdited: true);
-
-            this.AddEventHandlers();
+            this.childrenVM.AddRange(
+                [
+                    this.BookTabVM,
+                    this.DailyGraphTabVM,
+                    this.MonthlySummaryTabVM,
+                    this.MonthlyGraphTabVM,
+                    this.YearlySummaryTabVM,
+                    this.YearlyGraphTabVM
+                ]
+            );
         }
 
         protected override void AddEventHandlers()
@@ -1785,6 +1752,36 @@ namespace HouseholdAccountBook.ViewModels.Windows
             };
         }
 
+        public override async Task LoadAsync()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+            this.FiscalStartMonth = settings.App_StartMonth;
+
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                this.SelectedDBKind = dbHandler.DBKind;
+            }
+
+            // 帳簿リスト更新
+            await this.UpdateBookListAsync(settings.MainWindow_SelectedBookId);
+
+            // タブ選択
+            if (settings.MainWindow_SelectedTabIndex != -1) {
+                this.SelectedTabIndex = settings.MainWindow_SelectedTabIndex;
+            }
+            // グラフ種別1選択
+            if (settings.MainWindow_SelectedGraphKindIndex != -1) {
+                this.SelectedGraphKind1Index = settings.MainWindow_SelectedGraphKindIndex;
+            }
+            // グラフ種別2選択
+            if (settings.MainWindow_SelectedGraphKind2Index != -1) {
+                this.SelectedGraphKind2Index = settings.MainWindow_SelectedGraphKind2Index;
+            }
+
+            Log.Info($"SelectedTabIndex:{this.SelectedTabIndex} SelectedGraphKind1Index:{this.SelectedGraphKind1Index} SelectedGraphKind2Index:{this.SelectedGraphKind2Index}");
+
+            await this.UpdateAsync(isScroll: true, isUpdateActDateLastEdited: true);
+        }
+
         #region ウィンドウ設定プロパティ
         public override Size WindowSizeSetting
         {
@@ -1842,22 +1839,22 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             switch (this.SelectedTab) {
                 case Tabs.BooksTab:
-                    await this.BookTabVM.UpdateAsync(isScroll: isScroll, isUpdateActDateLastEdited: isUpdateActDateLastEdited);
+                    await this.BookTabVM.LoadAsync(isScroll: isScroll, isUpdateActDateLastEdited: isUpdateActDateLastEdited);
                     break;
                 case Tabs.DailyGraphTab:
-                    await this.DailyGraphTabVM.UpdateAsync();
+                    await this.DailyGraphTabVM.LoadAsync();
                     break;
                 case Tabs.MonthlyListTab:
-                    await this.MonthlySummaryTabVM.UpdateAsync();
+                    await this.MonthlySummaryTabVM.LoadAsync();
                     break;
                 case Tabs.MonthlyGraphTab:
-                    await this.MonthlyGraphTabVM.UpdateAsync();
+                    await this.MonthlyGraphTabVM.LoadAsync();
                     break;
                 case Tabs.YearlyListTab:
-                    await this.YearlySummaryTabVM.UpdateAsync();
+                    await this.YearlySummaryTabVM.LoadAsync();
                     break;
                 case Tabs.YearlyGraphTab:
-                    await this.YearlyGraphTabVM.UpdateAsync();
+                    await this.YearlyGraphTabVM.LoadAsync();
                     break;
             }
         }
