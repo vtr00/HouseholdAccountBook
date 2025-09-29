@@ -1,6 +1,6 @@
-﻿using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Models.Dao.Compositions;
-using HouseholdAccountBook.Models.DbHandler.Abstract;
+﻿using HouseholdAccountBook.Adapters.Dao.Compositions;
+using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 using System.Threading.Tasks;

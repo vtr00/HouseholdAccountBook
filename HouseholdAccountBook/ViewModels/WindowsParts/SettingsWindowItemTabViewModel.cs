@@ -1,10 +1,9 @@
-﻿using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Models.Dao.Compositions;
-using HouseholdAccountBook.Models.Dao.DbTable;
-using HouseholdAccountBook.Models.DbHandler.Abstract;
-using HouseholdAccountBook.Models.Dto.DbTable;
-using HouseholdAccountBook.Models.Logger;
-using HouseholdAccountBook.Models.Services;
+﻿using HouseholdAccountBook.Adapters.Dao.Compositions;
+using HouseholdAccountBook.Adapters.Dao.DbTable;
+using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+using HouseholdAccountBook.Adapters.Dto.DbTable;
+using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;

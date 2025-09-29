@@ -4,7 +4,7 @@ using HouseholdAccountBook.ViewModels.Abstract;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using static HouseholdAccountBook.Models.DbConstants;
+using static HouseholdAccountBook.Adapters.DbConstants;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {

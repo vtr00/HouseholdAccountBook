@@ -1,5 +1,5 @@
-﻿using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Models.DbHandler;
+﻿using HouseholdAccountBook.Adapters.DbHandler;
+using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Component;
 using System;

@@ -1,9 +1,8 @@
-﻿using HouseholdAccountBook.Enums;
+﻿using HouseholdAccountBook.Adapters.Dao.DbTable;
+using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+using HouseholdAccountBook.Adapters.Dto.DbTable;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Models.Dao.DbTable;
-using HouseholdAccountBook.Models.DbHandler.Abstract;
-using HouseholdAccountBook.Models.Dto.DbTable;
-using HouseholdAccountBook.Models.Services;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;

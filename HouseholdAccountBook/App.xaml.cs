@@ -1,9 +1,9 @@
-﻿using HouseholdAccountBook.DbHandler;
+﻿using HouseholdAccountBook.Adapters.DbHandler;
+using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Models.DbHandler;
-using HouseholdAccountBook.Models.DbHandler.Abstract;
-using HouseholdAccountBook.Models.Logger;
 using HouseholdAccountBook.Views.Windows;
 using Notification.Wpf;
 using System;

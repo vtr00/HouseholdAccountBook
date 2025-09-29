@@ -1,6 +1,6 @@
-﻿using HouseholdAccountBook.Enums;
+﻿using HouseholdAccountBook.Adapters.DbHandler;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Models.DbHandler;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views.UserControls;

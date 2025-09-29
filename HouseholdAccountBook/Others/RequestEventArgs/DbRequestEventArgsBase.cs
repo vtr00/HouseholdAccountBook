@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Models.DbHandler;
+﻿using HouseholdAccountBook.Adapters.DbHandler;
 using System;
 
 namespace HouseholdAccountBook.Others.RequestEventArgs

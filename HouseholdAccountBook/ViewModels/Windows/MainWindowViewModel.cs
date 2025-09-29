@@ -1,16 +1,15 @@
-﻿using HouseholdAccountBook.DbHandler;
+﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
+using HouseholdAccountBook.Adapters.Dao.DbTable;
+using HouseholdAccountBook.Adapters.Dao.KHDbTable;
+using HouseholdAccountBook.Adapters.DbHandler;
+using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+using HouseholdAccountBook.Adapters.Dto.Abstract;
+using HouseholdAccountBook.Adapters.Dto.DbTable;
+using HouseholdAccountBook.Adapters.Dto.KHDbTable;
+using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Models.Dao.Abstract;
-using HouseholdAccountBook.Models.Dao.DbTable;
-using HouseholdAccountBook.Models.Dao.KHDbTable;
-using HouseholdAccountBook.Models.DbHandler;
-using HouseholdAccountBook.Models.DbHandler.Abstract;
-using HouseholdAccountBook.Models.Dto.Abstract;
-using HouseholdAccountBook.Models.Dto.DbTable;
-using HouseholdAccountBook.Models.Dto.KHDbTable;
-using HouseholdAccountBook.Models.Logger;
-using HouseholdAccountBook.Models.Services;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -25,7 +24,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using static HouseholdAccountBook.Models.FileConstants;
+using static HouseholdAccountBook.Adapters.FileConstants;
 using static HouseholdAccountBook.Views.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.Windows
