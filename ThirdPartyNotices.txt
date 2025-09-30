@@ -57,67 +57,67 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Data.Sqlite 9.0.8
+# Microsoft.Data.Sqlite 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.Data.Sqlite.Core 9.0.8
+# Microsoft.Data.Sqlite.Core 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.EntityFrameworkCore 9.0.8
+# Microsoft.EntityFrameworkCore 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Abstractions 9.0.8
+# Microsoft.EntityFrameworkCore.Abstractions 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Analyzers 9.0.8
+# Microsoft.EntityFrameworkCore.Analyzers 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.Extensions.Caching.Abstractions 9.0.8
+# Microsoft.Extensions.Caching.Abstractions 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Caching.Memory 9.0.8
+# Microsoft.Extensions.Caching.Memory 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection 9.0.8
+# Microsoft.Extensions.DependencyInjection 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection.Abstractions 9.0.8
+# Microsoft.Extensions.DependencyInjection.Abstractions 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging 9.0.8
+# Microsoft.Extensions.Logging 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging.Abstractions 9.0.8
+# Microsoft.Extensions.Logging.Abstractions 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Options 9.0.8
+# Microsoft.Extensions.Options 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Primitives 9.0.8
+# Microsoft.Extensions.Primitives 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
@@ -172,7 +172,7 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://github.com/Microsoft/XamlBehaviorsWpf
 
-# Newtonsoft.Json 13.0.3
+# Newtonsoft.Json 13.0.4
    License: MIT
    Copyright © James Newton-King 2008
    https://www.newtonsoft.com/json
@@ -223,7 +223,7 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://github.com/Azure/azure-sdk-for-net/blob/System.ClientModel_1.5.1/sdk/core/System.ClientModel/README.md
 
-# System.CodeDom 9.0.8
+# System.CodeDom 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
@@ -233,27 +233,27 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://github.com/dotnet/runtime
 
-# System.Configuration.ConfigurationManager 9.0.8
+# System.Configuration.ConfigurationManager 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# System.Data.OleDb 9.0.8
+# System.Data.OleDb 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# System.Diagnostics.DiagnosticSource 9.0.8
+# System.Diagnostics.DiagnosticSource 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# System.Diagnostics.EventLog 9.0.8
+# System.Diagnostics.EventLog 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# System.Diagnostics.PerformanceCounter 9.0.8
+# System.Diagnostics.PerformanceCounter 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
@@ -288,7 +288,7 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# System.Security.Cryptography.ProtectedData 9.0.8
+# System.Security.Cryptography.ProtectedData 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
@@ -298,7 +298,7 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://github.com/dotnet/runtime
 
-# System.Text.Encoding.CodePages 9.0.8
+# System.Text.Encoding.CodePages 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
@@ -308,7 +308,7 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# System.Threading.Channels 9.0.8
+# System.Threading.Channels 9.0.9
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/

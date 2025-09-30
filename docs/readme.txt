@@ -6,8 +6,8 @@
 【    著作権者    】    toresebu
 【  ホームページ  】    https://github.com/vtr00/HouseholdAccountBook
 【    ソフト名    】    HouseholdAccountBook.exe
-【   バージョン   】    Ver 1.2.2.0
-【     作成日     】    2025/09/03
+【   バージョン   】    Ver 1.2.3.0
+【     作成日     】    2025/09/30
 【     連絡先     】    vtr0749@gmail.com
 ================================================================================
 

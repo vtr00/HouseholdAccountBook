@@ -33,9 +33,9 @@
     <NeutralLanguage>ja-JP</NeutralLanguage>
     <Authors>toresebu</Authors>
     <Company>PoliteMusic</Company>
-    <AssemblyVersion>1.2.2.0</AssemblyVersion>
+    <AssemblyVersion>1.2.3.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
-    <Version>1.2.2</Version>
+    <Version>1.2.3</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
@@ -157,6 +157,6 @@
     <Message Text="コピー処理を開始します(ThirdPartyNotices.txt)..." Importance="high" />
     <Copy SourceFiles="$(MSBuildProjectDirectory)/../ThirdPartyNotices.txt" DestinationFolder="$(PublishDir)" />
     <Message Text="コピー処理を開始します(readme.txt)..." Importance="high" />
-    <Copy SourceFiles="$(MSBuildProjectDirectory)/readme.txt" DestinationFolder="$(PublishDir)" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/../docs/readme.txt" DestinationFolder="$(PublishDir)" />
   </Target>
 </Project>
