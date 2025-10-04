@@ -126,7 +126,7 @@
                     AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True" 
                     HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
                 <DataGrid.Resources>
-                    <vm:BindingProxy x:Key="Proxy" DataContext="{Binding}"/>
+                    <vm:BindingProxy x:Key="Proxy" DataContext="{Binding ElementName=WVM}"/>
                 </DataGrid.Resources>
                 <DataGrid.InputBindings>
                     <KeyBinding Gesture="F2" Command="{Binding EditActionCommand}"/>
@@ -157,7 +157,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox IsChecked="{Binding IsMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MouseEnter="CheckBox_MouseEnter"
-                                           Command="{Binding ChangeIsMatchCommand}">
+                                          Command="{Binding DataContext.ChangeIsMatchCommand, Source={StaticResource Proxy}}">
                                     <CheckBox.Style>
                                         <Style TargetType="CheckBox">
                                             <Style.Triggers>

@@ -213,7 +213,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 一致チェック変更コマンド
         /// </summary>
-        public ICommand CheckIsMatchCommand => new RelayCommand(this.ChangeIsMatchCommand_Executed);
+        public ICommand ChangeIsMatchCommand => new RelayCommand(this.ChangeIsMatchCommand_Executed);
         #endregion
         #endregion
 
@@ -649,7 +649,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                                 continue;
                             }
 
-                            tmpVMList2.Add(new CsvComparisonViewModel() { Record = new CsvViewModel() { Date = date, Name = name, Value = value } });
+                            tmpVMList2.Add(new() { Record = new() { Date = date, Name = name, Value = value } });
                         }
                         catch (Exception) { }
                     }

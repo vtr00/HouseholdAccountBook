@@ -114,7 +114,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             bool oldValue = (bool)e.OldValue;
             bool newValue = (bool)e.NewValue;
-            if (!oldValue && newValue) {
+            if (oldValue != newValue) {
                 if (newValue) {
                     await this.WVM.UpdateComparisonVMListAsync();
                 }
@@ -164,7 +164,7 @@ namespace HouseholdAccountBook.Views.Windows
 
                     if (checkBox?.DataContext is CsvComparisonViewModel vm) {
                         this.WVM.SelectedCsvComparisonVM = vm;
-                        this.WVM.CheckIsMatchCommand?.Execute(null);
+                        this.WVM.ChangeIsMatchCommand?.Execute(null);
                     }
                 }
             }

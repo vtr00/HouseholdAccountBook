@@ -550,7 +550,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             ViewModelLoader loader = new(this.dbHandlerFactory);
             string tmpRemark = remark ?? this.SelectedRemark;
             this.RemarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
-            this.SelectedShopName = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
+            this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
         }
 
         public override async Task LoadAsync()
