@@ -261,7 +261,6 @@ namespace HouseholdAccountBook
             Log.Info("Application End");
 
             ReleaseMutex();
-            Log.Close();
         }
 
         /// <summary>
@@ -302,8 +301,7 @@ namespace HouseholdAccountBook
             string targetExe = GetCurrentExe();
             Log.Debug($"target: {targetExe}");
 
-            App.ReleaseMutex();
-            Log.Close();
+            ReleaseMutex();
 
             _ = Process.Start(targetExe);
 

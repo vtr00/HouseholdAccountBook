@@ -35,23 +35,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="selectedMonth">選択された年月</param>
         /// <param name="selectedDate">選択された日付</param>
         public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate)
-        {
-            this.Owner = owner;
-            this.Name = "MoveReg";
-            WindowLocationManager.Instance.Add(this);
-
-            this.InitializeComponent();
-
-            this.AddCommonEventHandlers();
-            this.Loaded += async (sender, e) => {
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadAsync(selectedBookId, null, selectedMonth, selectedDate);
-                }
-            };
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
-            this.WVM.RegKind = RegistrationKind.Add;
-        }
+            : this(owner, dbHandlerFactory, selectedBookId, null, selectedMonth, selectedDate, RegistrationKind.Add) { }
 
         /// <summary>
         /// 帳簿項目(移動)の編集(複製)のために <see cref="MoveRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
@@ -61,6 +45,10 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="selectedGroupId">選択された帳簿項目のグループID</param>
         /// <param name="regKind">登録種別</param>
         public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedGroupId, RegistrationKind regKind = RegistrationKind.Edit)
+            : this(owner, dbHandlerFactory, null, selectedGroupId, null, null, regKind) { }
+
+        private MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, int? selectedGroupId, DateTime? selectedMonth, DateTime? selectedDate, 
+            RegistrationKind regKind)
         {
             this.Owner = owner;
             this.Name = "MoveReg";
@@ -71,7 +59,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.AddCommonEventHandlers();
             this.Loaded += async (sender, e) => {
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadAsync(null, selectedGroupId, null, null);
+                    await this.WVM.LoadAsync(selectedBookId, selectedGroupId, selectedMonth, selectedDate);
                 }
             };
 

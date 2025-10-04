@@ -708,6 +708,7 @@
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition SharedSizeGroup="Header"/>
@@ -739,6 +740,11 @@
                                             <DataGridTextColumn Header="Height" Width="*" Binding="{Binding Height}"/>
                                         </DataGrid.Columns>
                                     </DataGrid>
+
+                                    <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" 
+                                            Visibility="{Binding DebugMode, Converter={StaticResource BoolVisibilityConverter}}"
+                                            Content="{x:Static properties:Resources.Button_InitializeWindowPositionAndSize}"
+                                            Command="{Binding InitializeWindowSettingCommand}"/>
                                 </Grid>
                             </GroupBox>
                             <!-- デバッグ -->
@@ -750,6 +756,7 @@
                                 <Grid Visibility="{Binding DebugMode, Converter={StaticResource BoolVisibilityConverter}}">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition SharedSizeGroup="Header"/>
@@ -757,9 +764,9 @@
                                         <ColumnDefinition SharedSizeGroup="Button"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" 
-                                            Content="{x:Static properties:Resources.Button_InitializeWindowPositionAndSize}"
-                                            Command="{Binding InitializeWindowSettingCommand}"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_OutputLog}"/>
+                                    <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" Content="{x:Static properties:Resources.CheckBox_Log_Operation}" IsChecked="{Binding OutputOperationLog}"/>
+                                    <CheckBox Grid.Row="1" Grid.Column="1" Margin="5" Content="{x:Static properties:Resources.CheckBox_Log_Window}" IsChecked="{Binding OutputWindowLog}"/>
                                 </Grid>
                             </GroupBox>
                         </StackPanel>

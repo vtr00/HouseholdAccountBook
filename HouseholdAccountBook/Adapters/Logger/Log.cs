@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.Properties;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -10,56 +11,53 @@ namespace HouseholdAccountBook.Adapters.Logger
     /// <summary>
     /// トレースログ出力
     /// </summary>
-    public static class Log
+    public class Log
     {
+        /// <summary>
+        /// シングルトンのインスタンス
+        /// </summary>
+        private static readonly Lazy<Log> singleton = new(() => new());
+        /// <summary>
+        /// インスタンス
+        /// </summary>
+        public static Log Instance => singleton.Value;
+
         private static readonly string listenerName = "logFileOutput";
-        private static TextWriterTraceListener listener = null;
+        private TextWriterTraceListener listener = null;
 
         /// <summary>
         /// <see cref="Log"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        static Log()
+        private Log()
         {
             Trace.AutoFlush = true;
-            CreateNewFileListener();
+        }
+
+        ~Log()
+        {
+            if (this.listener != null) {
+                this.listener.Close();
+                this.listener.Dispose();
+                this.listener = null;
+            }
         }
 
         /// <summary>
         /// リスナーを生成する
         /// </summary>
-        static private void CreateNewFileListener()
+        private void CreateListener()
         {
-            if (listener == null) {
-                listener = new TextWriterTraceListener();
+            if (this.listener == null) {
                 if (!Directory.Exists(LogFolderPath)) _ = Directory.CreateDirectory(LogFolderPath);
                 TextWriter sw = new StreamWriter(LogFilePath, true, Encoding.UTF8);
-                listener.Name = listenerName;
-                listener.Writer = sw;
-                listener.TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId | TraceOptions.ThreadId;
 
-                _ = Trace.Listeners.Add(listener);
-            }
-        }
+                this.listener = new TextWriterTraceListener {
+                    Name = listenerName,
+                    Writer = sw,
+                    TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId | TraceOptions.ThreadId
+                };
 
-        /// <summary>
-        /// ログファイルを変更する
-        /// </summary>
-        static public void ChangeNewFile()
-        {
-            Trace.Listeners.Remove(listenerName);
-            Close();
-            CreateNewFileListener();
-        }
-
-        /// <summary>
-        /// リスナーを閉じる
-        /// </summary>
-        static public void Close()
-        {
-            if (listener != null) {
-                listener.Close();
-                listener.Dispose();
-                listener = null;
+                _ = Trace.Listeners.Add(this.listener);
             }
         }
 
@@ -72,7 +70,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="lineNumber">出力元行数</param>
         static public void Error(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
-            WriteLine("[Error  ]", message, fileName, methodName, lineNumber);
+            Instance.WriteLine("[Error  ]", message, fileName, methodName, lineNumber);
         }
         /// <summary>
         /// ログファイルに警告ログを1行出力する
@@ -83,7 +81,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="lineNumber">出力元行数</param>
         static public void Warning(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
-            WriteLine("[Warning]", message, fileName, methodName, lineNumber);
+            Instance.WriteLine("[Warning]", message, fileName, methodName, lineNumber);
         }
         /// <summary>
         /// ログファイルに情報ログを1行出力する
@@ -94,7 +92,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="lineNumber">出力元行数</param>
         static public void Info(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
-            WriteLine("[Info   ]", message, fileName, methodName, lineNumber);
+            Instance.WriteLine("[Info   ]", message, fileName, methodName, lineNumber);
         }
         /// <summary>
         /// ログファイルにデバッグログを1行出力する
@@ -105,7 +103,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="lineNumber">出力元行数</param>
         static public void Debug(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
-            WriteLine("[Debug  ]", message, fileName, methodName, lineNumber);
+            Instance.WriteLine("[Debug  ]", message, fileName, methodName, lineNumber);
         }
 
         /// <summary>
@@ -116,9 +114,12 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
-        static private void WriteLine(string type, string message, string fileName, string methodName, int lineNumber)
+        private void WriteLine(string type, string message, string fileName, string methodName, int lineNumber)
         {
-            if (!Directory.Exists(LogFolderPath)) _ = Directory.CreateDirectory(LogFolderPath);
+            Settings settings = Settings.Default;
+            if (!settings.App_OutputFlag_OperationLog) return;
+
+            this.CreateListener();
 
             int index = fileName.LastIndexOf('\\');
             string className = fileName.Substring(index + 1, fileName.IndexOf('.', index + 1) - index - 1);

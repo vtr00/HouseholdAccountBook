@@ -21,26 +21,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="dateWithinMonth">月内日付</param>
         public TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateTime dateWithinMonth)
-        {
-            this.Owner = owner;
-            this.Name = "Term";
-            WindowLocationManager.Instance.Add(this);
-
-            this.InitializeComponent();
-
-            this.AddCommonEventHandlers();
-            // ロード時処理はコンストラクタで設定しておく
-            this.Loaded += (sender, e) => {
-                // xamlで指定するとCalendarが正しく表示されないため、ここで指定する
-                this.calendar.DisplayMode = CalendarMode.Year;
-
-                this.WVM.StartDate = dateWithinMonth.GetFirstDateOfMonth();
-                this.WVM.EndDate = dateWithinMonth.GetLastDateOfMonth();
-                this.selectedMonthRadioButton.IsChecked = true;
-            };
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
-        }
+            : this(owner, dbHandlerFactory, dateWithinMonth.GetFirstDateOfMonth(), dateWithinMonth.GetLastDateOfMonth()) { }
 
         /// <summary>
         /// <see cref="TermWindow"/> クラスの新しいインスタンスを初期化します。

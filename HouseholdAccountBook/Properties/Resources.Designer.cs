@@ -431,6 +431,24 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   操作ログ に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string CheckBox_Log_Operation {
+            get {
+                return ResourceManager.GetString("CheckBox_Log_Operation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ウィンドウログ に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string CheckBox_Log_Window {
+            get {
+                return ResourceManager.GetString("CheckBox_Log_Window", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   メインウィンドウ以外の位置 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string CheckBox_SaveTarget_PositionWithoutMainWindow {
@@ -2314,6 +2332,15 @@ namespace HouseholdAccountBook.Properties {
         public static string TextBlock_Npgsql_UserName {
             get {
                 return ResourceManager.GetString("TextBlock_Npgsql_UserName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ログ出力 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TextBlock_OutputLog {
+            get {
+                return ResourceManager.GetString("TextBlock_OutputLog", resourceCulture);
             }
         }
         

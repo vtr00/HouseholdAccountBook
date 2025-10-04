@@ -60,23 +60,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="selectedMonth">選択された年月</param>
         /// <param name="selectedDate">選択された日付</param>
         public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate = null)
-        {
-            this.Owner = owner;
-            this.Name = "ActListReg";
-            WindowLocationManager.Instance.Add(this);
-
-            this.InitializeComponent();
-
-            this.AddCommonEventHandlers();
-            this.Loaded += async (sender, e) => {
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadAsync(selectedBookId, selectedMonth, selectedDate, null, null);
-                }
-            };
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
-            this.WVM.RegKind = RegistrationKind.Add;
-        }
+            : this(owner, dbHandlerFactory, selectedBookId, selectedMonth, selectedDate, null, null, RegistrationKind.Add) { }
 
         /// <summary>
         /// 複数の帳簿項目の新規登録のために <see cref="ActionListRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
@@ -86,23 +70,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="selectedBookId">選択された帳簿ID</param>
         /// <param name="selectedRecordList">選択されたCSVレコードリスト</param>
         public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, List<CsvViewModel> selectedRecordList)
-        {
-            this.Owner = owner;
-            this.Name = "ActListReg";
-            WindowLocationManager.Instance.Add(this);
-
-            this.InitializeComponent();
-
-            this.AddCommonEventHandlers();
-            this.Loaded += async (sender, e) => {
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadAsync(selectedBookId, null, null, selectedRecordList, null);
-                }
-            };
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
-            this.WVM.RegKind = RegistrationKind.Add;
-        }
+            : this(owner, dbHandlerFactory, selectedBookId, null, null, selectedRecordList, null, RegistrationKind.Add) { }
 
         /// <summary>
         /// 複数の帳簿項目の編集(複製)のために <see cref="ActionListRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
@@ -112,6 +80,10 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="selectedGroupId">選択されたグループID</param>
         /// <param name="regKind">登録種別</param>
         public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedGroupId, RegistrationKind regKind = RegistrationKind.Edit)
+            : this(owner, dbHandlerFactory, null, null, null, null, selectedGroupId, regKind) { }
+
+        private ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate, 
+            List<CsvViewModel> selectedRecordList, int? selectedGroupId, RegistrationKind regKind)
         {
             this.Owner = owner;
             this.Name = "ActListReg";
@@ -122,7 +94,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.AddCommonEventHandlers();
             this.Loaded += async (sender, e) => {
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadAsync(null, null, null, null, selectedGroupId);
+                    await this.WVM.LoadAsync(selectedBookId, selectedMonth, selectedDate, selectedRecordList, selectedGroupId);
                 }
             };
 

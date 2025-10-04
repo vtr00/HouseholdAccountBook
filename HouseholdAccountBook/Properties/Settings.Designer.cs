@@ -934,5 +934,29 @@ namespace HouseholdAccountBook.Properties {
                 this["VersionWindow_Top"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool App_OutputFlag_WindowLog {
+            get {
+                return ((bool)(this["App_OutputFlag_WindowLog"]));
+            }
+            set {
+                this["App_OutputFlag_WindowLog"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool App_OutputFlag_OperationLog {
+            get {
+                return ((bool)(this["App_OutputFlag_OperationLog"]));
+            }
+            set {
+                this["App_OutputFlag_OperationLog"] = value;
+            }
+        }
     }
 }

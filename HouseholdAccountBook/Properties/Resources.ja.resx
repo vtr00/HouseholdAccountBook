@@ -801,6 +801,9 @@
   <data name="TextBlock_Book" xml:space="preserve">
     <value>帳簿</value>
   </data>
+  <data name="TextBlock_OutputLog" xml:space="preserve">
+    <value>ログ出力</value>
+  </data>
   <data name="TextBlock_Books" xml:space="preserve">
     <value>帳簿</value>
   </data>
@@ -1027,6 +1030,12 @@
     <value>祝日の一覧の取得に失敗しました。</value>
   </data>
   <data name="Unit_FiscalYear_Pre" xml:space="preserve">
-    <value></value>
+    <value />
+  </data>
+  <data name="CheckBox_Log_Operation" xml:space="preserve">
+    <value>操作ログ</value>
+  </data>
+  <data name="CheckBox_Log_Window" xml:space="preserve">
+    <value>ウィンドウログ</value>
   </data>
 </root>

@@ -245,6 +245,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
         #endregion
 
+        #region デバッグ
         /// <summary>
         /// デバッグモード
         /// </summary>
@@ -262,6 +263,32 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private bool _DebugMode;
         #endregion
 
+        /// <summary>
+        /// 操作ログ出力
+        /// </summary>
+        #region OutputOperationLog
+        public bool OutputOperationLog
+        {
+            get => this._OutputOperationLog;
+            set => this.SetProperty(ref this._OutputOperationLog, value);
+        }
+        private bool _OutputOperationLog = default;
+        #endregion
+
+        /// <summary>
+        /// ウィンドウログ出力
+        /// </summary>
+        #region OutputWindowLog
+        public bool OutputWindowLog
+        {
+            get => this._OutputWindowLog;
+            set => this.SetProperty(ref this._OutputWindowLog, value);
+        }
+        private bool _OutputWindowLog = default;
+        #endregion
+        #endregion
+
+        #region コマンド
         /// <summary>
         /// pg_dump.exe選択コマンド
         /// </summary>
@@ -294,6 +321,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// その他設定保存コマンド
         /// </summary>
         public ICommand SaveOtherSettingsCommand => new RelayCommand(this.SaveOtherSettingsCommand_Executed);
+        #endregion
         #endregion
 
         #region コマンドイベントハンドラ
@@ -519,6 +547,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.IsPositionSaved = settings.App_IsPositionSaved;
 
             this.DebugMode = settings.App_IsDebug;
+            this.OutputOperationLog = settings.App_OutputFlag_OperationLog;
+            this.OutputWindowLog = settings.App_OutputFlag_WindowLog;
 
             this.WindowSettingVMList = LoadWindowSettings();
         }
@@ -609,6 +639,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             settings.App_IsPositionSaved = this.IsPositionSaved;
 
             settings.App_IsDebug = this.DebugMode;
+            settings.App_OutputFlag_WindowLog = this.OutputWindowLog;
+            settings.App_OutputFlag_OperationLog = this.OutputOperationLog;
 
             settings.Save();
         }

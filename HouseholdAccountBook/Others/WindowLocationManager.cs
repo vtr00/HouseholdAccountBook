@@ -19,6 +19,11 @@ namespace HouseholdAccountBook.Others
         /// </summary>
         private static readonly Lazy<WindowLocationManager> singleton = new(() => new());
         /// <summary>
+        /// インスタンス
+        /// </summary>
+        public static WindowLocationManager Instance => singleton.Value;
+
+        /// <summary>
         /// ウィンドウログ
         /// </summary>
         private readonly Dictionary<Window, WindowLog> logDic = [];
@@ -30,8 +35,6 @@ namespace HouseholdAccountBook.Others
         /// 最終補正値
         /// </summary>
         private readonly Dictionary<Window, Rect> lastRectDic = [];
-
-        public static WindowLocationManager Instance => singleton.Value;
 
         private WindowLocationManager() { }
 

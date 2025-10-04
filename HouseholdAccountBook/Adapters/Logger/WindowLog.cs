@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using HouseholdAccountBook.Properties;
+using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Windows;
@@ -61,6 +62,9 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="forceLog">状態、位置が変わっていなくても保存するか</param>
         public void Log(string comment = "", bool forceLog = false)
         {
+            Settings settings = Settings.Default;
+            if (!settings.App_OutputFlag_WindowLog) return;
+
             if (!forceLog &&
                 this.lastSavedWindowState == this.window.WindowState &&
                 this.lastSavedRect == this.window.RestoreBounds) return;

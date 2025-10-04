@@ -53,23 +53,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="selectedMonth">選択された年月</param>
         /// <param name="selectedDate">選択された日付</param>
         public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate)
-        {
-            this.Owner = owner;
-            this.Name = "ActList";
-            WindowLocationManager.Instance.Add(this);
-
-            this.InitializeComponent();
-
-            this.AddCommonEventHandlers();
-            this.Loaded += async (sender, e) => {
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadAsync(selectedBookId, selectedMonth, selectedDate, null, null);
-                }
-            };
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
-            this.WVM.RegKind = RegistrationKind.Add;
-        }
+            : this(owner, dbHandlerFactory, selectedBookId, selectedMonth, selectedDate, null, null, RegistrationKind.Add) { }
 
         /// <summary>
         /// 帳簿項目の新規登録のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
@@ -79,24 +63,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="selectedBookId">選択された帳簿ID</param>
         /// <param name="selectedRecord">選択されたCSVレコード</param>
         public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, CsvViewModel selectedRecord)
-        {
-            this.Owner = owner;
-            this.Name = "ActList";
-            WindowLocationManager.Instance.Add(this);
-
-            this.InitializeComponent();
-
-            this.AddCommonEventHandlers();
-            this.Loaded += async (sender, e) => {
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadAsync(selectedBookId, null, null, selectedRecord, null);
-                }
-            };
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
-            this.WVM.RegKind = RegistrationKind.Add;
-            this.WVM.AddedByCsvComparison = true;
-        }
+            : this(owner, dbHandlerFactory, selectedBookId, null, null, selectedRecord, null, RegistrationKind.Add) { }
 
         /// <summary>
         /// 帳簿項目の編集(複製)のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
@@ -106,9 +73,13 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="selectedActionId">帳簿項目ID</param>
         /// <param name="regKind">登録種別</param>
         public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedActionId, RegistrationKind regKind = RegistrationKind.Edit)
+            : this(owner, dbHandlerFactory, null, null, null, null, selectedActionId, regKind) { }
+
+        private ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate, 
+                                         CsvViewModel selectedRecord, int? selectedActionId, RegistrationKind regKind)
         {
             this.Owner = owner;
-            this.Name = "ActList";
+            this.Name = "ActReg";
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
@@ -116,13 +87,15 @@ namespace HouseholdAccountBook.Views.Windows
             this.AddCommonEventHandlers();
             this.Loaded += async (sender, e) => {
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadAsync(null, null, null, null, selectedActionId);
+                    await this.WVM.LoadAsync(selectedBookId, selectedMonth, selectedDate, selectedRecord, selectedActionId);
                 }
             };
 
             this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
             this.WVM.RegKind = regKind;
+            this.WVM.AddedByCsvComparison = selectedRecord is not null;
         }
+
         #endregion
     }
 }

@@ -202,6 +202,7 @@ namespace HouseholdAccountBook.Views.Windows
                         // ウィンドウ非表示時イベントを登録する
                         this.ccw.Hided += (sender, e) => {
                             _ = this.Activate();
+                            _ = this._actionDataGrid.Focus();
                         };
                     }
                     else {
