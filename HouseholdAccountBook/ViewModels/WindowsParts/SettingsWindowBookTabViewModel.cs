@@ -330,19 +330,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
-        protected override void AddEventHandlers()
-        {
-            this.SelectedBookVMChanged += async (sender, e) => {
-                if (e.Value != null) {
-                    ViewModelLoader loader = new(this.dbHandlerFactory);
-                    this.DisplayedBookSettingVM = await loader.LoadBookSettingViewModelAsync(e.Value.Id.Value);
-                }
-                else {
-                    this.DisplayedBookSettingVM = null;
-                }
-            };
-        }
-
         public override async Task LoadAsync()
         {
             await this.LoadAsync(null);
@@ -374,6 +361,19 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             this.BookVMList = await loader.LoadBookListAsync();
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
+        }
+
+        public override void AddEventHandlers()
+        {
+            this.SelectedBookVMChanged += async (sender, e) => {
+                if (e.Value != null) {
+                    ViewModelLoader loader = new(this.dbHandlerFactory);
+                    this.DisplayedBookSettingVM = await loader.LoadBookSettingViewModelAsync(e.Value.Id.Value);
+                }
+                else {
+                    this.DisplayedBookSettingVM = null;
+                }
+            };
         }
     }
 }

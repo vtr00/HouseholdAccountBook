@@ -33,17 +33,17 @@ namespace HouseholdAccountBook.Extensions
         }
 
         /// <summary>
-        /// <see cref="WindowViewModelBase"/> に共通のイベントハンドラを登録する
+        /// <see cref="WindowViewModelBase"/> に汎用のイベントハンドラを登録する
         /// </summary>
         /// <param name="window"></param>
         /// <remarks>コンストラクタで呼び出す</remarks>
-        public static void AddCommonEventHandlers(this Window window)
+        public static void AddCommonEventHandlersToVM(this Window window)
         {
             if (window.DataContext is not WindowViewModelBase wvm) {
                 return;
             }
 
-            /// ViewModelのイベントハンドラを登録する
+            /// ViewModelにWindow関連のイベントハンドラを登録する
             wvm.CloseRequested += (sender, e) => {
                 if (e.IsDialog) {
                     try {

@@ -853,22 +853,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.SelectedActionVMList = [.. this.SelectedActionVMList.Where(vm => this.DisplayedActionVMList.Contains(vm))];
         }
 
-        protected override void AddEventHandlers()
-        {
-            // 帳簿項目選択変更時
-            this.SelectedActionVMList.CollectionChanged += (sender, e) => {
-                Log.Debug("SelectedActionVMList_CollectionChanged");
-
-                this.RaisePropertyChanged(nameof(this.AverageValue));
-                this.RaisePropertyChanged(nameof(this.Count));
-                this.RaisePropertyChanged(nameof(this.SumValue));
-                this.RaisePropertyChanged(nameof(this.IncomeSumValue));
-                this.RaisePropertyChanged(nameof(this.ExpensesSumValue));
-
-                this.RaisePropertyChanged(nameof(this.IsMatch));
-            };
-        }
-
         public override async Task LoadAsync()
         {
             await this.LoadAsync(null, null, null, null, false, false);
@@ -949,6 +933,22 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     this.ActDateLastEdited = null;
                 }
             }
+        }
+
+        public override void AddEventHandlers()
+        {
+            // 帳簿項目選択変更時
+            this.SelectedActionVMList.CollectionChanged += (sender, e) => {
+                Log.Debug("SelectedActionVMList_CollectionChanged");
+
+                this.RaisePropertyChanged(nameof(this.AverageValue));
+                this.RaisePropertyChanged(nameof(this.Count));
+                this.RaisePropertyChanged(nameof(this.SumValue));
+                this.RaisePropertyChanged(nameof(this.IncomeSumValue));
+                this.RaisePropertyChanged(nameof(this.ExpensesSumValue));
+
+                this.RaisePropertyChanged(nameof(this.IsMatch));
+            };
         }
     }
 }

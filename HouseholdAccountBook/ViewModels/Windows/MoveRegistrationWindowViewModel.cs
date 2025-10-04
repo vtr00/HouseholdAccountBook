@@ -34,19 +34,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 移動元帳簿変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<int?>> FromBookChanged;
+        public event EventHandler<ChangedEventArgs<int?>> FromBookChanged;
         /// <summary>
         /// 移動先帳簿変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<int?>> ToBookChanged;
+        public event EventHandler<ChangedEventArgs<int?>> ToBookChanged;
         /// <summary>
         /// 手数料種別変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<CommissionKind>> CommissionKindChanged;
+        public event EventHandler<ChangedEventArgs<CommissionKind>> CommissionKindChanged;
         /// <summary>
         /// 項目変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<int?>> ItemChanged;
+        public event EventHandler<ChangedEventArgs<int?>> ItemChanged;
 
         /// <summary>
         /// 登録時イベント
@@ -120,10 +120,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedFromBookVM;
             set {
+                var oldValue = this._SelectedFromBookVM;
                 if (this.SetProperty(ref this._SelectedFromBookVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        this.FromBookChanged?.Invoke(this, new EventArgs<int?>(value.Id));
+                        this.FromBookChanged?.Invoke(this, new() { OldValue = oldValue?.Id, NewValue = value?.Id });
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -139,10 +140,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedToBookVM;
             set {
+                var oldValue = this._SelectedToBookVM;
                 if (this.SetProperty(ref this._SelectedToBookVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        this.ToBookChanged?.Invoke(this, new EventArgs<int?>(value.Id));
+                        this.ToBookChanged?.Invoke(this, new() { OldValue = oldValue?.Id, NewValue = value?.Id });
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -250,10 +252,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedCommissionKind;
             set {
+                var oldValue = this._SelectedCommissionKind;
                 if (this.SetProperty(ref this._SelectedCommissionKind, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        CommissionKindChanged?.Invoke(this, new EventArgs<CommissionKind>(value));
+                        CommissionKindChanged?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -281,10 +284,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedItemVM;
             set {
+                var oldValue = this._SelectedItemVM;
                 if (this.SetProperty(ref this._SelectedItemVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        ItemChanged?.Invoke(this, new EventArgs<int?>(value?.Id));
+                        ItemChanged?.Invoke(this, new() { OldValue = oldValue?.Id, NewValue = value?.Id });
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -388,24 +392,26 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        protected override void AddEventHandlers()
+        public override async Task LoadAsync()
+        {
+            await this.LoadAsync(null, null, null, null);
+        }
+
+        public override void AddEventHandlers()
         {
             this.FromBookChanged += async (_, _) => {
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateItemListAsync();
-                    await this.UpdateRemarkListAsync();
                 }
             };
             this.ToBookChanged += async (_, _) => {
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateItemListAsync();
-                    await this.UpdateRemarkListAsync();
                 }
             };
             this.CommissionKindChanged += async (_, _) => {
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateItemListAsync();
-                    await this.UpdateRemarkListAsync();
                 }
             };
             this.ItemChanged += async (_, _) => {
@@ -413,11 +419,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     await this.UpdateRemarkListAsync();
                 }
             };
-        }
-
-        public override async Task LoadAsync()
-        {
-            await this.LoadAsync(null, null, null, null);
         }
 
         /// <summary>

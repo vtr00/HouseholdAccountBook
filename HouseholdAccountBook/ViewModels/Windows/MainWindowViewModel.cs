@@ -45,19 +45,23 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// タブ選択変更時イベント
         /// </summary>
-        public event Action SelectedTabChanged = default;
+        public event EventHandler<ChangedEventArgs<int>> SelectedTabChanged = default;
         /// <summary>
         /// 帳簿選択変更時イベント
         /// </summary>
-        public event Action SelectedBookChanged = default;
+        public event EventHandler<ChangedEventArgs<int?>> SelectedBookChanged = default;
         /// <summary>
-        /// グラフ種別選択変更時イベント
+        /// グラフ種別1選択変更時イベント
         /// </summary>
-        public event Action SelectedGraphKindChanged = default;
+        public event EventHandler<ChangedEventArgs<GraphKind1>> SelectedGraphKind1Changed = default;
+        /// <summary>
+        /// グラフ種別2選択変更時イベント
+        /// </summary>
+        public event EventHandler<ChangedEventArgs<GraphKind2>> SelectedGraphKind2Changed = default;
         /// <summary>
         /// 系列選択変更時イベント
         /// </summary>
-        public event Action SelectedSeriesChanged
+        public event EventHandler SelectedSeriesChanged
         {
             add {
                 this.MonthlySummaryTabVM.SelectedSeriesChanged += value;
@@ -215,8 +219,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedTabIndex;
             set {
+                var oldValue = this._SelectedTabIndex;
                 if (this.SetProperty(ref this._SelectedTabIndex, value)) {
-                    this.SelectedTabChanged?.Invoke();
+                    this.SelectedTabChanged?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
                     this.RaisePropertyChanged(nameof(this.DisplayedStart));
                     this.RaisePropertyChanged(nameof(this.DisplayedEnd));
                 }
@@ -254,8 +259,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedBookVM;
             set {
+                var oldVM = this._SelectedBookVM;
                 if (this.SetProperty(ref this._SelectedBookVM, value)) {
-                    this.SelectedBookChanged?.Invoke();
+                    this.SelectedBookChanged?.Invoke(this, new() { OldValue = oldVM?.Id, NewValue = value?.Id });
                 }
             }
         }
@@ -496,8 +502,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedGraphKind1;
             set {
+                var oldValue = this._SelectedGraphKind1;
                 if (this.SetProperty(ref this._SelectedGraphKind1, value)) {
-                    this.SelectedGraphKindChanged?.Invoke();
+                    this.SelectedGraphKind1Changed?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
                 }
             }
         }
@@ -528,8 +535,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedGraphKind2;
             set {
+                var oldValue = this._SelectedGraphKind2;
                 if (this.SetProperty(ref this._SelectedGraphKind2, value)) {
-                    this.SelectedGraphKindChanged?.Invoke();
+                    this.SelectedGraphKind2Changed?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
                 }
             }
         }
@@ -1693,46 +1701,56 @@ namespace HouseholdAccountBook.ViewModels.Windows
             );
         }
 
-        protected override void AddEventHandlers()
+        public override void AddEventHandlers()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
             // タブ選択変更時
-            this.SelectedTabChanged += async () => {
-                Log.Info($"SelectedTabChanged SelectedTabIndex:{this.SelectedTabIndex}");
+            this.SelectedTabChanged += async (sender, e) => {
+                Log.Info($"SelectedTabChanged old:{e.OldValue} new:{e.NewValue}");
 
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    settings.MainWindow_SelectedTabIndex = this.SelectedTabIndex;
+                    settings.MainWindow_SelectedTabIndex = e.NewValue;
                     settings.Save();
 
                     await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
                 }
             };
             // 帳簿選択変更時
-            this.SelectedBookChanged += async () => {
-                Log.Info($"SelectedBookChanged SelectedBookId:{this.SelectedBookVM?.Id}");
+            this.SelectedBookChanged += async (sender, e) => {
+                Log.Info($"SelectedBookChanged old:{e.OldValue} new:{e.NewValue}");
 
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    settings.MainWindow_SelectedBookId = this.SelectedBookVM?.Id ?? -1;
+                    settings.MainWindow_SelectedBookId = e.NewValue ?? -1;
                     settings.Save();
 
                     await this.UpdateAsync(isScroll: true);
                 }
             };
-            // グラフ種別選択変更時
-            this.SelectedGraphKindChanged += async () => {
-                Log.Info($"SelectedGraphKindChanged SelectedGraphKind1Index:{this.SelectedGraphKind1Index} SelectedGraphKind2Index:{this.SelectedGraphKind2Index}");
+            // グラフ種別1選択変更時
+            this.SelectedGraphKind1Changed += async (sender, e) => {
+                Log.Info($"SelectedGraphKind1Changed old:{e.OldValue} new:{e.NewValue}");
 
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    settings.MainWindow_SelectedGraphKindIndex = this.SelectedGraphKind1Index;
-                    settings.MainWindow_SelectedGraphKind2Index = this.SelectedGraphKind2Index;
+                    settings.MainWindow_SelectedGraphKindIndex = (int)e.NewValue;
+                    settings.Save();
+
+                    await this.UpdateAsync();
+                }
+            };
+            // グラフ種別2選択変更時
+            this.SelectedGraphKind2Changed += async (sender, e) => {
+                Log.Info($"SelectedGraphKind1Changed old:{e.OldValue} new:{e.NewValue}");
+
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    settings.MainWindow_SelectedGraphKind2Index = (int)e.NewValue;
                     settings.Save();
 
                     await this.UpdateAsync();
                 }
             };
             // 系列選択変更時
-            this.SelectedSeriesChanged += () => {
+            this.SelectedSeriesChanged += (sender, e) => {
                 Log.Info("SelectedSeriesChanged");
 
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
@@ -1866,8 +1884,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            this.BookVMList = await loader.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedStart, this.DisplayedEnd);
-            this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
+            var tmpBookVMList = await loader.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedStart, this.DisplayedEnd);
+            this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0); // 先に選択しておく
+            this.BookVMList = tmpBookVMList;
         }
 
         #region ダンプ/リストア

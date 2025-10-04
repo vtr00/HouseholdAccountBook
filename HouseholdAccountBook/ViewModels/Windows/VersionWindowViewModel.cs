@@ -60,14 +60,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        protected override void AddEventHandlers()
-        {
-            // NOP
-        }
-
         public override Task LoadAsync()
         {
             throw new System.NotImplementedException();
+        }
+
+        public override void AddEventHandlers()
+        {
+            // NOP
         }
     }
 }

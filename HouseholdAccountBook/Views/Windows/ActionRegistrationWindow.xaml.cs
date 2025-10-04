@@ -28,7 +28,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 帳簿変更時のイベント
         /// </summary>
-        public event EventHandler<EventArgs<int?>> BookChanged
+        public event EventHandler<ChangedEventArgs<int?>> BookChanged
         {
             add => this.WVM.BookChanged += value;
             remove => this.WVM.BookChanged -= value;
@@ -36,7 +36,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 日時変更時のイベント
         /// </summary>
-        public event EventHandler<EventArgs<DateTime>> DateChanged
+        public event EventHandler<ChangedEventArgs<DateTime>> DateChanged
         {
             add => this.WVM.DateChanged += value;
             remove => this.WVM.DateChanged -= value;
@@ -83,17 +83,18 @@ namespace HouseholdAccountBook.Views.Windows
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
-
-            this.AddCommonEventHandlers();
-            this.Loaded += async (sender, e) => {
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadAsync(selectedBookId, selectedMonth, selectedDate, selectedRecord, selectedActionId);
-                }
-            };
+            this.AddCommonEventHandlersToVM();
 
             this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
             this.WVM.RegKind = regKind;
             this.WVM.AddedByCsvComparison = selectedRecord is not null;
+
+            this.Loaded += async (sender, e) => {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
+                    await this.WVM.LoadAsync(selectedBookId, selectedMonth, selectedDate, selectedRecord, selectedActionId);
+                }
+                this.WVM.AddEventHandlers();
+            };
         }
 
         #endregion

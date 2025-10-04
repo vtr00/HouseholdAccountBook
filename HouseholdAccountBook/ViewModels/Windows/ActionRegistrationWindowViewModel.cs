@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.DbTable;
 using HouseholdAccountBook.Adapters.DbHandler.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others;
@@ -34,23 +35,23 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<int?>> BookChanged = default;
+        public event EventHandler<ChangedEventArgs<int?>> BookChanged = default;
         /// <summary>
         /// 日時変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<DateTime>> DateChanged = default;
+        public event EventHandler<ChangedEventArgs<DateTime>> DateChanged = default;
         /// <summary>
         /// 収支変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<BalanceKind>> BalanceKindChanged = default;
+        public event EventHandler<ChangedEventArgs<BalanceKind>> BalanceKindChanged = default;
         /// <summary>
         /// 分類変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<int?>> CategoryChanged = default;
+        public event EventHandler<ChangedEventArgs<int?>> CategoryChanged = default;
         /// <summary>
         /// 項目変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<int?>> ItemChanged = default;
+        public event EventHandler<ChangedEventArgs<int?>> ItemChanged = default;
 
         /// <summary>
         /// 登録時イベント
@@ -125,10 +126,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedBookVM;
             set {
+                var oldValue = this._SelectedBookVM;
                 if (this.SetProperty(ref this._SelectedBookVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        this.BookChanged?.Invoke(this, new EventArgs<int?>(value?.Id));
+                        this.BookChanged?.Invoke(this, new() { OldValue = oldValue?.Id, NewValue = value?.Id });
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -145,8 +147,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedDate;
             set {
+                var oldValue = this._SelectedDate;
                 if (this.SetProperty(ref this._SelectedDate, value)) {
-                    this.DateChanged?.Invoke(this, new EventArgs<DateTime>(value));
+                    this.DateChanged?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
                     CommandManager.InvalidateRequerySuggested();
                 }
             }
@@ -168,10 +171,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedBalanceKind;
             set {
+                var oldValue = this._SelectedBalanceKind;
                 if (this.SetProperty(ref this._SelectedBalanceKind, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        this.BalanceKindChanged?.Invoke(this, new EventArgs<BalanceKind>(value));
+                        this.BalanceKindChanged?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -199,10 +203,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedCategoryVM;
             set {
+                var oldValue = this._SelectedCategoryVM;
                 if (this.SetProperty(ref this._SelectedCategoryVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        this.CategoryChanged?.Invoke(this, new EventArgs<int?>(value?.Id));
+                        this.CategoryChanged?.Invoke(this, new () { OldValue = oldValue?.Id, NewValue = value?.Id });
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -230,10 +235,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedItemVM;
             set {
+                var oldValue = this._SelectedItemVM;
                 if (this.SetProperty(ref this._SelectedItemVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        this.ItemChanged?.Invoke(this, new EventArgs<int?>(value?.Id));
+                        this.ItemChanged?.Invoke(this, new() { OldValue = oldValue?.Id, NewValue = value?.Id });
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -448,111 +454,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        protected override void AddEventHandlers()
-        {
-            this.BookChanged += async (sender, e) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateCategoryListAsync();
-                    await this.UpdateItemListAsync();
-                    await this.UpdateShopListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-            this.BalanceKindChanged += async (sender, e) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateCategoryListAsync();
-                    await this.UpdateItemListAsync();
-                    await this.UpdateShopListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-            this.CategoryChanged += async (sender, e) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateItemListAsync();
-                    await this.UpdateShopListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-            this.ItemChanged += async (sender, e) => {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                    await this.UpdateShopListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
-        }
-
-        /// <summary>
-        /// 帳簿リストを更新する
-        /// </summary>
-        /// <param name="bookId">選択対象の帳簿ID</param>
-        /// <returns></returns>
-        private async Task UpdateBookListAsync(int? bookId = null)
-        {
-            ViewModelLoader loader = new(this.dbHandlerFactory);
-            this.BookVMList = await loader.LoadBookListAsync();
-            this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == bookId, 0);
-        }
-
-        /// <summary>
-        /// 分類リストを更新する
-        /// </summary>
-        /// <param name="categoryId">選択対象の分類ID</param>
-        /// <returns></returns>
-        private async Task UpdateCategoryListAsync(int? categoryId = null)
-        {
-            if (this.SelectedBookVM == null) return;
-
-            ViewModelLoader loader = new(this.dbHandlerFactory);
-            int? tmpCategoryId = categoryId ?? this.SelectedCategoryVM?.Id;
-            this.CategoryVMList = await loader.LoadCategoryListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind);
-            this.SelectedCategoryVM = this.CategoryVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpCategoryId, 0);
-        }
-
-        /// <summary>
-        /// 項目リストを更新する
-        /// </summary>
-        /// <param name="itemId">選択対象の項目ID</param>
-        /// <returns></returns>
-        private async Task UpdateItemListAsync(int? itemId = null)
-        {
-            if (this.SelectedBookVM == null || this.SelectedCategoryVM == null) return;
-
-            ViewModelLoader loader = new(this.dbHandlerFactory);
-            int? tmpItemId = itemId ?? this.SelectedItemVM?.Id;
-            this.ItemVMList = await loader.LoadItemListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind, this.SelectedCategoryVM.Id);
-            this.SelectedItemVM = this.ItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0);
-        }
-
-        /// <summary>
-        /// 店舗リストを更新する
-        /// </summary>
-        /// <param name="shopName">選択対象の店舗名</param>
-        /// <returns></returns>
-        private async Task UpdateShopListAsync(string shopName = null)
-        {
-            if (this.SelectedItemVM == null) return;
-
-            ViewModelLoader loader = new(this.dbHandlerFactory);
-            string tmpShopName = shopName ?? this.SelectedShopName;
-            this.ShopVMList = await loader.LoadShopListAsync(this.SelectedItemVM.Id);
-            this.SelectedShopName = this.ShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name;
-        }
-
-        /// <summary>
-        /// 備考リストを更新する
-        /// </summary>
-        /// <param name="remark">選択対象の備考</param>
-        /// <returns></returns>
-        private async Task UpdateRemarkListAsync(string remark = null)
-        {
-            if (this.SelectedItemVM == null) return;
-
-            ViewModelLoader loader = new(this.dbHandlerFactory);
-            string tmpRemark = remark ?? this.SelectedRemark;
-            this.RemarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
-            this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
-        }
-
         public override async Task LoadAsync()
         {
             await this.LoadAsync(null, null, null, null, null);
@@ -625,6 +526,114 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.UpdateItemListAsync(dto.ItemId);
             await this.UpdateShopListAsync(dto.ShopName);
             await this.UpdateRemarkListAsync(dto.Remark);
+        }
+
+        /// <summary>
+        /// 帳簿リストを更新する
+        /// </summary>
+        /// <param name="bookId">選択対象の帳簿ID</param>
+        /// <returns></returns>
+        private async Task UpdateBookListAsync(int? bookId = null)
+        {
+            ViewModelLoader loader = new(this.dbHandlerFactory);
+            var tmpBookVMList = await loader.LoadBookListAsync();
+            this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == bookId, 0); // 先に選択しておく
+            this.BookVMList = tmpBookVMList;
+        }
+
+        /// <summary>
+        /// 分類リストを更新する
+        /// </summary>
+        /// <param name="categoryId">選択対象の分類ID</param>
+        /// <returns></returns>
+        private async Task UpdateCategoryListAsync(int? categoryId = null)
+        {
+            if (this.SelectedBookVM == null) return;
+
+            ViewModelLoader loader = new(this.dbHandlerFactory);
+            int? tmpCategoryId = categoryId ?? this.SelectedCategoryVM?.Id;
+            var tmpCategoryVMList = await loader.LoadCategoryListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind);
+            this.SelectedCategoryVM = tmpCategoryVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpCategoryId, 0); // 先に選択しておく
+            this.CategoryVMList = tmpCategoryVMList;
+        }
+
+        /// <summary>
+        /// 項目リストを更新する
+        /// </summary>
+        /// <param name="itemId">選択対象の項目ID</param>
+        /// <returns></returns>
+        private async Task UpdateItemListAsync(int? itemId = null)
+        {
+            if (this.SelectedBookVM == null || this.SelectedCategoryVM == null) return;
+
+            ViewModelLoader loader = new(this.dbHandlerFactory);
+            int? tmpItemId = itemId ?? this.SelectedItemVM?.Id;
+            var tmpItemVMList = await loader.LoadItemListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind, this.SelectedCategoryVM.Id);
+            this.SelectedItemVM = tmpItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0); // 先に選択しておく
+            this.ItemVMList = tmpItemVMList;
+        }
+
+        /// <summary>
+        /// 店舗リストを更新する
+        /// </summary>
+        /// <param name="shopName">選択対象の店舗名</param>
+        /// <returns></returns>
+        private async Task UpdateShopListAsync(string shopName = null)
+        {
+            if (this.SelectedItemVM == null) return;
+
+            ViewModelLoader loader = new(this.dbHandlerFactory);
+            string tmpShopName = shopName ?? this.SelectedShopName;
+            var tmpShopVMList = await loader.LoadShopListAsync(this.SelectedItemVM.Id);
+            this.SelectedShopName = tmpShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name; // 先に選択しておく
+            this.ShopVMList = tmpShopVMList;
+        }
+
+        /// <summary>
+        /// 備考リストを更新する
+        /// </summary>
+        /// <param name="remark">選択対象の備考</param>
+        /// <returns></returns>
+        private async Task UpdateRemarkListAsync(string remark = null)
+        {
+            if (this.SelectedItemVM == null) return;
+
+            ViewModelLoader loader = new(this.dbHandlerFactory);
+            string tmpRemark = remark ?? this.SelectedRemark;
+            var tmpRemarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
+            this.SelectedRemark = tmpRemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark; // 先に選択しておく
+            this.RemarkVMList = tmpRemarkVMList;
+        }
+
+        public override void AddEventHandlers()
+        {
+            this.BookChanged += async (sender, e) => {
+                Log.Debug($"BookChanged old:{e.OldValue} new:{e.NewValue}");
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateCategoryListAsync();
+                    await this.UpdateItemListAsync();
+                }
+            };
+            this.BalanceKindChanged += async (sender, e) => {
+                Log.Debug($"BalanceKindChanged old:{e.OldValue} new:{e.NewValue}");
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateCategoryListAsync();
+                    await this.UpdateItemListAsync();
+                }
+            };
+            this.CategoryChanged += async (sender, e) => {
+                Log.Debug($"CategoryChanged old:{e.OldValue} new:{e.NewValue}");
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateItemListAsync();
+                }
+            };
+            this.ItemChanged += async (sender, e) => {
+                Log.Debug($"ItemChanged old:{e.OldValue} new:{e.NewValue}");
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    await this.UpdateShopListAsync();
+                    await this.UpdateRemarkListAsync();
+                }
+            };
         }
 
         /// <summary>

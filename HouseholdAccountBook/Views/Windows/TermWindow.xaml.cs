@@ -21,7 +21,9 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="dateWithinMonth">月内日付</param>
         public TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateTime dateWithinMonth)
-            : this(owner, dbHandlerFactory, dateWithinMonth.GetFirstDateOfMonth(), dateWithinMonth.GetLastDateOfMonth()) { }
+            : this(owner, dbHandlerFactory, dateWithinMonth, null, null) {
+            this.selectedMonthRadioButton.IsChecked = true;
+        }
 
         /// <summary>
         /// <see cref="TermWindow"/> クラスの新しいインスタンスを初期化します。
@@ -31,25 +33,37 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="startDate">開始日</param>
         /// <param name="endDate">終了日</param>
         public TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateTime startDate, DateTime endDate)
+            : this(owner, dbHandlerFactory, null, startDate, endDate)
+        {
+            this.selectedTermRadioButton.IsChecked = true;
+        }
+
+        private TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateTime? dateWithinMonth, DateTime? startDate, DateTime? endDate)
         {
             this.Owner = owner;
             this.Name = "Term";
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
+            this.AddCommonEventHandlersToVM();
 
-            this.AddCommonEventHandlers();
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
+
             // ロード時処理はコンストラクタで設定しておく
             this.Loaded += (sender, e) => {
                 // xamlで指定するとCalendarが正しく表示されないため、ここで指定する
                 this.calendar.DisplayMode = CalendarMode.Year;
 
-                this.WVM.StartDate = startDate;
-                this.WVM.EndDate = endDate;
-                this.selectedTermRadioButton.IsChecked = true;
+                if (dateWithinMonth.HasValue) {
+                    this.WVM.StartDate = dateWithinMonth.Value.GetFirstDateOfMonth();
+                    this.WVM.EndDate = dateWithinMonth.Value.GetLastDateOfMonth();
+                }
+                else {
+                    this.WVM.StartDate = startDate.Value;
+                    this.WVM.EndDate = endDate.Value;
+                }
+                this.WVM.AddEventHandlers();
             };
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
         }
         #endregion
 

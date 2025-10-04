@@ -567,10 +567,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
 
-        /// <summary>
-        /// イベントハンドラを登録する
-        /// </summary>
-        protected override void AddEventHandlers()
+        public override void AddEventHandlers()
         {
             this.CsvFilePathList.CollectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.CsvFilePathes));

@@ -259,11 +259,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        protected override void AddEventHandlers()
-        {
-            // LOP
-        }
-
         public override Task LoadAsync()
         {
             throw new NotImplementedException();
@@ -282,6 +277,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             // Access
             this.AccessSettingVM.Load();
+        }
+
+        public override void AddEventHandlers()
+        {
+            // LOP
         }
     }
 }

@@ -59,168 +59,170 @@ namespace HouseholdAccountBook.Views.Windows
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
+            this.AddCommonEventHandlersToVM();
+            this.WVM.ScrollRequested += (sender, e) => {
+                if (e.Value < 0) {
+                    this._actionDataGrid.ScrollToTop();
+                }
+                else {
+                    this._actionDataGrid.ScrollToButtom();
+                }
+            };
+            this.WVM.AddMoveRequested += (sender, e) => {
+                this.mrw = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
+                this.mrw.Registrated += e.Registered;
+                this.mrw.Closed += (sender, e) => {
+                    this.mrw = null;
+                    _ = this.Activate();
+                    _ = this._actionDataGrid.Focus();
+                };
+                this.mrw.Show();
+            };
+            this.WVM.AddActionRequested += (sender, e) => {
+                this.arw = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
+                this.arw.Registrated += e.Registered;
+                this.arw.Closed += (sender, e) => {
+                    this.arw = null;
+                    _ = this.Activate();
+                    _ = this._actionDataGrid.Focus();
+                };
+                this.arw.Show();
+            };
+            this.WVM.AddActionListRequested += (sender, e) => {
+                this.alrw = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
+                this.alrw.Registrated += e.Registered;
+                this.alrw.Closed += (sender, e) => {
+                    this.alrw = null;
+                    _ = this.Activate();
+                    _ = this._actionDataGrid.Focus();
+                };
+                this.alrw.Show();
+            };
+            this.WVM.CopyMoveRequested += (sender, e) => {
+                this.mrw = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Copy);
+                this.mrw.Registrated += e.Registered;
+                this.mrw.Closed += (sender, e) => {
+                    this.mrw = null;
+                    _ = this.Activate();
+                    _ = this._actionDataGrid.Focus();
+                };
+                this.mrw.Show();
+            };
+            this.WVM.CopyActionRequested += (sender, e) => {
+                this.arw = new(this, e.DbHandlerFactory, e.ActionId, RegistrationKind.Copy);
+                this.arw.Registrated += e.Registered;
+                this.arw.Closed += (sender, e) => {
+                    this.arw = null;
+                    _ = this.Activate();
+                    _ = this._actionDataGrid.Focus();
+                };
+                this.arw.Show();
+            };
+            this.WVM.EditMoveRequested += (sender, e) => {
+                this.mrw = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Edit);
+                this.mrw.Registrated += e.Registered;
+                this.mrw.Closed += (sender, e) => {
+                    this.mrw = null;
+                    _ = this.Activate();
+                    _ = this._actionDataGrid.Focus();
+                };
+                this.mrw.Show();
+            };
+            this.WVM.EditActionRequested += (sender, e) => {
+                this.arw = new(this, e.DbHandlerFactory, e.ActionId, RegistrationKind.Edit);
+                this.arw.Registrated += e.Registered;
+                this.arw.Closed += (sender, e) => {
+                    this.arw = null;
+                    _ = this.Activate();
+                    _ = this._actionDataGrid.Focus();
+                };
+                this.arw.Show();
+            };
+            this.WVM.EditActionListRequested += (sender, e) => {
+                this.alrw = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Edit);
+                this.alrw.Registrated += e.Registered;
+                this.alrw.Closed += (sender, e) => {
+                    this.alrw = null;
+                    _ = this.Activate();
+                    _ = this._actionDataGrid.Focus();
+                };
+                this.alrw.Show();
+            };
+            this.WVM.SelectTermRequested += (sender, e) => {
+                TermWindow stw = null;
+                switch (e.TermKind) {
+                    case TermKind.Monthly:
+                        stw = new TermWindow(this, e.DbHandlerFactory, e.Month.Value);
+                        break;
+                    case TermKind.Selected:
+                        stw = new TermWindow(this, e.DbHandlerFactory, e.StartDate, e.EndDate);
+                        break;
+                }
+                e.Result = stw.ShowDialog() == true;
+                if (e.Result) {
+                    e.StartDate = stw.WVM.StartDate;
+                    e.EndDate = stw.WVM.EndDate;
+                }
+            };
+            this.WVM.SettingsRequested += (sender, e) => {
+                SettingsWindow sw = new(this, e.DbHandlerFactory);
+                e.Result = sw.ShowDialog() == true;
+            };
+            this.WVM.CompareCsvFileRequested += (sender, e) => {
+                if (this.ccw is null) {
+                    this.ccw = new CsvComparisonWindow(this, e.DbHandlerFactory, e.BookId);
+                    // 帳簿項目の一致フラグ変更時のイベントを登録する
+                    this.ccw.IsMatchChanged += (sender, e) => {
+                        ActionViewModel vm = this.WVM.BookTabVM.ActionVMList.FirstOrDefault(tmpVM => tmpVM.ActionId == e.Value1);
+                        if (vm != null) {
+                            // UI上の表記だけを更新する
+                            vm.IsMatch = e.Value2;
+                        }
+                    };
+                    // 帳簿項目変更時のイベントを登録する
+                    this.ccw.ActionChanged += async (sender, e) => {
+                        using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
+                            // 帳簿一覧タブを更新する
+                            await this.WVM.BookTabVM.LoadAsync(isScroll: false, isUpdateActDateLastEdited: true);
+                        }
+                    };
+                    // 帳簿変更時のイベントを登録する
+                    this.ccw.BookChanged += (sender, e) => {
+                        var selectedVM = this.WVM.BookVMList.FirstOrDefault(vm => vm.Id == e.Value);
+                        if (selectedVM != null) {
+                            this.WVM.SelectedBookVM = selectedVM;
+                        }
+                    };
+                    // ウィンドウ非表示時イベントを登録する
+                    this.ccw.Hided += (sender, e) => {
+                        _ = this.Activate();
+                        _ = this._actionDataGrid.Focus();
+                    };
+                }
+                else {
+                    this.ccw.WVM.SelectedBookVM = this.ccw.WVM.BookVMList.FirstOrDefault(vm => vm.Id == e.BookId);
+                }
 
-            this.AddCommonEventHandlers();
+                this.ccw.Show();
+            };
+            this.WVM.ShowVersionRequested += (sender, e) => {
+                VersionWindow vw = new(this);
+                _ = vw.ShowDialog();
+            };
+
+            this.WVM.IsChildrenWindowOpenedRequested += () => this.ChildrenWindowOpened;
+            this.WVM.IsRegistrationWindowOpenedRequested += () => this.RegistrationWindowOpened;
+
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
+
             this.Loaded += async (sender, e) => {
                 Log.Info("Loaded");
 
-                await this.WVM.LoadAsync();
-                this.WVM.ScrollRequested += (sender, e) => {
-                    if (e.Value < 0) {
-                        this._actionDataGrid.ScrollToTop();
-                    }
-                    else {
-                        this._actionDataGrid.ScrollToButtom();
-                    }
-                };
-                this.WVM.AddMoveRequested += (sender, e) => {
-                    this.mrw = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
-                    this.mrw.Registrated += e.Registered;
-                    this.mrw.Closed += (sender, e) => {
-                        this.mrw = null;
-                        _ = this.Activate();
-                        _ = this._actionDataGrid.Focus();
-                    };
-                    this.mrw.Show();
-                };
-                this.WVM.AddActionRequested += (sender, e) => {
-                    this.arw = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
-                    this.arw.Registrated += e.Registered;
-                    this.arw.Closed += (sender, e) => {
-                        this.arw = null;
-                        _ = this.Activate();
-                        _ = this._actionDataGrid.Focus();
-                    };
-                    this.arw.Show();
-
-                };
-                this.WVM.AddActionListRequested += (sender, e) => {
-                    this.alrw = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
-                    this.alrw.Registrated += e.Registered;
-                    this.alrw.Closed += (sender, e) => {
-                        this.alrw = null;
-                        _ = this.Activate();
-                        _ = this._actionDataGrid.Focus();
-                    };
-                    this.alrw.Show();
-                };
-                this.WVM.CopyMoveRequested += (sender, e) => {
-                    this.mrw = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Copy);
-                    this.mrw.Registrated += e.Registered;
-                    this.mrw.Closed += (sender, e) => {
-                        this.mrw = null;
-                        _ = this.Activate();
-                        _ = this._actionDataGrid.Focus();
-                    };
-                    this.mrw.Show();
-                };
-                this.WVM.CopyActionRequested += (sender, e) => {
-                    this.arw = new(this, e.DbHandlerFactory, e.ActionId, RegistrationKind.Copy);
-                    this.arw.Registrated += e.Registered;
-                    this.arw.Closed += (sender, e) => {
-                        this.arw = null;
-                        _ = this.Activate();
-                        _ = this._actionDataGrid.Focus();
-                    };
-                    this.arw.Show();
-                };
-                this.WVM.EditMoveRequested += (sender, e) => {
-                    this.mrw = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Edit);
-                    this.mrw.Registrated += e.Registered;
-                    this.mrw.Closed += (sender, e) => {
-                        this.mrw = null;
-                        _ = this.Activate();
-                        _ = this._actionDataGrid.Focus();
-                    };
-                    this.mrw.Show();
-                };
-                this.WVM.EditActionRequested += (sender, e) => {
-                    this.arw = new(this, e.DbHandlerFactory, e.ActionId, RegistrationKind.Edit);
-                    this.arw.Registrated += e.Registered;
-                    this.arw.Closed += (sender, e) => {
-                        this.arw = null;
-                        _ = this.Activate();
-                        _ = this._actionDataGrid.Focus();
-                    };
-                    this.arw.Show();
-                };
-                this.WVM.EditActionListRequested += (sender, e) => {
-                    this.alrw = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Edit);
-                    this.alrw.Registrated += e.Registered;
-                    this.alrw.Closed += (sender, e) => {
-                        this.alrw = null;
-                        _ = this.Activate();
-                        _ = this._actionDataGrid.Focus();
-                    };
-                    this.alrw.Show();
-                };
-                this.WVM.SelectTermRequested += (sender, e) => {
-                    TermWindow stw = null;
-                    switch (e.TermKind) {
-                        case TermKind.Monthly:
-                            stw = new TermWindow(this, e.DbHandlerFactory, e.Month.Value);
-                            break;
-                        case TermKind.Selected:
-                            stw = new TermWindow(this, e.DbHandlerFactory, e.StartDate, e.EndDate);
-                            break;
-                    }
-                    e.Result = stw.ShowDialog() == true;
-                    if (e.Result) {
-                        e.StartDate = stw.WVM.StartDate;
-                        e.EndDate = stw.WVM.EndDate;
-                    }
-                };
-                this.WVM.SettingsRequested += (sender, e) => {
-                    SettingsWindow sw = new(this, e.DbHandlerFactory);
-                    e.Result = sw.ShowDialog() == true;
-                };
-                this.WVM.CompareCsvFileRequested += (sender, e) => {
-                    if (this.ccw is null) {
-                        this.ccw = new CsvComparisonWindow(this, e.DbHandlerFactory, e.BookId);
-                        // 帳簿項目の一致フラグ変更時のイベントを登録する
-                        this.ccw.IsMatchChanged += (sender, e) => {
-                            ActionViewModel vm = this.WVM.BookTabVM.ActionVMList.FirstOrDefault(tmpVM => tmpVM.ActionId == e.Value1);
-                            if (vm != null) {
-                                // UI上の表記だけを更新する
-                                vm.IsMatch = e.Value2;
-                            }
-                        };
-                        // 帳簿項目変更時のイベントを登録する
-                        this.ccw.ActionChanged += async (sender, e) => {
-                            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                                // 帳簿一覧タブを更新する
-                                await this.WVM.BookTabVM.LoadAsync(isScroll: false, isUpdateActDateLastEdited: true);
-                            }
-                        };
-                        // 帳簿変更時のイベントを登録する
-                        this.ccw.BookChanged += (sender, e) => {
-                            var selectedVM = this.WVM.BookVMList.FirstOrDefault(vm => vm.Id == e.Value);
-                            if (selectedVM != null) {
-                                this.WVM.SelectedBookVM = selectedVM;
-                            }
-                        };
-                        // ウィンドウ非表示時イベントを登録する
-                        this.ccw.Hided += (sender, e) => {
-                            _ = this.Activate();
-                            _ = this._actionDataGrid.Focus();
-                        };
-                    }
-                    else {
-                        this.ccw.WVM.SelectedBookVM = this.ccw.WVM.BookVMList.FirstOrDefault(vm => vm.Id == e.BookId);
-                    }
-
-                    this.ccw.Show();
-                };
-                this.WVM.ShowVersionRequested += (sender, e) => {
-                    VersionWindow vw = new(this);
-                    _ = vw.ShowDialog();
-                };
-
-                this.WVM.IsChildrenWindowOpenedRequested += () => this.ChildrenWindowOpened;
-                this.WVM.IsRegistrationWindowOpenedRequested += () => this.RegistrationWindowOpened;
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
+                    await this.WVM.LoadAsync();
+                }
+                this.WVM.AddEventHandlers();
             };
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
         }
 
         #region イベントハンドラ

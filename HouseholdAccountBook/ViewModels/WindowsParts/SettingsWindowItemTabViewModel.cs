@@ -497,7 +497,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
-        protected override void AddEventHandlers()
+        public override async Task LoadAsync()
+        {
+            await this.LoadAsync(null, null);
+        }
+
+        public override void AddEventHandlers()
         {
             this.SelectedHierarchicalVMChanged += async (sender, e) => {
                 if (e.Value != null) {
@@ -508,11 +513,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     this.DisplayedHierarchicalSettingVM = null;
                 }
             };
-        }
-
-        public override async Task LoadAsync()
-        {
-            await this.LoadAsync(null, null);
         }
 
         /// <summary>

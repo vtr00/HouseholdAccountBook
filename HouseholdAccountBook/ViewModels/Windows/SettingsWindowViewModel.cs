@@ -135,7 +135,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
 
-        protected override void AddEventHandlers()
+        public override void AddEventHandlers()
         {
             this.ItemTabVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
             this.ItemTabVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);

@@ -4,6 +4,7 @@ using HouseholdAccountBook.Others.RequestEventArgs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace HouseholdAccountBook.ViewModels.Abstract
@@ -116,11 +117,11 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         #endregion
 
         /// <summary>
-        /// ViewModelの初期化を行う
+        /// ViewModelの初期化を行いイベントハンドラを登録する
         /// </summary>
         /// <param name="waitCursorManagerFactory">WaitCursorマネージャファクトリ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <remarks>コードビハインドのコンストラクタで呼び出す</remarks>
+        /// <remarks><see cref="FrameworkElement">のコンストラクタで呼び出す</remarks>
         public void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
         {
             this.waitCursorManagerFactory = waitCursorManagerFactory;
@@ -129,20 +130,19 @@ namespace HouseholdAccountBook.ViewModels.Abstract
             foreach (WindowPartViewModelBase childVM in this.childrenVM) {
                 childVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
             }
-
-            this.AddEventHandlers();
         }
-
-        /// <summary>
-        /// イベントハンドラをWVMに登録する
-        /// </summary>
-        /// <remarks><see cref="Initialize(WaitCursorManagerFactory, DbHandlerFactory)"/> で呼び出す</remarks>
-        protected abstract void AddEventHandlers();
 
         /// <summary>
         /// 表示する情報を読み込む
         /// </summary>
+        /// <remarks><see cref="FrameworkElement.Loaded">内で呼び出す</remarks>
         public abstract Task LoadAsync();
+
+        /// <summary>
+        /// イベントハンドラを登録する
+        /// </summary>
+        /// <remarks><see cref="FrameworkElement.Loaded">内で<see cref="LoadAsync"/> のあとで呼び出す</remarks>
+        public abstract void AddEventHandlers();
 
         /// <summary>
         /// 表示する情報を保存する
@@ -172,7 +172,6 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// ファイル選択ダイアログ要求を発行する
         /// </summary>
         /// <param name="e"></param>
-        /// <param name="fileSelected"></param>
         protected bool OpenFileDialogRequest(OpenFileDialogRequestEventArgs e)
         {
             e.Multiselect = false;
@@ -184,7 +183,6 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// ファイル選択ダイアログ要求を発行する(複数選択版)
         /// </summary>
         /// <param name="e"></param>
-        /// <param name="filesSelected"></param>
         protected bool OpenFilesDialogRequest(OpenFileDialogRequestEventArgs e)
         {
             e.Multiselect = true;
@@ -196,7 +194,6 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// フォルダ選択ダイアログ要求を発行する
         /// </summary>
         /// <param name="e"></param>
-        /// <param name="folderSelected"></param>
         protected bool OpenFolderDialogRequest(OpenFolderDialogRequestEventArgs e)
         {
             this.OpenFolderDialogRequested?.Invoke(this, e);

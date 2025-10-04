@@ -37,8 +37,13 @@ namespace HouseholdAccountBook.Views.Windows
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
+            this.AddCommonEventHandlersToVM();
+            this.WVM.NeedToUpdateChanged += (sender, e) => {
+                this.needToUpdate = true;
+            };
 
-            this.AddCommonEventHandlers();
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
+
             this.Loaded += async (sender, e) => {
                 await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
                     this.WVM.OtherTabVM.SelectedDBKind = dbHandler.DBKind;
@@ -46,13 +51,8 @@ namespace HouseholdAccountBook.Views.Windows
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     await this.WVM.LoadAsync();
                 }
-
-                this.WVM.NeedToUpdateChanged += (sender, e) => {
-                    this.needToUpdate = true;
-                };
+                this.WVM.AddEventHandlers();
             };
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
         }
 
         #region イベントハンドラ

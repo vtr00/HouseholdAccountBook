@@ -34,7 +34,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 帳簿変更時のイベント
         /// </summary>
-        public event EventHandler<EventArgs<int?>> BookChanged
+        public event EventHandler<ChangedEventArgs<int?>> BookChanged
         {
             add => this.WVM.BookChanged += value;
             remove => this.WVM.BookChanged -= value;
@@ -90,16 +90,17 @@ namespace HouseholdAccountBook.Views.Windows
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
+            this.AddCommonEventHandlersToVM();
 
-            this.AddCommonEventHandlers();
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
+            this.WVM.RegKind = regKind;
+
             this.Loaded += async (sender, e) => {
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     await this.WVM.LoadAsync(selectedBookId, selectedMonth, selectedDate, selectedRecordList, selectedGroupId);
                 }
+                this.WVM.AddEventHandlers();
             };
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
-            this.WVM.RegKind = regKind;
         }
         #endregion
 
@@ -113,7 +114,9 @@ namespace HouseholdAccountBook.Views.Windows
         private void ButtonInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             TextBox textBox = this._popup.PlacementTarget as TextBox;
-            if (textBox.DataContext is not DateValueViewModel vm) vm = this.lastDateValueVM; // textBoxのDataContextが取得できないため応急処置
+            if (textBox.DataContext is not DateValueViewModel vm) {
+                vm = this.lastDateValueVM; // textBoxのDataContextが取得できないため応急処置
+            }
 
             switch (this.WVM.InputedKind) {
                 case NumericInputButton.InputKind.Number:

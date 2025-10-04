@@ -502,11 +502,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
-        protected override void AddEventHandlers()
-        {
-            // NOP
-        }
-
         public override Task LoadAsync()
         {
             throw new NotImplementedException();
@@ -551,6 +546,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.OutputWindowLog = settings.App_OutputFlag_WindowLog;
 
             this.WindowSettingVMList = LoadWindowSettings();
+        }
+        
+        public override void AddEventHandlers()
+        {
+            // NOP
         }
 
         /// <summary>

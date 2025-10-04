@@ -55,16 +55,17 @@ namespace HouseholdAccountBook.Views.Windows
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
+            this.AddCommonEventHandlersToVM();
 
-            this.AddCommonEventHandlers();
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
+            this.WVM.RegKind = regKind;
+
             this.Loaded += async (sender, e) => {
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     await this.WVM.LoadAsync(selectedBookId, selectedGroupId, selectedMonth, selectedDate);
                 }
+                this.WVM.AddEventHandlers();
             };
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
-            this.WVM.RegKind = regKind;
         }
         #endregion
     }

@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Windows;
@@ -25,7 +26,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 系列選択変更時イベント
         /// </summary>
-        public event Action SelectedSeriesChanged = default;
+        public event EventHandler SelectedSeriesChanged = default;
         #endregion
 
         #region プロパティ
@@ -49,23 +50,19 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             get => this._SelectedSeriesVM;
             set {
+                var oldVM = this._SelectedSeriesVM;
                 if (this.SetProperty(ref this._SelectedSeriesVM, value)) {
                     this.Parent.SelectedBalanceKind = value?.BalanceKind;
                     this.Parent.SelectedCategoryId = value?.CategoryId;
                     this.Parent.SelectedItemId = value?.ItemId;
 
-                    this.SelectedSeriesChanged?.Invoke();
+                    this.SelectedSeriesChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
         private SeriesViewModel _SelectedSeriesVM = default;
         #endregion
         #endregion
-
-        protected override void AddEventHandlers()
-        {
-            // NOP
-        }
 
         public override async Task LoadAsync()
         {
@@ -98,6 +95,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 _ => throw new NotImplementedException(),
             };
             this.SelectedSeriesVM = this.SeriesVMList?.FirstOrDefault(vm => vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId);
+        }
+
+        public override void AddEventHandlers()
+        {
+            // NOP
         }
     }
 }

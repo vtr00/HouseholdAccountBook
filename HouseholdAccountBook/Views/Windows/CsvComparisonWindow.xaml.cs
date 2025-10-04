@@ -63,44 +63,39 @@ namespace HouseholdAccountBook.Views.Windows
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
+            this.AddCommonEventHandlersToVM();
+            this.WVM.ScrollToButtomRequested += (sender, e) => {
+                this.csvCompDataGrid.ScrollToButtom();
+            };
+            this.WVM.AddActionRequested += (sender, e) => {
+                ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.BookId, e.Record);
+                arw.Registrated += e.Registered;
+                _ = arw.ShowDialog();
+            };
+            this.WVM.AddActionListRequested += (sender, e) => {
+                ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.BookId, e.Records);
+                alrw.Registrated += e.Registered;
+                _ = alrw.ShowDialog();
+            };
+            this.WVM.EditActionRequested += (sender, e) => {
+                ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.ActionId);
+                arw.Registrated += e.Registered;
+                _ = arw.ShowDialog();
+            };
+            this.WVM.EditActionListRequested += (sender, e) => {
+                ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.GroupId);
+                alrw.Registrated += e.Registered;
+                _ = alrw.ShowDialog();
+            };
 
-            this.AddCommonEventHandlers();
-            // ロード時処理はコンストラクタで設定しておく
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
+
             this.Loaded += async (sender, e) => {
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     await this.WVM.LoadAsync(selectedBookId);
                 }
-
-                this.WVM.ScrollToButtomRequested += (sender, e) => {
-                    this.csvCompDataGrid.ScrollToButtom();
-                };
-                this.WVM.AddActionRequested += (sender, e) => {
-                    ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.BookId, e.Record);
-                    arw.Registrated += e.Registered;
-                    _ = arw.ShowDialog();
-                };
-                this.WVM.AddActionListRequested += (sender, e) => {
-                    ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.BookId, e.Records);
-                    alrw.Registrated += e.Registered;
-                    _ = alrw.ShowDialog();
-                };
-                this.WVM.EditActionRequested += (sender, e) => {
-                    ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.ActionId);
-                    arw.Registrated += e.Registered;
-                    _ = arw.ShowDialog();
-                };
-                this.WVM.EditActionListRequested += (sender, e) => {
-                    ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.GroupId);
-                    alrw.Registrated += e.Registered;
-                    _ = alrw.ShowDialog();
-                };
-
-                var dcr = VisualTreeHelper.GetChild(this.csvCompDataGrid, 0) as Decorator;
-                var sv = dcr.Child as ScrollViewer;
-                sv.ScrollChanged += this.CsvCompDataGrid_ScrollChanged;
+                this.WVM.AddEventHandlers();
             };
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
         }
 
         #region イベントハンドラ
@@ -136,19 +131,6 @@ namespace HouseholdAccountBook.Views.Windows
             this.Hide();
         }
         #endregion
-
-        /// <summary>
-        /// DataGridスクロール時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CsvCompDataGrid_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            // TODO: 一致列の有効無効の表示状態を更新したい
-            // 表示を更新する
-            DataGrid dataGrid = sender as DataGrid;
-            dataGrid?.UpdateLayout();
-        }
 
         /// <summary>
         /// CheckBoxマウスホーバー時

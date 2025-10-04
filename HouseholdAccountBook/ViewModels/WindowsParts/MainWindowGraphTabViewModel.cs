@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
+using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Windows;
@@ -30,7 +31,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 系列選択変更時イベント
         /// </summary>
-        public event Action SelectedSeriesChanged = default;
+        public event EventHandler SelectedSeriesChanged = default;
         #endregion
 
         #region プロパティ
@@ -54,12 +55,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             get => this._SelectedGraphSeriesVM;
             set {
+                SeriesViewModel oldVM = this._SelectedGraphSeriesVM;
                 if (this.SetProperty(ref this._SelectedGraphSeriesVM, value)) {
                     this.Parent.SelectedBalanceKind = value?.BalanceKind;
                     this.Parent.SelectedCategoryId = value?.CategoryId;
                     this.Parent.SelectedItemId = value?.ItemId;
 
-                    this.SelectedSeriesChanged?.Invoke();
+                    this.SelectedSeriesChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -129,18 +131,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.Controller.BindMouseEnter(PlotCommands.HoverPointsOnlyTrack);
         }
 
-        protected override void AddEventHandlers()
-        {
-            // NOP
-        }
-
         public override async Task LoadAsync()
         {
             await this.LoadAsync(null, null);
         }
 
         /// <summary>
-        /// グラフタブ②表示するデータを読み込む
+        /// グラフタブに表示するデータを読み込む
         /// </summary>
         /// <param name="categoryId">分類ID</param>
         /// <param name="itemId">項目ID</param>
@@ -172,6 +169,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     }
                     break;
             }
+        }
+
+        public override void AddEventHandlers()
+        {
+            // NOP
         }
 
         /// <summary>

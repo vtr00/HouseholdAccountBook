@@ -24,19 +24,19 @@ namespace HouseholdAccountBook.Views.Windows
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
+            this.AddCommonEventHandlersToVM();
+            this.WVM.SetPassword = password => this.passwordBox.Password = password;
+            this.WVM.GetPassword = () => this.passwordBox.Password;
+
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), null);
+            this.WVM.Message = message;
+
             this.Loaded += (sender, e) => {
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     this.WVM.Load();
                 }
+                this.WVM.AddEventHandlers();
             };
-
-            this.WVM.SetPassword = password => this.passwordBox.Password = password;
-            this.WVM.GetPassword = () => this.passwordBox.Password;
-
-            this.AddCommonEventHandlers();
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), null);
-            this.WVM.Message = message;
         }
 
         #region イベントハンドラ

@@ -20,9 +20,12 @@ namespace HouseholdAccountBook.Views.Windows
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
-            this.Loaded += (sender, e) => this.HistoryLog.ScrollToEnd();
+            this.AddCommonEventHandlersToVM();
 
-            this.AddCommonEventHandlers();
+            this.Loaded += (sender, e) => {
+                this.HistoryLog.ScrollToEnd();
+                this.WVM.AddEventHandlers();
+            };
         }
     }
 }
