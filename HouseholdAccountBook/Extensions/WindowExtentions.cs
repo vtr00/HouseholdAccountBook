@@ -2,7 +2,9 @@
 using HouseholdAccountBook.ViewModels.Abstract;
 using Microsoft.Win32;
 using System;
+using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Interop;
 
 namespace HouseholdAccountBook.Extensions
 {
@@ -11,6 +13,26 @@ namespace HouseholdAccountBook.Extensions
     /// </summary>
     public static class WindowExtentions
     {
+        [DllImport("user32.dll")]
+        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        /// <summary>
+        /// モーダルウィンドウかどうかを判定する
+        /// </summary>
+        /// <param name="window"></param>
+        /// <returns></returns>
+        private static bool IsModal(this Window window)
+        {
+            const int GWL_STYLE = -16;
+            const int WS_DISABLED = 0x08000000;
+
+            var hwnd = new WindowInteropHelper(window).Handle;
+            if (hwnd == IntPtr.Zero) return false;
+
+            int style = GetWindowLong(hwnd, GWL_STYLE);
+            return (style & WS_DISABLED) != 0;
+        }
+
         /// <summary>
         /// <see cref="Window.Owner"/> の中央位置に移動する
         /// </summary>
@@ -45,7 +67,7 @@ namespace HouseholdAccountBook.Extensions
 
             /// ViewModelにWindow関連のイベントハンドラを登録する
             wvm.CloseRequested += (sender, e) => {
-                if (e.IsDialog) {
+                if (window.IsModal()) {
                     try {
                         window.DialogResult = e.DialogResult;
                     }
