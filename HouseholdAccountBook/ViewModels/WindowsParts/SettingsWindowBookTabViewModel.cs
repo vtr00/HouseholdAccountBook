@@ -341,7 +341,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="bookId">選択対象の帳簿ID</param>
         public async Task LoadAsync(int? bookId = null)
         {
-            Log.Info();
+            using FuncLog funcLog = new(new { bookId });
 
             // InitializeComponent内で呼ばれる場合があるため、nullチェックを行う
             if (this.dbHandlerFactory == null) {
@@ -357,6 +357,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="bookId">選択対象の帳簿ID</param>
         private async Task UpdateBookListAsync(int? bookId = null)
         {
+            using FuncLog funcLog = new(new { bookId });
+
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             this.BookVMList = await loader.LoadBookListAsync();
@@ -366,6 +368,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public override void AddEventHandlers()
         {
             this.SelectedBookVMChanged += async (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.SelectedBookVMChanged));
+
                 if (e.Value != null) {
                     ViewModelLoader loader = new(this.dbHandlerFactory);
                     this.DisplayedBookSettingVM = await loader.LoadBookSettingViewModelAsync(e.Value.Id.Value);

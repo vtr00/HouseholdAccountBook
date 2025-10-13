@@ -45,12 +45,12 @@ namespace HouseholdAccountBook.Extensions
 
             double right = window.Left + window.Width;
             double bottom = window.Top + window.Height;
-            Log.Info(string.Format($"window - top:{window.Top} right:{right} bottom:{bottom} left:{window.Left} width:{window.Width} height:{window.Height}"));
+            Log.Debug($"window - top:{window.Top} right:{right} bottom:{bottom} left:{window.Left} width:{window.Width} height:{window.Height}");
 
             if (window.Owner != null) {
                 double OwnerRight = window.Owner.Left + window.Owner.Width;
                 double OwnerBottom = window.Owner.Left + window.Owner.Height;
-                Log.Info(string.Format($"owner  - top:{window.Owner.Top} right:{OwnerRight} bottom:{OwnerBottom} left:{window.Owner.Left} width:{window.Owner.Width} height:{window.Owner.Height}"));
+                Log.Debug($"owner  - top:{window.Owner.Top} right:{OwnerRight} bottom:{OwnerBottom} left:{window.Owner.Left} width:{window.Owner.Width} height:{window.Owner.Height}");
             }
         }
 

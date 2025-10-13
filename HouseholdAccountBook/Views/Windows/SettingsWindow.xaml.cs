@@ -32,6 +32,8 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         public SettingsWindow(Window owner, DbHandlerFactory dbHandlerFactory)
         {
+            using FuncLog funcLog = new();
+
             this.Owner = owner;
             this.Name = "Settings";
             WindowLocationManager.Instance.Add(this);
@@ -45,6 +47,8 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
 
             this.Loaded += async (sender, e) => {
+                using FuncLog funcLog = new(methodName:nameof(this.Loaded));
+
                 await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
                     this.WVM.OtherTabVM.SelectedDBKind = dbHandler.DBKind;
                 }
@@ -64,6 +68,8 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private void SettingsWindow_Closing(object sender, CancelEventArgs e)
         {
+            using FuncLog funcLog = new();
+
             this.DialogResult = this.needToUpdate;
         }
         #endregion
@@ -77,7 +83,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             if (e.OriginalSource != sender) return;
 
-            Log.Info(this.WVM.SelectedTab.ToString());
+            using FuncLog funcLog = new(new { e.RemovedItems, e.AddedItems });
 
             using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 switch (this.WVM.SelectedTab) {
@@ -94,7 +100,6 @@ namespace HouseholdAccountBook.Views.Windows
             }
         }
 
-        #region 項目設定操作
         /// <summary>
         /// 項目設定で一覧の選択を変更した時
         /// </summary>
@@ -117,7 +122,6 @@ namespace HouseholdAccountBook.Views.Windows
                 }
             }
         }
-        #endregion
         #endregion
     }
 }

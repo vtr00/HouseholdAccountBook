@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Extensions;
+﻿using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others;
 using System;
 using System.Windows;
@@ -19,6 +20,8 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="message">表示メッセージ</param>
         public DbSettingWindow(Window owner, string message)
         {
+            using FuncLog funcLog = new(new { message });
+
             this.Owner = owner;
             this.Name = "DbSetting";
             WindowLocationManager.Instance.Add(this);
@@ -32,9 +35,12 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.Message = message;
 
             this.Loaded += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.Loaded));
+
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                     this.WVM.Load();
                 }
+
                 this.WVM.AddEventHandlers();
             };
         }
@@ -47,6 +53,8 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
+            using FuncLog funcLog = new();
+
             TextBox textBox = sender as TextBox;
             bool yes_parse = false;
             if (sender != null) {

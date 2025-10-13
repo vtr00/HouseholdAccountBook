@@ -1,6 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Windows;
@@ -81,12 +80,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             if (this.Parent.SelectedTab != this.Tab) return;
 
-            Log.Info($"balanceKind:{balanceKind} categoryId:{categoryId} itemId:{itemId}");
+            using FuncLog funcLog = new(new { balanceKind, categoryId, itemId });
 
             int? tmpBalanceKind = balanceKind ?? this.Parent.SelectedBalanceKind;
             int? tmpCategoryId = categoryId ?? this.Parent.SelectedCategoryId;
             int? tmpItemId = itemId ?? this.Parent.SelectedItemId;
-            Log.Info($"tmpBalanceKind:{tmpBalanceKind} tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
+            Log.Vars(vars: new { tmpBalanceKind, tmpCategoryId, tmpItemId });
 
             var loader = new ViewModelLoader(this.dbHandlerFactory);
             this.SeriesVMList = this.Tab switch {

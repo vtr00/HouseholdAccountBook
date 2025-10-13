@@ -207,7 +207,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 if (this.SetProperty(ref this._SelectedCategoryVM, value)) {
                     if (!this.isUpdateOnChanged) {
                         this.isUpdateOnChanged = true;
-                        this.CategoryChanged?.Invoke(this, new () { OldValue = oldValue?.Id, NewValue = value?.Id });
+                        this.CategoryChanged?.Invoke(this, new() { OldValue = oldValue?.Id, NewValue = value?.Id });
                         this.isUpdateOnChanged = false;
                     }
                 }
@@ -469,6 +469,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="selectedActionId">選択された帳簿項目ID</param>
         public async Task LoadAsync(int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate, CsvViewModel selectedRecord, int? selectedActionId)
         {
+            using FuncLog funcLog = new(new { selectedBookId, selectedMonth, selectedDate, selectedRecord, selectedActionId });
+
             BalanceKind balanceKind = BalanceKind.Expenses;
             int? groupId = null;
 
@@ -535,6 +537,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateBookListAsync(int? bookId = null)
         {
+            using FuncLog funcLog = new(new { bookId });
+
             ViewModelLoader loader = new(this.dbHandlerFactory);
             var tmpBookVMList = await loader.LoadBookListAsync();
             this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == bookId, 0); // 先に選択しておく
@@ -549,6 +553,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async Task UpdateCategoryListAsync(int? categoryId = null)
         {
             if (this.SelectedBookVM == null) return;
+
+            using FuncLog funcLog = new(new { categoryId });
 
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpCategoryId = categoryId ?? this.SelectedCategoryVM?.Id;
@@ -566,6 +572,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             if (this.SelectedBookVM == null || this.SelectedCategoryVM == null) return;
 
+            using FuncLog funcLog = new(new { itemId });
+
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpItemId = itemId ?? this.SelectedItemVM?.Id;
             var tmpItemVMList = await loader.LoadItemListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind, this.SelectedCategoryVM.Id);
@@ -581,6 +589,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async Task UpdateShopListAsync(string shopName = null)
         {
             if (this.SelectedItemVM == null) return;
+
+            using FuncLog funcLog = new(new { shopName });
 
             ViewModelLoader loader = new(this.dbHandlerFactory);
             string tmpShopName = shopName ?? this.SelectedShopName;
@@ -598,6 +608,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             if (this.SelectedItemVM == null) return;
 
+            using FuncLog funcLog = new(new { remark });
+
             ViewModelLoader loader = new(this.dbHandlerFactory);
             string tmpRemark = remark ?? this.SelectedRemark;
             var tmpRemarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
@@ -607,28 +619,34 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         public override void AddEventHandlers()
         {
+            using FuncLog funcLog = new();
+
             this.BookChanged += async (sender, e) => {
-                Log.Debug($"BookChanged old:{e.OldValue} new:{e.NewValue}");
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.BookChanged));
+
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateCategoryListAsync();
                     await this.UpdateItemListAsync();
                 }
             };
             this.BalanceKindChanged += async (sender, e) => {
-                Log.Debug($"BalanceKindChanged old:{e.OldValue} new:{e.NewValue}");
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.BalanceKindChanged));
+
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateCategoryListAsync();
                     await this.UpdateItemListAsync();
                 }
             };
             this.CategoryChanged += async (sender, e) => {
-                Log.Debug($"CategoryChanged old:{e.OldValue} new:{e.NewValue}");
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.CategoryChanged));
+
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateItemListAsync();
                 }
             };
             this.ItemChanged += async (sender, e) => {
-                Log.Debug($"ItemChanged old:{e.OldValue} new:{e.NewValue}");
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.ItemChanged));
+
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateShopListAsync();
                     await this.UpdateRemarkListAsync();
@@ -642,6 +660,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns>登録された帳簿項目ID(先頭のみ)</returns>
         protected override async Task<int?> SaveAsync()
         {
+            using FuncLog funcLog = new();
+
             int actionId = this.ActionId ?? -1;
             int groupId = this.GroupId ?? -1;
             BalanceKind balanceKind = this.SelectedBalanceKind; // 収支種別

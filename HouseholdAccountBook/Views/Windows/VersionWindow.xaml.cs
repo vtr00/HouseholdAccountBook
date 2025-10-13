@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Extensions;
+﻿using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others;
 using System.Windows;
 
@@ -15,6 +16,8 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="owner">親ウィンドウ</param>
         public VersionWindow(Window owner)
         {
+            using FuncLog funcLog = new();
+
             this.Owner = owner;
             this.Name = "Version";
             WindowLocationManager.Instance.Add(this);
@@ -23,6 +26,8 @@ namespace HouseholdAccountBook.Views.Windows
             this.AddCommonEventHandlersToVM();
 
             this.Loaded += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.Loaded));
+
                 this.HistoryLog.ScrollToEnd();
                 this.WVM.AddEventHandlers();
             };

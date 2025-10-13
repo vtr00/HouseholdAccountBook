@@ -55,12 +55,34 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DAOハンドラファクトリ</param>
         public MainWindow(DbHandlerFactory dbHandlerFactory)
         {
+            using FuncLog funcLog = new();
+
             this.Name = "Main";
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
             this.AddCommonEventHandlersToVM();
+            this.AddEventHandlersToVM();
+
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
+
+            this.Loaded += async (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.Loaded));
+
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
+                    await this.WVM.LoadAsync();
+                }
+                this.WVM.AddEventHandlers();
+            };
+        }
+
+        private void AddEventHandlersToVM()
+        {
+            using FuncLog funcLog = new();
+
             this.WVM.ScrollRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.ScrollRequested));
+
                 if (e.Value < 0) {
                     this._actionDataGrid.ScrollToTop();
                 }
@@ -69,6 +91,8 @@ namespace HouseholdAccountBook.Views.Windows
                 }
             };
             this.WVM.AddMoveRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.AddMoveRequested));
+
                 this.mrw = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
                 this.mrw.Registrated += e.Registered;
                 this.mrw.Closed += (sender, e) => {
@@ -79,6 +103,8 @@ namespace HouseholdAccountBook.Views.Windows
                 this.mrw.Show();
             };
             this.WVM.AddActionRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionRequested));
+
                 this.arw = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
                 this.arw.Registrated += e.Registered;
                 this.arw.Closed += (sender, e) => {
@@ -89,6 +115,8 @@ namespace HouseholdAccountBook.Views.Windows
                 this.arw.Show();
             };
             this.WVM.AddActionListRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionListRequested));
+
                 this.alrw = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
                 this.alrw.Registrated += e.Registered;
                 this.alrw.Closed += (sender, e) => {
@@ -99,6 +127,8 @@ namespace HouseholdAccountBook.Views.Windows
                 this.alrw.Show();
             };
             this.WVM.CopyMoveRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.CopyMoveRequested));
+
                 this.mrw = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Copy);
                 this.mrw.Registrated += e.Registered;
                 this.mrw.Closed += (sender, e) => {
@@ -109,6 +139,8 @@ namespace HouseholdAccountBook.Views.Windows
                 this.mrw.Show();
             };
             this.WVM.CopyActionRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.CopyActionRequested));
+
                 this.arw = new(this, e.DbHandlerFactory, e.ActionId, RegistrationKind.Copy);
                 this.arw.Registrated += e.Registered;
                 this.arw.Closed += (sender, e) => {
@@ -119,6 +151,8 @@ namespace HouseholdAccountBook.Views.Windows
                 this.arw.Show();
             };
             this.WVM.EditMoveRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.EditMoveRequested));
+
                 this.mrw = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Edit);
                 this.mrw.Registrated += e.Registered;
                 this.mrw.Closed += (sender, e) => {
@@ -129,6 +163,8 @@ namespace HouseholdAccountBook.Views.Windows
                 this.mrw.Show();
             };
             this.WVM.EditActionRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.EditActionRequested));
+
                 this.arw = new(this, e.DbHandlerFactory, e.ActionId, RegistrationKind.Edit);
                 this.arw.Registrated += e.Registered;
                 this.arw.Closed += (sender, e) => {
@@ -139,6 +175,8 @@ namespace HouseholdAccountBook.Views.Windows
                 this.arw.Show();
             };
             this.WVM.EditActionListRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.EditActionListRequested));
+
                 this.alrw = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Edit);
                 this.alrw.Registrated += e.Registered;
                 this.alrw.Closed += (sender, e) => {
@@ -149,6 +187,8 @@ namespace HouseholdAccountBook.Views.Windows
                 this.alrw.Show();
             };
             this.WVM.SelectTermRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.SelectTermRequested));
+
                 TermWindow stw = null;
                 switch (e.TermKind) {
                     case TermKind.Monthly:
@@ -165,14 +205,20 @@ namespace HouseholdAccountBook.Views.Windows
                 }
             };
             this.WVM.SettingsRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.SettingsRequested));
+
                 SettingsWindow sw = new(this, e.DbHandlerFactory);
                 e.Result = sw.ShowDialog() == true;
             };
             this.WVM.CompareCsvFileRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.CompareCsvFileRequested));
+
                 if (this.ccw is null) {
                     this.ccw = new CsvComparisonWindow(this, e.DbHandlerFactory, e.BookId);
                     // 帳簿項目の一致フラグ変更時のイベントを登録する
                     this.ccw.IsMatchChanged += (sender, e) => {
+                        using FuncLog funcLog = new(methodName: nameof(this.ccw.IsMatchChanged));
+
                         ActionViewModel vm = this.WVM.BookTabVM.ActionVMList.FirstOrDefault(tmpVM => tmpVM.ActionId == e.Value1);
                         if (vm != null) {
                             // UI上の表記だけを更新する
@@ -181,6 +227,8 @@ namespace HouseholdAccountBook.Views.Windows
                     };
                     // 帳簿項目変更時のイベントを登録する
                     this.ccw.ActionChanged += async (sender, e) => {
+                        using FuncLog funcLog = new(methodName: nameof(this.ccw.ActionChanged));
+
                         using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                             // 帳簿一覧タブを更新する
                             await this.WVM.BookTabVM.LoadAsync(isScroll: false, isUpdateActDateLastEdited: true);
@@ -188,13 +236,17 @@ namespace HouseholdAccountBook.Views.Windows
                     };
                     // 帳簿変更時のイベントを登録する
                     this.ccw.BookChanged += (sender, e) => {
-                        var selectedVM = this.WVM.BookVMList.FirstOrDefault(vm => vm.Id == e.Value);
+                        using FuncLog funcLog = new(methodName: nameof(this.ccw.BookChanged));
+
+                        var selectedVM = this.WVM.BookVMList.FirstOrDefault(vm => vm.Id == e.NewValue);
                         if (selectedVM != null) {
                             this.WVM.SelectedBookVM = selectedVM;
                         }
                     };
                     // ウィンドウ非表示時イベントを登録する
                     this.ccw.Hided += (sender, e) => {
+                        using FuncLog funcLog = new(methodName: nameof(this.ccw.Hided));
+
                         _ = this.Activate();
                         _ = this._actionDataGrid.Focus();
                     };
@@ -206,23 +258,14 @@ namespace HouseholdAccountBook.Views.Windows
                 this.ccw.Show();
             };
             this.WVM.ShowVersionRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.ShowVersionRequested));
+
                 VersionWindow vw = new(this);
                 _ = vw.ShowDialog();
             };
 
             this.WVM.IsChildrenWindowOpenedRequested += () => this.ChildrenWindowOpened;
             this.WVM.IsRegistrationWindowOpenedRequested += () => this.RegistrationWindowOpened;
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
-
-            this.Loaded += async (sender, e) => {
-                Log.Info("Loaded");
-
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadAsync();
-                }
-                this.WVM.AddEventHandlers();
-            };
         }
 
         #region イベントハンドラ
@@ -234,6 +277,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void MainWindow_Closing(object sender, CancelEventArgs e)
         {
+            using FuncLog funcLog = new();
             e.Cancel = true;
 
             // 他のウィンドウを開いているときは閉じない
@@ -262,6 +306,8 @@ namespace HouseholdAccountBook.Views.Windows
         private async void MainWindow_StateChanged(object sender, EventArgs e)
         {
             if (this.WindowState == WindowState.Minimized) {
+                using FuncLog funcLog = new();
+
                 Properties.Settings settings = Properties.Settings.Default;
                 if (settings.App_BackUpFlagAtMinimizing) {
                     Log.Info(string.Format($"BackUpCurrentAtMinimizing: {settings.App_BackUpCurrentAtMinimizing}"));
@@ -288,7 +334,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private void MonthlyListDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            Log.Info();
+            using FuncLog funcLog = new();
 
             if (this.WVM.SelectedTab != Tabs.MonthlyListTab) return;
 
@@ -315,7 +361,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private void YearlyListDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            Log.Info();
+            using FuncLog funcLog = new();
 
             if (this.WVM.SelectedTab != Tabs.YearlyListTab) return;
 

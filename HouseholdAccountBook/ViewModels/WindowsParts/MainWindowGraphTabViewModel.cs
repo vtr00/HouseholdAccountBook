@@ -1,7 +1,6 @@
 ﻿using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Windows;
@@ -118,6 +117,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="tab">タブ</param>
         public MainWindowGraphTabViewModel(MainWindowViewModel parent, Tabs tab)
         {
+            using FuncLog funcLog = new(new { tab });
+
             this.Parent = parent;
             this.Tab = tab;
 
@@ -145,6 +146,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public async Task LoadAsync(int? categoryId = null, int? itemId = null)
         {
             if (this.Parent.SelectedTab != this.Tab) return;
+
+            using FuncLog funcLog = new(new { categoryId, itemId });
 
             switch (this.Tab) {
                 case Tabs.DailyGraphTab:
@@ -184,6 +187,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             if (this.Parent.SelectedTab != this.Tab) return;
             if (this.Parent.SelectedGraphKind1 != GraphKind1.IncomeAndExpensesGraph) return;
 
+            using FuncLog funcLog = new();
+
             switch (this.Tab) {
                 case Tabs.DailyGraphTab:
                     this.UpdateSelectedDailyGraph();
@@ -203,7 +208,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private void InitializeDailyGraphTabData()
         {
-            Log.Info();
+            using FuncLog funcLog = new();
 
             DateTime start = this.Parent.DisplayedStart;
             DateTime end = this.Parent.DisplayedEnd;
@@ -282,11 +287,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="itemId">選択対象の項目ID</param>
         private async Task UpdateDailyGraphTabDataAsync(int? categoryId = null, int? itemId = null)
         {
-            Log.Info($"categoryId:{categoryId} itemId:{itemId}");
+            using FuncLog funcLog = new(new { categoryId, itemId });
 
             int? tmpCategoryId = categoryId ?? this.Parent.SelectedCategoryId ?? null;
             int? tmpItemId = itemId ?? this.Parent.SelectedItemId ?? null;
-            Log.Info($"tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
+            Log.Vars(vars: new { tmpCategoryId, tmpItemId });
 
             var loader = new ViewModelLoader(this.dbHandlerFactory);
             switch (this.Parent.SelectedGraphKind1) {
@@ -409,7 +414,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private void UpdateSelectedDailyGraph()
         {
-            Log.Info();
+            using FuncLog funcLog = new();
 
             SeriesViewModel vm = this.SelectedGraphSeriesVM;
 
@@ -455,7 +460,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private void InitializeMonthlyGraphTabData()
         {
-            Log.Info();
+            using FuncLog funcLog = new();
 
             DateTime start = this.Parent.DisplayedStart;
             DateTime end = this.Parent.DisplayedEnd;
@@ -534,11 +539,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="itemId">選択対象の項目ID</param>
         private async Task UpdateMonthlyGraphTabDataAsync(int? categoryId = null, int? itemId = null)
         {
-            Log.Info($"categoryId:{categoryId} itemId:{itemId}");
+            using FuncLog funcLog = new(new { categoryId, itemId });
 
             int? tmpCategoryId = categoryId ?? this.Parent.SelectedCategoryId ?? null;
             int? tmpItemId = itemId ?? this.Parent.SelectedItemId ?? null;
-            Log.Info($"tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
+            Log.Vars(vars: new { tmpCategoryId, tmpItemId });
 
             int start = this.Parent.FiscalStartMonth;
 
@@ -646,7 +651,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private void UpdateSelectedMonthlyGraph()
         {
-            Log.Info();
+            using FuncLog funcLog = new();
 
             SeriesViewModel vm = this.SelectedGraphSeriesVM;
 
@@ -692,7 +697,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private void InitializeYearlyGraphTabData()
         {
-            Log.Info();
+            using FuncLog funcLog = new();
 
             DateTime start = this.Parent.DisplayedStart;
             DateTime end = this.Parent.DisplayedEnd;
@@ -771,11 +776,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="itemId">選択対象の項目ID</param>
         private async Task UpdateYearlyGraphTabDataAsync(int? categoryId = null, int? itemId = null)
         {
-            Log.Info($"categoryId:{categoryId} itemId:{itemId}");
+            using FuncLog funcLog = new(new { categoryId, itemId });
 
             int? tmpCategoryId = categoryId ?? this.Parent.SelectedCategoryId ?? null;
             int? tmpItemId = itemId ?? this.Parent.SelectedItemId ?? null;
-            Log.Info($"tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
+            Log.Vars(vars: new { tmpCategoryId, tmpItemId });
 
             string unit_pre = this.Parent.FiscalStartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Pre;
             string unit_post = this.Parent.FiscalStartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Post;
@@ -884,7 +889,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private void UpdateSelectedYearlyGraph()
         {
-            Log.Info();
+            using FuncLog funcLog = new();
 
             string unit_pre = this.Parent.FiscalStartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Pre;
             string unit_post = this.Parent.FiscalStartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Post;

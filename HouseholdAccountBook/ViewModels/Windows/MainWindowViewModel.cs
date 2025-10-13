@@ -739,8 +739,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public async void ImportKichoFugetsuDbCommand_Executed()
         {
-            Log.Info();
-
             Properties.Settings settings = Properties.Settings.Default;
             (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Import_KichoFugetsu_FilePath, App.GetCurrentDir());
 
@@ -883,8 +881,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public async void ImportPostgreSQLFileCommand_Executed()
         {
-            Log.Info();
-
             Properties.Settings settings = Properties.Settings.Default;
 
             if (MessageBox.Show(Properties.Resources.Message_DeleteOldDataNotification, Properties.Resources.Title_Conformation,
@@ -986,8 +982,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public async void ImportCustomFileCommand_Executed()
         {
-            Log.Info();
-
             Properties.Settings settings = Properties.Settings.Default;
             (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Import_CustomFormat_FilePath, App.GetCurrentDir());
 
@@ -1056,8 +1050,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public async void ImportSQLiteFileCommand_Executed()
         {
-            Log.Info();
-
             Properties.Settings settings = Properties.Settings.Default;
             (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_SQLite_DBFilePath, App.GetCurrentDir());
 
@@ -1178,8 +1170,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public async void ExportCustomFileCommand_Executed()
         {
-            Log.Info();
-
             Properties.Settings settings = Properties.Settings.Default;
             (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Export_CustomFormat_FilePath, App.GetCurrentDir());
 
@@ -1221,8 +1211,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public async void ExportSQLFileCommand_Executed()
         {
-            Log.Info();
-
             Properties.Settings settings = Properties.Settings.Default;
 
             (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Export_SQLFilePath, App.GetCurrentDir());
@@ -1276,8 +1264,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public async void BackUpCommand_Executed()
         {
-            Log.Info();
-
             bool result = false;
             using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                 result = await this.CreateBackUpFileAsync();
@@ -1299,11 +1285,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// ウィンドウ終了コマンド処理
         /// </summary>
-        public void ExitWindowCommand_Executed()
-        {
-            Log.Info();
-            this.CloseRequest(new CloseRequestEventArgs(true));
-        }
+        public void ExitWindowCommand_Executed() => this.CloseRequest(new CloseRequestEventArgs(true));
         #endregion
 
         #region 表示メニュー
@@ -1322,12 +1304,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿タブ表示コマンド処理
         /// </summary>
-        private void ShowBookTabCommand_Executed()
-        {
-            Log.Info();
-
-            this.SelectedTab = Tabs.BooksTab;
-        }
+        private void ShowBookTabCommand_Executed() => this.SelectedTab = Tabs.BooksTab;
 
         /// <summary>
         /// 日別グラフタブ表示コマンド実行可能か
@@ -1337,12 +1314,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 日別グラフタブ表示コマンド処理
         /// </summary>
-        private void ShowDailyGraphTabCommand_Executed()
-        {
-            Log.Info();
-
-            this.SelectedTab = Tabs.DailyGraphTab;
-        }
+        private void ShowDailyGraphTabCommand_Executed() => this.SelectedTab = Tabs.DailyGraphTab;
 
         /// <summary>
         /// 月別一覧タブ表示コマンド実行可能か
@@ -1352,12 +1324,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 月別一覧タブ表示コマンド処理
         /// </summary>
-        private void ShowMonthlyListTabCommand_Executed()
-        {
-            Log.Info();
-
-            this.SelectedTab = Tabs.MonthlyListTab;
-        }
+        private void ShowMonthlyListTabCommand_Executed() => this.SelectedTab = Tabs.MonthlyListTab;
 
         /// <summary>
         /// 月別グラフタブ表示コマンド実行可能か
@@ -1367,12 +1334,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 月別グラフタブ表示コマンド処理
         /// </summary>
-        private void ShowMonthlyGraphTabCommand_Executed()
-        {
-            Log.Info();
-
-            this.SelectedTab = Tabs.MonthlyGraphTab;
-        }
+        private void ShowMonthlyGraphTabCommand_Executed() => this.SelectedTab = Tabs.MonthlyGraphTab;
 
         /// <summary>
         /// 年別一覧タブ表示コマンド実行可能か
@@ -1382,12 +1344,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 年別一覧タブ表示コマンド処理
         /// </summary>
-        private void ShowYearlyListTabCommand_Executed()
-        {
-            Log.Info();
-
-            this.SelectedTab = Tabs.YearlyListTab;
-        }
+        private void ShowYearlyListTabCommand_Executed() => this.SelectedTab = Tabs.YearlyListTab;
 
         /// <summary>
         /// 年別グラフタブ表示コマンド実行可能か
@@ -1397,12 +1354,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 年別グラフタブ表示コマンド処理
         /// </summary>
-        private void ShowYearlyGraphTabCommand_Executed()
-        {
-            Log.Info();
-
-            this.SelectedTab = Tabs.YearlyGraphTab;
-        }
+        private void ShowYearlyGraphTabCommand_Executed() => this.SelectedTab = Tabs.YearlyGraphTab;
         #endregion
 
         #region 月間表示
@@ -1410,18 +1362,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 先月表示コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool GoToLastMonthCommand_CanExecute()
-        {
-            // 帳簿/日別一覧タブを選択している
-            return (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedTermKind == TermKind.Monthly;
-        }
+        /// <remarks>帳簿/日別一覧タブを選択している</remarks>
+        private bool GoToLastMonthCommand_CanExecute() => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedTermKind == TermKind.Monthly;
         /// <summary>
         /// 先月表示コマンド処理
         /// </summary>
         private async void GoToLastMonthCommand_Executed()
         {
-            Log.Info();
-
             using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                 this.DisplayedMonth = this.DisplayedMonth.Value.AddMonths(-1);
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
@@ -1444,8 +1391,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void GoToThisMonthCommand_Executed()
         {
-            Log.Info();
-
             using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                 this.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
@@ -1456,18 +1401,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 翌月表示コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool GoToNextMonthCommand_CanExecute()
-        {
-            // 帳簿/月間一覧タブを選択している
-            return (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedTermKind == TermKind.Monthly;
-        }
+        /// <remarks>帳簿/月間一覧タブを選択している</remarks>
+        private bool GoToNextMonthCommand_CanExecute() => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedTermKind == TermKind.Monthly;
         /// <summary>
         /// 翌月表示コマンド処理
         /// </summary>
         private async void GoToNextMonthCommand_Executed()
         {
-            Log.Info();
-
             using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                 this.DisplayedMonth = this.DisplayedMonth.Value.AddMonths(1);
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
@@ -1484,8 +1424,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void SelectTermCommand_Executed()
         {
-            Log.Info();
-
             SelectTermRequestEventArgs e = new() {
                 DbHandlerFactory = this.dbHandlerFactory,
                 TermKind = this.DisplayedTermKind,
@@ -1511,18 +1449,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 前年表示コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool GoToLastYearCommand_CanExecute()
-        {
-            // 月別一覧/月別グラフ/年別一覧/年別グラフタブを選択している
-            return this.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab;
-        }
+        /// <remarks>月別一覧/月別グラフ/年別一覧/年別グラフタブを選択している</remarks>
+        private bool GoToLastYearCommand_CanExecute() => this.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab;
         /// <summary>
         /// 前年表示コマンド処理
         /// </summary>
         private async void GoToLastYearCommand_Executed()
         {
-            Log.Info();
-
             using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                 this.DisplayedYear = this.DisplayedYear.AddYears(-1);
                 await this.UpdateAsync(isUpdateBookList: true);
@@ -1545,8 +1478,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void GoToThisYearCommand_Executed()
         {
-            Log.Info();
-
             using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                 this.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
                 await this.UpdateAsync(isUpdateBookList: true);
@@ -1557,18 +1488,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 来年表示コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool GoToNextYearCommand_CanExecute()
-        {
-            // 月別一覧/月別グラフ/年別一覧/年別グラフタブを選択している
-            return this.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab;
-        }
+        /// <remarks>月別一覧/月別グラフ/年別一覧/年別グラフタブを選択している</remarks>
+        private bool GoToNextYearCommand_CanExecute() => this.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab;
         /// <summary>
         /// 来年表示コマンド処理
         /// </summary>
         private async void GoToNextYearCommand_Executed()
         {
-            Log.Info();
-
             using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                 this.DisplayedYear = this.DisplayedYear.AddYears(1);
                 await this.UpdateAsync(isUpdateBookList: true);
@@ -1581,8 +1507,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void UpdateCommand_Executed()
         {
-            Log.Info();
-
             using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                 await this.UpdateAsync(isUpdateBookList: true);
             }
@@ -1605,8 +1529,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void SettingsCommand_Executed()
         {
-            Log.Info();
-
             SettingsRequestEventArgs e = new() {
                 DbHandlerFactory = this.dbHandlerFactory
             };
@@ -1636,8 +1558,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private void CompareCsvFileCommand_Executed()
         {
-            Log.Info();
-
             CompareCsvFileRequestEventArgs e = new() {
                 DbHandlerFactory = this.dbHandlerFactory,
                 BookId = this.SelectedBookVM.Id
@@ -1657,12 +1577,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// バージョン表示コマンド処理
         /// </summary>
-        private void OpenVersionWindowCommand_Executed()
-        {
-            Log.Info();
-
-            this.ShowVersionRequested?.Invoke(this, EventArgs.Empty);
-        }
+        private void OpenVersionWindowCommand_Executed() => this.ShowVersionRequested?.Invoke(this, EventArgs.Empty);
         #endregion
         #endregion
 
@@ -1682,6 +1597,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public MainWindowViewModel()
         {
+            using FuncLog funcLog = new();
+
             this.BookTabVM = new(this, Tabs.BooksTab);
             this.DailyGraphTabVM = new(this, Tabs.DailyGraphTab);
             this.MonthlySummaryTabVM = new(this, Tabs.MonthlyListTab);
@@ -1703,11 +1620,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         public override void AddEventHandlers()
         {
+            using FuncLog funcLog = new();
+
             Properties.Settings settings = Properties.Settings.Default;
 
             // タブ選択変更時
             this.SelectedTabChanged += async (sender, e) => {
-                Log.Info($"SelectedTabChanged old:{e.OldValue} new:{e.NewValue}");
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedTabChanged));
 
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     settings.MainWindow_SelectedTabIndex = e.NewValue;
@@ -1718,7 +1637,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             };
             // 帳簿選択変更時
             this.SelectedBookChanged += async (sender, e) => {
-                Log.Info($"SelectedBookChanged old:{e.OldValue} new:{e.NewValue}");
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedBookChanged));
 
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     settings.MainWindow_SelectedBookId = e.NewValue ?? -1;
@@ -1729,7 +1648,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             };
             // グラフ種別1選択変更時
             this.SelectedGraphKind1Changed += async (sender, e) => {
-                Log.Info($"SelectedGraphKind1Changed old:{e.OldValue} new:{e.NewValue}");
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedGraphKind1));
 
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     settings.MainWindow_SelectedGraphKindIndex = (int)e.NewValue;
@@ -1740,7 +1659,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             };
             // グラフ種別2選択変更時
             this.SelectedGraphKind2Changed += async (sender, e) => {
-                Log.Info($"SelectedGraphKind1Changed old:{e.OldValue} new:{e.NewValue}");
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedGraphKind2Changed));
 
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     settings.MainWindow_SelectedGraphKind2Index = (int)e.NewValue;
@@ -1751,7 +1670,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             };
             // 系列選択変更時
             this.SelectedSeriesChanged += (sender, e) => {
-                Log.Info("SelectedSeriesChanged");
+                using FuncLog funcLog = new(methodName: nameof(this.SelectedSeriesChanged));
 
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     switch (this.SelectedTab) {
@@ -1771,6 +1690,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         public override async Task LoadAsync()
         {
+            using FuncLog funcLog = new();
+
             Properties.Settings settings = Properties.Settings.Default;
             this.FiscalStartMonth = settings.App_StartMonth;
 
@@ -1794,7 +1715,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 this.SelectedGraphKind2Index = settings.MainWindow_SelectedGraphKind2Index;
             }
 
-            Log.Info($"SelectedTabIndex:{this.SelectedTabIndex} SelectedGraphKind1Index:{this.SelectedGraphKind1Index} SelectedGraphKind2Index:{this.SelectedGraphKind2Index}");
+            Log.Vars(vars: new { this.SelectedTabIndex, this.SelectedGraphKind1Index, this.SelectedGraphKind2Index });
 
             await this.UpdateAsync(isScroll: true, isUpdateActDateLastEdited: true);
         }
@@ -1850,7 +1771,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
         public async Task UpdateAsync(bool isUpdateBookList = false, bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
-            Log.Info($"isUpdateBookList:{isUpdateBookList} isScroll:{isScroll} isUpdateActDateLastEdited:{isUpdateActDateLastEdited}");
+            using FuncLog funcLog = new(new { isUpdateBookList, isScroll, isUpdateActDateLastEdited });
 
             if (isUpdateBookList) await this.UpdateBookListAsync();
 
@@ -1882,6 +1803,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="bookId">選択対象の帳簿ID</param>
         public async Task UpdateBookListAsync(int? bookId = null)
         {
+            using FuncLog funcLog = new();
+
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             var tmpBookVMList = await loader.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedStart, this.DisplayedEnd);
@@ -1900,6 +1823,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns>成功/失敗</returns>
         public async Task<bool> CreateBackUpFileAsync(bool notifyResult = false, bool waitForFinish = true, int? backUpNum = null, string backUpFolderPath = null)
         {
+            using FuncLog funcLog = new(new { notifyResult, waitForFinish, backUpNum, backUpFolderPath });
+
             Properties.Settings settings = Properties.Settings.Default;
 
             int tmpBackUpNum = backUpNum ?? settings.App_BackUpNum;
@@ -1989,6 +1914,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns>成功/失敗/不明</returns>
         private static async Task<int?> ExecuteDumpPostgreSQL(DbHandlerFactory dbHandlerFactory, string backupFilePath, PostgresFormat format, bool notifyResult = false, bool waitForFinish = true)
         {
+            using FuncLog funcLog = new(new { backupFilePath, format, notifyResult, waitForFinish });
+
             Properties.Settings settings = Properties.Settings.Default;
 
             int? result = -1;
@@ -2030,6 +1957,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns>成功/失敗</returns>
         private static async Task<int> ExecuteRestorePostgreSQL(DbHandlerFactory dbHandlerFactory, string backupFilePath)
         {
+            using FuncLog funcLog = new(new { backupFilePath });
+
             Properties.Settings settings = Properties.Settings.Default;
 
             int result = -1;

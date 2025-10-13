@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandler;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others;
 using HouseholdAccountBook.ViewModels.Component;
@@ -8,7 +9,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Views.Windows
@@ -38,7 +38,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<int?>> BookChanged
+        public event EventHandler<ChangedEventArgs<int?>> BookChanged
         {
             add => this.WVM.BookChanged += value;
             remove => this.WVM.BookChanged -= value;
@@ -58,43 +58,64 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="selectedBookId">選択された帳簿ID</param>
         public CsvComparisonWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId)
         {
+            using FuncLog funcLog = new(new { selectedBookId });
+
             this.Owner = owner;
             this.Name = "CsvComp";
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
             this.AddCommonEventHandlersToVM();
+            this.AddEventHandlersToVM();
+
+            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
+
+            this.Loaded += async (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.Loaded));
+
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
+                    await this.WVM.LoadAsync(selectedBookId);
+                }
+                this.WVM.AddEventHandlers();
+            };
+        }
+
+        private void AddEventHandlersToVM()
+        {
+            using FuncLog funcLog = new();
+
             this.WVM.ScrollToButtomRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.ScrollToButtomRequested));
+
                 this.csvCompDataGrid.ScrollToButtom();
             };
             this.WVM.AddActionRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionRequested));
+
                 ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.BookId, e.Record);
                 arw.Registrated += e.Registered;
                 _ = arw.ShowDialog();
             };
             this.WVM.AddActionListRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionListRequested));
+
                 ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.BookId, e.Records);
                 alrw.Registrated += e.Registered;
                 _ = alrw.ShowDialog();
             };
             this.WVM.EditActionRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.EditActionRequested));
+
                 ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.ActionId);
                 arw.Registrated += e.Registered;
                 _ = arw.ShowDialog();
             };
             this.WVM.EditActionListRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.EditActionListRequested));
+
                 ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.GroupId);
                 alrw.Registrated += e.Registered;
                 _ = alrw.ShowDialog();
-            };
-
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
-
-            this.Loaded += async (sender, e) => {
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
-                    await this.WVM.LoadAsync(selectedBookId);
-                }
-                this.WVM.AddEventHandlers();
             };
         }
 
@@ -107,6 +128,8 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void CsvComparisonWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            using FuncLog funcLog = new();
+
             bool oldValue = (bool)e.OldValue;
             bool newValue = (bool)e.NewValue;
             if (oldValue != newValue) {
@@ -126,6 +149,8 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private void CsvComparisonWindow_Closing(object sender, CancelEventArgs e)
         {
+            using FuncLog funcLog = new();
+
             e.Cancel = true;
 
             this.Hide();
@@ -141,6 +166,8 @@ namespace HouseholdAccountBook.Views.Windows
         {
             // Ctrlキーが押されていたらチェックを入れる
             if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control) {
+                using FuncLog funcLog = new();
+
                 if (sender is CheckBox checkBox) {
                     checkBox.IsChecked = !checkBox.IsChecked;
 

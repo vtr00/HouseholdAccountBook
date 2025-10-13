@@ -504,7 +504,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         public override void AddEventHandlers()
         {
+            using FuncLog funcLog = new();
+
             this.SelectedHierarchicalVMChanged += async (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.SelectedHierarchicalVMChanged));
+
                 if (e.Value != null) {
                     ViewModelLoader loader = new(this.dbHandlerFactory);
                     this.DisplayedHierarchicalSettingVM = await loader.LoadHierarchicalSettingViewModelAsync(GetHierarchicalKind(e.Value).Value, e.Value.Id);
@@ -522,7 +526,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="id">選択対象のID</param>
         public async Task LoadAsync(HierarchicalKind? kind = null, int? id = null)
         {
-            Log.Info();
+            using FuncLog funcLog = new(new { kind, id });
 
             // InitializeComponent内で呼ばれる場合があるため、nullチェックを行う
             if (this.dbHandlerFactory == null) { return; }

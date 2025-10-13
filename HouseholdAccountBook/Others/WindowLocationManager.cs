@@ -12,17 +12,8 @@ namespace HouseholdAccountBook.Others
     /// <summary>
     /// ウィンドウの位置を管理する
     /// </summary>
-    public class WindowLocationManager
+    public class WindowLocationManager : SingletonBase<WindowLocationManager>
     {
-        /// <summary>
-        /// シングルトンのインスタンス
-        /// </summary>
-        private static readonly Lazy<WindowLocationManager> singleton = new(() => new());
-        /// <summary>
-        /// インスタンス
-        /// </summary>
-        public static WindowLocationManager Instance => singleton.Value;
-
         /// <summary>
         /// ウィンドウログ
         /// </summary>
@@ -35,6 +26,8 @@ namespace HouseholdAccountBook.Others
         /// 最終補正値
         /// </summary>
         private readonly Dictionary<Window, Rect> lastRectDic = [];
+
+        static WindowLocationManager() => Register(static () => new WindowLocationManager());
 
         private WindowLocationManager() { }
 

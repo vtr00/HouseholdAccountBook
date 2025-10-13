@@ -388,37 +388,24 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 編集コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool EditMenuCommand_CanExecute()
-        {
-            return !this.Parent.IsChildrenWindowOpened();
-        }
+        private bool EditMenuCommand_CanExecute() => !this.Parent.IsChildrenWindowOpened();
 
         /// <summary>
         /// 検索欄表示コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool ShowFindBoxCommand_CanExecute()
-        {
-            // 帳簿タブを選択
-            return this.Parent.SelectedTab == Tabs.BooksTab;
-        }
+        /// <remarks>帳簿タブを選択しているか</remarks>
+        private bool ShowFindBoxCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab;
         /// <summary>
         /// 検索欄表示コマンド処理
         /// </summary>
-        private void ShowFindBoxCommand_Executed()
-        {
-            Log.Info();
-
-            this.SelectedFindKind = FindKind.Find;
-        }
+        private void ShowFindBoxCommand_Executed() => this.SelectedFindKind = FindKind.Find;
 
         /// <summary>
         /// 検索欄非表示コマンド処理
         /// </summary>
         private void HideFindBoxCommand_Executed()
         {
-            Log.Info();
-
             this.FindText = string.Empty;
             this.SelectedFindKind = FindKind.None;
         }
@@ -427,61 +414,37 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 置換欄表示コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool ShowReplaceBoxCommand_CanExecute()
-        {
-            // 帳簿タブを選択
-            return this.Parent.SelectedTab == Tabs.BooksTab;
-        }
+        /// <remarks>帳簿タブを選択しているか</remarks>
+        private bool ShowReplaceBoxCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab;
         /// <summary>
         /// 置換欄表示コマンド処理
         /// </summary>
-        private void ShowReplaceBoxCommand_Executed()
-        {
-            Log.Info();
-
-            this.SelectedFindKind = FindKind.Replace;
-        }
+        private void ShowReplaceBoxCommand_Executed() => this.SelectedFindKind = FindKind.Replace;
 
         /// <summary>
         /// 置換欄非表示コマンド処理
         /// </summary>
-        private void HideReplaceBoxCommand_Executed()
-        {
-            this.SelectedFindKind = FindKind.Find;
-        }
+        private void HideReplaceBoxCommand_Executed() => this.SelectedFindKind = FindKind.Find;
 
         /// <summary>
         /// 帳簿項目検索コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool FindActionCommand_CanExecute()
-        {
-            return !string.IsNullOrWhiteSpace(this.FindInputText);
-        }
+        private bool FindActionCommand_CanExecute() => !string.IsNullOrWhiteSpace(this.FindInputText);
         /// <summary>
         /// 帳簿項目検索コマンド処理
         /// </summary>
-        private void FindActionCommand_Executed()
-        {
-            Log.Info();
-
-            this.FindText = this.FindInputText;
-        }
+        private void FindActionCommand_Executed() => this.FindText = this.FindInputText;
         /// <summary>
         /// 帳簿項目置換コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool ReplaceActionCommand_CanExecute()
-        {
-            return !string.IsNullOrWhiteSpace(this.FindInputText) && this.FindInputText != this.ReplaceText;
-        }
+        private bool ReplaceActionCommand_CanExecute() => !string.IsNullOrWhiteSpace(this.FindInputText) && this.FindInputText != this.ReplaceText;
         /// <summary>
         /// 帳簿項目置換コマンド処理
         /// </summary>
         private async void ReplaceActionCommand_Executed()
         {
-            Log.Info();
-
             this.FindText = this.FindInputText;
 
             if (MessageBox.Show(string.Format(Properties.Resources.Message_ReplaceShopNameRemarkNotification, this.FindText, this.ReplaceText), Properties.Resources.Title_Conformation,
@@ -511,18 +474,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 移動追加コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool AddMoveCommand_CanExecute()
-        {
-            // 帳簿タブを選択 かつ 帳簿が2つ以上存在 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない
-            return this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookVMList?.Count >= 2 && this.Parent.SelectedBookVM != null && !this.Parent.IsChildrenWindowOpened();
-        }
+        /// <remarks>帳簿タブを選択 かつ 帳簿が2つ以上存在 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない</remarks>
+        private bool AddMoveCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookVMList?.Count >= 2 && this.Parent.SelectedBookVM != null && !this.Parent.IsChildrenWindowOpened();
         /// <summary>
         /// 移動追加コマンド処理
         /// </summary>
         private void AddMoveCommand_Executed()
         {
-            Log.Info();
-
             AddMoveRequestEventArgs e = new() {
                 DbHandlerFactory = this.dbHandlerFactory,
                 BookId = this.Parent.SelectedBookVM?.Id,
@@ -540,18 +498,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 帳簿項目追加コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool AddActionCommand_CanExecute()
-        {
-            // 帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない
-            return this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.SelectedBookVM != null && !this.Parent.IsChildrenWindowOpened();
-        }
+        /// <remarks>帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない</remarks>
+        private bool AddActionCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.SelectedBookVM != null && !this.Parent.IsChildrenWindowOpened();
         /// <summary>
         /// 帳簿項目追加コマンド処理
         /// </summary>
         private void AddActionCommand_Executed()
         {
-            Log.Info();
-
             AddActionRequestEventArgs e = new() {
                 DbHandlerFactory = this.dbHandlerFactory,
                 BookId = this.Parent.SelectedBookVM?.Id,
@@ -569,18 +522,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 帳簿項目リスト追加コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool AddActionListCommand_CanExecute()
-        {
-            // 帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウを開いていない
-            return this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.SelectedBookVM != null && !this.Parent.IsChildrenWindowOpened();
-        }
+        /// <remarks>帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウを開いていない</remarks>
+        private bool AddActionListCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.SelectedBookVM != null && !this.Parent.IsChildrenWindowOpened();
         /// <summary>
         /// 帳簿項目リスト追加コマンド処理
         /// </summary>
         private void AddActionListCommand_Executed()
         {
-            Log.Info();
-
             AddActionListRequestEventArgs e = new() {
                 DbHandlerFactory = this.dbHandlerFactory,
                 BookId = this.Parent.SelectedBookVM?.Id,
@@ -598,19 +546,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 複製コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool CopyCommand_CanExecute()
-        {
-            // 帳簿タブを選択 かつ 選択されている帳簿項目が1つだけ存在 かつ 選択している帳簿項目のIDが0より大きい かつ 子ウィンドウを開いていない
-            return this.Parent.SelectedTab == Tabs.BooksTab &&
+        /// <remarks>帳簿タブを選択 かつ 選択されている帳簿項目が1つだけ存在 かつ 選択している帳簿項目のIDが0より大きい かつ 子ウィンドウを開いていない</remarks>
+        private bool CopyCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab &&
                    this.SelectedActionVMList.Count == 1 && this.SelectedActionVMList[0].ActionId > 0 && !this.Parent.IsChildrenWindowOpened();
-        }
         /// <summary>
         /// 複製コマンド処理
         /// </summary>
         private async void CopyCommand_Executed()
         {
-            Log.Info();
-
             // グループ種別を特定する
             int? groupKind = null;
             await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
@@ -649,19 +592,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 編集コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool EditCommand_CanExecute()
-        {
-            // 帳簿タブを選択 かつ 選択されている帳簿項目が1つだけ存在 かつ 選択している帳簿項目のIDが0より大きい かつ 子ウィンドウを開いていない
-            return this.Parent.SelectedTab == Tabs.BooksTab &&
+        /// <remarks>帳簿タブを選択 かつ 選択されている帳簿項目が1つだけ存在 かつ 選択している帳簿項目のIDが0より大きい かつ 子ウィンドウを開いていない</remarks>
+        private bool EditCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab &&
                    this.SelectedActionVMList.Count == 1 && 0 < this.SelectedActionVMList[0].ActionId && !this.Parent.IsChildrenWindowOpened();
-        }
         /// <summary>
         /// 編集コマンド処理
         /// </summary>
         private async void EditCommand_Executed()
         {
-            Log.Info();
-
             // グループ種別を特定する
             int? groupKind = null;
             await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
@@ -718,19 +656,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 削除コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool DeleteCommand_CanExecute()
-        {
-            // 帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 子ウィンドウが開いていない
-            return this.Parent.SelectedTab == Tabs.BooksTab &&
+        /// <remarks>帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 子ウィンドウが開いていない</remarks>
+        private bool DeleteCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab &&
                    this.SelectedActionVMList.Where(vm => vm.ActionId > 0).Any() && !this.Parent.IsChildrenWindowOpened();
-        }
         /// <summary>
         /// 削除コマンド処理
         /// </summary>
         private async void DeleteCommand_Executed()
         {
-            Log.Info();
-
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
@@ -793,19 +726,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 一致フラグ変更コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool ChangeIsMatchCommand_CanExecute()
-        {
-            // 帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 登録ウィンドウが開いていない
-            return this.Parent.SelectedTab == Tabs.BooksTab &&
+        /// <remarks>帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 登録ウィンドウが開いていない</remarks>
+        private bool ChangeIsMatchCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab &&
                    this.SelectedActionVMList.Where(vm => vm.ActionId > 0).Any() && !this.Parent.IsRegistrationWindowOpened();
-        }
         /// <summary>
         /// 一致ブラグ変更コマンド処理
         /// </summary>
         private async void ChangeIsMatchCommand_Executed()
         {
-            Log.Info();
-
             await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 // 帳簿項目IDが0を超える項目についてループ
                 HstActionDao hstActionDao = new(dbHandler);
@@ -822,6 +750,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <remarks>表示されている項目のみ選択する</remarks>
         private void UpdateDisplayedActionVMList()
         {
+            using FuncLog funcLog = new();
+
             ObservableCollection<ActionViewModel> tmp = this.ActionVMList;
 
             if (this._UseFilter) {   // フィルタ有効の場合
@@ -872,8 +802,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             if (this.Parent.SelectedTab != Tabs.BooksTab) return;
 
-            List<int> emptyIdList = [];
-            Log.Info($"actionIdList:{string.Join(",", actionIdList ?? emptyIdList)} balanceKind:{balanceKind} categoryId:{categoryId} itemId:{itemId} isScroll:{isScroll} isUpdateActDateLastEdited:{isUpdateActDateLastEdited}");
+            using FuncLog funcLog = new(new { actionIdList, balanceKind, categoryId, itemId, isScroll, isUpdateActDateLastEdited });
 
             // 指定がなければ、更新前の帳簿項目の選択を維持する
             List<int> tmpActionIdList = actionIdList ?? [.. this.SelectedActionVMList.Select(tmp => tmp.ActionId)];
@@ -881,7 +810,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             int? tmpBalanceKind = balanceKind ?? this.Parent.SelectedBalanceKind;
             int? tmpCategoryId = categoryId ?? this.Parent.SelectedCategoryId;
             int? tmpItemId = itemId ?? this.Parent.SelectedItemId;
-            Log.Info($"tmpActionIdList:{string.Join(",", tmpActionIdList ?? emptyIdList)} tmpBalanceKind:{tmpBalanceKind} tmpCategoryId:{tmpCategoryId} tmpItemId:{tmpItemId}");
+            Log.Vars(vars: new { tmpActionIdList, tmpBalanceKind, tmpCategoryId, tmpItemId });
 
             // 表示するデータを指定する
             var loader = new ViewModelLoader(this.dbHandlerFactory);
@@ -937,9 +866,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         public override void AddEventHandlers()
         {
+            using FuncLog funcLog = new();
+
             // 帳簿項目選択変更時
             this.SelectedActionVMList.CollectionChanged += (sender, e) => {
-                Log.Debug("SelectedActionVMList_CollectionChanged");
+                using FuncLog funcLog = new(methodName: nameof(this.SelectedActionVMList.CollectionChanged));
 
                 this.RaisePropertyChanged(nameof(this.AverageValue));
                 this.RaisePropertyChanged(nameof(this.Count));

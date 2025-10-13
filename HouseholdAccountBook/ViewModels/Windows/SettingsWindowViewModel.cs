@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Enums;
+﻿using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.WindowsParts;
 using System;
@@ -122,6 +123,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         public override async Task LoadAsync()
         {
+            using FuncLog funcLog = new();
+
             switch (this.SelectedTab) {
                 case SettingsTabs.ItemSettingsTab:
                     await this.ItemTabVM.LoadAsync();
@@ -137,6 +140,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         public override void AddEventHandlers()
         {
+            using FuncLog funcLog = new();
+
             this.ItemTabVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
             this.ItemTabVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);
             this.BookTabVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);

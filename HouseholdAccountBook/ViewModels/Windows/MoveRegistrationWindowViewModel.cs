@@ -3,6 +3,7 @@ using HouseholdAccountBook.Adapters.Dao.DbTable;
 using HouseholdAccountBook.Adapters.DbHandler.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
 using HouseholdAccountBook.Adapters.Dto.Others;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others;
@@ -399,22 +400,32 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         public override void AddEventHandlers()
         {
-            this.FromBookChanged += async (_, _) => {
+            using FuncLog funcLog = new();
+
+            this.FromBookChanged += async (sender, e) => {
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.FromBookChanged));
+
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateItemListAsync();
                 }
             };
-            this.ToBookChanged += async (_, _) => {
+            this.ToBookChanged += async (sender, e) => {
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.ToBookChanged));
+
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateItemListAsync();
                 }
             };
-            this.CommissionKindChanged += async (_, _) => {
+            this.CommissionKindChanged += async (sender, e) => {
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.CommissionKindChanged));
+
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateItemListAsync();
                 }
             };
-            this.ItemChanged += async (_, _) => {
+            this.ItemChanged += async (sender, e) => {
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.ItemChanged));
+
                 using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                     await this.UpdateRemarkListAsync();
                 }
@@ -431,6 +442,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         public async Task LoadAsync(int? selectedBookId, int? selectedGroupId, DateTime? selectedMonth, DateTime? selectedDate)
         {
+            using FuncLog funcLog = new(new { selectedBookId, selectedGroupId, selectedMonth, selectedDate });
+
             int? fromBookId = selectedBookId;
             int? toBookId = selectedBookId;
             int? commissionItemId = null;
@@ -515,6 +528,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateBookListAsync(int? fromBookId = null, int? toBookId = null)
         {
+            using FuncLog funcLog = new(new { fromBookId, toBookId });
+
             ViewModelLoader loader = new(this.dbHandlerFactory);
             this.BookVMList = await loader.LoadBookListAsync();
             this.SelectedFromBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == fromBookId, 0);
@@ -546,6 +561,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             if (this.SelectedFromBookVM == null || this.SelectedToBookVM == null) return;
 
+            using FuncLog funcLog = new(new { itemId });
+
             int bookId = this.SelectedCommissionKind switch {
                 CommissionKind.MoveFrom => this.SelectedFromBookVM.Id.Value,
                 CommissionKind.MoveTo => this.SelectedToBookVM.Id.Value,
@@ -566,6 +583,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             if (this.SelectedItemVM == null) return;
 
+            using FuncLog funcLog = new(new { remark });
+
             ViewModelLoader loader = new(this.dbHandlerFactory);
             string tmpRemark = remark ?? this.SelectedRemark;
             this.RemarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
@@ -578,6 +597,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns>登録された帳簿項目IDリスト</returns>
         protected override async Task<List<int>> SaveAsync()
         {
+            using FuncLog funcLog = new();
+
             List<int> resActionIdList = [];
 
             DateTime fromDate = this.FromDate;

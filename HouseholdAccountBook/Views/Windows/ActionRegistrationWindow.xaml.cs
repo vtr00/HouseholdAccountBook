@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandler;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others;
@@ -75,9 +76,11 @@ namespace HouseholdAccountBook.Views.Windows
         public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedActionId, RegistrationKind regKind = RegistrationKind.Edit)
             : this(owner, dbHandlerFactory, null, null, null, null, selectedActionId, regKind) { }
 
-        private ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate, 
+        private ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate,
                                          CsvViewModel selectedRecord, int? selectedActionId, RegistrationKind regKind)
         {
+            using FuncLog funcLog = new(new { selectedBookId, selectedMonth, selectedDate, selectedRecord, selectedActionId, regKind });
+
             this.Owner = owner;
             this.Name = "ActReg";
             WindowLocationManager.Instance.Add(this);
@@ -96,7 +99,6 @@ namespace HouseholdAccountBook.Views.Windows
                 this.WVM.AddEventHandlers();
             };
         }
-
         #endregion
     }
 }

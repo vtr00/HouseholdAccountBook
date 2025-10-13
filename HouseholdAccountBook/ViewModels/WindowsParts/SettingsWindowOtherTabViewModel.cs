@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Enums;
+﻿using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -512,6 +513,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public void Load()
         {
+            using FuncLog funcLog = new();
+
             Properties.Settings settings = Properties.Settings.Default;
 
             this.SelectedDBKind = (DBKind)settings.App_SelectedDBKind;
@@ -547,7 +550,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             this.WindowSettingVMList = LoadWindowSettings();
         }
-        
+
         public override void AddEventHandlers()
         {
             // NOP
@@ -558,6 +561,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private static ObservableCollection<WindowSettingViewModel> LoadWindowSettings()
         {
+            using FuncLog funcLog = new();
+
             Properties.Settings settings = Properties.Settings.Default;
 
             ObservableCollection<WindowSettingViewModel> list = [
@@ -615,6 +620,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private void Save()
         {
+            using FuncLog funcLog = new();
+
             Properties.Settings settings = Properties.Settings.Default;
 
             // PostgreSQL

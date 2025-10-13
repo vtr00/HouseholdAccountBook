@@ -9,7 +9,7 @@ using System.Windows.Input;
 namespace HouseholdAccountBook.Others
 {
     /// <summary>
-    /// <see cref="WaitCursorManager"/> を生成するファクトリ
+    /// <see cref="WaitCursorManager"/> のファクトリ
     /// </summary>
     public class WaitCursorManagerFactory(FrameworkElement fe)
     {
@@ -88,7 +88,7 @@ namespace HouseholdAccountBook.Others
             }
 
             _counter[this._fe] = ++value;
-            Log.Debug(string.Format($"Increase WaitCounter count:{value} from:{this._methodName}:{this._lineNumber}"));
+            Log.Debug(string.Format($"Increase count:{value} from:{this._methodName}({this._lineNumber})"));
             _mutex.ReleaseMutex();
         }
 
@@ -101,7 +101,7 @@ namespace HouseholdAccountBook.Others
             _ = _mutex.WaitOne();
             if (_counter.TryGetValue(this._fe, out int value)) {
                 _counter[this._fe] = --value;
-                Log.Debug(string.Format($"Decrease WaitCounter count:{value} from:{this._methodName}:{this._lineNumber}"));
+                Log.Debug(string.Format($"Decrease count:{value} from:{this._methodName}({this._lineNumber})"));
 
                 if (_counter[this._fe] <= 0) {
                     this._fe.Cursor = null;
@@ -109,7 +109,7 @@ namespace HouseholdAccountBook.Others
                 }
             }
             else {
-                Log.Debug($"Don't decrease WaitCounter from:{this._methodName}:{this._lineNumber}");
+                Log.Debug($"Can't decrease WaitCounter from:{this._methodName}({this._lineNumber})");
             }
             _mutex.ReleaseMutex();
         }

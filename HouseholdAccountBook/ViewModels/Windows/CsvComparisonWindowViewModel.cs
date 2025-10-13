@@ -4,6 +4,7 @@ using HouseholdAccountBook.Adapters.Dao.Compositions;
 using HouseholdAccountBook.Adapters.Dao.DbTable;
 using HouseholdAccountBook.Adapters.DbHandler.Abstract;
 using HouseholdAccountBook.Adapters.Dto.Others;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others;
@@ -33,7 +34,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<int?>> BookChanged;
+        public event EventHandler<ChangedEventArgs<int?>> BookChanged;
         /// <summary>
         /// 帳簿項目変更時イベント
         /// </summary>
@@ -103,8 +104,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             get => this._SelectedBookVM;
             set {
+                var oldValue = this._SelectedBookVM?.Id;
                 if (this.SetProperty(ref this._SelectedBookVM, value)) {
-                    this.BookChanged?.Invoke(this, new EventArgs<int?>(value.Id));
+                    this.BookChanged?.Invoke(this, new ChangedEventArgs<int?>() { OldValue = oldValue, NewValue = value.Id });
                 }
             }
         }
@@ -176,6 +178,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #region SelectedSumValue
         public int SelectedSumValue => this.SelectedCsvComparisonVMList.Sum(vm => vm.Record.Value);
         #endregion
+
+        /// <summary>
+        /// チェック数変更を通知する
+        /// </summary>
+        private void RaiseCheckedCountChanged(EventArgs<int?, bool> e)
+        {
+            this.RaisePropertyChanged(nameof(this.AllCheckedCount));
+            this.RaisePropertyChanged(nameof(this.SelectedCheckedCount));
+        }
 
         #region コマンド
         /// <summary>
@@ -336,11 +347,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 項目追加コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool AddActionCommand_CanExecute()
-        {
-            // 選択されている帳簿項目が1つ以上存在していて、値を持たない帳簿項目IDが1つ以上ある
-            return this.SelectedCsvComparisonVMList.Count != 0 && this.SelectedCsvComparisonVMList.Any(vm => !vm.ActionId.HasValue);
-        }
+        /// <remarks>選択されている帳簿項目が1つ以上存在していて、値を持たない帳簿項目IDが1つ以上ある</remarks>
+        private bool AddActionCommand_CanExecute() => this.SelectedCsvComparisonVMList.Count != 0 && this.SelectedCsvComparisonVMList.Any(vm => !vm.ActionId.HasValue);
         /// <summary>
         /// 項目追加コマンド処理
         /// </summary>
@@ -384,11 +392,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 項目編集コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool EditActionCommand_CanExecute()
-        {
-            // 選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが値を持つ
-            return this.SelectedCsvComparisonVMList.Count == 1 && this.SelectedCsvComparisonVM.ActionId.HasValue;
-        }
+        /// <remarks>選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが値を持つ</remarks>
+        private bool EditActionCommand_CanExecute() => this.SelectedCsvComparisonVMList.Count == 1 && this.SelectedCsvComparisonVM.ActionId.HasValue;
         /// <summary>
         /// 項目編集コマンド処理
         /// </summary>
@@ -552,6 +557,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         public async Task LoadAsync(int? selectedBookId)
         {
+            using FuncLog funcLog = new(new { selectedBookId });
+
             await this.UpdateBookCompListAsync(selectedBookId);
         }
 
@@ -561,6 +568,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="bookId">選択対象の帳簿ID</param>
         public async Task UpdateBookCompListAsync(int? bookId = null)
         {
+            using FuncLog funcLog = new(new { bookId });
+
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             this.BookVMList = await loader.UpdateBookCompListAsync();
@@ -569,10 +578,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         public override void AddEventHandlers()
         {
+            using FuncLog funcLog = new();
+
             this.CsvFilePathList.CollectionChanged += (sender, e) => {
+                using FuncLog funcLog = new(new { e.OldItems, e.NewItems }, methodName: nameof(this.CsvFilePathList.CollectionChanged));
+
                 this.RaisePropertyChanged(nameof(this.CsvFilePathes));
             };
             this.CsvComparisonVMList.CollectionChanged += (sender, e) => {
+                using FuncLog funcLog = new(new { e.OldItems, e.NewItems }, methodName: nameof(this.CsvComparisonVMList.CollectionChanged));
+
                 this.RaisePropertyChanged(nameof(this.AllCheckedCount));
                 this.RaisePropertyChanged(nameof(this.AllCount));
                 this.RaisePropertyChanged(nameof(this.AllSumValue));
@@ -593,24 +608,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             };
             this.SelectedCsvComparisonVMList.CollectionChanged += (sender, e) => {
+                using FuncLog funcLog = new(new { e.OldItems, e.NewItems }, methodName: nameof(this.SelectedCsvComparisonVMList.CollectionChanged));
+
                 this.RaisePropertyChanged(nameof(this.SelectedCheckedCount));
                 this.RaisePropertyChanged(nameof(this.SelectedCount));
                 this.RaisePropertyChanged(nameof(this.SelectedSumValue));
             };
 
             this.BookChanged += async (sender, e) => {
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.BookChanged));
+
                 this.ReloadCsvFiles();
                 await this.UpdateComparisonVMListAsync(true);
             };
-        }
-
-        /// <summary>
-        /// チェック数変更を通知する
-        /// </summary>
-        private void RaiseCheckedCountChanged(EventArgs<int?, bool> e)
-        {
-            this.RaisePropertyChanged(nameof(this.AllCheckedCount));
-            this.RaisePropertyChanged(nameof(this.SelectedCheckedCount));
         }
 
         /// <summary>
@@ -618,6 +628,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public void LoadCsvFiles(IList<string> csvFilePathList)
         {
+            using FuncLog funcLog = new(new { csvFilePathList });
+
             // CSVファイル上の対象インデックスを取得する
             int actDateIndex = this.SelectedBookVM.ActDateIndex.Value;
             int itemNameIndex = this.SelectedBookVM.ItemNameIndex.Value;
@@ -673,24 +685,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         public void ReloadCsvFiles()
         {
+            using FuncLog funcLog = new();
+
             // リストをクリアする
             this.CsvComparisonVMList.Clear();
 
             this.LoadCsvFiles(this.CsvFilePathList);
-        }
-
-        /// <summary>
-        /// 一致フラグを保存する
-        /// </summary>
-        /// <param name="actionId">帳簿項目ID</param>
-        /// <param name="isMatch">一致フラグ</param>
-        /// <returns></returns>
-        public async Task SaveIsMatchAsync(int actionId, bool isMatch)
-        {
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                HstActionDao hstActionDao = new(dbHandler);
-                _ = await hstActionDao.UpdateIsMatchByIdAsync(actionId, isMatch ? 1 : 0);
-            }
         }
 
         /// <summary>
@@ -699,6 +699,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="isScroll">スクロールするか</param>
         public async Task UpdateComparisonVMListAsync(bool isScroll = false)
         {
+            using FuncLog funcLog = new(new { isScroll });
+
             // 指定された帳簿内で、日付、金額が一致する帳簿項目を探す
             await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
                 foreach (var vm in this.CsvComparisonVMList) {
@@ -727,6 +729,22 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             if (isScroll) {
                 this.ScrollToButtomRequested?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        /// <summary>
+        /// 一致フラグを保存する
+        /// </summary>
+        /// <param name="actionId">帳簿項目ID</param>
+        /// <param name="isMatch">一致フラグ</param>
+        /// <returns></returns>
+        public async Task SaveIsMatchAsync(int actionId, bool isMatch)
+        {
+            using FuncLog funcLog = new(new { actionId, isMatch });
+
+            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                HstActionDao hstActionDao = new(dbHandler);
+                _ = await hstActionDao.UpdateIsMatchByIdAsync(actionId, isMatch ? 1 : 0);
             }
         }
     }

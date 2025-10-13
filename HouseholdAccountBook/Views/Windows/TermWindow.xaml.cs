@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandler;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others;
 using System;
@@ -21,7 +22,8 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="dateWithinMonth">月内日付</param>
         public TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateTime dateWithinMonth)
-            : this(owner, dbHandlerFactory, dateWithinMonth, null, null) {
+            : this(owner, dbHandlerFactory, dateWithinMonth, null, null)
+        {
             this.selectedMonthRadioButton.IsChecked = true;
         }
 
@@ -40,6 +42,8 @@ namespace HouseholdAccountBook.Views.Windows
 
         private TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateTime? dateWithinMonth, DateTime? startDate, DateTime? endDate)
         {
+            using FuncLog funcLog = new(new { dateWithinMonth, startDate, endDate });
+
             this.Owner = owner;
             this.Name = "Term";
             WindowLocationManager.Instance.Add(this);
@@ -71,6 +75,8 @@ namespace HouseholdAccountBook.Views.Windows
         #region ウィンドウ
         private void TermWindow_Closed(object sender, EventArgs e)
         {
+            using FuncLog funcLog = new();
+
             if (this.selectedMonthRadioButton.IsChecked.Value) {
                 this.WVM.StartDate = this.WVM.StartDate.GetFirstDateOfMonth();
                 this.WVM.EndDate = this.WVM.StartDate.GetLastDateOfMonth();
@@ -85,6 +91,8 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private void Calendar_DisplayModeChanged(object sender, CalendarModeChangedEventArgs e)
         {
+            using FuncLog funcLog = new();
+
             if (e.NewMode == CalendarMode.Month) {
                 this.WVM.StartDate = this.calendar.DisplayDate.GetFirstDateOfMonth();
                 this.WVM.EndDate = this.calendar.DisplayDate.GetLastDateOfMonth();

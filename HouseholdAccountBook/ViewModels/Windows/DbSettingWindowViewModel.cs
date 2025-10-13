@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Enums;
+﻿using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -266,6 +267,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         public void Load()
         {
+            using FuncLog funcLog = new();
+
             Properties.Settings settings = Properties.Settings.Default;
             this.SelectedDBKind = (DBKind)settings.App_SelectedDBKind;
 

@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandler;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others;
@@ -82,9 +83,11 @@ namespace HouseholdAccountBook.Views.Windows
         public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedGroupId, RegistrationKind regKind = RegistrationKind.Edit)
             : this(owner, dbHandlerFactory, null, null, null, null, selectedGroupId, regKind) { }
 
-        private ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate, 
+        private ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate,
             List<CsvViewModel> selectedRecordList, int? selectedGroupId, RegistrationKind regKind)
         {
+            using FuncLog funcLog = new(new { selectedBookId, selectedMonth, selectedDate, selectedRecordList, selectedGroupId, regKind });
+
             this.Owner = owner;
             this.Name = "ActListReg";
             WindowLocationManager.Instance.Add(this);

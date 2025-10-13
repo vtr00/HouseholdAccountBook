@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandler;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Others;
@@ -47,9 +48,11 @@ namespace HouseholdAccountBook.Views.Windows
         public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedGroupId, RegistrationKind regKind = RegistrationKind.Edit)
             : this(owner, dbHandlerFactory, null, selectedGroupId, null, null, regKind) { }
 
-        private MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, int? selectedGroupId, DateTime? selectedMonth, DateTime? selectedDate, 
+        private MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, int? selectedGroupId, DateTime? selectedMonth, DateTime? selectedDate,
             RegistrationKind regKind)
         {
+            using FuncLog funcLog = new(new { selectedBookId, selectedGroupId, selectedMonth, selectedDate, regKind });
+
             this.Owner = owner;
             this.Name = "MoveReg";
             WindowLocationManager.Instance.Add(this);

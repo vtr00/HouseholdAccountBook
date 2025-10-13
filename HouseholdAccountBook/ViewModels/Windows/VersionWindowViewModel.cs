@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.ViewModels.Abstract;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
@@ -62,7 +63,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         public override Task LoadAsync()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void AddEventHandlers()

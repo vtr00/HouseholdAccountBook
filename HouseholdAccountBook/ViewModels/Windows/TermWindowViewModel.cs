@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Compositions;
 using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
@@ -104,6 +105,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns>初日/最終日のペア</returns>
         private async Task<Tuple<DateTime, DateTime>> LoadFirstLastDate()
         {
+            using FuncLog funcLog = new();
+
             DateTime firstTime = DateTime.Today;
             DateTime lastTime = DateTime.Today;
             await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
