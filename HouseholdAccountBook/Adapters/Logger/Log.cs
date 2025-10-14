@@ -106,8 +106,15 @@ namespace HouseholdAccountBook.Adapters.Logger
         {
             string details = string.Empty;
             if (vars != null) {
-                static string toString(object tmp)
+                // オブジェクトを文字列化する
+                static string toString(object tmp, int depth = 0)
                 {
+                    // 再帰呼び出しの深さ制限
+                    depth++;
+                    if (10 < depth) {
+                        return "[overflow]";
+                    }
+
                     if (tmp is null) return "null";
 
                     if (tmp.GetType().IsPrimitive) return $"{tmp}";
@@ -124,10 +131,10 @@ namespace HouseholdAccountBook.Adapters.Logger
                                 return $"{dt:yyyy-MM-dd HH:mm:ss}";
                             }
                         case IEnumerable enumerable:
-                            return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => toString(item)))}]";
+                            return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => toString(item, depth)))}]";
                         default:
                             PropertyInfo[] propInfos = tmp.GetType().GetProperties();
-                            return string.Join(", ", propInfos.Select(propInfo => $"{propInfo.Name}:{toString(propInfo.GetValue(tmp))}"));
+                            return string.Join(", ", propInfos.Select(propInfo => $"{propInfo.Name}:{toString(propInfo.GetValue(tmp), depth)}"));
                     }
                 }
                 details += toString(vars);

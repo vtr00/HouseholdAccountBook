@@ -83,7 +83,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             if (e.OriginalSource != sender) return;
 
-            using FuncLog funcLog = new(new { e.RemovedItems, e.AddedItems });
+            using FuncLog funcLog = new(); // ここで e.OldItems, e.NewItems をログに出すと、StackOverflow になる
 
             using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
                 switch (this.WVM.SelectedTab) {
