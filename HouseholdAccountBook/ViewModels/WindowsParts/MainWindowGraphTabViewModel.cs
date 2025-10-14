@@ -149,29 +149,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             using FuncLog funcLog = new(new { categoryId, itemId });
 
-            switch (this.Tab) {
-                case Tabs.DailyGraphTab:
-                    this.InitializeDailyGraphTabData();
-                    await this.UpdateDailyGraphTabDataAsync(categoryId, itemId);
-                    if (this.Parent.SelectedGraphKind1 == GraphKind1.IncomeAndExpensesGraph) {
-                        this.UpdateSelectedDailyGraph();
-                    }
-                    break;
-                case Tabs.MonthlyGraphTab:
-                    this.InitializeMonthlyGraphTabData();
-                    await this.UpdateMonthlyGraphTabDataAsync(categoryId, itemId);
-                    if (this.Parent.SelectedGraphKind1 == GraphKind1.IncomeAndExpensesGraph) {
-                        this.UpdateSelectedMonthlyGraph();
-                    }
-                    break;
-                case Tabs.YearlyGraphTab:
-                    this.InitializeYearlyGraphTabData();
-                    await this.UpdateYearlyGraphTabDataAsync(categoryId, itemId);
-                    if (this.Parent.SelectedGraphKind1 == GraphKind1.IncomeAndExpensesGraph) {
-                        this.UpdateSelectedYearlyGraph();
-                    }
-                    break;
-            }
+            this.InitializeGraphTabData();
+            await this.UpdateGraphTabDataAsync(categoryId, itemId);
+            this.UpdateSelectedGraph();
         }
 
         public override void AddEventHandlers()
@@ -180,29 +160,23 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 個別グラフを更新する
+        /// グラフタブに表示するデータを初期化する
         /// </summary>
-        public void UpdateSelectedGraph()
+        private void InitializeGraphTabData()
         {
-            if (this.Parent.SelectedTab != this.Tab) return;
-            if (this.Parent.SelectedGraphKind1 != GraphKind1.IncomeAndExpensesGraph) return;
-
-            using FuncLog funcLog = new();
-
             switch (this.Tab) {
                 case Tabs.DailyGraphTab:
-                    this.UpdateSelectedDailyGraph();
+                    this.InitializeDailyGraphTabData();
                     break;
                 case Tabs.MonthlyGraphTab:
-                    this.UpdateSelectedMonthlyGraph();
+                    this.InitializeMonthlyGraphTabData();
                     break;
                 case Tabs.YearlyGraphTab:
-                    this.UpdateSelectedYearlyGraph();
+                    this.InitializeYearlyGraphTabData();
                     break;
             }
         }
 
-        #region 日別グラフタブ更新用の関数
         /// <summary>
         /// 日別グラフタブに表示するデータを初期化する
         /// </summary>
@@ -278,6 +252,181 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             this.SelectedGraphPlotModel.InvalidatePlot(true);
             #endregion
+        }
+
+        /// <summary>
+        /// 月別グラフタブに表示するデータを初期化する
+        /// </summary>
+        private void InitializeMonthlyGraphTabData()
+        {
+            using FuncLog funcLog = new();
+
+            DateTime start = this.Parent.DisplayedStart;
+            DateTime end = this.Parent.DisplayedEnd;
+            string unitX = Properties.Resources.Unit_Month;
+            string unitY = Properties.Resources.Unit_Money;
+
+            #region 全項目
+            this.GraphPlotModel.Axes.Clear();
+            this.GraphPlotModel.Series.Clear();
+
+            // 横軸 - 月軸
+            CategoryAxis horizontalAxis1 = new() {
+                Unit = unitX,
+                Position = AxisPosition.Bottom,
+                Key = "Category"
+            };
+            horizontalAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+            // 表示する月の文字列を作成する
+            for (DateTime tmp = start; tmp <= end; tmp = tmp.AddMonths(1)) {
+                horizontalAxis1.Labels.Add($"{tmp.Month}");
+            }
+            this.GraphPlotModel.Axes.Add(horizontalAxis1);
+
+            // 縦軸 - 線形軸
+            LinearAxis verticalAxis1 = new() {
+                Unit = unitY,
+                Position = AxisPosition.Left,
+                MajorGridlineStyle = LineStyle.Solid,
+                MinorGridlineStyle = LineStyle.Dot,
+                StringFormat = "#,0",
+                Key = "Value",
+                Title = GraphKind1Str[this.Parent.SelectedGraphKind1]
+            };
+            this.GraphPlotModel.Axes.Add(verticalAxis1);
+
+            this.GraphPlotModel.InvalidatePlot(true);
+            #endregion
+
+            #region 選択項目
+            this.SelectedGraphPlotModel.Axes.Clear();
+            this.SelectedGraphPlotModel.Series.Clear();
+
+            // 横軸 - 月軸
+            CategoryAxis horizontalAxis2 = new() {
+                Unit = unitX,
+                Position = AxisPosition.Bottom,
+                Key = "Category"
+            };
+            horizontalAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+            // 表示する月の文字列を作成する
+            for (DateTime tmp = start; tmp <= end; tmp = tmp.AddMonths(1)) {
+                horizontalAxis2.Labels.Add($"{tmp.Month}");
+            }
+            this.SelectedGraphPlotModel.Axes.Add(horizontalAxis2);
+
+            // 縦軸 - 線形軸
+            LinearAxis verticalAxis2 = new() {
+                Unit = unitY,
+                Position = AxisPosition.Left,
+                MajorGridlineStyle = LineStyle.Solid,
+                MinorGridlineStyle = LineStyle.Dot,
+                StringFormat = "#,0",
+                Key = "Value",
+                Title = GraphKind1Str[this.Parent.SelectedGraphKind1]
+            };
+            this.SelectedGraphPlotModel.Axes.Add(verticalAxis2);
+
+            this.SelectedGraphPlotModel.InvalidatePlot(true);
+            #endregion
+        }
+
+        /// <summary>
+        /// 年別グラフタブに表示するデータを初期化する
+        /// </summary>
+        private void InitializeYearlyGraphTabData()
+        {
+            using FuncLog funcLog = new();
+
+            DateTime start = this.Parent.DisplayedStart;
+            DateTime end = this.Parent.DisplayedEnd;
+            string unitX = DateTimeExtensions.GetYearUnit(this.Parent.FiscalStartMonth);
+            string unitY = Properties.Resources.Unit_Money;
+
+            #region 全項目
+            this.GraphPlotModel.Axes.Clear();
+            this.GraphPlotModel.Series.Clear();
+
+            // 横軸 - 年軸
+            CategoryAxis horizontalAxis1 = new() {
+                Unit = unitX,
+                Position = AxisPosition.Bottom,
+                Key = "Category"
+            };
+            horizontalAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+            // 表示する年の文字列を作成する
+            for (DateTime tmp = start; tmp <= end; tmp = tmp.AddYears(1)) {
+                horizontalAxis1.Labels.Add($"{tmp:yyyy}");
+            }
+            this.GraphPlotModel.Axes.Add(horizontalAxis1);
+
+            // 縦軸 - 線形軸
+            LinearAxis verticalAxis1 = new() {
+                Unit = unitY,
+                Position = AxisPosition.Left,
+                MajorGridlineStyle = LineStyle.Solid,
+                MinorGridlineStyle = LineStyle.Dot,
+                StringFormat = "#,0",
+                Key = "Value",
+                Title = GraphKind1Str[this.Parent.SelectedGraphKind1]
+            };
+            this.GraphPlotModel.Axes.Add(verticalAxis1);
+
+            this.GraphPlotModel.InvalidatePlot(true);
+            #endregion
+
+            #region 選択項目
+            this.SelectedGraphPlotModel.Axes.Clear();
+            this.SelectedGraphPlotModel.Series.Clear();
+
+            // 横軸 - 年軸
+            CategoryAxis horizontalAxis2 = new() {
+                Unit = unitX,
+                Position = AxisPosition.Bottom,
+                Key = "Category"
+            };
+            horizontalAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
+            // 表示する年の文字列を作成する
+            for (DateTime tmp = start; tmp <= end; tmp = tmp.AddYears(1)) {
+                horizontalAxis2.Labels.Add($"{tmp:yyyy}");
+            }
+            this.SelectedGraphPlotModel.Axes.Add(horizontalAxis2);
+
+            // 縦軸 - 線形軸
+            LinearAxis verticalAxis2 = new() {
+                Unit = unitY,
+                Position = AxisPosition.Left,
+                MajorGridlineStyle = LineStyle.Solid,
+                MinorGridlineStyle = LineStyle.Dot,
+                StringFormat = "#,0",
+                Key = "Value",
+                Title = GraphKind1Str[this.Parent.SelectedGraphKind1]
+            };
+            this.SelectedGraphPlotModel.Axes.Add(verticalAxis2);
+
+            this.SelectedGraphPlotModel.InvalidatePlot(true);
+            #endregion
+        }
+
+        /// <summary>
+        /// グラフタブに表示するデータ(上部)を更新する
+        /// </summary>
+        /// <param name="categoryId">選択対象の分類ID</param>
+        /// <param name="itemId">洗濯対象の項目ID</param>
+        /// <returns></returns>
+        private async Task UpdateGraphTabDataAsync(int? categoryId = null, int? itemId = null)
+        {
+            switch (this.Tab) {
+                case Tabs.DailyGraphTab:
+                    await this.UpdateDailyGraphTabDataAsync(categoryId, itemId);
+                    break;
+                case Tabs.MonthlyGraphTab:
+                    await this.UpdateMonthlyGraphTabDataAsync(categoryId, itemId);
+                    break;
+                case Tabs.YearlyGraphTab:
+                    await this.UpdateYearlyGraphTabDataAsync(categoryId, itemId);
+                    break;
+            }
         }
 
         /// <summary>
@@ -410,129 +559,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 選択項目日別グラフを更新する
-        /// </summary>
-        private void UpdateSelectedDailyGraph()
-        {
-            using FuncLog funcLog = new();
-
-            SeriesViewModel vm = this.SelectedGraphSeriesVM;
-
-            // グラフ表示データを設定する
-            this.SelectedGraphPlotModel.Series.Clear();
-            if (vm != null) {
-                CustomBarSeries selectedSeries = new() {
-                    IsStacked = true,
-                    Title = vm.DisplayedName,
-                    FillColor = (this.GraphPlotModel.Series.FirstOrDefault(series => {
-                        List<GraphDatumViewModel> datumVMList = [.. (series as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>()];
-                        return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
-                    }) as CustomBarSeries).ActualFillColor,
-                    ItemsSource = vm.Values.Zip(vm.StartDates, (value, date) => new GraphDatumViewModel {
-                        Value = value,
-                        Date = date,
-                        ItemId = vm.ItemId,
-                        CategoryId = vm.CategoryId
-                    }),
-                    ValueField = "Value",
-                    TrackerFormatString = "{Date:yyyy-MM-dd}: {Value:#,0}", //日付: 金額
-                    XAxisKey = "Value",
-                    YAxisKey = "Category"
-                };
-                this.SelectedGraphPlotModel.Series.Add(selectedSeries);
-
-                // Y軸の範囲を設定する
-                foreach (Axis axis in this.SelectedGraphPlotModel.Axes) {
-                    if (axis.Position == AxisPosition.Left) {
-                        axis.SetAxisRange(vm.Values.Min(), vm.Values.Max(), 4, true);
-                        break;
-                    }
-                }
-            }
-
-            this.SelectedGraphPlotModel.InvalidatePlot(true);
-        }
-        #endregion
-
-        #region 月別グラフタブ更新用の関数
-        /// <summary>
-        /// 月別グラフタブに表示するデータを初期化する
-        /// </summary>
-        private void InitializeMonthlyGraphTabData()
-        {
-            using FuncLog funcLog = new();
-
-            DateTime start = this.Parent.DisplayedStart;
-            DateTime end = this.Parent.DisplayedEnd;
-            string unitX = Properties.Resources.Unit_Month;
-            string unitY = Properties.Resources.Unit_Money;
-
-            #region 全項目
-            this.GraphPlotModel.Axes.Clear();
-            this.GraphPlotModel.Series.Clear();
-
-            // 横軸 - 月軸
-            CategoryAxis horizontalAxis1 = new() {
-                Unit = unitX,
-                Position = AxisPosition.Bottom,
-                Key = "Category"
-            };
-            horizontalAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
-            // 表示する月の文字列を作成する
-            for (DateTime tmp = start; tmp <= end; tmp = tmp.AddMonths(1)) {
-                horizontalAxis1.Labels.Add($"{tmp.Month}");
-            }
-            this.GraphPlotModel.Axes.Add(horizontalAxis1);
-
-            // 縦軸 - 線形軸
-            LinearAxis verticalAxis1 = new() {
-                Unit = unitY,
-                Position = AxisPosition.Left,
-                MajorGridlineStyle = LineStyle.Solid,
-                MinorGridlineStyle = LineStyle.Dot,
-                StringFormat = "#,0",
-                Key = "Value",
-                Title = GraphKind1Str[this.Parent.SelectedGraphKind1]
-            };
-            this.GraphPlotModel.Axes.Add(verticalAxis1);
-
-            this.GraphPlotModel.InvalidatePlot(true);
-            #endregion
-
-            #region 選択項目
-            this.SelectedGraphPlotModel.Axes.Clear();
-            this.SelectedGraphPlotModel.Series.Clear();
-
-            // 横軸 - 月軸
-            CategoryAxis horizontalAxis2 = new() {
-                Unit = unitX,
-                Position = AxisPosition.Bottom,
-                Key = "Category"
-            };
-            horizontalAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
-            // 表示する月の文字列を作成する
-            for (DateTime tmp = start; tmp <= end; tmp = tmp.AddMonths(1)) {
-                horizontalAxis2.Labels.Add($"{tmp.Month}");
-            }
-            this.SelectedGraphPlotModel.Axes.Add(horizontalAxis2);
-
-            // 縦軸 - 線形軸
-            LinearAxis verticalAxis2 = new() {
-                Unit = unitY,
-                Position = AxisPosition.Left,
-                MajorGridlineStyle = LineStyle.Solid,
-                MinorGridlineStyle = LineStyle.Dot,
-                StringFormat = "#,0",
-                Key = "Value",
-                Title = GraphKind1Str[this.Parent.SelectedGraphKind1]
-            };
-            this.SelectedGraphPlotModel.Axes.Add(verticalAxis2);
-
-            this.SelectedGraphPlotModel.InvalidatePlot(true);
-            #endregion
-        }
-
-        /// <summary>
         /// 月別グラフタブに表示するデータを更新する
         /// </summary>
         /// <param name="categoryId">選択対象の分類ID</param>
@@ -647,129 +673,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 選択項目月別グラフを更新する
-        /// </summary>
-        private void UpdateSelectedMonthlyGraph()
-        {
-            using FuncLog funcLog = new();
-
-            SeriesViewModel vm = this.SelectedGraphSeriesVM;
-
-            // グラフ表示データを設定する
-            this.SelectedGraphPlotModel.Series.Clear();
-            if (vm != null) {
-                CustomBarSeries selectedSeries = new() {
-                    IsStacked = true,
-                    Title = vm.DisplayedName,
-                    FillColor = (this.GraphPlotModel.Series.FirstOrDefault(series => {
-                        List<GraphDatumViewModel> datumVMList = [.. (series as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>()];
-                        return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
-                    }) as CustomBarSeries).ActualFillColor,
-                    ItemsSource = vm.Values.Zip(vm.StartDates, (value, date) => new GraphDatumViewModel {
-                        Value = value,
-                        Date = date,
-                        ItemId = vm.ItemId,
-                        CategoryId = vm.CategoryId
-                    }),
-                    ValueField = "Value",
-                    TrackerFormatString = "{Date:yyyy-MM}: {Value:#,0}", //月: 金額
-                    XAxisKey = "Value",
-                    YAxisKey = "Category"
-                };
-                this.SelectedGraphPlotModel.Series.Add(selectedSeries);
-
-                // Y軸の範囲を設定する
-                foreach (Axis axis in this.SelectedGraphPlotModel.Axes) {
-                    if (axis.Position == AxisPosition.Left) {
-                        axis.SetAxisRange(vm.Values.Min(), vm.Values.Max(), 4, true);
-                        break;
-                    }
-                }
-            }
-
-            this.SelectedGraphPlotModel.InvalidatePlot(true);
-        }
-        #endregion
-
-        #region 年別グラフタブ更新用の関数
-        /// <summary>
-        /// 年別グラフタブに表示するデータを初期化する
-        /// </summary>
-        private void InitializeYearlyGraphTabData()
-        {
-            using FuncLog funcLog = new();
-
-            DateTime start = this.Parent.DisplayedStart;
-            DateTime end = this.Parent.DisplayedEnd;
-            string unitX = this.Parent.FiscalStartMonth == 1 ? Properties.Resources.Unit_Year : Properties.Resources.Unit_FiscalYear;
-            string unitY = Properties.Resources.Unit_Money;
-
-            #region 全項目
-            this.GraphPlotModel.Axes.Clear();
-            this.GraphPlotModel.Series.Clear();
-
-            // 横軸 - 年軸
-            CategoryAxis horizontalAxis1 = new() {
-                Unit = unitX,
-                Position = AxisPosition.Bottom,
-                Key = "Category"
-            };
-            horizontalAxis1.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
-            // 表示する年の文字列を作成する
-            for (DateTime tmp = start; tmp <= end; tmp = tmp.AddYears(1)) {
-                horizontalAxis1.Labels.Add($"{tmp:yyyy}");
-            }
-            this.GraphPlotModel.Axes.Add(horizontalAxis1);
-
-            // 縦軸 - 線形軸
-            LinearAxis verticalAxis1 = new() {
-                Unit = unitY,
-                Position = AxisPosition.Left,
-                MajorGridlineStyle = LineStyle.Solid,
-                MinorGridlineStyle = LineStyle.Dot,
-                StringFormat = "#,0",
-                Key = "Value",
-                Title = GraphKind1Str[this.Parent.SelectedGraphKind1]
-            };
-            this.GraphPlotModel.Axes.Add(verticalAxis1);
-
-            this.GraphPlotModel.InvalidatePlot(true);
-            #endregion
-
-            #region 選択項目
-            this.SelectedGraphPlotModel.Axes.Clear();
-            this.SelectedGraphPlotModel.Series.Clear();
-
-            // 横軸 - 年軸
-            CategoryAxis horizontalAxis2 = new() {
-                Unit = unitX,
-                Position = AxisPosition.Bottom,
-                Key = "Category"
-            };
-            horizontalAxis2.Labels.Clear(); // 内部的にLabelsの値が共有されているのか、正常な表示にはこのコードが必要
-            // 表示する年の文字列を作成する
-            for (DateTime tmp = start; tmp <= end; tmp = tmp.AddYears(1)) {
-                horizontalAxis2.Labels.Add($"{tmp:yyyy}");
-            }
-            this.SelectedGraphPlotModel.Axes.Add(horizontalAxis2);
-
-            // 縦軸 - 線形軸
-            LinearAxis verticalAxis2 = new() {
-                Unit = unitY,
-                Position = AxisPosition.Left,
-                MajorGridlineStyle = LineStyle.Solid,
-                MinorGridlineStyle = LineStyle.Dot,
-                StringFormat = "#,0",
-                Key = "Value",
-                Title = GraphKind1Str[this.Parent.SelectedGraphKind1]
-            };
-            this.SelectedGraphPlotModel.Axes.Add(verticalAxis2);
-
-            this.SelectedGraphPlotModel.InvalidatePlot(true);
-            #endregion
-        }
-
-        /// <summary>
         /// 年別グラフタブに表示するデータを更新する
         /// </summary>
         /// <param name="categoryId">選択対象の分類ID</param>
@@ -782,8 +685,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             int? tmpItemId = itemId ?? this.Parent.SelectedItemId ?? null;
             Log.Vars(vars: new { tmpCategoryId, tmpItemId });
 
-            string unit_pre = this.Parent.FiscalStartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Pre;
-            string unit_post = this.Parent.FiscalStartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Post;
+            string unit_pre = DateTimeExtensions.GetYearPreUnit(this.Parent.FiscalStartMonth);
+            string unit_post = DateTimeExtensions.GetYearPostUnit(this.Parent.FiscalStartMonth);
 
             var loader = new ViewModelLoader(this.dbHandlerFactory);
             switch (this.Parent.SelectedGraphKind1) {
@@ -885,14 +788,125 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
+        /// 選択項目グラフを更新する
+        /// </summary>
+        public void UpdateSelectedGraph()
+        {
+            if (this.Parent.SelectedTab != this.Tab) return;
+            if (this.Parent.SelectedGraphKind1 != GraphKind1.IncomeAndExpensesGraph) return;
+
+            using FuncLog funcLog = new();
+
+            switch (this.Tab) {
+                case Tabs.DailyGraphTab:
+                    this.UpdateSelectedDailyGraph();
+                    break;
+                case Tabs.MonthlyGraphTab:
+                    this.UpdateSelectedMonthlyGraph();
+                    break;
+                case Tabs.YearlyGraphTab:
+                    this.UpdateSelectedYearlyGraph();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 選択項目日別グラフを更新する
+        /// </summary>
+        private void UpdateSelectedDailyGraph()
+        {
+            using FuncLog funcLog = new();
+
+            SeriesViewModel vm = this.SelectedGraphSeriesVM;
+
+            // グラフ表示データを設定する
+            this.SelectedGraphPlotModel.Series.Clear();
+            if (vm != null) {
+                CustomBarSeries selectedSeries = new() {
+                    IsStacked = true,
+                    Title = vm.DisplayedName,
+                    FillColor = (this.GraphPlotModel.Series.FirstOrDefault(series => {
+                        List<GraphDatumViewModel> datumVMList = [.. (series as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>()];
+                        return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
+                    }) as CustomBarSeries).ActualFillColor,
+                    ItemsSource = vm.Values.Zip(vm.StartDates, (value, date) => new GraphDatumViewModel {
+                        Value = value,
+                        Date = date,
+                        ItemId = vm.ItemId,
+                        CategoryId = vm.CategoryId
+                    }),
+                    ValueField = "Value",
+                    TrackerFormatString = "{Date:yyyy-MM-dd}: {Value:#,0}", //日付: 金額
+                    XAxisKey = "Value",
+                    YAxisKey = "Category"
+                };
+                this.SelectedGraphPlotModel.Series.Add(selectedSeries);
+
+                // Y軸の範囲を設定する
+                foreach (Axis axis in this.SelectedGraphPlotModel.Axes) {
+                    if (axis.Position == AxisPosition.Left) {
+                        axis.SetAxisRange(vm.Values.Min(), vm.Values.Max(), 4, true);
+                        break;
+                    }
+                }
+            }
+
+            this.SelectedGraphPlotModel.InvalidatePlot(true);
+        }
+
+        /// <summary>
+        /// 選択項目月別グラフを更新する
+        /// </summary>
+        private void UpdateSelectedMonthlyGraph()
+        {
+            using FuncLog funcLog = new();
+
+            SeriesViewModel vm = this.SelectedGraphSeriesVM;
+
+            // グラフ表示データを設定する
+            this.SelectedGraphPlotModel.Series.Clear();
+            if (vm != null) {
+                CustomBarSeries selectedSeries = new() {
+                    IsStacked = true,
+                    Title = vm.DisplayedName,
+                    FillColor = (this.GraphPlotModel.Series.FirstOrDefault(series => {
+                        List<GraphDatumViewModel> datumVMList = [.. (series as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>()];
+                        return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
+                    }) as CustomBarSeries).ActualFillColor,
+                    ItemsSource = vm.Values.Zip(vm.StartDates, (value, date) => new GraphDatumViewModel {
+                        Value = value,
+                        Date = date,
+                        ItemId = vm.ItemId,
+                        CategoryId = vm.CategoryId
+                    }),
+                    ValueField = "Value",
+                    TrackerFormatString = "{Date:yyyy-MM}: {Value:#,0}", //月: 金額
+                    XAxisKey = "Value",
+                    YAxisKey = "Category"
+                };
+                this.SelectedGraphPlotModel.Series.Add(selectedSeries);
+
+                // Y軸の範囲を設定する
+                foreach (Axis axis in this.SelectedGraphPlotModel.Axes) {
+                    if (axis.Position == AxisPosition.Left) {
+                        axis.SetAxisRange(vm.Values.Min(), vm.Values.Max(), 4, true);
+                        break;
+                    }
+                }
+            }
+
+            this.SelectedGraphPlotModel.InvalidatePlot(true);
+        }
+
+        /// <summary>
         /// 選択項目年別グラフを更新する
         /// </summary>
         private void UpdateSelectedYearlyGraph()
         {
             using FuncLog funcLog = new();
 
-            string unit_pre = this.Parent.FiscalStartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Pre;
-            string unit_post = this.Parent.FiscalStartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Post;
+            string unit_pre = DateTimeExtensions.GetYearPreUnit(this.Parent.FiscalStartMonth);
+            string unit_post = DateTimeExtensions.GetYearPostUnit(this.Parent.FiscalStartMonth);
 
             SeriesViewModel vm = this.SelectedGraphSeriesVM;
 
@@ -930,6 +944,5 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             this.SelectedGraphPlotModel.InvalidatePlot(true);
         }
-        #endregion
     }
 }

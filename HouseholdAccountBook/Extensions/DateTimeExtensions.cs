@@ -55,6 +55,9 @@ namespace HouseholdAccountBook.Extensions
                                 }
                             }
                         }
+                        else {
+                            Log.Error("Stream can't read");
+                        }
                     }
                 }
                 catch (Exception e) {
@@ -197,12 +200,29 @@ namespace HouseholdAccountBook.Extensions
         /// <summary>
         /// 設定に応じた年の単位を取得する
         /// </summary>
+        /// <param name="startMonth">会計年度開始月</param>
         /// <returns>年の単位</returns>
-        public static string GetYearUnit()
+        public static string GetYearUnit(int startMonth)
         {
-            Properties.Settings settings = Properties.Settings.Default;
-
-            return settings.App_StartMonth == 1 ? Properties.Resources.Unit_Year : Properties.Resources.Unit_FiscalYear;
+            return startMonth == 1 ? Properties.Resources.Unit_Year : Properties.Resources.Unit_FiscalYear;
+        }
+        /// <summary>
+        /// 設定に応じた年の単位(前置)を取得する
+        /// </summary>
+        /// <param name="startMonth">会計年度開始月</param>
+        /// <returns></returns>
+        public static string GetYearPreUnit(int startMonth)
+        {
+            return startMonth == 1 ? string.Empty : Properties.Resources.Unit_FiscalYear_Pre;
+        }
+        /// <summary>
+        /// 設定に応じた年の単位(後置)を取得する
+        /// </summary>
+        /// <param name="startMonth">会計年度開始月</param>
+        /// <returns></returns>
+        public static string GetYearPostUnit(int startMonth)
+        {
+            return startMonth == 1 ? string.Empty : Properties.Resources.Unit_FiscalYear_Post;
         }
     }
 }
