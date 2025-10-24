@@ -76,6 +76,17 @@ namespace HouseholdAccountBook.Views.Windows
         public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedActionId, RegistrationKind regKind = RegistrationKind.Edit)
             : this(owner, dbHandlerFactory, null, null, null, null, selectedActionId, regKind) { }
 
+        /// <summary>
+        /// <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
+        /// </summary>
+        /// <param name="owner">親ウィンドウ</param>
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
+        /// <param name="selectedBookId">選択された帳簿ID</param>
+        /// <param name="selectedMonth">選択された年月</param>
+        /// <param name="selectedDate">選択された日付</param>
+        /// <param name="selectedRecord">選択されたCSVレコード</param>
+        /// <param name="selectedActionId">帳簿項目ID</param>
+        /// <param name="regKind">登録種別</param>
         private ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate,
                                          CsvViewModel selectedRecord, int? selectedActionId, RegistrationKind regKind)
         {
@@ -93,7 +104,9 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.AddedByCsvComparison = selectedRecord is not null;
 
             this.Loaded += async (sender, e) => {
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
+                using FuncLog funcLog = new(methodName: nameof(this.Loaded));
+
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create(methodName: nameof(this.Loaded))) {
                     await this.WVM.LoadAsync(selectedBookId, selectedMonth, selectedDate, selectedRecord, selectedActionId);
                 }
                 this.WVM.AddEventHandlers();

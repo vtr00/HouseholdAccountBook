@@ -142,12 +142,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
-            this.ItemTabVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
-            this.ItemTabVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);
-            this.BookTabVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
-            this.BookTabVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);
-            this.OtherTabVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
-            this.OtherTabVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);
+            this.childrenVM.ForEach(childVM => {
+                childVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
+                childVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);
+            });
+
+            this.childrenVM.ForEach(childVM => childVM.AddEventHandlers());
         }
     }
 }

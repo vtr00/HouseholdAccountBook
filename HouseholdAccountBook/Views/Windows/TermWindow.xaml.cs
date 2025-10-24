@@ -40,6 +40,14 @@ namespace HouseholdAccountBook.Views.Windows
             this.selectedTermRadioButton.IsChecked = true;
         }
 
+        /// <summary>
+        /// <see cref="TermWindow"/> クラスの新しいインスタンスを初期化します。
+        /// </summary>
+        /// <param name="owner">親ウィンドウ</param>
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
+        /// <param name="dateWithinMonth">月内日付</param>
+        /// <param name="startDate">開始日</param>
+        /// <param name="endDate">終了日</param>
         private TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateTime? dateWithinMonth, DateTime? startDate, DateTime? endDate)
         {
             using FuncLog funcLog = new(new { dateWithinMonth, startDate, endDate });
@@ -55,6 +63,8 @@ namespace HouseholdAccountBook.Views.Windows
 
             // ロード時処理はコンストラクタで設定しておく
             this.Loaded += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.Loaded));
+
                 // xamlで指定するとCalendarが正しく表示されないため、ここで指定する
                 this.calendar.DisplayMode = CalendarMode.Year;
 

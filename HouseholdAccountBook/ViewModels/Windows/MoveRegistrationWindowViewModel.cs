@@ -537,12 +537,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             switch (this.RegKind) {
                 case RegistrationKind.Add: {
-                    if (this.SelectedFromBookVM.BookKind == BookKind.CreditCard) {
-                        if (this.SelectedFromBookVM.DebitBookId != null) {
-                            this.SelectedFromBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == this.SelectedFromBookVM.DebitBookId, 0);
+                    if (this.SelectedToBookVM.BookKind == BookKind.CreditCard) {
+                        if (this.SelectedToBookVM.DebitBookId != null) {
+                            this.SelectedFromBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == this.SelectedToBookVM.DebitBookId, 0);
                         }
-                        if (this.SelectedFromBookVM.PayDay != null) {
-                            this.FromDate = this.FromDate.GetDateInMonth(this.SelectedFromBookVM.PayDay.Value);
+                        if (this.SelectedToBookVM.PayDay != null) {
+                            this.FromDate = this.FromDate.GetDateInMonth(this.SelectedToBookVM.PayDay.Value);
                         }
                     }
                     this.IsLink = true;

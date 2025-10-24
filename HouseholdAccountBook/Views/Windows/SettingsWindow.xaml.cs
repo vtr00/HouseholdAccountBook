@@ -47,12 +47,12 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
 
             this.Loaded += async (sender, e) => {
-                using FuncLog funcLog = new(methodName:nameof(this.Loaded));
+                using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
                 await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
                     this.WVM.OtherTabVM.SelectedDBKind = dbHandler.DBKind;
                 }
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create(methodName: nameof(this.Loaded))) {
                     await this.WVM.LoadAsync();
                 }
                 this.WVM.AddEventHandlers();

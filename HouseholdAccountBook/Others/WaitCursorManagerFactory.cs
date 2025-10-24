@@ -18,12 +18,13 @@ namespace HouseholdAccountBook.Others
         /// <summary>
         /// <see cref="WaitCursorManager"/> を生成する
         /// </summary>
-        /// <param name="methodName"></param>
-        /// <param name="lineNumber"></param>
+        /// <param name="fileName">生成元ファイル名</param>
+        /// <param name="methodName">生成元関数名</param>
+        /// <param name="lineNumber">生成元行数</param>
         /// <returns></returns>
-        public WaitCursorManager Create([CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+        public WaitCursorManager Create([CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
-            return new WaitCursorManager(this.fe, methodName, lineNumber);
+            return new WaitCursorManager(this.fe, fileName, methodName, lineNumber);
         }
     }
 
@@ -46,25 +47,30 @@ namespace HouseholdAccountBook.Others
         /// </summary>
         private readonly FrameworkElement _fe;
         /// <summary>
-        /// 生成元関数名
+        /// 呼び出し元情報
         /// </summary>
-        private readonly string _methodName;
-        /// <summary>
-        /// 生成元行数
-        /// </summary>
-        private readonly int _lineNumber;
+        private readonly string _callerStr;
 
         /// <summary>
         /// <see cref="WaitCursorManager"/> クラスの新しいインスタンスを初期化します
         /// </summary>
         /// <param name="fe">生成元インスタンス</param>
+        /// <param name="filePath">生成元ファイル名</param>
         /// <param name="methodName">生成元関数名</param>
         /// <param name="lineNumber">生成元行数</param>
-        public WaitCursorManager(FrameworkElement fe, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+        public WaitCursorManager(FrameworkElement fe, [CallerFilePath] string filePath = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
             this._fe = fe;
-            this._methodName = methodName;
-            this._lineNumber = lineNumber;
+
+            int index = filePath.LastIndexOf('\\');
+            string fileName = filePath.Substring(index + 1, filePath.IndexOf('.', index + 1) - index - 1);
+            string callerStr = $"{fileName}";
+            if (methodName != ".ctor") {
+                callerStr += $"::{methodName}";
+            }
+            callerStr += $":{lineNumber}";
+
+            this._callerStr = callerStr;
 
             this.Increase();
         }
@@ -88,7 +94,8 @@ namespace HouseholdAccountBook.Others
             }
 
             _counter[this._fe] = ++value;
-            Log.Debug(string.Format($"Increase count:{value} from:{this._methodName}({this._lineNumber})"));
+
+            Log.Debug($"Increase count:{value} from:[{this._callerStr}]");
             _mutex.ReleaseMutex();
         }
 
@@ -101,7 +108,7 @@ namespace HouseholdAccountBook.Others
             _ = _mutex.WaitOne();
             if (_counter.TryGetValue(this._fe, out int value)) {
                 _counter[this._fe] = --value;
-                Log.Debug(string.Format($"Decrease count:{value} from:{this._methodName}({this._lineNumber})"));
+                Log.Debug(string.Format($"Decrease count:{value} from:[{this._callerStr}]"));
 
                 if (_counter[this._fe] <= 0) {
                     this._fe.Cursor = null;
@@ -109,7 +116,7 @@ namespace HouseholdAccountBook.Others
                 }
             }
             else {
-                Log.Debug($"Can't decrease WaitCounter from:{this._methodName}({this._lineNumber})");
+                Log.Debug($"Can't decrease WaitCounter from:[{this._callerStr}]");
             }
             _mutex.ReleaseMutex();
         }

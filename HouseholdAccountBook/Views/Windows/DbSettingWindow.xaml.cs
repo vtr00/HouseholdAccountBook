@@ -37,7 +37,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.Loaded += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
+                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create(methodName: nameof(this.Loaded))) {
                     this.WVM.Load();
                 }
 

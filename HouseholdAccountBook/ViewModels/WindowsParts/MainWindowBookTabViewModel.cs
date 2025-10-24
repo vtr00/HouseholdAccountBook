@@ -870,7 +870,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             // 帳簿項目選択変更時
             this.SelectedActionVMList.CollectionChanged += (sender, e) => {
-                using FuncLog funcLog = new(methodName: nameof(this.SelectedActionVMList.CollectionChanged));
+                using FuncLog funcLog = new(new { ActionIdList = this.SelectedActionVMList.Select(vm => vm.ActionId) }, methodName: nameof(this.SelectedActionVMList.CollectionChanged));
 
                 this.RaisePropertyChanged(nameof(this.AverageValue));
                 this.RaisePropertyChanged(nameof(this.Count));

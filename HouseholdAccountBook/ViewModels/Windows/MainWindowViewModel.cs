@@ -1628,7 +1628,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedTabChanged += async (sender, e) => {
                 using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedTabChanged));
 
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create(methodName: nameof(this.SelectedTabChanged))) {
                     settings.MainWindow_SelectedTabIndex = e.NewValue;
                     settings.Save();
 
@@ -1639,7 +1639,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedBookChanged += async (sender, e) => {
                 using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedBookChanged));
 
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create(methodName: nameof(this.SelectedBookChanged))) {
                     settings.MainWindow_SelectedBookId = e.NewValue ?? -1;
                     settings.Save();
 
@@ -1650,7 +1650,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedGraphKind1Changed += async (sender, e) => {
                 using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedGraphKind1));
 
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create(methodName: nameof(this.SelectedGraphKind1))) {
                     settings.MainWindow_SelectedGraphKindIndex = (int)e.NewValue;
                     settings.Save();
 
@@ -1661,7 +1661,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedGraphKind2Changed += async (sender, e) => {
                 using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedGraphKind2Changed));
 
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create(methodName: nameof(this.SelectedGraphKind2Changed))) {
                     settings.MainWindow_SelectedGraphKind2Index = (int)e.NewValue;
                     settings.Save();
 
@@ -1672,7 +1672,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedSeriesChanged += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedSeriesChanged));
 
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create(methodName: nameof(this.SelectedSeriesChanged))) {
                     switch (this.SelectedTab) {
                         case Tabs.DailyGraphTab:
                             this.DailyGraphTabVM.UpdateSelectedGraph();
@@ -1686,6 +1686,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     }
                 }
             };
+
+            this.childrenVM.ForEach(childVM => childVM.AddEventHandlers());
         }
 
         public override async Task LoadAsync()
@@ -1803,7 +1805,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="bookId">選択対象の帳簿ID</param>
         public async Task UpdateBookListAsync(int? bookId = null)
         {
-            using FuncLog funcLog = new();
+            using FuncLog funcLog = new(new { bookId });
 
             ViewModelLoader loader = new(this.dbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;

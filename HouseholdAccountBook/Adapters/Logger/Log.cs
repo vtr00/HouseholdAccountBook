@@ -81,7 +81,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
-        static public void FuncStart(object args = null, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+        public static void FuncStart(object args = null, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
             Vars("func start", args, fileName, methodName, lineNumber);
         }
@@ -90,9 +90,10 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// </summary>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
-        static public void FuncEnd([CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null)
+        /// <param name="digit">「-」の出力回数</param>
+        public static void FuncEnd([CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, ushort digit = 0)
         {
-            Info("func end", fileName, methodName, -1);
+            Info("func end", fileName, methodName, -digit);
         }
         /// <summary>
         /// ログファイルに変数ログを1行出力する
@@ -102,7 +103,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
-        static public void Vars(string message = "", object vars = null, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+        public static void Vars(string message = "", object vars = null, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
             string details = string.Empty;
             if (vars != null) {
@@ -140,7 +141,7 @@ namespace HouseholdAccountBook.Adapters.Logger
                 details += toString(vars);
             }
 
-            string tmpMessage = string.Join(message != string.Empty && details != string.Empty ? " " : "", message, details);
+            string tmpMessage = string.Join((message != string.Empty && details != string.Empty) ? " - " : "", message, details);
             Info(tmpMessage, fileName, methodName, lineNumber);
         }
 
@@ -151,7 +152,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
-        static public void Error(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+        public static void Error(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
             Instance.WriteLine(LogLevel.Error, message, fileName, methodName, lineNumber);
         }
@@ -162,7 +163,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
-        static public void Warning(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+        public static void Warning(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
             Instance.WriteLine(LogLevel.Warning, message, fileName, methodName, lineNumber);
         }
@@ -173,7 +174,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
-        static public void Info(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+        public static void Info(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
             Instance.WriteLine(LogLevel.Info, message, fileName, methodName, lineNumber);
         }
@@ -181,12 +182,12 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// ログファイルにデバッグログを1行出力する
         /// </summary>
         /// <param name="message">出力メッセージ</param>
-        /// <param name="fileName">出力元ファイル名</param>
+        /// <param name="filePath">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
-        static public void Debug(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+        public static void Debug(string message = "", [CallerFilePath] string filePath = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
-            Instance.WriteLine(LogLevel.Debug, message, fileName, methodName, lineNumber);
+            Instance.WriteLine(LogLevel.Debug, message, filePath, methodName, lineNumber);
         }
 
         /// <summary>
@@ -194,10 +195,10 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// </summary>
         /// <param name="level">ログレベル</param>
         /// <param name="message">出力メッセージ</param>
-        /// <param name="fileName">出力元ファイル名</param>
+        /// <param name="filePath">出力元ファイルパス</param>
         /// <param name="methodName">出力元関数名</param>
-        /// <param name="lineNumber">出力元行数</param>
-        private void WriteLine(LogLevel level, string message, string fileName, string methodName, int lineNumber)
+        /// <param name="lineNumber">出力元行数(負の場合は絶対値の数だけ「-」を繰り返す)</param>
+        private void WriteLine(LogLevel level, string message, string filePath, string methodName, int lineNumber)
         {
             Settings settings = Settings.Default;
             if (!settings.App_OutputFlag_OperationLog) return;
@@ -205,20 +206,20 @@ namespace HouseholdAccountBook.Adapters.Logger
 
             this.CreateListener();
 
-            int index = fileName.LastIndexOf('\\');
-            string className = fileName.Substring(index + 1, fileName.IndexOf('.', index + 1) - index - 1);
+            int index = filePath.LastIndexOf('\\');
+            string fileName = filePath.Substring(index + 1, filePath.IndexOf('.', index + 1) - index - 1);
 
-            string output = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{Environment.CurrentManagedThreadId:000}] [{level,-5}] {className}";
+            string callerStr = fileName;
             if (methodName != ".ctor") {
-                output += $"::{methodName}";
+                callerStr += $"::{methodName}";
             }
-
             if (0 <= lineNumber) {
-                output += $"({lineNumber})";
+                callerStr += $":{lineNumber}";
             }
             else {
-                output += "(-)";
+                callerStr += ":" + new string('-', Math.Abs(lineNumber));
             }
+            string output = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{Environment.CurrentManagedThreadId:000}] [{level,-5}] [{callerStr}]";
 
             if (!string.IsNullOrEmpty(message)) {
                 output += $" {message}";

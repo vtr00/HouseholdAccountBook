@@ -497,6 +497,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">年度内の日付</param>
+        /// <param name="startMonth">年度開始月</param>
         /// <returns>年度内月別系列VMリスト</returns>
         public async Task<ObservableCollection<SeriesViewModel>> LoadMonthlySeriesViewModelListWithinYearAsync(int? bookId, DateTime includedTime, int startMonth)
         {
