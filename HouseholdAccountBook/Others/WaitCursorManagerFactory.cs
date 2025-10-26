@@ -77,8 +77,8 @@ namespace HouseholdAccountBook.Others
 
         public void Dispose()
         {
-            GC.SuppressFinalize(this);
             this.Decrease();
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>

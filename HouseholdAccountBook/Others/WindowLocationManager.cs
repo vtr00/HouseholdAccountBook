@@ -27,8 +27,13 @@ namespace HouseholdAccountBook.Others
         /// </summary>
         private readonly Dictionary<Window, Rect> lastRectDic = [];
 
+        /// <summary>
+        /// スタティックコンストラクタ
+        /// </summary>
         static WindowLocationManager() => Register(static () => new WindowLocationManager());
-
+        /// <summary>
+        /// プライベートコンストラクタ
+        /// </summary>
         private WindowLocationManager() { }
 
         /// <summary>
@@ -60,6 +65,10 @@ namespace HouseholdAccountBook.Others
             window.Unloaded += this.Window_Unloaded;
         }
 
+        /// <summary>
+        /// ウィンドウから位置監視機能を削除する
+        /// </summary>
+        /// <param name="window">対象のウィンドウ</param>
         public void Remove(Window window)
         {
             this.Log(window, "Unmanaged", true);
@@ -81,109 +90,131 @@ namespace HouseholdAccountBook.Others
 
         private void Window_Initialized(object sender, EventArgs e)
         {
-            this.Log(sender, "-Initialized", true);
-            this.StoreInitialRect(sender);
-            this.StoreRect(sender);
+            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
 
-            this.LoadSetting(sender);
+            this.Log(window, "-Initialized", true);
+            this.StoreInitialRect(window);
+            this.StoreRect(window);
 
-            this.StoreRect(sender);
+            this.LoadSetting(window);
+
+            this.StoreRect(window);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.Log(sender, "-Loaded", true);
+            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+
+            this.Log(window, "-Loaded", true);
         }
 
         private void Window_StateChanged(object sender, EventArgs e)
         {
-            this.Log(sender, "-WindowStateChanged", true);
-            _ = this.ModifyLocationOrSize(sender);
+            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+
+            this.Log(window, "-StateChanged", true);
+            _ = this.ModifyLocationOrSize(window);
         }
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            this.Log(sender, "-WindowSizeChanged", true);
-            _ = this.ModifyLocationOrSize(sender);
+            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+
+            this.Log(window, "-SizeChanged", true);
+            _ = this.ModifyLocationOrSize(window);
         }
         private void Window_LocationChanged(object sender, EventArgs e)
         {
-            this.Log(sender, "-WindowLocationChanged", true);
-            _ = this.ModifyLocationOrSize(sender);
+            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+
+            this.Log(window, "-LocationChanged", true);
+            _ = this.ModifyLocationOrSize(window);
         }
 
         private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+
             bool oldValue = (bool)e.OldValue;
             bool newValue = (bool)e.NewValue;
-            this.Log(sender, $"-IsVisibleChanged({oldValue}->{newValue})", true);
+            this.Log(window, $"-IsVisibleChanged({oldValue}->{newValue})", true);
             if (oldValue != newValue) {
                 if (newValue) {
-                    this.LoadSetting(sender);
+                    this.LoadSetting(window);
                 }
                 else {
-                    this.SaveSetting(sender);
+                    this.SaveSetting(window);
                 }
             }
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            this.SaveSetting(sender);
+            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+
+            this.Log(window, "-Closed", true);
+            this.SaveSetting(window);
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (sender is not Window window) throw new ArgumentException("sender is not Window");
+            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
 
             this.Remove(window);
         }
 
-        private void Log(object sender, string comment, bool forceLog = false)
+        private void Log(Window window, string comment, bool forceLog = false)
         {
-            if (sender is not Window window) throw new ArgumentException("sender is not Window");
-
             this.logDic[window].Log(comment, forceLog);
         }
 
-        private void StoreInitialRect(object sender)
+        /// <summary>
+        /// ウィンドウの初期領域を保存する
+        /// </summary>
+        /// <param name="window"></param>
+        private void StoreInitialRect(Window window)
         {
-            if (sender is not Window window) throw new ArgumentException("sender is not Window");
-
             this.initialRectDic[window] = window.RestoreBounds;
         }
-        private Rect RestoreInitialRect(object sender)
+        /// <summary>
+        /// ウィンドウの初期領域を復元する
+        /// </summary>
+        /// <param name="window"></param>
+        /// <returns>ウィンドウの初期領域</returns>
+        private Rect RestoreInitialRect(Window window)
         {
-            if (sender is not Window window) throw new ArgumentException("sender is not Window");
-
             return this.initialRectDic[window];
         }
 
-        private void StoreRect(object sender)
+        /// <summary>
+        /// ウィンドウの領域を保存する
+        /// </summary>
+        /// <param name="window"></param>
+        private void StoreRect(Window window)
         {
-            if (sender is not Window window) throw new ArgumentException("sender is not Window");
-
             this.lastRectDic[window] = window.RestoreBounds;
         }
-        private Rect RestoreRect(object sender)
+        /// <summary>
+        /// ウィンドウの領域を復元する
+        /// </summary>
+        /// <param name="window"></param>
+        /// <returns>ウィンドウの領域</returns>
+        private Rect RestoreRect(Window window)
         {
-            if (sender is not Window window) throw new ArgumentException("sender is not Window");
-
             return this.lastRectDic[window];
         }
 
         /// <summary>
         /// 設定を読み込む
         /// </summary>
-        /// <param name="sender"></param>
-        private void LoadSetting(object sender)
+        /// <param name="window"></param>
+        private void LoadSetting(Window window)
         {
-            if (sender is not Window window) throw new ArgumentException("sender is not Window");
             if (window.DataContext is not WindowViewModelBase wvm) return;
 
             window.SizeChanged -= this.Window_SizeChanged;
             window.LocationChanged -= this.Window_LocationChanged;
 
-            this.Log(sender, "LoadSetting", true);
+            this.Log(window, "LoadSetting", true);
 
             bool isMainWindow = window is MainWindow;
 
@@ -212,20 +243,19 @@ namespace HouseholdAccountBook.Others
             window.SizeChanged += this.Window_SizeChanged;
             window.LocationChanged += this.Window_LocationChanged;
 
-            this.Log(sender, "LoadedSetting", true);
-            _ = this.ModifyLocationOrSize(sender);
+            this.Log(window, "LoadedSetting", true);
+            _ = this.ModifyLocationOrSize(window);
         }
 
         /// <summary>
         /// 設定を保存する
         /// </summary>
-        /// <param name="sender"></param>
-        private void SaveSetting(object sender)
+        /// <param name="window"></param>
+        private void SaveSetting(Window window)
         {
-            if (sender is not Window window) throw new ArgumentException("sender is not Window");
             if (window.DataContext is not WindowViewModelBase wvm) return;
 
-            this.Log(sender, "SaveSetting", true);
+            this.Log(window, "SaveSetting", true);
 
             bool isMainWindow = window is MainWindow;
 
@@ -260,16 +290,15 @@ namespace HouseholdAccountBook.Others
         /// <summary>
         /// ウィンドウ位置またはサイズを修正する
         /// </summary>
-        private bool ModifyLocationOrSize(object sender)
+        /// <param name="window"></param>
+        private bool ModifyLocationOrSize(Window window)
         {
-            if (sender is not Window window) throw new ArgumentException("sender is not Window");
-
             window.SizeChanged -= this.Window_SizeChanged;
             window.LocationChanged -= this.Window_LocationChanged;
 
             bool ret = true;
-            Rect initialBounds = this.RestoreInitialRect(sender);
-            Rect lastBounds = this.RestoreRect(sender);
+            Rect initialBounds = this.RestoreInitialRect(window);
+            Rect lastBounds = this.RestoreRect(window);
 
             /// 位置調整
             if (30000 < Math.Max(Math.Abs(window.Left), Math.Abs(window.Top))) {
@@ -285,10 +314,10 @@ namespace HouseholdAccountBook.Others
                 }
 
                 if (tmpTop != window.Top || tmpLeft != window.Left) {
-                    this.Log(sender, "WindowLocationModified", true);
+                    this.Log(window, "WindowLocationModified", true);
                 }
                 else {
-                    this.Log(sender, "FailedToModifyLocation", true);
+                    this.Log(window, "FailedToModifyLocation", true);
                     ret = false;
                 }
             }
@@ -307,15 +336,15 @@ namespace HouseholdAccountBook.Others
                 }
 
                 if (tmpHeight != window.Height || tmpWidth != window.Width) {
-                    this.Log(sender, "WindowSizeModified", true);
+                    this.Log(window, "WindowSizeModified", true);
                 }
                 else {
-                    this.Log(sender, "FailedToModifySize", true);
+                    this.Log(window, "FailedToModifySize", true);
                     ret = false;
                 }
             }
 
-            this.StoreRect(sender);
+            this.StoreRect(window);
 
             window.SizeChanged += this.Window_SizeChanged;
             window.LocationChanged += this.Window_LocationChanged;

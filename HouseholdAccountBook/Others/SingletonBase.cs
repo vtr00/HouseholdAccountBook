@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.Others
         /// <summary>
         /// インスタンス取得
         /// </summary>
-        public static T Instance => _instance?.Value ?? throw new InvalidOperationException();
+        public static T Instance => _instance?.Value ?? throw new InvalidOperationException("Uninitialized singleton called");
 
         static SingletonBase()
         {

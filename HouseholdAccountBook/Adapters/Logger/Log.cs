@@ -31,7 +31,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <summary>
         /// 出力ログレベル
         /// </summary>
-        public static LogLevel OutputLogLevel = LogLevel.Debug;
+        public static LogLevel OutputLogLevel { get; set; } = LogLevel.Debug;
 
         private static readonly string listenerName = "logFileOutput";
         private TextWriterTraceListener listener;
