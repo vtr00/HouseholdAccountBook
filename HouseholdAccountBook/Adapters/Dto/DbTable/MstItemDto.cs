@@ -4,7 +4,7 @@ using HouseholdAccountBook.Adapters.Dto.KHDbTable;
 namespace HouseholdAccountBook.Adapters.Dto.DbTable
 {
     /// <summary>
-    /// 項目テーブルDTO
+    /// 項目DTO
     /// </summary>
     public class MstItemDto : MstDtoBase
     {
@@ -12,7 +12,10 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// コンストラクタ
         /// </summary>
         public MstItemDto() : base() { }
-
+        /// <summary>
+        /// コンストラクタ(記帳風月の項目DTOからのコピー)
+        /// </summary>
+        /// <param name="dto">記帳風月の項目DTO</param>
         public MstItemDto(CbmItemDto dto) : base(dto)
         {
             this.ItemId = dto.ITEM_ID;
@@ -40,7 +43,7 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// </summary>
         public int CategoryId { get; set; } = 0;
         /// <summary>
-        /// 立替フラグ
+        /// 立替フラグ(未使用)
         /// </summary>
         public int AdvanceFlg { get; set; } = 0;
         /// <summary>

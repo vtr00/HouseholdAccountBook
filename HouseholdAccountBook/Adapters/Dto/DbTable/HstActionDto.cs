@@ -5,7 +5,7 @@ using System;
 namespace HouseholdAccountBook.Adapters.Dto.DbTable
 {
     /// <summary>
-    /// HstActionDto
+    /// 帳簿項目DTO
     /// </summary>
     public class HstActionDto : TableDtoBase, ISequentialIDDto
     {
@@ -13,7 +13,10 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// コンストラクタ
         /// </summary>
         public HstActionDto() : base() { }
-
+        /// <summary>
+        /// コンストラクタ(記帳風月の帳簿項目DTOからのコピー)
+        /// </summary>
+        /// <param name="dto">記帳風月の帳簿項目DTO</param>
         public HstActionDto(CbtActDto dto) : base(dto)
         {
             this.ActionId = dto.ACT_ID;

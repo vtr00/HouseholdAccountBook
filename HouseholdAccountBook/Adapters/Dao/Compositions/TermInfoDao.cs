@@ -14,7 +14,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <summary>
         /// 全帳簿の <see cref="TermInfoDto"/> を取得する
         /// </summary>
-        /// <returns></returns>
+        /// <returns>取得したレコード</returns>
         public async Task<TermInfoDto> Find()
         {
             TermInfoDto dto = await this.dbHandler.QuerySingleAsync<TermInfoDto>(@"

@@ -21,6 +21,9 @@ namespace HouseholdAccountBook.Others
         /// </summary>
         public static T Instance => _instance?.Value ?? throw new InvalidOperationException("Uninitialized singleton called");
 
+        /// <summary>
+        /// スタティックコンストラクタ
+        /// </summary>
         static SingletonBase()
         {
             // 子クラスのstaticコンストラクタを強制呼び出し

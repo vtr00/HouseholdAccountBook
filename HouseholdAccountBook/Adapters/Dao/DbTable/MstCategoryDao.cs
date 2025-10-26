@@ -26,13 +26,18 @@ WHERE del_flg = 0;");
             return dtoList;
         }
 
-        public override async Task<MstCategoryDto> FindByIdAsync(int pkey)
+        /// <summary>
+        /// <see cref="MstCategoryDto.CategoryId"/> に基づいて、レコードを取得する
+        /// </summary>
+        /// <param name="categoryId">分類ID</param>
+        /// <returns>取得したレコード</returns>
+        public override async Task<MstCategoryDto> FindByIdAsync(int categoryId)
         {
             var dto = await this.dbHandler.QuerySingleOrDefaultAsync<MstCategoryDto>(@"
 SELECT *
 FROM mst_category
 WHERE category_id = @CategoryId AND del_flg = 0;",
-new MstCategoryDto { CategoryId = pkey });
+new MstCategoryDto { CategoryId = categoryId });
 
             return dto;
         }
@@ -41,7 +46,7 @@ new MstCategoryDto { CategoryId = pkey });
         /// <see cref="MstCategoryDto.BalanceKind"/> に基づいて、レコードを取得する
         /// </summary>
         /// <param name="balanceKind">収支種別</param>
-        /// <returns>DTOリスト</returns>
+        /// <returns>取得したレコードリスト</returns>
         /// <remarks>移動を除く</remarks>
         public async Task<IEnumerable<MstCategoryDto>> FindByBalanceKindAsync(int balanceKind)
         {
@@ -94,7 +99,7 @@ RETURNING category_id;", dto);
         /// <see cref="MstCategoryDto.CategoryId"/> に基づいて、 <see cref="MstCategoryDto.CategoryName"/> を更新する
         /// </summary>
         /// <param name="dto">DTO</param>
-        /// <returns>更新行数</returns>
+        /// <returns>更新件数</returns>
         public async Task<int> UpdateSetableAsync(MstCategoryDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -110,7 +115,7 @@ WHERE category_id = @CategoryId;", dto);
         /// </summary>
         /// <param name="categoryId1">分類ID1</param>
         /// <param name="categoryId2">分類ID2</param>
-        /// <returns>更新行数</returns>
+        /// <returns>更新件数</returns>
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public async Task<int> SwapSortOrderAsync(int categoryId1, int categoryId2)
         {
@@ -144,13 +149,18 @@ new { CategoryId1 = categoryId1, CategoryId2 = categoryId2, UpdateTime = DateTim
             return count;
         }
 
-        public override async Task<int> DeleteByIdAsync(int pkey)
+        /// <summary>
+        /// <see cref="MstCategoryDto.CategoryId"/> に基づいて、レコードを削除する
+        /// </summary>
+        /// <param name="categoryId">分類ID</param>
+        /// <returns>削除件数</returns>
+        public override async Task<int> DeleteByIdAsync(int categoryId)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE mst_category
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE category_id = @CategoryId;",
-new MstCategoryDto { CategoryId = pkey });
+new MstCategoryDto { CategoryId = categoryId });
 
             return count;
         }

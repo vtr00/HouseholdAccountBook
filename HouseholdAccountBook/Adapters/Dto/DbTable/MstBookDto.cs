@@ -7,7 +7,7 @@ using System.Text.Json;
 namespace HouseholdAccountBook.Adapters.Dto.DbTable
 {
     /// <summary>
-    /// 帳簿テーブルDTO
+    /// 帳簿DTO
     /// </summary>
     public class MstBookDto : MstDtoBase
     {
@@ -17,9 +17,9 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         public MstBookDto() : base() { }
 
         /// <summary>
-        /// コンストラクタ
+        /// コンストラクタ(記帳風月の帳簿DTOからのコピー)
         /// </summary>
-        /// <param name="dto">記帳風月DTO</param>
+        /// <param name="dto">記帳風月の帳簿DTO</param>
         public MstBookDto(CbmBookDto dto) : base(dto)
         {
             this.BookId = dto.BOOK_ID;
@@ -94,8 +94,14 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
             /// </summary>
             public int? CsvItemNameIndex { get; set; } = null;
 
+            /// <summary>
+            /// コンストラクタ
+            /// </summary>
             public JsonDto() { }
-
+            /// <summary>
+            /// コンストラクタ(JSONコードから生成)
+            /// </summary>
+            /// <param name="jsonCode"><see cref="MstBookDto"/>のJsonCode</param>
             public JsonDto(string jsonCode)
             {
                 if (string.IsNullOrEmpty(jsonCode)) return;
@@ -110,6 +116,10 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
                 }
             }
 
+            /// <summary>
+            /// フィールドをコピーする
+            /// </summary>
+            /// <param name="org">コピー元</param>
             protected void Copy(JsonDto org)
             {
                 this.StartDate = org.StartDate;
@@ -121,6 +131,10 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
                 this.CsvItemNameIndex = org.CsvItemNameIndex;
             }
 
+            /// <summary>
+            /// Jsonコードに変換する
+            /// </summary>
+            /// <returns>Jsonコード</returns>
             public string ToJson()
             {
                 return JsonSerializer.Serialize(this);

@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// 全帳簿の開始日付までの <see cref="EndingBalanceInfoDto"/> を取得する
         /// </summary>
         /// <param name="startTime">開始日付</param>
-        /// <returns>繰越残高情報</returns>
+        /// <returns>取得したレコード</returns>
         public async Task<EndingBalanceInfoDto> Find(DateTime startTime)
         {
             var dto = await this.dbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"
@@ -35,7 +35,7 @@ new { StartTime = startTime });
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="startTime">開始日付</param>
-        /// <returns>繰越残高情報</returns>
+        /// <returns>取得したレコード</returns>
         public async Task<EndingBalanceInfoDto> FindByBookId(int bookId, DateTime startTime)
         {
             var dto = await this.dbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"

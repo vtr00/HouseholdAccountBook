@@ -30,9 +30,10 @@ WHERE del_flg = 0;");
         /// <summary>
         /// <see cref="HstShopDto.ShopName"/> と <see cref="HstShopDto.ItemId"/> に基づいて、レコードを取得する
         /// </summary>
-        /// <param name="dto"><see cref="HstShopDto"/></param>
+        /// <param name="shopName">店舗名</param>
+        /// <param name="itemId">項目ID</param>
         /// <param name="includeDeleted"><see cref="TableDtoBase.DelFlg">=1も含めるか</param>
-        /// <returns>DTO</returns>
+        /// <returns>取得したレコード</returns>
         public async Task<HstShopDto> FindByItemIdAndShopNameAsync(string shopName, int itemId, bool includeDeleted = false)
         {
             var dto = includeDeleted
@@ -51,8 +52,8 @@ new HstShopDto { ShopName = shopName, ItemId = itemId });
         /// <summary>
         /// <see cref="HstShopDto"/> を挿入する
         /// </summary>
-        /// <param name="dto"><see cref="HstRemarkDto"/></param>
-        /// <returns>挿入行数</returns>
+        /// <param name="dto">追加するレコード</param>
+        /// <returns>挿入件数</returns>
         public override async Task<int> InsertAsync(HstShopDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -65,8 +66,8 @@ VALUES (@ItemId, @ShopName, @UsedTime, @JsonCode, @DelFlg, @UpdateTime, @Updater
         /// <summary>
         /// <see cref="HstShopDto.ItemId"/> と <see cref="HstShopDto.ShopName"/> が一致するレコードを更新する
         /// </summary>
-        /// <param name="dto"><see cref="HstShopDto"/></param>
-        /// <returns>更新行数</returns>
+        /// <param name="dto">更新するレコード</param>
+        /// <returns>更新件数</returns>
         public override async Task<int> UpdateAsync(HstShopDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -80,8 +81,8 @@ WHERE item_id = @ItemId AND shop_name = @ShopName AND used_time < @UsedTime;", d
         /// <summary>
         /// <see cref="HstShopDto"/> を挿入または更新する
         /// </summary>
-        /// <param name="dto"><see cref="HstShopDto"/></param>
-        /// <returns>挿入/更新行数</returns>
+        /// <param name="dto">挿入/更新するレコード/param>
+        /// <returns>挿入/更新件数</returns>
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public override async Task<int> UpsertAsync(HstShopDto dto)
         {
@@ -95,10 +96,6 @@ WHERE hst_shop.item_id = @ItemId AND hst_shop.shop_name = @ShopName AND hst_shop
             return count;
         }
 
-        /// <summary>
-        /// <see cref="HstShopDto"/> の全てのレコードを削除する
-        /// </summary>
-        /// <returns>削除行数</returns>
         public override async Task<int> DeleteAllAsync()
         {
             int count = await this.dbHandler.ExecuteAsync(@"DELETE FROM hst_shop;");
@@ -109,8 +106,8 @@ WHERE hst_shop.item_id = @ItemId AND hst_shop.shop_name = @ShopName AND hst_shop
         /// <summary>
         /// <see cref="HstShopDto.ItemId"/> と <see cref="HstShopDto.ShopName"/> が一致するレコードを削除する
         /// </summary>
-        /// <param name="dto"><see cref="HstShopDto"/></param>
-        /// <returns>削除行数</returns>
+        /// <param name="dto">削除するレコード</param>
+        /// <returns>削除件数</returns>
         public async Task<int> DeleteAsync(HstShopDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"

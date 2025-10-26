@@ -16,7 +16,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <see cref="MstBookDto.BookId"/>に基づいて、<see cref="BookInfoDto"> を取得する
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
-        /// <returns>帳簿情報DTO</returns>
+        /// <returns>取得したレコード</returns>
         public async Task<BookInfoDto> FindByBookId(int bookId)
         {
             var dto = await this.dbHandler.QuerySingleAsync<BookInfoDto>(@"

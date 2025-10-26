@@ -9,7 +9,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
     /// <summary>
     /// 単一の主キーを持つテーブル向けのDAOのベースクラス
     /// </summary>
-    /// <typeparam name="DTO"><see cref="TableDtoBase"/>の派生クラス</typeparam>
+    /// <typeparam name="DTO"><see cref="TableDtoBase"/>の派生クラス かつ シーケンスを持つDTO</typeparam>
     /// <typeparam name="T">主キーの型</typeparam>
     public abstract class PrimaryKeyDaoBase<DTO, T>(DbHandlerBase dbHandler) : ReadWriteTableDaoBase<DTO>(dbHandler), ISequentialIDDao<DTO> where DTO : TableDtoBase, ISequentialIDDto
     {
@@ -21,10 +21,10 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
         public abstract Task SetIdSequenceAsync(int idSeq);
 
         /// <summary>
-        /// 主キーでレコードを取得する
+        /// 主キーに基づいて、レコードを取得する
         /// </summary>
         /// <param name="pkey">主キー</param>
-        /// <returns>DTO</returns>
+        /// <returns>取得したレコード</returns>
         public abstract Task<DTO> FindByIdAsync(T pkey);
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
         /// 主キーでレコードを削除する
         /// </summary>
         /// <param name="pkey">主キー</param>
-        /// <returns>成功した場合はtrue</returns>
+        /// <returns>削除件数</returns>
         public abstract Task<int> DeleteByIdAsync(T pkey);
     }
 }

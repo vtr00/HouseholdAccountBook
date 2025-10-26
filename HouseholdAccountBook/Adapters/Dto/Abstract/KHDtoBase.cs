@@ -5,6 +5,9 @@
     /// </summary>
     public abstract class KHDtoBase : DtoBase
     {
+        /// <summary>
+        /// 削除フラグ
+        /// </summary>
         public bool DEL_FLG { get; set; }
     }
 }

@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="balanceKind">帳簿種別</param>
-        /// <returns>DTO</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<MstCategoryDto>> FindByBookIdAndBalanceKindAsync(int bookId, int balanceKind)
         {
             var dtoList = await this.dbHandler.QueryAsync<MstCategoryDto>(@"

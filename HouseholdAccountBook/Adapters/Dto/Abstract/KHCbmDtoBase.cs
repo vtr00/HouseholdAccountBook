@@ -9,6 +9,9 @@
 
         public abstract int GetId();
 
+        /// <summary>
+        /// ソートキー
+        /// </summary>
         public int SORT_KEY { get; set; }
     }
 }

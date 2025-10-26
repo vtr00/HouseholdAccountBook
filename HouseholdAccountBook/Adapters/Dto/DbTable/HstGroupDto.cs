@@ -3,7 +3,7 @@
 namespace HouseholdAccountBook.Adapters.Dto.DbTable
 {
     /// <summary>
-    /// グループテーブルDTO
+    /// グループDTO
     /// </summary>
     public class HstGroupDto : TableDtoBase, ISequentialIDDto
     {

@@ -12,6 +12,10 @@ namespace HouseholdAccountBook.Adapters.Dto.Abstract
         /// </summary>
         public TableDtoBase() : base() { }
 
+        /// <summary>
+        /// コンストラクタ(KHDtoBaseからの変換)
+        /// </summary>
+        /// <param name="dto">記帳風月のレコード</param>
         public TableDtoBase(KHDtoBase dto) : base()
         {
             this.DelFlg = dto.DEL_FLG ? 1 : 0;
@@ -53,7 +57,7 @@ namespace HouseholdAccountBook.Adapters.Dto.Abstract
         public string Inserter { get; set; } = DbConstants.Inserter;
 
         /// <summary>
-        /// <see cref="UpdateTime"/> か <see cref="InsertTime"/> を取得した時刻
+        /// <see cref="UpdateTime"/> か <see cref="InsertTime"/> のうち先に取得した時刻
         /// </summary>
         private DateTime Now => this._Now ??= DateTime.Now;
         private DateTime? _Now = null;

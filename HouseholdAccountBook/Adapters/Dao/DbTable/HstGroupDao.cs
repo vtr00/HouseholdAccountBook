@@ -25,23 +25,28 @@ WHERE del_flg = 0;");
             return dtoList;
         }
 
-        public override async Task<HstGroupDto> FindByIdAsync(int pkey)
+        /// <summary>
+        /// <see cref="HstActionDto.GroupId"/> に基づいて、レコードを取得する
+        /// </summary>
+        /// <param name="groupId">グループID</param>
+        /// <returns>取得したレコード</returns>
+        public override async Task<HstGroupDto> FindByIdAsync(int groupId)
         {
             var dto = await this.dbHandler.QuerySingleOrDefaultAsync<HstGroupDto>(@"
 SELECT * FROM hst_group
 WHERE group_id = @GroupId AND del_flg = 0;",
-new HstGroupDto { GroupId = pkey });
+new HstGroupDto { GroupId = groupId });
 
             return dto;
         }
 
-        public override async Task SetIdSequenceAsync(int id)
+        public override async Task SetIdSequenceAsync(int idSeq)
         {
             if (this.dbHandler.DBKind == DBKind.SQLite) {
                 return;
             }
 
-            _ = await this.dbHandler.ExecuteAsync("SELECT setval('hst_group_group_id_seq', @GroupIdSeq);", new { GroupIdSeq = id });
+            _ = await this.dbHandler.ExecuteAsync("SELECT setval('hst_group_group_id_seq', @GroupIdSeq);", new { GroupIdSeq = idSeq });
         }
 
         public override async Task<int> InsertAsync(HstGroupDto dto)
@@ -82,12 +87,17 @@ RETURNING group_id;", dto);
             return count;
         }
 
-        public override async Task<int> DeleteByIdAsync(int pkey)
+        /// <summary>
+        /// <see cref="HstActionDto.GroupId"/> に基づいて、レコードを削除する
+        /// </summary>
+        /// <param name="groupId">グループID</param>
+        /// <returns>削除件数</returns>
+        public override async Task<int> DeleteByIdAsync(int groupId)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_group SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE group_id = @GroupId AND del_flg = 0;",
-new HstGroupDto { GroupId = pkey });
+new HstGroupDto { GroupId = groupId });
 
             return count;
         }

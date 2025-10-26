@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Adapters.Dao.KHDbTable
 {
+    /// <summary>
+    /// 花鳥風月の分類テーブルDAO
+    /// </summary>
+    /// <param name="dbHandler">DBハンドラ</param>
     public class CbmCategoryDao(OleDbHandler dbHandler) : KHReadDaoBase<CbmCategoryDto>(dbHandler)
     {
         public override async Task<IEnumerable<CbmCategoryDto>> FindAllAsync()

@@ -12,10 +12,6 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
     /// <param name="dbHandler">DBハンドラ</param>
     public class RelBookItemDao(DbHandlerBase dbHandler) : ReadWriteTableDaoBase<RelBookItemDto>(dbHandler)
     {
-        /// <summary>
-        /// 全レコードを取得する
-        /// </summary>
-        /// <returns>DTOリスト</returns>
         public override async Task<IEnumerable<RelBookItemDto>> FindAllAsync()
         {
             var dtoList = await this.dbHandler.QueryAsync<RelBookItemDto>(@"
@@ -31,7 +27,7 @@ WHERE del_flg = 0;");
         /// </summary>
         /// <param name="dto"><see cref="HstShopDto"/></param>
         /// <param name="includeDeleted"><see cref="DtoBase.DelFlg">=1も含めるか</param>
-        /// <returns>DTOリスト</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<RelBookItemDto> FindByBookIdAndItemIdAsync(int bookId, int itemId, bool includeDeleted = false)
         {
             var dto = includeDeleted
@@ -49,8 +45,8 @@ new RelBookItemDto { BookId = bookId, ItemId = itemId });
         /// <summary>
         /// <see cref="RelBookItemDto"/> を挿入する
         /// </summary>
-        /// <param name="dto"><see cref="RelBookItemDto"/></param>
-        /// <returns>挿入行数</returns>
+        /// <param name="dto">挿入するレコード</param>
+        /// <returns>挿入件数</returns>
         public override async Task<int> InsertAsync(RelBookItemDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -64,8 +60,8 @@ VALUES (@ItemId, @BookId, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime
         /// <summary>
         /// <see cref="RelBookItemDto.ItemId"/> と <see cref="RelBookItemDto.ShopName"/> が一致するレコードを更新する
         /// </summary>
-        /// <param name="dto"><see cref="RelBookItemDto"/></param>
-        /// <returns>更新行数</returns>
+        /// <param name="dto">更新するレコード</param>
+        /// <returns>更新件数</returns>
         public override async Task<int> UpdateAsync(RelBookItemDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -79,8 +75,8 @@ WHERE item_id = @ItemId AND book_id = @BookId;", dto);
         /// <summary>
         /// <see cref="RelBookItemDto"/> を挿入または更新する
         /// </summary>
-        /// <param name="dto"><see cref="HstRemarkDto"/></param>
-        /// <returns>挿入/更新行数</returns>
+        /// <param name="dto">挿入/更新するレコード</param>
+        /// <returns>挿入/更新件数</returns>
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public override async Task<int> UpsertAsync(RelBookItemDto dto)
         {
@@ -97,7 +93,7 @@ WHERE rel_book_item.item_id = @ItemId AND rel_book_item.book_id = @BookId;", dto
         /// <summary>
         /// <see cref="RelBookItemDto"/> の全てのレコードを削除する
         /// </summary>
-        /// <returns>削除行数</returns>
+        /// <returns>削除件数</returns>
         public override async Task<int> DeleteAllAsync()
         {
             int count = await this.dbHandler.ExecuteAsync(@"DELETE FROM rel_book_item;");
@@ -108,8 +104,8 @@ WHERE rel_book_item.item_id = @ItemId AND rel_book_item.book_id = @BookId;", dto
         /// <summary>
         /// <see cref="RelBookItemDto.ItemId"/> と <see cref="RelBookItemDto.BookId"/> が一致するレコードを削除する
         /// </summary>
-        /// <param name="dto"><see cref="RelBookItemDto"/></param>
-        /// <returns>削除行数</returns>
+        /// <param name="dto">削除するレコード</param>
+        /// <returns>削除件数</returns>
         public async Task<int> DeleteAsync(RelBookItemDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"

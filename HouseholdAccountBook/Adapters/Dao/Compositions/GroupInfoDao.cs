@@ -16,7 +16,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <see cref="HstActionDto.ActionId"/>に基づいて、<see cref="GroupInfoDto"/> を取得する
         /// </summary>
         /// <param name="actionId">帳簿ID</param>
-        /// <returns>グループ情報</returns>
+        /// <returns>取得したレコード</returns>
         public async Task<GroupInfoDto> FindByActionId(int actionId)
         {
             var dto = await this.dbHandler.QuerySingleAsync<GroupInfoDto>(@"

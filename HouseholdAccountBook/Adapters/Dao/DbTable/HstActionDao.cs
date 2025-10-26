@@ -25,13 +25,18 @@ WHERE del_flg = 0;");
             return dtoList;
         }
 
-        public override async Task<HstActionDto> FindByIdAsync(int pkey)
+        /// <summary>
+        /// <see cref="HstActionDto.ActionId"/> に基づいて、レコードを取得する
+        /// </summary>
+        /// <param name="actionId">帳簿項目ID</param>
+        /// <returns>取得したレコード</returns>
+        public override async Task<HstActionDto> FindByIdAsync(int actionId)
         {
             var dto = await this.dbHandler.QuerySingleOrDefaultAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
 WHERE action_id = @ActionId AND del_flg = 0;",
-new HstActionDto { ActionId = pkey });
+new HstActionDto { ActionId = actionId });
 
             return dto;
         }
@@ -40,7 +45,7 @@ new HstActionDto { ActionId = pkey });
         /// <see cref="HstActionDto.GroupId"/> に基づいて、レコードを取得する
         /// </summary>
         /// <param name="groupId">グループID</param>
-        /// <returns>DTOリスト</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByGroupIdAsync(int groupId)
         {
             var dtoList = await this.dbHandler.QueryAsync<HstActionDto>(@"
@@ -56,7 +61,7 @@ new HstActionDto { GroupId = groupId });
         /// <see cref="HstActionDto.ActionId"/> と同グループに属する同日以降のレコードを取得する
         /// </summary>
         /// <param name="actionId">帳簿項目ID</param>
-        /// <returns>削除件数</returns>
+        /// <returns>取得したレコードリスト</returns>
         /// <remarks>同日を含む</remarks>
         public async Task<IEnumerable<HstActionDto>> FindInGroupAfterDateByIdAsync(int actionId)
         {
@@ -74,7 +79,7 @@ new HstActionDto { ActionId = actionId });
         /// <see cref="HstActionDto.BookId"/> に基づいて、レコードを取得する
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
-        /// <returns>DTOリスト</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByBookIdAsync(int bookId)
         {
             var dtoList = await this.dbHandler.QueryAsync<HstActionDto>(@"
@@ -90,7 +95,7 @@ new HstActionDto { BookId = bookId });
         /// <see cref="HstActionDto.ItemId"/> に基づいて、レコードを取得する
         /// </summary>
         /// <param name="itemId">項目ID</param>
-        /// <returns>DTOリスト</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByItemIdAsync(int itemId)
         {
             var dtoList = await this.dbHandler.QueryAsync<HstActionDto>(@"
@@ -105,9 +110,9 @@ new HstActionDto { ItemId = itemId });
         /// <summary>
         /// <see cref="HstActionDto.BookId"/> と <see cref="HstActionDto.ItemId"/> に基づいて、レコードを取得する
         /// </summary>
-        /// <param name="bookId"></param>
-        /// <param name="itemId"></param>
-        /// <returns></returns>
+        /// <param name="bookId">帳簿ID</param>
+        /// <param name="itemId">項目ID</param>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByBookIdAndItemIdAsync(int bookId, int itemId)
         {
             var dtoList = await this.dbHandler.QueryAsync<HstActionDto>(@"
@@ -138,6 +143,11 @@ VALUES (@ActionId, @BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @
             return count;
         }
 
+        /// <summary>
+        /// レコードを挿入し、<see cref="HstActionDto.ActionId"/> を返す
+        /// </summary>
+        /// <param name="dto">挿入するレコード</param>
+        /// <returns>帳簿項目ID</returns>
         public override async Task<int> InsertReturningIdAsync(HstActionDto dto)
         {
             int actionId = await this.dbHandler.QuerySingleAsync<int>(@"
@@ -150,9 +160,9 @@ RETURNING action_id;", dto);
         }
 
         /// <summary>
-        /// 移動を挿入して帳簿項目IDを取得する
+        /// 移動レコードを挿入し、<see cref="HstActionDto.ActionId"/> を返す
         /// </summary>
-        /// <param name="dto">DTO</param>
+        /// <param name="dto">挿入する移動レコード</param>
         /// <param name="balanceKind">移動の収支種別</param>
         /// <returns>帳簿項目ID</returns>
         public async Task<int> InsertMoveActionReturningIdAsync(HstActionDto dto, int balanceKind)
@@ -181,10 +191,10 @@ WHERE action_id = @ActionId;", dto);
         }
 
         /// <summary>
-        /// 移動を更新する
+        /// 移動レコードを更新する
         /// </summary>
-        /// <param name="dto">DTO</param>
-        /// <returns>更新行数</returns>
+        /// <param name="dto">更新する移動レコード</param>
+        /// <returns>更新件数</returns>
         public async Task<int> UpdateMoveActionAsync(HstActionDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -198,8 +208,8 @@ WHERE action_id = @ActionId;", dto);
         /// <summary>
         /// <see cref="HstActionDto.ActionId"/> に基づいて、<see cref="HstActionDto.IsMatch"/> 以外のレコードを更新する
         /// </summary>
-        /// <param name="dto">DTO</param>
-        /// <returns>更新行数</returns>
+        /// <param name="dto">更新するレコード</param>
+        /// <returns>更新件数</returns>
         public async Task<int> UpdateWithoutIsMatchAsync(HstActionDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -211,7 +221,7 @@ WHERE action_id = @ActionId;", dto);
         }
 
         /// <summary>
-        /// <see cref="HstActionDto.ActionId"/> に基づいて、一致フラグを更新する
+        /// <see cref="HstActionDto.ActionId"/> に基づいて、<see cref="HstActionDto.IsMatch"/> を更新する
         /// </summary>
         /// <param name="actionId">帳簿項目ID</param>
         /// <param name="isMatch">一致フラグ</param>
@@ -233,7 +243,7 @@ new HstActionDto { IsMatch = isMatch, ActionId = actionId });
         /// <param name="actionId">帳簿項目ID</param>
         /// <param name="shopName">店舗名</param>
         /// <param name="remark">備考</param>
-        /// <returns>更新行数</returns>
+        /// <returns>更新件数</returns>
         public async Task<int> UpdateShopNameAndRemarkByIdAsync(int actionId, string shopName, string remark)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -245,10 +255,10 @@ new HstActionDto { ActionId = actionId, ShopName = shopName, Remark = remark });
         }
 
         /// <summary>
-        /// <see cref="HstActionDto.ActionId"/> に基づいて、グループIDをクリアする
+        /// <see cref="HstActionDto.ActionId"/> に基づいて、<see cref="HstActionDto.GroupId"/> をクリアする
         /// </summary>
         /// <param name="actionId">帳簿項目ID</param>
-        /// <returns>削除件数</returns>
+        /// <returns>クリア件数</returns>
         public async Task<int> ClearGroupIdByIdAsync(int actionId)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -262,7 +272,7 @@ new HstActionDto { ActionId = actionId });
 
         public override Task<int> UpsertAsync(HstActionDto dto)
         {
-            throw new NotSupportedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
+            throw new NotSupportedException($"Unsupported operation({MethodBase.GetCurrentMethod()?.Name}).");
         }
 
         public override async Task<int> DeleteAllAsync()
@@ -275,15 +285,15 @@ new HstActionDto { ActionId = actionId });
         /// <summary>
         /// <see cref="HstActionDto.ActionId"/> に基づいて、レコードを削除する
         /// </summary>
-        /// <param name="pkey">帳簿項目ID</param>
+        /// <param name="actionId">帳簿項目ID</param>
         /// <returns>削除件数</returns>
-        public override async Task<int> DeleteByIdAsync(int pkey)
+        public override async Task<int> DeleteByIdAsync(int actionId)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;",
-new HstActionDto { ActionId = pkey });
+new HstActionDto { ActionId = actionId });
 
             return count;
         }

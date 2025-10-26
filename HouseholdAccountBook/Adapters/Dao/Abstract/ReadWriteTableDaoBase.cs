@@ -30,15 +30,15 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
         /// <summary>
         /// レコードを更新する
         /// </summary>
-        /// <param name="dto">DTO</param>
-        /// <returns>更新行数</returns>
+        /// <param name="dto">対象のレコード</param>
+        /// <returns>更新件数</returns>
         public abstract Task<int> UpdateAsync(DTO dto);
 
         /// <summary>
         /// レコードを挿入または更新する
         /// </summary>
-        /// <param name="dto">DTO</param>
-        /// <returns>挿入/更新行数</returns>
+        /// <param name="dto">対象のレコード</param>
+        /// <returns>挿入/更新件数</returns>
         public abstract Task<int> UpsertAsync(DTO dto);
     }
 }

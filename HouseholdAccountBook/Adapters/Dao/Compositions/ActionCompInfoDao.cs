@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <param name="bookId">帳簿ID</param>
         /// <param name="date">CSVの日付</param>
         /// <param name="value">CSVの値</param>
-        /// <returns>DTOリスト</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<ActionCompInfoDto>> FindMatchesWithCsvAsync(int bookId, DateTime date, int value)
         {
             var dtoList = await this.dbHandler.QueryAsync<ActionCompInfoDto>(@"

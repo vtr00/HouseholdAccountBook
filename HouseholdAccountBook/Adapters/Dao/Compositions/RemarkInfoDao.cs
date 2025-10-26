@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <see cref="HstRemarkDto.ItemId"/> に基づいて、<see cref="RemarkInfoDto"/> リストを取得する
         /// </summary>
         /// <param name="itemId">項目ID</param>
-        /// <returns>備考情報リスト</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<RemarkInfoDto>> FindByItemIdAsync(int itemId)
         {
             var dtoList = await this.dbHandler.QueryAsync<RemarkInfoDto>(@"

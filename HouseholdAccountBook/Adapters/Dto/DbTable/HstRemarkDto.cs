@@ -5,7 +5,7 @@ using System;
 namespace HouseholdAccountBook.Adapters.Dto.DbTable
 {
     /// <summary>
-    /// 備考テーブルDTO
+    /// 備考DTO
     /// </summary>
     public class HstRemarkDto : TableDtoBase
     {
@@ -13,15 +13,15 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// コンストラクタ
         /// </summary>
         public HstRemarkDto() { }
-
         /// <summary>
-        /// コンストラクタ
+        /// コンストラクタ(記帳風月の備考DTOからのコピー)
         /// </summary>
-        /// <param name="dto">記帳風月DTO</param>
+        /// <param name="dto">記帳風月の備考DTO</param>
         public HstRemarkDto(CbtNoteDto dto) : base(dto)
         {
             this.ItemId = dto.ITEM_ID;
             this.Remark = dto.NOTE_NAME;
+            this.RemarkKind = 0;
         }
 
         /// <summary>

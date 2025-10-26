@@ -4,7 +4,7 @@ using HouseholdAccountBook.Adapters.Dto.KHDbTable;
 namespace HouseholdAccountBook.Adapters.Dto.DbTable
 {
     /// <summary>
-    /// 分類テーブルDTO
+    /// 分類DTO
     /// </summary>
     public class MstCategoryDto : MstDtoBase
     {
@@ -12,7 +12,10 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// コンストラクタ
         /// </summary>
         public MstCategoryDto() : base() { }
-
+        /// <summary>
+        /// コンストラクタ(記帳風月の分類DTOからのコピー)
+        /// </summary>
+        /// <param name="dto">記帳風月の分類DTO</param>
         public MstCategoryDto(CbmCategoryDto dto) : base(dto)
         {
             this.CategoryId = dto.CATEGORY_ID;

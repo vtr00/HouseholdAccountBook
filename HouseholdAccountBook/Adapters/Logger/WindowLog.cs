@@ -7,6 +7,9 @@ using static HouseholdAccountBook.Adapters.FileConstants;
 
 namespace HouseholdAccountBook.Adapters.Logger
 {
+    /// <summary>
+    /// ウィンドウ情報ログ
+    /// </summary>
     public class WindowLog
     {
         /// <summary>
@@ -38,7 +41,6 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <summary>
         /// <see cref="WindowLog"/> クラスのインスタンスを破棄します。
         /// </summary>
-        /// <param name="window"></param>
         ~WindowLog()
         {
             SystemEvents.DisplaySettingsChanging -= this.SystemEvents_DisplaySettingsChanging;

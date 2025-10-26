@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace HouseholdAccountBook.Adapters.Dao.Abstract
 {
     /// <summary>
-    /// シーケンスのDAOインターフェース
+    /// シーケンスをもつDTOのDAOインターフェース
     /// </summary>
     /// <typeparam name="DTO">シーケンスをもつDTO</typeparam>
     public interface ISequentialIDDao<DTO> where DTO : ISequentialIDDto
@@ -14,8 +14,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
         /// <summary>
         /// シーケンスを更新する
         /// </summary>
-        /// <param name="dtoList">シーケンスをもつDTOのリスト</param>
-        /// <returns></returns>
+        /// <param name="dtoList">シーケンスをもつレコードのリスト</param>
         public async Task SetIdSequenceAsync(IEnumerable<DTO> dtoList)
         {
             await this.SetIdSequenceAsync(dtoList.Max(d => d.GetId()));
@@ -25,7 +24,6 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
         /// シーケンスを更新する
         /// </summary>
         /// <param name="idSeq">ID</param>
-        /// <returns></returns>
         public abstract Task SetIdSequenceAsync(int idSeq);
     }
 }

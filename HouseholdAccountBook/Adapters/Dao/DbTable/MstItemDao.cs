@@ -26,13 +26,18 @@ WHERE del_flg = 0;");
             return dtoList;
         }
 
-        public override async Task<MstItemDto> FindByIdAsync(int pkey)
+        /// <summary>
+        /// <see cref="MstItemDto.ItemId"/> に基づいて、レコードを取得する
+        /// </summary>
+        /// <param name="itemId">分類ID</param>
+        /// <returns>取得したレコード</returns>
+        public override async Task<MstItemDto> FindByIdAsync(int itemId)
         {
             var dto = await this.dbHandler.QuerySingleOrDefaultAsync<MstItemDto>(@"
 SELECT *
 FROM mst_item
 WHERE item_id = @ItemId AND del_flg = 0;",
-new MstItemDto { ItemId = pkey });
+new MstItemDto { ItemId = itemId });
 
             return dto;
         }
@@ -41,7 +46,7 @@ new MstItemDto { ItemId = pkey });
         /// <see cref="MstItemDto.CategoryId"/> に基づいて、レコードを取得する
         /// </summary>
         /// <param name="categoryId">分類ID</param>
-        /// <returns>DTOリスト</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<MstItemDto>> FindByCategoryIdAsync(int categoryId)
         {
             var dtoList = await this.dbHandler.QueryAsync<MstItemDto>(@"
@@ -93,7 +98,7 @@ RETURNING item_id;", dto);
         /// <see cref="MstItemDto.ItemId"/> に基づいて、<see cref="MstItemDto.ItemName"/> を更新する
         /// </summary>
         /// <param name="dto">DTO</param>
-        /// <returns>更新行数</returns>
+        /// <returns>更新件数</returns>
         public async Task<int> UpdateSetableAsync(MstItemDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -109,7 +114,7 @@ WHERE item_id = @ItemId;", dto);
         /// </summary>
         /// <param name="categoryId">移動先の分類ID</param>
         /// <param name="itemId">項目ID</param>
-        /// <returns>更新行数</returns>
+        /// <returns>更新件数</returns>
         public async Task<int> UpdateSortOrderToMaximumAsync(int categoryId, int itemId)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -126,7 +131,7 @@ new MstItemDto { CategoryId = categoryId, ItemId = itemId });
         /// </summary>
         /// <param name="categoryId">移動先の分類ID</param>
         /// <param name="itemId">項目ID</param>
-        /// <returns>更新行数</returns>
+        /// <returns>更新件数</returns>
         public async Task<int> UpdateSortOrderToMinimumAsync(int categoryId, int itemId)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -143,7 +148,7 @@ new MstItemDto { CategoryId = categoryId, ItemId = itemId });
         /// </summary>
         /// <param name="itemId1">項目ID1</param>
         /// <param name="itemId2">項目ID2</param>
-        /// <returns>更新行数</returns>
+        /// <returns>更新件数</returns>
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public async Task<int> SwapSortOrderAsync(int itemId1, int itemId2)
         {
@@ -177,13 +182,18 @@ new { ItemId1 = itemId1, ItemId2 = itemId2, UpdateTime = DateTime.Now, Updater }
             return count;
         }
 
-        public override async Task<int> DeleteByIdAsync(int pkey)
+        /// <summary>
+        /// <see cref="MstItemDto.ItemId"/> に基づいて、レコードを削除する
+        /// </summary>
+        /// <param name="itemId">項目ID</param>
+        /// <returns>削除件数</returns>
+        public override async Task<int> DeleteByIdAsync(int itemId)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE mst_item
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId;",
-new MstItemDto { ItemId = pkey });
+new MstItemDto { ItemId = itemId });
 
             return count;
         }

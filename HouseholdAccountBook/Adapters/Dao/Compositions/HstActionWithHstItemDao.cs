@@ -16,7 +16,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <see cref="MstCategoryDto.CategoryId"/> に基づいて、<see cref="HstActionDto"/> リストを取得します
         /// </summary>
         /// <param name="categoryId">分類ID</param>
-        /// <returns>DTOリスト</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByCategoryIdAsync(int categoryId)
         {
             var dtoList = await this.dbHandler.QueryAsync<HstActionDto>(@"

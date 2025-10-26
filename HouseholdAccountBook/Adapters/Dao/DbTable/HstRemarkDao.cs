@@ -26,9 +26,10 @@ WHERE del_flg = 0;");
         /// <summary>
         /// <see cref="HstRemarkDto.Remark"/> と <see cref="HstRemarkDto.ItemId"/> に基づいて、レコードを取得する
         /// </summary>
-        /// <param name="dto"><see cref="HstRemarkDto"/></param>
+        /// <param name="remark">備考</param>
+        /// <param name="itemId">項目ID</param>
         /// <param name="includeDeleted"><see cref="TableDtoBase.DelFlg">=1も含めるか</param>
-        /// <returns>DTOリスト</returns>
+        /// <returns>取得したレコード</returns>
         public async Task<HstRemarkDto> FindByRemarkAndItemIdAsync(string remark, int itemId, bool includeDeleted = false)
         {
             var dto = includeDeleted
@@ -56,8 +57,8 @@ VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @JsonCode, @DelFlg, @UpdateTim
         /// <summary>
         /// <see cref="HstRemarkDto.ItemId"/> と <see cref="HstRemarkDto.Remark"/> が一致するレコードを更新する
         /// </summary>
-        /// <param name="dto"><see cref="HstRemarkDto"/></param>
-        /// <returns>更新行数</returns>
+        /// <param name="dto">更新するレコード</param>
+        /// <returns>更新件数</returns>
         public override async Task<int> UpdateAsync(HstRemarkDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -71,8 +72,8 @@ WHERE item_id = @ItemId AND remark = @Remark AND used_time < @UsedTime;", dto);
         /// <summary>
         /// <see cref="HstRemarkDto"/> を挿入または更新する
         /// </summary>
-        /// <param name="dto"><see cref="HstRemarkDto"/></param>
-        /// <returns>挿入/更新行数</returns>
+        /// <param name="dto">挿入/更新するレコード</param>
+        /// <returns>挿入/更新件数</returns>
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public override async Task<int> UpsertAsync(HstRemarkDto dto)
         {
@@ -96,8 +97,8 @@ WHERE hst_remark.item_id = @ItemId AND hst_remark.remark = @Remark AND hst_remar
         /// <summary>
         /// <see cref="HstRemarkDto.ItemId"/> と <see cref="HstRemarkDto.Remark"/> が一致するレコードを削除する
         /// </summary>
-        /// <param name="dto"><see cref="HstRemarkDto"/></param>
-        /// <returns>削除行数</returns>
+        /// <param name="dto">削除するレコード</param>
+        /// <returns>削除件数</returns>
         public async Task<int> DeleteAsync(HstRemarkDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"

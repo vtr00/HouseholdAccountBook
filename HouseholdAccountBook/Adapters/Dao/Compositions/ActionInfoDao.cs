@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// </summary>
         /// <param name="startTime">開始日付</param>
         /// <param name="finishTime">終了日付</param>
-        /// <returns>DTO</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<ActionInfoDto>> FindAllWithinTerm(DateTime startTime, DateTime finishTime)
         {
             var dtoList = await this.dbHandler.QueryAsync<ActionInfoDto>(@"
@@ -47,7 +47,7 @@ new { StartTime = startTime, FinishTime = finishTime });
         /// <param name="bookId">帳簿ID</param>
         /// <param name="startTime">開始日付</param>
         /// <param name="finishTime">終了日付</param>
-        /// <returns>DTO</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<ActionInfoDto>> FindByBookIdWithinTerm(int bookId, DateTime startTime, DateTime finishTime)
         {
             var dtoList = await this.dbHandler.QueryAsync<ActionInfoDto>(@"

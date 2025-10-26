@@ -4,7 +4,7 @@ using System;
 namespace HouseholdAccountBook.Adapters.Dto.DbTable
 {
     /// <summary>
-    /// 店舗名テーブルDTO
+    /// 店舗名DTO
     /// </summary>
     public class HstShopDto : TableDtoBase
     {

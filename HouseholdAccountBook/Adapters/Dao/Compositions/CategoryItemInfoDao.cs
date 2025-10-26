@@ -18,7 +18,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="balanceKind">帳簿種別</param>
-        /// <returns>分類-項目情報のリスト</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<CategoryItemInfoDto>> FindByBookIdAndBalanceKindAsync(int bookId, int balanceKind)
         {
             var dtoList = await this.dbHandler.QueryAsync<CategoryItemInfoDto>(@"
@@ -38,7 +38,7 @@ new { BalanceKind = balanceKind, BookId = bookId });
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <param name="categoryId">分類ID</param>
-        /// <returns>分類-項目情報のリスト</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<CategoryItemInfoDto>> FindByBookIdAndCategoryIdAsync(int bookId, int categoryId)
         {
             var dtoList = await this.dbHandler.QueryAsync<CategoryItemInfoDto>(@"

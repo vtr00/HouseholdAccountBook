@@ -27,13 +27,18 @@ ORDER BY sort_order;");
             return dtoList;
         }
 
-        public override async Task<MstBookDto> FindByIdAsync(int pkey)
+        /// <summary>
+        /// <see cref="MstBookDto.BookId"/> に基づいて、レコードを取得する
+        /// </summary>
+        /// <param name="bookId">帳簿ID</param>
+        /// <returns>取得したレコード</returns>
+        public override async Task<MstBookDto> FindByIdAsync(int bookId)
         {
             var dto = await this.dbHandler.QuerySingleOrDefaultAsync<MstBookDto>(@"
 SELECT *
 FROM mst_book
 WHERE book_id = @BookId AND del_flg = 0;",
-new MstBookDto { BookId = pkey });
+new MstBookDto { BookId = bookId });
 
             return dto;
         }
@@ -41,7 +46,7 @@ new MstBookDto { BookId = pkey });
         /// <summary>
         /// <see cref="MstBookDto.JsonCode"/> が空ではない全てのレコードを取得する
         /// </summary>
-        /// <returns>DTO</returns>
+        /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<MstBookDto>> FindIfJsonCodeExistsAsync()
         {
             var dtoList = await this.dbHandler.QueryAsync<MstBookDto>(@"
@@ -86,7 +91,7 @@ RETURNING book_id;", dto);
         /// <see cref="MstBookDto.BookId"/> に対応するレコードの設定可能な項目を更新する
         /// </summary>
         /// <param name="dto">DTO</param>
-        /// <returns>更新行数</returns>
+        /// <returns>更新件数</returns>
         public async Task<int> UpdateSetableAsync(MstBookDto dto)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
@@ -107,7 +112,7 @@ WHERE book_id = @BookId;", dto);
         /// </summary>
         /// <param name="bookId1">帳簿ID1</param>
         /// <param name="bookId2">帳簿ID2</param>
-        /// <returns>更新行数</returns>
+        /// <returns>更新件数</returns>
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public async Task<int> SwapSortOrderAsync(int bookId1, int bookId2)
         {
@@ -141,13 +146,18 @@ new { BookId1 = bookId1, BookId2 = bookId2, UpdateTime = DateTime.Now, Updater }
             return count;
         }
 
-        public override async Task<int> DeleteByIdAsync(int pkey)
+        /// <summary>
+        /// <see cref="MstBookDto.BookId"/> に基づいて、レコードを削除する
+        /// </summary>
+        /// <param name="bookId">帳簿ID</param>
+        /// <returns>削除件数</returns>
+        public override async Task<int> DeleteByIdAsync(int bookId)
         {
             int count = await this.dbHandler.ExecuteAsync(@"
 UPDATE mst_book
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE book_id = @BookId;",
-new MstBookDto { BookId = pkey });
+new MstBookDto { BookId = bookId });
 
             return count;
         }

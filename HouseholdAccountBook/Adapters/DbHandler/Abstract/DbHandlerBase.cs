@@ -178,7 +178,7 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
         /// </summary>
         /// <param name="sql">SQL</param>
         /// <param name="param">SQLパラメータ</param>
-        /// <returns>変更行数</returns>
+        /// <returns>変更件数</returns>
         public async Task<int> ExecuteAsync(string sql, object param = null)
         {
             try {
