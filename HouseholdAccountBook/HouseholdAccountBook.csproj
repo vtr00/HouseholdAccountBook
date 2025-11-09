@@ -48,30 +48,30 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Notification.Wpf" Version="8.0.0" />
     <PackageReference Include="CalcBinding" Version="2.5.2" />
     <PackageReference Include="CsvHelper" Version="33.1.0" />
     <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="DynamicExpresso.Core" Version="2.19.2" />
+    <PackageReference Include="DynamicExpresso.Core" Version="2.19.3" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-    <PackageReference Include="Npgsql" Version="9.0.3" />
+    <PackageReference Include="Npgsql" Version="9.0.4" />
     <PackageReference Include="OxyPlot.Core" Version="2.1.0" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.1.0" />
-    <PackageReference Include="System.CodeDom" Version="9.0.9" />
+    <PackageReference Include="System.CodeDom" Version="9.0.10" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.9" />
-    <PackageReference Include="System.Data.OleDb" Version="9.0.9" />
-    <PackageReference Include="System.Diagnostics.EventLog" Version="9.0.9" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.10" />
+    <PackageReference Include="System.Data.OleDb" Version="9.0.10" />
+    <PackageReference Include="System.Diagnostics.EventLog" Version="9.0.10" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.6.1" />
     <PackageReference Include="System.Security.AccessControl" Version="6.0.1" />
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.9" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.10" />
     <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.9" />
-    <PackageReference Include="System.Threading.Channels" Version="9.0.9" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.10" />
+    <PackageReference Include="System.Threading.Channels" Version="9.0.10" />
   </ItemGroup>
   <ItemGroup>
     <AppDesigner Include="Properties\" />
