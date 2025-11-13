@@ -231,16 +231,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         #region ウィンドウ設定プロパティ
-        public override Size WindowSizeSetting
+        protected override (double, double) WindowSizeSettingRaw
         {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
-                return new Size(settings.DbSettingWindow_Width, settings.DbSettingWindow_Height);
+                return (settings.DbSettingWindow_Width, settings.DbSettingWindow_Height);
             }
             set {
                 Properties.Settings settings = Properties.Settings.Default;
-                settings.DbSettingWindow_Width = value.Width;
-                settings.DbSettingWindow_Height = value.Height;
+                settings.DbSettingWindow_Width = value.Item1;
+                settings.DbSettingWindow_Height = value.Item2;
                 settings.Save();
             }
         }

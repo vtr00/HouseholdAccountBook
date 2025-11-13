@@ -220,10 +220,10 @@ namespace HouseholdAccountBook.Others
 
             Properties.Settings settings = Properties.Settings.Default;
 
-            Size size = wvm.WindowSizeSetting;
-            if (40 < size.Width && 40 < size.Height) {
-                window.Width = size.Width;
-                window.Height = size.Height;
+            Size? size = wvm.WindowSizeSetting;
+            if (size is not null && 40 < size.Value.Width && 40 < size.Value.Height) {
+                window.Width = size.Value.Width;
+                window.Height = size.Value.Height;
             }
 
             Point point = wvm.WindowPointSetting;

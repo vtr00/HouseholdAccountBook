@@ -10,7 +10,21 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// ウィンドウのサイズ設定を取得/設定する
         /// </summary>
-        public virtual Size WindowSizeSetting { get; set; }
+        public Size? WindowSizeSetting
+        {
+            get {
+                var (width, height) = this.WindowSizeSettingRaw;
+                if (width <= 0 || height <= 0) {
+                    return null;
+                }
+                return new Size(width, height);
+            }
+            set {
+                if (value is not null) {
+                    this.WindowSizeSettingRaw = (value.Value.Width, value.Value.Height);
+                }
+            }
+        }
         /// <summary>
         /// ウィンドウの位置設定を取得/設定する
         /// </summary>
@@ -19,5 +33,10 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// ウィンドウの状態設定を取得/設定する
         /// </summary>
         public virtual int WindowStateSetting { get; set; }
+
+        /// <summary>
+        /// ウィンドウのサイズ設定の生データを取得/設定する
+        /// </summary>
+        protected virtual (double, double) WindowSizeSettingRaw { get; set; }
     }
 }
