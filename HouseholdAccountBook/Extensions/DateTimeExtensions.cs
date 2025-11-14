@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,9 +37,9 @@ namespace HouseholdAccountBook.Extensions
                     MissingFieldFound = mffa => { }
                 };
 
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+                HttpClientHandler handler = new() { SslProtocols = System.Security.Authentication.SslProtocols.Tls12 };
                 try {
-                    using (HttpClient client = new()) {
+                    using (HttpClient client = new(handler)) {
                         Stream stream = await client.GetStreamAsync(uri);
                         if (stream.CanRead) {
                             holidayList.Clear();
