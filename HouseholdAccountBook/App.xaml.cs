@@ -196,6 +196,7 @@ namespace HouseholdAccountBook
 
             // 初回起動を解除する
             settings.App_InitFlag = false;
+            settings.App_InitSizeFlag = false;
             settings.Save();
 
             // 休日リストを取得する
