@@ -27,8 +27,8 @@ namespace HouseholdAccountBook
         /// 起動時刻
         /// </summary>
 #pragma warning disable IDE0032 // 自動プロパティを使用する
-        public DateTime StartupTime => this._startupTime;
-        private readonly DateTime _startupTime = DateTime.Now;
+        public DateTime StartupTime => this.mStartupTime;
+        private readonly DateTime mStartupTime = DateTime.Now;
 #pragma warning restore IDE0032 // 自動プロパティを使用する
         #endregion
 
@@ -37,7 +37,7 @@ namespace HouseholdAccountBook
         /// <summary>
         /// 多重起動抑止用Mutex
         /// </summary>
-        private static Mutex mutex = null;
+        private static Mutex mMutex;
 #endif
         #endregion
 
@@ -90,8 +90,8 @@ namespace HouseholdAccountBook
 
 #if !DEBUG
             // 多重起動を抑止する
-            App.mutex = new(false, this.GetType().Assembly.GetName().Name);
-            if (!mutex.WaitOne(TimeSpan.Zero, false)) {
+            App.mMutex = new(false, this.GetType().Assembly.GetName().Name);
+            if (!mMutex.WaitOne(TimeSpan.Zero, false)) {
                 Process curProcess = Process.GetCurrentProcess();
                 Process[] processList = Process.GetProcessesByName(curProcess.ProcessName);
 
@@ -283,10 +283,10 @@ namespace HouseholdAccountBook
         public static void ReleaseMutex()
         {
 #if !DEBUG
-            if (mutex != null) {
-                mutex.ReleaseMutex();
-                mutex.Close();
-                mutex = null;
+            if (mMutex != null) {
+                mMutex.ReleaseMutex();
+                mMutex.Close();
+                mMutex = null;
             }
 #endif
         }
@@ -313,27 +313,18 @@ namespace HouseholdAccountBook
         /// 実行ファイルのパスを取得する
         /// </summary>
         /// <returns>実行ファイルのパス</returns>
-        public static string GetCurrentExe()
-        {
-            return Environment.ProcessPath;
-        }
+        public static string GetCurrentExe() => Environment.ProcessPath;
 
         /// <summary>
         /// 実行ファイルの存在するフォルダのパスを取得する
         /// </summary>
         /// <returns>実行ファイルの存在するフォルダのパス</returns>
-        public static string GetCurrentDir()
-        {
-            return Path.GetDirectoryName(GetCurrentExe());
-        }
+        public static string GetCurrentDir() => Path.GetDirectoryName(GetCurrentExe());
 
         /// <summary>
         /// アセンブリバージョンを取得する
         /// </summary>
         /// <returns></returns>
-        public static Version GetAssemblyVersion()
-        {
-            return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-        }
+        public static Version GetAssemblyVersion() => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
     }
 }

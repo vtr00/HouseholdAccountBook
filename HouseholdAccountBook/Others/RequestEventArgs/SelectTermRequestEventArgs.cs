@@ -13,6 +13,6 @@ namespace HouseholdAccountBook.Others.RequestEventArgs
 
         public DateTime EndDate { get; set; }
 
-        public bool Result { get; set; } = false;
+        public bool Result { get; set; }
     }
 }

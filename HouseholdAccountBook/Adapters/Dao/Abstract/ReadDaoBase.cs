@@ -11,6 +11,6 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
         /// <summary>
         /// DBハンドラ
         /// </summary>
-        protected readonly DbHandlerBase dbHandler = dbHandler;
+        protected readonly DbHandlerBase mDbHandler = dbHandler;
     }
 }

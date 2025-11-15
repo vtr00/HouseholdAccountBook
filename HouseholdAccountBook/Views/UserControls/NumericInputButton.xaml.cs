@@ -26,8 +26,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// 入力値
         /// </summary>
         #region InputedValue
-        public int? InputedValue
-        {
+        public int? InputedValue {
             get => (int?)this.GetValue(InputedValueProperty);
             set => this.SetValue(InputedValueProperty, value);
         }
@@ -48,8 +47,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// 入力種別
         /// </summary>
         #region InputedKind
-        public InputKind InputedKind
-        {
+        public InputKind InputedKind {
             get => (InputKind)this.GetValue(InputedKindProperty);
             set => this.SetValue(InputedKindProperty, value);
         }
@@ -70,8 +68,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// コマンド
         /// </summary>
         #region Command
-        public ICommand Command
-        {
+        public ICommand Command {
             get => (ICommand)this.GetValue(CommandProperty);
             set => this.SetValue(CommandProperty, value);
         }
@@ -92,8 +89,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// コマンドパラメータ
         /// </summary>
         #region CommandParameter
-        public object CommandParameter
-        {
+        public object CommandParameter {
             get => this.GetValue(CommandParameterProperty);
             set => this.SetValue(CommandParameterProperty, value);
         }
@@ -114,8 +110,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// コマンドターゲット
         /// </summary>
         #region CommandTarget
-        public IInputElement CommandTarget
-        {
+        public IInputElement CommandTarget {
             get => (IInputElement)this.GetValue(CommandTargetProperty);
             set => this.SetValue(CommandTargetProperty, value);
         }
@@ -125,10 +120,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// <see cref="NumericInputButton"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        public NumericInputButton()
-        {
-            this.InitializeComponent();
-        }
+        public NumericInputButton() => this.InitializeComponent();
 
         #region イベントハンドラ
         #region コマンド
@@ -140,7 +132,7 @@ namespace HouseholdAccountBook.Views.UserControls
         private void NumberInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ContentControl control = e.OriginalSource as ContentControl;
-            int value = Int32.Parse(control.Content.ToString()); // 入力値
+            int value = int.Parse(control.Content.ToString()); // 入力値
 
             this.InputedValue = value;
             this.InputedKind = InputKind.Number;
@@ -184,10 +176,10 @@ namespace HouseholdAccountBook.Views.UserControls
         private static void CommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is NumericInputButton nib) {
-                if (e.OldValue != null && e.OldValue is ICommand oldCommand) {
+                if (e.OldValue is not null and ICommand oldCommand) {
                     oldCommand.CanExecuteChanged -= nib.OnCanExecuteChanged;
                 }
-                if (e.NewValue != null && e.NewValue is ICommand newCommand) {
+                if (e.NewValue is not null and ICommand newCommand) {
                     newCommand.CanExecuteChanged += nib.OnCanExecuteChanged;
                 }
             }
@@ -201,12 +193,9 @@ namespace HouseholdAccountBook.Views.UserControls
         private void OnCanExecuteChanged(object sender, EventArgs e)
         {
             if (this.Command != null) {
-                if (this.Command is RoutedCommand command) {
-                    this.IsEnabled = command?.CanExecute(this.CommandParameter, this.CommandTarget) ?? true;
-                }
-                else {
-                    this.IsEnabled = this.Command?.CanExecute(this.CommandParameter) ?? true;
-                }
+                this.IsEnabled = this.Command is RoutedCommand command
+                    ? command?.CanExecute(this.CommandParameter, this.CommandTarget) ?? true
+                    : this.Command?.CanExecute(this.CommandParameter) ?? true;
             }
         }
         #endregion

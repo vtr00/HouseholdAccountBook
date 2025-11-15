@@ -16,7 +16,7 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// <summary>
         /// 項目ID
         /// </summary>
-        public int ItemId { get; set; } = 0;
+        public int ItemId { get; set; }
         /// <summary>
         /// 店舗名
         /// </summary>

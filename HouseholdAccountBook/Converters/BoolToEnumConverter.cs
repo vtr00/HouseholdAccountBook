@@ -40,15 +40,11 @@ namespace HouseholdAccountBook.Converters
         /// <returns></returns>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (parameter is not string paramStr) {
-                return DependencyProperty.UnsetValue;
-            }
-
-            if (value is not bool isChecked) {
-                return DependencyProperty.UnsetValue;
-            }
-
-            return isChecked ? Enum.Parse(targetType, paramStr) : DependencyProperty.UnsetValue;
+            return parameter is not string paramStr || value is not bool isChecked
+                ? DependencyProperty.UnsetValue
+                : isChecked
+                    ? Enum.Parse(targetType, paramStr)
+                    : DependencyProperty.UnsetValue;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
         /// <returns>DTOリスト</returns>
         public override async Task<IEnumerable<HstShopDto>> FindAllAsync()
         {
-            var dtoList = await this.dbHandler.QueryAsync<HstShopDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<HstShopDto>(@"
 SELECT * 
 FROM hst_shop
 WHERE del_flg = 0;");
@@ -37,11 +37,11 @@ WHERE del_flg = 0;");
         public async Task<HstShopDto> FindByItemIdAndShopNameAsync(string shopName, int itemId, bool includeDeleted = false)
         {
             var dto = includeDeleted
-                ? await this.dbHandler.QuerySingleOrDefaultAsync<HstShopDto>(@"
+                ? await this.mDbHandler.QuerySingleOrDefaultAsync<HstShopDto>(@"
 SELECT * FROM hst_shop
 WHERE item_id = @ItemId AND shop_name = @ShopName;",
 new HstShopDto { ShopName = shopName, ItemId = itemId })
-                : await this.dbHandler.QuerySingleOrDefaultAsync<HstShopDto>(@"
+                : await this.mDbHandler.QuerySingleOrDefaultAsync<HstShopDto>(@"
 SELECT * FROM hst_shop
 WHERE item_id = @ItemId AND shop_name = @ShopName AND del_flg = 0;",
 new HstShopDto { ShopName = shopName, ItemId = itemId });
@@ -56,7 +56,7 @@ new HstShopDto { ShopName = shopName, ItemId = itemId });
         /// <returns>挿入件数</returns>
         public override async Task<int> InsertAsync(HstShopDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO hst_shop (item_id, shop_name, used_time, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@ItemId, @ShopName, @UsedTime, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
@@ -70,7 +70,7 @@ VALUES (@ItemId, @ShopName, @UsedTime, @JsonCode, @DelFlg, @UpdateTime, @Updater
         /// <returns>更新件数</returns>
         public override async Task<int> UpdateAsync(HstShopDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_shop
 SET used_time = @UsedTime, json_code = @JsonCode, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId AND shop_name = @ShopName AND used_time < @UsedTime;", dto);
@@ -86,7 +86,7 @@ WHERE item_id = @ItemId AND shop_name = @ShopName AND used_time < @UsedTime;", d
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public override async Task<int> UpsertAsync(HstShopDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO hst_shop (item_id, shop_name, used_time, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@ItemId, @ShopName, @UsedTime, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 ON CONFLICT (item_id, shop_name) DO UPDATE
@@ -98,7 +98,7 @@ WHERE hst_shop.item_id = @ItemId AND hst_shop.shop_name = @ShopName AND hst_shop
 
         public override async Task<int> DeleteAllAsync()
         {
-            int count = await this.dbHandler.ExecuteAsync(@"DELETE FROM hst_shop;");
+            int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM hst_shop;");
 
             return count;
         }
@@ -110,7 +110,7 @@ WHERE hst_shop.item_id = @ItemId AND hst_shop.shop_name = @ShopName AND hst_shop
         /// <returns>削除件数</returns>
         public async Task<int> DeleteAsync(HstShopDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_shop SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE shop_name = @ShopName AND item_id = @ItemId;", dto);
 

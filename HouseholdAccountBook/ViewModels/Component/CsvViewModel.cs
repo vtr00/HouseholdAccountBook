@@ -12,36 +12,30 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// 日付
         /// </summary>
         #region Date
-        public DateTime Date
-        {
-            get => this._Date;
-            set => this.SetProperty(ref this._Date, value);
+        public DateTime Date {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private DateTime _Date = default;
         #endregion
 
         /// <summary>
         /// 値
         /// </summary>
         #region Value
-        public int Value
-        {
-            get => this._Value;
-            set => this.SetProperty(ref this._Value, value);
+        public int Value {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _Value = default;
         #endregion
 
         /// <summary>
         /// 名称
         /// </summary>
         #region Name
-        public string Name
-        {
-            get => this._Name;
-            set => this.SetProperty(ref this._Name, value);
+        public string Name {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _Name = default;
         #endregion
     }
 }

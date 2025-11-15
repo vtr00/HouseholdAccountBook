@@ -38,31 +38,30 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 表示日付の更新中か
         /// </summary>
-        private bool onUpdateDisplayedDate = false;
+        private bool mOnUpdateDisplayedDate;
         #endregion
 
         #region イベント
         /// <summary>
         /// タブ選択変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<int>> SelectedTabChanged = default;
+        public event EventHandler<ChangedEventArgs<int>> SelectedTabChanged;
         /// <summary>
         /// 帳簿選択変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<int?>> SelectedBookChanged = default;
+        public event EventHandler<ChangedEventArgs<int?>> SelectedBookChanged;
         /// <summary>
         /// グラフ種別1選択変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<GraphKind1>> SelectedGraphKind1Changed = default;
+        public event EventHandler<ChangedEventArgs<GraphKind1>> SelectedGraphKind1Changed;
         /// <summary>
         /// グラフ種別2選択変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<GraphKind2>> SelectedGraphKind2Changed = default;
+        public event EventHandler<ChangedEventArgs<GraphKind2>> SelectedGraphKind2Changed;
         /// <summary>
         /// 系列選択変更時イベント
         /// </summary>
-        public event EventHandler SelectedSeriesChanged
-        {
+        public event EventHandler SelectedSeriesChanged {
             add {
                 this.MonthlySummaryTabVM.SelectedSeriesChanged += value;
                 this.YearlySummaryTabVM.SelectedSeriesChanged += value;
@@ -82,8 +81,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// スクロール要求時イベント
         /// </summary>
-        public event EventHandler<EventArgs<int>> ScrollRequested
-        {
+        public event EventHandler<EventArgs<int>> ScrollRequested {
             add => this.BookTabVM.ScrollRequested += value;
             remove => this.BookTabVM.ScrollRequested -= value;
         }
@@ -91,64 +89,56 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 移動追加要求時イベント
         /// </summary>
-        public event EventHandler<AddMoveRequestEventArgs> AddMoveRequested
-        {
+        public event EventHandler<AddMoveRequestEventArgs> AddMoveRequested {
             add => this.BookTabVM.AddMoveRequested += value;
             remove => this.BookTabVM.AddMoveRequested -= value;
         }
         /// <summary>
         /// 帳簿項目追加要求時イベント
         /// </summary>
-        public event EventHandler<AddActionRequestEventArgs> AddActionRequested
-        {
+        public event EventHandler<AddActionRequestEventArgs> AddActionRequested {
             add => this.BookTabVM.AddActionRequested += value;
             remove => this.BookTabVM.AddActionRequested -= value;
         }
         /// <summary>
         /// 帳簿項目リスト追加要求時イベント
         /// </summary>
-        public event EventHandler<AddActionListRequestEventArgs> AddActionListRequested
-        {
+        public event EventHandler<AddActionListRequestEventArgs> AddActionListRequested {
             add => this.BookTabVM.AddActionListRequested += value;
             remove => this.BookTabVM.AddActionListRequested -= value;
         }
         /// <summary>
         /// 移動複製要求時イベント
         /// </summary>
-        public event EventHandler<CopyMoveRequestEventArgs> CopyMoveRequested
-        {
+        public event EventHandler<CopyMoveRequestEventArgs> CopyMoveRequested {
             add => this.BookTabVM.CopyMoveRequested += value;
             remove => this.BookTabVM.CopyMoveRequested -= value;
         }
         /// <summary>
         /// 帳簿項目複製要求時イベント
         /// </summary>
-        public event EventHandler<CopyActionRequestEventArgs> CopyActionRequested
-        {
+        public event EventHandler<CopyActionRequestEventArgs> CopyActionRequested {
             add => this.BookTabVM.CopyActionRequested += value;
             remove => this.BookTabVM.CopyActionRequested -= value;
         }
         /// <summary>
         /// 移動編集要求時イベント
         /// </summary>
-        public event EventHandler<EditMoveRequestEventArgs> EditMoveRequested
-        {
+        public event EventHandler<EditMoveRequestEventArgs> EditMoveRequested {
             add => this.BookTabVM.EditMoveRequested += value;
             remove => this.BookTabVM.EditMoveRequested -= value;
         }
         /// <summary>
         /// 帳簿項目編集要求時イベント
         /// </summary>
-        public event EventHandler<EditActionRequestEventArgs> EditActionRequested
-        {
+        public event EventHandler<EditActionRequestEventArgs> EditActionRequested {
             add => this.BookTabVM.EditActionRequested += value;
             remove => this.BookTabVM.EditActionRequested -= value;
         }
         /// <summary>
         /// 帳簿項目リスト編集要求時イベント
         /// </summary>
-        public event EventHandler<EditActionListRequestEventArgs> EditActionListRequested
-        {
+        public event EventHandler<EditActionListRequestEventArgs> EditActionListRequested {
             add => this.BookTabVM.EditActionListRequested += value;
             remove => this.BookTabVM.EditActionListRequested -= value;
         }
@@ -185,17 +175,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択されたDB種別
         /// </summary>
         #region SelectedDBKind
-        public DBKind SelectedDBKind
-        {
-            get => this._SelectedDBKind;
+        public DBKind SelectedDBKind {
+            get;
             set {
-                if (this.SetProperty(ref this._SelectedDBKind, value)) {
+                if (this.SetProperty(ref field, value)) {
                     this.RaisePropertyChanged(nameof(this.IsPostgreSQL));
                     this.RaisePropertyChanged(nameof(this.IsSQLite));
                 }
             }
         }
-        private DBKind _SelectedDBKind = default;
         #endregion
 
         /// <summary>
@@ -215,27 +203,24 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択されたタブインデックス
         /// </summary>
         #region SelectedTabIndex
-        public int SelectedTabIndex
-        {
-            get => this._SelectedTabIndex;
+        public int SelectedTabIndex {
+            get;
             set {
-                var oldValue = this._SelectedTabIndex;
-                if (this.SetProperty(ref this._SelectedTabIndex, value)) {
+                int oldValue = field;
+                if (this.SetProperty(ref field, value)) {
                     this.SelectedTabChanged?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
                     this.RaisePropertyChanged(nameof(this.DisplayedStart));
                     this.RaisePropertyChanged(nameof(this.DisplayedEnd));
                 }
             }
         }
-        private int _SelectedTabIndex = default;
         #endregion
         /// <summary>
         /// 選択されたタブ種別
         /// </summary>
         #region SelectedTab
-        public Tabs SelectedTab
-        {
-            get => (Tabs)this._SelectedTabIndex;
+        public Tabs SelectedTab {
+            get => (Tabs)this.SelectedTabIndex;
             set => this.SelectedTabIndex = (int)value;
         }
         #endregion
@@ -244,42 +229,38 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
-        public ObservableCollection<BookViewModel> BookVMList
-        {
-            get => this._BookVMList;
-            set => this.SetProperty(ref this._BookVMList, value);
+        public ObservableCollection<BookViewModel> BookVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<BookViewModel> _BookVMList = default;
         #endregion
         /// <summary>
         /// 選択された帳簿VM
         /// </summary>
         #region SelectedBookVM
-        public BookViewModel SelectedBookVM
-        {
-            get => this._SelectedBookVM;
+        public BookViewModel SelectedBookVM {
+            get;
             set {
-                var oldVM = this._SelectedBookVM;
-                if (this.SetProperty(ref this._SelectedBookVM, value)) {
+                var oldVM = field;
+                if (this.SetProperty(ref field, value)) {
                     this.SelectedBookChanged?.Invoke(this, new() { OldValue = oldVM?.Id, NewValue = value?.Id });
                 }
             }
         }
-        private BookViewModel _SelectedBookVM;
         #endregion
 
         /// <summary>
         /// 選択された収支種別
         /// </summary>
-        public int? SelectedBalanceKind { get; set; } = default;
+        public int? SelectedBalanceKind { get; set; }
         /// <summary>
         /// 選択された分類ID
         /// </summary>
-        public int? SelectedCategoryId { get; set; } = default;
+        public int? SelectedCategoryId { get; set; }
         /// <summary>
         /// 選択された項目ID
         /// </summary>
-        public int? SelectedItemId { get; set; } = default;
+        public int? SelectedItemId { get; set; }
 
         /// <summary>
         /// 表示開始
@@ -304,11 +285,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 会計開始月
         /// </summary>
         #region FiscalStartMonth
-        public int FiscalStartMonth
-        {
-            get => this._fiscalStartMonth;
+        public int FiscalStartMonth {
+            get;
             set {
-                if (this.SetProperty(ref this._fiscalStartMonth, value)) {
+                if (this.SetProperty(ref field, value)) {
                     this.RaisePropertyChanged(nameof(this.DisplayedStart));
                     this.RaisePropertyChanged(nameof(this.DisplayedEnd));
                     this.RaisePropertyChanged(nameof(this.DisplayedMonth));
@@ -317,16 +297,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     this.RaisePropertyChanged(nameof(this.DisplayedYears));
                 }
             }
-        }
-        private int _fiscalStartMonth = 4;
+        } = 4;
         #endregion
 
         /// <summary>
         /// 表示区間種別
         /// </summary>
         #region DisplayedTermKind
-        public TermKind DisplayedTermKind
-        {
+        public TermKind DisplayedTermKind {
             get {
                 DateTime lastDate = this.StartDate.GetLastDateOfMonth();
                 return (this.StartDate.Day == 1 && DateTime.Equals(this.EndDate.Date, lastDate.Date)) ? TermKind.Monthly : TermKind.Selected;
@@ -338,8 +316,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 表示月
         /// </summary>
         #region DisplayedMonth
-        public DateTime? DisplayedMonth
-        {
+        public DateTime? DisplayedMonth {
             get => this.DisplayedTermKind switch {
                 TermKind.Monthly => (DateTime?)this.StartDate,
                 TermKind.Selected => null,
@@ -351,11 +328,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     this.StartDate = value.Value.GetFirstDateOfMonth();
                     this.EndDate = value.Value.GetLastDateOfMonth();
 
-                    if (!this.onUpdateDisplayedDate) {
-                        this.onUpdateDisplayedDate = true;
+                    if (!this.mOnUpdateDisplayedDate) {
+                        this.mOnUpdateDisplayedDate = true;
                         // 表示月の年度の最初の月を表示年とする
                         this.DisplayedYear = value.Value.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
-                        this.onUpdateDisplayedDate = false;
+                        this.mOnUpdateDisplayedDate = false;
                     }
 
                     this.RaisePropertyChanged(nameof(this.DisplayedStart));
@@ -373,51 +350,46 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 表示開始日
         /// </summary>
         #region StartDate
-        public DateTime StartDate
-        {
-            get => this._StartDate;
+        public DateTime StartDate {
+            get;
             set {
-                if (this.SetProperty(ref this._StartDate, value)) {
+                if (this.SetProperty(ref field, value)) {
                     this.RaisePropertyChanged(nameof(this.DisplayedMonth));
                 }
             }
-        }
-        private DateTime _StartDate = DateTime.Now.GetFirstDateOfMonth();
+        } = DateTime.Now.GetFirstDateOfMonth();
         #endregion
         /// <summary>
         /// 表示終了日
         /// </summary>
         #region EndDate
-        public DateTime EndDate
-        {
-            get => this._EndDate;
+        public DateTime EndDate {
+            get;
             set {
-                if (this.SetProperty(ref this._EndDate, value)) {
+                if (this.SetProperty(ref field, value)) {
                     this.RaisePropertyChanged(nameof(this.DisplayedMonth));
                 }
             }
-        }
-        private DateTime _EndDate = DateTime.Now.GetLastDateOfMonth();
+        } = DateTime.Now.GetLastDateOfMonth();
         #endregion
 
         /// <summary>
         /// 表示年
         /// </summary>
         #region DisplayedYear
-        public DateTime DisplayedYear
-        {
-            get => this._DisplayedYear;
+        public DateTime DisplayedYear {
+            get;
             set {
-                DateTime oldDisplayedYear = this._DisplayedYear;
-                if (this.SetProperty(ref this._DisplayedYear, value)) {
-                    if (!this.onUpdateDisplayedDate) {
-                        this.onUpdateDisplayedDate = true;
+                DateTime oldDisplayedYear = field;
+                if (this.SetProperty(ref field, value)) {
+                    if (!this.mOnUpdateDisplayedDate) {
+                        this.mOnUpdateDisplayedDate = true;
                         int yearDiff = value.GetFirstDateOfFiscalYear(this.FiscalStartMonth).Year - oldDisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth).Year;
                         if (this.DisplayedMonth != null) {
                             // 表示年の差分を表示月に反映する
                             this.DisplayedMonth = this.DisplayedMonth.Value.AddYears(yearDiff);
                         }
-                        this.onUpdateDisplayedDate = false;
+                        this.mOnUpdateDisplayedDate = false;
                     }
 
                     this.RaisePropertyChanged(nameof(this.DisplayedStart));
@@ -426,16 +398,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     this.RaisePropertyChanged(nameof(this.DisplayedYears));
                 }
             }
-        }
-        private DateTime _DisplayedYear = DateTime.Now;
+        } = DateTime.Now;
         #endregion
 
         /// <summary>
         /// 表示月リスト(月別一覧の月)
         /// </summary>
         #region DisplayedMonths
-        public ObservableCollection<DateTime> DisplayedMonths
-        {
+        public ObservableCollection<DateTime> DisplayedMonths {
             get {
                 DateTime tmpMonth = this.DisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
 
@@ -463,8 +433,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 表示年リスト(年別一覧の年)
         /// </summary>
         #region DisplayedYears
-        public ObservableCollection<DateTime> DisplayedYears
-        {
+        public ObservableCollection<DateTime> DisplayedYears {
             get {
                 DateTime tmpYear = this.DisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth).AddYears(-9);
                 ObservableCollection<DateTime> displayedYears = [];
@@ -498,25 +467,22 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択されたグラフ種別1
         /// </summary>
         #region SelectedGraphKind1
-        public GraphKind1 SelectedGraphKind1
-        {
-            get => this._SelectedGraphKind1;
+        public GraphKind1 SelectedGraphKind1 {
+            get;
             set {
-                var oldValue = this._SelectedGraphKind1;
-                if (this.SetProperty(ref this._SelectedGraphKind1, value)) {
+                var oldValue = field;
+                if (this.SetProperty(ref field, value)) {
                     this.SelectedGraphKind1Changed?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
                 }
             }
         }
-        private GraphKind1 _SelectedGraphKind1 = default;
         #endregion
         /// <summary>
         /// 選択されたグラフ種別1インデックス
         /// </summary>
         #region SelectedGraphKind1Index
-        public int SelectedGraphKind1Index
-        {
-            get => (int)this._SelectedGraphKind1;
+        public int SelectedGraphKind1Index {
+            get => (int)this.SelectedGraphKind1;
             set => this.SelectedGraphKind1 = (GraphKind1)value;
         }
         #endregion
@@ -531,25 +497,22 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択されたグラフ種別2
         /// </summary>
         #region SelectedGraphKind2
-        public GraphKind2 SelectedGraphKind2
-        {
-            get => this._SelectedGraphKind2;
+        public GraphKind2 SelectedGraphKind2 {
+            get;
             set {
-                var oldValue = this._SelectedGraphKind2;
-                if (this.SetProperty(ref this._SelectedGraphKind2, value)) {
+                var oldValue = field;
+                if (this.SetProperty(ref field, value)) {
                     this.SelectedGraphKind2Changed?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
                 }
             }
         }
-        private GraphKind2 _SelectedGraphKind2 = default;
         #endregion
         /// <summary>
         /// 選択されたグラフ種別2インデックス
         /// </summary>
         #region SelectedGraphKind2Index
-        public int SelectedGraphKind2Index
-        {
-            get => (int)this._SelectedGraphKind2;
+        public int SelectedGraphKind2Index {
+            get => (int)this.SelectedGraphKind2;
             set => this.SelectedGraphKind2 = (GraphKind2)value;
         }
         #endregion
@@ -742,13 +705,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
             Properties.Settings settings = Properties.Settings.Default;
             (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Import_KichoFugetsu_FilePath, App.GetCurrentDir());
 
-            var e = new OpenFileDialogRequestEventArgs() {
+            OpenFileDialogRequestEventArgs e = new() {
                 InitialDirectory = directory,
                 FileName = fileName,
                 Title = Properties.Resources.Title_FileSelection,
                 Filter = Properties.Resources.FileSelectFilter_MdbFile + "|*.mdb"
             };
-            if (!this.OpenFileDialogRequest(e)) return;
+            if (!this.OpenFileDialogRequest(e)) { return; }
 
             if (MessageBox.Show(Properties.Resources.Message_DeleteOldDataNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
@@ -863,12 +826,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
 
-            if (isOpen) {
-                _ = MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
-            }
-            else {
-                _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
-            }
+            _ = isOpen
+                ? MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
+                : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -960,12 +920,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
 
-            if (result) {
-                _ = MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
-            }
-            else {
-                _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
-            }
+            _ = result
+                ? MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
+                : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -985,14 +942,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
             Properties.Settings settings = Properties.Settings.Default;
             (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Import_CustomFormat_FilePath, App.GetCurrentDir());
 
-            var e = new OpenFileDialogRequestEventArgs() {
+            OpenFileDialogRequestEventArgs e = new() {
                 InitialDirectory = directory,
                 FileName = fileName,
                 Title = Properties.Resources.Title_FileSelection,
                 Filter = Properties.Resources.FileSelectFilter_CustomFormatFile + "|*.*"
             };
 
-            if (!this.OpenFileDialogRequest(e)) return;
+            if (!this.OpenFileDialogRequest(e)) { return; }
 
             if (MessageBox.Show(Properties.Resources.Message_DeleteOldDataNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
@@ -1005,14 +962,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
             int exitCode = -1;
             using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
                 await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
-                    var mstBookDao = new MstBookDao(dbHandler);
-                    var mstCategoryDao = new MstCategoryDao(dbHandler);
-                    var mstItemDao = new MstItemDao(dbHandler);
-                    var hstActionDao = new HstActionDao(dbHandler);
-                    var hstGroupDao = new HstGroupDao(dbHandler);
-                    var hstShopDao = new HstShopDao(dbHandler);
-                    var hstRemarkDao = new HstRemarkDao(dbHandler);
-                    var relBookItemDao = new RelBookItemDao(dbHandler);
+                    MstBookDao mstBookDao = new(dbHandler);
+                    MstCategoryDao mstCategoryDao = new(dbHandler);
+                    MstItemDao mstItemDao = new(dbHandler);
+                    HstActionDao hstActionDao = new(dbHandler);
+                    HstGroupDao hstGroupDao = new(dbHandler);
+                    HstShopDao hstShopDao = new(dbHandler);
+                    HstRemarkDao hstRemarkDao = new(dbHandler);
+                    RelBookItemDao relBookItemDao = new(dbHandler);
 
                     // 既存のデータを削除する
                     _ = await mstBookDao.DeleteAllAsync();
@@ -1032,12 +989,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
 
-            if (exitCode == 0) {
-                _ = MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
-            }
-            else {
-                _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
-            }
+            _ = exitCode == 0
+                ? MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
+                : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -1060,7 +1014,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 Filter = Properties.Resources.FileSelectFilter_SQLiteFile + "|*.db;*.sqlite;*.sqlite3"
             };
 
-            if (!this.OpenFileDialogRequest(e)) return;
+            if (!this.OpenFileDialogRequest(e)) { return; }
 
             if (MessageBox.Show(Properties.Resources.Message_DeleteOldDataNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
@@ -1148,12 +1102,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
             }
 
-            if (result) {
-                _ = MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
-            }
-            else {
-                _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
-            }
+            _ = result
+                ? MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
+                : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -1179,7 +1130,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 Title = Properties.Resources.Title_FileSelection,
                 Filter = Properties.Resources.FileSelectFilter_CustomFormatFile + "|*.*"
             };
-            if (!this.SaveFileDialogRequest(e)) return;
+            if (!this.SaveFileDialogRequest(e)) { return; }
 
             settings.App_Export_CustomFormat_FilePath = e.FileName;
             settings.Save();
@@ -1189,12 +1140,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 exitCode = await ExecuteDumpPostgreSQL(this.dbHandlerFactory, e.FileName, PostgresFormat.Custom);
             }
 
-            if (exitCode == 0) {
-                _ = MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
-            }
-            else {
-                _ = MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
-            }
+            _ = exitCode == 0
+                ? MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
+                : MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -1221,7 +1169,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 Title = Properties.Resources.Title_FileSelection,
                 Filter = Properties.Resources.FileSelectFilter_SqlFile + "|*.sql"
             };
-            if (!this.SaveFileDialogRequest(e)) return;
+            if (!this.SaveFileDialogRequest(e)) { return; }
 
             settings.App_Export_SQLFilePath = e.FileName;
             settings.Save();
@@ -1231,12 +1179,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 exitCode = await ExecuteDumpPostgreSQL(this.dbHandlerFactory, e.FileName, PostgresFormat.Plain);
             }
 
-            if (exitCode == 0) {
-                _ = MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
-            }
-            else {
-                _ = MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
-            }
+            _ = exitCode == 0
+                ? MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
+                : MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -1249,10 +1194,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// Excelファイルエクスポートコマンド処理
         /// </summary>
-        public void ExportExcelFileCommand_Executed()
-        {
-            throw new NotImplementedException();
-        }
+        public void ExportExcelFileCommand_Executed() => throw new NotImplementedException();
 
         /// <summary>
         /// バックアップコマンド実行可能か
@@ -1269,12 +1211,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 result = await this.CreateBackUpFileAsync();
             }
 
-            if (result) {
-                _ = MessageBox.Show(Properties.Resources.Message_FinishToBackup, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
-            }
-            else {
-                _ = MessageBox.Show(Properties.Resources.Message_FoultToBackup, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
-            }
+            _ = result
+                ? MessageBox.Show(Properties.Resources.Message_FinishToBackup, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
+                : MessageBox.Show(Properties.Resources.Message_FoultToBackup, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -1723,8 +1662,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         #region ウィンドウ設定プロパティ
-        protected override (double, double) WindowSizeSettingRaw
-        {
+        protected override (double, double) WindowSizeSettingRaw {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
                 return (settings.MainWindow_Width, settings.MainWindow_Height);
@@ -1737,8 +1675,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
 
-        public override Point WindowPointSetting
-        {
+        public override Point WindowPointSetting {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
                 return new Point(settings.MainWindow_Left, settings.MainWindow_Top);
@@ -1751,8 +1688,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
 
-        public override int WindowStateSetting
-        {
+        public override int WindowStateSetting {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
                 return settings.MainWindow_WindowState;
@@ -1775,7 +1711,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { isUpdateBookList, isScroll, isUpdateActDateLastEdited });
 
-            if (isUpdateBookList) await this.UpdateBookListAsync();
+            if (isUpdateBookList) { await this.UpdateBookListAsync(); }
 
             switch (this.SelectedTab) {
                 case Tabs.BooksTab:
@@ -1832,9 +1768,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             int tmpBackUpNum = backUpNum ?? settings.App_BackUpNum;
             string tmpBackUpFolderPath = backUpFolderPath ?? settings.App_BackUpFolderPath;
 
-            if (tmpBackUpFolderPath == string.Empty) {
-                return false;
-            }
+            if (tmpBackUpFolderPath == string.Empty) { return false; }
 
             bool result;
             string backUpFileExt = PostgreSQLBackupFileExt;

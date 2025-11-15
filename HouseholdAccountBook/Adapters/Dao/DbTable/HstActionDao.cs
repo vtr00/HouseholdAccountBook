@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
     {
         public override async Task<IEnumerable<HstActionDto>> FindAllAsync()
         {
-            var dtoList = await this.dbHandler.QueryAsync<HstActionDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT * 
 FROM hst_action
 WHERE del_flg = 0;");
@@ -32,7 +32,7 @@ WHERE del_flg = 0;");
         /// <returns>取得したレコード</returns>
         public override async Task<HstActionDto> FindByIdAsync(int actionId)
         {
-            var dto = await this.dbHandler.QuerySingleOrDefaultAsync<HstActionDto>(@"
+            var dto = await this.mDbHandler.QuerySingleOrDefaultAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
 WHERE action_id = @ActionId AND del_flg = 0;",
@@ -48,7 +48,7 @@ new HstActionDto { ActionId = actionId });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByGroupIdAsync(int groupId)
         {
-            var dtoList = await this.dbHandler.QueryAsync<HstActionDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
 WHERE group_id = @GroupId AND del_flg = 0;",
@@ -65,7 +65,7 @@ new HstActionDto { GroupId = groupId });
         /// <remarks>同日を含む</remarks>
         public async Task<IEnumerable<HstActionDto>> FindInGroupAfterDateByIdAsync(int actionId)
         {
-            var dtoList = await this.dbHandler.QueryAsync<HstActionDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action 
 WHERE del_flg = 0 AND group_id = (SELECT group_id FROM hst_action WHERE action_id = @ActionId) AND (SELECT act_time FROM hst_action WHERE action_id = @ActionId) <= act_time
@@ -82,7 +82,7 @@ new HstActionDto { ActionId = actionId });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByBookIdAsync(int bookId)
         {
-            var dtoList = await this.dbHandler.QueryAsync<HstActionDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
 WHERE book_id = @BookId AND del_flg = 0;",
@@ -98,7 +98,7 @@ new HstActionDto { BookId = bookId });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByItemIdAsync(int itemId)
         {
-            var dtoList = await this.dbHandler.QueryAsync<HstActionDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
 WHERE del_flg = 0 AND item_id = @ItemId;",
@@ -115,7 +115,7 @@ new HstActionDto { ItemId = itemId });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByBookIdAndItemIdAsync(int bookId, int itemId)
         {
-            var dtoList = await this.dbHandler.QueryAsync<HstActionDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
 WHERE book_id = @BookId AND item_id = @ItemId AND del_flg = 0;",
@@ -126,16 +126,16 @@ new HstActionDto { BookId = bookId, ItemId = itemId });
 
         public override async Task SetIdSequenceAsync(int idSeq)
         {
-            if (this.dbHandler.DBKind == DBKind.SQLite) {
+            if (this.mDbHandler.DBKind == DBKind.SQLite) {
                 return;
             }
 
-            _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('hst_action_action_id_seq', @ActionIdSeq);", new { ActionIdSeq = idSeq });
+            _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('hst_action_action_id_seq', @ActionIdSeq);", new { ActionIdSeq = idSeq });
         }
 
         public override async Task<int> InsertAsync(HstActionDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO hst_action
 (action_id, book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@ActionId, @BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @Remark, @IsMatch, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
@@ -150,7 +150,7 @@ VALUES (@ActionId, @BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @
         /// <returns>帳簿項目ID</returns>
         public override async Task<int> InsertReturningIdAsync(HstActionDto dto)
         {
-            int actionId = await this.dbHandler.QuerySingleAsync<int>(@"
+            int actionId = await this.mDbHandler.QuerySingleAsync<int>(@"
 INSERT INTO hst_action
 (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @Remark, @IsMatch, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
@@ -167,7 +167,7 @@ RETURNING action_id;", dto);
         /// <returns>帳簿項目ID</returns>
         public async Task<int> InsertMoveActionReturningIdAsync(HstActionDto dto, int balanceKind)
         {
-            int actionId = await this.dbHandler.QuerySingleAsync<int>(@"
+            int actionId = await this.mDbHandler.QuerySingleAsync<int>(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@BookId, (
   SELECT item_id FROM mst_item I
@@ -182,7 +182,7 @@ new { dto.BookId, dto.ActTime, dto.ActValue, dto.GroupId, dto.IsMatch, dto.JsonC
 
         public override async Task<int> UpdateAsync(HstActionDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, is_match = @IsMatch, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
@@ -197,7 +197,7 @@ WHERE action_id = @ActionId;", dto);
         /// <returns>更新件数</returns>
         public async Task<int> UpdateMoveActionAsync(HstActionDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET book_id = @BookId, act_time = @ActTime, act_value = @ActValue, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
@@ -212,7 +212,7 @@ WHERE action_id = @ActionId;", dto);
         /// <returns>更新件数</returns>
         public async Task<int> UpdateWithoutIsMatchAsync(HstActionDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
@@ -228,7 +228,7 @@ WHERE action_id = @ActionId;", dto);
         /// <returns>削除件数</returns>
         public async Task<int> UpdateIsMatchByIdAsync(int actionId, int isMatch)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET is_match = @IsMatch, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId and is_match <> @IsMatch;",
@@ -246,7 +246,7 @@ new HstActionDto { IsMatch = isMatch, ActionId = actionId });
         /// <returns>更新件数</returns>
         public async Task<int> UpdateShopNameAndRemarkByIdAsync(int actionId, string shopName, string remark)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action SET shop_name = @ShopName, remark = @Remark, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId AND del_flg = 0;",
 new HstActionDto { ActionId = actionId, ShopName = shopName, Remark = remark });
@@ -261,7 +261,7 @@ new HstActionDto { ActionId = actionId, ShopName = shopName, Remark = remark });
         /// <returns>クリア件数</returns>
         public async Task<int> ClearGroupIdByIdAsync(int actionId)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET group_id = null, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId AND del_flg = 0;",
@@ -270,14 +270,11 @@ new HstActionDto { ActionId = actionId });
             return count;
         }
 
-        public override Task<int> UpsertAsync(HstActionDto dto)
-        {
-            throw new NotSupportedException($"Unsupported operation({MethodBase.GetCurrentMethod()?.Name}).");
-        }
+        public override Task<int> UpsertAsync(HstActionDto dto) => throw new NotSupportedException($"Unsupported operation({MethodBase.GetCurrentMethod()?.Name}).");
 
         public override async Task<int> DeleteAllAsync()
         {
-            int count = await this.dbHandler.ExecuteAsync(@"DELETE FROM hst_action;");
+            int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM hst_action;");
 
             return count;
         }
@@ -289,7 +286,7 @@ new HstActionDto { ActionId = actionId });
         /// <returns>削除件数</returns>
         public override async Task<int> DeleteByIdAsync(int actionId)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;",
@@ -305,7 +302,7 @@ new HstActionDto { ActionId = actionId });
         /// <returns>削除件数</returns>
         public async Task<int> DeleteByGroupIdAsync(int groupId)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE group_id = @GroupId;",
@@ -323,12 +320,12 @@ new HstActionDto { GroupId = groupId });
         public async Task<int> DeleteInGroupAfterDateByIdAsync(int actionId, bool withInTarget)
         {
             int count = withInTarget
-                ? await this.dbHandler.ExecuteAsync(@"
+                ? await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE group_id = (SELECT group_id FROM hst_action WHERE action_id = @ActionId) AND (SELECT act_time FROM hst_action WHERE action_id = @ActionId) <= act_time;",
 new HstActionDto { ActionId = actionId })
-                : await this.dbHandler.ExecuteAsync(@"
+                : await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE group_id = (SELECT group_id FROM hst_action WHERE action_id = @ActionId) AND (SELECT act_time FROM hst_action WHERE action_id = @ActionId) < act_time;",

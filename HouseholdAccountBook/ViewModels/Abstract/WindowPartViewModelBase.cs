@@ -70,11 +70,11 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// ファイル選択コマンド
         /// </summary>
-        public virtual ICommand SelectFilePathCommand { get; set; } = null;
+        public virtual ICommand SelectFilePathCommand { get; set; }
         /// <summary>
         /// フォルダ選択コマンド
         /// </summary>
-        public virtual ICommand SelectFolderPathCommand { get; set; } = null;
+        public virtual ICommand SelectFolderPathCommand { get; set; }
         #endregion
 
         #region コマンドイベントハンドラ
@@ -82,38 +82,26 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// OKコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        protected virtual bool OKCommand_CanExecute() { return true; }
+        protected virtual bool OKCommand_CanExecute() => true;
         /// <summary>
         /// OKコマンド処理
         /// </summary>
-        protected virtual void OKCommand_Executed()
-        {
-            this.CloseRequest(new CloseRequestEventArgs(true));
-        }
+        protected virtual void OKCommand_Executed() => this.CloseRequest(new CloseRequestEventArgs(true));
 
         /// <summary>
         /// キャンセルコマンド処理
         /// </summary>
-        protected virtual void CanncelCommand_Executed()
-        {
-            this.CloseRequest(new CloseRequestEventArgs(false));
-        }
+        protected virtual void CanncelCommand_Executed() => this.CloseRequest(new CloseRequestEventArgs(false));
 
         /// <summary>
         /// クローズコマンド処理
         /// </summary>
-        protected virtual void CloseCommand_Executed()
-        {
-            this.CloseRequest(new CloseRequestEventArgs(null));
-        }
+        protected virtual void CloseCommand_Executed() => this.CloseRequest(new CloseRequestEventArgs(null));
 
         /// <summary>
         /// 非表示コマンド処理
         /// </summary>
-        protected virtual void HideCommand_Executed()
-        {
-            this.HideRequest();
-        }
+        protected virtual void HideCommand_Executed() => this.HideRequest();
         #endregion
 
         /// <summary>
@@ -147,26 +135,17 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// 表示する情報を保存する
         /// </summary>
-        protected virtual Task SaveAsync()
-        {
-            throw new NotImplementedException();
-        }
+        protected virtual Task SaveAsync() => throw new NotImplementedException();
 
         /// <summary>
         /// ウィンドウクローズ要求を発行する
         /// </summary>
         /// <param name="e"></param>
-        protected void CloseRequest(CloseRequestEventArgs e)
-        {
-            this.CloseRequested?.Invoke(this, e);
-        }
+        protected void CloseRequest(CloseRequestEventArgs e) => this.CloseRequested?.Invoke(this, e);
         /// <summary>
         /// ウィンドウ非表示要求を発行する
         /// </summary>
-        protected void HideRequest()
-        {
-            this.HideRequested?.Invoke(this, EventArgs.Empty);
-        }
+        protected void HideRequest() => this.HideRequested?.Invoke(this, EventArgs.Empty);
 
         /// <summary>
         /// ファイル選択ダイアログ要求を発行する

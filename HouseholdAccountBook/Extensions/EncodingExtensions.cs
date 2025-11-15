@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.Extensions
             List<EncodingInfo> encodingInfos = [.. Encoding.GetEncodings()];
             encodingInfos.Sort(static (info1, info2) => string.Compare(info1.Name, info2.Name, StringComparison.Ordinal));
 
-            var encodingList = new ObservableCollection<KeyValuePair<int, string>>(encodingInfos.Select(static info =>
+            ObservableCollection<KeyValuePair<int, string>> encodingList = new(encodingInfos.Select(static info =>
                 new KeyValuePair<int, string>(info.CodePage, $"{info.Name.ToUpper(System.Globalization.CultureInfo.CurrentCulture)} ({info.DisplayName})")
             ));
             return encodingList;

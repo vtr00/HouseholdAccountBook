@@ -13,7 +13,7 @@ namespace HouseholdAccountBook.Others
     /// </summary>
     public class WaitCursorManagerFactory(FrameworkElement fe)
     {
-        private readonly FrameworkElement fe = fe;
+        private readonly FrameworkElement mFe = fe;
 
         /// <summary>
         /// <see cref="WaitCursorManager"/> を生成する
@@ -22,10 +22,7 @@ namespace HouseholdAccountBook.Others
         /// <param name="methodName">生成元関数名</param>
         /// <param name="lineNumber">生成元行数</param>
         /// <returns></returns>
-        public WaitCursorManager Create([CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
-        {
-            return new WaitCursorManager(this.fe, fileName, methodName, lineNumber);
-        }
+        public WaitCursorManager Create([CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0) => new(this.mFe, fileName, methodName, lineNumber);
     }
 
     /// <summary>
@@ -36,20 +33,20 @@ namespace HouseholdAccountBook.Others
         /// <summary>
         /// カウンタ排他用Mutex
         /// </summary>
-        private static readonly Mutex _mutex = new(false);
+        private static readonly Mutex mMutex = new(false);
         /// <summary>
         /// <see cref="FrameworkElement"/> 毎のカウンタ
         /// </summary>
-        private static readonly Dictionary<FrameworkElement, int> _counter = [];
+        private static readonly Dictionary<FrameworkElement, int> mCounter = [];
 
         /// <summary>
         /// 生成元インスタンス
         /// </summary>
-        private readonly FrameworkElement _fe;
+        private readonly FrameworkElement mFe;
         /// <summary>
         /// 呼び出し元情報
         /// </summary>
-        private readonly string _callerStr;
+        private readonly string mCallerStr;
 
         /// <summary>
         /// <see cref="WaitCursorManager"/> クラスの新しいインスタンスを初期化します
@@ -60,7 +57,7 @@ namespace HouseholdAccountBook.Others
         /// <param name="lineNumber">生成元行数</param>
         public WaitCursorManager(FrameworkElement fe, [CallerFilePath] string filePath = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
-            this._fe = fe;
+            this.mFe = fe;
 
             int index = filePath.LastIndexOf('\\');
             string fileName = filePath.Substring(index + 1, filePath.IndexOf('.', index + 1) - index - 1);
@@ -70,7 +67,7 @@ namespace HouseholdAccountBook.Others
             }
             callerStr += $":{lineNumber}";
 
-            this._callerStr = callerStr;
+            this.mCallerStr = callerStr;
 
             this.Increase();
         }
@@ -86,17 +83,17 @@ namespace HouseholdAccountBook.Others
         /// </summary>
         public void Increase()
         {
-            _ = _mutex.WaitOne();
-            if (!_counter.TryGetValue(this._fe, out int value)) {
+            _ = mMutex.WaitOne();
+            if (!mCounter.TryGetValue(this.mFe, out int value)) {
                 value = 0;
-                _counter.Add(this._fe, value);
-                this._fe.Cursor = Cursors.Wait;
+                mCounter.Add(this.mFe, value);
+                this.mFe.Cursor = Cursors.Wait;
             }
 
-            _counter[this._fe] = ++value;
+            mCounter[this.mFe] = ++value;
 
-            Log.Debug($"Increase count:{value} from:[{this._callerStr}]");
-            _mutex.ReleaseMutex();
+            Log.Debug($"Increase count:{value} from:[{this.mCallerStr}]");
+            mMutex.ReleaseMutex();
         }
 
         /// <summary>
@@ -105,20 +102,20 @@ namespace HouseholdAccountBook.Others
         /// <remarks>カウンタが0になったら<see cref="null"/>に戻す</remarks>
         public void Decrease()
         {
-            _ = _mutex.WaitOne();
-            if (_counter.TryGetValue(this._fe, out int value)) {
-                _counter[this._fe] = --value;
-                Log.Debug(string.Format($"Decrease count:{value} from:[{this._callerStr}]"));
+            _ = mMutex.WaitOne();
+            if (mCounter.TryGetValue(this.mFe, out int value)) {
+                mCounter[this.mFe] = --value;
+                Log.Debug(string.Format($"Decrease count:{value} from:[{this.mCallerStr}]"));
 
-                if (_counter[this._fe] <= 0) {
-                    this._fe.Cursor = null;
-                    _ = _counter.Remove(this._fe);
+                if (mCounter[this.mFe] <= 0) {
+                    this.mFe.Cursor = null;
+                    _ = mCounter.Remove(this.mFe);
                 }
             }
             else {
-                Log.Debug($"Can't decrease WaitCounter from:[{this._callerStr}]");
+                Log.Debug($"Can't decrease WaitCounter from:[{this.mCallerStr}]");
             }
-            _mutex.ReleaseMutex();
+            mMutex.ReleaseMutex();
         }
     }
 }

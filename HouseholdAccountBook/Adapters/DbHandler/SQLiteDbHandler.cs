@@ -14,7 +14,7 @@ namespace HouseholdAccountBook.DbHandler
         /// <summary>
         /// 接続文字列
         /// </summary>
-        private const string stringFormat = @"Data Source={0}";
+        private const string mStringFormat = @"Data Source={0}";
 
         /// <summary>
         /// <see cref="SQLiteDbHandler"/> クラスの新しいインスタンスを初期化します。
@@ -26,7 +26,7 @@ namespace HouseholdAccountBook.DbHandler
         /// <see cref="SQLiteDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
-        public SQLiteDbHandler(string filePath) : base(new SqliteConnection(string.Format(stringFormat, filePath)))
+        public SQLiteDbHandler(string filePath) : base(new SqliteConnection(string.Format(mStringFormat, filePath)))
         {
             this.DBLibKind = DBLibraryKind.SQLite;
             this.DBKind = DBKind.SQLite;
@@ -41,19 +41,13 @@ namespace HouseholdAccountBook.DbHandler
         /// スキーマバージョンを取得する
         /// </summary>
         /// <returns>スキーマバージョン</returns>
-        public async Task<int> GetUserVersion()
-        {
-            return await this.QuerySingleAsync<int>($"PRAGMA USER_VERSION;");
-        }
+        public async Task<int> GetUserVersion() => await this.QuerySingleAsync<int>($"PRAGMA USER_VERSION;");
 
         /// <summary>
         /// スキーマバージョンを設定する
         /// </summary>
         /// <param name="version">スキーマバージョン</param>
         /// <returns></returns>
-        public async Task<int> SetUserVersion(int version)
-        {
-            return await this.ExecuteAsync($"PRAGMA USER_VERSION = @UserVersion;", new { UserVersion = version });
-        }
+        public async Task<int> SetUserVersion(int version) => await this.ExecuteAsync($"PRAGMA USER_VERSION = @UserVersion;", new { UserVersion = version });
     }
 }

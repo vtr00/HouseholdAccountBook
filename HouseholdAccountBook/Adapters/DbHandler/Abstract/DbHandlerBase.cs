@@ -30,7 +30,7 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
         /// 接続状態を取得する
         /// </summary>
         /// <returns>接続状態</returns>
-        public bool IsOpen => this.connection != null && this.connection.State == System.Data.ConnectionState.Open;
+        public bool IsOpen => this.mConnection != null && this.mConnection.State == System.Data.ConnectionState.Open;
 
         /// <summary>
         /// 接続情報
@@ -40,12 +40,12 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
         /// <summary>
         /// DB接続
         /// </summary>
-        protected DbConnection connection = null;
+        protected DbConnection mConnection;
 
         /// <summary>
         /// DBトランザクション
         /// </summary>
-        protected DbTransaction dbTransaction = null;
+        protected DbTransaction mDbTransaction;
 
         /// <summary>
         /// <see cref="DbHandlerBase"/> クラスの新しいインスタンスを初期化します。
@@ -55,7 +55,7 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
         {
             DefaultTypeMap.MatchNamesWithUnderscores = true;
 
-            this.connection = connection;
+            this.mConnection = connection;
         }
 
         /// <summary>
@@ -70,16 +70,16 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
             }
 
             try {
-                await this.connection.OpenAsync();
+                await this.mConnection.OpenAsync();
                 Stopwatch sw = Stopwatch.StartNew();
-                while (this.connection.State == System.Data.ConnectionState.Connecting) {
+                while (this.mConnection.State == System.Data.ConnectionState.Connecting) {
                     Thread.Sleep(10);
                     if (0 < timeoutMs && timeoutMs < sw.ElapsedMilliseconds) {
                         throw new TimeoutException();
                     }
                 }
 
-                return this.connection.State == System.Data.ConnectionState.Open;
+                return this.mConnection.State == System.Data.ConnectionState.Open;
             }
             catch (Npgsql.PostgresException) {
                 return false;
@@ -96,11 +96,11 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
         {
             GC.SuppressFinalize(this);
 
-            if (this.connection != null) {
-                await this.connection.CloseAsync();
-                await this.connection.DisposeAsync();
+            if (this.mConnection != null) {
+                await this.mConnection.CloseAsync();
+                await this.mConnection.DisposeAsync();
             }
-            this.connection = null;
+            this.mConnection = null;
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
         public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object param = null)
         {
             try {
-                return await this.connection.QueryAsync<T>(sql, param, this.dbTransaction);
+                return await this.mConnection.QueryAsync<T>(sql, param, this.mDbTransaction);
             }
             catch (Exception) {
                 throw;
@@ -130,7 +130,7 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
         public async Task<T> QueryFirstOrDefaultAsync<T>(string sql, object param = null)
         {
             try {
-                return await this.connection.QueryFirstOrDefaultAsync<T>(sql, param, this.dbTransaction);
+                return await this.mConnection.QueryFirstOrDefaultAsync<T>(sql, param, this.mDbTransaction);
             }
             catch (Exception) {
                 throw;
@@ -148,7 +148,7 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
         public async Task<T> QuerySingleAsync<T>(string sql, object param = null)
         {
             try {
-                return await this.connection.QuerySingleAsync<T>(sql, param, this.dbTransaction);
+                return await this.mConnection.QuerySingleAsync<T>(sql, param, this.mDbTransaction);
             }
             catch (Exception) {
                 throw;
@@ -166,7 +166,7 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
         public async Task<T> QuerySingleOrDefaultAsync<T>(string sql, object param = null)
         {
             try {
-                return await this.connection.QuerySingleOrDefaultAsync<T>(sql, param, this.dbTransaction);
+                return await this.mConnection.QuerySingleOrDefaultAsync<T>(sql, param, this.mDbTransaction);
             }
             catch (Exception) {
                 throw;
@@ -182,7 +182,7 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
         public async Task<int> ExecuteAsync(string sql, object param = null)
         {
             try {
-                return await this.connection.ExecuteAsync(sql, param, this.dbTransaction);
+                return await this.mConnection.ExecuteAsync(sql, param, this.mDbTransaction);
             }
             catch (Exception) {
                 throw;
@@ -200,25 +200,25 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
         /// <param name="actionAsync">トランザクション内の処理</param>
         public async Task ExecTransactionAsync(AxActionAsync actionAsync)
         {
-            this.dbTransaction = await this.connection.BeginTransactionAsync();
+            this.mDbTransaction = await this.mConnection.BeginTransactionAsync();
             try {
                 await actionAsync?.Invoke();
 
-                await this.dbTransaction.CommitAsync();
+                await this.mDbTransaction.CommitAsync();
             }
             catch (DbException e) {
                 Console.WriteLine(e.Message);
-                await this.dbTransaction.RollbackAsync();
+                await this.mDbTransaction.RollbackAsync();
                 throw;
             }
             catch (Exception e) {
                 Console.WriteLine(e.Message);
-                await this.dbTransaction.RollbackAsync();
+                await this.mDbTransaction.RollbackAsync();
                 throw;
             }
             finally {
-                await this.dbTransaction.DisposeAsync();
-                this.dbTransaction = null;
+                await this.mDbTransaction.DisposeAsync();
+                this.mDbTransaction = null;
             }
         }
     }

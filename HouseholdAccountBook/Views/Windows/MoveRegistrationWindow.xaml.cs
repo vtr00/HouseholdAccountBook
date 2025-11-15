@@ -19,8 +19,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 登録時イベント
         /// </summary>
-        public event EventHandler<EventArgs<List<int>>> Registrated
-        {
+        public event EventHandler<EventArgs<List<int>>> Registrated {
             add => this.WVM.Registrated += value;
             remove => this.WVM.Registrated -= value;
         }

@@ -27,7 +27,7 @@ namespace HouseholdAccountBook.Others.RequestEventArgs
         /// <summary>
         /// 複数選択可能にするか
         /// </summary>
-        public bool Multiselect { get; set; } = false;
+        public bool Multiselect { get; set; }
         /// <summary>
         /// 結果ファイル(複数)
         /// </summary>
@@ -35,7 +35,7 @@ namespace HouseholdAccountBook.Others.RequestEventArgs
         /// <summary>
         /// ダイアログの結果
         /// </summary>
-        public bool Result { get; set; } = false;
+        public bool Result { get; set; }
         /// <summary>
         /// ファイルが存在するフォルダが存在するか
         /// </summary>

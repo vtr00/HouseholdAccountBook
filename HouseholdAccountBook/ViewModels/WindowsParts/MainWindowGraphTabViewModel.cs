@@ -30,7 +30,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 系列選択変更時イベント
         /// </summary>
-        public event EventHandler SelectedSeriesChanged = default;
+        public event EventHandler SelectedSeriesChanged;
         #endregion
 
         #region プロパティ
@@ -38,24 +38,21 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// グラフ系列VMリスト
         /// </summary>
         #region GraphSeriesVMList
-        public ObservableCollection<SeriesViewModel> GraphSeriesVMList
-        {
-            get => this._GraphSeriesVMList;
-            set => this.SetProperty(ref this._GraphSeriesVMList, value);
+        public ObservableCollection<SeriesViewModel> GraphSeriesVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<SeriesViewModel> _GraphSeriesVMList = default;
         #endregion
 
         /// <summary>
         /// 選択されたグラフ系列VM
         /// </summary>
         #region SelectedGraphSeriesVM
-        public SeriesViewModel SelectedGraphSeriesVM
-        {
-            get => this._SelectedGraphSeriesVM;
+        public SeriesViewModel SelectedGraphSeriesVM {
+            get;
             set {
-                SeriesViewModel oldVM = this._SelectedGraphSeriesVM;
-                if (this.SetProperty(ref this._SelectedGraphSeriesVM, value)) {
+                SeriesViewModel oldVM = field;
+                if (this.SetProperty(ref field, value)) {
                     this.Parent.SelectedBalanceKind = value?.BalanceKind;
                     this.Parent.SelectedCategoryId = value?.CategoryId;
                     this.Parent.SelectedItemId = value?.ItemId;
@@ -64,19 +61,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
             }
         }
-        private SeriesViewModel _SelectedGraphSeriesVM = default;
         #endregion
 
         /// <summary>
         /// グラフプロットモデル
         /// </summary>
         #region GraphPlotModel
-        public PlotModel GraphPlotModel
-        {
-            get => this._GraphPlotModel;
-            set => this.SetProperty(ref this._GraphPlotModel, value);
-        }
-        private PlotModel _GraphPlotModel = new() {
+        public PlotModel GraphPlotModel {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = new() {
             Title = string.Empty,
             IsLegendVisible = false
         };
@@ -86,12 +80,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 選択項目グラフプロットモデル
         /// </summary>
         #region SelectedGraphPlotModel
-        public PlotModel SelectedGraphPlotModel
-        {
-            get => this._SelectedGraphPlotModel;
-            set => this.SetProperty(ref this._SelectedGraphPlotModel, value);
-        }
-        private PlotModel _SelectedGraphPlotModel = new() {
+        public PlotModel SelectedGraphPlotModel {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = new() {
             Title = Properties.Resources.GraphTitle_SeparetelyGraph,
             IsLegendVisible = false
         };
@@ -101,12 +93,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// グラフコントローラ
         /// </summary>
         #region Controller
-        public PlotController Controller
-        {
-            get => this._Controller;
-            set => this.SetProperty(ref this._Controller, value);
-        }
-        private PlotController _Controller = new();
+        public PlotController Controller {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = new();
         #endregion
         #endregion
 
@@ -132,10 +122,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.Controller.BindMouseEnter(PlotCommands.HoverPointsOnlyTrack);
         }
 
-        public override async Task LoadAsync()
-        {
-            await this.LoadAsync(null, null);
-        }
+        public override async Task LoadAsync() => await this.LoadAsync(null, null);
 
         /// <summary>
         /// グラフタブに表示するデータを読み込む
@@ -145,7 +132,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <returns></returns>
         public async Task LoadAsync(int? categoryId = null, int? itemId = null)
         {
-            if (this.Parent.SelectedTab != this.Tab) return;
+            if (this.Parent.SelectedTab != this.Tab) { return; }
 
             using FuncLog funcLog = new(new { categoryId, itemId });
 
@@ -164,7 +151,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private void InitializeGraphTabData()
         {
-            if (this.Parent.SelectedTab != this.Tab) return;
+            if (this.Parent.SelectedTab != this.Tab) { return; }
 
             using FuncLog funcLog = new();
 
@@ -269,7 +256,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 };
             }
 
-            var loader = new ViewModelLoader(this.dbHandlerFactory);
+            ViewModelLoader loader = new(this.dbHandlerFactory);
             switch (this.Parent.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
                     // グラフ表示データを取得する
@@ -319,7 +306,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         };
                         // 全項目グラフの項目をマウスオーバーした時のイベントを登録する
                         wholeSeries.TrackerHitResultChanged += (sender, e) => {
-                            if (e.Value == null) return;
+                            if (e.Value == null) { return; }
 
                             GraphDatumViewModel datumVM = e.Value.Item as GraphDatumViewModel;
                             this.SelectedGraphSeriesVM = this.GraphSeriesVMList.FirstOrDefault(tmp => tmp.CategoryId == datumVM.CategoryId && tmp.ItemId == datumVM.ItemId);
@@ -399,8 +386,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public void UpdateSelectedGraph()
         {
-            if (this.Parent.SelectedTab != this.Tab) return;
-            if (this.Parent.SelectedGraphKind1 != GraphKind1.IncomeAndExpensesGraph) return;
+            if (this.Parent.SelectedTab != this.Tab) { return; }
+            if (this.Parent.SelectedGraphKind1 != GraphKind1.IncomeAndExpensesGraph) { return; }
 
             using FuncLog funcLog = new();
 

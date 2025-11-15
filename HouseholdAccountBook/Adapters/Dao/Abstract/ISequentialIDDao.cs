@@ -15,10 +15,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
         /// シーケンスを更新する
         /// </summary>
         /// <param name="dtoList">シーケンスをもつレコードのリスト</param>
-        public async Task SetIdSequenceAsync(IEnumerable<DTO> dtoList)
-        {
-            await this.SetIdSequenceAsync(dtoList.Max(d => d.GetId()));
-        }
+        public async Task SetIdSequenceAsync(IEnumerable<DTO> dtoList) => await this.SetIdSequenceAsync(dtoList.Max(d => d.GetId()));
 
         /// <summary>
         /// シーケンスを更新する

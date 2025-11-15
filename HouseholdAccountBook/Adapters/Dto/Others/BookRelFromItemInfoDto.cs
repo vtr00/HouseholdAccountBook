@@ -23,6 +23,6 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
         /// <summary>
         /// 関連有無
         /// </summary>
-        public bool IsRelated { get; set; } = false;
+        public bool IsRelated { get; set; }
     }
 }

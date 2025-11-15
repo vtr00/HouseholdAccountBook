@@ -14,26 +14,23 @@ namespace HouseholdAccountBook.Others
         /// <summary>
         /// 遅延初期化
         /// </summary>
-        private static Lazy<T>? _instance;
+        private static Lazy<T>? mInstance;
 
         /// <summary>
         /// インスタンス取得
         /// </summary>
-        public static T Instance => _instance?.Value ?? throw new InvalidOperationException("Uninitialized singleton called");
+        public static T Instance => mInstance?.Value ?? throw new InvalidOperationException("Uninitialized singleton called");
 
         /// <summary>
         /// スタティックコンストラクタ
         /// </summary>
-        static SingletonBase()
-        {
-            // 子クラスのstaticコンストラクタを強制呼び出し
-            RuntimeHelpers.RunClassConstructor(typeof(T).TypeHandle);
-        }
+        /// <remarks>子クラスのstaticコンストラクタを強制呼び出し</remarks>
+        static SingletonBase() => RuntimeHelpers.RunClassConstructor(typeof(T).TypeHandle);
 
         /// <summary>
         /// ファクトリを登録
         /// </summary>
         /// <param name="factory">生成ロジック</param>
-        protected static void Register(Func<T> factory) => _instance = new Lazy<T>(factory);
+        protected static void Register(Func<T> factory) => mInstance = new Lazy<T>(factory);
     }
 }

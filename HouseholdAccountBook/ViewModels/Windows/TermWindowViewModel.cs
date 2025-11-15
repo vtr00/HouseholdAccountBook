@@ -20,24 +20,20 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 開始日
         /// </summary>
         #region StartDate
-        public DateTime StartDate
-        {
-            get => this._StartDate;
-            set => this.SetProperty(ref this._StartDate, value);
-        }
-        private DateTime _StartDate = DateTime.Now;
+        public DateTime StartDate {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = DateTime.Now;
         #endregion
 
         /// <summary>
         /// 終了日
         /// </summary>
         #region EndDate
-        public DateTime EndDate
-        {
-            get => this._EndDate;
-            set => this.SetProperty(ref this._EndDate, value);
-        }
-        private DateTime _EndDate = DateTime.Now;
+        public DateTime EndDate {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = DateTime.Now;
         #endregion
 
         #region コマンド
@@ -74,8 +70,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         #region ウィンドウ設定プロパティ
-        public override Point WindowPointSetting
-        {
+        public override Point WindowPointSetting {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
                 return new Point(settings.TermWindow_Left, settings.TermWindow_Top);
@@ -89,10 +84,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        public override Task LoadAsync()
-        {
-            throw new NotImplementedException();
-        }
+        public override Task LoadAsync() => throw new NotImplementedException();
 
         public override void AddEventHandlers()
         {

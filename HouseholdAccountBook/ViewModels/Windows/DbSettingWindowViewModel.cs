@@ -32,12 +32,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 表示メッセージ
         /// </summary>
         #region Message
-        public string Message
-        {
-            get => this._Message;
-            set => this.SetProperty(ref this._Message, value);
+        public string Message {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _Message = default;
         #endregion
 
         /// <summary>
@@ -50,48 +48,40 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択されたDB種別
         /// </summary>
         #region SelectedDBKind
-        public DBKind SelectedDBKind
-        {
-            get => this._SelectedDBKind;
-            set => this.SetProperty(ref this._SelectedDBKind, value);
-        }
-        private DBKind _SelectedDBKind = DBKind.PostgreSQL;
+        public DBKind SelectedDBKind {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = DBKind.PostgreSQL;
         #endregion
 
         /// <summary>
         /// PostgreSQL設定
         /// </summary>
         #region PostgreSQLDBSettingVM
-        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM
-        {
-            get => this._PostgreSQLDBSettingVM;
-            set => this.SetProperty(ref this._PostgreSQLDBSettingVM, value);
-        }
-        private PostgreSQLDBSettingViewModel _PostgreSQLDBSettingVM = new();
+        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = new();
         #endregion
 
         /// <summary>
         /// Access設定
         /// </summary>
         #region AccessSettingVM
-        public OleDbSettingViewModel AccessSettingVM
-        {
-            get => this._AccessSettingVM;
-            set => this.SetProperty(ref this._AccessSettingVM, value);
-        }
-        private OleDbSettingViewModel _AccessSettingVM = new();
+        public OleDbSettingViewModel AccessSettingVM {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = new();
         #endregion
 
         /// <summary>
         /// SQLite設定
         /// </summary>
         #region SQLiteSettingVM
-        public FileDbSettingViewModel SQLiteSettingVM
-        {
-            get => this._SQLiteSettingVM;
-            set => this.SetProperty(ref this._SQLiteSettingVM, value);
-        }
-        private FileDbSettingViewModel _SQLiteSettingVM = new();
+        public FileDbSettingViewModel SQLiteSettingVM {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = new();
         #endregion
 
         #region コマンド
@@ -146,7 +136,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
 
-            var e = new OpenFileDialogRequestEventArgs() {
+            OpenFileDialogRequestEventArgs e = new() {
                 CheckFileExists = checkFileExists,
                 InitialDirectory = directory,
                 FileName = fileName,
@@ -231,8 +221,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         #region ウィンドウ設定プロパティ
-        protected override (double, double) WindowSizeSettingRaw
-        {
+        protected override (double, double) WindowSizeSettingRaw {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
                 return (settings.DbSettingWindow_Width, settings.DbSettingWindow_Height);
@@ -245,8 +234,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
 
-        public override Point WindowPointSetting
-        {
+        public override Point WindowPointSetting {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
                 return new Point(settings.DbSettingWindow_Left, settings.DbSettingWindow_Top);
@@ -260,10 +248,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        public override Task LoadAsync()
-        {
-            throw new NotImplementedException();
-        }
+        public override Task LoadAsync() => throw new NotImplementedException();
 
         public void Load()
         {

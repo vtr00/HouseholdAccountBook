@@ -41,8 +41,7 @@ namespace HouseholdAccountBook.Views.Behaviors
         /// 選択されたアイテム
         /// </summary>
         #region SelectedItem
-        public object SelectedItem
-        {
+        public object SelectedItem {
             get => this.GetValue(SelectedItemProperty);
             set => this.SetValue(SelectedItemProperty, value);
         }

@@ -15,6 +15,6 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
         /// <summary>
         /// 繰越残高
         /// </summary>
-        public int EndingBalance { get; set; } = 0;
+        public int EndingBalance { get; set; }
     }
 }

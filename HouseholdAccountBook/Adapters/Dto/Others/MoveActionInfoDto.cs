@@ -32,7 +32,7 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
         /// <summary>
         /// 項目値
         /// </summary>
-        public int ActValue { get; set; } = 0;
+        public int ActValue { get; set; }
         /// <summary>
         /// 備考
         /// </summary>
@@ -40,6 +40,6 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
         /// <summary>
         /// 移動フラグ
         /// </summary>
-        public int MoveFlg { get; set; } = 0;
+        public int MoveFlg { get; set; }
     }
 }

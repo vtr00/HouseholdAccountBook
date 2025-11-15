@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコード</returns>
         public async Task<GroupInfoDto> FindByActionId(int actionId)
         {
-            var dto = await this.dbHandler.QuerySingleAsync<GroupInfoDto>(@"
+            var dto = await this.mDbHandler.QuerySingleAsync<GroupInfoDto>(@"
 SELECT A.group_id, G.group_kind
 FROM hst_action A
 LEFT JOIN (SELECT * FROM hst_group WHERE del_flg = 0) G ON G.group_id = A.group_id

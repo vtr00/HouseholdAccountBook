@@ -18,7 +18,7 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
     {
         public override async Task<IEnumerable<MstBookDto>> FindAllAsync()
         {
-            var dtoList = await this.dbHandler.QueryAsync<MstBookDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<MstBookDto>(@"
 SELECT * 
 FROM mst_book
 WHERE del_flg = 0
@@ -34,7 +34,7 @@ ORDER BY sort_order;");
         /// <returns>取得したレコード</returns>
         public override async Task<MstBookDto> FindByIdAsync(int bookId)
         {
-            var dto = await this.dbHandler.QuerySingleOrDefaultAsync<MstBookDto>(@"
+            var dto = await this.mDbHandler.QuerySingleOrDefaultAsync<MstBookDto>(@"
 SELECT *
 FROM mst_book
 WHERE book_id = @BookId AND del_flg = 0;",
@@ -49,7 +49,7 @@ new MstBookDto { BookId = bookId });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<MstBookDto>> FindIfJsonCodeExistsAsync()
         {
-            var dtoList = await this.dbHandler.QueryAsync<MstBookDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<MstBookDto>(@"
 SELECT * 
 FROM mst_book 
 WHERE del_flg = 0 AND json_code IS NOT NULL
@@ -60,16 +60,16 @@ ORDER BY sort_order;");
 
         public override async Task SetIdSequenceAsync(int idSeq)
         {
-            if (this.dbHandler.DBKind == DBKind.SQLite) {
+            if (this.mDbHandler.DBKind == DBKind.SQLite) {
                 return;
             }
 
-            _ = await this.dbHandler.ExecuteAsync(@"SELECT setval('mst_book_book_id_seq', @BookIdSeq);", new { BookIdSeq = idSeq });
+            _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('mst_book_book_id_seq', @BookIdSeq);", new { BookIdSeq = idSeq });
         }
 
         public override async Task<int> InsertAsync(MstBookDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO mst_book 
 (book_id, book_name, book_kind, initial_value, pay_day, debit_book_id, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter) 
 VALUES (@BookId, @BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @JsonCode, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
@@ -79,7 +79,7 @@ VALUES (@BookId, @BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @Js
 
         public override async Task<int> InsertReturningIdAsync(MstBookDto dto)
         {
-            int bookId = await this.dbHandler.QuerySingleAsync<int>(@"
+            int bookId = await this.mDbHandler.QuerySingleAsync<int>(@"
 INSERT INTO mst_book (book_name, book_kind, initial_value, pay_day, debit_book_id, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @JsonCode, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING book_id;", dto);
@@ -94,7 +94,7 @@ RETURNING book_id;", dto);
         /// <returns>更新件数</returns>
         public async Task<int> UpdateSetableAsync(MstBookDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE mst_book
 SET book_name = @BookName, book_kind = @BookKind, initial_value = @InitialValue, debit_book_id = @DebitBookId, pay_day = @PayDay, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE book_id = @BookId;", dto);
@@ -102,10 +102,7 @@ WHERE book_id = @BookId;", dto);
             return count;
         }
 
-        public override Task<int> UpdateAsync(MstBookDto dto)
-        {
-            throw new NotSupportedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
-        }
+        public override Task<int> UpdateAsync(MstBookDto dto) => throw new NotSupportedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
 
         /// <summary>
         /// レコードのソート順を入れ替える
@@ -116,7 +113,7 @@ WHERE book_id = @BookId;", dto);
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public async Task<int> SwapSortOrderAsync(int bookId1, int bookId2)
         {
-            int count = await this.dbHandler.ExecuteAsync(@" 
+            int count = await this.mDbHandler.ExecuteAsync(@" 
 WITH original AS (
   SELECT
     (SELECT sort_order FROM mst_book WHERE book_id = @BookId1) AS sort_order1,
@@ -134,14 +131,11 @@ new { BookId1 = bookId1, BookId2 = bookId2, UpdateTime = DateTime.Now, Updater }
             return count;
         }
 
-        public override Task<int> UpsertAsync(MstBookDto dto)
-        {
-            throw new NotSupportedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
-        }
+        public override Task<int> UpsertAsync(MstBookDto dto) => throw new NotSupportedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
 
         public override async Task<int> DeleteAllAsync()
         {
-            int count = await this.dbHandler.ExecuteAsync(@"DELETE FROM mst_book;");
+            int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM mst_book;");
 
             return count;
         }
@@ -153,7 +147,7 @@ new { BookId1 = bookId1, BookId2 = bookId2, UpdateTime = DateTime.Now, Updater }
         /// <returns>削除件数</returns>
         public override async Task<int> DeleteByIdAsync(int bookId)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE mst_book
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE book_id = @BookId;",

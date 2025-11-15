@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<MoveActionInfoDto>> GetAllAsync(int groupId)
         {
-            var dtoList = await this.dbHandler.QueryAsync<MoveActionInfoDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<MoveActionInfoDto>(@"
 SELECT A.book_id, A.action_id, A.item_id, A.act_time, A.act_value, A.remark, I.move_flg
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id

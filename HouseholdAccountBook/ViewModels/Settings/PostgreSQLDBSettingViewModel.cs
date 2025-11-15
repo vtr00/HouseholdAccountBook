@@ -16,108 +16,90 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// ホスト
         /// </summary>
         #region Host
-        public string Host
-        {
-            get => this._Host;
-            set => this.SetProperty(ref this._Host, value);
+        public string Host {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _Host = default;
         #endregion
 
         /// <summary>
         /// ポート
         /// </summary>
         #region Port
-        public int? Port
-        {
-            get => this._Port;
-            set => this.SetProperty(ref this._Port, value);
+        public int? Port {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int? _Port = default;
         #endregion
 
         /// <summary>
         /// ユーザ名
         /// </summary>
         #region UserName
-        public string UserName
-        {
-            get => this._UserName;
-            set => this.SetProperty(ref this._UserName, value);
+        public string UserName {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _UserName = default;
         #endregion
 
         /// <summary>
         /// パスワード
         /// </summary>
         #region Password
-        public string Password
-        {
-            get => this._Password;
-            set => this.SetProperty(ref this._Password, value);
+        public string Password {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _Password = default;
         #endregion
 
         /// <summary>
         /// データベース名
         /// </summary>
         #region DatabaseName
-        public string DatabaseName
-        {
-            get => this._DatabaseName;
-            set => this.SetProperty(ref this._DatabaseName, value);
+        public string DatabaseName {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _DatabaseName = default;
         #endregion
 
         /// <summary>
         /// ロール名
         /// </summary>
         #region Role
-        public string Role
-        {
-            get => this._Role;
-            set => this.SetProperty(ref this._Role, value);
+        public string Role {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _Role = default;
         #endregion
 
         /// <summary>
         /// pg_dump.exeパス
         /// </summary>
         #region DumpExePath
-        public string DumpExePath
-        {
-            get => this._DumpExePath;
-            set => this.SetProperty(ref this._DumpExePath, value);
+        public string DumpExePath {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _DumpExePath = default;
         #endregion
 
         /// <summary>
         /// pg_restore.exeパス
         /// </summary>
         #region RestoreExePath
-        public string RestoreExePath
-        {
-            get => this._RestoreExePath;
-            set => this.SetProperty(ref this._RestoreExePath, value);
+        public string RestoreExePath {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _RestoreExePath = default;
         #endregion
 
         /// <summary>
         /// パスワード入力方法
         /// </summary>
         #region PasswordInput
-        public PostgresPasswordInput PasswordInput
-        {
-            get => this._PasswordInput;
-            set => this.SetProperty(ref this._PasswordInput, value);
-        }
-        private PostgresPasswordInput _PasswordInput = PostgresPasswordInput.InputWindow;
+        public PostgresPasswordInput PasswordInput {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = PostgresPasswordInput.InputWindow;
         #endregion
         #endregion
 
@@ -175,17 +157,12 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// </summary>
         /// <param name="getPassword">パスワードを取得するデリゲート</param>
         /// <returns>設定の保存可否</returns>
-        public bool CanSave(Func<string> getPassword)
-        {
-            if (string.IsNullOrWhiteSpace(this.Host)) return false;
-            if (!this.Port.HasValue || this.Port < 1 || this.Port > 65535) return false;
-            if (string.IsNullOrWhiteSpace(this.UserName)) return false;
-            if (string.IsNullOrWhiteSpace(getPassword?.Invoke())) return false;
-            if (string.IsNullOrWhiteSpace(this.DatabaseName)) return false;
-            if (string.IsNullOrWhiteSpace(this.DumpExePath) || !File.Exists(this.DumpExePath)) return false;
-            if (string.IsNullOrWhiteSpace(this.RestoreExePath) || !File.Exists(this.RestoreExePath)) return false;
-
-            return true;
-        }
+        public bool CanSave(Func<string> getPassword) => !(
+            string.IsNullOrWhiteSpace(this.Host) || !this.Port.HasValue || this.Port < 1 || this.Port > 65535
+            || string.IsNullOrWhiteSpace(this.UserName) || string.IsNullOrWhiteSpace(getPassword?.Invoke())
+            || string.IsNullOrWhiteSpace(this.DatabaseName)
+            || string.IsNullOrWhiteSpace(this.DumpExePath) || !File.Exists(this.DumpExePath)
+            || string.IsNullOrWhiteSpace(this.RestoreExePath) || !File.Exists(this.RestoreExePath)
+            );
     }
 }

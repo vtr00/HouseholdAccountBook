@@ -27,7 +27,7 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// <summary>
         /// 項目ID
         /// </summary>
-        public int ItemId { get; set; } = 0;
+        public int ItemId { get; set; }
         /// <summary>
         /// 備考
         /// </summary>
@@ -35,7 +35,7 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// <summary>
         /// 備考種別(未使用)
         /// </summary>
-        public int RemarkKind { get; set; } = 0;
+        public int RemarkKind { get; set; }
         /// <summary>
         /// 使用日時
         /// </summary>

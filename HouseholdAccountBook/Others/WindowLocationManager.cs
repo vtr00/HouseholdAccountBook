@@ -17,15 +17,15 @@ namespace HouseholdAccountBook.Others
         /// <summary>
         /// ウィンドウログ
         /// </summary>
-        private readonly Dictionary<Window, WindowLog> logDic = [];
+        private readonly Dictionary<Window, WindowLog> mLogDic = [];
         /// <summary>
         /// 初期値
         /// </summary>
-        private readonly Dictionary<Window, Rect> initialRectDic = [];
+        private readonly Dictionary<Window, Rect> mInitialRectDic = [];
         /// <summary>
         /// 最終補正値
         /// </summary>
-        private readonly Dictionary<Window, Rect> lastRectDic = [];
+        private readonly Dictionary<Window, Rect> mLastRectDic = [];
 
         /// <summary>
         /// スタティックコンストラクタ
@@ -46,10 +46,10 @@ namespace HouseholdAccountBook.Others
                 window.Name = window.Title;
             }
 
-            if (this.logDic.ContainsKey(window)) return;
+            if (this.mLogDic.ContainsKey(window)) { return; }
 
-            var log = new WindowLog(window);
-            this.logDic.Add(window, log);
+            WindowLog log = new(window);
+            this.mLogDic.Add(window, log);
 
             this.Log(window, "Managed", true);
 
@@ -84,13 +84,13 @@ namespace HouseholdAccountBook.Others
             window.Closed -= this.Window_Closed;
             window.Unloaded -= this.Window_Unloaded;
 
-            _ = this.lastRectDic.Remove(window);
-            _ = this.logDic.Remove(window);
+            _ = this.mLastRectDic.Remove(window);
+            _ = this.mLogDic.Remove(window);
         }
 
         private void Window_Initialized(object sender, EventArgs e)
         {
-            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+            if (sender is not Window window) { throw new ArgumentException("sender isn't Window"); }
 
             this.Log(window, "-Initialized", true);
             this.StoreInitialRect(window);
@@ -103,28 +103,28 @@ namespace HouseholdAccountBook.Others
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+            if (sender is not Window window) { throw new ArgumentException("sender isn't Window"); }
 
             this.Log(window, "-Loaded", true);
         }
 
         private void Window_StateChanged(object sender, EventArgs e)
         {
-            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+            if (sender is not Window window) { throw new ArgumentException("sender isn't Window"); }
 
             this.Log(window, "-StateChanged", true);
             _ = this.ModifyLocationOrSize(window);
         }
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+            if (sender is not Window window) { throw new ArgumentException("sender isn't Window"); }
 
             this.Log(window, "-SizeChanged", true);
             _ = this.ModifyLocationOrSize(window);
         }
         private void Window_LocationChanged(object sender, EventArgs e)
         {
-            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+            if (sender is not Window window) { throw new ArgumentException("sender isn't Window"); }
 
             this.Log(window, "-LocationChanged", true);
             _ = this.ModifyLocationOrSize(window);
@@ -132,7 +132,7 @@ namespace HouseholdAccountBook.Others
 
         private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+            if (sender is not Window window) { throw new ArgumentException("sender isn't Window"); }
 
             bool oldValue = (bool)e.OldValue;
             bool newValue = (bool)e.NewValue;
@@ -149,7 +149,7 @@ namespace HouseholdAccountBook.Others
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+            if (sender is not Window window) { throw new ArgumentException("sender isn't Window"); }
 
             this.Log(window, "-Closed", true);
             this.SaveSetting(window);
@@ -157,51 +157,36 @@ namespace HouseholdAccountBook.Others
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (sender is not Window window) throw new ArgumentException("sender isn't Window");
+            if (sender is not Window window) { throw new ArgumentException("sender isn't Window"); }
 
             this.Remove(window);
         }
 
-        private void Log(Window window, string comment, bool forceLog = false)
-        {
-            this.logDic[window].Log(comment, forceLog);
-        }
+        private void Log(Window window, string comment, bool forceLog = false) => this.mLogDic[window].Log(comment, forceLog);
 
         /// <summary>
         /// ウィンドウの初期領域を保存する
         /// </summary>
         /// <param name="window"></param>
-        private void StoreInitialRect(Window window)
-        {
-            this.initialRectDic[window] = window.RestoreBounds;
-        }
+        private void StoreInitialRect(Window window) => this.mInitialRectDic[window] = window.RestoreBounds;
         /// <summary>
         /// ウィンドウの初期領域を復元する
         /// </summary>
         /// <param name="window"></param>
         /// <returns>ウィンドウの初期領域</returns>
-        private Rect RestoreInitialRect(Window window)
-        {
-            return this.initialRectDic[window];
-        }
+        private Rect RestoreInitialRect(Window window) => this.mInitialRectDic[window];
 
         /// <summary>
         /// ウィンドウの領域を保存する
         /// </summary>
         /// <param name="window"></param>
-        private void StoreRect(Window window)
-        {
-            this.lastRectDic[window] = window.RestoreBounds;
-        }
+        private void StoreRect(Window window) => this.mLastRectDic[window] = window.RestoreBounds;
         /// <summary>
         /// ウィンドウの領域を復元する
         /// </summary>
         /// <param name="window"></param>
         /// <returns>ウィンドウの領域</returns>
-        private Rect RestoreRect(Window window)
-        {
-            return this.lastRectDic[window];
-        }
+        private Rect RestoreRect(Window window) => this.mLastRectDic[window];
 
         /// <summary>
         /// 設定を読み込む
@@ -209,7 +194,7 @@ namespace HouseholdAccountBook.Others
         /// <param name="window"></param>
         private void LoadSetting(Window window)
         {
-            if (window.DataContext is not WindowViewModelBase wvm) return;
+            if (window.DataContext is not WindowViewModelBase wvm) { return; }
 
             window.SizeChanged -= this.Window_SizeChanged;
             window.LocationChanged -= this.Window_LocationChanged;
@@ -236,7 +221,7 @@ namespace HouseholdAccountBook.Others
             }
 
             int state = wvm.WindowStateSetting;
-            if (0 < state && state <= (int)Enum.GetValues(typeof(WindowState)).Cast<WindowState>().Max()) {
+            if (0 < state && state <= (int)Enum.GetValues<WindowState>().Cast<WindowState>().Max()) {
                 window.WindowState = (WindowState)state;
             }
 
@@ -253,7 +238,7 @@ namespace HouseholdAccountBook.Others
         /// <param name="window"></param>
         private void SaveSetting(Window window)
         {
-            if (window.DataContext is not WindowViewModelBase wvm) return;
+            if (window.DataContext is not WindowViewModelBase wvm) { return; }
 
             this.Log(window, "SaveSetting", true);
 

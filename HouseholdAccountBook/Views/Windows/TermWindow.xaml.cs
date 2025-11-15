@@ -22,10 +22,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="dateWithinMonth">月内日付</param>
         public TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateTime dateWithinMonth)
-            : this(owner, dbHandlerFactory, dateWithinMonth, null, null)
-        {
-            this.selectedMonthRadioButton.IsChecked = true;
-        }
+            : this(owner, dbHandlerFactory, dateWithinMonth, null, null) => this.selectedMonthRadioButton.IsChecked = true;
 
         /// <summary>
         /// <see cref="TermWindow"/> クラスの新しいインスタンスを初期化します。
@@ -35,10 +32,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="startDate">開始日</param>
         /// <param name="endDate">終了日</param>
         public TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateTime startDate, DateTime endDate)
-            : this(owner, dbHandlerFactory, null, startDate, endDate)
-        {
-            this.selectedTermRadioButton.IsChecked = true;
-        }
+            : this(owner, dbHandlerFactory, null, startDate, endDate) => this.selectedTermRadioButton.IsChecked = true;
 
         /// <summary>
         /// <see cref="TermWindow"/> クラスの新しいインスタンスを初期化します。

@@ -49,11 +49,11 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 平均
         /// </summary>
-        public int? Average { get; set; } = null;
+        public int? Average { get; set; }
         /// <summary>
         /// 合計
         /// </summary>
-        public int? Total { get; set; } = null;
+        public int? Total { get; set; }
 
         /// <summary>
         /// その他名称
@@ -63,30 +63,28 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 表示名
         /// </summary>
-        public string DisplayedName
-        {
+        public string DisplayedName {
             get {
-                if (this.BalanceName != string.Empty && this.CategoryName != string.Empty && this.ItemName != string.Empty)
-                    return $"{this.BalanceName} > {this.CategoryName} > {this.ItemName}";
-                if (this.BalanceName != string.Empty && this.CategoryName != string.Empty)
-                    return $"{this.BalanceName} > {this.CategoryName}";
-                return this.OtherName;
+                return this.BalanceName != string.Empty && this.CategoryName != string.Empty
+                    ? this.ItemName != string.Empty
+                        ? $"{this.BalanceName} > {this.CategoryName} > {this.ItemName}"
+                        : $"{this.BalanceName} > {this.CategoryName}"
+                    : this.OtherName;
             }
             private set { }
         }
         /// <summary>
         /// 一覧表示名(サマリーや一覧に表示する名称)
         /// </summary>
-        public string ListName
-        {
+        public string ListName {
             get {
-                if (this.ItemName != string.Empty)
-                    return $"  {this.ItemName}";
-                if (this.CategoryName != string.Empty)
-                    return this.CategoryName;
-                if (this.BalanceName != string.Empty)
-                    return this.BalanceName;
-                return this.OtherName;
+                return this.ItemName != string.Empty
+                    ? $"  {this.ItemName}"
+                    : this.CategoryName != string.Empty
+                        ? this.CategoryName
+                        : this.BalanceName != string.Empty
+                            ? this.BalanceName
+                            : this.OtherName;
             }
             private set { }
         }

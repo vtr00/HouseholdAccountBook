@@ -31,12 +31,9 @@ namespace HouseholdAccountBook.Extensions
             string fullTargetPath = Path.GetFullPath(targetPath, fullBasePath);
 
             // targetPath が fullRootPath の下にあるか確認
-            if (fullTargetPath.StartsWith(fullRootPath, StringComparison.OrdinalIgnoreCase)) {
-                return Path.GetRelativePath(fullRootPath, fullTargetPath);
-            }
-            else {
-                return fullTargetPath;
-            }
+            return fullTargetPath.StartsWith(fullRootPath, StringComparison.OrdinalIgnoreCase)
+                ? Path.GetRelativePath(fullRootPath, fullTargetPath)
+                : fullTargetPath;
         }
 
         /// <summary>

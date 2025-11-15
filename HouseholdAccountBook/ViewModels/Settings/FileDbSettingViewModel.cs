@@ -11,12 +11,10 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// DBファイルパス
         /// </summary>
         #region DBFilePath
-        public string DBFilePath
-        {
-            get => this._DBFilePath;
-            set => this.SetProperty(ref this._DBFilePath, value);
+        public string DBFilePath {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _DBFilePath = default;
         #endregion
 
         /// <summary>
@@ -61,11 +59,6 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 設定を保存可能か
         /// </summary>
         /// <returns>設定の保存可否</returns>
-        public bool CanSave()
-        {
-            if (string.IsNullOrWhiteSpace(this.DBFilePath)) return false;
-
-            return true;
-        }
+        public bool CanSave() => !string.IsNullOrWhiteSpace(this.DBFilePath);
     }
 }

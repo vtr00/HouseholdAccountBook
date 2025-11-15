@@ -43,93 +43,77 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// ソート順
         /// </summary>
         #region SortOrder
-        public int SortOrder
-        {
-            get => this._SortOrder;
-            set => this.SetProperty(ref this._SortOrder, value);
+        public int SortOrder {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _SortOrder = default;
         #endregion
 
         /// <summary>
         /// 名称
         /// </summary>
         #region Name
-        public string Name
-        {
-            get => this._Name;
-            set => this.SetProperty(ref this._Name, value);
+        public string Name {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _Name = default;
         #endregion
 
         /// <summary>
         /// 関係性VMリスト
         /// </summary>
         #region RelationVMList
-        public ObservableCollection<RelationViewModel> RelationVMList
-        {
-            get => this._RelationVMList;
-            set => this.SetProperty(ref this._RelationVMList, value);
+        public ObservableCollection<RelationViewModel> RelationVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<RelationViewModel> _RelationVMList = default;
         #endregion
         /// <summary>
         /// 選択された関係性VM
         /// </summary>
         #region SelectedRelationVM
-        public RelationViewModel SelectedRelationVM
-        {
-            get => this._SelectedRelationVM;
-            set => this.SetProperty(ref this._SelectedRelationVM, value);
+        public RelationViewModel SelectedRelationVM {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private RelationViewModel _SelectedRelationVM = default;
         #endregion
 
         /// <summary>
         /// 店舗VMリスト
         /// </summary>
         #region ShopVMList
-        public ObservableCollection<ShopViewModel> ShopVMList
-        {
-            get => this._ShopVMList;
-            set => this.SetProperty(ref this._ShopVMList, value);
+        public ObservableCollection<ShopViewModel> ShopVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<ShopViewModel> _ShopVMList = default;
         #endregion
         /// <summary>
         /// 選択された店舗VM
         /// </summary>
         #region SelectedShopVM
-        public ShopViewModel SelectedShopVM
-        {
-            get => this._SelectedShopVM;
-            set => this.SetProperty(ref this._SelectedShopVM, value);
+        public ShopViewModel SelectedShopVM {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ShopViewModel _SelectedShopVM = default;
         #endregion
 
         /// <summary>
         /// 備考VMリスト
         /// </summary>
         #region RemarkVMList
-        public ObservableCollection<RemarkViewModel> RemarkVMList
-        {
-            get => this._RemarkVMList;
-            set => this.SetProperty(ref this._RemarkVMList, value);
+        public ObservableCollection<RemarkViewModel> RemarkVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<RemarkViewModel> _RemarkVMList = default;
         #endregion
         /// <summary>
         /// 選択された備考VM
         /// </summary>
         #region SelectedRemarkVM
-        public RemarkViewModel SelectedRemarkVM
-        {
-            get => this._SelectedRemarkVM;
-            set => this.SetProperty(ref this._SelectedRemarkVM, value);
+        public RemarkViewModel SelectedRemarkVM {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private RemarkViewModel _SelectedRemarkVM = default;
         #endregion
 
         /// <summary>
@@ -152,9 +136,6 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// </summary>
         /// <param name="vm">階層構造VM</param>
         /// <returns>階層種別</returns>
-        static public HierarchicalKind? GetHierarchicalKind(HierarchicalViewModel vm)
-        {
-            return (HierarchicalKind?)vm?.Depth;
-        }
+        public static HierarchicalKind? GetHierarchicalKind(HierarchicalViewModel vm) => (HierarchicalKind?)vm?.Depth;
     }
 }

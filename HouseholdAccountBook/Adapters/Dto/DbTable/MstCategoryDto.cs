@@ -24,15 +24,12 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
             this.SortOrder = dto.SORT_KEY;
         }
 
-        public override int GetId()
-        {
-            return this.CategoryId;
-        }
+        public override int GetId() => this.CategoryId;
 
         /// <summary>
         /// 種別ID
         /// </summary>
-        public int CategoryId { get; set; } = 0;
+        public int CategoryId { get; set; }
         /// <summary>
         /// 種別名
         /// </summary>

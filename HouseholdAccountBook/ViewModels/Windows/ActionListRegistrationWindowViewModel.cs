@@ -27,7 +27,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 変更時処理重複防止用フラグ
         /// </summary>
-        private bool isUpdateOnChanged = false;
+        private bool mIsUpdateOnChanged;
         #endregion
 
         #region イベント
@@ -59,56 +59,48 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 登録種別
         /// </summary>
         #region RegKind
-        public RegistrationKind RegKind
-        {
-            get => this._RegKind;
-            set => this.SetProperty(ref this._RegKind, value);
+        public RegistrationKind RegKind {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private RegistrationKind _RegKind = default;
         #endregion
 
         /// <summary>
         /// グループID
         /// </summary>
         #region GroupId
-        public int? GroupId
-        {
-            get => this._GroupId;
-            set => this.SetProperty(ref this._GroupId, value);
+        public int? GroupId {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int? _GroupId = default;
         #endregion
 
         /// <summary>
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
-        public ObservableCollection<BookViewModel> BookVMList
-        {
-            get => this._BookVMList;
-            set => this.SetProperty(ref this._BookVMList, value);
+        public ObservableCollection<BookViewModel> BookVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<BookViewModel> _BookVMList = default;
         #endregion
         /// <summary>
         /// 選択された帳簿VM
         /// </summary>
         #region SelectedBookVM
-        public BookViewModel SelectedBookVM
-        {
-            get => this._SelectedBookVM;
+        public BookViewModel SelectedBookVM {
+            get;
             set {
-                var oldVM = this._SelectedBookVM;
-                if (this.SetProperty(ref this._SelectedBookVM, value)) {
-                    if (!this.isUpdateOnChanged) {
-                        this.isUpdateOnChanged = true;
+                var oldVM = field;
+                if (this.SetProperty(ref field, value)) {
+                    if (!this.mIsUpdateOnChanged) {
+                        this.mIsUpdateOnChanged = true;
                         this.BookChanged?.Invoke(this, new() { OldValue = oldVM?.Id, NewValue = value?.Id });
-                        this.isUpdateOnChanged = false;
+                        this.mIsUpdateOnChanged = false;
                     }
                 }
             }
         }
-        private BookViewModel _SelectedBookVM = default;
         #endregion
 
         /// <summary>
@@ -121,167 +113,143 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された収支種別
         /// </summary>
         #region SelectedBalanceKind
-        public BalanceKind SelectedBalanceKind
-        {
-            get => this._SelectedBalanceKind;
+        public BalanceKind SelectedBalanceKind {
+            get;
             set {
-                var oldValue = this._SelectedBalanceKind;
-                if (this.SetProperty(ref this._SelectedBalanceKind, value)) {
-                    if (!this.isUpdateOnChanged) {
-                        this.isUpdateOnChanged = true;
+                var oldValue = field;
+                if (this.SetProperty(ref field, value)) {
+                    if (!this.mIsUpdateOnChanged) {
+                        this.mIsUpdateOnChanged = true;
                         this.BalanceKindChanged?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
-                        this.isUpdateOnChanged = false;
+                        this.mIsUpdateOnChanged = false;
                     }
                 }
             }
         }
-        private BalanceKind _SelectedBalanceKind = default;
         #endregion
 
         /// <summary>
         /// 分類VMリスト
         /// </summary>
         #region CategoryVMList
-        public ObservableCollection<CategoryViewModel> CategoryVMList
-        {
-            get => this._CategoryVMList;
-            set => this.SetProperty(ref this._CategoryVMList, value);
+        public ObservableCollection<CategoryViewModel> CategoryVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<CategoryViewModel> _CategoryVMList = default;
         #endregion
         /// <summary>
         /// 選択された分類VM
         /// </summary>
         #region SelectedCategoryVM
-        public CategoryViewModel SelectedCategoryVM
-        {
-            get => this._SelectedCategoryVM;
+        public CategoryViewModel SelectedCategoryVM {
+            get;
             set {
-                var oldValue = this._SelectedCategoryVM;
-                if (this.SetProperty(ref this._SelectedCategoryVM, value)) {
-                    if (!this.isUpdateOnChanged) {
-                        this.isUpdateOnChanged = true;
+                var oldValue = field;
+                if (this.SetProperty(ref field, value)) {
+                    if (!this.mIsUpdateOnChanged) {
+                        this.mIsUpdateOnChanged = true;
                         this.CategoryChanged?.Invoke(this, new() { OldValue = oldValue?.Id, NewValue = value?.Id });
-                        this.isUpdateOnChanged = false;
+                        this.mIsUpdateOnChanged = false;
                     }
                 }
             }
         }
-        private CategoryViewModel _SelectedCategoryVM = default;
         #endregion
 
         /// <summary>
         /// 項目VMリスト
         /// </summary>
         #region ItemVMList
-        public ObservableCollection<ItemViewModel> ItemVMList
-        {
-            get => this._ItemVMList;
-            set => this.SetProperty(ref this._ItemVMList, value);
+        public ObservableCollection<ItemViewModel> ItemVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<ItemViewModel> _ItemVMList = default;
         #endregion
         /// <summary>
         /// 選択された項目VM
         /// </summary>
         #region SelectedItemVM
-        public ItemViewModel SelectedItemVM
-        {
-            get => this._SelectedItemVM;
+        public ItemViewModel SelectedItemVM {
+            get;
             set {
-                var oldValue = this._SelectedItemVM;
-                if (this.SetProperty(ref this._SelectedItemVM, value)) {
-                    if (!this.isUpdateOnChanged) {
-                        this.isUpdateOnChanged = true;
+                var oldValue = field;
+                if (this.SetProperty(ref field, value)) {
+                    if (!this.mIsUpdateOnChanged) {
+                        this.mIsUpdateOnChanged = true;
                         this.ItemChanged?.Invoke(this, new() { OldValue = oldValue?.Id, NewValue = value?.Id });
-                        this.isUpdateOnChanged = false;
+                        this.mIsUpdateOnChanged = false;
                     }
                 }
             }
         }
-        private ItemViewModel _SelectedItemVM = default;
         #endregion
 
         /// <summary>
         /// 日付金額VMリスト
         /// </summary>
         #region DateValueVMList
-        public ObservableCollection<DateValueViewModel> DateValueVMList
-        {
-            get => this._DateValueVMList;
-            set => this.SetProperty(ref this._DateValueVMList, value);
-        }
-        private ObservableCollection<DateValueViewModel> _DateValueVMList = [];
+        public ObservableCollection<DateValueViewModel> DateValueVMList {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = [];
         #endregion
 
         /// <summary>
         /// 編集中か
         /// </summary>
         #region IsEditing
-        public bool IsEditing
-        {
-            get => this._IsEditing;
-            set => this.SetProperty(ref this._IsEditing, value);
+        public bool IsEditing {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _IsEditing = default;
         #endregion
 
         /// <summary>
         /// 日付自動インクリメント
         /// </summary>
         #region IsDateAutoIncrement
-        public bool IsDateAutoIncrement
-        {
-            get => this._IsDateAutoIncrement;
-            set => this.SetProperty(ref this._IsDateAutoIncrement, value);
+        public bool IsDateAutoIncrement {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _IsDateAutoIncrement = default;
         #endregion
 
         /// <summary>
         /// 店舗VMリスト
         /// </summary>
         #region ShopNameList
-        public ObservableCollection<ShopViewModel> ShopVMList
-        {
-            get => this._ShopVMList;
-            set => this.SetProperty(ref this._ShopVMList, value);
+        public ObservableCollection<ShopViewModel> ShopVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<ShopViewModel> _ShopVMList = default;
         #endregion
         /// <summary>
         /// 選択された店名
         /// </summary>
         #region SelectedShopName
-        public string SelectedShopName
-        {
-            get => this._SelectedShopName;
-            set => this.SetProperty(ref this._SelectedShopName, value);
+        public string SelectedShopName {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _SelectedShopName = default;
         #endregion
 
         /// <summary>
         /// 備考VMリスト
         /// </summary>
         #region RemarkVMList
-        public ObservableCollection<RemarkViewModel> RemarkVMList
-        {
-            get => this._RemarkVMList;
-            set => this.SetProperty(ref this._RemarkVMList, value);
+        public ObservableCollection<RemarkViewModel> RemarkVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<RemarkViewModel> _RemarkVMList = default;
         #endregion
         /// <summary>
         /// 選択された備考
         /// </summary>
         #region SelectedRemark
-        public string SelectedRemark
-        {
-            get => this._SelectedRemark;
-            set => this.SetProperty(ref this._SelectedRemark, value);
+        public string SelectedRemark {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _SelectedRemark = default;
         #endregion
 
         /// <summary>
@@ -295,10 +263,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         #region コマンドイベントハンドラ
-        protected override bool OKCommand_CanExecute()
-        {
-            return this.SelectedItemVM != null && this.DateValueVMList.Any(vm => vm.ActValue.HasValue);
-        }
+        protected override bool OKCommand_CanExecute() => this.SelectedItemVM != null && this.DateValueVMList.Any(static vm => vm.ActValue.HasValue);
         protected override async void OKCommand_Executed()
         {
             // DB登録
@@ -315,8 +280,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         #region ウィンドウ設定プロパティ
-        protected override (double, double) WindowSizeSettingRaw
-        {
+        protected override (double, double) WindowSizeSettingRaw {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
                 return (settings.ActionListRegistrationWindow_Width, settings.ActionListRegistrationWindow_Height);
@@ -329,8 +293,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
 
-        public override Point WindowPointSetting
-        {
+        public override Point WindowPointSetting {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
                 return new Point(settings.ActionListRegistrationWindow_Left, settings.ActionListRegistrationWindow_Top);
@@ -344,10 +307,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        public override async Task LoadAsync()
-        {
-            await this.LoadAsync(null, null, null, null, null);
-        }
+        public override async Task LoadAsync() => await this.LoadAsync(null, null, null, null, null);
 
         /// <summary>
         /// DBから読み込む
@@ -446,7 +406,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateCategoryListAsync(int? categoryId = null)
         {
-            if (this.SelectedBookVM == null) return;
+            if (this.SelectedBookVM == null) { return; }
 
             using FuncLog funcLog = new(new { categoryId });
 
@@ -463,7 +423,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateItemListAsync(int? itemId = null)
         {
-            if (this.SelectedBookVM == null || this.SelectedCategoryVM == null) return;
+            if (this.SelectedBookVM == null || this.SelectedCategoryVM == null) { return; }
 
             using FuncLog funcLog = new(new { itemId });
 
@@ -480,7 +440,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateShopListAsync(string shopName = null)
         {
-            if (this.SelectedItemVM == null) return;
+            if (this.SelectedItemVM == null) { return; }
 
             using FuncLog funcLog = new(new { shopName });
 
@@ -497,7 +457,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private async Task UpdateRemarkListAsync(string remark = null)
         {
-            if (this.SelectedItemVM == null) return;
+            if (this.SelectedItemVM == null) { return; }
 
             using FuncLog funcLog = new(new { remark });
 

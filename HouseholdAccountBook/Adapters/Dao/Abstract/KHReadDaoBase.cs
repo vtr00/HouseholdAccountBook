@@ -15,7 +15,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
         /// <summary>
         /// Ole DBハンドラ
         /// </summary>
-        protected readonly OleDbHandler dbHandler = dbHandler;
+        protected readonly OleDbHandler mDbHandler = dbHandler;
 
         public abstract Task<IEnumerable<DTO>> FindAllAsync();
     }

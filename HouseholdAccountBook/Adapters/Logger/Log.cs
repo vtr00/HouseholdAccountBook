@@ -33,25 +33,22 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// </summary>
         public static LogLevel OutputLogLevel { get; set; } = LogLevel.Debug;
 
-        private static readonly string listenerName = "logFileOutput";
-        private TextWriterTraceListener listener;
+        private static readonly string mListenerName = "logFileOutput";
+        private TextWriterTraceListener mListener;
 
         static Log() => Register(static () => new Log());
 
         /// <summary>
         /// <see cref="Log"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        private Log()
-        {
-            Trace.AutoFlush = true;
-        }
+        private Log() => Trace.AutoFlush = true;
 
         ~Log()
         {
-            if (this.listener != null) {
-                this.listener.Close();
-                this.listener.Dispose();
-                this.listener = null;
+            if (this.mListener != null) {
+                this.mListener.Close();
+                this.mListener.Dispose();
+                this.mListener = null;
             }
         }
 
@@ -60,17 +57,17 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// </summary>
         private void CreateListener()
         {
-            if (this.listener == null) {
-                if (!Directory.Exists(LogFolderPath)) _ = Directory.CreateDirectory(LogFolderPath);
+            if (this.mListener == null) {
+                if (!Directory.Exists(LogFolderPath)) { _ = Directory.CreateDirectory(LogFolderPath); }
                 TextWriter sw = new StreamWriter(LogFilePath, true, Encoding.UTF8);
 
-                this.listener = new TextWriterTraceListener {
-                    Name = listenerName,
+                this.mListener = new TextWriterTraceListener {
+                    Name = mListenerName,
                     Writer = sw,
                     TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId | TraceOptions.ThreadId
                 };
 
-                _ = Trace.Listeners.Add(this.listener);
+                _ = Trace.Listeners.Add(this.mListener);
             }
         }
 
@@ -82,9 +79,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
         public static void FuncStart(object args = null, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
-        {
-            Vars("func start", args, fileName, methodName, lineNumber);
-        }
+            => Vars("func start", args, fileName, methodName, lineNumber);
         /// <summary>
         /// ログファイルに関数終了ログを1行出力する
         /// </summary>
@@ -92,9 +87,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="methodName">出力元関数名</param>
         /// <param name="digit">「-」の出力回数</param>
         public static void FuncEnd([CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, ushort digit = 0)
-        {
-            Info("func end", fileName, methodName, -digit);
-        }
+            => Info("func end", fileName, methodName, -digit);
         /// <summary>
         /// ログファイルに変数ログを1行出力する
         /// </summary>
@@ -108,7 +101,7 @@ namespace HouseholdAccountBook.Adapters.Logger
             string details = string.Empty;
             if (vars != null) {
                 // オブジェクトを文字列化する
-                static string toString(object tmp, int depth = 0)
+                static string ToString(object tmp, int depth = 0)
                 {
                     // 再帰呼び出しの深さ制限
                     depth++;
@@ -116,29 +109,24 @@ namespace HouseholdAccountBook.Adapters.Logger
                         return "[overflow]";
                     }
 
-                    if (tmp is null) return "null";
+                    if (tmp is null) { return "null"; }
 
-                    if (tmp.GetType().IsPrimitive) return $"{tmp}";
-                    if (tmp.GetType().IsEnum) return $"{tmp}";
+                    if (tmp.GetType().IsPrimitive) { return $"{tmp}"; }
+                    if (tmp.GetType().IsEnum) { return $"{tmp}"; }
 
                     switch (tmp) {
                         case string s:
                             return $"\"{s}\"";
                         case DateTime dt:
-                            if (dt.TimeOfDay == TimeSpan.Zero) {
-                                return $"{dt:yyyy-MM-dd}";
-                            }
-                            else {
-                                return $"{dt:yyyy-MM-dd HH:mm:ss}";
-                            }
+                            return dt.TimeOfDay == TimeSpan.Zero ? $"{dt:yyyy-MM-dd}" : $"{dt:yyyy-MM-dd HH:mm:ss}";
                         case IEnumerable enumerable:
-                            return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => toString(item, depth)))}]";
+                            return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => ToString(item, depth)))}]";
                         default:
                             PropertyInfo[] propInfos = tmp.GetType().GetProperties();
-                            return string.Join(", ", propInfos.Select(propInfo => $"{propInfo.Name}:{toString(propInfo.GetValue(tmp), depth)}"));
+                            return string.Join(", ", propInfos.Select(propInfo => $"{propInfo.Name}:{ToString(propInfo.GetValue(tmp), depth)}"));
                     }
                 }
-                details += toString(vars);
+                details += ToString(vars);
             }
 
             string tmpMessage = string.Join((message != string.Empty && details != string.Empty) ? " - " : "", message, details);
@@ -153,9 +141,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
         public static void Error(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
-        {
-            Instance.WriteLine(LogLevel.Error, message, fileName, methodName, lineNumber);
-        }
+            => Instance.WriteLine(LogLevel.Error, message, fileName, methodName, lineNumber);
         /// <summary>
         /// ログファイルに警告ログを1行出力する
         /// </summary>
@@ -164,9 +150,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
         public static void Warning(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
-        {
-            Instance.WriteLine(LogLevel.Warning, message, fileName, methodName, lineNumber);
-        }
+            => Instance.WriteLine(LogLevel.Warning, message, fileName, methodName, lineNumber);
         /// <summary>
         /// ログファイルに情報ログを1行出力する
         /// </summary>
@@ -175,9 +159,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
         public static void Info(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
-        {
-            Instance.WriteLine(LogLevel.Info, message, fileName, methodName, lineNumber);
-        }
+            => Instance.WriteLine(LogLevel.Info, message, fileName, methodName, lineNumber);
         /// <summary>
         /// ログファイルにデバッグログを1行出力する
         /// </summary>
@@ -186,9 +168,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
         public static void Debug(string message = "", [CallerFilePath] string filePath = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
-        {
-            Instance.WriteLine(LogLevel.Debug, message, filePath, methodName, lineNumber);
-        }
+            => Instance.WriteLine(LogLevel.Debug, message, filePath, methodName, lineNumber);
 
         /// <summary>
         /// ログファイルにログを1行出力する
@@ -201,8 +181,8 @@ namespace HouseholdAccountBook.Adapters.Logger
         private void WriteLine(LogLevel level, string message, string filePath, string methodName, int lineNumber)
         {
             Settings settings = Settings.Default;
-            if (!settings.App_OutputFlag_OperationLog) return;
-            if (level < OutputLogLevel) return;
+            if (!settings.App_OutputFlag_OperationLog) { return; }
+            if (level < OutputLogLevel) { return; }
 
             this.CreateListener();
 

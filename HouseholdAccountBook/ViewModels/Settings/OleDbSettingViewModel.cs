@@ -27,24 +27,20 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 選択されたプロバイダ名
         /// </summary>
         #region SelectedProviderName
-        public string SelectedProviderName
-        {
-            get => this._SelectedProviderName;
-            set => this.SetProperty(ref this._SelectedProviderName, value);
+        public string SelectedProviderName {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _SelectedProviderName = default;
         #endregion
 
         /// <summary>
         /// DBファイルパス
         /// </summary>
         #region DBFilePath
-        public string DBFilePath
-        {
-            get => this._DBFilePath;
-            set => this.SetProperty(ref this._DBFilePath, value);
+        public string DBFilePath {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _DBFilePath = default;
         #endregion
 
         /// <summary>
@@ -103,12 +99,6 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 設定を保存可能か
         /// </summary>
         /// <returns>設定の保存可否</returns>
-        public bool CanSave()
-        {
-            if (string.IsNullOrWhiteSpace(this.SelectedProviderName)) return false;
-            if (string.IsNullOrWhiteSpace(this.DBFilePath)) return false;
-
-            return true;
-        }
+        public bool CanSave() => !(string.IsNullOrWhiteSpace(this.SelectedProviderName) || string.IsNullOrWhiteSpace(this.DBFilePath));
     }
 }

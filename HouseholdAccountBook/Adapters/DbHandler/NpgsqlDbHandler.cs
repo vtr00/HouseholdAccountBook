@@ -16,11 +16,11 @@ namespace HouseholdAccountBook.DbHandler
         /// <summary>
         /// 接続文字列
         /// </summary>
-        private const string stringFormat = @"Server={0};Port={1};User Id={2};Password={3};Database={4}";
+        private const string mStringFormat = @"Server={0};Port={1};User Id={2};Password={3};Database={4}";
         /// <summary>
         /// 接続情報
         /// </summary>
-        private readonly ConnectInfo connectInfo;
+        private readonly ConnectInfo mConnectInfo;
 
         /// <summary>
         /// 結果通知デリゲート
@@ -31,10 +31,7 @@ namespace HouseholdAccountBook.DbHandler
         /// <see cref="NpgsqlDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public NpgsqlDbHandler(ConnectInfo info) : this(info.Host, info.Port, info.UserName, info.Password, info.DatabaseName)
-        {
-            this.connectInfo = info;
-        }
+        public NpgsqlDbHandler(ConnectInfo info) : this(info.Host, info.Port, info.UserName, info.Password, info.DatabaseName) => this.mConnectInfo = info;
 
         /// <summary>
         /// <see cref="NpgsqlDbHandler"/> クラスの新しいインスタンスを初期化します。
@@ -45,7 +42,7 @@ namespace HouseholdAccountBook.DbHandler
         /// <param name="password">パスワード</param>
         /// <param name="databaseName">データベース名</param>
         private NpgsqlDbHandler(string uri, int port, string userName, string password, string databaseName)
-            : base(new NpgsqlConnection(string.Format(stringFormat, uri, port, userName, password, databaseName)))
+            : base(new NpgsqlConnection(string.Format(mStringFormat, uri, port, userName, password, databaseName)))
         {
             this.DBLibKind = DBLibraryKind.PostgreSQL;
             this.DBKind = DBKind.PostgreSQL;
@@ -71,14 +68,14 @@ namespace HouseholdAccountBook.DbHandler
                 FileName = dumpExePath,
                 Arguments = string.Format(
                     "--host {0} --port {1} --username \"{2}\" --role \"{3}\" {4} --format {5} --data-only --verbose --column-inserts --file \"{6}\" \"{7}\"",
-                    this.connectInfo.Host,
-                    this.connectInfo.Port,
-                    this.connectInfo.UserName,
-                    this.connectInfo.Role,
+                    this.mConnectInfo.Host,
+                    this.mConnectInfo.Port,
+                    this.mConnectInfo.UserName,
+                    this.mConnectInfo.Role,
                     pgPassConf ? "--no-password" : "--password",
                     format.ToString().ToLower(),
                     backupFilePath,
-                    this.connectInfo.DatabaseName
+                    this.mConnectInfo.DatabaseName
                 ),
                 WindowStyle = pgPassConf ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal,
                 RedirectStandardOutput = true,
@@ -138,12 +135,12 @@ namespace HouseholdAccountBook.DbHandler
                 FileName = restoreExePath,
                 Arguments = string.Format(
                     "--host {0} --port {1} --username \"{2}\" --role \"{3}\" {4} --data-only --verbose --dbname \"{5}\" \"{6}\"",
-                    this.connectInfo.Host,
-                    this.connectInfo.Port,
-                    this.connectInfo.UserName,
-                    this.connectInfo.Role,
+                    this.mConnectInfo.Host,
+                    this.mConnectInfo.Port,
+                    this.mConnectInfo.UserName,
+                    this.mConnectInfo.Role,
                     pgPassConf ? "--no-password" : "--password",
-                    this.connectInfo.DatabaseName,
+                    this.mConnectInfo.DatabaseName,
                     backupFilePath
                 ),
                 WindowStyle = pgPassConf ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal,

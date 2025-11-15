@@ -28,10 +28,7 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
             this.Remark = dto.NOTE_NAME;
         }
 
-        public int GetId()
-        {
-            return this.ActionId;
-        }
+        public int GetId() => this.ActionId;
 
         /// <summary>
         /// 帳簿項目ID
@@ -52,22 +49,22 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// <summary>
         /// 項目値
         /// </summary>
-        public int ActValue { get; set; } = 0;
+        public int ActValue { get; set; }
         /// <summary>
         /// 店舗名
         /// </summary>
-        public string ShopName { get; set; } = null;
+        public string ShopName { get; set; }
         /// <summary>
         /// 一致フラグ
         /// </summary>
-        public int IsMatch { get; set; } = 0;
+        public int IsMatch { get; set; }
         /// <summary>
         /// グループID
         /// </summary>
-        public int? GroupId { get; set; } = null;
+        public int? GroupId { get; set; }
         /// <summary>
         /// 備考
         /// </summary>
-        public string Remark { get; set; } = null;
+        public string Remark { get; set; }
     }
 }

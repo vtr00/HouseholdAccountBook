@@ -15,10 +15,10 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
         /// <summary>
         /// グループID
         /// </summary>
-        public int? GroupId { get; set; } = null;
+        public int? GroupId { get; set; }
         /// <summary>
         /// グループ種別
         /// </summary>
-        public int? GroupKind { get; set; } = null;
+        public int? GroupKind { get; set; }
     }
 }

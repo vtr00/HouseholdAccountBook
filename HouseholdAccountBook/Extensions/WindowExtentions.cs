@@ -48,9 +48,9 @@ namespace HouseholdAccountBook.Extensions
             Log.Debug($"window - top:{window.Top} right:{right} bottom:{bottom} left:{window.Left} width:{window.Width} height:{window.Height}");
 
             if (window.Owner != null) {
-                double OwnerRight = window.Owner.Left + window.Owner.Width;
-                double OwnerBottom = window.Owner.Left + window.Owner.Height;
-                Log.Debug($"owner  - top:{window.Owner.Top} right:{OwnerRight} bottom:{OwnerBottom} left:{window.Owner.Left} width:{window.Owner.Width} height:{window.Owner.Height}");
+                double ownerRight = window.Owner.Left + window.Owner.Width;
+                double ownerBottom = window.Owner.Left + window.Owner.Height;
+                Log.Debug($"owner  - top:{window.Owner.Top} right:{ownerRight} bottom:{ownerBottom} left:{window.Owner.Left} width:{window.Owner.Width} height:{window.Owner.Height}");
             }
         }
 
@@ -75,9 +75,7 @@ namespace HouseholdAccountBook.Extensions
                 }
                 window.Close();
             };
-            wvm.HideRequested += (sender, e) => {
-                window.Hide();
-            };
+            wvm.HideRequested += (sender, e) => window.Hide();
 
             wvm.OpenFileDialogRequested += (sender, e) => {
                 OpenFileDialog ofd = new() {

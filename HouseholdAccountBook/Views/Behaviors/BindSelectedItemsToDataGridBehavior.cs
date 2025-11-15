@@ -48,8 +48,7 @@ namespace HouseholdAccountBook.Views.Behaviors
         /// 選択されたアイテムのコレクション
         /// </summary>
         #region SelectedItems
-        public IList SelectedItems
-        {
+        public IList SelectedItems {
             get => (IList)this.GetValue(SelectedItemsProperty);
             set => this.SetValue(SelectedItemsProperty, value);
         }

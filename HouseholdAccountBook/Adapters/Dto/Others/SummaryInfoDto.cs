@@ -35,6 +35,6 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
         /// <summary>
         /// 合計
         /// </summary>
-        public int Total { get; set; } = 0;
+        public int Total { get; set; }
     }
 }

@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
     {
         public override async Task<IEnumerable<HstGroupDto>> FindAllAsync()
         {
-            var dtoList = await this.dbHandler.QueryAsync<HstGroupDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<HstGroupDto>(@"
 SELECT * 
 FROM hst_group
 WHERE del_flg = 0;");
@@ -32,7 +32,7 @@ WHERE del_flg = 0;");
         /// <returns>取得したレコード</returns>
         public override async Task<HstGroupDto> FindByIdAsync(int groupId)
         {
-            var dto = await this.dbHandler.QuerySingleOrDefaultAsync<HstGroupDto>(@"
+            var dto = await this.mDbHandler.QuerySingleOrDefaultAsync<HstGroupDto>(@"
 SELECT * FROM hst_group
 WHERE group_id = @GroupId AND del_flg = 0;",
 new HstGroupDto { GroupId = groupId });
@@ -42,16 +42,16 @@ new HstGroupDto { GroupId = groupId });
 
         public override async Task SetIdSequenceAsync(int idSeq)
         {
-            if (this.dbHandler.DBKind == DBKind.SQLite) {
+            if (this.mDbHandler.DBKind == DBKind.SQLite) {
                 return;
             }
 
-            _ = await this.dbHandler.ExecuteAsync("SELECT setval('hst_group_group_id_seq', @GroupIdSeq);", new { GroupIdSeq = idSeq });
+            _ = await this.mDbHandler.ExecuteAsync("SELECT setval('hst_group_group_id_seq', @GroupIdSeq);", new { GroupIdSeq = idSeq });
         }
 
         public override async Task<int> InsertAsync(HstGroupDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO hst_group
 (group_id, group_kind, remark, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@GroupId, @GroupKind, @Remark, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
@@ -61,7 +61,7 @@ VALUES (@GroupId, @GroupKind, @Remark, @JsonCode, @DelFlg, @UpdateTime, @Updater
 
         public override async Task<int> InsertReturningIdAsync(HstGroupDto dto)
         {
-            int groupId = await this.dbHandler.QuerySingleAsync<int>(@"
+            int groupId = await this.mDbHandler.QuerySingleAsync<int>(@"
 INSERT INTO hst_group
 (group_kind, remark, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@GroupKind, @Remark, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
@@ -70,19 +70,13 @@ RETURNING group_id;", dto);
             return groupId;
         }
 
-        public override Task<int> UpdateAsync(HstGroupDto dto)
-        {
-            throw new NotSupportedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
-        }
+        public override Task<int> UpdateAsync(HstGroupDto dto) => throw new NotSupportedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
 
-        public override Task<int> UpsertAsync(HstGroupDto dto)
-        {
-            throw new NotSupportedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
-        }
+        public override Task<int> UpsertAsync(HstGroupDto dto) => throw new NotSupportedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
 
         public override async Task<int> DeleteAllAsync()
         {
-            int count = await this.dbHandler.ExecuteAsync(@"DELETE FROM hst_group;");
+            int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM hst_group;");
 
             return count;
         }
@@ -94,7 +88,7 @@ RETURNING group_id;", dto);
         /// <returns>削除件数</returns>
         public override async Task<int> DeleteByIdAsync(int groupId)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_group SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE group_id = @GroupId AND del_flg = 0;",
 new HstGroupDto { GroupId = groupId });

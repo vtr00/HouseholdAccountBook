@@ -20,10 +20,10 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
         /// <summary>
         /// 使用回数
         /// </summary>
-        public int Count { get; set; } = 0;
+        public int Count { get; set; }
         /// <summary>
         /// 使用時刻
         /// </summary>
-        public DateTime? UsedTime { get; set; } = null;
+        public DateTime? UsedTime { get; set; }
     }
 }

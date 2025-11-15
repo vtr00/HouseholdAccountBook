@@ -15,7 +15,7 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
     {
         public override async Task<IEnumerable<HstRemarkDto>> FindAllAsync()
         {
-            var dtoList = await this.dbHandler.QueryAsync<HstRemarkDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<HstRemarkDto>(@"
 SELECT * 
 FROM hst_remark
 WHERE del_flg = 0;");
@@ -33,11 +33,11 @@ WHERE del_flg = 0;");
         public async Task<HstRemarkDto> FindByRemarkAndItemIdAsync(string remark, int itemId, bool includeDeleted = false)
         {
             var dto = includeDeleted
-                ? await this.dbHandler.QuerySingleOrDefaultAsync<HstRemarkDto>(@"
+                ? await this.mDbHandler.QuerySingleOrDefaultAsync<HstRemarkDto>(@"
 SELECT * FROM hst_remark
 WHERE item_id = @ItemId AND remark = @Remark;",
 new HstRemarkDto { Remark = remark, ItemId = itemId })
-                : await this.dbHandler.QuerySingleOrDefaultAsync<HstRemarkDto>(@"
+                : await this.mDbHandler.QuerySingleOrDefaultAsync<HstRemarkDto>(@"
 SELECT * FROM hst_remark
 WHERE item_id = @ItemId AND remark = @Remark AND del_flg = 0;",
 new HstRemarkDto { Remark = remark, ItemId = itemId });
@@ -47,7 +47,7 @@ new HstRemarkDto { Remark = remark, ItemId = itemId });
 
         public override async Task<int> InsertAsync(HstRemarkDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
@@ -61,7 +61,7 @@ VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @JsonCode, @DelFlg, @UpdateTim
         /// <returns>更新件数</returns>
         public override async Task<int> UpdateAsync(HstRemarkDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_remark
 SET used_time = @UsedTime, json_code = @JsonCode, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId AND remark = @Remark AND used_time < @UsedTime;", dto);
@@ -77,7 +77,7 @@ WHERE item_id = @ItemId AND remark = @Remark AND used_time < @UsedTime;", dto);
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public override async Task<int> UpsertAsync(HstRemarkDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO hst_remark (item_id, remark, remark_kind, used_time, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@ItemId, @Remark, @RemarkKind, @UsedTime, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 ON CONFLICT (item_id, remark) DO UPDATE
@@ -89,7 +89,7 @@ WHERE hst_remark.item_id = @ItemId AND hst_remark.remark = @Remark AND hst_remar
 
         public override async Task<int> DeleteAllAsync()
         {
-            int count = await this.dbHandler.ExecuteAsync(@"DELETE FROM hst_remark;");
+            int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM hst_remark;");
 
             return count;
         }
@@ -101,7 +101,7 @@ WHERE hst_remark.item_id = @ItemId AND hst_remark.remark = @Remark AND hst_remar
         /// <returns>削除件数</returns>
         public async Task<int> DeleteAsync(HstRemarkDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_remark SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE remark = @Remark AND item_id = @ItemId;", dto);
 

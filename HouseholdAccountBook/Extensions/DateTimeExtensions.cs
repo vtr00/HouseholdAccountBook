@@ -21,7 +21,7 @@ namespace HouseholdAccountBook.Extensions
         /// <summary>
         /// 国民の祝日リスト
         /// </summary>
-        private static readonly List<DateTime> holidayList = [];
+        private static readonly List<DateTime> mHolidayList = [];
 
         /// <summary>
         /// 国民の祝日リストを取得する
@@ -42,13 +42,13 @@ namespace HouseholdAccountBook.Extensions
                     using (HttpClient client = new(handler)) {
                         Stream stream = await client.GetStreamAsync(uri);
                         if (stream.CanRead) {
-                            holidayList.Clear();
+                            mHolidayList.Clear();
                             // CSVファイルを読み込む
                             using (CsvReader reader = new(new StreamReader(stream, Encoding.GetEncoding(settings.App_NationalHolidayCsv_TextEncoding)), csvConfig)) {
                                 while (reader.Read()) {
                                     if (reader.TryGetField(settings.App_NationalHolidayCsv_DateIndex, out string dateString)) {
                                         if (DateTime.TryParse(dateString, out DateTime dateTime)) {
-                                            holidayList.Add(dateTime);
+                                            mHolidayList.Add(dateTime);
                                         }
                                     }
                                 }
@@ -63,7 +63,7 @@ namespace HouseholdAccountBook.Extensions
                     Log.Error(e.Message);
                 }
 
-                if (holidayList.Count == 0) {
+                if (mHolidayList.Count == 0) {
                     // ハンドルされない例外の発生を通知する
                     NotificationManager nm = new();
                     NotificationContent nc = new() {
@@ -170,7 +170,7 @@ namespace HouseholdAccountBook.Extensions
         /// <returns>国民の祝日かどうか</returns>
         public static bool IsNationalHoliday(this DateTime dateTime)
         {
-            bool ans = holidayList.Contains(dateTime);
+            bool ans = mHolidayList.Contains(dateTime);
             return ans;
         }
 
@@ -187,13 +187,8 @@ namespace HouseholdAccountBook.Extensions
             Debug.Assert(startDateTime1 == null || endDateTime1 == null || startDateTime1 < endDateTime1);
             Debug.Assert(startDateTime2 == null || endDateTime2 == null || startDateTime2 < endDateTime2);
 
-            if (startDateTime1 != null && endDateTime2 != null && endDateTime2 < startDateTime1) {
-                return false;
-            }
-            if (startDateTime2 != null && endDateTime1 != null && endDateTime1 < startDateTime2) {
-                return false;
-            }
-            return true;
+            return !(startDateTime1 != null && endDateTime2 != null && (endDateTime2 < startDateTime1))
+                && !(startDateTime2 != null && endDateTime1 != null && (endDateTime1 < startDateTime2));
         }
 
         /// <summary>
@@ -201,27 +196,18 @@ namespace HouseholdAccountBook.Extensions
         /// </summary>
         /// <param name="startMonth">会計年度開始月</param>
         /// <returns>年の単位</returns>
-        public static string GetYearUnit(int startMonth)
-        {
-            return startMonth == 1 ? Properties.Resources.Unit_Year : Properties.Resources.Unit_FiscalYear;
-        }
+        public static string GetYearUnit(int startMonth) => startMonth == 1 ? Properties.Resources.Unit_Year : Properties.Resources.Unit_FiscalYear;
         /// <summary>
         /// 設定に応じた年の単位(前置)を取得する
         /// </summary>
         /// <param name="startMonth">会計年度開始月</param>
         /// <returns></returns>
-        public static string GetYearPreUnit(int startMonth)
-        {
-            return startMonth == 1 ? string.Empty : Properties.Resources.Unit_FiscalYear_Pre;
-        }
+        public static string GetYearPreUnit(int startMonth) => startMonth == 1 ? string.Empty : Properties.Resources.Unit_FiscalYear_Pre;
         /// <summary>
         /// 設定に応じた年の単位(後置)を取得する
         /// </summary>
         /// <param name="startMonth">会計年度開始月</param>
         /// <returns></returns>
-        public static string GetYearPostUnit(int startMonth)
-        {
-            return startMonth == 1 ? string.Empty : Properties.Resources.Unit_FiscalYear_Post;
-        }
+        public static string GetYearPostUnit(int startMonth) => startMonth == 1 ? string.Empty : Properties.Resources.Unit_FiscalYear_Post;
     }
 }

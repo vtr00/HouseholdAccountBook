@@ -28,48 +28,40 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// ソート順
         /// </summary>
         #region SortOrder
-        public int SortOrder
-        {
-            get => this._SortOrder;
-            set => this.SetProperty(ref this._SortOrder, value);
+        public int SortOrder {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _SortOrder = default;
         #endregion
 
         /// <summary>
         /// 名称
         /// </summary>
         #region Name
-        public string Name
-        {
-            get => this._Name;
-            set => this.SetProperty(ref this._Name, value);
+        public string Name {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _Name = default;
         #endregion
 
         /// <summary>
         /// 選択されているか
         /// </summary>
         #region SelectFlag
-        public bool SelectFlag
-        {
-            get => this._SelectFlag;
-            set => this.SetProperty(ref this._SelectFlag, value);
+        public bool SelectFlag {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _SelectFlag = default;
         #endregion
 
         /// <summary>
         /// 子要素VMリスト
         /// </summary>
         #region ChildrenVMList
-        public ObservableCollection<HierarchicalViewModel> ChildrenVMList
-        {
-            get => this._ChildrenVMList;
-            set => this.SetProperty(ref this._ChildrenVMList, value);
+        public ObservableCollection<HierarchicalViewModel> ChildrenVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<HierarchicalViewModel> _ChildrenVMList = default;
         #endregion
         #endregion
     }

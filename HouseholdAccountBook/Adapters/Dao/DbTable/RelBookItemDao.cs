@@ -14,7 +14,7 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
     {
         public override async Task<IEnumerable<RelBookItemDto>> FindAllAsync()
         {
-            var dtoList = await this.dbHandler.QueryAsync<RelBookItemDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<RelBookItemDto>(@"
 SELECT * 
 FROM rel_book_item
 WHERE del_flg = 0;");
@@ -31,10 +31,10 @@ WHERE del_flg = 0;");
         public async Task<RelBookItemDto> FindByBookIdAndItemIdAsync(int bookId, int itemId, bool includeDeleted = false)
         {
             var dto = includeDeleted
-                ? await this.dbHandler.QuerySingleOrDefaultAsync<RelBookItemDto>(@"
+                ? await this.mDbHandler.QuerySingleOrDefaultAsync<RelBookItemDto>(@"
 SELECT * FROM rel_book_item
 WHERE item_id = @ItemId AND book_id = @BookId;", new RelBookItemDto { BookId = bookId, ItemId = itemId })
-                : await this.dbHandler.QuerySingleOrDefaultAsync<RelBookItemDto>(@"
+                : await this.mDbHandler.QuerySingleOrDefaultAsync<RelBookItemDto>(@"
 SELECT * FROM rel_book_item
 WHERE item_id = @ItemId AND book_id = @BookId AND del_flg = 0;",
 new RelBookItemDto { BookId = bookId, ItemId = itemId });
@@ -49,7 +49,7 @@ new RelBookItemDto { BookId = bookId, ItemId = itemId });
         /// <returns>挿入件数</returns>
         public override async Task<int> InsertAsync(RelBookItemDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO rel_book_item
 (item_id, book_id, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@ItemId, @BookId, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
@@ -64,7 +64,7 @@ VALUES (@ItemId, @BookId, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime
         /// <returns>更新件数</returns>
         public override async Task<int> UpdateAsync(RelBookItemDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE rel_book_item
 SET json_code = @JsonCode, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId AND book_id = @BookId;", dto);
@@ -80,7 +80,7 @@ WHERE item_id = @ItemId AND book_id = @BookId;", dto);
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public override async Task<int> UpsertAsync(RelBookItemDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO rel_book_item (item_id, book_id, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@ItemId, @BookId, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 ON CONFLICT (item_id, book_id) DO UPDATE
@@ -96,7 +96,7 @@ WHERE rel_book_item.item_id = @ItemId AND rel_book_item.book_id = @BookId;", dto
         /// <returns>削除件数</returns>
         public override async Task<int> DeleteAllAsync()
         {
-            int count = await this.dbHandler.ExecuteAsync(@"DELETE FROM rel_book_item;");
+            int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM rel_book_item;");
 
             return count;
         }
@@ -108,7 +108,7 @@ WHERE rel_book_item.item_id = @ItemId AND rel_book_item.book_id = @BookId;", dto
         /// <returns>削除件数</returns>
         public async Task<int> DeleteAsync(RelBookItemDto dto)
         {
-            int count = await this.dbHandler.ExecuteAsync(@"
+            int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE rel_book_item SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId AND book_id = @BookId;", dto);
 

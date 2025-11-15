@@ -65,7 +65,7 @@ namespace HouseholdAccountBook.Views.Windows
                         yes_parse = true;
                     }
                     else {
-                        yes_parse = Int32.TryParse(tmp, out int xx);
+                        yes_parse = int.TryParse(tmp, out int xx);
 
                         // 範囲内かどうかチェック
                         if (yes_parse) {

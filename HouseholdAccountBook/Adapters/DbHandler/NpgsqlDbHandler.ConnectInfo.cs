@@ -25,8 +25,7 @@ namespace HouseholdAccountBook.DbHandler
             /// <summary>
             /// パスワード
             /// </summary>
-            public string Password
-            {
+            public string Password {
                 get => ProtectedDataExtension.DecryptPassword(this.EncryptedPassword);
                 set => this.EncryptedPassword = ProtectedDataExtension.EncryptPassword(value);
             }

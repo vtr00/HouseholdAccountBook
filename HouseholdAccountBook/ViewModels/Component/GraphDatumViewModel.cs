@@ -13,60 +13,50 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// 値(Y軸用)
         /// </summary>
         #region Value
-        public int Value
-        {
-            get => this._Value;
-            set => this.SetProperty(ref this._Value, value);
+        public int Value {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _Value = default;
         #endregion
 
         /// <summary>
         /// 日付(Tracker用)
         /// </summary>
         #region Date
-        public DateTime Date
-        {
-            get => this._Date;
-            set => this.SetProperty(ref this._Date, value);
+        public DateTime Date {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private DateTime _Date = default;
         #endregion
 
         /// <summary>
         /// インデックス(LineSeriesのX軸用)
         /// </summary>
         #region Index
-        public int Index
-        {
-            get => this._Index;
-            set => this.SetProperty(ref this._Index, value);
+        public int Index {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _Index = default;
         #endregion
 
         /// <summary>
         /// 項目ID
         /// </summary>
         #region ItemId
-        public int ItemId
-        {
-            get => this._ItemId;
-            set => this.SetProperty(ref this._ItemId, value);
+        public int ItemId {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _ItemId = default;
         #endregion
 
         /// <summary>
         /// 分類ID
         /// </summary>
         #region CategoryId
-        public int CategoryId
-        {
-            get => this._CategoryId;
-            set => this.SetProperty(ref this._CategoryId, value);
+        public int CategoryId {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _CategoryId = default;
         #endregion
         #endregion
     }

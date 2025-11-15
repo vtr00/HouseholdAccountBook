@@ -48,7 +48,7 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
         /// <summary>
         /// 項目値
         /// </summary>
-        public int ActValue { get; set; } = 0;
+        public int ActValue { get; set; }
         /// <summary>
         /// 店舗名
         /// </summary>
@@ -56,7 +56,7 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
         /// <summary>
         /// グループID
         /// </summary>
-        public int? GroupId { get; set; } = null;
+        public int? GroupId { get; set; }
         /// <summary>
         /// 備考
         /// </summary>
@@ -64,6 +64,6 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
         /// <summary>
         /// 一致フラグ
         /// </summary>
-        public int IsMatch { get; set; } = 0;
+        public int IsMatch { get; set; }
     }
 }

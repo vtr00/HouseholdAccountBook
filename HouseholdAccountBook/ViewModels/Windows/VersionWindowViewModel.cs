@@ -46,8 +46,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         #region ウィンドウ設定プロパティ
-        public override Point WindowPointSetting
-        {
+        public override Point WindowPointSetting {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
                 return new Point(settings.VersionWindow_Left, settings.VersionWindow_Top);
@@ -61,10 +60,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        public override Task LoadAsync()
-        {
-            throw new NotImplementedException();
-        }
+        public override Task LoadAsync() => throw new NotImplementedException();
 
         public override void AddEventHandlers()
         {

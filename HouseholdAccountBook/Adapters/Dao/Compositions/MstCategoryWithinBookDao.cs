@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<MstCategoryDto>> FindByBookIdAndBalanceKindAsync(int bookId, int balanceKind)
         {
-            var dtoList = await this.dbHandler.QueryAsync<MstCategoryDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<MstCategoryDto>(@"
 SELECT C.category_id, C.category_name
 FROM mst_category C
 WHERE EXISTS (

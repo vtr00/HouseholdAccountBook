@@ -17,8 +17,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 更新必要時イベント
         /// </summary>
-        public event EventHandler NeedToUpdateChanged
-        {
+        public event EventHandler NeedToUpdateChanged {
             add {
                 this.ItemTabVM.NeedToUpdateChanged += value;
                 this.BookTabVM.NeedToUpdateChanged += value;
@@ -37,31 +36,27 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された設定タブインデックス
         /// </summary>
         #region SelectedTabIndex
-        public int SelectedTabIndex
-        {
-            get => this._SelectedTabIndex;
+        public int SelectedTabIndex {
+            get;
             set {
-                if (this.SetProperty(ref this._SelectedTabIndex, value)) {
-                    this._SelectedTab = (SettingsTabs)value;
+                if (this.SetProperty(ref field, value)) {
+                    this.SelectedTab = (SettingsTabs)value;
                 }
             }
         }
-        private int _SelectedTabIndex = default;
         #endregion
         /// <summary>
         /// 選択された設定タブ種別
         /// </summary>
         #region SelectedTab
-        public SettingsTabs SelectedTab
-        {
-            get => this._SelectedTab;
+        public SettingsTabs SelectedTab {
+            get;
             set {
-                if (this.SetProperty(ref this._SelectedTab, value)) {
-                    this._SelectedTabIndex = (int)value;
+                if (this.SetProperty(ref field, value)) {
+                    this.SelectedTabIndex = (int)value;
                 }
             }
         }
-        private SettingsTabs _SelectedTab = default;
         #endregion
 
         /// <summary>
@@ -81,8 +76,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         #region ウィンドウ設定プロパティ
-        protected override (double, double) WindowSizeSettingRaw
-        {
+        protected override (double, double) WindowSizeSettingRaw {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
                 return (settings.SettingsWindow_Width, settings.SettingsWindow_Height);
@@ -95,8 +89,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
 
-        public override Point WindowPointSetting
-        {
+        public override Point WindowPointSetting {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
                 return new Point(settings.SettingsWindow_Left, settings.SettingsWindow_Top);

@@ -10,6 +10,6 @@ namespace HouseholdAccountBook.Others.RequestEventArgs
 
         public string Title { get; set; }
 
-        public bool Result { get; set; } = false;
+        public bool Result { get; set; }
     }
 }

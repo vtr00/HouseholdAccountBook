@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコード</returns>
         public async Task<EndingBalanceInfoDto> Find(DateTime startTime)
         {
-            var dto = await this.dbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"
+            var dto = await this.mDbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0) AS ending_balance
 FROM hst_action AA
 INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
@@ -38,7 +38,7 @@ new { StartTime = startTime });
         /// <returns>取得したレコード</returns>
         public async Task<EndingBalanceInfoDto> FindByBookId(int bookId, DateTime startTime)
         {
-            var dto = await this.dbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"
+            var dto = await this.mDbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @BookId) AS ending_balance
 FROM hst_action AA
 INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id

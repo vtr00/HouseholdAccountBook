@@ -26,8 +26,7 @@ namespace HouseholdAccountBook.ViewModels
         /// データバインドした場合は、このプロパティがViewModelの代わりになる。
         /// </summary>
         #region DataContext
-        public object DataContext
-        {
+        public object DataContext {
             get => this.GetValue(DataContextProperty);
             set => this.SetValue(DataContextProperty, value);
         }
@@ -38,9 +37,6 @@ namespace HouseholdAccountBook.ViewModels
         /// <see cref="Freezable"/> クラスのインスタンスを生成します。
         /// </summary>
         /// <returns>インスタンス</returns>
-        protected override Freezable CreateInstanceCore()
-        {
-            return new BindingProxy();
-        }
+        protected override Freezable CreateInstanceCore() => new BindingProxy();
     }
 }

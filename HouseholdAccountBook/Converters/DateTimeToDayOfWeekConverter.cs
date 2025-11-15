@@ -14,12 +14,9 @@ namespace HouseholdAccountBook.Converters
         /// </summary>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is DateTime dateTime) {
-                return (object)culture.DateTimeFormat.GetAbbreviatedDayName(dateTime.DayOfWeek);
-            }
-            else {
-                throw new NotImplementedException();
-            }
+            return value is DateTime dateTime
+                ? (object)culture.DateTimeFormat.GetAbbreviatedDayName(dateTime.DayOfWeek)
+                : throw new NotImplementedException();
         }
 
         /// <summary>
@@ -31,10 +28,7 @@ namespace HouseholdAccountBook.Converters
         /// <param name="culture"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 
 }

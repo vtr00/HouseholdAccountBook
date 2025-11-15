@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByCategoryIdAsync(int categoryId)
         {
-            var dtoList = await this.dbHandler.QueryAsync<HstActionDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action A
 INNER JOIN (SELECT item_id FROM mst_item WHERE del_flg = 0 AND category_id = @CategoryId) I ON A.item_id = I.item_id

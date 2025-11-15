@@ -25,15 +25,12 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
             this.AdvanceFlg = 0;
         }
 
-        public override int GetId()
-        {
-            return this.ItemId;
-        }
+        public override int GetId() => this.ItemId;
 
         /// <summary>
         /// 項目ID
         /// </summary>
-        public int ItemId { get; set; } = 0;
+        public int ItemId { get; set; }
         /// <summary>
         /// 項目名
         /// </summary>
@@ -41,14 +38,14 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// <summary>
         /// 分類ID
         /// </summary>
-        public int CategoryId { get; set; } = 0;
+        public int CategoryId { get; set; }
         /// <summary>
         /// 立替フラグ(未使用)
         /// </summary>
-        public int AdvanceFlg { get; set; } = 0;
+        public int AdvanceFlg { get; set; }
         /// <summary>
         /// 移動フラグ
         /// </summary>
-        public int MoveFlg { get; set; } = 0;
+        public int MoveFlg { get; set; }
     }
 }

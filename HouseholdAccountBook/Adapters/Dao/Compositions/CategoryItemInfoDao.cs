@@ -21,7 +21,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<CategoryItemInfoDto>> FindByBookIdAndBalanceKindAsync(int bookId, int balanceKind)
         {
-            var dtoList = await this.dbHandler.QueryAsync<CategoryItemInfoDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<CategoryItemInfoDto>(@"
 SELECT I.item_id, I.item_name, C.category_name
 FROM mst_item I
 INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
@@ -41,7 +41,7 @@ new { BalanceKind = balanceKind, BookId = bookId });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<CategoryItemInfoDto>> FindByBookIdAndCategoryIdAsync(int bookId, int categoryId)
         {
-            var dtoList = await this.dbHandler.QueryAsync<CategoryItemInfoDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<CategoryItemInfoDto>(@"
 SELECT I.item_id, I.item_name, C.category_name
 FROM mst_item I
 INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id

@@ -10,10 +10,7 @@ namespace HouseholdAccountBook.Adapters.Dto.KHDbTable
     {
         public CbtActDto() { }
 
-        public int GetId()
-        {
-            return this.ACT_ID;
-        }
+        public int GetId() => this.ACT_ID;
 
         /// <summary>
         /// 帳簿項目ID

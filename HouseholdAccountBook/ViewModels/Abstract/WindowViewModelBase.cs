@@ -10,14 +10,10 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// ウィンドウのサイズ設定を取得/設定する
         /// </summary>
-        public Size? WindowSizeSetting
-        {
+        public Size? WindowSizeSetting {
             get {
                 var (width, height) = this.WindowSizeSettingRaw;
-                if (width <= 0 || height <= 0) {
-                    return null;
-                }
-                return new Size(width, height);
+                return width <= 0 || height <= 0 ? null : new Size(width, height);
             }
             set {
                 if (value is not null) {

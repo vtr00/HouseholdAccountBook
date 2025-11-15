@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// カレンダーが開く前に選択されていたテキストボックス内の位置
         /// </summary>
-        private int selectedPositionBeforeCalendarOpened;
+        private int mSelectedPositionBeforeCalendarOpened;
 
         /// <summary>
         /// この要素のデートフォーマットが変更されたときに発生します。
@@ -60,8 +60,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// 日付フォーマット(yyyy,MM,ddのみ。区切り文字は/または-。順序に縛りなし)
         /// </summary>
         #region DateFormat
-        public string DateFormat
-        {
+        public string DateFormat {
             get => (string)this.GetValue(DateFormatProperty);
             set => this.SetValue(DateFormatProperty, value);
         }
@@ -211,9 +210,9 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <param name="e"></param>
         private void DateTimePicker_CalendarOpened(object sender, RoutedEventArgs e)
         {
-            var dateTimePicker = sender as DateTimePicker;
+            DateTimePicker dateTimePicker = sender as DateTimePicker;
             var textBox = GetTemplateTextBox(dateTimePicker);
-            this.selectedPositionBeforeCalendarOpened = textBox.SelectionStart;
+            this.mSelectedPositionBeforeCalendarOpened = textBox.SelectionStart;
         }
 
         /// <summary>
@@ -223,9 +222,9 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <param name="e"></param>
         private void DateTimePicker_CalendarClosed(object sender, RoutedEventArgs e)
         {
-            var dateTimePicker = (DateTimePicker)sender;
+            DateTimePicker dateTimePicker = sender as DateTimePicker;
             var textBox = GetTemplateTextBox(dateTimePicker);
-            textBox.SelectionStart = this.selectedPositionBeforeCalendarOpened;
+            textBox.SelectionStart = this.mSelectedPositionBeforeCalendarOpened;
         }
 
         /// <summary>
@@ -235,7 +234,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <param name="e"></param>
         private static void DateTimePicker_DateFormatChanged(DependencyObject dobj, DependencyPropertyChangedEventArgs e)
         {
-            DateTimePicker dateTimePicker = (DateTimePicker)dobj;
+            DateTimePicker dateTimePicker = dobj as DateTimePicker;
 
             _ = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action<DateTimePicker>(DateTimePicker.ApplyDateFormat), dateTimePicker);
 
@@ -340,8 +339,8 @@ namespace HouseholdAccountBook.Views.UserControls
         private static void SelectAsRange(TextBox textBox)
         {
             List<char> charList = [];
-            if (-1 != textBox.Text.LastIndexOf('/')) charList.Add('/');
-            if (-1 != textBox.Text.LastIndexOf('-')) charList.Add('-');
+            if (-1 != textBox.Text.LastIndexOf('/')) { charList.Add('/'); }
+            if (-1 != textBox.Text.LastIndexOf('-')) { charList.Add('-'); }
             char separetor = charList.Count == 1 ? charList[0] : '-';
 
             string forward = textBox.Text[..textBox.SelectionStart];

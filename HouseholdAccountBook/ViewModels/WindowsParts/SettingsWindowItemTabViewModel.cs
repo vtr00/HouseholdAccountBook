@@ -42,38 +42,32 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 階層構造設定VMリスト
         /// </summary>
         #region HierarchicalVMList
-        public ObservableCollection<HierarchicalViewModel> HierarchicalVMList
-        {
-            get => this._HierarchicalVMList;
-            set => this.SetProperty(ref this._HierarchicalVMList, value);
+        public ObservableCollection<HierarchicalViewModel> HierarchicalVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<HierarchicalViewModel> _HierarchicalVMList = default;
         #endregion
         /// <summary>
         /// 選択された階層構造設定VM
         /// </summary>
         #region SelectedHierarchicalVM
-        public HierarchicalViewModel SelectedHierarchicalVM
-        {
-            get => this._SelectedHierarchicalVM;
+        public HierarchicalViewModel SelectedHierarchicalVM {
+            get;
             set {
-                if (this.SetProperty(ref this._SelectedHierarchicalVM, value)) {
+                if (this.SetProperty(ref field, value)) {
                     this.SelectedHierarchicalVMChanged?.Invoke(this, new EventArgs<HierarchicalViewModel>(value));
                 }
             }
         }
-        private HierarchicalViewModel _SelectedHierarchicalVM = default;
         #endregion
         /// <summary>
         /// 表示された階層構造設定VM
         /// </summary>
         #region DisplayedHierarchicalSettingVM
-        public HierarchicalSettingViewModel DisplayedHierarchicalSettingVM
-        {
-            get => this._DisplayedHierarchicalSettingVM;
-            set => this.SetProperty(ref this._DisplayedHierarchicalSettingVM, value);
+        public HierarchicalSettingViewModel DisplayedHierarchicalSettingVM {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private HierarchicalSettingViewModel _DisplayedHierarchicalSettingVM = default;
         #endregion
 
         /// <summary>
@@ -497,10 +491,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
-        public override async Task LoadAsync()
-        {
-            await this.LoadAsync(null, null);
-        }
+        public override async Task LoadAsync() => await this.LoadAsync(null, null);
 
         public override void AddEventHandlers()
         {

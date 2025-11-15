@@ -22,7 +22,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<ActionInfoDto>> FindAllWithinTerm(DateTime startTime, DateTime finishTime)
         {
-            var dtoList = await this.dbHandler.QueryAsync<ActionInfoDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<ActionInfoDto>(@"
 SELECT A.action_id, A.act_time, B.book_id, C.category_id, I.item_id, B.book_name, C.category_name, I.item_name, A.act_value, 
        A.shop_name, A.group_id, A.remark, A.is_match
 FROM hst_action A
@@ -50,7 +50,7 @@ new { StartTime = startTime, FinishTime = finishTime });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<ActionInfoDto>> FindByBookIdWithinTerm(int bookId, DateTime startTime, DateTime finishTime)
         {
-            var dtoList = await this.dbHandler.QueryAsync<ActionInfoDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<ActionInfoDto>(@"
 SELECT A.action_id, A.act_time, B.book_id, C.category_id, I.item_id, B.book_name, C.category_name, I.item_name, A.act_value,
        A.shop_name, A.group_id, A.remark, A.is_match
 FROM hst_action A

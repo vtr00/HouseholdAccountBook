@@ -12,12 +12,10 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// 関係があるか
         /// </summary>
         #region IsRelated
-        public bool IsRelated
-        {
-            get => this._IsRelated;
-            set => this.SetProperty(ref this._IsRelated, value);
+        public bool IsRelated {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _IsRelated = default;
         #endregion
 
         /// <summary>

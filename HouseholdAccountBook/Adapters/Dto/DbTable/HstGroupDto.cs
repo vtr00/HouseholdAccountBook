@@ -12,22 +12,19 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// </summary>
         public HstGroupDto() { }
 
-        public int GetId()
-        {
-            return this.GroupId;
-        }
+        public int GetId() => this.GroupId;
 
         /// <summary>
         /// グループID
         /// </summary>
-        public int GroupId { get; set; } = 0;
+        public int GroupId { get; set; }
         /// <summary>
         /// グループ種別
         /// </summary>
-        public int GroupKind { get; set; } = 0;
+        public int GroupKind { get; set; }
         /// <summary>
         /// 備考(未使用)
         /// </summary>
-        public string Remark { get; set; } = null;
+        public string Remark { get; set; }
     }
 }

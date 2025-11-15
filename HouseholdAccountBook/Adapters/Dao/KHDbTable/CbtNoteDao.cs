@@ -12,9 +12,6 @@ namespace HouseholdAccountBook.Adapters.Dao.KHDbTable
     /// <param name="dbHandler">DBハンドラ</param>
     public class CbtNoteDao(OleDbHandler dbHandler) : KHReadDaoBase<CbtNoteDto>(dbHandler)
     {
-        public override async Task<IEnumerable<CbtNoteDto>> FindAllAsync()
-        {
-            return await this.dbHandler.QueryAsync<CbtNoteDto>(@"SELECT * FROM CBT_NOTE;");
-        }
+        public override async Task<IEnumerable<CbtNoteDto>> FindAllAsync() => await this.mDbHandler.QueryAsync<CbtNoteDto>(@"SELECT * FROM CBT_NOTE;");
     }
 }

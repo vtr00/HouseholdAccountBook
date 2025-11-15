@@ -12,10 +12,7 @@ namespace HouseholdAccountBook.Extensions
         /// <see cref="WaitCursorManagerFactory"/> を取得します
         /// </summary>
         /// <param name="fe"></param>
-        /// <returns></returns>
-        public static WaitCursorManagerFactory GetWaitCursorManagerFactory(this FrameworkElement fe)
-        {
-            return new WaitCursorManagerFactory(fe);
-        }
+        /// <returns><see cref="WaitCursorManagerFactory"/></returns>
+        public static WaitCursorManagerFactory GetWaitCursorManagerFactory(this FrameworkElement fe) => new(fe);
     }
 }

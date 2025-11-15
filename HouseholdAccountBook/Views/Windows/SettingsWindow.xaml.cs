@@ -22,7 +22,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 表示更新の必要があるか
         /// </summary>
-        private bool needToUpdate = false;
+        private bool mNeedToUpdate;
         #endregion
 
         /// <summary>
@@ -40,9 +40,7 @@ namespace HouseholdAccountBook.Views.Windows
 
             this.InitializeComponent();
             this.AddCommonEventHandlersToVM();
-            this.WVM.NeedToUpdateChanged += (sender, e) => {
-                this.needToUpdate = true;
-            };
+            this.WVM.NeedToUpdateChanged += (sender, e) => this.mNeedToUpdate = true;
 
             this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
 
@@ -70,7 +68,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             using FuncLog funcLog = new();
 
-            this.DialogResult = this.needToUpdate;
+            this.DialogResult = this.mNeedToUpdate;
         }
         #endregion
 
@@ -81,7 +79,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void SettingsTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.OriginalSource != sender) return;
+            if (e.OriginalSource != sender) { return; }
 
             using FuncLog funcLog = new(); // ここで e.OldItems, e.NewItems をログに出すと、StackOverflow になる
 

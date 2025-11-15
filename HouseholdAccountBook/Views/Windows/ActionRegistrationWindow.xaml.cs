@@ -20,8 +20,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 登録時のイベント
         /// </summary>
-        public event EventHandler<EventArgs<List<int>>> Registrated
-        {
+        public event EventHandler<EventArgs<List<int>>> Registrated {
             add => this.WVM.Registrated += value;
             remove => this.WVM.Registrated -= value;
         }
@@ -29,16 +28,14 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 帳簿変更時のイベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<int?>> BookChanged
-        {
+        public event EventHandler<ChangedEventArgs<int?>> BookChanged {
             add => this.WVM.BookChanged += value;
             remove => this.WVM.BookChanged -= value;
         }
         /// <summary>
         /// 日時変更時のイベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<DateTime>> DateChanged
-        {
+        public event EventHandler<ChangedEventArgs<DateTime>> DateChanged {
             add => this.WVM.DateChanged += value;
             remove => this.WVM.DateChanged -= value;
         }

@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<BookRelFromItemInfoDto>> FindByItemIdAsync(int itemId)
         {
-            var dtoList = await this.dbHandler.QueryAsync<BookRelFromItemInfoDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<BookRelFromItemInfoDto>(@"
 SELECT B.book_id AS book_id, B.book_name, RBI.book_id IS NOT NULL AS is_related
 FROM mst_book B
 LEFT JOIN (SELECT book_id FROM rel_book_item WHERE del_flg = 0 AND item_id = @ItemId) RBI ON RBI.book_id = B.book_id

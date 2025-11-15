@@ -21,6 +21,6 @@
         /// <summary>
         /// ダイアログの結果
         /// </summary>
-        public bool Result { get; set; } = false;
+        public bool Result { get; set; }
     }
 }

@@ -24,19 +24,18 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 金額列の最後に選択したセル
         /// </summary>
-        private DataGridCell lastDataGridCell;
+        private DataGridCell mLastDataGridCell;
         /// <summary>
         /// 最後に選択したセルのVM
         /// </summary>
-        private DateValueViewModel lastDateValueVM;
+        private DateValueViewModel mLastDateValueVM;
         #endregion
 
         #region イベント
         /// <summary>
         /// 帳簿変更時のイベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<int?>> BookChanged
-        {
+        public event EventHandler<ChangedEventArgs<int?>> BookChanged {
             add => this.WVM.BookChanged += value;
             remove => this.WVM.BookChanged -= value;
         }
@@ -44,8 +43,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 登録時のイベント
         /// </summary>
-        public event EventHandler<EventArgs<List<int>>> Registrated
-        {
+        public event EventHandler<EventArgs<List<int>>> Registrated {
             add => this.WVM.Registrated += value;
             remove => this.WVM.Registrated -= value;
         }
@@ -131,7 +129,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             TextBox textBox = this._popup.PlacementTarget as TextBox;
             if (textBox.DataContext is not DateValueViewModel vm) {
-                vm = this.lastDateValueVM; // textBoxのDataContextが取得できないため応急処置
+                vm = this.mLastDateValueVM; // textBoxのDataContextが取得できないため応急処置
             }
 
             switch (this.WVM.InputedKind) {
@@ -190,9 +188,9 @@ namespace HouseholdAccountBook.Views.Windows
             }
 
             // 外れたフォーカスを元に戻す
-            this.lastDataGridCell.IsEditing = true; // セルを編集モードにする - 画面がちらつくがやむを得ない？
+            this.mLastDataGridCell.IsEditing = true; // セルを編集モードにする - 画面がちらつくがやむを得ない？
             _ = textBox.Focus();
-            _ = this.lastDataGridCell.Focus(); // Enterキーでの入力完了を有効にする
+            _ = this.mLastDataGridCell.Focus(); // Enterキーでの入力完了を有効にする
             //Keyboard.Focus(textBox); // キーでの数値入力を有効にする - 意図した動作にならない
 
             e.Handled = true;
@@ -240,10 +238,10 @@ namespace HouseholdAccountBook.Views.Windows
             DataGridCell dataGridCell = sender as DataGridCell;
 
             // 新しいセルに移動していたら数値入力ボタンを非表示にする
-            if (dataGridCell != this.lastDataGridCell) {
+            if (dataGridCell != this.mLastDataGridCell) {
                 this.WVM.IsEditing = false;
             }
-            this.lastDataGridCell = dataGridCell;
+            this.mLastDataGridCell = dataGridCell;
         }
 
         /// <summary>
@@ -290,7 +288,7 @@ namespace HouseholdAccountBook.Views.Windows
                 this._popup.PlacementTarget = textBox;
                 this.WVM.IsEditing = true;
 
-                this.lastDateValueVM = textBox.DataContext as DateValueViewModel;
+                this.mLastDateValueVM = textBox.DataContext as DateValueViewModel;
             }
             e.Handled = true;
         }

@@ -34,48 +34,40 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 選択されたDB種別
         /// </summary>
         #region SelectedDBKind
-        public DBKind SelectedDBKind
-        {
-            get => this._SelectedDBKind;
-            set => this.SetProperty(ref this._SelectedDBKind, value);
+        public DBKind SelectedDBKind {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private DBKind _SelectedDBKind = default;
         #endregion
 
         /// <summary>
         /// PostgreSQL設定
         /// </summary>
         #region PostgreSQLDBSettingVM
-        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM
-        {
-            get => this._PostgreSQLDBSettingVM;
-            set => this.SetProperty(ref this._PostgreSQLDBSettingVM, value);
-        }
-        private PostgreSQLDBSettingViewModel _PostgreSQLDBSettingVM = new();
+        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = new();
         #endregion
 
         /// <summary>
         /// Access設定
         /// </summary>
         #region AccessSettingVM
-        public OleDbSettingViewModel AccessSettingVM
-        {
-            get => this._AccessSettingVM;
-            set => this.SetProperty(ref this._AccessSettingVM, value);
-        }
-        private OleDbSettingViewModel _AccessSettingVM = new();
+        public OleDbSettingViewModel AccessSettingVM {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = new();
         #endregion
 
         /// <summary>
         /// SQLite設定
         /// </summary>
         #region SQLiteSettingVM
-        public FileDbSettingViewModel SQLiteSettingVM
-        {
-            get => this._SQLiteSettingVM;
-            set => this.SetProperty(ref this._SQLiteSettingVM, value);
-        }
-        private FileDbSettingViewModel _SQLiteSettingVM = new();
+        public FileDbSettingViewModel SQLiteSettingVM {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = new();
         #endregion
         #endregion
 
@@ -88,12 +80,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 選択された言語種別
         /// </summary>
         #region SelectedCultureName
-        public string SelectedCultureName
-        {
-            get => this._SelectedCultureName;
-            set => this.SetProperty(ref this._SelectedCultureName, value);
-        }
-        private string _SelectedCultureName = "ja-JP";
+        public string SelectedCultureName {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = "ja-JP";
         #endregion
         #endregion
 
@@ -102,60 +92,50 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// バックアップ数
         /// </summary>
         #region BackUpNum
-        public int BackUpNum
-        {
-            get => this._BackUpNum;
-            set => this.SetProperty(ref this._BackUpNum, value);
+        public int BackUpNum {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _BackUpNum = default;
         #endregion
 
         /// <summary>
         /// バックアップ先フォルダ
         /// </summary>
         #region BackUpFolderPath
-        public string BackUpFolderPath
-        {
-            get => this._BackUpFolderPath;
-            set => this.SetProperty(ref this._BackUpFolderPath, value);
+        public string BackUpFolderPath {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _BackUpFolderPath = default;
         #endregion
 
         /// <summary>
         /// メインウィンドウ最小化時バックアップフラグ
         /// </summary>
         #region BackUpFlagAtMinimizing
-        public bool BackUpFlagAtMinimizing
-        {
-            get => this._BackUpFlagAtMinimizing;
-            set => this.SetProperty(ref this._BackUpFlagAtMinimizing, value);
+        public bool BackUpFlagAtMinimizing {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _BackUpFlagAtMinimizing = default;
         #endregion
 
         /// <summary>
         /// メインウィンドウ最小化時バックアップインターバル(分)
         /// </summary>
         #region BackUpIntervalAtMinimizing
-        public int BackUpIntervalAtMinimizing
-        {
-            get => this._BackUpIntervalAtMinimizing;
-            set => this.SetProperty(ref this._BackUpIntervalAtMinimizing, value);
+        public int BackUpIntervalAtMinimizing {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _BackUpIntervalAtMinimizing = default;
         #endregion
 
         /// <summary>
         /// メインウィンドウクローズ時バックアップフラグ
         /// </summary>
         #region BackUpFlagAtClosing
-        public bool BackUpFlagAtClosing
-        {
-            get => this._BackUpFlagAtClosing;
-            set => this.SetProperty(ref this._BackUpFlagAtClosing, value);
+        public bool BackUpFlagAtClosing {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _BackUpFlagAtClosing = default;
         #endregion
         #endregion
 
@@ -164,59 +144,49 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 開始月
         /// </summary>
         #region StartMonth
-        public int StartMonth
-        {
-            get => this._StartMonth;
-            set => this.SetProperty(ref this._StartMonth, value);
+        public int StartMonth {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _StartMonth = default;
         #endregion
 
         /// <summary>
         /// 国民の祝日CSV URI
         /// </summary>
         #region NationalHolidayCsvURI
-        public string NationalHolidayCsvURI
-        {
-            get => this._NationalHolidayCsvURI;
-            set => this.SetProperty(ref this._NationalHolidayCsvURI, value);
+        public string NationalHolidayCsvURI {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _NationalHolidayCsvURI = default;
         #endregion
 
         /// <summary>
         /// 国民の祝日CSV 文字エンコーディング
         /// </summary>
         #region NatioalHolidayTextEncodingList
-        public ObservableCollection<KeyValuePair<int, string>> NationalHolidayTextEncodingList
-        {
-            get => this._NationalHolidayTextEncodingList;
-            set => this.SetProperty(ref this._NationalHolidayTextEncodingList, value);
+        public ObservableCollection<KeyValuePair<int, string>> NationalHolidayTextEncodingList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<KeyValuePair<int, string>> _NationalHolidayTextEncodingList = default;
         #endregion
         /// <summary>
         /// 国民の祝日CSV 選択された文字エンコーディング
         /// </summary>
         #region SelectedNationalHolidayTextEncoding
-        public int SelectedNationalHolidayTextEncoding
-        {
-            get => this._SelectedNationalHolidayTextEncoding;
-            set => this.SetProperty(ref this._SelectedNationalHolidayTextEncoding, value);
+        public int SelectedNationalHolidayTextEncoding {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _SelectedNationalHolidayTextEncoding = default;
         #endregion
 
         /// <summary>
         /// 国民の祝日CSV 日付インデックス(1開始)
         /// </summary>
         #region NationalHolidayCsvDateIndex
-        public int NationalHolidayCsvDateIndex
-        {
-            get => this._NationalHolidayCsvDateIndex;
-            set => this.SetProperty(ref this._NationalHolidayCsvDateIndex, value);
+        public int NationalHolidayCsvDateIndex {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _NationalHolidayCsvDateIndex = default;
         #endregion
         #endregion
 
@@ -225,24 +195,20 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// ウィンドウ位置を保存するか
         /// </summary>
         #region IsPositionSaved
-        public bool IsPositionSaved
-        {
-            get => this._IsPositionSaved;
-            set => this.SetProperty(ref this._IsPositionSaved, value);
+        public bool IsPositionSaved {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _IsPositionSaved = default;
         #endregion
 
         /// <summary>
         /// ウィンドウ設定
         /// </summary>
         #region WindowSettingVMList
-        public ObservableCollection<WindowSettingViewModel> WindowSettingVMList
-        {
-            get => this._WindowSettingVMList;
-            set => this.SetProperty(ref this._WindowSettingVMList, value);
+        public ObservableCollection<WindowSettingViewModel> WindowSettingVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<WindowSettingViewModel> _WindowSettingVMList = default;
         #endregion
         #endregion
 
@@ -251,41 +217,35 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// デバッグモード
         /// </summary>
         #region DebugMode
-        public bool DebugMode
-        {
-            get => this._DebugMode;
+        public bool DebugMode {
+            get;
             set {
-                if (this.SetProperty(ref this._DebugMode, value)) {
+                if (this.SetProperty(ref field, value)) {
                     // リソースを更新して他ウィンドウの項目の表示/非表示を切り替える
                     App.RegisterToResource();
                 }
             }
         }
-        private bool _DebugMode;
         #endregion
 
         /// <summary>
         /// 操作ログ出力
         /// </summary>
         #region OutputOperationLog
-        public bool OutputOperationLog
-        {
-            get => this._OutputOperationLog;
-            set => this.SetProperty(ref this._OutputOperationLog, value);
+        public bool OutputOperationLog {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _OutputOperationLog = default;
         #endregion
 
         /// <summary>
         /// ウィンドウログ出力
         /// </summary>
         #region OutputWindowLog
-        public bool OutputWindowLog
-        {
-            get => this._OutputWindowLog;
-            set => this.SetProperty(ref this._OutputWindowLog, value);
+        public bool OutputWindowLog {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _OutputWindowLog = default;
         #endregion
         #endregion
 
@@ -336,7 +296,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 folderPath = App.GetCurrentDir();
             }
 
-            var e = new OpenFileDialogRequestEventArgs() {
+            OpenFileDialogRequestEventArgs e = new() {
                 CheckFileExists = true,
                 InitialDirectory = folderPath,
                 FileName = fileName,
@@ -358,7 +318,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 folderPath = App.GetCurrentDir();
             }
 
-            var e = new OpenFileDialogRequestEventArgs() {
+            OpenFileDialogRequestEventArgs e = new() {
                 CheckFileExists = true,
                 InitialDirectory = folderPath,
                 FileName = fileName,
@@ -412,7 +372,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 folderFullPath = Path.Combine(folderPath, fileName);
             }
 
-            var e = new OpenFolderDialogRequestEventArgs() {
+            OpenFolderDialogRequestEventArgs e = new() {
                 InitialDirectory = folderFullPath,
                 Title = Properties.Resources.Title_BackupFolderSelection
             };
@@ -424,10 +384,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// ウィンドウ設定再読込コマンド処理
         /// </summary>
-        private void ReloadWindowSettingCommand_Executed()
-        {
-            this.WindowSettingVMList = LoadWindowSettings();
-        }
+        private void ReloadWindowSettingCommand_Executed() => this.WindowSettingVMList = LoadWindowSettings();
 
         /// <summary>
         /// ウィンドウ設定初期化コマンド処理
@@ -509,10 +466,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
-        public override Task LoadAsync()
-        {
-            throw new NotImplementedException();
-        }
+        public override Task LoadAsync() => throw new NotImplementedException();
 
         /// <summary>
         /// その他設定を読み込む

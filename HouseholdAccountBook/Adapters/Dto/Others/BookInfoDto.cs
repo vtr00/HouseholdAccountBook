@@ -22,19 +22,19 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
         /// <summary>
         /// 初期値
         /// </summary>
-        public int InitialValue { get; set; } = 0;
+        public int InitialValue { get; set; }
         /// <summary>
         /// 帳簿種別
         /// </summary>
-        public int BookKind { get; set; } = 0;
+        public int BookKind { get; set; }
         /// <summary>
         /// 支払日
         /// </summary>
-        public int? PayDay { get; set; } = null;
+        public int? PayDay { get; set; }
         /// <summary>
         /// 支払帳簿ID
         /// </summary>
-        public int? DebitBookId { get; set; } = null;
+        public int? DebitBookId { get; set; }
         /// <summary>
         /// JsonCode
         /// </summary>
@@ -42,14 +42,14 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
         /// <summary>
         /// ソート順
         /// </summary>
-        public int SortOrder { get; set; } = 0;
+        public int SortOrder { get; set; }
         /// <summary>
         /// 開始日
         /// </summary>
-        public DateTime? StartDate { get; set; } = null;
+        public DateTime? StartDate { get; set; }
         /// <summary>
         /// 終了日
         /// </summary>
-        public DateTime? EndDate { get; set; } = null;
+        public DateTime? EndDate { get; set; }
     }
 }

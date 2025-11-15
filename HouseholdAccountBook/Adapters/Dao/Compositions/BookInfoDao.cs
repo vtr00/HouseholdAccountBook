@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコード</returns>
         public async Task<BookInfoDto> FindByBookId(int bookId)
         {
-            var dto = await this.dbHandler.QuerySingleAsync<BookInfoDto>(@"
+            var dto = await this.mDbHandler.QuerySingleAsync<BookInfoDto>(@"
 SELECT B.book_name, B.book_kind, B.debit_book_id, B.pay_day, B.initial_value, B.json_code, B.sort_order, MIN(A.act_time) AS start_date, MAX(A.act_time) AS end_date
 FROM mst_book B
 LEFT OUTER JOIN hst_action A ON A.book_id = B.book_id AND A.del_flg = 0

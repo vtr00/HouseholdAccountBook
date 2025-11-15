@@ -28,15 +28,12 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
             this.SortOrder = dto.SORT_KEY;
         }
 
-        public override int GetId()
-        {
-            return this.BookId;
-        }
+        public override int GetId() => this.BookId;
 
         /// <summary>
         /// 帳簿ID
         /// </summary>
-        public int BookId { get; set; } = 0;
+        public int BookId { get; set; }
         /// <summary>
         /// 帳簿名
         /// </summary>
@@ -44,19 +41,19 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// <summary>
         /// 初期値
         /// </summary>
-        public int InitialValue { get; set; } = 0;
+        public int InitialValue { get; set; }
         /// <summary>
         /// 帳簿種別
         /// </summary>
-        public int BookKind { get; set; } = 0;
+        public int BookKind { get; set; }
         /// <summary>
         /// 支払日
         /// </summary>
-        public int? PayDay { get; set; } = null;
+        public int? PayDay { get; set; }
         /// <summary>
         /// 支払い元帳簿ID
         /// </summary>
-        public int? DebitBookId { get; set; } = null;
+        public int? DebitBookId { get; set; }
 
         /// <summary>
         /// MstBookのJSONコード
@@ -66,16 +63,16 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
             /// <summary>
             /// 開始日
             /// </summary>
-            public DateTime? StartDate { get; set; } = null;
+            public DateTime? StartDate { get; set; }
             /// <summary>
             /// 終了日
             /// </summary>
-            public DateTime? EndDate { get; set; } = null;
+            public DateTime? EndDate { get; set; }
 
             /// <summary>
             /// CSVフォルダパス
             /// </summary>
-            public string CsvFolderPath { get; set; } = null;
+            public string CsvFolderPath { get; set; }
             /// <summary>
             /// テキストエンコーディング
             /// </summary>
@@ -84,15 +81,15 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
             /// <summary>
             /// CSV内での日付のインデックス
             /// </summary>
-            public int? CsvActDateIndex { get; set; } = null;
+            public int? CsvActDateIndex { get; set; }
             /// <summary>
             /// CSV内での出費のインデックス
             /// </summary>
-            public int? CsvOutgoIndex { get; set; } = null;
+            public int? CsvOutgoIndex { get; set; }
             /// <summary>
             /// CSV内での項目名のインデックス
             /// </summary>
-            public int? CsvItemNameIndex { get; set; } = null;
+            public int? CsvItemNameIndex { get; set; }
 
             /// <summary>
             /// コンストラクタ
@@ -104,7 +101,7 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
             /// <param name="jsonCode"><see cref="MstBookDto"/>のJsonCode</param>
             public JsonDto(string jsonCode)
             {
-                if (string.IsNullOrEmpty(jsonCode)) return;
+                if (string.IsNullOrEmpty(jsonCode)) { return; }
                 try {
                     JsonDto dto = JsonSerializer.Deserialize<JsonDto>(jsonCode);
                     if (dto != null) {
@@ -135,10 +132,7 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
             /// Jsonコードに変換する
             /// </summary>
             /// <returns>Jsonコード</returns>
-            public string ToJson()
-            {
-                return JsonSerializer.Serialize(this);
-            }
+            public string ToJson() => JsonSerializer.Serialize(this);
         }
     }
 }

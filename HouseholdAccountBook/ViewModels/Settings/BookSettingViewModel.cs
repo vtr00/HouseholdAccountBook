@@ -23,24 +23,20 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// ソート順
         /// </summary>
         #region SortOrder
-        public int SortOrder
-        {
-            get => this._SortOrder;
-            set => this.SetProperty(ref this._SortOrder, value);
+        public int SortOrder {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _SortOrder = default;
         #endregion
 
         /// <summary>
         /// 帳簿名
         /// </summary>
         #region Name
-        public string Name
-        {
-            get => this._Name;
-            set => this.SetProperty(ref this._Name, value);
+        public string Name {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _Name = default;
         #endregion
 
         /// <summary>
@@ -51,28 +47,24 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 選択された帳簿種別
         /// </summary>
         #region SelectedBookKind
-        public BookKind SelectedBookKind
-        {
-            get => this._SelectedBookKind;
+        public BookKind SelectedBookKind {
+            get;
             set {
-                _ = this.SetProperty(ref this._SelectedBookKind, value);
+                _ = this.SetProperty(ref field, value);
                 this.RaisePropertyChanged(nameof(this.NeedToPay));
                 this.RaisePropertyChanged(nameof(this.CsvDataExists));
             }
-        }
-        private BookKind _SelectedBookKind = BookKind.Uncategorized;
+        } = BookKind.Uncategorized;
         #endregion
 
         /// <summary>
         /// 初期値
         /// </summary>
         #region InitialValue
-        public int InitialValue
-        {
-            get => this._InitialValue;
-            set => this.SetProperty(ref this._InitialValue, value);
+        public int InitialValue {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _InitialValue = 0;
         #endregion
 
         #region 期間情報
@@ -80,46 +72,38 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 開始日の有無
         /// </summary>
         #region StartDateExists
-        public bool StartDateExists
-        {
-            get => this._StartDateExists;
-            set => this.SetProperty(ref this._StartDateExists, value);
+        public bool StartDateExists {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _StartDateExists = default;
         #endregion
         /// <summary>
         /// 開始日
         /// </summary>
         #region StartDate
-        public DateTime StartDate
-        {
-            get => this._StartDate;
-            set => this.SetProperty(ref this._StartDate, value);
-        }
-        private DateTime _StartDate = DateTime.Now;
+        public DateTime StartDate {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = DateTime.Now;
         #endregion
 
         /// <summary>
         /// 終了日の有無
         /// </summary>
         #region EndDateExists
-        public bool EndDateExists
-        {
-            get => this._EndDateExists;
-            set => this.SetProperty(ref this._EndDateExists, value);
+        public bool EndDateExists {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _EndDateExists = default;
         #endregion
         /// <summary>
         /// 終了日
         /// </summary>
         #region EndDate
-        public DateTime EndDate
-        {
-            get => this._EndDate;
-            set => this.SetProperty(ref this._EndDate, value);
-        }
-        private DateTime _EndDate = DateTime.Now;
+        public DateTime EndDate {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = DateTime.Now;
         #endregion
         #endregion
 
@@ -135,35 +119,29 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 支払元帳簿VMリスト
         /// </summary>
         #region DebitBookVMList
-        public ObservableCollection<BookViewModel> DebitBookVMList
-        {
-            get => this._DebitBookVMList;
-            set => this.SetProperty(ref this._DebitBookVMList, value);
+        public ObservableCollection<BookViewModel> DebitBookVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<BookViewModel> _DebitBookVMList = default;
         #endregion
         /// <summary>
         /// 選択された支払元帳簿VM
         /// </summary>
         #region SelectedDebitBookVM
-        public BookViewModel SelectedDebitBookVM
-        {
-            get => this._SelectedDebitBookVM;
-            set => this.SetProperty(ref this._SelectedDebitBookVM, value);
+        public BookViewModel SelectedDebitBookVM {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private BookViewModel _SelectedDebitBookVM = default;
         #endregion
 
         /// <summary>
         /// 支払日
         /// </summary>
         #region PayDay
-        public int? PayDay
-        {
-            get => this._PayDay;
-            set => this.SetProperty(ref this._PayDay, value);
+        public int? PayDay {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int? _PayDay = default;
         #endregion
         #endregion
 
@@ -179,71 +157,59 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// CSVフォルダパス
         /// </summary>
         #region CsvFolderPath
-        public string CsvFolderPath
-        {
-            get => this._CsvFolderPath;
-            set => this.SetProperty(ref this._CsvFolderPath, value);
+        public string CsvFolderPath {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _CsvFolderPath = default;
         #endregion
 
         /// <summary>
         /// 文字エンコーディング
         /// </summary>
         #region TextEncodingList
-        public ObservableCollection<KeyValuePair<int, string>> TextEncodingList
-        {
-            get => this._TextEncodingList;
-            set => this.SetProperty(ref this._TextEncodingList, value);
+        public ObservableCollection<KeyValuePair<int, string>> TextEncodingList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<KeyValuePair<int, string>> _TextEncodingList = default;
         #endregion
         /// <summary>
         /// 選択された文字エンコーディング
         /// </summary>
         #region SelectedTextEncoding
-        public int SelectedTextEncoding
-        {
-            get => this._SelectedTextEncoding;
-            set => this.SetProperty(ref this._SelectedTextEncoding, value);
+        public int SelectedTextEncoding {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int _SelectedTextEncoding = default;
         #endregion
 
         /// <summary>
         /// 日付 位置(1開始)
         /// </summary>
         #region ActDateIndex
-        public int? ActDateIndex
-        {
-            get => this._ActDateIndex;
-            set => this.SetProperty(ref this._ActDateIndex, value);
+        public int? ActDateIndex {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int? _ActDateIndex = default;
         #endregion
 
         /// <summary>
         /// 支出 位置(1開始)
         /// </summary>
         #region ExpensesIndex
-        public int? ExpensesIndex
-        {
-            get => this._ExpensesIndex;
-            set => this.SetProperty(ref this._ExpensesIndex, value);
+        public int? ExpensesIndex {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int? _ExpensesIndex = default;
         #endregion
 
         /// <summary>
         /// 項目名 位置(1開始)
         /// </summary>
         #region ItemNameIndex
-        public int? ItemNameIndex
-        {
-            get => this._ItemNameIndex;
-            set => this.SetProperty(ref this._ItemNameIndex, value);
+        public int? ItemNameIndex {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int? _ItemNameIndex = default;
         #endregion
         #endregion
 
@@ -251,23 +217,19 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 関係性VMリスト
         /// </summary>
         #region RelationVMList
-        public ObservableCollection<RelationViewModel> RelationVMList
-        {
-            get => this._RelationVMList;
-            set => this.SetProperty(ref this._RelationVMList, value);
+        public ObservableCollection<RelationViewModel> RelationVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<RelationViewModel> _RelationVMList = default;
         #endregion
         /// <summary>
         /// 選択された関係性VM
         /// </summary>
         #region SelectedRelationVM
-        public RelationViewModel SelectedRelationVM
-        {
-            get => this._SelectedRelationVM;
-            set => this.SetProperty(ref this._SelectedRelationVM, value);
+        public RelationViewModel SelectedRelationVM {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private RelationViewModel _SelectedRelationVM = default;
         #endregion
         #endregion
     }

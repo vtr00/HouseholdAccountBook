@@ -14,7 +14,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// ディアクティベート時の <see cref="Popup.IsOpen"/>
         /// </summary>
-        private bool isOpenOnDeactivated = default;
+        private bool mIsOpenOnDeactivated;
 
         /// <summary>
         /// <see cref="FollowablePopup"/> クラスの新しいインスタンスを初期化します
@@ -34,18 +34,14 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <param name="e"></param>
         private static void IsOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is not FollowablePopup followablePopup) {
-                return;
-            }
+            if (d is not FollowablePopup followablePopup) { return; }
 
             var target = followablePopup.PlacementTarget;
-            if (target == null) {
-                return;
-            }
+            if (target == null) { return; }
 
-            var window = Window.GetWindow(target);
+            Window window = Window.GetWindow(target);
             // Popup の Placement の親要素にScrollViewer要素があれば取得する
-            var scrollViewer = GetDependencyObjectFromVisualTree(target, typeof(ScrollViewer)) as ScrollViewer;
+            ScrollViewer scrollViewer = GetDependencyObjectFromVisualTree(target, typeof(ScrollViewer)) as ScrollViewer;
 
             // 更新前のIsOpenプロパティがtrueだったので、登録済みのイベントハンドラを解除する
             if (e.OldValue != null && (bool)e.OldValue == true) {
@@ -95,7 +91,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <param name="e"></param>
         private void OnFollowWindowRectChanged(object sender, EventArgs e)
         {
-            var offset = this.HorizontalOffset;
+            double offset = this.HorizontalOffset;
             // HorizontalOffsetなどのプロパティを一度変更しないと、ポップアップの位置が更新されないため、同一プロパティに2回値をセットしている
             this.HorizontalOffset = offset + 1;
             this.HorizontalOffset = offset;
@@ -106,11 +102,9 @@ namespace HouseholdAccountBook.Views.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnFollowWindowActivated(object sender, EventArgs e)
-        {
+        private void OnFollowWindowActivated(object sender, EventArgs e) =>
             // アクティベート時にディアクティベート時のPopupの表示状態に復帰する
-            this.IsOpen = this.isOpenOnDeactivated;
-        }
+            this.IsOpen = this.mIsOpenOnDeactivated;
 
         /// <summary>
         /// 追従対象の <see cref="Window"/> のディアクティベート時のイベント
@@ -119,7 +113,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <param name="e"></param>
         private void OnFollowWindowDiactivated(object sender, EventArgs e)
         {
-            this.isOpenOnDeactivated = this.IsOpen; // ディアクティベート時のPopup表示状態を記憶しておく
+            this.mIsOpenOnDeactivated = this.IsOpen; // ディアクティベート時のPopup表示状態を記憶しておく
             this.IsOpen = false;
         }
 
@@ -135,7 +129,7 @@ namespace HouseholdAccountBook.Views.UserControls
             }
         }
 
-        static private DependencyObject GetDependencyObjectFromVisualTree(DependencyObject startObject, Type type)
+        private static DependencyObject GetDependencyObjectFromVisualTree(DependencyObject startObject, Type type)
         {
             var target = startObject;
             while (target != null) {

@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコード</returns>
         public async Task<TermInfoDto> Find()
         {
-            TermInfoDto dto = await this.dbHandler.QuerySingleAsync<TermInfoDto>(@"
+            TermInfoDto dto = await this.mDbHandler.QuerySingleAsync<TermInfoDto>(@"
 SELECT MIN(act_time) as first_time, MAX(act_time) as last_time
 FROM hst_action
 WHERE del_flg = 0;");

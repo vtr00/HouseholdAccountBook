@@ -11,15 +11,15 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <summary>
         /// 呼び出し元ファイル名
         /// </summary>
-        private readonly string fileName;
+        private readonly string mFileName;
         /// <summary>
         /// 呼び出し元関数名
         /// </summary>
-        private readonly string methodName;
+        private readonly string mEthodName;
         /// <summary>
         /// 呼び出し元行数
         /// </summary>
-        private readonly int lineNumber;
+        private readonly int mLineNumber;
 
         /// <summary>
         /// 関数ログ コンストラクタ
@@ -30,9 +30,9 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="lineNumber">呼び出し元行数</param>
         public FuncLog(object args = null, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
-            this.fileName = fileName;
-            this.methodName = methodName;
-            this.lineNumber = lineNumber;
+            this.mFileName = fileName;
+            this.mEthodName = methodName;
+            this.mLineNumber = lineNumber;
             // コンストラクタで関数開始ログを出力
             Log.FuncStart(args, fileName, methodName, lineNumber);
         }
@@ -40,7 +40,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         public void Dispose()
         {
             // 破棄時に関数終了ログを出力
-            Log.FuncEnd(this.fileName, this.methodName, (ushort)(Math.Log10(this.lineNumber) + 1));
+            Log.FuncEnd(this.mFileName, this.mEthodName, (ushort)(Math.Log10(this.mLineNumber) + 1));
             GC.SuppressFinalize(this);
         }
     }

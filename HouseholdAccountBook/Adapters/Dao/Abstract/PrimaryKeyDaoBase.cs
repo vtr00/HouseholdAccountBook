@@ -13,10 +13,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
     /// <typeparam name="T">主キーの型</typeparam>
     public abstract class PrimaryKeyDaoBase<DTO, T>(DbHandlerBase dbHandler) : ReadWriteTableDaoBase<DTO>(dbHandler), ISequentialIDDao<DTO> where DTO : TableDtoBase, ISequentialIDDto
     {
-        public async Task SetIdSequenceAsync(IEnumerable<DTO> dtoList)
-        {
-            await this.SetIdSequenceAsync(dtoList.Max(d => d.GetId()));
-        }
+        public async Task SetIdSequenceAsync(IEnumerable<DTO> dtoList) => await this.SetIdSequenceAsync(dtoList.Max(d => d.GetId()));
 
         public abstract Task SetIdSequenceAsync(int idSeq);
 

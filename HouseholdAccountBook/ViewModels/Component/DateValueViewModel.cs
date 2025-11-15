@@ -24,16 +24,14 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// 金額
         /// </summary>
         #region ActValue
-        public int? ActValue
-        {
-            get => this._ActValue;
+        public int? ActValue {
+            get;
             set {
-                if (this.SetProperty(ref this._ActValue, value)) {
+                if (this.SetProperty(ref field, value)) {
                     CommandManager.InvalidateRequerySuggested();
                 }
             }
         }
-        private int? _ActValue = default;
         #endregion
         #endregion
     }

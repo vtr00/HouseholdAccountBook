@@ -12,9 +12,6 @@ namespace HouseholdAccountBook.Adapters.Dao.KHDbTable
     /// <param name="dbHandler">DBハンドラ</param>
     public class CbmCategoryDao(OleDbHandler dbHandler) : KHReadDaoBase<CbmCategoryDto>(dbHandler)
     {
-        public override async Task<IEnumerable<CbmCategoryDto>> FindAllAsync()
-        {
-            return await this.dbHandler.QueryAsync<CbmCategoryDto>(@"SELECT * FROM CBM_CATEGORY ORDER BY CATEGORY_ID;");
-        }
+        public override async Task<IEnumerable<CbmCategoryDto>> FindAllAsync() => await this.mDbHandler.QueryAsync<CbmCategoryDto>(@"SELECT * FROM CBM_CATEGORY ORDER BY CATEGORY_ID;");
     }
 }

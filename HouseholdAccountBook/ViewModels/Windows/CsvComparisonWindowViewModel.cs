@@ -71,58 +71,50 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// CSVファイルパス
         /// </summary>
         #region CsvFilePathes
-        public string CsvFilePathes => 0 < this._CsvFilePathList.Count ? string.Join(",", this._CsvFilePathList) : null;
+        public string CsvFilePathes => 0 < this.CsvFilePathList.Count ? string.Join(",", this.CsvFilePathList) : null;
         #endregion
         /// <summary>
         /// CSVファイルパスリスト
         /// </summary>
         #region CsvFilePathList
-        public ObservableCollection<string> CsvFilePathList
-        {
-            get => this._CsvFilePathList;
-            set => this.SetProperty(ref this._CsvFilePathList, value);
-        }
-        private ObservableCollection<string> _CsvFilePathList = [];
+        public ObservableCollection<string> CsvFilePathList {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = [];
         #endregion
 
         /// <summary>
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
-        public ObservableCollection<BookComparisonViewModel> BookVMList
-        {
-            get => this._BookVMList;
-            set => this.SetProperty(ref this._BookVMList, value);
+        public ObservableCollection<BookComparisonViewModel> BookVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<BookComparisonViewModel> _BookVMList = default;
         #endregion
         /// <summary>
         /// 選択された帳簿VM
         /// </summary>
         #region SelectedBookVM
-        public BookComparisonViewModel SelectedBookVM
-        {
-            get => this._SelectedBookVM;
+        public BookComparisonViewModel SelectedBookVM {
+            get;
             set {
-                var oldValue = this._SelectedBookVM?.Id;
-                if (this.SetProperty(ref this._SelectedBookVM, value)) {
+                int? oldValue = field?.Id;
+                if (this.SetProperty(ref field, value)) {
                     this.BookChanged?.Invoke(this, new ChangedEventArgs<int?>() { OldValue = oldValue, NewValue = value.Id });
                 }
             }
-        }
-        private BookComparisonViewModel _SelectedBookVM = new() { };
+        } = new() { };
         #endregion
 
         /// <summary>
         /// CSV比較VMリスト
         /// </summary>
         #region CsvComparisonVMList
-        public ObservableCollection<CsvComparisonViewModel> CsvComparisonVMList
-        {
-            get => this._CsvComparisonVMList;
-            set => this.SetProperty(ref this._CsvComparisonVMList, value);
-        }
-        private ObservableCollection<CsvComparisonViewModel> _CsvComparisonVMList = [];
+        public ObservableCollection<CsvComparisonViewModel> CsvComparisonVMList {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = [];
         #endregion
         /// <summary>
         /// CSV比較VMのチェック数
@@ -147,12 +139,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択されたCSV比較VM(先頭)
         /// </summary>
         #region SelectedCsvComparisonVM
-        public CsvComparisonViewModel SelectedCsvComparisonVM
-        {
-            get => this._SelectedCsvComparisonVM;
-            set => this.SetProperty(ref this._SelectedCsvComparisonVM, value);
+        public CsvComparisonViewModel SelectedCsvComparisonVM {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private CsvComparisonViewModel _SelectedCsvComparisonVM = default;
         #endregion
         /// <summary>
         /// 選択されたCSV比較VMリスト
@@ -237,7 +227,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             Properties.Settings settings = Properties.Settings.Default;
             (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(settings.App_CsvFilePath, App.GetCurrentDir());
 
-            var e = new OpenFileDialogRequestEventArgs {
+            OpenFileDialogRequestEventArgs e = new() {
                 CheckFileExists = true,
                 InitialDirectory = folderPath,
                 FileName = fileName,
@@ -292,7 +282,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 List<string> tmpCsvFilePathList = [];
                 string dstFolderPath = this.SelectedBookVM.CsvFolderPath;
                 foreach (string srcFilePath in this.CsvFilePathList) {
-                    if (!File.Exists(srcFilePath)) continue;
+                    if (!File.Exists(srcFilePath)) { continue; }
 
                     // 移動元と移動先が一致するなら移動しない
                     string dstFilePath = Path.Combine(dstFolderPath, Path.GetFileName(srcFilePath));
@@ -357,7 +347,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             List<CsvComparisonViewModel> vmList = [.. this.SelectedCsvComparisonVMList.Where(vm => !vm.ActionId.HasValue)];
             List<CsvViewModel> recordList = [.. vmList.Select(vm => vm.Record)];
 
-            async void func(object sender, EventArgs<List<int>> e)
+            async void Registered(object sender, EventArgs<List<int>> e)
             {
                 // CSVの項目をベースに追加したので既定で一致フラグを立てる
                 foreach (int actionId in e.Value) {
@@ -375,7 +365,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     DbHandlerFactory = this.dbHandlerFactory,
                     BookId = this.SelectedBookVM.Id.Value,
                     Record = record,
-                    Registered = func
+                    Registered = Registered
                 });
             }
             else {
@@ -383,7 +373,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     DbHandlerFactory = this.dbHandlerFactory,
                     BookId = this.SelectedBookVM.Id.Value,
                     Records = recordList,
-                    Registered = func
+                    Registered = Registered
                 });
             }
         }
@@ -407,7 +397,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 groupKind = dto.GroupKind;
             }
 
-            async void func(object sender, EventArgs<List<int>> e)
+            async void Registered(object sender, EventArgs<List<int>> e)
             {
                 // 表示を更新する
                 this.ActionChanged?.Invoke(this, e);
@@ -422,7 +412,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     this.EditActionListRequested?.Invoke(this, new EditActionListRequestEventArgs() {
                         DbHandlerFactory = this.dbHandlerFactory,
                         GroupId = this.SelectedCsvComparisonVM.GroupId.Value,
-                        Registered = func
+                        Registered = Registered
                     });
                     break;
                 case (int)GroupKind.Repeat:
@@ -430,7 +420,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     this.EditActionRequested?.Invoke(this, new EditActionRequestEventArgs() {
                         DbHandlerFactory = this.dbHandlerFactory,
                         ActionId = this.SelectedCsvComparisonVM.ActionId.Value,
-                        Registered = func
+                        Registered = Registered
                     });
                     break;
             }
@@ -516,8 +506,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         #region ウィンドウ設定プロパティ
-        protected override (double, double) WindowSizeSettingRaw
-        {
+        protected override (double, double) WindowSizeSettingRaw {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
                 return (settings.CsvComparisonWindow_Width, settings.CsvComparisonWindow_Height);
@@ -530,8 +519,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
 
-        public override Point WindowPointSetting
-        {
+        public override Point WindowPointSetting {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
                 return new Point(settings.CsvComparisonWindow_Left, settings.CsvComparisonWindow_Top);
@@ -545,10 +533,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        public override async Task LoadAsync()
-        {
-            await this.LoadAsync(null);
-        }
+        public override async Task LoadAsync() => await this.LoadAsync(null);
 
         /// <summary>
         /// DBから読み込む

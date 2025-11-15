@@ -21,102 +21,86 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// 帳簿項目ID
         /// </summary>
         #region ActionId
-        public int? ActionId
-        {
-            get => this._ActionId;
-            set => this.SetProperty(ref this._ActionId, value);
+        public int? ActionId {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int? _ActionId = default;
         #endregion
 
         /// <summary>
         /// 項目名
         /// </summary>
         #region ItemName
-        public string ItemName
-        {
-            get => this._ItemName;
-            set => this.SetProperty(ref this._ItemName, value);
+        public string ItemName {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _ItemName = default;
         #endregion
 
         /// <summary>
         /// 店舗名
         /// </summary>
         #region ShopName
-        public string ShopName
-        {
-            get => this._ShopName;
-            set => this.SetProperty(ref this._ShopName, value);
+        public string ShopName {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _ShopName = default;
         #endregion
 
         /// <summary>
         /// 備考
         /// </summary>
         #region Remark
-        public string Remark
-        {
-            get => this._Remark;
-            set => this.SetProperty(ref this._Remark, value);
+        public string Remark {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private string _Remark = default;
         #endregion
 
         /// <summary>
         /// グループID
         /// </summary>
         #region GroupId
-        public int? GroupId
-        {
-            get => this._GroupId;
-            set => this.SetProperty(ref this._GroupId, value);
+        public int? GroupId {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private int? _GroupId = default;
         #endregion
 
         /// <summary>
         /// 一致フラグ
         /// </summary>
         #region IsMatch
-        public bool IsMatch
-        {
-            get => this._IsMatch;
+        public bool IsMatch {
+            get;
             set {
                 if (this.ActionId.HasValue) {
-                    if (this.SetProperty(ref this._IsMatch, value)) {
+                    if (this.SetProperty(ref field, value)) {
                         this.IsMatchChanged?.Invoke(new EventArgs<int?, bool>(this.ActionId, value));
                     }
                 }
             }
         }
-        private bool _IsMatch = default;
         #endregion
 
         /// <summary>
         /// CSVデータ
         /// </summary>
         #region Record
-        public CsvViewModel Record
-        {
-            get => this._Record;
-            set => this.SetProperty(ref this._Record, value);
+        public CsvViewModel Record {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private CsvViewModel _Record = default;
         #endregion
 
         /// <summary>
         /// 選択フラグ
         /// </summary>
         #region IsSelected
-        public bool SelectFlag
-        {
-            get => this._SelectFlag;
-            set => this.SetProperty(ref this._SelectFlag, value);
+        public bool SelectFlag {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _SelectFlag = default;
         #endregion
         #endregion
 

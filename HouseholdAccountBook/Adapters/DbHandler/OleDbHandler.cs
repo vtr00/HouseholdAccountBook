@@ -15,7 +15,7 @@ namespace HouseholdAccountBook.DbHandler
         /// <summary>
         /// 接続文字列
         /// </summary>
-        private const string stringFormat = @"Provider={0};Data Source={1}";
+        private const string mStringFormat = @"Provider={0};Data Source={1}";
 
         /// <summary>
         /// <see cref="OleDbHandler"/> クラスの新しいインスタンスを初期化します。
@@ -27,15 +27,10 @@ namespace HouseholdAccountBook.DbHandler
         /// <see cref="OleDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
-        public OleDbHandler(string provider, string filePath) : base(new OleDbConnection(string.Format(stringFormat, provider, filePath)))
+        public OleDbHandler(string provider, string filePath) : base(new OleDbConnection(string.Format(mStringFormat, provider, filePath)))
         {
             this.DBLibKind = DBLibraryKind.OleDb;
-            if (provider.Contains(AccessProviderHeader)) {
-                this.DBKind = DBKind.Access;
-            }
-            else {
-                this.DBKind = DBKind.Undefined;
-            }
+            this.DBKind = provider.Contains(AccessProviderHeader) ? DBKind.Access : DBKind.Undefined;
         }
 
         /// <summary>

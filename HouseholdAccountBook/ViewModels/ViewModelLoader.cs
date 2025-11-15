@@ -710,7 +710,7 @@ namespace HouseholdAccountBook.ViewModels
                 var dtoList = await mstBookDao.FindIfJsonCodeExistsAsync();
                 foreach (MstBookDto dto in dtoList) {
                     MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
-                    if (jsonObj is null) continue;
+                    if (jsonObj is null) { continue; }
 
                     BookComparisonViewModel vm = new() {
                         Id = dto.BookId,
@@ -721,7 +721,7 @@ namespace HouseholdAccountBook.ViewModels
                         ExpensesIndex = jsonObj.CsvOutgoIndex + 1,
                         ItemNameIndex = jsonObj.CsvItemNameIndex + 1
                     };
-                    if (vm.CsvFolderPath == null || vm.ActDateIndex == null || vm.ExpensesIndex == null || vm.ItemNameIndex == null) continue;
+                    if (vm.CsvFolderPath == null || vm.ActDateIndex == null || vm.ExpensesIndex == null || vm.ItemNameIndex == null) { continue; }
 
                     bookCompVMList.Add(vm);
                 }

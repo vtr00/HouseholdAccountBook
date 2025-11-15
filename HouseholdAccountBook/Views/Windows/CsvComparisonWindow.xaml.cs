@@ -22,24 +22,21 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 一致フラグ変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<int?, bool>> IsMatchChanged
-        {
+        public event EventHandler<EventArgs<int?, bool>> IsMatchChanged {
             add => this.WVM.IsMatchChanged += value;
             remove => this.WVM.IsMatchChanged -= value;
         }
         /// <summary>
         /// 帳簿項目変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<List<int>>> ActionChanged
-        {
+        public event EventHandler<EventArgs<List<int>>> ActionChanged {
             add => this.WVM.ActionChanged += value;
             remove => this.WVM.ActionChanged -= value;
         }
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<int?>> BookChanged
-        {
+        public event EventHandler<ChangedEventArgs<int?>> BookChanged {
             add => this.WVM.BookChanged += value;
             remove => this.WVM.BookChanged -= value;
         }

@@ -22,7 +22,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<SummaryInfoDto>> FindAllWithinTerm(DateTime startTime, DateTime finishTime)
         {
-            var dtoList = await this.dbHandler.QueryAsync<SummaryInfoDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<SummaryInfoDto>(@"
 SELECT C.balance_kind, C.category_id, C.category_name, SQ.item_id, I.item_name, SQ.total
 FROM (
   SELECT I.item_id AS item_id, COALESCE(SUM(A.act_value), 0) AS total
@@ -48,7 +48,7 @@ new { StartTime = startTime, FinishTime = finishTime });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<SummaryInfoDto>> FindByBookIdWithinTerm(int bookId, DateTime startTime, DateTime finishTime)
         {
-            var dtoList = await this.dbHandler.QueryAsync<SummaryInfoDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<SummaryInfoDto>(@"
 SELECT C.balance_kind, C.category_id, C.category_name, SQ.item_id, I.item_name, SQ.total
 FROM (
   SELECT I.item_id AS item_id, COALESCE(SUM(A.act_value), 0) AS total

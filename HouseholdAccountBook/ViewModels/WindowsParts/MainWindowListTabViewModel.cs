@@ -25,7 +25,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 系列選択変更時イベント
         /// </summary>
-        public event EventHandler SelectedSeriesChanged = default;
+        public event EventHandler SelectedSeriesChanged;
         #endregion
 
         #region プロパティ
@@ -33,24 +33,21 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 系列VMリスト
         /// </summary>
         #region SeriesVMList
-        public ObservableCollection<SeriesViewModel> SeriesVMList
-        {
-            get => this._SeriesVMList;
-            set => this.SetProperty(ref this._SeriesVMList, value);
+        public ObservableCollection<SeriesViewModel> SeriesVMList {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private ObservableCollection<SeriesViewModel> _SeriesVMList = default;
         #endregion
 
         /// <summary>
         /// 選択された系列VM
         /// </summary>
         #region SelectedSeriesVM
-        public SeriesViewModel SelectedSeriesVM
-        {
-            get => this._SelectedSeriesVM;
+        public SeriesViewModel SelectedSeriesVM {
+            get;
             set {
-                var oldVM = this._SelectedSeriesVM;
-                if (this.SetProperty(ref this._SelectedSeriesVM, value)) {
+                var oldVM = field;
+                if (this.SetProperty(ref field, value)) {
                     this.Parent.SelectedBalanceKind = value?.BalanceKind;
                     this.Parent.SelectedCategoryId = value?.CategoryId;
                     this.Parent.SelectedItemId = value?.ItemId;
@@ -59,14 +56,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
             }
         }
-        private SeriesViewModel _SelectedSeriesVM = default;
         #endregion
         #endregion
 
-        public override async Task LoadAsync()
-        {
-            await this.LoadAsync(null, null, null);
-        }
+        public override async Task LoadAsync() => await this.LoadAsync(null, null, null);
 
         /// <summary>
         /// リストタブに表示するデータを読み込む
@@ -78,7 +71,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <exception cref="NotImplementedException"></exception>
         public async Task LoadAsync(int? balanceKind = null, int? categoryId = null, int? itemId = null)
         {
-            if (this.Parent.SelectedTab != this.Tab) return;
+            if (this.Parent.SelectedTab != this.Tab) { return; }
 
             using FuncLog funcLog = new(new { balanceKind, categoryId, itemId });
 
@@ -87,7 +80,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             int? tmpItemId = itemId ?? this.Parent.SelectedItemId;
             Log.Vars(vars: new { tmpBalanceKind, tmpCategoryId, tmpItemId });
 
-            var loader = new ViewModelLoader(this.dbHandlerFactory);
+            ViewModelLoader loader = new(this.dbHandlerFactory);
             this.SeriesVMList = this.Tab switch {
                 Tabs.MonthlyListTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
                 Tabs.YearlyListTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),

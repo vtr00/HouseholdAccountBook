@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<RemarkInfoDto>> FindByItemIdAsync(int itemId)
         {
-            var dtoList = await this.dbHandler.QueryAsync<RemarkInfoDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<RemarkInfoDto>(@"
 SELECT R.remark, COUNT(A.remark) AS count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
 FROM hst_remark R
 LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.remark = R.remark AND A.item_id = R.item_id

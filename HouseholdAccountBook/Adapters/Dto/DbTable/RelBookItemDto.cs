@@ -25,10 +25,10 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// <summary>
         /// 帳簿ID
         /// </summary>
-        public int BookId { get; set; } = 0;
+        public int BookId { get; set; }
         /// <summary>
         /// 項目ID
         /// </summary>
-        public int ItemId { get; set; } = 0;
+        public int ItemId { get; set; }
     }
 }

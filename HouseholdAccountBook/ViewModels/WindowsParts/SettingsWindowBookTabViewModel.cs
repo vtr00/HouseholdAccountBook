@@ -40,44 +40,38 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
-        public ObservableCollection<BookViewModel> BookVMList
-        {
-            get => this._BookVMList;
+        public ObservableCollection<BookViewModel> BookVMList {
+            get;
             set {
-                this._BookVMList.Clear();
+                field.Clear();
                 foreach (BookViewModel vm in value) {
-                    this._BookVMList.Add(vm);
+                    field.Add(vm);
                 }
                 this.RaisePropertyChanged(nameof(this.BookVMList));
             }
-        }
-        private readonly ObservableCollection<BookViewModel> _BookVMList = [];
+        } = [];
         #endregion
         /// <summary>
         /// 選択された帳簿VM
         /// </summary>
         #region SelectedBookVM
-        public BookViewModel SelectedBookVM
-        {
-            get => this._SelectedBookVM;
+        public BookViewModel SelectedBookVM {
+            get;
             set {
-                if (this.SetProperty(ref this._SelectedBookVM, value)) {
+                if (this.SetProperty(ref field, value)) {
                     this.SelectedBookVMChanged?.Invoke(this, new EventArgs<BookViewModel>(value));
                 }
             }
         }
-        private BookViewModel _SelectedBookVM = default;
         #endregion
         /// <summary>
         /// 表示された帳簿設定VM
         /// </summary>
         #region DisplayedBookSettingVM
-        public BookSettingViewModel DisplayedBookSettingVM
-        {
-            get => this._DisplayedBookSettingVM;
-            set => this.SetProperty(ref this._DisplayedBookSettingVM, value);
+        public BookSettingViewModel DisplayedBookSettingVM {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private BookSettingViewModel _DisplayedBookSettingVM = default;
         #endregion
 
         #region コマンド
@@ -330,10 +324,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
-        public override async Task LoadAsync()
-        {
-            await this.LoadAsync(null);
-        }
+        public override async Task LoadAsync() => await this.LoadAsync(null);
 
         /// <summary>
         /// 帳簿設定タブに表示するデータを読み込む

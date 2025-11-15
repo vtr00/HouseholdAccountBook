@@ -2,7 +2,6 @@
 {
     public class SettingsRequestEventArgs : DbRequestEventArgsBase
     {
-        public bool Result { get; set; } = false;
-
+        public bool Result { get; set; }
     }
 }

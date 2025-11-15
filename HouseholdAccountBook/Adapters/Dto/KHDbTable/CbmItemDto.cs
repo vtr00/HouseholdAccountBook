@@ -9,10 +9,7 @@ namespace HouseholdAccountBook.Adapters.Dto.KHDbTable
     {
         public CbmItemDto() { }
 
-        public override int GetId()
-        {
-            return this.ITEM_ID;
-        }
+        public override int GetId() => this.ITEM_ID;
 
         /// <summary>
         /// 項目ID

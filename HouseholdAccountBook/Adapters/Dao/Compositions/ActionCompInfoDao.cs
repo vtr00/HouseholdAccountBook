@@ -23,7 +23,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<ActionCompInfoDto>> FindMatchesWithCsvAsync(int bookId, DateTime date, int value)
         {
-            var dtoList = await this.dbHandler.QueryAsync<ActionCompInfoDto>(@"
+            var dtoList = await this.mDbHandler.QueryAsync<ActionCompInfoDto>(@"
 SELECT A.action_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match, A.group_id
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id

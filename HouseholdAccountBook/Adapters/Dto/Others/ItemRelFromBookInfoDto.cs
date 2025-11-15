@@ -27,10 +27,10 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
         /// <summary>
         /// 収支種別
         /// </summary>
-        public int BalanceKind { get; set; } = 0;
+        public int BalanceKind { get; set; }
         /// <summary>
         /// 関連有無
         /// </summary>
-        public bool IsRelated { get; set; } = false;
+        public bool IsRelated { get; set; }
     }
 }

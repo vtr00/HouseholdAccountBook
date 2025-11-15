@@ -75,24 +75,20 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// CSVと一致したか
         /// </summary>
         #region IsMatch
-        public bool IsMatch
-        {
-            get => this._IsMatch;
-            set => this.SetProperty(ref this._IsMatch, value);
+        public bool IsMatch {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _IsMatch = default;
         #endregion
 
         /// <summary>
         /// 選択されているか
         /// </summary>
         #region SelectFlag
-        public bool SelectFlag
-        {
-            get => this._SelectFlag;
-            set => this.SetProperty(ref this._SelectFlag, value);
+        public bool SelectFlag {
+            get;
+            set => this.SetProperty(ref field, value);
         }
-        private bool _SelectFlag = default;
         #endregion
 
         /// <summary>
