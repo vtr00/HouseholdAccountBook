@@ -438,6 +438,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Properties.Settings settings = Properties.Settings.Default;
 
+                // DB設定
+                settings.DbSettingWindow_Left = -1;
+                settings.DbSettingWindow_Top = -1;
+                settings.DbSettingWindow_Width = -1;
+                settings.DbSettingWindow_Height = -1;
+
                 // メイン
                 settings.MainWindow_Left = -1;
                 settings.MainWindow_Top = -1;
