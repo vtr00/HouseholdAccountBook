@@ -93,7 +93,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.AddMoveRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddMoveRequested));
 
-                this.mMRW = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
+                this.mMRW = new(this, e.DbHandlerFactory, e.InitialBookId, e.InitialMonth, e.InitialDate);
                 this.mMRW.Registrated += e.Registered;
                 this.mMRW.Closed += (sender, e) => {
                     this.mMRW = null;
@@ -105,7 +105,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.AddActionRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionRequested));
 
-                this.mARW = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
+                this.mARW = new(this, e.DbHandlerFactory, e.InitialBookId, e.InitialMonth, e.InitialDate);
                 this.mARW.Registrated += e.Registered;
                 this.mARW.Closed += (sender, e) => {
                     this.mARW = null;
@@ -117,7 +117,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.AddActionListRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionListRequested));
 
-                this.mALRW = new(this, e.DbHandlerFactory, e.BookId, e.Month, e.Date);
+                this.mALRW = new(this, e.DbHandlerFactory, e.InitialBookId, e.InitialMonth, e.InitialDate);
                 this.mALRW.Registrated += e.Registered;
                 this.mALRW.Closed += (sender, e) => {
                     this.mALRW = null;
@@ -129,7 +129,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.CopyMoveRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.CopyMoveRequested));
 
-                this.mMRW = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Copy);
+                this.mMRW = new(this, e.DbHandlerFactory, e.TargetGroupId, RegistrationKind.Copy);
                 this.mMRW.Registrated += e.Registered;
                 this.mMRW.Closed += (sender, e) => {
                     this.mMRW = null;
@@ -141,7 +141,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.CopyActionRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.CopyActionRequested));
 
-                this.mARW = new(this, e.DbHandlerFactory, e.ActionId, RegistrationKind.Copy);
+                this.mARW = new(this, e.DbHandlerFactory, e.TargetActionId, RegistrationKind.Copy);
                 this.mARW.Registrated += e.Registered;
                 this.mARW.Closed += (sender, e) => {
                     this.mARW = null;
@@ -153,7 +153,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.EditMoveRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.EditMoveRequested));
 
-                this.mMRW = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Edit);
+                this.mMRW = new(this, e.DbHandlerFactory, e.TargetGroupId, RegistrationKind.Edit);
                 this.mMRW.Registrated += e.Registered;
                 this.mMRW.Closed += (sender, e) => {
                     this.mMRW = null;
@@ -165,7 +165,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.EditActionRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.EditActionRequested));
 
-                this.mARW = new(this, e.DbHandlerFactory, e.ActionId, RegistrationKind.Edit);
+                this.mARW = new(this, e.DbHandlerFactory, e.TargetActionId, RegistrationKind.Edit);
                 this.mARW.Registrated += e.Registered;
                 this.mARW.Closed += (sender, e) => {
                     this.mARW = null;
@@ -177,7 +177,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.EditActionListRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.EditActionListRequested));
 
-                this.mALRW = new(this, e.DbHandlerFactory, e.GroupId, RegistrationKind.Edit);
+                this.mALRW = new(this, e.DbHandlerFactory, e.TargetGroupId);
                 this.mALRW.Registrated += e.Registered;
                 this.mALRW.Closed += (sender, e) => {
                     this.mALRW = null;
@@ -214,7 +214,7 @@ namespace HouseholdAccountBook.Views.Windows
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.CompareCsvFileRequested));
 
                 if (this.mCCW is null) {
-                    this.mCCW = new CsvComparisonWindow(this, e.DbHandlerFactory, e.BookId);
+                    this.mCCW = new CsvComparisonWindow(this, e.DbHandlerFactory, e.InitialBookId);
                     // 帳簿項目の一致フラグ変更時のイベントを登録する
                     this.mCCW.IsMatchChanged += (sender, e) => {
                         using FuncLog funcLog = new(methodName: nameof(this.mCCW.IsMatchChanged));
@@ -250,7 +250,7 @@ namespace HouseholdAccountBook.Views.Windows
                     };
                 }
                 else {
-                    this.mCCW.WVM.SelectedBookVM = this.mCCW.WVM.BookVMList.FirstOrDefault(vm => vm.Id == e.BookId);
+                    this.mCCW.WVM.SelectedBookVM = this.mCCW.WVM.BookVMList.FirstOrDefault(vm => vm.Id == e.InitialBookId);
                 }
 
                 this.mCCW.Show();

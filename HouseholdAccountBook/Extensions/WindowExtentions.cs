@@ -69,7 +69,7 @@ namespace HouseholdAccountBook.Extensions
             wvm.CloseRequested += (sender, e) => {
                 if (window.IsModal()) {
                     try {
-                        window.DialogResult = e.DialogResult;
+                        window.DialogResult = e.Result;
                     }
                     catch (InvalidOperationException) { }
                 }

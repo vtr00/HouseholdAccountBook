@@ -277,7 +277,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void MoveCsvFilesCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 // ファイルの移動を試みる
                 List<string> tmpCsvFilePathList = [];
                 string dstFolderPath = this.SelectedBookVM.CsvFolderPath;
@@ -362,17 +362,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
             if (recordList.Count == 1) {
                 CsvViewModel record = recordList[0];
                 this.AddActionRequested?.Invoke(this, new AddActionRequestEventArgs() {
-                    DbHandlerFactory = this.dbHandlerFactory,
-                    BookId = this.SelectedBookVM.Id.Value,
-                    Record = record,
+                    DbHandlerFactory = this.mDbHandlerFactory,
+                    InitialBookId = this.SelectedBookVM.Id.Value,
+                    InitialRecord = record,
                     Registered = Registered
                 });
             }
             else {
                 this.AddActionListRequested?.Invoke(this, new AddActionListRequestEventArgs() {
-                    DbHandlerFactory = this.dbHandlerFactory,
-                    BookId = this.SelectedBookVM.Id.Value,
-                    Records = recordList,
+                    DbHandlerFactory = this.mDbHandlerFactory,
+                    InitialBookId = this.SelectedBookVM.Id.Value,
+                    InitialRecordList = recordList,
                     Registered = Registered
                 });
             }
@@ -391,7 +391,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             // グループ種別を特定する
             int? groupKind = null;
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 GroupInfoDao groupInfoDao = new(dbHandler);
                 var dto = await groupInfoDao.FindByActionId(this.SelectedCsvComparisonVM.ActionId.Value);
                 groupKind = dto.GroupKind;
@@ -410,16 +410,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     break;
                 case (int)GroupKind.ListReg:
                     this.EditActionListRequested?.Invoke(this, new EditActionListRequestEventArgs() {
-                        DbHandlerFactory = this.dbHandlerFactory,
-                        GroupId = this.SelectedCsvComparisonVM.GroupId.Value,
+                        DbHandlerFactory = this.mDbHandlerFactory,
+                        TargetGroupId = this.SelectedCsvComparisonVM.GroupId.Value,
                         Registered = Registered
                     });
                     break;
                 case (int)GroupKind.Repeat:
                 default:
                     this.EditActionRequested?.Invoke(this, new EditActionRequestEventArgs() {
-                        DbHandlerFactory = this.dbHandlerFactory,
-                        ActionId = this.SelectedCsvComparisonVM.ActionId.Value,
+                        DbHandlerFactory = this.mDbHandlerFactory,
+                        TargetActionId = this.SelectedCsvComparisonVM.ActionId.Value,
                         Registered = Registered
                     });
                     break;
@@ -467,7 +467,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void BulkCheckCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 foreach (CsvComparisonViewModel vm in this.CsvComparisonVMList) {
                     if (vm.ActionId.HasValue && !vm.IsMatch) {
                         vm.IsMatch = true;
@@ -488,7 +488,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void UpdateListCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 await this.UpdateComparisonVMListAsync();
             }
         }
@@ -538,13 +538,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// DBから読み込む
         /// </summary>
-        /// <param name="selectedBookId">選択された帳簿ID</param>
+        /// <param name="initialBookId">初期選択する帳簿のID</param>
         /// <returns></returns>
-        public async Task LoadAsync(int? selectedBookId)
+        public async Task LoadAsync(int? initialBookId)
         {
-            using FuncLog funcLog = new(new { selectedBookId });
+            using FuncLog funcLog = new(new { initialBookId });
 
-            await this.UpdateBookCompListAsync(selectedBookId);
+            await this.UpdateBookCompListAsync(initialBookId);
         }
 
         /// <summary>
@@ -555,7 +555,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { bookId });
 
-            ViewModelLoader loader = new(this.dbHandlerFactory);
+            ViewModelLoader loader = new(this.mDbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             this.BookVMList = await loader.UpdateBookCompListAsync();
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
@@ -687,7 +687,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new(new { isScroll });
 
             // 指定された帳簿内で、日付、金額が一致する帳簿項目を探す
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 foreach (var vm in this.CsvComparisonVMList) {
                     // 前回の帳簿項目情報をクリアする
                     vm.ClearActionInfo();
@@ -727,7 +727,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { actionId, isMatch });
 
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 HstActionDao hstActionDao = new(dbHandler);
                 _ = await hstActionDao.UpdateIsMatchByIdAsync(actionId, isMatch ? 1 : 0);
             }

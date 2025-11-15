@@ -2,10 +2,13 @@
 
 namespace HouseholdAccountBook.Others.RequestEventArgs
 {
+    /// <summary>
+    /// ファイル選択ダイアログ要求時イベントのイベント引数
+    /// </summary>
     public class OpenFileDialogRequestEventArgs : EventArgs
     {
         /// <summary>
-        /// ファイルが存在するか
+        /// ファイルの存在を確認するか
         /// </summary>
         public bool CheckFileExists { get; set; } = true;
         /// <summary>
@@ -13,7 +16,7 @@ namespace HouseholdAccountBook.Others.RequestEventArgs
         /// </summary>
         public string InitialDirectory { get; set; }
         /// <summary>
-        /// 初期ファイル及び結果ファイル
+        /// 初期ファイル名及び結果ファイル名
         /// </summary>
         public string FileName { get; set; }
         /// <summary>
@@ -33,12 +36,13 @@ namespace HouseholdAccountBook.Others.RequestEventArgs
         /// </summary>
         public string[] FileNames { get; set; }
         /// <summary>
-        /// ダイアログの結果
-        /// </summary>
-        public bool Result { get; set; }
-        /// <summary>
         /// ファイルが存在するフォルダが存在するか
         /// </summary>
         public bool CheckPathExists { get; set; } = true;
+
+        /// <summary>
+        /// ダイアログの結果
+        /// </summary>
+        public bool Result { get; set; }
     }
 }

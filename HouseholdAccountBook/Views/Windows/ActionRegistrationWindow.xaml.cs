@@ -43,51 +43,51 @@ namespace HouseholdAccountBook.Views.Windows
 
         #region コンストラクタ
         /// <summary>
-        /// 帳簿項目の新規登録のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
+        /// 帳簿項目の追加のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="selectedBookId">選択された帳簿ID</param>
-        /// <param name="selectedMonth">選択された年月</param>
-        /// <param name="selectedDate">選択された日付</param>
-        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate)
-            : this(owner, dbHandlerFactory, selectedBookId, selectedMonth, selectedDate, null, null, RegistrationKind.Add) { }
+        /// <param name="initialBookId">初期選択する帳簿のID</param>
+        /// <param name="initialMonth">初期選択する年月</param>
+        /// <param name="initialDate">初期選択する日付</param>
+        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, DateTime? initialMonth, DateTime? initialDate)
+            : this(owner, dbHandlerFactory, initialBookId, initialMonth, initialDate, null, null, RegistrationKind.Add) { }
 
         /// <summary>
-        /// 帳簿項目の新規登録のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
+        /// 帳簿項目の追加のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="selectedBookId">選択された帳簿ID</param>
-        /// <param name="selectedRecord">選択されたCSVレコード</param>
-        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, CsvViewModel selectedRecord)
-            : this(owner, dbHandlerFactory, selectedBookId, null, null, selectedRecord, null, RegistrationKind.Add) { }
+        /// <param name="initialBookId">初期選択する帳簿ID</param>
+        /// <param name="initialRecord">初期表示するCSVレコード</param>
+        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, CsvViewModel initialRecord)
+            : this(owner, dbHandlerFactory, initialBookId, null, null, initialRecord, null, RegistrationKind.Add) { }
 
         /// <summary>
-        /// 帳簿項目の編集(複製)のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
+        /// 帳簿項目の複製/編集のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="selectedActionId">帳簿項目ID</param>
+        /// <param name="targetActionId">複製/編集する帳簿項目のID</param>
         /// <param name="regKind">登録種別</param>
-        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedActionId, RegistrationKind regKind = RegistrationKind.Edit)
-            : this(owner, dbHandlerFactory, null, null, null, null, selectedActionId, regKind) { }
+        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int targetActionId, RegistrationKind regKind = RegistrationKind.Edit)
+            : this(owner, dbHandlerFactory, null, null, null, null, targetActionId, regKind) { }
 
         /// <summary>
         /// <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="selectedBookId">選択された帳簿ID</param>
-        /// <param name="selectedMonth">選択された年月</param>
-        /// <param name="selectedDate">選択された日付</param>
-        /// <param name="selectedRecord">選択されたCSVレコード</param>
-        /// <param name="selectedActionId">帳簿項目ID</param>
+        /// <param name="initialBookId">初期選択する帳簿ID</param>
+        /// <param name="initialMonth">初期選択する年月</param>
+        /// <param name="initialDate">初期選択する日付</param>
+        /// <param name="initialRecord">初期表示するCSVレコード</param>
+        /// <param name="targetActionId">複製/編集する帳簿項目ID</param>
         /// <param name="regKind">登録種別</param>
-        private ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate,
-                                         CsvViewModel selectedRecord, int? selectedActionId, RegistrationKind regKind)
+        private ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, DateTime? initialMonth, DateTime? initialDate,
+                                         CsvViewModel initialRecord, int? targetActionId, RegistrationKind regKind)
         {
-            using FuncLog funcLog = new(new { selectedBookId, selectedMonth, selectedDate, selectedRecord, selectedActionId, regKind });
+            using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, initialRecord, targetActionId, regKind });
 
             this.Owner = owner;
             this.Name = "ActReg";
@@ -98,13 +98,13 @@ namespace HouseholdAccountBook.Views.Windows
 
             this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
             this.WVM.RegKind = regKind;
-            this.WVM.AddedByCsvComparison = selectedRecord is not null;
+            this.WVM.AddedByCsvComparison = initialRecord is not null;
 
             this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create(methodName: nameof(this.Loaded))) {
-                    await this.WVM.LoadAsync(selectedBookId, selectedMonth, selectedDate, selectedRecord, selectedActionId);
+                    await this.WVM.LoadAsync(initialBookId, initialMonth, initialDate, initialRecord, targetActionId);
                 }
                 this.WVM.AddEventHandlers();
             };

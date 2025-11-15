@@ -80,7 +80,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             int? tmpItemId = itemId ?? this.Parent.SelectedItemId;
             Log.Vars(vars: new { tmpBalanceKind, tmpCategoryId, tmpItemId });
 
-            ViewModelLoader loader = new(this.dbHandlerFactory);
+            ViewModelLoader loader = new(this.mDbHandlerFactory);
             this.SeriesVMList = this.Tab switch {
                 Tabs.MonthlyListTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
                 Tabs.YearlyListTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),

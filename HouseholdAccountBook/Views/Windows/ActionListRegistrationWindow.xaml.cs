@@ -51,51 +51,50 @@ namespace HouseholdAccountBook.Views.Windows
 
         #region コンストラクタ
         /// <summary>
-        /// 複数の帳簿項目の新規登録のために <see cref="ActionListRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
+        /// 複数の帳簿項目の追加のために <see cref="ActionListRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="selectedBookId">選択された帳簿ID</param>
-        /// <param name="selectedMonth">選択された年月</param>
-        /// <param name="selectedDate">選択された日付</param>
-        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate = null)
-            : this(owner, dbHandlerFactory, selectedBookId, selectedMonth, selectedDate, null, null, RegistrationKind.Add) { }
+        /// <param name="initialBookId">初期選択する帳簿のID</param>
+        /// <param name="initialMonth">初期選択する年月</param>
+        /// <param name="initialDate">初期選択する日付</param>
+        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, DateTime? initialMonth, DateTime? initialDate = null)
+            : this(owner, dbHandlerFactory, initialBookId, initialMonth, initialDate, null, null, RegistrationKind.Add) { }
 
         /// <summary>
-        /// 複数の帳簿項目の新規登録のために <see cref="ActionListRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
+        /// 複数の帳簿項目の追加のために <see cref="ActionListRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="selectedBookId">選択された帳簿ID</param>
-        /// <param name="selectedRecordList">選択されたCSVレコードリスト</param>
-        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, List<CsvViewModel> selectedRecordList)
-            : this(owner, dbHandlerFactory, selectedBookId, null, null, selectedRecordList, null, RegistrationKind.Add) { }
+        /// <param name="initialBookId">初期選択する帳簿のID</param>
+        /// <param name="initialRecordList">初期表示するCSVレコードリスト</param>
+        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, List<CsvViewModel> initialRecordList)
+            : this(owner, dbHandlerFactory, initialBookId, null, null, initialRecordList, null, RegistrationKind.Add) { }
 
         /// <summary>
-        /// 複数の帳簿項目の編集(複製)のために <see cref="ActionListRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
+        /// 複数の帳簿項目の編集のために <see cref="ActionListRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="selectedGroupId">選択されたグループID</param>
-        /// <param name="regKind">登録種別</param>
-        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int selectedGroupId, RegistrationKind regKind = RegistrationKind.Edit)
-            : this(owner, dbHandlerFactory, null, null, null, null, selectedGroupId, regKind) { }
+        /// <param name="targetGroupId">編集する帳簿項目のグループID</param>
+        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int targetGroupId)
+            : this(owner, dbHandlerFactory, null, null, null, null, targetGroupId, RegistrationKind.Edit) { }
 
         /// <summary>
         /// <see cref="ActionListRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="selectedBookId">選択された帳簿ID</param>
-        /// <param name="selectedMonth">選択された年月</param>
-        /// <param name="selectedDate">選択された日付</param>
-        /// <param name="selectedRecordList">選択されたCSVレコードリスト</param>
-        /// <param name="selectedGroupId">選択されたグループID</param>
+        /// <param name="initialBookId">追加時、初期選択する帳簿ID</param>
+        /// <param name="initialMonth">追加時、初期選択する年月</param>
+        /// <param name="initialDate">追加時、初期選択する日付</param>
+        /// <param name="initialRecordList">追加時、初期表示するCSVレコードリスト</param>
+        /// <param name="targetGroupId">編集時、編集する帳簿項目のグループID</param>
         /// <param name="regKind">登録種別</param>
-        private ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId, DateTime? selectedMonth, DateTime? selectedDate,
-            List<CsvViewModel> selectedRecordList, int? selectedGroupId, RegistrationKind regKind)
+        private ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, DateTime? initialMonth, DateTime? initialDate,
+            List<CsvViewModel> initialRecordList, int? targetGroupId, RegistrationKind regKind)
         {
-            using FuncLog funcLog = new(new { selectedBookId, selectedMonth, selectedDate, selectedRecordList, selectedGroupId, regKind });
+            using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, initialRecordList, targetGroupId, regKind });
 
             this.Owner = owner;
             this.Name = "ActListReg";
@@ -111,7 +110,7 @@ namespace HouseholdAccountBook.Views.Windows
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create(methodName: nameof(this.Loaded))) {
-                    await this.WVM.LoadAsync(selectedBookId, selectedMonth, selectedDate, selectedRecordList, selectedGroupId);
+                    await this.WVM.LoadAsync(initialBookId, initialMonth, initialDate, initialRecordList, targetGroupId);
                 }
                 this.WVM.AddEventHandlers();
             };

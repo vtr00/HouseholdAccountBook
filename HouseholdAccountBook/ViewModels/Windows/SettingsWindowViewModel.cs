@@ -105,7 +105,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         public SettingsWindowViewModel()
         {
-            this.childrenVM.AddRange(
+            this.mChildrenVM.AddRange(
                 [
                     this.ItemTabVM,
                     this.BookTabVM,
@@ -135,12 +135,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
-            this.childrenVM.ForEach(childVM => {
+            this.mChildrenVM.ForEach(childVM => {
                 childVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
                 childVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);
             });
 
-            this.childrenVM.ForEach(childVM => childVM.AddEventHandlers());
+            this.mChildrenVM.ForEach(childVM => childVM.AddEventHandlers());
         }
     }
 }

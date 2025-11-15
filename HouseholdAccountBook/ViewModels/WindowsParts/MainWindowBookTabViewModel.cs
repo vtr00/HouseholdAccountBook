@@ -436,7 +436,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 string shopName = vm.ShopName.Replace(this.FindText, this.ReplaceText);
                 string remark = vm.Remark.Replace(this.FindText, this.ReplaceText);
 
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     HstActionDao hstActionDao = new(dbHandler);
                     _ = await hstActionDao.UpdateShopNameAndRemarkByIdAsync(vm.ActionId, shopName, remark);
                 }
@@ -458,10 +458,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private void AddMoveCommand_Executed()
         {
             AddMoveRequestEventArgs e = new() {
-                DbHandlerFactory = this.dbHandlerFactory,
-                BookId = this.Parent.SelectedBookVM?.Id,
-                Month = this.Parent.DisplayedTermKind == TermKind.Monthly ? this.Parent.DisplayedMonth : null,
-                Date = this.SelectedActionVM?.ActTime,
+                DbHandlerFactory = this.mDbHandlerFactory,
+                InitialBookId = this.Parent.SelectedBookVM?.Id,
+                InitialMonth = this.Parent.DisplayedTermKind == TermKind.Monthly ? this.Parent.DisplayedMonth : null,
+                InitialDate = this.SelectedActionVM?.ActTime,
                 Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
             };
             this.AddMoveRequested?.Invoke(this, e);
@@ -479,10 +479,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private void AddActionCommand_Executed()
         {
             AddActionRequestEventArgs e = new() {
-                DbHandlerFactory = this.dbHandlerFactory,
-                BookId = this.Parent.SelectedBookVM?.Id,
-                Month = this.Parent.DisplayedTermKind == TermKind.Monthly ? this.Parent.DisplayedMonth : null,
-                Date = this.SelectedActionVM?.ActTime,
+                DbHandlerFactory = this.mDbHandlerFactory,
+                InitialBookId = this.Parent.SelectedBookVM?.Id,
+                InitialMonth = this.Parent.DisplayedTermKind == TermKind.Monthly ? this.Parent.DisplayedMonth : null,
+                InitialDate = this.SelectedActionVM?.ActTime,
                 Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true)  // 帳簿一覧タブを更新する
             };
             this.AddActionRequested?.Invoke(this, e);
@@ -500,10 +500,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private void AddActionListCommand_Executed()
         {
             AddActionListRequestEventArgs e = new() {
-                DbHandlerFactory = this.dbHandlerFactory,
-                BookId = this.Parent.SelectedBookVM?.Id,
-                Month = this.Parent.DisplayedTermKind == TermKind.Monthly ? this.Parent.DisplayedMonth : null,
-                Date = this.SelectedActionVM?.ActTime,
+                DbHandlerFactory = this.mDbHandlerFactory,
+                InitialBookId = this.Parent.SelectedBookVM?.Id,
+                InitialMonth = this.Parent.DisplayedTermKind == TermKind.Monthly ? this.Parent.DisplayedMonth : null,
+                InitialDate = this.SelectedActionVM?.ActTime,
                 Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
             };
             this.AddActionListRequested?.Invoke(this, e);
@@ -523,7 +523,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             // グループ種別を特定する
             int? groupKind = null;
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 GroupInfoDao groupInfoDao = new(dbHandler);
                 var dto = await groupInfoDao.FindByActionId(this.SelectedActionVM.ActionId);
                 groupKind = dto.GroupKind;
@@ -532,8 +532,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             if (groupKind is null or ((int)GroupKind.Repeat)) {
                 // 移動以外の帳簿項目の複製時の処理
                 CopyActionRequestEventArgs e = new() {
-                    DbHandlerFactory = this.dbHandlerFactory,
-                    ActionId = this.SelectedActionVM.ActionId,
+                    DbHandlerFactory = this.mDbHandlerFactory,
+                    TargetActionId = this.SelectedActionVM.ActionId,
                     Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
                 };
                 this.CopyActionRequested?.Invoke(this, e);
@@ -541,8 +541,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             else {
                 // 移動の複製時の処理
                 CopyMoveRequestEventArgs e = new() {
-                    DbHandlerFactory = this.dbHandlerFactory,
-                    GroupId = this.SelectedActionVM.GroupId.Value,
+                    DbHandlerFactory = this.mDbHandlerFactory,
+                    TargetGroupId = this.SelectedActionVM.GroupId.Value,
                     Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
                 };
                 this.CopyMoveRequested?.Invoke(this, e);
@@ -563,7 +563,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             // グループ種別を特定する
             int? groupKind = null;
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 GroupInfoDao groupInfoDao = new(dbHandler);
                 var dto = await groupInfoDao.FindByActionId(this.SelectedActionVM.ActionId);
                 groupKind = dto.GroupKind;
@@ -573,8 +573,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 case (int)GroupKind.Move: {
                     // 移動の編集時の処理
                     EditMoveRequestEventArgs e = new() {
-                        DbHandlerFactory = this.dbHandlerFactory,
-                        GroupId = this.SelectedActionVM.GroupId.Value,
+                        DbHandlerFactory = this.mDbHandlerFactory,
+                        TargetGroupId = this.SelectedActionVM.GroupId.Value,
                         Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
                     };
                     this.EditMoveRequested?.Invoke(this, e);
@@ -583,8 +583,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 case (int)GroupKind.ListReg: {
                     // リスト登録された帳簿項目の編集時の処理
                     EditActionListRequestEventArgs e = new() {
-                        DbHandlerFactory = this.dbHandlerFactory,
-                        GroupId = this.SelectedActionVM.GroupId.Value,
+                        DbHandlerFactory = this.mDbHandlerFactory,
+                        TargetGroupId = this.SelectedActionVM.GroupId.Value,
                         Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
                     };
                     this.EditActionListRequested?.Invoke(this, e);
@@ -594,8 +594,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 default: {
                     // 移動・リスト登録以外の帳簿項目の編集時の処理
                     EditActionRequestEventArgs e = new() {
-                        DbHandlerFactory = this.dbHandlerFactory,
-                        ActionId = this.SelectedActionVM.ActionId,
+                        DbHandlerFactory = this.mDbHandlerFactory,
+                        TargetActionId = this.SelectedActionVM.ActionId,
                         Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
                     };
                     this.EditActionRequested?.Invoke(this, e);
@@ -618,7 +618,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     await dbHandler.ExecTransactionAsync(async () => {
                         HstActionDao hstActionDao = new(dbHandler);
                         HstGroupDao hstGroupDao = new(dbHandler);
@@ -686,7 +686,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async void ChangeIsMatchCommand_Executed()
         {
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 // 帳簿項目IDが0を超える項目についてループ
                 HstActionDao hstActionDao = new(dbHandler);
                 foreach (ActionViewModel vm in this.SelectedActionVMList.Where(vm => 0 < vm.ActionId)) {
@@ -758,7 +758,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             Log.Vars(vars: new { tmpActionIdList, tmpBalanceKind, tmpCategoryId, tmpItemId });
 
             // 表示するデータを指定する
-            ViewModelLoader loader = new(this.dbHandlerFactory);
+            ViewModelLoader loader = new(this.mDbHandlerFactory);
             switch (this.Parent.DisplayedTermKind) {
                 case TermKind.Monthly:
                     var (tmp1, tmp2) = await (
@@ -797,7 +797,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             // 最後に操作した帳簿項目の日付を更新する
             if (isUpdateActDateLastEdited) {
                 if (actionIdList != null && actionIdList.Count != 0) {
-                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                    await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                         HstActionDao hstActionDao = new(dbHandler);
                         var dto = await hstActionDao.FindByIdAsync(actionIdList[0]);
                         this.ActDateLastEdited = dto.ActTime;

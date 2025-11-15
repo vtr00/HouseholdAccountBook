@@ -52,10 +52,10 @@ namespace HouseholdAccountBook.Views.Windows
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="selectedBookId">選択された帳簿ID</param>
-        public CsvComparisonWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? selectedBookId)
+        /// <param name="initialBookId">初期選択する帳簿のID</param>
+        public CsvComparisonWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId)
         {
-            using FuncLog funcLog = new(new { selectedBookId });
+            using FuncLog funcLog = new(new { initialBookId });
 
             this.Owner = owner;
             this.Name = "CsvComp";
@@ -71,7 +71,7 @@ namespace HouseholdAccountBook.Views.Windows
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create(methodName: nameof(this.Loaded))) {
-                    await this.WVM.LoadAsync(selectedBookId);
+                    await this.WVM.LoadAsync(initialBookId);
                 }
                 this.WVM.AddEventHandlers();
             };
@@ -89,28 +89,28 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.AddActionRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionRequested));
 
-                ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.BookId, e.Record);
+                ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.InitialBookId, e.InitialRecord);
                 arw.Registrated += e.Registered;
                 _ = arw.ShowDialog();
             };
             this.WVM.AddActionListRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionListRequested));
 
-                ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.BookId, e.Records);
+                ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.InitialBookId, e.InitialRecordList);
                 alrw.Registrated += e.Registered;
                 _ = alrw.ShowDialog();
             };
             this.WVM.EditActionRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.EditActionRequested));
 
-                ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.ActionId);
+                ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.TargetActionId);
                 arw.Registrated += e.Registered;
                 _ = arw.ShowDialog();
             };
             this.WVM.EditActionListRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.EditActionListRequested));
 
-                ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.GroupId);
+                ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.TargetGroupId);
                 alrw.Registrated += e.Registered;
                 _ = alrw.ShowDialog();
             };

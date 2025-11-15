@@ -120,7 +120,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async void AddCategoryCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 HierarchicalViewModel vm = this.SelectedHierarchicalVM;
                 while (GetHierarchicalKind(vm) != HierarchicalKind.Balance) {
                     vm = vm.ParentVM;
@@ -128,7 +128,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 BalanceKind kind = (BalanceKind)vm.Id;
 
                 int categoryId = -1;
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     MstCategoryDao dao = new(dbHandler);
                     categoryId = await dao.InsertReturningIdAsync(new MstCategoryDto { BalanceKind = (int)kind });
                 }
@@ -148,7 +148,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async void AddItemCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 HierarchicalViewModel vm = this.SelectedHierarchicalVM;
                 while (GetHierarchicalKind(vm) != HierarchicalKind.Category) {
                     vm = vm.ParentVM;
@@ -156,7 +156,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 int categoryId = vm.Id;
 
                 int itemId = -1;
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     MstItemDao mstItemDao = new(dbHandler);
                     itemId = await mstItemDao.InsertReturningIdAsync(new MstItemDto { CategoryId = categoryId });
                 }
@@ -176,11 +176,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async void DeleteItemCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 HierarchicalKind? kind = GetHierarchicalKind(this.SelectedHierarchicalVM);
                 int id = this.SelectedHierarchicalVM.Id;
 
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     switch (kind) {
                         case HierarchicalKind.Category: {
                             await dbHandler.ExecTransactionAsync(async () => {
@@ -249,14 +249,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async void RaiseItemSortOrderCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 var parentVM = this.SelectedHierarchicalVM.ParentVM;
                 int index = parentVM.ChildrenVMList.IndexOf(this.SelectedHierarchicalVM);
                 int changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
                 if (0 < index) {
                     int changedId = parentVM.ChildrenVMList[index - 1].Id; // 入れ替え対象の項目のID
 
-                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                    await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                         switch (GetHierarchicalKind(this.SelectedHierarchicalVM)) {
                             case HierarchicalKind.Category: {
                                 MstCategoryDao mstCategoryDao = new(dbHandler);
@@ -277,7 +277,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     int toCategoryId = grandparentVM.ChildrenVMList[index2 - 1].Id;
 
-                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                    await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                         MstItemDao mstItemDao = new(dbHandler);
                         _ = await mstItemDao.UpdateSortOrderToMaximumAsync(toCategoryId, changingId);
                     }
@@ -317,14 +317,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async void DropItemSortOrderCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 var parentVM = this.SelectedHierarchicalVM.ParentVM;
                 int index = parentVM.ChildrenVMList.IndexOf(this.SelectedHierarchicalVM);
                 int changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
                 if (parentVM.ChildrenVMList.Count - 1 > index) {
                     int changedId = parentVM.ChildrenVMList[index + 1].Id; // 入れ替え対象の項目のID
 
-                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                    await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                         switch (GetHierarchicalKind(this.SelectedHierarchicalVM)) {
                             case HierarchicalKind.Category: {
                                 MstCategoryDao mstCategoryDao = new(dbHandler);
@@ -345,7 +345,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     int toCategoryId = grandparentVM.ChildrenVMList[index2 + 1].Id;
 
-                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                    await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                         MstItemDao mstItemDao = new(dbHandler);
                         _ = await mstItemDao.UpdateSortOrderToMinimumAsync(toCategoryId, changingId);
                     }
@@ -371,10 +371,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async void SaveItemInfoCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 HierarchicalSettingViewModel vm = this.DisplayedHierarchicalSettingVM;
 
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     switch (vm.Kind) {
                         case HierarchicalKind.Category: {
                             MstCategoryDao mstCategoryDao = new(dbHandler);
@@ -401,13 +401,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="viewModel">チェック対象に紐づくVM</param>
         private async void ChangeItemRelationCommand_Executed(object viewModel)
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 Debug.Assert(this.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
                 HierarchicalSettingViewModel vm = this.DisplayedHierarchicalSettingVM;
                 vm.SelectedRelationVM = viewModel as RelationViewModel; // チェックボックスを変更しただけでは変更されないため、引数で受け取る
 
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     HstActionDao hstActionDao = new(dbHandler);
                     var actionDtoList = await hstActionDao.FindByBookIdAndItemIdAsync(vm.SelectedRelationVM.Id, vm.Id);
 
@@ -443,10 +443,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                     Debug.Assert(this.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
-                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                    await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                         HstShopDao hstShopDao = new(dbHandler);
                         _ = await hstShopDao.DeleteAsync(new HstShopDto {
                             ShopName = this.DisplayedHierarchicalSettingVM.SelectedShopVM.Name,
@@ -454,7 +454,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         });
                     }
 
-                    ViewModelLoader loader = new(this.dbHandlerFactory);
+                    ViewModelLoader loader = new(this.mDbHandlerFactory);
                     this.DisplayedHierarchicalSettingVM = await loader.LoadHierarchicalSettingViewModelAsync(HierarchicalKind.Item, this.DisplayedHierarchicalSettingVM.Id);
                 }
             }
@@ -473,10 +473,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                     Debug.Assert(this.DisplayedHierarchicalSettingVM.Kind == HierarchicalKind.Item);
 
-                    await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                    await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                         HstRemarkDao hstRemarkDao = new(dbHandler);
                         _ = await hstRemarkDao.DeleteAsync(new HstRemarkDto {
                             Remark = this.DisplayedHierarchicalSettingVM.SelectedRemarkVM.Remark,
@@ -484,7 +484,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         });
                     }
 
-                    ViewModelLoader loader = new(this.dbHandlerFactory);
+                    ViewModelLoader loader = new(this.mDbHandlerFactory);
                     this.DisplayedHierarchicalSettingVM = await loader.LoadHierarchicalSettingViewModelAsync(HierarchicalKind.Item, this.DisplayedHierarchicalSettingVM.Id);
                 }
             }
@@ -501,7 +501,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedHierarchicalVMChanged));
 
                 if (e.Value != null) {
-                    ViewModelLoader loader = new(this.dbHandlerFactory);
+                    ViewModelLoader loader = new(this.mDbHandlerFactory);
                     this.DisplayedHierarchicalSettingVM = await loader.LoadHierarchicalSettingViewModelAsync(GetHierarchicalKind(e.Value).Value, e.Value.Id);
                 }
                 else {
@@ -520,7 +520,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             using FuncLog funcLog = new(new { kind, id });
 
             // InitializeComponent内で呼ばれる場合があるため、nullチェックを行う
-            if (this.dbHandlerFactory == null) { return; }
+            if (this.mDbHandlerFactory == null) { return; }
 
             // 指定がなければ現在選択中の項目を再選択する
             if (this.SelectedHierarchicalVM != null && kind == null && id == null) {
@@ -528,7 +528,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 id = this.SelectedHierarchicalVM.Id;
             }
 
-            ViewModelLoader loader = new(this.dbHandlerFactory);
+            ViewModelLoader loader = new(this.mDbHandlerFactory);
             this.HierarchicalVMList = await loader.LoadHierarchicalViewModelListAsync();
 
             // 選択する項目を探す

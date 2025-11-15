@@ -256,7 +256,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 };
             }
 
-            ViewModelLoader loader = new(this.dbHandlerFactory);
+            ViewModelLoader loader = new(this.mDbHandlerFactory);
             switch (this.Parent.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
                     // グラフ表示データを取得する

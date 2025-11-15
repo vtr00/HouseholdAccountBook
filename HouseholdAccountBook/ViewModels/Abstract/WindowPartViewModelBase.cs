@@ -14,24 +14,24 @@ namespace HouseholdAccountBook.ViewModels.Abstract
     /// </summary>
     public abstract class WindowPartViewModelBase : BindableBase
     {
-        protected readonly List<WindowPartViewModelBase> childrenVM = [];
+        protected readonly List<WindowPartViewModelBase> mChildrenVM = [];
 
         #region フィールド
         /// <summary>
         /// WaitCursorマネージャファクトリ
         /// </summary>
-        protected WaitCursorManagerFactory waitCursorManagerFactory;
+        protected WaitCursorManagerFactory mWaitCursorManagerFactory;
         /// <summary>
         /// DBハンドラファクトリ
         /// </summary>
-        protected DbHandlerFactory dbHandlerFactory;
+        protected DbHandlerFactory mDbHandlerFactory;
         #endregion
 
         #region イベント
         /// <summary>
         /// ウィンドウクローズ要求イベント
         /// </summary>
-        public event EventHandler<CloseRequestEventArgs> CloseRequested;
+        public event EventHandler<DialogCloseRequestEventArgs> CloseRequested;
         /// <summary>
         /// ウィンドウ非表示要求イベント
         /// </summary>
@@ -86,17 +86,17 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// OKコマンド処理
         /// </summary>
-        protected virtual void OKCommand_Executed() => this.CloseRequest(new CloseRequestEventArgs(true));
+        protected virtual void OKCommand_Executed() => this.CloseRequest(new DialogCloseRequestEventArgs(true));
 
         /// <summary>
         /// キャンセルコマンド処理
         /// </summary>
-        protected virtual void CanncelCommand_Executed() => this.CloseRequest(new CloseRequestEventArgs(false));
+        protected virtual void CanncelCommand_Executed() => this.CloseRequest(new DialogCloseRequestEventArgs(false));
 
         /// <summary>
         /// クローズコマンド処理
         /// </summary>
-        protected virtual void CloseCommand_Executed() => this.CloseRequest(new CloseRequestEventArgs(null));
+        protected virtual void CloseCommand_Executed() => this.CloseRequest(new DialogCloseRequestEventArgs(null));
 
         /// <summary>
         /// 非表示コマンド処理
@@ -112,10 +112,10 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <remarks><see cref="FrameworkElement">のコンストラクタで呼び出す</remarks>
         public void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
         {
-            this.waitCursorManagerFactory = waitCursorManagerFactory;
-            this.dbHandlerFactory = dbHandlerFactory;
+            this.mWaitCursorManagerFactory = waitCursorManagerFactory;
+            this.mDbHandlerFactory = dbHandlerFactory;
 
-            foreach (WindowPartViewModelBase childVM in this.childrenVM) {
+            foreach (WindowPartViewModelBase childVM in this.mChildrenVM) {
                 childVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
             }
         }
@@ -141,7 +141,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// ウィンドウクローズ要求を発行する
         /// </summary>
         /// <param name="e"></param>
-        protected void CloseRequest(CloseRequestEventArgs e) => this.CloseRequested?.Invoke(this, e);
+        protected void CloseRequest(DialogCloseRequestEventArgs e) => this.CloseRequested?.Invoke(this, e);
         /// <summary>
         /// ウィンドウ非表示要求を発行する
         /// </summary>

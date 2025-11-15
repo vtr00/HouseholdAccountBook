@@ -1,6 +1,11 @@
-﻿namespace HouseholdAccountBook.Others.RequestEventArgs
+﻿using System;
+
+namespace HouseholdAccountBook.Others.RequestEventArgs
 {
-    public class SaveFileDialogRequestEventArgs
+    /// <summary>
+    /// ファイル保存ダイアログ要求時イベントのイベント引数
+    /// </summary>
+    public class SaveFileDialogRequestEventArgs : EventArgs
     {
         /// <summary>
         /// 初期ディレクトリ
@@ -18,6 +23,7 @@
         /// フィルタ
         /// </summary>
         public string Filter { get; set; }
+
         /// <summary>
         /// ダイアログの結果
         /// </summary>

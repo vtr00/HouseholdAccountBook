@@ -112,9 +112,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async void AddBookCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 int bookId = -1;
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     MstBookDao mstBookDao = new(dbHandler);
                     bookId = await mstBookDao.InsertReturningIdAsync(new MstBookDto { });
                 }
@@ -135,8 +135,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async void DeleteBookCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     await dbHandler.ExecTransactionAsync(async () => {
                         HstActionDao hstActionDao = new(dbHandler);
                         var dtoList = await hstActionDao.FindByBookIdAsync(this.SelectedBookVM.Id.Value);
@@ -174,12 +174,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async void RaiseBookSortOrderCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 int index = this.BookVMList.IndexOf(this.SelectedBookVM);
                 int changingId = this.BookVMList[index].Id.Value;
                 int changedId = this.BookVMList[index - 1].Id.Value;
 
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     MstBookDao mstBookDao = new(dbHandler);
                     _ = await mstBookDao.SwapSortOrderAsync(changingId, changedId);
                 }
@@ -208,12 +208,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async void DropBookSortOrderCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 int index = this.BookVMList.IndexOf(this.SelectedBookVM);
                 int changingId = this.BookVMList[index].Id.Value;
                 int changedId = this.BookVMList[index + 1].Id.Value;
 
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     MstBookDao mstBookDao = new(dbHandler);
                     _ = await mstBookDao.SwapSortOrderAsync(changingId, changedId);
                 }
@@ -234,9 +234,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async void SaveBookInfoCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 BookSettingViewModel vm = this.DisplayedBookSettingVM;
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     MstBookDto.JsonDto jsonObj = new() {
                         StartDate = vm.StartDateExists ? vm.StartDate : null,
                         EndDate = vm.EndDateExists ? vm.EndDate : null,
@@ -296,11 +296,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async void ChangeBookRelationCommand_Executed(object viewModel)
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 BookSettingViewModel vm = this.DisplayedBookSettingVM;
                 vm.SelectedRelationVM = viewModel as RelationViewModel; // チェックボックスを変更しただけでは変更されないため、引数で受け取る
 
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     await dbHandler.ExecTransactionAsync(async () => {
                         HstActionDao hstActionDao = new(dbHandler);
                         var hstActionDtoList = await hstActionDao.FindByBookIdAndItemIdAsync(vm.Id.Value, vm.SelectedRelationVM.Id);
@@ -335,7 +335,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             using FuncLog funcLog = new(new { bookId });
 
             // InitializeComponent内で呼ばれる場合があるため、nullチェックを行う
-            if (this.dbHandlerFactory == null) {
+            if (this.mDbHandlerFactory == null) {
                 return;
             }
 
@@ -350,7 +350,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using FuncLog funcLog = new(new { bookId });
 
-            ViewModelLoader loader = new(this.dbHandlerFactory);
+            ViewModelLoader loader = new(this.mDbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             this.BookVMList = await loader.LoadBookListAsync();
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
@@ -362,7 +362,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedBookVMChanged));
 
                 if (e.Value != null) {
-                    ViewModelLoader loader = new(this.dbHandlerFactory);
+                    ViewModelLoader loader = new(this.mDbHandlerFactory);
                     this.DisplayedBookSettingVM = await loader.LoadBookSettingViewModelAsync(e.Value.Id.Value);
                 }
                 else {

@@ -722,14 +722,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.Save();
 
             bool isOpen = false;
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 OleDbHandler.ConnectInfo info = new() {
                     Provider = settings.App_Access_Provider,
                     FilePath = e.FileName
                 };
 
                 await using (OleDbHandler dbHandlerOle = await new DbHandlerFactory(info).CreateAsync() as OleDbHandler)
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     isOpen = dbHandlerOle.IsOpen;
 
                     if (isOpen) {
@@ -849,7 +849,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             bool result = false;
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 NpgsqlDbHandler.ConnectInfo info = new() {
                     Host = settings.App_Postgres_Host,
                     Port = settings.App_Postgres_Port,
@@ -864,7 +864,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 };
 
                 await using (NpgsqlDbHandler dbHandlerNpgsql = await new DbHandlerFactory(info).CreateAsync() as NpgsqlDbHandler)
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     result = dbHandlerNpgsql.IsOpen;
 
                     if (result) {
@@ -960,8 +960,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.Save();
 
             int exitCode = -1;
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     MstBookDao mstBookDao = new(dbHandler);
                     MstCategoryDao mstCategoryDao = new(dbHandler);
                     MstItemDao mstItemDao = new(dbHandler);
@@ -982,7 +982,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     _ = await relBookItemDao.DeleteAllAsync();
                 }
 
-                exitCode = await ExecuteRestorePostgreSQL(this.dbHandlerFactory, e.FileName);
+                exitCode = await ExecuteRestorePostgreSQL(this.mDbHandlerFactory, e.FileName);
 
                 if (exitCode == 0) {
                     await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
@@ -1036,12 +1036,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     break;
                 }
                 case (int)DBKind.PostgreSQL: {
-                    using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                    using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                         SQLiteDbHandler.ConnectInfo info = new() {
                             FilePath = e.FileName
                         };
                         await using (SQLiteDbHandler dbHandlerSqlite = await new DbHandlerFactory(info).CreateAsync() as SQLiteDbHandler)
-                        await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+                        await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                             result = dbHandlerSqlite.IsOpen;
 
                             if (result) {
@@ -1136,8 +1136,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.Save();
 
             int? exitCode = -1;
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                exitCode = await ExecuteDumpPostgreSQL(this.dbHandlerFactory, e.FileName, PostgresFormat.Custom);
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
+                exitCode = await ExecuteDumpPostgreSQL(this.mDbHandlerFactory, e.FileName, PostgresFormat.Custom);
             }
 
             _ = exitCode == 0
@@ -1175,8 +1175,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.Save();
 
             int? exitCode = -1;
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
-                exitCode = await ExecuteDumpPostgreSQL(this.dbHandlerFactory, e.FileName, PostgresFormat.Plain);
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
+                exitCode = await ExecuteDumpPostgreSQL(this.mDbHandlerFactory, e.FileName, PostgresFormat.Plain);
             }
 
             _ = exitCode == 0
@@ -1207,7 +1207,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public async void BackUpCommand_Executed()
         {
             bool result = false;
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 result = await this.CreateBackUpFileAsync();
             }
 
@@ -1224,7 +1224,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// ウィンドウ終了コマンド処理
         /// </summary>
-        public void ExitWindowCommand_Executed() => this.CloseRequest(new CloseRequestEventArgs(true));
+        public void ExitWindowCommand_Executed() => this.CloseRequest(new DialogCloseRequestEventArgs(true));
         #endregion
 
         #region 表示メニュー
@@ -1308,7 +1308,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void GoToLastMonthCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 this.DisplayedMonth = this.DisplayedMonth.Value.AddMonths(-1);
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
             }
@@ -1330,7 +1330,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void GoToThisMonthCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 this.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
             }
@@ -1347,7 +1347,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void GoToNextMonthCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 this.DisplayedMonth = this.DisplayedMonth.Value.AddMonths(1);
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
             }
@@ -1364,7 +1364,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async void SelectTermCommand_Executed()
         {
             SelectTermRequestEventArgs e = new() {
-                DbHandlerFactory = this.dbHandlerFactory,
+                DbHandlerFactory = this.mDbHandlerFactory,
                 TermKind = this.DisplayedTermKind,
                 Month = this.DisplayedMonth,
                 StartDate = this.StartDate,
@@ -1373,7 +1373,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             this.SelectTermRequested?.Invoke(this, e);
             if (e.Result) {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                     this.StartDate = e.StartDate;
                     this.EndDate = e.EndDate;
 
@@ -1395,7 +1395,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void GoToLastYearCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 this.DisplayedYear = this.DisplayedYear.AddYears(-1);
                 await this.UpdateAsync(isUpdateBookList: true);
             }
@@ -1417,7 +1417,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void GoToThisYearCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 this.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
                 await this.UpdateAsync(isUpdateBookList: true);
             }
@@ -1434,7 +1434,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void GoToNextYearCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 this.DisplayedYear = this.DisplayedYear.AddYears(1);
                 await this.UpdateAsync(isUpdateBookList: true);
             }
@@ -1446,7 +1446,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void UpdateCommand_Executed()
         {
-            using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 await this.UpdateAsync(isUpdateBookList: true);
             }
         }
@@ -1469,12 +1469,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async void SettingsCommand_Executed()
         {
             SettingsRequestEventArgs e = new() {
-                DbHandlerFactory = this.dbHandlerFactory
+                DbHandlerFactory = this.mDbHandlerFactory
             };
             this.SettingsRequested?.Invoke(this, e);
 
             if (e.Result) {
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create()) {
+                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                     this.FiscalStartMonth = Properties.Settings.Default.App_StartMonth;
                     await DateTimeExtensions.DownloadHolidayListAsync();
                     await this.UpdateAsync(isUpdateBookList: true);
@@ -1498,8 +1498,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private void CompareCsvFileCommand_Executed()
         {
             CompareCsvFileRequestEventArgs e = new() {
-                DbHandlerFactory = this.dbHandlerFactory,
-                BookId = this.SelectedBookVM.Id
+                DbHandlerFactory = this.mDbHandlerFactory,
+                InitialBookId = this.SelectedBookVM.Id
             };
             this.CompareCsvFileRequested?.Invoke(this, e);
         }
@@ -1545,7 +1545,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.YearlySummaryTabVM = new(this, Tabs.YearlyListTab);
             this.YearlyGraphTabVM = new(this, Tabs.YearlyGraphTab);
 
-            this.childrenVM.AddRange(
+            this.mChildrenVM.AddRange(
                 [
                     this.BookTabVM,
                     this.DailyGraphTabVM,
@@ -1567,7 +1567,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedTabChanged += async (sender, e) => {
                 using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedTabChanged));
 
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create(methodName: nameof(this.SelectedTabChanged))) {
+                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create(methodName: nameof(this.SelectedTabChanged))) {
                     settings.MainWindow_SelectedTabIndex = e.NewValue;
                     settings.Save();
 
@@ -1578,7 +1578,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedBookChanged += async (sender, e) => {
                 using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedBookChanged));
 
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create(methodName: nameof(this.SelectedBookChanged))) {
+                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create(methodName: nameof(this.SelectedBookChanged))) {
                     settings.MainWindow_SelectedBookId = e.NewValue ?? -1;
                     settings.Save();
 
@@ -1589,7 +1589,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedGraphKind1Changed += async (sender, e) => {
                 using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedGraphKind1));
 
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create(methodName: nameof(this.SelectedGraphKind1))) {
+                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create(methodName: nameof(this.SelectedGraphKind1))) {
                     settings.MainWindow_SelectedGraphKindIndex = (int)e.NewValue;
                     settings.Save();
 
@@ -1600,7 +1600,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedGraphKind2Changed += async (sender, e) => {
                 using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedGraphKind2Changed));
 
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create(methodName: nameof(this.SelectedGraphKind2Changed))) {
+                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create(methodName: nameof(this.SelectedGraphKind2Changed))) {
                     settings.MainWindow_SelectedGraphKind2Index = (int)e.NewValue;
                     settings.Save();
 
@@ -1611,7 +1611,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedSeriesChanged += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedSeriesChanged));
 
-                using (WaitCursorManager wcm = this.waitCursorManagerFactory.Create(methodName: nameof(this.SelectedSeriesChanged))) {
+                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create(methodName: nameof(this.SelectedSeriesChanged))) {
                     switch (this.SelectedTab) {
                         case Tabs.DailyGraphTab:
                             this.DailyGraphTabVM.UpdateSelectedGraph();
@@ -1626,7 +1626,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             };
 
-            this.childrenVM.ForEach(childVM => childVM.AddEventHandlers());
+            this.mChildrenVM.ForEach(childVM => childVM.AddEventHandlers());
         }
 
         public override async Task LoadAsync()
@@ -1636,7 +1636,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             Properties.Settings settings = Properties.Settings.Default;
             this.FiscalStartMonth = settings.App_StartMonth;
 
-            await using (DbHandlerBase dbHandler = await this.dbHandlerFactory.CreateAsync()) {
+            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 this.SelectedDBKind = dbHandler.DBKind;
             }
 
@@ -1743,7 +1743,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { bookId });
 
-            ViewModelLoader loader = new(this.dbHandlerFactory);
+            ViewModelLoader loader = new(this.mDbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             var tmpBookVMList = await loader.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedStart, this.DisplayedEnd);
             this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0); // 先に選択しておく
@@ -1787,7 +1787,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         int? exitCode = null;
 
                         if (settings.App_Postgres_DumpExePath != string.Empty) {
-                            exitCode = await ExecuteDumpPostgreSQL(this.dbHandlerFactory, backupFilePath, PostgresFormat.Custom, notifyResult, waitForFinish);
+                            exitCode = await ExecuteDumpPostgreSQL(this.mDbHandlerFactory, backupFilePath, PostgresFormat.Custom, notifyResult, waitForFinish);
                         }
 
                         result = exitCode == 0;

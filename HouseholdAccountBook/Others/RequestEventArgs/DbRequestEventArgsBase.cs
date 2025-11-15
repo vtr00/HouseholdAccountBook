@@ -4,7 +4,7 @@ using System;
 namespace HouseholdAccountBook.Others.RequestEventArgs
 {
     /// <summary>
-    /// DBリクエストイベント引数基底クラス
+    /// DBリクエストイベント時のイベント引数の基底クラス
     /// </summary>
     public abstract class DbRequestEventArgsBase : EventArgs
     {
