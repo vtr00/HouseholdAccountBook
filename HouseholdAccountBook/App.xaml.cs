@@ -12,6 +12,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -66,6 +67,7 @@ namespace HouseholdAccountBook
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
+            Log.Debug($"App_InitFlag: {settings.App_InitFlag}");
 
             Log.Info($"Current Culture: {CultureInfo.CurrentCulture.Name}");
             Log.Info($"Application Culture: {settings.App_CultureName}");
@@ -116,82 +118,11 @@ namespace HouseholdAccountBook
                 settings.Upgrade();
             }
 
-            // 初回起動時
-            Log.Debug($"App_InitFlag: {settings.App_InitFlag}");
-            if (settings.App_InitFlag) {
-#if !DEBUG
-                // リリースビルドの初回起動時デバッグモードはOFF
-                settings.App_IsDebug = false;
-#endif
-            }
-
-            // DB設定ダイアログ終了時に閉じないように設定する(明示的なシャットダウンが必要)
-            this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-
-            DbHandlerFactory dbHandlerFactory = null;
-            bool isOpen = false;
-            while (!isOpen) {
-                // 初回起動時、またはDB接続に失敗した時
-                if (settings.App_InitFlag || dbHandlerFactory is not null) {
-                    // データベース接続を設定する
-                    string message = dbHandlerFactory is not null
-                        ? HouseholdAccountBook.Properties.Resources.Message_FoultToConnectDb
-                        : HouseholdAccountBook.Properties.Resources.Message_PleaseInputDbSetting;
-                    DbSettingWindow dsw = new(null, message);
-
-                    if (dsw.ShowDialog() != true) {
-                        this.Shutdown();
-                        return;
-                    }
-                }
-
-                // 接続設定を読み込む
-                DbHandlerBase.ConnectInfo connInfo = null;
-                switch ((DBKind)settings.App_SelectedDBKind) {
-                    case DBKind.PostgreSQL: {
-                        NpgsqlDbHandler.ConnectInfo connectInfo = new() {
-                            Host = settings.App_Postgres_Host,
-                            Port = settings.App_Postgres_Port,
-                            UserName = settings.App_Postgres_UserName,
-                            Password = settings.App_Postgres_Password,
-#if DEBUG
-                            DatabaseName = settings.App_Postgres_DatabaseName_Debug,
-#else
-                            DatabaseName = settings.App_Postgres_DatabaseName,
-#endif
-                            Role = settings.App_Postgres_Role
-                        };
-                        if (settings.App_Postgres_Password == string.Empty) {
-                            connectInfo.EncryptedPassword = settings.App_Postgres_EncryptedPassword;
-                        }
-                        else {
-                            connectInfo.Password = settings.App_Postgres_Password;
-                            settings.App_Postgres_EncryptedPassword = connectInfo.EncryptedPassword;
-                            settings.App_Postgres_Password = string.Empty; // パスワードは保存しない
-                            settings.Save();
-                        }
-                        connInfo = connectInfo;
-                        break;
-                    }
-                    case DBKind.SQLite:
-                        connInfo = new SQLiteDbHandler.ConnectInfo() {
-                            FilePath = settings.App_SQLite_DBFilePath
-                        };
-                        break;
-                    case DBKind.Access:
-                    case DBKind.Undefined:
-                    default:
-                        throw new NotSupportedException();
-                }
-                dbHandlerFactory = new(connInfo);
-
-                // 接続を試行する
-                try {
-                    await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
-                        isOpen = dbHandler.IsOpen;
-                    }
-                }
-                catch (TimeoutException) { }
+            DbHandlerFactory dbHandlerFactory = await this.GetDbHandlerFactory();
+            if (dbHandlerFactory == null) {
+                // DB接続設定がキャンセルされた場合はアプリケーションを終了する
+                this.Shutdown();
+                return;
             }
 
             // 初回起動を解除する
@@ -276,6 +207,87 @@ namespace HouseholdAccountBook
             if (rd.Contains("AppCulture")) {
                 rd["AppCulture"] = HouseholdAccountBook.Properties.Resources.Culture;
             }
+        }
+
+        /// <summary>
+        /// DBハンドラファクトリを取得する
+        /// </summary>
+        /// <returns>DBハンドラファクトリ</returns>
+        /// <exception cref="NotSupportedException"></exception>
+        private async Task<DbHandlerFactory> GetDbHandlerFactory()
+        {
+            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
+
+            DbHandlerFactory dbHandlerFactory = null;
+            bool isOpen = false;
+            while (!isOpen) {
+                // 初回起動時、またはDB接続に失敗した時
+                if (settings.App_InitFlag || dbHandlerFactory is not null) {
+                    // データベース接続を設定する
+                    string message = dbHandlerFactory is not null
+                        ? HouseholdAccountBook.Properties.Resources.Message_FoultToConnectDb
+                        : HouseholdAccountBook.Properties.Resources.Message_PleaseInputDbSetting;
+                    DbSettingWindow dsw = new(null, message);
+                    this.MainWindow = dsw;
+                    // DB設定ダイアログ終了時に閉じないように設定する(明示的なシャットダウンが必要)
+                    this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+                    dsw.SetIsModal(true);
+                    if (dsw.ShowDialog() != true) {
+                        return null;
+                    }
+                }
+
+                // 接続設定を読み込む
+                DbHandlerBase.ConnectInfo connInfo = null;
+                switch ((DBKind)settings.App_SelectedDBKind) {
+                    case DBKind.PostgreSQL: {
+                        NpgsqlDbHandler.ConnectInfo connectInfo = new() {
+                            Host = settings.App_Postgres_Host,
+                            Port = settings.App_Postgres_Port,
+                            UserName = settings.App_Postgres_UserName,
+                            Password = settings.App_Postgres_Password,
+#if DEBUG
+                            DatabaseName = settings.App_Postgres_DatabaseName_Debug,
+#else
+                            DatabaseName = settings.App_Postgres_DatabaseName,
+#endif
+                            Role = settings.App_Postgres_Role
+                        };
+                        if (settings.App_Postgres_Password == string.Empty) {
+                            connectInfo.EncryptedPassword = settings.App_Postgres_EncryptedPassword;
+                        }
+                        else {
+                            connectInfo.Password = settings.App_Postgres_Password;
+                            settings.App_Postgres_EncryptedPassword = connectInfo.EncryptedPassword;
+                            settings.App_Postgres_Password = string.Empty; // パスワードは保存しない
+                            settings.Save();
+                        }
+                        connInfo = connectInfo;
+                        break;
+                    }
+                    case DBKind.SQLite:
+                        connInfo = new SQLiteDbHandler.ConnectInfo() {
+                            FilePath = settings.App_SQLite_DBFilePath
+                        };
+                        break;
+                    case DBKind.Access:
+                    case DBKind.Undefined:
+                    default:
+                        throw new NotSupportedException();
+                }
+                dbHandlerFactory = new(connInfo);
+
+                // 接続を試行する
+                try {
+                    await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
+                        isOpen = dbHandler.IsOpen;
+                    }
+                }
+                catch (TimeoutException) { }
+            }
+
+            return dbHandlerFactory;
         }
 
         /// <summary>

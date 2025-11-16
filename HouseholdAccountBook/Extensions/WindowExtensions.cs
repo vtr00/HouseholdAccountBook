@@ -2,36 +2,24 @@
 using HouseholdAccountBook.ViewModels.Abstract;
 using Microsoft.Win32;
 using System;
-using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Interop;
 
 namespace HouseholdAccountBook.Extensions
 {
     /// <summary>
     /// <see cref="Window"/> の拡張メソッドを提供します
     /// </summary>
-    public static class WindowExtentions
+    public static class WindowExtensions
     {
-        [DllImport("user32.dll")]
-        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        public static readonly DependencyProperty IsModalProperty = DependencyProperty.RegisterAttached(
+            "IsModal",
+            typeof(bool),
+            typeof(WindowExtensions),
+            new PropertyMetadata(false));
 
-        /// <summary>
-        /// モーダルウィンドウかどうかを判定する
-        /// </summary>
-        /// <param name="window"></param>
-        /// <returns></returns>
-        private static bool IsModal(this Window window)
-        {
-            const int GWL_STYLE = -16;
-            const int WS_DISABLED = 0x08000000;
+        public static void SetIsModal(this Window window, bool value) => window.SetValue(IsModalProperty, value);
 
-            var hwnd = new WindowInteropHelper(window).Handle;
-            if (hwnd == IntPtr.Zero) return false;
-
-            int style = GetWindowLong(hwnd, GWL_STYLE);
-            return (style & WS_DISABLED) != 0;
-        }
+        public static bool GetIsModal(this Window window) => (bool)window.GetValue(IsModalProperty);
 
         /// <summary>
         /// <see cref="Window.Owner"/> の中央位置に移動する
@@ -61,17 +49,17 @@ namespace HouseholdAccountBook.Extensions
         /// <remarks>コンストラクタで呼び出す</remarks>
         public static void AddCommonEventHandlersToVM(this Window window)
         {
-            if (window.DataContext is not WindowViewModelBase wvm) {
-                return;
-            }
+            if (window.DataContext is not WindowViewModelBase wvm) { return; }
 
             /// ViewModelにWindow関連のイベントハンドラを登録する
-            wvm.CloseRequested += (sender, e) => {
-                if (window.IsModal()) {
+            wvm.CloseRequested += async (sender, e) => {
+                if (window.GetIsModal()) {
                     try {
                         window.DialogResult = e.Result;
                     }
-                    catch (InvalidOperationException) { }
+                    catch (InvalidOperationException) {
+                        Log.Warning("Failed to set DialogResult");
+                    }
                 }
                 window.Close();
             };

@@ -91,6 +91,7 @@ namespace HouseholdAccountBook.Views.Windows
 
                 ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.InitialBookId, e.InitialRecord);
                 arw.Registrated += e.Registered;
+                arw.SetIsModal(true);
                 _ = arw.ShowDialog();
             };
             this.WVM.AddActionListRequested += (sender, e) => {
@@ -98,6 +99,7 @@ namespace HouseholdAccountBook.Views.Windows
 
                 ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.InitialBookId, e.InitialRecordList);
                 alrw.Registrated += e.Registered;
+                alrw.SetIsModal(true);
                 _ = alrw.ShowDialog();
             };
             this.WVM.EditActionRequested += (sender, e) => {
@@ -105,6 +107,7 @@ namespace HouseholdAccountBook.Views.Windows
 
                 ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.TargetActionId);
                 arw.Registrated += e.Registered;
+                arw.SetIsModal(true);
                 _ = arw.ShowDialog();
             };
             this.WVM.EditActionListRequested += (sender, e) => {
@@ -112,6 +115,7 @@ namespace HouseholdAccountBook.Views.Windows
 
                 ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.TargetGroupId);
                 alrw.Registrated += e.Registered;
+                alrw.SetIsModal(true);
                 _ = alrw.ShowDialog();
             };
         }

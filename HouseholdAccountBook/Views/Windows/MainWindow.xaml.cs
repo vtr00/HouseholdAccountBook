@@ -201,6 +201,7 @@ namespace HouseholdAccountBook.Views.Windows
                         stw = new TermWindow(this, e.DbHandlerFactory, e.StartDate, e.EndDate);
                         break;
                 }
+                stw.SetIsModal(true);
                 e.Result = stw.ShowDialog() == true;
                 if (e.Result) {
                     e.StartDate = stw.WVM.StartDate;
@@ -211,6 +212,7 @@ namespace HouseholdAccountBook.Views.Windows
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.SettingsRequested));
 
                 SettingsWindow sw = new(this, e.DbHandlerFactory);
+                sw.SetIsModal(true);
                 e.Result = sw.ShowDialog() == true;
             };
             this.WVM.CompareCsvFileRequested += (sender, e) => {
@@ -262,6 +264,7 @@ namespace HouseholdAccountBook.Views.Windows
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.ShowVersionRequested));
 
                 VersionWindow vw = new(this);
+                vw.SetIsModal(true);
                 _ = vw.ShowDialog();
             };
 
