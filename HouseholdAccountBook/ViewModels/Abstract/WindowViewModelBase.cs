@@ -33,6 +33,6 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// ウィンドウのサイズ設定の生データを取得/設定する
         /// </summary>
-        protected virtual (double, double) WindowSizeSettingRaw { get; set; }
+        protected virtual (double width, double height) WindowSizeSettingRaw { get; set; }
     }
 }

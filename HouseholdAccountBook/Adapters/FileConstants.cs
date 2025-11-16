@@ -25,7 +25,7 @@ namespace HouseholdAccountBook.Adapters
         }
         #endregion
 
-        #region バックアップファイル
+        #region DBバックアップファイル
         /// <summary>
         /// PostgreSQL バックアップファイル ポストフィックス
         /// </summary>
@@ -85,5 +85,10 @@ namespace HouseholdAccountBook.Adapters
             return string.Format($@"{WindowLocationFolderPath}\{windowName}_{dt:yyyyMMdd_HHmmss}.txt");
         }
         #endregion
+
+        /// <summary>
+        /// 設定ファイルのファイルパス
+        /// </summary>
+        public static string SettingsJsonFilePath => @".\Settings.json";
     }
 }

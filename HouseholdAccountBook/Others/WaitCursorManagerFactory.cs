@@ -22,7 +22,7 @@ namespace HouseholdAccountBook.Others
         /// <param name="methodName">生成元関数名</param>
         /// <param name="lineNumber">生成元行数</param>
         /// <returns></returns>
-        public WaitCursorManager Create([CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0) 
+        public WaitCursorManager Create([CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
             => new(this.mFe, fileName, methodName, lineNumber);
     }
 

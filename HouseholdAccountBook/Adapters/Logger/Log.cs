@@ -101,7 +101,7 @@ namespace HouseholdAccountBook.Adapters.Logger
             string details = string.Empty;
             if (vars != null) {
                 // オブジェクトを文字列化する
-                static string ToString(object tmp, int depth = 0)
+                static string ToString(object obj, int depth = 0)
                 {
                     // 再帰呼び出しの深さ制限
                     depth++;
@@ -109,12 +109,12 @@ namespace HouseholdAccountBook.Adapters.Logger
                         return "[overflow]";
                     }
 
-                    if (tmp is null) { return "null"; }
+                    if (obj is null) { return "null"; }
 
-                    if (tmp.GetType().IsPrimitive) { return $"{tmp}"; }
-                    if (tmp.GetType().IsEnum) { return $"{tmp}"; }
+                    if (obj.GetType().IsPrimitive) { return $"{obj}"; }
+                    if (obj.GetType().IsEnum) { return $"{obj}"; }
 
-                    switch (tmp) {
+                    switch (obj) {
                         case string s:
                             return $"\"{s}\"";
                         case DateTime dt:
@@ -122,8 +122,8 @@ namespace HouseholdAccountBook.Adapters.Logger
                         case IEnumerable enumerable:
                             return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => ToString(item, depth)))}]";
                         default:
-                            PropertyInfo[] propInfos = tmp.GetType().GetProperties();
-                            return string.Join(", ", propInfos.Select(propInfo => $"{propInfo.Name}:{ToString(propInfo.GetValue(tmp), depth)}"));
+                            PropertyInfo[] propInfos = obj.GetType().GetProperties();
+                            return string.Join(", ", propInfos.Select(propInfo => $"{propInfo.Name}:{ToString(propInfo.GetValue(obj), depth)}"));
                     }
                 }
                 details += ToString(vars);

@@ -20,11 +20,7 @@ namespace HouseholdAccountBook.Adapters.Logger
             // 例外情報をファイルに保存する
             this.RelatedFilePath = UnhandledExceptionInfoFilePath;
             string jsonCode = JsonConvert.SerializeObject(e, Formatting.Indented);
-            using (FileStream fs = new(this.RelatedFilePath, FileMode.Create)) {
-                using (StreamWriter sw = new(fs)) {
-                    sw.WriteLine(jsonCode);
-                }
-            }
+            File.WriteAllText(this.RelatedFilePath, jsonCode);
         }
     }
 }

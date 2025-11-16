@@ -1,4 +1,11 @@
-﻿using System;
+﻿using HouseholdAccountBook.Adapters;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Configuration;
+using System.IO;
 
 namespace HouseholdAccountBook.Properties
 {
@@ -9,25 +16,68 @@ namespace HouseholdAccountBook.Properties
     //  SettingsSaving イベントは、設定値が保存される前に発生します。
     public sealed partial class Settings
     {
-
         public Settings()
         {
-            // // 設定の保存と変更のイベント ハンドラーを追加するには、以下の行のコメントを解除します:
-            //
-            // this.SettingChanging += this.SettingChangingEventHandler;
-            //
-            // this.SettingsSaving += this.SettingsSavingEventHandler;
-            //
+            this.SettingsLoaded += this.Settings_SettingsLoaded;
+            this.SettingsSaving += this.Settings_SettingsSaving;
         }
 
-        private void SettingChangingEventHandler(object sender, System.Configuration.SettingChangingEventArgs e)
+        /// <summary>
+        /// app.config から設定を読み込んだあとに、JSON ファイルから設定を読み込む
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Settings_SettingsLoaded(object sender, SettingsLoadedEventArgs e)
         {
-            // SettingChangingEvent イベントを処理するコードをここに追加してください。
+            if (File.Exists(FileConstants.SettingsJsonFilePath)) {
+                string jsonCode = File.ReadAllText(FileConstants.SettingsJsonFilePath);
+                JObject jObj = JObject.Parse(jsonCode);
+
+                foreach (SettingsProperty prop in this.Properties) {
+                    string name = prop.Name;
+                    Type type = prop.PropertyType;
+
+                    if (!jObj.TryGetValue(name, out JToken token)) { continue; }
+
+                    // Nullable対応
+                    Type targetType = Nullable.GetUnderlyingType(type) ?? type;
+
+                    try {
+                        object value = targetType == typeof(DateTime)
+                            ? token.Type == JTokenType.String
+                                ? DateTime.Parse(token.ToString())
+                                : token.ToObject<DateTime>()
+                            : token.ToObject(targetType);
+                        this[name] = value;
+                    }
+                    catch (Exception ex) {
+                        Console.WriteLine($"設定 '{name}' の読み込みに失敗: {ex.Message}");
+                    }
+                }
+
+                this.SettingsSaving -= this.Settings_SettingsSaving;
+                this.Save();
+                this.SettingsSaving += this.Settings_SettingsSaving;
+            }
         }
 
-        private void SettingsSavingEventHandler(object sender, System.ComponentModel.CancelEventArgs e)
+        /// <summary>
+        /// app.config に設定を保存する前に、JSON ファイルに設定を保存する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Settings_SettingsSaving(object sender, CancelEventArgs e)
         {
-            // SettingsSaving イベントを処理するコードをここに追加してください。
+            // 全設定を辞書に格納する
+            SortedDictionary<string, object> dict = [];
+            foreach (SettingsProperty prop in this.Properties) {
+                object value = this[prop.Name];
+                dict[prop.Name] = value;
+            }
+
+            // 辞書を JSON ファイルに保存する
+            string jsonCode = JsonConvert.SerializeObject(dict, Formatting.Indented, new JsonSerializerSettings { DateFormatString = "yyyy-MM-dd HH:mm:ss" });
+            File.WriteAllText(FileConstants.SettingsJsonFilePath, jsonCode);
         }
 
         /// <summary>
@@ -56,7 +106,7 @@ namespace HouseholdAccountBook.Properties
             #endregion
 
             // Upgrade時のバージョン番号を保存する
-            Version assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            Version assemblyVersion = App.GetAssemblyVersion();
             this.App_Version = assemblyVersion.ToString();
             this.Save();
         }

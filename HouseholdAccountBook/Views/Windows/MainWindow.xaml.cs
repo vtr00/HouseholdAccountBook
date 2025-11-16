@@ -76,6 +76,9 @@ namespace HouseholdAccountBook.Views.Windows
             };
         }
 
+        /// <summary>
+        /// WVMにイベントハンドラを追加する
+        /// </summary>
         private void AddEventHandlersToVM()
         {
             using FuncLog funcLog = new();
@@ -287,7 +290,6 @@ namespace HouseholdAccountBook.Views.Windows
             this.Hide();
 
             Properties.Settings settings = Properties.Settings.Default;
-            settings.Reload();
             if (settings.App_BackUpFlagAtClosing) {
                 // 通知しても即座に終了するため通知しない
                 _ = await this.WVM.CreateBackUpFileAsync();

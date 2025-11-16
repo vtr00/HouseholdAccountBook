@@ -378,7 +378,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
                     // WVMに値を設定する
                     this.GroupId = targetGroupId;
-                    foreach(DateValueViewModel vm in dateValueVMList) {
+                    foreach (DateValueViewModel vm in dateValueVMList) {
                         this.DateValueVMList.Add(vm);
                     }
 
