@@ -184,7 +184,7 @@ new { dto.BookId, dto.ActTime, dto.ActValue, dto.GroupId, dto.IsMatch, dto.JsonC
         {
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, is_match = @IsMatch, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
+SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, is_match = @IsMatch, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
 
             return count;
@@ -214,7 +214,7 @@ WHERE action_id = @ActionId;", dto);
         {
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
+SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
 
             return count;

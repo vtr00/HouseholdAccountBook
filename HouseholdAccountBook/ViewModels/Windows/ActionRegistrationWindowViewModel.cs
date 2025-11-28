@@ -767,7 +767,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                                     }
                                     else {
                                         #region グループに属する項目が2項目以上
-                                        // この帳簿項目のグループIDをクリアせずに残す(対象は過去分)
+                                        // この帳簿項目のグループIDをクリアせずに残す(過去分と同じグループIDになる)
                                         _ = await hstActionDao.UpdateWithoutIsMatchAsync(new HstActionDto {
                                             BookId = bookId,
                                             ItemId = itemId,
@@ -820,6 +820,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                                     ActionId = actionId
                                 });
 
+                                // 既存のレコードを更新する
                                 tmpActTime = GetDateTimeWithHolidaySettingKind(actTime.AddMonths(1)); // 登録日付
                                 for (int i = 1; i < actionIdList.Count; ++i) {
                                     int targetActionId = actionIdList[i];

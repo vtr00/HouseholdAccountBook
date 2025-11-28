@@ -655,6 +655,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                                 ActTime = actTime,
                                 ActValue = -commission,
                                 Remark = remark,
+                                GroupId = tmpGroupId,
                                 ActionId = commissionId
                             });
                         }
@@ -666,8 +667,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
                                 ItemId = commissionItemId,
                                 ActTime = actTime,
                                 ActValue = -commission,
-                                GroupId = tmpGroupId,
-                                Remark = remark
+                                Remark = remark,
+                                GroupId = tmpGroupId
                             });
                         }
                         resActionIdList.Add(commissionId);

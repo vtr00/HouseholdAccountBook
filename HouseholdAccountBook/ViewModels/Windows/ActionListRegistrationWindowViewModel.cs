@@ -583,6 +583,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                                             ActValue = actValue,
                                             ShopName = shopName,
                                             Remark = remark,
+                                            GroupId = groupId,
                                             ActionId = actionId.Value
                                         });
 
@@ -595,8 +596,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
                                             ActTime = actTime,
                                             ActValue = actValue,
                                             ShopName = shopName,
-                                            GroupId = groupId,
-                                            Remark = remark
+                                            Remark = remark,
+                                            GroupId = groupId
                                         });
                                         resActionIdList.Add(id);
                                     }
