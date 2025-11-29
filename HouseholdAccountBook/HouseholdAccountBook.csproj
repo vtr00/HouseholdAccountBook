@@ -33,9 +33,9 @@
     <NeutralLanguage>ja-JP</NeutralLanguage>
     <Authors>toresebu</Authors>
     <Company>PoliteMusic</Company>
-    <AssemblyVersion>1.2.3.0</AssemblyVersion>
+    <AssemblyVersion>1.2.4.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
-    <Version>1.2.3</Version>
+    <Version>1.2.4</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -58,7 +58,7 @@
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="DynamicExpresso.Core" Version="2.19.3" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-    <PackageReference Include="Npgsql" Version="9.0.4" />
+    <PackageReference Include="Npgsql" Version="10.0.0" />
     <PackageReference Include="OxyPlot.Core" Version="2.1.0" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.1.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
@@ -141,14 +141,21 @@
     <RemoveDir Directories="@(UnwantedDirs)" />
   </Target>
   <Target Name="RemoveNonWinFolders" AfterTargets="Publish">
+    <!-- Windows向け以外のフォルダ削除 -->
     <Exec Command="powershell -Command &quot;Get-ChildItem '$(PublishDir)\runtimes' -Directory | Where-Object { $_.Name -notlike 'win*' } | Remove-Item -Recurse -Force&quot;" />
   </Target>
   <Target Name="CopyFiles" AfterTargets="Publish">
     <Message Text="コピー処理を開始します(LICENSE)..." Importance="high" />
     <Copy SourceFiles="$(MSBuildProjectDirectory)/../LICENSE" DestinationFolder="$(PublishDir)" />
-    <Message Text="コピー処理を開始します(ThirdPartyNotices.txt)..." Importance="high" />
-    <Copy SourceFiles="$(MSBuildProjectDirectory)/../ThirdPartyNotices.txt" DestinationFolder="$(PublishDir)" />
     <Message Text="コピー処理を開始します(readme.txt)..." Importance="high" />
     <Copy SourceFiles="$(MSBuildProjectDirectory)/../docs/readme.txt" DestinationFolder="$(PublishDir)" />
+  </Target>
+  <Target Name="CopyLicensesDir" AfterTargets="Publish">
+    <!-- LICENSESフォルダ以下のすべてのフォルダ/ファイルをコピー -->
+    <ItemGroup>
+      <Licenses Include="$(MSBuildProjectDirectory)/../LICENSES/**/*" />
+    </ItemGroup>
+    <Message Text="コピー処理を開始します(LICENSES/*)..." Importance="high" />
+    <Copy SourceFiles="@(Licenses)" DestinationFiles="@(Licenses->'$(PublishDir)/LICENSES/%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 </Project>

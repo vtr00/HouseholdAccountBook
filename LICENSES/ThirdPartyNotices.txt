@@ -27,7 +27,7 @@ This project incorporates material from the following third-party projects:
    2019 Stack Exchange, Inc.
    https://github.com/DapperLib/Dapper
 
-# DynamicExpresso.Core 2.19.2
+# DynamicExpresso.Core 2.19.3
    License: MIT
    Davide Icardi
    https://github.com/dynamicexpresso/DynamicExpresso
@@ -37,87 +37,82 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Bcl.Cryptography 8.0.0
+# Microsoft.Bcl.Cryptography 9.0.4
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.CSharp 4.7.0
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://github.com/dotnet/corefx
-
-# Microsoft.Data.SqlClient 6.1.1
+# Microsoft.Data.SqlClient 6.1.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
 # Microsoft.Data.SqlClient.SNI.runtime 6.0.2
-   License: LICENSE.txt
+   License: https://www.nuget.org/packages/Microsoft.Data.SqlClient.SNI.runtime/6.0.2/license
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Data.Sqlite 9.0.9
+# Microsoft.Data.Sqlite 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.Data.Sqlite.Core 9.0.9
+# Microsoft.Data.Sqlite.Core 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.EntityFrameworkCore 9.0.9
+# Microsoft.EntityFrameworkCore 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Abstractions 9.0.9
+# Microsoft.EntityFrameworkCore.Abstractions 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Analyzers 9.0.9
+# Microsoft.EntityFrameworkCore.Analyzers 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.Extensions.Caching.Abstractions 9.0.9
+# Microsoft.Extensions.Caching.Abstractions 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Caching.Memory 9.0.9
+# Microsoft.Extensions.Caching.Memory 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection 9.0.9
+# Microsoft.Extensions.DependencyInjection 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection.Abstractions 9.0.9
+# Microsoft.Extensions.DependencyInjection.Abstractions 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging 9.0.9
+# Microsoft.Extensions.Logging 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging.Abstractions 9.0.9
+# Microsoft.Extensions.Logging.Abstractions 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Options 9.0.9
+# Microsoft.Extensions.Options 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Primitives 9.0.9
+# Microsoft.Extensions.Primitives 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
@@ -182,9 +177,9 @@ This project incorporates material from the following third-party projects:
    https://github.com/Platonenkov
    https://github.com/Platonenkov/Notification.Wpf
 
-# Npgsql 9.0.3
+# Npgsql 10.0.0
    License: PostgreSQL
-   Copyright 2024 © The Npgsql Development Team
+   Copyright 2025 © The Npgsql Development Team
    https://github.com/npgsql/npgsql
 
 # OxyPlot.Core 2.1.0
@@ -202,19 +197,19 @@ This project incorporates material from the following third-party projects:
    OxyPlot contributors
    https://oxyplot.github.io/
 
-# SQLitePCLRaw.bundle_e_sqlite3 2.1.10
+# SQLitePCLRaw.bundle_e_sqlite3 2.1.11
    License: Apache-2.0
    Copyright 2014-2024 SourceGear, LLC
 
-# SQLitePCLRaw.core 2.1.10
+# SQLitePCLRaw.core 2.1.11
    License: Apache-2.0
    Copyright 2014-2024 SourceGear, LLC
 
-# SQLitePCLRaw.lib.e_sqlite3 2.1.10
+# SQLitePCLRaw.lib.e_sqlite3 2.1.11
    License: Apache-2.0
    Copyright 2014-2024 SourceGear, LLC
 
-# SQLitePCLRaw.provider.e_sqlite3 2.1.10
+# SQLitePCLRaw.provider.e_sqlite3 2.1.11
    License: Apache-2.0
    Copyright 2014-2024 SourceGear, LLC
 
@@ -223,37 +218,12 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://github.com/Azure/azure-sdk-for-net/blob/System.ClientModel_1.5.1/sdk/core/System.ClientModel/README.md
 
-# System.CodeDom 9.0.9
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://dot.net/
-
 # System.ComponentModel.Annotations 5.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/dotnet/runtime
 
-# System.Configuration.ConfigurationManager 9.0.9
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://dot.net/
-
-# System.Data.OleDb 9.0.9
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://dot.net/
-
-# System.Diagnostics.DiagnosticSource 9.0.9
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://dot.net/
-
-# System.Diagnostics.EventLog 9.0.9
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://dot.net/
-
-# System.Diagnostics.PerformanceCounter 9.0.9
+# System.Data.OleDb 10.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
@@ -263,58 +233,8 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet
 
-# System.Memory 4.5.5
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://dot.net/
-
 # System.Memory.Data 8.0.1
    License: MIT
    © Microsoft Corporation. All rights reserved.
-   https://dot.net/
-
-# System.Numerics.Vectors 4.6.1
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://github.com/dotnet/maintenance-packages
-
-# System.Security.AccessControl 6.0.1
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://dot.net/
-
-# System.Security.Cryptography.Pkcs 8.0.1
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://dot.net/
-
-# System.Security.Cryptography.ProtectedData 9.0.9
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://dot.net/
-
-# System.Security.Principal.Windows 5.0.0
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://github.com/dotnet/runtime
-
-# System.Text.Encoding.CodePages 9.0.9
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://dot.net/
-
-# System.Text.Json 8.0.5
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://dot.net/
-
-# System.Threading.Channels 9.0.9
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://dot.net/
-
-# System.ValueTuple 4.5.0
-   License: MIT
-   © Microsoft Corporation.  All rights reserved.
    https://dot.net/
 

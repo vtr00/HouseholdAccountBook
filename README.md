@@ -12,12 +12,12 @@ DBアクセスを高速に実行したいのであれば、PostgreSQLの使用�
 
 ## __開発環境__
 * IDE  
-  [Visual Studio Community](https://www.microsoft.com/ja-jp/dev/products/community.aspx) 2022  
+  [Visual Studio Community](https://www.microsoft.com/ja-jp/dev/products/community.aspx) 2026  
 * DB  
   [PostgreSQL](https://www.postgresql.org/) 17  
   [SQLite](https://sqlite.org/)
 * 言語  
-  C# (.NET 8.0)
+  C# (.NET 10.0)
 
 ## __機能__
 ### 実装済
