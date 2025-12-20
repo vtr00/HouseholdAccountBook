@@ -72,7 +72,7 @@
         <Menu Grid.Row="0" Grid.Column="0">
             <!-- ファイル -->
             <MenuItem Header="{x:Static properties:Resources.Menu_File}" Command="{Binding FileMenuCommand}">
-                <MenuItem Header="{x:Static properties:Resources.Menu_File_Import}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_File_Import}" Command="{Binding ImportCommand}">
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_KichoFugetsu}" Command="{Binding ImportKichoFugetsuDbCommand}"/>
                     <Separator/>
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{Binding ImportSQLiteFileCommand}"
@@ -85,7 +85,7 @@
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{Binding ImportSQLiteFileCommand}"
                               Visibility="{Binding IsSQLite, Converter={StaticResource BoolVisibilityConverter}}"/>
                 </MenuItem>
-                <MenuItem Header="{x:Static properties:Resources.Menu_File_Export}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_File_Export}" Command="{Binding ExportCommand}">
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_CustomFormatFile}" Command="{Binding ExportCustomFileCommand}"
                               Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_SQLFile}" Command="{Binding ExportSQLFileCommand}"
@@ -95,6 +95,12 @@
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Backup}" Command="{Binding BackUpCommand}"/>
+                <Separator/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_File_LogFile}" Command="{Binding LogFileCommand}">
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_LogFile_OperationLog}" Command="{Binding OperationLogFileCommand}">
+                        <MenuItem Header="{x:Static properties:Resources.Menu_File_LogFile_OperationLog_Open}" Command="{Binding OpenOperationLogFileCommand}"/>
+                    </MenuItem>
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Exit}" Command="{Binding ExitWindowCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>

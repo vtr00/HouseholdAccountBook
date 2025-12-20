@@ -27,18 +27,20 @@ namespace HouseholdAccountBook.Extensions
         /// <param name="window"></param>
         public static void MoveOwnersCenter(this Window window)
         {
+            using FuncLog funcLog = new(new { WindowName = window.Name });
+
             window.WindowStartupLocation = window.Owner != null && window.Owner.WindowState == WindowState.Normal
                 ? WindowStartupLocation.CenterOwner
                 : WindowStartupLocation.CenterScreen;
 
             double right = window.Left + window.Width;
             double bottom = window.Top + window.Height;
-            Log.Debug($"window - top:{window.Top} right:{right} bottom:{bottom} left:{window.Left} width:{window.Width} height:{window.Height}");
+            Log.Debug($"child - top:{window.Top} right:{right} bottom:{bottom} left:{window.Left} width:{window.Width} height:{window.Height}");
 
             if (window.Owner != null) {
                 double ownerRight = window.Owner.Left + window.Owner.Width;
                 double ownerBottom = window.Owner.Left + window.Owner.Height;
-                Log.Debug($"owner  - top:{window.Owner.Top} right:{ownerRight} bottom:{ownerBottom} left:{window.Owner.Left} width:{window.Owner.Width} height:{window.Owner.Height}");
+                Log.Debug($"owner - top:{window.Owner.Top} right:{ownerRight} bottom:{ownerBottom} left:{window.Owner.Left} width:{window.Owner.Width} height:{window.Owner.Height}");
             }
         }
 
@@ -51,8 +53,12 @@ namespace HouseholdAccountBook.Extensions
         {
             if (window.DataContext is not WindowViewModelBase wvm) { return; }
 
+            using FuncLog funcLog = new(new { WindowName = window.Name });
+
             /// ViewModelにWindow関連のイベントハンドラを登録する
             wvm.CloseRequested += async (sender, e) => {
+                using FuncLog funcLog = new(new { WindowName = window.Name }, methodName: nameof(wvm.CloseRequested));
+
                 if (window.GetIsModal()) {
                     try {
                         window.DialogResult = e.Result;
@@ -66,6 +72,8 @@ namespace HouseholdAccountBook.Extensions
             wvm.HideRequested += (sender, e) => window.Hide();
 
             wvm.OpenFileDialogRequested += (sender, e) => {
+                using FuncLog funcLog = new(new { WindowName = window.Name }, methodName: nameof(wvm.OpenFileDialogRequested));
+
                 OpenFileDialog ofd = new() {
                     CheckFileExists = e.CheckFileExists,
                     InitialDirectory = e.InitialDirectory,
@@ -90,6 +98,8 @@ namespace HouseholdAccountBook.Extensions
                 }
             };
             wvm.OpenFolderDialogRequested += (sender, e) => {
+                using FuncLog funcLog = new(new { WindowName = window.Name }, methodName: nameof(wvm.OpenFolderDialogRequested));
+
                 OpenFolderDialog ofd = new() {
                     InitialDirectory = e.InitialDirectory,
                     Title = e.Title,
@@ -102,17 +112,19 @@ namespace HouseholdAccountBook.Extensions
                 }
             };
             wvm.SaveFileDialogRequested += (sender, e) => {
-                SaveFileDialog ofd = new() {
+                using FuncLog funcLog = new(new { WindowName = window.Name }, methodName: nameof(wvm.SaveFileDialogRequested));
+
+                SaveFileDialog sfd = new() {
                     InitialDirectory = e.InitialDirectory,
                     FileName = e.FileName,
                     Title = e.Title,
                     Filter = e.Filter,
                 };
 
-                bool? result = ofd.ShowDialog(window) ?? throw new InvalidOperationException();
+                bool? result = sfd.ShowDialog(window) ?? throw new InvalidOperationException();
                 e.Result = (bool)result;
                 if (e.Result) {
-                    e.FileName = ofd.FileName;
+                    e.FileName = sfd.FileName;
                 }
             };
         }

@@ -563,7 +563,7 @@
     <value>KichoFugetsu(Access) (_K)...</value>
   </data>
   <data name="Menu_File_Import_SQLiteFile" xml:space="preserve">
-    <value>SQLite file (_L)...</value>
+    <value>SQLite file (_S)...</value>
   </data>
   <data name="Menu_File_Import_CustomFormatFile" xml:space="preserve">
     <value>Custom format file (_C)...</value>
@@ -1036,5 +1036,14 @@ list</value>
   </data>
   <data name="CheckBox_Log_Window" xml:space="preserve">
     <value>Window log</value>
+  </data>
+  <data name="Menu_File_LogFile" xml:space="preserve">
+    <value>Log file(_L)</value>
+  </data>
+  <data name="Menu_File_LogFile_OperationLog" xml:space="preserve">
+    <value>Operation log file(_O)</value>
+  </data>
+  <data name="Menu_File_LogFile_OperationLog_Open" xml:space="preserve">
+    <value>Open(_O)</value>
   </data>
 </root>

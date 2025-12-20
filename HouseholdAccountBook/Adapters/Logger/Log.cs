@@ -8,7 +8,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using static HouseholdAccountBook.Adapters.FileConstants;
 
 namespace HouseholdAccountBook.Adapters.Logger
 {
@@ -32,6 +31,10 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// 出力ログレベル
         /// </summary>
         public static LogLevel OutputLogLevel { get; set; } = LogLevel.Debug;
+        /// <summary>
+        /// ログファイルパス
+        /// </summary>
+        public static string LogFilePath => FileConstants.LogFilePath;
 
         private static readonly string mListenerName = "logFileOutput";
         private TextWriterTraceListener mListener;
@@ -58,7 +61,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         private void CreateListener()
         {
             if (this.mListener == null) {
-                if (!Directory.Exists(LogFolderPath)) { _ = Directory.CreateDirectory(LogFolderPath); }
+                if (!Directory.Exists(FileConstants.LogFolderPath)) { _ = Directory.CreateDirectory(FileConstants.LogFolderPath); }
                 TextWriter sw = new StreamWriter(LogFilePath, true, Encoding.UTF8);
 
                 this.mListener = new TextWriterTraceListener {

@@ -168,10 +168,13 @@ namespace HouseholdAccountBook
                 nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
                     string absoluteFilePath = Path.Combine(GetCurrentDir(), log.RelatedFilePath);
                     Log.Info($"Create Unhandled Exception Info Absolute File: {absoluteFilePath}");
-                    _ = Process.Start(new ProcessStartInfo() {
-                        FileName = absoluteFilePath,
-                        UseShellExecute = true
-                    });
+                    try {
+                        _ = Process.Start(new ProcessStartInfo() {
+                            FileName = absoluteFilePath,
+                            UseShellExecute = true
+                        });
+                    }
+                    catch (Exception) { }
                     if (Current.MainWindow == null || !Current.MainWindow.IsInitialized) {
                         Current.Shutdown(1); // メインウィンドウがない場合は強制終了
                     }

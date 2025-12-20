@@ -566,7 +566,7 @@
     <value>記帳風月(Access)(_K)...</value>
   </data>
   <data name="Menu_File_Import_SQLiteFile" xml:space="preserve">
-    <value>SQLiteファイル(_L)...</value>
+    <value>SQLiteファイル(_S)...</value>
   </data>
   <data name="Menu_File_Import_CustomFormatFile" xml:space="preserve">
     <value>カスタム形式ファイル(_C)...</value>
@@ -1037,5 +1037,14 @@
   </data>
   <data name="CheckBox_Log_Window" xml:space="preserve">
     <value>ウィンドウログ</value>
+  </data>
+  <data name="Menu_File_LogFile" xml:space="preserve">
+    <value>ログファイル(_L)</value>
+  </data>
+  <data name="Menu_File_LogFile_OperationLog" xml:space="preserve">
+    <value>操作ログファイル(_O)</value>
+  </data>
+  <data name="Menu_File_LogFile_OperationLog_Open" xml:space="preserve">
+    <value>開く(_O)</value>
   </data>
 </root>

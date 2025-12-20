@@ -19,6 +19,7 @@ using Notification.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -550,7 +551,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// ファイルコマンド
         /// </summary>
-        public ICommand FileMenuCommand => new RelayCommand(null, this.FileMenuCommand_CanExecute);
+        public ICommand FileMenuCommand => new RelayCommand(null);
+        /// <summary>
+        /// インポートコマンド
+        /// </summary>
+        public ICommand ImportCommand => new RelayCommand(null, this.ImportCommand_CanExecute);
         /// <summary>
         /// 記帳風月インポートコマンド
         /// </summary>
@@ -568,6 +573,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand ImportSQLiteFileCommand => new RelayCommand(this.ImportSQLiteFileCommand_Executed, this.ImportSQLiteFileCommand_CanExecute);
         /// <summary>
+        /// エクスポートコマンド
+        /// </summary>
+        public ICommand ExportCommand => new RelayCommand(null, this.ExportCommand_CanExecute);
+        /// <summary>
         /// カスタムファイルエクスポートコマンド
         /// </summary>
         public ICommand ExportCustomFileCommand => new RelayCommand(this.ExportCustomFileCommand_Executed, this.ExportCustomFileCommand_CanExecute);
@@ -583,6 +592,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// バックアップコマンド
         /// </summary>
         public ICommand BackUpCommand => new RelayCommand(this.BackUpCommand_Executed, this.BackUpCommand_CanExecute);
+        /// <summary>
+        /// ログファイルコマンド
+        /// </summary>
+        public ICommand LogFileCommand => new RelayCommand(null);
+        /// <summary>
+        /// 操作ログファイルコマンド
+        /// </summary>
+        public ICommand OperationLogFileCommand => new RelayCommand(null, this.OperationLogFileCommand_CanExecute);
+        /// <summary>
+        /// 操作ログファイルオープンコマンド
+        /// </summary>
+        public ICommand OpenOperationLogFileCommand => new RelayCommand(this.OpenOperationLogFileCommand_Executed);
         /// <summary>
         /// ウィンドウ終了コマンド
         /// </summary>
@@ -687,10 +708,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #region イベントハンドラ
         #region ファイルメニュー
         /// <summary>
-        /// ファイルコマンド実行可能か
+        /// インポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool FileMenuCommand_CanExecute() => !this.IsChildrenWindowOpened();
+        public bool ImportCommand_CanExecute() => !this.IsChildrenWindowOpened();
 
         /// <summary>
         /// 記帳風月インポートコマンド実行可能か
@@ -1108,6 +1129,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
+        /// エクスポートコマンド実行可能か
+        /// </summary>
+        /// <returns></returns>
+        public bool ExportCommand_CanExecute() => !this.IsChildrenWindowOpened();
+
+        /// <summary>
         /// カスタムファイルエクスポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
@@ -1214,6 +1241,29 @@ namespace HouseholdAccountBook.ViewModels.Windows
             _ = result
                 ? MessageBox.Show(Properties.Resources.Message_FinishToBackup, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
                 : MessageBox.Show(Properties.Resources.Message_FoultToBackup, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+        }
+
+        /// <summary>
+        /// 操作ログファイルコマンド実行可能か
+        /// </summary>
+        /// <returns></returns>
+        public bool OperationLogFileCommand_CanExecute()
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+            return settings.App_OutputFlag_OperationLog;
+        }
+        /// <summary>
+        /// 操作ログファイルオープンコマンド処理
+        /// </summary>
+        public void OpenOperationLogFileCommand_Executed()
+        {
+            try {
+                _ = Process.Start(new ProcessStartInfo {
+                    FileName = Log.LogFilePath,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception) { }
         }
 
         /// <summary>
