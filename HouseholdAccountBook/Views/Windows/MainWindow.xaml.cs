@@ -255,7 +255,7 @@ namespace HouseholdAccountBook.Views.Windows
                     };
                 }
                 else {
-                    this.mCCW.WVM.SelectedBookVM = this.mCCW.WVM.BookVMList.FirstOrDefault(vm => vm.Id == e.InitialBookId);
+                    this.mCCW.SetSelectedBookId(e.InitialBookId);
                 }
 
                 this.mCCW.Show();

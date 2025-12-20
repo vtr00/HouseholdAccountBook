@@ -101,10 +101,30 @@ namespace HouseholdAccountBook.ViewModels.Windows
             set {
                 int? oldValue = field?.Id;
                 if (this.SetProperty(ref field, value)) {
-                    this.BookChanged?.Invoke(this, new ChangedEventArgs<int?>() { OldValue = oldValue, NewValue = value.Id });
+                    this.BookChanged?.Invoke(this, new ChangedEventArgs<int?>() { OldValue = oldValue, NewValue = value?.Id });
                 }
             }
         } = new() { };
+        #endregion
+        /// <summary>
+        /// 選択された帳簿ID
+        /// </summary>
+        #region SelectedBookId
+        public int? SelectedBookId {
+            get => this.SelectedBookVM?.Id;
+            set {
+                int? oldValue = this.SelectedBookId;
+                // 現在の選択と異なる場合
+                if (this.SelectedBookVM?.Id != value) {
+                    // 帳簿VMリストから該当する帳簿VMを選択する
+                    this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == value, 0);
+                    // 当てはまる帳簿がなく現在の選択と同じになった場合に変更イベントを発行する
+                    if (oldValue == this.SelectedBookId) {
+                        this.BookChanged?.Invoke(this, new ChangedEventArgs<int?>() { OldValue = oldValue, NewValue = this.SelectedBookId });
+                    }
+                }
+            }
+        }
         #endregion
 
         /// <summary>
@@ -258,7 +278,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private bool MoveCsvFilesCommand_CanExecute()
         {
             // CSVフォルダパスの指定がある
-            bool canExecute = this.SelectedBookVM.CsvFolderPath != null;
+            bool canExecute = this.SelectedBookVM?.CsvFolderPath != null;
 
             if (canExecute) {
                 // いずれかのファイルが存在してかつ移動済ではない
@@ -334,13 +354,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 項目追加コマンド実行可能か
+        /// 帳簿項目追加コマンド実行可能か
         /// </summary>
         /// <returns></returns>
         /// <remarks>選択されている帳簿項目が1つ以上存在していて、値を持たない帳簿項目IDが1つ以上ある</remarks>
         private bool AddActionCommand_CanExecute() => this.SelectedCsvComparisonVMList.Count != 0 && this.SelectedCsvComparisonVMList.Any(vm => !vm.ActionId.HasValue);
         /// <summary>
-        /// 項目追加コマンド処理
+        /// 帳簿項目追加コマンド処理
         /// </summary>
         private void AddActionCommand_Executed()
         {
@@ -379,13 +399,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 項目編集コマンド実行可能か
+        /// 帳簿項目編集コマンド実行可能か
         /// </summary>
         /// <returns></returns>
         /// <remarks>選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが値を持つ</remarks>
         private bool EditActionCommand_CanExecute() => this.SelectedCsvComparisonVMList.Count == 1 && this.SelectedCsvComparisonVM.ActionId.HasValue;
         /// <summary>
-        /// 項目編集コマンド処理
+        /// 帳簿項目編集コマンド処理
         /// </summary>
         private async void EditActionCommand_Executed()
         {
@@ -428,12 +448,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 項目追加/編集コマンド実行可能か
+        /// 帳簿項目追加/編集コマンド実行可能か
         /// </summary>
         /// <returns></returns>
         private bool AddOrEditActionCommand_CanExecute() => this.AddActionCommand_CanExecute() | this.EditActionCommand_CanExecute();
         /// <summary>
-        /// 項目追加/編集コマンド処理
+        /// 帳簿項目追加/編集コマンド処理
         /// </summary>
         private void AddOrEditActionCommand_Executed()
         {
@@ -614,6 +634,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public void LoadCsvFiles(IList<string> csvFilePathList)
         {
             using FuncLog funcLog = new(new { csvFilePathList });
+
+            if (this.SelectedBookVM == null) {
+                return;
+            }
 
             // CSVファイル上の対象インデックスを取得する
             int actDateIndex = this.SelectedBookVM.ActDateIndex.Value;
