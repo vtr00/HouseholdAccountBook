@@ -743,6 +743,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.Save();
 
             bool isOpen = false;
+            int actRowsDiff = 0;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 OleDbHandler.ConnectInfo info = new() {
                     Provider = settings.App_Access_Provider,
@@ -754,7 +755,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     isOpen = dbHandlerOle.IsOpen;
 
                     if (isOpen) {
-                        static async Task Mapping<DTO1, DTO2>(IReadTableDao<DTO1> src, IWriteTableDao<DTO2> dest, Func<IEnumerable<DTO1>, IEnumerable<DTO2>> converter) where DTO1 : DtoBase where DTO2 : DtoBase
+                        static async Task<int> Mapping<DTO1, DTO2>(IReadTableDao<DTO1> src, IWriteTableDao<DTO2> dest, Func<IEnumerable<DTO1>, IEnumerable<DTO2>> converter) where DTO1 : DtoBase where DTO2 : DtoBase
                         {
                             var srcDtoList = await src.FindAllAsync();
                             _ = await dest.DeleteAllAsync();
@@ -762,25 +763,27 @@ namespace HouseholdAccountBook.ViewModels.Windows
                                 // シーケンスを更新する
                                 await destSeq.SetIdSequenceAsync(srcSeqDtoList);
                             }
-                            _ = await dest.BulkInsertAsync(converter(srcDtoList));
+                            int srcCount = srcDtoList.Count();
+                            int dstCount = await dest.BulkInsertAsync(converter(srcDtoList));
+                            return srcCount - dstCount;
                         }
 
                         await dbHandler.ExecTransactionAsync(async () => {
                             CbmBookDao cbmBookDao = new(dbHandlerOle);
                             MstBookDao mstBookDao = new(dbHandler);
-                            await Mapping(cbmBookDao, mstBookDao, src => src.Select(dto => new MstBookDto(dto)));
+                            _ = await Mapping(cbmBookDao, mstBookDao, src => src.Select(dto => new MstBookDto(dto)));
 
                             CbmCategoryDao cbmCategoryDao = new(dbHandlerOle);
                             MstCategoryDao mstCategoryDao = new(dbHandler);
-                            await Mapping(cbmCategoryDao, mstCategoryDao, src => src.Select(dto => new MstCategoryDto(dto)));
+                            _ = await Mapping(cbmCategoryDao, mstCategoryDao, src => src.Select(dto => new MstCategoryDto(dto)));
 
                             CbmItemDao cbmItemDao = new(dbHandlerOle);
                             MstItemDao mstItemDao = new(dbHandler);
-                            await Mapping(cbmItemDao, mstItemDao, src => src.Select(dto => new MstItemDto(dto)));
+                            _ = await Mapping(cbmItemDao, mstItemDao, src => src.Select(dto => new MstItemDto(dto)));
 
                             CbtActDao cbtActDao = new(dbHandlerOle);
                             HstActionDao hstActionDao = new(dbHandler);
-                            await Mapping(cbtActDao, hstActionDao, src => src.Select(dto => new HstActionDto(dto)));
+                            actRowsDiff = await Mapping(cbtActDao, hstActionDao, src => src.Where(dto => !(dto.INCOME == 0 && dto.EXPENSE == 0)).Select(dto => new HstActionDto(dto)));
 
                             HstGroupDao hstGroupDao = new(dbHandler);
                             var cbtActDtoList = await cbtActDao.FindAllAsync();
@@ -825,19 +828,21 @@ namespace HouseholdAccountBook.ViewModels.Windows
                                     });
                                 }
                             }
-                            await hstGroupDao.SetIdSequenceAsync(maxGroupId);
-                            _ = await hstGroupDao.BulkInsertAsync(hstGroupDtoList);
+                            if (0 < maxGroupId) {
+                                await hstGroupDao.SetIdSequenceAsync(maxGroupId);
+                                _ = await hstGroupDao.BulkInsertAsync(hstGroupDtoList);
+                            }
 
                             HstShopDao hstShopDao = new(dbHandler);
                             _ = await hstShopDao.DeleteAllAsync();
 
                             CbtNoteDao cbtNoteDao = new(dbHandlerOle);
                             HstRemarkDao hstRemarkDao = new(dbHandler);
-                            await Mapping(cbtNoteDao, hstRemarkDao, src => src.Select(dto => new HstRemarkDto(dto)));
+                            _ = await Mapping(cbtNoteDao, hstRemarkDao, src => src.Select(dto => new HstRemarkDto(dto)));
 
                             CbrBookDao cbrBookDao = new(dbHandlerOle);
                             RelBookItemDao relBookItemDao = new(dbHandler);
-                            await Mapping(cbrBookDao, relBookItemDao, src => src.Select(dto => new RelBookItemDto(dto)));
+                            _ = await Mapping(cbrBookDao, relBookItemDao, src => src.Select(dto => new RelBookItemDto(dto)));
                         });
                     }
                 }
@@ -848,7 +853,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             _ = isOpen
-                ? MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
+                ? MessageBox.Show(Properties.Resources.Message_FinishToImport + (0 < actRowsDiff ? Environment.NewLine + Properties.Resources.Message_DeletedZeroValueInformation : string.Empty), 
+                    Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
                 : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 

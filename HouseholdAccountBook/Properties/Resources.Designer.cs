@@ -1718,6 +1718,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   値が0の帳簿項目を削除しました。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Message_DeletedZeroValueInformation {
+            get {
+                return ResourceManager.GetString("Message_DeletedZeroValueInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   選択した項目を削除します。よろしいですか？ に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Message_DeleteNotification {

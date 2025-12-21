@@ -181,6 +181,9 @@
   <data name="Message_FinishToImport" xml:space="preserve">
     <value>インポートが完了しました。</value>
   </data>
+  <data name="Message_DeletedZeroValueInformation" xml:space="preserve">
+    <value>値が0の帳簿項目を削除しました。</value>
+  </data>
   <data name="Message_FinishToSave" xml:space="preserve">
     <value>保存が完了しました。</value>
   </data>

@@ -178,6 +178,9 @@
   <data name="Message_FinishToImport" xml:space="preserve">
     <value>The import is complete.</value>
   </data>
+  <data name="Message_DeletedZeroValueInformation" xml:space="preserve">
+    <value>Deleted book items the value is zero.</value>
+  </data>
   <data name="Message_FinishToSave" xml:space="preserve">
     <value>The saving is complete.</value>
   </data>
