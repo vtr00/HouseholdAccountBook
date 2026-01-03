@@ -27,8 +27,13 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
+            <!-- ファイル -->
             <MenuItem Header="{x:Static properties:Resources.Menu_File}">
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Exit}" Command="{Binding CloseCommand}" InputGestureText="Alt+F4"/>
+            </MenuItem>
+            <!-- 表示 -->
+            <MenuItem Header="{x:Static properties:Resources.Menu_View}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_View_DebugMode}" IsCheckable="True" IsChecked="{Binding App_IsDebug, Source={StaticResource Settings}}"/>
             </MenuItem>
         </Menu>
         
@@ -766,13 +771,9 @@
                                             Command="{Binding InitializeWindowSettingCommand}"/>
                                 </Grid>
                             </GroupBox>
-                            <!-- デバッグ -->
-                            <GroupBox>
-                                <GroupBox.Header>
-                                    <CheckBox Content="{x:Static properties:Resources.GroupHeader_Debug}" IsChecked="{Binding DebugMode}"/>
-                                </GroupBox.Header>
-
-                                <Grid Visibility="{Binding DebugMode, Converter={StaticResource BoolVisibilityConverter}}">
+                            <!-- ログ情報 -->
+                            <GroupBox Header="{x:Static properties:Resources.GroupHeader_LogInformation}">
+                                <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>

@@ -935,6 +935,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   ログ情報 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string GroupHeader_LogInformation {
+            get {
+                return ResourceManager.GetString("GroupHeader_LogInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   指定月 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string GroupHeader_MonthSelection {
@@ -1525,6 +1534,15 @@ namespace HouseholdAccountBook.Properties {
         public static string Menu_View_DailyGraph_ThisMonth {
             get {
                 return ResourceManager.GetString("Menu_View_DailyGraph_ThisMonth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   デバッグモード(_D) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Menu_View_DebugMode {
+            get {
+                return ResourceManager.GetString("Menu_View_DebugMode", resourceCulture);
             }
         }
         
@@ -2853,17 +2871,15 @@ namespace HouseholdAccountBook.Properties {
         ///凡例：＋追加 △変更 ×削除 ↑バグ修正
         ///---------------------------------------------------------------------------------------------------------------------
         ///* 2026
+        ///2026-01-04
+        ///  SettingWindow
+        ///    △データベース設定、バックアップ設定をDB設定として別のタブに変更した - refs #14
         ///2026-01-03
         ///  MainWindow
         ///    ↑記帳風月からインポート時、0円のデータがあるとスキーマ制約に違反し例外が発生するのを修正した - refs #3
         ///    ↑記帳風月からインポート時、グループが存在しないとスキーマ制約に違反し例外が発生するのを修正した
         ///  VersionWindow
-        ///    △変更履歴の記載順序及び記載内容を変更した - refs #4, #5
-        ///
-        ///* 2025
-        ///2025-12-20
-        ///  全体
-        ///    ↑例外が発生したときの [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        ///    [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string UpdateLog {
             get {

@@ -114,22 +114,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
         #endregion
 
-        #region デバッグ
-        /// <summary>
-        /// デバッグモード
-        /// </summary>
-        #region DebugMode
-        public bool DebugMode {
-            get;
-            set {
-                if (this.SetProperty(ref field, value)) {
-                    // リソースを更新して他ウィンドウの項目の表示/非表示を切り替える
-                    App.RegisterToResource();
-                }
-            }
-        }
-        #endregion
-
+        #region ログ
         /// <summary>
         /// 操作ログ出力
         /// </summary>
@@ -282,21 +267,23 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             Properties.Settings settings = Properties.Settings.Default;
 
+            // 言語情報
             this.SelectedCultureName = settings.App_CultureName;
 
+            // カレンダー情報
             this.StartMonth = settings.App_StartMonth;
             this.NationalHolidayCsvURI = settings.App_NationalHolidayCsv_Uri;
             this.NationalHolidayTextEncodingList = GetTextEncodingList();
             this.SelectedNationalHolidayTextEncoding = settings.App_NationalHolidayCsv_TextEncoding;
             this.NationalHolidayCsvDateIndex = settings.App_NationalHolidayCsv_DateIndex + 1;
 
+            // ウィンドウ情報
             this.IsPositionSaved = settings.App_IsPositionSaved;
+            this.WindowSettingVMList = LoadWindowSettings();
 
-            this.DebugMode = settings.App_IsDebug;
+            // ログ情報
             this.OutputOperationLog = settings.App_OutputFlag_OperationLog;
             this.OutputWindowLog = settings.App_OutputFlag_WindowLog;
-
-            this.WindowSettingVMList = LoadWindowSettings();
         }
 
         public override void AddEventHandlers()
@@ -384,7 +371,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             // ウィンドウ情報
             settings.App_IsPositionSaved = this.IsPositionSaved;
 
-            settings.App_IsDebug = this.DebugMode;
+            // ログ情報
             settings.App_OutputFlag_WindowLog = this.OutputWindowLog;
             settings.App_OutputFlag_OperationLog = this.OutputOperationLog;
 

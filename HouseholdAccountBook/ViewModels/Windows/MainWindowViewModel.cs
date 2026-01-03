@@ -264,23 +264,27 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public int? SelectedItemId { get; set; }
 
         /// <summary>
-        /// 表示開始
+        /// 表示開始日付
         /// </summary>
+        #region DisplayedStart
         public DateTime DisplayedStart => this.SelectedTab switch {
             Tabs.BooksTab or Tabs.DailyGraphTab => this.StartDate,
             Tabs.MonthlyListTab or Tabs.MonthlyGraphTab => this.DisplayedStartMonth,
             Tabs.YearlyGraphTab or Tabs.YearlyListTab => this.DisplayedStartYear,
             _ => this.StartDate,
         };
+        #endregion
         /// <summary>
-        /// 表示終了
+        /// 表示終了日付
         /// </summary>
+        #region DisplayedEnd
         public DateTime DisplayedEnd => this.SelectedTab switch {
             Tabs.BooksTab or Tabs.DailyGraphTab => this.EndDate,
             Tabs.MonthlyListTab or Tabs.MonthlyGraphTab => this.DisplayedEndMonth,
             Tabs.YearlyGraphTab or Tabs.YearlyListTab => this.DisplayedEndYear,
             _ => this.EndDate,
         };
+        #endregion
 
         /// <summary>
         /// 会計開始月
@@ -1533,6 +1537,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                     this.FiscalStartMonth = Properties.Settings.Default.App_StartMonth;
                     await DateTimeExtensions.DownloadHolidayListAsync();
+
                     await this.UpdateAsync(isUpdateBookList: true);
                 }
             }
