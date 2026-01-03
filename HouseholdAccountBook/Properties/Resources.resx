@@ -269,7 +269,7 @@
     <value>ウィンドウ情報</value>
   </data>
   <data name="GroupHeader_DataBaseInformation" xml:space="preserve">
-    <value>データベース情報</value>
+    <value>接続情報</value>
   </data>
   <data name="GroupHeader_Debug" xml:space="preserve">
     <value>デバッグ</value>
@@ -669,6 +669,9 @@
   </data>
   <data name="TabHeader_BookSettings" xml:space="preserve">
     <value>帳簿設定</value>
+  </data>
+  <data name="TabHeader_DbSettings" xml:space="preserve">
+    <value>DB設定</value>
   </data>
   <data name="TabHeader_OtherSettings" xml:space="preserve">
     <value>その他</value>

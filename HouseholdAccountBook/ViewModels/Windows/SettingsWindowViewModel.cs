@@ -70,6 +70,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public SettingsWindowBookTabViewModel BookTabVM { get; } = new();
 
         /// <summary>
+        /// DB設定タブVM
+        /// </summary>
+        public SettingsWindowDbTabViewModel DbTabVM { get; } = new();
+
+        /// <summary>
         /// その他設定タブVM
         /// </summary>
         public SettingsWindowOtherTabViewModel OtherTabVM { get; } = new();
@@ -109,6 +114,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 [
                     this.ItemTabVM,
                     this.BookTabVM,
+                    this.DbTabVM,
                     this.OtherTabVM
                 ]
             );
@@ -124,6 +130,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     break;
                 case SettingsTabs.BookSettingsTab:
                     await this.BookTabVM.LoadAsync();
+                    break;
+                case SettingsTabs.DbSettingsTab:
+                    this.DbTabVM.Load();
                     break;
                 case SettingsTabs.OtherSettingsTab:
                     this.OtherTabVM.Load();

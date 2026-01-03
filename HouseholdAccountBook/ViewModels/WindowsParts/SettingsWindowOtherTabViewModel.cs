@@ -1,13 +1,9 @@
 ﻿using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -29,48 +25,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
 
         #region Bindingプロパティ
-        #region データベース
-        /// <summary>
-        /// 選択されたDB種別
-        /// </summary>
-        #region SelectedDBKind
-        public DBKind SelectedDBKind {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
-
-        /// <summary>
-        /// PostgreSQL設定
-        /// </summary>
-        #region PostgreSQLDBSettingVM
-        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = new();
-        #endregion
-
-        /// <summary>
-        /// Access設定
-        /// </summary>
-        #region AccessSettingVM
-        public OleDbSettingViewModel AccessSettingVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = new();
-        #endregion
-
-        /// <summary>
-        /// SQLite設定
-        /// </summary>
-        #region SQLiteSettingVM
-        public FileDbSettingViewModel SQLiteSettingVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = new();
-        #endregion
-        #endregion
-
         #region 言語
         /// <summary>
         /// 言語種別辞書
@@ -84,58 +38,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             get;
             set => this.SetProperty(ref field, value);
         } = "ja-JP";
-        #endregion
-        #endregion
-
-        #region バックアップ
-        /// <summary>
-        /// バックアップ数
-        /// </summary>
-        #region BackUpNum
-        public int BackUpNum {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
-
-        /// <summary>
-        /// バックアップ先フォルダ
-        /// </summary>
-        #region BackUpFolderPath
-        public string BackUpFolderPath {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
-
-        /// <summary>
-        /// メインウィンドウ最小化時バックアップフラグ
-        /// </summary>
-        #region BackUpFlagAtMinimizing
-        public bool BackUpFlagAtMinimizing {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
-
-        /// <summary>
-        /// メインウィンドウ最小化時バックアップインターバル(分)
-        /// </summary>
-        #region BackUpIntervalAtMinimizing
-        public int BackUpIntervalAtMinimizing {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
-
-        /// <summary>
-        /// メインウィンドウクローズ時バックアップフラグ
-        /// </summary>
-        #region BackUpFlagAtClosing
-        public bool BackUpFlagAtClosing {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
         #endregion
         #endregion
 
@@ -251,25 +153,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         #region コマンド
         /// <summary>
-        /// pg_dump.exe選択コマンド
-        /// </summary>
-        public ICommand SelectDumpExePathCommand => new RelayCommand(this.SelectDumpExePathCommand_Executed);
-        /// <summary>
-        /// pg_restore.exe選択コマンド
-        /// </summary>
-        public ICommand SelectRestoreExePathCommand => new RelayCommand(this.SelectRestoreExePathCommand_Executed);
-        /// <summary>
-        /// データベース設定コマンド
-        /// </summary>
-        public ICommand RestartForDbSettingCommand => new RelayCommand(this.RestartForDbSettingCommand_Executed);
-        /// <summary>
         /// 言語設定適用コマンド
         /// </summary>
         public ICommand RestartForLanguageCommand => new RelayCommand(this.RestartForLanguageCommand_Executed);
-        /// <summary>
-        /// バックアップフォルダ選択コマンド
-        /// </summary>
-        public ICommand SelectBackUpFolderPathCommand => new RelayCommand(this.SelectBackUpFolderPathCommand_Executed);
         /// <summary>
         /// ウィンドウ設定再読込コマンド
         /// </summary>
@@ -287,64 +173,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         #region コマンドイベントハンドラ
         /// <summary>
-        /// pg_dump.exe選択コマンド処理
-        /// </summary>
-        private void SelectDumpExePathCommand_Executed()
-        {
-            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.PostgreSQLDBSettingVM.DumpExePath, App.GetCurrentDir());
-            if (string.IsNullOrWhiteSpace(folderPath)) {
-                folderPath = App.GetCurrentDir();
-            }
-
-            OpenFileDialogRequestEventArgs e = new() {
-                CheckFileExists = true,
-                InitialDirectory = folderPath,
-                FileName = fileName,
-                Title = Properties.Resources.Title_FileSelection,
-                Filter = "pg_dump.exe|pg_dump.exe"
-            };
-            if (this.OpenFileDialogRequest(e)) {
-                this.PostgreSQLDBSettingVM.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
-            }
-        }
-
-        /// <summary>
-        /// pg_restore.exe選択コマンド処理
-        /// </summary>
-        private void SelectRestoreExePathCommand_Executed()
-        {
-            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.PostgreSQLDBSettingVM.RestoreExePath, App.GetCurrentDir());
-            if (string.IsNullOrWhiteSpace(folderPath)) {
-                folderPath = App.GetCurrentDir();
-            }
-
-            OpenFileDialogRequestEventArgs e = new() {
-                CheckFileExists = true,
-                InitialDirectory = folderPath,
-                FileName = fileName,
-                Title = Properties.Resources.Title_FileSelection,
-                Filter = "pg_restore.exe|pg_restore.exe"
-            };
-            if (this.OpenFileDialogRequest(e)) {
-                this.PostgreSQLDBSettingVM.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
-            }
-        }
-
-        /// <summary>
-        /// データベース設定コマンド処理
-        /// </summary>
-        private void RestartForDbSettingCommand_Executed()
-        {
-            if (MessageBox.Show(Properties.Resources.Message_RestartNotification, Properties.Resources.Title_Conformation,
-                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                Properties.Settings.Default.App_InitFlag = true;
-                Properties.Settings.Default.Save();
-
-                ((App)Application.Current).Restart();
-            }
-        }
-
-        /// <summary>
         /// 言語設定適用コマンド処理
         /// </summary>
         private void RestartForLanguageCommand_Executed()
@@ -355,29 +183,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Properties.Settings.Default.Save();
 
                 ((App)Application.Current).Restart();
-            }
-        }
-
-        /// <summary>
-        /// バックアップフォルダ選択コマンド処理
-        /// </summary>
-        private void SelectBackUpFolderPathCommand_Executed()
-        {
-            string folderFullPath;
-            if (string.IsNullOrWhiteSpace(this.BackUpFolderPath)) {
-                folderFullPath = App.GetCurrentDir();
-            }
-            else {
-                (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.BackUpFolderPath, App.GetCurrentDir());
-                folderFullPath = Path.Combine(folderPath, fileName);
-            }
-
-            OpenFolderDialogRequestEventArgs e = new() {
-                InitialDirectory = folderFullPath,
-                Title = Properties.Resources.Title_BackupFolderSelection
-            };
-            if (this.OpenFolderDialogRequest(e)) {
-                this.BackUpFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FolderName);
             }
         }
 
@@ -477,24 +282,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             Properties.Settings settings = Properties.Settings.Default;
 
-            this.SelectedDBKind = (DBKind)settings.App_SelectedDBKind;
-
-            // PostgreSQL
-            this.PostgreSQLDBSettingVM.Load(null);
-
-            // SQLite
-            this.SQLiteSettingVM.Load();
-
-            // Access(記帳風月)
-            this.AccessSettingVM.LoadForKichoFugetsu();
-
             this.SelectedCultureName = settings.App_CultureName;
-
-            this.BackUpNum = settings.App_BackUpNum;
-            this.BackUpFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_BackUpFolderPath);
-            this.BackUpFlagAtMinimizing = settings.App_BackUpFlagAtMinimizing;
-            this.BackUpIntervalAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
-            this.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
 
             this.StartMonth = settings.App_StartMonth;
             this.NationalHolidayCsvURI = settings.App_NationalHolidayCsv_Uri;
@@ -584,25 +372,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             Properties.Settings settings = Properties.Settings.Default;
 
-            // PostgreSQL
-            _ = this.PostgreSQLDBSettingVM.Save(null);
-
-            // Access(記帳風月)
-            _ = this.AccessSettingVM.SaveForKichoFugetsu();
-
+            // 言語情報
             settings.App_CultureName = this.SelectedCultureName;
 
-            settings.App_BackUpNum = this.BackUpNum;
-            settings.App_BackUpFolderPath = Path.GetFullPath(this.BackUpFolderPath, App.GetCurrentDir());
-            settings.App_BackUpFlagAtMinimizing = this.BackUpFlagAtMinimizing;
-            settings.App_BackUpIntervalMinAtMinimizing = this.BackUpIntervalAtMinimizing;
-            settings.App_BackUpFlagAtClosing = this.BackUpFlagAtClosing;
-
+            // カレンダー情報
             settings.App_StartMonth = this.StartMonth;
             settings.App_NationalHolidayCsv_Uri = this.NationalHolidayCsvURI;
             settings.App_NationalHolidayCsv_TextEncoding = this.SelectedNationalHolidayTextEncoding;
             settings.App_NationalHolidayCsv_DateIndex = this.NationalHolidayCsvDateIndex - 1;
 
+            // ウィンドウ情報
             settings.App_IsPositionSaved = this.IsPositionSaved;
 
             settings.App_IsDebug = this.DebugMode;

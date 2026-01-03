@@ -170,7 +170,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public event Func<bool> IsRegistrationWindowOpenedRequested;
         #endregion
 
-        #region プロパティ
+        #region Bindingプロパティ
         #region プロパティ(共通)
         /// <summary>
         /// 選択されたDB種別
