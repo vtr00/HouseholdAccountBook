@@ -863,7 +863,7 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
-        ///   データベース情報 に類似しているローカライズされた文字列を検索します。
+        ///   接続情報 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string GroupHeader_DataBaseInformation {
             get {
@@ -1945,6 +1945,15 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
+        ///   DB設定 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TabHeader_DbSettings {
+            get {
+                return ResourceManager.GetString("TabHeader_DbSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   項目設定 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string TabHeader_ItemSettings {
@@ -2840,23 +2849,21 @@ namespace HouseholdAccountBook.Properties {
         }
         
         /// <summary>
-        ///   * 記録以前
-        ///  記帳風月からのインポート
-        ///  帳簿項目追加、編集
-        ///  概要表示
+        ///   ---------------------------------------------------------------------------------------------------------------------
+        ///凡例：＋追加 △変更 ×削除 ↑バグ修正
+        ///---------------------------------------------------------------------------------------------------------------------
+        ///* 2026
+        ///2026-01-03
+        ///  MainWindow
+        ///    ↑記帳風月からインポート時、0円のデータがあるとスキーマ制約に違反し例外が発生するのを修正した - refs #3
+        ///    ↑記帳風月からインポート時、グループが存在しないとスキーマ制約に違反し例外が発生するのを修正した
+        ///  VersionWindow
+        ///    △変更履歴の記載順序及び記載内容を変更した - refs #4, #5
         ///
-        ///* 2016
-        ///2016/12/29
-        ///  MainWindow.xaml.cs
-        ///    ＋削除時に移動も削除されるようにした(2017/01/01確認)
-        ///    ↑移動操作可能の判定が「帳簿」ではなく「帳簿項目」になっていたのを修正した
-        ///    ↑項目編集処理のグループ種別判定処理のSQLを修正した
-        ///    ↑NumericUpDown.ValueのModeをTwoWayに修正した - Editしたテキストが取得できなかったため
-        ///    ↑NumericUpDown内のTextBoxのUpdateSourceTriggerをPropertyChangedに修正した - Editしたテキストが取得できなかったため
-        ///  ActionRegistrationWindow.xaml.cs
-        ///    △グループに属する項目が1つになったときにグループを削除するように変更した
-        ///    ↑登録完了時にDialogResult=trueとなるように修正した
-        ///    ↑グループ内帳簿項目洗い出し時に日付昇順になるよう [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        ///* 2025
+        ///2025-12-20
+        ///  全体
+        ///    ↑例外が発生したときの [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string UpdateLog {
             get {

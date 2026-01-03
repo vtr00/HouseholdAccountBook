@@ -304,9 +304,13 @@
         /// </summary>
         BookSettingsTab = 1,
         /// <summary>
+        /// DB設定タブ
+        /// </summary>
+        DbSettingsTab = 2,
+        /// <summary>
         /// その他タブ
         /// </summary>
-        OtherSettingsTab = 2
+        OtherSettingsTab = 3
     }
     #endregion
 

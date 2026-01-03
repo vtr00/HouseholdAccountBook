@@ -470,11 +470,10 @@
                     </Grid>
                 </Grid>
             </TabItem>
-            
-            <!-- その他 -->
-            <TabItem x:Name="_OtherTab" DataContext="{Binding OtherTabVM}">
+
+            <TabItem x:Name="_DbTab" DataContext="{Binding DbTabVM}">
                 <TabItem.Header>
-                    <TextBlock Text="{x:Static properties:Resources.TabHeader_OtherSettings}" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_DbSettings}" HorizontalAlignment="Center"/>
                 </TabItem.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -574,26 +573,6 @@
                                             Command="{Binding RestartForDbSettingCommand}"/>
                                 </Grid>
                             </GroupBox>
-                            <!-- 言語情報 -->
-                            <GroupBox Header="{x:Static properties:Resources.GroupHeader_LanguageInformation}">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition SharedSizeGroup="Header"/>
-                                        <ColumnDefinition Width="200"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Language}"/>
-                                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" ItemsSource="{Binding CultureNameDic}" 
-                                              SelectedValue="{Binding SelectedCultureName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
-                                    <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5"
-                                            Content="{x:Static properties:Resources.Button_ApplyLanguage}" Command="{Binding RestartForLanguageCommand}"/>
-                                </Grid>
-                            </GroupBox>
                             <!-- バックアップ情報 -->
                             <GroupBox Header="{x:Static properties:Resources.GroupHeader_BackUpInformation}">
                                 <Grid>
@@ -642,6 +621,46 @@
                                               Content="{x:Static properties:Resources.CheckBox_Timing_ClosingMainWindow}" IsChecked="{Binding BackUpFlagAtClosing}"/>
                                 </Grid>
                             </GroupBox>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Button Grid.Row="1" Margin="5" Content="{x:Static properties:Resources.Button_Save}" Command="{Binding SaveDbSettingsCommand}"/>
+                </Grid>
+            </TabItem>
+            
+            <!-- その他 -->
+            <TabItem x:Name="_OtherTab" DataContext="{Binding OtherTabVM}">
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_OtherSettings}" HorizontalAlignment="Center"/>
+                </TabItem.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ScrollViewer Grid.Row="0">
+                        <StackPanel Grid.IsSharedSizeScope="True" Margin="0,0,5,0">
+                            <!-- 言語情報 -->
+                            <GroupBox Header="{x:Static properties:Resources.GroupHeader_LanguageInformation}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Language}"/>
+                                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" ItemsSource="{Binding CultureNameDic}" 
+                                              SelectedValue="{Binding SelectedCultureName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                    <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" 
+                                            Content="{x:Static properties:Resources.Button_ApplyLanguage}" Command="{Binding RestartForLanguageCommand}"/>
+                                </Grid>
+                            </GroupBox>
                             <!-- カレンダー情報 -->
                             <GroupBox Header="{x:Static properties:Resources.GroupHeader_CalendarInformation}">
                                 <Grid>
@@ -651,7 +670,7 @@
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition SharedSizeGroup="Header"/>
-                                        <ColumnDefinition SharedSizeGroup="Number"/>
+                                        <ColumnDefinition Width="100" SharedSizeGroup="Number"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition SharedSizeGroup="Button"/>
                                     </Grid.ColumnDefinitions>

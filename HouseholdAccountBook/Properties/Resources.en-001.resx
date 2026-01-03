@@ -266,7 +266,7 @@
     <value>Window information</value>
   </data>
   <data name="GroupHeader_DataBaseInformation" xml:space="preserve">
-    <value>Database information</value>
+    <value>Connection information</value>
   </data>
   <data name="GroupHeader_Debug" xml:space="preserve">
     <value>Debug</value>
@@ -667,6 +667,10 @@ settings</value>
   </data>
   <data name="TabHeader_BookSettings" xml:space="preserve">
     <value>Book
+settings</value>
+  </data>
+  <data name="TabHeader_DbSettings" xml:space="preserve">
+    <value>Database
 settings</value>
   </data>
   <data name="TabHeader_OtherSettings" xml:space="preserve">

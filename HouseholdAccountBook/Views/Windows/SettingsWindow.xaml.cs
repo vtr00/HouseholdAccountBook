@@ -48,7 +48,7 @@ namespace HouseholdAccountBook.Views.Windows
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
                 await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
-                    this.WVM.OtherTabVM.SelectedDBKind = dbHandler.DBKind;
+                    this.WVM.DbTabVM.SelectedDBKind = dbHandler.DBKind;
                 }
                 using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create(methodName: nameof(this.Loaded))) {
                     await this.WVM.LoadAsync();
@@ -90,6 +90,9 @@ namespace HouseholdAccountBook.Views.Windows
                         break;
                     case SettingsTabs.BookSettingsTab:
                         await this.WVM.BookTabVM.LoadAsync(this.WVM.BookTabVM.SelectedBookVM?.Id);
+                        break;
+                    case SettingsTabs.DbSettingsTab:
+                        this.WVM.DbTabVM.Load();
                         break;
                     case SettingsTabs.OtherSettingsTab:
                         this.WVM.OtherTabVM.Load();
