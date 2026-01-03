@@ -28,7 +28,6 @@ namespace HouseholdAccountBook.Views.Windows
             this.Loaded += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
-                this.HistoryLog.ScrollToEnd();
                 this.WVM.AddEventHandlers();
             };
         }
