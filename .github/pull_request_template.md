@@ -30,6 +30,7 @@ Link related issues using `close #123` or similar.
 関連するIssueを `close #123` などの形式で記載してください。
 
 - close #
+- refs #
 
 ---
 
