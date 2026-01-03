@@ -61,6 +61,8 @@
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_BulkCheck}" Command="{Binding BulkCheckCommand}" InputGestureText="Ctrl+B"/>
             </MenuItem>
             <MenuItem Header="{x:Static properties:Resources.Menu_View}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_View_DebugMode}" IsCheckable="True" IsChecked="{Binding App_IsDebug, Source={StaticResource Settings}}"/>
+                <Separator/>
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Update}" Command="{Binding UpdateListCommand}" InputGestureText="F5"/>
             </MenuItem>
         </Menu>

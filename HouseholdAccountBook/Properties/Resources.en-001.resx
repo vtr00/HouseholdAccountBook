@@ -265,6 +265,9 @@
   <data name="GroupHeader_WindowInformation" xml:space="preserve">
     <value>Window information</value>
   </data>
+  <data name="GroupHeader_LogInformation" xml:space="preserve">
+    <value>Log information</value>
+  </data>
   <data name="GroupHeader_DataBaseInformation" xml:space="preserve">
     <value>Connection information</value>
   </data>
@@ -1052,5 +1055,8 @@ list</value>
   </data>
   <data name="Menu_File_LogFile_OperationLog_Open" xml:space="preserve">
     <value>Open(_O)</value>
+  </data>
+  <data name="Menu_View_DebugMode" xml:space="preserve">
+    <value>Debug mode (_D)</value>
   </data>
 </root>

@@ -172,6 +172,8 @@
                     </MenuItem>
                 </MenuItem>
                 <Separator/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_View_DebugMode}" IsCheckable="True" IsChecked="{Binding App_IsDebug, Source={StaticResource Settings}}"/>
+                <Separator/>
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Update}" Command="{Binding UpdateCommand}" InputGestureText="F5"/>
             </MenuItem>
             <!-- ツール -->
@@ -253,7 +255,7 @@
                             </Button>
 
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
-                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
+                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                         </StackPanel>
                             
                         <StackPanel Grid.Column="2" Orientation="Horizontal">
