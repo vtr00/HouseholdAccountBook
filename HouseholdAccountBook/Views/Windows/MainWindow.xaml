@@ -40,12 +40,15 @@
 
         <Style x:Key="DayOfWeekStyle" TargetType="DataGridCell">
             <Style.Triggers>
+                <!-- 土曜日 -->
                 <DataTrigger Binding="{Binding ActTime.DayOfWeek}" Value="Saturday">
                     <Setter Property="Foreground" Value="Blue"/>
                 </DataTrigger>
+                <!-- 日曜日 -->
                 <DataTrigger Binding="{Binding ActTime.DayOfWeek}" Value="Sunday">
                     <Setter Property="Foreground" Value="Red"/>
                 </DataTrigger>
+                <!-- 祝日 -->
                 <DataTrigger Binding="{Binding ActTime, Converter={StaticResource DateTimeToIsNationalHolidayConverter}}" Value="true">
                     <Setter Property="Foreground" Value="Red"/>
                 </DataTrigger>
@@ -61,15 +64,18 @@
     <Grid Background="WhiteSmoke">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1.0*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <!-- メニュー -->
-        <Menu Grid.Row="0" Grid.Column="0">
+        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
             <!-- ファイル -->
             <MenuItem Header="{x:Static properties:Resources.Menu_File}" Command="{Binding FileMenuCommand}">
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Import}" Command="{Binding ImportCommand}">
@@ -192,17 +198,26 @@
             </MenuItem>
         </Menu>
 
-        <TabControl Grid.Row="1" Grid.Column="0" Margin="5" Width="Auto" Height="Auto" TabStripPlacement="Left"
+        <!-- 帳簿 -->
+        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5,5,5,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+           <TextBlock Text="{x:Static properties:Resources.TextBlock_Book}"/>:
+        </TextBlock>
+        <ComboBox Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" MinWidth="150"
+                  ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
+        <TextBlock Grid.Row="1" Grid.Column="2" Margin="5,5,5,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                   Text="{Binding SelectedBookVM.Remark}"/>
+
+        <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Width="Auto" Height="Auto" TabStripPlacement="Left"
                     SelectedIndex="{Binding SelectedTabIndex}">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="TabItem">
                     <Setter Property="Height" Value="75"/>
                 </Style>
             </TabControl.ItemContainerStyle>
-            <!-- 帳簿 -->
+            <!-- 帳簿項目 -->
             <TabItem x:Name="_BookTab">
                 <TabItem.Header>
-                    <TextBlock Text="{x:Static properties:Resources.TabHeader_AccountBook}" TextAlignment="Center"/>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_BookItems}" TextAlignment="Center"/>
                 </TabItem.Header>
                 <TabItem.InputBindings>
                     <KeyBinding Gesture="F5" Command="{Binding UpdateCommand}"/>
@@ -222,7 +237,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 上部メニュー -->
-                    <Grid Grid.Row="0" Grid.Column="0" Margin="2">
+                    <Grid Grid.Row="0" Height="22" Margin="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="1.0*"/>
@@ -253,9 +268,6 @@
                                     <TextBlock Text="{Binding Now, Source={StaticResource DateTime}, StringFormat={}{0:yyyy-MM}}"/>
                                 </ToolTipService.ToolTip>
                             </Button>
-
-                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
-                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                         </StackPanel>
                             
                         <StackPanel Grid.Column="2" Orientation="Horizontal">
@@ -482,6 +494,7 @@
                     <KeyBinding Gesture="Alt+Left" Command="{Binding GoToLastMonthCommand}"/>
                     <KeyBinding Gesture="Alt+Right" Command="{Binding GoToNextMonthCommand}"/>
                 </TabItem.InputBindings>
+                
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -491,7 +504,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0" Margin="2">
+                    <Grid Grid.Row="0" Height="22" Margin="2">
                         <StackPanel Orientation="Horizontal">
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastMonthCommand}"/>
                             <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToDisplayedMonthConverter}, TargetNullValue={x:Static properties:Resources.Button_DateRange}}"
@@ -517,9 +530,7 @@
                                 </ToolTipService.ToolTip>
                             </Button>
                             
-                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
-                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0,0,0" MinWidth="100"
                                       ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
                                       ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
@@ -592,7 +603,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0" Margin="2">
+                    <Grid Grid.Row="0" Height="22" Margin="2">
                         <StackPanel Orientation="Horizontal">
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastYearCommand}"/>
                             <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}">
@@ -616,8 +627,6 @@
                                     <TextBlock Text="{Binding Now, Source={StaticResource DateTime}, StringFormat={}{0:yyyy}}"/>
                                 </ToolTipService.ToolTip>
                             </Button>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
-                                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
                         </StackPanel>
                     </Grid>
 
@@ -705,7 +714,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0" Margin="2">
+                    <Grid Grid.Row="0" Height="22" Margin="2">
                         <StackPanel Orientation="Horizontal">
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastYearCommand}"/>
                             <Button Width="120" Content="{Binding DisplayedYear, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}">
@@ -729,10 +738,7 @@
                                     <TextBlock Text="{Binding Now, Source={StaticResource DateTime}, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
                                 </ToolTipService.ToolTip>
                             </Button>
-                            
-                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
-                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name" />
-                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0,0,0" MinWidth="100"
                                       ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
                                       ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
@@ -805,7 +811,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0" Margin="2">
+                    <Grid Grid.Row="0" Height="22" Margin="2">
                         <StackPanel Orientation="Horizontal">
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastYearCommand}"/>
                             <Button Width="120">
@@ -819,8 +825,6 @@
                             </Button>
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{Binding GoToNextYearCommand}"/>
                             <Button Width="80" Content="{x:Static properties:Resources.Button_LastDecade}" Command="{Binding GoToThisYearCommand}"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
-                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
                         </StackPanel>
                     </Grid>
 
@@ -902,7 +906,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 中央メニュー -->
-                    <Grid Grid.Row="0" Margin="2">
+                    <Grid Grid.Row="0" Height="22" Margin="2">
                         <StackPanel Orientation="Horizontal">
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastYearCommand}"/>
                             <Button Width="120">
@@ -917,9 +921,7 @@
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Forward}" Command="{Binding GoToNextYearCommand}"/>
                             <Button Width="80" Content="{x:Static properties:Resources.Button_LastDecade}" Command="{Binding GoToThisYearCommand}"/>
                             
-                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0" MinWidth="150"
-                                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
-                            <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
+                            <ComboBox HorizontalAlignment="Stretch" Margin="3,0,0,0" MinWidth="100"
                                       ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
                                       ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">

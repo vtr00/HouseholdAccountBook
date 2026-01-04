@@ -58,7 +58,15 @@ namespace HouseholdAccountBook.ViewModels.Settings
         #endregion
 
         /// <summary>
-        /// 初期値
+        /// 備考
+        /// </summary>
+        public string Remark {
+            get;
+            set => this.SetProperty(ref field, value);
+        }
+
+        /// <summary>
+        /// 初期残高
         /// </summary>
         #region InitialValue
         public int InitialValue {

@@ -5,8 +5,11 @@
 2026-01-04
   SettingWindow
     △データベース設定、バックアップ設定をDB設定として別のタブに変更した - refs #14
-  SettingWindow, MainWindow
+  MainWindow, SettingWindow, CsvComparisonWindow
     △デバッグ表示の有効/無効をメニューから切り替えるように変更した - refs #15
+  MainWindow, SettingWindow
+    △帳簿の選択コンボボックスの配置を変更した - refs #10
+    ＋帳簿ごとに備考を設定/表示する機能を追加した - refs #10
 2026-01-03
   MainWindow
     ↑記帳風月からインポート時、0円のデータがあるとスキーマ制約に違反し例外が発生するのを修正した - refs #3

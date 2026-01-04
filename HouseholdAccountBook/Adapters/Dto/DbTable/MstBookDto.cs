@@ -61,6 +61,11 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         public class JsonDto
         {
             /// <summary>
+            /// 備考
+            /// </summary>
+            public string Remark { get; set; }
+
+            /// <summary>
             /// 開始日
             /// </summary>
             public DateTime? StartDate { get; set; }
@@ -119,6 +124,7 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
             /// <param name="org">コピー元</param>
             protected void Copy(JsonDto org)
             {
+                this.Remark = org.Remark;
                 this.StartDate = org.StartDate;
                 this.EndDate = org.EndDate;
                 this.CsvFolderPath = org.CsvFolderPath;

@@ -661,8 +661,9 @@
   <data name="ColumnHeader_LastUsageDate" xml:space="preserve">
     <value>Last used date</value>
   </data>
-  <data name="TabHeader_AccountBook" xml:space="preserve">
-    <value>Books</value>
+  <data name="TabHeader_BookItems" xml:space="preserve">
+    <value>Book
+items</value>
   </data>
   <data name="TabHeader_ItemSettings" xml:space="preserve">
     <value>Item

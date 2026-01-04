@@ -238,6 +238,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 BookSettingViewModel vm = this.DisplayedBookSettingVM;
                 await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     MstBookDto.JsonDto jsonObj = new() {
+                        Remark = vm.Remark ?? string.Empty,
                         StartDate = vm.StartDateExists ? vm.StartDate : null,
                         EndDate = vm.EndDateExists ? vm.EndDate : null,
                         CsvFolderPath = vm.CsvFolderPath != string.Empty ? Path.GetFullPath(vm.CsvFolderPath, App.GetCurrentDir()) : null,
