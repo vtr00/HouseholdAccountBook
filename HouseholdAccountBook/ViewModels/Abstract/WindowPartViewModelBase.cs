@@ -14,6 +14,9 @@ namespace HouseholdAccountBook.ViewModels.Abstract
     /// </summary>
     public abstract class WindowPartViewModelBase : BindableBase
     {
+        /// <summary>
+        /// 子ViewModelリスト
+        /// </summary>
         protected readonly List<WindowPartViewModelBase> mChildrenVM = [];
 
         #region フィールド

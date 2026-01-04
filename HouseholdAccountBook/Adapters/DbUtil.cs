@@ -1,0 +1,157 @@
+﻿using HouseholdAccountBook.Adapters.DbHandler;
+using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.Enums;
+using Notification.Wpf;
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using static HouseholdAccountBook.Adapters.FileConstants;
+
+namespace HouseholdAccountBook.Adapters
+{
+    public static class DbUtil
+    {
+        #region ダンプ/リストア
+        /// <summary>
+        /// バックアップファイルを作成する
+        /// </summary>
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
+        /// <param name="notifyResult">実行結果を通知する</param>
+        /// <param name="waitForFinish">完了を待つか</param>
+        /// <param name="backUpNum">バックアップ数</param>
+        /// <param name="backUpFolderPath">バックアップ用フォルダパス</param>
+        /// <returns>成功/失敗</returns>
+        public static async Task<bool> CreateBackUpFileAsync(DbHandlerFactory dbHandlerFactory, bool notifyResult = false, bool waitForFinish = true, int? backUpNum = null, string backUpFolderPath = null)
+        {
+            using FuncLog funcLog = new(new { notifyResult, waitForFinish, backUpNum, backUpFolderPath });
+
+            Properties.Settings settings = Properties.Settings.Default;
+
+            int tmpBackUpNum = backUpNum ?? settings.App_BackUpNum;
+            string tmpBackUpFolderPath = backUpFolderPath ?? settings.App_BackUpFolderPath;
+
+            if (tmpBackUpFolderPath == string.Empty) { return false; }
+
+            bool result;
+            string backUpFileExt = PostgreSQLBackupFileExt;
+            if (0 < tmpBackUpNum) {
+                Log.Debug("Create backup file.");
+                // フォルダが存在しなければ作成する
+                if (!Directory.Exists(tmpBackUpFolderPath)) {
+                    _ = Directory.CreateDirectory(tmpBackUpFolderPath);
+                }
+
+                DBKind selectedDBKind = (DBKind)settings.App_SelectedDBKind;
+                switch (selectedDBKind) {
+                    case DBKind.PostgreSQL: {
+                        string backupFilePath = Path.Combine(tmpBackUpFolderPath, PostgreSQLBackupFileName);
+                        backUpFileExt = PostgreSQLBackupFileExt;
+                        int? exitCode = null;
+
+                        if (settings.App_Postgres_DumpExePath != string.Empty) {
+                            exitCode = await ExecuteDumpPostgreSQL(dbHandlerFactory, backupFilePath, PostgresFormat.Custom, notifyResult, waitForFinish);
+                        }
+
+                        result = exitCode == 0;
+                        break;
+                    }
+                    case DBKind.SQLite: {
+                        string backupFilePath = Path.Combine(tmpBackUpFolderPath, SQLiteBackupFileName);
+                        backUpFileExt = SQLiteBackupFileExt;
+                        try {
+                            File.Copy(settings.App_SQLite_DBFilePath, backupFilePath, true);
+                            result = true;
+                        }
+                        catch {
+                            result = false;
+                        }
+                        break;
+                    }
+                    default:
+                        result = false;
+                        break;
+                }
+            }
+            else {
+                result = true;
+            }
+
+            // 古いバックアップファイルを削除する
+            FileUtil.DeleteOldFiles(tmpBackUpFolderPath, $"*.{backUpFileExt}", tmpBackUpNum);
+
+            return result;
+        }
+
+        /// <summary>
+        /// PostgreSQLのダンプを実行する
+        /// </summary>
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
+        /// <param name="backupFilePath">バックアップファイルパス</param>
+        /// <param name="format">ダンプフォーマット</param>
+        /// <param name="notifyResult">実行結果を通知する</param>
+        /// <param name="waitForFinish">処理の完了を待機する</param>
+        /// <returns>成功/失敗/不明</returns>
+        public static async Task<int?> ExecuteDumpPostgreSQL(DbHandlerFactory dbHandlerFactory, string backupFilePath, PostgresFormat format, bool notifyResult = false, bool waitForFinish = true)
+        {
+            using FuncLog funcLog = new(new { backupFilePath, format, notifyResult, waitForFinish });
+
+            Properties.Settings settings = Properties.Settings.Default;
+
+            int? result = -1;
+            await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
+                if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
+                    result = notifyResult
+                        ? await npgsqlDbHandler.ExecuteDump(backupFilePath, settings.App_Postgres_DumpExePath, (PostgresPasswordInput)settings.App_Postgres_Password_Input, format,
+                            exitCode => {
+                                // ダンプ結果を通知する
+                                if (exitCode == 0) {
+                                    NotificationManager nm = new();
+                                    NotificationContent nc = new() {
+                                        Title = Properties.Resources.Title_MainWindow,
+                                        Message = Properties.Resources.Message_FinishToBackup,
+                                        Type = NotificationType.Success
+                                    };
+                                    nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+                                }
+                                else if (exitCode != null) {
+                                    NotificationManager nm = new();
+                                    NotificationContent nc = new() {
+                                        Title = Properties.Resources.Title_MainWindow,
+                                        Message = Properties.Resources.Message_FoultToBackup,
+                                        Type = NotificationType.Error
+                                    };
+                                    nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+                                }
+                            }, waitForFinish)
+                        : await npgsqlDbHandler.ExecuteDump(backupFilePath, settings.App_Postgres_DumpExePath, (PostgresPasswordInput)settings.App_Postgres_Password_Input, format, null, waitForFinish);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// PostgreSQLのリストアを実行する
+        /// </summary>
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
+        /// <param name="backupFilePath">バックアップファイルパス</param>
+        /// <returns>成功/失敗</returns>
+        public static async Task<int> ExecuteRestorePostgreSQL(DbHandlerFactory dbHandlerFactory, string backupFilePath)
+        {
+            using FuncLog funcLog = new(new { backupFilePath });
+
+            Properties.Settings settings = Properties.Settings.Default;
+
+            int result = -1;
+            await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
+                if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
+                    result = await npgsqlDbHandler.ExecuteRestore(backupFilePath, settings.App_Postgres_RestoreExePath, (PostgresPasswordInput)settings.App_Postgres_Password_Input);
+                }
+            }
+            return result;
+        }
+        #endregion
+
+    }
+}
