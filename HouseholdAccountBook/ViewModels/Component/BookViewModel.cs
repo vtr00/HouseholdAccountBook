@@ -20,6 +20,11 @@ namespace HouseholdAccountBook.ViewModels.Component
         public string Name { get; set; }
 
         /// <summary>
+        /// 備考
+        /// </summary>
+        public string Remark { get; set; }
+
+        /// <summary>
         /// 帳簿種別
         /// </summary>
         public BookKind BookKind { get; set; }

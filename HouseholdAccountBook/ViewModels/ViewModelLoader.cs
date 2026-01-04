@@ -56,6 +56,7 @@ namespace HouseholdAccountBook.ViewModels
                         BookViewModel vm = new() {
                             Id = dto.BookId,
                             Name = dto.BookName,
+                            Remark = jsonObj?.Remark ?? string.Empty,
                             BookKind = (BookKind)dto.BookKind,
                             DebitBookId = dto.DebitBookId,
                             PayDay = dto.PayDay
@@ -757,6 +758,7 @@ namespace HouseholdAccountBook.ViewModels
                     SortOrder = dto.SortOrder,
                     Name = dto.BookName,
                     SelectedBookKind = (BookKind)dto.BookKind,
+                    Remark = jsonObj?.Remark ?? string.Empty,
                     InitialValue = dto.InitialValue,
                     StartDateExists = jsonObj?.StartDate != null,
                     StartDate = jsonObj?.StartDate ?? dto.StartDate ?? DateTime.Today,
