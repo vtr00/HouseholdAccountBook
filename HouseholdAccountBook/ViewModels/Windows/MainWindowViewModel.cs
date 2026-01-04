@@ -857,7 +857,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             _ = isOpen
-                ? MessageBox.Show(Properties.Resources.Message_FinishToImport + (0 < actRowsDiff ? Environment.NewLine + Properties.Resources.Message_DeletedZeroValueInformation : string.Empty), 
+                ? MessageBox.Show(Properties.Resources.Message_FinishToImport + (0 < actRowsDiff ? Environment.NewLine + Properties.Resources.Message_DeletedZeroValueInformation : string.Empty),
                     Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
                 : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }

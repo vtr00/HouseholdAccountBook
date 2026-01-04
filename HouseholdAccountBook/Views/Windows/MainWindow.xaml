@@ -78,122 +78,184 @@
         <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
             <!-- ファイル -->
             <MenuItem Header="{x:Static properties:Resources.Menu_File}" Command="{Binding FileMenuCommand}">
+                <!-- インポート -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Import}" Command="{Binding ImportCommand}">
+                    <!-- 記帳風月 -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_KichoFugetsu}" Command="{Binding ImportKichoFugetsuDbCommand}"/>
                     <Separator/>
+                    <!-- SQLiteファイル > PostgreSQL -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{Binding ImportSQLiteFileCommand}"
                               Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <!-- PostgreSQL > SQLiteファイル -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_PostgreSQL}" Command="{Binding ImportPostgreSQLFileCommand}"
                               Visibility="{Binding IsSQLite, Converter={StaticResource BoolVisibilityConverter}}"/>
                     <Separator/>
+                    <!-- カスタム形式ファイル > PostgreSQL -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_CustomFormatFile}" Command="{Binding ImportCustomFileCommand}"
                               Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <!-- SQLiteファイル > SQLiteファイル -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{Binding ImportSQLiteFileCommand}"
                               Visibility="{Binding IsSQLite, Converter={StaticResource BoolVisibilityConverter}}"/>
                 </MenuItem>
+                <!-- エクスポート -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Export}" Command="{Binding ExportCommand}">
+                    <!-- カスタム形式ファイル -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_CustomFormatFile}" Command="{Binding ExportCustomFileCommand}"
                               Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <!-- SQLファイル -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_SQLFile}" Command="{Binding ExportSQLFileCommand}"
                               Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
                     <Separator Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
+                    <!-- Excelファイル -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Export_Excel}" Command="{Binding ExportExcelFileCommand}" IsEnabled="False"/>
                 </MenuItem>
                 <Separator/>
+                <!-- バックアップ -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Backup}" Command="{Binding BackUpCommand}"/>
                 <Separator/>
+                <!-- ログファイル -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_LogFile}" Command="{Binding LogFileCommand}">
+                    <!-- 操作ログファイル -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_LogFile_OperationLog}" Command="{Binding OperationLogFileCommand}">
+                        <!-- 開く -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_File_LogFile_OperationLog_Open}" Command="{Binding OpenOperationLogFileCommand}"/>
                     </MenuItem>
                 </MenuItem>
                 <Separator/>
+                <!-- 終了 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Exit}" Command="{Binding ExitWindowCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>
             <!-- 編集 -->
             <MenuItem Header="{x:Static properties:Resources.Menu_Edit}" Command="{Binding BookTabVM.EditMenuCommand}">
+                <!-- 検索 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Find}" Command="{Binding BookTabVM.ShowFindBoxCommand}" InputGestureText="Ctrl+F"/>
+                <!-- 置換 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Replace}" Command="{Binding BookTabVM.ShowReplaceBoxCommand}" InputGestureText="Ctrl+H"/>
                 <Separator/>
+                <!-- 移動 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Move}" Command="{Binding BookTabVM.AddMoveCommand}" InputGestureText="Ctrl+M"/>
                 <Separator/>
+                <!-- 追加 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Add}" Command="{Binding BookTabVM.AddActionCommand}" InputGestureText="Ctrl++"/>
+                <!-- リスト追加 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_AddList}" Command="{Binding BookTabVM.AddActionListCommand}" InputGestureText="Ctrl+Shift++"/>
+                <!-- 複製 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Copy}" Command="{Binding BookTabVM.CopyCommand}" InputGestureText="Ctrl+Shift+C"/>
                 <Separator/>
+                <!-- 編集 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Edit}" Command="{Binding BookTabVM.EditCommand}" InputGestureText="F2"/>
                 <Separator/>
+                <!-- 削除 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Delete}" Command="{Binding BookTabVM.DeleteCommand}" InputGestureText="Del"/>
             </MenuItem>
             <!-- 表示 -->
             <MenuItem Header="{x:Static properties:Resources.Menu_View}" Command="{Binding ShowMenuCommand}">
-                <MenuItem Header="{x:Static properties:Resources.Menu_View_Book}">
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_Change}" Command="{Binding ShowBookTabCommand}"/>
+                <!-- 帳簿項目 -->
+                <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems}">
+                    <!-- 切替 -->
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_Change}" Command="{Binding ShowBookTabCommand}"/>
                     <Separator/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_LastMonth}" Command="{Binding GoToLastMonthCommand}" InputGestureText="Alt+←"/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_ThisMonth}" Command="{Binding GoToThisMonthCommand}" InputGestureText="Alt+↓"/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_NextMonth}" Command="{Binding GoToNextMonthCommand}" InputGestureText="Alt+→"/>
+                    <!-- 先月 -->
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_LastMonth}" Command="{Binding GoToLastMonthCommand}" InputGestureText="Alt+←"/>
+                    <!-- 今月 -->
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_ThisMonth}" Command="{Binding GoToThisMonthCommand}" InputGestureText="Alt+↓"/>
+                    <!-- 来月 -->
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_NextMonth}" Command="{Binding GoToNextMonthCommand}" InputGestureText="Alt+→"/>
                     <Separator/>
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_Book_DailyTermSelection}" Command="{Binding SelectTermCommand}"/>
+                    <!-- 期間指定 -->
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_DailyTermSelection}" Command="{Binding SelectTermCommand}"/>
                 </MenuItem>
+                <!-- 日別グラフ -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph}">
+                    <!-- 切替 -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_Change}" Command="{Binding ShowDailyGraphTabCommand}"/>
                     <Separator/>
+                    <!-- 先月 -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_LastMonth}" Command="{Binding GoToLastMonthCommand}" InputGestureText="Alt+←"/>
+                    <!-- 今月 -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_ThisMonth}" Command="{Binding GoToThisMonthCommand}" InputGestureText="Alt+↓"/>
+                    <!-- 来月 -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_NextMonth}" Command="{Binding GoToNextMonthCommand}" InputGestureText="Alt+→"/>
                     <Separator/>
+                    <!-- 期間指定 -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_DailyTermSelection}" Command="{Binding SelectTermCommand}"/>
                 </MenuItem>
+                <!-- 月別 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Monthly}">
+                    <!-- 月別リスト -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList}">
+                        <!-- 切替 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_Change}" Command="{Binding ShowMonthlyListTabCommand}"/>
                         <Separator/>
+                        <!-- 去年 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{Binding GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <!-- 今年 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{Binding GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <!-- 来年 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{Binding GoToNextYearCommand}" InputGestureText="Alt+→"/>
                     </MenuItem>
+                    <!-- 月別グラフ -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph}">
+                        <!-- 切替 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_Change}" Command="{Binding ShowMonthlyGraphTabCommand}"/>
                         <Separator/>
+                        <!-- 去年 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_LastYear}" Command="{Binding GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <!-- 今年 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_ThisYear}" Command="{Binding GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <!-- 来年 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyGraph_NextYear}" Command="{Binding GoToNextYearCommand}" InputGestureText="Alt+→"/>
                     </MenuItem>
                 </MenuItem>
+                <!-- 年別 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Yearly}">
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyList}">
+                        <!-- 切替 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyList_Change}" Command="{Binding ShowYearlyListTabCommand}"/>
                         <Separator/>
+                        <!-- 去年 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{Binding GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <!-- 今年 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{Binding GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <!-- 来年 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{Binding GoToNextYearCommand}" InputGestureText="Alt+→"/>
                     </MenuItem>
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyGraph}">
+                        <!-- 切替 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_YearlyGraph_Change}" Command="{Binding ShowYearlyGraphTabCommand}"/>
                         <Separator/>
+                        <!-- 去年 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_LastYear}" Command="{Binding GoToLastYearCommand}" InputGestureText="Alt+←"/>
+                        <!-- 今年 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_ThisYear}" Command="{Binding GoToThisYearCommand}" InputGestureText="Alt+↓"/>
+                        <!-- 来年 -->
                         <MenuItem Header="{x:Static properties:Resources.Menu_View_MonthlyList_NextYear}" Command="{Binding GoToNextYearCommand}" InputGestureText="Alt+→"/>
                     </MenuItem>
                 </MenuItem>
                 <Separator/>
+                <!-- デバッグモード -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_DebugMode}" IsCheckable="True" IsChecked="{Binding App_IsDebug, Source={StaticResource Settings}}"/>
                 <Separator/>
+                <!-- 更新 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Update}" Command="{Binding UpdateCommand}" InputGestureText="F5"/>
             </MenuItem>
             <!-- ツール -->
             <MenuItem Header="{x:Static properties:Resources.Menu_Tool}" Command="{Binding ToolMenuCommand}">
+                <!-- CSV比較 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Tool_CsvComparison}" Command="{Binding CompareCsvFileCommand}"/>
                 <Separator/>
+                <!-- 帳簿 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Book}" Command="{Binding ToolInBookCommand}">
+                    <!-- フィルタ -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Book_Filter}" IsCheckable="True" IsChecked="{Binding BookTabVM.UseFilter}"/>
                 </MenuItem>
                 <Separator/>
+                <!-- 設定 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Settings}" Command="{Binding SettingsCommand}"/>
             </MenuItem>
             <!-- ヘルプ -->
             <MenuItem Header="{x:Static properties:Resources.Menu_Help}" Command="{Binding HelpMenuCommand}">
+                <!-- バージョン情報 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Help_VersionInfo}" Command="{Binding ShowVersionCommand}" InputGestureText="F1"/>
             </MenuItem>
         </Menu>

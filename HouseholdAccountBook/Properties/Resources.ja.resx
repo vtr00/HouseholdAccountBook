@@ -508,22 +508,22 @@
   <data name="Menu_View_DailyGraph_NextMonth" xml:space="preserve">
     <value>来月(_N)</value>
   </data>
-  <data name="Menu_View_Book" xml:space="preserve">
-    <value>帳簿(_B)</value>
+  <data name="Menu_View_BookItems" xml:space="preserve">
+    <value>帳簿項目(_B)</value>
   </data>
-  <data name="Menu_View_Book_Change" xml:space="preserve">
+  <data name="Menu_View_BookItems_Change" xml:space="preserve">
     <value>切替(_C)</value>
   </data>
-  <data name="Menu_View_Book_LastMonth" xml:space="preserve">
+  <data name="Menu_View_BookItems_LastMonth" xml:space="preserve">
     <value>先月(_L)</value>
   </data>
-  <data name="Menu_View_Book_ThisMonth" xml:space="preserve">
+  <data name="Menu_View_BookItems_ThisMonth" xml:space="preserve">
     <value>今月(_T)</value>
   </data>
-  <data name="Menu_View_Book_DailyTermSelection" xml:space="preserve">
+  <data name="Menu_View_BookItems_DailyTermSelection" xml:space="preserve">
     <value>期間指定(_S)...</value>
   </data>
-  <data name="Menu_View_Book_NextMonth" xml:space="preserve">
+  <data name="Menu_View_BookItems_NextMonth" xml:space="preserve">
     <value>来月(_N)</value>
   </data>
   <data name="Menu_Edit_Edit" xml:space="preserve">

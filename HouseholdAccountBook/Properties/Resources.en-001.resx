@@ -505,22 +505,22 @@
   <data name="Menu_View_DailyGraph_NextMonth" xml:space="preserve">
     <value>Next month (_N)</value>
   </data>
-  <data name="Menu_View_Book" xml:space="preserve">
-    <value>Books (_B)</value>
+  <data name="Menu_View_BookItems" xml:space="preserve">
+    <value>Book items (_B)</value>
   </data>
-  <data name="Menu_View_Book_Change" xml:space="preserve">
+  <data name="Menu_View_BookItems_Change" xml:space="preserve">
     <value>Switching (_C)</value>
   </data>
-  <data name="Menu_View_Book_LastMonth" xml:space="preserve">
+  <data name="Menu_View_BookItems_LastMonth" xml:space="preserve">
     <value>Last month (_L)</value>
   </data>
-  <data name="Menu_View_Book_ThisMonth" xml:space="preserve">
+  <data name="Menu_View_BookItems_ThisMonth" xml:space="preserve">
     <value>This month (_T)</value>
   </data>
-  <data name="Menu_View_Book_DailyTermSelection" xml:space="preserve">
+  <data name="Menu_View_BookItems_DailyTermSelection" xml:space="preserve">
     <value>Specify the period (_S)...</value>
   </data>
-  <data name="Menu_View_Book_NextMonth" xml:space="preserve">
+  <data name="Menu_View_BookItems_NextMonth" xml:space="preserve">
     <value>Next month (_N)</value>
   </data>
   <data name="Menu_Edit_Edit" xml:space="preserve">
