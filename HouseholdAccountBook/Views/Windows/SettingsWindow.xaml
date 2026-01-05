@@ -779,7 +779,7 @@
                                     </DataGrid>
 
                                     <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" 
-                                            Visibility="{Binding DebugMode, Converter={StaticResource BoolVisibilityConverter}}"
+                                            Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                             Content="{x:Static properties:Resources.Button_InitializeWindowPositionAndSize}"
                                             Command="{Binding InitializeWindowSettingCommand}"/>
                                 </Grid>
