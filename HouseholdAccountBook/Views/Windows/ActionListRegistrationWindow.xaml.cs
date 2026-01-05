@@ -97,7 +97,7 @@ namespace HouseholdAccountBook.Views.Windows
             using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, initialRecordList, targetGroupId, regKind });
 
             this.Owner = owner;
-            this.Name = "ActListReg";
+            this.Name = UiConstants.WindowNameStr[nameof(ActionListRegistrationWindow)];
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();

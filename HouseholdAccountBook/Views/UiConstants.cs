@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.Views.Windows;
 using System.Collections.Generic;
 
 namespace HouseholdAccountBook.Views
@@ -72,5 +73,21 @@ namespace HouseholdAccountBook.Views
             { "ja-JP",  Properties.Resources.CultureName_ja_JP },
             { "en-001", Properties.Resources.CultureName_en_001 }
         };
+
+        /// <summary>
+        /// ウィンドウ名文字列
+        /// </summary>
+        public static Dictionary<string, string> WindowNameStr => new() {
+            { nameof(DbSettingWindow),              "DbSetting" },
+            { nameof(MainWindow),                   "Main" },
+            { nameof(TermWindow),                   "Term" },
+            { nameof(SettingsWindow),               "Settings" },
+            { nameof(VersionWindow),                "Version" },
+            { nameof(CsvComparisonWindow),          "CsvComp" },
+            { nameof(MoveRegistrationWindow),       "MoveReg" },
+            { nameof(ActionRegistrationWindow),     "ActReg" },
+            { nameof(ActionListRegistrationWindow), "ActListReg" }
+        };
+
     }
 }

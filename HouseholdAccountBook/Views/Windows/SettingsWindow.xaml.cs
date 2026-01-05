@@ -35,7 +35,7 @@ namespace HouseholdAccountBook.Views.Windows
             using FuncLog funcLog = new();
 
             this.Owner = owner;
-            this.Name = "Settings";
+            this.Name = UiConstants.WindowNameStr[nameof(SettingsWindow)];
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();

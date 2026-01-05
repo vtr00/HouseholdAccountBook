@@ -64,7 +64,7 @@ namespace HouseholdAccountBook.Views.Windows
             using FuncLog funcLog = new();
 
             this.mDbHandlerFactory = dbHandlerFactory;
-            this.Name = "Main";
+            this.Name = UiConstants.WindowNameStr[nameof(MainWindow)];
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();

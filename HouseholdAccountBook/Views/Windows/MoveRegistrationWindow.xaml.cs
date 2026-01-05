@@ -63,7 +63,7 @@ namespace HouseholdAccountBook.Views.Windows
             using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, targetGroupId, regKind });
 
             this.Owner = owner;
-            this.Name = "MoveReg";
+            this.Name = UiConstants.WindowNameStr[nameof(MoveRegistrationWindow)];
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();

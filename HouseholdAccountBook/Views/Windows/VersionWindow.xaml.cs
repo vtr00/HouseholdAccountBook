@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.Views.Windows
             using FuncLog funcLog = new();
 
             this.Owner = owner;
-            this.Name = "Version";
+            this.Name = UiConstants.WindowNameStr[nameof(VersionWindow)];
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();

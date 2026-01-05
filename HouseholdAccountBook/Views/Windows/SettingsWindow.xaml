@@ -488,7 +488,7 @@
                 </Grid>
             </TabItem>
 
-            <!-- データベース設定 -->
+            <!-- DB設定 -->
             <TabItem x:Name="_DbTab" DataContext="{Binding DbTabVM}">
                 <TabItem.Header>
                     <TextBlock Text="{x:Static properties:Resources.TabHeader_DbSettings}" HorizontalAlignment="Center"/>
@@ -790,16 +790,61 @@
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition SharedSizeGroup="Header"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition SharedSizeGroup="Button"/>
-                                    </Grid.ColumnDefinitions>
 
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_OutputLog}"/>
-                                    <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" Content="{x:Static properties:Resources.CheckBox_Log_Operation}" IsChecked="{Binding OutputOperationLog}"/>
-                                    <CheckBox Grid.Row="1" Grid.Column="1" Margin="5" Content="{x:Static properties:Resources.CheckBox_Log_Window}" IsChecked="{Binding OutputWindowLog}"/>
+                                    <GroupBox Grid.Row="0">
+                                        <GroupBox.Header>
+                                            <CheckBox Content="{x:Static properties:Resources.GroupHeader_OperationLog}" IsChecked="{Binding OutputOperationLog}"/>
+                                        </GroupBox.Header>
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="Header"/>
+                                                <ColumnDefinition SharedSizeGroup="Number"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition SharedSizeGroup="Button"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
+                                               Text="{x:Static properties:Resources.TextBlock_Count}"/>
+                                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="0" MaxValue="100" Value="{Binding OperationLogNum}"/>
+                                        </Grid>
+                                    </GroupBox>
+
+                                    <GroupBox Grid.Row="1">
+                                        <GroupBox.Header>
+                                            <CheckBox Content="{x:Static properties:Resources.GroupHeader_WindowLog}" IsChecked="{Binding OutputWindowLog}"/>
+                                        </GroupBox.Header>
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="Header"/>
+                                                <ColumnDefinition SharedSizeGroup="Number"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition SharedSizeGroup="Button"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
+                                               Text="{x:Static properties:Resources.TextBlock_Count}"/>
+                                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="0" MaxValue="100" Value="{Binding WindowLogNum}"/>
+                                        </Grid>
+                                    </GroupBox>
+
+                                    <GroupBox Grid.Row="2" Header="{x:Static properties:Resources.GroupHeader_UnhandledExceptionLog}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="Header"/>
+                                                <ColumnDefinition SharedSizeGroup="Number"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition SharedSizeGroup="Button"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
+                                               Text="{x:Static properties:Resources.TextBlock_Count}"/>
+                                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="1" MaxValue="100" Value="{Binding UnhandledExceptionLogNum}"/>
+                                        </Grid>
+                                    </GroupBox>
                                 </Grid>
                             </GroupBox>
                         </StackPanel>

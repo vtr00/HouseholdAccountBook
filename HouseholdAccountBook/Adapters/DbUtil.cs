@@ -35,7 +35,7 @@ namespace HouseholdAccountBook.Adapters
             if (tmpBackUpFolderPath == string.Empty) { return false; }
 
             bool result;
-            string backUpFileExt = PostgreSQLBackupFileExt;
+            string backUpFileNamePattern = PostgreSQLBackupFileNamePattern;
             if (0 < tmpBackUpNum) {
                 Log.Debug("Create backup file.");
                 // フォルダが存在しなければ作成する
@@ -47,7 +47,7 @@ namespace HouseholdAccountBook.Adapters
                 switch (selectedDBKind) {
                     case DBKind.PostgreSQL: {
                         string backupFilePath = Path.Combine(tmpBackUpFolderPath, PostgreSQLBackupFileName);
-                        backUpFileExt = PostgreSQLBackupFileExt;
+                        backUpFileNamePattern = PostgreSQLBackupFileNamePattern;
                         int? exitCode = null;
 
                         if (settings.App_Postgres_DumpExePath != string.Empty) {
@@ -59,7 +59,7 @@ namespace HouseholdAccountBook.Adapters
                     }
                     case DBKind.SQLite: {
                         string backupFilePath = Path.Combine(tmpBackUpFolderPath, SQLiteBackupFileName);
-                        backUpFileExt = SQLiteBackupFileExt;
+                        backUpFileNamePattern = SQLiteBackupFileNamePattern;
                         try {
                             File.Copy(settings.App_SQLite_DBFilePath, backupFilePath, true);
                             result = true;
@@ -79,7 +79,7 @@ namespace HouseholdAccountBook.Adapters
             }
 
             // 古いバックアップファイルを削除する
-            FileUtil.DeleteOldFiles(tmpBackUpFolderPath, $"*.{backUpFileExt}", tmpBackUpNum);
+            FileUtil.DeleteOldFiles(tmpBackUpFolderPath, backUpFileNamePattern, tmpBackUpNum);
 
             return result;
         }
