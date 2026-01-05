@@ -23,7 +23,7 @@ namespace HouseholdAccountBook.Views.Windows
             using FuncLog funcLog = new(new { message });
 
             this.Owner = owner;
-            this.Name = "DbSetting";
+            this.Name = UiConstants.WindowNameStr[nameof(DbSettingWindow)];
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();

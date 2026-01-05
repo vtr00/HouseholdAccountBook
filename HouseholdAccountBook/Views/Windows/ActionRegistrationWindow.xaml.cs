@@ -90,7 +90,7 @@ namespace HouseholdAccountBook.Views.Windows
             using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, initialRecord, targetActionId, regKind });
 
             this.Owner = owner;
-            this.Name = "ActReg";
+            this.Name = UiConstants.WindowNameStr[nameof(ActionRegistrationWindow)];
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();

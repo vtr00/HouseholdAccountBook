@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Properties;
+using HouseholdAccountBook.Views;
 using Microsoft.Win32;
 using System;
 using System.IO;
@@ -25,6 +26,10 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// ウィンドウの境界(最終保存値)
         /// </summary>
         private Rect mLastSavedRect;
+        /// <summary>
+        /// 古いログファイルを削除済か
+        /// </summary>
+        private bool mDeletedOldLogs = false;
 
         /// <summary>
         /// <see cref="WindowLog"/> クラスの新しいインスタンスを初期化します。
@@ -59,36 +64,69 @@ namespace HouseholdAccountBook.Adapters.Logger
         public void Log(string comment = "", bool forceLog = false)
         {
             Settings settings = Settings.Default;
-            if (!settings.App_OutputFlag_WindowLog) { return; }
+            if (settings.App_OutputFlag_WindowLog && 0 < settings.App_WindowLogNum) {
+                if (!forceLog &&
+                    this.mLastSavedWindowState == this.mWindow.WindowState &&
+                    this.mLastSavedRect == this.mWindow.RestoreBounds) { return; }
 
-            if (!forceLog &&
-                this.mLastSavedWindowState == this.mWindow.WindowState &&
-                this.mLastSavedRect == this.mWindow.RestoreBounds) { return; }
+                this.mLastSavedWindowState = this.mWindow.WindowState;
+                this.mLastSavedRect = this.mWindow.RestoreBounds;
+                string windowState = this.mWindow.WindowState switch {
+                    WindowState.Maximized => "Max",
+                    WindowState.Minimized => "Min",
+                    WindowState.Normal => "Normal",
+                    _ => "---",
+                };
 
-            this.mLastSavedWindowState = this.mWindow.WindowState;
-            this.mLastSavedRect = this.mWindow.RestoreBounds;
-            string windowState = this.mWindow.WindowState switch {
-                WindowState.Maximized => "Max",
-                WindowState.Minimized => "Min",
-                WindowState.Normal => "Normal",
-                _ => "---",
-            };
-            /// ディレクトリ生成
-            if (!Directory.Exists(WindowLocationFolderPath)) { _ = Directory.CreateDirectory(WindowLocationFolderPath); }
+                // ディレクトリ生成
+                if (!Directory.Exists(WindowLocationFolderPath)) { _ = Directory.CreateDirectory(WindowLocationFolderPath); }
 
-            using (FileStream fs = new(WindowLocationFilePath(this.mWindow.Name), FileMode.Append)) {
-                using (StreamWriter sw = new(fs)) {
-                    if (fs.Length == 0) {
-                        sw.WriteLine("yyyy-MM-dd HH:mm:ss.ffff\tState\tLeft\tTop\tHeight\tWidth");
+                using (FileStream fs = new(WindowLocationFilePath(this.mWindow.Name), FileMode.Append)) {
+                    using (StreamWriter sw = new(fs)) {
+                        if (fs.Length == 0) {
+                            sw.WriteLine("yyyy-MM-dd HH:mm:ss.ffff\tState\tLeft\tTop\tHeight\tWidth");
+                        }
+
+                        sw.Write(string.Format($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.ffff}\t{windowState}\t{this.mWindow.Left}\t{this.mWindow.Top}\t{this.mWindow.Height}\t{this.mWindow.Width}"));
+                        if (!string.IsNullOrEmpty(comment)) {
+                            sw.Write(string.Format($"\t{comment}"));
+                        }
+                        sw.WriteLine();
                     }
-
-                    sw.Write(string.Format($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.ffff}\t{windowState}\t{this.mWindow.Left}\t{this.mWindow.Top}\t{this.mWindow.Height}\t{this.mWindow.Width}"));
-                    if (!string.IsNullOrEmpty(comment)) {
-                        sw.Write(string.Format($"\t{comment}"));
-                    }
-                    sw.WriteLine();
                 }
             }
+
+            if (!this.mDeletedOldLogs) {
+                this.DeleteOldWindowLogs();
+            }
+        }
+
+        /// <summary>
+        /// 古いウィンドウ情報ファイルを削除する
+        /// </summary>
+        public void DeleteOldWindowLogs()
+        {
+            this.mDeletedOldLogs = true;
+
+            DeleteOldWindowLogs(this.mWindow.Name);
+        }
+        /// <summary>
+        /// 全てのウィンドウの古いウィンドウ情報ファイルを削除する
+        /// </summary>
+        public static void DeleteAllOldWindowLogs()
+        {
+            foreach (string windowName in UiConstants.WindowNameStr.Values) {
+                DeleteOldWindowLogs(windowName);
+            }
+        }
+        /// <summary>
+        /// 古いウィンドウ情報ファイルを削除する
+        /// </summary>
+        /// <param name="windowName">ウィンドウ名</param>
+        public static void DeleteOldWindowLogs(string windowName)
+        {
+            Settings settings = Settings.Default;
+            FileUtil.DeleteOldFiles(WindowLocationFolderPath, WindowLocationFileNamePattern(windowName), settings.App_WindowLogNum);
         }
     }
 }

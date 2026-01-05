@@ -124,12 +124,40 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             set => this.SetProperty(ref field, value);
         }
         #endregion
+        /// <summary>
+        /// 操作ログ数
+        /// </summary>
+        #region OperationLogNum
+        public int OperationLogNum {
+            get;
+            set => this.SetProperty(ref field, value);
+        }
+        #endregion
 
         /// <summary>
         /// ウィンドウログ出力
         /// </summary>
         #region OutputWindowLog
         public bool OutputWindowLog {
+            get;
+            set => this.SetProperty(ref field, value);
+        }
+        #endregion
+        /// <summary>
+        /// ウィンドウログ数
+        /// </summary>
+        #region WindowLogNum
+        public int WindowLogNum {
+            get;
+            set => this.SetProperty(ref field, value);
+        }
+        #endregion
+
+        /// <summary>
+        /// 捕捉されない例外ログ数
+        /// </summary>
+        #region UnhandledExceptionLogNum
+        public int UnhandledExceptionLogNum {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -283,7 +311,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             // ログ情報
             this.OutputOperationLog = settings.App_OutputFlag_OperationLog;
+            this.OperationLogNum = settings.App_OperationLogNum;
             this.OutputWindowLog = settings.App_OutputFlag_WindowLog;
+            this.WindowLogNum = settings.App_WindowLogNum;
+            this.UnhandledExceptionLogNum = settings.App_UnhandledExceptionLogNum;
         }
 
         public override void AddEventHandlers()
@@ -372,10 +403,18 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             settings.App_IsPositionSaved = this.IsPositionSaved;
 
             // ログ情報
-            settings.App_OutputFlag_WindowLog = this.OutputWindowLog;
             settings.App_OutputFlag_OperationLog = this.OutputOperationLog;
+            settings.App_OperationLogNum = this.OperationLogNum;
+            settings.App_OutputFlag_WindowLog = this.OutputWindowLog;
+            settings.App_WindowLogNum = this.WindowLogNum;
+            settings.App_UnhandledExceptionLogNum = this.UnhandledExceptionLogNum;
 
             settings.Save();
+
+            // 新しい設定に合わせて古いログファイルを削除する
+            Log.DeleteOldLogFiles();
+            ExceptionLog.DeleteOldExceptionLogs();
+            WindowLog.DeleteAllOldWindowLogs();
         }
     }
 }

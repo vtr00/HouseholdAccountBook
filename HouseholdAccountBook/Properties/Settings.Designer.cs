@@ -958,5 +958,41 @@ namespace HouseholdAccountBook.Properties {
                 this["App_OutputFlag_OperationLog"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int App_WindowLogNum {
+            get {
+                return ((int)(this["App_WindowLogNum"]));
+            }
+            set {
+                this["App_WindowLogNum"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int App_UnhandledExceptionLogNum {
+            get {
+                return ((int)(this["App_UnhandledExceptionLogNum"]));
+            }
+            set {
+                this["App_UnhandledExceptionLogNum"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int App_OperationLogNum {
+            get {
+                return ((int)(this["App_OperationLogNum"]));
+            }
+            set {
+                this["App_OperationLogNum"] = value;
+            }
+        }
     }
 }

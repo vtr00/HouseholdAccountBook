@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Adapters.DbHandler;
+﻿using HouseholdAccountBook.Adapters;
+using HouseholdAccountBook.Adapters.DbHandler;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
@@ -20,6 +21,11 @@ namespace HouseholdAccountBook.Views.Windows
     public partial class MainWindow : Window
     {
         #region フィールド
+        /// <summary>
+        /// DBハンドラファクトリ
+        /// </summary>
+        private readonly DbHandlerFactory mDbHandlerFactory;
+
         /// <summary>
         /// 移動登録ウィンドウ
         /// </summary>
@@ -57,7 +63,8 @@ namespace HouseholdAccountBook.Views.Windows
         {
             using FuncLog funcLog = new();
 
-            this.Name = "Main";
+            this.mDbHandlerFactory = dbHandlerFactory;
+            this.Name = UiConstants.WindowNameStr[nameof(MainWindow)];
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();
@@ -295,7 +302,7 @@ namespace HouseholdAccountBook.Views.Windows
             Properties.Settings settings = Properties.Settings.Default;
             if (settings.App_BackUpFlagAtClosing) {
                 // 通知しても即座に終了するため通知しない
-                _ = await this.WVM.CreateBackUpFileAsync();
+                _ = await DbUtil.CreateBackUpFileAsync(this.mDbHandlerFactory);
             }
 
             this.Close();
@@ -318,7 +325,7 @@ namespace HouseholdAccountBook.Views.Windows
                     Log.Info(string.Format($"NextBackup: {nextBackup}"));
 
                     if (nextBackup <= DateTime.Now) {
-                        bool result = await this.WVM.CreateBackUpFileAsync(true);
+                        bool result = await DbUtil.CreateBackUpFileAsync(this.mDbHandlerFactory, true);
                         if (result != false) {
                             settings.App_BackUpCurrentAtMinimizing = DateTime.Now;
                             settings.Save();

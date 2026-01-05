@@ -47,7 +47,7 @@ namespace HouseholdAccountBook.Views.Windows
             using FuncLog funcLog = new(new { dateWithinMonth, startDate, endDate });
 
             this.Owner = owner;
-            this.Name = "Term";
+            this.Name = UiConstants.WindowNameStr[nameof(TermWindow)];
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();

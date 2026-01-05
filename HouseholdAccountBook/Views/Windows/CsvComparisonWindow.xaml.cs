@@ -58,7 +58,7 @@ namespace HouseholdAccountBook.Views.Windows
             using FuncLog funcLog = new(new { initialBookId });
 
             this.Owner = owner;
-            this.Name = "CsvComp";
+            this.Name = UiConstants.WindowNameStr[nameof(CsvComparisonWindow)];
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();

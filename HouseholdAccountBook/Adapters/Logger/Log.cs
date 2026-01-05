@@ -36,42 +36,98 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// </summary>
         public static string LogFilePath => FileConstants.LogFilePath;
 
-        private static readonly string mListenerName = "logFileOutput";
-        private TextWriterTraceListener mListener;
+        private static readonly string mLogFileListenerName = "logFileOutput";
+        private TextWriterTraceListener mLogFileListener;
+        private static readonly string mStdoutListenerName = "stdout";
+        private TextWriterTraceListener mStdoutListener;
+
+        /// <summary>
+        /// ログファイル出力リスナーの削除中か
+        /// </summary>
+        private bool mOnDeleteLogFileListener = false;
 
         static Log() => Register(static () => new Log());
 
         /// <summary>
         /// <see cref="Log"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        private Log() => Trace.AutoFlush = true;
+        private Log()
+        {
+            Trace.AutoFlush = true;
+
+            this.mStdoutListener = new TextWriterTraceListener(Console.Out) {
+                Name = mStdoutListenerName,
+                TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId | TraceOptions.ThreadId
+            };
+            _ = Trace.Listeners.Add(this.mStdoutListener);
+        }
 
         ~Log()
         {
-            if (this.mListener != null) {
-                this.mListener.Close();
-                this.mListener.Dispose();
-                this.mListener = null;
+            this.DeleteLogFileListener();
+
+            if (this.mStdoutListener != null) {
+                this.mStdoutListener.Close();
+                this.mStdoutListener.Dispose();
+                this.mStdoutListener = null;
             }
+            Trace.Listeners.Remove(mStdoutListenerName);
         }
 
         /// <summary>
-        /// リスナーを生成する
+        /// ログファイル出力リスナーを生成する
         /// </summary>
-        private void CreateListener()
+        private void CreateLogFileListener()
         {
-            if (this.mListener == null) {
+            if (this.mLogFileListener == null) {
                 if (!Directory.Exists(FileConstants.LogFolderPath)) { _ = Directory.CreateDirectory(FileConstants.LogFolderPath); }
+
                 TextWriter sw = new StreamWriter(LogFilePath, true, Encoding.UTF8);
 
-                this.mListener = new TextWriterTraceListener {
-                    Name = mListenerName,
+                this.mLogFileListener = new TextWriterTraceListener {
+                    Name = mLogFileListenerName,
                     Writer = sw,
                     TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId | TraceOptions.ThreadId
                 };
 
-                _ = Trace.Listeners.Add(this.mListener);
+                _ = Trace.Listeners.Add(this.mLogFileListener);
+
+                // リスナーを登録してから開始ログを出力する
+                Info("== Start to output log ==");
+
+                // リスナーを生成するときのみ古いログファイルを削除する
+                DeleteOldLogFiles();
             }
+        }
+
+        /// <summary>
+        /// ログファイル出力リスナーを削除する
+        /// </summary>
+        private void DeleteLogFileListener()
+        {
+            // 多重呼び出し防止
+            if (this.mOnDeleteLogFileListener) { return; }
+
+            this.mOnDeleteLogFileListener = true;
+            if (this.mLogFileListener != null) {
+                // 終了ログを出力してからリスナーを削除する
+                Info("== Finish to outout log ==");
+
+                this.mLogFileListener.Close();
+                this.mLogFileListener.Dispose();
+                this.mLogFileListener = null;
+            }
+            Trace.Listeners.Remove(mLogFileListenerName);
+            this.mOnDeleteLogFileListener = false;
+        }
+
+        /// <summary>
+        /// 古いログファイルを削除する
+        /// </summary>
+        public static void DeleteOldLogFiles()
+        {
+            Settings settings = Settings.Default;
+            FileUtil.DeleteOldFiles(FileConstants.LogFolderPath, FileConstants.LogFileNamePattern, settings.App_OperationLogNum);
         }
 
         /// <summary>
@@ -184,10 +240,14 @@ namespace HouseholdAccountBook.Adapters.Logger
         private void WriteLine(LogLevel level, string message, string filePath, string methodName, int lineNumber)
         {
             Settings settings = Settings.Default;
-            if (!settings.App_OutputFlag_OperationLog) { return; }
-            if (level < OutputLogLevel) { return; }
+            if (settings.App_OutputFlag_OperationLog && 0 < settings.App_OperationLogNum) {
+                this.CreateLogFileListener();
+            }
+            else {
+                this.DeleteLogFileListener();
+            }
 
-            this.CreateListener();
+            if (level < OutputLogLevel) { return; }
 
             int index = filePath.LastIndexOf('\\');
             string fileName = filePath.Substring(index + 1, filePath.IndexOf('.', index + 1) - index - 1);

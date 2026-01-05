@@ -271,9 +271,6 @@
   <data name="GroupHeader_DataBaseInformation" xml:space="preserve">
     <value>Connection information</value>
   </data>
-  <data name="GroupHeader_Debug" xml:space="preserve">
-    <value>Debug</value>
-  </data>
   <data name="GroupHeader_BackUpInformation" xml:space="preserve">
     <value>Backup information</value>
   </data>
@@ -811,9 +808,6 @@ list</value>
   <data name="TextBlock_Book" xml:space="preserve">
     <value>Book</value>
   </data>
-  <data name="TextBlock_OutputLog" xml:space="preserve">
-    <value>Output log</value>
-  </data>
   <data name="TextBlock_Books" xml:space="preserve">
     <value>Books</value>
   </data>
@@ -1042,10 +1036,13 @@ list</value>
   <data name="Unit_FiscalYear_Pre" xml:space="preserve">
     <value>FY</value>
   </data>
-  <data name="CheckBox_Log_Operation" xml:space="preserve">
+  <data name="GroupHeader_OperationLog" xml:space="preserve">
     <value>Operation log</value>
   </data>
-  <data name="CheckBox_Log_Window" xml:space="preserve">
+  <data name="GroupHeader_UnhandledExceptionLog" xml:space="preserve">
+    <value>Unhandled exception log</value>
+  </data>
+  <data name="GroupHeader_WindowLog" xml:space="preserve">
     <value>Window log</value>
   </data>
   <data name="Menu_File_LogFile" xml:space="preserve">
