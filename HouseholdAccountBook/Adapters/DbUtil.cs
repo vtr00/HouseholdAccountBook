@@ -3,8 +3,6 @@ using HouseholdAccountBook.Adapters.DbHandler.Abstract;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.Enums;
-using Notification.Wpf;
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using static HouseholdAccountBook.Adapters.FileConstants;
@@ -107,22 +105,10 @@ namespace HouseholdAccountBook.Adapters
                             exitCode => {
                                 // ダンプ結果を通知する
                                 if (exitCode == 0) {
-                                    NotificationManager nm = new();
-                                    NotificationContent nc = new() {
-                                        Title = Properties.Resources.Title_MainWindow,
-                                        Message = Properties.Resources.Message_FinishToBackup,
-                                        Type = NotificationType.Success
-                                    };
-                                    nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+                                    NotificationUtil.NotifyFinishingToBackup();
                                 }
                                 else if (exitCode != null) {
-                                    NotificationManager nm = new();
-                                    NotificationContent nc = new() {
-                                        Title = Properties.Resources.Title_MainWindow,
-                                        Message = Properties.Resources.Message_FoultToBackup,
-                                        Type = NotificationType.Error
-                                    };
-                                    nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+                                    NotificationUtil.NotifyFailingToBackup();
                                 }
                             }, waitForFinish)
                         : await npgsqlDbHandler.ExecuteDump(backupFilePath, settings.App_Postgres_DumpExePath, (PostgresPasswordInput)settings.App_Postgres_Password_Input, format, null, waitForFinish);

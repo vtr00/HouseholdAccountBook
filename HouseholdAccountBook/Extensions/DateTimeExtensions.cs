@@ -1,7 +1,7 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using HouseholdAccountBook.Adapters;
 using HouseholdAccountBook.Adapters.Logger;
-using Notification.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,7 +9,6 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace HouseholdAccountBook.Extensions
 {
@@ -64,14 +63,8 @@ namespace HouseholdAccountBook.Extensions
                 }
 
                 if (mHolidayList.Count == 0) {
-                    // ハンドルされない例外の発生を通知する
-                    NotificationManager nm = new();
-                    NotificationContent nc = new() {
-                        Title = Application.Current.MainWindow?.Title ?? "",
-                        Message = Properties.Resources.Message_FoultToGetHolidayList,
-                        Type = NotificationType.Warning
-                    };
-                    nm.Show(nc);
+                    // 祝日取得失敗を通知する
+                    NotificationUtil.NotifyFailingToGetHolidayList();
                 }
             }
         }
