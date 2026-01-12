@@ -141,7 +141,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             get {
                 Dictionary<Log.LogLevel, string> dic = LogLevelStr;
 #if !DEBUG
-                _ = dic.Remove(LogLevel.Trace);
+                _ = dic.Remove(Log.LogLevel.Trace);
 #endif
                 return dic;
             }
