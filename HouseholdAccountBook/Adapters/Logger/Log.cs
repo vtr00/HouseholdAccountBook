@@ -1,6 +1,5 @@
 ﻿using HouseholdAccountBook.Others;
 using HouseholdAccountBook.Properties;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -18,12 +17,25 @@ namespace HouseholdAccountBook.Adapters.Logger
     public class Log : SingletonBase<Log>
     {
         /// <summary>
+        /// ログレベル
+        /// </summary>
+        public enum LogLevel
+        {
+            Trace = 0,
+            Debug,
+            Info,
+            Warn,
+            Error,
+            Critical,
+        }
+
+        /// <summary>
         /// 出力ログレベル
         /// </summary>
         public static LogLevel OutputLogLevel {
             get;
             set {
-                field = LogLevel.Information;
+                field = LogLevel.Info;
                 Log.Info($"Set OutputLogLevel to {value}");
                 field = value;
             }
@@ -201,7 +213,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
         public static void Warning(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
-            => Instance.WriteLine(LogLevel.Warning, message, fileName, methodName, lineNumber);
+            => Instance.WriteLine(LogLevel.Warn, message, fileName, methodName, lineNumber);
         /// <summary>
         /// ログファイルに情報ログを1行出力する
         /// </summary>
@@ -210,7 +222,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
         public static void Info(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
-            => Instance.WriteLine(LogLevel.Information, message, fileName, methodName, lineNumber);
+            => Instance.WriteLine(LogLevel.Info, message, fileName, methodName, lineNumber);
         /// <summary>
         /// ログファイルにデバッグログを1行出力する
         /// </summary>

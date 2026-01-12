@@ -5,7 +5,6 @@ using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Views.Windows;
-using Microsoft.Extensions.Logging;
 using Notification.Wpf;
 using System;
 using System.Diagnostics;
@@ -56,7 +55,7 @@ namespace HouseholdAccountBook
         private async void App_Startup(object sender, StartupEventArgs e)
         {
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
-            Log.OutputLogLevel = (LogLevel)settings.App_OperationLogLevel;
+            Log.OutputLogLevel = (Log.LogLevel)settings.App_OperationLogLevel;
 
             Log.Info("Application Startup");
 
