@@ -668,14 +668,13 @@
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
-                                        <ColumnDefinition Width="200"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Language}"/>
                                     <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" ItemsSource="{Binding CultureNameDic}" 
                                               SelectedValue="{Binding SelectedCultureName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
-                                    <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" 
+                                    <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" 
                                             Content="{x:Static properties:Resources.Button_ApplyLanguage}" Command="{Binding RestartForLanguageCommand}"/>
                                 </Grid>
                             </GroupBox>
@@ -793,25 +792,34 @@
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
+                                    <!-- 操作ログ -->
                                     <GroupBox Grid.Row="0">
                                         <GroupBox.Header>
                                             <CheckBox Content="{x:Static properties:Resources.GroupHeader_OperationLog}" IsChecked="{Binding OutputOperationLog}"/>
                                         </GroupBox.Header>
 
                                         <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition SharedSizeGroup="Header"/>
                                                 <ColumnDefinition SharedSizeGroup="Number"/>
                                                 <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition SharedSizeGroup="Button"/>
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
-                                               Text="{x:Static properties:Resources.TextBlock_Count}"/>
+                                                       Text="{x:Static properties:Resources.TextBlock_Count}"/>
                                             <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="0" MaxValue="100" Value="{Binding OperationLogNum}"/>
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center"
+                                                       Text="{x:Static properties:Resources.TextBlock_OutoutLogLevel}"/>
+                                            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding LogLevelDic}"
+                                                      SelectedValue="{Binding SelectedLogLevel, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
                                         </Grid>
                                     </GroupBox>
 
+                                    <!-- ウィンドウログ -->
                                     <GroupBox Grid.Row="1">
                                         <GroupBox.Header>
                                             <CheckBox Content="{x:Static properties:Resources.GroupHeader_WindowLog}" IsChecked="{Binding OutputWindowLog}"/>
@@ -822,7 +830,6 @@
                                                 <ColumnDefinition SharedSizeGroup="Header"/>
                                                 <ColumnDefinition SharedSizeGroup="Number"/>
                                                 <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition SharedSizeGroup="Button"/>
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
@@ -831,13 +838,13 @@
                                         </Grid>
                                     </GroupBox>
 
+                                    <!-- 例外ログ -->
                                     <GroupBox Grid.Row="2" Header="{x:Static properties:Resources.GroupHeader_UnhandledExceptionLog}">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition SharedSizeGroup="Header"/>
                                                 <ColumnDefinition SharedSizeGroup="Number"/>
                                                 <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition SharedSizeGroup="Button"/>
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"

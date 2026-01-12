@@ -5,6 +5,7 @@ using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Views.Windows;
+using Microsoft.Extensions.Logging;
 using Notification.Wpf;
 using System;
 using System.Diagnostics;
@@ -54,9 +55,8 @@ namespace HouseholdAccountBook
         /// <param name="e"></param>
         private async void App_Startup(object sender, StartupEventArgs e)
         {
-#if DEBUG
-            Trace.Listeners.Add(new ConsoleTraceListener());
-#endif
+            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
+            Log.OutputLogLevel = (LogLevel)settings.App_OperationLogLevel;
 
             Log.Info("Application Startup");
 
@@ -66,7 +66,6 @@ namespace HouseholdAccountBook
             // shift-jis を使用するために必要
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
             Log.Debug($"App_InitFlag: {settings.App_InitFlag}");
 
             Log.Info($"Current Culture: {CultureInfo.CurrentCulture.Name}");

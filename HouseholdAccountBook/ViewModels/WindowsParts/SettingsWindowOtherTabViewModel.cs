@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -132,6 +133,29 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             get;
             set => this.SetProperty(ref field, value);
         }
+        #endregion
+        /// <summary>
+        /// ログレベル辞書
+        /// </summary>
+        #region LogLevelDic
+        public Dictionary<LogLevel, string> LogLevelDic {
+            get {
+                Dictionary<LogLevel, string> dic = LogLevelStr;
+#if !DEBUG
+                _ = dic.Remove(LogLevel.Trace);
+#endif
+                return dic;
+            }
+        }
+        #endregion
+        /// <summary>
+        /// 選択されたログレベル
+        /// </summary>
+        #region SelectedLogLevel
+        public LogLevel SelectedLogLevel {
+            get;
+            set => this.SetProperty(ref field, value);
+        } = LogLevel.Debug;
         #endregion
 
         /// <summary>
@@ -312,6 +336,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             // ログ情報
             this.OutputOperationLog = settings.App_OutputFlag_OperationLog;
             this.OperationLogNum = settings.App_OperationLogNum;
+            this.SelectedLogLevel = (LogLevel)settings.App_OperationLogLevel;
             this.OutputWindowLog = settings.App_OutputFlag_WindowLog;
             this.WindowLogNum = settings.App_WindowLogNum;
             this.UnhandledExceptionLogNum = settings.App_UnhandledExceptionLogNum;
@@ -405,10 +430,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             // ログ情報
             settings.App_OutputFlag_OperationLog = this.OutputOperationLog;
             settings.App_OperationLogNum = this.OperationLogNum;
+            settings.App_OperationLogLevel = (int)this.SelectedLogLevel;
             settings.App_OutputFlag_WindowLog = this.OutputWindowLog;
             settings.App_WindowLogNum = this.WindowLogNum;
             settings.App_UnhandledExceptionLogNum = this.UnhandledExceptionLogNum;
 
+            Log.OutputLogLevel = this.SelectedLogLevel;
             settings.Save();
 
             // 新しい設定に合わせて古いログファイルを削除する

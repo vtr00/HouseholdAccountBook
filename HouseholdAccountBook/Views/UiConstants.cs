@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Views.Windows;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 
 namespace HouseholdAccountBook.Views
@@ -63,6 +64,17 @@ namespace HouseholdAccountBook.Views
         public static Dictionary<GraphKind2, string> GraphKind2Str => new() {
             { GraphKind2.CategoryGraph, Properties.Resources.GraphKind2_CategoryGraph },
             { GraphKind2.ItemGraph,     Properties.Resources.GraphKind2_ItemGraph }
+        };
+        /// <summary>
+        /// ログレベル文字列
+        /// </summary>
+        public static Dictionary<LogLevel, string> LogLevelStr => new() {
+            { LogLevel.Trace,       Properties.Resources.LogLevel_Trace  },
+            { LogLevel.Debug,       Properties.Resources.LogLevel_Debug },
+            { LogLevel.Information, Properties.Resources.LogLevel_Information },
+            { LogLevel.Warning,     Properties.Resources.LogLevel_Warning },
+            { LogLevel.Error,       Properties.Resources.LogLevel_Error },
+            { LogLevel.Critical,    Properties.Resources.LogLevel_Critical }
         };
         #endregion
 
