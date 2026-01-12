@@ -1,11 +1,11 @@
-﻿using HouseholdAccountBook.Adapters.DbHandler;
+﻿using HouseholdAccountBook.Adapters;
+using HouseholdAccountBook.Adapters.DbHandler;
 using HouseholdAccountBook.Adapters.DbHandler.Abstract;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Views.Windows;
-using Notification.Wpf;
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -157,26 +157,8 @@ namespace HouseholdAccountBook
                 Log.Info($"Create Unhandled Exception Info File: {log.RelatedFilePath}");
 
                 // ハンドルされない例外の発生を通知する
-                NotificationManager nm = new();
-                NotificationContent nc = new() {
-                    Title = Current.MainWindow?.Title ?? "",
-                    Message = HouseholdAccountBook.Properties.Resources.Message_UnhandledExceptionOccurred,
-                    Type = NotificationType.Warning
-                };
-                nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
-                    string absoluteFilePath = Path.Combine(GetCurrentDir(), log.RelatedFilePath);
-                    Log.Info($"Create Unhandled Exception Info Absolute File: {absoluteFilePath}");
-                    try {
-                        _ = Process.Start(new ProcessStartInfo() {
-                            FileName = absoluteFilePath,
-                            UseShellExecute = true
-                        });
-                    }
-                    catch (Exception) { }
-                    if (Current.MainWindow == null || !Current.MainWindow.IsInitialized) {
-                        Current.Shutdown(1); // メインウィンドウがない場合は強制終了
-                    }
-                });
+                string absoluteFilePath = Path.Combine(GetCurrentDir(), log.RelatedFilePath);
+                NotificationUtil.NotifyUnhandledException(absoluteFilePath);
             }
             catch (Exception ex) {
                 Log.Error($"Exception Occured in Unhandled Exception Handler: {ex.Message}");
@@ -259,6 +241,7 @@ namespace HouseholdAccountBook
                             connectInfo.EncryptedPassword = settings.App_Postgres_EncryptedPassword;
                         }
                         else {
+                            // 平文が保存されている場合は暗号化して保存し直す
                             connectInfo.Password = settings.App_Postgres_Password;
                             settings.App_Postgres_EncryptedPassword = connectInfo.EncryptedPassword;
                             settings.App_Postgres_Password = string.Empty; // パスワードは保存しない
