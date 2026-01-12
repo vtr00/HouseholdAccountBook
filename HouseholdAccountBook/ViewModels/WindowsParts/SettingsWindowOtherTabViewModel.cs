@@ -1,7 +1,6 @@
 ﻿using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -138,9 +137,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// ログレベル辞書
         /// </summary>
         #region LogLevelDic
-        public Dictionary<LogLevel, string> LogLevelDic {
+        public Dictionary<Log.LogLevel, string> LogLevelDic {
             get {
-                Dictionary<LogLevel, string> dic = LogLevelStr;
+                Dictionary<Log.LogLevel, string> dic = LogLevelStr;
 #if !DEBUG
                 _ = dic.Remove(LogLevel.Trace);
 #endif
@@ -152,10 +151,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 選択されたログレベル
         /// </summary>
         #region SelectedLogLevel
-        public LogLevel SelectedLogLevel {
+        public Log.LogLevel SelectedLogLevel {
             get;
             set => this.SetProperty(ref field, value);
-        } = LogLevel.Debug;
+        } = Log.LogLevel.Debug;
         #endregion
 
         /// <summary>
@@ -336,7 +335,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             // ログ情報
             this.OutputOperationLog = settings.App_OutputFlag_OperationLog;
             this.OperationLogNum = settings.App_OperationLogNum;
-            this.SelectedLogLevel = (LogLevel)settings.App_OperationLogLevel;
+            this.SelectedLogLevel = (Log.LogLevel)settings.App_OperationLogLevel;
             this.OutputWindowLog = settings.App_OutputFlag_WindowLog;
             this.WindowLogNum = settings.App_WindowLogNum;
             this.UnhandledExceptionLogNum = settings.App_UnhandledExceptionLogNum;

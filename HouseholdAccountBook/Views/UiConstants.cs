@@ -1,6 +1,6 @@
-﻿using HouseholdAccountBook.Enums;
+﻿using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Views.Windows;
-using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 
 namespace HouseholdAccountBook.Views
@@ -68,13 +68,13 @@ namespace HouseholdAccountBook.Views
         /// <summary>
         /// ログレベル文字列
         /// </summary>
-        public static Dictionary<LogLevel, string> LogLevelStr => new() {
-            { LogLevel.Trace,       Properties.Resources.LogLevel_Trace  },
-            { LogLevel.Debug,       Properties.Resources.LogLevel_Debug },
-            { LogLevel.Information, Properties.Resources.LogLevel_Information },
-            { LogLevel.Warning,     Properties.Resources.LogLevel_Warning },
-            { LogLevel.Error,       Properties.Resources.LogLevel_Error },
-            { LogLevel.Critical,    Properties.Resources.LogLevel_Critical }
+        public static Dictionary<Log.LogLevel, string> LogLevelStr => new() {
+            { Log.LogLevel.Trace,       Properties.Resources.LogLevel_Trace  },
+            { Log.LogLevel.Debug,       Properties.Resources.LogLevel_Debug },
+            { Log.LogLevel.Info,        Properties.Resources.LogLevel_Information },
+            { Log.LogLevel.Warn,        Properties.Resources.LogLevel_Warning },
+            { Log.LogLevel.Error,       Properties.Resources.LogLevel_Error },
+            { Log.LogLevel.Critical,    Properties.Resources.LogLevel_Critical }
         };
         #endregion
 
