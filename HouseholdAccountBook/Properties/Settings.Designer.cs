@@ -994,5 +994,17 @@ namespace HouseholdAccountBook.Properties {
                 this["App_OperationLogNum"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int App_OperationLogLevel {
+            get {
+                return ((int)(this["App_OperationLogLevel"]));
+            }
+            set {
+                this["App_OperationLogLevel"] = value;
+            }
+        }
     }
 }

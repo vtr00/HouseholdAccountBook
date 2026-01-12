@@ -1057,4 +1057,25 @@
   <data name="Menu_View_DebugMode" xml:space="preserve">
     <value>デバッグモード(_D)</value>
   </data>
+  <data name="LogLevel_Debug" xml:space="preserve">
+    <value>デバッグ</value>
+  </data>
+  <data name="LogLevel_Trace" xml:space="preserve">
+    <value>トレース</value>
+  </data>
+  <data name="LogLevel_Information" xml:space="preserve">
+    <value>情報</value>
+  </data>
+  <data name="LogLevel_Warning" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="LogLevel_Critical" xml:space="preserve">
+    <value>致命的</value>
+  </data>
+  <data name="LogLevel_Error" xml:space="preserve">
+    <value>エラー</value>
+  </data>
+  <data name="TextBlock_OutoutLogLevel" xml:space="preserve">
+    <value>出力レベル</value>
+  </data>
 </root>

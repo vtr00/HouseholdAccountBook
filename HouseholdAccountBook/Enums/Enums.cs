@@ -1,4 +1,7 @@
-﻿namespace HouseholdAccountBook.Enums
+﻿/// <summary>
+/// どのクラスにも紐づかない列挙型をまとめた名前空間
+/// </summary>
+namespace HouseholdAccountBook.Enums
 {
     #region DB関連
     /// <summary>

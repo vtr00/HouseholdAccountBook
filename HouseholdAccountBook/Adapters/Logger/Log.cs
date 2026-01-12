@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Others;
 using HouseholdAccountBook.Properties;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -17,20 +18,16 @@ namespace HouseholdAccountBook.Adapters.Logger
     public class Log : SingletonBase<Log>
     {
         /// <summary>
-        /// ログレベル
-        /// </summary>
-        public enum LogLevel
-        {
-            Debug = 0,
-            Info,
-            Warning,
-            Error,
-        }
-
-        /// <summary>
         /// 出力ログレベル
         /// </summary>
-        public static LogLevel OutputLogLevel { get; set; } = LogLevel.Debug;
+        public static LogLevel OutputLogLevel {
+            get;
+            set {
+                field = LogLevel.Information;
+                Log.Info($"Set OutputLogLevel to {value}");
+                field = value;
+            }
+        } = LogLevel.Debug;
         /// <summary>
         /// ログファイルパス
         /// </summary>
@@ -38,8 +35,6 @@ namespace HouseholdAccountBook.Adapters.Logger
 
         private static readonly string mLogFileListenerName = "logFileOutput";
         private TextWriterTraceListener mLogFileListener;
-        private static readonly string mStdoutListenerName = "stdout";
-        private TextWriterTraceListener mStdoutListener;
 
         /// <summary>
         /// ログファイル出力リスナーの削除中か
@@ -53,25 +48,13 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// </summary>
         private Log()
         {
-            Trace.AutoFlush = true;
-
-            this.mStdoutListener = new TextWriterTraceListener(Console.Out) {
-                Name = mStdoutListenerName,
-                TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId | TraceOptions.ThreadId
-            };
-            _ = Trace.Listeners.Add(this.mStdoutListener);
+            System.Diagnostics.Trace.AutoFlush = true;
+            _ = System.Diagnostics.Trace.Listeners.Add(new ConsoleTraceListener());
         }
 
         ~Log()
         {
             this.DeleteLogFileListener();
-
-            if (this.mStdoutListener != null) {
-                this.mStdoutListener.Close();
-                this.mStdoutListener.Dispose();
-                this.mStdoutListener = null;
-            }
-            Trace.Listeners.Remove(mStdoutListenerName);
         }
 
         /// <summary>
@@ -90,7 +73,7 @@ namespace HouseholdAccountBook.Adapters.Logger
                     TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId | TraceOptions.ThreadId
                 };
 
-                _ = Trace.Listeners.Add(this.mLogFileListener);
+                _ = System.Diagnostics.Trace.Listeners.Add(this.mLogFileListener);
 
                 // リスナーを登録してから開始ログを出力する
                 Info("== Start to output log ==");
@@ -117,7 +100,7 @@ namespace HouseholdAccountBook.Adapters.Logger
                 this.mLogFileListener.Dispose();
                 this.mLogFileListener = null;
             }
-            Trace.Listeners.Remove(mLogFileListenerName);
+            System.Diagnostics.Trace.Listeners.Remove(mLogFileListenerName);
             this.mOnDeleteLogFileListener = false;
         }
 
@@ -193,6 +176,15 @@ namespace HouseholdAccountBook.Adapters.Logger
         }
 
         /// <summary>
+        /// ログファイルに致命的ログを1行出力する
+        /// </summary>
+        /// <param name="message">出力メッセージ</param>
+        /// <param name="fileName">出力元ファイル名</param>
+        /// <param name="methodName">出力元関数名</param>
+        /// <param name="lineNumber">出力元行数</param>
+        public static void Critical(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+            => Instance.WriteLine(LogLevel.Critical, message, fileName, methodName, lineNumber);
+        /// <summary>
         /// ログファイルにエラーログを1行出力する
         /// </summary>
         /// <param name="message">出力メッセージ</param>
@@ -218,7 +210,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
         public static void Info(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
-            => Instance.WriteLine(LogLevel.Info, message, fileName, methodName, lineNumber);
+            => Instance.WriteLine(LogLevel.Information, message, fileName, methodName, lineNumber);
         /// <summary>
         /// ログファイルにデバッグログを1行出力する
         /// </summary>
@@ -228,6 +220,15 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="lineNumber">出力元行数</param>
         public static void Debug(string message = "", [CallerFilePath] string filePath = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
             => Instance.WriteLine(LogLevel.Debug, message, filePath, methodName, lineNumber);
+        /// <summary>
+        /// ログファイルにトレースログを1行出力する
+        /// </summary>
+        /// <param name="message">出力メッセージ</param>
+        /// <param name="filePath">出力元ファイル名</param>
+        /// <param name="methodName">出力元関数名</param>
+        /// <param name="lineNumber">出力元行数</param>
+        public static void Trace(string message = "", [CallerFilePath] string filePath = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+            => Instance.WriteLine(LogLevel.Trace, message, filePath, methodName, lineNumber);
 
         /// <summary>
         /// ログファイルにログを1行出力する
@@ -268,7 +269,7 @@ namespace HouseholdAccountBook.Adapters.Logger
                 output += $" {message}";
             }
 
-            Trace.WriteLine(output);
+            System.Diagnostics.Trace.WriteLine(output);
         }
     }
 }

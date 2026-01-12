@@ -1057,4 +1057,25 @@ list</value>
   <data name="Menu_View_DebugMode" xml:space="preserve">
     <value>Debug mode (_D)</value>
   </data>
+  <data name="LogLevel_Debug" xml:space="preserve">
+    <value>Debug</value>
+  </data>
+  <data name="LogLevel_Trace" xml:space="preserve">
+    <value>Trace</value>
+  </data>
+  <data name="LogLevel_Information" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="LogLevel_Warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="LogLevel_Critical" xml:space="preserve">
+    <value>Critical</value>
+  </data>
+  <data name="LogLevel_Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="TextBlock_OutoutLogLevel" xml:space="preserve">
+    <value>OutputLevel</value>
+  </data>
 </root>
