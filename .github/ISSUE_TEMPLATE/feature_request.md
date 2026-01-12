@@ -1,4 +1,4 @@
-﻿---
+---
 name: Feature request / 機能追加リクエスト
 about: Suggest new idea for this project / このプロジェクトに新しい考えを提案する
 title: "[Enhancement] "

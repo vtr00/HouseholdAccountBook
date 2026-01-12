@@ -1,4 +1,4 @@
-﻿---
+---
 name: Bug report / バグ報告
 about: Create a report to help us improve / 改善の助けとなる報告を作成する
 title: "[BUG]"
