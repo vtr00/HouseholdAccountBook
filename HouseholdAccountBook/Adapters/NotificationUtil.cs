@@ -10,14 +10,14 @@ namespace HouseholdAccountBook.Adapters
 {
     public static class NotificationUtil
     {
-        private static readonly Brush InformationForeground = Brushes.Blue;
-        private static readonly Brush InformationBackground = Brushes.LightBlue;
+        private static readonly Brush mInformationForeground = Brushes.Blue;
+        private static readonly Brush mInformationBackground = Brushes.LightBlue;
 
-        private static readonly Brush WarningForeground = Brushes.LightYellow;
-        private static readonly Brush WarningBackground = Brushes.DarkOrange;
+        private static readonly Brush mWarningForeground = Brushes.LightYellow;
+        private static readonly Brush mWarningBackground = Brushes.DarkOrange;
 
-        private static readonly Brush ErrorForeground = Brushes.LightPink;
-        private static readonly Brush ErrorBackground = Brushes.DarkRed;
+        private static readonly Brush mErrorForeground = Brushes.LightPink;
+        private static readonly Brush mErrorBackground = Brushes.DarkRed;
 
         /// <summary>
         /// 捕捉されない例外を通知する
@@ -31,8 +31,8 @@ namespace HouseholdAccountBook.Adapters
                 Title = Properties.Resources.Title_MainWindow,
                 Message = Properties.Resources.Message_UnhandledExceptionOccurred,
                 Type = NotificationType.Error,
-                Background = ErrorBackground,
-                Foreground = ErrorForeground,
+                Background = mErrorBackground,
+                Foreground = mErrorForeground,
                 Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
             };
             nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
@@ -61,8 +61,8 @@ namespace HouseholdAccountBook.Adapters
                 Title = Properties.Resources.Title_MainWindow,
                 Message = Properties.Resources.Message_FoultToGetHolidayList,
                 Type = NotificationType.Warning,
-                Background = WarningBackground,
-                Foreground = WarningForeground,
+                Background = mWarningBackground,
+                Foreground = mWarningForeground,
                 Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
             };
             nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
@@ -78,8 +78,8 @@ namespace HouseholdAccountBook.Adapters
                 Title = Properties.Resources.Title_MainWindow,
                 Message = Properties.Resources.Message_FinishToBackup,
                 Type = NotificationType.Information,
-                Background = InformationBackground,
-                Foreground = InformationForeground,
+                Background = mInformationBackground,
+                Foreground = mInformationForeground,
                 Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
             };
             nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
@@ -95,8 +95,8 @@ namespace HouseholdAccountBook.Adapters
                 Title = Properties.Resources.Title_MainWindow,
                 Message = Properties.Resources.Message_FoultToBackup,
                 Type = NotificationType.Error,
-                Background = ErrorBackground,
-                Foreground = ErrorForeground,
+                Background = mErrorBackground,
+                Foreground = mErrorForeground,
                 Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
             };
             nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
