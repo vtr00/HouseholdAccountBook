@@ -23,7 +23,7 @@ Describe of what you want to happen clearly and concisely.
 Describe of related bug.  
 関連する不具合を記載してください。
 
-- refs 
+- refs #
 - none / なし
 
 ## Additional context / 補足情報
