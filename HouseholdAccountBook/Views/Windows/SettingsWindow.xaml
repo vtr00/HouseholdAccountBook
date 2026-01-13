@@ -758,6 +758,7 @@
                                               Content="{x:Static properties:Resources.CheckBox_SaveTarget_PositionWithoutMainWindow}" IsChecked="{Binding IsPositionSaved}"/>
 
                                     <DataGrid Grid.Row="1" Grid.ColumnSpan="3" Margin="5" ItemsSource="{Binding WindowSettingVMList}"
+                                              Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                               IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
                                               CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                               AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
