@@ -95,7 +95,7 @@ namespace HouseholdAccountBook.DbHandler
                 Process process = Process.Start(info);
                 Log.Info("Process executing...");
                 if (waitForFinish) {
-                    if (process.WaitForExit(pgPassConf ? 10 * 1000 : -1)) {
+                    if (process.WaitForExit(-1)) {
                         localExitCode = process.ExitCode;
                         if (localExitCode != 0) {
                             using (StreamReader r = process.StandardError) {
@@ -159,7 +159,7 @@ namespace HouseholdAccountBook.DbHandler
                 Log.Info("Start Restore");
 
                 Process process = Process.Start(info);
-                if (process.WaitForExit(pgPassConf ? 10 * 1000 : -1)) {
+                if (process.WaitForExit(-1)) {
                     localExitCode = process.ExitCode;
                     if (localExitCode != 0) {
                         using (StreamReader r = process.StandardError) {
