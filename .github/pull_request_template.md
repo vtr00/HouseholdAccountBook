@@ -1,4 +1,4 @@
-﻿## Summary / 概要
+## Summary / 概要
 Please describe the purpose and background of this PR.  
 このPRの目的・背景を記載してください。
 
@@ -38,4 +38,4 @@ Link related issues using `close #123` or similar.
 Add any additional notes or considerations.  
 補足事項や注意点があれば記載してください。
 
-- 
+- None / なし
