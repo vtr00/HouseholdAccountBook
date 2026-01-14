@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HouseholdAccountBook.Others.RequestEventArgs
+namespace HouseholdAccountBook.Args.RequestEventArgs
 {
     /// <summary>
-    /// 帳簿項目編集要求イベント時のイベント引数
+    /// 帳簿項目複製要求イベント時のイベント引数
     /// </summary>
-    public class EditActionRequestEventArgs : DbRequestEventArgsBase
+    public class CopyActionRequestEventArgs : DbRequestEventArgsBase
     {
         /// <summary>
-        /// 編集対象の帳簿項目のID
+        /// 複製対象の帳簿項目のID
         /// </summary>
         public int TargetActionId { get; set; }
 

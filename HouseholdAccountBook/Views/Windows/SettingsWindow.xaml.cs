@@ -3,7 +3,7 @@ using HouseholdAccountBook.Adapters.DbHandler.Abstract;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Others;
+using HouseholdAccountBook.Utilites;
 using HouseholdAccountBook.ViewModels.Settings;
 using System.ComponentModel;
 using System.Windows;

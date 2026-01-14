@@ -6,7 +6,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 
-namespace HouseholdAccountBook.Others
+namespace HouseholdAccountBook.Utilites
 {
     /// <summary>
     /// <see cref="WaitCursorManager"/> のファクトリ

@@ -2,9 +2,10 @@
 using HouseholdAccountBook.Adapters.DbHandler.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
 using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.Args;
+using HouseholdAccountBook.Args.RequestEventArgs;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Others;
-using HouseholdAccountBook.Others.RequestEventArgs;
+using HouseholdAccountBook.Utilites;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Settings;
@@ -283,7 +284,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 folderFullPath = Path.Combine(folderPath, fileName);
             }
 
-            var e = new OpenFolderDialogRequestEventArgs() {
+            OpenFolderDialogRequestEventArgs e = new() {
                 InitialDirectory = folderFullPath,
                 Title = Properties.Resources.Title_CsvFolderSelection
             };
@@ -295,6 +296,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿-項目関係変更コマンド処理
         /// </summary>
+        /// <param name="viewModel">チェックされた対象の<see cref="RelationViewModel"/></param>
         private async void ChangeBookRelationCommand_Executed(object viewModel)
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
@@ -313,7 +315,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         }
 
                         RelBookItemDao relBookItemDao = new(dbHandler);
-                        var dtoList = await relBookItemDao.UpsertAsync(new RelBookItemDto {
+                        _ = await relBookItemDao.UpsertAsync(new RelBookItemDto {
                             BookId = vm.Id.Value,
                             ItemId = vm.SelectedRelationVM.Id,
                             DelFlg = vm.SelectedRelationVM.IsRelated ? 0 : 1
