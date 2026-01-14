@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Others;
+﻿using HouseholdAccountBook.Args;
 using OxyPlot;
 using OxyPlot.Series;
 using System;

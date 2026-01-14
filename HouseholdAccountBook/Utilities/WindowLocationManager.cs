@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 
-namespace HouseholdAccountBook.Others
+namespace HouseholdAccountBook.Utilites
 {
     /// <summary>
     /// ウィンドウの位置を管理する

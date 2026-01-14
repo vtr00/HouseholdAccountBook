@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.Args.RequestEventArgs;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Others.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;

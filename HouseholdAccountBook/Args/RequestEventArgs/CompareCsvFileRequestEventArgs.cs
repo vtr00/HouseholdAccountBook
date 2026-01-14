@@ -1,4 +1,4 @@
-﻿namespace HouseholdAccountBook.Others.RequestEventArgs
+﻿namespace HouseholdAccountBook.Args.RequestEventArgs
 {
     /// <summary>
     /// CSVファイル比較リクエスト時のイベント引数

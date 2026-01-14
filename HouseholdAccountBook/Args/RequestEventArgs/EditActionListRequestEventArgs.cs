@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HouseholdAccountBook.Others.RequestEventArgs
+namespace HouseholdAccountBook.Args.RequestEventArgs
 {
     /// <summary>
-    /// 移動編集要求イベント時のイベント引数
+    /// 帳簿項目リスト編集要求イベント時のイベント引数
     /// </summary>
-    public class EditMoveRequestEventArgs : DbRequestEventArgsBase
+    public class EditActionListRequestEventArgs : DbRequestEventArgsBase
     {
         /// <summary>
         /// 編集対象の帳簿項目のグループID

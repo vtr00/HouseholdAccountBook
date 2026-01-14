@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Enums;
 using System;
 
-namespace HouseholdAccountBook.Others.RequestEventArgs
+namespace HouseholdAccountBook.Args.RequestEventArgs
 {
     /// <summary>
     /// 期間選択要求イベント時のイベント引数

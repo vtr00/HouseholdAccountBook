@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace HouseholdAccountBook.Others.RequestEventArgs
+namespace HouseholdAccountBook.Args.RequestEventArgs
 {
     /// <summary>
     /// 帳簿項目追加要求イベント時のイベント引数

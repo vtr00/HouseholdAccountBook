@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HouseholdAccountBook.Others.RequestEventArgs
+namespace HouseholdAccountBook.Args.RequestEventArgs
 {
     /// <summary>
     /// フォルダ選択ダイアログ要求時イベントのイベント引数

@@ -1,13 +1,12 @@
-﻿using HouseholdAccountBook.ViewModels.Component;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace HouseholdAccountBook.Others.RequestEventArgs
+namespace HouseholdAccountBook.Args.RequestEventArgs
 {
     /// <summary>
-    /// 帳簿項目リスト追加要求イベント時のイベント引数
+    /// 移動追加要求イベント時のイベント引数
     /// </summary>
-    public class AddActionListRequestEventArgs : DbRequestEventArgsBase
+    public class AddMoveRequestEventArgs : DbRequestEventArgsBase
     {
         /// <summary>
         /// 初期選択する帳簿のID
@@ -21,10 +20,6 @@ namespace HouseholdAccountBook.Others.RequestEventArgs
         /// 初期選択する日付
         /// </summary>
         public DateTime? InitialDate { get; set; }
-        /// <summary>
-        /// 初期表示するCSVレコードリスト
-        /// </summary>
-        public List<CsvViewModel> InitialRecordList { get; set; }
 
         /// <summary>
         /// 登録完了時イベントハンドラ

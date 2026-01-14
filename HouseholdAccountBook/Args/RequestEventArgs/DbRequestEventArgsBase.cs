@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandler;
 using System;
 
-namespace HouseholdAccountBook.Others.RequestEventArgs
+namespace HouseholdAccountBook.Args.RequestEventArgs
 {
     /// <summary>
     /// DBリクエストイベント時のイベント引数の基底クラス

@@ -1,4 +1,4 @@
-﻿namespace HouseholdAccountBook.Others.RequestEventArgs
+﻿namespace HouseholdAccountBook.Args.RequestEventArgs
 {
     /// <summary>
     /// 設定編集要求イベント時のイベント引数
