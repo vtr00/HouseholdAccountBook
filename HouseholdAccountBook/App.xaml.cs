@@ -57,7 +57,7 @@ namespace HouseholdAccountBook
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
             Log.OutputLogLevel = (Log.LogLevel)settings.App_OperationLogLevel;
 
-            Log.Info("Application Startup");
+            using FuncLog funcLog = new();
 
             this.DispatcherUnhandledException += this.App_DispatcherUnhandledException;
             this.Exit += this.App_Exit;
@@ -123,7 +123,7 @@ namespace HouseholdAccountBook
                 return;
             }
 
-            // 初回起動を解除する
+            // 初期化フラグを解除する
             settings.App_InitFlag = false;
             settings.App_InitSizeFlag = false;
             settings.Save();
@@ -131,7 +131,7 @@ namespace HouseholdAccountBook
             // 休日リストを取得する
             await DateTimeExtensions.DownloadHolidayListAsync();
 
-            // DBに接続できる場合だけメインウィンドウを開く
+            // メインウィンドウを開く
             MainWindow mw = new(dbHandlerFactory);
             this.MainWindow = mw;
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
@@ -145,6 +145,8 @@ namespace HouseholdAccountBook
         /// <param name="e"></param>
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
+            using FuncLog funcLog = new();
+
             try {
                 Log.Error("Unhandled Exception Occured.");
 
@@ -173,8 +175,9 @@ namespace HouseholdAccountBook
         /// <param name="e"></param>
         private void App_Exit(object sender, ExitEventArgs e)
         {
-            Log.Info("Application End");
+            using FuncLog funcLog = new();
 
+            // 多重起動防止用のMutexを解放する
             ReleaseMutex();
         }
 
@@ -183,6 +186,8 @@ namespace HouseholdAccountBook
         /// </summary>
         public static void RegisterToResource()
         {
+            using FuncLog funcLog = new();
+
             ResourceDictionary rd = Current.Resources;
             if (rd.Contains("Settings")) {
                 rd["Settings"] = HouseholdAccountBook.Properties.Settings.Default;
@@ -199,67 +204,17 @@ namespace HouseholdAccountBook
         /// <exception cref="NotSupportedException"></exception>
         private async Task<DbHandlerFactory> GetDbHandlerFactory()
         {
+            using FuncLog funcLog = new();
+
             Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
 
             DbHandlerFactory dbHandlerFactory = null;
             bool isOpen = false;
+            string message = HouseholdAccountBook.Properties.Resources.Message_PleaseInputDbSetting;
+
             while (!isOpen) {
-                // 初回起動時、またはDB接続に失敗した時
-                if (settings.App_InitFlag || dbHandlerFactory is not null) {
-                    // データベース接続を設定する
-                    string message = dbHandlerFactory is not null
-                        ? HouseholdAccountBook.Properties.Resources.Message_FoultToConnectDb
-                        : HouseholdAccountBook.Properties.Resources.Message_PleaseInputDbSetting;
-                    DbSettingWindow dsw = new(null, message);
-                    this.MainWindow = dsw;
-                    // DB設定ダイアログ終了時に閉じないように設定する(明示的なシャットダウンが必要)
-                    this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-
-                    dsw.SetIsModal(true);
-                    if (dsw.ShowDialog() != true) {
-                        return null;
-                    }
-                }
-
                 // 接続設定を読み込む
-                DbHandlerBase.ConnectInfo connInfo = null;
-                switch ((DBKind)settings.App_SelectedDBKind) {
-                    case DBKind.PostgreSQL: {
-                        NpgsqlDbHandler.ConnectInfo connectInfo = new() {
-                            Host = settings.App_Postgres_Host,
-                            Port = settings.App_Postgres_Port,
-                            UserName = settings.App_Postgres_UserName,
-                            Password = settings.App_Postgres_Password,
-#if DEBUG
-                            DatabaseName = settings.App_Postgres_DatabaseName_Debug,
-#else
-                            DatabaseName = settings.App_Postgres_DatabaseName,
-#endif
-                            Role = settings.App_Postgres_Role
-                        };
-                        if (settings.App_Postgres_Password == string.Empty) {
-                            connectInfo.EncryptedPassword = settings.App_Postgres_EncryptedPassword;
-                        }
-                        else {
-                            // 平文が保存されている場合は暗号化して保存し直す
-                            connectInfo.Password = settings.App_Postgres_Password;
-                            settings.App_Postgres_EncryptedPassword = connectInfo.EncryptedPassword;
-                            settings.App_Postgres_Password = string.Empty; // パスワードは保存しない
-                            settings.Save();
-                        }
-                        connInfo = connectInfo;
-                        break;
-                    }
-                    case DBKind.SQLite:
-                        connInfo = new SQLiteDbHandler.ConnectInfo() {
-                            FilePath = settings.App_SQLite_DBFilePath
-                        };
-                        break;
-                    case DBKind.Access:
-                    case DBKind.Undefined:
-                    default:
-                        throw new NotSupportedException();
-                }
+                DbHandlerBase.ConnectInfo connInfo = GetDbConnectInfo();
                 dbHandlerFactory = new(connInfo);
 
                 // 接続を試行する
@@ -269,9 +224,98 @@ namespace HouseholdAccountBook
                     }
                 }
                 catch (TimeoutException) { }
+
+                // 初期化ではなく、DB接続に成功した場合はループを抜ける
+                if (!settings.App_InitFlag && isOpen) {
+                    Log.Info("Database connection succeeded.");
+                    break;
+                }
+
+                // SQLiteの場合
+                if (connInfo is SQLiteDbHandler.ConnectInfo sqliteInfo) {
+                    // DB接続に失敗した(SQLiteファイルにアクセスできない)時
+                    if (!isOpen) {
+                        // DBファイルが存在しない場合は新規作成を試みる
+                        if (!File.Exists(sqliteInfo.FilePath)) {
+                            if (SQLiteDbHandler.CreateTemplateFile(sqliteInfo.FilePath)) {
+                                continue; // 作成に成功した場合は再度接続を試みる
+                            }
+                        }
+                        else {
+                            Log.Warning("Failed to connect to existing SQLite database file.");
+                        }
+                    }
+                }
+
+                // データベース接続を設定する
+                DbSettingWindow dsw = new(null, message);
+                this.MainWindow = dsw;
+                // DB設定ダイアログ終了時に閉じないように設定する(明示的なシャットダウンが必要)
+                this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+                dsw.SetIsModal(true);
+                if (dsw.ShowDialog() != true) {
+                    // DB設定ダイアログでキャンセルされた場合はnullを返す
+                    return null;
+                }
+
+                message = HouseholdAccountBook.Properties.Resources.Message_FoultToConnectDb;
             }
 
             return dbHandlerFactory;
+        }
+
+        /// <summary>
+        /// DB接続情報を取得する
+        /// </summary>
+        /// <returns>DB接続情報</returns>
+        /// <exception cref="NotSupportedException">サポート対象外のDBが設定されている場合</exception>
+        public static DbHandlerBase.ConnectInfo GetDbConnectInfo()
+        {
+            using FuncLog funcLog = new();
+
+            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
+
+            DbHandlerBase.ConnectInfo connInfo = null;
+            switch ((DBKind)settings.App_SelectedDBKind) {
+                case DBKind.PostgreSQL: {
+                    NpgsqlDbHandler.ConnectInfo connectInfo = new() {
+                        Host = settings.App_Postgres_Host,
+                        Port = settings.App_Postgres_Port,
+                        UserName = settings.App_Postgres_UserName,
+                        Password = settings.App_Postgres_Password,
+#if DEBUG
+                        DatabaseName = settings.App_Postgres_DatabaseName_Debug,
+#else
+                            DatabaseName = settings.App_Postgres_DatabaseName,
+#endif
+                        Role = settings.App_Postgres_Role
+                    };
+                    if (settings.App_Postgres_Password == string.Empty) {
+                        connectInfo.EncryptedPassword = settings.App_Postgres_EncryptedPassword;
+                    }
+                    else {
+                        // 平文が保存されている場合は暗号化して保存し直す
+                        connectInfo.Password = settings.App_Postgres_Password;
+                        settings.App_Postgres_EncryptedPassword = connectInfo.EncryptedPassword;
+                        settings.App_Postgres_Password = string.Empty; // パスワードは保存しない
+                        settings.Save();
+                    }
+                    connInfo = connectInfo;
+                    break;
+                }
+                case DBKind.SQLite:
+                    connInfo = new SQLiteDbHandler.ConnectInfo() {
+                        FilePath = settings.App_SQLite_DBFilePath
+                    };
+                    break;
+                case DBKind.Access:
+                case DBKind.Undefined:
+                default:
+                    throw new NotSupportedException();
+            }
+
+            return connInfo;
         }
 
         /// <summary>
@@ -279,6 +323,8 @@ namespace HouseholdAccountBook
         /// </summary>
         public static void ReleaseMutex()
         {
+            using FuncLog funcLog = new();
+
 #if !DEBUG
             if (mMutex != null) {
                 mMutex.ReleaseMutex();
@@ -293,7 +339,7 @@ namespace HouseholdAccountBook
         /// </summary>
         public void Restart()
         {
-            Log.Info("Application Restart");
+            using FuncLog funcLog = new();
 
             string targetExe = GetCurrentExe();
             Log.Debug($"target: {targetExe}");

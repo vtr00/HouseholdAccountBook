@@ -49,5 +49,27 @@ namespace HouseholdAccountBook.DbHandler
         /// <param name="version">スキーマバージョン</param>
         /// <returns></returns>
         public async Task<int> SetUserVersion(int version) => await this.ExecuteAsync($"PRAGMA USER_VERSION = @UserVersion;", new { UserVersion = version });
+
+        /// <summary>
+        /// SQLiteテンプレートファイルをコピーして新規作成する
+        /// </summary>
+        /// <param name="sqliteFilePath">SQLiteファイルパス</param>
+        /// <returns>ファイルが存在するか</returns>
+        /// <remarks>ファイルが既に存在する場合は何もしない</remarks>
+        public static bool CreateTemplateFile(string sqliteFilePath)
+        {
+            bool exists = File.Exists(sqliteFilePath);
+            if (!exists) {
+                // SQLiteのテンプレートファイルをコピーして新規作成する
+                byte[] sqliteBinary = Properties.Resources.SQLiteTemplateFile;
+                try {
+                    File.WriteAllBytes(sqliteFilePath, sqliteBinary);
+                    exists = true;
+                }
+                catch { }
+            }
+
+            return exists;
+        }
     }
 }
