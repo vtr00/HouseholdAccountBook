@@ -59,8 +59,16 @@
         <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2">
             <TextBlock Text="{x:Static properties:Resources.TextBlock_UpdateHistory}"/>:
         </TextBlock>
-        <TextBox x:Name="HistoryLog" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="3" Text="{x:Static properties:Resources.UpdateLog}"
-                 AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" IsReadOnly="True"/>
+        <RichTextBox x:Name="HistoryLog" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="3"
+                     HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" IsReadOnly="True"
+                     PreviewMouseLeftButtonDown="RichTextBox_PreviewMouseLeftButtonDown">
+            <RichTextBox.Resources>
+                <Style TargetType="Hyperlink">
+                    <Setter Property="Foreground" Value="#0066CC"/>
+                    <Setter Property="TextDecorations" Value="Underline"/>
+                </Style>
+            </RichTextBox.Resources>
+        </RichTextBox>
 
         <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="5" Width="100" Content="{x:Static properties:Resources.Button_Close}" Command="{Binding CloseCommand}"/>
     </Grid>
