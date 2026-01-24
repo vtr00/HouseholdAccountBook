@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Extensions;
+﻿using HouseholdAccountBook.DbHandler;
+using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System.IO;
 using System.Windows;
@@ -37,15 +38,15 @@ namespace HouseholdAccountBook.ViewModels.Settings
             string sqliteFilePath = Path.GetFullPath(this.DBFilePath);
             bool exists = File.Exists(sqliteFilePath);
             if (!exists) {
+                // ファイルが存在しない場合、新規作成するか確認する
                 if (MessageBox.Show(Properties.Resources.Message_NotFoundFileDoYouCreateNew, Properties.Resources.Title_Conformation, MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
-                    byte[] sqliteBinary = Properties.Resources.SQLiteTemplateFile;
-                    try {
-                        File.WriteAllBytes(sqliteFilePath, sqliteBinary);
+                    // 新規作成する
+                    if (SQLiteDbHandler.CreateTemplateFile(sqliteFilePath)) {
                         exists = true;
                     }
-                    catch { }
                 }
             }
+            // ファイルが存在する場合、設定を保存する
             if (exists) {
                 Properties.Settings settings = Properties.Settings.Default;
                 settings.App_SQLite_DBFilePath = Path.GetFullPath(sqliteFilePath, App.GetCurrentDir());

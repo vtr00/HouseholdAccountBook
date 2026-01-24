@@ -81,7 +81,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="App_InitFlag" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="App_Postgres_Role" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -189,7 +189,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="App_SQLite_DBFilePath" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">HouseholdAccountBook.sqlite</Value>
     </Setting>
     <Setting Name="App_SelectedDBKind" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">2</Value>

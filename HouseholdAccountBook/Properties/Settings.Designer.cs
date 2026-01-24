@@ -337,7 +337,7 @@ namespace HouseholdAccountBook.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool App_InitFlag {
             get {
                 return ((bool)(this["App_InitFlag"]));
@@ -769,7 +769,7 @@ namespace HouseholdAccountBook.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("HouseholdAccountBook.sqlite")]
         public string App_SQLite_DBFilePath {
             get {
                 return ((string)(this["App_SQLite_DBFilePath"]));

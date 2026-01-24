@@ -63,8 +63,10 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
         /// </summary>
         /// <param name="timeoutMs">タイムアウト時間(ms)。0以下の場合は無制限</param>
         /// <returns>接続結果</returns>
+        /// <exception cref="TimeoutException">接続タイムアウトが発生した場合</exception>
         public async Task<bool> OpenAsync(int timeoutMs = 0)
         {
+            // 接続不可の場合、接続しない
             if (this.CanOpen == false) {
                 return false;
             }
@@ -75,6 +77,7 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
                 while (this.mConnection.State == System.Data.ConnectionState.Connecting) {
                     Thread.Sleep(10);
                     if (0 < timeoutMs && timeoutMs < sw.ElapsedMilliseconds) {
+                        this.mConnection.Close();
                         throw new TimeoutException();
                     }
                 }
@@ -200,8 +203,9 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
         /// <param name="actionAsync">トランザクション内の処理</param>
         public async Task ExecTransactionAsync(AxActionAsync actionAsync)
         {
-            this.mDbTransaction = await this.mConnection.BeginTransactionAsync();
             try {
+                this.mDbTransaction = await this.mConnection.BeginTransactionAsync();
+
                 await actionAsync?.Invoke();
 
                 await this.mDbTransaction.CommitAsync();
