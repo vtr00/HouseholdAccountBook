@@ -29,17 +29,19 @@ namespace HouseholdAccountBook.Properties
         /// <param name="e"></param>
         private void Settings_SettingsLoaded(object sender, SettingsLoadedEventArgs e)
         {
+            // JSON ファイルが存在する場合、JSON ファイルから設定を読み込む
             if (File.Exists(FileConstants.SettingsJsonFilePath)) {
                 string jsonCode = File.ReadAllText(FileConstants.SettingsJsonFilePath);
                 JObject jObj = JObject.Parse(jsonCode);
 
                 foreach (SettingsProperty prop in this.Properties) {
                     string name = prop.Name;
-                    Type type = prop.PropertyType;
 
+                    // JSON に設定が存在しない場合はスキップ
                     if (!jObj.TryGetValue(name, out JToken token)) { continue; }
 
                     // Nullable対応
+                    Type type = prop.PropertyType;
                     Type targetType = Nullable.GetUnderlyingType(type) ?? type;
 
                     try {
@@ -54,10 +56,6 @@ namespace HouseholdAccountBook.Properties
                         Console.WriteLine($"設定 '{name}' の読み込みに失敗: {ex.Message}");
                     }
                 }
-
-                this.SettingsSaving -= this.Settings_SettingsSaving;
-                this.Save();
-                this.SettingsSaving += this.Settings_SettingsSaving;
             }
         }
 
@@ -78,6 +76,8 @@ namespace HouseholdAccountBook.Properties
             // 辞書を JSON ファイルに保存する
             string jsonCode = JsonConvert.SerializeObject(dict, Formatting.Indented, new JsonSerializerSettings { DateFormatString = "yyyy-MM-dd HH:mm:ss" });
             File.WriteAllText(FileConstants.SettingsJsonFilePath, jsonCode);
+
+            e.Cancel = true; // app.config への保存はキャンセルする
         }
 
         /// <summary>
