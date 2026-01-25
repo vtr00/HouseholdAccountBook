@@ -1006,5 +1006,29 @@ namespace HouseholdAccountBook.Properties {
                 this["App_OperationLogLevel"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double VersionWindow_Height {
+            get {
+                return ((double)(this["VersionWindow_Height"]));
+            }
+            set {
+                this["VersionWindow_Height"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double VersionWindow_Width {
+            get {
+                return ((double)(this["VersionWindow_Width"]));
+            }
+            set {
+                this["VersionWindow_Width"] = value;
+            }
+        }
     }
 }

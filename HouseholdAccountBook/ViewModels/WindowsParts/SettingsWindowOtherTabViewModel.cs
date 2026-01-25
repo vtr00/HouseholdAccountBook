@@ -287,8 +287,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 // バージョン
                 settings.VersionWindow_Left = -1;
                 settings.VersionWindow_Top = -1;
-                // settings.VersionWindow_Width = -1;
-                // settings.VersionWindow_Height = -1;
+                settings.VersionWindow_Width = -1;
+                settings.VersionWindow_Height = -1;
 
                 settings.App_InitSizeFlag = true;
                 settings.Save();
@@ -399,7 +399,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_VersionWindow,
                     Left = settings.VersionWindow_Left, Top = settings.VersionWindow_Top,
-                    Width = -1, Height = -1
+                    Width = settings.VersionWindow_Width, Height = settings.VersionWindow_Height
                 }
             ];
             return list;
