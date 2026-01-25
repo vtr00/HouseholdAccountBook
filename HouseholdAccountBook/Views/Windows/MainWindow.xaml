@@ -113,13 +113,15 @@
                 <!-- バックアップ -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Backup}" Command="{Binding BackUpCommand}"/>
                 <Separator/>
-                <!-- ログファイル -->
-                <MenuItem Header="{x:Static properties:Resources.Menu_File_LogFile}" Command="{Binding LogFileCommand}">
-                    <!-- 操作ログファイル -->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_LogFile_OperationLog}" Command="{Binding OperationLogFileCommand}">
-                        <!-- 開く -->
-                        <MenuItem Header="{x:Static properties:Resources.Menu_File_LogFile_OperationLog_Open}" Command="{Binding OpenOperationLogFileCommand}"/>
-                    </MenuItem>
+                <!-- 操作ログファイル -->
+                <MenuItem Header="{x:Static properties:Resources.Menu_File_OperationLog}" Command="{Binding OperationLogFileCommand}" ItemsSource="{Binding OperationLogFileMenuList}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Header" Value="{Binding Header}" />
+                            <Setter Property="Command" Value="{Binding Command}" />
+                            <Setter Property="ItemsSource" Value="{Binding Children}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
                 </MenuItem>
                 <Separator/>
                 <!-- 終了 -->

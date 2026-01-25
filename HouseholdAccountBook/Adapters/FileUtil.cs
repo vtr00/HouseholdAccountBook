@@ -47,5 +47,23 @@ namespace HouseholdAccountBook.Adapters
                 }
             }
         }
+
+        /// <summary>
+        /// 指定フォルダ内のファイル一覧を取得する
+        /// </summary>
+        /// <param name="directoryPath">探索するフォルダ</param>
+        /// <param name="searchPattern">ファイル名のパターン</param>
+        /// <param name="searchOption"></param>
+        /// <returns>ファイルパス一覧</returns>
+        public static List<string> GetFiles(string directoryPath, string searchPattern, SearchOption searchOption)
+        {
+            using FuncLog funcLog = new(new { directoryPath, searchPattern, searchOption });
+
+            List<string> filePathList = [];
+            if (Directory.Exists(directoryPath)) {
+                filePathList = [.. Directory.GetFiles(directoryPath, searchPattern, searchOption)];
+            }
+            return filePathList;
+        }
     }
 }

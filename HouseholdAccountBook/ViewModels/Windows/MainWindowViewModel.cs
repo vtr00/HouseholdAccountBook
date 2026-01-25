@@ -173,6 +173,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #region Bindingプロパティ
         #region プロパティ(共通)
         /// <summary>
+        /// 操作ログファイルメニューリスト
+        /// </summary>
+        public ObservableCollection<MenuItemViewModel> OperationLogFileMenuList { get; set; } = [];
+
+        /// <summary>
         /// 選択されたDB種別
         /// </summary>
         #region SelectedDBKind
@@ -597,17 +602,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand BackUpCommand => new RelayCommand(this.BackUpCommand_Executed, this.BackUpCommand_CanExecute);
         /// <summary>
-        /// ログファイルコマンド
-        /// </summary>
-        public ICommand LogFileCommand => new RelayCommand(null);
-        /// <summary>
         /// 操作ログファイルコマンド
         /// </summary>
         public ICommand OperationLogFileCommand => new RelayCommand(null, this.OperationLogFileCommand_CanExecute);
-        /// <summary>
-        /// 操作ログファイルオープンコマンド
-        /// </summary>
-        public ICommand OpenOperationLogFileCommand => new RelayCommand(this.OpenOperationLogFileCommand_Executed);
         /// <summary>
         /// ウィンドウ終了コマンド
         /// </summary>
@@ -1257,24 +1254,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 操作ログファイルコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool OperationLogFileCommand_CanExecute()
-        {
-            Properties.Settings settings = Properties.Settings.Default;
-            return settings.App_OutputFlag_OperationLog;
-        }
-        /// <summary>
-        /// 操作ログファイルオープンコマンド処理
-        /// </summary>
-        public void OpenOperationLogFileCommand_Executed()
-        {
-            try {
-                _ = Process.Start(new ProcessStartInfo {
-                    FileName = Log.LogFilePath,
-                    UseShellExecute = true
-                });
-            }
-            catch (Exception) { }
-        }
+        public bool OperationLogFileCommand_CanExecute() => 0 < this.OperationLogFileMenuList.Count;
 
         /// <summary>
         /// ウィンドウ終了コマンド実行可能か
@@ -1772,6 +1752,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { isUpdateBookList, isScroll, isUpdateActDateLastEdited });
 
+            this.UpdateOperationLogFileMenuList();
             if (isUpdateBookList) { await this.UpdateBookListAsync(); }
 
             switch (this.SelectedTab) {
@@ -1793,6 +1774,33 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 case Tabs.YearlyGraphTab:
                     await this.YearlyGraphTabVM.LoadAsync();
                     break;
+            }
+        }
+
+        /// <summary>
+        /// 操作ログファイルメニューリストを更新する
+        /// </summary>
+        public void UpdateOperationLogFileMenuList()
+        {
+            this.OperationLogFileMenuList.Clear();
+            List<string> logFileList = Log.GetLogFiles();
+            logFileList.Reverse();
+            int count = 0;
+            foreach (string logFile in logFileList) {
+                count++;
+                this.OperationLogFileMenuList.Add(new MenuItemViewModel {
+                    Header = $"{count}: {Path.GetFileName(logFile).Replace("_", "__")}",
+                    Command = new RelayCommand(() => {
+                        try {
+                            _ = Process.Start(new ProcessStartInfo {
+                                FileName = logFile,
+                                UseShellExecute = true
+                            });
+                        }
+                        catch (Exception) { }
+                    })
+                });
+                if (10 <= count) { break; }
             }
         }
 
