@@ -1045,14 +1045,8 @@ list</value>
   <data name="GroupHeader_WindowLog" xml:space="preserve">
     <value>Window log</value>
   </data>
-  <data name="Menu_File_LogFile" xml:space="preserve">
-    <value>Log file(_L)</value>
-  </data>
-  <data name="Menu_File_LogFile_OperationLog" xml:space="preserve">
+  <data name="Menu_File_OperationLog" xml:space="preserve">
     <value>Operation log file(_O)</value>
-  </data>
-  <data name="Menu_File_LogFile_OperationLog_Open" xml:space="preserve">
-    <value>Open(_O)</value>
   </data>
   <data name="Menu_View_DebugMode" xml:space="preserve">
     <value>Debug mode (_D)</value>

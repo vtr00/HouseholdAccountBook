@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Utilites;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -115,6 +116,12 @@ namespace HouseholdAccountBook.Adapters.Logger
             System.Diagnostics.Trace.Listeners.Remove(mLogFileListenerName);
             this.mOnDeleteLogFileListener = false;
         }
+
+        /// <summary>
+        /// ログファイル一覧を取得する
+        /// </summary>
+        /// <returns>ログファイル一覧</returns>
+        public static List<string> GetLogFiles() => FileUtil.GetFiles(FileConstants.LogFolderPath, FileConstants.LogFileNamePattern, SearchOption.TopDirectoryOnly);
 
         /// <summary>
         /// 古いログファイルを削除する
