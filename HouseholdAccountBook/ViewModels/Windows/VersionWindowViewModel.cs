@@ -46,6 +46,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         #region ウィンドウ設定プロパティ
+        protected override (double, double) WindowSizeSettingRaw {
+            get {
+                Properties.Settings settings = Properties.Settings.Default;
+                return (settings.VersionWindow_Width, settings.VersionWindow_Height);
+            }
+            set {
+                Properties.Settings settings = Properties.Settings.Default;
+                settings.VersionWindow_Width = value.Item1;
+                settings.VersionWindow_Height = value.Item2;
+                settings.Save();
+            }
+        }
+
         public override Point WindowPointSetting {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
