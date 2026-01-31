@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Args.RequestEventArgs;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
@@ -121,23 +122,19 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         #region コマンド
         /// <summary>
-        /// pg_dump.exe選択コマンド
+        /// ファイル選択コマンド
         /// </summary>
-        public ICommand SelectDumpExePathCommand => new RelayCommand(this.SelectDumpExePathCommand_Executed);
+        public override ICommand SelectFilePathCommand => new RelayCommand<FilePathKind>(this.SelectFilePathCommand_Executed);
         /// <summary>
-        /// pg_restore.exe選択コマンド
-        /// </summary>
-        public ICommand SelectRestoreExePathCommand => new RelayCommand(this.SelectRestoreExePathCommand_Executed);
-        /// <summary>
-        /// データベース設定コマンド
+        /// データベース再設定コマンド
         /// </summary>
         public ICommand RestartForDbSettingCommand => new RelayCommand(this.RestartForDbSettingCommand_Executed);
         /// <summary>
-        /// バックアップフォルダ選択コマンド
+        /// フォルダ選択コマンド
         /// </summary>
-        public ICommand SelectBackUpFolderPathCommand => new RelayCommand(this.SelectBackUpFolderPathCommand_Executed);
+        public override ICommand SelectFolderPathCommand => new RelayCommand<FolderPathKind>(this.SelectFolderPathCommand_Executed);
         /// <summary>
-        /// その他設定保存コマンド
+        /// DB設定保存コマンド
         /// </summary>
         public ICommand SaveDbSettingsCommand => new RelayCommand(this.SaveDbSettingsCommand_Executed);
         #endregion
@@ -145,46 +142,54 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         #region コマンドイベントハンドラ
         /// <summary>
-        /// pg_dump.exe選択コマンド処理
+        /// ファイル選択コマンド処理
         /// </summary>
-        private void SelectDumpExePathCommand_Executed()
+        /// <param name="kind">ファイルパス種別</param>
+        private void SelectFilePathCommand_Executed(FilePathKind kind)
         {
-            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.PostgreSQLDBSettingVM.DumpExePath, App.GetCurrentDir());
-            if (string.IsNullOrWhiteSpace(folderPath)) {
-                folderPath = App.GetCurrentDir();
+            bool checkFileExists = true;
+            string directory = string.Empty;
+            string fileName = string.Empty;
+            string filter = string.Empty;
+            switch (kind) {
+                case FilePathKind.DumpExeFile: {
+                    (directory, fileName) = PathExtensions.GetSeparatedPath(this.PostgreSQLDBSettingVM.DumpExePath, App.GetCurrentDir());
+                    if (string.IsNullOrWhiteSpace(directory)) {
+                        directory = App.GetCurrentDir();
+                    }
+                    filter = "pg_dump.exe|pg_dump.exe";
+                    break;
+                }
+                case FilePathKind.RestoreExeFile: {
+                    (directory, fileName) = PathExtensions.GetSeparatedPath(this.PostgreSQLDBSettingVM.RestoreExePath, App.GetCurrentDir());
+                    if (string.IsNullOrWhiteSpace(directory)) {
+                        directory = App.GetCurrentDir();
+                    }
+                    filter = "pg_restore.exe|pg_restore.exe";
+                    break;
+                }
+                default:
+                    break;
             }
 
             OpenFileDialogRequestEventArgs e = new() {
-                CheckFileExists = true,
-                InitialDirectory = folderPath,
+                CheckFileExists = checkFileExists,
+                InitialDirectory = directory,
                 FileName = fileName,
                 Title = Properties.Resources.Title_FileSelection,
-                Filter = "pg_dump.exe|pg_dump.exe"
+                Filter = filter,
             };
             if (this.OpenFileDialogRequest(e)) {
-                this.PostgreSQLDBSettingVM.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
-            }
-        }
-
-        /// <summary>
-        /// pg_restore.exe選択コマンド処理
-        /// </summary>
-        private void SelectRestoreExePathCommand_Executed()
-        {
-            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.PostgreSQLDBSettingVM.RestoreExePath, App.GetCurrentDir());
-            if (string.IsNullOrWhiteSpace(folderPath)) {
-                folderPath = App.GetCurrentDir();
-            }
-
-            OpenFileDialogRequestEventArgs e = new() {
-                CheckFileExists = true,
-                InitialDirectory = folderPath,
-                FileName = fileName,
-                Title = Properties.Resources.Title_FileSelection,
-                Filter = "pg_restore.exe|pg_restore.exe"
-            };
-            if (this.OpenFileDialogRequest(e)) {
-                this.PostgreSQLDBSettingVM.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                switch (kind) {
+                    case FilePathKind.DumpExeFile:
+                        this.PostgreSQLDBSettingVM.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                        break;
+                    case FilePathKind.RestoreExeFile:
+                        this.PostgreSQLDBSettingVM.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -203,25 +208,39 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// バックアップフォルダ選択コマンド処理
+        /// フォルダ選択コマンド処理
         /// </summary>
-        private void SelectBackUpFolderPathCommand_Executed()
+        private void SelectFolderPathCommand_Executed(FolderPathKind kind)
         {
-            string folderFullPath;
-            if (string.IsNullOrWhiteSpace(this.BackUpFolderPath)) {
-                folderFullPath = App.GetCurrentDir();
-            }
-            else {
-                (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.BackUpFolderPath, App.GetCurrentDir());
-                folderFullPath = Path.Combine(folderPath, fileName);
+            string folderFullPath = string.Empty;
+            string title = string.Empty;
+            switch (kind) {
+                case FolderPathKind.BackUpFolder:
+                    if (string.IsNullOrWhiteSpace(this.BackUpFolderPath)) {
+                        folderFullPath = App.GetCurrentDir();
+                    }
+                    else {
+                        (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.BackUpFolderPath, App.GetCurrentDir());
+                        folderFullPath = Path.Combine(folderPath, fileName);
+                    }
+                    title = Properties.Resources.Title_BackupFolderSelection;
+                    break;
+                default:
+                    break;
             }
 
             OpenFolderDialogRequestEventArgs e = new() {
                 InitialDirectory = folderFullPath,
-                Title = Properties.Resources.Title_BackupFolderSelection
+                Title = title
             };
             if (this.OpenFolderDialogRequest(e)) {
-                this.BackUpFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FolderName);
+                switch (kind) {
+                    case FolderPathKind.BackUpFolder:
+                        this.BackUpFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FolderName);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
