@@ -200,7 +200,7 @@ namespace HouseholdAccountBook
 
             ResourceDictionary rd = Current.Resources;
             if (rd.Contains("Settings")) {
-                rd["Settings"] = HouseholdAccountBook.Properties.Settings.Default;
+                rd["Settings"] = MySettings.Default;
             }
             if (rd.Contains("AppCulture")) {
                 rd["AppCulture"] = MyResources.Culture;
@@ -216,7 +216,7 @@ namespace HouseholdAccountBook
         {
             using FuncLog funcLog = new();
 
-            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
+            MySettings settings = MySettings.Default;
 
             DbHandlerFactory dbHandlerFactory = null;
             bool isOpen = false;
@@ -297,7 +297,7 @@ namespace HouseholdAccountBook
 #if DEBUG
                         DatabaseName = settings.App_Postgres_DatabaseName_Debug,
 #else
-                            DatabaseName = settings.App_Postgres_DatabaseName,
+                        DatabaseName = settings.App_Postgres_DatabaseName,
 #endif
                         Role = settings.App_Postgres_Role
                     };
