@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Adapters.DbHandler.Abstract;
 using HouseholdAccountBook.Adapters.Dto.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,8 +12,10 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
     /// 備考テーブルDAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class HstRemarkDao(DbHandlerBase dbHandler) : ReadWriteTableDaoBase<HstRemarkDto>(dbHandler)
+    public class HstRemarkDao(DbHandlerBase dbHandler) : CommonTableDaoBase<HstRemarkDto>(dbHandler)
     {
+        public override Task<int> CreateTableAsync() => throw new NotImplementedException();
+
         public override async Task<IEnumerable<HstRemarkDto>> FindAllAsync()
         {
             var dtoList = await this.mDbHandler.QueryAsync<HstRemarkDto>(@"
@@ -28,7 +31,7 @@ WHERE del_flg = 0;");
         /// </summary>
         /// <param name="remark">備考</param>
         /// <param name="itemId">項目ID</param>
-        /// <param name="includeDeleted"><see cref="TableDtoBase.DelFlg">=1も含めるか</param>
+        /// <param name="includeDeleted"><see cref="CommonTableDtoBase.DelFlg">=1も含めるか</param>
         /// <returns>取得したレコード</returns>
         public async Task<HstRemarkDto> FindByRemarkAndItemIdAsync(string remark, int itemId, bool includeDeleted = false)
         {

@@ -5,7 +5,7 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
     /// <summary>
     /// 項目-帳簿関連情報DTO
     /// </summary>
-    public class BookRelFromItemInfoDto : DtoBase
+    public class BookRelFromItemInfoDto : VirTableDtoBase
     {
         /// <summary>
         /// コンストラクタ

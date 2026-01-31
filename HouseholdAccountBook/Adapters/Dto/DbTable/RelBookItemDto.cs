@@ -6,7 +6,7 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
     /// <summary>
     /// 帳簿-項目関連DTO
     /// </summary>
-    public class RelBookItemDto : TableDtoBase
+    public class RelBookItemDto : CommonTableDtoBase
     {
         /// <summary>
         /// コンストラクタ

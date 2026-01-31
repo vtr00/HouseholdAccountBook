@@ -11,7 +11,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
     /// 備考情報DAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class RemarkInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
+    public class RemarkInfoDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
     {
         /// <summary>
         /// <see cref="HstRemarkDto.ItemId"/> に基づいて、<see cref="RemarkInfoDto"/> リストを取得する

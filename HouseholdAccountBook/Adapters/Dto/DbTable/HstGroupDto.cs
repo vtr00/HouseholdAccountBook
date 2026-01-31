@@ -5,7 +5,7 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
     /// <summary>
     /// グループDTO
     /// </summary>
-    public class HstGroupDto : TableDtoBase, ISequentialIDDto
+    public class HstGroupDto : CommonTableDtoBase, ISequentialIDDto
     {
         /// <summary>
         /// コンストラクタ

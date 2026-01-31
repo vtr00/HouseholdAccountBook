@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Adapters.DbHandler;
+﻿using HouseholdAccountBook.Adapters.Dao.DbTable;
+using HouseholdAccountBook.Adapters.DbHandler;
 using HouseholdAccountBook.Adapters.DbHandler.Abstract;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.DbHandler;
@@ -167,29 +168,11 @@ namespace HouseholdAccountBook.Adapters
             using FuncLog funcLog = new();
 
             if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
-                // バージョン管理テーブル作成
-                await npgsqlDbHandler.ExecTransactionAsync(async () => {
-                    // テーブルがなければ、バージョン管理テーブルを作成する
-                    _ = await npgsqlDbHandler.ExecuteAsync($@"
-CREATE TABLE IF NOT EXISTS mtd_schema_version (
-    version INTEGER NOT NULL,
-    update_time timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT mtd_schema_version_check CHECK (version >= 0)
-) TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS mtd_schema_version
-    OWNER to ""{npgsqlDbHandler.GetDbCreationRoll()}"";
-");
-
-                    // レコードがなければ、初期レコードを挿入する
-                    _ = await npgsqlDbHandler.ExecuteAsync(@"
-INSERT INTO mtd_schema_version (version)
-SELECT 0
-WHERE NOT EXISTS (SELECT 1 FROM mtd_schema_version);");
-                });
+                MtdSchemaVersionDao dao = new(dbHandler);
+                await dbHandler.ExecTransactionAsync(dao.CreateTableAsync);
 
                 int requiredSchemaVersion = 0; // アプリが想定しているバージョン
-                int currentSchemaVersion = await npgsqlDbHandler.QuerySingleAsync<int>("SELECT version FROM mtd_schema_version;");
+                int currentSchemaVersion = await dao.GetSchemaVersionAsync();
                 while (currentSchemaVersion < requiredSchemaVersion) {
                     switch (currentSchemaVersion) {
                         case 0:
@@ -199,6 +182,7 @@ WHERE NOT EXISTS (SELECT 1 FROM mtd_schema_version);");
                             break;
                     }
                     currentSchemaVersion++;
+                    _ = await dao.UpdateSchemaVersionAsync(currentSchemaVersion);
                 }
 
                 return true;
@@ -222,6 +206,7 @@ WHERE NOT EXISTS (SELECT 1 FROM mtd_schema_version);");
                             break;
                     }
                     currentSchemaVersion++;
+                    _ = await sqliteDbHandler.SetUserVersion(currentSchemaVersion);
                 }
 
                 return true;

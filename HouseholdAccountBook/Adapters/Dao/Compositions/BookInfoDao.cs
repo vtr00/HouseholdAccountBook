@@ -10,7 +10,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
     /// 帳簿情報DAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class BookInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
+    public class BookInfoDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
     {
         /// <summary>
         /// <see cref="MstBookDto.BookId"/>に基づいて、<see cref="BookInfoDto"> を取得する

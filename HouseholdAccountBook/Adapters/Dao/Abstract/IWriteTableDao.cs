@@ -29,5 +29,19 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
         /// <param name="dtoList">追加するレコードのリスト</param>
         /// <returns>追加件数</returns>
         public Task<int> BulkInsertAsync(IEnumerable<DTO> dtoList);
+
+        /// <summary>
+        /// レコードを更新する
+        /// </summary>
+        /// <param name="dto">対象のレコード</param>
+        /// <returns>更新件数</returns>
+        public Task<int> UpdateAsync(DTO dto);
+
+        /// <summary>
+        /// レコードを挿入または更新する
+        /// </summary>
+        /// <param name="dto">対象のレコード</param>
+        /// <returns>挿入/更新件数</returns>
+        public Task<int> UpsertAsync(DTO dto);
     }
 }

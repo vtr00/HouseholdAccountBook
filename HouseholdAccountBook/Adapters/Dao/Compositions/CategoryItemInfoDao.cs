@@ -11,7 +11,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
     /// 分類-項目情報DAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class CategoryItemInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
+    public class CategoryItemInfoDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
     {
         /// <summary>
         /// <see cref="MstBookDto.BookId"/> と <see cref="MstCategoryDto.BalanceKind"/> に基づいて、<see cref="CategoryItemInfoDto"/> リストを取得する

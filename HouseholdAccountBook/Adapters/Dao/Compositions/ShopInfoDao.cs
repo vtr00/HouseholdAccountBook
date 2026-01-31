@@ -11,7 +11,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
     /// 店舗情報DAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class ShopInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
+    public class ShopInfoDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
     {
         /// <summary>
         /// <see cref="HstShopDto.ItemId"> に基づいて、<see cref="ShopInfoDto"/> リストを取得する

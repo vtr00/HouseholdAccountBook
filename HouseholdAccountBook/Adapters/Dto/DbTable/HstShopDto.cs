@@ -6,7 +6,7 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
     /// <summary>
     /// 店舗名DTO
     /// </summary>
-    public class HstShopDto : TableDtoBase
+    public class HstShopDto : CommonTableDtoBase
     {
         /// <summary>
         /// コンストラクタ

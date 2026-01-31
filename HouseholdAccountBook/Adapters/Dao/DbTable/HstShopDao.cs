@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Adapters.DbHandler.Abstract;
 using HouseholdAccountBook.Adapters.Dto.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,8 +12,10 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
     /// 店舗名テーブルDAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class HstShopDao(DbHandlerBase dbHandler) : ReadWriteTableDaoBase<HstShopDto>(dbHandler)
+    public class HstShopDao(DbHandlerBase dbHandler) : CommonTableDaoBase<HstShopDto>(dbHandler)
     {
+        public override Task<int> CreateTableAsync() => throw new NotImplementedException();
+
         /// <summary>
         /// 全レコードを取得する
         /// </summary>
@@ -32,7 +35,7 @@ WHERE del_flg = 0;");
         /// </summary>
         /// <param name="shopName">店舗名</param>
         /// <param name="itemId">項目ID</param>
-        /// <param name="includeDeleted"><see cref="TableDtoBase.DelFlg">=1も含めるか</param>
+        /// <param name="includeDeleted"><see cref="CommonTableDtoBase.DelFlg">=1も含めるか</param>
         /// <returns>取得したレコード</returns>
         public async Task<HstShopDto> FindByItemIdAndShopNameAsync(string shopName, int itemId, bool includeDeleted = false)
         {

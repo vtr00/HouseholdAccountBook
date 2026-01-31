@@ -11,7 +11,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
     /// 繰越残高情報を取得するDAOクラス
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class EndingBalanceInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
+    public class EndingBalanceInfoDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
     {
         /// <summary>
         /// 全帳簿の開始日付までの <see cref="EndingBalanceInfoDto"/> を取得する

@@ -11,7 +11,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
     /// 項目-帳簿関連情報DAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class BookRelFromItemInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
+    public class BookRelFromItemInfoDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
     {
         /// <summary>
         /// <see cref="MstItemDto.ItemId"/> に基づいて、<see cref="BookRelFromItemInfoDto"/> リストを取得する

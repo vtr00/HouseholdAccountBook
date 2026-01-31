@@ -3,20 +3,20 @@
 namespace HouseholdAccountBook.Adapters.Dto.Abstract
 {
     /// <summary>
-    /// テーブルDTOのベースクラス
+    /// 汎用テーブルDTOのベースクラス
     /// </summary>
-    public class TableDtoBase : DtoBase
+    public class CommonTableDtoBase : PhyTableDtoBase
     {
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public TableDtoBase() : base() { }
+        public CommonTableDtoBase() : base() { }
 
         /// <summary>
         /// コンストラクタ(KHDtoBaseからの変換)
         /// </summary>
         /// <param name="dto">記帳風月のレコード</param>
-        public TableDtoBase(KHDtoBase dto) : base() => this.DelFlg = dto.DEL_FLG ? 1 : 0;
+        public CommonTableDtoBase(KHDtoBase dto) : base() => this.DelFlg = dto.DEL_FLG ? 1 : 0;
 
         /// <summary>
         /// JSONコード

@@ -6,7 +6,7 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
     /// <summary>
     /// 備考情報DTO
     /// </summary>
-    public class RemarkInfoDto : DtoBase
+    public class RemarkInfoDto : VirTableDtoBase
     {
         /// <summary>
         /// コンストラクタ

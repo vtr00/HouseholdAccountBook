@@ -10,7 +10,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
     /// グループ情報DAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class GroupInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
+    public class GroupInfoDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
     {
         /// <summary>
         /// <see cref="HstActionDto.ActionId"/>に基づいて、<see cref="GroupInfoDto"/> を取得する

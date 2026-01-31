@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
     /// 帳簿項目情報DAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class ActionInfoDao(DbHandlerBase dbHandler) : ReadDaoBase(dbHandler)
+    public class ActionInfoDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
     {
         /// <summary>
         /// 全帳簿の <see cref="ActionInfoDto"/> リストを取得する

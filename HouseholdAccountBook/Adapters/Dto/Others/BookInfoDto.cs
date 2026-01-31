@@ -8,7 +8,7 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
     /// 帳簿情報DTO
     /// </summary>
     /// <remarks><see cref="MstBookDto"/></remarks>
-    public class BookInfoDto : DtoBase
+    public class BookInfoDto : VirTableDtoBase
     {
         /// <summary>
         /// コンストラクタ
