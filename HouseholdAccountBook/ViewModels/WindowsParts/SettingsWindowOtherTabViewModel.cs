@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
+using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -434,13 +435,19 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             settings.App_WindowLogNum = this.WindowLogNum;
             settings.App_UnhandledExceptionLogNum = this.UnhandledExceptionLogNum;
 
-            Log.OutputLogLevel = this.SelectedLogLevel;
             settings.Save();
 
+            LogImpl.Instance.OutputLogToFile = settings.App_OutputFlag_OperationLog;
+            LogImpl.Instance.LogFileAmount = settings.App_OperationLogNum;
+            LogImpl.Instance.OutputLogLevel = (Log.LogLevel)settings.App_OperationLogLevel;
+            ExceptionLog.LogFileAmount = settings.App_UnhandledExceptionLogNum;
+            WindowLog.OutputLog = settings.App_OutputFlag_WindowLog;
+            WindowLog.LogFileAmount = settings.App_WindowLogNum;
+
             // 新しい設定に合わせて古いログファイルを削除する
-            Log.DeleteOldLogFiles();
+            LogImpl.DeleteOldLogFiles();
             ExceptionLog.DeleteOldExceptionLogs();
-            WindowLog.DeleteAllOldWindowLogs();
+            WindowLog.DeleteAllOldWindowLogs([.. UiConstants.WindowNameStr.Values]);
         }
     }
 }

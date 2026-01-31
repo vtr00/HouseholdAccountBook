@@ -1,4 +1,3 @@
-﻿using HouseholdAccountBook.Adapters;
 using HouseholdAccountBook.Adapters.DbHandlers;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;

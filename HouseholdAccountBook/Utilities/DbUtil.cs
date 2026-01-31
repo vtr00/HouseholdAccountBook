@@ -1,17 +1,53 @@
-﻿using HouseholdAccountBook.Adapters.Dao.DbTable;
+using HouseholdAccountBook.Adapters;
+using HouseholdAccountBook.Adapters.Dao.DbTable;
 using HouseholdAccountBook.Adapters.DbHandlers;
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Utilities;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using static HouseholdAccountBook.Adapters.FileConstants;
 
-namespace HouseholdAccountBook.Adapters
+namespace HouseholdAccountBook.Utilities
 {
     public static class DbUtil
     {
+        #region プロパティ
+        /// <summary>
+        /// PostgreSQL バックアップファイル ポストフィックス
+        /// </summary>
+        private static string PostgreSQLBackupFileExt => "backup";
+        /// <summary>
+        /// PostgreSQL バックアップファイル名
+        /// </summary>
+        public static string PostgreSQLBackupFileName {
+            get {
+                DateTime dt = DateTime.Now;
+                return string.Format($"{dt:yyyyMMdd_HHmmss}.{PostgreSQLBackupFileExt}");
+            }
+        }
+        /// <summary>
+        /// PostgreSQL バックアップファイル名パターン
+        /// </summary>
+        public static string PostgreSQLBackupFileNamePattern => $"*_*.{PostgreSQLBackupFileExt}";
+        /// <summary>
+        /// SQLite バックアップファイル ポストフィックス
+        /// </summary>
+        private static string SQLiteBackupFileExt => "sqlite3";
+        /// <summary>
+        /// SQLite バックアップファイル名
+        /// </summary>
+        public static string SQLiteBackupFileName {
+            get {
+                DateTime dt = DateTime.Now;
+                return string.Format($"{dt:yyyyMMdd_HHmmss}.{SQLiteBackupFileExt}");
+            }
+        }
+        /// <summary>
+        /// SQLite バックアップファイル名パターン
+        /// </summary>
+        public static string SQLiteBackupFileNamePattern => $"*_*.{SQLiteBackupFileExt}";
+        #endregion
+
         #region ダンプ/リストア
         /// <summary>
         /// バックアップファイルを作成する
@@ -140,6 +176,7 @@ namespace HouseholdAccountBook.Adapters
         }
         #endregion
 
+        #region マイグレーション
         /// <summary>
         /// アップマイグレーションを実行する
         /// </summary>
@@ -161,6 +198,11 @@ namespace HouseholdAccountBook.Adapters
             return result;
         }
 
+        /// <summary>
+        /// PostgreSQLのアップマイグレーションを実行する
+        /// </summary>
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
+        /// <returns>成功/失敗</returns>
         private static async Task<bool> UpMigratePostgreSQLAsync(DbHandlerBase dbHandler)
         {
             using FuncLog funcLog = new();
@@ -188,6 +230,11 @@ namespace HouseholdAccountBook.Adapters
             return false;
         }
 
+        /// <summary>
+        /// SQLiteのアップマイグレーションを実行する
+        /// </summary>
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
+        /// <returns>成功/失敗</returns>
         private static async Task<bool> UpMigrateSQLiteAsync(DbHandlerBase dbHandler)
         {
             using FuncLog funcLog = new();
@@ -211,5 +258,6 @@ namespace HouseholdAccountBook.Adapters
             }
             return false;
         }
+        #endregion
     }
 }

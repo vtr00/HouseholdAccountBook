@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.Adapters;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -16,6 +15,11 @@ namespace HouseholdAccountBook.Properties
     //  SettingsSaving イベントは、設定値が保存される前に発生します。
     public sealed partial class Settings
     {
+        /// <summary>
+        /// 設定ファイルのファイルパス
+        /// </summary>
+        public static string SettingsJsonFilePath => @".\Settings.json";
+
         public Settings()
         {
             this.SettingsLoaded += this.Settings_SettingsLoaded;
@@ -30,8 +34,8 @@ namespace HouseholdAccountBook.Properties
         private void Settings_SettingsLoaded(object sender, SettingsLoadedEventArgs e)
         {
             // JSON ファイルが存在する場合、JSON ファイルから設定を読み込む
-            if (File.Exists(FileConstants.SettingsJsonFilePath)) {
-                string jsonCode = File.ReadAllText(FileConstants.SettingsJsonFilePath);
+            if (File.Exists(SettingsJsonFilePath)) {
+                string jsonCode = File.ReadAllText(SettingsJsonFilePath);
                 JObject jObj = JObject.Parse(jsonCode);
 
                 foreach (SettingsProperty prop in this.Properties) {
@@ -75,7 +79,7 @@ namespace HouseholdAccountBook.Properties
 
             // 辞書を JSON ファイルに保存する
             string jsonCode = JsonConvert.SerializeObject(dict, Formatting.Indented, new JsonSerializerSettings { DateFormatString = "yyyy-MM-dd HH:mm:ss" });
-            File.WriteAllText(FileConstants.SettingsJsonFilePath, jsonCode);
+            File.WriteAllText(SettingsJsonFilePath, jsonCode);
 
             e.Cancel = true; // app.config への保存はキャンセルする
         }
