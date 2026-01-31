@@ -220,39 +220,41 @@ namespace HouseholdAccountBook
 
             DbHandlerFactory dbHandlerFactory = null;
             bool isOpen = false;
+            bool tryConnect = !settings.App_InitFlag; // 接続を試みるか
             string message = MyResources.Message_PleaseInputDbSetting;
 
-            while (!isOpen) {
-                // 接続設定を読み込む
-                DbHandlerBase.ConnectInfo connInfo = GetDbConnectInfo();
-                dbHandlerFactory = new(connInfo);
+            while (true) {
+                // 接続する場合
+                if (tryConnect) {
+                    // 接続設定を読み込む
+                    DbHandlerBase.ConnectInfo connInfo = GetDbConnectInfo();
+                    dbHandlerFactory = new(connInfo);
 
-                // 接続を試行する
-                try {
-                    await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
-                        isOpen = dbHandler.IsOpen;
-                    }
-                }
-                catch (TimeoutException) { }
-
-                // 初期化ではなく、DB接続に成功した場合はループを抜ける
-                if (!settings.App_InitFlag && isOpen) {
-                    Log.Info("Database connection succeeded.");
-                    break;
-                }
-
-                // SQLiteの場合
-                if (connInfo is SQLiteDbHandler.ConnectInfo sqliteInfo) {
-                    // DB接続に失敗した(SQLiteファイルにアクセスできない)時
-                    if (!isOpen) {
-                        // DBファイルが存在しない場合は新規作成を試みる
-                        if (!File.Exists(sqliteInfo.FilePath)) {
-                            if (SQLiteDbHandler.CreateTemplateFile(sqliteInfo.FilePath)) {
-                                continue; // 作成に成功した場合は再度接続を試みる
-                            }
+                    // 接続を試行する
+                    try {
+                        await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
+                            isOpen = dbHandler.IsOpen;
                         }
-                        else {
-                            Log.Warning("Failed to connect to existing SQLite database file.");
+                    }
+                    catch (TimeoutException) { }
+
+                    if (isOpen) {
+                        // DB接続に成功した場合はループを抜ける
+                        Log.Info("Database connection succeeded.");
+                        break;
+                    }
+                    else {
+                        // SQLiteの場合
+                        if (connInfo is SQLiteDbHandler.ConnectInfo sqliteInfo) {
+                            // DBファイルが存在しない場合は新規作成を試みる
+                            if (!File.Exists(sqliteInfo.FilePath)) {
+                                if (SQLiteDbHandler.CreateTemplateFile(sqliteInfo.FilePath)) {
+                                    continue; // 作成に成功した場合は再度接続を試みる
+                                }
+                            }
+                            else {
+                                Log.Warning("Failed to connect to existing SQLite database file.");
+                            }
                         }
                     }
                 }
@@ -269,6 +271,8 @@ namespace HouseholdAccountBook
                     return null;
                 }
 
+                // 接続を試みる(SQLiteの場合はこの時点でファイルが作成済となっている)
+                tryConnect = true;
                 message = MyResources.Message_FoultToConnectDb;
             }
 
