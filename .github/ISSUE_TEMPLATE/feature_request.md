@@ -2,7 +2,7 @@
 name: Feature request / 機能追加リクエスト
 about: Suggest new idea for this project / このプロジェクトに新しい考えを提案する
 title: "[Enhancement] "
-labels: enhancement
+labels: ["➕️enhancement"]
 assignees: ''
 
 ---
@@ -23,8 +23,8 @@ Describe of what you want to happen clearly and concisely.
 Describe of related bug.  
 関連する不具合を記載してください。
 
-- refs #
 - none / なし
+- refs #
 
 ## Additional context / 補足情報
 If able, add any other context or screenshots about the feature request here.  
