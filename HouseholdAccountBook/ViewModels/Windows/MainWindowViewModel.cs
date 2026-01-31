@@ -1786,7 +1786,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public void UpdateOperationLogFileMenuList()
         {
             this.OperationLogFileMenuList.Clear();
-            List<string> logFileList = Log.GetLogFiles();
+            List<string> logFileList = LogImpl.GetLogFiles();
             logFileList.Reverse();
             int count = 0;
             foreach (string logFile in logFileList) {

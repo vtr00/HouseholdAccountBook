@@ -56,7 +56,13 @@ namespace HouseholdAccountBook
         private async void App_Startup(object sender, StartupEventArgs e)
         {
             MySettings settings = MySettings.Default;
-            Log.OutputLogLevel = (Log.LogLevel)settings.App_OperationLogLevel;
+
+            LogImpl.Instance.OutputLogToFile = settings.App_OutputFlag_OperationLog;
+            LogImpl.Instance.LogFileAmount = settings.App_OperationLogNum;
+            LogImpl.Instance.OutputLogLevel = (Log.LogLevel)settings.App_OperationLogLevel;
+            ExceptionLog.LogFileAmount = settings.App_UnhandledExceptionLogNum;
+            WindowLog.OutputLog = settings.App_OutputFlag_WindowLog;
+            WindowLog.LogFileAmount = settings.App_WindowLogNum;
 
             using FuncLog funcLog = new();
 
