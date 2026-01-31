@@ -511,8 +511,29 @@
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <!-- PostgreSQL -->
+                                    <!-- SQLite -->
                                     <GroupBox Grid.Row="0" Grid.Column="0">
+                                        <GroupBox.Header>
+                                            <RadioButton Content="{x:Static properties:Resources.GroupHeader_SQLite}" 
+                                                         IsChecked="{Binding SelectedDBKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=SQLite}"
+                                                         GroupName="DBkindGroup" IsEnabled="False"/>
+                                        </GroupBox.Header>
+                                        <Grid DataContext="{Binding SQLiteSettingVM}">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="30" SharedSizeGroup="Button"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_SQLite_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Margin="1" Text="{Binding DBFilePath}" IsReadOnly="True"/>
+                                        </Grid>
+                                    </GroupBox>
+                                    <!-- PostgreSQL -->
+                                    <GroupBox Grid.Row="1" Grid.Column="0">
                                         <GroupBox.Header>
                                             <RadioButton Content="{x:Static properties:Resources.GroupHeader_PostgreSQL}" 
                                                          IsChecked="{Binding SelectedDBKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=PostgreSQL}"
@@ -534,12 +555,12 @@
                                             <TextBlock Grid.Row="0" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
                                             <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding DumpExePath}" IsReadOnly="True"/>
                                             <Button Grid.Row="0" Grid.Column="2" Margin="5" Content="..."
-                                                    Command="{Binding DataContext.SelectDumpExePathCommand, ElementName=_OtherTab}"/>
+                                                    Command="{Binding DataContext.SelectDumpExePathCommand, ElementName=_DbTab}"/>
 
                                             <TextBlock Grid.Row="1" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
                                             <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding RestoreExePath}" IsReadOnly="True"/>
                                             <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..."
-                                                    Command="{Binding DataContext.SelectRestoreExePathCommand, ElementName=_OtherTab}"/>
+                                                    Command="{Binding DataContext.SelectRestoreExePathCommand, ElementName=_DbTab}"/>
 
                                             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Password}"/>
                                             <RadioButton Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_input" Margin="5" 
@@ -548,27 +569,6 @@
                                             <RadioButton Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_pgpass" Margin="5" 
                                                          Content="{x:Static properties:Resources.RadioButton_Password_SpecifyPgpassConf}"
                                                          IsChecked="{Binding PasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=PgPassConf}"/>
-                                        </Grid>
-                                    </GroupBox>
-                                    <!-- SQLite -->
-                                    <GroupBox Grid.Row="1" Grid.Column="0">
-                                        <GroupBox.Header>
-                                            <RadioButton Content="{x:Static properties:Resources.GroupHeader_SQLite}" 
-                                                         IsChecked="{Binding SelectedDBKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=SQLite}"
-                                                         GroupName="DBkindGroup" IsEnabled="False"/>
-                                        </GroupBox.Header>
-                                        <Grid DataContext="{Binding SQLiteSettingVM}">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="30" SharedSizeGroup="Button"/>
-                                            </Grid.ColumnDefinitions>
-
-                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_SQLite_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
-                                            <TextBox Grid.Row="0" Grid.Column="1" Margin="1" Text="{Binding DBFilePath}" IsReadOnly="True"/>
                                         </Grid>
                                     </GroupBox>
                                     <!-- Microsoft Access -->
