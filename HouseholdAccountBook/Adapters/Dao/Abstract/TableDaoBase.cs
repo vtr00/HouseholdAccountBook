@@ -3,10 +3,10 @@
 namespace HouseholdAccountBook.Adapters.Dao.Abstract
 {
     /// <summary>
-    /// 読み込み専用のDTO向けのDAOのベースクラス
+    /// DB DAOのベースクラス
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public abstract class ReadDaoBase(DbHandlerBase dbHandler)
+    public abstract class TableDaoBase(DbHandlerBase dbHandler)
     {
         /// <summary>
         /// DBハンドラ

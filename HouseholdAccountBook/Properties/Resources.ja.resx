@@ -1072,4 +1072,7 @@
   <data name="TextBlock_OutoutLogLevel" xml:space="preserve">
     <value>出力レベル</value>
   </data>
+  <data name="Message_FoultToMigrateDb" xml:space="preserve">
+    <value>データベースのバージョンアップに失敗しました。</value>
+  </data>
 </root>

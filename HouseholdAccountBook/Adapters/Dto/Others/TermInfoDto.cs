@@ -6,7 +6,7 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
     /// <summary>
     /// 期間情報DTO
     /// </summary>
-    public class TermInfoDto : DtoBase
+    public class TermInfoDto : VirTableDtoBase
     {
         /// <summary>
         /// コンストラクタ

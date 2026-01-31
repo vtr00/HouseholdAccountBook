@@ -1072,4 +1072,7 @@ list</value>
   <data name="TextBlock_OutoutLogLevel" xml:space="preserve">
     <value>OutputLevel</value>
   </data>
+  <data name="Message_FoultToMigrateDb" xml:space="preserve">
+    <value>Failed to migrate database.</value>
+  </data>
 </root>

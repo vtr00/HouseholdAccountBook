@@ -16,6 +16,8 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
     /// <param name="dbHandler">DBハンドラ</param>
     public class MstBookDao(DbHandlerBase dbHandler) : PrimaryKeyDaoBase<MstBookDto, int>(dbHandler)
     {
+        public override Task<int> CreateTableAsync() => throw new NotImplementedException();
+
         public override async Task<IEnumerable<MstBookDto>> FindAllAsync()
         {
             var dtoList = await this.mDbHandler.QueryAsync<MstBookDto>(@"

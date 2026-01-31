@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Adapters.DbHandler;
+﻿using HouseholdAccountBook.Adapters;
+using HouseholdAccountBook.Adapters.DbHandler;
 using HouseholdAccountBook.Adapters.DbHandler.Abstract;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.DbHandler;
@@ -15,6 +16,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using MyResources = HouseholdAccountBook.Properties.Resources;
+using MySettings = HouseholdAccountBook.Properties.Settings;
 
 namespace HouseholdAccountBook
 {
@@ -54,7 +57,7 @@ namespace HouseholdAccountBook
         /// <param name="e"></param>
         private async void App_Startup(object sender, StartupEventArgs e)
         {
-            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
+            MySettings settings = MySettings.Default;
             Log.OutputLogLevel = (Log.LogLevel)settings.App_OperationLogLevel;
 
             using FuncLog funcLog = new();
@@ -79,7 +82,7 @@ namespace HouseholdAccountBook
             }
             CultureInfo cultureInfo = new(settings.App_CultureName);
 
-            HouseholdAccountBook.Properties.Resources.Culture = cultureInfo;
+            MyResources.Culture = cultureInfo;
             Thread.CurrentThread.CurrentCulture = cultureInfo;
             Thread.CurrentThread.CurrentUICulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
@@ -103,7 +106,7 @@ namespace HouseholdAccountBook
                     }
                 }
 
-                MessageBox.Show(HouseholdAccountBook.Properties.Resources.Message_DoNotDuplicateProcess, HouseholdAccountBook.Properties.Resources.Title_Warning);
+                MessageBox.Show(MyResources.Message_DoNotDuplicateProcess, MyResources.Title_Warning);
                 this.Shutdown();
                 return;
             }
@@ -119,6 +122,13 @@ namespace HouseholdAccountBook
             DbHandlerFactory dbHandlerFactory = await this.GetDbHandlerFactory();
             if (dbHandlerFactory == null) {
                 // DB接続設定がキャンセルされた場合はアプリケーションを終了する
+                this.Shutdown();
+                return;
+            }
+
+            bool migrateResult = await DbUtil.UpMigrateAsync(dbHandlerFactory);
+            if (!migrateResult) {
+                MessageBox.Show(MyResources.Message_FoultToMigrateDb, MyResources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Shutdown();
                 return;
             }
@@ -190,10 +200,10 @@ namespace HouseholdAccountBook
 
             ResourceDictionary rd = Current.Resources;
             if (rd.Contains("Settings")) {
-                rd["Settings"] = HouseholdAccountBook.Properties.Settings.Default;
+                rd["Settings"] = MySettings.Default;
             }
             if (rd.Contains("AppCulture")) {
-                rd["AppCulture"] = HouseholdAccountBook.Properties.Resources.Culture;
+                rd["AppCulture"] = MyResources.Culture;
             }
         }
 
@@ -206,11 +216,11 @@ namespace HouseholdAccountBook
         {
             using FuncLog funcLog = new();
 
-            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
+            MySettings settings = MySettings.Default;
 
             DbHandlerFactory dbHandlerFactory = null;
             bool isOpen = false;
-            string message = HouseholdAccountBook.Properties.Resources.Message_PleaseInputDbSetting;
+            string message = MyResources.Message_PleaseInputDbSetting;
 
             while (!isOpen) {
                 // 接続設定を読み込む
@@ -259,7 +269,7 @@ namespace HouseholdAccountBook
                     return null;
                 }
 
-                message = HouseholdAccountBook.Properties.Resources.Message_FoultToConnectDb;
+                message = MyResources.Message_FoultToConnectDb;
             }
 
             return dbHandlerFactory;
@@ -274,7 +284,7 @@ namespace HouseholdAccountBook
         {
             using FuncLog funcLog = new();
 
-            Properties.Settings settings = HouseholdAccountBook.Properties.Settings.Default;
+            MySettings settings = MySettings.Default;
 
             DbHandlerBase.ConnectInfo connInfo = null;
             switch ((DBKind)settings.App_SelectedDBKind) {
@@ -287,7 +297,7 @@ namespace HouseholdAccountBook
 #if DEBUG
                         DatabaseName = settings.App_Postgres_DatabaseName_Debug,
 #else
-                            DatabaseName = settings.App_Postgres_DatabaseName,
+                        DatabaseName = settings.App_Postgres_DatabaseName,
 #endif
                         Role = settings.App_Postgres_Role
                     };

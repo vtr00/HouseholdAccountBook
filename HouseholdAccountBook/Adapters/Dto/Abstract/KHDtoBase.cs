@@ -3,7 +3,7 @@
     /// <summary>
     /// 記帳風月のDTO向けのベースクラス
     /// </summary>
-    public abstract class KHDtoBase : DtoBase
+    public abstract class KHDtoBase : PhyTableDtoBase
     {
         /// <summary>
         /// 削除フラグ

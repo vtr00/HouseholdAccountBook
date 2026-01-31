@@ -6,7 +6,7 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
     /// <summary>
     /// 移動情報DTO
     /// </summary>
-    public class MoveActionInfoDto : DtoBase
+    public class MoveActionInfoDto : VirTableDtoBase
     {
         /// <summary>
         /// コンストラクタ

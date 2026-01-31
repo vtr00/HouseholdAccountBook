@@ -49,6 +49,12 @@ namespace HouseholdAccountBook.DbHandler
         }
 
         /// <summary>
+        /// DB作成ロールを取得する
+        /// </summary>
+        /// <returns>DB作成時のロール</returns>
+        public string GetDbCreationRoll() => this.mConnectInfo.Role;
+
+        /// <summary>
         /// ダンプを実行する
         /// </summary>
         /// <param name="backupFilePath">バックアップファイルパス</param>

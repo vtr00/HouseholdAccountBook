@@ -5,7 +5,7 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
     /// <summary>
     /// 帳簿項目比較情報DTO
     /// </summary>
-    public class ActionCompInfoDto : DtoBase
+    public class ActionCompInfoDto : VirTableDtoBase
     {
         /// <summary>
         /// コンストラクタ

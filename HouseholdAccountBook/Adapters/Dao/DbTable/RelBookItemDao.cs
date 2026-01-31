@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
 using HouseholdAccountBook.Adapters.DbHandler.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,8 +11,10 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
     /// 帳簿-項目関連テーブルDAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class RelBookItemDao(DbHandlerBase dbHandler) : ReadWriteTableDaoBase<RelBookItemDto>(dbHandler)
+    public class RelBookItemDao(DbHandlerBase dbHandler) : CommonTableDaoBase<RelBookItemDto>(dbHandler)
     {
+        public override Task<int> CreateTableAsync() => throw new NotImplementedException();
+
         public override async Task<IEnumerable<RelBookItemDto>> FindAllAsync()
         {
             var dtoList = await this.mDbHandler.QueryAsync<RelBookItemDto>(@"

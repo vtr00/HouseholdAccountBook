@@ -9,9 +9,9 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
     /// <summary>
     /// 単一の主キーを持つテーブル向けのDAOのベースクラス
     /// </summary>
-    /// <typeparam name="DTO"><see cref="TableDtoBase"/>の派生クラス かつ シーケンスを持つDTO</typeparam>
+    /// <typeparam name="DTO"><see cref="CommonTableDtoBase"/>の派生クラス かつ シーケンスを持つDTO</typeparam>
     /// <typeparam name="T">主キーの型</typeparam>
-    public abstract class PrimaryKeyDaoBase<DTO, T>(DbHandlerBase dbHandler) : ReadWriteTableDaoBase<DTO>(dbHandler), ISequentialIDDao<DTO> where DTO : TableDtoBase, ISequentialIDDto
+    public abstract class PrimaryKeyDaoBase<DTO, T>(DbHandlerBase dbHandler) : CommonTableDaoBase<DTO>(dbHandler), ISequentialIDDao<DTO> where DTO : CommonTableDtoBase, ISequentialIDDto
     {
         public async Task SetIdSequenceAsync(IEnumerable<DTO> dtoList) => await this.SetIdSequenceAsync(dtoList.Max(d => d.GetId()));
 

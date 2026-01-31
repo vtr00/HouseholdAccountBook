@@ -460,7 +460,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             ViewModelLoader loader = new(this.mDbHandlerFactory);
             string tmpShopName = selectingShopName ?? this.SelectedShopName;
-            this.ShopVMList = await loader.LoadShopListAsync(this.SelectedItemVM.Id); ;
+            this.ShopVMList = await loader.LoadShopListAsync(this.SelectedItemVM.Id);
             this.SelectedShopName = this.ShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name;
         }
 

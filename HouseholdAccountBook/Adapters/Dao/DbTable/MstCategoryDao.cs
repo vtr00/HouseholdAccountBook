@@ -16,6 +16,8 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
     /// <param name="dbHandler">DBハンドラ</param>
     public class MstCategoryDao(DbHandlerBase dbHandler) : PrimaryKeyDaoBase<MstCategoryDto, int>(dbHandler)
     {
+        public override Task<int> CreateTableAsync() => throw new NotImplementedException();
+
         public override async Task<IEnumerable<MstCategoryDto>> FindAllAsync()
         {
             var dtoList = await this.mDbHandler.QueryAsync<MstCategoryDto>(@"

@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandler.Abstract;
 using HouseholdAccountBook.Extensions;
+using System;
 
 namespace HouseholdAccountBook.DbHandler
 {
@@ -21,7 +22,14 @@ namespace HouseholdAccountBook.DbHandler
             /// <summary>
             /// ユーザー名
             /// </summary>
-            public string UserName { get; set; }
+            public string UserName {
+                get;
+                set {
+                    if (!SetValidIdentifier(ref field, value)) {
+                        throw new ArgumentException("Invalid UserName", value);
+                    }
+                }
+            }
             /// <summary>
             /// パスワード
             /// </summary>
@@ -32,16 +40,51 @@ namespace HouseholdAccountBook.DbHandler
             /// <summary>
             /// データベース名
             /// </summary>
-            public string DatabaseName { get; set; }
+            public string DatabaseName {
+                get;
+                set {
+                    if (!SetValidIdentifier(ref field, value)) {
+                        throw new ArgumentException("Invalid DatabaseName", value);
+                    }
+                }
+            }
             /// <summary>
             /// ロール名
             /// </summary>
-            public string Role { get; set; }
+            public string Role {
+                get;
+                set {
+                    if (!SetValidIdentifier(ref field, value)) {
+                        throw new ArgumentException("Invalid Role", value);
+                    }
+                }
+            }
 
             /// <summary>
             /// 暗号化済パスワード
             /// </summary>
             public string EncryptedPassword { get; set; }
+
+            /// <summary>
+            /// 適切な識別子かどうかを検証して、フィールドに設定する
+            /// </summary>
+            /// <param name="field">設定対象のフィールド</param>
+            /// <param name="s">設定値</param>
+            /// <returns>適切か</returns>
+            public static bool SetValidIdentifier(ref string field, string s)
+            {
+                if (string.IsNullOrEmpty(s)) { return false; }
+                if (s.Length > 63) { return false; }
+                if (!char.IsLetter(s[0])) { return false; }
+
+                foreach (var c in s) {
+                    if (!(char.IsLetterOrDigit(c) || c == '_')) {
+                        return false;
+                    }
+                }
+                field = s;
+                return true;
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
     /// <summary>
     /// 店舗情報DTO
     /// </summary>
-    public class ShopInfoDto : DtoBase
+    public class ShopInfoDto : VirTableDtoBase
     {
         /// <summary>
         /// コンストラクタ

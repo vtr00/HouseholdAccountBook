@@ -5,7 +5,7 @@ namespace HouseholdAccountBook.Adapters.Dto.Others
     /// <summary>
     /// 繰越残高情報DTO
     /// </summary>
-    public class EndingBalanceInfoDto : DtoBase
+    public class EndingBalanceInfoDto : VirTableDtoBase
     {
         /// <summary>
         /// コンストラクタ

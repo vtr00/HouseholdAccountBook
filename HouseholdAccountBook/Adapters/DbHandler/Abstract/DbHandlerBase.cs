@@ -225,5 +225,11 @@ namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
                 this.mDbTransaction = null;
             }
         }
+
+        /// <summary>
+        /// トランザクション中か
+        /// </summary>
+        /// <returns>トランザクション中か</returns>
+        public bool InTransaction() => this.mDbTransaction != null;
     }
 }

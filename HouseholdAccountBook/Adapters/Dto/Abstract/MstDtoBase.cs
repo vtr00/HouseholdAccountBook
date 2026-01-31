@@ -3,7 +3,7 @@
     /// <summary>
     /// マスタテーブルのDTOのベースクラス
     /// </summary>
-    public abstract class MstDtoBase : TableDtoBase, ISequentialIDDto
+    public abstract class MstDtoBase : CommonTableDtoBase, ISequentialIDDto
     {
         /// <summary>
         /// コンストラクタ

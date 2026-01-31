@@ -7,7 +7,7 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
     /// <summary>
     /// 備考DTO
     /// </summary>
-    public class HstRemarkDto : TableDtoBase
+    public class HstRemarkDto : CommonTableDtoBase
     {
         /// <summary>
         /// コンストラクタ
