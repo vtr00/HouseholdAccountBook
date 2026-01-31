@@ -4,6 +4,7 @@ using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Utilites;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using static HouseholdAccountBook.Adapters.FileConstants;
@@ -139,5 +140,93 @@ namespace HouseholdAccountBook.Adapters
             return result;
         }
         #endregion
+
+        /// <summary>
+        /// アップマイグレーションを実行する
+        /// </summary>
+        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
+        /// <returns>成功/失敗</returns>
+        public static async Task<bool> UpMigrateAsync(DbHandlerFactory dbHandlerFactory)
+        {
+            using FuncLog funcLog = new();
+
+            bool result = true;
+            await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
+                result = dbHandler.DBKind switch {
+                    DBKind.PostgreSQL => await UpMigratePostgreSQLAsync(dbHandler),
+                    DBKind.SQLite => await UpMigrateSQLiteAsync(dbHandler),
+                    _ => throw new NotSupportedException("Unsupported DB kind."),
+                };
+            }
+
+            return result;
+        }
+
+        private static async Task<bool> UpMigratePostgreSQLAsync(DbHandlerBase dbHandler)
+        {
+            using FuncLog funcLog = new();
+
+            if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
+                // バージョン管理テーブル作成
+                await npgsqlDbHandler.ExecTransactionAsync(async () => {
+                    // テーブルがなければ、バージョン管理テーブルを作成する
+                    _ = await npgsqlDbHandler.ExecuteAsync($@"
+CREATE TABLE IF NOT EXISTS mtd_schema_version (
+    version INTEGER NOT NULL,
+    update_time timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT mtd_schema_version_check CHECK (version >= 0)
+) TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS mtd_schema_version
+    OWNER to ""{npgsqlDbHandler.GetDbCreationRoll()}"";
+");
+
+                    // レコードがなければ、初期レコードを挿入する
+                    _ = await npgsqlDbHandler.ExecuteAsync(@"
+INSERT INTO mtd_schema_version (version)
+SELECT 0
+WHERE NOT EXISTS (SELECT 1 FROM mtd_schema_version);");
+                });
+
+                int requiredSchemaVersion = 0; // アプリが想定しているバージョン
+                int currentSchemaVersion = await npgsqlDbHandler.QuerySingleAsync<int>("SELECT version FROM mtd_schema_version;");
+                while (currentSchemaVersion < requiredSchemaVersion) {
+                    switch (currentSchemaVersion) {
+                        case 0:
+                            // バージョン1へアップグレード
+                            break;
+                        default:
+                            break;
+                    }
+                    currentSchemaVersion++;
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+        private static async Task<bool> UpMigrateSQLiteAsync(DbHandlerBase dbHandler)
+        {
+            using FuncLog funcLog = new();
+
+            if (dbHandler is SQLiteDbHandler sqliteDbHandler) {
+                int requiredSchemaVersion = 0; // アプリが想定しているバージョン
+                int currentSchemaVersion = await sqliteDbHandler.GetUserVersion();
+                while (currentSchemaVersion < requiredSchemaVersion) {
+                    switch (currentSchemaVersion) {
+                        case 0:
+                            // バージョン1へアップグレード
+                            break;
+                        default:
+                            break;
+                    }
+                    currentSchemaVersion++;
+                }
+
+                return true;
+            }
+            return false;
+        }
     }
 }
