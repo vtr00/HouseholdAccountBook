@@ -254,4 +254,12 @@ namespace HouseholdAccountBook.Enums
         RestoreExeFile,
         DbFile
     }
+    /// <summary>
+    /// フォルダパス種別
+    /// </summary>
+    public enum FolderPathKind
+    {
+        CsvFolder,
+        BackUpFolder
+    }
 }

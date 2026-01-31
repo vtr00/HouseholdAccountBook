@@ -6,6 +6,7 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:vmw="clr-namespace:HouseholdAccountBook.ViewModels.Windows"
+        xmlns:enums="clr-namespace:HouseholdAccountBook.Enums"
         xmlns:controls="clr-namespace:HouseholdAccountBook.Views.UserControls"
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Views.Behaviors"
         mc:Ignorable="d"
@@ -420,7 +421,8 @@
                                         <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                  Text="{Binding CsvFolderPath, UpdateSourceTrigger=PropertyChanged}"/>
                                         <Button Grid.Row="0" Grid.Column="3" Margin="5" Content="..." 
-                                                Command="{Binding DataContext.SelectCsvFolderPathCommand, ElementName=_BookTab}"/>
+                                                Command="{Binding DataContext.SelectFolderPathCommand, ElementName=_BookTab}"
+                                                CommandParameter="{x:Static enums:FolderPathKind.CsvFolder}"/>
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
                                                    Text="{x:Static properties:Resources.TextBlock_TextEncoding}"/>
@@ -555,12 +557,14 @@
                                             <TextBlock Grid.Row="0" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
                                             <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding DumpExePath}" IsReadOnly="True"/>
                                             <Button Grid.Row="0" Grid.Column="2" Margin="5" Content="..."
-                                                    Command="{Binding DataContext.SelectDumpExePathCommand, ElementName=_DbTab}"/>
+                                                    Command="{Binding DataContext.SelectFilePathCommand, ElementName=_DbTab}"
+                                                    CommandParameter="{x:Static enums:FilePathKind.DumpExeFile}"/>
 
                                             <TextBlock Grid.Row="1" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
                                             <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding RestoreExePath}" IsReadOnly="True"/>
                                             <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..."
-                                                    Command="{Binding DataContext.SelectRestoreExePathCommand, ElementName=_DbTab}"/>
+                                                    Command="{Binding DataContext.SelectFilePathCommand, ElementName=_DbTab}"
+                                                    CommandParameter="{x:Static enums:FilePathKind.RestoreExeFile}"/>
 
                                             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Password}"/>
                                             <RadioButton Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_input" Margin="5" 
@@ -616,7 +620,9 @@
                                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
                                                Text="{x:Static properties:Resources.TextBlock_FolderPath}"/>
                                     <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsReadOnly="True" Text="{Binding BackUpFolderPath}"/>
-                                    <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="..." Command="{Binding SelectBackUpFolderPathCommand}"/>
+                                    <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="..."
+                                            Command="{Binding DataContext.SelectFolderPathCommand, ElementName=_DbTab}"
+                                            CommandParameter="{x:Static enums:FolderPathKind.BackUpFolder}"/>
 
                                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Timing}"/>
                                     <GroupBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="5">

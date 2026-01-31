@@ -4,6 +4,7 @@ using HouseholdAccountBook.Adapters.Dto.DbTable;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Args;
 using HouseholdAccountBook.Args.RequestEventArgs;
+using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.Utilities;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -99,7 +100,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// フォルダパス選択コマンド
         /// </summary>
-        public ICommand SelectCsvFolderPathCommand => new RelayCommand(this.SelectCsvFolderPathCommand_Executed);
+        public override ICommand SelectFolderPathCommand => new RelayCommand<FolderPathKind>(this.SelectFolderPathCommand_Executed);
         /// <summary>
         /// 帳簿-項目関係変更コマンド
         /// </summary>
@@ -269,27 +270,41 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// CSVフォルダパス選択コマンド処理
+        /// フォルダパス選択コマンド処理
         /// </summary>
-        private void SelectCsvFolderPathCommand_Executed()
+        private void SelectFolderPathCommand_Executed(FolderPathKind kind)
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            string folderFullPath;
-            if (string.IsNullOrWhiteSpace(this.DisplayedBookSettingVM.CsvFolderPath)) {
-                folderFullPath = Path.GetDirectoryName(settings.App_CsvFilePath);
-            }
-            else {
-                (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.DisplayedBookSettingVM.CsvFolderPath, App.GetCurrentDir());
-                folderFullPath = Path.Combine(folderPath, fileName);
+            string folderFullPath = string.Empty;
+            string title = string.Empty;
+            switch(kind) {
+                case FolderPathKind.CsvFolder:
+                    if (string.IsNullOrWhiteSpace(this.DisplayedBookSettingVM.CsvFolderPath)) {
+                        folderFullPath = Path.GetDirectoryName(settings.App_CsvFilePath);
+                    }
+                    else {
+                        (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.DisplayedBookSettingVM.CsvFolderPath, App.GetCurrentDir());
+                        folderFullPath = Path.Combine(folderPath, fileName);
+                    }
+                    title = Properties.Resources.Title_CsvFolderSelection;
+                    break;
+                default:
+                    break;
             }
 
             OpenFolderDialogRequestEventArgs e = new() {
                 InitialDirectory = folderFullPath,
-                Title = Properties.Resources.Title_CsvFolderSelection
+                Title = title
             };
             if (this.OpenFolderDialogRequest(e)) {
-                this.DisplayedBookSettingVM.CsvFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FolderName);
+                switch(kind) {
+                    case FolderPathKind.CsvFolder:
+                        this.DisplayedBookSettingVM.CsvFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FolderName);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
