@@ -8,7 +8,6 @@ using HouseholdAccountBook.ViewModels.Component;
 using System;
 using System.Collections.Generic;
 using System.Windows;
-using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Views.Windows
 {
@@ -97,14 +96,14 @@ namespace HouseholdAccountBook.Views.Windows
             this.InitializeComponent();
             this.AddCommonEventHandlersToVM();
 
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
+            this.WVM.Initialize(new WaitCursorManagerFactory(this), dbHandlerFactory);
             this.WVM.RegKind = regKind;
             this.WVM.AddedByCsvComparison = initialRecord is not null;
 
             this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create(methodName: nameof(this.Loaded))) {
+                using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create(methodName: nameof(this.Loaded))) {
                     await this.WVM.LoadAsync(initialBookId, initialMonth, initialDate, initialRecord, targetActionId);
                 }
                 this.WVM.AddEventHandlers();

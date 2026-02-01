@@ -14,12 +14,12 @@ namespace HouseholdAccountBook.ViewModels.Abstract
     /// </summary>
     public abstract class WindowPartViewModelBase : BindableBase
     {
+        #region フィールド
         /// <summary>
         /// 子ViewModelリスト
         /// </summary>
         protected readonly List<WindowPartViewModelBase> mChildrenVM = [];
 
-        #region フィールド
         /// <summary>
         /// WaitCursorマネージャファクトリ
         /// </summary>

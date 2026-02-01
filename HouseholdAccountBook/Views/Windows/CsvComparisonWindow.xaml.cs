@@ -10,7 +10,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Views.Windows
 {
@@ -66,12 +65,12 @@ namespace HouseholdAccountBook.Views.Windows
             this.AddCommonEventHandlersToVM();
             this.AddEventHandlersToVM();
 
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
+            this.WVM.Initialize(new WaitCursorManagerFactory(this), dbHandlerFactory);
 
             this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create(methodName: nameof(this.Loaded))) {
+                using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create(methodName: nameof(this.Loaded))) {
                     await this.WVM.LoadAsync(initialBookId);
                 }
                 this.WVM.AddEventHandlers();

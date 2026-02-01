@@ -77,7 +77,7 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
                 if (s.Length > 63) { return false; }
                 if (!char.IsLetter(s[0])) { return false; }
 
-                foreach (var c in s) {
+                foreach (char c in s) {
                     if (!(char.IsLetterOrDigit(c) || c == '_')) {
                         return false;
                     }

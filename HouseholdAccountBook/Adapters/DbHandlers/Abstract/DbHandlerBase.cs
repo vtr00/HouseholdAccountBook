@@ -14,6 +14,23 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
     public abstract class DbHandlerBase : IAsyncDisposable
     {
         /// <summary>
+        /// 接続情報
+        /// </summary>
+        public abstract class ConnectInfo { }
+
+        #region フィールド
+        /// <summary>
+        /// DB接続
+        /// </summary>
+        protected DbConnection mConnection;
+        /// <summary>
+        /// DBトランザクション
+        /// </summary>
+        protected DbTransaction mDbTransaction;
+        #endregion
+
+        #region プロパティ
+        /// <summary>
         /// 対象データベースライブラリ
         /// </summary>
         public DBLibraryKind DBLibKind { get; protected set; } = DBLibraryKind.Undefined;
@@ -30,21 +47,7 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// </summary>
         /// <returns>接続状態</returns>
         public bool IsOpen => this.mConnection != null && this.mConnection.State == System.Data.ConnectionState.Open;
-
-        /// <summary>
-        /// 接続情報
-        /// </summary>
-        public abstract class ConnectInfo { }
-
-        /// <summary>
-        /// DB接続
-        /// </summary>
-        protected DbConnection mConnection;
-
-        /// <summary>
-        /// DBトランザクション
-        /// </summary>
-        protected DbTransaction mDbTransaction;
+        #endregion
 
         /// <summary>
         /// <see cref="DbHandlerBase"/> クラスの新しいインスタンスを初期化します。
