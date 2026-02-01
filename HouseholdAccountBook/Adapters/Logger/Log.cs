@@ -1,5 +1,5 @@
 ﻿using HouseholdAccountBook.Properties;
-using HouseholdAccountBook.Utilites;
+using HouseholdAccountBook.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;

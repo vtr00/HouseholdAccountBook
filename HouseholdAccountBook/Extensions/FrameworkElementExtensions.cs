@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Utilites;
+﻿using HouseholdAccountBook.Utilities;
 using System.Windows;
 
 namespace HouseholdAccountBook.Extensions

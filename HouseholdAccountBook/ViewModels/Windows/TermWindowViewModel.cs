@@ -1,5 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Compositions;
-using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;

@@ -1,9 +1,9 @@
 ﻿using HouseholdAccountBook.Adapters;
-using HouseholdAccountBook.Adapters.DbHandler;
+using HouseholdAccountBook.Adapters.DbHandlers;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Utilites;
+using HouseholdAccountBook.Utilities;
 using HouseholdAccountBook.ViewModels.Component;
 using System;
 using System.ComponentModel;

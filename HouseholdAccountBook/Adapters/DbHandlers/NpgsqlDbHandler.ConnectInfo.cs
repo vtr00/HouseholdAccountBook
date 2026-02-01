@@ -1,8 +1,8 @@
-﻿using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Extensions;
 using System;
 
-namespace HouseholdAccountBook.DbHandler
+namespace HouseholdAccountBook.Adapters.DbHandlers
 {
     public partial class NpgsqlDbHandler : DbHandlerBase
     {

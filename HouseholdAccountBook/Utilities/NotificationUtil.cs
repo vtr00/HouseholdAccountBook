@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace HouseholdAccountBook.Utilites
+namespace HouseholdAccountBook.Utilities
 {
     public static class NotificationUtil
     {

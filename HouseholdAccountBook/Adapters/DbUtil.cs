@@ -1,10 +1,9 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.DbTable;
-using HouseholdAccountBook.Adapters.DbHandler;
-using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+using HouseholdAccountBook.Adapters.DbHandlers;
+using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Utilites;
+using HouseholdAccountBook.Utilities;
 using System;
 using System.IO;
 using System.Threading.Tasks;

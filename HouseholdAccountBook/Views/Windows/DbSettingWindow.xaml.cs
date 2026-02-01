@@ -1,6 +1,6 @@
 ﻿using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Utilites;
+using HouseholdAccountBook.Utilities;
 using System;
 using System.Windows;
 using System.Windows.Controls;

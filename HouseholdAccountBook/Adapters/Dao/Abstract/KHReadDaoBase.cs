@@ -1,5 +1,5 @@
-﻿using HouseholdAccountBook.Adapters.Dto.Abstract;
-using HouseholdAccountBook.DbHandler;
+﻿using HouseholdAccountBook.Adapters.DbHandlers;
+using HouseholdAccountBook.Adapters.Dto.Abstract;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
 using Npgsql;
@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace HouseholdAccountBook.DbHandler
+namespace HouseholdAccountBook.Adapters.DbHandlers
 {
     /// <summary>
     /// Npgsql DB Handler

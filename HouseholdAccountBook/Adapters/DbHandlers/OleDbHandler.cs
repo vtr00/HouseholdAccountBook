@@ -1,11 +1,11 @@
-﻿using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Enums;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using static HouseholdAccountBook.Adapters.DbConstants;
 
-namespace HouseholdAccountBook.DbHandler
+namespace HouseholdAccountBook.Adapters.DbHandlers
 {
     /// <summary>
     /// Ole Db Handler

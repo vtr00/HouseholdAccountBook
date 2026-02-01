@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 #nullable enable
 
-namespace HouseholdAccountBook.Utilites
+namespace HouseholdAccountBook.Utilities
 {
     /// <summary>
     /// シングルトンの基本クラス

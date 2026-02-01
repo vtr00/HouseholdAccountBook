@@ -1,10 +1,10 @@
-﻿using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Enums;
 using Microsoft.Data.Sqlite;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace HouseholdAccountBook.DbHandler
+namespace HouseholdAccountBook.Adapters.DbHandlers
 {
     /// <summary>
     /// SQLite DB Hander
