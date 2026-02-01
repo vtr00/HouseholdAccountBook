@@ -19,6 +19,7 @@ namespace HouseholdAccountBook.Utilities
         /// <summary>
         /// インスタンス取得
         /// </summary>
+        /// <remarks>初めて呼び出したタイミングで子クラスのコンストラクタが呼び出される</remarks>
         public static T Instance => mInstance?.Value ?? throw new InvalidOperationException("Uninitialized singleton called");
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace HouseholdAccountBook.Utilities
         static SingletonBase() => RuntimeHelpers.RunClassConstructor(typeof(T).TypeHandle);
 
         /// <summary>
-        /// ファクトリを登録
+        /// ファクトリを登録する
         /// </summary>
         /// <param name="factory">生成ロジック</param>
         protected static void Register(Func<T> factory) => mInstance = new Lazy<T>(factory);

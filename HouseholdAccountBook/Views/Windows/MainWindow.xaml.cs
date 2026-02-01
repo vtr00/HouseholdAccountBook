@@ -11,7 +11,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Views.Windows
 {
@@ -71,12 +70,12 @@ namespace HouseholdAccountBook.Views.Windows
             this.AddCommonEventHandlersToVM();
             this.AddEventHandlersToVM();
 
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
+            this.WVM.Initialize(new WaitCursorManagerFactory(this), dbHandlerFactory);
 
             this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create(methodName: nameof(this.Loaded))) {
+                using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create(methodName: nameof(this.Loaded))) {
                     await this.WVM.LoadAsync();
                 }
                 this.WVM.AddEventHandlers();
@@ -239,7 +238,7 @@ namespace HouseholdAccountBook.Views.Windows
                     this.mCCW.ActionChanged += async (sender, e) => {
                         using FuncLog funcLog = new(methodName: nameof(this.mCCW.ActionChanged));
 
-                        using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
+                        using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create()) {
                             // 帳簿一覧タブを更新する
                             await this.WVM.BookTabVM.LoadAsync(isScroll: false, isUpdateActDateLastEdited: true);
                         }

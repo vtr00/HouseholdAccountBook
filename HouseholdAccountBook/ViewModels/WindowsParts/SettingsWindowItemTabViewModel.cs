@@ -420,7 +420,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
                     await dbHandler.ExecTransactionAsync(async () => {
                         RelBookItemDao relBookItemDao = new(dbHandler);
-                        var dtoList = await relBookItemDao.UpsertAsync(new RelBookItemDto {
+                        _ = await relBookItemDao.UpsertAsync(new RelBookItemDto {
                             BookId = vm.SelectedRelationVM.Id,
                             ItemId = vm.Id,
                             DelFlg = vm.SelectedRelationVM.IsRelated ? 0 : 1

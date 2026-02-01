@@ -31,13 +31,13 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.SetPassword = password => this.passwordBox.Password = password;
             this.WVM.GetPassword = () => this.passwordBox.Password;
 
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), null);
+            this.WVM.Initialize(new WaitCursorManagerFactory(this), null);
             this.WVM.Message = message;
 
             this.Loaded += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create(methodName: nameof(this.Loaded))) {
+                using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create(methodName: nameof(this.Loaded))) {
                     this.WVM.Load();
                 }
 

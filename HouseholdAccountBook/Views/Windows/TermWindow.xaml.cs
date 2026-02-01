@@ -53,7 +53,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.InitializeComponent();
             this.AddCommonEventHandlersToVM();
 
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
+            this.WVM.Initialize(new WaitCursorManagerFactory(this), dbHandlerFactory);
 
             // ロード時処理はコンストラクタで設定しておく
             this.Loaded += (sender, e) => {

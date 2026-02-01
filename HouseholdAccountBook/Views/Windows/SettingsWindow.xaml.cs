@@ -9,7 +9,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using static HouseholdAccountBook.Extensions.FrameworkElementExtensions;
 
 namespace HouseholdAccountBook.Views.Windows
 {
@@ -42,7 +41,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.AddCommonEventHandlersToVM();
             this.WVM.NeedToUpdateChanged += (sender, e) => this.mNeedToUpdate = true;
 
-            this.WVM.Initialize(this.GetWaitCursorManagerFactory(), dbHandlerFactory);
+            this.WVM.Initialize(new WaitCursorManagerFactory(this), dbHandlerFactory);
 
             this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
@@ -50,7 +49,7 @@ namespace HouseholdAccountBook.Views.Windows
                 await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
                     this.WVM.DbTabVM.SelectedDBKind = dbHandler.DBKind;
                 }
-                using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create(methodName: nameof(this.Loaded))) {
+                using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create(methodName: nameof(this.Loaded))) {
                     await this.WVM.LoadAsync();
                 }
                 this.WVM.AddEventHandlers();
@@ -83,7 +82,7 @@ namespace HouseholdAccountBook.Views.Windows
 
             using FuncLog funcLog = new(); // ここで e.OldItems, e.NewItems をログに出すと、StackOverflow になる
 
-            using (WaitCursorManager wcm = this.GetWaitCursorManagerFactory().Create()) {
+            using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create()) {
                 switch (this.WVM.SelectedTab) {
                     case SettingsTabs.ItemSettingsTab:
                         await this.WVM.ItemTabVM.LoadAsync(HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.ItemTabVM.SelectedHierarchicalVM), this.WVM.ItemTabVM.SelectedHierarchicalVM?.Id);
