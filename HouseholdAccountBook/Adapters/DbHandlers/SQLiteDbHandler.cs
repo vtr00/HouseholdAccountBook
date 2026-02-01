@@ -53,14 +53,13 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// SQLiteテンプレートファイルをコピーして新規作成する
         /// </summary>
         /// <param name="sqliteFilePath">SQLiteファイルパス</param>
+        /// <param name="sqliteBinary">SQLiteテンプレートファイルのバイナリデータ</param>
         /// <returns>ファイルが存在するか</returns>
         /// <remarks>ファイルが既に存在する場合は何もしない</remarks>
-        public static bool CreateTemplateFile(string sqliteFilePath)
+        public static bool CreateTemplateFile(string sqliteFilePath, byte[] sqliteBinary)
         {
             bool exists = File.Exists(sqliteFilePath);
             if (!exists) {
-                // SQLiteのテンプレートファイルをコピーして新規作成する
-                byte[] sqliteBinary = Properties.Resources.SQLiteTemplateFile;
                 try {
                     File.WriteAllBytes(sqliteFilePath, sqliteBinary);
                     exists = true;

@@ -137,7 +137,10 @@ namespace HouseholdAccountBook
             settings.Save();
 
             // 休日リストを取得する
-            await DateTimeExtensions.DownloadHolidayListAsync();
+            if (!await DateTimeExtensions.DownloadHolidayListAsync(settings.App_NationalHolidayCsv_Uri, settings.App_NationalHolidayCsv_TextEncoding, settings.App_NationalHolidayCsv_DateIndex)) {
+                // 祝日取得失敗を通知する
+                NotificationUtil.NotifyFailingToGetHolidayList();
+            }
 
             // メインウィンドウを開く
             MainWindow mw = new(dbHandlerFactory);
@@ -246,7 +249,9 @@ namespace HouseholdAccountBook
                         if (connInfo is SQLiteDbHandler.ConnectInfo sqliteInfo) {
                             // DBファイルが存在しない場合は新規作成を試みる
                             if (!File.Exists(sqliteInfo.FilePath)) {
-                                if (SQLiteDbHandler.CreateTemplateFile(sqliteInfo.FilePath)) {
+                                // SQLiteのテンプレートファイルをコピーして新規作成する
+                                byte[] sqliteBinary = MyResources.SQLiteTemplateFile;
+                                if (SQLiteDbHandler.CreateTemplateFile(sqliteInfo.FilePath, sqliteBinary)) {
                                     continue; // 作成に成功した場合は再度接続を試みる
                                 }
                             }
