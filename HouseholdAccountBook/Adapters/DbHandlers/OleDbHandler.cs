@@ -1,9 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
-using HouseholdAccountBook.Enums;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using static HouseholdAccountBook.Adapters.DbConstants;
 
 namespace HouseholdAccountBook.Adapters.DbHandlers
 {
@@ -12,10 +10,19 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
     /// </summary>
     public partial class OleDbHandler : DbHandlerBase
     {
+        #region フィールド
         /// <summary>
         /// 接続文字列
         /// </summary>
         private const string mStringFormat = @"Provider={0};Data Source={1}";
+        #endregion
+
+        #region プロパティ
+        /// <summary>
+        /// Accessプロバイダヘッダ
+        /// </summary>
+        public static string AccessProviderHeader => "Microsoft.ACE.OLEDB";
+        #endregion
 
         /// <summary>
         /// <see cref="OleDbHandler"/> クラスの新しいインスタンスを初期化します。

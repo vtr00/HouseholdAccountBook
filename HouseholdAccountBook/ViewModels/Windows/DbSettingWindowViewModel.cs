@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Adapters.Logger;
+﻿using HouseholdAccountBook.Adapters;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Args.RequestEventArgs;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;

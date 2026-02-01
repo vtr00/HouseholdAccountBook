@@ -2,7 +2,6 @@
 using HouseholdAccountBook.Adapters.DbHandlers;
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Utilities;
 using System;
 using System.IO;

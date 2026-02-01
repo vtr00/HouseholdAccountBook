@@ -1,6 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Enums;
 using Npgsql;
 using System.Diagnostics;
 using System.IO;

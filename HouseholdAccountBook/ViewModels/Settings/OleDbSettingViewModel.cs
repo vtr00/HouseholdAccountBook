@@ -4,7 +4,6 @@ using HouseholdAccountBook.ViewModels.Abstract;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using static HouseholdAccountBook.Adapters.DbConstants;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {
@@ -64,7 +63,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             Properties.Settings settings = Properties.Settings.Default;
 
             this.ProviderNameDic.Clear();
-            OleDbHandler.GetOleDbProvider().FindAll(pair => pair.Key.Contains(AccessProviderHeader)).ForEach(this.ProviderNameDic.Add);
+            OleDbHandler.GetOleDbProvider().FindAll(pair => pair.Key.Contains(OleDbHandler.AccessProviderHeader)).ForEach(this.ProviderNameDic.Add);
             this.SelectedProviderName = settings.App_Import_KichoFugetsu_Provider;
         }
 
