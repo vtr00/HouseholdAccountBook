@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
-using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+using HouseholdAccountBook.Adapters.DbHandlers;
+using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
-using HouseholdAccountBook.DbHandler;
 using HouseholdAccountBook.Enums;
 using System;
 using System.Collections.Generic;

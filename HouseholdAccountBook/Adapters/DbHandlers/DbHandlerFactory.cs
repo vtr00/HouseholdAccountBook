@@ -1,10 +1,9 @@
-﻿using HouseholdAccountBook.Adapters.DbHandler.Abstract;
-using HouseholdAccountBook.DbHandler;
+﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Enums;
 using System;
 using System.Threading.Tasks;
 
-namespace HouseholdAccountBook.Adapters.DbHandler
+namespace HouseholdAccountBook.Adapters.DbHandlers
 {
     /// <summary>
     /// DBハンドラファクトリ
@@ -53,7 +52,7 @@ namespace HouseholdAccountBook.Adapters.DbHandler
         /// [非同期] <see cref="DbHandlerBase"/> 生成
         /// </summary>
         /// <param name="timeoutMs">タイムアウト時間(ms)。0以下の場合は無制限</param>
-        /// <returns>DbHandler</returns>
+        /// <returns>DbHandlers</returns>
         /// <exception cref="TimeoutException">接続タイムアウトが発生した場合</exception>
         /// <remarks>このタイミングではSQLiteファイルは生成されない</remarks>
         public async Task<DbHandlerBase> CreateAsync(int timeoutMs = 0)

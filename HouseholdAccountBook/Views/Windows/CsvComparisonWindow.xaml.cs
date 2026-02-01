@@ -1,8 +1,8 @@
-﻿using HouseholdAccountBook.Adapters.DbHandler;
+﻿using HouseholdAccountBook.Adapters.DbHandlers;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Args;
 using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Utilites;
+using HouseholdAccountBook.Utilities;
 using HouseholdAccountBook.ViewModels.Component;
 using System;
 using System.Collections.Generic;

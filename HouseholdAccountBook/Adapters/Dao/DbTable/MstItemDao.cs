@@ -1,5 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
-using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
 using HouseholdAccountBook.Enums;
 using System;

@@ -1,11 +1,11 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Compositions;
 using HouseholdAccountBook.Adapters.Dao.DbTable;
-using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Args;
 using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Utilites;
+using HouseholdAccountBook.Utilities;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Settings;

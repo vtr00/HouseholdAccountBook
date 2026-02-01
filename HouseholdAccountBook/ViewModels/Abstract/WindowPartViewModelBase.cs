@@ -1,6 +1,6 @@
-﻿using HouseholdAccountBook.Adapters.DbHandler;
+﻿using HouseholdAccountBook.Adapters.DbHandlers;
 using HouseholdAccountBook.Args.RequestEventArgs;
-using HouseholdAccountBook.Utilites;
+using HouseholdAccountBook.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

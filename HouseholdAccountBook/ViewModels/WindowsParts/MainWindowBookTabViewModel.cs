@@ -1,6 +1,6 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Compositions;
 using HouseholdAccountBook.Adapters.Dao.DbTable;
-using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Args;
 using HouseholdAccountBook.Args.RequestEventArgs;

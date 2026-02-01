@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.Abstract;
 using System.Collections.Generic;
 using System.Linq;

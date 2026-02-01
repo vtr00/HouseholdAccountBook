@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.DbHandler;
+﻿using HouseholdAccountBook.Adapters.DbHandlers;
 using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System.IO;

@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Adapters.DbHandler.Abstract;
+﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 
 namespace HouseholdAccountBook.Adapters.Dao.Abstract
 {

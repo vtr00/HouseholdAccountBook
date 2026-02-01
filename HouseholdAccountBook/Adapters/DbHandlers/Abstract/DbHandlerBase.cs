@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace HouseholdAccountBook.Adapters.DbHandler.Abstract
+namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
 {
     /// <summary>
     /// Db Handler Base クラス
