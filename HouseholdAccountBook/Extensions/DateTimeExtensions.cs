@@ -1,7 +1,5 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
-using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,11 +23,14 @@ namespace HouseholdAccountBook.Extensions
         /// <summary>
         /// 国民の祝日リストを取得する
         /// </summary>
-        public static async Task DownloadHolidayListAsync()
+        /// <param name="url">CSVファイルのURL</param>
+        /// <param name="textEncoding">CSVファイルの文字エンコード</param>
+        /// <param name="dateIndex">日付のインデックス</param>
+        /// <returns>成功/失敗</returns>
+        public static async Task<bool> DownloadHolidayListAsync(string url, int textEncoding, int dateIndex)
         {
-            Properties.Settings settings = Properties.Settings.Default;
-            if (settings.App_NationalHolidayCsv_Uri != string.Empty) {
-                Uri uri = new(settings.App_NationalHolidayCsv_Uri);
+            if (url != string.Empty) {
+                Uri uri = new(url);
 
                 CsvConfiguration csvConfig = new(System.Globalization.CultureInfo.CurrentCulture) {
                     HasHeaderRecord = true,
@@ -43,9 +44,9 @@ namespace HouseholdAccountBook.Extensions
                         if (stream.CanRead) {
                             mHolidayList.Clear();
                             // CSVファイルを読み込む
-                            using (CsvReader reader = new(new StreamReader(stream, Encoding.GetEncoding(settings.App_NationalHolidayCsv_TextEncoding)), csvConfig)) {
+                            using (CsvReader reader = new(new StreamReader(stream, Encoding.GetEncoding(textEncoding)), csvConfig)) {
                                 while (reader.Read()) {
-                                    if (reader.TryGetField(settings.App_NationalHolidayCsv_DateIndex, out string dateString)) {
+                                    if (reader.TryGetField(dateIndex, out string dateString)) {
                                         if (DateTime.TryParse(dateString, out DateTime dateTime)) {
                                             mHolidayList.Add(dateTime);
                                         }
@@ -53,20 +54,24 @@ namespace HouseholdAccountBook.Extensions
                                 }
                             }
                         }
-                        else {
-                            Log.Error("Stream can't read");
-                        }
                     }
                 }
-                catch (Exception e) {
-                    Log.Error(e.Message);
-                }
+                catch (Exception) { }
 
-                if (mHolidayList.Count == 0) {
-                    // 祝日取得失敗を通知する
-                    NotificationUtil.NotifyFailingToGetHolidayList();
-                }
+                return mHolidayList.Count != 0;
             }
+            return true;
+        }
+
+        /// <summary>
+        /// 国民の祝日かどうかを取得する
+        /// </summary>
+        /// <param name="dateTime">対象の日付</param>
+        /// <returns>国民の祝日かどうか</returns>
+        public static bool IsNationalHoliday(this DateTime dateTime)
+        {
+            bool ans = mHolidayList.Contains(dateTime);
+            return ans;
         }
 
         /// <summary>
@@ -153,17 +158,6 @@ namespace HouseholdAccountBook.Extensions
         {
             day = Math.Min(day, DateTime.DaysInMonth(dateTime.Year, dateTime.Month));
             DateTime ans = new(dateTime.Year, dateTime.Month, day);
-            return ans;
-        }
-
-        /// <summary>
-        /// 国民の祝日かどうかを取得する
-        /// </summary>
-        /// <param name="dateTime">対象の日付</param>
-        /// <returns>国民の祝日かどうか</returns>
-        public static bool IsNationalHoliday(this DateTime dateTime)
-        {
-            bool ans = mHolidayList.Contains(dateTime);
             return ans;
         }
 

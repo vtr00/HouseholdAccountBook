@@ -40,8 +40,9 @@ namespace HouseholdAccountBook.ViewModels.Settings
             if (!exists) {
                 // ファイルが存在しない場合、新規作成するか確認する
                 if (MessageBox.Show(Properties.Resources.Message_NotFoundFileDoYouCreateNew, Properties.Resources.Title_Conformation, MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
-                    // 新規作成する
-                    if (SQLiteDbHandler.CreateTemplateFile(sqliteFilePath)) {
+                    // SQLiteのテンプレートファイルをコピーして新規作成する
+                    byte[] sqliteBinary = Properties.Resources.SQLiteTemplateFile;
+                    if (SQLiteDbHandler.CreateTemplateFile(sqliteFilePath, sqliteBinary)) {
                         exists = true;
                     }
                 }

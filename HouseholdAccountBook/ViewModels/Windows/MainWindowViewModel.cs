@@ -1514,8 +1514,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             if (e.Result) {
                 using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    this.FiscalStartMonth = Properties.Settings.Default.App_StartMonth;
-                    await DateTimeExtensions.DownloadHolidayListAsync();
+                    Properties.Settings settings = Properties.Settings.Default;
+                    this.FiscalStartMonth = settings.App_StartMonth;
+                    if (!await DateTimeExtensions.DownloadHolidayListAsync(settings.App_NationalHolidayCsv_Uri, settings.App_NationalHolidayCsv_TextEncoding, settings.App_NationalHolidayCsv_DateIndex)) {
+                        // 祝日取得失敗を通知する
+                        NotificationUtil.NotifyFailingToGetHolidayList();
+                    }
 
                     await this.UpdateAsync(isUpdateBookList: true);
                 }
