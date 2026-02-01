@@ -1,5 +1,4 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
-using HouseholdAccountBook.Enums;
 using Microsoft.Data.Sqlite;
 using System.IO;
 using System.Threading.Tasks;

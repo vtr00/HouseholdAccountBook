@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Adapters.Logger;
+﻿using HouseholdAccountBook.Adapters;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Views.Windows;
 using System.Collections.Generic;
