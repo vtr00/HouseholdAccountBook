@@ -39,6 +39,7 @@
         /// <summary>
         /// Ole DB
         /// </summary>
+        /// <remarks>Access, Excel, CSV, SQLServer, Oracle, PostgreSQL, MySQLなどに接続可能(ファイルに限定されない)</remarks>
         OleDb,
         /// <summary>
         /// SQLite

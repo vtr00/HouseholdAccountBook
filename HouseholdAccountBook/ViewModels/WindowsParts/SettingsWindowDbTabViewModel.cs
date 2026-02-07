@@ -3,6 +3,7 @@ using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Args.RequestEventArgs;
 using HouseholdAccountBook.Enums;
 using HouseholdAccountBook.Extensions;
+using HouseholdAccountBook.Utilities;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;
@@ -307,6 +308,17 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             settings.App_BackUpFlagAtMinimizing = this.BackUpFlagAtMinimizing;
             settings.App_BackUpIntervalMinAtMinimizing = this.BackUpIntervalAtMinimizing;
             settings.App_BackUpFlagAtClosing = this.BackUpFlagAtClosing;
+
+            // DbBackUpManagerへ設定を反映する
+            DbBackUpManager.Instance.PostgresDumpExePath = settings.App_Postgres_DumpExePath;
+            DbBackUpManager.Instance.PostgresRestoreExePath = settings.App_Postgres_RestoreExePath;
+            DbBackUpManager.Instance.PostgresPasswordInput = (PostgresPasswordInput)settings.App_Postgres_Password_Input;
+
+            DbBackUpManager.Instance.BackUpNum = settings.App_BackUpNum;
+            DbBackUpManager.Instance.BackUpFolderPath = settings.App_BackUpFolderPath;
+            DbBackUpManager.Instance.BackUpFlagAtMinimizing = settings.App_BackUpFlagAtMinimizing;
+            DbBackUpManager.Instance.BackUpIntervalMinAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
+            DbBackUpManager.Instance.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
 
             settings.Save();
         }

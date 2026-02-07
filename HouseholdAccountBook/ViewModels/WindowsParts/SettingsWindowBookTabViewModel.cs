@@ -278,7 +278,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             string folderFullPath = string.Empty;
             string title = string.Empty;
-            switch(kind) {
+            switch (kind) {
                 case FolderPathKind.CsvFolder:
                     if (string.IsNullOrWhiteSpace(this.DisplayedBookSettingVM.CsvFolderPath)) {
                         folderFullPath = Path.GetDirectoryName(settings.App_CsvFilePath);
@@ -298,7 +298,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Title = title
             };
             if (this.OpenFolderDialogRequest(e)) {
-                switch(kind) {
+                switch (kind) {
                     case FolderPathKind.CsvFolder:
                         this.DisplayedBookSettingVM.CsvFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FolderName);
                         break;

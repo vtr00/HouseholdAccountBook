@@ -14,9 +14,9 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
             /// </summary>
             public string Provider { get; set; }
             /// <summary>
-            /// ファイルパス
+            /// データソース
             /// </summary>
-            public string FilePath { get; set; }
+            public string DataSource { get; set; }
         }
     }
 }

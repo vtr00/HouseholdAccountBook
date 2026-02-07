@@ -10,22 +10,35 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
     /// </summary>
     public partial class SQLiteDbHandler : DbHandlerBase
     {
+        #region フィールド
         /// <summary>
         /// 接続文字列
         /// </summary>
         private const string mStringFormat = @"Data Source={0}";
+        /// <summary>
+        /// 接続情報
+        /// </summary>
+        private readonly ConnectInfo mConnectInfo;
+        #endregion
+
+        #region プロパティ
+        /// <summary>
+        /// DBファイルパス
+        /// </summary>
+        public string DbFilePath => this.mConnectInfo.FilePath;
+        #endregion
 
         /// <summary>
         /// <see cref="SQLiteDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public SQLiteDbHandler(ConnectInfo info) : this(info.FilePath) { }
+        public SQLiteDbHandler(ConnectInfo info) : this(info.FilePath) => this.mConnectInfo = info;
 
         /// <summary>
         /// <see cref="SQLiteDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
-        public SQLiteDbHandler(string filePath) : base(new SqliteConnection(string.Format(mStringFormat, filePath)))
+        private SQLiteDbHandler(string filePath) : base(new SqliteConnection(string.Format(mStringFormat, filePath)))
         {
             this.DBLibKind = DBLibraryKind.SQLite;
             this.DBKind = DBKind.SQLite;

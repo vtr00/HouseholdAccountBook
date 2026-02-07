@@ -12,6 +12,7 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
     /// </summary>
     public partial class NpgsqlDbHandler : DbHandlerBase
     {
+        #region フィールド
         /// <summary>
         /// 接続文字列
         /// </summary>
@@ -20,6 +21,14 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// 接続情報
         /// </summary>
         private readonly ConnectInfo mConnectInfo;
+        #endregion
+
+        #region プロパティ
+        /// <summary>
+        /// DB作成時のロール
+        /// </summary>
+        public string DbCreationRole => this.mConnectInfo.Role;
+        #endregion
 
         /// <summary>
         /// 結果通知デリゲート
@@ -48,12 +57,6 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         }
 
         /// <summary>
-        /// DB作成ロールを取得する
-        /// </summary>
-        /// <returns>DB作成時のロール</returns>
-        public string GetDbCreationRoll() => this.mConnectInfo.Role;
-
-        /// <summary>
         /// ダンプを実行する
         /// </summary>
         /// <param name="backupFilePath">バックアップファイルパス</param>
@@ -62,7 +65,7 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// <param name="format">ダンプフォーマット</param>
         /// <param name="notifyResultAsync">実行結果を通知するデリゲート</param>
         /// <param name="waitForFinish">処理の完了を待機するか</param>
-        /// <returns>成功/失敗/不明</returns>
+        /// <returns>エラーコード</returns>
         public async Task<int?> ExecuteDump(string backupFilePath, string dumpExePath, PostgresPasswordInput passwordInput, PostgresFormat format,
                                             NotifyResult notifyResultAsync = null, bool waitForFinish = true)
         {
@@ -88,9 +91,7 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
                 RedirectStandardInput = true,
                 UseShellExecute = false
             };
-#if DEBUG
-            Log.Debug(string.Format($"Dump: \"{info.FileName}\" {info.Arguments}"));
-#endif
+            Log.Trace(string.Format($"Dump: \"{info.FileName}\" {info.Arguments}"));
 
             // バックアップする
             int? exitCode = await Task.Run(() => {
@@ -130,7 +131,7 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// </summary>
         /// <param name="backupFilePath">バックアップファイルパス</param>
         /// <param name="restoreExePath"></param>
-        /// <returns>成功/失敗</returns>
+        /// <returns>エラーコード</returns>
         public async Task<int> ExecuteRestore(string backupFilePath, string restoreExePath, PostgresPasswordInput passwordInput)
         {
             bool pgPassConf = passwordInput == PostgresPasswordInput.PgPassConf;
@@ -154,9 +155,7 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
                 RedirectStandardInput = true,
                 UseShellExecute = false
             };
-#if DEBUG
-            Log.Debug(string.Format($"Restore: \"{info.FileName}\" {info.Arguments}"));
-#endif
+            Log.Trace(string.Format($"Restore: \"{info.FileName}\" {info.Arguments}"));
 
             // リストアする
             int exitCode = await Task.Run(() => {
