@@ -61,13 +61,17 @@ namespace HouseholdAccountBook.Utilities
         /// </summary>
         public bool BackUpFlagAtMinimizing { get; set; }
         /// <summary>
-        /// メインウィンドウを再消化したときにバックアップを行った時刻
+        /// メインウィンドウを最小化したときにバックアップを行った時刻
         /// </summary>
         public DateTime BackUpCurrentAtMinimizing { get; set; }
         /// <summary>
-        /// メインウィンドウを再消化したときにバックアップを行う間隔[ms]
+        /// メインウィンドウを最小化したときにバックアップを行う間隔[ms]
         /// </summary>
         public int BackUpIntervalMinAtMinimizing { get; set; }
+        /// <summary>
+        /// メインウィンドウを最小化したときにバックアップを行ったあと通知するか
+        /// </summary>
+        public bool BackUpNotifyAtMinimizing { get; set; }
         /// <summary>
         /// バックアップの個数
         /// </summary>
@@ -132,7 +136,7 @@ namespace HouseholdAccountBook.Utilities
                     Log.Info(string.Format($"NextBackup: {nextBackup}"));
 
                     if (nextBackup <= DateTime.Now) {
-                        result = await this.CreateBackUpFileAsync(true);
+                        result = await this.CreateBackUpFileAsync(this.BackUpNotifyAtMinimizing);
                     }
                 }
             }

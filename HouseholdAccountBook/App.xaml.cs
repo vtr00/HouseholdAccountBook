@@ -132,9 +132,12 @@ namespace HouseholdAccountBook
 
             // DBバックアップマネージャーを初期化する
             DbBackUpManager.Instance.DbHandlerFactory = dbHandlerFactory;
-            DbBackUpManager.Instance.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
-            DbBackUpManager.Instance.BackUpIntervalMinAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
+
             DbBackUpManager.Instance.BackUpFlagAtMinimizing = settings.App_BackUpFlagAtMinimizing;
+            DbBackUpManager.Instance.BackUpIntervalMinAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
+            DbBackUpManager.Instance.BackUpNotifyAtMinimizing = settings.App_BackUpNotifyAtMinimizing;
+            DbBackUpManager.Instance.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
+
             DbBackUpManager.Instance.BackUpNum = settings.App_BackUpNum;
             DbBackUpManager.Instance.BackUpFolderPath = settings.App_BackUpFolderPath;
             DbBackUpManager.Instance.PostgresDumpExePath = settings.App_Postgres_DumpExePath;

@@ -886,6 +886,9 @@
   <data name="TextBlock_FolderPath" xml:space="preserve">
     <value>フォルダパス</value>
   </data>
+  <data name="TextBlock_Notifications" xml:space="preserve">
+    <value>通知</value>
+  </data>
   <data name="TextBlock_Timing" xml:space="preserve">
     <value>タイミング</value>
   </data>
@@ -1074,5 +1077,8 @@
   </data>
   <data name="Message_FoultToMigrateDb" xml:space="preserve">
     <value>データベースのバージョンアップに失敗しました。</value>
+  </data>
+  <data name="CheckBox_Notifications_MinimizingMainWindow" xml:space="preserve">
+    <value>メインウィンドウ最小化時</value>
   </data>
 </root>

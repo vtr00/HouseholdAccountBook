@@ -604,7 +604,6 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition SharedSizeGroup="Header"/>
@@ -643,6 +642,10 @@
                                     </GroupBox>
                                     <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                               Content="{x:Static properties:Resources.CheckBox_Timing_ClosingMainWindow}" IsChecked="{Binding BackUpFlagAtClosing}"/>
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Notifications}"/>
+                                    <CheckBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
+                                              Content="{x:Static properties:Resources.CheckBox_Notifications_MinimizingMainWindow}" IsChecked="{Binding BackUpNotifyAtMinimizing}"/>
                                 </Grid>
                             </GroupBox>
                         </StackPanel>
