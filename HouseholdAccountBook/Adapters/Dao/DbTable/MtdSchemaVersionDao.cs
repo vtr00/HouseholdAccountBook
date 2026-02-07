@@ -79,7 +79,7 @@ ON TRUE -- テーブルの結合条件
 WHEN NOT MATCHED THEN -- ON条件でテーブルが結合できなかった場合(= mtd_schema_version にレコードが存在しない場合)
     INSERT (version) VALUES (@Version)
 WHEN MATCHED THEN -- ON条件でテーブルが結合できた場合(= mtd_schema_version にレコードが存在する場合)
-    UPDATE SET version = @Version;",
+    UPDATE SET version = @Version, update_time = now();",
 new MtdSchemaVersionDto { Version = version });
             return count;
         }
