@@ -569,9 +569,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand ImportKichoFugetsuDbCommand => new RelayCommand(this.ImportKichoFugetsuDbCommand_Executed, this.ImportKichoFugetsuDbCommand_CanExecute);
         /// <summary>
-        /// PostgreSQLファイルインポートコマンド
+        /// PostgreSQLインポートコマンド
         /// </summary>
-        public ICommand ImportPostgreSQLFileCommand => new RelayCommand(this.ImportPostgreSQLFileCommand_Executed, this.ImportPostgreSQLFileCommand_CanExecute);
+        public ICommand ImportPostgreSQLCommand => new RelayCommand(this.ImportPostgreSQLCommand_Executed, this.ImportPostgreSQLCommand_CanExecute);
         /// <summary>
         /// カスタムファイルインポートコマンド
         /// </summary>
@@ -747,7 +747,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 OleDbHandler.ConnectInfo info = new() {
                     Provider = settings.App_Access_Provider,
-                    FilePath = e.FileName
+                    DataSource = e.FileName
                 };
 
                 await using (OleDbHandler dbHandlerOle = await new DbHandlerFactory(info).CreateAsync() as OleDbHandler)
@@ -859,14 +859,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// PostgreSQLファイルインポートコマンド実行可能か
+        /// PostgreSQLインポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool ImportPostgreSQLFileCommand_CanExecute() => this.IsSQLite && !this.IsChildrenWindowOpened();
+        public bool ImportPostgreSQLCommand_CanExecute() => this.IsSQLite && !this.IsChildrenWindowOpened();
         /// <summary>
-        /// PostgreSQLファイルインポートコマンド処理
+        /// PostgreSQLインポートコマンド処理
         /// </summary>
-        public async void ImportPostgreSQLFileCommand_Executed()
+        public async void ImportPostgreSQLCommand_Executed()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -895,6 +895,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     result = dbHandlerNpgsql.IsOpen;
 
                     if (result) {
+                        // データ移行処理
                         static async Task Mapping<DTO>(IReadTableDao<DTO> src, IWriteTableDao<DTO> dest) where DTO : DtoBase
                         {
                             var srcDtoList = await src.FindAllAsync();
@@ -956,11 +957,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// カスタムファイルインポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool ImportCustomFileCommand_CanExecute()
-        {
-            Properties.Settings settings = Properties.Settings.Default;
-            return this.IsPostgreSQL && settings.App_Postgres_RestoreExePath != string.Empty && !this.IsChildrenWindowOpened();
-        }
+        public bool ImportCustomFileCommand_CanExecute() => this.IsPostgreSQL && DbBackUpManager.Instance.PostgresRestoreExePath != string.Empty && !this.IsChildrenWindowOpened();
         /// <summary>
         /// カスタムファイルインポートコマンド処理
         /// </summary>
@@ -986,37 +983,39 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.App_Import_CustomFormat_FilePath = e.FileName;
             settings.Save();
 
-            int exitCode = -1;
+            bool result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                    MstBookDao mstBookDao = new(dbHandler);
-                    MstCategoryDao mstCategoryDao = new(dbHandler);
-                    MstItemDao mstItemDao = new(dbHandler);
-                    HstActionDao hstActionDao = new(dbHandler);
-                    HstGroupDao hstGroupDao = new(dbHandler);
-                    HstShopDao hstShopDao = new(dbHandler);
-                    HstRemarkDao hstRemarkDao = new(dbHandler);
-                    RelBookItemDao relBookItemDao = new(dbHandler);
+                    await dbHandler.ExecTransactionAsync(async () => {
+                        MstBookDao mstBookDao = new(dbHandler);
+                        MstCategoryDao mstCategoryDao = new(dbHandler);
+                        MstItemDao mstItemDao = new(dbHandler);
+                        HstActionDao hstActionDao = new(dbHandler);
+                        HstGroupDao hstGroupDao = new(dbHandler);
+                        HstShopDao hstShopDao = new(dbHandler);
+                        HstRemarkDao hstRemarkDao = new(dbHandler);
+                        RelBookItemDao relBookItemDao = new(dbHandler);
 
-                    // 既存のデータを削除する
-                    _ = await mstBookDao.DeleteAllAsync();
-                    _ = await mstCategoryDao.DeleteAllAsync();
-                    _ = await mstItemDao.DeleteAllAsync();
-                    _ = await hstActionDao.DeleteAllAsync();
-                    _ = await hstGroupDao.DeleteAllAsync();
-                    _ = await hstShopDao.DeleteAllAsync();
-                    _ = await hstRemarkDao.DeleteAllAsync();
-                    _ = await relBookItemDao.DeleteAllAsync();
+                        // 既存のデータを削除する
+                        _ = await mstBookDao.DeleteAllAsync();
+                        _ = await mstCategoryDao.DeleteAllAsync();
+                        _ = await mstItemDao.DeleteAllAsync();
+                        _ = await hstActionDao.DeleteAllAsync();
+                        _ = await hstGroupDao.DeleteAllAsync();
+                        _ = await hstShopDao.DeleteAllAsync();
+                        _ = await hstRemarkDao.DeleteAllAsync();
+                        _ = await relBookItemDao.DeleteAllAsync();
+                    });
                 }
 
-                exitCode = await DbUtil.ExecuteRestorePostgreSQL(this.mDbHandlerFactory, e.FileName);
+                result = await DbBackUpManager.Instance.ExecuteRestorePostgreSQL(e.FileName);
 
-                if (exitCode == 0) {
+                if (result) {
                     await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
                 }
             }
 
-            _ = exitCode == 0
+            _ = result
                 ? MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
                 : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
@@ -1072,6 +1071,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                             result = dbHandlerSqlite.IsOpen;
 
                             if (result) {
+                                // データ移行処理
                                 static async Task Mapping<DTO>(IReadTableDao<DTO> src, IWriteTableDao<DTO> dest) where DTO : DtoBase
                                 {
                                     var srcDtoList = await src.FindAllAsync();
@@ -1144,11 +1144,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// カスタムファイルエクスポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool ExportCustomFileCommand_CanExecute()
-        {
-            Properties.Settings settings = Properties.Settings.Default;
-            return this.IsPostgreSQL && settings.App_Postgres_DumpExePath != string.Empty && !this.IsChildrenWindowOpened();
-        }
+        public bool ExportCustomFileCommand_CanExecute() => this.IsPostgreSQL && DbBackUpManager.Instance.PostgresDumpExePath != string.Empty && !this.IsChildrenWindowOpened();
         /// <summary>
         /// カスタムファイルエクスポートコマンド処理
         /// </summary>
@@ -1168,12 +1164,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.App_Export_CustomFormat_FilePath = e.FileName;
             settings.Save();
 
-            int? exitCode = -1;
+            bool result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                exitCode = await DbUtil.ExecuteDumpPostgreSQL(this.mDbHandlerFactory, e.FileName, PostgresFormat.Custom);
+                result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQL(e.FileName, PostgresFormat.Custom) == true;
             }
 
-            _ = exitCode == 0
+            _ = result
                 ? MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
                 : MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
@@ -1182,11 +1178,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// SQLファイルエクスポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool ExportSQLFileCommand_CanExecute()
-        {
-            Properties.Settings settings = Properties.Settings.Default;
-            return this.IsPostgreSQL && settings.App_Postgres_DumpExePath != string.Empty && !this.IsChildrenWindowOpened();
-        }
+        public bool ExportSQLFileCommand_CanExecute() => this.IsPostgreSQL && DbBackUpManager.Instance.PostgresDumpExePath != string.Empty && !this.IsChildrenWindowOpened();
         /// <summary>
         /// SQLファイルエクスポートコマンド処理
         /// </summary>
@@ -1207,12 +1199,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.App_Export_SQLFilePath = e.FileName;
             settings.Save();
 
-            int? exitCode = -1;
+            bool result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                exitCode = await DbUtil.ExecuteDumpPostgreSQL(this.mDbHandlerFactory, e.FileName, PostgresFormat.Plain);
+                result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQL(e.FileName, PostgresFormat.Plain) == true;
             }
 
-            _ = exitCode == 0
+            _ = result
                 ? MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
                 : MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
@@ -1241,7 +1233,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             bool result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                result = await DbUtil.CreateBackUpFileAsync(this.mDbHandlerFactory);
+                result = await DbBackUpManager.Instance.CreateBackUpFileAsync();
             }
 
             _ = result

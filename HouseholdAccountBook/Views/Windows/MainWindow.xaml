@@ -87,7 +87,7 @@
                     <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_SQLiteFile}" Command="{Binding ImportSQLiteFileCommand}"
                               Visibility="{Binding IsPostgreSQL, Converter={StaticResource BoolVisibilityConverter}}"/>
                     <!-- PostgreSQL > SQLiteファイル -->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_PostgreSQL}" Command="{Binding ImportPostgreSQLFileCommand}"
+                    <MenuItem Header="{x:Static properties:Resources.Menu_File_Import_PostgreSQL}" Command="{Binding ImportPostgreSQLCommand}"
                               Visibility="{Binding IsSQLite, Converter={StaticResource BoolVisibilityConverter}}"/>
                     <Separator/>
                     <!-- カスタム形式ファイル > PostgreSQL -->

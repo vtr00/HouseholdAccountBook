@@ -15,6 +15,10 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// 接続文字列
         /// </summary>
         private const string mStringFormat = @"Provider={0};Data Source={1}";
+        /// <summary>
+        /// 接続情報
+        /// </summary>
+        private readonly ConnectInfo mConnectInfo;
         #endregion
 
         #region プロパティ
@@ -22,19 +26,23 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// Accessプロバイダヘッダ
         /// </summary>
         public static string AccessProviderHeader => "Microsoft.ACE.OLEDB";
+        /// <summary>
+        /// データソース
+        /// </summary>
+        public string DataSource => this.mConnectInfo.DataSource;
         #endregion
 
         /// <summary>
         /// <see cref="OleDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public OleDbHandler(ConnectInfo info) : this(info.Provider, info.FilePath) { }
+        public OleDbHandler(ConnectInfo info) : this(info.Provider, info.DataSource) => this.mConnectInfo = info;
 
         /// <summary>
         /// <see cref="OleDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
-        public OleDbHandler(string provider, string filePath) : base(new OleDbConnection(string.Format(mStringFormat, provider, filePath)))
+        private OleDbHandler(string provider, string filePath) : base(new OleDbConnection(string.Format(mStringFormat, provider, filePath)))
         {
             this.DBLibKind = DBLibraryKind.OleDb;
             this.DBKind = provider.Contains(AccessProviderHeader) ? DBKind.Access : DBKind.Undefined;

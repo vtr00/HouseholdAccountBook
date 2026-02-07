@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS mtd_schema_version (
 ) TABLESPACE pg_default;");
 
             if (this.mDbHandler is NpgsqlDbHandler npgsqlDbHandler) {
-                string roll = npgsqlDbHandler.GetDbCreationRoll();
+                string roll = npgsqlDbHandler.DbCreationRole;
                 // オーナーを設定する
                 _ = await npgsqlDbHandler.ExecuteAsync($@"
 ALTER TABLE IF EXISTS mtd_schema_version

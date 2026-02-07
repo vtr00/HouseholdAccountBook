@@ -130,6 +130,20 @@ namespace HouseholdAccountBook
                 return;
             }
 
+            // DBバックアップマネージャーを初期化する
+            DbBackUpManager.Instance.DbHandlerFactory = dbHandlerFactory;
+            DbBackUpManager.Instance.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
+            DbBackUpManager.Instance.BackUpIntervalMinAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
+            DbBackUpManager.Instance.BackUpFlagAtMinimizing = settings.App_BackUpFlagAtMinimizing;
+            DbBackUpManager.Instance.BackUpNum = settings.App_BackUpNum;
+            DbBackUpManager.Instance.BackUpFolderPath = settings.App_BackUpFolderPath;
+            DbBackUpManager.Instance.PostgresDumpExePath = settings.App_Postgres_DumpExePath;
+            DbBackUpManager.Instance.PostgresRestoreExePath = settings.App_Postgres_RestoreExePath;
+            DbBackUpManager.Instance.PostgresPasswordInput = (PostgresPasswordInput)settings.App_Postgres_Password_Input;
+
+            DbBackUpManager.Instance.BackUpCurrentAtMinimizing = settings.App_BackUpCurrentAtMinimizing;
+
+            // DBのマイグレーションを実行する
             bool migrateResult = await DbUtil.UpMigrateAsync(dbHandlerFactory);
             if (!migrateResult) {
                 MessageBox.Show(MyResources.Message_FoultToMigrateDb, MyResources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);

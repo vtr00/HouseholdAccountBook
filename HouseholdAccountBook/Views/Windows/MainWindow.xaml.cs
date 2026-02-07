@@ -287,23 +287,16 @@ namespace HouseholdAccountBook.Views.Windows
         private async void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             using FuncLog funcLog = new();
-            e.Cancel = true;
 
             // 他のウィンドウを開いているときは閉じない
             if (this.ChildrenWindowOpened) {
+                e.Cancel = true;
                 return;
             }
 
-            this.Closing -= this.MainWindow_Closing;
             this.Hide();
 
-            Properties.Settings settings = Properties.Settings.Default;
-            if (settings.App_BackUpFlagAtClosing) {
-                // 通知しても即座に終了するため通知しない
-                _ = await DbUtil.CreateBackUpFileAsync(this.mDbHandlerFactory);
-            }
-
-            this.Close();
+            _ = await DbBackUpManager.Instance.ExecuteAtMainWindowClosing();
         }
 
         /// <summary>
@@ -313,24 +306,13 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void MainWindow_StateChanged(object sender, EventArgs e)
         {
-            if (this.WindowState == WindowState.Minimized) {
-                using FuncLog funcLog = new();
-
+            if (await DbBackUpManager.Instance.ExecuteAtMainWindowStateChanged(this.WindowState)) {
                 Properties.Settings settings = Properties.Settings.Default;
-                if (settings.App_BackUpFlagAtMinimizing) {
-                    Log.Info(string.Format($"BackUpCurrentAtMinimizing: {settings.App_BackUpCurrentAtMinimizing}"));
-                    DateTime nextBackup = settings.App_BackUpCurrentAtMinimizing.AddMinutes(settings.App_BackUpIntervalMinAtMinimizing);
-                    Log.Info(string.Format($"NextBackup: {nextBackup}"));
+                settings.App_BackUpCurrentAtMinimizing = DateTime.Now;
+                settings.Save();
+                Log.Info(string.Format($"Update BackUpCurrentAtMinimizing: {settings.App_BackUpCurrentAtMinimizing}"));
 
-                    if (nextBackup <= DateTime.Now) {
-                        bool result = await DbUtil.CreateBackUpFileAsync(this.mDbHandlerFactory, true);
-                        if (result != false) {
-                            settings.App_BackUpCurrentAtMinimizing = DateTime.Now;
-                            settings.Save();
-                            Log.Info(string.Format($"Update BackUpCurrentAtMinimizing: {settings.App_BackUpCurrentAtMinimizing}"));
-                        }
-                    }
-                }
+                DbBackUpManager.Instance.BackUpCurrentAtMinimizing = settings.App_BackUpCurrentAtMinimizing;
             }
         }
         #endregion
