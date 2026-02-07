@@ -886,6 +886,9 @@ list</value>
   <data name="TextBlock_FolderPath" xml:space="preserve">
     <value>Folder path</value>
   </data>
+  <data name="TextBlock_Notifications" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
   <data name="TextBlock_Timing" xml:space="preserve">
     <value>Timing</value>
   </data>
@@ -1074,5 +1077,8 @@ list</value>
   </data>
   <data name="Message_FoultToMigrateDb" xml:space="preserve">
     <value>Failed to migrate database.</value>
+  </data>
+  <data name="CheckBox_Notifications_MinimizingMainWindow" xml:space="preserve">
+    <value>When the main window is minimized</value>
   </data>
 </root>

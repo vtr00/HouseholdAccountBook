@@ -1030,5 +1030,17 @@ namespace HouseholdAccountBook.Properties {
                 this["VersionWindow_Width"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool App_BackUpNotifyAtMinimizing {
+            get {
+                return ((bool)(this["App_BackUpNotifyAtMinimizing"]));
+            }
+            set {
+                this["App_BackUpNotifyAtMinimizing"] = value;
+            }
+        }
     }
 }

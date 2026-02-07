@@ -111,6 +111,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
 
         /// <summary>
+        /// メインウィンドウ最小化時バックアップ通知フラグ
+        /// </summary>
+        #region BackUpNotifyAtMinimizing
+        public bool BackUpNotifyAtMinimizing {
+            get;
+            set => this.SetProperty(ref field, value);
+        }
+        #endregion
+
+        /// <summary>
         /// メインウィンドウクローズ時バックアップフラグ
         /// </summary>
         #region BackUpFlagAtClosing
@@ -280,6 +290,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.BackUpFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_BackUpFolderPath);
             this.BackUpFlagAtMinimizing = settings.App_BackUpFlagAtMinimizing;
             this.BackUpIntervalAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
+            this.BackUpNotifyAtMinimizing = settings.App_BackUpNotifyAtMinimizing;
             this.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
         }
 
@@ -307,6 +318,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             settings.App_BackUpFolderPath = Path.GetFullPath(this.BackUpFolderPath, App.GetCurrentDir());
             settings.App_BackUpFlagAtMinimizing = this.BackUpFlagAtMinimizing;
             settings.App_BackUpIntervalMinAtMinimizing = this.BackUpIntervalAtMinimizing;
+            settings.App_BackUpNotifyAtMinimizing = this.BackUpNotifyAtMinimizing;
             settings.App_BackUpFlagAtClosing = this.BackUpFlagAtClosing;
 
             // DbBackUpManagerへ設定を反映する
@@ -318,6 +330,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             DbBackUpManager.Instance.BackUpFolderPath = settings.App_BackUpFolderPath;
             DbBackUpManager.Instance.BackUpFlagAtMinimizing = settings.App_BackUpFlagAtMinimizing;
             DbBackUpManager.Instance.BackUpIntervalMinAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
+            DbBackUpManager.Instance.BackUpNotifyAtMinimizing = settings.App_BackUpNotifyAtMinimizing;
             DbBackUpManager.Instance.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
 
             settings.Save();
