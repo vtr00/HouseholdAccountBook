@@ -4,6 +4,7 @@ using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Adapters.Dao.DbTable
@@ -56,20 +57,30 @@ FROM mtd_schema_version;");
             return dtoList;
         }
 
-        public override Task<int> InsertAsync(MtdSchemaVersionDto dto) => throw new NotImplementedException();
-        public override Task<int> UpdateAsync(MtdSchemaVersionDto dto) => throw new NotImplementedException();
-        public override Task<int> UpsertAsync(MtdSchemaVersionDto dto) => throw new NotImplementedException();
+        public override Task<int> InsertAsync(MtdSchemaVersionDto dto) => throw new NotImplementedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
+        public override Task<int> UpdateAsync(MtdSchemaVersionDto dto) => throw new NotImplementedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
+        public override Task<int> UpsertAsync(MtdSchemaVersionDto dto) => throw new NotImplementedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
 
-        public override Task<int> DeleteAllAsync() => throw new NotImplementedException();
+        public override async Task<int> DeleteAllAsync()
+        {
+            int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM mtd_schema_version;");
 
-        public async Task<int> GetSchemaVersionAsync() => await this.mDbHandler.QuerySingleAsync<int>("SELECT version FROM mtd_schema_version;");
+            return count;
+        }
 
-        public async Task<int> UpdateSchemaVersionAsync(int version)
+        public async Task<int> SelectSchemaVersionAsync() => await this.mDbHandler.QuerySingleAsync<int>("SELECT version FROM mtd_schema_version;");
+
+        public async Task<int> UpsertSchemaVersionAsync(int version)
         {
             int count = await this.mDbHandler.ExecuteAsync(@"
-UPDATE mtd_schema_version
-SET version = @Version, update_time = CURRENT_TIMESTAMP;",
-new { Version = version });
+MERGE INTO mtd_schema_version
+USING (SELECT 1)
+ON TRUE -- テーブルの結合条件
+WHEN NOT MATCHED THEN -- ON条件でテーブルが結合できなかった場合(= mtd_schema_version にレコードが存在しない場合)
+    INSERT (version) VALUES (@Version)
+WHEN MATCHED THEN -- ON条件でテーブルが結合できた場合(= mtd_schema_version にレコードが存在する場合)
+    UPDATE SET version = @Version;",
+new MtdSchemaVersionDto { Version = version });
             return count;
         }
     }
