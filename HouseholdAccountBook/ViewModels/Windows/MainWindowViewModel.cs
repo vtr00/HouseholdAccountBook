@@ -569,15 +569,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand ImportKichoFugetsuDbCommand => new RelayCommand(this.ImportKichoFugetsuDbCommand_Executed, this.ImportKichoFugetsuDbCommand_CanExecute);
         /// <summary>
-        /// PostgreSQLインポートコマンド
+        /// PostgreSQL -> SQLite インポートコマンド
         /// </summary>
         public ICommand ImportPostgreSQLCommand => new RelayCommand(this.ImportPostgreSQLCommand_Executed, this.ImportPostgreSQLCommand_CanExecute);
         /// <summary>
-        /// カスタムファイルインポートコマンド
+        /// カスタムファイル -> PostgreSQL インポートコマンド
         /// </summary>
         public ICommand ImportCustomFileCommand => new RelayCommand(this.ImportCustomFileCommand_Executed, this.ImportCustomFileCommand_CanExecute);
         /// <summary>
-        /// SQLiteファイルインポートコマンド
+        /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド
         /// </summary>
         public ICommand ImportSQLiteFileCommand => new RelayCommand(this.ImportSQLiteFileCommand_Executed, this.ImportSQLiteFileCommand_CanExecute);
         /// <summary>
@@ -859,12 +859,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// PostgreSQLインポートコマンド実行可能か
+        /// PostgreSQL -> SQLite インポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
         public bool ImportPostgreSQLCommand_CanExecute() => this.IsSQLite && !this.IsChildrenWindowOpened();
         /// <summary>
-        /// PostgreSQLインポートコマンド処理
+        /// PostgreSQL -> SQLite インポートコマンド処理
         /// </summary>
         public async void ImportPostgreSQLCommand_Executed()
         {
@@ -891,7 +891,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 };
 
                 await using (NpgsqlDbHandler dbHandlerNpgsql = await new DbHandlerFactory(info).CreateAsync() as NpgsqlDbHandler)
-                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
+                await using (DbHandlerBase dbHandlerSQLite = await this.mDbHandlerFactory.CreateAsync()) {
                     result = dbHandlerNpgsql.IsOpen;
 
                     if (result) {
@@ -907,38 +907,40 @@ namespace HouseholdAccountBook.ViewModels.Windows
                             _ = await dest.BulkInsertAsync(srcDtoList);
                         }
 
-                        await dbHandler.ExecTransactionAsync(async () => {
+                        await dbHandlerSQLite.ExecTransactionAsync(async () => {
                             MstBookDao mstBookDao1 = new(dbHandlerNpgsql);
-                            MstBookDao mstBookDao2 = new(dbHandler);
+                            MstBookDao mstBookDao2 = new(dbHandlerSQLite);
                             await Mapping(mstBookDao1, mstBookDao2);
 
                             MstCategoryDao mstCategoryDao1 = new(dbHandlerNpgsql);
-                            MstCategoryDao mstCategoryDao2 = new(dbHandler);
+                            MstCategoryDao mstCategoryDao2 = new(dbHandlerSQLite);
                             await Mapping(mstCategoryDao1, mstCategoryDao2);
 
                             MstItemDao mstItemDao1 = new(dbHandlerNpgsql);
-                            MstItemDao mstItemDao2 = new(dbHandler);
+                            MstItemDao mstItemDao2 = new(dbHandlerSQLite);
                             await Mapping(mstItemDao1, mstItemDao2);
 
                             HstActionDao hstActionDao1 = new(dbHandlerNpgsql);
-                            HstActionDao hstActionDao2 = new(dbHandler);
+                            HstActionDao hstActionDao2 = new(dbHandlerSQLite);
                             await Mapping(hstActionDao1, hstActionDao2);
 
                             HstGroupDao hstGroupDao1 = new(dbHandlerNpgsql);
-                            HstGroupDao hstGroupDao2 = new(dbHandler);
+                            HstGroupDao hstGroupDao2 = new(dbHandlerSQLite);
                             await Mapping(hstGroupDao1, hstGroupDao2);
 
                             HstShopDao hstShopDao1 = new(dbHandlerNpgsql);
-                            HstShopDao hstShopDao2 = new(dbHandler);
+                            HstShopDao hstShopDao2 = new(dbHandlerSQLite);
                             await Mapping(hstShopDao1, hstShopDao2);
 
                             HstRemarkDao hstRemarkDao1 = new(dbHandlerNpgsql);
-                            HstRemarkDao hstRemarkDao2 = new(dbHandler);
+                            HstRemarkDao hstRemarkDao2 = new(dbHandlerSQLite);
                             await Mapping(hstRemarkDao1, hstRemarkDao2);
 
                             RelBookItemDao relBookItemDao1 = new(dbHandlerNpgsql);
-                            RelBookItemDao relBookItemDao2 = new(dbHandler);
+                            RelBookItemDao relBookItemDao2 = new(dbHandlerSQLite);
                             await Mapping(relBookItemDao1, relBookItemDao2);
+
+                            // スキーマバージョンは移行しない
                         });
                     }
                 }
@@ -954,12 +956,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// カスタムファイルインポートコマンド実行可能か
+        /// カスタムファイル -> PostgreSQL インポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
         public bool ImportCustomFileCommand_CanExecute() => this.IsPostgreSQL && DbBackUpManager.Instance.PostgresRestoreExePath != string.Empty && !this.IsChildrenWindowOpened();
         /// <summary>
-        /// カスタムファイルインポートコマンド処理
+        /// カスタムファイル -> PostgreSQL インポートコマンド処理
         /// </summary>
         public async void ImportCustomFileCommand_Executed()
         {
@@ -984,6 +986,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.Save();
 
             bool result = false;
+            int schemaVersion = 0;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     await dbHandler.ExecTransactionAsync(async () => {
@@ -995,6 +998,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         HstShopDao hstShopDao = new(dbHandler);
                         HstRemarkDao hstRemarkDao = new(dbHandler);
                         RelBookItemDao relBookItemDao = new(dbHandler);
+                        MtdSchemaVersionDao mtdSchemaVersionDao = new(dbHandler);
+
+                        // 現在のスキーマバージョンを取得しておく
+                        schemaVersion = await mtdSchemaVersionDao.SelectSchemaVersionAsync(); 
 
                         // 既存のデータを削除する
                         _ = await mstBookDao.DeleteAllAsync();
@@ -1005,10 +1012,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         _ = await hstShopDao.DeleteAllAsync();
                         _ = await hstRemarkDao.DeleteAllAsync();
                         _ = await relBookItemDao.DeleteAllAsync();
+                        _ = await mtdSchemaVersionDao.DeleteAllAsync(); // リストア時にレコードが増えるためスキーマバージョンを削除する
                     });
                 }
 
                 result = await DbBackUpManager.Instance.ExecuteRestorePostgreSQL(e.FileName);
+
+                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
+                    // スキーマバージョンを元に戻す
+                    MtdSchemaVersionDao mtdSchemaVersionDao = new(dbHandler);
+                    _ = await mtdSchemaVersionDao.UpsertSchemaVersionAsync(schemaVersion);
+                }
 
                 if (result) {
                     await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
@@ -1021,12 +1035,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// SQLiteファイルインポートコマンド実行可能か
+        /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
         public bool ImportSQLiteFileCommand_CanExecute() => (this.IsPostgreSQL || this.IsSQLite) && !this.IsChildrenWindowOpened();
         /// <summary>
-        /// SQLiteファイルインポートコマンド処理
+        /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド処理
         /// </summary>
         public async void ImportSQLiteFileCommand_Executed()
         {
@@ -1067,7 +1081,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                             FilePath = e.FileName
                         };
                         await using (SQLiteDbHandler dbHandlerSqlite = await new DbHandlerFactory(info).CreateAsync() as SQLiteDbHandler)
-                        await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
+                        await using (DbHandlerBase dbHandlerNpgsql = await this.mDbHandlerFactory.CreateAsync()) {
                             result = dbHandlerSqlite.IsOpen;
 
                             if (result) {
@@ -1083,38 +1097,40 @@ namespace HouseholdAccountBook.ViewModels.Windows
                                     _ = await dest.BulkInsertAsync(srcDtoList);
                                 }
 
-                                await dbHandler.ExecTransactionAsync(async () => {
+                                await dbHandlerNpgsql.ExecTransactionAsync(async () => {
                                     MstBookDao mstBookDao1 = new(dbHandlerSqlite);
-                                    MstBookDao mstBookDao2 = new(dbHandler);
+                                    MstBookDao mstBookDao2 = new(dbHandlerNpgsql);
                                     await Mapping(mstBookDao1, mstBookDao2);
 
                                     MstCategoryDao mstCategoryDao1 = new(dbHandlerSqlite);
-                                    MstCategoryDao mstCategoryDao2 = new(dbHandler);
+                                    MstCategoryDao mstCategoryDao2 = new(dbHandlerNpgsql);
                                     await Mapping(mstCategoryDao1, mstCategoryDao2);
 
                                     MstItemDao mstItemDao1 = new(dbHandlerSqlite);
-                                    MstItemDao mstItemDao2 = new(dbHandler);
+                                    MstItemDao mstItemDao2 = new(dbHandlerNpgsql);
                                     await Mapping(mstItemDao1, mstItemDao2);
 
                                     HstActionDao hstActionDao1 = new(dbHandlerSqlite);
-                                    HstActionDao hstActionDao2 = new(dbHandler);
+                                    HstActionDao hstActionDao2 = new(dbHandlerNpgsql);
                                     await Mapping(hstActionDao1, hstActionDao2);
 
                                     HstGroupDao hstGroupDao1 = new(dbHandlerSqlite);
-                                    HstGroupDao hstGroupDao2 = new(dbHandler);
+                                    HstGroupDao hstGroupDao2 = new(dbHandlerNpgsql);
                                     await Mapping(hstGroupDao1, hstGroupDao2);
 
                                     HstShopDao hstShopDao1 = new(dbHandlerSqlite);
-                                    HstShopDao hstShopDao2 = new(dbHandler);
+                                    HstShopDao hstShopDao2 = new(dbHandlerNpgsql);
                                     await Mapping(hstShopDao1, hstShopDao2);
 
                                     HstRemarkDao hstRemarkDao1 = new(dbHandlerSqlite);
-                                    HstRemarkDao hstRemarkDao2 = new(dbHandler);
+                                    HstRemarkDao hstRemarkDao2 = new(dbHandlerNpgsql);
                                     await Mapping(hstRemarkDao1, hstRemarkDao2);
 
                                     RelBookItemDao relBookItemDao1 = new(dbHandlerSqlite);
-                                    RelBookItemDao relBookItemDao2 = new(dbHandler);
+                                    RelBookItemDao relBookItemDao2 = new(dbHandlerNpgsql);
                                     await Mapping(relBookItemDao1, relBookItemDao2);
+
+                                    // スキーマバージョンは移行しない
                                 });
                             }
                         }

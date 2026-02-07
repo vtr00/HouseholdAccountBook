@@ -46,7 +46,7 @@ namespace HouseholdAccountBook.Utilities
                 await dbHandler.ExecTransactionAsync(dao.CreateTableAsync);
 
                 int requiredSchemaVersion = 0; // アプリが想定しているバージョン
-                int currentSchemaVersion = await dao.GetSchemaVersionAsync();
+                int currentSchemaVersion = await dao.SelectSchemaVersionAsync();
                 while (currentSchemaVersion < requiredSchemaVersion) {
                     switch (currentSchemaVersion) {
                         case 0:
@@ -56,7 +56,7 @@ namespace HouseholdAccountBook.Utilities
                             break;
                     }
                     currentSchemaVersion++;
-                    _ = await dao.UpdateSchemaVersionAsync(currentSchemaVersion);
+                    _ = await dao.UpsertSchemaVersionAsync(currentSchemaVersion);
                 }
 
                 return true;

@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
     public interface ISequentialIDDao<DTO> where DTO : ISequentialIDDto
     {
         /// <summary>
-        /// シーケンスを更新する
+        /// 引数のレコードにおける最大のIDでシーケンスを更新する
         /// </summary>
         /// <param name="dtoList">シーケンスをもつレコードのリスト</param>
         public async Task SetIdSequenceAsync(IEnumerable<DTO> dtoList) => await this.SetIdSequenceAsync(dtoList.Max(d => d.GetId()));
