@@ -296,7 +296,12 @@ namespace HouseholdAccountBook.Views.Windows
 
             this.Hide();
 
-            _ = await DbBackUpManager.Instance.ExecuteAtMainWindowClosing();
+            if (await DbBackUpManager.Instance.ExecuteAtMainWindowClosing()) {
+                Properties.Settings settings = Properties.Settings.Default;
+                settings.App_BackUpCurrentAtClosing = DateTime.Now;
+                settings.Save();
+                Log.Info(string.Format($"Update BackUpCurrentAtClosing: {settings.App_BackUpCurrentAtClosing}"));
+            }
         }
 
         /// <summary>
@@ -310,6 +315,7 @@ namespace HouseholdAccountBook.Views.Windows
                 Properties.Settings settings = Properties.Settings.Default;
                 settings.App_BackUpCurrentAtMinimizing = DateTime.Now;
                 settings.Save();
+                this.WVM.BookTabVM.RaiseCurrentBackUpChanged();
                 Log.Info(string.Format($"Update BackUpCurrentAtMinimizing: {settings.App_BackUpCurrentAtMinimizing}"));
 
                 DbBackUpManager.Instance.BackUpCurrentAtMinimizing = settings.App_BackUpCurrentAtMinimizing;

@@ -985,6 +985,9 @@ list</value>
   <data name="TextBlock_Whole" xml:space="preserve">
     <value>Whole</value>
   </data>
+  <data name="TextBlock_CurrentBackUp" xml:space="preserve">
+    <value>Current back up</value>
+  </data>
   <data name="CultureName_ja_JP" xml:space="preserve">
     <value>Japanese(ja-JP)</value>
   </data>

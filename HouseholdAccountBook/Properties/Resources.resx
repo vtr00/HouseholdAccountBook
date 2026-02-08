@@ -985,6 +985,9 @@
   <data name="TextBlock_Whole" xml:space="preserve">
     <value>全体</value>
   </data>
+  <data name="TextBlock_CurrentBackUp" xml:space="preserve">
+    <value>最後のバックアップ</value>
+  </data>
   <data name="CultureName_ja_JP" xml:space="preserve">
     <value>日本語(ja-JP)</value>
   </data>
