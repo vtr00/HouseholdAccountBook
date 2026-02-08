@@ -1001,7 +1001,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         MtdSchemaVersionDao mtdSchemaVersionDao = new(dbHandler);
 
                         // 現在のスキーマバージョンを取得しておく
-                        schemaVersion = await mtdSchemaVersionDao.SelectSchemaVersionAsync(); 
+                        schemaVersion = await mtdSchemaVersionDao.SelectSchemaVersionAsync();
 
                         // 既存のデータを削除する
                         _ = await mstBookDao.DeleteAllAsync();

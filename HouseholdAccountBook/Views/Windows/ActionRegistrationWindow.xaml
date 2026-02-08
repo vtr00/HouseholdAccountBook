@@ -101,9 +101,10 @@
             
             <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_AmountOfMoney}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <controls:NumericUpDown Grid.Row="7" Grid.Column="1" Margin="5" 
-                                    Value="{Binding Value}" MinValue="1"/>
-            
+            <controls:NumericUpDown Grid.Row="7" Grid.Column="1" Margin="5" Value="{Binding Value}" MinValue="1"/>
+            <TextBlock Grid.Row="7" Grid.Column="2" Margin="5" HorizontalAlignment="Right"
+                       Text="{Binding Value, Converter={StaticResource IntToMoneyDisplayConverter}, TargetNullValue=0}"/>
+
             <TextBlock Grid.Row="8" Grid.Column="0" Margin="5"
                        Text="{x:Static properties:Resources.TextBlock_ShopName}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="8" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="2"
@@ -156,14 +157,13 @@
                         <ColumnDefinition Width="0.25*" SharedSizeGroup="Button"/>
                     </Grid.ColumnDefinitions>
                     
-                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5"
-                           Text="{x:Static properties:Resources.TextBlock_Repeat_Count}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5"
-                                    Value="{Binding Count}" MinValue="1"/>
-                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
-                               Text="{x:Static properties:Resources.TextBlock_Repeat_Holiday}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"
+                               Text="{x:Static properties:Resources.TextBlock_Repeat_Count}"/>
+                    <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding Count}" MinValue="1"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"
+                               Text="{x:Static properties:Resources.TextBlock_Repeat_Holiday}"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                      ItemsSource="{Binding HolidaySettingKindDic}" SelectedValue="{Binding SelectedHolidaySettingKind}" SelectedValuePath="Key" DisplayMemberPath="Value">
+                              ItemsSource="{Binding HolidaySettingKindDic}" SelectedValue="{Binding SelectedHolidaySettingKind}" SelectedValuePath="Key" DisplayMemberPath="Value">
                         <ComboBox.Style>
                             <Style TargetType="ComboBox">
                                 <Style.Triggers>
@@ -174,8 +174,8 @@
                             </Style>
                         </ComboBox.Style>
                     </ComboBox>
-                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="5"
-                               Text="{x:Static properties:Resources.TextBlock_Repeat_BulkEdit}" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"
+                               Text="{x:Static properties:Resources.TextBlock_Repeat_BulkEdit}">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed"/>
