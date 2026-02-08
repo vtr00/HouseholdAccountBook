@@ -9,6 +9,7 @@
         <RoutedCommand x:Key="NumberInputCommand"/>
         <RoutedCommand x:Key="BackSpaceInputCommand"/>
         <RoutedCommand x:Key="ClearCommand"/>
+        <RoutedCommand x:Key="CloseCommand"/>
     </UserControl.Resources>
 
     <UserControl.CommandBindings>
@@ -18,69 +19,79 @@
                         Executed="BackSpaceInputCommand_Executed"/>
         <CommandBinding Command="{StaticResource ClearCommand}" 
                         Executed="ClearCommand_Executed"/>
+        <CommandBinding Command="{StaticResource CloseCommand}" 
+                        Executed="CloseCommand_Executed"/>
     </UserControl.CommandBindings>
 
-    <Grid>
-        <Grid>
-            <Grid Height="50" Width="150">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="0.5*"/>
-                    <RowDefinition Height="0.5*"/>
-                </Grid.RowDefinitions>
+    <Grid Background="Transparent">
+        <Grid Height="65" Width="156" Background="Transparent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.1*"/>
+                <RowDefinition Height="0.2*"/>
+                <RowDefinition Height="0.2*"/>
+            </Grid.RowDefinitions>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.2*"/>
-                    <ColumnDefinition Width="0.2*"/>
-                    <ColumnDefinition Width="0.2*"/>
-                    <ColumnDefinition Width="0.2*"/>
-                    <ColumnDefinition Width="0.2*"/>
-                    <ColumnDefinition Width="0.2*"/>
-                </Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.1*"/>
+                <ColumnDefinition Width="0.1*"/>
+            </Grid.ColumnDefinitions>
 
-                <Button Grid.Row="0" Grid.Column="0" Content="1" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="0" Grid.Column="1" Content="2" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="0" Grid.Column="2" Content="3" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="0" Grid.Column="3" Content="4" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="0" Grid.Column="4" Content="5" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="0" Grid.Column="5" Content="BS" Command="{StaticResource BackSpaceInputCommand}"/>
+            <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="6" IsHitTestVisible="False" Background="Transparent"/>
+            <Button Grid.Row="0" Grid.Column="6" Content="✕" FontSize="6" Command="{StaticResource CloseCommand}"/>
 
-                <Button Grid.Row="1" Grid.Column="0" Content="6" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="1" Grid.Column="1" Content="7" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="1" Grid.Column="2" Content="8" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="1" Grid.Column="3" Content="9" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="1" Grid.Column="4" Content="0" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="1" Grid.Column="5" Content="C" Command="{StaticResource ClearCommand}"/>
-            </Grid>
-            <Grid Height="100" Width="75" Visibility="Collapsed">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="0.5*"/>
-                    <RowDefinition Height="0.5*"/>
-                    <RowDefinition Height="0.5*"/>
-                    <RowDefinition Height="0.5*"/>
-                </Grid.RowDefinitions>
+            <Button Grid.Row="1" Grid.Column="0" Content="1" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="1" Grid.Column="1" Content="2" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="1" Grid.Column="2" Content="3" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="1" Grid.Column="3" Content="4" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="1" Grid.Column="4" Content="5" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="2" Content="BS" Command="{StaticResource BackSpaceInputCommand}"/>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.3*"/>
-                    <ColumnDefinition Width="0.3*"/>
-                    <ColumnDefinition Width="0.3*"/>
-                </Grid.ColumnDefinitions>
+            <Button Grid.Row="2" Grid.Column="0" Content="6" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="2" Grid.Column="1" Content="7" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="2" Grid.Column="2" Content="8" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="2" Grid.Column="3" Content="9" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="2" Grid.Column="4" Content="0" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="2" Grid.Column="5" Grid.ColumnSpan="2" Content="C" Command="{StaticResource ClearCommand}"/>
+        </Grid>
+        <Grid Height="104" Width="78" Background="Transparent" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.1*"/>
+                <RowDefinition Height="0.2*"/>
+                <RowDefinition Height="0.2*"/>
+                <RowDefinition Height="0.2*"/>
+                <RowDefinition Height="0.2*"/>
+            </Grid.RowDefinitions>
 
-                <Button Grid.Row="0" Grid.Column="0" Content="7" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="0" Grid.Column="1" Content="8" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="0" Grid.Column="2" Content="9" Command="{StaticResource NumberInputCommand}"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.1*"/>
+                <ColumnDefinition Width="0.1*"/>
+            </Grid.ColumnDefinitions>
 
-                <Button Grid.Row="1" Grid.Column="0" Content="4" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="1" Grid.Column="1" Content="5" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="1" Grid.Column="2" Content="6" Command="{StaticResource NumberInputCommand}"/>
+            <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" IsHitTestVisible="False" Background="Transparent"/>
+            <Button Grid.Row="0" Grid.Column="3" Content="✕" FontSize="6" Command="{StaticResource CloseCommand}"/>
 
-                <Button Grid.Row="2" Grid.Column="0" Content="1" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="2" Grid.Column="1" Content="2" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="2" Grid.Column="2" Content="3" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="1" Grid.Column="0" Content="7" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="1" Grid.Column="1" Content="8" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="1" Grid.Column="2" Content="9" Grid.ColumnSpan="2" Command="{StaticResource NumberInputCommand}"/>
 
-                <Button Grid.Row="3" Grid.Column="0" Content="BS" Command="{StaticResource BackSpaceInputCommand}"/>
-                <Button Grid.Row="3" Grid.Column="1" Content="0" Command="{StaticResource NumberInputCommand}"/>
-                <Button Grid.Row="3" Grid.Column="2" Content="C" Command="{StaticResource ClearCommand}"/>
-            </Grid>
+            <Button Grid.Row="2" Grid.Column="0" Content="4" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="2" Grid.Column="1" Content="5" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="2" Grid.Column="2" Content="6" Grid.ColumnSpan="2" Command="{StaticResource NumberInputCommand}"/>
+
+            <Button Grid.Row="3" Grid.Column="0" Content="1" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="3" Grid.Column="1" Content="2" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="3" Grid.Column="2" Content="3" Grid.ColumnSpan="2" Command="{StaticResource NumberInputCommand}"/>
+
+            <Button Grid.Row="4" Grid.Column="0" Content="BS" Command="{StaticResource BackSpaceInputCommand}"/>
+            <Button Grid.Row="4" Grid.Column="1" Content="0" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="4" Grid.Column="2" Content="C" Grid.ColumnSpan="2" Command="{StaticResource ClearCommand}"/>
         </Grid>
     </Grid>
 </UserControl>

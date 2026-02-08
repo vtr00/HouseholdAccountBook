@@ -184,13 +184,18 @@ namespace HouseholdAccountBook.Views.Windows
                 case NumericInputButton.InputKind.Clear:
                     vm.ActValue = null;
                     break;
+                case NumericInputButton.InputKind.Close:
+                    this.WVM.IsEditing = false;
+                    break;
             }
 
-            // 外れたフォーカスを元に戻す
-            this.mLastDataGridCell.IsEditing = true; // セルを編集モードにする - 画面がちらつくがやむを得ない？
-            _ = textBox.Focus();
-            _ = this.mLastDataGridCell.Focus(); // Enterキーでの入力完了を有効にする
-            //Keyboard.Focus(textBox); // キーでの数値入力を有効にする - 意図した動作にならない
+            if (this.WVM.InputedKind != NumericInputButton.InputKind.Close) {
+                // 外れたフォーカスを元に戻す
+                this.mLastDataGridCell.IsEditing = true; // セルを編集モードにする - 画面がちらつくがやむを得ない？
+                _ = textBox.Focus();
+                _ = this.mLastDataGridCell.Focus(); // Enterキーでの入力完了を有効にする
+                //Keyboard.Focus(textBox); // キーでの数値入力を有効にする - 意図した動作にならない
+            }
 
             e.Handled = true;
         }

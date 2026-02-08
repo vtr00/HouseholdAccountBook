@@ -25,7 +25,11 @@ namespace HouseholdAccountBook.Views.UserControls
             /// <summary>
             /// クリア
             /// </summary>
-            Clear
+            Clear,
+            /// <summary>
+            /// 閉じる
+            /// </summary>
+            Close
         }
     }
 }

@@ -34,25 +34,25 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
-        public static void FuncStart(object args = null, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
-            => Vars("func start", args, fileName, methodName, lineNumber);
+        public static void FuncStart(object args = null, LogLevel level = LogLevel.Info, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+            => Vars("func start", args, level, fileName, methodName, lineNumber);
         /// <summary>
         /// 関数終了ログを1行出力する
         /// </summary>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="digit">「-」の出力回数</param>
-        public static void FuncEnd([CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, ushort digit = 0)
-            => Info("func end", fileName, methodName, -digit);
+        public static void FuncEnd(LogLevel level = LogLevel.Info, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, ushort digit = 0)
+            => OutputImpl?.Invoke(level, "func end", fileName, methodName, -digit);
         /// <summary>
         /// 変数ログを1行出力する
         /// </summary>
         /// <param name="message">出力メッセージ</param>
-        /// <param name="args">引数を含む匿名クラス</param>
+        /// <param name="vars">引数を含む匿名クラス</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
-        public static void Vars(string message = "", object vars = null, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+        public static void Vars(string message = "", object vars = null, LogLevel level = LogLevel.Info, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
             string details = string.Empty;
             if (vars != null) {
@@ -60,7 +60,7 @@ namespace HouseholdAccountBook.Adapters.Logger
             }
 
             string tmpMessage = string.Join((message != string.Empty && details != string.Empty) ? " - " : "", message, details);
-            Info(tmpMessage, fileName, methodName, lineNumber);
+            OutputImpl?.Invoke(level, message, fileName, methodName, lineNumber);
         }
 
         /// <summary>
