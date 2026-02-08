@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.Views.UserControls
         private bool mIsOpenOnDeactivated;
 
         /// <summary>
-        /// <see cref="FollowablePopup"/> クラスの新しいインスタンスを初期化します
+        /// <see cref="FollowablePopup"/> クラスのオブジェクトを初期化します
         /// </summary>
         static FollowablePopup()
         {
@@ -36,7 +36,7 @@ namespace HouseholdAccountBook.Views.UserControls
         {
             if (d is not FollowablePopup followablePopup) { return; }
 
-            var target = followablePopup.PlacementTarget;
+            UIElement target = followablePopup.PlacementTarget;
             if (target == null) { return; }
 
             Window window = Window.GetWindow(target);
@@ -44,7 +44,7 @@ namespace HouseholdAccountBook.Views.UserControls
             ScrollViewer scrollViewer = GetDependencyObjectFromVisualTree(target, typeof(ScrollViewer)) as ScrollViewer;
 
             // 更新前のIsOpenプロパティがtrueだったので、登録済みのイベントハンドラを解除する
-            if (e.OldValue != null && (bool)e.OldValue == true) {
+            if (e.OldValue != null && (bool)e.OldValue) {
                 if (window != null) {
                     // ウィンドウの移動/リサイズ時の処理を解除
                     window.LocationChanged -= followablePopup.OnFollowWindowRectChanged;
@@ -64,7 +64,7 @@ namespace HouseholdAccountBook.Views.UserControls
             }
 
             // IsOpenプロパティをtrueに変更したので、各種イベントハンドラを登録する
-            if (e.NewValue != null && (bool)e.NewValue == true) {
+            if (e.NewValue != null && (bool)e.NewValue) {
                 if (window != null) {
                     // ウィンドウの移動/リサイズ時の処理を設定
                     window.LocationChanged += followablePopup.OnFollowWindowRectChanged;

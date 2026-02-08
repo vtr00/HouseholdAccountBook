@@ -245,13 +245,19 @@ namespace HouseholdAccountBook.Views.UserControls
                 case NumericInputButton.InputKind.Clear:
                     tmpValue = null;
                     break;
+                case NumericInputButton.InputKind.Close:
+                    this.UVM.NumericUpDownFocused = false;
+                    this.UVM.IsOpen = false;
+                    break;
             }
 
-            if ((this.MinValue <= tmpValue && tmpValue <= this.MaxValue) || tmpValue == null) {
-                this.Value = tmpValue;
-                textBox.SelectionStart = tmpSelectionStart;
+            if (this.UVM.InputedKind != NumericInputButton.InputKind.Close) {
+                if ((this.MinValue <= tmpValue && tmpValue <= this.MaxValue) || tmpValue == null) {
+                    this.Value = tmpValue;
+                    textBox.SelectionStart = tmpSelectionStart;
 
-                _ = textBox.Focus();
+                    _ = textBox.Focus();
+                }
             }
 
             e.Handled = true;

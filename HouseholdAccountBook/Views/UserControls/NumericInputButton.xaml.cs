@@ -166,6 +166,19 @@ namespace HouseholdAccountBook.Views.UserControls
 
             e.Handled = true;
         }
+
+        /// <summary>
+        /// Closeボタン押下時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CloseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.InputedKind = InputKind.Close;
+            this.ExecuteCommand();
+
+            e.Handled = true;
+        }
         #endregion
 
         /// <summary>
