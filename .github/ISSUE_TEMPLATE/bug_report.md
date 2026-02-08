@@ -1,7 +1,7 @@
 ---
 name: Bug report / バグ報告
 about: Create a report to help us improve / 改善の助けとなる報告を作成する
-title: "[BUG]"
+title: "[BUG] "
 labels: ["🐞bug"]
 assignees: ''
 
@@ -17,7 +17,6 @@ Describe of what the bug is clearly and concisely.
 Steps to reproduce the behavior:  
 振る舞いを再現する手順:
 
-1. 
 1. 
 1. 
 
@@ -36,6 +35,13 @@ If able, add screenshots to help explain your problem.
 ## Environment / 実行環境
 
 - Version / バージョン: 
+
+## Relational feature / 関連する機能追加
+Describe of related feature.  
+関連する機能追加を記載してください。
+
+- none / なし
+- refs #
 
 ## Additional context / 補足情報
 Add any other context about the problem here.  

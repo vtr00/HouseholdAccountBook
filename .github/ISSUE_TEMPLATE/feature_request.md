@@ -19,13 +19,6 @@ Describe of what you want to happen clearly and concisely.
 
 - 
 
-## Relational bug / 関連する不具合
-Describe of related bug.  
-関連する不具合を記載してください。
-
-- none / なし
-- refs #
-
 ## Additional context / 補足情報
 If able, add any other context or screenshots about the feature request here.  
 可能であれば、機能追加リクエストに関する他の情報やスクリーンショットを追加してください。
