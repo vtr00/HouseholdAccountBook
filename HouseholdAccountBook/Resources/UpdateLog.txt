@@ -6,6 +6,12 @@
   MainWindow
     ↑PostgreSQLのカスタムファイルのインポート後、次の起動時に例外が発生することがあるのを修正した - refs #61
     ＋最後にバックアップした日時の表示をステータスバーに追加した - refs #55
+  MoveRegisrationWindow
+  ActionRegistrationWindow
+  SettingWindow
+    ＋金額入力欄の右側に金額フォーマットでの表示を追加した - refs #44
+  ActionListRegistrationWindow
+    △金額入力欄の非編集時の表示を金額フォーマットに変更した - refs #44
 2026-02-07
   SettingWindow
     △フォルダ・ファイル選択ダイアログ周りの処理を変更した - refs #54

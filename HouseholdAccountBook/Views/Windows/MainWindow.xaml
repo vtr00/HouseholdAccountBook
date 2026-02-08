@@ -460,7 +460,9 @@
                                     <Button Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" Content="▶️" Command="{Binding FindActionCommand}"/>
                                 </Grid>
                                 
-                                <Button Grid.Row="0" Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="{x:Static properties:Resources.Button_HideFind}" Command="{Binding HideFindBoxCommand}"/>
+                                <Button Grid.Row="0" Grid.Column="2" Margin="0,3,3,3" Height="20" Width="20" 
+                                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                                        Content="{x:Static properties:Resources.Button_HideFind}" Command="{Binding HideFindBoxCommand}"/>
 
                                 <Grid Grid.Row="1" Grid.Column="1" Visibility="{c:Binding ShowReplaceBox, FalseToVisibility=Collapsed}">
                                     <Grid.ColumnDefinitions>

@@ -163,7 +163,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public DateTime? CurrentBackUp {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
-                DateTime backUpCurrent = new [] { settings.App_BackUpCurrentAtMinimizing, settings.App_BackUpCurrentAtClosing, settings.App_BackUpCurrentBySelf }.Max();
+                DateTime backUpCurrent = new[] { settings.App_BackUpCurrentAtMinimizing, settings.App_BackUpCurrentAtClosing, settings.App_BackUpCurrentBySelf }.Max();
                 return backUpCurrent == DateTime.MinValue ? null : backUpCurrent;
             }
         }
