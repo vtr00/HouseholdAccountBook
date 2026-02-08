@@ -1042,5 +1042,29 @@ namespace HouseholdAccountBook.Properties {
                 this["App_BackUpNotifyAtMinimizing"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1970-01-01")]
+        public global::System.DateTime App_BackUpCurrentAtClosing {
+            get {
+                return ((global::System.DateTime)(this["App_BackUpCurrentAtClosing"]));
+            }
+            set {
+                this["App_BackUpCurrentAtClosing"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1970-01-01")]
+        public global::System.DateTime App_BackUpCurrentBySelf {
+            get {
+                return ((global::System.DateTime)(this["App_BackUpCurrentBySelf"]));
+            }
+            set {
+                this["App_BackUpCurrentBySelf"] = value;
+            }
+        }
     }
 }

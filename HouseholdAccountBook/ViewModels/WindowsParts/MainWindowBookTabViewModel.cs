@@ -157,6 +157,18 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
 
         /// <summary>
+        /// 最後にバックアップした日時
+        /// </summary>
+        #region CurrentBackUp
+        public DateTime? CurrentBackUp {
+            get {
+                Properties.Settings settings = Properties.Settings.Default;
+                DateTime backUpCurrent = new [] { settings.App_BackUpCurrentAtMinimizing, settings.App_BackUpCurrentAtClosing, settings.App_BackUpCurrentBySelf }.Max();
+                return backUpCurrent == DateTime.MinValue ? null : backUpCurrent;
+            }
+        }
+        #endregion
+        /// <summary>
         /// 最後に操作した帳簿項目の日付
         /// </summary>
         #region ActDateLastEdited
@@ -695,6 +707,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
         }
         #endregion
+
+        /// <summary>
+        /// 最後のバックアップ日時が変更されたことを通知する
+        /// </summary>
+        public void RaiseCurrentBackUpChanged() => this.RaisePropertyChanged(nameof(this.CurrentBackUp));
 
         /// <summary>
         /// <see cref="DisplayedActionVMList"/> を更新する

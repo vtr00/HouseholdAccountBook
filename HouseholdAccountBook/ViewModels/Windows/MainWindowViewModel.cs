@@ -1250,6 +1250,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
             bool result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 result = await DbBackUpManager.Instance.CreateBackUpFileAsync();
+
+                if (result) {
+                    Properties.Settings settings = Properties.Settings.Default;
+                    settings.App_BackUpCurrentBySelf = DateTime.Now;
+                    settings.Save();
+                    this.BookTabVM.RaiseCurrentBackUpChanged();
+                }
             }
 
             _ = result

@@ -257,5 +257,11 @@
     <Setting Name="App_BackUpNotifyAtMinimizing" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="App_BackUpCurrentAtClosing" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)">1970-01-01</Value>
+    </Setting>
+    <Setting Name="App_BackUpCurrentBySelf" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)">1970-01-01</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

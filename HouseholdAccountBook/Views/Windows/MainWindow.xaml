@@ -527,6 +527,8 @@
                     <StatusBar Grid.Row="2" Grid.Column="0" Margin="2" DataContext="{Binding BookTabVM}" Background="White">
                         <StatusBarItem HorizontalAlignment="Left">
                             <TextBlock>
+                                <TextBlock Text="{x:Static properties:Resources.TextBlock_CurrentBackUp}"/>:
+                                <TextBlock Text="{Binding CurrentBackUp, TargetNullValue='-', StringFormat='yyyy-MM-dd hh:mm:ss'}"/>
                                 <TextBlock Text="{x:Static properties:Resources.TextBlock_LastOperatedBookItem}"/>:
                                 <TextBlock Text="{Binding ActDateLastEdited, TargetNullValue='-', StringFormat='yyyy-MM-dd'}"/>
                             </TextBlock>
