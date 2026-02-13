@@ -88,6 +88,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             using FuncLog funcLog = new();
 
+            // スクロール要求イベントを登録する
             this.WVM.ScrollRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.ScrollRequested));
 
@@ -98,6 +99,7 @@ namespace HouseholdAccountBook.Views.Windows
                     this._actionDataGrid.ScrollToButtom();
                 }
             };
+            // 移動追加要求イベントを登録する
             this.WVM.AddMoveRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddMoveRequested));
 
@@ -110,6 +112,7 @@ namespace HouseholdAccountBook.Views.Windows
                 };
                 this.mMRW.Show();
             };
+            // 項目追加要求イベントを登録する
             this.WVM.AddActionRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionRequested));
 
@@ -122,6 +125,7 @@ namespace HouseholdAccountBook.Views.Windows
                 };
                 this.mARW.Show();
             };
+            // 項目リスト追加要求イベントを登録する
             this.WVM.AddActionListRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionListRequested));
 
@@ -134,6 +138,7 @@ namespace HouseholdAccountBook.Views.Windows
                 };
                 this.mALRW.Show();
             };
+            // 移動追加要求イベントを登録する
             this.WVM.CopyMoveRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.CopyMoveRequested));
 
@@ -146,6 +151,7 @@ namespace HouseholdAccountBook.Views.Windows
                 };
                 this.mMRW.Show();
             };
+            // 項目複製要求イベントを登録する
             this.WVM.CopyActionRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.CopyActionRequested));
 
@@ -158,6 +164,7 @@ namespace HouseholdAccountBook.Views.Windows
                 };
                 this.mARW.Show();
             };
+            // 移動編集要求イベントを登録する
             this.WVM.EditMoveRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.EditMoveRequested));
 
@@ -170,6 +177,7 @@ namespace HouseholdAccountBook.Views.Windows
                 };
                 this.mMRW.Show();
             };
+            // 項目編集要求イベントを登録する
             this.WVM.EditActionRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.EditActionRequested));
 
@@ -182,6 +190,7 @@ namespace HouseholdAccountBook.Views.Windows
                 };
                 this.mARW.Show();
             };
+            // 項目リスト編集要求イベントを登録する
             this.WVM.EditActionListRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.EditActionListRequested));
 
@@ -194,6 +203,7 @@ namespace HouseholdAccountBook.Views.Windows
                 };
                 this.mALRW.Show();
             };
+            // 期間選択要求イベントを登録する
             this.WVM.SelectTermRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.SelectTermRequested));
 
@@ -213,6 +223,7 @@ namespace HouseholdAccountBook.Views.Windows
                     e.EndDate = stw.WVM.EndDate;
                 }
             };
+            // 設定要求イベントを登録する
             this.WVM.SettingsRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.SettingsRequested));
 
@@ -220,6 +231,7 @@ namespace HouseholdAccountBook.Views.Windows
                 sw.SetIsModal(true);
                 e.Result = sw.ShowDialog() == true;
             };
+            // CSV比較要求イベントを登録する
             this.WVM.CompareCsvFileRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.CompareCsvFileRequested));
 
@@ -239,7 +251,7 @@ namespace HouseholdAccountBook.Views.Windows
 
                         using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create()) {
                             // 帳簿一覧タブを更新する
-                            await this.WVM.BookTabVM.LoadAsync(isScroll: false, isUpdateActDateLastEdited: true);
+                            await this.WVM.BookTabVM.LoadAsync(e.Value, isScroll: false, isUpdateActDateLastEdited: true);
                         }
                     };
                     // 帳簿変更時のイベントを登録する
@@ -265,6 +277,7 @@ namespace HouseholdAccountBook.Views.Windows
 
                 this.mCCW.Show();
             };
+            // バージョン情報表示要求イベントを登録する
             this.WVM.ShowVersionRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.ShowVersionRequested));
 
