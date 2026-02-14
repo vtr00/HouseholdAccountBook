@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HouseholdAccountBook.Extensions
 {
-    public class ProtectedDataExtension
+    public class ProtectedDataExtensions
     {
         /// <summary>
         /// 暗号化されたパスワードを生成する

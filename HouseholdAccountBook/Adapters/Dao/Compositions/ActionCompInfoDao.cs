@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
 using HouseholdAccountBook.Adapters.Dto.Others;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -23,6 +24,8 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<ActionCompInfoDto>> FindMatchesWithCsvAsync(int bookId, DateTime date, int value)
         {
+            using FuncLog funcLog = new(new { bookId, date, value }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<ActionCompInfoDto>(@"
 SELECT A.action_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match, A.group_id
 FROM hst_action A

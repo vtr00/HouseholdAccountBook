@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
 using HouseholdAccountBook.Adapters.Dto.Others;
+using HouseholdAccountBook.Adapters.Logger;
 using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Adapters.Dao.Compositions
@@ -19,6 +20,8 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコード</returns>
         public async Task<GroupInfoDto> FindByActionId(int actionId)
         {
+            using FuncLog funcLog = new(new { actionId }, Log.LogLevel.Trace);
+
             var dto = await this.mDbHandler.QuerySingleAsync<GroupInfoDto>(@"
 SELECT A.group_id, G.group_kind
 FROM hst_action A

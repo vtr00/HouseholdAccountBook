@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
 using HouseholdAccountBook.Adapters.DbHandlers;
 using HouseholdAccountBook.Adapters.Dto.KHDbTable;
+using HouseholdAccountBook.Adapters.Logger;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,6 +13,11 @@ namespace HouseholdAccountBook.Adapters.Dao.KHDbTable
     /// <param name="dbHandler">DBハンドラ</param>
     public class CbmCategoryDao(OleDbHandler dbHandler) : KHReadDaoBase<CbmCategoryDto>(dbHandler)
     {
-        public override async Task<IEnumerable<CbmCategoryDto>> FindAllAsync() => await this.mDbHandler.QueryAsync<CbmCategoryDto>(@"SELECT * FROM CBM_CATEGORY ORDER BY CATEGORY_ID;");
+        public override async Task<IEnumerable<CbmCategoryDto>> FindAllAsync()
+        {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
+            return await this.mDbHandler.QueryAsync<CbmCategoryDto>(@"SELECT * FROM CBM_CATEGORY ORDER BY CATEGORY_ID;");
+        }
     }
 }

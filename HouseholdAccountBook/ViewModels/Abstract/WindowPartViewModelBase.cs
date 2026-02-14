@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandlers;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Args.RequestEventArgs;
 using HouseholdAccountBook.Utilities;
 using System;
@@ -115,6 +116,8 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <remarks><see cref="FrameworkElement">のコンストラクタで呼び出す</remarks>
         public void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
         {
+            using FuncLog funcLog = new();
+
             this.mWaitCursorManagerFactory = waitCursorManagerFactory;
             this.mDbHandlerFactory = dbHandlerFactory;
 
@@ -144,11 +147,22 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// ウィンドウクローズ要求を発行する
         /// </summary>
         /// <param name="e"></param>
-        protected void CloseRequest(DialogCloseRequestEventArgs e) => this.CloseRequested?.Invoke(this, e);
+        protected void CloseRequest(DialogCloseRequestEventArgs e)
+        {
+            using FuncLog funcLog = new(new { e });
+
+            this.CloseRequested?.Invoke(this, e);
+        }
+
         /// <summary>
         /// ウィンドウ非表示要求を発行する
         /// </summary>
-        protected void HideRequest() => this.HideRequested?.Invoke(this, EventArgs.Empty);
+        protected void HideRequest()
+        {
+            using FuncLog funcLog = new();
+
+            this.HideRequested?.Invoke(this, EventArgs.Empty);
+        }
 
         /// <summary>
         /// ファイル選択ダイアログ要求を発行する
@@ -156,6 +170,8 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <param name="e"></param>
         protected bool OpenFileDialogRequest(OpenFileDialogRequestEventArgs e)
         {
+            using FuncLog funcLog = new(new { e });
+
             e.Multiselect = false;
             this.OpenFileDialogRequested?.Invoke(this, e);
             return e.Result;
@@ -167,6 +183,8 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <param name="e"></param>
         protected bool OpenFilesDialogRequest(OpenFileDialogRequestEventArgs e)
         {
+            using FuncLog funcLog = new(new { e });
+
             e.Multiselect = true;
             this.OpenFileDialogRequested?.Invoke(this, e);
             return e.Result;
@@ -178,6 +196,8 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <param name="e"></param>
         protected bool OpenFolderDialogRequest(OpenFolderDialogRequestEventArgs e)
         {
+            using FuncLog funcLog = new(new { e });
+
             this.OpenFolderDialogRequested?.Invoke(this, e);
             return e.Result;
         }
@@ -189,6 +209,8 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <returns></returns>
         protected bool SaveFileDialogRequest(SaveFileDialogRequestEventArgs e)
         {
+            using FuncLog funcLog = new(new { e });
+
             this.SaveFileDialogRequested?.Invoke(this, e);
             return e.Result;
         }

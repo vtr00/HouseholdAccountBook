@@ -8,6 +8,7 @@ namespace HouseholdAccountBook.ViewModels.Component
     /// </summary>
     public class CsvViewModel : BindableBase
     {
+        #region プロパティ
         /// <summary>
         /// 日付
         /// </summary>
@@ -36,6 +37,7 @@ namespace HouseholdAccountBook.ViewModels.Component
             get;
             set => this.SetProperty(ref field, value);
         }
+        #endregion
         #endregion
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.Attributes;
+using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
@@ -14,7 +15,7 @@ namespace HouseholdAccountBook.Extensions
         /// </summary>
         /// <param name="obj">文字列化の対象</param>
         /// <param name="depth">探索の深さ</param>
-        /// <returns></returns>
+        /// <returns>文字列</returns>
         public static string? ToString2(this object obj, int depth = 0)
         {
             // 再帰呼び出しの深さ制限
@@ -30,14 +31,19 @@ namespace HouseholdAccountBook.Extensions
 
             switch (obj) {
                 case string s:
-                    return $"\"{s}\"";
+                    return $"\"{s.Replace(Environment.NewLine, "\\r\\n")}\"";
                 case DateTime dt:
                     return dt.TimeOfDay == TimeSpan.Zero ? $"{dt:yyyy-MM-dd}" : $"{dt:yyyy-MM-dd HH:mm:ss}";
                 case IEnumerable enumerable:
                     return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => item.ToString2(depth)))}]";
                 default:
-                    PropertyInfo[] propInfos = obj.GetType().GetProperties();
-                    return string.Join(", ", propInfos.Select(propInfo => $"{propInfo.Name}:{propInfo.GetValue(obj)?.ToString2(depth) ?? "null"}"));
+                    PropertyInfo[] propInfos = obj.GetType().GetProperties(); // クラスが保持しているプロパティの情報を取得
+
+                    string tmp = string.Join(", ", propInfos.Select(propInfo => {
+                        IgnoreToStringAttribute? attr = propInfo.GetCustomAttribute<IgnoreToStringAttribute>(); // この属性が付与されているプロパティは出力しない
+                        return attr != null ? $"{propInfo.Name}:{attr.Alternative}" : $"{propInfo.Name}:{propInfo.GetValue(obj)?.ToString2(depth) ?? "null"}";
+                    }));
+                    return depth == 1 ? tmp : $"[{tmp}]";
             }
         }
     }

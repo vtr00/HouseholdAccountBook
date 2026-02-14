@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -18,6 +19,8 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
 
         public override async Task<IEnumerable<HstActionDto>> FindAllAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT * 
 FROM hst_action
@@ -33,6 +36,8 @@ WHERE del_flg = 0;");
         /// <returns>取得したレコード</returns>
         public override async Task<HstActionDto> FindByIdAsync(int actionId)
         {
+            using FuncLog funcLog = new(new { actionId }, Log.LogLevel.Trace);
+
             var dto = await this.mDbHandler.QuerySingleOrDefaultAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
@@ -49,6 +54,8 @@ new HstActionDto { ActionId = actionId });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByGroupIdAsync(int groupId)
         {
+            using FuncLog funcLog = new(new { groupId }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
@@ -66,6 +73,8 @@ new HstActionDto { GroupId = groupId });
         /// <remarks>同日を含む</remarks>
         public async Task<IEnumerable<HstActionDto>> FindInGroupAfterDateByIdAsync(int actionId)
         {
+            using FuncLog funcLog = new(new { actionId }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action 
@@ -83,6 +92,8 @@ new HstActionDto { ActionId = actionId });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByBookIdAsync(int bookId)
         {
+            using FuncLog funcLog = new(new { bookId }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
@@ -99,6 +110,8 @@ new HstActionDto { BookId = bookId });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByItemIdAsync(int itemId)
         {
+            using FuncLog funcLog = new(new { itemId }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
@@ -116,6 +129,8 @@ new HstActionDto { ItemId = itemId });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByBookIdAndItemIdAsync(int bookId, int itemId)
         {
+            using FuncLog funcLog = new(new { bookId, itemId }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
@@ -125,11 +140,17 @@ new HstActionDto { BookId = bookId, ItemId = itemId });
             return dtoList;
         }
 
-        public override async Task SetIdSequenceAsync(int idSeq) =>
+        public override async Task SetIdSequenceAsync(int idSeq)
+        {
+            using FuncLog funcLog = new(new { idSeq }, Log.LogLevel.Trace);
+
             _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('hst_action_action_id_seq', @ActionIdSeq);", new { ActionIdSeq = idSeq }, DBKindMask.PostgreSQL);
+        }
 
         public override async Task<int> InsertAsync(HstActionDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO hst_action
 (action_id, book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
@@ -145,6 +166,8 @@ VALUES (@ActionId, @BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @
         /// <returns>帳簿項目ID</returns>
         public override async Task<int> InsertReturningIdAsync(HstActionDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int actionId = await this.mDbHandler.QuerySingleAsync<int>(@"
 INSERT INTO hst_action
 (book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
@@ -162,6 +185,8 @@ RETURNING action_id;", dto);
         /// <returns>帳簿項目ID</returns>
         public async Task<int> InsertMoveActionReturningIdAsync(HstActionDto dto, int balanceKind)
         {
+            using FuncLog funcLog = new(new { dto, balanceKind }, Log.LogLevel.Trace);
+
             int actionId = await this.mDbHandler.QuerySingleAsync<int>(@"
 INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@BookId, (
@@ -177,6 +202,8 @@ new { dto.BookId, dto.ActTime, dto.ActValue, dto.GroupId, dto.IsMatch, dto.JsonC
 
         public override async Task<int> UpdateAsync(HstActionDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, is_match = @IsMatch, 
@@ -193,6 +220,8 @@ WHERE action_id = @ActionId;", dto);
         /// <returns>更新件数</returns>
         public async Task<int> UpdateMoveActionAsync(HstActionDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET book_id = @BookId, act_time = @ActTime, act_value = @ActValue, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
@@ -208,6 +237,8 @@ WHERE action_id = @ActionId;", dto);
         /// <returns>更新件数</returns>
         public async Task<int> UpdateWithoutIsMatchAsync(HstActionDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, 
@@ -225,6 +256,8 @@ WHERE action_id = @ActionId;", dto);
         /// <returns>削除件数</returns>
         public async Task<int> UpdateIsMatchByIdAsync(int actionId, int isMatch)
         {
+            using FuncLog funcLog = new(new { actionId, isMatch }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET is_match = @IsMatch, update_time = @UpdateTime, updater = @Updater
@@ -243,6 +276,8 @@ new HstActionDto { IsMatch = isMatch, ActionId = actionId });
         /// <returns>更新件数</returns>
         public async Task<int> UpdateShopNameAndRemarkByIdAsync(int actionId, string shopName, string remark)
         {
+            using FuncLog funcLog = new(new { actionId, shopName, remark }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action SET shop_name = @ShopName, remark = @Remark, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId AND del_flg = 0;",
@@ -258,6 +293,8 @@ new HstActionDto { ActionId = actionId, ShopName = shopName, Remark = remark });
         /// <returns>クリア件数</returns>
         public async Task<int> ClearGroupIdByIdAsync(int actionId)
         {
+            using FuncLog funcLog = new(new { actionId }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET group_id = null, update_time = @UpdateTime, updater = @Updater
@@ -271,6 +308,8 @@ new HstActionDto { ActionId = actionId });
 
         public override async Task<int> DeleteAllAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM hst_action;");
 
             return count;
@@ -283,6 +322,8 @@ new HstActionDto { ActionId = actionId });
         /// <returns>削除件数</returns>
         public override async Task<int> DeleteByIdAsync(int actionId)
         {
+            using FuncLog funcLog = new(new { actionId }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
@@ -299,6 +340,8 @@ new HstActionDto { ActionId = actionId });
         /// <returns>削除件数</returns>
         public async Task<int> DeleteByGroupIdAsync(int groupId)
         {
+            using FuncLog funcLog = new(new { groupId }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
@@ -316,6 +359,8 @@ new HstActionDto { GroupId = groupId });
         /// <returns>削除件数</returns>
         public async Task<int> DeleteInGroupAfterDateByIdAsync(int actionId, bool withInTarget)
         {
+            using FuncLog funcLog = new(new { actionId, withInTarget }, Log.LogLevel.Trace);
+
             int count = withInTarget
                 ? await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action

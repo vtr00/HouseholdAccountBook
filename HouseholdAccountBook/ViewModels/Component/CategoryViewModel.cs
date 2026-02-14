@@ -1,9 +1,11 @@
-﻿namespace HouseholdAccountBook.ViewModels.Component
+﻿using HouseholdAccountBook.ViewModels.Abstract;
+
+namespace HouseholdAccountBook.ViewModels.Component
 {
     /// <summary>
     /// 分類VM
     /// </summary>
-    public partial class CategoryViewModel
+    public class CategoryViewModel : BindableBase
     {
         #region プロパティ
         /// <summary>

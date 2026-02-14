@@ -1,4 +1,6 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
+using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.Attributes;
 using HouseholdAccountBook.Extensions;
 using System;
 
@@ -26,16 +28,17 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
                 get;
                 set {
                     if (!SetValidIdentifier(ref field, value)) {
-                        throw new ArgumentException("Invalid UserName", value);
+                        throw new ArgumentException($"Invalid UserName: {value}", nameof(this.UserName));
                     }
                 }
             }
             /// <summary>
             /// パスワード
             /// </summary>
+            [IgnoreToString]
             public string Password {
-                get => ProtectedDataExtension.DecryptPassword(this.EncryptedPassword);
-                set => this.EncryptedPassword = ProtectedDataExtension.EncryptPassword(value);
+                get => ProtectedDataExtensions.DecryptPassword(this.EncryptedPassword);
+                set => this.EncryptedPassword = ProtectedDataExtensions.EncryptPassword(value);
             }
             /// <summary>
             /// データベース名
@@ -44,7 +47,7 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
                 get;
                 set {
                     if (!SetValidIdentifier(ref field, value)) {
-                        throw new ArgumentException("Invalid DatabaseName", value);
+                        throw new ArgumentException($"Invalid DatabaseName: {value}", nameof(this.DatabaseName));
                     }
                 }
             }
@@ -55,7 +58,7 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
                 get;
                 set {
                     if (!SetValidIdentifier(ref field, value)) {
-                        throw new ArgumentException("Invalid Role", value);
+                        throw new ArgumentException($"Invalid Role: {value}", nameof(this.Role));
                     }
                 }
             }
@@ -63,6 +66,7 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
             /// <summary>
             /// 暗号化済パスワード
             /// </summary>
+            [IgnoreToString]
             public string EncryptedPassword { get; set; }
 
             /// <summary>
@@ -73,6 +77,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
             /// <returns>適切か</returns>
             public static bool SetValidIdentifier(ref string field, string str)
             {
+                using FuncLog funcLog = new(new { str }, Log.LogLevel.Trace);
+
                 if (!str.IsValidDBIdentifier()) {
                     return false;
                 }

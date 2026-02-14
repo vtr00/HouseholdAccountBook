@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
+using HouseholdAccountBook.Adapters.Logger;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
@@ -44,6 +45,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// <param name="filePath">ファイルパス</param>
         private OleDbHandler(string provider, string filePath) : base(new OleDbConnection(string.Format(mStringFormat, provider, filePath)))
         {
+            using FuncLog funcLog = new(new { provider, filePath }, Log.LogLevel.Trace);
+
             this.DBLibKind = DBLibraryKind.OleDb;
             this.DBKind = provider.Contains(AccessProviderHeader) ? DBKind.Access : DBKind.Undefined;
         }
@@ -54,6 +57,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// <returns></returns>
         public static List<KeyValuePair<string, string>> GetOleDbProvider()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             List<KeyValuePair<string, string>> list = [];
 
             OleDbEnumerator enumerator = new();

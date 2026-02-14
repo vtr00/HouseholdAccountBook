@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.Adapters.Logger;
+using System;
 using System.IO;
 
 namespace HouseholdAccountBook.Extensions
@@ -14,6 +15,8 @@ namespace HouseholdAccountBook.Extensions
         /// <returns>fullRootPath から targetPath への相対パス。targetPath が fullRootPath 配下にない場合は targetPath のフルパス</returns>
         public static string GetSmartPath(string fullRootPath, string targetPath, string fullBasePath = "")
         {
+            using FuncLog funcLog = new(new { fullRootPath, targetPath, fullBasePath }, Log.LogLevel.Trace);
+
             if (string.IsNullOrEmpty(targetPath)) {
                 return string.Empty;
             }
@@ -44,6 +47,8 @@ namespace HouseholdAccountBook.Extensions
         /// <returns>フォルダパスとファイル名/フォルダ名のタプル</returns>
         public static (string, string) GetSeparatedPath(string path, string fullBasePath)
         {
+            using FuncLog funcLog = new(new { path, fullBasePath }, Log.LogLevel.Trace);
+
             if (string.IsNullOrEmpty(path)) {
                 return (fullBasePath, string.Empty);
             }

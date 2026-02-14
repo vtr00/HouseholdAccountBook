@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
 using HouseholdAccountBook.Adapters.Dto.Others;
+using HouseholdAccountBook.Adapters.Logger;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -20,6 +21,8 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<RemarkInfoDto>> FindByItemIdAsync(int itemId)
         {
+            using FuncLog funcLog = new(new {itemId }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<RemarkInfoDto>(@"
 SELECT R.remark, COUNT(A.remark) AS count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
 FROM hst_remark R

@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.ViewModels.Abstract;
 using System.Windows;
 
 namespace HouseholdAccountBook.Extensions
@@ -6,6 +7,7 @@ namespace HouseholdAccountBook.Extensions
     /// <summary>
     /// <see cref="Window"/> の拡張メソッドを提供します
     /// </summary>
+    /// <remarks><see cref="WindowViewModelBase"/>に依存しない処理</remarks>
     public static class WindowExtensions
     {
         public static readonly DependencyProperty IsModalProperty = DependencyProperty.RegisterAttached(

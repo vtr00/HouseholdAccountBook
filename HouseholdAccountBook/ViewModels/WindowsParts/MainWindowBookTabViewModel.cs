@@ -315,7 +315,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 編集コマンド
         /// </summary>
-        public ICommand EditMenuCommand => new RelayCommand(null, this.EditMenuCommand_CanExecute);
+        public ICommand EditMenuCommand => new RelayCommand(this.EditMenuCommand_CanExecute);
         /// <summary>
         /// 検索欄表示コマンド
         /// </summary>

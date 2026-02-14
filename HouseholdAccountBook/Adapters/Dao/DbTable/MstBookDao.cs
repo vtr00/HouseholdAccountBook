@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -19,6 +20,8 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
 
         public override async Task<IEnumerable<MstBookDto>> FindAllAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<MstBookDto>(@"
 SELECT * 
 FROM mst_book
@@ -35,6 +38,8 @@ ORDER BY sort_order;");
         /// <returns>取得したレコード</returns>
         public override async Task<MstBookDto> FindByIdAsync(int bookId)
         {
+            using FuncLog funcLog = new(new { bookId }, Log.LogLevel.Trace);
+
             var dto = await this.mDbHandler.QuerySingleOrDefaultAsync<MstBookDto>(@"
 SELECT *
 FROM mst_book
@@ -50,6 +55,8 @@ new MstBookDto { BookId = bookId });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<MstBookDto>> FindIfJsonCodeExistsAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<MstBookDto>(@"
 SELECT * 
 FROM mst_book 
@@ -59,11 +66,17 @@ ORDER BY sort_order;");
             return dtoList;
         }
 
-        public override async Task SetIdSequenceAsync(int idSeq) =>
+        public override async Task SetIdSequenceAsync(int idSeq)
+        {
+            using FuncLog funcLog = new(new { idSeq }, Log.LogLevel.Trace);
+
             _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('mst_book_book_id_seq', @BookIdSeq);", new { BookIdSeq = idSeq }, DBKindMask.PostgreSQL);
+        }
 
         public override async Task<int> InsertAsync(MstBookDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO mst_book 
 (book_id, book_name, book_kind, initial_value, pay_day, debit_book_id, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter) 
@@ -74,6 +87,8 @@ VALUES (@BookId, @BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @Js
 
         public override async Task<int> InsertReturningIdAsync(MstBookDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int bookId = await this.mDbHandler.QuerySingleAsync<int>(@"
 INSERT INTO mst_book (book_name, book_kind, initial_value, pay_day, debit_book_id, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @JsonCode, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
@@ -89,6 +104,8 @@ RETURNING book_id;", dto);
         /// <returns>更新件数</returns>
         public async Task<int> UpdateSetableAsync(MstBookDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE mst_book
 SET book_name = @BookName, book_kind = @BookKind, initial_value = @InitialValue, debit_book_id = @DebitBookId, pay_day = @PayDay, 
@@ -109,6 +126,8 @@ WHERE book_id = @BookId;", dto);
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public async Task<int> SwapSortOrderAsync(int bookId1, int bookId2)
         {
+            using FuncLog funcLog = new(new { bookId1, bookId2 }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@" 
 WITH original AS (
   SELECT
@@ -131,6 +150,8 @@ new { BookId1 = bookId1, BookId2 = bookId2, UpdateTime = DateTime.Now, Updater }
 
         public override async Task<int> DeleteAllAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM mst_book;");
 
             return count;
@@ -143,6 +164,8 @@ new { BookId1 = bookId1, BookId2 = bookId2, UpdateTime = DateTime.Now, Updater }
         /// <returns>削除件数</returns>
         public override async Task<int> DeleteByIdAsync(int bookId)
         {
+            using FuncLog funcLog = new(new { bookId }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE mst_book
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater

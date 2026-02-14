@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
 using HouseholdAccountBook.Adapters.Dto.Others;
+using HouseholdAccountBook.Adapters.Logger;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -20,6 +21,8 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<MoveActionInfoDto>> GetAllAsync(int groupId)
         {
+            using FuncLog funcLog = new(new { groupId }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<MoveActionInfoDto>(@"
 SELECT A.book_id, A.action_id, A.item_id, A.act_time, A.act_value, A.remark, I.move_flg
 FROM hst_action A

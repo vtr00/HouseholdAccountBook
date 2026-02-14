@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -19,6 +20,8 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
 
         public override async Task<IEnumerable<MstCategoryDto>> FindAllAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<MstCategoryDto>(@"
 SELECT * 
 FROM mst_category
@@ -34,6 +37,8 @@ WHERE del_flg = 0;");
         /// <returns>取得したレコード</returns>
         public override async Task<MstCategoryDto> FindByIdAsync(int categoryId)
         {
+            using FuncLog funcLog = new(new { categoryId }, Log.LogLevel.Trace);
+
             var dto = await this.mDbHandler.QuerySingleOrDefaultAsync<MstCategoryDto>(@"
 SELECT *
 FROM mst_category
@@ -51,6 +56,8 @@ new MstCategoryDto { CategoryId = categoryId });
         /// <remarks>移動を除く</remarks>
         public async Task<IEnumerable<MstCategoryDto>> FindByBalanceKindAsync(int balanceKind)
         {
+            using FuncLog funcLog = new(new { balanceKind }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<MstCategoryDto>(@"
 SELECT *
 FROM mst_category
@@ -61,11 +68,17 @@ new MstCategoryDto { BalanceKind = balanceKind });
             return dtoList;
         }
 
-        public override async Task SetIdSequenceAsync(int idSeq) =>
+        public override async Task SetIdSequenceAsync(int idSeq)
+        {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('mst_category_category_id_seq', @CategoryIdSeq);", new { CategoryIdSeq = idSeq }, DBKindMask.PostgreSQL);
+        }
 
         public override async Task<int> InsertAsync(MstCategoryDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO mst_category
 (category_id, category_name, balance_kind, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
@@ -76,6 +89,8 @@ VALUES (@CategoryId, @CategoryName, @BalanceKind, @JsonCode, @SortOrder, @DelFlg
 
         public override async Task<int> InsertReturningIdAsync(MstCategoryDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int categoryId = await this.mDbHandler.QuerySingleAsync<int>(@"
 INSERT INTO mst_category
 (category_name, balance_kind, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
@@ -94,6 +109,8 @@ RETURNING category_id;", dto);
         /// <returns>更新件数</returns>
         public async Task<int> UpdateSetableAsync(MstCategoryDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE mst_category
 SET category_name = @CategoryName, update_time = @UpdateTime, updater = @Updater
@@ -111,6 +128,8 @@ WHERE category_id = @CategoryId;", dto);
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public async Task<int> SwapSortOrderAsync(int categoryId1, int categoryId2)
         {
+            using FuncLog funcLog = new(new { categoryId1, categoryId2 }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@" 
 WITH original AS (
   SELECT
@@ -133,6 +152,8 @@ new { CategoryId1 = categoryId1, CategoryId2 = categoryId2, UpdateTime = DateTim
 
         public override async Task<int> DeleteAllAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM mst_category;");
 
             return count;
@@ -145,6 +166,8 @@ new { CategoryId1 = categoryId1, CategoryId2 = categoryId2, UpdateTime = DateTim
         /// <returns>削除件数</returns>
         public override async Task<int> DeleteByIdAsync(int categoryId)
         {
+            using FuncLog funcLog = new(new { categoryId }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE mst_category
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater

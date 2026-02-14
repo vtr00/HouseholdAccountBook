@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.ViewModels.Abstract;
+using System;
 using System.Collections.Generic;
 
 namespace HouseholdAccountBook.ViewModels.Component
@@ -6,7 +7,7 @@ namespace HouseholdAccountBook.ViewModels.Component
     /// <summary>
     /// 系列VM(一覧の行、グラフの系列データ)
     /// </summary>
-    public class SeriesViewModel
+    public class SeriesViewModel : BindableBase
     {
         #region プロパティ
         /// <summary>
@@ -71,7 +72,6 @@ namespace HouseholdAccountBook.ViewModels.Component
                         : $"{this.BalanceName} > {this.CategoryName}"
                     : this.OtherName;
             }
-            private set { }
         }
         /// <summary>
         /// 一覧表示名(サマリーや一覧に表示する名称)
@@ -86,7 +86,6 @@ namespace HouseholdAccountBook.ViewModels.Component
                             ? this.BalanceName
                             : this.OtherName;
             }
-            private set { }
         }
         #endregion
 
@@ -94,6 +93,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// デフォルトコンストラクタ
         /// </summary>
         public SeriesViewModel() { }
+
         /// <summary>
         /// コピーコンストラクタ
         /// </summary>

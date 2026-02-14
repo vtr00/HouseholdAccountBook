@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
 using HouseholdAccountBook.Adapters.Dto.Others;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 using System.Threading.Tasks;
 
@@ -20,6 +21,8 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコード</returns>
         public async Task<EndingBalanceInfoDto> Find(DateTime startTime)
         {
+            using FuncLog funcLog = new(new { startTime }, Log.LogLevel.Trace);
+
             var dto = await this.mDbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0) AS ending_balance
 FROM hst_action AA
@@ -38,6 +41,8 @@ new { StartTime = startTime });
         /// <returns>取得したレコード</returns>
         public async Task<EndingBalanceInfoDto> FindByBookId(int bookId, DateTime startTime)
         {
+            using FuncLog funcLog = new(new { bookId, startTime }, Log.LogLevel.Trace);
+
             var dto = await this.mDbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @BookId) AS ending_balance
 FROM hst_action AA

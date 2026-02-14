@@ -52,6 +52,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         private NpgsqlDbHandler(string uri, int port, string userName, string password, string databaseName)
             : base(new NpgsqlConnection(string.Format(mStringFormat, uri, port, userName, password, databaseName)))
         {
+            using FuncLog funcLog = new(new { uri, port, userName, databaseName }, Log.LogLevel.Trace);
+
             this.DBLibKind = DBLibraryKind.PostgreSQL;
             this.DBKind = DBKind.PostgreSQL;
         }
@@ -69,6 +71,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         public async Task<int?> ExecuteDump(string backupFilePath, string dumpExePath, PostgresPasswordInput passwordInput, PostgresFormat format,
                                             NotifyResult notifyResult = null, bool waitForFinish = true)
         {
+            using FuncLog funcLog = new(new { backupFilePath, dumpExePath, passwordInput, format, notifyResult, waitForFinish }, Log.LogLevel.Trace);
+
             bool pgPassConf = passwordInput == PostgresPasswordInput.PgPassConf;
 
             // 起動情報を設定する
@@ -134,6 +138,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// <returns>エラーコード</returns>
         public async Task<int> ExecuteRestore(string backupFilePath, string restoreExePath, PostgresPasswordInput passwordInput)
         {
+            using FuncLog funcLog = new(new { backupFilePath, restoreExePath, passwordInput }, Log.LogLevel.Trace);
+
             bool pgPassConf = passwordInput == PostgresPasswordInput.PgPassConf;
 
             // 起動情報を設定する

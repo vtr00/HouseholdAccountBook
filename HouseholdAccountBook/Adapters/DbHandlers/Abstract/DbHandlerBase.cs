@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -55,6 +56,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// <param name="connection">DB接続</param>
         public DbHandlerBase(DbConnection connection)
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             this.mConnection = connection;
@@ -68,6 +71,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// <exception cref="TimeoutException">接続タイムアウトが発生した場合</exception>
         public async Task<bool> OpenAsync(int timeoutMs = 0)
         {
+            using FuncLog funcLog = new(new { timeoutMs }, Log.LogLevel.Trace);
+
             // 接続不可の場合、接続しない
             if (this.CanOpen == false) {
                 return false;
@@ -99,6 +104,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// </summary>
         public async ValueTask DisposeAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             GC.SuppressFinalize(this);
 
             if (this.mConnection != null) {
@@ -118,6 +125,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// <returns>クエリ結果リスト。対象外の場合はデフォルト値</returns>
         public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object param = null, DBKindMask target = DBKindMask.All)
         {
+            using FuncLog funcLog = new(new { sql, param, target }, Log.LogLevel.Trace);
+
             if (!target.Check(this.DBKind)) { return default; }
 
             try {
@@ -138,6 +147,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// <returns>クエリ結果 または デフォルト値。対象外の場合はデフォルト値</returns>
         public async Task<T> QueryFirstOrDefaultAsync<T>(string sql, object param = null, DBKindMask target = DBKindMask.All)
         {
+            using FuncLog funcLog = new(new { sql, param, target }, Log.LogLevel.Trace);
+
             if (!target.Check(this.DBKind)) { return default; }
 
             try {
@@ -159,6 +170,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// <exception cref="InvalidOperationException">結果が1行以外の場合にスローされる</exception>
         public async Task<T> QuerySingleAsync<T>(string sql, object param = null, DBKindMask target = DBKindMask.All)
         {
+            using FuncLog funcLog = new(new { sql, param, target }, Log.LogLevel.Trace);
+
             if (!target.Check(this.DBKind)) { return default; }
 
             try {
@@ -180,6 +193,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// <exception cref="InvalidOperationException">結果が2行以上の場合にスローされる</exception>
         public async Task<T> QuerySingleOrDefaultAsync<T>(string sql, object param = null, DBKindMask target = DBKindMask.All)
         {
+            using FuncLog funcLog = new(new { sql, param, target }, Log.LogLevel.Trace);
+
             if (!target.Check(this.DBKind)) { return default; }
 
             try {
@@ -199,6 +214,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// <returns>変更件数。対象外の場合は0</returns>
         public async Task<int> ExecuteAsync(string sql, object param = null, DBKindMask target = DBKindMask.All)
         {
+            using FuncLog funcLog = new(new { sql, param, target }, Log.LogLevel.Trace);
+
             if (!target.Check(this.DBKind)) { return default; }
 
             try {
@@ -221,6 +238,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// <param name="actionAsync">トランザクション内の処理</param>
         public async Task ExecTransactionAsync(AxActionAsync actionAsync, DBKindMask target = DBKindMask.All)
         {
+            using FuncLog funcLog = new(new { target }, Log.LogLevel.Trace);
+
             if (!target.Check(this.DBKind)) { return; }
 
             try {

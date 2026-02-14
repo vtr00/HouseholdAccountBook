@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
+using HouseholdAccountBook.Adapters.Logger;
 using Microsoft.Data.Sqlite;
 using System.IO;
 using System.Threading.Tasks;
@@ -40,6 +41,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// <param name="filePath">ファイルパス</param>
         private SQLiteDbHandler(string filePath) : base(new SqliteConnection(string.Format(mStringFormat, filePath)))
         {
+            using FuncLog funcLog = new(new { filePath }, Log.LogLevel.Trace);
+
             this.DBLibKind = DBLibraryKind.SQLite;
             this.DBKind = DBKind.SQLite;
 
@@ -53,14 +56,24 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// スキーマバージョンを取得する
         /// </summary>
         /// <returns>スキーマバージョン</returns>
-        public async Task<int> GetUserVersion() => await this.QuerySingleAsync<int>($"PRAGMA USER_VERSION;");
+        public async Task<int> GetUserVersion()
+        {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
+            return await this.QuerySingleAsync<int>($"PRAGMA USER_VERSION;");
+        }
 
         /// <summary>
         /// スキーマバージョンを設定する
         /// </summary>
         /// <param name="version">スキーマバージョン</param>
         /// <returns></returns>
-        public async Task<int> SetUserVersion(int version) => await this.ExecuteAsync($"PRAGMA USER_VERSION = @UserVersion;", new { UserVersion = version });
+        public async Task<int> SetUserVersion(int version)
+        {
+            using FuncLog funcLog = new(new { version }, Log.LogLevel.Trace);
+
+            return await this.ExecuteAsync($"PRAGMA USER_VERSION = @UserVersion;", new { UserVersion = version });
+        }
 
         /// <summary>
         /// SQLiteテンプレートファイルをコピーして新規作成する
@@ -71,6 +84,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// <remarks>ファイルが既に存在する場合は何もしない</remarks>
         public static bool CreateTemplateFile(string sqliteFilePath, byte[] sqliteBinary)
         {
+            using FuncLog funcLog = new(new { sqliteFilePath }, Log.LogLevel.Trace);
+
             bool exists = File.Exists(sqliteFilePath);
             if (!exists) {
                 try {

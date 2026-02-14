@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Adapters.Dto.Abstract;
 using HouseholdAccountBook.Adapters.Dto.KHDbTable;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 using System.Text;
 using System.Text.Json;
@@ -22,6 +23,8 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// <param name="dto">記帳風月の帳簿DTO</param>
         public MstBookDto(CbmBookDto dto) : base(dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             this.BookId = dto.BOOK_ID;
             this.BookName = dto.BOOK_NAME;
             this.InitialValue = dto.BALANCE;

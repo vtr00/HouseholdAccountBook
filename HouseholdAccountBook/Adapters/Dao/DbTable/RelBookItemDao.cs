@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,6 +18,8 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
 
         public override async Task<IEnumerable<RelBookItemDto>> FindAllAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<RelBookItemDto>(@"
 SELECT * 
 FROM rel_book_item
@@ -33,6 +36,8 @@ WHERE del_flg = 0;");
         /// <returns>取得したレコードリスト</returns>
         public async Task<RelBookItemDto> FindByBookIdAndItemIdAsync(int bookId, int itemId, bool includeDeleted = false)
         {
+            using FuncLog funcLog = new(new { bookId, itemId, includeDeleted }, Log.LogLevel.Trace);
+
             var dto = includeDeleted
                 ? await this.mDbHandler.QuerySingleOrDefaultAsync<RelBookItemDto>(@"
 SELECT * FROM rel_book_item
@@ -52,6 +57,8 @@ new RelBookItemDto { BookId = bookId, ItemId = itemId });
         /// <returns>挿入件数</returns>
         public override async Task<int> InsertAsync(RelBookItemDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO rel_book_item
 (item_id, book_id, json_code, del_flg, update_time, updater, insert_time, inserter)
@@ -67,6 +74,8 @@ VALUES (@ItemId, @BookId, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime
         /// <returns>更新件数</returns>
         public override async Task<int> UpdateAsync(RelBookItemDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE rel_book_item
 SET json_code = @JsonCode, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
@@ -83,6 +92,8 @@ WHERE item_id = @ItemId AND book_id = @BookId;", dto);
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public override async Task<int> UpsertAsync(RelBookItemDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO rel_book_item (item_id, book_id, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@ItemId, @BookId, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
@@ -99,6 +110,8 @@ WHERE rel_book_item.item_id = @ItemId AND rel_book_item.book_id = @BookId;", dto
         /// <returns>削除件数</returns>
         public override async Task<int> DeleteAllAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM rel_book_item;");
 
             return count;
@@ -111,6 +124,8 @@ WHERE rel_book_item.item_id = @ItemId AND rel_book_item.book_id = @BookId;", dto
         /// <returns>削除件数</returns>
         public async Task<int> DeleteAsync(RelBookItemDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE rel_book_item SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId AND book_id = @BookId;", dto);

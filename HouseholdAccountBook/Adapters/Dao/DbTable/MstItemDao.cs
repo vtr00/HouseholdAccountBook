@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -19,6 +20,8 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
 
         public override async Task<IEnumerable<MstItemDto>> FindAllAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<MstItemDto>(@"
 SELECT * 
 FROM mst_item
@@ -34,6 +37,8 @@ WHERE del_flg = 0;");
         /// <returns>取得したレコード</returns>
         public override async Task<MstItemDto> FindByIdAsync(int itemId)
         {
+            using FuncLog funcLog = new(new { itemId }, Log.LogLevel.Trace);
+
             var dto = await this.mDbHandler.QuerySingleOrDefaultAsync<MstItemDto>(@"
 SELECT *
 FROM mst_item
@@ -50,6 +55,8 @@ new MstItemDto { ItemId = itemId });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<MstItemDto>> FindByCategoryIdAsync(int categoryId)
         {
+            using FuncLog funcLog = new(new { categoryId }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<MstItemDto>(@"
 SELECT item_id, item_name, advance_flg, sort_order
 FROM mst_item
@@ -60,11 +67,17 @@ new MstItemDto { CategoryId = categoryId });
             return dtoList;
         }
 
-        public override async Task SetIdSequenceAsync(int idSeq) =>
+        public override async Task SetIdSequenceAsync(int idSeq)
+        {
+            using FuncLog funcLog = new(new { idSeq }, Log.LogLevel.Trace);
+
             _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('mst_item_item_id_seq', @ItemIdSeq);", new { ItemIdSeq = idSeq }, DBKindMask.PostgreSQL);
+        }
 
         public override async Task<int> InsertAsync(MstItemDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO mst_item
 (item_id, item_name, category_id, move_flg, advance_flg, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
@@ -75,6 +88,8 @@ VALUES (@ItemId, @ItemName, @CategoryId, @MoveFlg, @AdvanceFlg, @JsonCode, @Sort
 
         public override async Task<int> InsertReturningIdAsync(MstItemDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int itemId = await this.mDbHandler.QuerySingleAsync<int>(@"
 INSERT INTO mst_item
 (item_name, category_id, move_flg, advance_flg, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
@@ -93,6 +108,8 @@ RETURNING item_id;", dto);
         /// <returns>更新件数</returns>
         public async Task<int> UpdateSetableAsync(MstItemDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE mst_item
 SET item_name = @ItemName, update_time = @UpdateTime, updater = @Updater
@@ -109,6 +126,8 @@ WHERE item_id = @ItemId;", dto);
         /// <returns>更新件数</returns>
         public async Task<int> UpdateSortOrderToMaximumAsync(int categoryId, int itemId)
         {
+            using FuncLog funcLog = new(new { categoryId, itemId }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE mst_item
 SET category_id = @CategoryId, sort_order = (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), update_time = @UpdateTime, updater = @Updater
@@ -126,6 +145,8 @@ new MstItemDto { CategoryId = categoryId, ItemId = itemId });
         /// <returns>更新件数</returns>
         public async Task<int> UpdateSortOrderToMinimumAsync(int categoryId, int itemId)
         {
+            using FuncLog funcLog = new(new { categoryId, itemId }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE mst_item
 SET category_id = @CategoryId, sort_order = (SELECT COALESCE(MAX(sort_order) - 1, 1) FROM mst_item), update_time = @UpdateTime, updater = @Updater
@@ -144,6 +165,8 @@ new MstItemDto { CategoryId = categoryId, ItemId = itemId });
         /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
         public async Task<int> SwapSortOrderAsync(int itemId1, int itemId2)
         {
+            using FuncLog funcLog = new(new { itemId1, itemId2 }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@" 
 WITH original AS (
   SELECT
@@ -166,6 +189,8 @@ new { ItemId1 = itemId1, ItemId2 = itemId2, UpdateTime = DateTime.Now, Updater }
 
         public override async Task<int> DeleteAllAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM mst_item;");
 
             return count;
@@ -178,6 +203,8 @@ new { ItemId1 = itemId1, ItemId2 = itemId2, UpdateTime = DateTime.Now, Updater }
         /// <returns>削除件数</returns>
         public override async Task<int> DeleteByIdAsync(int itemId)
         {
+            using FuncLog funcLog = new(new { itemId }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE mst_item
 SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
