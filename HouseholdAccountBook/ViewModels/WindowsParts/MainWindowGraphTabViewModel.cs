@@ -160,7 +160,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             string unitX = this.Tab switch {
                 Tabs.DailyGraphTab => Properties.Resources.Unit_Day,
                 Tabs.MonthlyGraphTab => Properties.Resources.Unit_Month,
-                Tabs.YearlyGraphTab => DateTimeUtil.GetYearUnit(this.Parent.FiscalStartMonth),
+                Tabs.YearlyGraphTab => UnitUtil.GetYearUnit(this.Parent.FiscalStartMonth),
                 _ => throw new InvalidOperationException(),
             };
             DateTime start = this.Parent.DisplayedStart;
@@ -247,8 +247,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             // トラッカーのフォーマット文字列を取得する関数
             string GetTrackerFormatString(bool addItemName)
             {
-                string unit_pre = DateTimeUtil.GetYearPreUnit(this.Parent.FiscalStartMonth);
-                string unit_post = DateTimeUtil.GetYearPostUnit(this.Parent.FiscalStartMonth);
+                string unit_pre = UnitUtil.GetYearPreUnit(this.Parent.FiscalStartMonth);
+                string unit_post = UnitUtil.GetYearPostUnit(this.Parent.FiscalStartMonth);
                 return (addItemName ? "{0}\n" : "") + this.Tab switch {                             //{項目名}\n
                     Tabs.DailyGraphTab => "{Date:yyyy-MM-dd}: {Value:#,0}",                         //{日付}: {金額}
                     Tabs.MonthlyGraphTab => "{Date:yyyy-MM}: {Value:#,0}",                          //{月}: {金額}
@@ -395,8 +395,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             // トラッカーのフォーマット文字列を取得する関数
             string GetTrackerFormatString()
             {
-                string unit_pre = DateTimeUtil.GetYearPreUnit(this.Parent.FiscalStartMonth);
-                string unit_post = DateTimeUtil.GetYearPostUnit(this.Parent.FiscalStartMonth);
+                string unit_pre = UnitUtil.GetYearPreUnit(this.Parent.FiscalStartMonth);
+                string unit_post = UnitUtil.GetYearPostUnit(this.Parent.FiscalStartMonth);
                 return this.Tab switch {
                     Tabs.DailyGraphTab => "{Date:yyyy-MM-dd}: {Value:#,0}",                        //{日付}: {金額}
                     Tabs.MonthlyGraphTab => "{Date:yyyy-MM}: {Value:#,0}",                         //{月}: {金額}

@@ -1,9 +1,11 @@
-﻿namespace HouseholdAccountBook.ViewModels.Settings
+﻿using HouseholdAccountBook.ViewModels.Abstract;
+
+namespace HouseholdAccountBook.ViewModels.Settings
 {
     /// <summary>
     /// ウィンドウ設定VM
     /// </summary>
-    public class WindowSettingViewModel
+    public class WindowSettingViewModel : BindableBase
     {
         /// <summary>
         /// ウィンドウタイトル

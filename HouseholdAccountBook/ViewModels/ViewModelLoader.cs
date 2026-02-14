@@ -697,6 +697,7 @@ namespace HouseholdAccountBook.ViewModels
         }
         #endregion
 
+        #region CsvComparisonWindow
         /// <summary>
         /// 帳簿VM(比較用)を取得する
         /// </summary>
@@ -730,6 +731,7 @@ namespace HouseholdAccountBook.ViewModels
 
             return bookCompVMList;
         }
+        #endregion
 
         #region SettingsWindow
         /// <summary>

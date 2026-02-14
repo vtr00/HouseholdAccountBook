@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.Abstract;
+using HouseholdAccountBook.Adapters.Logger;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -23,6 +24,8 @@ namespace HouseholdAccountBook.Adapters.Dao.Abstract
         public abstract Task<int> InsertAsync(DTO dto);
         public async Task<int> BulkInsertAsync(IEnumerable<DTO> dtoList)
         {
+            using FuncLog funcLog = new(new { dtoList }, Log.LogLevel.Trace);
+
             int count = 0;
             foreach (var dto in dtoList) {
                 count += await this.InsertAsync(dto);

@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
 using HouseholdAccountBook.Adapters.DbHandlers;
 using HouseholdAccountBook.Adapters.Dto.KHDbTable;
+using HouseholdAccountBook.Adapters.Logger;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,7 +13,12 @@ namespace HouseholdAccountBook.Adapters.Dao.KHDbTable
     /// <param name="dbHandler">DBハンドラ</param>
     public class CbtActDao(OleDbHandler dbHandler) : KHReadDaoBase<CbtActDto>(dbHandler)
     {
-        public override async Task<IEnumerable<CbtActDto>> FindAllAsync() => await this.mDbHandler.QueryAsync<CbtActDto>(@"SELECT * FROM CBT_ACT ORDER BY ACT_ID;");
+        public override async Task<IEnumerable<CbtActDto>> FindAllAsync()
+        {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
+            return await this.mDbHandler.QueryAsync<CbtActDto>(@"SELECT * FROM CBT_ACT ORDER BY ACT_ID;");
+        }
 
         /// <summary>
         /// <see cref="CbtActDto.GROUP_ID"/> に基づいて、レコードを取得する
@@ -20,6 +26,10 @@ namespace HouseholdAccountBook.Adapters.Dao.KHDbTable
         /// <param name="groupId">グループID</param>
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<CbtActDto>> FindByGroupIdAsync(int groupId)
-            => await this.mDbHandler.QueryAsync<CbtActDto>(@"SELECT * FROM CBT_ACT WHERE GROUP_ID = @GROUP_ID;", new CbtActDto { GROUP_ID = groupId });
+        {
+            using FuncLog funcLog = new(new { groupId }, Log.LogLevel.Trace);
+
+            return await this.mDbHandler.QueryAsync<CbtActDto>(@"SELECT * FROM CBT_ACT WHERE GROUP_ID = @GROUP_ID;", new CbtActDto { GROUP_ID = groupId });
+        }
     }
 }

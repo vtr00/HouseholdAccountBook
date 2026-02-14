@@ -7,9 +7,9 @@ namespace HouseholdAccountBook.ViewModels.Component
     /// <summary>
     /// CSV比較VM
     /// </summary>
-    public partial class CsvComparisonViewModel : BindableBase, ISelectable
+    public class CsvComparisonViewModel : BindableBase, ISelectable
     {
-        #region フィールド
+        #region イベント
         /// <summary>
         /// 一致フラグ変更時のイベント
         /// </summary>

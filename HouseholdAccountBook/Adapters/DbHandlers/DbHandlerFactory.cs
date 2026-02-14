@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 using System.Threading.Tasks;
 
@@ -30,6 +31,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// <param name="info">接続情報</param>
         public DbHandlerFactory(DbHandlerBase.ConnectInfo info)
         {
+            using FuncLog funcLog = new(new { info }, Log.LogLevel.Trace);
+
             if (info is NpgsqlDbHandler.ConnectInfo) {
                 this.DBLibKind = DBLibraryKind.PostgreSQL;
                 this.mInfo = info;
@@ -61,6 +64,8 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// <remarks>このタイミングではSQLiteファイルは生成されない</remarks>
         public async Task<DbHandlerBase> CreateAsync(int timeoutMs = 0)
         {
+            using FuncLog funcLog = new(new { timeoutMs }, Log.LogLevel.Trace);
+
             try {
                 DbHandlerBase dbHandler = this.DBLibKind switch {
                     DBLibraryKind.SQLite => new SQLiteDbHandler(this.mInfo as SQLiteDbHandler.ConnectInfo),

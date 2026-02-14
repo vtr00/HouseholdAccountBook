@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Adapters.Dto.Abstract;
 using HouseholdAccountBook.Adapters.Dto.KHDbTable;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 
 namespace HouseholdAccountBook.Adapters.Dto.DbTable
@@ -19,6 +20,8 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// <param name="dto">記帳風月の備考DTO</param>
         public HstRemarkDto(CbtNoteDto dto) : base(dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             this.ItemId = dto.ITEM_ID;
             this.Remark = dto.NOTE_NAME;
             this.RemarkKind = 0;

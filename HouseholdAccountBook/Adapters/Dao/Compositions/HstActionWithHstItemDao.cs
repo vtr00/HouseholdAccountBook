@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
+using HouseholdAccountBook.Adapters.Logger;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -19,6 +20,8 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<HstActionDto>> FindByCategoryIdAsync(int categoryId)
         {
+            using FuncLog funcLog = new(new { categoryId }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action A

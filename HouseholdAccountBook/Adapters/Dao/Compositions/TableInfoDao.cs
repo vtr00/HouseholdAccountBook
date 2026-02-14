@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.Others;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Extensions;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,8 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコード</returns>
         public async Task<IEnumerable<TableInfoDto>> FindByColumnName(string columnName)
         {
+            using FuncLog funcLog = new(new {columnName }, Log.LogLevel.Trace);
+
             if (!columnName.IsValidDBIdentifier()) {
                 throw new ArgumentException($"Invalid column name: {columnName}");
             }

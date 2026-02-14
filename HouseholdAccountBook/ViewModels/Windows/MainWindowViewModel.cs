@@ -559,11 +559,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// ファイルコマンド
         /// </summary>
-        public ICommand FileMenuCommand => new RelayCommand(null);
+        public ICommand FileMenuCommand => new RelayCommand();
         /// <summary>
         /// インポートコマンド
         /// </summary>
-        public ICommand ImportCommand => new RelayCommand(null, this.ImportCommand_CanExecute);
+        public ICommand ImportCommand => new RelayCommand(this.ImportCommand_CanExecute);
         /// <summary>
         /// 記帳風月インポートコマンド
         /// </summary>
@@ -583,7 +583,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// エクスポートコマンド
         /// </summary>
-        public ICommand ExportCommand => new RelayCommand(null, this.ExportCommand_CanExecute);
+        public ICommand ExportCommand => new RelayCommand(this.ExportCommand_CanExecute);
         /// <summary>
         /// カスタムファイルエクスポートコマンド
         /// </summary>
@@ -595,7 +595,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// Excelファイルエクスポートコマンド
         /// </summary>
-        public ICommand ExportExcelFileCommand => new RelayCommand(this.ExportExcelFileCommand_Executed, this.ExportExcelFileCommand_CanExecute);
+        public ICommand ExportExcelFileCommand => new RelayCommand(this.ExportExcelFileCommand_Executed, ExportExcelFileCommand_CanExecute);
         /// <summary>
         /// バックアップコマンド
         /// </summary>
@@ -603,7 +603,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 操作ログファイルコマンド
         /// </summary>
-        public ICommand OperationLogFileCommand => new RelayCommand(null, this.OperationLogFileCommand_CanExecute);
+        public ICommand OperationLogFileCommand => new RelayCommand(this.OperationLogFileCommand_CanExecute);
         /// <summary>
         /// ウィンドウ終了コマンド
         /// </summary>
@@ -614,7 +614,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 表示コマンド
         /// </summary>
-        public ICommand ShowMenuCommand => new RelayCommand(null, this.ShowMenuCommand_CanExecute);
+        public ICommand ShowMenuCommand => new RelayCommand(this.ShowMenuCommand_CanExecute);
         /// <summary>
         /// 帳簿項目タブ表示コマンド
         /// </summary>
@@ -677,7 +677,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// ツールメニューコマンド
         /// </summary>
-        public ICommand ToolMenuCommand => new RelayCommand(null, this.ToolCommand_CanExecute);
+        public ICommand ToolMenuCommand => new RelayCommand(this.ToolCommand_CanExecute);
         /// <summary>
         /// 設定コマンド
         /// </summary>
@@ -685,7 +685,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿内ツールコマンド
         /// </summary>
-        public ICommand ToolInBookCommand => new RelayCommand(null, this.ToolInBookCommand_CanExecute);
+        public ICommand ToolInBookCommand => new RelayCommand(this.ToolInBookCommand_CanExecute);
         /// <summary>
         /// CSVファイル比較コマンド
         /// </summary>
@@ -696,7 +696,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// ヘルプメニューコマンド
         /// </summary>
-        public ICommand HelpMenuCommand => new RelayCommand(null, this.HelpMenuCommand_CanExecute);
+        public ICommand HelpMenuCommand => new RelayCommand(this.HelpMenuCommand_CanExecute);
         /// <summary>
         /// バージョン表示コマンド
         /// </summary>
@@ -1229,9 +1229,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// Excelファイルエクスポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-#pragma warning disable CA1822 // メンバーを static に設定します
-        public bool ExportExcelFileCommand_CanExecute() => false;
-#pragma warning restore CA1822 // メンバーを static に設定します
+        public static bool ExportExcelFileCommand_CanExecute() => false;
         /// <summary>
         /// Excelファイルエクスポートコマンド処理
         /// </summary>
@@ -1249,7 +1247,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             bool result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                result = await DbBackUpManager.Instance.CreateBackUpFileAsync(backUpNum:-1);
+                result = await DbBackUpManager.Instance.CreateBackUpFileAsync(backUpNum: -1);
 
                 if (result) {
                     Properties.Settings settings = Properties.Settings.Default;

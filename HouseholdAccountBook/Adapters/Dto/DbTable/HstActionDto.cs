@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Adapters.Dto.Abstract;
 using HouseholdAccountBook.Adapters.Dto.KHDbTable;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 
 namespace HouseholdAccountBook.Adapters.Dto.DbTable
@@ -19,6 +20,8 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// <param name="dto">記帳風月の帳簿項目DTO</param>
         public HstActionDto(CbtActDto dto) : base(dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             this.ActionId = dto.ACT_ID;
             this.BookId = dto.BOOK_ID;
             this.ItemId = dto.ITEM_ID;

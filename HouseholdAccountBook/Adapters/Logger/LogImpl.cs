@@ -80,6 +80,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         private LogImpl()
         {
             Log.OutputImpl = this.WriteLine;
+            Log.IsOutputImpl = level => level >= this.OutputLogLevel;
 
             Trace.AutoFlush = true;
             _ = Trace.Listeners.Add(new ConsoleTraceListener());

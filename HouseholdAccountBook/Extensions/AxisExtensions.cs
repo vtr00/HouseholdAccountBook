@@ -1,4 +1,5 @@
-﻿using OxyPlot.Axes;
+﻿using HouseholdAccountBook.Adapters.Logger;
+using OxyPlot.Axes;
 using System;
 using System.Diagnostics;
 
@@ -16,6 +17,8 @@ namespace HouseholdAccountBook.Extensions
         /// <param name="isDisplayZero">0を表示するか</param>
         public static void SetAxisRange(this Axis axis, double minValue, double maxValue, int divNum, bool isDisplayZero)
         {
+            using FuncLog funcLog = new(new { minValue, maxValue, divNum, isDisplayZero }, Log.LogLevel.Trace);
+
             double unit = 0.25; // 最大値/最小値の求める単位(1以下の値)
             Debug.Assert(unit is > 0 and <= 1);
 

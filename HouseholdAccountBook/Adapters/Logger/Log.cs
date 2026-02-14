@@ -27,6 +27,12 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// </summary>
         public static OutputImplDelegate OutputImpl { get; set; }
 
+        public delegate bool IsOutputImplDelegate(LogLevel level);
+        /// <summary>
+        /// 出力判定デリゲート
+        /// </summary>
+        public static IsOutputImplDelegate IsOutputImpl { get; set; }
+
         /// <summary>
         /// 関数開始ログを1行出力する
         /// </summary>
@@ -39,27 +45,30 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// <summary>
         /// 関数終了ログを1行出力する
         /// </summary>
+        /// <param name="returns">戻り値を含む匿名クラス</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="digit">「-」の出力回数</param>
-        public static void FuncEnd(LogLevel level = LogLevel.Info, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, ushort digit = 0)
-            => OutputImpl?.Invoke(level, "func end", fileName, methodName, -digit);
+        public static void FuncEnd(object returns = null, LogLevel level = LogLevel.Info, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, ushort digit = 0)
+            => Vars("func end", returns, level, fileName, methodName, -digit);
         /// <summary>
         /// 変数ログを1行出力する
         /// </summary>
         /// <param name="message">出力メッセージ</param>
-        /// <param name="vars">引数を含む匿名クラス</param>
+        /// <param name="vars">引数/戻り値を含む匿名クラス</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
-        /// <param name="lineNumber">出力元行数</param>
+        /// <param name="lineNumber">出力元行数(負の場合は「-」桁数)</param>
         public static void Vars(string message = "", object vars = null, LogLevel level = LogLevel.Info, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
-            string details = string.Empty;
+            if (IsOutputImpl?.Invoke(level) != true) { return; }
+
+            string varsStr = string.Empty;
             if (vars != null) {
-                details += vars.ToString2();
+                varsStr += vars.ToString2();
             }
 
-            string tmpMessage = string.Join((message != string.Empty && details != string.Empty) ? " - " : "", message, details);
+            string tmpMessage = string.Join((message != string.Empty && varsStr != string.Empty) ? " - " : "", message, varsStr);
             OutputImpl?.Invoke(level, tmpMessage, fileName, methodName, lineNumber);
         }
 

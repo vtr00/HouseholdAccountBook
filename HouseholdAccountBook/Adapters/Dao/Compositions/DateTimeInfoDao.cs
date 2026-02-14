@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.Others;
+using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Extensions;
 using System;
 using System.Threading.Tasks;
@@ -21,6 +22,8 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <exception cref="ArgumentException">テーブル名が不正</exception>
         public async Task<DateTime> GetUpdateTime(TableInfoDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             if (!dto.TableName.IsValidDBIdentifier()) {
                 throw new ArgumentException($"Invalid table name: {dto.TableName}");
             }
@@ -35,6 +38,8 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <exception cref="ArgumentException">テーブル名が不正</exception>
         public async Task<DateTime> GetInsertTime(TableInfoDto dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             if (!dto.TableName.IsValidDBIdentifier()) {
                 throw new ArgumentException($"Invalid table name: {dto.TableName}");
             }

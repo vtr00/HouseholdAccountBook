@@ -5,7 +5,7 @@ namespace HouseholdAccountBook.Extensions
     /// <summary>
     /// 複数の <see cref="Task"/> の同時実行を提供します 
     /// </summary>
-    public static class ValueTupleExtensions
+    public static class TaskTupleExtensions
     {
         /// <summary>
         /// 複数の <see cref="Task"/> を同時に非同期で実行する

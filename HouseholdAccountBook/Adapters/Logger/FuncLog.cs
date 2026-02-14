@@ -8,6 +8,7 @@ namespace HouseholdAccountBook.Adapters.Logger
     /// </summary>
     public class FuncLog : IDisposable
     {
+        #region フィールド
         /// <summary>
         /// ログレベル
         /// </summary>
@@ -24,6 +25,14 @@ namespace HouseholdAccountBook.Adapters.Logger
         /// 呼び出し元行数
         /// </summary>
         private readonly int mLineNumber;
+        #endregion
+
+        #region プロパティ
+        /// <summary>
+        /// 戻り値
+        /// </summary>
+        public object Returns { get; set; }
+        #endregion
 
         /// <summary>
         /// 関数ログ コンストラクタ
@@ -47,7 +56,7 @@ namespace HouseholdAccountBook.Adapters.Logger
         public void Dispose()
         {
             // 破棄時に関数終了ログを出力
-            Log.FuncEnd(this.mLevel, this.mFileName, this.mEthodName, (ushort)(Math.Log10(this.mLineNumber) + 1));
+            Log.FuncEnd(this.Returns, this.mLevel, this.mFileName, this.mEthodName, (ushort)(Math.Log10(this.mLineNumber) + 1));
             GC.SuppressFinalize(this);
         }
     }

@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Adapters.Dao.Abstract;
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.Others;
+using HouseholdAccountBook.Adapters.Logger;
 using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Adapters.Dao.Compositions
@@ -17,6 +18,8 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコード</returns>
         public async Task<TermInfoDto> Find()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             TermInfoDto dto = await this.mDbHandler.QuerySingleAsync<TermInfoDto>(@"
 SELECT MIN(act_time) as first_time, MAX(act_time) as last_time
 FROM hst_action

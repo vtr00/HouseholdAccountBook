@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Adapters.DbHandlers;
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -17,6 +18,8 @@ namespace HouseholdAccountBook.Adapters.Dao.DbTable
     {
         public override async Task CreateTableAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             if (this.mDbHandler.DBKind != DBKind.PostgreSQL) {
                 throw new NotSupportedException("This method is only supported for PostgreSQL.");
             }
@@ -50,6 +53,8 @@ WHERE NOT EXISTS (SELECT 1 FROM mtd_schema_version);");
 
         public override async Task<IEnumerable<MtdSchemaVersionDto>> FindAllAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<MtdSchemaVersionDto>(@"
 SELECT * 
 FROM mtd_schema_version;");
@@ -63,6 +68,8 @@ FROM mtd_schema_version;");
 
         public override async Task<int> DeleteAllAsync()
         {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM mtd_schema_version;");
 
             return count;
@@ -72,6 +79,8 @@ FROM mtd_schema_version;");
 
         public async Task<int> UpsertSchemaVersionAsync(int version)
         {
+            using FuncLog funcLog = new(new { version }, Log.LogLevel.Trace);
+
             int count = await this.mDbHandler.ExecuteAsync(@"
 MERGE INTO mtd_schema_version
 USING (SELECT 1)

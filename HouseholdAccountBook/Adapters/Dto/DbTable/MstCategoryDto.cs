@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Adapters.Dto.Abstract;
 using HouseholdAccountBook.Adapters.Dto.KHDbTable;
+using HouseholdAccountBook.Adapters.Logger;
 
 namespace HouseholdAccountBook.Adapters.Dto.DbTable
 {
@@ -18,6 +19,8 @@ namespace HouseholdAccountBook.Adapters.Dto.DbTable
         /// <param name="dto">記帳風月の分類DTO</param>
         public MstCategoryDto(CbmCategoryDto dto) : base(dto)
         {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
             this.CategoryId = dto.CATEGORY_ID;
             this.CategoryName = dto.CATEGORY_NAME;
             this.BalanceKind = dto.REXP_DIV - 1;

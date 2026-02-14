@@ -10,10 +10,12 @@ namespace HouseholdAccountBook.ViewModels.UserControls
     /// </summary>
     public class NumericUpDownViewModel : BindableBase
     {
+        #region フィールド
         /// <summary>
         /// IsOpenの瞬時値
         /// </summary>
         private bool mLocalIsOpen;
+        #endregion
 
         #region プロパティ
         /// <summary>

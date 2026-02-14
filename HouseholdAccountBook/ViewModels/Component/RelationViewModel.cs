@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         #endregion
 
         /// <summary>
-        /// ID
+        /// 帳簿/項目ID
         /// </summary>
         public int Id { get; set; }
 

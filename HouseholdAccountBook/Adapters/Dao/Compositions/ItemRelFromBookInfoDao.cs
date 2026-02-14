@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
 using HouseholdAccountBook.Adapters.Dto.DbTable;
 using HouseholdAccountBook.Adapters.Dto.Others;
+using HouseholdAccountBook.Adapters.Logger;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -20,6 +21,8 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<ItemRelFromBookInfoDto>> FindByBookIdAsync(int bookId)
         {
+            using FuncLog funcLog = new(new { bookId }, Log.LogLevel.Trace);
+
             var dtoList = await this.mDbHandler.QueryAsync<ItemRelFromBookInfoDto>(@"
 SELECT I.item_id AS item_id, C.balance_kind AS balance_kind, C.category_name AS category_name, I.item_name AS item_name, RBI.item_id IS NOT NULL AS is_related
 FROM mst_item I

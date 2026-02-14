@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using HouseholdAccountBook.Adapters.Logger;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,6 +30,8 @@ namespace HouseholdAccountBook.Extensions
         /// <returns>成功/失敗</returns>
         public static async Task<bool> DownloadHolidayListAsync(string url, int textEncoding, int dateIndex)
         {
+            using FuncLog funcLog = new(new { url, textEncoding, dateIndex });
+
             if (url != string.Empty) {
                 Uri uri = new(url);
 

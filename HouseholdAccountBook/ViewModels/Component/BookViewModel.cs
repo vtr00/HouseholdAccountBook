@@ -1,11 +1,12 @@
 ﻿using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.ViewModels.Abstract;
 
 namespace HouseholdAccountBook.ViewModels.Component
 {
     /// <summary>
     /// 帳簿VM
     /// </summary>
-    public class BookViewModel
+    public class BookViewModel : BindableBase
     {
         #region プロパティ
         /// <summary>
