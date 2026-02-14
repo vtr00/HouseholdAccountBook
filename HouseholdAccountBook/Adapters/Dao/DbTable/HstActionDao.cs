@@ -125,14 +125,8 @@ new HstActionDto { BookId = bookId, ItemId = itemId });
             return dtoList;
         }
 
-        public override async Task SetIdSequenceAsync(int idSeq)
-        {
-            if (this.mDbHandler.DBKind == DBKind.SQLite) {
-                return;
-            }
-
-            _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('hst_action_action_id_seq', @ActionIdSeq);", new { ActionIdSeq = idSeq });
-        }
+        public override async Task SetIdSequenceAsync(int idSeq) => 
+            _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('hst_action_action_id_seq', @ActionIdSeq);", new { ActionIdSeq = idSeq }, DBKindMask.PostgreSQL);
 
         public override async Task<int> InsertAsync(HstActionDto dto)
         {
@@ -185,7 +179,8 @@ new { dto.BookId, dto.ActTime, dto.ActValue, dto.GroupId, dto.IsMatch, dto.JsonC
         {
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, is_match = @IsMatch, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
+SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, is_match = @IsMatch, 
+    json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
 
             return count;
@@ -215,7 +210,8 @@ WHERE action_id = @ActionId;", dto);
         {
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
+SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, 
+    json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
 
             return count;

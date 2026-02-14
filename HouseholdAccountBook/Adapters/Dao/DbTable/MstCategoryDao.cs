@@ -61,14 +61,8 @@ new MstCategoryDto { BalanceKind = balanceKind });
             return dtoList;
         }
 
-        public override async Task SetIdSequenceAsync(int idSeq)
-        {
-            if (this.mDbHandler.DBKind == DBKind.SQLite) {
-                return;
-            }
-
-            _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('mst_category_category_id_seq', @CategoryIdSeq);", new { CategoryIdSeq = idSeq });
-        }
+        public override async Task SetIdSequenceAsync(int idSeq) => 
+            _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('mst_category_category_id_seq', @CategoryIdSeq);", new { CategoryIdSeq = idSeq }, DBKindMask.PostgreSQL);
 
         public override async Task<int> InsertAsync(MstCategoryDto dto)
         {

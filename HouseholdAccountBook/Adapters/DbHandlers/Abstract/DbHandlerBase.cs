@@ -114,9 +114,12 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// <typeparam name="T">DTO</typeparam>
         /// <param name="sql">SQL</param>
         /// <param name="param">SQLパラメータ</param>
-        /// <returns>クエリ結果リスト</returns>
-        public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object param = null)
+        /// <param name="target">対象データベース</param>
+        /// <returns>クエリ結果リスト。対象外の場合はデフォルト値</returns>
+        public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object param = null, DBKindMask target = DBKindMask.All)
         {
+            if (!target.Check(this.DBKind)) { return default; }
+
             try {
                 return await this.mConnection.QueryAsync<T>(sql, param, this.mDbTransaction);
             }
@@ -131,9 +134,12 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// <typeparam name="T">DTO</typeparam>
         /// <param name="sql">SQL</param>
         /// <param name="param">SQLパラメータ</param>
-        /// <returns>クエリ結果 または デフォルト値</returns>
-        public async Task<T> QueryFirstOrDefaultAsync<T>(string sql, object param = null)
+        /// <param name="target">対象データベース</param>
+        /// <returns>クエリ結果 または デフォルト値。対象外の場合はデフォルト値</returns>
+        public async Task<T> QueryFirstOrDefaultAsync<T>(string sql, object param = null, DBKindMask target = DBKindMask.All)
         {
+            if (!target.Check(this.DBKind)) { return default; }
+
             try {
                 return await this.mConnection.QueryFirstOrDefaultAsync<T>(sql, param, this.mDbTransaction);
             }
@@ -148,10 +154,13 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// <typeparam name="T">DTO</typeparam>
         /// <param name="sql">SQL</param>
         /// <param name="param">SQLパラメータ</param>
-        /// <returns>クエリ結果</returns>
+        /// <param name="target">対象データベース</param>
+        /// <returns>クエリ結果。対象外の場合はデフォルト値</returns>
         /// <exception cref="InvalidOperationException">結果が1行以外の場合にスローされる</exception>
-        public async Task<T> QuerySingleAsync<T>(string sql, object param = null)
+        public async Task<T> QuerySingleAsync<T>(string sql, object param = null, DBKindMask target = DBKindMask.All)
         {
+            if (!target.Check(this.DBKind)) { return default; }
+
             try {
                 return await this.mConnection.QuerySingleAsync<T>(sql, param, this.mDbTransaction);
             }
@@ -166,10 +175,13 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// <typeparam name="T">DTO</typeparam>
         /// <param name="sql">SQL</param>
         /// <param name="param">SQLパラメータ</param>
-        /// <returns>クエリ結果 または デフォルト値</returns>
+        /// <param name="target">対象データベース</param>
+        /// <returns>クエリ結果 または デフォルト値。対象外の場合はデフォルト値</returns>
         /// <exception cref="InvalidOperationException">結果が2行以上の場合にスローされる</exception>
-        public async Task<T> QuerySingleOrDefaultAsync<T>(string sql, object param = null)
+        public async Task<T> QuerySingleOrDefaultAsync<T>(string sql, object param = null, DBKindMask target = DBKindMask.All)
         {
+            if (!target.Check(this.DBKind)) { return default; }
+
             try {
                 return await this.mConnection.QuerySingleOrDefaultAsync<T>(sql, param, this.mDbTransaction);
             }
@@ -183,9 +195,12 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// </summary>
         /// <param name="sql">SQL</param>
         /// <param name="param">SQLパラメータ</param>
-        /// <returns>変更件数</returns>
-        public async Task<int> ExecuteAsync(string sql, object param = null)
+        /// <param name="target">対象データベース</param>
+        /// <returns>変更件数。対象外の場合は0</returns>
+        public async Task<int> ExecuteAsync(string sql, object param = null, DBKindMask target = DBKindMask.All)
         {
+            if (!target.Check(this.DBKind)) { return default; }
+
             try {
                 return await this.mConnection.ExecuteAsync(sql, param, this.mDbTransaction);
             }
@@ -202,9 +217,12 @@ namespace HouseholdAccountBook.Adapters.DbHandlers.Abstract
         /// <summary>
         /// [非同期]トランザクション処理を行う
         /// </summary>
+        /// <param name="target">対象データベース</param>
         /// <param name="actionAsync">トランザクション内の処理</param>
-        public async Task ExecTransactionAsync(AxActionAsync actionAsync)
+        public async Task ExecTransactionAsync(AxActionAsync actionAsync, DBKindMask target = DBKindMask.All)
         {
+            if (!target.Check(this.DBKind)) { return; }
+
             try {
                 this.mDbTransaction = await this.mConnection.BeginTransactionAsync();
 
