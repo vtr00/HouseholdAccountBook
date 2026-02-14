@@ -60,7 +60,7 @@ namespace HouseholdAccountBook.Adapters.Logger
             }
 
             string tmpMessage = string.Join((message != string.Empty && details != string.Empty) ? " - " : "", message, details);
-            OutputImpl?.Invoke(level, message, fileName, methodName, lineNumber);
+            OutputImpl?.Invoke(level, tmpMessage, fileName, methodName, lineNumber);
         }
 
         /// <summary>
