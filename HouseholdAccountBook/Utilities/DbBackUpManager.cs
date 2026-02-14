@@ -161,7 +161,7 @@ namespace HouseholdAccountBook.Utilities
         /// <param name="waitForFinish">完了を待つか</param>
         /// <param name="backUpNum">バックアップ数。-1は無制限</param>
         /// <param name="backUpFolderPath">バックアップ用フォルダパス</param>
-        /// <returns>成功/失敗</returns>
+        /// <returns>成功/失敗 または 未実施</returns>
         public async Task<bool> CreateBackUpFileAsync(bool notifyResult = false, bool waitForFinish = true, int? backUpNum = null, string backUpFolderPath = null)
         {
             using FuncLog funcLog = new(new { notifyResult, waitForFinish, backUpNum, backUpFolderPath });
@@ -172,7 +172,11 @@ namespace HouseholdAccountBook.Utilities
             if (tmpBackUpFolderPath == string.Empty) { return false; }
 
             bool result;
-            string backUpFileNamePattern = PostgreSQLBackupFileNamePattern;
+
+            DBKind selectedDBKind;
+            await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
+                selectedDBKind = dbHandler.DBKind;
+            }
             if (tmpBackUpNum is (-1) or > 0) {
                 Log.Debug("Create backup file.");
                 // フォルダが存在しなければ作成する
@@ -180,36 +184,28 @@ namespace HouseholdAccountBook.Utilities
                     _ = Directory.CreateDirectory(tmpBackUpFolderPath);
                 }
 
-                DBKind selectedDBKind;
-                await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
-                    selectedDBKind = dbHandler.DBKind;
-                }
-
-                switch (selectedDBKind) {
-                    case DBKind.PostgreSQL: {
-                        string backupFilePath = Path.Combine(tmpBackUpFolderPath, PostgreSQLBackupFileName);
-                        backUpFileNamePattern = PostgreSQLBackupFileNamePattern;
-                        result = await this.ExecuteDumpPostgreSQLAsync(backupFilePath, PostgresFormat.Custom, notifyResult, waitForFinish) == true;
-                        break;
-                    }
-                    case DBKind.SQLite: {
-                        string backupFilePath = Path.Combine(tmpBackUpFolderPath, SQLiteBackupFileName);
-                        backUpFileNamePattern = SQLiteBackupFileNamePattern;
-                        result = await this.ExecuteCopySQLiteAsync(backupFilePath, notifyResult);
-                        break;
-                    }
-                    default: {
-                        result = false;
-                        break;
-                    }
-                }
+                string backupFilePath = Path.Combine(tmpBackUpFolderPath, selectedDBKind switch {
+                    DBKind.PostgreSQL => PostgreSQLBackupFileName,
+                    DBKind.SQLite => SQLiteBackupFileName,
+                    _ => string.Empty
+                });
+                result = selectedDBKind switch {
+                    DBKind.PostgreSQL => await this.ExecuteDumpPostgreSQLAsync(backupFilePath, PostgresFormat.Custom, notifyResult, waitForFinish) == true,
+                    DBKind.SQLite => await this.ExecuteCopySQLiteAsync(backupFilePath, notifyResult),
+                    _ => false
+                };
             }
             else {
-                result = true;
+                result = false;
             }
 
             if (tmpBackUpNum != -1) {
                 // 古いバックアップファイルを削除する
+                string backUpFileNamePattern = selectedDBKind switch {
+                    DBKind.PostgreSQL => PostgreSQLBackupFileNamePattern,
+                    DBKind.SQLite => SQLiteBackupFileNamePattern,
+                    _ => string.Empty
+                };
                 FileUtil.DeleteOldFiles(tmpBackUpFolderPath, backUpFileNamePattern, tmpBackUpNum);
             }
 
