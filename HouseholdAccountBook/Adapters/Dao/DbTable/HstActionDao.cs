@@ -125,7 +125,7 @@ new HstActionDto { BookId = bookId, ItemId = itemId });
             return dtoList;
         }
 
-        public override async Task SetIdSequenceAsync(int idSeq) => 
+        public override async Task SetIdSequenceAsync(int idSeq) =>
             _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('hst_action_action_id_seq', @ActionIdSeq);", new { ActionIdSeq = idSeq }, DBKindMask.PostgreSQL);
 
         public override async Task<int> InsertAsync(HstActionDto dto)

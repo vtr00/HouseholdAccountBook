@@ -111,20 +111,30 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
 
         /// <summary>
-        /// メインウィンドウ最小化時バックアップ通知フラグ
+        /// メインウィンドウクローズ時バックアップフラグ
         /// </summary>
-        #region BackUpNotifyAtMinimizing
-        public bool BackUpNotifyAtMinimizing {
+        #region BackUpFlagAtClosing
+        public bool BackUpFlagAtClosing {
             get;
             set => this.SetProperty(ref field, value);
         }
         #endregion
 
         /// <summary>
-        /// メインウィンドウクローズ時バックアップフラグ
+        /// 選択されたバックアップ条件
         /// </summary>
-        #region BackUpFlagAtClosing
-        public bool BackUpFlagAtClosing {
+        #region SelectedBackUpCondition
+        public BackUpCondition SelectedBackUpCondition {
+            get;
+            set => this.SetProperty(ref field, value);
+        }
+        #endregion
+
+        /// <summary>
+        /// メインウィンドウ最小化時バックアップ通知フラグ
+        /// </summary>
+        #region BackUpNotifyAtMinimizing
+        public bool BackUpNotifyAtMinimizing {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -292,6 +302,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.BackUpIntervalAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
             this.BackUpNotifyAtMinimizing = settings.App_BackUpNotifyAtMinimizing;
             this.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
+            this.SelectedBackUpCondition = (BackUpCondition)settings.App_BackUpCondition;
         }
 
         public override void AddEventHandlers()
@@ -320,6 +331,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             settings.App_BackUpIntervalMinAtMinimizing = this.BackUpIntervalAtMinimizing;
             settings.App_BackUpNotifyAtMinimizing = this.BackUpNotifyAtMinimizing;
             settings.App_BackUpFlagAtClosing = this.BackUpFlagAtClosing;
+            settings.App_BackUpCondition = (int)this.SelectedBackUpCondition;
 
             // DbBackUpManagerへ設定を反映する
             DbBackUpManager.Instance.PostgresDumpExePath = settings.App_Postgres_DumpExePath;

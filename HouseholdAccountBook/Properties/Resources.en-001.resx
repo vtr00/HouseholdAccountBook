@@ -1084,4 +1084,13 @@ list</value>
   <data name="CheckBox_Notifications_MinimizingMainWindow" xml:space="preserve">
     <value>When the main window is minimized</value>
   </data>
+  <data name="TextBlock_BackUpCondition" xml:space="preserve">
+    <value>Condition</value>
+  </data>
+  <data name="RadioButton_BackUpCondition_Always" xml:space="preserve">
+    <value>Always</value>
+  </data>
+  <data name="RadioButton_BackUpCondition_Updated" xml:space="preserve">
+    <value>Database updated</value>
+  </data>
 </root>

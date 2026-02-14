@@ -1084,4 +1084,13 @@
   <data name="CheckBox_Notifications_MinimizingMainWindow" xml:space="preserve">
     <value>メインウィンドウ最小化時</value>
   </data>
+  <data name="TextBlock_BackUpCondition" xml:space="preserve">
+    <value>条件</value>
+  </data>
+  <data name="RadioButton_BackUpCondition_Always" xml:space="preserve">
+    <value>常時</value>
+  </data>
+  <data name="RadioButton_BackUpCondition_Updated" xml:space="preserve">
+    <value>DB更新後</value>
+  </data>
 </root>
