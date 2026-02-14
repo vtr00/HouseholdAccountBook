@@ -1249,7 +1249,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             bool result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                result = await DbBackUpManager.Instance.CreateBackUpFileAsync();
+                result = await DbBackUpManager.Instance.CreateBackUpFileAsync(backUpNum:-1);
 
                 if (result) {
                     Properties.Settings settings = Properties.Settings.Default;
