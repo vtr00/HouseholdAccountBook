@@ -1,4 +1,6 @@
-﻿namespace HouseholdAccountBook.Adapters
+﻿using System.Runtime.CompilerServices;
+
+namespace HouseholdAccountBook.Adapters
 {
     /// <summary>
     /// SQL DB種別
@@ -45,6 +47,43 @@
         /// SQLite
         /// </summary>
         SQLite
+    }
+
+    /// <summary>
+    /// SQL DB種別マスク
+    /// </summary>
+    public enum DBKindMask
+    {
+        /// <summary>
+        /// PostgreSQL
+        /// </summary>
+        PostgreSQL = 1 << DBKind.PostgreSQL,
+        /// <summary>
+        /// Access
+        /// </summary>
+        Access = 1 << DBKind.Access,
+        /// <summary>
+        /// SQLite
+        /// </summary>
+        SQLite = 1 << DBKind.SQLite,
+        /// <summary>
+        /// All DB
+        /// </summary>
+        All = PostgreSQL | Access | SQLite
+    }
+
+    /// <summary>
+    /// SQL DB種別マスクの拡張メソッド
+    /// </summary>
+    public static class DBKindMaskExtension
+    {
+        /// <summary>
+        /// マスクの対象かどうかを判定する
+        /// </summary>
+        /// <param name="dbKindMask">マスク</param>
+        /// <param name="dbKind">判定対象のDB種別</param>
+        /// <returns>マスクの対象</returns>
+        public static bool Check(this DBKindMask dbKindMask, DBKind dbKind) => (dbKindMask & (DBKindMask)(1 << (int)dbKind)) != 0;
     }
 
     /// <summary>

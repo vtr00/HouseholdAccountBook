@@ -59,14 +59,8 @@ ORDER BY sort_order;");
             return dtoList;
         }
 
-        public override async Task SetIdSequenceAsync(int idSeq)
-        {
-            if (this.mDbHandler.DBKind == DBKind.SQLite) {
-                return;
-            }
-
-            _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('mst_book_book_id_seq', @BookIdSeq);", new { BookIdSeq = idSeq });
-        }
+        public override async Task SetIdSequenceAsync(int idSeq) => 
+            _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('mst_book_book_id_seq', @BookIdSeq);", new { BookIdSeq = idSeq }, DBKindMask.PostgreSQL);
 
         public override async Task<int> InsertAsync(MstBookDto dto)
         {
@@ -97,7 +91,8 @@ RETURNING book_id;", dto);
         {
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE mst_book
-SET book_name = @BookName, book_kind = @BookKind, initial_value = @InitialValue, debit_book_id = @DebitBookId, pay_day = @PayDay, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
+SET book_name = @BookName, book_kind = @BookKind, initial_value = @InitialValue, debit_book_id = @DebitBookId, pay_day = @PayDay, 
+    json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE book_id = @BookId;", dto);
 
             return count;
