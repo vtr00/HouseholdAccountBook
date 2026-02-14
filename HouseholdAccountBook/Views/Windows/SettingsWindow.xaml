@@ -606,6 +606,8 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition SharedSizeGroup="Header"/>
@@ -614,17 +616,18 @@
                                         <ColumnDefinition SharedSizeGroup="Button"/>
                                     </Grid.ColumnDefinitions>
 
+                                    <!-- 個数 -->
                                     <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
                                                Text="{x:Static properties:Resources.TextBlock_Count}"/>
                                     <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="0" MaxValue="100" Value="{Binding BackUpNum}"/>
-
+                                    <!-- フォルダパス -->
                                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
                                                Text="{x:Static properties:Resources.TextBlock_FolderPath}"/>
                                     <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsReadOnly="True" Text="{Binding BackUpFolderPath}"/>
                                     <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="..."
                                             Command="{Binding DataContext.SelectFolderPathCommand, ElementName=_DbTab}"
                                             CommandParameter="{x:Static enums:FolderPathKind.BackUpFolder}"/>
-
+                                    <!-- タイミング -->
                                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Timing}"/>
                                     <GroupBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="5">
                                         <GroupBox.Header>
@@ -644,9 +647,18 @@
                                     </GroupBox>
                                     <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                               Content="{x:Static properties:Resources.CheckBox_Timing_ClosingMainWindow}" IsChecked="{Binding BackUpFlagAtClosing}"/>
-
-                                    <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Notifications}"/>
-                                    <CheckBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
+                                    <!-- 条件 -->
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" VerticalAlignment="Center"
+                                               Text="{x:Static properties:Resources.TextBlock_BackUpCondition}"/>
+                                    <RadioButton Grid.Row="4" Grid.Column="1" Margin="5" Content="{x:Static properties:Resources.RadioButton_BackUpCondition_Always}" 
+                                                 IsChecked="{Binding SelectedBackUpCondition, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Always}"
+                                                 GroupName="BackupCondition"/>
+                                    <RadioButton Grid.Row="5" Grid.Column="1" Margin="5" Content="{x:Static properties:Resources.RadioButton_BackUpCondition_Updated}" 
+                                                 IsChecked="{Binding SelectedBackUpCondition, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Updated}"
+                                                 GroupName="BackupCondition"/>
+                                    <!-- 通知 -->
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Notifications}"/>
+                                    <CheckBox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                               Content="{x:Static properties:Resources.CheckBox_Notifications_MinimizingMainWindow}" IsChecked="{Binding BackUpNotifyAtMinimizing}"/>
                                 </Grid>
                             </GroupBox>

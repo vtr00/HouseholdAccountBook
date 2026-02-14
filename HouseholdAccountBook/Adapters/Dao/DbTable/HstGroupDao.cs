@@ -41,7 +41,7 @@ new HstGroupDto { GroupId = groupId });
             return dto;
         }
 
-        public override async Task SetIdSequenceAsync(int idSeq) => 
+        public override async Task SetIdSequenceAsync(int idSeq) =>
             _ = await this.mDbHandler.ExecuteAsync("SELECT setval('hst_group_group_id_seq', @GroupIdSeq);", new { GroupIdSeq = idSeq }, DBKindMask.PostgreSQL);
 
         public override async Task<int> InsertAsync(HstGroupDto dto)

@@ -69,20 +69,15 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
             /// 適切な識別子かどうかを検証して、フィールドに設定する
             /// </summary>
             /// <param name="field">設定対象のフィールド</param>
-            /// <param name="s">設定値</param>
+            /// <param name="str">設定値</param>
             /// <returns>適切か</returns>
-            public static bool SetValidIdentifier(ref string field, string s)
+            public static bool SetValidIdentifier(ref string field, string str)
             {
-                if (string.IsNullOrEmpty(s)) { return false; }
-                if (s.Length > 63) { return false; }
-                if (!char.IsLetter(s[0])) { return false; }
-
-                foreach (char c in s) {
-                    if (!(char.IsLetterOrDigit(c) || c == '_')) {
-                        return false;
-                    }
+                if (!str.IsValidDBIdentifier()) {
+                    return false;
                 }
-                field = s;
+
+                field = str;
                 return true;
             }
         }

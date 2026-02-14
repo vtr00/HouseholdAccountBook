@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace HouseholdAccountBook.Adapters
+﻿namespace HouseholdAccountBook.Adapters
 {
     /// <summary>
     /// SQL DB種別
@@ -110,5 +108,20 @@ namespace HouseholdAccountBook.Adapters
         Custom = 1,
         Dictionary = 2,
         Tar = 3
+    }
+
+    /// <summary>
+    /// DBバックアップ条件
+    /// </summary>
+    public enum BackUpCondition
+    {
+        /// <summary>
+        /// 常時
+        /// </summary>
+        Always = 0,
+        /// <summary>
+        /// DB更新後
+        /// </summary>
+        Updated = 1
     }
 }

@@ -1066,5 +1066,17 @@ namespace HouseholdAccountBook.Properties {
                 this["App_BackUpCurrentBySelf"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int App_BackUpCondition {
+            get {
+                return ((int)(this["App_BackUpCondition"]));
+            }
+            set {
+                this["App_BackUpCondition"] = value;
+            }
+        }
     }
 }

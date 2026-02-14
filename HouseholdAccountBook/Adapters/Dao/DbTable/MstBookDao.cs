@@ -59,7 +59,7 @@ ORDER BY sort_order;");
             return dtoList;
         }
 
-        public override async Task SetIdSequenceAsync(int idSeq) => 
+        public override async Task SetIdSequenceAsync(int idSeq) =>
             _ = await this.mDbHandler.ExecuteAsync(@"SELECT setval('mst_book_book_id_seq', @BookIdSeq);", new { BookIdSeq = idSeq }, DBKindMask.PostgreSQL);
 
         public override async Task<int> InsertAsync(MstBookDto dto)

@@ -1,3 +1,4 @@
+using HouseholdAccountBook.Adapters;
 using HouseholdAccountBook.Adapters.DbHandlers;
 using HouseholdAccountBook.Adapters.Logger;
 using HouseholdAccountBook.Enums;
@@ -309,11 +310,12 @@ namespace HouseholdAccountBook.Views.Windows
 
             this.Hide();
 
-            if (await DbBackUpManager.Instance.ExecuteAtMainWindowClosing()) {
-                Properties.Settings settings = Properties.Settings.Default;
+            Properties.Settings settings = Properties.Settings.Default;
+            DateTime? currentBackUp = settings.App_BackUpCondition == (int)BackUpCondition.Updated ? this.WVM.BookTabVM.CurrentBackUp : null;
+            if (await DbBackUpManager.Instance.ExecuteAtMainWindowClosing(currentBackUp)) {
                 settings.App_BackUpCurrentAtClosing = DateTime.Now;
                 settings.Save();
-                Log.Info(string.Format($"Update BackUpCurrentAtClosing: {settings.App_BackUpCurrentAtClosing}"));
+                Log.Info($"Update BackUpCurrentAtClosing: {settings.App_BackUpCurrentAtClosing}");
             }
         }
 
@@ -324,12 +326,13 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void MainWindow_StateChanged(object sender, EventArgs e)
         {
-            if (await DbBackUpManager.Instance.ExecuteAtMainWindowStateChanged(this.WindowState)) {
-                Properties.Settings settings = Properties.Settings.Default;
+            Properties.Settings settings = Properties.Settings.Default;
+            DateTime? currentBackUp = settings.App_BackUpCondition == (int)BackUpCondition.Updated ? this.WVM.BookTabVM.CurrentBackUp : null;
+            if (await DbBackUpManager.Instance.ExecuteAtMainWindowStateChanged(this.WindowState, currentBackUp)) {
                 settings.App_BackUpCurrentAtMinimizing = DateTime.Now;
                 settings.Save();
                 this.WVM.BookTabVM.RaiseCurrentBackUpChanged();
-                Log.Info(string.Format($"Update BackUpCurrentAtMinimizing: {settings.App_BackUpCurrentAtMinimizing}"));
+                Log.Info($"Update BackUpCurrentAtMinimizing: {settings.App_BackUpCurrentAtMinimizing}");
 
                 DbBackUpManager.Instance.BackUpCurrentAtMinimizing = settings.App_BackUpCurrentAtMinimizing;
             }
