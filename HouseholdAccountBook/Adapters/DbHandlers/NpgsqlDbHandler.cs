@@ -63,11 +63,11 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
         /// <param name="dumpExePath">pg_dump.exeパス</param>
         /// <param name="passwordInput">パスワード入力方法</param>
         /// <param name="format">ダンプフォーマット</param>
-        /// <param name="notifyResultAsync">実行結果を通知するデリゲート</param>
+        /// <param name="notifyResult">実行結果を通知するデリゲート</param>
         /// <param name="waitForFinish">処理の完了を待機するか</param>
         /// <returns>エラーコード</returns>
         public async Task<int?> ExecuteDump(string backupFilePath, string dumpExePath, PostgresPasswordInput passwordInput, PostgresFormat format,
-                                            NotifyResult notifyResultAsync = null, bool waitForFinish = true)
+                                            NotifyResult notifyResult = null, bool waitForFinish = true)
         {
             bool pgPassConf = passwordInput == PostgresPasswordInput.PgPassConf;
 
@@ -121,7 +121,7 @@ namespace HouseholdAccountBook.Adapters.DbHandlers
                 return localExitCode;
             });
 
-            notifyResultAsync?.Invoke(exitCode);
+            notifyResult?.Invoke(exitCode);
 
             return exitCode;
         }
