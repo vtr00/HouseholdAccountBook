@@ -1016,7 +1016,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     });
                 }
 
-                result = await DbBackUpManager.Instance.ExecuteRestorePostgreSQL(e.FileName);
+                result = await DbBackUpManager.Instance.ExecuteRestorePostgreSQLAsync(e.FileName);
 
                 await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     // スキーマバージョンを元に戻す
@@ -1182,7 +1182,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             bool result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQL(e.FileName, PostgresFormat.Custom) == true;
+                result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQLAsync(e.FileName, PostgresFormat.Custom) == true;
             }
 
             _ = result
@@ -1217,7 +1217,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             bool result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQL(e.FileName, PostgresFormat.Plain) == true;
+                result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQLAsync(e.FileName, PostgresFormat.Plain) == true;
             }
 
             _ = result

@@ -180,36 +180,27 @@ namespace HouseholdAccountBook.Utilities
                     _ = Directory.CreateDirectory(tmpBackUpFolderPath);
                 }
 
+                DBKind selectedDBKind;
                 await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
-                    // 競合するためDB接続を閉じる
-                    await dbHandler.DisposeAsync();
-
-                    DBKind selectedDBKind;
                     selectedDBKind = dbHandler.DBKind;
-                    switch (selectedDBKind) {
-                        case DBKind.PostgreSQL: {
-                            string backupFilePath = Path.Combine(tmpBackUpFolderPath, PostgreSQLBackupFileName);
-                            backUpFileNamePattern = PostgreSQLBackupFileNamePattern;
-                            result = await this.ExecuteDumpPostgreSQL(backupFilePath, PostgresFormat.Custom, notifyResult, waitForFinish) == true;
-                            break;
-                        }
-                        case DBKind.SQLite: {
-                            string backupFilePath = Path.Combine(tmpBackUpFolderPath, SQLiteBackupFileName);
-                            backUpFileNamePattern = SQLiteBackupFileNamePattern;
-                            try {
-                                SQLiteDbHandler tmpDbHandler = dbHandler as SQLiteDbHandler;
-                                File.Copy(tmpDbHandler.DbFilePath, backupFilePath, true);
-                                result = true;
-                            }
-                            catch {
-                                result = false;
-                            }
-                            break;
-                        }
-                        default: {
-                            result = false;
-                            break;
-                        }
+                }
+
+                switch (selectedDBKind) {
+                    case DBKind.PostgreSQL: {
+                        string backupFilePath = Path.Combine(tmpBackUpFolderPath, PostgreSQLBackupFileName);
+                        backUpFileNamePattern = PostgreSQLBackupFileNamePattern;
+                        result = await this.ExecuteDumpPostgreSQLAsync(backupFilePath, PostgresFormat.Custom, notifyResult, waitForFinish) == true;
+                        break;
+                    }
+                    case DBKind.SQLite: {
+                        string backupFilePath = Path.Combine(tmpBackUpFolderPath, SQLiteBackupFileName);
+                        backUpFileNamePattern = SQLiteBackupFileNamePattern;
+                        result = await this.ExecuteCopySQLiteAsync(backupFilePath, notifyResult);
+                        break;
+                    }
+                    default: {
+                        result = false;
+                        break;
                     }
                 }
             }
@@ -233,7 +224,7 @@ namespace HouseholdAccountBook.Utilities
         /// <param name="notifyResult">実行結果を通知する</param>
         /// <param name="waitForFinish">処理の完了を待機する</param>
         /// <returns>成功/失敗/不明</returns>
-        public async Task<bool?> ExecuteDumpPostgreSQL(string backupFilePath, PostgresFormat format, bool notifyResult = false, bool waitForFinish = true)
+        public async Task<bool?> ExecuteDumpPostgreSQLAsync(string backupFilePath, PostgresFormat format, bool notifyResult = false, bool waitForFinish = true)
         {
             using FuncLog funcLog = new(new { backupFilePath, format, notifyResult, waitForFinish });
 
@@ -264,7 +255,7 @@ namespace HouseholdAccountBook.Utilities
         /// </summary>
         /// <param name="backupFilePath">バックアップファイルパス</param>
         /// <returns>成功/失敗</returns>
-        public async Task<bool> ExecuteRestorePostgreSQL(string backupFilePath)
+        public async Task<bool> ExecuteRestorePostgreSQLAsync(string backupFilePath)
         {
             using FuncLog funcLog = new(new { backupFilePath });
 
@@ -278,6 +269,46 @@ namespace HouseholdAccountBook.Utilities
             }
             return errorCode == 0;
         }
+
+        /// <summary>
+        /// SQLiteのDBファイルのコピーを実行する
+        /// </summary>
+        /// <param name="backupFilePath">バックアップファイルパス</param>
+        /// <param name="notifyResult">実行結果を通知する</param>
+        /// <returns>成功/失敗</returns>
+        public async Task<bool> ExecuteCopySQLiteAsync(string backupFilePath, bool notifyResult = false)
+        {
+            using FuncLog funcLog = new(new { backupFilePath, notifyResult });
+
+            bool result = false;
+            string sourceFilePath = string.Empty;
+            await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
+                if (dbHandler is SQLiteDbHandler sqliteDbHandler) {
+                    sourceFilePath = sqliteDbHandler.DbFilePath;
+                }
+            }
+
+            if (sourceFilePath != string.Empty) {
+                try {
+                    File.Copy(sourceFilePath, backupFilePath, true);
+                    result = true;
+                }
+                catch {
+                    result = false;
+                }
+            }
+
+            if (notifyResult) {
+                if (result) {
+                    NotificationUtil.NotifyFinishingToBackup();
+                }
+                else {
+                    NotificationUtil.NotifyFailingToBackup();
+                }
+            }
+
+            return result;
+        }
         #endregion
 
         /// <summary>
@@ -286,6 +317,8 @@ namespace HouseholdAccountBook.Utilities
         /// <returns>最後に更新された日時</returns>
         private async Task<DateTime> GetDbRowUpdateTime()
         {
+            using FuncLog funcLog = new();
+
             DateTime updateTime = DateTime.MinValue;
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 TableInfoDao tableInfoDao = new(dbHandler);
