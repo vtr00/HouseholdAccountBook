@@ -650,10 +650,10 @@
                                     <!-- 条件 -->
                                     <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" VerticalAlignment="Center"
                                                Text="{x:Static properties:Resources.TextBlock_BackUpCondition}"/>
-                                    <RadioButton Grid.Row="4" Grid.Column="1" Margin="5" Content="{x:Static properties:Resources.RadioButton_BackUpCondition_Always}" 
+                                    <RadioButton Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="{x:Static properties:Resources.RadioButton_BackUpCondition_Always}" 
                                                  IsChecked="{Binding SelectedBackUpCondition, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Always}"
                                                  GroupName="BackupCondition"/>
-                                    <RadioButton Grid.Row="5" Grid.Column="1" Margin="5" Content="{x:Static properties:Resources.RadioButton_BackUpCondition_Updated}" 
+                                    <RadioButton Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="{x:Static properties:Resources.RadioButton_BackUpCondition_Updated}" 
                                                  IsChecked="{Binding SelectedBackUpCondition, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Updated}"
                                                  GroupName="BackupCondition"/>
                                     <!-- 通知 -->
