@@ -166,6 +166,11 @@
                     <Separator/>
                     <!-- 期間指定 -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_DailyTermSelection}" Command="{Binding SelectTermCommand}"/>
+                    <Separator/>
+                    <!-- 帳簿名を常に表示-->
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_AlwaysDisplay_BookName}" IsCheckable="True" IsChecked="{Binding MainWindow_Show_BookName, Source={StaticResource Settings}}"/>
+                    <!-- 分類名を常に表示-->
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_AlwaysDisplay_CategoryName}" IsCheckable="True" IsChecked="{Binding MainWindow_Show_CategoryName, Source={StaticResource Settings}}"/>
                 </MenuItem>
                 <!-- 日別グラフ -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph}">
@@ -414,9 +419,9 @@
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Day}" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}, ConverterCulture={StaticResource AppCulture}}"
                                                     CellStyle="{StaticResource DayOfWeekStyle}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_BookName}" MinWidth="70" Binding="{Binding BookName}"
-                                                    Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                                    Visibility="{Binding MainWindow_Show_BookName, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_CategoryName}" MinWidth="70" Binding="{Binding CategoryName}"
-                                                    Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                                    Visibility="{Binding MainWindow_Show_CategoryName, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" MinWidth="70" Binding="{Binding ItemName}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Income}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Income, Converter={StaticResource IntToMoneyDisplayConverter}}" 
                                                     ElementStyle="{StaticResource TextAlignRight}"/>

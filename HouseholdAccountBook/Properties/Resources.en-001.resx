@@ -1093,4 +1093,10 @@ list</value>
   <data name="RadioButton_BackUpCondition_Updated" xml:space="preserve">
     <value>Database updated</value>
   </data>
+  <data name="Menu_View_BookItems_AlwaysDisplay_BookName" xml:space="preserve">
+    <value>Always show book names</value>
+  </data>
+  <data name="Menu_View_BookItems_AlwaysDisplay_CategoryName" xml:space="preserve">
+    <value>Always show category names</value>
+  </data>
 </root>

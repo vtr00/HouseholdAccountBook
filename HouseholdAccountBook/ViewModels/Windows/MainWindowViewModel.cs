@@ -639,6 +639,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 年別グラフタブ表示コマンド
         /// </summary>
         public ICommand ShowYearlyGraphTabCommand => new RelayCommand(this.ShowYearlyGraphTabCommand_Executed, this.ShowYearlyGraphTabCommand_CanExecute);
+        
         /// <summary>
         /// 先月表示コマンド
         /// </summary>

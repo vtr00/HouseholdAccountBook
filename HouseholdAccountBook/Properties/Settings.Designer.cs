@@ -1078,5 +1078,29 @@ namespace HouseholdAccountBook.Properties {
                 this["App_BackUpCondition"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool MainWindow_Show_BookName {
+            get {
+                return ((bool)(this["MainWindow_Show_BookName"]));
+            }
+            set {
+                this["MainWindow_Show_BookName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool MainWindow_Show_CategoryName {
+            get {
+                return ((bool)(this["MainWindow_Show_CategoryName"]));
+            }
+            set {
+                this["MainWindow_Show_CategoryName"] = value;
+            }
+        }
     }
 }
