@@ -23,7 +23,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<SummaryInfoDto>> FindAllWithinTerm(DateTime startTime, DateTime finishTime)
         {
-            using FuncLog funcLog = new(new {startTime,finishTime }, Log.LogLevel.Trace);
+            using FuncLog funcLog = new(new { startTime, finishTime }, Log.LogLevel.Trace);
 
             var dtoList = await this.mDbHandler.QueryAsync<SummaryInfoDto>(@"
 SELECT C.balance_kind, C.category_id, C.category_name, SQ.item_id, I.item_name, SQ.total
@@ -51,7 +51,7 @@ new { StartTime = startTime, FinishTime = finishTime });
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<SummaryInfoDto>> FindByBookIdWithinTerm(int bookId, DateTime startTime, DateTime finishTime)
         {
-            using FuncLog funcLog = new(new {bookId,startTime,finishTime }, Log.LogLevel.Trace);
+            using FuncLog funcLog = new(new { bookId, startTime, finishTime }, Log.LogLevel.Trace);
 
             var dtoList = await this.mDbHandler.QueryAsync<SummaryInfoDto>(@"
 SELECT C.balance_kind, C.category_id, C.category_name, SQ.item_id, I.item_name, SQ.total

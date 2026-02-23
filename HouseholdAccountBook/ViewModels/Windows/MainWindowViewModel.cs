@@ -593,10 +593,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand ExportSQLFileCommand => new RelayCommand(this.ExportSQLFileCommand_Executed, this.ExportSQLFileCommand_CanExecute);
         /// <summary>
-        /// Excelファイルエクスポートコマンド
-        /// </summary>
-        public ICommand ExportExcelFileCommand => new RelayCommand(this.ExportExcelFileCommand_Executed, ExportExcelFileCommand_CanExecute);
-        /// <summary>
         /// バックアップコマンド
         /// </summary>
         public ICommand BackUpCommand => new RelayCommand(this.BackUpCommand_Executed, this.BackUpCommand_CanExecute);
@@ -639,7 +635,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 年別グラフタブ表示コマンド
         /// </summary>
         public ICommand ShowYearlyGraphTabCommand => new RelayCommand(this.ShowYearlyGraphTabCommand_Executed, this.ShowYearlyGraphTabCommand_CanExecute);
-        
+
         /// <summary>
         /// 先月表示コマンド
         /// </summary>
@@ -1227,16 +1223,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// Excelファイルエクスポートコマンド実行可能か
-        /// </summary>
-        /// <returns></returns>
-        public static bool ExportExcelFileCommand_CanExecute() => false;
-        /// <summary>
-        /// Excelファイルエクスポートコマンド処理
-        /// </summary>
-        public void ExportExcelFileCommand_Executed() => throw new NotImplementedException();
-
-        /// <summary>
         /// バックアップコマンド実行可能か
         /// </summary>
         /// <returns></returns>
@@ -1684,7 +1670,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             };
 
-            this.mChildrenVM.ForEach(childVM => childVM.AddEventHandlers());
+            this.mChildrenVM.ForEach(childVM => {
+                childVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
+                childVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);
+                childVM.SaveFileDialogRequested += (sender, e) => this.SaveFileDialogRequest(e);
+                childVM.AddEventHandlers();
+            });
         }
 
         public override async Task LoadAsync()

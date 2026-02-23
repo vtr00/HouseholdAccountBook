@@ -1102,5 +1102,17 @@ namespace HouseholdAccountBook.Properties {
                 this["MainWindow_Show_CategoryName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string App_ExportCsvFilePath {
+            get {
+                return ((string)(this["App_ExportCsvFilePath"]));
+            }
+            set {
+                this["App_ExportCsvFilePath"] = value;
+            }
+        }
     }
 }

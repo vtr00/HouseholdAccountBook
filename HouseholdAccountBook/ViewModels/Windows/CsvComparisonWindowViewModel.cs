@@ -1,5 +1,4 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
+﻿using HouseholdAccountBook.Adapters;
 using HouseholdAccountBook.Adapters.Dao.Compositions;
 using HouseholdAccountBook.Adapters.Dao.DbTable;
 using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
@@ -16,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -266,10 +264,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         this.CsvFilePathList.Add(tmpFileName);
                     }
                 }
-                this.LoadCsvFiles(e.FileNames);
+                await this.LoadCsvFilesAsync(e.FileNames);
                 await this.UpdateComparisonVMListAsync(true);
             }
-
         }
 
         /// <summary>
@@ -333,7 +330,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
 
                 // CSVファイルを再読み込みする
-                this.ReloadCsvFiles();
+                await this.ReloadCsvFilesAsync();
                 await this.UpdateComparisonVMListAsync();
             }
         }
@@ -624,7 +621,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.BookChanged += async (sender, e) => {
                 using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.BookChanged));
 
-                this.ReloadCsvFiles();
+                await this.ReloadCsvFilesAsync();
                 await this.UpdateComparisonVMListAsync(true);
             };
         }
@@ -632,7 +629,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 指定されたCSVファイルを追加で読み込む
         /// </summary>
-        public void LoadCsvFiles(IList<string> csvFilePathList)
+        public async Task LoadCsvFilesAsync(IList<string> csvFilePathList)
         {
             using FuncLog funcLog = new(new { csvFilePathList });
 
@@ -646,39 +643,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             int expensesIndex = this.SelectedBookVM.ExpensesIndex.Value;
 
             // CSVファイルを読み込む
-            CsvConfiguration csvConfig = new(CultureInfo.CurrentCulture) {
-                HasHeaderRecord = true,
-                MissingFieldFound = mffa => { }
-            };
-            List<CsvComparisonViewModel> tmpVMList = [];
-            foreach (string tmpFileName in csvFilePathList) {
-                using (CsvReader reader = new(new StreamReader(tmpFileName, Encoding.GetEncoding(this.SelectedBookVM.TextEncoding)), csvConfig)) {
-                    List<CsvComparisonViewModel> tmpVMList2 = [];
-                    while (reader.Read()) {
-                        try {
-                            if (!reader.TryGetField(actDateIndex - 1, out DateTime date)) {
-                                continue;
-                            }
-                            if (!reader.TryGetField(itemNameIndex - 1, out string name)) {
-                                // 項目名は読込みに失敗してもOK
-                                name = null;
-                            }
-                            if (!reader.TryGetField(expensesIndex - 1, out string valueStr) ||
-                                !int.TryParse(valueStr, NumberStyles.Any, NumberFormatInfo.CurrentInfo, out int value)) {
-                                continue;
-                            }
-
-                            tmpVMList2.Add(new() { Record = new() { Date = date, Name = name, Value = value } });
-                        }
-                        catch (Exception) { }
-                    }
-
-                    // 有効な行があれば追加する
-                    if (0 < tmpVMList2.Count) {
-                        tmpVMList.AddRange(tmpVMList2);
-                    }
-                }
-            }
+            List<CsvComparisonViewModel> tmpVMList =
+                await CSVIOService.LoadCsvCompListAsync(csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, Encoding.GetEncoding(this.SelectedBookVM.TextEncoding));
 
             // 有効な行があればリストに追加する(日付昇順)
             if (0 < tmpVMList.Count) {
@@ -693,14 +659,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// CSVファイルを再読み込みする
         /// </summary>
         /// <returns></returns>
-        public void ReloadCsvFiles()
+        public async Task ReloadCsvFilesAsync()
         {
             using FuncLog funcLog = new();
 
             // リストをクリアする
             this.CsvComparisonVMList.Clear();
 
-            this.LoadCsvFiles(this.CsvFilePathList);
+            await this.LoadCsvFilesAsync(this.CsvFilePathList);
         }
 
         /// <summary>

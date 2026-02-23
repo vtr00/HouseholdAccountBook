@@ -147,9 +147,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.mChildrenVM.ForEach(childVM => {
                 childVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
                 childVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);
+                childVM.SaveFileDialogRequested += (sender, e) => this.SaveFileDialogRequest(e);
+                childVM.AddEventHandlers();
             });
-
-            this.mChildrenVM.ForEach(childVM => childVM.AddEventHandlers());
         }
     }
 }
