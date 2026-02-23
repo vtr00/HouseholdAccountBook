@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Adapters.Logger;
+﻿using HouseholdAccountBook.Models.Infrastructure.Logger;
 using System;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;

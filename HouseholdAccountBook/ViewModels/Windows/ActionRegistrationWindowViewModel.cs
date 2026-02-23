@@ -1,13 +1,13 @@
-﻿using HouseholdAccountBook.Adapters.Dao.DbTable;
-using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
-using HouseholdAccountBook.Adapters.Dto.DbTable;
-using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Args;
-using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Utilities;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.Infrastructure.DbDao.DbTable;
+using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
+using HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities.Args;
+using HouseholdAccountBook.Models.Utilities.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
+using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,7 +16,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using static HouseholdAccountBook.Views.UiConstants;
+using static HouseholdAccountBook.ViewModels.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -512,7 +512,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { selectingBookId });
 
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             var tmpBookVMList = await loader.LoadBookListAsync();
             this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == selectingBookId, 0); // 先に選択しておく
             this.BookVMList = tmpBookVMList;
@@ -529,7 +529,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingCategoryId });
 
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             int? tmpCategoryId = selectingCategoryId ?? this.SelectedCategoryVM?.Id;
             var tmpCategoryVMList = await loader.LoadCategoryListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind);
             this.SelectedCategoryVM = tmpCategoryVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpCategoryId, 0); // 先に選択しておく
@@ -547,7 +547,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingItemId });
 
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             int? tmpItemId = selectingItemId ?? this.SelectedItemVM?.Id;
             var tmpItemVMList = await loader.LoadItemListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind, this.SelectedCategoryVM.Id);
             this.SelectedItemVM = tmpItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0); // 先に選択しておく
@@ -565,7 +565,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingShopName });
 
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             string tmpShopName = selectingShopName ?? this.SelectedShopName;
             var tmpShopVMList = await loader.LoadShopListAsync(this.SelectedItemVM.Id);
             this.SelectedShopName = tmpShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name; // 先に選択しておく
@@ -583,7 +583,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingRemark });
 
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
             var tmpRemarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
             this.SelectedRemark = tmpRemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark; // 先に選択しておく

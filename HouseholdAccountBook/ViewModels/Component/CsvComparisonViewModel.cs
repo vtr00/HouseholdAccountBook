@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Args;
+﻿using HouseholdAccountBook.Models.Utilities.Args;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 

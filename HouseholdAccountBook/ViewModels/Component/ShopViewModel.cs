@@ -1,12 +1,11 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
-using System;
+﻿using System;
 
 namespace HouseholdAccountBook.ViewModels.Component
 {
     /// <summary>
     /// 店舗VM
     /// </summary>
-    public class ShopViewModel : BindableBase
+    public class ShopViewModel
     {
         #region プロパティ
         /// <summary>

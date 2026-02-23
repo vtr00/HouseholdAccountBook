@@ -1,15 +1,14 @@
-﻿using HouseholdAccountBook.Adapters.Logger;
+﻿using HouseholdAccountBook.Models.Infrastructure.Logger;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
-using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using static HouseholdAccountBook.Extensions.EncodingExtensions;
-using static HouseholdAccountBook.Views.UiConstants;
+using static HouseholdAccountBook.Models.Infrastructure.EncodingUtil;
+using static HouseholdAccountBook.ViewModels.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
 {

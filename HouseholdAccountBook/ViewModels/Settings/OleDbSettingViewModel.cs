@@ -1,5 +1,5 @@
-﻿using HouseholdAccountBook.Adapters.DbHandlers;
-using HouseholdAccountBook.Extensions;
+﻿using HouseholdAccountBook.Models.DbHandlers;
+using HouseholdAccountBook.Models.Infrastructure;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -52,7 +52,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             this.ProviderNameDic.Clear();
             OleDbHandler.GetOleDbProvider().ForEach(this.ProviderNameDic.Add);
             this.SelectedProviderName = settings.App_Access_Provider;
-            this.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Access_DBFilePath);
+            this.DBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_Access_DBFilePath);
         }
 
         /// <summary>

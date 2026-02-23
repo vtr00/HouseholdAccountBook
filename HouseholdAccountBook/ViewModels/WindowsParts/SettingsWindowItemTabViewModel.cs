@@ -1,14 +1,14 @@
-﻿using HouseholdAccountBook.Adapters.Dao.Compositions;
-using HouseholdAccountBook.Adapters.Dao.DbTable;
-using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
-using HouseholdAccountBook.Adapters.Dto.DbTable;
-using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Args;
-using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Utilities;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.Infrastructure.DbDao.Compositions;
+using HouseholdAccountBook.Models.Infrastructure.DbDao.DbTable;
+using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
+using HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities.Args;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Settings;
+using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +17,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using static HouseholdAccountBook.ViewModels.Settings.HierarchicalSettingViewModel;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
 {
@@ -123,7 +122,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 HierarchicalViewModel vm = this.SelectedHierarchicalVM;
-                while (GetHierarchicalKind(vm) != HierarchicalKind.Balance) {
+                while (vm?.Kind != HierarchicalKind.Balance) {
                     vm = vm.ParentVM;
                 }
                 BalanceKind kind = (BalanceKind)vm.Id;
@@ -142,7 +141,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 項目追加コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool AddItemCommand_CanExecute() => this.SelectedHierarchicalVM != null && GetHierarchicalKind(this.SelectedHierarchicalVM) != HierarchicalKind.Balance;
+        private bool AddItemCommand_CanExecute() => this.SelectedHierarchicalVM != null && this.SelectedHierarchicalVM.Kind != HierarchicalKind.Balance;
 
         /// <summary>
         /// 項目追加コマンド処理
@@ -151,7 +150,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 HierarchicalViewModel vm = this.SelectedHierarchicalVM;
-                while (GetHierarchicalKind(vm) != HierarchicalKind.Category) {
+                while (vm?.Kind != HierarchicalKind.Category) {
                     vm = vm.ParentVM;
                 }
                 int categoryId = vm.Id;
@@ -170,7 +169,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 分類/項目削除コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool DeleteItemCommand_CanExecute() => this.SelectedHierarchicalVM != null && GetHierarchicalKind(this.SelectedHierarchicalVM) != HierarchicalKind.Balance;
+        private bool DeleteItemCommand_CanExecute() => this.SelectedHierarchicalVM != null && this.SelectedHierarchicalVM.Kind != HierarchicalKind.Balance;
 
         /// <summary>
         /// 分類/項目削除コマンド処理
@@ -178,7 +177,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private async void DeleteItemCommand_Executed()
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                HierarchicalKind? kind = GetHierarchicalKind(this.SelectedHierarchicalVM);
+                HierarchicalKind? kind = this.SelectedHierarchicalVM?.Kind;
                 int id = this.SelectedHierarchicalVM.Id;
 
                 await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
@@ -216,7 +215,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         break;
                     }
                 }
-                await this.LoadAsync(GetHierarchicalKind(this.SelectedHierarchicalVM.ParentVM), this.SelectedHierarchicalVM.ParentVM.Id);
+                await this.LoadAsync(this.SelectedHierarchicalVM.ParentVM?.Kind, this.SelectedHierarchicalVM.ParentVM.Id);
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -258,7 +257,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     int changedId = parentVM.ChildrenVMList[index - 1].Id; // 入れ替え対象の項目のID
 
                     await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                        switch (GetHierarchicalKind(this.SelectedHierarchicalVM)) {
+                        switch (this.SelectedHierarchicalVM?.Kind) {
                             case HierarchicalKind.Category: {
                                 MstCategoryDao mstCategoryDao = new(dbHandler);
                                 _ = await mstCategoryDao.SwapSortOrderAsync(changingId, changedId);
@@ -273,7 +272,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     }
                 }
                 else { // 分類を跨いで項目の表示順を変更するとき
-                    Debug.Assert(GetHierarchicalKind(this.SelectedHierarchicalVM) == HierarchicalKind.Item);
+                    Debug.Assert(this.SelectedHierarchicalVM?.Kind == HierarchicalKind.Item);
                     var grandparentVM = parentVM.ParentVM;
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     int toCategoryId = grandparentVM.ChildrenVMList[index2 - 1].Id;
@@ -284,7 +283,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     }
                 }
 
-                await this.LoadAsync(GetHierarchicalKind(this.SelectedHierarchicalVM), this.SelectedHierarchicalVM.Id);
+                await this.LoadAsync(this.SelectedHierarchicalVM?.Kind, this.SelectedHierarchicalVM.Id);
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -326,7 +325,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     int changedId = parentVM.ChildrenVMList[index + 1].Id; // 入れ替え対象の項目のID
 
                     await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                        switch (GetHierarchicalKind(this.SelectedHierarchicalVM)) {
+                        switch (this.SelectedHierarchicalVM?.Kind) {
                             case HierarchicalKind.Category: {
                                 MstCategoryDao mstCategoryDao = new(dbHandler);
                                 _ = await mstCategoryDao.SwapSortOrderAsync(changingId, changedId);
@@ -341,7 +340,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     }
                 }
                 else { // 分類を跨いで項目の表示順を変更するとき
-                    Debug.Assert(GetHierarchicalKind(this.SelectedHierarchicalVM) == HierarchicalKind.Item);
+                    Debug.Assert(this.SelectedHierarchicalVM?.Kind == HierarchicalKind.Item);
                     var grandparentVM = parentVM.ParentVM;
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     int toCategoryId = grandparentVM.ChildrenVMList[index2 + 1].Id;
@@ -352,7 +351,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     }
                 }
 
-                await this.LoadAsync(GetHierarchicalKind(this.SelectedHierarchicalVM), this.SelectedHierarchicalVM.Id);
+                await this.LoadAsync(this.SelectedHierarchicalVM?.Kind, this.SelectedHierarchicalVM.Id);
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -363,7 +362,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <returns></returns>
         private bool SaveItemInfoCommand_CanExecute()
         {
-            return this.SelectedHierarchicalVM != null && GetHierarchicalKind(this.SelectedHierarchicalVM) != HierarchicalKind.Balance &&
+            return this.SelectedHierarchicalVM != null && this.SelectedHierarchicalVM.Kind != HierarchicalKind.Balance &&
                    !string.IsNullOrWhiteSpace(this.SelectedHierarchicalVM.Name);
         }
 
@@ -455,7 +454,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         });
                     }
 
-                    ViewModelLoader loader = new(this.mDbHandlerFactory);
+                    ViewModelService loader = new(this.mDbHandlerFactory);
                     this.DisplayedHierarchicalSettingVM = await loader.LoadHierarchicalSettingViewModelAsync(HierarchicalKind.Item, this.DisplayedHierarchicalSettingVM.Id);
                 }
             }
@@ -485,7 +484,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         });
                     }
 
-                    ViewModelLoader loader = new(this.mDbHandlerFactory);
+                    ViewModelService loader = new(this.mDbHandlerFactory);
                     this.DisplayedHierarchicalSettingVM = await loader.LoadHierarchicalSettingViewModelAsync(HierarchicalKind.Item, this.DisplayedHierarchicalSettingVM.Id);
                 }
             }
@@ -502,8 +501,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedHierarchicalVMChanged));
 
                 if (e.Value != null) {
-                    ViewModelLoader loader = new(this.mDbHandlerFactory);
-                    this.DisplayedHierarchicalSettingVM = await loader.LoadHierarchicalSettingViewModelAsync(GetHierarchicalKind(e.Value).Value, e.Value.Id);
+                    ViewModelService loader = new(this.mDbHandlerFactory);
+                    this.DisplayedHierarchicalSettingVM = await loader.LoadHierarchicalSettingViewModelAsync(e.Value.Kind, e.Value.Id);
                 }
                 else {
                     this.DisplayedHierarchicalSettingVM = null;
@@ -525,23 +524,23 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             // 指定がなければ現在選択中の項目を再選択する
             if (this.SelectedHierarchicalVM != null && kind == null && id == null) {
-                kind = GetHierarchicalKind(this.SelectedHierarchicalVM);
+                kind = this.SelectedHierarchicalVM.Kind;
                 id = this.SelectedHierarchicalVM.Id;
             }
 
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             this.HierarchicalVMList = await loader.LoadHierarchicalViewModelListAsync();
 
             // 選択する項目を探す
             HierarchicalViewModel selectedVM = null;
             if (kind != null && id != null) {
                 // 収支から探す
-                IEnumerable<HierarchicalViewModel> query = this.HierarchicalVMList.Where(vm => GetHierarchicalKind(vm) == kind && vm.Id == id);
+                IEnumerable<HierarchicalViewModel> query = this.HierarchicalVMList.Where(vm => vm.Kind == kind && vm.Id == id);
 
                 if (!query.Any()) {
                     // 分類から探す
                     foreach (HierarchicalViewModel tmpVM in this.HierarchicalVMList) {
-                        query = tmpVM.ChildrenVMList.Where(vm => GetHierarchicalKind(vm) == kind && vm.Id == id);
+                        query = tmpVM.ChildrenVMList.Where(vm => vm.Kind == kind && vm.Id == id);
                         if (query.Any()) { break; }
                     }
                 }
@@ -550,7 +549,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     // 項目から探す
                     foreach (HierarchicalViewModel tmpVM in this.HierarchicalVMList) {
                         foreach (HierarchicalViewModel tmpVM2 in tmpVM.ChildrenVMList) {
-                            query = tmpVM2.ChildrenVMList.Where(vm => GetHierarchicalKind(vm) == kind && vm.Id == id);
+                            query = tmpVM2.ChildrenVMList.Where(vm => vm.Kind == kind && vm.Id == id);
                             if (query.Any()) { break; }
                         }
                         if (query.Any()) { break; }

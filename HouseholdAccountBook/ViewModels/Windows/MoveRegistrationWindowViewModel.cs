@@ -1,15 +1,15 @@
-﻿using HouseholdAccountBook.Adapters.Dao.Compositions;
-using HouseholdAccountBook.Adapters.Dao.DbTable;
-using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
-using HouseholdAccountBook.Adapters.Dto.DbTable;
-using HouseholdAccountBook.Adapters.Dto.Others;
-using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Args;
-using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Utilities;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.Infrastructure.DbDao.Compositions;
+using HouseholdAccountBook.Models.Infrastructure.DbDao.DbTable;
+using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
+using HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable;
+using HouseholdAccountBook.Models.Infrastructure.DbDto.Others;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities.Args;
+using HouseholdAccountBook.Models.Utilities.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
+using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using static HouseholdAccountBook.Views.UiConstants;
+using static HouseholdAccountBook.ViewModels.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -495,7 +495,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { selectingFromBookId, selectingToBookId });
 
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             this.BookVMList = await loader.LoadBookListAsync();
             this.SelectedFromBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == selectingFromBookId, 0);
             this.SelectedToBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == selectingToBookId, 0);
@@ -533,7 +533,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 CommissionKind.MoveTo => this.SelectedToBookVM.Id.Value,
                 _ => throw new ArgumentException("SelectedComissionKind"),
             };
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             int? tmpItemId = selectingItemId ?? this.SelectedItemVM?.Id;
             this.ItemVMList = await loader.LoadItemListAsync(bookId, BalanceKind.Expenses, -1);
             this.SelectedItemVM = this.ItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0);
@@ -550,7 +550,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingRemark });
 
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
             this.RemarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
             this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;

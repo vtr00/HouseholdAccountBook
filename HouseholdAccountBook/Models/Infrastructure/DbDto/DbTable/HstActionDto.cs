@@ -1,0 +1,73 @@
+﻿using HouseholdAccountBook.Models.Infrastructure.DbDto.Abstract;
+using HouseholdAccountBook.Models.Infrastructure.DbDto.KHDbTable;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using System;
+
+namespace HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable
+{
+    /// <summary>
+    /// 帳簿項目DTO
+    /// </summary>
+    public class HstActionDto : CommonTableDtoBase, ISequentialIDDto
+    {
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public HstActionDto() : base() { }
+        /// <summary>
+        /// コンストラクタ(記帳風月の帳簿項目DTOからのコピー)
+        /// </summary>
+        /// <param name="dto">記帳風月の帳簿項目DTO</param>
+        public HstActionDto(CbtActDto dto) : base(dto)
+        {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
+            this.ActionId = dto.ACT_ID;
+            this.BookId = dto.BOOK_ID;
+            this.ItemId = dto.ITEM_ID;
+            this.ActTime = dto.ACT_DT;
+            this.ActValue = dto.INCOME != 0 ? dto.INCOME : -dto.EXPENSE;
+            this.GroupId = dto.GROUP_ID == 0 ? null : dto.GROUP_ID;
+            this.Remark = dto.NOTE_NAME;
+        }
+
+        public int GetId() => this.ActionId;
+
+        /// <summary>
+        /// 帳簿項目ID
+        /// </summary>
+        public int ActionId { get; set; } = -1;
+        /// <summary>
+        /// 帳簿ID
+        /// </summary>
+        public int BookId { get; set; } = -1;
+        /// <summary>
+        /// 項目ID
+        /// </summary>
+        public int ItemId { get; set; } = -1;
+        /// <summary>
+        /// 項目日時
+        /// </summary>
+        public DateTime ActTime { get; set; } = DateTime.Now;
+        /// <summary>
+        /// 項目値
+        /// </summary>
+        public int ActValue { get; set; }
+        /// <summary>
+        /// 店舗名
+        /// </summary>
+        public string ShopName { get; set; }
+        /// <summary>
+        /// 一致フラグ
+        /// </summary>
+        public int IsMatch { get; set; }
+        /// <summary>
+        /// グループID
+        /// </summary>
+        public int? GroupId { get; set; }
+        /// <summary>
+        /// 備考
+        /// </summary>
+        public string Remark { get; set; }
+    }
+}

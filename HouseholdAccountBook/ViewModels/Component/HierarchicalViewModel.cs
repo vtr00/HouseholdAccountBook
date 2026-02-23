@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.ViewModels.Abstract;
 using System.Collections.ObjectModel;
 
 namespace HouseholdAccountBook.ViewModels.Component
@@ -13,6 +14,11 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// 階層の深さ
         /// </summary>
         public int Depth { get; set; }
+
+        /// <summary>
+        /// 階層種別
+        /// </summary>
+        public HierarchicalKind Kind => (HierarchicalKind)this.Depth;
 
         /// <summary>
         /// ID

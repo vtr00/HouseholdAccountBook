@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Enums;
+﻿using HouseholdAccountBook.Models;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 

@@ -1,5 +1,5 @@
-﻿using HouseholdAccountBook.Adapters;
-using HouseholdAccountBook.Extensions;
+﻿using HouseholdAccountBook.Models.Infrastructure;
+using HouseholdAccountBook.Models.Utilities;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 using System.IO;
@@ -115,15 +115,15 @@ namespace HouseholdAccountBook.ViewModels.Settings
             this.Port = settings.App_Postgres_Port;
             this.UserName = settings.App_Postgres_UserName;
             setPassword?.Invoke(settings.App_Postgres_Password == string.Empty ?
-                ProtectedDataExtensions.DecryptPassword(settings.App_Postgres_EncryptedPassword) : settings.App_Postgres_Password);
+                ProtectedDataUtil.DecryptPassword(settings.App_Postgres_EncryptedPassword) : settings.App_Postgres_Password);
 #if DEBUG
             this.DatabaseName = settings.App_Postgres_DatabaseName_Debug;
 #else
             this.DatabaseName = settings.App_Postgres_DatabaseName;
 #endif
             this.Role = settings.App_Postgres_Role;
-            this.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_DumpExePath);
-            this.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_RestoreExePath);
+            this.DumpExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_DumpExePath);
+            this.RestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_RestoreExePath);
             this.PasswordInput = (PostgresPasswordInput)settings.App_Postgres_Password_Input;
         }
 
@@ -141,7 +141,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             settings.App_Postgres_UserName = this.UserName;
             settings.App_Postgres_Password = string.Empty; // パスワードは暗号化して保存するので、空にしておく
             if (getPassword != null) {
-                settings.App_Postgres_EncryptedPassword = ProtectedDataExtensions.EncryptPassword(getPassword?.Invoke());
+                settings.App_Postgres_EncryptedPassword = ProtectedDataUtil.EncryptPassword(getPassword?.Invoke());
             }
             settings.App_Postgres_DatabaseName = this.DatabaseName;
             settings.App_Postgres_Role = this.Role;

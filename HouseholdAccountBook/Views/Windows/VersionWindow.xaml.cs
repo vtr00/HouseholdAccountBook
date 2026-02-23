@@ -1,6 +1,6 @@
-﻿using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Utilities;
+﻿using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.ViewModels;
+using HouseholdAccountBook.Views.Extensions;
 using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;

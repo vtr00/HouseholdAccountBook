@@ -1,5 +1,5 @@
-﻿using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Enums;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.WindowsParts;
 using System;

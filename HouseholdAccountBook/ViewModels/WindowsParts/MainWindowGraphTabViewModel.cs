@@ -1,10 +1,10 @@
-﻿using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Utilities;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Windows;
+using HouseholdAccountBook.Views.Extensions;
 using HouseholdAccountBook.Views.UserControls;
 using OxyPlot;
 using OxyPlot.Axes;
@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using static HouseholdAccountBook.Views.UiConstants;
+using static HouseholdAccountBook.ViewModels.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
 {
@@ -257,7 +257,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 };
             }
 
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             switch (this.Parent.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
                     // グラフ表示データを取得する

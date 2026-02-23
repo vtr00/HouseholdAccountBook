@@ -6,7 +6,7 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:vmw="clr-namespace:HouseholdAccountBook.ViewModels.Windows"
-        xmlns:enums="clr-namespace:HouseholdAccountBook.Enums"
+        xmlns:enums="clr-namespace:HouseholdAccountBook.Models"
         xmlns:controls="clr-namespace:HouseholdAccountBook.Views.UserControls"
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Views.Behaviors"
         mc:Ignorable="d"

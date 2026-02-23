@@ -1,0 +1,30 @@
+﻿using HouseholdAccountBook.Models.Infrastructure.DbDto.Abstract;
+
+namespace HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable
+{
+    /// <summary>
+    /// グループDTO
+    /// </summary>
+    public class HstGroupDto : CommonTableDtoBase, ISequentialIDDto
+    {
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public HstGroupDto() { }
+
+        public int GetId() => this.GroupId;
+
+        /// <summary>
+        /// グループID
+        /// </summary>
+        public int GroupId { get; set; }
+        /// <summary>
+        /// グループ種別
+        /// </summary>
+        public int GroupKind { get; set; }
+        /// <summary>
+        /// 備考(未使用)
+        /// </summary>
+        public string Remark { get; set; }
+    }
+}

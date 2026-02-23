@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using System.Collections.ObjectModel;
 
@@ -9,25 +10,6 @@ namespace HouseholdAccountBook.ViewModels.Settings
     /// </summary>
     public class HierarchicalSettingViewModel : BindableBase
     {
-        /// <summary>
-        /// 階層種別
-        /// </summary>
-        public enum HierarchicalKind
-        {
-            /// <summary>
-            /// 収支
-            /// </summary>
-            Balance = 0,
-            /// <summary>
-            /// 分類
-            /// </summary>
-            Category,
-            /// <summary>
-            /// 項目
-            /// </summary>
-            Item
-        }
-
         #region プロパティ
         /// <summary>
         /// 種類
@@ -130,12 +112,5 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public bool IsSettable => this.Kind == HierarchicalKind.Item;
         #endregion
         #endregion
-
-        /// <summary>
-        /// 階層構造VMから階層種別を取得する
-        /// </summary>
-        /// <param name="vm">階層構造VM</param>
-        /// <returns>階層種別</returns>
-        public static HierarchicalKind? GetHierarchicalKind(HierarchicalViewModel vm) => (HierarchicalKind?)vm?.Depth;
     }
 }

@@ -1,12 +1,11 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
-using System;
+﻿using System;
 
 namespace HouseholdAccountBook.ViewModels.Component
 {
     /// <summary>
     /// 備考VM
     /// </summary>
-    public class RemarkViewModel : BindableBase
+    public class RemarkViewModel
     {
         #region プロパティ
         /// <summary>

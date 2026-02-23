@@ -1,7 +1,7 @@
-﻿using HouseholdAccountBook.Adapters.Dao.Compositions;
-using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
-using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Extensions;
+﻿using HouseholdAccountBook.Models.Infrastructure.DbDao.Compositions;
+using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 using System.Threading.Tasks;

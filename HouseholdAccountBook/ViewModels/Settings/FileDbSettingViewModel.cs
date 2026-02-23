@@ -1,5 +1,5 @@
-﻿using HouseholdAccountBook.Adapters.DbHandlers;
-using HouseholdAccountBook.Extensions;
+﻿using HouseholdAccountBook.Models.DbHandlers;
+using HouseholdAccountBook.Models.Infrastructure;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System.IO;
 using System.Windows;
@@ -24,7 +24,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public void Load()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            this.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_SQLite_DBFilePath);
+            this.DBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_SQLite_DBFilePath);
         }
 
         /// <summary>

@@ -1,21 +1,22 @@
-﻿using HouseholdAccountBook.Adapters;
-using HouseholdAccountBook.Adapters.Dao.Abstract;
-using HouseholdAccountBook.Adapters.Dao.DbTable;
-using HouseholdAccountBook.Adapters.Dao.KHDbTable;
-using HouseholdAccountBook.Adapters.DbHandlers;
-using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
-using HouseholdAccountBook.Adapters.Dto.Abstract;
-using HouseholdAccountBook.Adapters.Dto.DbTable;
-using HouseholdAccountBook.Adapters.Dto.KHDbTable;
-using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Args;
-using HouseholdAccountBook.Args.RequestEventArgs;
-using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Utilities;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.DbHandlers;
+using HouseholdAccountBook.Models.Infrastructure;
+using HouseholdAccountBook.Models.Infrastructure.DbDao.Abstract;
+using HouseholdAccountBook.Models.Infrastructure.DbDao.DbTable;
+using HouseholdAccountBook.Models.Infrastructure.DbDao.KHDbTable;
+using HouseholdAccountBook.Models.Infrastructure.DbHandlers;
+using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
+using HouseholdAccountBook.Models.Infrastructure.DbDto.Abstract;
+using HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable;
+using HouseholdAccountBook.Models.Infrastructure.DbDto.KHDbTable;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities.Args;
+using HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs;
+using HouseholdAccountBook.Models.Utilities.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.WindowsParts;
+using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,7 +26,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using static HouseholdAccountBook.Views.UiConstants;
+using static HouseholdAccountBook.ViewModels.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -721,7 +722,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public async void ImportKichoFugetsuDbCommand_Executed()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Import_KichoFugetsu_FilePath, App.GetCurrentDir());
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_Import_KichoFugetsu_FilePath, App.GetCurrentDir());
 
             OpenFileDialogRequestEventArgs e = new() {
                 InitialDirectory = directory,
@@ -963,7 +964,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public async void ImportCustomFileCommand_Executed()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Import_CustomFormat_FilePath, App.GetCurrentDir());
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_Import_CustomFormat_FilePath, App.GetCurrentDir());
 
             OpenFileDialogRequestEventArgs e = new() {
                 InitialDirectory = directory,
@@ -1042,7 +1043,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public async void ImportSQLiteFileCommand_Executed()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_SQLite_DBFilePath, App.GetCurrentDir());
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_SQLite_DBFilePath, App.GetCurrentDir());
 
             OpenFileDialogRequestEventArgs e = new() {
                 InitialDirectory = directory,
@@ -1164,7 +1165,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public async void ExportCustomFileCommand_Executed()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Export_CustomFormat_FilePath, App.GetCurrentDir());
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_Export_CustomFormat_FilePath, App.GetCurrentDir());
 
             SaveFileDialogRequestEventArgs e = new() {
                 InitialDirectory = directory,
@@ -1199,7 +1200,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            (string directory, string fileName) = PathExtensions.GetSeparatedPath(settings.App_Export_SQLFilePath, App.GetCurrentDir());
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_Export_SQLFilePath, App.GetCurrentDir());
 
             SaveFileDialogRequestEventArgs e = new() {
                 InitialDirectory = directory,
@@ -1820,7 +1821,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { bookId });
 
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             var tmpBookVMList = await loader.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedStart, this.DisplayedEnd);
             this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0); // 先に選択しておく
