@@ -1,11 +1,9 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
-
-namespace HouseholdAccountBook.ViewModels.Component
+﻿namespace HouseholdAccountBook.ViewModels.Component
 {
     /// <summary>
     /// 帳簿VM(CSV比較用)
     /// </summary>
-    public class BookComparisonViewModel : BindableBase
+    public class BookComparisonViewModel
     {
         #region プロパティ
         /// <summary>

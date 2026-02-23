@@ -6,7 +6,7 @@
         xmlns:project="clr-namespace:HouseholdAccountBook"
         xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:vmw="clr-namespace:HouseholdAccountBook.ViewModels.Windows"
-        xmlns:enums="clr-namespace:HouseholdAccountBook.Enums"
+        xmlns:enums="clr-namespace:HouseholdAccountBook.Models"
         mc:Ignorable="d"
         Title="{x:Static properties:Resources.Title_DbSettingWindow}" Height="370" Width="400" WindowStyle="ToolWindow">
     <Window.DataContext>

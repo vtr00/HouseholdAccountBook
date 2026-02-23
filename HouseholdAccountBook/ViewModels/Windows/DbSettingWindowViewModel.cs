@@ -1,8 +1,7 @@
-﻿using HouseholdAccountBook.Adapters;
-using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Args.RequestEventArgs;
-using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Extensions;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.Infrastructure;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;
@@ -10,7 +9,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using static HouseholdAccountBook.Views.UiConstants;
+using static HouseholdAccountBook.ViewModels.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -103,7 +102,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             string filter = string.Empty;
             switch (kind) {
                 case FilePathKind.DumpExeFile: {
-                    (directory, fileName) = PathExtensions.GetSeparatedPath(this.PostgreSQLDBSettingVM.DumpExePath, App.GetCurrentDir());
+                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.DumpExePath, App.GetCurrentDir());
                     if (string.IsNullOrWhiteSpace(directory)) {
                         directory = App.GetCurrentDir();
                     }
@@ -111,7 +110,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     break;
                 }
                 case FilePathKind.RestoreExeFile: {
-                    (directory, fileName) = PathExtensions.GetSeparatedPath(this.PostgreSQLDBSettingVM.RestoreExePath, App.GetCurrentDir());
+                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.RestoreExePath, App.GetCurrentDir());
                     if (string.IsNullOrWhiteSpace(directory)) {
                         directory = App.GetCurrentDir();
                     }
@@ -122,13 +121,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     switch (this.SelectedDBKind) {
                         case DBKind.SQLite: {
                             checkFileExists = false;
-                            (directory, fileName) = PathExtensions.GetSeparatedPath(this.SQLiteSettingVM.DBFilePath, App.GetCurrentDir());
+                            (directory, fileName) = PathUtil.GetSeparatedPath(this.SQLiteSettingVM.DBFilePath, App.GetCurrentDir());
                             filter = $"{Properties.Resources.FileSelectFilter_SQLiteFile}|*.db;*.sqlite;*.sqlite3";
                             break;
                         }
                         case DBKind.Access: {
                             checkFileExists = false;
-                            (directory, fileName) = PathExtensions.GetSeparatedPath(this.AccessSettingVM.DBFilePath, App.GetCurrentDir());
+                            (directory, fileName) = PathUtil.GetSeparatedPath(this.AccessSettingVM.DBFilePath, App.GetCurrentDir());
                             filter = $"{Properties.Resources.FileSelectFilter_AccessFile}|*.mdb;*.accdb";
                             break;
                         }
@@ -147,18 +146,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
             if (this.OpenFileDialogRequest(e)) {
                 switch (kind) {
                     case FilePathKind.DumpExeFile:
-                        this.PostgreSQLDBSettingVM.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                        this.PostgreSQLDBSettingVM.DumpExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
                     case FilePathKind.RestoreExeFile:
-                        this.PostgreSQLDBSettingVM.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                        this.PostgreSQLDBSettingVM.RestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
                     case FilePathKind.DbFile:
                         switch (this.SelectedDBKind) {
                             case DBKind.SQLite:
-                                this.SQLiteSettingVM.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                                this.SQLiteSettingVM.DBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                                 break;
                             case DBKind.Access:
-                                this.AccessSettingVM.DBFilePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                                this.AccessSettingVM.DBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                                 break;
                         }
                         break;

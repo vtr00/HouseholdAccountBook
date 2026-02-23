@@ -1,7 +1,8 @@
-﻿using HouseholdAccountBook.Adapters.DbHandlers;
-using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Utilities;
+﻿using HouseholdAccountBook.Models.Infrastructure.DbHandlers;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities.Extensions;
+using HouseholdAccountBook.ViewModels;
+using HouseholdAccountBook.Views.Extensions;
 using System;
 using System.Windows;
 using System.Windows.Controls;

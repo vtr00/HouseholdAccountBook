@@ -1,16 +1,16 @@
-﻿using HouseholdAccountBook.Adapters;
-using HouseholdAccountBook.Adapters.Dao.Compositions;
-using HouseholdAccountBook.Adapters.Dao.DbTable;
-using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
-using HouseholdAccountBook.Adapters.Dto.Others;
-using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Args;
-using HouseholdAccountBook.Args.RequestEventArgs;
-using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Utilities;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.Infrastructure;
+using HouseholdAccountBook.Models.Infrastructure.DbDao.Compositions;
+using HouseholdAccountBook.Models.Infrastructure.DbDao.DbTable;
+using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
+using HouseholdAccountBook.Models.Infrastructure.DbDto.Others;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities.Args;
+using HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs;
+using HouseholdAccountBook.Models.Utilities.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
+using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -244,7 +244,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async void OpenCsvFilesCommand_Executed()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(settings.App_CsvFilePath, App.GetCurrentDir());
+            (string folderPath, string fileName) = PathUtil.GetSeparatedPath(settings.App_CsvFilePath, App.GetCurrentDir());
 
             OpenFileDialogRequestEventArgs e = new() {
                 CheckFileExists = true,
@@ -573,7 +573,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { bookId });
 
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             this.BookVMList = await loader.UpdateBookCompListAsync();
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
@@ -644,7 +644,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             // CSVファイルを読み込む
             List<CsvComparisonViewModel> tmpVMList =
-                await CSVIOService.LoadCsvCompListAsync(csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, Encoding.GetEncoding(this.SelectedBookVM.TextEncoding));
+                await CSVFileDao.LoadCsvCompListAsync(csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, Encoding.GetEncoding(this.SelectedBookVM.TextEncoding));
 
             // 有効な行があればリストに追加する(日付昇順)
             if (0 < tmpVMList.Count) {

@@ -1,7 +1,7 @@
-﻿using HouseholdAccountBook.Adapters.DbHandlers;
-using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Args.RequestEventArgs;
-using HouseholdAccountBook.Utilities;
+﻿using HouseholdAccountBook.Models.Infrastructure.DbHandlers;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs;
+using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

@@ -1,15 +1,16 @@
-﻿using HouseholdAccountBook.Adapters.Dao.DbTable;
-using HouseholdAccountBook.Adapters.DbHandlers.Abstract;
-using HouseholdAccountBook.Adapters.Dto.DbTable;
-using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Args;
-using HouseholdAccountBook.Args.RequestEventArgs;
-using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Utilities;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.Infrastructure;
+using HouseholdAccountBook.Models.Infrastructure.DbDao.DbTable;
+using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
+using HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities.Args;
+using HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs;
+using HouseholdAccountBook.Models.Utilities.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Settings;
+using HouseholdAccountBook.Views;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -284,7 +285,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         folderFullPath = Path.GetDirectoryName(settings.App_CsvFilePath);
                     }
                     else {
-                        (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.DisplayedBookSettingVM.CsvFolderPath, App.GetCurrentDir());
+                        (string folderPath, string fileName) = PathUtil.GetSeparatedPath(this.DisplayedBookSettingVM.CsvFolderPath, App.GetCurrentDir());
                         folderFullPath = Path.Combine(folderPath, fileName);
                     }
                     title = Properties.Resources.Title_CsvFolderSelection;
@@ -300,7 +301,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             if (this.OpenFolderDialogRequest(e)) {
                 switch (kind) {
                     case FolderPathKind.CsvFolder:
-                        this.DisplayedBookSettingVM.CsvFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FolderName);
+                        this.DisplayedBookSettingVM.CsvFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FolderName);
                         break;
                     default:
                         break;
@@ -368,7 +369,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using FuncLog funcLog = new(new { bookId });
 
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             this.BookVMList = await loader.LoadBookListAsync();
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
@@ -380,7 +381,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedBookVMChanged));
 
                 if (e.Value != null) {
-                    ViewModelLoader loader = new(this.mDbHandlerFactory);
+                    ViewModelService loader = new(this.mDbHandlerFactory);
                     this.DisplayedBookSettingVM = await loader.LoadBookSettingViewModelAsync(e.Value.Id.Value);
                 }
                 else {

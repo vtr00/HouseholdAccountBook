@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:HouseholdAccountBook"
              xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
-             xmlns:converters="clr-namespace:HouseholdAccountBook.Converters"
+             xmlns:converters="clr-namespace:HouseholdAccountBook.Views.Converters"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:sysglb="clr-namespace:System.Globalization;assembly=mscorlib"
              Startup="App_Startup">

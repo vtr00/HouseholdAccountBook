@@ -1,9 +1,7 @@
-﻿using HouseholdAccountBook.Adapters;
-using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Args.RequestEventArgs;
-using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Extensions;
-using HouseholdAccountBook.Utilities;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.Infrastructure;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;
@@ -174,7 +172,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             string filter = string.Empty;
             switch (kind) {
                 case FilePathKind.DumpExeFile: {
-                    (directory, fileName) = PathExtensions.GetSeparatedPath(this.PostgreSQLDBSettingVM.DumpExePath, App.GetCurrentDir());
+                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.DumpExePath, App.GetCurrentDir());
                     if (string.IsNullOrWhiteSpace(directory)) {
                         directory = App.GetCurrentDir();
                     }
@@ -182,7 +180,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     break;
                 }
                 case FilePathKind.RestoreExeFile: {
-                    (directory, fileName) = PathExtensions.GetSeparatedPath(this.PostgreSQLDBSettingVM.RestoreExePath, App.GetCurrentDir());
+                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.RestoreExePath, App.GetCurrentDir());
                     if (string.IsNullOrWhiteSpace(directory)) {
                         directory = App.GetCurrentDir();
                     }
@@ -203,10 +201,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             if (this.OpenFileDialogRequest(e)) {
                 switch (kind) {
                     case FilePathKind.DumpExeFile:
-                        this.PostgreSQLDBSettingVM.DumpExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                        this.PostgreSQLDBSettingVM.DumpExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
                     case FilePathKind.RestoreExeFile:
-                        this.PostgreSQLDBSettingVM.RestoreExePath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                        this.PostgreSQLDBSettingVM.RestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
                     default:
                         break;
@@ -241,7 +239,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         folderFullPath = App.GetCurrentDir();
                     }
                     else {
-                        (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(this.BackUpFolderPath, App.GetCurrentDir());
+                        (string folderPath, string fileName) = PathUtil.GetSeparatedPath(this.BackUpFolderPath, App.GetCurrentDir());
                         folderFullPath = Path.Combine(folderPath, fileName);
                     }
                     title = Properties.Resources.Title_BackupFolderSelection;
@@ -257,7 +255,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             if (this.OpenFolderDialogRequest(e)) {
                 switch (kind) {
                     case FolderPathKind.BackUpFolder:
-                        this.BackUpFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), e.FolderName);
+                        this.BackUpFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FolderName);
                         break;
                     default:
                         break;
@@ -297,7 +295,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             // バックアップ
             this.BackUpNum = settings.App_BackUpNum;
-            this.BackUpFolderPath = PathExtensions.GetSmartPath(App.GetCurrentDir(), settings.App_BackUpFolderPath);
+            this.BackUpFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_BackUpFolderPath);
             this.BackUpFlagAtMinimizing = settings.App_BackUpFlagAtMinimizing;
             this.BackUpIntervalAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
             this.BackUpNotifyAtMinimizing = settings.App_BackUpNotifyAtMinimizing;

@@ -1,0 +1,45 @@
+﻿using HouseholdAccountBook.Models.Infrastructure.DbDto.Abstract;
+using HouseholdAccountBook.Models.Infrastructure.DbDto.KHDbTable;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+
+namespace HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable
+{
+    /// <summary>
+    /// 分類DTO
+    /// </summary>
+    public class MstCategoryDto : MstDtoBase
+    {
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public MstCategoryDto() : base() { }
+        /// <summary>
+        /// コンストラクタ(記帳風月の分類DTOからのコピー)
+        /// </summary>
+        /// <param name="dto">記帳風月の分類DTO</param>
+        public MstCategoryDto(CbmCategoryDto dto) : base(dto)
+        {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
+            this.CategoryId = dto.CATEGORY_ID;
+            this.CategoryName = dto.CATEGORY_NAME;
+            this.BalanceKind = dto.REXP_DIV - 1;
+            this.SortOrder = dto.SORT_KEY;
+        }
+
+        public override int GetId() => this.CategoryId;
+
+        /// <summary>
+        /// 種別ID
+        /// </summary>
+        public int CategoryId { get; set; }
+        /// <summary>
+        /// 種別名
+        /// </summary>
+        public string CategoryName { get; set; } = "(no name)";
+        /// <summary>
+        /// 収支種別
+        /// </summary>
+        public int BalanceKind { get; set; } = (int)Models.BalanceKind.Income;
+    }
+}

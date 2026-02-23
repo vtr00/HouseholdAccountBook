@@ -1,11 +1,9 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
-
-namespace HouseholdAccountBook.ViewModels.Component
+﻿namespace HouseholdAccountBook.ViewModels.Component
 {
     /// <summary>
     /// 概要VM
     /// </summary>
-    public class SummaryViewModel : BindableBase
+    public class SummaryViewModel
     {
         #region プロパティ
         /// <summary>

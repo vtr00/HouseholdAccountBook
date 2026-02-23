@@ -1,0 +1,50 @@
+﻿using HouseholdAccountBook.Models.Infrastructure.DbDao.Abstract;
+using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
+using HouseholdAccountBook.Models.Infrastructure.DbDto.Others;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities.Extensions;
+using System;
+using System.Threading.Tasks;
+
+namespace HouseholdAccountBook.Models.Infrastructure.DbDao.Compositions
+{
+    /// <summary>
+    /// 日時情報DAO
+    /// </summary>
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class DateTimeInfoDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
+    {
+        /// <summary>
+        /// テーブル内のデータの更新日時を取得する
+        /// </summary>
+        /// <param name="dto">対象のテーブル情報</param>
+        /// <returns>テーブル内のデータの更新日時</returns>
+        /// <exception cref="ArgumentException">テーブル名が不正</exception>
+        public async Task<DateTime> GetUpdateTime(TableInfoDto dto)
+        {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
+            if (!dto.TableName.IsValidDBIdentifier()) {
+                throw new ArgumentException($"Invalid table name: {dto.TableName}");
+            }
+            return await this.mDbHandler.QuerySingleAsync<DateTime>($"SELECT MAX(update_time) FROM {dto.TableName};");
+        }
+
+        /// <summary>
+        /// テーブル内のデータの挿入日時を取得する
+        /// </summary>
+        /// <param name="dto">対象のテーブル情報</param>
+        /// <returns>テーブル内のデータの挿入日時</returns>
+        /// <exception cref="ArgumentException">テーブル名が不正</exception>
+        public async Task<DateTime> GetInsertTime(TableInfoDto dto)
+        {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
+            if (!dto.TableName.IsValidDBIdentifier()) {
+                throw new ArgumentException($"Invalid table name: {dto.TableName}");
+            }
+
+            return await this.mDbHandler.QuerySingleAsync<DateTime>($"SELECT MAX(insert_time) FROM {dto.TableName};");
+        }
+    }
+}

@@ -1,11 +1,11 @@
-﻿using HouseholdAccountBook.Adapters;
-using HouseholdAccountBook.Adapters.Logger;
-using HouseholdAccountBook.Args.RequestEventArgs;
-using HouseholdAccountBook.Enums;
-using HouseholdAccountBook.Extensions;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.Infrastructure;
+using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Windows;
+using HouseholdAccountBook.Views.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -85,7 +85,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             int? tmpItemId = itemId ?? this.Parent.SelectedItemId;
             Log.Vars(vars: new { tmpBalanceKind, tmpCategoryId, tmpItemId });
 
-            ViewModelLoader loader = new(this.mDbHandlerFactory);
+            ViewModelService loader = new(this.mDbHandlerFactory);
             this.SeriesVMList = this.Tab switch {
                 Tabs.MonthlyListTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
                 Tabs.YearlyListTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
@@ -106,7 +106,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public async Task ExportCSVFileAsync(IEnumerable<DataGridExtensions.ColumnInfo> columnInfos)
         {
             Properties.Settings settings = Properties.Settings.Default;
-            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(settings.App_ExportCsvFilePath, App.GetCurrentDir());
+            (string folderPath, string fileName) = PathUtil.GetSeparatedPath(settings.App_ExportCsvFilePath, App.GetCurrentDir());
 
             SaveFileDialogRequestEventArgs e = new() {
                 InitialDirectory = folderPath,
@@ -119,7 +119,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 settings.App_ExportCsvFilePath = e.FileName;
                 settings.Save();
 
-                await CSVIOService.SaveDataGridDataAsync(e.FileName, columnInfos, this.SeriesVMList);
+                await CSVFileDao.SaveDataGridDataAsync(e.FileName, columnInfos, this.SeriesVMList);
             }
 
             bool result = true;
