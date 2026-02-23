@@ -577,8 +577,8 @@
   <data name="Menu_File_Export_SQLFile" xml:space="preserve">
     <value>SQL file (_S)...</value>
   </data>
-  <data name="Menu_File_Export_Excel" xml:space="preserve">
-    <value>Excel file(_E)...</value>
+  <data name="Menu_File_Export_CSV" xml:space="preserve">
+    <value>CSV file(_V)...</value>
   </data>
   <data name="Button_Forward" xml:space="preserve">
     <value>▶</value>

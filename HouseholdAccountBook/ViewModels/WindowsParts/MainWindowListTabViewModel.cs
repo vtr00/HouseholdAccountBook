@@ -1,12 +1,17 @@
-﻿using HouseholdAccountBook.Adapters.Logger;
+﻿using HouseholdAccountBook.Adapters;
+using HouseholdAccountBook.Adapters.Logger;
+using HouseholdAccountBook.Args.RequestEventArgs;
 using HouseholdAccountBook.Enums;
+using HouseholdAccountBook.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Windows;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
 {
@@ -92,6 +97,35 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public override void AddEventHandlers()
         {
             // NOP
+        }
+
+        /// <summary>
+        /// DataGridの情報をCSVファイルにエクスポートする
+        /// </summary>
+        /// <param name="columnInfos">列情報</param>
+        public async Task ExportCSVFileAsync(IEnumerable<DataGridExtensions.ColumnInfo> columnInfos)
+        {
+            Properties.Settings settings = Properties.Settings.Default;
+            (string folderPath, string fileName) = PathExtensions.GetSeparatedPath(settings.App_ExportCsvFilePath, App.GetCurrentDir());
+
+            SaveFileDialogRequestEventArgs e = new() {
+                InitialDirectory = folderPath,
+                FileName = fileName,
+                Title = Properties.Resources.Title_FileSelection,
+                Filter = Properties.Resources.FileSelectFilter_CsvFile + "|*.csv"
+            };
+            if (this.SaveFileDialogRequest(e)) {
+                // 選択したCSVファイルのパスを設定として保存する
+                settings.App_ExportCsvFilePath = e.FileName;
+                settings.Save();
+
+                await CSVIOService.SaveDataGridDataAsync(e.FileName, columnInfos, this.SeriesVMList);
+            }
+
+            bool result = true;
+            _ = result
+                ? MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
+                : MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
     }
 }

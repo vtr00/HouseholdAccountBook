@@ -21,7 +21,7 @@ namespace HouseholdAccountBook.Adapters.Dao.Compositions
         /// <returns>取得したレコードリスト</returns>
         public async Task<IEnumerable<ShopInfoDto>> FindByItemIdAsync(int itemId)
         {
-            using FuncLog funcLog = new(new { itemId}, Log.LogLevel.Trace);
+            using FuncLog funcLog = new(new { itemId }, Log.LogLevel.Trace);
 
             var dtoList = await this.mDbHandler.QueryAsync<ShopInfoDto>(@"
 SELECT S.shop_name, COUNT(A.shop_name) AS count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time

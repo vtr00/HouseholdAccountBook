@@ -86,7 +86,7 @@ namespace HouseholdAccountBook.Extensions
                     InitialDirectory = e.InitialDirectory,
                     FileName = e.FileName,
                     Title = e.Title,
-                    Filter = e.Filter,
+                    Filter = e.Filter
                 };
 
                 bool? result = sfd.ShowDialog(window) ?? throw new InvalidOperationException();
