@@ -47,67 +47,67 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Data.Sqlite 10.0.2
+# Microsoft.Data.Sqlite 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.Data.Sqlite.Core 10.0.2
+# Microsoft.Data.Sqlite.Core 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.EntityFrameworkCore 10.0.2
+# Microsoft.EntityFrameworkCore 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Abstractions 10.0.2
+# Microsoft.EntityFrameworkCore.Abstractions 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Analyzers 10.0.2
+# Microsoft.EntityFrameworkCore.Analyzers 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.Extensions.Caching.Abstractions 10.0.2
+# Microsoft.Extensions.Caching.Abstractions 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Caching.Memory 10.0.2
+# Microsoft.Extensions.Caching.Memory 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection 10.0.2
+# Microsoft.Extensions.DependencyInjection 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection.Abstractions 10.0.2
+# Microsoft.Extensions.DependencyInjection.Abstractions 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging 10.0.2
+# Microsoft.Extensions.Logging 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging.Abstractions 10.0.2
+# Microsoft.Extensions.Logging.Abstractions 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Options 10.0.2
+# Microsoft.Extensions.Options 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Primitives 10.0.2
+# Microsoft.Extensions.Primitives 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
@@ -218,7 +218,7 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://github.com/dotnet/runtime
 
-# System.Data.OleDb 10.0.2
+# System.Data.OleDb 10.0.3
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
