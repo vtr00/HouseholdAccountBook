@@ -808,14 +808,14 @@ namespace HouseholdAccountBook.ViewModels
         }
 
         /// <summary>
-        /// 階層構造項目VMリストを取得する
+        /// 項目ツリーVMリストを取得する
         /// </summary>
         /// <returns>階層構造項目VMリスト</returns>
-        public async Task<ObservableCollection<HierarchicalViewModel>> LoadHierarchicalViewModelListAsync()
+        public async Task<ObservableCollection<ItemTreeViewModel>> LoadItemTreeVMListAsync()
         {
             using FuncLog funcLog = new();
 
-            ObservableCollection<HierarchicalViewModel> vmList = [
+            ObservableCollection<ItemTreeViewModel> vmList = [
                 new () {
                     Depth = (int)HierarchicalKind.Balance,
                     Id = (int)BalanceKind.Income,
@@ -835,13 +835,13 @@ namespace HouseholdAccountBook.ViewModels
             ];
 
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
-                foreach (HierarchicalViewModel vm in vmList) {
+                foreach (ItemTreeViewModel vm in vmList) {
                     // 分類
                     MstCategoryDao mstCategoryDao = new(dbHandler);
                     var cDtoList = await mstCategoryDao.FindByBalanceKindAsync(vm.Id);
 
                     foreach (MstCategoryDto dto in cDtoList) {
-                        vm.ChildrenVMList.Add(new HierarchicalViewModel() {
+                        vm.ChildrenVMList.Add(new ItemTreeViewModel() {
                             Depth = (int)HierarchicalKind.Category,
                             Id = dto.CategoryId,
                             SortOrder = dto.SortOrder,
@@ -853,11 +853,11 @@ namespace HouseholdAccountBook.ViewModels
 
                     // 項目
                     MstItemDao mstItemDao = new(dbHandler);
-                    foreach (HierarchicalViewModel categoryVM in vm.ChildrenVMList) {
+                    foreach (ItemTreeViewModel categoryVM in vm.ChildrenVMList) {
                         var iDtoList = await mstItemDao.FindByCategoryIdAsync(categoryVM.Id);
 
                         foreach (MstItemDto dto in iDtoList) {
-                            categoryVM.ChildrenVMList.Add(new HierarchicalViewModel() {
+                            categoryVM.ChildrenVMList.Add(new ItemTreeViewModel() {
                                 Depth = (int)HierarchicalKind.Item,
                                 Id = dto.ItemId,
                                 SortOrder = dto.SortOrder,
@@ -873,20 +873,20 @@ namespace HouseholdAccountBook.ViewModels
         }
 
         /// <summary>
-        /// 階層構造設定VMを取得する
+        /// 分類/項目設定VMを取得する
         /// </summary>
         /// <param name="kind">表示対象の階層種別</param>
         /// <param name="id">表示対象のID</param>
-        /// <returns>階層構造設定VM</returns>
-        public async Task<HierarchicalSettingViewModel> LoadHierarchicalSettingViewModelAsync(HierarchicalKind kind, int id)
+        /// <returns>分類/項目設定VM</returns>
+        public async Task<ItemSettingViewModel> LoadItemSettingVMAsync(HierarchicalKind kind, int id)
         {
             using FuncLog funcLog = new(new { kind, id });
 
-            HierarchicalSettingViewModel vm = null;
+            ItemSettingViewModel vm = null;
 
             switch (kind) {
                 case HierarchicalKind.Balance: {
-                    vm = new HierarchicalSettingViewModel() {
+                    vm = new ItemSettingViewModel() {
                         Kind = HierarchicalKind.Balance,
                         Id = -1,
                         SortOrder = -1,
@@ -900,7 +900,7 @@ namespace HouseholdAccountBook.ViewModels
                         MstCategoryDao mstCategoryDao = new(dbHandler);
                         var dto = await mstCategoryDao.FindByIdAsync(id);
 
-                        vm = new HierarchicalSettingViewModel() {
+                        vm = new ItemSettingViewModel() {
                             Kind = HierarchicalKind.Category,
                             Id = id,
                             SortOrder = dto.SortOrder,
@@ -915,7 +915,7 @@ namespace HouseholdAccountBook.ViewModels
                         MstItemDao mstItemDao = new(dbHandler);
                         var dto = await mstItemDao.FindByIdAsync(id);
 
-                        vm = new HierarchicalSettingViewModel {
+                        vm = new ItemSettingViewModel {
                             Kind = HierarchicalKind.Item,
                             Id = id,
                             SortOrder = dto.SortOrder,

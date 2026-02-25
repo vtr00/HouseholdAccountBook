@@ -6,9 +6,9 @@ using System.Collections.ObjectModel;
 namespace HouseholdAccountBook.ViewModels.Settings
 {
     /// <summary>
-    /// 階層構造設定VM
+    /// 分類/項目設定VM
     /// </summary>
-    public class HierarchicalSettingViewModel : BindableBase
+    public class ItemSettingViewModel : BindableBase
     {
         #region プロパティ
         /// <summary>
