@@ -495,8 +495,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { selectingFromBookId, selectingToBookId });
 
-            ViewModelService loader = new(this.mDbHandlerFactory);
-            this.BookVMList = await loader.LoadBookListAsync();
+            ViewModelService service = new(this.mDbHandlerFactory);
+            this.BookVMList = await service.LoadBookListAsync();
             this.SelectedFromBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == selectingFromBookId, 0);
             this.SelectedToBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == selectingToBookId, 0);
 
@@ -533,9 +533,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 CommissionKind.MoveTo => this.SelectedToBookVM.Id.Value,
                 _ => throw new ArgumentException("SelectedComissionKind"),
             };
-            ViewModelService loader = new(this.mDbHandlerFactory);
+            ViewModelService service = new(this.mDbHandlerFactory);
             int? tmpItemId = selectingItemId ?? this.SelectedItemVM?.Id;
-            this.ItemVMList = await loader.LoadItemListAsync(bookId, BalanceKind.Expenses, -1);
+            this.ItemVMList = await service.LoadItemListAsync(bookId, BalanceKind.Expenses, -1);
             this.SelectedItemVM = this.ItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0);
         }
 
@@ -550,9 +550,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingRemark });
 
-            ViewModelService loader = new(this.mDbHandlerFactory);
+            ViewModelService service = new(this.mDbHandlerFactory);
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
-            this.RemarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
+            this.RemarkVMList = await service.LoadRemarkListAsync(this.SelectedItemVM.Id);
             this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
         }
 

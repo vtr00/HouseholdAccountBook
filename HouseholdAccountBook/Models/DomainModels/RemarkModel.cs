@@ -11,17 +11,17 @@ namespace HouseholdAccountBook.Models.DomainModels
         /// <summary>
         /// 備考
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; init; }
 
         /// <summary>
         /// 使用回数
         /// </summary>
-        public int UsedCount { get; set; }
+        public int UsedCount { get; init; }
 
         /// <summary>
         /// 最終使用日
         /// </summary>
-        public DateTime? UsedTime { get; set; }
+        public DateTime? UsedTime { get; init; }
         #endregion
     }
 }

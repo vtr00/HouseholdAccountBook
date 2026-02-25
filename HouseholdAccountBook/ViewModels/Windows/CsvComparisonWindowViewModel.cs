@@ -573,9 +573,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { bookId });
 
-            ViewModelService loader = new(this.mDbHandlerFactory);
+            ViewModelService service = new(this.mDbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            this.BookVMList = await loader.UpdateBookCompListAsync();
+            this.BookVMList = await service.UpdateBookCompListAsync();
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
 

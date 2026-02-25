@@ -11,40 +11,40 @@ namespace HouseholdAccountBook.Models.DomainModels
         /// <summary>
         /// 帳簿項目ID
         /// </summary>
-        public int ActionId { get; set; }
+        public int ActionId { get; init; }
         /// <summary>
         /// グループID
         /// </summary>
-        public int? GroupId { get; set; }
+        public int? GroupId { get; init; }
 
         /// <summary>
         /// 時刻
         /// </summary>
-        public DateTime ActTime { get; set; }
+        public DateTime ActTime { get; init; }
         /// <summary>
         /// 帳簿
         /// </summary>
-        public BookModel Book { get; set; }
+        public BookModel Book { get; init; }
         /// <summary>
         /// 分類
         /// </summary>
-        public CategoryModel Category { get; set; }
+        public CategoryModel Category { get; init; }
         /// <summary>
         /// 項目
         /// </summary>
-        public ItemModel Item { get; set; }
+        public ItemModel Item { get; init; }
         /// <summary>
         /// 金額
         /// </summary>
-        public AmountModel Amount { get; set; }
+        public AmountModel Amount { get; init; }
         /// <summary>
         /// 店舗
         /// </summary>
-        public ShopModel Shop { get; set; }
+        public ShopModel Shop { get; init; }
         /// <summary>
         /// 備考
         /// </summary>
-        public RemarkModel Remark { get; set; }
+        public RemarkModel Remark { get; init; }
         #endregion
     }
 }

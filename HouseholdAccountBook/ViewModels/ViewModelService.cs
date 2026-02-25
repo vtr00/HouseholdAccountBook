@@ -354,10 +354,14 @@ namespace HouseholdAccountBook.ViewModels
                     summaryVMList.Add(new SummaryViewModel() {
                         BalanceKind = dto.BalanceKind,
                         BalanceName = BalanceKindStr[(BalanceKind)dto.BalanceKind],
-                        CategoryId = dto.CategoryId,
-                        CategoryName = dto.CategoryName,
-                        ItemId = dto.ItemId,
-                        ItemName = dto.ItemName,
+                        Category = new() {
+                            Id = dto.CategoryId,
+                            Name = dto.CategoryName
+                        },
+                        Item = new() {
+                            Id = dto.ItemId,
+                            Name = dto.ItemName
+                        },
                         Total = dto.Total
                     });
                 }
@@ -379,12 +383,14 @@ namespace HouseholdAccountBook.ViewModels
                     Total = g1.Sum(obj => obj.Total)
                 });
                 // 分類別の小計を計算する
-                foreach (var g2 in g1.GroupBy(obj => obj.CategoryId)) {
+                foreach (var g2 in g1.GroupBy(obj => obj.Category.Id)) {
                     totalAsCategoryList.Add(new SummaryViewModel() {
                         BalanceKind = g1.Key,
                         BalanceName = BalanceKindStr[(BalanceKind)g1.Key],
-                        CategoryId = g2.Key,
-                        CategoryName = g2.First().CategoryName,
+                        Category = new() {
+                            Id = g2.Key,
+                            Name = g2.First().Category.Name
+                        },
                         Total = g2.Sum(obj => obj.Total)
                     });
                 }
@@ -401,7 +407,7 @@ namespace HouseholdAccountBook.ViewModels
             }
             // 分類別の小計を追加する
             foreach (SummaryViewModel svm in totalAsCategoryList) {
-                summaryVMList.Insert(summaryVMList.IndexOf(summaryVMList.First(obj => obj.CategoryId == svm.CategoryId)), svm);
+                summaryVMList.Insert(summaryVMList.IndexOf(summaryVMList.First(obj => obj.Category.Id == svm.Category.Id)), svm);
             }
 
             return summaryVMList;
@@ -777,8 +783,8 @@ namespace HouseholdAccountBook.ViewModels
 
             BookSettingViewModel vm = null;
 
-            ViewModelService loader = new(this.DbHandlerFactory);
-            ObservableCollection<BookModel> vmList = await loader.LoadBookListAsync(Properties.Resources.ListName_None);
+            ViewModelService service = new(this.DbHandlerFactory);
+            ObservableCollection<BookModel> vmList = await service.LoadBookListAsync(Properties.Resources.ListName_None);
 
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 // 帳簿一覧を取得する

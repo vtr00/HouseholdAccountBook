@@ -370,9 +370,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using FuncLog funcLog = new(new { bookId });
 
-            ViewModelService loader = new(this.mDbHandlerFactory);
+            ViewModelService service = new(this.mDbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            this.BookVMList = await loader.LoadBookListAsync();
+            this.BookVMList = await service.LoadBookListAsync();
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
 
@@ -382,8 +382,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedBookVMChanged));
 
                 if (e.Value != null) {
-                    ViewModelService loader = new(this.mDbHandlerFactory);
-                    this.DisplayedBookSettingVM = await loader.LoadBookSettingViewModelAsync(e.Value.Id.Value);
+                    ViewModelService service = new(this.mDbHandlerFactory);
+                    this.DisplayedBookSettingVM = await service.LoadBookSettingViewModelAsync(e.Value.Id.Value);
                 }
                 else {
                     this.DisplayedBookSettingVM = null;

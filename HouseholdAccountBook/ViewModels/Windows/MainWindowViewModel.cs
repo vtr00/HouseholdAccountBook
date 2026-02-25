@@ -1822,9 +1822,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { bookId });
 
-            ViewModelService loader = new(this.mDbHandlerFactory);
+            ViewModelService service = new(this.mDbHandlerFactory);
             int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            var tmpBookVMList = await loader.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedStart, this.DisplayedEnd);
+            var tmpBookVMList = await service.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedStart, this.DisplayedEnd);
             this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0); // 先に選択しておく
             this.BookVMList = tmpBookVMList;
         }

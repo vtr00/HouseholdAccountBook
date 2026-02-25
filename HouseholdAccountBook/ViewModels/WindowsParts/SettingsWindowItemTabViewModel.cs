@@ -454,8 +454,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         });
                     }
 
-                    ViewModelService loader = new(this.mDbHandlerFactory);
-                    this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
+                    ViewModelService service = new(this.mDbHandlerFactory);
+                    this.DisplayedItemSettingVM = await service.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
                 }
             }
         }
@@ -484,8 +484,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         });
                     }
 
-                    ViewModelService loader = new(this.mDbHandlerFactory);
-                    this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
+                    ViewModelService service = new(this.mDbHandlerFactory);
+                    this.DisplayedItemSettingVM = await service.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
                 }
             }
         }
@@ -501,8 +501,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedItemTreeVMChanged));
 
                 if (e.Value != null) {
-                    ViewModelService loader = new(this.mDbHandlerFactory);
-                    this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(e.Value.Kind, e.Value.Id);
+                    ViewModelService service = new(this.mDbHandlerFactory);
+                    this.DisplayedItemSettingVM = await service.LoadItemSettingVMAsync(e.Value.Kind, e.Value.Id);
                 }
                 else {
                     this.DisplayedItemSettingVM = null;
@@ -528,8 +528,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 id = this.SelectedItemTreeVM.Id;
             }
 
-            ViewModelService loader = new(this.mDbHandlerFactory);
-            this.ItemTreeVMList = await loader.LoadItemTreeVMListAsync();
+            ViewModelService service = new(this.mDbHandlerFactory);
+            this.ItemTreeVMList = await service.LoadItemTreeVMListAsync();
 
             // 選択する項目を探す
             ItemTreeViewModel selectedVM = null;
