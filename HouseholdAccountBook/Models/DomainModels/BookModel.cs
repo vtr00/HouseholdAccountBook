@@ -37,6 +37,33 @@ namespace HouseholdAccountBook.Models.DomainModels
         /// 支払い元帳簿ID
         /// </summary>
         public int? DebitBookId { get; init; }
+
+        #region CSV比較用
+        /// <summary>
+        /// CSVフォルダパス
+        /// </summary>
+        public string CsvFolderPath { get; init; }
+
+        /// <summary>
+        /// 文字エンコーディング
+        /// </summary>
+        public int TextEncoding { get; init; }
+
+        /// <summary>
+        /// 日付 位置(1開始)
+        /// </summary>
+        public int? ActDateIndex { get; init; }
+
+        /// <summary>
+        /// 支出 位置(1開始)
+        /// </summary>
+        public int? ExpensesIndex { get; init; }
+
+        /// <summary>
+        /// 項目名 位置(1開始)
+        /// </summary>
+        public int? ItemNameIndex { get; init; }
+        #endregion
         #endregion
     }
 }
