@@ -135,19 +135,19 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="itemId">絞り込み対象の項目ID</param>
         /// <returns></returns>
-        public async Task<ObservableCollection<ShopModel>> LoadShopListAsync(int itemId)
+        public async Task<ObservableCollection<ShopViewModel>> LoadShopListAsync(int itemId)
         {
             using FuncLog funcLog = new(new { itemId });
 
-            ObservableCollection<ShopModel> shopNameVMList = [
-                new ShopModel() { Name = string.Empty }
+            ObservableCollection<ShopViewModel> shopNameVMList = [
+                new ShopViewModel() { Name = string.Empty }
             ];
 
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 ShopInfoDao shopInfoDao = new(dbHandler);
                 var dtoList = await shopInfoDao.FindByItemIdAsync(itemId);
                 foreach (ShopInfoDto dto in dtoList) {
-                    ShopModel vm = new() {
+                    ShopViewModel vm = new() {
                         Name = dto.ShopName,
                         UsedCount = dto.Count,
                         UsedTime = dto.UsedTime
@@ -164,19 +164,19 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="itemId">絞り込み対象の項目ID</param>
         /// <returns></returns>
-        public async Task<ObservableCollection<RemarkModel>> LoadRemarkListAsync(int itemId)
+        public async Task<ObservableCollection<RemarkViewModel>> LoadRemarkListAsync(int itemId)
         {
             using FuncLog funcLog = new(new { itemId });
 
-            ObservableCollection<RemarkModel> remarkVMList = [
-                    new RemarkModel() { Remark = string.Empty }
+            ObservableCollection<RemarkViewModel> remarkVMList = [
+                    new RemarkViewModel() { Remark = string.Empty }
             ];
 
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 RemarkInfoDao remarkInfoDao = new(dbHandler);
                 var dtoList = await remarkInfoDao.FindByItemIdAsync(itemId);
                 foreach (RemarkInfoDto dto in dtoList) {
-                    RemarkModel vm = new() {
+                    RemarkViewModel vm = new() {
                         Remark = dto.Remark,
                         UsedCount = dto.Count,
                         UsedTime = dto.UsedTime
@@ -248,12 +248,8 @@ namespace HouseholdAccountBook.ViewModels
                                     Income = null,
                                     Expenses = null
                                 },
-                                Shop = new() {
-                                    Name = null
-                                },
-                                Remark = new() {
-                                    Remark = null
-                                }
+                                ShopName = null,
+                                Remark = null
                             },
                             Balance = balance
                         },
@@ -293,12 +289,8 @@ namespace HouseholdAccountBook.ViewModels
                                     Income = aDto.ActValue < 0 ? null : aDto.ActValue,
                                     Expenses = aDto.ActValue < 0 ? -aDto.ActValue : null
                                 },
-                                Shop = new() {
-                                    Name = aDto.ShopName
-                                },
-                                Remark = new() {
-                                    Remark = aDto.Remark
-                                }
+                                ShopName = aDto.ShopName,
+                                Remark = aDto.Remark
                             },
                             Balance = balance
                         },
@@ -1001,16 +993,16 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="dbHandler">DBハンドラ</param>
         /// <param name="itemId">項目ID</param>
         /// <returns>店舗VMリスト</returns>
-        private static async Task<ObservableCollection<ShopModel>> LoadShopViewModelListAsync(DbHandlerBase dbHandler, int itemId)
+        private static async Task<ObservableCollection<ShopViewModel>> LoadShopViewModelListAsync(DbHandlerBase dbHandler, int itemId)
         {
             using FuncLog funcLog = new(new { itemId });
 
-            ObservableCollection<ShopModel> svmList = [];
+            ObservableCollection<ShopViewModel> svmList = [];
             ShopInfoDao shopInfoDao = new(dbHandler);
             var dtoList = await shopInfoDao.FindByItemIdAsync(itemId);
 
             foreach (ShopInfoDto dto in dtoList) {
-                ShopModel svm = new() {
+                ShopViewModel svm = new() {
                     Name = dto.ShopName,
                     UsedCount = dto.Count,
                     UsedTime = dto.UsedTime
@@ -1026,16 +1018,16 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="dbHandler">DBハンドラ</param>
         /// <param name="itemId">項目ID</param>
         /// <returns>備考VMリスト</returns>
-        private static async Task<ObservableCollection<RemarkModel>> LoadRemarkViewModelListAsync(DbHandlerBase dbHandler, int itemId)
+        private static async Task<ObservableCollection<RemarkViewModel>> LoadRemarkViewModelListAsync(DbHandlerBase dbHandler, int itemId)
         {
             using FuncLog funcLog = new(new { itemId });
 
-            ObservableCollection<RemarkModel> rvmList = [];
+            ObservableCollection<RemarkViewModel> rvmList = [];
             RemarkInfoDao remarkInfoDao = new(dbHandler);
             var dtoList = await remarkInfoDao.FindByItemIdAsync(itemId);
 
             foreach (RemarkInfoDto dto in dtoList) {
-                RemarkModel rvm = new() {
+                RemarkViewModel rvm = new() {
                     Remark = dto.Remark,
                     UsedCount = dto.Count,
                     UsedTime = dto.UsedTime

@@ -1,5 +1,4 @@
 ﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.DomainModels;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using System.Collections.ObjectModel;
@@ -65,7 +64,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 店舗VMリスト
         /// </summary>
         #region ShopVMList
-        public ObservableCollection<ShopModel> ShopVMList {
+        public ObservableCollection<ShopViewModel> ShopVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -74,7 +73,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 選択された店舗VM
         /// </summary>
         #region SelectedShopVM
-        public ShopModel SelectedShopVM {
+        public ShopViewModel SelectedShopVM {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -84,7 +83,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 備考VMリスト
         /// </summary>
         #region RemarkVMList
-        public ObservableCollection<RemarkModel> RemarkVMList {
+        public ObservableCollection<RemarkViewModel> RemarkVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -93,7 +92,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 選択された備考VM
         /// </summary>
         #region SelectedRemarkVM
-        public RemarkModel SelectedRemarkVM {
+        public RemarkViewModel SelectedRemarkVM {
             get;
             set => this.SetProperty(ref field, value);
         }

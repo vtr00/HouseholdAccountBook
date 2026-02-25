@@ -18,6 +18,7 @@ using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ViewModels.UiConstants;
 using HouseholdAccountBook.Models.DomainModels;
+using HouseholdAccountBook.ViewModels.Component;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -288,7 +289,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 備考VMリスト
         /// </summary>
         #region RemarkVMList
-        public ObservableCollection<RemarkModel> RemarkVMList {
+        public ObservableCollection<RemarkViewModel> RemarkVMList {
             get;
             set => this.SetProperty(ref field, value);
         }

@@ -446,9 +446,9 @@
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Balance}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding ActionWithBalance.Balance, Converter={StaticResource IntToMoneyDisplayConverter}}" 
                                                     ElementStyle="{StaticResource TextAlignRight}"/>
                                     <!-- 店舗名 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding ActionWithBalance.Action.Shop.Name}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding ActionWithBalance.Action.ShopName}"/>
                                     <!-- 備考 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding ActionWithBalance.Action.Remark.Remark}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding ActionWithBalance.Action.Remark}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
 

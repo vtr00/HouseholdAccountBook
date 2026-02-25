@@ -1,17 +1,17 @@
 ﻿using System;
 
-namespace HouseholdAccountBook.Models.DomainModels
+namespace HouseholdAccountBook.ViewModels.Component
 {
     /// <summary>
-    /// 店舗Model
+    /// 備考VM
     /// </summary>
-    public class ShopModel
+    public class RemarkViewModel
     {
         #region プロパティ
         /// <summary>
-        /// 店舗名
+        /// 備考
         /// </summary>
-        public string Name { get; init; }
+        public string Remark { get; init; }
 
         /// <summary>
         /// 使用回数
