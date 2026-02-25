@@ -85,7 +85,7 @@ namespace HouseholdAccountBook.Views.Windows
             using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create()) {
                 switch (this.WVM.SelectedTab) {
                     case SettingsTabs.ItemSettingsTab:
-                        await this.WVM.ItemTabVM.LoadAsync(HierarchicalSettingViewModel.GetHierarchicalKind(this.WVM.ItemTabVM.SelectedHierarchicalVM), this.WVM.ItemTabVM.SelectedHierarchicalVM?.Id);
+                        await this.WVM.ItemTabVM.LoadAsync(this.WVM.ItemTabVM.SelectedItemTreeVM?.Kind, this.WVM.ItemTabVM.SelectedItemTreeVM?.Id);
                         break;
                     case SettingsTabs.BookSettingsTab:
                         await this.WVM.BookTabVM.LoadAsync(this.WVM.BookTabVM.SelectedBookVM?.Id);

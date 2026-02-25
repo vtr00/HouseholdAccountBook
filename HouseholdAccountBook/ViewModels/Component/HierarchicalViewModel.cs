@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.ViewModels.Abstract;
+﻿using HouseholdAccountBook.ViewModels.Abstract;
 using System.Collections.ObjectModel;
 
 namespace HouseholdAccountBook.ViewModels.Component
@@ -7,18 +6,13 @@ namespace HouseholdAccountBook.ViewModels.Component
     /// <summary>
     /// 階層構造VM
     /// </summary>
-    public class HierarchicalViewModel : BindableBase, ISelectable
+    public class HierarchicalViewModel<T> : BindableBase, ISelectable
     {
         #region プロパティ
         /// <summary>
         /// 階層の深さ
         /// </summary>
         public int Depth { get; set; }
-
-        /// <summary>
-        /// 階層種別
-        /// </summary>
-        public HierarchicalKind Kind => (HierarchicalKind)this.Depth;
 
         /// <summary>
         /// ID
@@ -28,7 +22,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 親要素VM
         /// </summary>
-        public HierarchicalViewModel ParentVM { get; set; }
+        public T ParentVM { get; set; }
 
         /// <summary>
         /// ソート順
@@ -64,7 +58,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// 子要素VMリスト
         /// </summary>
         #region ChildrenVMList
-        public ObservableCollection<HierarchicalViewModel> ChildrenVMList {
+        public ObservableCollection<T> ChildrenVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
