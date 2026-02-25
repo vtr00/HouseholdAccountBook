@@ -11,17 +11,17 @@ namespace HouseholdAccountBook.Models.Infrastructure
         /// <summary>
         /// 日付
         /// </summary>
-        public DateTime Date { get; set; }
+        public DateTime Date { get; init; }
 
         /// <summary>
         /// 値
         /// </summary>
-        public int Value { get; set; }
+        public int Value { get; init; }
 
         /// <summary>
         /// 名称
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; init; }
         #endregion
     }
 }

@@ -12,11 +12,11 @@ namespace HouseholdAccountBook.Models.DomainModels
         /// <summary>
         /// 帳簿項目
         /// </summary>
-        public ActionModel Action { get; set; }
+        public ActionModel Action { get; init; }
 
         /// <summary>
         /// 残高
         /// </summary>
-        public int Balance { get; set; }
+        public int Balance { get; init; }
     }
 }

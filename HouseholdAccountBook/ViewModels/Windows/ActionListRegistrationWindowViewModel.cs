@@ -409,9 +409,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { selectingBookId });
 
-            ViewModelService loader = new(this.mDbHandlerFactory);
+            ViewModelService service = new(this.mDbHandlerFactory);
             int? tmpBookId = selectingBookId ?? this.SelectedBookVM?.Id;
-            this.BookVMList = await loader.LoadBookListAsync();
+            this.BookVMList = await service.LoadBookListAsync();
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
 
@@ -426,9 +426,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingCategoryId });
 
-            ViewModelService loader = new(this.mDbHandlerFactory);
+            ViewModelService service = new(this.mDbHandlerFactory);
             int? tmpCategoryId = selectingCategoryId ?? this.SelectedCategoryVM?.Id;
-            this.CategoryVMList = await loader.LoadCategoryListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind);
+            this.CategoryVMList = await service.LoadCategoryListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind);
             this.SelectedCategoryVM = this.CategoryVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpCategoryId, 0);
         }
 
@@ -443,9 +443,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingItemId });
 
-            ViewModelService loader = new(this.mDbHandlerFactory);
+            ViewModelService service = new(this.mDbHandlerFactory);
             int? tmpItemId = selectingItemId ?? this.SelectedItemVM?.Id;
-            this.ItemVMList = await loader.LoadItemListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind, this.SelectedCategoryVM.Id);
+            this.ItemVMList = await service.LoadItemListAsync(this.SelectedBookVM.Id.Value, this.SelectedBalanceKind, this.SelectedCategoryVM.Id);
             this.SelectedItemVM = this.ItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0);
         }
 
@@ -460,9 +460,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingShopName });
 
-            ViewModelService loader = new(this.mDbHandlerFactory);
+            ViewModelService service = new(this.mDbHandlerFactory);
             string tmpShopName = selectingShopName ?? this.SelectedShopName;
-            this.ShopVMList = await loader.LoadShopListAsync(this.SelectedItemVM.Id);
+            this.ShopVMList = await service.LoadShopListAsync(this.SelectedItemVM.Id);
             this.SelectedShopName = this.ShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name;
         }
 
@@ -477,9 +477,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingRemark });
 
-            ViewModelService loader = new(this.mDbHandlerFactory);
+            ViewModelService service = new(this.mDbHandlerFactory);
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
-            this.RemarkVMList = await loader.LoadRemarkListAsync(this.SelectedItemVM.Id);
+            this.RemarkVMList = await service.LoadRemarkListAsync(this.SelectedItemVM.Id);
             this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
         }
 

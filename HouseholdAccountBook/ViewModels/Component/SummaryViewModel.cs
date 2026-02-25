@@ -1,4 +1,6 @@
-﻿namespace HouseholdAccountBook.ViewModels.Component
+﻿using HouseholdAccountBook.Models.DomainModels;
+
+namespace HouseholdAccountBook.ViewModels.Component
 {
     /// <summary>
     /// 概要VM
@@ -14,22 +16,15 @@
         /// 収支名
         /// </summary>
         public string BalanceName { get; set; } = string.Empty;
+
         /// <summary>
-        /// 分類ID
+        /// 分類
         /// </summary>
-        public int CategoryId { get; set; } = -1;
+        public CategoryModel Category { get; set; } = new CategoryModel();
         /// <summary>
-        /// 分類名
+        /// 項目
         /// </summary>
-        public string CategoryName { get; set; } = string.Empty;
-        /// <summary>
-        /// 項目ID
-        /// </summary>
-        public int ItemId { get; set; } = -1;
-        /// <summary>
-        /// 項目名
-        /// </summary>
-        public string ItemName { get; set; } = string.Empty;
+        public ItemModel Item { get; set; } = new ItemModel();
         /// <summary>
         /// その他名称
         /// </summary>
@@ -40,10 +35,10 @@
         /// </summary>
         public string Name {
             get {
-                return this.ItemName != string.Empty
-                    ? $"  {this.ItemName}"
-                    : this.CategoryName != string.Empty
-                        ? this.CategoryName
+                return this.Item.Name != string.Empty
+                    ? $"  {this.Item.Name}"
+                    : this.Category.Name != string.Empty
+                        ? this.Category.Name
                         : this.BalanceName != string.Empty
                             ? this.BalanceName
                             : this.OtherName;

@@ -102,10 +102,10 @@ namespace HouseholdAccountBook.ViewModels.Component
         {
             this.BalanceKind = summary.BalanceKind;
             this.BalanceName = summary.BalanceName;
-            this.CategoryId = summary.CategoryId;
-            this.CategoryName = summary.CategoryName;
-            this.ItemId = summary.ItemId;
-            this.ItemName = summary.ItemName;
+            this.CategoryId = summary.Category.Id;
+            this.CategoryName = summary.Category.Name;
+            this.ItemId = summary.Item.Id;
+            this.ItemName = summary.Item.Name;
             this.OtherName = summary.OtherName;
 
             this.Total = summary.Total;

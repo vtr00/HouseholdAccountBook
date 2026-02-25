@@ -11,33 +11,32 @@ namespace HouseholdAccountBook.Models.DomainModels
         /// <summary>
         /// 帳簿ID
         /// </summary>
-        /// <note>TODO: null許容型の理由は？</note>
-        public int? Id { get; set; }
+        public int? Id { get; init; }
 
         /// <summary>
         /// 帳簿名
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; init; }
 
         /// <summary>
         /// 備考
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; init; }
 
         /// <summary>
         /// 帳簿種別
         /// </summary>
-        public BookKind BookKind { get; set; }
+        public BookKind BookKind { get; init; }
 
         /// <summary>
         /// 支払日
         /// </summary>
-        public int? PayDay { get; set; }
+        public int? PayDay { get; init; }
 
         /// <summary>
         /// 支払い元帳簿ID
         /// </summary>
-        public int? DebitBookId { get; set; }
+        public int? DebitBookId { get; init; }
         #endregion
     }
 }
