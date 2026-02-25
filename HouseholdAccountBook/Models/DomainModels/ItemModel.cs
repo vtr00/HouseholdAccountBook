@@ -1,9 +1,9 @@
-﻿namespace HouseholdAccountBook.ViewModels.Component
+﻿namespace HouseholdAccountBook.Models.DomainModels
 {
     /// <summary>
-    /// 項目VM
+    /// 項目Model
     /// </summary>
-    public class ItemViewModel
+    public class ItemModel
     {
         #region プロパティ
         /// <summary>

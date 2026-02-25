@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Models.Utilities.Args;
+﻿using HouseholdAccountBook.Models.Infrastructure;
+using HouseholdAccountBook.Models.Utilities.Args;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 
@@ -87,7 +88,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// CSVデータ
         /// </summary>
         #region Record
-        public CsvViewModel Record {
+        public ActionCsvDto Record {
             get;
             set => this.SetProperty(ref field, value);
         }

@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace HouseholdAccountBook.ViewModels.Component
+namespace HouseholdAccountBook.Models.DomainModels
 {
     /// <summary>
-    /// 店舗VM
+    /// 店舗Model
     /// </summary>
-    public class ShopViewModel
+    public class ShopModel
     {
         #region プロパティ
         /// <summary>

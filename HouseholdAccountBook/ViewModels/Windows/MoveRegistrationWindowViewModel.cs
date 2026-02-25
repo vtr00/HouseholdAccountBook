@@ -8,7 +8,6 @@ using HouseholdAccountBook.Models.Infrastructure.Logger;
 using HouseholdAccountBook.Models.Utilities.Args;
 using HouseholdAccountBook.Models.Utilities.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
-using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
@@ -18,6 +17,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ViewModels.UiConstants;
+using HouseholdAccountBook.Models.DomainModels;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -100,7 +100,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
-        public ObservableCollection<BookViewModel> BookVMList {
+        public ObservableCollection<BookModel> BookVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -109,7 +109,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された移動元帳簿VM
         /// </summary>
         #region SelectedFromBookVM
-        public BookViewModel SelectedFromBookVM {
+        public BookModel SelectedFromBookVM {
             get;
             set {
                 var oldValue = field;
@@ -127,7 +127,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された移動先帳簿VM
         /// </summary>
         #region SelectedToBookVM
-        public BookViewModel SelectedToBookVM {
+        public BookModel SelectedToBookVM {
             get;
             set {
                 var oldValue = field;
@@ -246,7 +246,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 手数料項目VMリスト
         /// </summary>
         #region ItemVMList
-        public ObservableCollection<ItemViewModel> ItemVMList {
+        public ObservableCollection<ItemModel> ItemVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -255,7 +255,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された手数料項目VM
         /// </summary>
         #region SelectedItemVM
-        public ItemViewModel SelectedItemVM {
+        public ItemModel SelectedItemVM {
             get;
             set {
                 var oldValue = field;
@@ -288,7 +288,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 備考VMリスト
         /// </summary>
         #region RemarkVMList
-        public ObservableCollection<RemarkViewModel> RemarkVMList {
+        public ObservableCollection<RemarkModel> RemarkVMList {
             get;
             set => this.SetProperty(ref field, value);
         }

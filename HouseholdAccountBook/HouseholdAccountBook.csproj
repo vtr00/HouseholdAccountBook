@@ -126,9 +126,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\DomainModels\" />
-  </ItemGroup>
   <Target Name="RemoveUnwantedCultureFolders" AfterTargets="Publish">
     <!-- PublishDir の直下のフォルダを列挙 -->
     <ItemGroup>

@@ -363,7 +363,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private void AddActionCommand_Executed()
         {
             List<CsvComparisonViewModel> vmList = [.. this.SelectedCsvComparisonVMList.Where(vm => !vm.ActionId.HasValue)];
-            List<CsvViewModel> recordList = [.. vmList.Select(vm => vm.Record)];
+            List<ActionCsvDto> recordList = [.. vmList.Select(vm => vm.Record)];
 
             async void Registered(object sender, EventArgs<List<int>> e)
             {
@@ -378,7 +378,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             if (recordList.Count == 1) {
-                CsvViewModel record = recordList[0];
+                ActionCsvDto record = recordList[0];
                 this.AddActionRequested?.Invoke(this, new AddActionRequestEventArgs() {
                     DbHandlerFactory = this.mDbHandlerFactory,
                     InitialBookId = this.SelectedBookVM.Id.Value,

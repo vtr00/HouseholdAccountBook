@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.Infrastructure;
 using HouseholdAccountBook.Models.Infrastructure.DbHandlers;
 using HouseholdAccountBook.Models.Infrastructure.Logger;
 using HouseholdAccountBook.Models.Utilities.Args;
@@ -68,7 +69,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="initialBookId">初期選択する帳簿のID</param>
         /// <param name="initialRecordList">初期表示するCSVレコードリスト</param>
-        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, List<CsvViewModel> initialRecordList)
+        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, List<ActionCsvDto> initialRecordList)
             : this(owner, dbHandlerFactory, initialBookId, null, null, initialRecordList, null, RegistrationKind.Add) { }
 
         /// <summary>
@@ -92,7 +93,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="targetGroupId">編集時、編集する帳簿項目のグループID</param>
         /// <param name="regKind">登録種別</param>
         private ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, DateTime? initialMonth, DateTime? initialDate,
-            List<CsvViewModel> initialRecordList, int? targetGroupId, RegistrationKind regKind)
+            List<ActionCsvDto> initialRecordList, int? targetGroupId, RegistrationKind regKind)
         {
             using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, initialRecordList, targetGroupId, regKind });
 

@@ -1,9 +1,9 @@
-﻿namespace HouseholdAccountBook.ViewModels.Component
+﻿namespace HouseholdAccountBook.Models.DomainModels
 {
     /// <summary>
-    /// 分類VM
+    /// 分類Model
     /// </summary>
-    public class CategoryViewModel
+    public class CategoryModel
     {
         #region プロパティ
         /// <summary>

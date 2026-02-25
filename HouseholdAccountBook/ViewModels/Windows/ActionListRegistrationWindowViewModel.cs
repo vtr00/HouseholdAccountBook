@@ -16,6 +16,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using static HouseholdAccountBook.ViewModels.UiConstants;
+using HouseholdAccountBook.Models.DomainModels;
+using HouseholdAccountBook.Models.Infrastructure;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -85,7 +87,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
-        public ObservableCollection<BookViewModel> BookVMList {
+        public ObservableCollection<BookModel> BookVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -94,7 +96,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された帳簿VM
         /// </summary>
         #region SelectedBookVM
-        public BookViewModel SelectedBookVM {
+        public BookModel SelectedBookVM {
             get;
             set {
                 var oldVM = field;
@@ -138,7 +140,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 分類VMリスト
         /// </summary>
         #region CategoryVMList
-        public ObservableCollection<CategoryViewModel> CategoryVMList {
+        public ObservableCollection<CategoryModel> CategoryVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -147,7 +149,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された分類VM
         /// </summary>
         #region SelectedCategoryVM
-        public CategoryViewModel SelectedCategoryVM {
+        public CategoryModel SelectedCategoryVM {
             get;
             set {
                 var oldValue = field;
@@ -166,7 +168,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 項目VMリスト
         /// </summary>
         #region ItemVMList
-        public ObservableCollection<ItemViewModel> ItemVMList {
+        public ObservableCollection<ItemModel> ItemVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -175,7 +177,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された項目VM
         /// </summary>
         #region SelectedItemVM
-        public ItemViewModel SelectedItemVM {
+        public ItemModel SelectedItemVM {
             get;
             set {
                 var oldValue = field;
@@ -224,7 +226,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 店舗VMリスト
         /// </summary>
         #region ShopNameList
-        public ObservableCollection<ShopViewModel> ShopVMList {
+        public ObservableCollection<ShopModel> ShopVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -243,7 +245,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 備考VMリスト
         /// </summary>
         #region RemarkVMList
-        public ObservableCollection<RemarkViewModel> RemarkVMList {
+        public ObservableCollection<RemarkModel> RemarkVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -323,7 +325,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="initialDate">追加時、初期選択する日付</param>
         /// <param name="initialRecordList">追加時、初期表示するCSVレコードリスト</param>
         /// <param name="targetGroupId">編集時、編集対象のグループID</param>
-        public async Task LoadAsync(int? initialBookId, DateTime? initialMonth, DateTime? initialDate, List<CsvViewModel> initialRecordList, int? targetGroupId)
+        public async Task LoadAsync(int? initialBookId, DateTime? initialMonth, DateTime? initialDate, List<ActionCsvDto> initialRecordList, int? targetGroupId)
         {
             using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, initialRecordList, targetGroupId });
 
@@ -343,7 +345,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         this.DateValueVMList.Add(new DateValueViewModel() { ActDate = actDate });
                     }
                     else {
-                        foreach (CsvViewModel record in initialRecordList) {
+                        foreach (ActionCsvDto record in initialRecordList) {
                             this.DateValueVMList.Add(new DateValueViewModel() { ActDate = record.Date, ActValue = record.Value });
                         }
                     }

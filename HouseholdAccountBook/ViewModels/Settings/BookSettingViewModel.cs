@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.DomainModels;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using System;
@@ -127,7 +128,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 支払元帳簿VMリスト
         /// </summary>
         #region DebitBookVMList
-        public ObservableCollection<BookViewModel> DebitBookVMList {
+        public ObservableCollection<BookModel> DebitBookVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -136,7 +137,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 選択された支払元帳簿VM
         /// </summary>
         #region SelectedDebitBookVM
-        public BookViewModel SelectedDebitBookVM {
+        public BookModel SelectedDebitBookVM {
             get;
             set => this.SetProperty(ref field, value);
         }

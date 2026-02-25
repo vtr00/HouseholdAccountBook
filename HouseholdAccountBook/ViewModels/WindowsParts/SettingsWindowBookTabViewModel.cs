@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using HouseholdAccountBook.Models.DomainModels;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
 {
@@ -30,7 +31,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 選択された帳簿VM変更時のイベント
         /// </summary>
-        public event EventHandler<EventArgs<BookViewModel>> SelectedBookVMChanged;
+        public event EventHandler<EventArgs<BookModel>> SelectedBookVMChanged;
 
         /// <summary>
         /// 更新必要時イベント
@@ -43,11 +44,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
-        public ObservableCollection<BookViewModel> BookVMList {
+        public ObservableCollection<BookModel> BookVMList {
             get;
             set {
                 field.Clear();
-                foreach (BookViewModel vm in value) {
+                foreach (BookModel vm in value) {
                     field.Add(vm);
                 }
                 this.RaisePropertyChanged(nameof(this.BookVMList));
@@ -58,11 +59,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 選択された帳簿VM
         /// </summary>
         #region SelectedBookVM
-        public BookViewModel SelectedBookVM {
+        public BookModel SelectedBookVM {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
-                    this.SelectedBookVMChanged?.Invoke(this, new EventArgs<BookViewModel>(value));
+                    this.SelectedBookVMChanged?.Invoke(this, new EventArgs<BookModel>(value));
                 }
             }
         }
