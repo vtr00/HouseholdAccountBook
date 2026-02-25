@@ -739,11 +739,11 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 帳簿VM(比較用)を取得する
         /// </summary>
-        public async Task<ObservableCollection<BookComparisonViewModel>> UpdateBookCompListAsync()
+        public async Task<ObservableCollection<BookModel>> UpdateBookCompListAsync()
         {
             using FuncLog funcLog = new();
 
-            ObservableCollection<BookComparisonViewModel> bookCompVMList = [];
+            ObservableCollection<BookModel> bookCompVMList = [];
 
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 MstBookDao mstBookDao = new(dbHandler);
@@ -752,7 +752,7 @@ namespace HouseholdAccountBook.ViewModels
                     MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
                     if (jsonObj is null) { continue; }
 
-                    BookComparisonViewModel vm = new() {
+                    BookModel vm = new() {
                         Id = dto.BookId,
                         Name = dto.BookName,
                         CsvFolderPath = jsonObj.CsvFolderPath == string.Empty ? null : jsonObj.CsvFolderPath,

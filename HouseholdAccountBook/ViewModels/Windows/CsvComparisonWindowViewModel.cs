@@ -21,6 +21,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using HouseholdAccountBook.Models.DomainModels;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -86,7 +87,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
-        public ObservableCollection<BookComparisonViewModel> BookVMList {
+        public ObservableCollection<BookModel> BookVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -95,7 +96,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された帳簿VM
         /// </summary>
         #region SelectedBookVM
-        public BookComparisonViewModel SelectedBookVM {
+        public BookModel SelectedBookVM {
             get;
             set {
                 int? oldValue = field?.Id;
@@ -355,14 +356,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿項目追加コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        /// <remarks>選択されている帳簿項目が1つ以上存在していて、値を持たない帳簿項目IDが1つ以上ある</remarks>
-        private bool AddActionCommand_CanExecute() => this.SelectedCsvComparisonVMList.Count != 0 && this.SelectedCsvComparisonVMList.Any(vm => !vm.ActionId.HasValue);
+        /// <remarks>選択されているCSVデータが1つ以上存在していて、帳簿に紐づかない項目が1つ以上ある</remarks>
+        private bool AddActionCommand_CanExecute() => this.SelectedCsvComparisonVMList.Count != 0 && this.SelectedCsvComparisonVMList.Any(vm => vm.Action is null);
         /// <summary>
         /// 帳簿項目追加コマンド処理
         /// </summary>
         private void AddActionCommand_Executed()
         {
-            List<CsvComparisonViewModel> vmList = [.. this.SelectedCsvComparisonVMList.Where(vm => !vm.ActionId.HasValue)];
+            List<CsvComparisonViewModel> vmList = [.. this.SelectedCsvComparisonVMList.Where(vm => vm.Action is null)];
             List<ActionCsvDto> recordList = [.. vmList.Select(vm => vm.Record)];
 
             async void Registered(object sender, EventArgs<List<int>> e)
@@ -400,8 +401,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿項目編集コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        /// <remarks>選択されている帳簿項目が1つだけ存在していて、選択している帳簿項目のIDが値を持つ</remarks>
-        private bool EditActionCommand_CanExecute() => this.SelectedCsvComparisonVMList.Count == 1 && this.SelectedCsvComparisonVM.ActionId.HasValue;
+        /// <remarks>選択されているCSVデータが1つだけ存在していて、帳簿項目に紐づいている</remarks>
+        private bool EditActionCommand_CanExecute() => this.SelectedCsvComparisonVMList.Count == 1 && this.SelectedCsvComparisonVM.Action is not null;
         /// <summary>
         /// 帳簿項目編集コマンド処理
         /// </summary>
@@ -411,7 +412,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             int? groupKind = null;
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 GroupInfoDao groupInfoDao = new(dbHandler);
-                var dto = await groupInfoDao.FindByActionId(this.SelectedCsvComparisonVM.ActionId.Value);
+                var dto = await groupInfoDao.FindByActionId(this.SelectedCsvComparisonVM.Action.ActionId);
                 groupKind = dto.GroupKind;
             }
 
@@ -429,7 +430,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 case (int)GroupKind.ListReg:
                     this.EditActionListRequested?.Invoke(this, new EditActionListRequestEventArgs() {
                         DbHandlerFactory = this.mDbHandlerFactory,
-                        TargetGroupId = this.SelectedCsvComparisonVM.GroupId.Value,
+                        TargetGroupId = this.SelectedCsvComparisonVM.Action.GroupId.Value,
                         Registered = Registered
                     });
                     break;
@@ -437,7 +438,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 default:
                     this.EditActionRequested?.Invoke(this, new EditActionRequestEventArgs() {
                         DbHandlerFactory = this.mDbHandlerFactory,
-                        TargetActionId = this.SelectedCsvComparisonVM.ActionId.Value,
+                        TargetActionId = this.SelectedCsvComparisonVM.Action.ActionId,
                         Registered = Registered
                     });
                     break;
@@ -455,8 +456,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private void AddOrEditActionCommand_Executed()
         {
-            // 選択されている帳簿項目が1つ以上存在していて、値を持たない帳簿項目IDが1つ以上ある
-            if (0 < this.SelectedCsvComparisonVMList.Count && this.SelectedCsvComparisonVMList.Any(vm => !vm.ActionId.HasValue)) {
+            // 選択されているCSVデータが1つ以上存在していて、帳簿項目に紐づかない項目が1つ以上ある
+            if (0 < this.SelectedCsvComparisonVMList.Count && this.SelectedCsvComparisonVMList.Any(vm => vm.Action is null)) {
                 this.AddActionCommand_Executed();
             }
             else {
@@ -474,7 +475,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             bool canExecute = false;
             if (this.CsvComparisonVMList != null) {
                 foreach (CsvComparisonViewModel vm in this.CsvComparisonVMList) {
-                    canExecute |= vm.ActionId.HasValue && !vm.IsMatch;
+                    canExecute |= vm.Action is not null && !vm.IsMatch;
                     if (canExecute) { break; }
                 }
             }
@@ -487,10 +488,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 foreach (CsvComparisonViewModel vm in this.CsvComparisonVMList) {
-                    if (vm.ActionId.HasValue && !vm.IsMatch) {
+                    if (vm.Action is not null && !vm.IsMatch) {
                         vm.IsMatch = true;
-                        this.IsMatchChanged?.Invoke(this, new EventArgs<int?, bool>(vm.ActionId, vm.IsMatch));
-                        await this.SaveIsMatchAsync(vm.ActionId.Value, vm.IsMatch);
+                        this.IsMatchChanged?.Invoke(this, new EventArgs<int?, bool>(vm.Action.ActionId, vm.IsMatch));
+                        await this.SaveIsMatchAsync(vm.Action.ActionId, vm.IsMatch);
                     }
                 }
             }
@@ -516,9 +517,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void ChangeIsMatchCommand_Executed()
         {
-            if (this.SelectedCsvComparisonVM.ActionId.HasValue) {
-                this.IsMatchChanged?.Invoke(this, new EventArgs<int?, bool>(this.SelectedCsvComparisonVM.ActionId, this.SelectedCsvComparisonVM.IsMatch));
-                await this.SaveIsMatchAsync(this.SelectedCsvComparisonVM.ActionId.Value, this.SelectedCsvComparisonVM.IsMatch);
+            if (this.SelectedCsvComparisonVM.Action is not null) {
+                this.IsMatchChanged?.Invoke(this, new EventArgs<int?, bool>(this.SelectedCsvComparisonVM.Action.ActionId, this.SelectedCsvComparisonVM.IsMatch));
+                await this.SaveIsMatchAsync(this.SelectedCsvComparisonVM.Action.ActionId, this.SelectedCsvComparisonVM.IsMatch);
             }
         }
         #endregion
@@ -687,15 +688,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     var dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(this.SelectedBookVM.Id.Value, vm.Record.Date, vm.Record.Value);
                     foreach (ActionCompInfoDto dto in dtoList) {
                         // 帳簿項目IDが使用済なら次のレコードを調べるようにする
-                        bool checkNext = this.CsvComparisonVMList.Where(tmpVM => tmpVM.ActionId == dto.ActionId).Any();
+                        bool checkNext = this.CsvComparisonVMList.Where(tmpVM => tmpVM.Action.ActionId == dto.ActionId).Any();
                         // 帳簿項目情報を紐付ける
                         if (!checkNext) {
-                            vm.ActionId = dto.ActionId;
-                            vm.ItemName = dto.ItemName;
-                            vm.ShopName = dto.ShopName;
-                            vm.Remark = dto.Remark;
+                            vm.Action = new() {
+                                ActionId = dto.ActionId,
+                                GroupId = dto.GroupId,
+                                Item = new() { Name = dto.ItemName },
+                                Shop = new() { Name = dto.ShopName },
+                                Remark = new() { Remark = dto.Remark }
+                            };
                             vm.IsMatch = dto.IsMatch == 1;
-                            vm.GroupId = dto.GroupId;
 
                             break;
                         }
