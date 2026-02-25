@@ -11,24 +11,24 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 収支種別
         /// </summary>
-        public int BalanceKind { get; set; } = -1;
+        public int BalanceKind { get; init; } = -1;
         /// <summary>
         /// 収支名
         /// </summary>
-        public string BalanceName { get; set; } = string.Empty;
+        public string BalanceName { get; init; } = string.Empty;
 
         /// <summary>
         /// 分類
         /// </summary>
-        public CategoryModel Category { get; set; } = new CategoryModel();
+        public CategoryModel Category { get; init; } = new CategoryModel();
         /// <summary>
         /// 項目
         /// </summary>
-        public ItemModel Item { get; set; } = new ItemModel();
+        public ItemModel Item { get; init; } = new ItemModel();
         /// <summary>
         /// その他名称
         /// </summary>
-        public string OtherName { get; set; } = string.Empty;
+        public string OtherName { get; init; } = string.Empty;
 
         /// <summary>
         /// 表示名
@@ -48,7 +48,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 合計
         /// </summary>
-        public int Total { get; set; }
+        public int Total { get; init; }
         #endregion
     }
 }

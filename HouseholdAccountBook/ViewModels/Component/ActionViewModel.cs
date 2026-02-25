@@ -14,7 +14,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 残高付き帳簿項目Model
         /// </summary>
-        public ActionWithBalanceModel ActionWithBalance { get; set; }
+        public ActionWithBalanceModel ActionWithBalance { get; init; }
 
         /// <summary>
         /// CSVと一致したか

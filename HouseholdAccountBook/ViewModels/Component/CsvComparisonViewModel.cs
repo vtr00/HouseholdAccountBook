@@ -38,12 +38,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// CSVデータ
         /// </summary>
-        #region Record
-        public ActionCsvDto Record {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
+        public ActionCsvDto Record { get; init; }
         /// <summary>
         /// 帳簿項目
         /// </summary>

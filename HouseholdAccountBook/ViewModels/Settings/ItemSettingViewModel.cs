@@ -14,22 +14,17 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 種類
         /// </summary>
-        public HierarchicalKind Kind { get; set; }
+        public HierarchicalKind Kind { get; init; }
 
         /// <summary>
         /// ID
         /// </summary>
-        public int Id { get; set; }
+        public int Id { get; init; }
 
         /// <summary>
         /// ソート順
         /// </summary>
-        #region SortOrder
-        public int SortOrder {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
+        public int SortOrder { get; init; }
 
         /// <summary>
         /// 名称

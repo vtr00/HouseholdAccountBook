@@ -12,11 +12,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
     /// </summary>
     public class OleDbSettingViewModel : BindableBase
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public OleDbSettingViewModel() { }
-
+        #region プロパティ
         /// <summary>
         /// プロバイダ名
         /// </summary>
@@ -40,6 +36,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             get;
             set => this.SetProperty(ref field, value);
         }
+        #endregion
         #endregion
 
         /// <summary>

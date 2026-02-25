@@ -11,27 +11,27 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 値(Y軸用)
         /// </summary>
-        public int Value { get; set; }
+        public int Value { get; init; }
 
         /// <summary>
         /// 日付(Tracker用)
         /// </summary>
-        public DateTime Date { get; set; }
+        public DateTime Date { get; init; }
 
         /// <summary>
         /// インデックス(LineSeriesのX軸用)
         /// </summary>
-        public int Index { get; set; }
+        public int Index { get; init; }
 
         /// <summary>
         /// 項目ID
         /// </summary>
-        public int ItemId { get; set; }
+        public int ItemId { get; init; }
 
         /// <summary>
         /// 分類ID
         /// </summary>
-        public int CategoryId { get; set; }
+        public int CategoryId { get; init; }
         #endregion
     }
 }
