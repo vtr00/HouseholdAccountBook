@@ -226,7 +226,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 店舗VMリスト
         /// </summary>
         #region ShopNameList
-        public ObservableCollection<ShopModel> ShopVMList {
+        public ObservableCollection<ShopViewModel> ShopVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -245,7 +245,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 備考VMリスト
         /// </summary>
         #region RemarkVMList
-        public ObservableCollection<RemarkModel> RemarkVMList {
+        public ObservableCollection<RemarkViewModel> RemarkVMList {
             get;
             set => this.SetProperty(ref field, value);
         }

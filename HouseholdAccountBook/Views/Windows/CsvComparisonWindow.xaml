@@ -163,7 +163,7 @@
                                     <CheckBox.Style>
                                         <Style TargetType="CheckBox">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ActionId}" Value="{x:Null}">
+                                                <DataTrigger Binding="{Binding Action}" Value="{x:Null}">
                                                     <Setter Property="IsEnabled" Value="False"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -179,13 +179,13 @@
                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Expenses}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Record.Value, Converter={StaticResource IntToMoneyDisplayConverter}}" 
                                         ElementStyle="{StaticResource TextAlignRight}"/>
                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_CSVItemName}" Binding="{Binding Record.Name}"/>
-                    <DataGridTextColumn Header="Id" Binding="{Binding ActionId}"
+                    <DataGridTextColumn Header="Id" Binding="{Binding Action.ActionId, TargetNullValue=''}"
                                         Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
-                    <DataGridTextColumn Header="GId" Binding="{Binding GroupId}"
+                    <DataGridTextColumn Header="GId" Binding="{Binding Action.GroupId, TargetNullValue=''}"
                                         Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
-                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" Width="*" Binding="{Binding ItemName}"/>
-                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding ShopName}"/>
-                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Remark}"/>
+                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" Width="*" Binding="{Binding Action.Item.Name, TargetNullValue=''}"/>
+                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Action.ShopName, TargetNullValue=''}"/>
+                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Action.Remark, TargetNullValue=''}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
