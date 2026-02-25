@@ -17,6 +17,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ViewModels.UiConstants;
+using HouseholdAccountBook.Models.DomainModels;
+using HouseholdAccountBook.Models.Infrastructure;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -104,7 +106,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
-        public ObservableCollection<BookViewModel> BookVMList {
+        public ObservableCollection<BookModel> BookVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -113,7 +115,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された帳簿VM
         /// </summary>
         #region SelectedBookVM
-        public BookViewModel SelectedBookVM {
+        public BookModel SelectedBookVM {
             get;
             set {
                 var oldValue = field;
@@ -173,7 +175,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 分類VMリスト
         /// </summary>
         #region CategoryVMList
-        public ObservableCollection<CategoryViewModel> CategoryVMList {
+        public ObservableCollection<CategoryModel> CategoryVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -182,7 +184,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された分類VM
         /// </summary>
         #region SelectedCategoryVM
-        public CategoryViewModel SelectedCategoryVM {
+        public CategoryModel SelectedCategoryVM {
             get;
             set {
                 var oldValue = field;
@@ -201,7 +203,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 項目VMリスト
         /// </summary>
         #region ItemVMList
-        public ObservableCollection<ItemViewModel> ItemVMList {
+        public ObservableCollection<ItemModel> ItemVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -210,7 +212,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された項目VM
         /// </summary>
         #region SelectedItemVM
-        public ItemViewModel SelectedItemVM {
+        public ItemModel SelectedItemVM {
             get;
             set {
                 var oldValue = field;
@@ -243,7 +245,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 店舗VMリスト
         /// </summary>
         #region ShopVMList
-        public ObservableCollection<ShopViewModel> ShopVMList {
+        public ObservableCollection<ShopModel> ShopVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -262,7 +264,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 備考VMリスト
         /// </summary>
         #region RemarkVMList
-        public ObservableCollection<RemarkViewModel> RemarkVMList {
+        public ObservableCollection<RemarkModel> RemarkVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -421,7 +423,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="InitialDate">追加時、初期選択する日付</param>
         /// <param name="initialRecord">追加時、初期表示するCSVレコード</param>
         /// <param name="targetActionId">複製/編集時、複製/編集対象の帳簿項目のID</param>
-        public async Task LoadAsync(int? initialBookId, DateTime? initialMonth, DateTime? InitialDate, CsvViewModel initialRecord, int? targetActionId)
+        public async Task LoadAsync(int? initialBookId, DateTime? initialMonth, DateTime? InitialDate, ActionCsvDto initialRecord, int? targetActionId)
         {
             using FuncLog funcLog = new(new { initialBookId, initialMonth, InitialDate, initialRecord, targetActionId });
 

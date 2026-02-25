@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.ViewModels.Component;
+﻿using HouseholdAccountBook.Models.Infrastructure;
+using HouseholdAccountBook.ViewModels.Component;
 using System;
 using System.Collections.Generic;
 
@@ -24,7 +25,7 @@ namespace HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs
         /// <summary>
         /// 初期表示するCSVレコードリスト
         /// </summary>
-        public List<CsvViewModel> InitialRecordList { get; set; }
+        public List<ActionCsvDto> InitialRecordList { get; set; }
 
         /// <summary>
         /// 登録完了時イベントハンドラ

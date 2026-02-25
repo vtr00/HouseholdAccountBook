@@ -27,6 +27,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ViewModels.UiConstants;
+using HouseholdAccountBook.Models.DomainModels;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -235,7 +236,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿VMリスト
         /// </summary>
         #region BookVMList
-        public ObservableCollection<BookViewModel> BookVMList {
+        public ObservableCollection<BookModel> BookVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -244,7 +245,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された帳簿VM
         /// </summary>
         #region SelectedBookVM
-        public BookViewModel SelectedBookVM {
+        public BookModel SelectedBookVM {
             get;
             set {
                 var oldVM = field;

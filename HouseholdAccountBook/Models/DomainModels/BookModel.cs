@@ -1,11 +1,11 @@
 ﻿using HouseholdAccountBook.Models;
 
-namespace HouseholdAccountBook.ViewModels.Component
+namespace HouseholdAccountBook.Models.DomainModels
 {
     /// <summary>
-    /// 帳簿VM
+    /// 帳簿Model
     /// </summary>
-    public class BookViewModel
+    public class BookModel
     {
         #region プロパティ
         /// <summary>

@@ -244,7 +244,7 @@ namespace HouseholdAccountBook.Views.Windows
                     this.mCCW.IsMatchChanged += (sender, e) => {
                         using FuncLog funcLog = new(methodName: nameof(this.mCCW.IsMatchChanged));
 
-                        ActionViewModel vm = this.WVM.BookTabVM.ActionVMList.FirstOrDefault(tmpVM => tmpVM.ActionId == e.Value1);
+                        ActionViewModel vm = this.WVM.BookTabVM.ActionVMList.FirstOrDefault(tmpVM => tmpVM.ActionWithBalance.Action.ActionId == e.Value1);
                         // UI上の表記だけを更新する
                         _ = (vm?.IsMatch = e.Value2);
                     };

@@ -18,6 +18,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static HouseholdAccountBook.Models.Infrastructure.EncodingUtil;
 using static HouseholdAccountBook.ViewModels.UiConstants;
+using HouseholdAccountBook.Models.DomainModels;
 
 namespace HouseholdAccountBook.ViewModels
 {
@@ -35,15 +36,15 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="initialName">1番目に追加する項目の名称(空文字の場合は追加しない)</param>
         /// <param name="start">開始日</param>
         /// <param name="end">終了日</param>
-        public async Task<ObservableCollection<BookViewModel>> LoadBookListAsync(string initialName = "", DateTime? start = null, DateTime? end = null)
+        public async Task<ObservableCollection<BookModel>> LoadBookListAsync(string initialName = "", DateTime? start = null, DateTime? end = null)
         {
             using FuncLog funcLog = new(new { initialName, start, end });
 
-            ObservableCollection<BookViewModel> bookVMList = [];
+            ObservableCollection<BookModel> bookVMList = [];
 
             // 1番目に表示する項目を追加する
             if (initialName != string.Empty) {
-                bookVMList.Add(new BookViewModel() { Id = null, Name = initialName });
+                bookVMList.Add(new BookModel() { Id = null, Name = initialName });
             }
 
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
@@ -53,7 +54,7 @@ namespace HouseholdAccountBook.ViewModels
                     MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
 
                     if (DateTimeExtensions.IsWithIn(start, end, jsonObj?.StartDate, jsonObj?.EndDate)) {
-                        BookViewModel vm = new() {
+                        BookModel vm = new() {
                             Id = dto.BookId,
                             Name = dto.BookName,
                             Remark = jsonObj?.Remark ?? string.Empty,
@@ -75,19 +76,19 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="bookId">絞り込み対象の帳簿ID</param>
         /// <param name="balanceKind">絞り込み対象の収支種別</param>
         /// <returns></returns>
-        public async Task<ObservableCollection<CategoryViewModel>> LoadCategoryListAsync(int bookId, BalanceKind balanceKind)
+        public async Task<ObservableCollection<CategoryModel>> LoadCategoryListAsync(int bookId, BalanceKind balanceKind)
         {
             using FuncLog funcLog = new(new { bookId, balanceKind });
 
-            ObservableCollection<CategoryViewModel> categoryVMList = [
-                new CategoryViewModel() { Id = -1, Name = Properties.Resources.ListName_NoSpecification }
+            ObservableCollection<CategoryModel> categoryVMList = [
+                new CategoryModel() { Id = -1, Name = Properties.Resources.ListName_NoSpecification }
             ];
 
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 MstCategoryWithinBookDao mstCategoryWithinBookDao = new(dbHandler);
                 var dtoList = await mstCategoryWithinBookDao.FindByBookIdAndBalanceKindAsync(bookId, (int)balanceKind);
                 foreach (MstCategoryDto dto in dtoList) {
-                    CategoryViewModel vm = new() {
+                    CategoryModel vm = new() {
                         Id = dto.CategoryId,
                         Name = dto.CategoryName
                     };
@@ -105,11 +106,11 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="balanceKind">絞り込み対象の収支種別</param>
         /// <param name="categoryId">絞り込み対象の分類ID</param>
         /// <returns></returns>
-        public async Task<ObservableCollection<ItemViewModel>> LoadItemListAsync(int bookId, BalanceKind balanceKind, int categoryId)
+        public async Task<ObservableCollection<ItemModel>> LoadItemListAsync(int bookId, BalanceKind balanceKind, int categoryId)
         {
             using FuncLog funcLog = new(new { bookId, balanceKind, categoryId });
 
-            ObservableCollection<ItemViewModel> itemVMList = [];
+            ObservableCollection<ItemModel> itemVMList = [];
 
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 CategoryItemInfoDao categoryItemInfoDao = new(dbHandler);
@@ -117,7 +118,7 @@ namespace HouseholdAccountBook.ViewModels
                     ? await categoryItemInfoDao.FindByBookIdAndBalanceKindAsync(bookId, (int)balanceKind)
                     : await categoryItemInfoDao.FindByBookIdAndCategoryIdAsync(bookId, categoryId);
                 foreach (CategoryItemInfoDto dto in dtoList) {
-                    ItemViewModel vm = new() {
+                    ItemModel vm = new() {
                         Id = dto.ItemId,
                         Name = dto.ItemName,
                         CategoryName = categoryId == -1 ? dto.CategoryName : ""
@@ -134,19 +135,19 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="itemId">絞り込み対象の項目ID</param>
         /// <returns></returns>
-        public async Task<ObservableCollection<ShopViewModel>> LoadShopListAsync(int itemId)
+        public async Task<ObservableCollection<ShopModel>> LoadShopListAsync(int itemId)
         {
             using FuncLog funcLog = new(new { itemId });
 
-            ObservableCollection<ShopViewModel> shopNameVMList = [
-                new ShopViewModel() { Name = string.Empty }
+            ObservableCollection<ShopModel> shopNameVMList = [
+                new ShopModel() { Name = string.Empty }
             ];
 
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 ShopInfoDao shopInfoDao = new(dbHandler);
                 var dtoList = await shopInfoDao.FindByItemIdAsync(itemId);
                 foreach (ShopInfoDto dto in dtoList) {
-                    ShopViewModel vm = new() {
+                    ShopModel vm = new() {
                         Name = dto.ShopName,
                         UsedCount = dto.Count,
                         UsedTime = dto.UsedTime
@@ -163,19 +164,19 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="itemId">絞り込み対象の項目ID</param>
         /// <returns></returns>
-        public async Task<ObservableCollection<RemarkViewModel>> LoadRemarkListAsync(int itemId)
+        public async Task<ObservableCollection<RemarkModel>> LoadRemarkListAsync(int itemId)
         {
             using FuncLog funcLog = new(new { itemId });
 
-            ObservableCollection<RemarkViewModel> remarkVMList = [
-                    new RemarkViewModel() { Remark = string.Empty }
+            ObservableCollection<RemarkModel> remarkVMList = [
+                    new RemarkModel() { Remark = string.Empty }
             ];
 
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 RemarkInfoDao remarkInfoDao = new(dbHandler);
                 var dtoList = await remarkInfoDao.FindByItemIdAsync(itemId);
                 foreach (RemarkInfoDto dto in dtoList) {
-                    RemarkViewModel vm = new() {
+                    RemarkModel vm = new() {
                         Remark = dto.Remark,
                         UsedCount = dto.Count,
                         UsedTime = dto.UsedTime
@@ -226,21 +227,36 @@ namespace HouseholdAccountBook.ViewModels
                 int balance = dto.EndingBalance;
                 {
                     ActionViewModel avm = new() {
-                        ActionId = -1,
-                        ActTime = startTime,
-                        BookId = -1,
-                        CategoryId = -1,
-                        ItemId = -1,
-                        BookName = "",
-                        CategoryName = "",
-                        ItemName = Properties.Resources.ListName_CarryForward,
-                        BalanceKind = BalanceKind.Others,
-                        Income = null,
-                        Expenses = null,
-                        Balance = balance,
-                        ShopName = null,
-                        GroupId = null,
-                        Remark = null,
+                        ActionWithBalance = new() {
+                            Action = new() {
+                                ActionId = -1,
+                                ActTime = startTime,
+                                Book = new() {
+                                    Id = -1,
+                                    Name = ""
+                                },
+                                Category = new() {
+                                    Id = -1,
+                                    Name = ""
+                                },
+                                Item = new() {
+                                    Id = -1,
+                                    Name = Properties.Resources.ListName_CarryForward
+                                },
+                                Amount = new() {
+                                    BalanceKind = BalanceKind.Others,
+                                    Income = null,
+                                    Expenses = null
+                                },
+                                Shop = new() {
+                                    Name = null
+                                },
+                                Remark = new() {
+                                    Remark = null
+                                }
+                            },
+                            Balance = balance
+                        },
                         IsMatch = false
                     };
                     actionVMList.Add(avm);
@@ -255,21 +271,37 @@ namespace HouseholdAccountBook.ViewModels
                     balance += aDto.ActValue;
 
                     ActionViewModel avm = new() {
-                        ActionId = aDto.ActionId,
-                        ActTime = aDto.ActTime,
-                        BookId = aDto.BookId,
-                        CategoryId = aDto.CategoryId,
-                        ItemId = aDto.ItemId,
-                        BookName = aDto.BookName,
-                        CategoryName = aDto.CategoryName,
-                        ItemName = aDto.ItemName,
-                        BalanceKind = aDto.ActValue < 0 ? BalanceKind.Expenses : BalanceKind.Income,
-                        Income = aDto.ActValue < 0 ? null : aDto.ActValue,
-                        Expenses = aDto.ActValue < 0 ? -aDto.ActValue : null,
-                        Balance = balance,
-                        ShopName = aDto.ShopName,
-                        GroupId = aDto.GroupId,
-                        Remark = aDto.Remark,
+                        ActionWithBalance = new() {
+                            Action = new() {
+                                ActionId = aDto.ActionId,
+                                GroupId = aDto.GroupId,
+                                ActTime = aDto.ActTime,
+                                Book = new() {
+                                    Id = aDto.BookId,
+                                    Name = aDto.BookName
+                                },
+                                Category = new() {
+                                    Id = aDto.CategoryId,
+                                    Name = aDto.CategoryName
+                                },
+                                Item = new() {
+                                    Id = aDto.ItemId,
+                                    Name = aDto.ItemName
+                                },
+                                Amount = new() {
+                                    BalanceKind = aDto.ActValue < 0 ? BalanceKind.Expenses : BalanceKind.Income,
+                                    Income = aDto.ActValue < 0 ? null : aDto.ActValue,
+                                    Expenses = aDto.ActValue < 0 ? -aDto.ActValue : null
+                                },
+                                Shop = new() {
+                                    Name = aDto.ShopName
+                                },
+                                Remark = new() {
+                                    Remark = aDto.Remark
+                                }
+                            },
+                            Balance = balance
+                        },
                         IsMatch = aDto.IsMatch == 1
                     };
                     actionVMList.Add(avm);
@@ -746,7 +778,7 @@ namespace HouseholdAccountBook.ViewModels
             BookSettingViewModel vm = null;
 
             ViewModelService loader = new(this.DbHandlerFactory);
-            ObservableCollection<BookViewModel> vmList = await loader.LoadBookListAsync(Properties.Resources.ListName_None);
+            ObservableCollection<BookModel> vmList = await loader.LoadBookListAsync(Properties.Resources.ListName_None);
 
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 // 帳簿一覧を取得する
@@ -766,7 +798,7 @@ namespace HouseholdAccountBook.ViewModels
                     StartDate = jsonObj?.StartDate ?? dto.StartDate ?? DateTime.Today,
                     EndDateExists = jsonObj?.EndDate != null,
                     EndDate = jsonObj?.EndDate ?? dto.EndDate ?? DateTime.Today,
-                    DebitBookVMList = new ObservableCollection<BookViewModel>(vmList.Where(tmpVM => tmpVM.Id != bookId)),
+                    DebitBookVMList = new ObservableCollection<BookModel>(vmList.Where(tmpVM => tmpVM.Id != bookId)),
                     PayDay = dto.PayDay,
                     CsvFolderPath = jsonObj is null ? "" : PathUtil.GetSmartPath(App.GetCurrentDir(), jsonObj.CsvFolderPath),
                     TextEncodingList = GetTextEncodingList(),
@@ -963,16 +995,16 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="dbHandler">DBハンドラ</param>
         /// <param name="itemId">項目ID</param>
         /// <returns>店舗VMリスト</returns>
-        private static async Task<ObservableCollection<ShopViewModel>> LoadShopViewModelListAsync(DbHandlerBase dbHandler, int itemId)
+        private static async Task<ObservableCollection<ShopModel>> LoadShopViewModelListAsync(DbHandlerBase dbHandler, int itemId)
         {
             using FuncLog funcLog = new(new { itemId });
 
-            ObservableCollection<ShopViewModel> svmList = [];
+            ObservableCollection<ShopModel> svmList = [];
             ShopInfoDao shopInfoDao = new(dbHandler);
             var dtoList = await shopInfoDao.FindByItemIdAsync(itemId);
 
             foreach (ShopInfoDto dto in dtoList) {
-                ShopViewModel svm = new() {
+                ShopModel svm = new() {
                     Name = dto.ShopName,
                     UsedCount = dto.Count,
                     UsedTime = dto.UsedTime
@@ -988,16 +1020,16 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="dbHandler">DBハンドラ</param>
         /// <param name="itemId">項目ID</param>
         /// <returns>備考VMリスト</returns>
-        private static async Task<ObservableCollection<RemarkViewModel>> LoadRemarkViewModelListAsync(DbHandlerBase dbHandler, int itemId)
+        private static async Task<ObservableCollection<RemarkModel>> LoadRemarkViewModelListAsync(DbHandlerBase dbHandler, int itemId)
         {
             using FuncLog funcLog = new(new { itemId });
 
-            ObservableCollection<RemarkViewModel> rvmList = [];
+            ObservableCollection<RemarkModel> rvmList = [];
             RemarkInfoDao remarkInfoDao = new(dbHandler);
             var dtoList = await remarkInfoDao.FindByItemIdAsync(itemId);
 
             foreach (RemarkInfoDto dto in dtoList) {
-                RemarkViewModel rvm = new() {
+                RemarkModel rvm = new() {
                     Remark = dto.Remark,
                     UsedCount = dto.Count,
                     UsedTime = dto.UsedTime
