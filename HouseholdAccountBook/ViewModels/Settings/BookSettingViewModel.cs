@@ -23,12 +23,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// ソート順
         /// </summary>
-        #region SortOrder
-        public int SortOrder {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
+        public int SortOrder { get; init; }
 
         /// <summary>
         /// 帳簿名

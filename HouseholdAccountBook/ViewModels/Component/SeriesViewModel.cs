@@ -7,7 +7,7 @@ namespace HouseholdAccountBook.ViewModels.Component
     /// <summary>
     /// 系列VM(一覧の行、グラフの系列データ)
     /// </summary>
-    public class SeriesViewModel : BindableBase
+    public class SeriesViewModel
     {
         #region プロパティ
         /// <summary>

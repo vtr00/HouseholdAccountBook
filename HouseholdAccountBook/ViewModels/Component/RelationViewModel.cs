@@ -21,12 +21,12 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 帳簿/項目ID
         /// </summary>
-        public int Id { get; set; }
+        public int Id { get; init; }
 
         /// <summary>
         /// 表示名
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; init; }
         #endregion
     }
 }
