@@ -695,8 +695,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
                                 ActionId = dto.ActionId,
                                 GroupId = dto.GroupId,
                                 Item = new() { Name = dto.ItemName },
-                                ShopName = dto.ShopName,
-                                Remark = dto.Remark
+                                Shop = new() { Name = dto.ShopName },
+                                Remark = new() { Text = dto.Remark }
                             };
                             vm.IsMatch = dto.IsMatch == 1;
 

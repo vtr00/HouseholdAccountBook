@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.Models.DomainModels;
+using System;
 
 namespace HouseholdAccountBook.ViewModels.Component
 {
@@ -9,9 +10,9 @@ namespace HouseholdAccountBook.ViewModels.Component
     {
         #region プロパティ
         /// <summary>
-        /// 店舗名
+        /// 店舗
         /// </summary>
-        public string Name { get; init; }
+        public ShopModel Shop { get; init; }
 
         /// <summary>
         /// 使用回数

@@ -24,11 +24,11 @@
             <Setter Property="Background" Value="#FFEEE3FB"/>
             <Style.Triggers>
                 <!-- 分類小計 -->
-                <DataTrigger Binding="{Binding ItemId}" Value="-1">
+                <DataTrigger Binding="{Binding Item.Id}" Value="-1">
                     <Setter Property="Background" Value="#FFFFFFB0"/>
                 </DataTrigger>
                 <!-- 収支小計 -->
-                <DataTrigger Binding="{Binding CategoryId}" Value="-1">
+                <DataTrigger Binding="{Binding Category.Id}" Value="-1">
                     <Setter Property="Background" Value="#FFB0FFB0"/>
                 </DataTrigger>
                 <!-- 差引損益/残高 -->
@@ -446,9 +446,9 @@
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Balance}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding ActionWithBalance.Balance, Converter={StaticResource IntToMoneyDisplayConverter}}" 
                                                     ElementStyle="{StaticResource TextAlignRight}"/>
                                     <!-- 店舗名 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding ActionWithBalance.Action.ShopName}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding ActionWithBalance.Action.Shop.Name}"/>
                                     <!-- 備考 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding ActionWithBalance.Action.Remark}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding ActionWithBalance.Action.Remark.Text}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
 
@@ -524,9 +524,9 @@
                                     </Style>
                                 </DataGrid.ColumnHeaderStyle>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="CId" Binding="{Binding CategoryId}"
+                                    <DataGridTextColumn Header="CId" Binding="{Binding Category.Id}"
                                                          Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
-                                    <DataGridTextColumn Header="IId" Binding="{Binding ItemId}"
+                                    <DataGridTextColumn Header="IId" Binding="{Binding Item.Id}"
                                                          Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" Binding="{Binding Name}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Total}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Total, Converter={StaticResource IntToMoneyDisplayConverter}}" 

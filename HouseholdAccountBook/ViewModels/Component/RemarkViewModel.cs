@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.Models.DomainModels;
+using System;
 
 namespace HouseholdAccountBook.ViewModels.Component
 {
@@ -11,7 +12,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 備考
         /// </summary>
-        public string Remark { get; init; }
+        public RemarkModel Remark { get; init; }
 
         /// <summary>
         /// 使用回数

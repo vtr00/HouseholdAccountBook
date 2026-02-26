@@ -91,7 +91,7 @@
                                     </Style>
                                 </TreeView.ItemContainerStyle>
                                 <i:Interaction.Behaviors>
-                                    <behaviors:BindSelectedItemToTreeViewBehavior SelectedItem="{Binding SelectedHierarchicalVM}"/>
+                                    <behaviors:BindSelectedItemToTreeViewBehavior SelectedItem="{Binding SelectedItemTreeVM}"/>
                                 </i:Interaction.Behaviors>
                                 <TreeView.ItemTemplate>
                                     <HierarchicalDataTemplate DataType="viewmodels:HierarchicalViewModel" 
@@ -164,7 +164,7 @@
                                     </TextBlock.Style>
                                 </TextBlock>
                                 <TextBox Grid.Row="2" Grid.Column="1" Margin="5" 
-                                                    Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsRenamable, Converter={StaticResource NegationConverter}}"/>
+                                                    Text="{Binding InputedName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsRenamable, Converter={StaticResource NegationConverter}}"/>
                                 <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Content="{x:Static properties:Resources.Button_Save}" 
                                         Command="{Binding DataContext.SaveItemInfoCommand, ElementName=_ItemTab}" ToolTip="Ctrl+S"/>
                             </Grid>
@@ -207,7 +207,7 @@
                                     <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteShopNameCommand, ElementName=_ItemTab}"/>
                                 </DataGrid.InputBindings>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Shop.Name}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_UsageCount}" Width="*" Binding="{Binding UsedCount}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
                                 </DataGrid.Columns>
@@ -231,7 +231,7 @@
                                     <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteRemarkCommand, ElementName=_ItemTab}"/>
                                 </DataGrid.InputBindings>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Remark}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Remark.Text}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_UsageCount}" Width="*" Binding="{Binding UsedCount}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
                                 </DataGrid.Columns>
@@ -328,7 +328,7 @@
                                 <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                                            Text="{x:Static properties:Resources.TextBlock_BookName}"/>
                                 <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                                         Text="{Binding InputedName, UpdateSourceTrigger=PropertyChanged}"/>
 
                                 <!-- 帳簿種別 -->
                                 <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
@@ -340,14 +340,14 @@
                                 <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                                            Text="{x:Static properties:Resources.TextBlock_Remark}"/>
                                 <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                         Text="{Binding Remark, UpdateSourceTrigger=PropertyChanged}"/>
+                                         Text="{Binding InputedRemark, UpdateSourceTrigger=PropertyChanged}"/>
 
                                 <!-- 初期残高 -->
                                 <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
                                            Text="{x:Static properties:Resources.TextBlock_InitialBalance}"/>
-                                <controls:NumericUpDown Grid.Row="5" Grid.Column="1" Margin="5" Value="{Binding InitialValue}"/>
+                                <controls:NumericUpDown Grid.Row="5" Grid.Column="1" Margin="5" Value="{Binding InputedInitialValue}"/>
                                 <TextBlock Grid.Row="5" Grid.Column="2" Margin="5" HorizontalAlignment="Right"
-                                           Text="{Binding InitialValue, Converter={StaticResource IntToMoneyDisplayConverter}, TargetNullValue=0}"/>
+                                           Text="{Binding InputedInitialValue, Converter={StaticResource IntToMoneyDisplayConverter}, TargetNullValue=0}"/>
 
                                 <!-- 期間情報 -->
                                 <GroupBox Grid.Row="6" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_TermInformation}">
@@ -368,16 +368,16 @@
                                         <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_StartDate}"/>
                                         <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                                                  Content="{x:Static properties:Resources.CheckBox_Setting}" IsChecked="{Binding StartDateExists}"/>
-                                        <controls:DateTimePicker Grid.Row="0" Grid.Column="2" Margin="1" IsEnabled="{Binding StartDateExists}"
-                                                                 DateFormat="yyyy-MM-dd" SelectedDate="{Binding StartDate}"/>
+                                                  Content="{x:Static properties:Resources.CheckBox_Setting}" IsChecked="{Binding SelectedIfStartDateExists}"/>
+                                        <controls:DateTimePicker Grid.Row="0" Grid.Column="2" Margin="1" IsEnabled="{Binding SelectedIfStartDateExists}"
+                                                                 DateFormat="yyyy-MM-dd" SelectedDate="{Binding InputedStartDate}"/>
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_EndDate}"/>
                                         <CheckBox Grid.Row="1" Grid.Column="1" Margin="5" 
-                                                  Content="{x:Static properties:Resources.CheckBox_Setting}" IsChecked="{Binding EndDateExists}"/>
-                                        <controls:DateTimePicker Grid.Row="1" Grid.Column="2" Margin="1" IsEnabled="{Binding EndDateExists}"
-                                                                 DateFormat="yyyy-MM-dd" SelectedDate="{Binding EndDate}"/>
+                                                  Content="{x:Static properties:Resources.CheckBox_Setting}" IsChecked="{Binding SelectedIfEndDateExists}"/>
+                                        <controls:DateTimePicker Grid.Row="1" Grid.Column="2" Margin="1" IsEnabled="{Binding SelectedIfEndDateExists}"
+                                                                 DateFormat="yyyy-MM-dd" SelectedDate="{Binding InputedEndDate}"/>
                                     </Grid>
                                 </GroupBox>
                                 <!-- 支払情報 -->
@@ -400,7 +400,7 @@
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_PaymentDate}"/>
                                         <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" 
-                                                                MinValue="1" MaxValue="31" Value="{Binding PayDay, TargetNullValue=''}"/>
+                                                                MinValue="1" MaxValue="31" Value="{Binding InputedPayDay, TargetNullValue=''}"/>
                                     </Grid>
                                 </GroupBox>
                                 <!-- CSV情報 -->
@@ -421,7 +421,7 @@
                                         <TextBlock Grid.Row="0" Grid.Column="0" Margin="5"
                                                    Text="{x:Static properties:Resources.TextBlock_FolderPath}"/>
                                         <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                                 Text="{Binding CsvFolderPath, UpdateSourceTrigger=PropertyChanged}"/>
+                                                 Text="{Binding InputedCsvFolderPath, UpdateSourceTrigger=PropertyChanged}"/>
                                         <Button Grid.Row="0" Grid.Column="3" Margin="5" Content="..." 
                                                 Command="{Binding DataContext.SelectFolderPathCommand, ElementName=_BookTab}"
                                                 CommandParameter="{x:Static enums:FolderPathKind.CsvFolder}"/>
@@ -449,15 +449,15 @@
                                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                                                            Text="{x:Static properties:Resources.TextBlock_Date}"/>
                                                 <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="1"
-                                                                                Value="{Binding ActDateIndex, TargetNullValue=''}"/>
+                                                                                Value="{Binding InputedActDateIndex, TargetNullValue=''}"/>
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                                                            Text="{x:Static properties:Resources.TextBlock_Expenses}"/>
                                                 <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" MinValue="1"
-                                                                                Value="{Binding ExpensesIndex, TargetNullValue=''}"/>
+                                                                                Value="{Binding InputedExpensesIndex, TargetNullValue=''}"/>
                                                 <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                                                            Text="{x:Static properties:Resources.TextBlock_ItemName}"/>
                                                 <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" MinValue="1"
-                                                                                Value="{Binding ItemNameIndex, TargetNullValue=''}"/>
+                                                                                Value="{Binding InputedItemNameIndex, TargetNullValue=''}"/>
                                             </Grid>
                                         </GroupBox>
                                     </Grid>

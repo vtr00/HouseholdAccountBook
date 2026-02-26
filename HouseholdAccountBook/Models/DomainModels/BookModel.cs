@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Models;
+using System;
 
 namespace HouseholdAccountBook.Models.DomainModels
 {
@@ -28,22 +29,33 @@ namespace HouseholdAccountBook.Models.DomainModels
         /// </summary>
         public BookKind BookKind { get; init; }
 
+        #region 期間情報
+        /// <summary>
+        /// 開始日
+        /// </summary>
+        public DateTime? StartTime { get; init; }
+        /// <summary>
+        /// 終了日
+        /// </summary>
+        public DateTime? EndTime { get; init; }
+        #endregion
+
+        #region 支払い情報
         /// <summary>
         /// 支払日
         /// </summary>
         public int? PayDay { get; init; }
-
         /// <summary>
         /// 支払い元帳簿ID
         /// </summary>
         public int? DebitBookId { get; init; }
+        #endregion
 
-        #region CSV比較用
+        #region CSV情報
         /// <summary>
         /// CSVフォルダパス
         /// </summary>
         public string CsvFolderPath { get; init; }
-
         /// <summary>
         /// 文字エンコーディング
         /// </summary>
@@ -53,12 +65,10 @@ namespace HouseholdAccountBook.Models.DomainModels
         /// 日付 位置(1開始)
         /// </summary>
         public int? ActDateIndex { get; init; }
-
         /// <summary>
         /// 支出 位置(1開始)
         /// </summary>
         public int? ExpensesIndex { get; init; }
-
         /// <summary>
         /// 項目名 位置(1開始)
         /// </summary>

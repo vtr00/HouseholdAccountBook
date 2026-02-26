@@ -437,8 +437,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             foreach (ActionViewModel vm in this.DisplayedActionVMList) {
                 actionIdList.Add(vm.ActionWithBalance.Action.ActionId);
 
-                string shopName = vm.ActionWithBalance.Action.ShopName.Replace(this.FindText, this.ReplaceText);
-                string remark = vm.ActionWithBalance.Action.Remark.Replace(this.FindText, this.ReplaceText);
+                string shopName = vm.ActionWithBalance.Action.Shop.Name.Replace(this.FindText, this.ReplaceText);
+                string remark = vm.ActionWithBalance.Action.Remark.Text.Replace(this.FindText, this.ReplaceText);
 
                 await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     HstActionDao hstActionDao = new(dbHandler);
@@ -731,7 +731,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             // 検索テキストで絞り込む
             if (this.FindText != string.Empty) {
-                tmp = [.. tmp.Where(vm => (vm.ActionWithBalance.Action.ShopName?.Contains(this.FindText) ?? false) || (vm.ActionWithBalance.Action.Remark?.Contains(this.FindText) ?? false))];
+                tmp = [.. tmp.Where(vm => (vm.ActionWithBalance.Action.Shop?.Name.Contains(this.FindText) ?? false) || (vm.ActionWithBalance.Action.Remark?.Text.Contains(this.FindText) ?? false))];
             }
 
             this.DisplayedActionVMList = tmp;

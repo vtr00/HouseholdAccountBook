@@ -41,11 +41,11 @@ namespace HouseholdAccountBook.Models.DomainModels
         /// <summary>
         /// 店舗名
         /// </summary>
-        public string ShopName { get; init; }
+        public ShopModel Shop { get; init; }
         /// <summary>
         /// 備考
         /// </summary>
-        public string Remark { get; init; }
+        public RemarkModel Remark { get; init; }
         #endregion
     }
 }

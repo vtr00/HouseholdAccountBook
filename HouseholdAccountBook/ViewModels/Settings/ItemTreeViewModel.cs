@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.ViewModels.Component;
 
-namespace HouseholdAccountBook.ViewModels.Component
+namespace HouseholdAccountBook.ViewModels.Settings
 {
     /// <summary>
     /// 項目ツリーVM

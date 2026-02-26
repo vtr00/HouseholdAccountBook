@@ -27,10 +27,10 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public int SortOrder { get; init; }
 
         /// <summary>
-        /// 名称
+        /// 入力された名称
         /// </summary>
-        #region Name
-        public string Name {
+        #region InputedName
+        public string InputedName {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -96,16 +96,12 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// リネーム可能か
         /// </summary>
-        #region IsRenamable
         public bool IsRenamable => this.Kind != HierarchicalKind.Balance;
-        #endregion
 
         /// <summary>
         /// 設定可能か
         /// </summary>
-        #region IsSettable
         public bool IsSettable => this.Kind == HierarchicalKind.Item;
-        #endregion
         #endregion
     }
 }

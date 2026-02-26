@@ -463,7 +463,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             ViewModelService service = new(this.mDbHandlerFactory);
             string tmpShopName = selectingShopName ?? this.SelectedShopName;
             this.ShopVMList = await service.LoadShopListAsync(this.SelectedItemVM.Id);
-            this.SelectedShopName = this.ShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name;
+            this.SelectedShopName = this.ShopVMList.FirstOrElementAtOrDefault(vm => vm.Shop.Name == tmpShopName, 0).Shop.Name;
         }
 
         /// <summary>
@@ -480,7 +480,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             ViewModelService service = new(this.mDbHandlerFactory);
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
             this.RemarkVMList = await service.LoadRemarkListAsync(this.SelectedItemVM.Id);
-            this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
+            this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark.Text == tmpRemark, 0).Remark.Text;
         }
 
         public override void AddEventHandlers()

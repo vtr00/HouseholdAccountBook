@@ -54,8 +54,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 var oldVM = field;
                 if (this.SetProperty(ref field, value)) {
                     this.Parent.SelectedBalanceKind = value?.BalanceKind;
-                    this.Parent.SelectedCategoryId = value?.CategoryId;
-                    this.Parent.SelectedItemId = value?.ItemId;
+                    this.Parent.SelectedCategoryId = value?.Category.Id;
+                    this.Parent.SelectedItemId = value?.Item.Id;
 
                     this.SelectedSeriesChanged?.Invoke(this, EventArgs.Empty);
                 }
@@ -91,7 +91,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Tabs.YearlyListTab => await service.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
                 _ => throw new NotImplementedException(),
             };
-            this.SelectedSeriesVM = this.SeriesVMList?.FirstOrDefault(vm => vm.BalanceKind == tmpBalanceKind && vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId);
+            this.SelectedSeriesVM = this.SeriesVMList?.FirstOrDefault(vm => vm.BalanceKind == tmpBalanceKind && vm.Category.Id == tmpCategoryId && vm.Item.Id == tmpItemId);
         }
 
         public override void AddEventHandlers()
