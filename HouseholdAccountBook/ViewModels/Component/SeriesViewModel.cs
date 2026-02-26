@@ -1,4 +1,6 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.DomainModels;
+using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 using System.Collections.Generic;
 
@@ -17,23 +19,17 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 収支名
         /// </summary>
-        public string BalanceName { get; set; } = string.Empty;
+        public string BalanceName => this.BalanceKind == -1 ? string.Empty : UiConstants.BalanceKindStr[(BalanceKind)this.BalanceKind];
+
         /// <summary>
-        /// 分類ID
+        /// 分類
         /// </summary>
-        public int CategoryId { get; set; } = -1;
+        public CategoryModel Category { get; set; } = new CategoryModel();
         /// <summary>
-        /// 分類名
+        /// 項目
         /// </summary>
-        public string CategoryName { get; set; } = string.Empty;
-        /// <summary>
-        /// 項目ID
-        /// </summary>
-        public int ItemId { get; set; } = -1;
-        /// <summary>
-        /// 項目名
-        /// </summary>
-        public string ItemName { get; set; } = string.Empty;
+        public ItemModel Item { get; set; } = new ItemModel();
+
         /// <summary>
         /// 値
         /// </summary>
@@ -66,10 +62,10 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// </summary>
         public string DisplayedName {
             get {
-                return this.BalanceName != string.Empty && this.CategoryName != string.Empty
-                    ? this.ItemName != string.Empty
-                        ? $"{this.BalanceName} > {this.CategoryName} > {this.ItemName}"
-                        : $"{this.BalanceName} > {this.CategoryName}"
+                return this.BalanceName != string.Empty && this.Category.Name != string.Empty
+                    ? this.Item.Name != string.Empty
+                        ? $"{this.BalanceName} > {this.Category.Name} > {this.Item.Name}"
+                        : $"{this.BalanceName} > {this.Category.Name}"
                     : this.OtherName;
             }
         }
@@ -78,10 +74,10 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// </summary>
         public string ListName {
             get {
-                return this.ItemName != string.Empty
-                    ? $"  {this.ItemName}"
-                    : this.CategoryName != string.Empty
-                        ? this.CategoryName
+                return this.Item.Name != string.Empty
+                    ? $"  {this.Item.Name}"
+                    : this.Category.Name != string.Empty
+                        ? this.Category.Name
                         : this.BalanceName != string.Empty
                             ? this.BalanceName
                             : this.OtherName;
@@ -101,11 +97,8 @@ namespace HouseholdAccountBook.ViewModels.Component
         public SeriesViewModel(SummaryViewModel summary)
         {
             this.BalanceKind = summary.BalanceKind;
-            this.BalanceName = summary.BalanceName;
-            this.CategoryId = summary.Category.Id;
-            this.CategoryName = summary.Category.Name;
-            this.ItemId = summary.Item.Id;
-            this.ItemName = summary.Item.Name;
+            this.Category = summary.Category;
+            this.Item = summary.Item;
             this.OtherName = summary.OtherName;
 
             this.Total = summary.Total;

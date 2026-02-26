@@ -242,24 +242,24 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 BookSettingViewModel vm = this.DisplayedBookSettingVM;
                 await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     MstBookDto.JsonDto jsonObj = new() {
-                        Remark = vm.Remark ?? string.Empty,
-                        StartDate = vm.StartDateExists ? vm.StartDate : null,
-                        EndDate = vm.EndDateExists ? vm.EndDate : null,
-                        CsvFolderPath = vm.CsvFolderPath != string.Empty ? Path.GetFullPath(vm.CsvFolderPath, App.GetCurrentDir()) : null,
+                        Remark = vm.InputedRemark ?? string.Empty,
+                        StartDate = vm.SelectedIfStartDateExists ? vm.InputedStartDate : null,
+                        EndDate = vm.SelectedIfEndDateExists ? vm.InputedEndDate : null,
+                        CsvFolderPath = vm.InputedCsvFolderPath != string.Empty ? Path.GetFullPath(vm.InputedCsvFolderPath, App.GetCurrentDir()) : null,
                         TextEncoding = vm.SelectedTextEncoding,
-                        CsvActDateIndex = vm.ActDateIndex - 1,
-                        CsvOutgoIndex = vm.ExpensesIndex - 1,
-                        CsvItemNameIndex = vm.ItemNameIndex - 1
+                        CsvActDateIndex = vm.InputedActDateIndex - 1,
+                        CsvOutgoIndex = vm.InputedExpensesIndex - 1,
+                        CsvItemNameIndex = vm.InputedItemNameIndex - 1
                     };
                     string jsonCode = jsonObj.ToJson();
 
                     MstBookDao mstBookDao = new(dbHandler);
                     _ = await mstBookDao.UpdateSetableAsync(new MstBookDto {
-                        BookName = vm.Name,
+                        BookName = vm.InputedName,
                         BookKind = (int)vm.SelectedBookKind,
-                        InitialValue = vm.InitialValue,
+                        InitialValue = vm.InputedInitialValue,
                         DebitBookId = vm.SelectedDebitBookVM.Id,
-                        PayDay = vm.PayDay,
+                        PayDay = vm.InputedPayDay,
                         JsonCode = jsonCode,
                         BookId = vm.Id.Value
                     });
@@ -282,11 +282,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             string title = string.Empty;
             switch (kind) {
                 case FolderPathKind.CsvFolder:
-                    if (string.IsNullOrWhiteSpace(this.DisplayedBookSettingVM.CsvFolderPath)) {
+                    if (string.IsNullOrWhiteSpace(this.DisplayedBookSettingVM.InputedCsvFolderPath)) {
                         folderFullPath = Path.GetDirectoryName(settings.App_CsvFilePath);
                     }
                     else {
-                        (string folderPath, string fileName) = PathUtil.GetSeparatedPath(this.DisplayedBookSettingVM.CsvFolderPath, App.GetCurrentDir());
+                        (string folderPath, string fileName) = PathUtil.GetSeparatedPath(this.DisplayedBookSettingVM.InputedCsvFolderPath, App.GetCurrentDir());
                         folderFullPath = Path.Combine(folderPath, fileName);
                     }
                     title = Properties.Resources.Title_CsvFolderSelection;
@@ -302,7 +302,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             if (this.OpenFolderDialogRequest(e)) {
                 switch (kind) {
                     case FolderPathKind.CsvFolder:
-                        this.DisplayedBookSettingVM.CsvFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FolderName);
+                        this.DisplayedBookSettingVM.InputedCsvFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FolderName);
                         break;
                     default:
                         break;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.Models.DomainModels;
+using System;
 
 namespace HouseholdAccountBook.ViewModels.Component
 {
@@ -24,14 +25,14 @@ namespace HouseholdAccountBook.ViewModels.Component
         public int Index { get; init; }
 
         /// <summary>
-        /// 項目ID
+        /// 項目
         /// </summary>
-        public int ItemId { get; init; }
+        public ItemModel Item { get; init; }
 
         /// <summary>
-        /// 分類ID
+        /// 分類
         /// </summary>
-        public int CategoryId { get; init; }
+        public CategoryModel Category { get; init; }
         #endregion
     }
 }

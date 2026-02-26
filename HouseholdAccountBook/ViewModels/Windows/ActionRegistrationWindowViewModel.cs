@@ -570,7 +570,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             ViewModelService service = new(this.mDbHandlerFactory);
             string tmpShopName = selectingShopName ?? this.SelectedShopName;
             var tmpShopVMList = await service.LoadShopListAsync(this.SelectedItemVM.Id);
-            this.SelectedShopName = tmpShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name; // 先に選択しておく
+            this.SelectedShopName = tmpShopVMList.FirstOrElementAtOrDefault(vm => vm.Shop.Name == tmpShopName, 0).Shop.Name; // 先に選択しておく
             this.ShopVMList = tmpShopVMList;
         }
 
@@ -588,7 +588,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             ViewModelService service = new(this.mDbHandlerFactory);
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
             var tmpRemarkVMList = await service.LoadRemarkListAsync(this.SelectedItemVM.Id);
-            this.SelectedRemark = tmpRemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark; // 先に選択しておく
+            this.SelectedRemark = tmpRemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark.Text == tmpRemark, 0).Remark.Text; // 先に選択しておく
             this.RemarkVMList = tmpRemarkVMList;
         }
 

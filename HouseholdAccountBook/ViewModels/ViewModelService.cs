@@ -140,7 +140,7 @@ namespace HouseholdAccountBook.ViewModels
             using FuncLog funcLog = new(new { itemId });
 
             ObservableCollection<ShopViewModel> shopNameVMList = [
-                new ShopViewModel() { Name = string.Empty }
+                new ShopViewModel()
             ];
 
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
@@ -148,7 +148,7 @@ namespace HouseholdAccountBook.ViewModels
                 var dtoList = await shopInfoDao.FindByItemIdAsync(itemId);
                 foreach (ShopInfoDto dto in dtoList) {
                     ShopViewModel vm = new() {
-                        Name = dto.ShopName,
+                        Shop = new() { Name = dto.ShopName },
                         UsedCount = dto.Count,
                         UsedTime = dto.UsedTime
                     };
@@ -169,7 +169,7 @@ namespace HouseholdAccountBook.ViewModels
             using FuncLog funcLog = new(new { itemId });
 
             ObservableCollection<RemarkViewModel> remarkVMList = [
-                    new RemarkViewModel() { Remark = string.Empty }
+                    new RemarkViewModel()
             ];
 
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
@@ -177,7 +177,7 @@ namespace HouseholdAccountBook.ViewModels
                 var dtoList = await remarkInfoDao.FindByItemIdAsync(itemId);
                 foreach (RemarkInfoDto dto in dtoList) {
                     RemarkViewModel vm = new() {
-                        Remark = dto.Remark,
+                        Remark = new() { Text = dto.Remark },
                         UsedCount = dto.Count,
                         UsedTime = dto.UsedTime
                     };
@@ -248,7 +248,7 @@ namespace HouseholdAccountBook.ViewModels
                                     Income = null,
                                     Expenses = null
                                 },
-                                ShopName = null,
+                                Shop = null,
                                 Remark = null
                             },
                             Balance = balance
@@ -289,8 +289,8 @@ namespace HouseholdAccountBook.ViewModels
                                     Income = aDto.ActValue < 0 ? null : aDto.ActValue,
                                     Expenses = aDto.ActValue < 0 ? -aDto.ActValue : null
                                 },
-                                ShopName = aDto.ShopName,
-                                Remark = aDto.Remark
+                                Shop = new() { Name = aDto.ShopName },
+                                Remark = new() { Text = aDto.Remark }
                             },
                             Balance = balance
                         },
@@ -345,7 +345,6 @@ namespace HouseholdAccountBook.ViewModels
                     int summary = dto.Total;
                     summaryVMList.Add(new SummaryViewModel() {
                         BalanceKind = dto.BalanceKind,
-                        BalanceName = BalanceKindStr[(BalanceKind)dto.BalanceKind],
                         Category = new() {
                             Id = dto.CategoryId,
                             Name = dto.CategoryName
@@ -371,14 +370,12 @@ namespace HouseholdAccountBook.ViewModels
                 // 収入/支出の小計を計算する
                 totalAsBalanceKindList.Add(new SummaryViewModel() {
                     BalanceKind = g1.Key,
-                    BalanceName = BalanceKindStr[(BalanceKind)g1.Key],
                     Total = g1.Sum(obj => obj.Total)
                 });
                 // 分類別の小計を計算する
                 foreach (var g2 in g1.GroupBy(obj => obj.Category.Id)) {
                     totalAsCategoryList.Add(new SummaryViewModel() {
                         BalanceKind = g1.Key,
-                        BalanceName = BalanceKindStr[(BalanceKind)g1.Key],
                         Category = new() {
                             Id = g2.Key,
                             Name = g2.First().Category.Name
@@ -788,22 +785,22 @@ namespace HouseholdAccountBook.ViewModels
                 vm = new BookSettingViewModel() {
                     Id = bookId,
                     SortOrder = dto.SortOrder,
-                    Name = dto.BookName,
+                    InputedName = dto.BookName,
                     SelectedBookKind = (BookKind)dto.BookKind,
-                    Remark = jsonObj?.Remark ?? string.Empty,
-                    InitialValue = dto.InitialValue,
-                    StartDateExists = jsonObj?.StartDate != null,
-                    StartDate = jsonObj?.StartDate ?? dto.StartDate ?? DateTime.Today,
-                    EndDateExists = jsonObj?.EndDate != null,
-                    EndDate = jsonObj?.EndDate ?? dto.EndDate ?? DateTime.Today,
+                    InputedRemark = jsonObj?.Remark ?? string.Empty,
+                    InputedInitialValue = dto.InitialValue,
+                    SelectedIfStartDateExists = jsonObj?.StartDate != null,
+                    InputedStartDate = jsonObj?.StartDate ?? dto.StartDate ?? DateTime.Today,
+                    SelectedIfEndDateExists = jsonObj?.EndDate != null,
+                    InputedEndDate = jsonObj?.EndDate ?? dto.EndDate ?? DateTime.Today,
                     DebitBookVMList = new ObservableCollection<BookModel>(vmList.Where(tmpVM => tmpVM.Id != bookId)),
-                    PayDay = dto.PayDay,
-                    CsvFolderPath = jsonObj is null ? "" : PathUtil.GetSmartPath(App.GetCurrentDir(), jsonObj.CsvFolderPath),
+                    InputedPayDay = dto.PayDay,
+                    InputedCsvFolderPath = jsonObj is null ? "" : PathUtil.GetSmartPath(App.GetCurrentDir(), jsonObj.CsvFolderPath),
                     TextEncodingList = GetTextEncodingList(),
                     SelectedTextEncoding = jsonObj?.TextEncoding ?? Encoding.UTF8.CodePage,
-                    ActDateIndex = jsonObj?.CsvActDateIndex + 1,
-                    ExpensesIndex = jsonObj?.CsvOutgoIndex + 1,
-                    ItemNameIndex = jsonObj?.CsvItemNameIndex + 1,
+                    InputedActDateIndex = jsonObj?.CsvActDateIndex + 1,
+                    InputedExpensesIndex = jsonObj?.CsvOutgoIndex + 1,
+                    InputedItemNameIndex = jsonObj?.CsvItemNameIndex + 1,
                     RelationVMList = await LoadRelationViewModelListFromBookIdAsync(dbHandler, bookId)
                 };
                 vm.SelectedDebitBookVM = vm.DebitBookVMList.FirstOrElementAtOrDefault(tmpVM => tmpVM.Id == dto.DebitBookId, 0);
@@ -920,7 +917,7 @@ namespace HouseholdAccountBook.ViewModels
                         Kind = HierarchicalKind.Balance,
                         Id = -1,
                         SortOrder = -1,
-                        Name = string.Empty
+                        InputedName = string.Empty
                     };
                     break;
                 }
@@ -934,7 +931,7 @@ namespace HouseholdAccountBook.ViewModels
                             Kind = HierarchicalKind.Category,
                             Id = id,
                             SortOrder = dto.SortOrder,
-                            Name = dto.CategoryName
+                            InputedName = dto.CategoryName
                         };
                     }
                     break;
@@ -949,7 +946,7 @@ namespace HouseholdAccountBook.ViewModels
                             Kind = HierarchicalKind.Item,
                             Id = id,
                             SortOrder = dto.SortOrder,
-                            Name = dto.ItemName,
+                            InputedName = dto.ItemName,
                             RelationVMList = await LoadRelationViewModelListAsync(dbHandler, id),
                             ShopVMList = await LoadShopViewModelListAsync(dbHandler, id),
                             RemarkVMList = await LoadRemarkViewModelListAsync(dbHandler, id)
@@ -1003,7 +1000,7 @@ namespace HouseholdAccountBook.ViewModels
 
             foreach (ShopInfoDto dto in dtoList) {
                 ShopViewModel svm = new() {
-                    Name = dto.ShopName,
+                    Shop = new() { Name = dto.ShopName },
                     UsedCount = dto.Count,
                     UsedTime = dto.UsedTime
                 };
@@ -1028,7 +1025,7 @@ namespace HouseholdAccountBook.ViewModels
 
             foreach (RemarkInfoDto dto in dtoList) {
                 RemarkViewModel rvm = new() {
-                    Remark = dto.Remark,
+                    Remark = new() { Text = dto.Remark },
                     UsedCount = dto.Count,
                     UsedTime = dto.UsedTime
                 };

@@ -55,8 +55,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 SeriesViewModel oldVM = field;
                 if (this.SetProperty(ref field, value)) {
                     this.Parent.SelectedBalanceKind = value?.BalanceKind;
-                    this.Parent.SelectedCategoryId = value?.CategoryId;
-                    this.Parent.SelectedItemId = value?.ItemId;
+                    this.Parent.SelectedCategoryId = value?.Category.Id;
+                    this.Parent.SelectedItemId = value?.Item.Id;
 
                     this.SelectedSeriesChanged?.Invoke(this, EventArgs.Empty);
                 }
@@ -278,10 +278,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     // グラフ表示データを設定用に絞り込む
                     switch (this.Parent.SelectedGraphKind2) {
                         case GraphKind2.CategoryGraph:
-                            tmpVMList = new(tmpVMList.Where(vm => vm.CategoryId != -1 && vm.ItemId == -1));
+                            tmpVMList = new(tmpVMList.Where(vm => vm.Category.Id != -1 && vm.Item.Id == -1));
                             break;
                         case GraphKind2.ItemGraph:
-                            tmpVMList = new(tmpVMList.Where(vm => vm.ItemId != -1));
+                            tmpVMList = new(tmpVMList.Where(vm => vm.Item.Id != -1));
                             break;
                     }
                     this.GraphSeriesVMList = tmpVMList;
@@ -297,8 +297,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                             ItemsSource = tmpVM.Values.Zip(tmpVM.StartDates, (value, date) => new GraphDatumViewModel {
                                 Value = value,
                                 Date = date,
-                                ItemId = tmpVM.ItemId,
-                                CategoryId = tmpVM.CategoryId
+                                Item = tmpVM.Item,
+                                Category = tmpVM.Category
                             }),
                             ValueField = "Value",
                             TrackerFormatString = GetTrackerFormatString(true),
@@ -310,7 +310,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                             if (e.Value == null) { return; }
 
                             GraphDatumViewModel datumVM = e.Value.Item as GraphDatumViewModel;
-                            this.SelectedGraphSeriesVM = this.GraphSeriesVMList.FirstOrDefault(tmp => tmp.CategoryId == datumVM.CategoryId && tmp.ItemId == datumVM.ItemId);
+                            this.SelectedGraphSeriesVM = this.GraphSeriesVMList.FirstOrDefault(tmp => tmp.Category.Id == datumVM.Category.Id && tmp.Item.Id == datumVM.Item.Id);
                         };
                         this.GraphPlotModel.Series.Add(wholeSeries);
 
@@ -379,7 +379,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
             this.GraphPlotModel.InvalidatePlot(true);
 
-            this.SelectedGraphSeriesVM = this.GraphSeriesVMList.FirstOrDefault(vm => vm.CategoryId == tmpCategoryId && vm.ItemId == tmpItemId);
+            this.SelectedGraphSeriesVM = this.GraphSeriesVMList.FirstOrDefault(vm => vm.Category.Id == tmpCategoryId && vm.Item.Id == tmpItemId);
         }
 
         /// <summary>
@@ -414,13 +414,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     Title = vm.DisplayedName,
                     FillColor = (this.GraphPlotModel.Series.FirstOrDefault(series => {
                         List<GraphDatumViewModel> datumVMList = [.. (series as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>()];
-                        return vm.CategoryId == datumVMList[0].CategoryId && vm.ItemId == datumVMList[0].ItemId;
+                        return vm.Category.Id == datumVMList[0].Category.Id && vm.Item.Id == datumVMList[0].Item.Id;
                     }) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Zip(vm.StartDates, (value, date) => new GraphDatumViewModel {
                         Value = value,
                         Date = date,
-                        ItemId = vm.ItemId,
-                        CategoryId = vm.CategoryId
+                        Item = vm.Item,
+                        Category = vm.Category
                     }),
                     ValueField = "Value",
                     TrackerFormatString = GetTrackerFormatString(),

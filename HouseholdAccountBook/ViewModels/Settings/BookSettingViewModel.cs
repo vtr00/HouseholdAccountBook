@@ -5,7 +5,6 @@ using HouseholdAccountBook.ViewModels.Component;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using static HouseholdAccountBook.ViewModels.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {
@@ -18,7 +17,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 帳簿ID
         /// </summary>
-        public int? Id { get; set; }
+        public int? Id { get; init; }
 
         /// <summary>
         /// ソート順
@@ -26,10 +25,10 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public int SortOrder { get; init; }
 
         /// <summary>
-        /// 帳簿名
+        /// 入力された帳簿名
         /// </summary>
-        #region Name
-        public string Name {
+        #region InputedName
+        public string InputedName {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -38,7 +37,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 帳簿種別辞書
         /// </summary>
-        public Dictionary<BookKind, string> BookKindDic { get; } = BookKindStr;
+        public Dictionary<BookKind, string> BookKindDic { get; } = UiConstants.BookKindStr;
         /// <summary>
         /// 選択された帳簿種別
         /// </summary>
@@ -54,18 +53,18 @@ namespace HouseholdAccountBook.ViewModels.Settings
         #endregion
 
         /// <summary>
-        /// 備考
+        /// 入力された備考
         /// </summary>
-        public string Remark {
+        public string InputedRemark {
             get;
             set => this.SetProperty(ref field, value);
         }
 
         /// <summary>
-        /// 初期残高
+        /// 入力された初期残高
         /// </summary>
-        #region InitialValue
-        public int InitialValue {
+        #region InputedInitialValue
+        public int InputedInitialValue {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -73,38 +72,38 @@ namespace HouseholdAccountBook.ViewModels.Settings
 
         #region 期間情報
         /// <summary>
-        /// 開始日の有無
+        /// 選択された開始日の有無
         /// </summary>
-        #region StartDateExists
-        public bool StartDateExists {
+        #region SelectedIfStartDateExists
+        public bool SelectedIfStartDateExists {
             get;
             set => this.SetProperty(ref field, value);
         }
         #endregion
         /// <summary>
-        /// 開始日
+        /// 入力された開始日
         /// </summary>
-        #region StartDate
-        public DateTime StartDate {
+        #region InputedStartDate
+        public DateTime InputedStartDate {
             get;
             set => this.SetProperty(ref field, value);
         } = DateTime.Now;
         #endregion
 
         /// <summary>
-        /// 終了日の有無
+        /// 指定された終了日の有無
         /// </summary>
-        #region EndDateExists
-        public bool EndDateExists {
+        #region SelectedIfEndDateExists
+        public bool SelectedIfEndDateExists {
             get;
             set => this.SetProperty(ref field, value);
         }
         #endregion
         /// <summary>
-        /// 終了日
+        /// 指定された終了日
         /// </summary>
-        #region EndDate
-        public DateTime EndDate {
+        #region InputedEndDate
+        public DateTime InputedEndDate {
             get;
             set => this.SetProperty(ref field, value);
         } = DateTime.Now;
@@ -139,10 +138,10 @@ namespace HouseholdAccountBook.ViewModels.Settings
         #endregion
 
         /// <summary>
-        /// 支払日
+        /// 入力された支払日
         /// </summary>
-        #region PayDay
-        public int? PayDay {
+        #region InputedPayDay
+        public int? InputedPayDay {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -153,15 +152,13 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// CSVデータがあるか
         /// </summary>
-        #region CsvDataExists
         public bool CsvDataExists => this.SelectedBookKind != BookKind.Wallet;
-        #endregion
 
         /// <summary>
-        /// CSVフォルダパス
+        /// 入力されたCSVフォルダパス
         /// </summary>
-        #region CsvFolderPath
-        public string CsvFolderPath {
+        #region InputedCsvFolderPath
+        public string InputedCsvFolderPath {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -187,30 +184,30 @@ namespace HouseholdAccountBook.ViewModels.Settings
         #endregion
 
         /// <summary>
-        /// 日付 位置(1開始)
+        /// 入力された日付 位置(1開始)
         /// </summary>
-        #region ActDateIndex
-        public int? ActDateIndex {
+        #region InputedActDateIndex
+        public int? InputedActDateIndex {
             get;
             set => this.SetProperty(ref field, value);
         }
         #endregion
 
         /// <summary>
-        /// 支出 位置(1開始)
+        /// 入力された支出 位置(1開始)
         /// </summary>
-        #region ExpensesIndex
-        public int? ExpensesIndex {
+        #region InputedExpensesIndex
+        public int? InputedExpensesIndex {
             get;
             set => this.SetProperty(ref field, value);
         }
         #endregion
 
         /// <summary>
-        /// 項目名 位置(1開始)
+        /// 入力された項目名 位置(1開始)
         /// </summary>
-        #region ItemNameIndex
-        public int? ItemNameIndex {
+        #region InputedItemNameIndex
+        public int? InputedItemNameIndex {
             get;
             set => this.SetProperty(ref field, value);
         }

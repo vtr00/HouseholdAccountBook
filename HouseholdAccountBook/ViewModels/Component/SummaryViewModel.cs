@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Models.DomainModels;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.DomainModels;
 
 namespace HouseholdAccountBook.ViewModels.Component
 {
@@ -15,7 +16,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 収支名
         /// </summary>
-        public string BalanceName { get; init; } = string.Empty;
+        public string BalanceName => this.BalanceKind == -1 ? string.Empty : UiConstants.BalanceKindStr[(BalanceKind)this.BalanceKind];
 
         /// <summary>
         /// 分類

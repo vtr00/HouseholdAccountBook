@@ -378,12 +378,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     switch (vm.Kind) {
                         case HierarchicalKind.Category: {
                             MstCategoryDao mstCategoryDao = new(dbHandler);
-                            _ = await mstCategoryDao.UpdateSetableAsync(new MstCategoryDto { CategoryName = vm.Name, CategoryId = vm.Id });
+                            _ = await mstCategoryDao.UpdateSetableAsync(new MstCategoryDto { CategoryName = vm.InputedName, CategoryId = vm.Id });
                         }
                         break;
                         case HierarchicalKind.Item: {
                             MstItemDao mstItemDao = new(dbHandler);
-                            _ = await mstItemDao.UpdateSetableAsync(new MstItemDto { ItemName = vm.Name, ItemId = vm.Id });
+                            _ = await mstItemDao.UpdateSetableAsync(new MstItemDto { ItemName = vm.InputedName, ItemId = vm.Id });
                         }
                         break;
                     }
@@ -449,7 +449,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                         HstShopDao hstShopDao = new(dbHandler);
                         _ = await hstShopDao.DeleteAsync(new HstShopDto {
-                            ShopName = this.DisplayedItemSettingVM.SelectedShopVM.Name,
+                            ShopName = this.DisplayedItemSettingVM.SelectedShopVM.Shop.Name,
                             ItemId = this.DisplayedItemSettingVM.Id
                         });
                     }
@@ -479,7 +479,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                         HstRemarkDao hstRemarkDao = new(dbHandler);
                         _ = await hstRemarkDao.DeleteAsync(new HstRemarkDto {
-                            Remark = this.DisplayedItemSettingVM.SelectedRemarkVM.Remark,
+                            Remark = this.DisplayedItemSettingVM.SelectedRemarkVM.Remark.Text,
                             ItemId = this.DisplayedItemSettingVM.Id
                         });
                     }
