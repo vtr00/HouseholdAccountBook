@@ -14,7 +14,19 @@ namespace HouseholdAccountBook.Views.Converters
         /// DateTime -> 国民の祝日変換
         /// </summary>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            => value is DateTime dateTime ? (object)dateTime.IsNationalHoliday() : throw new NotImplementedException();
+        {
+            if (value is null) {
+                return null;
+            }
+            else if (value is DateTime dateTime) {
+                return dateTime.IsNationalHoliday();
+            }
+            else if (value is DateOnly dateOnly) {
+                return dateOnly.IsNationalHoliday();
+            }
+
+            throw new NotImplementedException();
+        }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }

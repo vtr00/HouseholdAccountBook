@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Models.DomainModels;
 using HouseholdAccountBook.Models.Infrastructure;
 using HouseholdAccountBook.Models.Utilities.Args;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 
@@ -15,7 +16,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 一致フラグ変更時のイベント
         /// </summary>
-        public event Action<EventArgs<int?, bool>> IsMatchChanged;
+        public event Action<EventArgs<ActionIdObj, bool>> IsMatchChanged;
         #endregion
 
         #region プロパティ
@@ -28,7 +29,7 @@ namespace HouseholdAccountBook.ViewModels.Component
             set {
                 if (this.Action is not null) {
                     if (this.SetProperty(ref field, value)) {
-                        this.IsMatchChanged?.Invoke(new EventArgs<int?, bool>(this.Action.ActionId, value));
+                        this.IsMatchChanged?.Invoke(new EventArgs<ActionIdObj, bool>(this.Action.ActionId, value));
                     }
                 }
             }

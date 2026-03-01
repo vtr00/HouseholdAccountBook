@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
 using HouseholdAccountBook.Models.Infrastructure.Logger;
 using HouseholdAccountBook.Models.Utilities.Extensions;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 using System.Threading.Tasks;
@@ -13,27 +14,57 @@ namespace HouseholdAccountBook.ViewModels.Windows
     /// <summary>
     /// 期間指定ウィンドウVM
     /// </summary>
-    public class TermWindowViewModel : WindowViewModelBase
+    public class PeriodSelectionWindowViewModel : WindowViewModelBase
     {
         #region Bindingプロパティ
         /// <summary>
-        /// 開始日
+        /// 選択された月
         /// </summary>
-        #region StartDate
-        public DateTime StartDate {
+        public DateTime SelectedMonth {
             get;
-            set => this.SetProperty(ref field, value);
-        } = DateTime.Now;
-        #endregion
-
+            set {
+                if (this.SetProperty(ref field, value)) {
+                    this.SelectedStart = value.GetFirstDateOfMonth().ToDateOnly();
+                }
+            }
+        }
         /// <summary>
-        /// 終了日
+        /// 選択された開始日
         /// </summary>
-        #region EndDate
-        public DateTime EndDate {
+        #region SelectedStart
+        public DateOnly SelectedStart {
             get;
-            set => this.SetProperty(ref field, value);
-        } = DateTime.Now;
+            set {
+                if (this.SetProperty(ref field, value)) {
+                    this.SelectedMonth = value.ToDateTime(TimeOnly.MinValue);
+                }
+            }
+        }
+        #endregion
+        /// <summary>
+        /// 選択された終了日
+        /// </summary>
+        #region SelectedEnd
+        public DateOnly SelectedEnd {
+            get;
+            set {
+                if (this.SetProperty(ref field, value)) {
+                    
+                }
+            }
+        }
+        #endregion
+        /// <summary>
+        /// 選択された期間
+        /// </summary>
+        #region SelectedPeriod
+        public PeriodObj<DateOnly> SelectedPeriod {
+            get => new(this.SelectedStart, this.SelectedEnd);
+            set {
+                this.SelectedStart = value.Start;
+                this.SelectedEnd = value.End;
+            }
+        }
         #endregion
 
         #region コマンド
@@ -44,7 +75,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 全期間コマンド
         /// </summary>
-        public ICommand AllTermCommand => new RelayCommand(this.AllTermCommand_Executed);
+        public ICommand AllPeriodCommand => new RelayCommand(this.AllPeriodCommand_Executed);
         #endregion
         #endregion
 
@@ -52,20 +83,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 今月コマンド処理
         /// </summary>
-        void ThisMonthCommand_Executed()
-        {
-            this.StartDate = DateTime.Today.GetFirstDateOfMonth();
-            this.EndDate = DateTime.Today.GetLastDateOfMonth();
-        }
+        void ThisMonthCommand_Executed() => this.SelectedPeriod = new PeriodObj<DateOnly>(DateOnlyExtensions.Today.GetFirstDateOfMonth(), DateOnlyExtensions.Today.GetLastDateOfMonth());
 
         /// <summary>
         /// 全期間コマンド処理
         /// </summary>
-        async void AllTermCommand_Executed()
+        async void AllPeriodCommand_Executed()
         {
             var firstLastPair = await this.LoadFirstLastDate();
-            this.StartDate = firstLastPair.Item1;
-            this.EndDate = firstLastPair.Item2;
+            this.SelectedPeriod = new PeriodObj<DateOnly>(firstLastPair.Item1, firstLastPair.Item2);
         }
         #endregion
 
@@ -95,19 +121,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿項目の初日/最終日を取得する
         /// </summary>
         /// <returns>初日/最終日のペア</returns>
-        private async Task<Tuple<DateTime, DateTime>> LoadFirstLastDate()
+        private async Task<Tuple<DateOnly, DateOnly>> LoadFirstLastDate()
         {
             using FuncLog funcLog = new();
 
-            DateTime firstTime = DateTime.Today;
-            DateTime lastTime = DateTime.Today;
+            DateOnly firstDate;
+            DateOnly lastDate;
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                TermInfoDao termInfoDao = new(dbHandler);
-                var dto = await termInfoDao.Find();
-                firstTime = dto.FirstTime;
-                lastTime = dto.LastTime;
+                PeriodInfoDao periodInfoDao = new(dbHandler);
+                var dto = await periodInfoDao.Find();
+                firstDate = DateOnly.FromDateTime(dto.FirstTime);
+                lastDate = DateOnly.FromDateTime(dto.LastTime);
             }
-            return new Tuple<DateTime, DateTime>(firstTime, lastTime);
+            return new Tuple<DateOnly, DateOnly>(firstDate, lastDate);
         }
     }
 }

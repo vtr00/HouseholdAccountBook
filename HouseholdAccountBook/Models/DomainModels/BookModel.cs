@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.ValueObjects;
 using System;
 
 namespace HouseholdAccountBook.Models.DomainModels
@@ -6,18 +7,20 @@ namespace HouseholdAccountBook.Models.DomainModels
     /// <summary>
     /// 帳簿Model
     /// </summary>
-    public class BookModel
+    /// <param name="id">帳簿ID</param>
+    /// <param name="name">帳簿名</param>
+    public class BookModel(BookIdObj id, string name)
     {
         #region プロパティ
         /// <summary>
         /// 帳簿ID
         /// </summary>
-        public int? Id { get; init; }
+        public BookIdObj Id { get; init; } = id;
 
         /// <summary>
         /// 帳簿名
         /// </summary>
-        public string Name { get; init; }
+        public string Name { get; init; } = name;
 
         /// <summary>
         /// 備考
@@ -31,13 +34,9 @@ namespace HouseholdAccountBook.Models.DomainModels
 
         #region 期間情報
         /// <summary>
-        /// 開始日
+        /// 期間
         /// </summary>
-        public DateTime? StartTime { get; init; }
-        /// <summary>
-        /// 終了日
-        /// </summary>
-        public DateTime? EndTime { get; init; }
+        public PeriodObj<DateOnly> Period { get; init; }
         #endregion
 
         #region 支払い情報
@@ -48,7 +47,7 @@ namespace HouseholdAccountBook.Models.DomainModels
         /// <summary>
         /// 支払い元帳簿ID
         /// </summary>
-        public int? DebitBookId { get; init; }
+        public BookIdObj DebitBookId { get; init; }
         #endregion
 
         #region CSV情報

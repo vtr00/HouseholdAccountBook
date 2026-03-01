@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
+﻿using HouseholdAccountBook.Models.ValueObjects;
+using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 using System.Windows.Input;
 
@@ -13,7 +14,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 帳簿項目ID
         /// </summary>
-        public int? ActionId { get; set; }
+        public ActionIdObj ActionId { get; set; }
 
         /// <summary>
         /// 日付
@@ -24,7 +25,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// 金額
         /// </summary>
         #region ActValue
-        public int? ActValue {
+        public decimal? ActValue {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {

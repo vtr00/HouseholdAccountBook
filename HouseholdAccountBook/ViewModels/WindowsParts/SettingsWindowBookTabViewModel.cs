@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using HouseholdAccountBook.Models.DomainModels;
+using HouseholdAccountBook.Models.ValueObjects;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
 {
@@ -143,14 +144,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     await dbHandler.ExecTransactionAsync(async () => {
                         HstActionDao hstActionDao = new(dbHandler);
-                        var dtoList = await hstActionDao.FindByBookIdAsync(this.SelectedBookVM.Id.Value);
+                        var dtoList = await hstActionDao.FindByBookIdAsync((int)this.SelectedBookVM.Id);
                         if (dtoList.Any()) {
                             _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInBook, Properties.Resources.Title_Error);
                             return;
                         }
 
                         MstBookDao hstBookDao = new(dbHandler);
-                        _ = await hstBookDao.DeleteByIdAsync(this.SelectedBookVM.Id.Value);
+                        _ = await hstBookDao.DeleteByIdAsync((int)this.SelectedBookVM.Id);
                     });
                 }
 
@@ -180,12 +181,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 int index = this.BookVMList.IndexOf(this.SelectedBookVM);
-                int changingId = this.BookVMList[index].Id.Value;
-                int changedId = this.BookVMList[index - 1].Id.Value;
+                BookIdObj changingId = this.BookVMList[index].Id;
+                BookIdObj changedId = this.BookVMList[index - 1].Id;
 
                 await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     MstBookDao mstBookDao = new(dbHandler);
-                    _ = await mstBookDao.SwapSortOrderAsync(changingId, changedId);
+                    _ = await mstBookDao.SwapSortOrderAsync((int)changingId, (int)changedId);
                 }
 
                 await this.LoadAsync(changingId);
@@ -214,12 +215,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 int index = this.BookVMList.IndexOf(this.SelectedBookVM);
-                int changingId = this.BookVMList[index].Id.Value;
-                int changedId = this.BookVMList[index + 1].Id.Value;
+                BookIdObj changingId = this.BookVMList[index].Id;
+                BookIdObj changedId = this.BookVMList[index + 1].Id;
 
                 await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     MstBookDao mstBookDao = new(dbHandler);
-                    _ = await mstBookDao.SwapSortOrderAsync(changingId, changedId);
+                    _ = await mstBookDao.SwapSortOrderAsync((int)changingId, (int)changedId);
                 }
 
                 await this.LoadAsync(changingId);
@@ -243,8 +244,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     MstBookDto.JsonDto jsonObj = new() {
                         Remark = vm.InputedRemark ?? string.Empty,
-                        StartDate = vm.SelectedIfStartDateExists ? vm.InputedStartDate : null,
-                        EndDate = vm.SelectedIfEndDateExists ? vm.InputedEndDate : null,
+                        StartDate = vm.SelectedIfStartDateExists ? vm.InputedPeriod.Start.ToDateTime(TimeOnly.MinValue) : null,
+                        EndDate = vm.SelectedIfEndDateExists ? vm.InputedPeriod.End.ToDateTime(TimeOnly.MinValue) : null,
                         CsvFolderPath = vm.InputedCsvFolderPath != string.Empty ? Path.GetFullPath(vm.InputedCsvFolderPath, App.GetCurrentDir()) : null,
                         TextEncoding = vm.SelectedTextEncoding,
                         CsvActDateIndex = vm.InputedActDateIndex - 1,
@@ -257,11 +258,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     _ = await mstBookDao.UpdateSetableAsync(new MstBookDto {
                         BookName = vm.InputedName,
                         BookKind = (int)vm.SelectedBookKind,
-                        InitialValue = vm.InputedInitialValue,
-                        DebitBookId = vm.SelectedDebitBookVM.Id,
+                        InitialValue = (int)vm.InputedInitialValue,
+                        DebitBookId = (int)vm.SelectedDebitBookVM.Id,
                         PayDay = vm.InputedPayDay,
                         JsonCode = jsonCode,
-                        BookId = vm.Id.Value
+                        BookId = (int)vm.Id
                     });
                 }
 
@@ -323,7 +324,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     await dbHandler.ExecTransactionAsync(async () => {
                         HstActionDao hstActionDao = new(dbHandler);
-                        var hstActionDtoList = await hstActionDao.FindByBookIdAndItemIdAsync(vm.Id.Value, vm.SelectedRelationVM.Id);
+                        var hstActionDtoList = await hstActionDao.FindByBookIdAndItemIdAsync((int)vm.Id, (int)vm.SelectedRelationVM.Id);
 
                         if (hstActionDtoList.Any()) {
                             vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
@@ -333,8 +334,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
                         RelBookItemDao relBookItemDao = new(dbHandler);
                         _ = await relBookItemDao.UpsertAsync(new RelBookItemDto {
-                            BookId = vm.Id.Value,
-                            ItemId = vm.SelectedRelationVM.Id,
+                            BookId = (int)vm.Id,
+                            ItemId = (int)vm.SelectedRelationVM.Id,
                             DelFlg = vm.SelectedRelationVM.IsRelated ? 0 : 1
                         });
                     });
@@ -350,7 +351,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 帳簿設定タブに表示するデータを読み込む
         /// </summary>
         /// <param name="bookId">選択対象の帳簿ID</param>
-        public async Task LoadAsync(int? bookId = null)
+        public async Task LoadAsync(BookIdObj bookId = null)
         {
             using FuncLog funcLog = new(new { bookId });
 
@@ -366,12 +367,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 帳簿リストを更新する
         /// </summary>
         /// <param name="bookId">選択対象の帳簿ID</param>
-        private async Task UpdateBookListAsync(int? bookId = null)
+        private async Task UpdateBookListAsync(BookIdObj bookId = null)
         {
             using FuncLog funcLog = new(new { bookId });
 
             ViewModelService service = new(this.mDbHandlerFactory);
-            int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
+            BookIdObj tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             this.BookVMList = await service.LoadBookListAsync();
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
@@ -383,7 +384,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
                 if (e.Value != null) {
                     ViewModelService service = new(this.mDbHandlerFactory);
-                    this.DisplayedBookSettingVM = await service.LoadBookSettingViewModelAsync(e.Value.Id.Value);
+                    this.DisplayedBookSettingVM = await service.LoadBookSettingViewModelAsync(e.Value.Id);
                 }
                 else {
                     this.DisplayedBookSettingVM = null;

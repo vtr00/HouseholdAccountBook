@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 日付(Tracker用)
         /// </summary>
-        public DateTime Date { get; init; }
+        public DateOnly Date { get; init; }
 
         /// <summary>
         /// インデックス(LineSeriesのX軸用)

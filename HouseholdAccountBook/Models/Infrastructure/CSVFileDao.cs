@@ -27,7 +27,7 @@ namespace HouseholdAccountBook.Models.Infrastructure
         /// <param name="expensesIndex">支出インデックス</param>
         /// <param name="encoding">エンコーディング</param>
         /// <returns>読込結果</returns>
-        public static async Task<List<CsvComparisonViewModel>> LoadCsvCompListAsync(IList<string> csvFilePathList, int actDateIndex, int itemNameIndex, int expensesIndex, Encoding encoding)
+        public static async Task<List<CsvComparisonViewModel>> LoadCsvCompListAsync(IEnumerable<string> csvFilePathList, int actDateIndex, int itemNameIndex, int expensesIndex, Encoding encoding)
         {
             CsvConfiguration csvConfig = new(CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,
@@ -68,15 +68,13 @@ namespace HouseholdAccountBook.Models.Infrastructure
         }
 
         /// <summary>
-        /// DataGridのデータをCSVファイルに保存する
+        /// CSVファイルに保存する
         /// </summary>
         /// <param name="filePath">保存先ファイルパス</param>
-        /// <param name="columnInfos">列情報</param>
-        /// <param name="items">エクスポートするデータ</param>
+        /// <param name="saveData">保存するデータ</param>
         /// <returns></returns>
-        public static async Task SaveDataGridDataAsync(string filePath, IEnumerable<DataGridExtensions.ColumnInfo> columnInfos, IEnumerable<object> items)
+        public static async Task SaveDataAsync(string filePath, IEnumerable<IEnumerable<string>> saveData)
         {
-            List<List<string>> exportData = GetExportData(columnInfos, items);
             CsvConfiguration config = new(CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,              // ヘッダー出力
                 Delimiter = ",",                     // 区切り文字
@@ -85,73 +83,13 @@ namespace HouseholdAccountBook.Models.Infrastructure
                 ShouldQuote = args => true           // Excel誤認識対策（安全重視）
             };
             using (CsvWriter writer = new(new StreamWriter(filePath, false, Encoding.UTF8), config)) {
-                foreach (List<string> row in exportData) {
+                foreach (IEnumerable<string> row in saveData) {
                     foreach (string str in row) {
                         writer.WriteField(str);
                     }
                     await writer.NextRecordAsync();
                 }
             }
-        }
-
-        /// <summary>
-        /// リフレクションの情報を元にエクスポートするデータを取得する
-        /// </summary>
-        /// <param name="columnInfos">列情報</param>
-        /// <returns>エクスポートするデータ</returns>
-        private static List<List<string>> GetExportData(IEnumerable<DataGridExtensions.ColumnInfo> columnInfos, IEnumerable<object> items)
-        {
-            List<List<string>> data = [];
-
-            // ヘッダ名を取得する
-            List<string> headers = [];
-            foreach (DataGridExtensions.ColumnInfo columnInfo in columnInfos) {
-                headers.Add(columnInfo.HeaderText);
-            }
-            data.Add(headers);
-
-            // 列データを取得する
-            foreach (object item in items) {
-                List<string> values = [];
-
-                foreach (DataGridExtensions.ColumnInfo columnInfo in columnInfos) {
-                    // フィールドの生データを取得する
-                    Regex regex = new(@"(.+)\[(\d+)\]");
-                    Match match = regex.Match(columnInfo.PropertyPath);
-                    object rawValue = null;
-                    if (match.Success) {
-                        // パスがプロパティの要素の場合
-                        PropertyInfo prop = item.GetType().GetProperty(match.Groups[1].Value);
-                        object tmp = prop?.GetValue(item);
-                        if (tmp is List<int> list && int.TryParse(match.Groups[2].Value, out int idx)) {
-                            rawValue = list[idx];
-                        }
-                    }
-                    else {
-                        // パスがプロパティの場合
-                        PropertyInfo prop = item.GetType().GetProperty(columnInfo.PropertyPath);
-                        rawValue = prop?.GetValue(item);
-                    }
-
-                    // Converterで変換する
-                    object converted = rawValue;
-                    if (columnInfo.Converter != null) {
-                        converted = columnInfo.Converter.Convert(rawValue, typeof(string), columnInfo.ConverterParameter, columnInfo.ConverterCulture);
-                    }
-                    // 文字列フォーマットに従って文字列に変換する
-                    string text = converted?.ToString();
-                    if (!string.IsNullOrEmpty(columnInfo.StringFormat)) {
-                        if (converted is IFormattable formattable) {
-                            text = formattable.ToString(columnInfo.StringFormat, columnInfo.ConverterCulture);
-                        }
-                    }
-
-                    values.Add(text);
-                }
-                data.Add(values);
-            }
-
-            return data;
         }
     }
 }

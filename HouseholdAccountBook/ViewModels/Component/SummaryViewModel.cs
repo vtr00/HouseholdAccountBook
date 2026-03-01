@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.DomainModels;
+using HouseholdAccountBook.Models.ValueObjects;
 
 namespace HouseholdAccountBook.ViewModels.Component
 {
@@ -10,22 +11,18 @@ namespace HouseholdAccountBook.ViewModels.Component
     {
         #region プロパティ
         /// <summary>
-        /// 収支種別
-        /// </summary>
-        public int BalanceKind { get; init; } = -1;
-        /// <summary>
         /// 収支名
         /// </summary>
-        public string BalanceName => this.BalanceKind == -1 ? string.Empty : UiConstants.BalanceKindStr[(BalanceKind)this.BalanceKind];
+        public string BalanceName => UiConstants.BalanceKindStr[this.Category.BalanceKind];
 
         /// <summary>
         /// 分類
         /// </summary>
-        public CategoryModel Category { get; init; } = new CategoryModel();
+        public CategoryModel Category { get; init; } = new(-1, string.Empty, BalanceKind.Others);
         /// <summary>
         /// 項目
         /// </summary>
-        public ItemModel Item { get; init; } = new ItemModel();
+        public ItemModel Item { get; init; } = new(-1, string.Empty);
         /// <summary>
         /// その他名称
         /// </summary>
@@ -49,7 +46,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 合計
         /// </summary>
-        public int Total { get; init; }
+        public decimal Total { get; init; } = 0;
         #endregion
     }
 }

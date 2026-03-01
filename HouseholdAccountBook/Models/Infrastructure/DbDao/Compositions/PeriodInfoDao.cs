@@ -10,17 +10,17 @@ namespace HouseholdAccountBook.Models.Infrastructure.DbDao.Compositions
     /// 期間情報DAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class TermInfoDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
+    public class PeriodInfoDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
     {
         /// <summary>
-        /// 全帳簿の <see cref="TermInfoDto"/> を取得する
+        /// 全帳簿の <see cref="PeriodInfoDto"/> を取得する
         /// </summary>
         /// <returns>取得したレコード</returns>
-        public async Task<TermInfoDto> Find()
+        public async Task<PeriodInfoDto> Find()
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
-            TermInfoDto dto = await this.mDbHandler.QuerySingleAsync<TermInfoDto>(@"
+            PeriodInfoDto dto = await this.mDbHandler.QuerySingleAsync<PeriodInfoDto>(@"
 SELECT MIN(act_time) as first_time, MAX(act_time) as last_time
 FROM hst_action
 WHERE del_flg = 0;");

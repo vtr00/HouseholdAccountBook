@@ -14,13 +14,16 @@ namespace HouseholdAccountBook.Views.Converters
             if (value == null) {
                 return null;
             }
-            else if (value is DateTime dateTime) {
-                Properties.Settings settings = Properties.Settings.Default;
-                string unit_pre = settings.App_StartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Pre;
-                string unit_post = settings.App_StartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Post;
 
+            Properties.Settings settings = Properties.Settings.Default;
+            string unit_pre = settings.App_StartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Pre;
+            string unit_post = settings.App_StartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Post;
+
+            if (value is DateTime dateTime) {
                 return $"{unit_pre}{dateTime:yyyy}{unit_post}";
-
+            }
+            else if (value is DateOnly dateOnly) {
+                return $"{unit_pre}{dateOnly:yyyy}{unit_post}";
             }
             throw new NotImplementedException();
         }

@@ -16,7 +16,7 @@ namespace HouseholdAccountBook.Views.Extensions
         /// <param name="maxValue">最大値</param>
         /// <param name="divNum">目盛幅分割数(基準値)</param>
         /// <param name="isDisplayZero">0を表示するか</param>
-        public static void SetAxisRange(this Axis axis, double minValue, double maxValue, int divNum, bool isDisplayZero)
+        public static void SetAxisRange(this Axis axis, decimal minValue, decimal maxValue, int divNum, bool isDisplayZero)
         {
             using FuncLog funcLog = new(new { minValue, maxValue, divNum, isDisplayZero }, Log.LogLevel.Trace);
 
@@ -30,18 +30,18 @@ namespace HouseholdAccountBook.Views.Extensions
             }
 
             // マージンを設ける
-            double tmpMin = minValue * (minValue < 0 ? 1.05 : 0.95);
-            double tmpMax = maxValue * (0 < maxValue ? 1.05 : 0.95);
+            decimal tmpMin = minValue * (minValue < 0 ? 1.05m : 0.95m);
+            decimal tmpMax = maxValue * (0 < maxValue ? 1.05m : 0.95m);
             // 0はログが計算できないので近い値に置き換える
             tmpMin = (tmpMin is 0 or 1) ? -1 : tmpMin - 1;
             tmpMax = (tmpMax is (-1) or 0) ? 1 : tmpMax + 1;
 
-            double minDigit = Math.Floor(Math.Log10(Math.Abs(tmpMin))); // 最小値 の桁数
-            double maxDigit = Math.Floor(Math.Log10(Math.Abs(tmpMax))); // 最大値 の桁数
+            double minDigit = Math.Floor(Math.Log10((double)Math.Abs(tmpMin))); // 最小値 の桁数
+            double maxDigit = Math.Floor(Math.Log10((double)Math.Abs(tmpMax))); // 最大値 の桁数
             double diffDigit = Math.Max(minDigit, maxDigit);
 
-            int minimum = (int)Math.Round(MathExtensions.Floor(tmpMin, Math.Pow(10, diffDigit) * unit)); // 軸の最小値
-            int maximum = (int)Math.Round(MathExtensions.Ceiling(tmpMax, Math.Pow(10, diffDigit) * unit)); // 軸の最大値
+            int minimum = (int)Math.Round(MathExtensions.Floor(tmpMin, (decimal)(Math.Pow(10, diffDigit) * unit))); // 軸の最小値
+            int maximum = (int)Math.Round(MathExtensions.Ceiling(tmpMax, (decimal)(Math.Pow(10, diffDigit) * unit))); // 軸の最大値
             if (!(minValue == 0 && maxValue == 0)) {
                 if (minValue == 0) { minimum = 0; }
                 if (maxValue == 0) { maximum = 0; }

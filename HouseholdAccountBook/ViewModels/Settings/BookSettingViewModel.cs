@@ -1,5 +1,7 @@
 ﻿using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.DomainModels;
+using HouseholdAccountBook.Models.Utilities.Extensions;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using System;
@@ -17,7 +19,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 帳簿ID
         /// </summary>
-        public int? Id { get; init; }
+        public BookIdObj Id { get; init; }
 
         /// <summary>
         /// ソート順
@@ -55,16 +57,18 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 入力された備考
         /// </summary>
+        #region InputedRemark
         public string InputedRemark {
             get;
             set => this.SetProperty(ref field, value);
         }
+        #endregion
 
         /// <summary>
         /// 入力された初期残高
         /// </summary>
         #region InputedInitialValue
-        public int InputedInitialValue {
+        public decimal InputedInitialValue {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -81,16 +85,6 @@ namespace HouseholdAccountBook.ViewModels.Settings
         }
         #endregion
         /// <summary>
-        /// 入力された開始日
-        /// </summary>
-        #region InputedStartDate
-        public DateTime InputedStartDate {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = DateTime.Now;
-        #endregion
-
-        /// <summary>
         /// 指定された終了日の有無
         /// </summary>
         #region SelectedIfEndDateExists
@@ -100,13 +94,13 @@ namespace HouseholdAccountBook.ViewModels.Settings
         }
         #endregion
         /// <summary>
-        /// 指定された終了日
+        /// 指定された期間
         /// </summary>
-        #region InputedEndDate
-        public DateTime InputedEndDate {
+        #region InputedPeriod
+        public PeriodObj<DateOnly> InputedPeriod {
             get;
             set => this.SetProperty(ref field, value);
-        } = DateTime.Now;
+        } = new(DateOnlyExtensions.Today, DateOnlyExtensions.Today);
         #endregion
         #endregion
 

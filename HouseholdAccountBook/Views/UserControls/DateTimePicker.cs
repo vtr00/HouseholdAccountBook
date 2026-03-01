@@ -54,7 +54,7 @@ namespace HouseholdAccountBook.Views.UserControls
                 nameof(DateFormat),
                 typeof(string),
                 typeof(DateTimePicker),
-                new PropertyMetadata(DateTimePicker_DateFormatChanged));
+                new PropertyMetadata(OnDateFormatChanged));
         #endregion
         /// <summary>
         /// 日付フォーマット(yyyy,MM,ddのみ。区切り文字は/または-。順序に縛りなし)
@@ -65,6 +65,82 @@ namespace HouseholdAccountBook.Views.UserControls
             set => this.SetValue(DateFormatProperty, value);
         }
         #endregion
+
+        /// <summary>
+        /// <see cref="DateTimePicker.DateFormat"/> 変更時処理
+        /// </summary>
+        /// <param name="dobj"></param>
+        /// <param name="e"></param>
+        private static void OnDateFormatChanged(DependencyObject dobj, DependencyPropertyChangedEventArgs e)
+        {
+            DateTimePicker dateTimePicker = dobj as DateTimePicker;
+
+            _ = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action<DateTimePicker>(DateTimePicker.ApplyDateFormat), dateTimePicker);
+
+            dateTimePicker.DateFormatChanged?.Invoke(dobj, e);
+        }
+
+        /// <summary>
+        /// <see cref="SelectedDateOnly"/> 依存関係プロパティを識別します。
+        /// </summary>
+        public static readonly DependencyProperty SelectedDateOnlyProperty = DependencyProperty.Register(
+                nameof(SelectedDateOnly),
+                typeof(DateOnly?),
+                typeof(DateTimePicker),
+                new FrameworkPropertyMetadata(
+                    null,
+                    FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                    OnSelectedDateOnlyChanged));
+
+        /// <summary>
+        /// 選択中の <see cref="DateOnly"/>
+        /// </summary>
+        public DateOnly? SelectedDateOnly {
+            get => (DateOnly?)this.GetValue(SelectedDateOnlyProperty);
+            set => this.SetValue(SelectedDateOnlyProperty, value);
+        }
+
+        /// <summary>
+        /// <see cref="DateTimePicker.SelectedDateOnly"/> 変更時処理
+        /// </summary>
+        /// <param name="dobj"></param>
+        /// <param name="e"></param>
+        private static void OnSelectedDateOnlyChanged(DependencyObject dobj, DependencyPropertyChangedEventArgs e)
+        {
+            DateTimePicker dateTimePicker = dobj as DateTimePicker;
+
+            if (e.NewValue is DateOnly dateOnly) {
+                DateTime dateTime = dateOnly.ToDateTime(TimeOnly.MinValue);
+
+                if (dateTimePicker.SelectedDate != dateTime) {
+                    dateTimePicker.SelectedDate = dateTime;
+                }
+            }
+            else {
+                dateTimePicker.SelectedDate = null;
+            }
+        }
+
+        /// <summary>
+        /// <see cref="DatePicker.SelectedDate"/> 変更時処理
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnSelectedDateChanged(SelectionChangedEventArgs e)
+        {
+            base.OnSelectedDateChanged(e);
+
+            if (this.SelectedDate is DateTime dateTime) {
+                DateOnly dateOnly = DateOnly.FromDateTime(dateTime);
+
+                if (this.SelectedDateOnly != dateOnly) {
+                    this.SelectedDateOnly = dateOnly;
+                }
+            }
+            else {
+                this.SelectedDateOnly = null;
+            }
+        }
+
         #endregion
 
         #region イベントハンドラ
@@ -225,20 +301,6 @@ namespace HouseholdAccountBook.Views.UserControls
             DateTimePicker dateTimePicker = sender as DateTimePicker;
             var textBox = GetTemplateTextBox(dateTimePicker);
             textBox.SelectionStart = this.mSelectedPositionBeforeCalendarOpened;
-        }
-
-        /// <summary>
-        /// 表示フォーマット変更時処理
-        /// </summary>
-        /// <param name="dobj"></param>
-        /// <param name="e"></param>
-        private static void DateTimePicker_DateFormatChanged(DependencyObject dobj, DependencyPropertyChangedEventArgs e)
-        {
-            DateTimePicker dateTimePicker = dobj as DateTimePicker;
-
-            _ = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action<DateTimePicker>(DateTimePicker.ApplyDateFormat), dateTimePicker);
-
-            dateTimePicker.DateFormatChanged?.Invoke(dobj, e);
         }
         #endregion
 

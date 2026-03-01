@@ -60,7 +60,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// SQLite設定
         /// </summary>
         #region SQLiteSettingVM
-        public FileDbSettingViewModel SQLiteSettingVM {
+        public SQLiteSettingViewModel SQLiteSettingVM {
             get;
             set => this.SetProperty(ref field, value);
         } = new();
@@ -69,50 +69,50 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         #region バックアップ
         /// <summary>
-        /// バックアップ数
+        /// 入力されたバックアップ数
         /// </summary>
-        #region BackUpNum
-        public int BackUpNum {
+        #region InputedBackUpNum
+        public int InputedBackUpNum {
             get;
             set => this.SetProperty(ref field, value);
         }
         #endregion
 
         /// <summary>
-        /// バックアップ先フォルダ
+        /// 入力されたバックアップ先フォルダ
         /// </summary>
-        #region BackUpFolderPath
-        public string BackUpFolderPath {
+        #region InputedBackUpFolderPath
+        public string InputedBackUpFolderPath {
             get;
             set => this.SetProperty(ref field, value);
         }
         #endregion
 
         /// <summary>
-        /// メインウィンドウ最小化時バックアップフラグ
+        /// 選択されたメインウィンドウ最小化時バックアップするか
         /// </summary>
-        #region BackUpFlagAtMinimizing
-        public bool BackUpFlagAtMinimizing {
+        #region SelectedIfBackUpAtMinimizing
+        public bool SelectedIfBackUpAtMinimizing {
             get;
             set => this.SetProperty(ref field, value);
         }
         #endregion
 
         /// <summary>
-        /// メインウィンドウ最小化時バックアップインターバル(分)
+        /// 入力されたメインウィンドウ最小化時バックアップインターバル(分)
         /// </summary>
-        #region BackUpIntervalAtMinimizing
-        public int BackUpIntervalAtMinimizing {
+        #region InputedBackUpIntervalAtMinimizing
+        public int InputedBackUpIntervalAtMinimizing {
             get;
             set => this.SetProperty(ref field, value);
         }
         #endregion
 
         /// <summary>
-        /// メインウィンドウクローズ時バックアップフラグ
+        /// 選択されたメインウィンドウクローズ時バックアップするか
         /// </summary>
-        #region BackUpFlagAtClosing
-        public bool BackUpFlagAtClosing {
+        #region SelectedIfBackUpAtClosing
+        public bool SelectedIfBackUpAtClosing {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -129,10 +129,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
 
         /// <summary>
-        /// メインウィンドウ最小化時バックアップ通知フラグ
+        /// 選択されたメインウィンドウ最小化時バックアップを通知するか
         /// </summary>
-        #region BackUpNotifyAtMinimizing
-        public bool BackUpNotifyAtMinimizing {
+        #region SelectedIfNotifyBackUpAtMinimizing
+        public bool SelectedIfNotifyBackUpAtMinimizing {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -172,7 +172,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             string filter = string.Empty;
             switch (kind) {
                 case FilePathKind.DumpExeFile: {
-                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.DumpExePath, App.GetCurrentDir());
+                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.InputedDumpExePath, App.GetCurrentDir());
                     if (string.IsNullOrWhiteSpace(directory)) {
                         directory = App.GetCurrentDir();
                     }
@@ -180,7 +180,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     break;
                 }
                 case FilePathKind.RestoreExeFile: {
-                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.RestoreExePath, App.GetCurrentDir());
+                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.InputedRestoreExePath, App.GetCurrentDir());
                     if (string.IsNullOrWhiteSpace(directory)) {
                         directory = App.GetCurrentDir();
                     }
@@ -201,10 +201,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             if (this.OpenFileDialogRequest(e)) {
                 switch (kind) {
                     case FilePathKind.DumpExeFile:
-                        this.PostgreSQLDBSettingVM.DumpExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                        this.PostgreSQLDBSettingVM.InputedDumpExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
                     case FilePathKind.RestoreExeFile:
-                        this.PostgreSQLDBSettingVM.RestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                        this.PostgreSQLDBSettingVM.InputedRestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
                     default:
                         break;
@@ -235,11 +235,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             string title = string.Empty;
             switch (kind) {
                 case FolderPathKind.BackUpFolder:
-                    if (string.IsNullOrWhiteSpace(this.BackUpFolderPath)) {
+                    if (string.IsNullOrWhiteSpace(this.InputedBackUpFolderPath)) {
                         folderFullPath = App.GetCurrentDir();
                     }
                     else {
-                        (string folderPath, string fileName) = PathUtil.GetSeparatedPath(this.BackUpFolderPath, App.GetCurrentDir());
+                        (string folderPath, string fileName) = PathUtil.GetSeparatedPath(this.InputedBackUpFolderPath, App.GetCurrentDir());
                         folderFullPath = Path.Combine(folderPath, fileName);
                     }
                     title = Properties.Resources.Title_BackupFolderSelection;
@@ -255,7 +255,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             if (this.OpenFolderDialogRequest(e)) {
                 switch (kind) {
                     case FolderPathKind.BackUpFolder:
-                        this.BackUpFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FolderName);
+                        this.InputedBackUpFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FolderName);
                         break;
                     default:
                         break;
@@ -294,12 +294,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.AccessSettingVM.LoadForKichoFugetsu();
 
             // バックアップ
-            this.BackUpNum = settings.App_BackUpNum;
-            this.BackUpFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_BackUpFolderPath);
-            this.BackUpFlagAtMinimizing = settings.App_BackUpFlagAtMinimizing;
-            this.BackUpIntervalAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
-            this.BackUpNotifyAtMinimizing = settings.App_BackUpNotifyAtMinimizing;
-            this.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
+            this.InputedBackUpNum = settings.App_BackUpNum;
+            this.InputedBackUpFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_BackUpFolderPath);
+            this.SelectedIfBackUpAtMinimizing = settings.App_BackUpFlagAtMinimizing;
+            this.InputedBackUpIntervalAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
+            this.SelectedIfNotifyBackUpAtMinimizing = settings.App_BackUpNotifyAtMinimizing;
+            this.SelectedIfBackUpAtClosing = settings.App_BackUpFlagAtClosing;
             this.SelectedBackUpCondition = (BackUpCondition)settings.App_BackUpCondition;
         }
 
@@ -323,12 +323,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             _ = this.AccessSettingVM.SaveForKichoFugetsu();
 
             // バックアップ
-            settings.App_BackUpNum = this.BackUpNum;
-            settings.App_BackUpFolderPath = Path.GetFullPath(this.BackUpFolderPath, App.GetCurrentDir());
-            settings.App_BackUpFlagAtMinimizing = this.BackUpFlagAtMinimizing;
-            settings.App_BackUpIntervalMinAtMinimizing = this.BackUpIntervalAtMinimizing;
-            settings.App_BackUpNotifyAtMinimizing = this.BackUpNotifyAtMinimizing;
-            settings.App_BackUpFlagAtClosing = this.BackUpFlagAtClosing;
+            settings.App_BackUpNum = this.InputedBackUpNum;
+            settings.App_BackUpFolderPath = Path.GetFullPath(this.InputedBackUpFolderPath, App.GetCurrentDir());
+            settings.App_BackUpFlagAtMinimizing = this.SelectedIfBackUpAtMinimizing;
+            settings.App_BackUpIntervalMinAtMinimizing = this.InputedBackUpIntervalAtMinimizing;
+            settings.App_BackUpNotifyAtMinimizing = this.SelectedIfNotifyBackUpAtMinimizing;
+            settings.App_BackUpFlagAtClosing = this.SelectedIfBackUpAtClosing;
             settings.App_BackUpCondition = (int)this.SelectedBackUpCondition;
 
             // DbBackUpManagerへ設定を反映する

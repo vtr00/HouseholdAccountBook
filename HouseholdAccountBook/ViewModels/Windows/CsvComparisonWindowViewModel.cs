@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using HouseholdAccountBook.Models.DomainModels;
+using HouseholdAccountBook.Models.ValueObjects;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -34,15 +35,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<int?>> BookChanged;
+        public event EventHandler<ChangedEventArgs<BookIdObj>> BookChanged;
         /// <summary>
         /// 帳簿項目変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<List<int>>> ActionChanged;
+        public event EventHandler<EventArgs<List<ActionIdObj>>> ActionChanged;
         /// <summary>
         /// 一致フラグ変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<int?, bool>> IsMatchChanged;
+        public event EventHandler<EventArgs<ActionIdObj, bool>> IsMatchChanged;
 
         /// <summary>
         /// 最下部までスクロール要求時イベント
@@ -99,28 +100,28 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public BookModel SelectedBookVM {
             get;
             set {
-                int? oldValue = field?.Id;
+                BookIdObj oldValue = field?.Id;
                 if (this.SetProperty(ref field, value)) {
-                    this.BookChanged?.Invoke(this, new ChangedEventArgs<int?>() { OldValue = oldValue, NewValue = value?.Id });
+                    this.BookChanged?.Invoke(this, new ChangedEventArgs<BookIdObj>() { OldValue = oldValue, NewValue = value?.Id });
                 }
             }
-        } = new() { };
+        }
         #endregion
         /// <summary>
         /// 選択された帳簿ID
         /// </summary>
         #region SelectedBookId
-        public int? SelectedBookId {
+        public BookIdObj SelectedBookId {
             get => this.SelectedBookVM?.Id;
             set {
-                int? oldValue = this.SelectedBookId;
+                BookIdObj oldValue = this.SelectedBookId;
                 // 現在の選択と異なる場合
                 if (this.SelectedBookVM?.Id != value) {
                     // 帳簿VMリストから該当する帳簿VMを選択する
                     this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == value, 0);
                     // 当てはまる帳簿がなく現在の選択と同じになった場合に変更イベントを発行する
                     if (oldValue == this.SelectedBookId) {
-                        this.BookChanged?.Invoke(this, new ChangedEventArgs<int?>() { OldValue = oldValue, NewValue = this.SelectedBookId });
+                        this.BookChanged?.Invoke(this, new ChangedEventArgs<BookIdObj>() { OldValue = oldValue, NewValue = this.SelectedBookId });
                     }
                 }
             }
@@ -192,7 +193,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// チェック数変更を通知する
         /// </summary>
-        private void RaiseCheckedCountChanged(EventArgs<int?, bool> e)
+        private void RaiseCheckedCountChanged(EventArgs<ActionIdObj, bool> e)
         {
             this.RaisePropertyChanged(nameof(this.AllCheckedCount));
             this.RaisePropertyChanged(nameof(this.SelectedCheckedCount));
@@ -366,10 +367,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
             List<CsvComparisonViewModel> vmList = [.. this.SelectedCsvComparisonVMList.Where(vm => vm.Action is null)];
             List<ActionCsvDto> recordList = [.. vmList.Select(vm => vm.Record)];
 
-            async void Registered(object sender, EventArgs<List<int>> e)
+            async void Registered(object sender, EventArgs<List<ActionIdObj>> e)
             {
                 // CSVの項目をベースに追加したので既定で一致フラグを立てる
-                foreach (int actionId in e.Value) {
+                foreach (ActionIdObj actionId in e.Value) {
                     await this.SaveIsMatchAsync(actionId, true);
                 }
 
@@ -382,7 +383,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 ActionCsvDto record = recordList[0];
                 this.AddActionRequested?.Invoke(this, new AddActionRequestEventArgs() {
                     DbHandlerFactory = this.mDbHandlerFactory,
-                    InitialBookId = this.SelectedBookVM.Id.Value,
+                    InitialBookId = this.SelectedBookVM.Id,
                     InitialRecord = record,
                     Registered = Registered
                 });
@@ -390,7 +391,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             else {
                 this.AddActionListRequested?.Invoke(this, new AddActionListRequestEventArgs() {
                     DbHandlerFactory = this.mDbHandlerFactory,
-                    InitialBookId = this.SelectedBookVM.Id.Value,
+                    InitialBookId = this.SelectedBookVM.Id,
                     InitialRecordList = recordList,
                     Registered = Registered
                 });
@@ -412,11 +413,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
             int? groupKind = null;
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 GroupInfoDao groupInfoDao = new(dbHandler);
-                var dto = await groupInfoDao.FindByActionId(this.SelectedCsvComparisonVM.Action.ActionId);
+                var dto = await groupInfoDao.FindByActionId((int)this.SelectedCsvComparisonVM.Action.ActionId);
                 groupKind = dto.GroupKind;
             }
 
-            async void Registered(object sender, EventArgs<List<int>> e)
+            async void Registered(object sender, EventArgs<List<ActionIdObj>> e)
             {
                 // 表示を更新する
                 this.ActionChanged?.Invoke(this, e);
@@ -430,7 +431,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 case (int)GroupKind.ListReg:
                     this.EditActionListRequested?.Invoke(this, new EditActionListRequestEventArgs() {
                         DbHandlerFactory = this.mDbHandlerFactory,
-                        TargetGroupId = this.SelectedCsvComparisonVM.Action.GroupId.Value,
+                        TargetGroupId = this.SelectedCsvComparisonVM.Action.GroupId,
                         Registered = Registered
                     });
                     break;
@@ -490,7 +491,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 foreach (CsvComparisonViewModel vm in this.CsvComparisonVMList) {
                     if (vm.Action is not null && !vm.IsMatch) {
                         vm.IsMatch = true;
-                        this.IsMatchChanged?.Invoke(this, new EventArgs<int?, bool>(vm.Action.ActionId, vm.IsMatch));
+                        this.IsMatchChanged?.Invoke(this, new EventArgs<ActionIdObj, bool>(vm.Action.ActionId, vm.IsMatch));
                         await this.SaveIsMatchAsync(vm.Action.ActionId, vm.IsMatch);
                     }
                 }
@@ -518,7 +519,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async void ChangeIsMatchCommand_Executed()
         {
             if (this.SelectedCsvComparisonVM.Action is not null) {
-                this.IsMatchChanged?.Invoke(this, new EventArgs<int?, bool>(this.SelectedCsvComparisonVM.Action.ActionId, this.SelectedCsvComparisonVM.IsMatch));
+                this.IsMatchChanged?.Invoke(this, new EventArgs<ActionIdObj, bool>(this.SelectedCsvComparisonVM.Action.ActionId, this.SelectedCsvComparisonVM.IsMatch));
                 await this.SaveIsMatchAsync(this.SelectedCsvComparisonVM.Action.ActionId, this.SelectedCsvComparisonVM.IsMatch);
             }
         }
@@ -559,7 +560,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         /// <param name="initialBookId">初期選択する帳簿のID</param>
         /// <returns></returns>
-        public async Task LoadAsync(int? initialBookId)
+        public async Task LoadAsync(BookIdObj initialBookId)
         {
             using FuncLog funcLog = new(new { initialBookId });
 
@@ -570,12 +571,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿VM(比較用)を更新する
         /// </summary>
         /// <param name="bookId">選択対象の帳簿ID</param>
-        public async Task UpdateBookCompListAsync(int? bookId = null)
+        public async Task UpdateBookCompListAsync(BookIdObj bookId = null)
         {
             using FuncLog funcLog = new(new { bookId });
 
             ViewModelService service = new(this.mDbHandlerFactory);
-            int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
+            BookIdObj tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             this.BookVMList = await service.UpdateBookCompListAsync();
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
@@ -685,18 +686,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     vm.ClearActionInfo();
 
                     ActionCompInfoDao actionCompInfoDao = new(dbHandler);
-                    var dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(this.SelectedBookVM.Id.Value, vm.Record.Date, vm.Record.Value);
+                    var dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync((int)this.SelectedBookVM.Id, vm.Record.Date, vm.Record.Value);
                     foreach (ActionCompInfoDto dto in dtoList) {
                         // 帳簿項目IDが使用済なら次のレコードを調べるようにする
-                        bool checkNext = this.CsvComparisonVMList.Where(tmpVM => tmpVM.Action.ActionId == dto.ActionId).Any();
+                        bool checkNext = this.CsvComparisonVMList.Where(tmpVM => (int?)tmpVM.Action?.ActionId == dto.ActionId).Any();
                         // 帳簿項目情報を紐付ける
                         if (!checkNext) {
                             vm.Action = new() {
-                                ActionId = dto.ActionId,
                                 GroupId = dto.GroupId,
-                                Item = new() { Name = dto.ItemName },
-                                Shop = new() { Name = dto.ShopName },
-                                Remark = new() { Text = dto.Remark }
+                                Item = new(dto.ItemId, dto.ItemName),
+                                Base = new(dto.ActionId, vm.Record.Date, vm.Record.Value),
+                                Shop = new(dto.ShopName),
+                                Remark = new(dto.Remark)
                             };
                             vm.IsMatch = dto.IsMatch == 1;
 
@@ -717,13 +718,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="actionId">帳簿項目ID</param>
         /// <param name="isMatch">一致フラグ</param>
         /// <returns></returns>
-        public async Task SaveIsMatchAsync(int actionId, bool isMatch)
+        public async Task SaveIsMatchAsync(ActionIdObj actionId, bool isMatch)
         {
             using FuncLog funcLog = new(new { actionId, isMatch });
 
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 HstActionDao hstActionDao = new(dbHandler);
-                _ = await hstActionDao.UpdateIsMatchByIdAsync(actionId, isMatch ? 1 : 0);
+                _ = await hstActionDao.UpdateIsMatchByIdAsync((int)actionId, isMatch ? 1 : 0);
             }
         }
     }

@@ -50,6 +50,11 @@ namespace HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract
         public bool IsOpen => this.mConnection != null && this.mConnection.State == System.Data.ConnectionState.Open;
         #endregion
 
+        static DbHandlerBase() {
+            DefaultTypeMap.MatchNamesWithUnderscores = true;
+            SqlMapper.AddTypeHandler(new DateOnlyHandler());
+        }
+
         /// <summary>
         /// <see cref="DbHandlerBase"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
@@ -57,8 +62,6 @@ namespace HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract
         public DbHandlerBase(DbConnection connection)
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
-
-            DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             this.mConnection = connection;
         }

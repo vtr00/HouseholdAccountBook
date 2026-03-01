@@ -1,6 +1,6 @@
 ﻿using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.Infrastructure.Logger;
-using HouseholdAccountBook.Models.Utilities;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Windows;
@@ -54,7 +54,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             set {
                 SeriesViewModel oldVM = field;
                 if (this.SetProperty(ref field, value)) {
-                    this.Parent.SelectedBalanceKind = value?.BalanceKind;
+                    this.Parent.SelectedBalanceKind = value?.Category.BalanceKind;
                     this.Parent.SelectedCategoryId = value?.Category.Id;
                     this.Parent.SelectedItemId = value?.Item.Id;
 
@@ -131,7 +131,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="categoryId">分類ID</param>
         /// <param name="itemId">項目ID</param>
         /// <returns></returns>
-        public async Task LoadAsync(int? categoryId = null, int? itemId = null)
+        public async Task LoadAsync(CategoryIdObj categoryId = null, ItemIdObj itemId = null)
         {
             if (this.Parent.SelectedTab != this.Tab) { return; }
 
@@ -163,24 +163,24 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Tabs.YearlyGraphTab => UnitUtil.GetYearUnit(this.Parent.FiscalStartMonth),
                 _ => throw new InvalidOperationException(),
             };
-            DateTime start = this.Parent.DisplayedStart;
-            DateTime end = this.Parent.DisplayedEnd;
+            DateOnly start = this.Parent.DisplayedStart;
+            DateOnly end = this.Parent.DisplayedEnd;
             List<string> GetHorizontalLabels()
             {
                 List<string> labels = [];
                 switch (this.Tab) {
                     case Tabs.DailyGraphTab:
-                        for (DateTime tmp = start; tmp <= end; tmp = tmp.AddDays(1)) {
+                        for (DateOnly tmp = start; tmp <= end; tmp = tmp.AddDays(1)) {
                             labels.Add($"{tmp.Day}");
                         }
                         break;
                     case Tabs.MonthlyGraphTab:
-                        for (DateTime tmp = start; tmp <= end; tmp = tmp.AddMonths(1)) {
+                        for (DateOnly tmp = start; tmp <= end; tmp = tmp.AddMonths(1)) {
                             labels.Add($"{tmp.Month}");
                         }
                         break;
                     case Tabs.YearlyGraphTab:
-                        for (DateTime tmp = start; tmp <= end; tmp = tmp.AddYears(1)) {
+                        for (DateOnly tmp = start; tmp <= end; tmp = tmp.AddYears(1)) {
                             labels.Add($"{tmp:yyyy}");
                         }
                         break;
@@ -236,12 +236,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="categoryId">選択対象の分類ID</param>
         /// <param name="itemId">洗濯対象の項目ID</param>
         /// <returns></returns>
-        private async Task UpdateGraphTabDataAsync(int? categoryId = null, int? itemId = null)
+        private async Task UpdateGraphTabDataAsync(CategoryIdObj categoryId = null, ItemIdObj itemId = null)
         {
             using FuncLog funcLog = new(new { categoryId, itemId });
 
-            int? tmpCategoryId = categoryId ?? this.Parent.SelectedCategoryId ?? null;
-            int? tmpItemId = itemId ?? this.Parent.SelectedItemId ?? null;
+            CategoryIdObj tmpCategoryId = categoryId ?? this.Parent.SelectedCategoryId ?? null;
+            ItemIdObj tmpItemId = itemId ?? this.Parent.SelectedItemId ?? null;
             Log.Vars(vars: new { tmpCategoryId, tmpItemId });
 
             // トラッカーのフォーマット文字列を取得する関数
@@ -264,9 +264,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     async Task<ObservableCollection<SeriesViewModel>> GetSeriesVMList()
                     {
                         return this.Tab switch {
-                            Tabs.DailyGraphTab => this.Parent.DisplayedTermKind switch {
-                                TermKind.Monthly => await service.LoadDailySeriesViewModelListWithinMonthAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value),
-                                TermKind.Selected => await service.LoadDailySeriesViewModelListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.StartDate, this.Parent.EndDate),
+                            Tabs.DailyGraphTab => this.Parent.DisplayedPeriodKind switch {
+                                PeriodKind.Monthly => await service.LoadDailySeriesViewModelListWithinMonthAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value),
+                                PeriodKind.Selected => await service.LoadDailySeriesViewModelListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedPeriod),
                                 _ => throw new InvalidOperationException(),
                             },
                             Tabs.MonthlyGraphTab => await service.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
@@ -278,24 +278,24 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     // グラフ表示データを設定用に絞り込む
                     switch (this.Parent.SelectedGraphKind2) {
                         case GraphKind2.CategoryGraph:
-                            tmpVMList = new(tmpVMList.Where(vm => vm.Category.Id != -1 && vm.Item.Id == -1));
+                            tmpVMList = new(tmpVMList.Where(vm => (int)vm.Category.Id != -1 && (int)vm.Item.Id == -1));
                             break;
                         case GraphKind2.ItemGraph:
-                            tmpVMList = new(tmpVMList.Where(vm => vm.Item.Id != -1));
+                            tmpVMList = new(tmpVMList.Where(vm => (int)vm.Item.Id != -1));
                             break;
                     }
                     this.GraphSeriesVMList = tmpVMList;
 
                     // グラフ表示データを設定する
                     this.GraphPlotModel.Series.Clear();
-                    List<int> sumPlus = [.. Enumerable.Repeat(0, this.GraphSeriesVMList[0].Values.Count)]; // 単位ごとの合計収入(Y軸範囲の計算に使用)
-                    List<int> sumMinus = [.. Enumerable.Repeat(0, this.GraphSeriesVMList[0].Values.Count)]; // 単位ごとの合計支出(Y軸範囲の計算に使用)
+                    List<decimal> sumPlus = [.. Enumerable.Repeat(0, this.GraphSeriesVMList[0].Values.Count)]; // 単位ごとの合計収入(Y軸範囲の計算に使用)
+                    List<decimal> sumMinus = [.. Enumerable.Repeat(0, this.GraphSeriesVMList[0].Values.Count)]; // 単位ごとの合計支出(Y軸範囲の計算に使用)
                     foreach (SeriesViewModel tmpVM in this.GraphSeriesVMList) {
                         CustomBarSeries wholeSeries = new() {
                             IsStacked = true,
                             Title = tmpVM.DisplayedName,
-                            ItemsSource = tmpVM.Values.Zip(tmpVM.StartDates, (value, date) => new GraphDatumViewModel {
-                                Value = value,
+                            ItemsSource = tmpVM.Values.Zip(tmpVM.Periods.Select(period => period.Start), (value, date) => new GraphDatumViewModel {
+                                Value = (int)value,
                                 Date = date,
                                 Item = tmpVM.Item,
                                 Category = tmpVM.Category
@@ -339,9 +339,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     async Task<ObservableCollection<SeriesViewModel>> GetGraphSeriesVMList()
                     {
                         return this.Tab switch {
-                            Tabs.DailyGraphTab => this.Parent.DisplayedTermKind switch {
-                                TermKind.Monthly => await service.LoadDailySeriesViewModelListWithinMonthAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value),
-                                TermKind.Selected => await service.LoadDailySeriesViewModelListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.StartDate, this.Parent.EndDate),
+                            Tabs.DailyGraphTab => this.Parent.DisplayedPeriodKind switch {
+                                PeriodKind.Monthly => await service.LoadDailySeriesViewModelListWithinMonthAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value),
+                                PeriodKind.Selected => await service.LoadDailySeriesViewModelListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedPeriod),
                                 _ => throw new InvalidOperationException(),
                             },
                             Tabs.MonthlyGraphTab => await service.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.SelectedBookVM.Id, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
@@ -356,8 +356,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     SeriesViewModel tmpVM = this.GraphSeriesVMList[0];
                     LineSeries series = new() {
                         Title = Properties.Resources.GraphKind1_BalanceGraph,
-                        ItemsSource = tmpVM.Values.Select((value, index) => (value, index)).Zip(tmpVM.StartDates, (tmp, date) => new GraphDatumViewModel() {
-                            Value = tmp.value,
+                        ItemsSource = tmpVM.Values.Select((value, index) => (value, index)).Zip(tmpVM.Periods.Select(period => period.Start), (tmp, date) => new GraphDatumViewModel() {
+                            Value = (int)tmp.value,
                             Date = date,
                             Index = tmp.index
                         }),
@@ -416,8 +416,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         List<GraphDatumViewModel> datumVMList = [.. (series as CustomBarSeries).ItemsSource.Cast<GraphDatumViewModel>()];
                         return vm.Category.Id == datumVMList[0].Category.Id && vm.Item.Id == datumVMList[0].Item.Id;
                     }) as CustomBarSeries).ActualFillColor,
-                    ItemsSource = vm.Values.Zip(vm.StartDates, (value, date) => new GraphDatumViewModel {
-                        Value = value,
+                    ItemsSource = vm.Values.Zip(vm.Periods.Select(period => period.Start), (value, date) => new GraphDatumViewModel {
+                        Value = (int)value,
                         Date = date,
                         Item = vm.Item,
                         Category = vm.Category

@@ -24,15 +24,15 @@
             <Setter Property="Background" Value="#FFEEE3FB"/>
             <Style.Triggers>
                 <!-- 分類小計 -->
-                <DataTrigger Binding="{Binding Item.Id}" Value="-1">
+                <DataTrigger Binding="{Binding Item.Id.Value}" Value="-1">
                     <Setter Property="Background" Value="#FFFFFFB0"/>
                 </DataTrigger>
                 <!-- 収支小計 -->
-                <DataTrigger Binding="{Binding Category.Id}" Value="-1">
+                <DataTrigger Binding="{Binding Category.Id.Value}" Value="-1">
                     <Setter Property="Background" Value="#FFB0FFB0"/>
                 </DataTrigger>
                 <!-- 差引損益/残高 -->
-                <DataTrigger Binding="{Binding BalanceKind}" Value="-1">
+                <DataTrigger Binding="{Binding Category.BalanceKind}" Value="-1">
                     <Setter Property="Background" Value="#FFFFB0B0"/>
                 </DataTrigger>
             </Style.Triggers>
@@ -437,10 +437,10 @@
                                     <!-- 項目名 -->
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" MinWidth="70" Binding="{Binding ActionWithBalance.Action.Item.Name}"/>
                                     <!-- 収入 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Income}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding ActionWithBalance.Action.Amount.Income, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Income}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding ActionWithBalance.Action.Income, Converter={StaticResource IntToMoneyDisplayConverter}}" 
                                                     ElementStyle="{StaticResource TextAlignRight}"/>
                                     <!-- 支出 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Expenses}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding ActionWithBalance.Action.Amount.Expenses, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Expenses}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding ActionWithBalance.Action.Expenses, Converter={StaticResource IntToMoneyDisplayConverter}}" 
                                                     ElementStyle="{StaticResource TextAlignRight}"/>
                                     <!-- 残高 -->
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Balance}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding ActionWithBalance.Balance, Converter={StaticResource IntToMoneyDisplayConverter}}" 

@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using System.Collections.ObjectModel;
@@ -19,7 +20,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// ID
         /// </summary>
-        public int Id { get; init; }
+        public IdObj Id { get; init; }
 
         /// <summary>
         /// ソート順

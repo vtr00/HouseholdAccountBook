@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Models.DbHandlers;
 using HouseholdAccountBook.Models.Infrastructure;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -29,10 +30,10 @@ namespace HouseholdAccountBook.ViewModels.Settings
         #endregion
 
         /// <summary>
-        /// DBファイルパス
+        /// 入力されたDBファイルパス
         /// </summary>
-        #region DBFilePath
-        public string DBFilePath {
+        #region InputedDBFilePath
+        public string InputedDBFilePath {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -49,7 +50,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             this.ProviderNameDic.Clear();
             OleDbHandler.GetOleDbProvider().ForEach(this.ProviderNameDic.Add);
             this.SelectedProviderName = settings.App_Access_Provider;
-            this.DBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_Access_DBFilePath);
+            this.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_Access_DBFilePath);
         }
 
         /// <summary>
@@ -73,7 +74,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             Properties.Settings settings = Properties.Settings.Default;
 
             settings.App_Access_Provider = this.SelectedProviderName;
-            settings.App_Access_DBFilePath = Path.GetFullPath(this.DBFilePath, App.GetCurrentDir());
+            settings.App_Access_DBFilePath = Path.GetFullPath(this.InputedDBFilePath, App.GetCurrentDir());
 
             return true;
         }
@@ -95,6 +96,6 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 設定を保存可能か
         /// </summary>
         /// <returns>設定の保存可否</returns>
-        public bool CanSave() => !(string.IsNullOrWhiteSpace(this.SelectedProviderName) || string.IsNullOrWhiteSpace(this.DBFilePath));
+        public bool CanSave() => !(string.IsNullOrWhiteSpace(this.SelectedProviderName) || string.IsNullOrWhiteSpace(this.InputedDBFilePath));
     }
 }

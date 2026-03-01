@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.DomainModels;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 using System.Collections.Generic;
@@ -13,44 +14,36 @@ namespace HouseholdAccountBook.ViewModels.Component
     {
         #region プロパティ
         /// <summary>
-        /// 収支種別
-        /// </summary>
-        public int BalanceKind { get; set; } = -1;
-        /// <summary>
         /// 収支名
         /// </summary>
-        public string BalanceName => this.BalanceKind == -1 ? string.Empty : UiConstants.BalanceKindStr[(BalanceKind)this.BalanceKind];
+        public string BalanceName => UiConstants.BalanceKindStr[this.Category.BalanceKind];
 
         /// <summary>
         /// 分類
         /// </summary>
-        public CategoryModel Category { get; set; } = new CategoryModel();
+        public CategoryModel Category { get; set; } = new(-1, string.Empty, BalanceKind.Others);
         /// <summary>
         /// 項目
         /// </summary>
-        public ItemModel Item { get; set; } = new ItemModel();
+        public ItemModel Item { get; set; } = new(-1, string.Empty);
 
         /// <summary>
         /// 値
         /// </summary>
-        public List<int> Values { get; set; }
+        public List<decimal> Values { get; set; } = [];
         /// <summary>
-        /// 開始日
+        /// 期間
         /// </summary>
-        public List<DateTime> StartDates { get; set; }
-        /// <summary>
-        /// 終了日
-        /// </summary>
-        public List<DateTime> EndDates { get; set; }
+        public List<PeriodObj<DateOnly>> Periods { get; set; } = [];
 
         /// <summary>
         /// 平均
         /// </summary>
-        public int? Average { get; set; }
+        public decimal? Average { get; set; }
         /// <summary>
         /// 合計
         /// </summary>
-        public int? Total { get; set; }
+        public decimal? Total { get; set; }
 
         /// <summary>
         /// その他名称
@@ -96,7 +89,6 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <param name="summary">コピー元の概要VM</param>
         public SeriesViewModel(SummaryViewModel summary)
         {
-            this.BalanceKind = summary.BalanceKind;
             this.Category = summary.Category;
             this.Item = summary.Item;
             this.OtherName = summary.OtherName;

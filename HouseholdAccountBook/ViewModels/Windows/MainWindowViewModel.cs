@@ -28,6 +28,7 @@ using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ViewModels.UiConstants;
 using HouseholdAccountBook.Models.DomainModels;
+using HouseholdAccountBook.Models.ValueObjects;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -51,7 +52,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿選択変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<int?>> SelectedBookChanged;
+        public event EventHandler<ChangedEventArgs<BookIdObj>> SelectedBookChanged;
         /// <summary>
         /// グラフ種別1選択変更時イベント
         /// </summary>
@@ -147,7 +148,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 期間選択要求時イベント
         /// </summary>
-        public event EventHandler<SelectTermRequestEventArgs> SelectTermRequested;
+        public event EventHandler<SelectPeriodRequestEventArgs> SelectTermRequested;
         /// <summary>
         /// 設定要求時イベント
         /// </summary>
@@ -259,21 +260,21 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 選択された収支種別
         /// </summary>
-        public int? SelectedBalanceKind { get; set; }
+        public BalanceKind? SelectedBalanceKind { get; set; }
         /// <summary>
         /// 選択された分類ID
         /// </summary>
-        public int? SelectedCategoryId { get; set; }
+        public CategoryIdObj SelectedCategoryId { get; set; }
         /// <summary>
         /// 選択された項目ID
         /// </summary>
-        public int? SelectedItemId { get; set; }
+        public ItemIdObj SelectedItemId { get; set; }
 
         /// <summary>
         /// 表示開始日付
         /// </summary>
         #region DisplayedStart
-        public DateTime DisplayedStart => this.SelectedTab switch {
+        public DateOnly DisplayedStart => this.SelectedTab switch {
             Tabs.BooksTab or Tabs.DailyGraphTab => this.StartDate,
             Tabs.MonthlyListTab or Tabs.MonthlyGraphTab => this.DisplayedStartMonth,
             Tabs.YearlyGraphTab or Tabs.YearlyListTab => this.DisplayedStartYear,
@@ -284,11 +285,20 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 表示終了日付
         /// </summary>
         #region DisplayedEnd
-        public DateTime DisplayedEnd => this.SelectedTab switch {
+        public DateOnly DisplayedEnd => this.SelectedTab switch {
             Tabs.BooksTab or Tabs.DailyGraphTab => this.EndDate,
             Tabs.MonthlyListTab or Tabs.MonthlyGraphTab => this.DisplayedEndMonth,
             Tabs.YearlyGraphTab or Tabs.YearlyListTab => this.DisplayedEndYear,
-            _ => this.EndDate,
+            _ => this.EndDate
+        };
+        /// <summary>
+        /// 表示期間
+        /// </summary>
+        public PeriodObj<DateOnly> DisplayedPeriod => this.SelectedTab switch {
+            Tabs.BooksTab or Tabs.DailyGraphTab => new(this.StartDate, this.EndDate),
+            Tabs.MonthlyListTab or Tabs.MonthlyGraphTab => new(this.DisplayedStartMonth, this.DisplayedEndMonth),
+            Tabs.YearlyGraphTab or Tabs.YearlyListTab => new(this.DisplayedStartYear, this.DisplayedEndYear),
+            _ => new(this.StartDate, this.EndDate)
         };
         #endregion
 
@@ -315,10 +325,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 表示区間種別
         /// </summary>
         #region DisplayedTermKind
-        public TermKind DisplayedTermKind {
+        public PeriodKind DisplayedPeriodKind {
             get {
-                DateTime lastDate = this.StartDate.GetLastDateOfMonth();
-                return (this.StartDate.Day == 1 && DateTime.Equals(this.EndDate.Date, lastDate.Date)) ? TermKind.Monthly : TermKind.Selected;
+                DateOnly lastDate = this.StartDate.GetLastDateOfMonth();
+                return (this.StartDate.Day == 1 && this.EndDate == lastDate) ? PeriodKind.Monthly : PeriodKind.Selected;
             }
         }
         #endregion
@@ -327,10 +337,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 表示月
         /// </summary>
         #region DisplayedMonth
-        public DateTime? DisplayedMonth {
-            get => this.DisplayedTermKind switch {
-                TermKind.Monthly => (DateTime?)this.StartDate,
-                TermKind.Selected => null,
+        public DateOnly? DisplayedMonth {
+            get => this.DisplayedPeriodKind switch {
+                PeriodKind.Monthly => (DateOnly?)this.StartDate,
+                PeriodKind.Selected => null,
                 _ => null,
             };
             set {
@@ -361,37 +371,37 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 表示開始日
         /// </summary>
         #region StartDate
-        public DateTime StartDate {
+        public DateOnly StartDate {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
                     this.RaisePropertyChanged(nameof(this.DisplayedMonth));
                 }
             }
-        } = DateTime.Now.GetFirstDateOfMonth();
+        } = DateOnlyExtensions.Today.GetFirstDateOfMonth();
         #endregion
         /// <summary>
         /// 表示終了日
         /// </summary>
         #region EndDate
-        public DateTime EndDate {
+        public DateOnly EndDate {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
                     this.RaisePropertyChanged(nameof(this.DisplayedMonth));
                 }
             }
-        } = DateTime.Now.GetLastDateOfMonth();
+        } = DateOnlyExtensions.Today.GetLastDateOfMonth();
         #endregion
 
         /// <summary>
         /// 表示年
         /// </summary>
         #region DisplayedYear
-        public DateTime DisplayedYear {
+        public DateOnly DisplayedYear {
             get;
             set {
-                DateTime oldDisplayedYear = field;
+                DateOnly oldDisplayedYear = field;
                 if (this.SetProperty(ref field, value)) {
                     if (!this.mOnUpdateDisplayedDate) {
                         this.mOnUpdateDisplayedDate = true;
@@ -409,19 +419,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     this.RaisePropertyChanged(nameof(this.DisplayedYears));
                 }
             }
-        } = DateTime.Now;
+        } = DateOnlyExtensions.Today;
         #endregion
 
         /// <summary>
         /// 表示月リスト(月別一覧の月)
         /// </summary>
         #region DisplayedMonths
-        public ObservableCollection<DateTime> DisplayedMonths {
+        public ObservableCollection<DateOnly> DisplayedMonths {
             get {
-                DateTime tmpMonth = this.DisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
+                DateOnly tmpMonth = this.DisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
 
                 // 表示する月の文字列を作成する
-                ObservableCollection<DateTime> displayedMonths = [];
+                ObservableCollection<DateOnly> displayedMonths = [];
                 for (int i = 0; i < 12; ++i) {
                     displayedMonths.Add(tmpMonth);
                     tmpMonth = tmpMonth.AddMonths(1);
@@ -434,20 +444,20 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 表示開始月
         /// </summary>
-        public DateTime DisplayedStartMonth => this.DisplayedMonths.First();
+        public DateOnly DisplayedStartMonth => this.DisplayedMonths.First();
         /// <summary>
         /// 表示終了月
         /// </summary>
-        public DateTime DisplayedEndMonth => this.DisplayedMonths.Last();
+        public DateOnly DisplayedEndMonth => this.DisplayedMonths.Last();
 
         /// <summary>
         /// 表示年リスト(年別一覧の年)
         /// </summary>
         #region DisplayedYears
-        public ObservableCollection<DateTime> DisplayedYears {
+        public ObservableCollection<DateOnly> DisplayedYears {
             get {
-                DateTime tmpYear = this.DisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth).AddYears(-9);
-                ObservableCollection<DateTime> displayedYears = [];
+                DateOnly tmpYear = this.DisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth).AddYears(-9);
+                ObservableCollection<DateOnly> displayedYears = [];
                 for (int i = 0; i < 10; ++i) {
                     displayedYears.Add(tmpYear);
                     tmpYear = tmpYear.AddYears(1);
@@ -460,11 +470,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 表示開始年
         /// </summary>
-        public DateTime DisplayedStartYear => this.DisplayedYears.First();
+        public DateOnly DisplayedStartYear => this.DisplayedYears.First();
         /// <summary>
         /// 表示終了年
         /// </summary>
-        public DateTime DisplayedEndYear => this.DisplayedYears.Last();
+        public DateOnly DisplayedEndYear => this.DisplayedYears.Last();
         #endregion
 
         #region プロパティ(グラフ共通)
@@ -1343,7 +1353,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         /// <returns></returns>
         /// <remarks>帳簿/日別一覧タブを選択している</remarks>
-        private bool GoToLastMonthCommand_CanExecute() => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedTermKind == TermKind.Monthly;
+        private bool GoToLastMonthCommand_CanExecute() => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly;
         /// <summary>
         /// 先月表示コマンド処理
         /// </summary>
@@ -1361,10 +1371,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private bool GoToThisMonthCommand_CanExecute()
         {
-            DateTime thisMonth = DateTime.Today.GetFirstDateOfMonth();
+            DateOnly thisMonth = DateOnlyExtensions.Today.GetFirstDateOfMonth();
             // 帳簿/月間一覧タブを選択している かつ 今月が表示されていない
             return (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) &&
-                   (this.DisplayedTermKind == TermKind.Selected || !(thisMonth <= this.DisplayedMonth && this.DisplayedMonth < thisMonth.AddMonths(1)));
+                   (this.DisplayedPeriodKind == PeriodKind.Selected || !(thisMonth <= this.DisplayedMonth && this.DisplayedMonth < thisMonth.AddMonths(1)));
         }
         /// <summary>
         /// 今月表示コマンド処理
@@ -1372,7 +1382,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async void GoToThisMonthCommand_Executed()
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                this.DisplayedMonth = DateTime.Now.GetFirstDateOfMonth();
+                this.DisplayedMonth = DateOnlyExtensions.Today.GetFirstDateOfMonth();
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
             }
         }
@@ -1382,7 +1392,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         /// <returns></returns>
         /// <remarks>帳簿/月間一覧タブを選択している</remarks>
-        private bool GoToNextMonthCommand_CanExecute() => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedTermKind == TermKind.Monthly;
+        private bool GoToNextMonthCommand_CanExecute() => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly;
         /// <summary>
         /// 翌月表示コマンド処理
         /// </summary>
@@ -1404,19 +1414,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async void SelectTermCommand_Executed()
         {
-            SelectTermRequestEventArgs e = new() {
+            SelectPeriodRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
-                TermKind = this.DisplayedTermKind,
+                TermKind = this.DisplayedPeriodKind,
                 Month = this.DisplayedMonth,
-                StartDate = this.StartDate,
-                EndDate = this.EndDate,
+                Period = new(this.StartDate, this.EndDate)
             };
 
             this.SelectTermRequested?.Invoke(this, e);
             if (e.Result) {
                 using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    this.StartDate = e.StartDate;
-                    this.EndDate = e.EndDate;
+                    this.StartDate = e.Period.Start;
+                    this.EndDate = e.Period.End;
 
                     await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
                 }
@@ -1448,7 +1457,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <returns></returns>
         private bool GoToThisYearCommand_CanExecute()
         {
-            DateTime thisYear = DateTime.Now.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
+            DateOnly thisYear = DateOnlyExtensions.Today.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
             // 月別一覧/月別グラフ/年別一覧/年別グラフタブを選択している かつ 今年が表示されていない
             return (this.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab) &&
                    !(thisYear <= this.DisplayedYear && this.DisplayedYear < thisYear.AddYears(1));
@@ -1459,7 +1468,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async void GoToThisYearCommand_Executed()
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                this.DisplayedYear = DateTime.Now.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
+                this.DisplayedYear = DateOnlyExtensions.Today.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
                 await this.UpdateAsync(isUpdateBookList: true);
             }
         }
@@ -1625,7 +1634,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedBookChanged));
 
                 using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create(methodName: nameof(this.SelectedBookChanged))) {
-                    settings.MainWindow_SelectedBookId = e.NewValue ?? -1;
+                    settings.MainWindow_SelectedBookId = (int?)e.NewValue ?? -1;
                     settings.Save();
 
                     await this.UpdateAsync(isScroll: true);
@@ -1818,13 +1827,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿リストを更新する
         /// </summary>
         /// <param name="bookId">選択対象の帳簿ID</param>
-        public async Task UpdateBookListAsync(int? bookId = null)
+        public async Task UpdateBookListAsync(BookIdObj bookId = null)
         {
             using FuncLog funcLog = new(new { bookId });
 
             ViewModelService service = new(this.mDbHandlerFactory);
-            int? tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            var tmpBookVMList = await service.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedStart, this.DisplayedEnd);
+            BookIdObj tmpBookId = bookId ?? this.SelectedBookVM?.Id;
+            ObservableCollection<BookModel> tmpBookVMList = await service.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedPeriod);
             this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0); // 先に選択しておく
             this.BookVMList = tmpBookVMList;
         }

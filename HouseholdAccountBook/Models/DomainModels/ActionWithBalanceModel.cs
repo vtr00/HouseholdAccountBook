@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.Models.ValueObjects;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,11 +13,11 @@ namespace HouseholdAccountBook.Models.DomainModels
         /// <summary>
         /// 帳簿項目
         /// </summary>
-        public ActionModel Action { get; init; }
+        public ActionModel Action { get; init; } = new();
 
         /// <summary>
         /// 残高
         /// </summary>
-        public int Balance { get; init; }
+        public decimal Balance { get; init; } = 0;
     }
 }

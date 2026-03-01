@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Models.Infrastructure.DbHandlers;
 using HouseholdAccountBook.Models.Infrastructure.Logger;
 using HouseholdAccountBook.Models.Utilities.Args;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.Views.Extensions;
 using System;
@@ -19,7 +20,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 登録時イベント
         /// </summary>
-        public event EventHandler<EventArgs<List<int>>> Registrated {
+        public event EventHandler<EventArgs<List<ActionIdObj>>> Registrated {
             add => this.WVM.Registrated += value;
             remove => this.WVM.Registrated -= value;
         }
@@ -34,7 +35,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="initialBookId">初期選択する帳簿ID</param>
         /// <param name="initialMonth">初期選択する年月</param>
         /// <param name="initialDate">初期選択する日付</param>
-        public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, DateTime? initialMonth, DateTime? initialDate)
+        public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate)
             : this(owner, dbHandlerFactory, initialBookId, initialMonth, initialDate, null, RegistrationKind.Add) { }
 
         /// <summary>
@@ -44,7 +45,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="targetGroupId">複製/編集時、複製/編集対象の帳簿項目のグループID</param>
         /// <param name="regKind">登録種別</param>
-        public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int targetGroupId, RegistrationKind regKind = RegistrationKind.Edit)
+        public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, GroupIdObj targetGroupId, RegistrationKind regKind = RegistrationKind.Edit)
             : this(owner, dbHandlerFactory, null, null, null, targetGroupId, regKind) { }
 
         /// <summary>
@@ -57,7 +58,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="initialDate">追加時、初期選択する日付</param>
         /// <param name="targetGroupId">複製/編集時、複製/編集対象の帳簿項目のグループID</param>
         /// <param name="regKind">登録種別</param>
-        private MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, DateTime? initialMonth, DateTime? initialDate, int? targetGroupId,
+        private MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate, GroupIdObj targetGroupId,
             RegistrationKind regKind)
         {
             using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, targetGroupId, regKind });

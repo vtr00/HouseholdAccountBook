@@ -78,7 +78,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// SQLite設定
         /// </summary>
         #region SQLiteSettingVM
-        public FileDbSettingViewModel SQLiteSettingVM {
+        public SQLiteSettingViewModel SQLiteSettingVM {
             get;
             set => this.SetProperty(ref field, value);
         } = new();
@@ -102,7 +102,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             string filter = string.Empty;
             switch (kind) {
                 case FilePathKind.DumpExeFile: {
-                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.DumpExePath, App.GetCurrentDir());
+                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.InputedDumpExePath, App.GetCurrentDir());
                     if (string.IsNullOrWhiteSpace(directory)) {
                         directory = App.GetCurrentDir();
                     }
@@ -110,7 +110,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     break;
                 }
                 case FilePathKind.RestoreExeFile: {
-                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.RestoreExePath, App.GetCurrentDir());
+                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.InputedRestoreExePath, App.GetCurrentDir());
                     if (string.IsNullOrWhiteSpace(directory)) {
                         directory = App.GetCurrentDir();
                     }
@@ -121,13 +121,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     switch (this.SelectedDBKind) {
                         case DBKind.SQLite: {
                             checkFileExists = false;
-                            (directory, fileName) = PathUtil.GetSeparatedPath(this.SQLiteSettingVM.DBFilePath, App.GetCurrentDir());
+                            (directory, fileName) = PathUtil.GetSeparatedPath(this.SQLiteSettingVM.InputedDBFilePath, App.GetCurrentDir());
                             filter = $"{Properties.Resources.FileSelectFilter_SQLiteFile}|*.db;*.sqlite;*.sqlite3";
                             break;
                         }
                         case DBKind.Access: {
                             checkFileExists = false;
-                            (directory, fileName) = PathUtil.GetSeparatedPath(this.AccessSettingVM.DBFilePath, App.GetCurrentDir());
+                            (directory, fileName) = PathUtil.GetSeparatedPath(this.AccessSettingVM.InputedDBFilePath, App.GetCurrentDir());
                             filter = $"{Properties.Resources.FileSelectFilter_AccessFile}|*.mdb;*.accdb";
                             break;
                         }
@@ -146,18 +146,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
             if (this.OpenFileDialogRequest(e)) {
                 switch (kind) {
                     case FilePathKind.DumpExeFile:
-                        this.PostgreSQLDBSettingVM.DumpExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                        this.PostgreSQLDBSettingVM.InputedDumpExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
                     case FilePathKind.RestoreExeFile:
-                        this.PostgreSQLDBSettingVM.RestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                        this.PostgreSQLDBSettingVM.InputedRestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
                     case FilePathKind.DbFile:
                         switch (this.SelectedDBKind) {
                             case DBKind.SQLite:
-                                this.SQLiteSettingVM.DBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                                this.SQLiteSettingVM.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                                 break;
                             case DBKind.Access:
-                                this.AccessSettingVM.DBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                                this.AccessSettingVM.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                                 break;
                         }
                         break;
@@ -191,30 +191,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         protected override void OKCommand_Executed()
         {
-            bool result = false;
-            Properties.Settings settings = Properties.Settings.Default;
-            settings.App_SelectedDBKind = (int)this.SelectedDBKind;
-
-            switch (this.SelectedDBKind) {
-                case DBKind.PostgreSQL: {
-                    result = this.PostgreSQLDBSettingVM.Save(this.GetPassword);
-                    break;
-                }
-                case DBKind.SQLite: {
-                    result = this.SQLiteSettingVM.Save();
-                    break;
-                }
-                case DBKind.Access: {
-                    result = this.AccessSettingVM.Save();
-                    break;
-                }
-                case DBKind.Undefined:
-                default:
-                    break;
-            }
+            bool result = this.Save();
 
             if (result) {
-                settings.Save();
                 base.OKCommand_Executed();
             }
         }
@@ -265,6 +244,39 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             // Access
             this.AccessSettingVM.Load();
+        }
+
+        /// <summary>
+        /// 保存処理
+        /// </summary>
+        /// <returns>保存結果</returns>
+        public bool Save()
+        {
+            bool result = false;
+            Properties.Settings settings = Properties.Settings.Default;
+            settings.App_SelectedDBKind = (int)this.SelectedDBKind;
+
+            switch (this.SelectedDBKind) {
+                case DBKind.PostgreSQL: {
+                    result = this.PostgreSQLDBSettingVM.Save(this.GetPassword);
+                    break;
+                }
+                case DBKind.SQLite: {
+                    result = this.SQLiteSettingVM.Save();
+                    break;
+                }
+                case DBKind.Access: {
+                    result = this.AccessSettingVM.Save();
+                    break;
+                }
+                case DBKind.Undefined:
+                default:
+                    break;
+            }
+            if (result) {
+                settings.Save();
+            }
+            return result;
         }
 
         public override void AddEventHandlers()

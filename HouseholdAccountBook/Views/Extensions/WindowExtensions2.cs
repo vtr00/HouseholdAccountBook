@@ -1,7 +1,9 @@
 ﻿using HouseholdAccountBook.Models.Infrastructure.Logger;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using Microsoft.Win32;
 using System;
+using System.Linq;
 using System.Windows;
 
 namespace HouseholdAccountBook.Views.Extensions

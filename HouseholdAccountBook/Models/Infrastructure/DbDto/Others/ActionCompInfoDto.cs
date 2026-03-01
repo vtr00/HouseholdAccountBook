@@ -17,6 +17,10 @@ namespace HouseholdAccountBook.Models.Infrastructure.DbDto.Others
         /// </summary>
         public int ActionId { get; set; } = -1;
         /// <summary>
+        /// 項目ID
+        /// </summary>
+        public int ItemId { get; set; } = -1;
+        /// <summary>
         /// 項目名
         /// </summary>
         public string ItemName { get; set; } = string.Empty;

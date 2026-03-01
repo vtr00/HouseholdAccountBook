@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
+﻿using HouseholdAccountBook.Models.ValueObjects;
+using HouseholdAccountBook.ViewModels.Abstract;
 
 namespace HouseholdAccountBook.ViewModels.Component
 {
@@ -21,7 +22,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 帳簿/項目ID
         /// </summary>
-        public int Id { get; init; }
+        public IdObj Id { get; init; }
 
         /// <summary>
         /// 表示名
