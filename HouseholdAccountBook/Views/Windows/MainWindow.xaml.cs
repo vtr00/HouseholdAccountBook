@@ -6,6 +6,7 @@ using HouseholdAccountBook.Models.Utilities.Extensions;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views.Extensions;
+using Notifications.Wpf.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -141,7 +142,7 @@ namespace HouseholdAccountBook.Views.Windows
                 };
                 this.mALRW.Show();
             };
-            // 移動追加要求イベントを登録する
+            // 移動複製要求イベントを登録する
             this.WVM.CopyMoveRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.CopyMoveRequested));
 
@@ -212,18 +213,17 @@ namespace HouseholdAccountBook.Views.Windows
 
                 TermWindow stw = null;
                 switch (e.TermKind) {
-                    case TermKind.Monthly:
+                    case PeriodKind.Monthly:
                         stw = new TermWindow(this, e.DbHandlerFactory, e.Month.Value);
                         break;
-                    case TermKind.Selected:
-                        stw = new TermWindow(this, e.DbHandlerFactory, e.StartDate, e.EndDate);
+                    case PeriodKind.Selected:
+                        stw = new TermWindow(this, e.DbHandlerFactory, e.Period);
                         break;
                 }
                 stw.SetIsModal(true);
                 e.Result = stw.ShowDialog() == true;
                 if (e.Result) {
-                    e.StartDate = stw.WVM.StartDate;
-                    e.EndDate = stw.WVM.EndDate;
+                    e.Period = stw.WVM.SelectedPeriod;
                 }
             };
             // 設定要求イベントを登録する
@@ -358,18 +358,18 @@ namespace HouseholdAccountBook.Views.Windows
         {
             switch (this.WVM.SelectedTab) {
                 case Tabs.BooksTab: {
-                    IEnumerable<DataGridExtensions.ColumnInfo> columnInfos = this._actionDataGrid.GetColumnInfo();
-                    await this.WVM.BookTabVM.ExportCSVFileAsync(columnInfos);
+                    List<List<string>> rows = this._actionDataGrid.ExtractDisplayValues();
+                    await this.WVM.BookTabVM.ExportCSVFileAsync(rows);
                     break;
                 }
                 case Tabs.MonthlyListTab: {
-                    IEnumerable<DataGridExtensions.ColumnInfo> columnInfos = this._monthlyDataGrid.GetColumnInfo();
-                    await this.WVM.MonthlySummaryTabVM.ExportCSVFileAsync(columnInfos);
+                    List<List<string>> rows = this._monthlyDataGrid.ExtractDisplayValues();
+                    await this.WVM.YearlySummaryTabVM.ExportCSVFileAsync(rows);
                     break;
                 }
                 case Tabs.YearlyListTab: {
-                    IEnumerable<DataGridExtensions.ColumnInfo> columnInfos = this._yearlyDataGrid.GetColumnInfo();
-                    await this.WVM.YearlySummaryTabVM.ExportCSVFileAsync(columnInfos);
+                    List<List<string>> rows = this._yearlyDataGrid.ExtractDisplayValues();
+                    await this.WVM.YearlySummaryTabVM.ExportCSVFileAsync(rows);
                     break;
                 }
             }

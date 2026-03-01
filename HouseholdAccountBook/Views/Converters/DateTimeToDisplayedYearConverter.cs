@@ -16,7 +16,9 @@ namespace HouseholdAccountBook.Views.Converters
             }
             else if (value is DateTime dateTime) {
                 return $"{dateTime:yyyy}";
-
+            }
+            else if (value is DateOnly dateOnly) {
+                return $"{dateOnly:yyyy}";
             }
             throw new NotImplementedException();
         }

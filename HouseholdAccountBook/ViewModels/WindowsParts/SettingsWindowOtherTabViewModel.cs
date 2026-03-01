@@ -43,20 +43,20 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         #region カレンダー
         /// <summary>
-        /// 開始月
+        /// 入力された開始月
         /// </summary>
-        #region StartMonth
-        public int StartMonth {
+        #region InputedStartMonth
+        public int InputedStartMonth {
             get;
             set => this.SetProperty(ref field, value);
         }
         #endregion
 
         /// <summary>
-        /// 国民の祝日CSV URI
+        /// 入力された国民の祝日CSV URI
         /// </summary>
-        #region NationalHolidayCsvURI
-        public string NationalHolidayCsvURI {
+        #region InputedNationalHolidayCsvURI
+        public string InputedNationalHolidayCsvURI {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -82,10 +82,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
 
         /// <summary>
-        /// 国民の祝日CSV 日付インデックス(1開始)
+        /// 入力された国民の祝日CSV 日付インデックス(1開始)
         /// </summary>
-        #region NationalHolidayCsvDateIndex
-        public int NationalHolidayCsvDateIndex {
+        #region InoutedNationalHolidayCsvDateIndex
+        public int InputedNationalHolidayCsvDateIndex {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -116,19 +116,19 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         #region ログ
         /// <summary>
-        /// 操作ログ出力
+        /// 選択された操作ログ出力の有無
         /// </summary>
-        #region OutputOperationLog
-        public bool OutputOperationLog {
+        #region SelectedIfOutputOperationLog
+        public bool SelectedIfOutputOperationLog {
             get;
             set => this.SetProperty(ref field, value);
         }
         #endregion
         /// <summary>
-        /// 操作ログ数
+        /// 入力された操作ログ数
         /// </summary>
-        #region OperationLogNum
-        public int OperationLogNum {
+        #region InputedOperationLogNum
+        public int InputedOperationLogNum {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -158,29 +158,29 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
 
         /// <summary>
-        /// ウィンドウログ出力
+        /// 選択されたウィンドウログ出力の有無
         /// </summary>
-        #region OutputWindowLog
-        public bool OutputWindowLog {
+        #region SelectedIfOutputWindowLog
+        public bool SelectedIfOutputWindowLog {
             get;
             set => this.SetProperty(ref field, value);
         }
         #endregion
         /// <summary>
-        /// ウィンドウログ数
+        /// 入力されたウィンドウログ数
         /// </summary>
-        #region WindowLogNum
-        public int WindowLogNum {
+        #region InputedWindowLogNum
+        public int InputedWindowLogNum {
             get;
             set => this.SetProperty(ref field, value);
         }
         #endregion
 
         /// <summary>
-        /// 捕捉されない例外ログ数
+        /// 入力された捕捉されない例外ログ数
         /// </summary>
-        #region UnhandledExceptionLogNum
-        public int UnhandledExceptionLogNum {
+        #region InputedUnhandledExceptionLogNum
+        public int InputedUnhandledExceptionLogNum {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -322,23 +322,23 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.SelectedCultureName = settings.App_CultureName;
 
             // カレンダー情報
-            this.StartMonth = settings.App_StartMonth;
-            this.NationalHolidayCsvURI = settings.App_NationalHolidayCsv_Uri;
+            this.InputedStartMonth = settings.App_StartMonth;
+            this.InputedNationalHolidayCsvURI = settings.App_NationalHolidayCsv_Uri;
             this.NationalHolidayTextEncodingList = GetTextEncodingList();
             this.SelectedNationalHolidayTextEncoding = settings.App_NationalHolidayCsv_TextEncoding;
-            this.NationalHolidayCsvDateIndex = settings.App_NationalHolidayCsv_DateIndex + 1;
+            this.InputedNationalHolidayCsvDateIndex = settings.App_NationalHolidayCsv_DateIndex + 1;
 
             // ウィンドウ情報
             this.IsPositionSaved = settings.App_IsPositionSaved;
             this.WindowSettingVMList = LoadWindowSettings();
 
             // ログ情報
-            this.OutputOperationLog = settings.App_OutputFlag_OperationLog;
-            this.OperationLogNum = settings.App_OperationLogNum;
+            this.SelectedIfOutputOperationLog = settings.App_OutputFlag_OperationLog;
+            this.InputedOperationLogNum = settings.App_OperationLogNum;
             this.SelectedLogLevel = (Log.LogLevel)settings.App_OperationLogLevel;
-            this.OutputWindowLog = settings.App_OutputFlag_WindowLog;
-            this.WindowLogNum = settings.App_WindowLogNum;
-            this.UnhandledExceptionLogNum = settings.App_UnhandledExceptionLogNum;
+            this.SelectedIfOutputWindowLog = settings.App_OutputFlag_WindowLog;
+            this.InputedWindowLogNum = settings.App_WindowLogNum;
+            this.InputedUnhandledExceptionLogNum = settings.App_UnhandledExceptionLogNum;
         }
 
         public override void AddEventHandlers()
@@ -392,7 +392,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     Width = settings.SettingsWindow_Width, Height = settings.SettingsWindow_Height
                 },
                 new WindowSettingViewModel(){
-                    Title = Properties.Resources.Title_TermSelectionWindow,
+                    Title = Properties.Resources.Title_PeriodSelectionWindow,
                     Left = settings.TermWindow_Left, Top = settings.TermWindow_Top,
                     Width = -1, Height = -1
                 },
@@ -418,21 +418,21 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             settings.App_CultureName = this.SelectedCultureName;
 
             // カレンダー情報
-            settings.App_StartMonth = this.StartMonth;
-            settings.App_NationalHolidayCsv_Uri = this.NationalHolidayCsvURI;
+            settings.App_StartMonth = this.InputedStartMonth;
+            settings.App_NationalHolidayCsv_Uri = this.InputedNationalHolidayCsvURI;
             settings.App_NationalHolidayCsv_TextEncoding = this.SelectedNationalHolidayTextEncoding;
-            settings.App_NationalHolidayCsv_DateIndex = this.NationalHolidayCsvDateIndex - 1;
+            settings.App_NationalHolidayCsv_DateIndex = this.InputedNationalHolidayCsvDateIndex - 1;
 
             // ウィンドウ情報
             settings.App_IsPositionSaved = this.IsPositionSaved;
 
             // ログ情報
-            settings.App_OutputFlag_OperationLog = this.OutputOperationLog;
-            settings.App_OperationLogNum = this.OperationLogNum;
+            settings.App_OutputFlag_OperationLog = this.SelectedIfOutputOperationLog;
+            settings.App_OperationLogNum = this.InputedOperationLogNum;
             settings.App_OperationLogLevel = (int)this.SelectedLogLevel;
-            settings.App_OutputFlag_WindowLog = this.OutputWindowLog;
-            settings.App_WindowLogNum = this.WindowLogNum;
-            settings.App_UnhandledExceptionLogNum = this.UnhandledExceptionLogNum;
+            settings.App_OutputFlag_WindowLog = this.SelectedIfOutputWindowLog;
+            settings.App_WindowLogNum = this.InputedWindowLogNum;
+            settings.App_UnhandledExceptionLogNum = this.InputedUnhandledExceptionLogNum;
 
             settings.Save();
 

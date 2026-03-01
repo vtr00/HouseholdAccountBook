@@ -27,7 +27,7 @@ namespace HouseholdAccountBook.Models.Infrastructure.DbDao.Compositions
             using FuncLog funcLog = new(new { bookId, date, value }, Log.LogLevel.Trace);
 
             var dtoList = await this.mDbHandler.QueryAsync<ActionCompInfoDto>(@"
-SELECT A.action_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match, A.group_id
+SELECT A.action_id, I.item_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match, A.group_id
 FROM hst_action A
 INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
 WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @Date AND A.act_value = -@Value AND book_id = @BookId AND A.del_flg = 0;",

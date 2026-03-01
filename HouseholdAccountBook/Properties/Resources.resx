@@ -769,7 +769,7 @@
   <data name="Title_EditMoveWindow" xml:space="preserve">
     <value>移動編集</value>
   </data>
-  <data name="Title_TermSelectionWindow" xml:space="preserve">
+  <data name="Title_PeriodSelectionWindow" xml:space="preserve">
     <value>期間選択</value>
   </data>
   <data name="Button_AllTerm" xml:space="preserve">

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.Models.ValueObjects;
+using System;
 using System.Collections.Generic;
 
 namespace HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs
@@ -11,11 +12,11 @@ namespace HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs
         /// <summary>
         /// 編集対象の帳簿項目のID
         /// </summary>
-        public int TargetActionId { get; set; }
+        public ActionIdObj TargetActionId { get; set; }
 
         /// <summary>
         /// 登録完了時イベントハンドラ
         /// </summary>
-        public EventHandler<EventArgs<List<int>>> Registered { get; set; }
+        public EventHandler<EventArgs<List<ActionIdObj>>> Registered { get; set; }
     }
 }

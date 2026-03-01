@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Models.Infrastructure.DbHandlers;
 using HouseholdAccountBook.Models.Infrastructure.Logger;
 using HouseholdAccountBook.Models.Utilities.Args;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views.Extensions;
@@ -22,21 +23,21 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 一致フラグ変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<int?, bool>> IsMatchChanged {
+        public event EventHandler<EventArgs<ActionIdObj, bool>> IsMatchChanged {
             add => this.WVM.IsMatchChanged += value;
             remove => this.WVM.IsMatchChanged -= value;
         }
         /// <summary>
         /// 帳簿項目変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<List<int>>> ActionChanged {
+        public event EventHandler<EventArgs<List<ActionIdObj>>> ActionChanged {
             add => this.WVM.ActionChanged += value;
             remove => this.WVM.ActionChanged -= value;
         }
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<int?>> BookChanged {
+        public event EventHandler<ChangedEventArgs<BookIdObj>> BookChanged {
             add => this.WVM.BookChanged += value;
             remove => this.WVM.BookChanged -= value;
         }
@@ -53,7 +54,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="initialBookId">初期選択する帳簿のID</param>
-        public CsvComparisonWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId)
+        public CsvComparisonWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId)
         {
             using FuncLog funcLog = new(new { initialBookId });
 
@@ -185,7 +186,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// 選択対象の帳簿IDを設定する
         /// </summary>
         /// <param name="bookId">選択する帳簿ID</param>
-        public void SetSelectedBookId(int? bookId)
+        public void SetSelectedBookId(BookIdObj bookId)
         {
             using FuncLog funcLog = new(new { bookId });
 

@@ -40,6 +40,7 @@ namespace HouseholdAccountBook.Models.Utilities.Extensions
         /// <param name="baseValue">基準値</param>
         /// <returns>指定した基準値の倍数のうち最も近い数値に切り上げた値</returns>
         public static double Ceiling(double value, double baseValue) => Math.Ceiling(value / baseValue) * baseValue;
+        public static decimal Ceiling(decimal value, decimal baseValue) => Math.Ceiling(value / baseValue) * baseValue;
 
         /// <summary>
         /// 指定した基準値の倍数のうち、最も近い値に数値を切り捨てます
@@ -48,6 +49,7 @@ namespace HouseholdAccountBook.Models.Utilities.Extensions
         /// <param name="baseValue">基準値</param>
         /// <returns>指定した基準値の倍数のうち最も近い数値に切り捨てた値</returns>
         public static double Floor(double value, double baseValue) => Math.Floor(value / baseValue) * baseValue;
+        public static decimal Floor(decimal value, decimal baseValue) => Math.Floor(value / baseValue) * baseValue;
 
         /// <summary>
         /// 最大公約数を求めます

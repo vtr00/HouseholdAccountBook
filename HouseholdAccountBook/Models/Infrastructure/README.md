@@ -1,0 +1,1 @@
+- Unused ValueObjects and DomainModels in the Infrastructure Layer

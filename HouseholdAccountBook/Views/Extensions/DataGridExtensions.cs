@@ -9,68 +9,36 @@ namespace HouseholdAccountBook.Views.Extensions
 {
     public static class DataGridExtensions
     {
-        /// <summary>
-        /// <see cref="DataGrid"/> の列情報
-        /// </summary>
-        public class ColumnInfo
+        public static List<List<string>> ExtractDisplayValues(this DataGrid dataGrid)
         {
-            /// <summary>
-            /// <see cref="Binding.Path"/>
-            /// </summary>
-            public string PropertyPath { get; set; }
-            /// <summary>
-            /// <see cref="DataGridColumn.Header"/>
-            /// </summary>
-            public string HeaderText { get; set; }
-            /// <summary>
-            /// <see cref="DataGridColumn.DisplayIndex"/>
-            /// </summary>
-            public int DisplayIndex { get; set; }
-            /// <summary>
-            /// <see cref="BindingBase.StringFormat"/>
-            /// </summary>
-            public string StringFormat { get; set; }
-            /// <summary>
-            /// <see cref="Binding.Converter"/>
-            /// </summary>
-            public IValueConverter Converter { get; set; }
-            /// <summary>
-            /// <see cref="Binding.ConverterParameter"/>
-            /// </summary>
-            public object ConverterParameter { get; set; }
-            /// <summary>
-            /// <see cref="Binding.ConverterCulture"/>
-            /// </summary>
-            public CultureInfo ConverterCulture { get; set; }
-        }
+            List<List<string>> result = [];
 
-        /// <summary>
-        /// <see cref="DataGrid"/> の列情報を取得する
-        /// </summary>
-        /// <param name="dataGrid"></param>
-        /// <returns>列情報</returns>
-        public static IEnumerable<ColumnInfo> GetColumnInfo(this DataGrid dataGrid)
-        {
-            return [.. dataGrid.Columns
+            List<DataGridBoundColumn> columns = [.. dataGrid.Columns
                 .Where(c => c.Visibility == Visibility.Visible)
                 .OrderBy(c => c.DisplayIndex)
-                .Select(c => {
-                    ColumnInfo info = new () {
-                        HeaderText = c.Header?.ToString(),
-                        DisplayIndex = c.DisplayIndex
-                    };
+                .OfType<DataGridBoundColumn>()];
 
-                    if (c is DataGridBoundColumn boundColumn &&
-                        boundColumn.Binding is Binding binding) {
-                        info.PropertyPath = binding.Path?.Path;
-                        info.StringFormat = binding.StringFormat;
-                        info.Converter = binding.Converter;
-                        info.ConverterParameter = binding.ConverterParameter;
-                        info.ConverterCulture = binding.ConverterCulture;
+            foreach (object item in dataGrid.Items) {
+                if (item == CollectionView.NewItemPlaceholder) {
+                    continue;
+                }
+
+                List<string> row = [];
+
+                foreach (var column in columns) {
+                    if (column.Binding is not Binding binding) {
+                        row.Add(string.Empty);
+                        continue;
                     }
 
-                    return info;
-                })];
+                    object value = BindingEvaluator.Evaluate(item, binding);
+                    row.Add(value?.ToString() ?? string.Empty);
+                }
+
+                result.Add(row);
+            }
+
+            return result;
         }
     }
 }

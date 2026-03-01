@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.Models.ValueObjects;
+using System;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -11,7 +12,7 @@ namespace HouseholdAccountBook.Views.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) return null;
+            if (value == null) { return null; }
 
             string param = parameter as string;
 
@@ -20,6 +21,9 @@ namespace HouseholdAccountBook.Views.Converters
             }
             if (value is double tmp2) {
                 return string.Format("{0:#,0.###}", param == "abs" ? Math.Abs(tmp2) : tmp2);
+            }
+            if (value is decimal tmp3) {
+                return string.Format("{0:#,0.###}", param == "abs" ? Math.Abs(tmp3) : tmp3);
             }
 
             throw new NotImplementedException();

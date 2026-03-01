@@ -143,7 +143,7 @@
                     <Style TargetType="DataGridRow">
                         <Setter Property="IsSelected" Value="{Binding SelectFlag}"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ActionId}" Value="{x:Null}">
+                            <DataTrigger Binding="{Binding Action}" Value="{x:Null}">
                                 <Setter Property="Foreground" Value="DarkRed"/>
                             </DataTrigger>
                         </Style.Triggers>
@@ -184,8 +184,8 @@
                     <DataGridTextColumn Header="GId" Binding="{Binding Action.GroupId, TargetNullValue=''}"
                                         Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" Width="*" Binding="{Binding Action.Item.Name, TargetNullValue=''}"/>
-                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Action.ShopName, TargetNullValue=''}"/>
-                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Action.Remark, TargetNullValue=''}"/>
+                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Action.Shop.Name, TargetNullValue=''}"/>
+                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Action.Remark.Text, TargetNullValue=''}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

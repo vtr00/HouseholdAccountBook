@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
+﻿using HouseholdAccountBook.Models.ValueObjects;
+using HouseholdAccountBook.ViewModels.Abstract;
 using System.Collections.ObjectModel;
 
 namespace HouseholdAccountBook.ViewModels.Component
@@ -17,7 +18,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// ID
         /// </summary>
-        public int Id { get; init; }
+        public IdObj Id { get; init; }
 
         /// <summary>
         /// 親要素VM

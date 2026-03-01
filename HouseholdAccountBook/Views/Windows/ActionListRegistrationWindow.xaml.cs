@@ -3,6 +3,7 @@ using HouseholdAccountBook.Models.Infrastructure;
 using HouseholdAccountBook.Models.Infrastructure.DbHandlers;
 using HouseholdAccountBook.Models.Infrastructure.Logger;
 using HouseholdAccountBook.Models.Utilities.Args;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views.Extensions;
@@ -36,7 +37,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 帳簿変更時のイベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<int?>> BookChanged {
+        public event EventHandler<ChangedEventArgs<BookIdObj>> BookChanged {
             add => this.WVM.BookChanged += value;
             remove => this.WVM.BookChanged -= value;
         }
@@ -44,7 +45,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 登録時のイベント
         /// </summary>
-        public event EventHandler<EventArgs<List<int>>> Registrated {
+        public event EventHandler<EventArgs<List<ActionIdObj>>> Registrated {
             add => this.WVM.Registrated += value;
             remove => this.WVM.Registrated -= value;
         }
@@ -59,7 +60,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="initialBookId">初期選択する帳簿のID</param>
         /// <param name="initialMonth">初期選択する年月</param>
         /// <param name="initialDate">初期選択する日付</param>
-        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, DateTime? initialMonth, DateTime? initialDate = null)
+        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate = null)
             : this(owner, dbHandlerFactory, initialBookId, initialMonth, initialDate, null, null, RegistrationKind.Add) { }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="initialBookId">初期選択する帳簿のID</param>
         /// <param name="initialRecordList">初期表示するCSVレコードリスト</param>
-        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, List<ActionCsvDto> initialRecordList)
+        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, List<ActionCsvDto> initialRecordList)
             : this(owner, dbHandlerFactory, initialBookId, null, null, initialRecordList, null, RegistrationKind.Add) { }
 
         /// <summary>
@@ -78,7 +79,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="targetGroupId">編集する帳簿項目のグループID</param>
-        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int targetGroupId)
+        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, GroupIdObj targetGroupId)
             : this(owner, dbHandlerFactory, null, null, null, null, targetGroupId, RegistrationKind.Edit) { }
 
         /// <summary>
@@ -92,8 +93,8 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="initialRecordList">追加時、初期表示するCSVレコードリスト</param>
         /// <param name="targetGroupId">編集時、編集する帳簿項目のグループID</param>
         /// <param name="regKind">登録種別</param>
-        private ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, DateTime? initialMonth, DateTime? initialDate,
-            List<ActionCsvDto> initialRecordList, int? targetGroupId, RegistrationKind regKind)
+        private ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate,
+            List<ActionCsvDto> initialRecordList, GroupIdObj targetGroupId, RegistrationKind regKind)
         {
             using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, initialRecordList, targetGroupId, regKind });
 
@@ -209,12 +210,12 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private void DataGrid_AddingNewItem(object sender, AddingNewItemEventArgs e)
         {
-            if (this.WVM.DateValueVMList.Count == 0) {
+            if (this.WVM.InputedDateValueVMList.Count == 0) {
                 e.NewItem = new DateValueViewModel() { ActDate = DateTime.Today, ActValue = null };
             }
             else {
                 // リストに入力済の末尾のデータの日付を追加時に採用する
-                DateValueViewModel lastVM = this.WVM.DateValueVMList.Last();
+                DateValueViewModel lastVM = this.WVM.InputedDateValueVMList.Last();
                 e.NewItem = new DateValueViewModel() { ActDate = this.WVM.IsDateAutoIncrement ? lastVM.ActDate.AddDays(1) : lastVM.ActDate, ActValue = null };
             }
         }

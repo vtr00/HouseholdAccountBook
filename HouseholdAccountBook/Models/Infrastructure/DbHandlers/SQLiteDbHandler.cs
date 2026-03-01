@@ -16,7 +16,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// <summary>
         /// 接続文字列
         /// </summary>
-        private const string mStringFormat = @"Data Source={0}";
+        private const string mStringFormat = @"Data Source={0};";
         /// <summary>
         /// 接続情報
         /// </summary>

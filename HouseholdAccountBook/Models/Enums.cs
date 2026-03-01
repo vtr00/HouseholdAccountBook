@@ -37,17 +37,18 @@ namespace HouseholdAccountBook.Models
     public enum BalanceKind
     {
         /// <summary>
+        /// その他(残高、差引損益)
+        /// </summary>
+        Others = -1,
+
+        /// <summary>
         /// 収入
         /// </summary>
         Income = 0,
         /// <summary>
         /// 支出
         /// </summary>
-        Expenses = 1,
-        /// <summary>
-        /// その他(残高、差引損益)
-        /// </summary>
-        Others = -1
+        Expenses = 1
     }
 
     /// <summary>
@@ -73,7 +74,7 @@ namespace HouseholdAccountBook.Models
     /// <summary>
     /// 期間種別
     /// </summary>
-    public enum TermKind
+    public enum PeriodKind
     {
         /// <summary>
         /// 月

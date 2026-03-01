@@ -40,6 +40,6 @@ namespace HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable
         /// <summary>
         /// 収支種別
         /// </summary>
-        public int BalanceKind { get; set; } = (int)Models.BalanceKind.Income;
+        public int BalanceKind { get; set; } = 0; // 収入
     }
 }

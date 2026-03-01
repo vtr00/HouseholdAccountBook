@@ -34,6 +34,7 @@ namespace HouseholdAccountBook.ViewModels
         /// 収支種別文字列
         /// </summary>
         public static Dictionary<BalanceKind, string> BalanceKindStr => new() {
+            { BalanceKind.Others,   ""},
             { BalanceKind.Income,   Properties.Resources.BalanceKind_Income },
             { BalanceKind.Expenses, Properties.Resources.BalanceKind_Expenses }
         };

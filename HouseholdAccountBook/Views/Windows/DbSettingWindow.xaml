@@ -72,32 +72,32 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Host}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding Host}"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding InputedHost}"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Port}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding Port}" 
+                    <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding InputedPort}" 
                          PreviewTextInput="TextBox_PreviewTextInput"/>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_UserName}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding UserName}"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding InputedUserName}"/>
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Password}" Margin="5" VerticalAlignment="Center"/>
                     <PasswordBox x:Name="passwordBox" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="1"/>
 
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_DbName}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding DatabaseName}"/>
+                    <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding InputedDatabaseName}"/>
 
                     <TextBlock Grid.Row="5" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Roll}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding Role}"/>
+                    <TextBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding InputedRole}"/>
 
                     <TextBlock Grid.Row="6" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="6" Grid.Column="1" Margin="1" Text="{Binding DumpExePath}" IsReadOnly="True"/>
+                    <TextBox Grid.Row="6" Grid.Column="1" Margin="1" Text="{Binding InputedDumpExePath}" IsReadOnly="True"/>
                     <Button Grid.Row="6" Grid.Column="2" Margin="1" Content="..."
                             Command="{Binding DataContext.SelectFilePathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                             CommandParameter="{x:Static enums:FilePathKind.DumpExeFile}"/>
 
                     <TextBlock Grid.Row="7" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="7" Grid.Column="1" Margin="1" Text="{Binding RestoreExePath}" IsReadOnly="True"/>
+                    <TextBox Grid.Row="7" Grid.Column="1" Margin="1" Text="{Binding InputedRestoreExePath}" IsReadOnly="True"/>
                     <Button Grid.Row="7" Grid.Column="2" Margin="1" Content="..." 
                             Command="{Binding DataContext.SelectFilePathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                             CommandParameter="{x:Static enums:FilePathKind.RestoreExeFile}"/>
@@ -144,7 +144,7 @@
                                ItemsSource="{Binding ProviderNameDic}" SelectedValue="{Binding SelectedProviderName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Access_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" Margin="1" Text="{Binding DBFilePath}" IsReadOnly="True"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="1" Text="{Binding InputedDBFilePath}" IsReadOnly="True"/>
                     <Button Grid.Row="1" Grid.Column="2" Margin="1" Content="..."
                             Command="{Binding DataContext.SelectFilePathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                             CommandParameter="{x:Static enums:FilePathKind.DbFile}"/>
@@ -185,7 +185,7 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_SQLite_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="0" Grid.Column="1" Margin="1" Text="{Binding DBFilePath}" IsReadOnly="True"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Margin="1" Text="{Binding InputedDBFilePath}" IsReadOnly="True"/>
                     <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="..." 
                             Command="{Binding DataContext.SelectFilePathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                             CommandParameter="{x:Static enums:FilePathKind.DbFile}"/>

@@ -1,20 +1,24 @@
-﻿namespace HouseholdAccountBook.Models.DomainModels
+﻿using HouseholdAccountBook.Models.ValueObjects;
+
+namespace HouseholdAccountBook.Models.DomainModels
 {
     /// <summary>
     /// 項目Model
     /// </summary>
-    public class ItemModel
+    /// <param name="id">項目ID</param>
+    /// <param name="name">項目名</param>
+    public class ItemModel(ItemIdObj id, string name)
     {
         #region プロパティ
         /// <summary>
         /// 項目ID
         /// </summary>
-        public int Id { get; init; } = -1;
+        public ItemIdObj Id { get; init; } = id;
 
         /// <summary>
         /// 項目名
         /// </summary>
-        public string Name { get; init; } = string.Empty;
+        public string Name { get; init; } = name;
 
         /// <summary>
         /// 分類名

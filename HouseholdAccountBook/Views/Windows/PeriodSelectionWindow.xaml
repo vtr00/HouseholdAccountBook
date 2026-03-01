@@ -8,11 +8,11 @@
         xmlns:controls="clr-namespace:HouseholdAccountBook.Views.UserControls"
         mc:Ignorable="d" 
         Height="430" Width="300" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize"
-        Title="{x:Static properties:Resources.Title_TermSelectionWindow}"
-        Closed="TermWindow_Closed">
+        Title="{x:Static properties:Resources.Title_PeriodSelectionWindow}"
+        Closed="PeriodSelectionWindow_Closed">
     
     <Window.DataContext>
-        <vmw:TermWindowViewModel x:Name="WVM"/>
+        <vmw:PeriodSelectionWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
     
     <Grid Margin="10">
@@ -30,7 +30,7 @@
             <GroupBox Grid.Row="0">
                 <GroupBox.Header>
                     <RadioButton x:Name="selectedMonthRadioButton" Content="{x:Static properties:Resources.GroupHeader_MonthSelection}" 
-                                 GroupName="TermKind" IsChecked="True"/>
+                                 GroupName="PeriodKind" IsChecked="True"/>
                 </GroupBox.Header>
                 
                 <Grid IsEnabled="{Binding IsChecked, ElementName=selectedMonthRadioButton}">
@@ -40,18 +40,18 @@
                     </Grid.RowDefinitions>
 
                     <Button Grid.Row="0" Margin="5" Content="{x:Static properties:Resources.Button_ThisMonth}" Command="{Binding ThisMonthCommand}"/>
-                    <Calendar Grid.Row="1" x:Name="calendar" DisplayDate="{Binding StartDate, Mode=TwoWay}" SelectedDate="{Binding StartDate, Mode=TwoWay}" 
+                    <Calendar Grid.Row="1" x:Name="calendar" DisplayDate="{Binding SelectedMonth, Mode=TwoWay}" SelectedDate="{Binding SelectedMonth, Mode=TwoWay}" 
                               DisplayModeChanged="Calendar_DisplayModeChanged"/>
                 </Grid>
             </GroupBox>
             
             <GroupBox Grid.Row="1">
                 <GroupBox.Header>
-                    <RadioButton x:Name="selectedTermRadioButton" Content="{x:Static properties:Resources.GroupHeader_TermSelection}" 
-                                 GroupName="TermKind"/>
+                    <RadioButton x:Name="selectedPeriodRadioButton" Content="{x:Static properties:Resources.GroupHeader_TermSelection}" 
+                                 GroupName="PeriodKind"/>
                 </GroupBox.Header>
                 
-                <Grid IsEnabled="{Binding IsChecked, ElementName=selectedTermRadioButton}">
+                <Grid IsEnabled="{Binding IsChecked, ElementName=selectedPeriodRadioButton}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -62,17 +62,19 @@
                         <ColumnDefinition Width="0.5*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Row="0" Grid.ColumnSpan="2" Margin="5" Content="{x:Static properties:Resources.Button_AllTerm}" Command="{Binding AllTermCommand}"/>
+                    <Button Grid.Row="0" Grid.ColumnSpan="2" Margin="5" Content="{x:Static properties:Resources.Button_AllTerm}" Command="{Binding AllPeriodCommand}"/>
+                    <!-- 開始日 -->
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center">
                         <TextBlock Text="{x:Static properties:Resources.TextBlock_StartDate}"/>:
                     </TextBlock>
                     <controls:DateTimePicker Grid.Row="1" Grid.Column="1" Margin="5" DateFormat="yyyy-MM-dd" 
-                                             SelectedDate="{Binding StartDate}"/>
+                                             SelectedDateOnly="{Binding SelectedStart}"/>
+                    <!-- 終了日 -->
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" VerticalAlignment="Center">
                         <TextBlock Text="{x:Static properties:Resources.TextBlock_EndDate}"/>:
                     </TextBlock>
                     <controls:DateTimePicker Grid.Row="2" Grid.Column="1" Margin="5" DateFormat="yyyy-MM-dd" 
-                                             SelectedDate="{Binding EndDate}"/>
+                                             SelectedDateOnly="{Binding SelectedEnd}"/>
                 </Grid>
             </GroupBox>
         </Grid>

@@ -6,13 +6,16 @@ using System.Windows;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {
-    public class FileDbSettingViewModel : BindableBase
+    /// <summary>
+    /// SQLite設定VM
+    /// </summary>
+    public class SQLiteSettingViewModel : BindableBase
     {
         /// <summary>
-        /// DBファイルパス
+        /// 入力されたDBファイルパス
         /// </summary>
-        #region DBFilePath
-        public string DBFilePath {
+        #region InputedDBFilePath
+        public string InputedDBFilePath {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -24,7 +27,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public void Load()
         {
             Properties.Settings settings = Properties.Settings.Default;
-            this.DBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_SQLite_DBFilePath);
+            this.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_SQLite_DBFilePath);
         }
 
         /// <summary>
@@ -35,7 +38,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         {
             bool result = false;
 
-            string sqliteFilePath = Path.GetFullPath(this.DBFilePath);
+            string sqliteFilePath = Path.GetFullPath(this.InputedDBFilePath);
             bool exists = File.Exists(sqliteFilePath);
             if (!exists) {
                 // ファイルが存在しない場合、新規作成するか確認する
@@ -61,6 +64,6 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 設定を保存可能か
         /// </summary>
         /// <returns>設定の保存可否</returns>
-        public bool CanSave() => !string.IsNullOrWhiteSpace(this.DBFilePath);
+        public bool CanSave() => !string.IsNullOrWhiteSpace(this.InputedDBFilePath);
     }
 }

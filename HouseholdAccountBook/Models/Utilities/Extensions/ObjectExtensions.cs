@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Models.Utilities.Attributes;
+using HouseholdAccountBook.Models.ValueObjects;
 using System;
 using System.Collections;
 using System.Linq;
@@ -32,10 +33,16 @@ namespace HouseholdAccountBook.Models.Utilities.Extensions
             switch (obj) {
                 case string s:
                     return $"\"{s.Replace(Environment.NewLine, "\\r\\n")}\"";
+                case DateOnly d:
+                    return $"{d:yyyy-MM-dd}";
+                case TimeOnly t:
+                    return $"{t:HH:mm:ss}";
                 case DateTime dt:
                     return dt.TimeOfDay == TimeSpan.Zero ? $"{dt:yyyy-MM-dd}" : $"{dt:yyyy-MM-dd HH:mm:ss}";
                 case IEnumerable enumerable:
                     return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => item.ToString2(depth)))}]";
+                case IdObj idObj:
+                    return $"{idObj.Value}";
                 default:
                     PropertyInfo[] propInfos = obj.GetType().GetProperties(); // クラスが保持しているプロパティの情報を取得
 

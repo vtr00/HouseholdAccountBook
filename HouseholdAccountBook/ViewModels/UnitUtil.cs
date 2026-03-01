@@ -1,8 +1,9 @@
-﻿namespace HouseholdAccountBook.Models.Utilities
+﻿namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
     /// <see cref="Properties.Resources"/> から単位を取得します
     /// </summary>
+    /// <remakes>UIに依存するためViewModelに配置する</remakes>
     public static class UnitUtil
     {
         /// <summary>

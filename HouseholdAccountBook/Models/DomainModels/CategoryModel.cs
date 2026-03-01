@@ -1,19 +1,29 @@
-﻿namespace HouseholdAccountBook.Models.DomainModels
+﻿using HouseholdAccountBook.Models.ValueObjects;
+
+namespace HouseholdAccountBook.Models.DomainModels
 {
     /// <summary>
     /// 分類Model
     /// </summary>
-    public class CategoryModel
+    /// <param name="id">分類ID</param>
+    /// <param name="name">分類名</param>
+    /// <param name="kind">収支種別</param>
+    public class CategoryModel(CategoryIdObj id, string name, BalanceKind kind)
     {
         #region プロパティ
         /// <summary>
         /// 分類ID
         /// </summary>
-        public int Id { get; init; } = -1;
+        public CategoryIdObj Id { get; init; } = id;
         /// <summary>
         /// 分類名
         /// </summary>
-        public string Name { get; init; } = string.Empty;
+        public string Name { get; init; } = name;
+
+        /// <summary>
+        /// 収支種別
+        /// </summary>
+        public BalanceKind BalanceKind { get; init; } = kind;
         #endregion
     }
 }

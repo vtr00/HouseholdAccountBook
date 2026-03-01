@@ -3,6 +3,7 @@ using HouseholdAccountBook.Models.Infrastructure;
 using HouseholdAccountBook.Models.Infrastructure.DbHandlers;
 using HouseholdAccountBook.Models.Infrastructure.Logger;
 using HouseholdAccountBook.Models.Utilities.Args;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views.Extensions;
@@ -21,7 +22,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 登録時のイベント
         /// </summary>
-        public event EventHandler<EventArgs<List<int>>> Registrated {
+        public event EventHandler<EventArgs<List<ActionIdObj>>> Registrated {
             add => this.WVM.Registrated += value;
             remove => this.WVM.Registrated -= value;
         }
@@ -29,7 +30,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 帳簿変更時のイベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<int?>> BookChanged {
+        public event EventHandler<ChangedEventArgs<BookIdObj>> BookChanged {
             add => this.WVM.BookChanged += value;
             remove => this.WVM.BookChanged -= value;
         }
@@ -51,7 +52,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="initialBookId">初期選択する帳簿のID</param>
         /// <param name="initialMonth">初期選択する年月</param>
         /// <param name="initialDate">初期選択する日付</param>
-        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, DateTime? initialMonth, DateTime? initialDate)
+        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate)
             : this(owner, dbHandlerFactory, initialBookId, initialMonth, initialDate, null, null, RegistrationKind.Add) { }
 
         /// <summary>
@@ -61,7 +62,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="initialBookId">初期選択する帳簿ID</param>
         /// <param name="initialRecord">初期表示するCSVレコード</param>
-        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, ActionCsvDto initialRecord)
+        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, ActionCsvDto initialRecord)
             : this(owner, dbHandlerFactory, initialBookId, null, null, initialRecord, null, RegistrationKind.Add) { }
 
         /// <summary>
@@ -71,7 +72,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="targetActionId">複製/編集する帳簿項目のID</param>
         /// <param name="regKind">登録種別</param>
-        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int targetActionId, RegistrationKind regKind = RegistrationKind.Edit)
+        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, ActionIdObj targetActionId, RegistrationKind regKind = RegistrationKind.Edit)
             : this(owner, dbHandlerFactory, null, null, null, null, targetActionId, regKind) { }
 
         /// <summary>
@@ -85,8 +86,8 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="initialRecord">初期表示するCSVレコード</param>
         /// <param name="targetActionId">複製/編集する帳簿項目ID</param>
         /// <param name="regKind">登録種別</param>
-        private ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, int? initialBookId, DateTime? initialMonth, DateTime? initialDate,
-                                         ActionCsvDto initialRecord, int? targetActionId, RegistrationKind regKind)
+        private ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate,
+                                         ActionCsvDto initialRecord, ActionIdObj targetActionId, RegistrationKind regKind)
         {
             using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, initialRecord, targetActionId, regKind });
 

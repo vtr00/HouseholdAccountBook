@@ -7,11 +7,17 @@ namespace HouseholdAccountBook.Models.DomainModels
     /// <summary>
     /// 備考Model
     /// </summary>
-    public class RemarkModel
+    /// <param name="text">備考</param>
+    public class RemarkModel(string text)
     {
         /// <summary>
         /// テキスト
         /// </summary>
-        public string Text { get; init; } = string.Empty;
+        public string Text { get; init; } = text;
+
+        public override string ToString() => this.Text;
+
+        public static implicit operator string(RemarkModel remark) => remark.Text;
+        public static implicit operator RemarkModel(string remark) => new(remark);
     }
 }
