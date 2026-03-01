@@ -1,5 +1,5 @@
 ﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.DomainModels;
+using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 
@@ -8,13 +8,13 @@ namespace HouseholdAccountBook.ViewModels.Component
     /// <summary>
     /// 帳簿項目VM
     /// </summary>
-    public class ActionViewModel : BindableBase, ISelectable
+    public class ActionViewModel(ActionWithBalanceModel model) : BindableBase, ISelectable
     {
         #region プロパティ
         /// <summary>
         /// 残高付き帳簿項目Model
         /// </summary>
-        public ActionWithBalanceModel ActionWithBalance { get; init; }
+        public ActionWithBalanceModel ActionWithBalance { get; init; } = model;
 
         /// <summary>
         /// CSVと一致したか
@@ -23,7 +23,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         public bool IsMatch {
             get;
             set => this.SetProperty(ref field, value);
-        }
+        } = model.Action.IsMatch;
         #endregion
 
         /// <summary>

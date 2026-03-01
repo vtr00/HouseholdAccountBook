@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Models.ValueObjects;
+﻿using HouseholdAccountBook.Models.UiDto;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 
 namespace HouseholdAccountBook.ViewModels.Component
@@ -6,9 +7,13 @@ namespace HouseholdAccountBook.ViewModels.Component
     /// <summary>
     /// 関係性VM
     /// </summary>
-    public class RelationViewModel : BindableBase
+    public class RelationViewModel(RelationModel relation) : BindableBase
     {
-        #region プロパティ
+        /// <summary>
+        /// 関係性Model
+        /// </summary>
+        public RelationModel Relation { get; set; } = relation;
+
         /// <summary>
         /// 関係があるか
         /// </summary>
@@ -16,18 +21,17 @@ namespace HouseholdAccountBook.ViewModels.Component
         public bool IsRelated {
             get;
             set => this.SetProperty(ref field, value);
-        }
+        } = relation.IsRelated;
         #endregion
 
         /// <summary>
         /// 帳簿/項目ID
         /// </summary>
-        public IdObj Id { get; init; }
+        public IdObj Id => this.Relation.Id;
 
         /// <summary>
         /// 表示名
         /// </summary>
-        public string Name { get; init; }
-        #endregion
+        public string Name => this.Relation.Name;
     }
 }

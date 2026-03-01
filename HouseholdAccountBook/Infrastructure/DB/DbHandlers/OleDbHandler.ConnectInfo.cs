@@ -1,0 +1,22 @@
+﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+
+namespace HouseholdAccountBook.Models.DbHandlers
+{
+    public partial class OleDbHandler : DbHandlerBase
+    {
+        /// <summary>
+        /// 接続情報
+        /// </summary>
+        public new class ConnectInfo : DbHandlerBase.ConnectInfo
+        {
+            /// <summary>
+            /// プロバイダ
+            /// </summary>
+            public string Provider { get; set; }
+            /// <summary>
+            /// データソース
+            /// </summary>
+            public string DataSource { get; set; }
+        }
+    }
+}

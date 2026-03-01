@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Models.DomainModels;
+﻿using HouseholdAccountBook.Models.UiDto;
 using System;
 
 namespace HouseholdAccountBook.ViewModels.Component

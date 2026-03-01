@@ -1,0 +1,138 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.Abstract;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+
+namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
+{
+    /// <summary>
+    /// 店舗名テーブルDAO
+    /// </summary>
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class HstShopDao(DbHandlerBase dbHandler) : CommonTableDaoBase<HstShopDto>(dbHandler)
+    {
+        public override Task<int> CreateTableAsync() => throw new NotImplementedException();
+
+        /// <summary>
+        /// 全レコードを取得する
+        /// </summary>
+        /// <returns>DTOリスト</returns>
+        public override async Task<IEnumerable<HstShopDto>> FindAllAsync()
+        {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
+            var dtoList = await this.mDbHandler.QueryAsync<HstShopDto>(@"
+SELECT * 
+FROM hst_shop
+WHERE del_flg = 0;");
+
+            return dtoList;
+        }
+
+        /// <summary>
+        /// <see cref="HstShopDto.ShopName"/> と <see cref="HstShopDto.ItemId"/> に基づいて、レコードを取得する
+        /// </summary>
+        /// <param name="shopName">店舗名</param>
+        /// <param name="itemId">項目ID</param>
+        /// <param name="includeDeleted"><see cref="CommonTableDtoBase.DelFlg">=1も含めるか</param>
+        /// <returns>取得したレコード</returns>
+        public async Task<HstShopDto> FindByItemIdAndShopNameAsync(string shopName, int itemId, bool includeDeleted = false)
+        {
+            using FuncLog funcLog = new(new { shopName, itemId, includeDeleted }, Log.LogLevel.Trace);
+
+            HstShopDto dto = includeDeleted
+                ? await this.mDbHandler.QuerySingleOrDefaultAsync<HstShopDto>(@"
+SELECT * FROM hst_shop
+WHERE item_id = @ItemId AND shop_name = @ShopName;",
+new HstShopDto { ShopName = shopName, ItemId = itemId })
+                : await this.mDbHandler.QuerySingleOrDefaultAsync<HstShopDto>(@"
+SELECT * FROM hst_shop
+WHERE item_id = @ItemId AND shop_name = @ShopName AND del_flg = 0;",
+new HstShopDto { ShopName = shopName, ItemId = itemId });
+
+            return dto;
+        }
+
+        /// <summary>
+        /// <see cref="HstShopDto"/> を挿入する
+        /// </summary>
+        /// <param name="dto">追加するレコード</param>
+        /// <returns>挿入件数</returns>
+        public override async Task<int> InsertAsync(HstShopDto dto)
+        {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
+            int count = await this.mDbHandler.ExecuteAsync(@"
+INSERT INTO hst_shop (item_id, shop_name, used_time, json_code, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@ItemId, @ShopName, @UsedTime, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
+
+            return count;
+        }
+
+        /// <summary>
+        /// <see cref="HstShopDto.ItemId"/> と <see cref="HstShopDto.ShopName"/> が一致するレコードを更新する
+        /// </summary>
+        /// <param name="dto">更新するレコード</param>
+        /// <returns>更新件数</returns>
+        public override async Task<int> UpdateAsync(HstShopDto dto)
+        {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
+            int count = await this.mDbHandler.ExecuteAsync(@"
+UPDATE hst_shop
+SET used_time = @UsedTime, json_code = @JsonCode, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
+WHERE item_id = @ItemId AND shop_name = @ShopName AND used_time < @UsedTime;", dto);
+
+            return count;
+        }
+
+        /// <summary>
+        /// <see cref="HstShopDto"/> を挿入または更新する
+        /// </summary>
+        /// <param name="dto">挿入/更新するレコード/param>
+        /// <returns>挿入/更新件数</returns>
+        /// <remarks>PostgreSQLとSQLiteで挙動が変わる可能性があるため変更時は要動作確認</remarks>
+        public override async Task<int> UpsertAsync(HstShopDto dto)
+        {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
+            int count = await this.mDbHandler.ExecuteAsync(@"
+INSERT INTO hst_shop (item_id, shop_name, used_time, json_code, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@ItemId, @ShopName, @UsedTime, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
+ON CONFLICT (item_id, shop_name) DO UPDATE
+SET used_time = @UsedTime, json_code = @JsonCode, del_flg = @DelFlg, update_time = @UpdateTime, updater = @Updater
+WHERE hst_shop.item_id = @ItemId AND hst_shop.shop_name = @ShopName AND hst_shop.used_time < @UsedTime;", dto);
+
+            return count;
+        }
+
+        public override async Task<int> DeleteAllAsync()
+        {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
+            int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM hst_shop;");
+
+            return count;
+        }
+
+        /// <summary>
+        /// <see cref="HstShopDto.ItemId"/> と <see cref="HstShopDto.ShopName"/> が一致するレコードを削除する
+        /// </summary>
+        /// <param name="dto">削除するレコード</param>
+        /// <returns>削除件数</returns>
+        public async Task<int> DeleteAsync(HstShopDto dto)
+        {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
+            int count = await this.mDbHandler.ExecuteAsync(@"
+UPDATE hst_shop SET del_flg = 1, update_time = @UpdateTime, updater = @Updater
+WHERE shop_name = @ShopName AND item_id = @ItemId;", dto);
+
+            return count;
+        }
+    }
+}

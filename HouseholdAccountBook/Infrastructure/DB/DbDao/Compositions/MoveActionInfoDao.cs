@@ -1,0 +1,37 @@
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+
+namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
+{
+    /// <summary>
+    /// 移動情報DAO
+    /// </summary>
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class MoveActionInfoDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
+    {
+        /// <summary>
+        /// <see cref="HstGroupDto.GroupId"/> に基づいて、<see cref="MoveActionInfoDto"/> リストを取得する
+        /// </summary>
+        /// <param name="groupId">グループID</param>
+        /// <returns>取得したレコードリスト</returns>
+        public async Task<IEnumerable<MoveActionInfoDto>> GetAllAsync(int groupId)
+        {
+            using FuncLog funcLog = new(new { groupId }, Log.LogLevel.Trace);
+
+            var dtoList = await this.mDbHandler.QueryAsync<MoveActionInfoDto>(@"
+SELECT A.book_id, A.action_id, A.item_id, A.act_time, A.act_value, A.remark, I.move_flg
+FROM hst_action A
+INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
+WHERE A.del_flg = 0 AND A.group_id = @GroupId
+ORDER BY I.move_flg DESC;",
+new { GroupId = groupId });
+
+            return dtoList;
+        }
+    }
+}

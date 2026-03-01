@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Models.Infrastructure.Logger;
+﻿using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.Views.Extensions;
 using System;

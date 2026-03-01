@@ -1,6 +1,6 @@
-﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.DomainModels;
-using HouseholdAccountBook.Models.Utilities.Extensions;
+﻿using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
@@ -212,7 +212,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 関係性VMリスト
         /// </summary>
         #region RelationVMList
-        public ObservableCollection<RelationViewModel> RelationVMList {
+        public ObservableCollection<RelationModel> RelationVMList {
             get;
             set => this.SetProperty(ref field, value);
         }

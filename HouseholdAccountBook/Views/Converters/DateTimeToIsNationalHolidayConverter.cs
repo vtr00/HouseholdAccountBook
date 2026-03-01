@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Models.Utilities.Extensions;
+﻿using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using System;
 using System.Globalization;
 using System.Windows.Data;

@@ -1,5 +1,5 @@
-﻿using HouseholdAccountBook.Models.Infrastructure.Logger;
-using HouseholdAccountBook.Models.Utilities.Extensions;
+﻿using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using OxyPlot.Axes;
 using System;
 using System.Diagnostics;

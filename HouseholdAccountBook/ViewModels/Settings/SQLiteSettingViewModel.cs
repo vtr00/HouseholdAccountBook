@@ -1,5 +1,5 @@
-﻿using HouseholdAccountBook.Models.DbHandlers;
-using HouseholdAccountBook.Models.Infrastructure;
+﻿using HouseholdAccountBook.Infrastructure;
+using HouseholdAccountBook.Models.DbHandlers;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System.IO;
 using System.Windows;

@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Models.Utilities.Args;
+﻿using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using OxyPlot;
 using OxyPlot.Series;
 using System;

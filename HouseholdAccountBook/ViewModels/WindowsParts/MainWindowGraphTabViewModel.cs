@@ -1,5 +1,6 @@
-﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
+﻿using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
@@ -257,7 +258,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 };
             }
 
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
+            SeriesViewModelLoader loader = new(service);
             switch (this.Parent.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
                     // グラフ表示データを取得する
@@ -265,12 +267,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     {
                         return this.Tab switch {
                             Tabs.DailyGraphTab => this.Parent.DisplayedPeriodKind switch {
-                                PeriodKind.Monthly => await service.LoadDailySeriesViewModelListWithinMonthAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value),
-                                PeriodKind.Selected => await service.LoadDailySeriesViewModelListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedPeriod),
+                                PeriodKind.Monthly => await loader.LoadDailySeriesViewModelListWithinMonthAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value),
+                                PeriodKind.Selected => await loader.LoadDailySeriesViewModelListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedPeriod),
                                 _ => throw new InvalidOperationException(),
                             },
-                            Tabs.MonthlyGraphTab => await service.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
-                            Tabs.YearlyGraphTab => await service.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
+                            Tabs.MonthlyGraphTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
+                            Tabs.YearlyGraphTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
                             _ => throw new InvalidOperationException(),
                         };
                     }
@@ -340,12 +342,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     {
                         return this.Tab switch {
                             Tabs.DailyGraphTab => this.Parent.DisplayedPeriodKind switch {
-                                PeriodKind.Monthly => await service.LoadDailySeriesViewModelListWithinMonthAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value),
-                                PeriodKind.Selected => await service.LoadDailySeriesViewModelListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedPeriod),
+                                PeriodKind.Monthly => await loader.LoadDailySeriesViewModelListWithinMonthAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value),
+                                PeriodKind.Selected => await loader.LoadDailySeriesViewModelListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedPeriod),
                                 _ => throw new InvalidOperationException(),
                             },
-                            Tabs.MonthlyGraphTab => await service.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.SelectedBookVM.Id, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
-                            Tabs.YearlyGraphTab => await service.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.SelectedBookVM.Id, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
+                            Tabs.MonthlyGraphTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.SelectedBookVM.Id, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
+                            Tabs.YearlyGraphTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.SelectedBookVM.Id, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
                             _ => throw new InvalidOperationException(),
                         };
                     }
