@@ -1,7 +1,5 @@
 ﻿#nullable enable
 
-using HouseholdAccountBook;
-
 namespace HouseholdAccountBook.Infrastructure.Utilities.Args
 {
     /// <summary>

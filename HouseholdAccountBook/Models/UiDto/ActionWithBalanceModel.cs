@@ -1,9 +1,4 @@
-﻿using HouseholdAccountBook.Models.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HouseholdAccountBook.Models.UiDto
+﻿namespace HouseholdAccountBook.Models.UiDto
 {
     /// <summary>
     /// 残高付き帳簿項目Model

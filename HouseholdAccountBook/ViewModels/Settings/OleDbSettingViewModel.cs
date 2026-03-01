@@ -1,6 +1,5 @@
 ﻿using HouseholdAccountBook.Infrastructure;
 using HouseholdAccountBook.Models.DbHandlers;
-using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

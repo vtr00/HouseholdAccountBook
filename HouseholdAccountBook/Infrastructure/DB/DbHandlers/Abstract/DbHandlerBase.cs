@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using HouseholdAccountBook.Infrastructure.DB;
 using HouseholdAccountBook.Infrastructure.Logger;
 using System;
 using System.Collections.Generic;
@@ -51,7 +50,8 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         public bool IsOpen => this.mConnection != null && this.mConnection.State == System.Data.ConnectionState.Open;
         #endregion
 
-        static DbHandlerBase() {
+        static DbHandlerBase()
+        {
             DefaultTypeMap.MatchNamesWithUnderscores = true;
             SqlMapper.AddTypeHandler(new DateOnlyHandler());
         }

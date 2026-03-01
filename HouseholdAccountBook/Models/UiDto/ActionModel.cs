@@ -1,5 +1,4 @@
 ﻿using HouseholdAccountBook.Models.ValueObjects;
-using HouseholdAccountBook.ViewModels.Component;
 using System;
 
 namespace HouseholdAccountBook.Models.UiDto

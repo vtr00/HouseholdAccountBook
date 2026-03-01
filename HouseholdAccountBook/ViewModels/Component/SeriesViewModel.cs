@@ -1,7 +1,6 @@
 ﻿using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
-using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 using System.Collections.Generic;
 

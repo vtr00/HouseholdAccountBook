@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using HouseholdAccountBook.Infrastructure.DB.DbDto.Abstract;
+﻿using HouseholdAccountBook.Infrastructure.DB.DbDto.Abstract;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract
 {

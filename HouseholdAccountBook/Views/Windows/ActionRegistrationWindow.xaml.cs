@@ -5,7 +5,6 @@ using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels;
-using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views.Extensions;
 using System;
 using System.Collections.Generic;

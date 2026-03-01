@@ -37,6 +37,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             set {
                 if (this.SetProperty(ref field, value)) {
                     this.SelectedMonth = value.ToDateTime(TimeOnly.MinValue);
+                    // TODO: SelectedStartよりも後になった場合の処理
                 }
             }
         }
@@ -49,7 +50,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
-                    
+                    // TODO: SelectedStartよりも前になった場合の処理
                 }
             }
         }

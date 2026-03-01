@@ -1,14 +1,11 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using HouseholdAccountBook.ViewModels.Component;
-using HouseholdAccountBook.Views.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Infrastructure.CSV

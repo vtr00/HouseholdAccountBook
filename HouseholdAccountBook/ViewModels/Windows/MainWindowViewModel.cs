@@ -1,5 +1,22 @@
-﻿using HouseholdAccountBook.Models;
+﻿using HouseholdAccountBook.Infrastructure;
+using HouseholdAccountBook.Infrastructure.DB;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.KHDbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.Abstract;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.KHDbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Args;
+using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
+using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.DbHandlers;
+using HouseholdAccountBook.Models.UiDto;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.WindowsParts;
@@ -14,23 +31,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ViewModels.UiConstants;
-using HouseholdAccountBook.Models.ValueObjects;
-using HouseholdAccountBook.Infrastructure;
-using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Infrastructure.Utilities.Args;
-using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
-using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
-using HouseholdAccountBook.Infrastructure.DB;
-using HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract;
-using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
-using HouseholdAccountBook.Infrastructure.DB.DbDao.KHDbTable;
-using HouseholdAccountBook.Infrastructure.DB.DbDto.Abstract;
-using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
-using HouseholdAccountBook.Infrastructure.DB.DbDto.KHDbTable;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
-using HouseholdAccountBook.Models.UiDto;
-using HouseholdAccountBook.Models.AppServices;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {

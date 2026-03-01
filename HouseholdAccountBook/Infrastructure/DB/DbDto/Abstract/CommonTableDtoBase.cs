@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.Infrastructure.DB;
-using System;
+﻿using System;
 
 namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Abstract
 {

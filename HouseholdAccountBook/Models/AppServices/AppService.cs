@@ -259,7 +259,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             DateOnly startTime = includedTime.GetFirstDateOfMonth();
             DateOnly endTime = startTime.GetLastDateOfMonth();
-            return await this.LoadActionListAsync(targetBookId, (PeriodObj<DateOnly>)new (startTime, endTime));
+            return await this.LoadActionListAsync(targetBookId, (PeriodObj<DateOnly>)new(startTime, endTime));
         }
 
         /// <summary>
@@ -276,8 +276,8 @@ namespace HouseholdAccountBook.Models.AppServices
             decimal balance = await this.LoadEndingBalance(targetBookId, period.Start);
 
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                    // 繰越残高を追加
-                    {
+                // 繰越残高を追加
+                {
                     ActionWithBalanceModel am = new() {
                         Action = new() {
                             Book = new(-1, string.Empty),
@@ -469,7 +469,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     InputedInitialValue = dto.InitialValue,
                     SelectedIfStartDateExists = jsonObj?.StartDate != null,
                     SelectedIfEndDateExists = jsonObj?.EndDate != null,
-                    InputedPeriod = new(jsonObj?.StartDate?.ToDateOnly() ?? dto.StartDate?.ToDateOnly() ?? DateOnlyExtensions.Today, 
+                    InputedPeriod = new(jsonObj?.StartDate?.ToDateOnly() ?? dto.StartDate?.ToDateOnly() ?? DateOnlyExtensions.Today,
                                         jsonObj?.EndDate?.ToDateOnly() ?? dto.EndDate?.ToDateOnly() ?? DateOnlyExtensions.Today),
                     DebitBookVMList = new ObservableCollection<BookModel>(vmList.Where(tmpVM => tmpVM.Id != bookId)),
                     InputedPayDay = dto.PayDay,
