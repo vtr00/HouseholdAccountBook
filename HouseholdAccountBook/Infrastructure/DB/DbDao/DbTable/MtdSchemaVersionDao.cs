@@ -1,0 +1,97 @@
+﻿using HouseholdAccountBook.Models.DbHandlers;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading.Tasks;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.DB;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+
+namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
+{
+    /// <summary>
+    /// スキーマバージョンテーブルDAO
+    /// </summary>
+    /// <param name="dbHandler"></param>
+    public class MtdSchemaVersionDao(DbHandlerBase dbHandler) : PhyTableDaoBase<MtdSchemaVersionDto>(dbHandler)
+    {
+        public override async Task CreateTableAsync()
+        {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
+            if (this.mDbHandler.DBKind != DBKind.PostgreSQL) {
+                throw new NotSupportedException("This method is only supported for PostgreSQL.");
+            }
+            if (!this.mDbHandler.InTransaction()) {
+                throw new InvalidOperationException("Cannot create table during a transaction.");
+            }
+
+            // テーブルがなければ作成する
+            _ = await this.mDbHandler.ExecuteAsync($@"
+CREATE TABLE IF NOT EXISTS mtd_schema_version (
+    version INTEGER NOT NULL,
+    update_time timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT mtd_schema_version_check CHECK (version >= 0)
+) TABLESPACE pg_default;");
+
+            if (this.mDbHandler is NpgsqlDbHandler npgsqlDbHandler) {
+                string roll = npgsqlDbHandler.DbCreationRole;
+                // オーナーを設定する
+                _ = await npgsqlDbHandler.ExecuteAsync($@"
+ALTER TABLE IF EXISTS mtd_schema_version
+    OWNER to ""{roll}"";
+");
+            }
+
+            // レコードがなければ、初期レコードを挿入する
+            _ = await this.mDbHandler.ExecuteAsync(@"
+INSERT INTO mtd_schema_version (version)
+SELECT 0
+WHERE NOT EXISTS (SELECT 1 FROM mtd_schema_version);");
+        }
+
+        public override async Task<IEnumerable<MtdSchemaVersionDto>> FindAllAsync()
+        {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
+            var dtoList = await this.mDbHandler.QueryAsync<MtdSchemaVersionDto>(@"
+SELECT * 
+FROM mtd_schema_version;");
+
+            return dtoList;
+        }
+
+        public override Task<int> InsertAsync(MtdSchemaVersionDto dto) => throw new NotImplementedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
+        public override Task<int> UpdateAsync(MtdSchemaVersionDto dto) => throw new NotImplementedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
+        public override Task<int> UpsertAsync(MtdSchemaVersionDto dto) => throw new NotImplementedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
+
+        public override async Task<int> DeleteAllAsync()
+        {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
+            int count = await this.mDbHandler.ExecuteAsync(@"DELETE FROM mtd_schema_version;");
+
+            return count;
+        }
+
+        public async Task<int> SelectSchemaVersionAsync() => await this.mDbHandler.QuerySingleAsync<int>("SELECT version FROM mtd_schema_version;");
+
+        public async Task<int> UpsertSchemaVersionAsync(int version)
+        {
+            using FuncLog funcLog = new(new { version }, Log.LogLevel.Trace);
+
+            int count = await this.mDbHandler.ExecuteAsync(@"
+MERGE INTO mtd_schema_version
+USING (SELECT 1)
+ON TRUE -- テーブルの結合条件
+WHEN NOT MATCHED THEN -- ON条件でテーブルが結合できなかった場合(= mtd_schema_version にレコードが存在しない場合)
+    INSERT (version) VALUES (@Version)
+WHEN MATCHED THEN -- ON条件でテーブルが結合できた場合(= mtd_schema_version にレコードが存在する場合)
+    UPDATE SET version = @Version, update_time = now();",
+new MtdSchemaVersionDto { Version = version });
+            return count;
+        }
+    }
+}

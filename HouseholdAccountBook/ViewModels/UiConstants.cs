@@ -1,6 +1,6 @@
-﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.Infrastructure;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
+﻿using HouseholdAccountBook.Infrastructure.DB;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Views.Windows;
 using System.Collections.Generic;
 

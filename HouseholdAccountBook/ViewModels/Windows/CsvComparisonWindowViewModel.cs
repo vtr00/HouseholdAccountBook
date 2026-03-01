@@ -1,13 +1,4 @@
 ﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.Infrastructure;
-using HouseholdAccountBook.Models.Infrastructure.DbDao.Compositions;
-using HouseholdAccountBook.Models.Infrastructure.DbDao.DbTable;
-using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
-using HouseholdAccountBook.Models.Infrastructure.DbDto.Others;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
-using HouseholdAccountBook.Models.Utilities.Args;
-using HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs;
-using HouseholdAccountBook.Models.Utilities.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views;
@@ -21,8 +12,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using HouseholdAccountBook.Models.DomainModels;
 using HouseholdAccountBook.Models.ValueObjects;
+using HouseholdAccountBook.Infrastructure;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Args;
+using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Infrastructure.CSV;
+using HouseholdAccountBook.Models.UiDto;
+using HouseholdAccountBook.Models.AppServices;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -575,7 +577,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { bookId });
 
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
             BookIdObj tmpBookId = bookId ?? this.SelectedBookVM?.Id;
             this.BookVMList = await service.UpdateBookCompListAsync();
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);

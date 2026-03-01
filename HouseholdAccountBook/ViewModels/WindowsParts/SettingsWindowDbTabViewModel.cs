@@ -1,7 +1,8 @@
-﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.Infrastructure;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
-using HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs;
+﻿using HouseholdAccountBook.Infrastructure;
+using HouseholdAccountBook.Infrastructure.DB;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
+using HouseholdAccountBook.Models;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;

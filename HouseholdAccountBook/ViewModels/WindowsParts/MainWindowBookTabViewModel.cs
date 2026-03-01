@@ -1,12 +1,15 @@
-﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.Infrastructure;
-using HouseholdAccountBook.Models.Infrastructure.DbDao.Compositions;
-using HouseholdAccountBook.Models.Infrastructure.DbDao.DbTable;
-using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
-using HouseholdAccountBook.Models.Utilities.Args;
-using HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs;
-using HouseholdAccountBook.Models.Utilities.Extensions;
+﻿using HouseholdAccountBook.Infrastructure;
+using HouseholdAccountBook.Infrastructure.CSV;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Args;
+using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
+using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
@@ -206,7 +209,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 概要VMリスト
         /// </summary>
         #region SummaryVMList
-        public ObservableCollection<SummaryViewModel> SummaryVMList {
+        public ObservableCollection<SummaryModel> SummaryVMList {
             get;
             set {
                 _ = this.SetProperty(ref field, value);
@@ -218,7 +221,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 選択された概要VM
         /// </summary>
         #region SelectedSummaryVM
-        public SummaryViewModel SelectedSummaryVM {
+        public SummaryModel SelectedSummaryVM {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
@@ -439,7 +442,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 actionIdList.Add(vm.ActionWithBalance.Action.ActionId);
 
                 string shopName = vm.ActionWithBalance.Action.Shop.Name.Replace(this.FindText, this.ReplaceText);
-                string remark = vm.ActionWithBalance.Action.Remark.Text.Replace(this.FindText, this.ReplaceText);
+                string remark = vm.ActionWithBalance.Action.Remark.Remark.Replace(this.FindText, this.ReplaceText);
 
                 await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                     HstActionDao hstActionDao = new(dbHandler);
@@ -732,7 +735,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             // 検索テキストで絞り込む
             if (this.FindText != string.Empty) {
-                tmp = [.. tmp.Where(vm => (vm.ActionWithBalance.Action.Shop?.Name.Contains(this.FindText) ?? false) || (vm.ActionWithBalance.Action.Remark?.Text.Contains(this.FindText) ?? false))];
+                tmp = [.. tmp.Where(vm => (vm.ActionWithBalance.Action.Shop?.Name.Contains(this.FindText) ?? false) || (vm.ActionWithBalance.Action.Remark?.Remark.Contains(this.FindText) ?? false))];
             }
 
             this.DisplayedActionVMList = tmp;
@@ -768,21 +771,21 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             Log.Vars(vars: new { tmpActionIdList, tmpBalanceKind, tmpCategoryId, tmpItemId });
 
             // 表示するデータを指定する
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
             switch (this.Parent.DisplayedPeriodKind) {
                 case PeriodKind.Monthly:
                     var (tmp1, tmp2) = await (
-                        service.LoadActionViewModelListWithinMonthAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value),
-                        service.LoadSummaryViewModelListWithinMonthAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value)).WhenAll();
-                    this.ActionVMList = tmp1;
-                    this.SummaryVMList = tmp2;
+                        service.LoadActionListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value),
+                        service.LoadSummaryListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value)).WhenAll();
+                    this.ActionVMList = [.. tmp1.Select(tmp => new ActionViewModel(tmp))];
+                    this.SummaryVMList = [.. tmp2];
                     break;
                 case PeriodKind.Selected:
                     var (tmp3, tmp4) = await (
-                        service.LoadActionViewModelListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedPeriod),
-                        service.LoadSummaryViewModelListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedPeriod)).WhenAll();
-                    this.ActionVMList = tmp3;
-                    this.SummaryVMList = tmp4;
+                        service.LoadActionListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedPeriod),
+                        service.LoadSummaryListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedPeriod)).WhenAll();
+                    this.ActionVMList = [.. tmp3.Select(tmp => new ActionViewModel(tmp))];
+                    this.SummaryVMList = [.. tmp4];
                     break;
             }
 

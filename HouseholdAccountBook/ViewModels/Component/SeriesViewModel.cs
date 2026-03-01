@@ -1,5 +1,5 @@
 ﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.DomainModels;
+using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
@@ -87,7 +87,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// コピーコンストラクタ
         /// </summary>
         /// <param name="summary">コピー元の概要VM</param>
-        public SeriesViewModel(SummaryViewModel summary)
+        public SeriesViewModel(SummaryModel summary)
         {
             this.Category = summary.Category;
             this.Item = summary.Item;

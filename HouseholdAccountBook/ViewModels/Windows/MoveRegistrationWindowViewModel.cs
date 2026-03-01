@@ -1,12 +1,4 @@
 ﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.Infrastructure.DbDao.Compositions;
-using HouseholdAccountBook.Models.Infrastructure.DbDao.DbTable;
-using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
-using HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable;
-using HouseholdAccountBook.Models.Infrastructure.DbDto.Others;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
-using HouseholdAccountBook.Models.Utilities.Args;
-using HouseholdAccountBook.Models.Utilities.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.Views;
 using System;
@@ -17,9 +9,17 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ViewModels.UiConstants;
-using HouseholdAccountBook.Models.DomainModels;
-using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Models.ValueObjects;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Args;
+using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Models.UiDto;
+using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -290,7 +290,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 備考VMリスト
         /// </summary>
         #region RemarkVMList
-        public ObservableCollection<RemarkViewModel> RemarkVMList {
+        public ObservableCollection<RemarkModel> RemarkVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -497,8 +497,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { selectingFromBookId, selectingToBookId });
 
-            ViewModelService service = new(this.mDbHandlerFactory);
-            this.BookVMList = await service.LoadBookListAsync();
+            AppService service = new(this.mDbHandlerFactory);
+            this.BookVMList = [.. await service.LoadBookListAsync()];
             this.SelectedFromBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == selectingFromBookId, 0);
             this.SelectedToBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == selectingToBookId, 0);
 
@@ -535,9 +535,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 CommissionKind.MoveTo => this.SelectedToBookVM.Id,
                 _ => throw new ArgumentException("SelectedComissionKind"),
             };
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
             ItemIdObj tmpItemId = selectingItemId ?? this.SelectedItemVM?.Id;
-            this.ItemVMList = await service.LoadItemListAsync(bookId, BalanceKind.Expenses, -1);
+            this.ItemVMList = [.. await service.LoadItemListAsync(bookId, BalanceKind.Expenses, -1)];
             this.SelectedItemVM = this.ItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0);
         }
 
@@ -552,10 +552,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingRemark });
 
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
-            this.RemarkVMList = await service.LoadRemarkListAsync(this.SelectedItemVM.Id);
-            this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark?.Text == tmpRemark, 0).Remark?.Text;
+            this.RemarkVMList = [.. await service.LoadRemarkListAsync(this.SelectedItemVM.Id)];
+            this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
         }
 
         /// <summary>

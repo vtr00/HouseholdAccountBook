@@ -1,7 +1,7 @@
-﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.Infrastructure.DbHandlers;
-using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
+﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Models;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.ViewModels.Settings;
 using HouseholdAccountBook.Views.Extensions;

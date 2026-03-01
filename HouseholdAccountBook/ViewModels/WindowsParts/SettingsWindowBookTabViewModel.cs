@@ -1,14 +1,5 @@
 ﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.Infrastructure;
-using HouseholdAccountBook.Models.Infrastructure.DbDao.DbTable;
-using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
-using HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
-using HouseholdAccountBook.Models.Utilities.Args;
-using HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs;
-using HouseholdAccountBook.Models.Utilities.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
-using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Settings;
 using HouseholdAccountBook.Views;
 using System;
@@ -18,8 +9,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using HouseholdAccountBook.Models.DomainModels;
 using HouseholdAccountBook.Models.ValueObjects;
+using HouseholdAccountBook.Infrastructure;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Args;
+using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Models.UiDto;
+using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.ViewModels.Component;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
 {
@@ -314,7 +315,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿-項目関係変更コマンド処理
         /// </summary>
-        /// <param name="viewModel">チェックされた対象の<see cref="RelationViewModel"/></param>
+        /// <param name="viewModel">チェックされた対象の<see cref="RelationModel"/></param>
         private async void ChangeBookRelationCommand_Executed(object viewModel)
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
@@ -371,9 +372,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using FuncLog funcLog = new(new { bookId });
 
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
             BookIdObj tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            this.BookVMList = await service.LoadBookListAsync();
+            this.BookVMList = [.. await service.LoadBookListAsync()];
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
 
@@ -383,7 +384,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedBookVMChanged));
 
                 if (e.Value != null) {
-                    ViewModelService service = new(this.mDbHandlerFactory);
+                    AppService service = new(this.mDbHandlerFactory);
                     this.DisplayedBookSettingVM = await service.LoadBookSettingViewModelAsync(e.Value.Id);
                 }
                 else {

@@ -1,18 +1,5 @@
 ﻿using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.DbHandlers;
-using HouseholdAccountBook.Models.Infrastructure;
-using HouseholdAccountBook.Models.Infrastructure.DbDao.Abstract;
-using HouseholdAccountBook.Models.Infrastructure.DbDao.DbTable;
-using HouseholdAccountBook.Models.Infrastructure.DbDao.KHDbTable;
-using HouseholdAccountBook.Models.Infrastructure.DbHandlers;
-using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
-using HouseholdAccountBook.Models.Infrastructure.DbDto.Abstract;
-using HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable;
-using HouseholdAccountBook.Models.Infrastructure.DbDto.KHDbTable;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
-using HouseholdAccountBook.Models.Utilities.Args;
-using HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs;
-using HouseholdAccountBook.Models.Utilities.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.WindowsParts;
@@ -27,8 +14,23 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using static HouseholdAccountBook.ViewModels.UiConstants;
-using HouseholdAccountBook.Models.DomainModels;
 using HouseholdAccountBook.Models.ValueObjects;
+using HouseholdAccountBook.Infrastructure;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Args;
+using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
+using HouseholdAccountBook.Infrastructure.DB;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.KHDbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.Abstract;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.KHDbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Models.UiDto;
+using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -1831,9 +1833,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { bookId });
 
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
             BookIdObj tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            ObservableCollection<BookModel> tmpBookVMList = await service.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedPeriod);
+            ObservableCollection<BookModel> tmpBookVMList = [.. await service.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedPeriod)];
             this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0); // 先に選択しておく
             this.BookVMList = tmpBookVMList;
         }

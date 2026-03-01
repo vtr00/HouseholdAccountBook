@@ -1,12 +1,5 @@
 ﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.Infrastructure.DbDao.Compositions;
-using HouseholdAccountBook.Models.Infrastructure.DbDao.DbTable;
-using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
-using HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
-using HouseholdAccountBook.Models.Utilities.Args;
 using HouseholdAccountBook.ViewModels.Abstract;
-using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Settings;
 using HouseholdAccountBook.Views;
 using System;
@@ -18,6 +11,15 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using HouseholdAccountBook.Models.ValueObjects;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Args;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.UiDto;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
+using HouseholdAccountBook.ViewModels.Component;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
 {
@@ -450,12 +452,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                         HstShopDao hstShopDao = new(dbHandler);
                         _ = await hstShopDao.DeleteAsync(new HstShopDto {
-                            ShopName = this.DisplayedItemSettingVM.SelectedShopVM.Shop.Name,
+                            ShopName = this.DisplayedItemSettingVM.SelectedShopVM.Name,
                             ItemId = (int)this.DisplayedItemSettingVM.Id
                         });
                     }
 
-                    ViewModelService service = new(this.mDbHandlerFactory);
+                    AppService service = new(this.mDbHandlerFactory);
                     this.DisplayedItemSettingVM = await service.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
                 }
             }
@@ -480,12 +482,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                         HstRemarkDao hstRemarkDao = new(dbHandler);
                         _ = await hstRemarkDao.DeleteAsync(new HstRemarkDto {
-                            Remark = this.DisplayedItemSettingVM.SelectedRemarkVM.Remark.Text,
+                            Remark = this.DisplayedItemSettingVM.SelectedRemarkVM.Remark,
                             ItemId = (int)this.DisplayedItemSettingVM.Id
                         });
                     }
 
-                    ViewModelService service = new(this.mDbHandlerFactory);
+                    AppService service = new(this.mDbHandlerFactory);
                     this.DisplayedItemSettingVM = await service.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
                 }
             }
@@ -502,7 +504,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedItemTreeVMChanged));
 
                 if (e.Value != null) {
-                    ViewModelService service = new(this.mDbHandlerFactory);
+                    AppService service = new(this.mDbHandlerFactory);
                     this.DisplayedItemSettingVM = await service.LoadItemSettingVMAsync(e.Value.Kind, e.Value.Id);
                 }
                 else {
@@ -529,7 +531,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 id = this.SelectedItemTreeVM.Id;
             }
 
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
             this.ItemTreeVMList = await service.LoadItemTreeVMListAsync();
 
             // 選択する項目を探す

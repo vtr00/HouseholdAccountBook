@@ -1,6 +1,6 @@
-﻿using HouseholdAccountBook.Models.Infrastructure.DbHandlers;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
-using HouseholdAccountBook.Models.Utilities.Extensions;
+﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.Views.Extensions;

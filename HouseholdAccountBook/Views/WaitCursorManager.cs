@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Models.Infrastructure.Logger;
+﻿using HouseholdAccountBook.Infrastructure.Logger;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;

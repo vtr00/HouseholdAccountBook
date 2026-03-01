@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+
+namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
+{
+    /// <summary>
+    /// 帳簿項目比較情報DAO
+    /// </summary>
+    /// <param name="dbHandler">DBハンドラ</param>
+    public class ActionCompInfoDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
+    {
+        /// <summary>
+        /// <see cref="MstBookDto.BookId"/> と日付、値に基づいて、<see cref="ActionCompInfoDto"/> リストを取得する
+        /// </summary>
+        /// <param name="bookId">帳簿ID</param>
+        /// <param name="date">CSVの日付</param>
+        /// <param name="value">CSVの値</param>
+        /// <returns>取得したレコードリスト</returns>
+        public async Task<IEnumerable<ActionCompInfoDto>> FindMatchesWithCsvAsync(int bookId, DateTime date, int value)
+        {
+            using FuncLog funcLog = new(new { bookId, date, value }, Log.LogLevel.Trace);
+
+            var dtoList = await this.mDbHandler.QueryAsync<ActionCompInfoDto>(@"
+SELECT A.action_id, I.item_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match, A.group_id
+FROM hst_action A
+INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
+WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @Date AND A.act_value = -@Value AND book_id = @BookId AND A.del_flg = 0;",
+new { Date = date, Value = value, BookId = bookId });
+
+            return dtoList;
+        }
+    }
+}

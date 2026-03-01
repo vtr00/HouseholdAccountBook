@@ -1,10 +1,4 @@
 ﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.Infrastructure.DbDao.DbTable;
-using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
-using HouseholdAccountBook.Models.Infrastructure.DbDto.DbTable;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
-using HouseholdAccountBook.Models.Utilities.Args;
-using HouseholdAccountBook.Models.Utilities.Extensions;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views;
@@ -16,9 +10,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using static HouseholdAccountBook.ViewModels.UiConstants;
-using HouseholdAccountBook.Models.DomainModels;
-using HouseholdAccountBook.Models.Infrastructure;
 using HouseholdAccountBook.Models.ValueObjects;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Args;
+using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Infrastructure.CSV;
+using HouseholdAccountBook.Models.UiDto;
+using HouseholdAccountBook.Models.AppServices;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
@@ -227,7 +228,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 店舗VMリスト
         /// </summary>
         #region ShopNameList
-        public ObservableCollection<ShopViewModel> ShopVMList {
+        public ObservableCollection<ShopModel> ShopVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -246,7 +247,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 備考VMリスト
         /// </summary>
         #region RemarkVMList
-        public ObservableCollection<RemarkViewModel> RemarkVMList {
+        public ObservableCollection<RemarkModel> RemarkVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -410,9 +411,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { selectingBookId });
 
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
             BookIdObj tmpBookId = selectingBookId ?? this.SelectedBookVM?.Id;
-            this.BookVMList = await service.LoadBookListAsync();
+            this.BookVMList = [.. await service.LoadBookListAsync()];
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
 
@@ -427,9 +428,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingCategoryId });
 
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
             CategoryIdObj tmpCategoryId = selectingCategoryId ?? this.SelectedCategoryVM?.Id;
-            this.CategoryVMList = await service.LoadCategoryListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind);
+            this.CategoryVMList = [.. await service.LoadCategoryListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind)];
             this.SelectedCategoryVM = this.CategoryVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpCategoryId, 0);
         }
 
@@ -444,9 +445,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingItemId });
 
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
             ItemIdObj tmpItemId = selectingItemId ?? this.SelectedItemVM?.Id;
-            this.ItemVMList = await service.LoadItemListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, this.SelectedCategoryVM.Id);
+            this.ItemVMList = [.. await service.LoadItemListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, this.SelectedCategoryVM.Id)];
             this.SelectedItemVM = this.ItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0);
         }
 
@@ -461,10 +462,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingShopName });
 
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
             string tmpShopName = selectingShopName ?? this.SelectedShopName;
-            this.ShopVMList = await service.LoadShopListAsync(this.SelectedItemVM.Id);
-            this.SelectedShopName = this.ShopVMList.FirstOrElementAtOrDefault(vm => vm.Shop?.Name == tmpShopName, 0).Shop?.Name;
+            this.ShopVMList = [.. await service.LoadShopListAsync(this.SelectedItemVM.Id)];
+            this.SelectedShopName = this.ShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name;
         }
 
         /// <summary>
@@ -478,10 +479,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingRemark });
 
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
-            this.RemarkVMList = await service.LoadRemarkListAsync(this.SelectedItemVM.Id);
-            this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark?.Text == tmpRemark, 0).Remark?.Text;
+            this.RemarkVMList = [.. await service.LoadRemarkListAsync(this.SelectedItemVM.Id)];
+            this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
         }
 
         public override void AddEventHandlers()

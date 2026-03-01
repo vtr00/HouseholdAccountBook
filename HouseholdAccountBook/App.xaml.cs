@@ -1,9 +1,10 @@
-﻿using HouseholdAccountBook.Models.DbHandlers;
-using HouseholdAccountBook.Models.Infrastructure;
-using HouseholdAccountBook.Models.Infrastructure.DbHandlers;
-using HouseholdAccountBook.Models.Infrastructure.DbHandlers.Abstract;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
-using HouseholdAccountBook.Models.Utilities.Extensions;
+﻿using HouseholdAccountBook.Infrastructure;
+using HouseholdAccountBook.Infrastructure.DB;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Models.DbHandlers;
 using HouseholdAccountBook.Views.Extensions;
 using HouseholdAccountBook.Views.Windows;
 using System;

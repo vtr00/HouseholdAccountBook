@@ -1,7 +1,9 @@
-﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.Infrastructure;
-using HouseholdAccountBook.Models.Infrastructure.Logger;
-using HouseholdAccountBook.Models.Utilities.Args.RequestEventArgs;
+﻿using HouseholdAccountBook.Infrastructure;
+using HouseholdAccountBook.Infrastructure.CSV;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
+using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
@@ -86,10 +88,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             ItemIdObj tmpItemId = itemId ?? this.Parent.SelectedItemId;
             Log.Vars(vars: new { tmpBalanceKind, tmpCategoryId, tmpItemId });
 
-            ViewModelService service = new(this.mDbHandlerFactory);
+            AppService service = new(this.mDbHandlerFactory);
+            SeriesViewModelLoader loader = new(service);
             this.SeriesVMList = this.Tab switch {
-                Tabs.MonthlyListTab => await service.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
-                Tabs.YearlyListTab => await service.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
+                Tabs.MonthlyListTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
+                Tabs.YearlyListTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
                 _ => throw new NotImplementedException(),
             };
             this.SelectedSeriesVM = this.SeriesVMList?.FirstOrDefault(vm => vm.Category.BalanceKind == tmpBalanceKind && vm.Category.Id == tmpCategoryId && vm.Item.Id == tmpItemId);
