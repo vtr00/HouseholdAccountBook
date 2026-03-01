@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.Infrastructure.DB;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Models.DbHandlers;
 using System;

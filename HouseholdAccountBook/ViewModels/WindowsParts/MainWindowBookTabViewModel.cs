@@ -14,7 +14,6 @@ using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Windows;
-using HouseholdAccountBook.Views.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

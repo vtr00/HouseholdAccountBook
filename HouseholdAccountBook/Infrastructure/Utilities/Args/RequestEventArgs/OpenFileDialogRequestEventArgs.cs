@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.Models.ValueObjects;
-using System;
+﻿using System;
 
 namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
 {

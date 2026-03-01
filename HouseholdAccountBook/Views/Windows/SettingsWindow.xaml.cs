@@ -3,7 +3,6 @@ using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.ViewModels;
-using HouseholdAccountBook.ViewModels.Settings;
 using HouseholdAccountBook.Views.Extensions;
 using System.ComponentModel;
 using System.Windows;

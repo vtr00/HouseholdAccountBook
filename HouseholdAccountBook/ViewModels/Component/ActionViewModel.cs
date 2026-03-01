@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.UiDto;
+﻿using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 

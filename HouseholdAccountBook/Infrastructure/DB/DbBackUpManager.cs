@@ -1,15 +1,15 @@
-﻿using HouseholdAccountBook.Models.DbHandlers;
+﻿using HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Models.DbHandlers;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
-using HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions;
-using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 
 namespace HouseholdAccountBook.Infrastructure.DB
 {

@@ -6,7 +6,6 @@ using HouseholdAccountBook.Models;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views.Extensions;
-using Notifications.Wpf.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

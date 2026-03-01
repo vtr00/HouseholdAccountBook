@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.ViewModels.Abstract;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace HouseholdAccountBook.ViewModels.Component

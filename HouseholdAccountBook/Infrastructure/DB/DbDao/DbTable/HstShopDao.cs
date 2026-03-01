@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract;
+﻿using HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract;
 using HouseholdAccountBook.Infrastructure.DB.DbDto.Abstract;
 using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Infrastructure.Logger;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
 {

@@ -1,4 +1,14 @@
-﻿using HouseholdAccountBook.Models;
+﻿using HouseholdAccountBook.Infrastructure.CSV;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Args;
+using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.UiDto;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views;
@@ -10,16 +20,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using static HouseholdAccountBook.ViewModels.UiConstants;
-using HouseholdAccountBook.Models.ValueObjects;
-using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Infrastructure.Utilities.Args;
-using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
-using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
-using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
-using HouseholdAccountBook.Infrastructure.CSV;
-using HouseholdAccountBook.Models.UiDto;
-using HouseholdAccountBook.Models.AppServices;
 
 namespace HouseholdAccountBook.ViewModels.Windows
 {
