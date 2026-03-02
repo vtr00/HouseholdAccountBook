@@ -17,9 +17,19 @@ namespace HouseholdAccountBook.Models.UiDto
         public BookIdObj Id { get; init; } = id;
 
         /// <summary>
+        /// ソート順
+        /// </summary>
+        public int SortOrder { get; init; }
+
+        /// <summary>
         /// 帳簿名
         /// </summary>
         public string Name { get; init; } = name;
+
+        /// <summary>
+        /// 帳簿種別
+        /// </summary>
+        public BookKind BookKind { get; init; }
 
         /// <summary>
         /// 備考
@@ -27,11 +37,19 @@ namespace HouseholdAccountBook.Models.UiDto
         public string Remark { get; init; }
 
         /// <summary>
-        /// 帳簿種別
+        /// 初期残高
         /// </summary>
-        public BookKind BookKind { get; init; }
+        public decimal InitialValue { get; init; }
 
         #region 期間情報
+        /// <summary>
+        /// 開始日の有無
+        /// </summary>
+        public bool StartDateExists { get; init; }
+        /// <summary>
+        /// 終了日の有無
+        /// </summary>
+        public bool EndDateExists { get; init; }
         /// <summary>
         /// 期間
         /// </summary>

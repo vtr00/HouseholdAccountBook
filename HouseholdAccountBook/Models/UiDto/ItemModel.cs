@@ -16,6 +16,11 @@ namespace HouseholdAccountBook.Models.UiDto
         public ItemIdObj Id { get; init; } = id;
 
         /// <summary>
+        /// ソート順
+        /// </summary>
+        public int SortOrder { get; init; } = -1;
+
+        /// <summary>
         /// 項目名
         /// </summary>
         public string Name { get; init; } = name;

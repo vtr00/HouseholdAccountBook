@@ -13,12 +13,12 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 階層の深さ
         /// </summary>
-        public int Depth { get; init; }
+        public int Depth { get; init; } = 0;
 
         /// <summary>
         /// ID
         /// </summary>
-        public IdObj Id { get; init; }
+        public IdObj Id { get; init; } = -1;
 
         /// <summary>
         /// 親要素VM
@@ -28,17 +28,17 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// ソート順
         /// </summary>
-        public int SortOrder { get; init; }
+        public int SortOrder { get; init; } = -1;
 
         /// <summary>
         /// 名称
         /// </summary>
-        public string Name { get; init; }
+        public string Name { get; init; } = string.Empty;
 
         /// <summary>
         /// 子要素VMリスト
         /// </summary>
-        public ObservableCollection<T> ChildrenVMList { get; init; }
+        public ObservableCollection<T> ChildrenVMList { get; init; } = [];
 
         /// <summary>
         /// 選択されているか

@@ -105,5 +105,40 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// </summary>
         public bool IsSettable => this.Kind == HierarchicalKind.Item;
         #endregion
+
+        /// <summary>
+        /// 収支設定コンストラクタ
+        /// </summary>
+        public ItemSettingViewModel()
+        {
+            this.Kind = HierarchicalKind.Balance;
+            this.Id = -1;
+            this.SortOrder = -1;
+            this.InputedName = string.Empty;
+        }
+
+        /// <summary>
+        /// 分類設定コンストラクタ
+        /// </summary>
+        /// <param name="category">分類Model</param>
+        public ItemSettingViewModel(CategoryModel category)
+        {
+            this.Kind = HierarchicalKind.Category;
+            this.Id = category.Id;
+            this.SortOrder = category.SortOrder;
+            this.InputedName = category.Name;
+        }
+
+        /// <summary>
+        /// 項目設定コンストラクタ
+        /// </summary>
+        /// <param name="item">項目Model</param>
+        public ItemSettingViewModel(ItemModel item)
+        {
+            this.Kind = HierarchicalKind.Item;
+            this.Id = item.Id;
+            this.SortOrder = item.SortOrder;
+            this.InputedName = item.Name;
+        }
     }
 }
