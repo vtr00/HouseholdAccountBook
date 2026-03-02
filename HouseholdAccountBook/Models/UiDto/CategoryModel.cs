@@ -15,6 +15,12 @@ namespace HouseholdAccountBook.Models.UiDto
         /// 分類ID
         /// </summary>
         public CategoryIdObj Id { get; init; } = id;
+
+        /// <summary>
+        /// ソート順
+        /// </summary>
+        public int SortOrder { get; init; } = -1;
+
         /// <summary>
         /// 分類名
         /// </summary>
