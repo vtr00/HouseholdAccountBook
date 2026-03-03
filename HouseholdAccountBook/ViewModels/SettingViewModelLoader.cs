@@ -15,13 +15,18 @@ namespace HouseholdAccountBook.ViewModels
     /// <summary>
     /// 設定VMローダー
     /// </summary>
-    /// <param name="service">アプリサービス</param>
-    public class SettingViewModelLoader(AppService service)
+    /// <param name="appService">アプリサービス</param>
+    /// <param name="settingService">設定サービス</param>
+    public class SettingViewModelLoader(AppService appService, SettingService settingService)
     {
         /// <summary>
         /// アプリサービス
         /// </summary>
-        private readonly AppService mService = service;
+        private readonly AppService mAppService = appService;
+        /// <summary>
+        /// 設定サービス
+        /// </summary>
+        private readonly SettingService mService = settingService;
 
         /// <summary>
         /// 帳簿設定VMを取得する
@@ -34,8 +39,7 @@ namespace HouseholdAccountBook.ViewModels
 
             BookSettingViewModel vm = null;
 
-            List<BookModel> bmList = await this.mService.LoadBookListAsync(Properties.Resources.ListName_None);
-
+            List<BookModel> bmList = await this.mAppService.LoadBookListAsync(Properties.Resources.ListName_None);
             BookModel bm = await this.mService.LoadBookAsync(bookId);
 
             vm = new BookSettingViewModel(bm) {

@@ -384,7 +384,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedBookVMChanged));
 
                 if (e.Value != null) {
-                    SettingViewModelLoader loader = new(new(this.mDbHandlerFactory));
+                    SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
                     this.DisplayedBookSettingVM = await loader.LoadBookSettingViewModelAsync(e.Value.Id);
                 }
                 else {

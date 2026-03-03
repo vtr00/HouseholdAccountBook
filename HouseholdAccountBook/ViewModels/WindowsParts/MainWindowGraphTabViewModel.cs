@@ -258,8 +258,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 };
             }
 
-            AppService service = new(this.mDbHandlerFactory);
-            SeriesViewModelLoader loader = new(service);
+            SeriesViewModelLoader loader = new(new(this.mDbHandlerFactory));
             switch (this.Parent.SelectedGraphKind1) {
                 case GraphKind1.IncomeAndExpensesGraph: {
                     // グラフ表示データを取得する

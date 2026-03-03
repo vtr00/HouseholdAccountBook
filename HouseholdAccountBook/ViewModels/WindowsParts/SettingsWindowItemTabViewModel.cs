@@ -456,7 +456,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         });
                     }
 
-                    SettingViewModelLoader loader = new(new(this.mDbHandlerFactory));
+                    SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
                     this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
                 }
             }
@@ -486,7 +486,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         });
                     }
 
-                    SettingViewModelLoader loader = new(new(this.mDbHandlerFactory));
+                    SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
                     this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
                 }
             }
@@ -503,7 +503,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedItemTreeVMChanged));
 
                 if (e.Value != null) {
-                    SettingViewModelLoader loader = new(new(this.mDbHandlerFactory));
+                    SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
                     this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(e.Value.Kind, e.Value.Id);
                 }
                 else {
@@ -530,7 +530,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 id = this.SelectedItemTreeVM.Id;
             }
 
-            SettingViewModelLoader loader = new(new(this.mDbHandlerFactory));
+            SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
             this.ItemTreeVMList = await loader.LoadItemTreeVMListAsync();
 
             // 選択する項目を探す

@@ -770,7 +770,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             Log.Vars(vars: new { tmpActionIdList, tmpBalanceKind, tmpCategoryId, tmpItemId });
 
             // 表示するデータを指定する
-            AppService service = new(this.mDbHandlerFactory);
+            MainService service = new(this.mDbHandlerFactory);
             switch (this.Parent.DisplayedPeriodKind) {
                 case PeriodKind.Monthly:
                     var (tmp1, tmp2) = await (
