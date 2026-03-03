@@ -10,9 +10,16 @@ using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.ViewModels
 {
-    public class SeriesViewModelLoader(AppService appService)
+    /// <summary>
+    /// 系列VMローダ
+    /// </summary>
+    /// <param name="appService">アプリサービス</param>
+    public class SeriesViewModelLoader(MainService appService)
     {
-        private readonly AppService mAppService = appService;
+        /// <summary>
+        /// アプリサービス
+        /// </summary>
+        private readonly MainService mAppService = appService;
 
         /// <summary>
         /// 月内日別系列VMリストを取得する(日別グラフタブ)
