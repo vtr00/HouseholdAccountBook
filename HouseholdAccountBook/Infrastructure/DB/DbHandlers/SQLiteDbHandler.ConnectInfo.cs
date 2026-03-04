@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+﻿using HouseholdAccountBook.Infrastructure.DB;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 
 namespace HouseholdAccountBook.Models.DbHandlers
 {
@@ -7,8 +8,10 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// <summary>
         /// 接続情報
         /// </summary>
-        public new class ConnectInfo : DbHandlerBase.ConnectInfo
+        public class ConnectInfo : ConnectInfoBase
         {
+            public ConnectInfo() => this.Kind = DBKind.SQLite;
+
             /// <summary>
             /// ファイルパス
             /// </summary>

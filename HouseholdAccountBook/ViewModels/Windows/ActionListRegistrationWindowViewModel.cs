@@ -430,7 +430,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             AppService service = new(this.mDbHandlerFactory);
             CategoryIdObj tmpCategoryId = selectingCategoryId ?? this.SelectedCategoryVM?.Id;
-            this.CategoryVMList = [.. await service.LoadCategoryListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind)];
+            this.CategoryVMList = [.. await service.LoadCategoryListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, Properties.Resources.ListName_NoSpecification)];
             this.SelectedCategoryVM = this.CategoryVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpCategoryId, 0);
         }
 
@@ -464,7 +464,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             AppService service = new(this.mDbHandlerFactory);
             string tmpShopName = selectingShopName ?? this.SelectedShopName;
-            this.ShopVMList = [.. await service.LoadShopListAsync(this.SelectedItemVM.Id)];
+            this.ShopVMList = [.. await service.LoadShopListAsync(this.SelectedItemVM.Id, true)];
             this.SelectedShopName = this.ShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name;
         }
 
@@ -481,7 +481,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             AppService service = new(this.mDbHandlerFactory);
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
-            this.RemarkVMList = [.. await service.LoadRemarkListAsync(this.SelectedItemVM.Id)];
+            this.RemarkVMList = [.. await service.LoadRemarkListAsync(this.SelectedItemVM.Id, true)];
             this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
         }
 

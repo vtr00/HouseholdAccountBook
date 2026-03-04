@@ -16,7 +16,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers
         /// <summary>
         /// 接続情報
         /// </summary>
-        private readonly DbHandlerBase.ConnectInfo mInfo;
+        private readonly DbHandlerBase.ConnectInfoBase mConnectInfo;
         #endregion
 
         #region プロパティ
@@ -24,36 +24,40 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers
         /// DBライブラリ種別
         /// </summary>
         public DBLibraryKind DBLibKind { get; protected set; }
+        /// <summary>
+        /// DB種別
+        /// </summary>
+        public DBKind DBKind => this.mConnectInfo.Kind;
         #endregion
 
         /// <summary>
         /// <see cref="DbHandlerFactory"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public DbHandlerFactory(DbHandlerBase.ConnectInfo info)
+        public DbHandlerFactory(DbHandlerBase.ConnectInfoBase info)
         {
             using FuncLog funcLog = new(new { info }, Log.LogLevel.Trace);
 
             if (info is NpgsqlDbHandler.ConnectInfo) {
                 this.DBLibKind = DBLibraryKind.PostgreSQL;
-                this.mInfo = info;
+                this.mConnectInfo = info;
                 return;
             }
 
             if (info is SQLiteDbHandler.ConnectInfo) {
                 this.DBLibKind = DBLibraryKind.SQLite;
-                this.mInfo = info;
+                this.mConnectInfo = info;
                 return;
             }
 
             if (info is OleDbHandler.ConnectInfo) {
                 this.DBLibKind = DBLibraryKind.OleDb;
-                this.mInfo = info;
+                this.mConnectInfo = info;
                 return;
             }
 
             this.DBLibKind = DBLibraryKind.Undefined;
-            this.mInfo = null;
+            this.mConnectInfo = null;
         }
 
         /// <summary>
@@ -69,9 +73,9 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers
 
             try {
                 DbHandlerBase dbHandler = this.DBLibKind switch {
-                    DBLibraryKind.SQLite => new SQLiteDbHandler(this.mInfo as SQLiteDbHandler.ConnectInfo),
-                    DBLibraryKind.PostgreSQL => new NpgsqlDbHandler(this.mInfo as NpgsqlDbHandler.ConnectInfo),
-                    DBLibraryKind.OleDb => new OleDbHandler(this.mInfo as OleDbHandler.ConnectInfo),
+                    DBLibraryKind.SQLite => new SQLiteDbHandler(this.mConnectInfo as SQLiteDbHandler.ConnectInfo),
+                    DBLibraryKind.PostgreSQL => new NpgsqlDbHandler(this.mConnectInfo as NpgsqlDbHandler.ConnectInfo),
+                    DBLibraryKind.OleDb => new OleDbHandler(this.mConnectInfo as OleDbHandler.ConnectInfo),
                     _ => null,
                 };
 

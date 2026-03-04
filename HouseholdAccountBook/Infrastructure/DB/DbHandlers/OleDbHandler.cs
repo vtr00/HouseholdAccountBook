@@ -17,28 +17,20 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// 接続文字列
         /// </summary>
         private const string mStringFormat = @"Provider={0};Data Source={1}";
-        /// <summary>
-        /// 接続情報
-        /// </summary>
-        private readonly ConnectInfo mConnectInfo;
         #endregion
 
         #region プロパティ
         /// <summary>
-        /// Accessプロバイダヘッダ
-        /// </summary>
-        public static string AccessProviderHeader => "Microsoft.ACE.OLEDB";
-        /// <summary>
         /// データソース
         /// </summary>
-        public string DataSource => this.mConnectInfo.DataSource;
+        public string DataSource => (this.mConnectInfoBase as ConnectInfo).DataSource;
         #endregion
 
         /// <summary>
         /// <see cref="OleDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public OleDbHandler(ConnectInfo info) : this(info.Provider, info.DataSource) => this.mConnectInfo = info;
+        public OleDbHandler(ConnectInfo info) : this(info.Provider, info.DataSource) => this.mConnectInfoBase = info;
 
         /// <summary>
         /// <see cref="OleDbHandler"/> クラスの新しいインスタンスを初期化します。
@@ -48,8 +40,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
         {
             using FuncLog funcLog = new(new { provider, filePath }, Log.LogLevel.Trace);
 
-            this.DBLibKind = DBLibraryKind.OleDb;
-            this.DBKind = provider.Contains(AccessProviderHeader) ? DBKind.Access : DBKind.Undefined;
+            this.LibKind = DBLibraryKind.OleDb;
         }
 
         /// <summary>

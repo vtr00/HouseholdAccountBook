@@ -3,21 +3,12 @@
     /// <summary>
     /// ID VO
     /// </summary>
-    /// <typeparam name="T">IDの型</typeparam>
-    /// <param name="id">ID</param>
-    public class IdObj(int id)
+    /// <param name="Value">ID</param>
+    public record class IdObj(int Value)
     {
-        /// <summary>
-        /// 値
-        /// </summary>
-        public int Value { get; protected init; } = id;
-
-        public static implicit operator IdObj(int id) => new(id);
+        public static implicit operator IdObj(int value) => new(value);
         public static explicit operator int?(IdObj obj) => obj?.Value;
-        public static bool operator ==(IdObj left, IdObj right) => left?.Value == right?.Value;
-        public static bool operator !=(IdObj left, IdObj right) => left?.Value != right?.Value;
-        public override bool Equals(object obj) => ReferenceEquals(this, obj);
-        public override int GetHashCode() => this.Value.GetHashCode();
+        public static explicit operator int(IdObj obj) => obj is null ? -1 : obj.Value;
 
         public override string ToString() => $"{this.Value}";
     }
@@ -25,49 +16,54 @@
     /// <summary>
     /// 帳簿項目ID
     /// </summary>
-    /// <param name="id">帳簿ID</param>
-    public class ActionIdObj(int id) : IdObj(id)
+    /// <param name="Value">帳簿ID</param>
+    public record class ActionIdObj(int Value) : IdObj(Value)
     {
         public static implicit operator ActionIdObj(int id) => new(id);
         public static explicit operator int?(ActionIdObj obj) => obj?.Value;
+        public static explicit operator int(ActionIdObj obj) => obj is null ? -1 : obj.Value;
     }
     /// <summary>
     /// グループID
     /// </summary>
-    /// <param name="id">グループID</param>
-    public class GroupIdObj(int id) : IdObj(id)
+    /// <param name="Value">グループID</param>
+    public record class GroupIdObj(int Value) : IdObj(Value)
     {
         public static implicit operator GroupIdObj(int id) => new(id);
         public static explicit operator int?(GroupIdObj obj) => obj?.Value;
+        public static explicit operator int(GroupIdObj obj) => obj is null ? -1 : obj.Value;
     }
 
     /// <summary>
     /// 帳簿ID
     /// </summary>
-    /// <param name="id">帳簿ID</param>
-    public class BookIdObj(int id) : IdObj(id)
+    /// <param name="Value">帳簿ID</param>
+    public record class BookIdObj(int Value) : IdObj(Value)
     {
         public static implicit operator BookIdObj(int id) => new(id);
         public static explicit operator int?(BookIdObj obj) => obj?.Value;
+        public static explicit operator int(BookIdObj obj) => obj is null ? -1 : obj.Value;
     }
 
     /// <summary>
     /// 分類ID
     /// </summary>
-    /// <param name="id">分類ID</param>
-    public class CategoryIdObj(int id) : IdObj(id)
+    /// <param name="Value">分類ID</param>
+    public record class CategoryIdObj(int Value) : IdObj(Value)
     {
         public static implicit operator CategoryIdObj(int id) => new(id);
         public static explicit operator int?(CategoryIdObj obj) => obj?.Value;
+        public static explicit operator int(CategoryIdObj obj) => obj is null ? -1 : obj.Value;
     }
 
     /// <summary>
     /// 項目ID
     /// </summary>
-    /// <param name="id">項目ID</param>
-    public class ItemIdObj(int id) : IdObj(id)
+    /// <param name="Value">項目ID</param>
+    public record class ItemIdObj(int Value) : IdObj(Value)
     {
         public static implicit operator ItemIdObj(int id) => new(id);
         public static explicit operator int?(ItemIdObj obj) => obj?.Value;
+        public static explicit operator int(ItemIdObj obj) => obj is null ? -1 : obj.Value;
     }
 }

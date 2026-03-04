@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbDto.Abstract;
+using System;
 
 namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Others
 {
@@ -16,6 +17,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Others
         /// 帳簿ID
         /// </summary>
         public int ActionId { get; set; } = -1;
+        /// <summary>
+        /// 項目日時
+        /// </summary>
+        public DateTime ActTime { get; set; } = DateTime.Now;
         /// <summary>
         /// 項目ID
         /// </summary>

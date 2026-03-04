@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Models.UiDto;
+using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 
@@ -14,6 +15,10 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// 残高付き帳簿項目Model
         /// </summary>
         public ActionWithBalanceModel ActionWithBalance { get; init; } = model;
+
+        public ActionIdObj ActionId => this.ActionWithBalance.Action.ActionId;
+
+        public GroupIdObj GroupId => this.ActionWithBalance.Action.GroupId;
 
         /// <summary>
         /// CSVと一致したか

@@ -5,14 +5,10 @@ namespace HouseholdAccountBook.Models.UiDto
     /// <summary>
     /// 備考Model
     /// </summary>
-    public class RemarkModel(string remark)
+    /// <param name="Remark">備考</param>
+    public record class RemarkModel(string Remark)
     {
         #region プロパティ
-        /// <summary>
-        /// 備考
-        /// </summary>
-        public string Remark { get; init; } = remark;
-
         /// <summary>
         /// 使用回数
         /// </summary>

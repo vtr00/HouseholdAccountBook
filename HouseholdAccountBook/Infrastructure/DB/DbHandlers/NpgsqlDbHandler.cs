@@ -18,17 +18,13 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// 接続文字列
         /// </summary>
         private const string mStringFormat = @"Server={0};Port={1};User Id={2};Password={3};Database={4}";
-        /// <summary>
-        /// 接続情報
-        /// </summary>
-        private readonly ConnectInfo mConnectInfo;
         #endregion
 
         #region プロパティ
         /// <summary>
         /// DB作成時のロール
         /// </summary>
-        public string DbCreationRole => this.mConnectInfo.Role;
+        public string DbCreationRole => (this.mConnectInfoBase as NpgsqlDbHandler.ConnectInfo).Role;
         #endregion
 
         /// <summary>
@@ -40,7 +36,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// <see cref="NpgsqlDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public NpgsqlDbHandler(ConnectInfo info) : this(info.Host, info.Port, info.UserName, info.Password, info.DatabaseName) => this.mConnectInfo = info;
+        public NpgsqlDbHandler(ConnectInfo info) : this(info.Host, info.Port, info.UserName, info.Password, info.DatabaseName) => this.mConnectInfoBase = info;
 
         /// <summary>
         /// <see cref="NpgsqlDbHandler"/> クラスの新しいインスタンスを初期化します。
@@ -55,8 +51,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
         {
             using FuncLog funcLog = new(new { uri, port, userName, databaseName }, Log.LogLevel.Trace);
 
-            this.DBLibKind = DBLibraryKind.PostgreSQL;
-            this.DBKind = DBKind.PostgreSQL;
+            this.LibKind = DBLibraryKind.PostgreSQL;
         }
 
         /// <summary>
@@ -75,20 +70,21 @@ namespace HouseholdAccountBook.Models.DbHandlers
             using FuncLog funcLog = new(new { backupFilePath, dumpExePath, passwordInput, format, notifyResult, waitForFinish }, Log.LogLevel.Trace);
 
             bool pgPassConf = passwordInput == PostgresPasswordInput.PgPassConf;
+            ConnectInfo connectInfo = this.mConnectInfoBase as ConnectInfo;
 
             // 起動情報を設定する
             ProcessStartInfo info = new() {
                 FileName = dumpExePath,
                 Arguments = string.Format(
                     "--host {0} --port {1} --username \"{2}\" --role \"{3}\" {4} --format {5} --data-only --verbose --column-inserts --file \"{6}\" \"{7}\"",
-                    this.mConnectInfo.Host,
-                    this.mConnectInfo.Port,
-                    this.mConnectInfo.UserName,
-                    this.mConnectInfo.Role,
+                    connectInfo.Host,
+                    connectInfo.Port,
+                    connectInfo.UserName,
+                    connectInfo.Role,
                     pgPassConf ? "--no-password" : "--password",
                     format.ToString().ToLower(),
                     backupFilePath,
-                    this.mConnectInfo.DatabaseName
+                    connectInfo.DatabaseName
                 ),
                 WindowStyle = pgPassConf ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal,
                 RedirectStandardOutput = true,
@@ -142,18 +138,19 @@ namespace HouseholdAccountBook.Models.DbHandlers
             using FuncLog funcLog = new(new { backupFilePath, restoreExePath, passwordInput }, Log.LogLevel.Trace);
 
             bool pgPassConf = passwordInput == PostgresPasswordInput.PgPassConf;
+            ConnectInfo connectInfo = this.mConnectInfoBase as ConnectInfo;
 
             // 起動情報を設定する
             ProcessStartInfo info = new() {
                 FileName = restoreExePath,
                 Arguments = string.Format(
                     "--host {0} --port {1} --username \"{2}\" --role \"{3}\" {4} --data-only --verbose --dbname \"{5}\" \"{6}\"",
-                    this.mConnectInfo.Host,
-                    this.mConnectInfo.Port,
-                    this.mConnectInfo.UserName,
-                    this.mConnectInfo.Role,
+                    connectInfo.Host,
+                    connectInfo.Port,
+                    connectInfo.UserName,
+                    connectInfo.Role,
                     pgPassConf ? "--no-password" : "--password",
-                    this.mConnectInfo.DatabaseName,
+                    connectInfo.DatabaseName,
                     backupFilePath
                 ),
                 WindowStyle = pgPassConf ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal,

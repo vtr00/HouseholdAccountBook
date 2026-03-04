@@ -1,13 +1,6 @@
 ﻿using HouseholdAccountBook.Infrastructure;
 using HouseholdAccountBook.Infrastructure.DB;
-using HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract;
-using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
-using HouseholdAccountBook.Infrastructure.DB.DbDao.KHDbTable;
-using HouseholdAccountBook.Infrastructure.DB.DbDto.Abstract;
-using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
-using HouseholdAccountBook.Infrastructure.DB.DbDto.KHDbTable;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
@@ -40,6 +33,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
     public class MainWindowViewModel : WindowViewModelBase
     {
         #region フィールド
+        /// <summary>
+        /// DBインポートサービス
+        /// </summary>
+        private DbImportService mDbImportService;
+
         /// <summary>
         /// 表示日付の更新中か
         /// </summary>
@@ -753,117 +751,20 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.App_Import_KichoFugetsu_FilePath = e.FileName;
             settings.Save();
 
-            bool isOpen = false;
+            bool result = false;
             int actRowsDiff = 0;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                OleDbHandler.ConnectInfo info = new() {
-                    Provider = settings.App_Access_Provider,
+                OleDbHandler.ConnectInfo info = new(settings.App_Access_Provider) {
                     DataSource = e.FileName
                 };
+                (result, actRowsDiff) = await this.mDbImportService.ImportKichoFugetsuDbAsync(info);
 
-                await using (OleDbHandler dbHandlerOle = await new DbHandlerFactory(info).CreateAsync() as OleDbHandler)
-                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                    isOpen = dbHandlerOle.IsOpen;
-
-                    if (isOpen) {
-                        static async Task<int> Mapping<DTO1, DTO2>(IReadTableDao<DTO1> src, IWriteTableDao<DTO2> dest, Func<IEnumerable<DTO1>, IEnumerable<DTO2>> converter) where DTO1 : DtoBase where DTO2 : DtoBase
-                        {
-                            var srcDtoList = await src.FindAllAsync();
-                            _ = await dest.DeleteAllAsync();
-                            if (srcDtoList is IEnumerable<ISequentialIDDto> srcSeqDtoList && dest is ISequentialIDDao<ISequentialIDDto> destSeq) {
-                                // シーケンスを更新する
-                                await destSeq.SetIdSequenceAsync(srcSeqDtoList);
-                            }
-                            int srcCount = srcDtoList.Count();
-                            int dstCount = await dest.BulkInsertAsync(converter(srcDtoList));
-                            return srcCount - dstCount;
-                        }
-
-                        await dbHandler.ExecTransactionAsync(async () => {
-                            CbmBookDao cbmBookDao = new(dbHandlerOle);
-                            MstBookDao mstBookDao = new(dbHandler);
-                            _ = await Mapping(cbmBookDao, mstBookDao, src => src.Select(dto => new MstBookDto(dto)));
-
-                            CbmCategoryDao cbmCategoryDao = new(dbHandlerOle);
-                            MstCategoryDao mstCategoryDao = new(dbHandler);
-                            _ = await Mapping(cbmCategoryDao, mstCategoryDao, src => src.Select(dto => new MstCategoryDto(dto)));
-
-                            CbmItemDao cbmItemDao = new(dbHandlerOle);
-                            MstItemDao mstItemDao = new(dbHandler);
-                            _ = await Mapping(cbmItemDao, mstItemDao, src => src.Select(dto => new MstItemDto(dto)));
-
-                            CbtActDao cbtActDao = new(dbHandlerOle);
-                            HstActionDao hstActionDao = new(dbHandler);
-                            actRowsDiff = await Mapping(cbtActDao, hstActionDao, src => src.Where(dto => !(dto.INCOME == 0 && dto.EXPENSE == 0)).Select(dto => new HstActionDto(dto)));
-
-                            HstGroupDao hstGroupDao = new(dbHandler);
-                            var cbtActDtoList = await cbtActDao.FindAllAsync();
-                            _ = await hstGroupDao.DeleteAllAsync();
-                            int maxGroupId = 0; // グループIDの最大値
-                            IEnumerable<HstGroupDto> hstGroupDtoList = [];
-                            foreach (CbtActDto cbtActDto in cbtActDtoList) {
-                                // groupId が存在しないなら次のレコードへ
-                                if (cbtActDto.GROUP_ID == 0) { continue; }
-                                int groupId = cbtActDto.GROUP_ID;
-
-                                // groupId のレコードが存在しないとき
-                                if (!hstGroupDtoList.Any(dto => dto.GroupId == groupId)) {
-                                    // グループIDの最大値を更新する
-                                    if (maxGroupId < groupId) { maxGroupId = groupId; }
-
-                                    // グループの種類を調べる
-                                    var cbtActDtoList2 = cbtActDtoList.Where(dto => dto.GROUP_ID == groupId);
-                                    GroupKind groupKind = GroupKind.Repeat;
-                                    int? tmpBookId = null;
-                                    foreach (CbtActDto cbtActDto2 in cbtActDtoList2) {
-                                        if (tmpBookId == null) { // 1つ目のレコードの帳簿IDを記録する
-                                            tmpBookId = cbtActDto2.BOOK_ID;
-                                        }
-                                        else { // 2つ目のレコードの帳簿IDが1つ目と一致するか
-                                            if (tmpBookId != cbtActDto2.BOOK_ID) {
-                                                // 帳簿が一致しない場合は移動
-                                                groupKind = GroupKind.Move;
-                                            }
-                                            else {
-                                                // 帳簿が一致する場合は繰り返し
-                                                groupKind = GroupKind.Repeat;
-                                            }
-                                            break;
-                                        }
-                                    }
-
-                                    // グループテーブルのレコードを追加する
-                                    hstGroupDtoList = hstGroupDtoList.Append(new HstGroupDto {
-                                        GroupId = groupId,
-                                        GroupKind = (int)groupKind
-                                    });
-                                }
-                            }
-                            if (0 < maxGroupId) {
-                                await hstGroupDao.SetIdSequenceAsync(maxGroupId);
-                                _ = await hstGroupDao.BulkInsertAsync(hstGroupDtoList);
-                            }
-
-                            HstShopDao hstShopDao = new(dbHandler);
-                            _ = await hstShopDao.DeleteAllAsync();
-
-                            CbtNoteDao cbtNoteDao = new(dbHandlerOle);
-                            HstRemarkDao hstRemarkDao = new(dbHandler);
-                            _ = await Mapping(cbtNoteDao, hstRemarkDao, src => src.Select(dto => new HstRemarkDto(dto)));
-
-                            CbrBookDao cbrBookDao = new(dbHandlerOle);
-                            RelBookItemDao relBookItemDao = new(dbHandler);
-                            _ = await Mapping(cbrBookDao, relBookItemDao, src => src.Select(dto => new RelBookItemDto(dto)));
-                        });
-                    }
-                }
-
-                if (isOpen) {
+                if (result) {
                     await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
                 }
             }
 
-            _ = isOpen
+            _ = result
                 ? MessageBox.Show(Properties.Resources.Message_FinishToImport + (0 < actRowsDiff ? Environment.NewLine + Properties.Resources.Message_DeletedZeroValueInformation : string.Empty),
                     Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
                 : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
@@ -900,61 +801,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 #endif
                     Role = settings.App_Postgres_Role
                 };
-
-                await using (NpgsqlDbHandler dbHandlerNpgsql = await new DbHandlerFactory(info).CreateAsync() as NpgsqlDbHandler)
-                await using (DbHandlerBase dbHandlerSQLite = await this.mDbHandlerFactory.CreateAsync()) {
-                    result = dbHandlerNpgsql.IsOpen;
-
-                    if (result) {
-                        // データ移行処理
-                        static async Task Mapping<DTO>(IReadTableDao<DTO> src, IWriteTableDao<DTO> dest) where DTO : DtoBase
-                        {
-                            var srcDtoList = await src.FindAllAsync();
-                            _ = await dest.DeleteAllAsync();
-                            if (srcDtoList is IEnumerable<ISequentialIDDto> srcSeqDtoList && dest is ISequentialIDDao<ISequentialIDDto> destSeq) {
-                                // シーケンスを更新する
-                                await destSeq.SetIdSequenceAsync(srcSeqDtoList);
-                            }
-                            _ = await dest.BulkInsertAsync(srcDtoList);
-                        }
-
-                        await dbHandlerSQLite.ExecTransactionAsync(async () => {
-                            MstBookDao mstBookDao1 = new(dbHandlerNpgsql);
-                            MstBookDao mstBookDao2 = new(dbHandlerSQLite);
-                            await Mapping(mstBookDao1, mstBookDao2);
-
-                            MstCategoryDao mstCategoryDao1 = new(dbHandlerNpgsql);
-                            MstCategoryDao mstCategoryDao2 = new(dbHandlerSQLite);
-                            await Mapping(mstCategoryDao1, mstCategoryDao2);
-
-                            MstItemDao mstItemDao1 = new(dbHandlerNpgsql);
-                            MstItemDao mstItemDao2 = new(dbHandlerSQLite);
-                            await Mapping(mstItemDao1, mstItemDao2);
-
-                            HstActionDao hstActionDao1 = new(dbHandlerNpgsql);
-                            HstActionDao hstActionDao2 = new(dbHandlerSQLite);
-                            await Mapping(hstActionDao1, hstActionDao2);
-
-                            HstGroupDao hstGroupDao1 = new(dbHandlerNpgsql);
-                            HstGroupDao hstGroupDao2 = new(dbHandlerSQLite);
-                            await Mapping(hstGroupDao1, hstGroupDao2);
-
-                            HstShopDao hstShopDao1 = new(dbHandlerNpgsql);
-                            HstShopDao hstShopDao2 = new(dbHandlerSQLite);
-                            await Mapping(hstShopDao1, hstShopDao2);
-
-                            HstRemarkDao hstRemarkDao1 = new(dbHandlerNpgsql);
-                            HstRemarkDao hstRemarkDao2 = new(dbHandlerSQLite);
-                            await Mapping(hstRemarkDao1, hstRemarkDao2);
-
-                            RelBookItemDao relBookItemDao1 = new(dbHandlerNpgsql);
-                            RelBookItemDao relBookItemDao2 = new(dbHandlerSQLite);
-                            await Mapping(relBookItemDao1, relBookItemDao2);
-
-                            // スキーマバージョンは移行しない
-                        });
-                    }
-                }
+                result = await this.mDbImportService.ImportPostgreSQLAsync(info);
 
                 if (result) {
                     await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
@@ -997,43 +844,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.Save();
 
             bool result = false;
-            int schemaVersion = 0;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                    await dbHandler.ExecTransactionAsync(async () => {
-                        MstBookDao mstBookDao = new(dbHandler);
-                        MstCategoryDao mstCategoryDao = new(dbHandler);
-                        MstItemDao mstItemDao = new(dbHandler);
-                        HstActionDao hstActionDao = new(dbHandler);
-                        HstGroupDao hstGroupDao = new(dbHandler);
-                        HstShopDao hstShopDao = new(dbHandler);
-                        HstRemarkDao hstRemarkDao = new(dbHandler);
-                        RelBookItemDao relBookItemDao = new(dbHandler);
-                        MtdSchemaVersionDao mtdSchemaVersionDao = new(dbHandler);
-
-                        // 現在のスキーマバージョンを取得しておく
-                        schemaVersion = await mtdSchemaVersionDao.SelectSchemaVersionAsync();
-
-                        // 既存のデータを削除する
-                        _ = await mstBookDao.DeleteAllAsync();
-                        _ = await mstCategoryDao.DeleteAllAsync();
-                        _ = await mstItemDao.DeleteAllAsync();
-                        _ = await hstActionDao.DeleteAllAsync();
-                        _ = await hstGroupDao.DeleteAllAsync();
-                        _ = await hstShopDao.DeleteAllAsync();
-                        _ = await hstRemarkDao.DeleteAllAsync();
-                        _ = await relBookItemDao.DeleteAllAsync();
-                        _ = await mtdSchemaVersionDao.DeleteAllAsync(); // リストア時にレコードが増えるためスキーマバージョンを削除する
-                    });
-                }
-
-                result = await DbBackUpManager.Instance.ExecuteRestorePostgreSQLAsync(e.FileName);
-
-                await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                    // スキーマバージョンを元に戻す
-                    MtdSchemaVersionDao mtdSchemaVersionDao = new(dbHandler);
-                    _ = await mtdSchemaVersionDao.UpsertSchemaVersionAsync(schemaVersion);
-                }
+                result = await this.mDbImportService.ImportCustomFileAsync(e.FileName);
 
                 if (result) {
                     await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
@@ -1076,84 +888,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.Save();
 
             bool result = false;
-            switch (settings.App_SelectedDBKind) {
-                case (int)DBKind.SQLite: {
-                    try {
-                        // ファイルをコピーするだけ
-                        File.Copy(e.FileName, settings.App_SQLite_DBFilePath, true);
-                        result = true;
-                    }
-                    catch (Exception) { }
-                    break;
+            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
+                result = await this.mDbImportService.ImportSQLiteAsync(this.SelectedDBKind, e.FileName, settings.App_SQLite_DBFilePath);
+
+                if (result) {
+                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
                 }
-                case (int)DBKind.PostgreSQL: {
-                    using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                        SQLiteDbHandler.ConnectInfo info = new() {
-                            FilePath = e.FileName
-                        };
-                        await using (SQLiteDbHandler dbHandlerSqlite = await new DbHandlerFactory(info).CreateAsync() as SQLiteDbHandler)
-                        await using (DbHandlerBase dbHandlerNpgsql = await this.mDbHandlerFactory.CreateAsync()) {
-                            result = dbHandlerSqlite.IsOpen;
-
-                            if (result) {
-                                // データ移行処理
-                                static async Task Mapping<DTO>(IReadTableDao<DTO> src, IWriteTableDao<DTO> dest) where DTO : DtoBase
-                                {
-                                    var srcDtoList = await src.FindAllAsync();
-                                    _ = await dest.DeleteAllAsync();
-                                    if (srcDtoList is IEnumerable<ISequentialIDDto> srcSeqDtoList && dest is ISequentialIDDao<ISequentialIDDto> destSeq) {
-                                        // シーケンスを更新する
-                                        await destSeq.SetIdSequenceAsync(srcSeqDtoList);
-                                    }
-                                    _ = await dest.BulkInsertAsync(srcDtoList);
-                                }
-
-                                await dbHandlerNpgsql.ExecTransactionAsync(async () => {
-                                    MstBookDao mstBookDao1 = new(dbHandlerSqlite);
-                                    MstBookDao mstBookDao2 = new(dbHandlerNpgsql);
-                                    await Mapping(mstBookDao1, mstBookDao2);
-
-                                    MstCategoryDao mstCategoryDao1 = new(dbHandlerSqlite);
-                                    MstCategoryDao mstCategoryDao2 = new(dbHandlerNpgsql);
-                                    await Mapping(mstCategoryDao1, mstCategoryDao2);
-
-                                    MstItemDao mstItemDao1 = new(dbHandlerSqlite);
-                                    MstItemDao mstItemDao2 = new(dbHandlerNpgsql);
-                                    await Mapping(mstItemDao1, mstItemDao2);
-
-                                    HstActionDao hstActionDao1 = new(dbHandlerSqlite);
-                                    HstActionDao hstActionDao2 = new(dbHandlerNpgsql);
-                                    await Mapping(hstActionDao1, hstActionDao2);
-
-                                    HstGroupDao hstGroupDao1 = new(dbHandlerSqlite);
-                                    HstGroupDao hstGroupDao2 = new(dbHandlerNpgsql);
-                                    await Mapping(hstGroupDao1, hstGroupDao2);
-
-                                    HstShopDao hstShopDao1 = new(dbHandlerSqlite);
-                                    HstShopDao hstShopDao2 = new(dbHandlerNpgsql);
-                                    await Mapping(hstShopDao1, hstShopDao2);
-
-                                    HstRemarkDao hstRemarkDao1 = new(dbHandlerSqlite);
-                                    HstRemarkDao hstRemarkDao2 = new(dbHandlerNpgsql);
-                                    await Mapping(hstRemarkDao1, hstRemarkDao2);
-
-                                    RelBookItemDao relBookItemDao1 = new(dbHandlerSqlite);
-                                    RelBookItemDao relBookItemDao2 = new(dbHandlerNpgsql);
-                                    await Mapping(relBookItemDao1, relBookItemDao2);
-
-                                    // スキーマバージョンは移行しない
-                                });
-                            }
-                        }
-                    }
-                    break;
-                }
-                default:
-                    break;
-            }
-
-            if (result) {
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
             }
 
             _ = result
@@ -1614,6 +1354,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
             );
         }
 
+        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        {
+            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+
+            this.mDbImportService = new(this.mDbHandlerFactory);
+        }
+
         public override void AddEventHandlers()
         {
             using FuncLog funcLog = new();
@@ -1698,9 +1445,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             Properties.Settings settings = Properties.Settings.Default;
             this.FiscalStartMonth = settings.App_StartMonth;
 
-            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                this.SelectedDBKind = dbHandler.DBKind;
-            }
+            this.SelectedDBKind = this.mDbHandlerFactory.DBKind;
 
             // 帳簿リスト更新
             await this.UpdateBookListAsync(settings.MainWindow_SelectedBookId);
@@ -1835,7 +1580,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             AppService service = new(this.mDbHandlerFactory);
             BookIdObj tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            ObservableCollection<BookModel> tmpBookVMList = [.. await service.LoadBookListAsync(Properties.Resources.ListName_AllBooks, this.DisplayedPeriod)];
+            ObservableCollection<BookModel> tmpBookVMList = [.. await service.LoadBookListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllBooks)];
             this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0); // 先に選択しておく
             this.BookVMList = tmpBookVMList;
         }

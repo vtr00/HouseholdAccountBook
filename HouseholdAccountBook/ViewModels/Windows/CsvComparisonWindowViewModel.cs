@@ -1,9 +1,6 @@
 ﻿using HouseholdAccountBook.Infrastructure;
 using HouseholdAccountBook.Infrastructure.CSV;
-using HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions;
-using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
-using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
@@ -33,6 +30,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
     /// </summary>
     public class CsvComparisonWindowViewModel : WindowViewModelBase
     {
+        /// <summary>
+        /// CSV比較サービス
+        /// </summary>
+        private CsvCompService mService;
+
         #region イベント
         /// <summary>
         /// 帳簿変更時イベント
@@ -412,12 +414,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async void EditActionCommand_Executed()
         {
             // グループ種別を特定する
-            int? groupKind = null;
-            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                GroupInfoDao groupInfoDao = new(dbHandler);
-                var dto = await groupInfoDao.FindByActionId((int)this.SelectedCsvComparisonVM.Action.ActionId);
-                groupKind = dto.GroupKind;
-            }
+            AppService service = new(this.mDbHandlerFactory);
+            GroupKind kind = await service.LoadGroupKind(this.SelectedCsvComparisonVM.Action.ActionId);
 
             async void Registered(object sender, EventArgs<List<ActionIdObj>> e)
             {
@@ -426,18 +424,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 await this.UpdateComparisonVMListAsync();
             }
 
-            switch (groupKind) {
-                case (int)GroupKind.Move:
+            switch (kind) {
+                case GroupKind.Move:
                     Debug.Assert(true);
                     break;
-                case (int)GroupKind.ListReg:
+                case GroupKind.ListReg:
                     this.EditActionListRequested?.Invoke(this, new EditActionListRequestEventArgs() {
                         DbHandlerFactory = this.mDbHandlerFactory,
                         TargetGroupId = this.SelectedCsvComparisonVM.Action.GroupId,
                         Registered = Registered
                     });
                     break;
-                case (int)GroupKind.Repeat:
+                case GroupKind.Repeat:
+                case GroupKind.NotInOne:
                 default:
                     this.EditActionRequested?.Invoke(this, new EditActionRequestEventArgs() {
                         DbHandlerFactory = this.mDbHandlerFactory,
@@ -446,7 +445,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     });
                     break;
             }
-
         }
 
         /// <summary>
@@ -577,10 +575,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { bookId });
 
-            CsvCompService service = new(this.mDbHandlerFactory);
             BookIdObj tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            this.BookVMList = await service.UpdateBookCompListAsync();
+            this.BookVMList = [.. await this.mService.UpdateBookCompListAsync()];
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
+        }
+
+        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        {
+            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+
+            this.mService = new(this.mDbHandlerFactory);
         }
 
         public override void AddEventHandlers()
@@ -682,29 +686,22 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new(new { isScroll });
 
             // 指定された帳簿内で、日付、金額が一致する帳簿項目を探す
-            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                foreach (var vm in this.CsvComparisonVMList) {
-                    // 前回の帳簿項目情報をクリアする
-                    vm.ClearActionInfo();
+            foreach (CsvComparisonViewModel vm in this.CsvComparisonVMList) {
+                // 前回の帳簿項目情報をクリアする
+                vm.ClearActionInfo();
 
-                    ActionCompInfoDao actionCompInfoDao = new(dbHandler);
-                    var dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync((int)this.SelectedBookVM.Id, vm.Record.Date, vm.Record.Value);
-                    foreach (ActionCompInfoDto dto in dtoList) {
-                        // 帳簿項目IDが使用済なら次のレコードを調べるようにする
-                        bool checkNext = this.CsvComparisonVMList.Where(tmpVM => (int?)tmpVM.Action?.ActionId == dto.ActionId).Any();
-                        // 帳簿項目情報を紐付ける
-                        if (!checkNext) {
-                            vm.Action = new() {
-                                GroupId = dto.GroupId,
-                                Item = new(dto.ItemId, dto.ItemName),
-                                Base = new(dto.ActionId, vm.Record.Date, vm.Record.Value),
-                                Shop = new(dto.ShopName),
-                                Remark = new(dto.Remark)
-                            };
-                            vm.IsMatch = dto.IsMatch == 1;
+                // 一致する帳簿項目を取得する
+                List<ActionModel> actionList = [.. await this.mService.LoadMatchedActionAsync((int)this.SelectedBookVM.Id, vm.Record.Date, vm.Record.Value)];
 
-                            break;
-                        }
+                foreach (ActionModel action in actionList) {
+                    // 帳簿項目IDが使用済なら次のレコードを調べるようにする
+                    bool checkNext = this.CsvComparisonVMList.Where(tmpVM => (int?)tmpVM.Action?.ActionId == action.ActionId).Any();
+                    // 帳簿項目情報を紐付ける
+                    if (!checkNext) {
+                        vm.Action = action;
+                        vm.IsMatch = action.IsMatch;
+
+                        break;
                     }
                 }
             }
@@ -724,10 +721,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { actionId, isMatch });
 
-            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                HstActionDao hstActionDao = new(dbHandler);
-                _ = await hstActionDao.UpdateIsMatchByIdAsync((int)actionId, isMatch ? 1 : 0);
-            }
+            AppService service = new(this.mDbHandlerFactory);
+            await service.SaveIsMatchAsync(actionId, isMatch);
         }
     }
 }

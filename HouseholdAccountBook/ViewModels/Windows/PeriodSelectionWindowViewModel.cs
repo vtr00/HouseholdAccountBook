@@ -1,7 +1,6 @@
-﻿using HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
-using HouseholdAccountBook.Infrastructure.Logger;
+﻿using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
@@ -89,11 +88,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 全期間コマンド処理
         /// </summary>
-        async void AllPeriodCommand_Executed()
-        {
-            var firstLastPair = await this.LoadFirstLastDate();
-            this.SelectedPeriod = new PeriodObj<DateOnly>(firstLastPair.Item1, firstLastPair.Item2);
-        }
+        async void AllPeriodCommand_Executed() => this.SelectedPeriod = await this.LoadFirstLastDate();
         #endregion
 
         #region ウィンドウ設定プロパティ
@@ -122,19 +117,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿項目の初日/最終日を取得する
         /// </summary>
         /// <returns>初日/最終日のペア</returns>
-        private async Task<Tuple<DateOnly, DateOnly>> LoadFirstLastDate()
+        private async Task<PeriodObj<DateOnly>> LoadFirstLastDate()
         {
             using FuncLog funcLog = new();
 
-            DateOnly firstDate;
-            DateOnly lastDate;
-            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                PeriodInfoDao periodInfoDao = new(dbHandler);
-                var dto = await periodInfoDao.Find();
-                firstDate = DateOnly.FromDateTime(dto.FirstTime);
-                lastDate = DateOnly.FromDateTime(dto.LastTime);
-            }
-            return new Tuple<DateOnly, DateOnly>(firstDate, lastDate);
+            AppService service = new(this.mDbHandlerFactory);
+            return (await service.LoadPeriodOfAll()).Convert(DateOnly.FromDateTime);
         }
     }
 }
