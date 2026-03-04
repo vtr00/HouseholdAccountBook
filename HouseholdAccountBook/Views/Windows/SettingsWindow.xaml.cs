@@ -46,7 +46,7 @@ namespace HouseholdAccountBook.Views.Windows
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
                 await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
-                    this.WVM.DbTabVM.SelectedDBKind = dbHandler.DBKind;
+                    this.WVM.DbTabVM.SelectedDBKind = dbHandler.Kind;
                 }
                 using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create(methodName: nameof(this.Loaded))) {
                     await this.WVM.LoadAsync();

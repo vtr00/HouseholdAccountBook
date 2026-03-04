@@ -57,6 +57,11 @@ namespace HouseholdAccountBook.Models
     public enum GroupKind
     {
         /// <summary>
+        /// グループ外
+        /// </summary>
+        NotInOne = -1,
+
+        /// <summary>
         /// 移動
         /// </summary>
         Move = 0,

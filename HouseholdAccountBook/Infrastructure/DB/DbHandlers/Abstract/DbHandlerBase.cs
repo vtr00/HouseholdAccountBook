@@ -17,9 +17,19 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         /// <summary>
         /// 接続情報
         /// </summary>
-        public abstract class ConnectInfo { }
+        public abstract class ConnectInfoBase {
+            /// <summary>
+            /// DB種別
+            /// </summary>
+            /// <remarks>接続情報からどのDBに接続するのかが明らかになるのでここで保持する</remarks>
+            public DBKind Kind { get; init; }
+        }
 
         #region フィールド
+        /// <summary>
+        /// 接続情報
+        /// </summary>
+        protected ConnectInfoBase mConnectInfoBase;
         /// <summary>
         /// DB接続
         /// </summary>
@@ -34,11 +44,11 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         /// <summary>
         /// 対象データベースライブラリ
         /// </summary>
-        public DBLibraryKind DBLibKind { get; protected set; } = DBLibraryKind.Undefined;
+        public DBLibraryKind LibKind { get; protected init; } = DBLibraryKind.Undefined;
         /// <summary>
         /// 対象データベース
         /// </summary>
-        public DBKind DBKind { get; protected set; } = DBKind.Undefined;
+        public DBKind Kind => this.mConnectInfoBase.Kind;
         /// <summary>
         /// 接続可能か
         /// </summary>
@@ -131,7 +141,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         {
             using FuncLog funcLog = new(new { sql, param, target }, Log.LogLevel.Trace);
 
-            if (!target.Check(this.DBKind)) { return default; }
+            if (!target.Check(this.Kind)) { return default; }
 
             try {
                 return await this.mConnection.QueryAsync<T>(sql, param, this.mDbTransaction);
@@ -153,7 +163,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         {
             using FuncLog funcLog = new(new { sql, param, target }, Log.LogLevel.Trace);
 
-            if (!target.Check(this.DBKind)) { return default; }
+            if (!target.Check(this.Kind)) { return default; }
 
             try {
                 return await this.mConnection.QueryFirstOrDefaultAsync<T>(sql, param, this.mDbTransaction);
@@ -176,7 +186,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         {
             using FuncLog funcLog = new(new { sql, param, target }, Log.LogLevel.Trace);
 
-            if (!target.Check(this.DBKind)) { return default; }
+            if (!target.Check(this.Kind)) { return default; }
 
             try {
                 return await this.mConnection.QuerySingleAsync<T>(sql, param, this.mDbTransaction);
@@ -199,7 +209,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         {
             using FuncLog funcLog = new(new { sql, param, target }, Log.LogLevel.Trace);
 
-            if (!target.Check(this.DBKind)) { return default; }
+            if (!target.Check(this.Kind)) { return default; }
 
             try {
                 return await this.mConnection.QuerySingleOrDefaultAsync<T>(sql, param, this.mDbTransaction);
@@ -220,7 +230,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         {
             using FuncLog funcLog = new(new { sql, param, target }, Log.LogLevel.Trace);
 
-            if (!target.Check(this.DBKind)) { return default; }
+            if (!target.Check(this.Kind)) { return default; }
 
             try {
                 return await this.mConnection.ExecuteAsync(sql, param, this.mDbTransaction);
@@ -233,18 +243,24 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         /// <summary>
         /// [非同期]トランザクション内の処理
         /// </summary>
-        public delegate Task AxActionAsync();
+        public delegate Task ActionAsync();
+        /// <summary>
+        /// ロールバック後の処理
+        /// </summary>
+        public delegate void OnRollbacked();
 
         /// <summary>
         /// [非同期]トランザクション処理を行う
         /// </summary>
         /// <param name="target">対象データベース</param>
         /// <param name="actionAsync">トランザクション内の処理</param>
-        public async Task ExecTransactionAsync(AxActionAsync actionAsync, DBKindMask target = DBKindMask.All)
+        /// <exception cref="DbException">DB関連の例外</exception>
+        /// <exception cref="Exception">DB以外の例外</exception>
+        public async Task ExecTransactionAsync(ActionAsync actionAsync, OnRollbacked onRollbacked = null, DBKindMask target = DBKindMask.All)
         {
             using FuncLog funcLog = new(new { target }, Log.LogLevel.Trace);
 
-            if (!target.Check(this.DBKind)) { return; }
+            if (!target.Check(this.Kind)) { return; }
 
             try {
                 this.mDbTransaction = await this.mConnection.BeginTransactionAsync();
@@ -256,11 +272,13 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
             catch (DbException e) {
                 Console.WriteLine(e.Message);
                 await this.mDbTransaction.RollbackAsync();
+                onRollbacked?.Invoke();
                 throw;
             }
             catch (Exception e) {
                 Console.WriteLine(e.Message);
                 await this.mDbTransaction.RollbackAsync();
+                onRollbacked?.Invoke();
                 throw;
             }
             finally {

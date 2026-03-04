@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
-            if (this.mDbHandler.DBKind != DBKind.PostgreSQL) {
+            if (this.mDbHandler.Kind != DBKind.PostgreSQL) {
                 throw new NotSupportedException("This method is only supported for PostgreSQL.");
             }
             if (!this.mDbHandler.InTransaction()) {

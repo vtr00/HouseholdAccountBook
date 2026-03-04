@@ -209,7 +209,7 @@
                                     <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteShopNameCommand, ElementName=_ItemTab}"/>
                                 </DataGrid.InputBindings>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Shop.Name}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Name}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_UsageCount}" Width="*" Binding="{Binding UsedCount}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
                                 </DataGrid.Columns>
@@ -234,7 +234,7 @@
                                     <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteRemarkCommand, ElementName=_ItemTab}"/>
                                 </DataGrid.InputBindings>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Remark.Text}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Remark}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_UsageCount}" Width="*" Binding="{Binding UsedCount}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
                                 </DataGrid.Columns>

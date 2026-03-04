@@ -17,24 +17,20 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// 接続文字列
         /// </summary>
         private const string mStringFormat = @"Data Source={0};";
-        /// <summary>
-        /// 接続情報
-        /// </summary>
-        private readonly ConnectInfo mConnectInfo;
         #endregion
 
         #region プロパティ
         /// <summary>
         /// DBファイルパス
         /// </summary>
-        public string DbFilePath => this.mConnectInfo.FilePath;
+        public string DbFilePath => (this.mConnectInfoBase as ConnectInfo).FilePath;
         #endregion
 
         /// <summary>
         /// <see cref="SQLiteDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public SQLiteDbHandler(ConnectInfo info) : this(info.FilePath) => this.mConnectInfo = info;
+        public SQLiteDbHandler(ConnectInfo info) : this(info.FilePath) => this.mConnectInfoBase = info;
 
         /// <summary>
         /// <see cref="SQLiteDbHandler"/> クラスの新しいインスタンスを初期化します。
@@ -44,8 +40,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
         {
             using FuncLog funcLog = new(new { filePath }, Log.LogLevel.Trace);
 
-            this.DBLibKind = DBLibraryKind.SQLite;
-            this.DBKind = DBKind.SQLite;
+            this.LibKind = DBLibraryKind.SQLite;
 
             // SQLiteはファイルがない状態で接続するとファイルが作成される仕様のため、ファイルがない場合は接続しない
             if (!File.Exists(filePath)) {

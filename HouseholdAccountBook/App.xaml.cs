@@ -253,7 +253,7 @@ namespace HouseholdAccountBook
                 // 接続する場合
                 if (tryConnect) {
                     // 接続設定を読み込む
-                    DbHandlerBase.ConnectInfo connInfo = GetDbConnectInfo();
+                    DbHandlerBase.ConnectInfoBase connInfo = GetDbConnectInfo();
                     dbHandlerFactory = new(connInfo);
 
                     // 接続を試行する
@@ -312,13 +312,13 @@ namespace HouseholdAccountBook
         /// </summary>
         /// <returns>DB接続情報</returns>
         /// <exception cref="NotSupportedException">サポート対象外のDBが設定されている場合</exception>
-        public static DbHandlerBase.ConnectInfo GetDbConnectInfo()
+        public static DbHandlerBase.ConnectInfoBase GetDbConnectInfo()
         {
             using FuncLog funcLog = new();
 
             MySettings settings = MySettings.Default;
 
-            DbHandlerBase.ConnectInfo connInfo = null;
+            DbHandlerBase.ConnectInfoBase connInfo = null;
             switch ((DBKind)settings.App_SelectedDBKind) {
                 case DBKind.PostgreSQL: {
                     NpgsqlDbHandler.ConnectInfo connectInfo = new() {

@@ -22,7 +22,7 @@ namespace HouseholdAccountBook.Infrastructure.DB
 
             bool result = true;
             await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
-                result = dbHandler.DBKind switch {
+                result = dbHandler.Kind switch {
                     DBKind.PostgreSQL => await UpMigratePostgreSQLAsync(dbHandler),
                     DBKind.SQLite => await UpMigrateSQLiteAsync(dbHandler),
                     _ => throw new NotSupportedException("Unsupported DB kind."),

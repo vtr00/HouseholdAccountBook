@@ -114,7 +114,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <param name="waitCursorManagerFactory">WaitCursorマネージャファクトリ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <remarks><see cref="FrameworkElement">のコンストラクタで呼び出す</remarks>
-        public void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        public virtual void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
         {
             using FuncLog funcLog = new();
 

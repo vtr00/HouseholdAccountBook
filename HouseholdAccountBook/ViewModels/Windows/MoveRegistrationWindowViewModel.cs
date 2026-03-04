@@ -554,7 +554,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             AppService service = new(this.mDbHandlerFactory);
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
-            this.RemarkVMList = [.. await service.LoadRemarkListAsync(this.SelectedItemVM.Id)];
+            this.RemarkVMList = [.. await service.LoadRemarkListAsync(this.SelectedItemVM.Id, true)];
             this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
         }
 

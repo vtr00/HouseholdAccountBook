@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+﻿using HouseholdAccountBook.Infrastructure.DB;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 
 namespace HouseholdAccountBook.Models.DbHandlers
 {
@@ -7,8 +8,15 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// <summary>
         /// 接続情報
         /// </summary>
-        public new class ConnectInfo : DbHandlerBase.ConnectInfo
+        public class ConnectInfo : ConnectInfoBase
         {
+            public ConnectInfo(string provider)
+            {
+                this.Kind = provider.Contains(AccessProviderHeader) ? DBKind.Access : DBKind.Undefined;
+
+                this.Provider = provider;
+            }
+
             /// <summary>
             /// プロバイダ
             /// </summary>
@@ -17,6 +25,11 @@ namespace HouseholdAccountBook.Models.DbHandlers
             /// データソース
             /// </summary>
             public string DataSource { get; set; }
+
+            /// <summary>
+            /// Accessプロバイダヘッダ
+            /// </summary>
+            public static string AccessProviderHeader => "Microsoft.ACE.OLEDB";
         }
     }
 }

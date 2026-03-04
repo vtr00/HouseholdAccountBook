@@ -175,7 +175,7 @@ namespace HouseholdAccountBook.Infrastructure.DB
 
             DBKind selectedDBKind;
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
-                selectedDBKind = dbHandler.DBKind;
+                selectedDBKind = dbHandler.Kind;
             }
             if (tmpBackUpNum is (-1) or > 0) {
                 Log.Debug("Create backup file.");

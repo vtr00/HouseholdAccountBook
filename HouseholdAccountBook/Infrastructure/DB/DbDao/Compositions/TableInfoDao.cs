@@ -25,7 +25,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
             }
 
             IEnumerable<TableInfoDto> dtoList;
-            switch (this.mDbHandler.DBKind) {
+            switch (this.mDbHandler.Kind) {
                 case DBKind.PostgreSQL: {
                     dtoList = await this.mDbHandler.QueryAsync<TableInfoDto>($@"
 SELECT table_schema, table_name
@@ -47,7 +47,7 @@ ORDER BY m.name;");
                     break;
                 }
                 default: {
-                    throw new NotSupportedException($"DB Kind: {this.mDbHandler.DBKind} is not supported.");
+                    throw new NotSupportedException($"DB Kind: {this.mDbHandler.Kind} is not supported.");
                 }
             }
 

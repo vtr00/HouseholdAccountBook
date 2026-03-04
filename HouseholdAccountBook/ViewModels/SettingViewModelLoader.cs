@@ -39,12 +39,12 @@ namespace HouseholdAccountBook.ViewModels
 
             BookSettingViewModel vm = null;
 
-            List<BookModel> bmList = await this.mAppService.LoadBookListAsync(Properties.Resources.ListName_None);
+            List<BookModel> bmList = await this.mAppService.LoadBookListAsync(initialName: Properties.Resources.ListName_None);
             BookModel bm = await this.mService.LoadBookAsync(bookId);
 
             vm = new BookSettingViewModel(bm) {
                 DebitBookVMList = new ObservableCollection<BookModel>(bmList.Where(tmpVM => tmpVM.Id != bookId)),
-                RelationVMList = [.. await this.mService.LoadRelationAsync(bookId)]
+                RelationVMList = [.. await this.mService.LoadRelationListAsync(bookId)]
             };
             vm.SelectedDebitBookVM = vm.DebitBookVMList.FirstOrElementAtOrDefault(tmpVM => (int?)tmpVM.Id == bm.DebitBookId, 0);
 
@@ -104,7 +104,12 @@ namespace HouseholdAccountBook.ViewModels
                 }
                 case HierarchicalKind.Item: {
                     // 項目
-                    vm = new(await this.mService.LoadItemAsync(id.Value));
+                    ItemIdObj itemId = id.Value;
+                    vm = new(await this.mService.LoadItemAsync(itemId)) {
+                        RelationVMList = [.. await this.mService.LoadRelationListAsync(itemId)],
+                        ShopVMList = [.. await this.mAppService.LoadShopListAsync(itemId)],
+                        RemarkVMList = [.. await this.mAppService.LoadRemarkListAsync(itemId)]
+                    };
                     break;
                 }
             }

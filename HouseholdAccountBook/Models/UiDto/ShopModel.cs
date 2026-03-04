@@ -5,14 +5,10 @@ namespace HouseholdAccountBook.Models.UiDto
     /// <summary>
     /// 店舗Model
     /// </summary>
-    public class ShopModel(string name)
+    /// <param name="Name">店名</param>
+    public record class ShopModel(string Name)
     {
         #region プロパティ
-        /// <summary>
-        /// 店舗
-        /// </summary>
-        public string Name { get; init; } = name;
-
         /// <summary>
         /// 使用回数
         /// </summary>

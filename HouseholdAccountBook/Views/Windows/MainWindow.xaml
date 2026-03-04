@@ -448,7 +448,7 @@
                                     <!-- 店舗名 -->
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding ActionWithBalance.Action.Shop.Name}"/>
                                     <!-- 備考 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding ActionWithBalance.Action.Remark.Text}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding ActionWithBalance.Action.Remark.Remark}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
 

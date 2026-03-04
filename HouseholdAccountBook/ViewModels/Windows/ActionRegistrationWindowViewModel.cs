@@ -534,7 +534,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             CategoryIdObj tmpCategoryId = selectingCategoryId ?? this.SelectedCategoryVM?.Id;
             AppService service = new(this.mDbHandlerFactory);
-            ObservableCollection<CategoryModel> tmpCategoryVMList = [.. await service.LoadCategoryListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind)];
+            ObservableCollection<CategoryModel> tmpCategoryVMList = [.. await service.LoadCategoryListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, Properties.Resources.ListName_NoSpecification)];
             this.SelectedCategoryVM = tmpCategoryVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpCategoryId, 0); // 先に選択しておく
             this.CategoryVMList = tmpCategoryVMList;
         }
@@ -570,7 +570,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             string tmpShopName = selectingShopName ?? this.SelectedShopName;
             AppService service = new(this.mDbHandlerFactory);
-            ObservableCollection<ShopModel> tmpShopVMList = [.. await service.LoadShopListAsync(this.SelectedItemVM.Id)];
+            ObservableCollection<ShopModel> tmpShopVMList = [.. await service.LoadShopListAsync(this.SelectedItemVM.Id, true)];
             this.SelectedShopName = tmpShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name; // 先に選択しておく
             this.ShopVMList = tmpShopVMList;
         }
@@ -588,7 +588,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             AppService service = new(this.mDbHandlerFactory);
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
-            ObservableCollection<RemarkModel> tmpRemarkVMList = [.. await service.LoadRemarkListAsync(this.SelectedItemVM.Id)];
+            ObservableCollection<RemarkModel> tmpRemarkVMList = [.. await service.LoadRemarkListAsync(this.SelectedItemVM.Id, true)];
             this.SelectedRemark = tmpRemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark; // 先に選択しておく
             this.RemarkVMList = tmpRemarkVMList;
         }

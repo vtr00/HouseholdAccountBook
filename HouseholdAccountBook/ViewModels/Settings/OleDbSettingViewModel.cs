@@ -60,7 +60,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             Properties.Settings settings = Properties.Settings.Default;
 
             this.ProviderNameDic.Clear();
-            OleDbHandler.GetOleDbProvider().FindAll(pair => pair.Key.Contains(OleDbHandler.AccessProviderHeader)).ForEach(this.ProviderNameDic.Add);
+            OleDbHandler.GetOleDbProvider().FindAll(pair => pair.Key.Contains(OleDbHandler.ConnectInfo.AccessProviderHeader)).ForEach(this.ProviderNameDic.Add);
             this.SelectedProviderName = settings.App_Import_KichoFugetsu_Provider;
         }
 
