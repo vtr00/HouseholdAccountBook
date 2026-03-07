@@ -1,7 +1,5 @@
 ﻿using HouseholdAccountBook.Infrastructure.CSV;
-using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
-using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
@@ -29,6 +27,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
     public class ActionListRegistrationWindowViewModel : WindowViewModelBase
     {
         #region フィールド
+        /// <summary>
+        /// アプリサービス
+        /// </summary>
+        private AppService mAppService;
+        /// <summary>
+        /// 帳簿項目登録サービス
+        /// </summary>
+        private ActionRegService mService;
+
         /// <summary>
         /// 変更時処理重複防止用フラグ
         /// </summary>
@@ -358,27 +365,24 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     List<DateValueViewModel> dateValueVMList = [];
 
                     // DBから値を読み込む
-                    await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                        HstActionDao hstActionDao = new(dbHandler);
-                        IEnumerable<HstActionDto> dtoList = await hstActionDao.FindByGroupIdAsync((int)targetGroupId);
+                    List<ActionModel> actionList = [.. await this.mService.LoadActionListAsync(targetGroupId)];
 
-                        foreach (HstActionDto dto in dtoList) {
-                            // 日付金額リストに追加
-                            DateValueViewModel vm = new() {
-                                ActionId = dto.ActionId,
-                                ActDate = dto.ActTime,
-                                ActValue = Math.Abs(dto.ActValue)
-                            };
+                    foreach (ActionModel action in actionList) {
+                        // 日付金額リストに追加
+                        DateValueViewModel vm = new() {
+                            ActionId = action.ActionId,
+                            ActDate = action.ActTime,
+                            ActValue = action.Expenses is null ? null : Math.Abs(action.Expenses.Value)
+                        };
 
-                            selectingBookId = dto.BookId;
-                            selectingItemId = dto.ItemId;
-                            selectingShopName = dto.ShopName;
-                            selectingRemark = dto.Remark;
+                        selectingBookId = action.Book.Id;
+                        selectingItemId = action.Item.Id;
+                        selectingShopName = action.Shop.Name;
+                        selectingRemark = action.Remark;
 
-                            selectingBalanceKind = Math.Sign(dto.ActValue) > 0 ? BalanceKind.Income : BalanceKind.Expenses; // 収入 / 支出
+                        selectingBalanceKind = 0 < Math.Sign(action.Amount) ? BalanceKind.Income : BalanceKind.Expenses; // 収入 / 支出
 
-                            dateValueVMList.Add(vm);
-                        }
+                        dateValueVMList.Add(vm);
                     }
 
                     // WVMに値を設定する
@@ -411,9 +415,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { selectingBookId });
 
-            AppService service = new(this.mDbHandlerFactory);
             BookIdObj tmpBookId = selectingBookId ?? this.SelectedBookVM?.Id;
-            this.BookVMList = [.. await service.LoadBookListAsync()];
+
+            this.BookVMList = [.. await this.mAppService.LoadBookListAsync()];
             this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
 
@@ -428,9 +432,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingCategoryId });
 
-            AppService service = new(this.mDbHandlerFactory);
             CategoryIdObj tmpCategoryId = selectingCategoryId ?? this.SelectedCategoryVM?.Id;
-            this.CategoryVMList = [.. await service.LoadCategoryListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, Properties.Resources.ListName_NoSpecification)];
+
+            this.CategoryVMList = [.. await this.mAppService.LoadCategoryListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, Properties.Resources.ListName_NoSpecification)];
             this.SelectedCategoryVM = this.CategoryVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpCategoryId, 0);
         }
 
@@ -445,9 +449,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingItemId });
 
-            AppService service = new(this.mDbHandlerFactory);
             ItemIdObj tmpItemId = selectingItemId ?? this.SelectedItemVM?.Id;
-            this.ItemVMList = [.. await service.LoadItemListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, this.SelectedCategoryVM.Id)];
+
+            this.ItemVMList = [.. await this.mAppService.LoadItemListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, this.SelectedCategoryVM.Id)];
             this.SelectedItemVM = this.ItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0);
         }
 
@@ -462,9 +466,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingShopName });
 
-            AppService service = new(this.mDbHandlerFactory);
             string tmpShopName = selectingShopName ?? this.SelectedShopName;
-            this.ShopVMList = [.. await service.LoadShopListAsync(this.SelectedItemVM.Id, true)];
+
+            this.ShopVMList = [.. await this.mAppService.LoadShopListAsync(this.SelectedItemVM.Id, true)];
             this.SelectedShopName = this.ShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name;
         }
 
@@ -479,10 +483,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             using FuncLog funcLog = new(new { selectingRemark });
 
-            AppService service = new(this.mDbHandlerFactory);
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
-            this.RemarkVMList = [.. await service.LoadRemarkListAsync(this.SelectedItemVM.Id, true)];
+
+            this.RemarkVMList = [.. await this.mAppService.LoadRemarkListAsync(this.SelectedItemVM.Id, true)];
             this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
+        }
+
+        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        {
+            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+
+            this.mAppService = new(this.mDbHandlerFactory);
+            this.mService = new(this.mDbHandlerFactory);
         }
 
         public override void AddEventHandlers()
@@ -530,115 +542,37 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
-            List<ActionIdObj> resActionIdList = [];
-
+            List<ActionModel> actionList = [];
             BalanceKind balanceKind = this.SelectedBalanceKind; // 収支種別
-            BookIdObj bookId = this.SelectedBookVM.Id;          // 帳簿ID
-            ItemIdObj itemId = this.SelectedItemVM.Id;          // 帳簿項目ID
-            GroupIdObj groupId = this.GroupId ?? -1;            // グループID
-            string shopName = this.SelectedShopName;            // 店舗名
-            string remark = this.SelectedRemark;                // 備考
+            ActionModel commonAction = new() {
+                Base = new(null, DateTime.Now, 0),
+                GroupId = this.GroupId,
+                Book = new(this.SelectedBookVM.Id, string.Empty),
+                Item = new(this.SelectedItemVM.Id, string.Empty),
+                Shop = this.SelectedShopName,
+                Remark = this.SelectedRemark
+            };
+            foreach (DateValueViewModel vm in this.InputedDateValueVMList) {
+                if (vm.ActValue == null) { continue; }
+
+                ActionBaseModel baseAction = new(vm.ActionId, vm.ActDate, (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value);
+                actionList.Add(commonAction.WithChanges(baseAction));
+            }
+
+            List<ActionIdObj> resActionIdList = [.. await this.mService.SaveActionListAsync(actionList)];
 
             DateTime lastActTime = this.InputedDateValueVMList.Max(tmp => tmp.ActDate);
-            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                switch (this.RegKind) {
-                    case RegistrationKind.Add: {
-                        #region 帳簿項目を追加する
-                        await dbHandler.ExecTransactionAsync(async () => {
-                            // グループIDを取得する
-                            HstGroupDao hstGroupDao = new(dbHandler);
-                            int tmpGroupId = await hstGroupDao.InsertReturningIdAsync(new HstGroupDto { GroupKind = (int)GroupKind.ListReg });
 
-                            HstActionDao hstActionDao = new(dbHandler);
-                            foreach (DateValueViewModel vm in this.InputedDateValueVMList) {
-                                if (vm.ActValue != null) {
-                                    DateTime actTime = vm.ActDate; // 日付
-                                    decimal actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value; // 金額
-                                    int id = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
-                                        BookId = (int)bookId,
-                                        ItemId = (int)itemId,
-                                        ActTime = actTime,
-                                        ActValue = (int)actValue,
-                                        ShopName = shopName,
-                                        GroupId = tmpGroupId,
-                                        Remark = remark
-                                    });
-                                    resActionIdList.Add(id);
-                                }
-                            }
-                        });
-                        #endregion
-                        break;
-                    }
-                    case RegistrationKind.Edit: {
-                        #region 帳簿項目を編集する
-                        await dbHandler.ExecTransactionAsync(async () => {
-                            HstActionDao hstActionDao = new(dbHandler);
-                            foreach (DateValueViewModel vm in this.InputedDateValueVMList) {
-                                if (vm.ActValue != null) {
-                                    ActionIdObj actionId = vm.ActionId;
-                                    DateTime actTime = vm.ActDate; // 日付
-                                    decimal actValue = (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value; // 金額
+            string shopName = this.SelectedShopName;            // 店舗名
+            if (shopName != null && shopName != string.Empty) {
+                ShopModel shop = new(shopName) { ItemId = this.SelectedItemVM.Id, UsedTime = lastActTime };
+                await this.mService.SaveShopAsync(shop);
+            }
 
-                                    if (actionId is not null) {
-                                        _ = await hstActionDao.UpdateWithoutIsMatchAsync(new HstActionDto {
-                                            BookId = (int)bookId,
-                                            ItemId = (int)itemId,
-                                            ActTime = actTime,
-                                            ActValue = (int)actValue,
-                                            ShopName = shopName,
-                                            Remark = remark,
-                                            GroupId = (int)groupId,
-                                            ActionId = actionId.Value
-                                        });
-
-                                        resActionIdList.Add(actionId.Value);
-                                    }
-                                    else {
-                                        int id = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
-                                            BookId = (int)bookId,
-                                            ItemId = (int)itemId,
-                                            ActTime = actTime,
-                                            ActValue = (int)actValue,
-                                            ShopName = shopName,
-                                            Remark = remark,
-                                            GroupId = (int)groupId
-                                        });
-                                        resActionIdList.Add(id);
-                                    }
-                                }
-                            }
-
-                            var dtoList = await hstActionDao.FindByGroupIdAsync(this.GroupId.Value);
-                            IEnumerable<int> expected = dtoList.Select(dto => dto.ActionId).Except(resActionIdList.Select(tmp => (int)tmp));
-                            foreach (int actionId in expected) {
-                                _ = await hstActionDao.DeleteByIdAsync(actionId);
-                            }
-                        });
-                        #endregion
-                        break;
-                    }
-                }
-
-                if (shopName != null && shopName != string.Empty) {
-                    // 店舗を追加/更新する
-                    HstShopDao hstShopDao = new(dbHandler);
-                    _ = await hstShopDao.UpsertAsync(new HstShopDto {
-                        ItemId = (int)itemId,
-                        ShopName = shopName,
-                        UsedTime = lastActTime
-                    });
-                }
-
-                if (remark != null && remark != string.Empty) {
-                    // 備考を追加/更新する
-                    HstRemarkDao hstRemarkDao = new(dbHandler);
-                    _ = await hstRemarkDao.UpsertAsync(new HstRemarkDto {
-                        ItemId = (int)itemId,
-                        Remark = remark,
-                        UsedTime = lastActTime
-                    });
-                }
+            string remarkText = this.SelectedRemark;            // 備考
+            if (remarkText != null && remarkText != string.Empty) {
+                RemarkModel remark = new(remarkText) { ItemId = this.SelectedItemVM.Id, UsedTime = lastActTime };
+                await this.mService.SaveRemarkAsync(remark);
             }
 
             return resActionIdList;

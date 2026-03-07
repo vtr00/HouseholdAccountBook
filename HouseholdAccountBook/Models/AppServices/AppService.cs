@@ -138,7 +138,7 @@ namespace HouseholdAccountBook.Models.AppServices
             foreach (ShopInfoDto dto in dtoList) {
                 ShopModel vm = new(dto.ShopName) {
                     UsedCount = dto.Count,
-                    UsedTime = dto.UsedTime
+                    UsedTime = dto.UsedTime ?? DateTime.MinValue
                 };
                 smList.Add(vm);
             }
@@ -168,7 +168,7 @@ namespace HouseholdAccountBook.Models.AppServices
             foreach (RemarkInfoDto dto in dtoList) {
                 RemarkModel vm = new(dto.Remark) {
                     UsedCount = dto.Count,
-                    UsedTime = dto.UsedTime
+                    UsedTime = dto.UsedTime ?? DateTime.MinValue
                 };
                 rmList.Add(vm);
             }

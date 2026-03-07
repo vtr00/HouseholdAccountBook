@@ -51,28 +51,33 @@ namespace HouseholdAccountBook.Models.UiDto
         /// <summary>
         /// 帳簿項目ID
         /// </summary>
-        public ActionIdObj ActionId => this.Base?.ActionId;
+        public ActionIdObj ActionId => this.Base.ActionId;
         /// <summary>
-        /// 時刻
+        /// 日時
         /// </summary>
-        public DateTime? ActTime => this.Base?.ActTime;
+        public DateTime ActTime => this.Base.ActTime;
         /// <summary>
         /// 金額
         /// </summary>
-        public decimal? Amount => this.Base?.Amount;
+        public decimal Amount => this.Base.Amount;
 
         /// <summary>
         /// 収入
         /// </summary>
-        public decimal? Income => this.Base?.Income;
+        public decimal? Income => this.Base.Income;
         /// <summary>
         /// 支出
         /// </summary>
-        public decimal? Expenses => this.Base?.Expenses;
+        public decimal? Expenses => this.Base.Expenses;
         #endregion
 
         public ActionModel() { }
 
+        /// <summary>
+        /// ベースとなる部分のみを変更した複製を作成する
+        /// </summary>
+        /// <param name="baseModel">ベース部分</param>
+        /// <returns>複製</returns>
         public ActionModel WithChanges(ActionBaseModel baseModel)
         {
             return new() {
@@ -82,7 +87,8 @@ namespace HouseholdAccountBook.Models.UiDto
                 Item = this.Item,
                 Base = baseModel,
                 Shop = this.Shop,
-                Remark = this.Remark
+                Remark = this.Remark,
+                IsMatch = false
             };
         }
     }

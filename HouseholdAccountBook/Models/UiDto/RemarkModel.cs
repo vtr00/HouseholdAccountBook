@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.Models.ValueObjects;
+using System;
 
 namespace HouseholdAccountBook.Models.UiDto
 {
@@ -10,6 +11,11 @@ namespace HouseholdAccountBook.Models.UiDto
     {
         #region プロパティ
         /// <summary>
+        /// 項目ID
+        /// </summary>
+        public ItemIdObj ItemId { get; set; }
+
+        /// <summary>
         /// 使用回数
         /// </summary>
         public int UsedCount { get; init; }
@@ -17,7 +23,7 @@ namespace HouseholdAccountBook.Models.UiDto
         /// <summary>
         /// 最終使用日
         /// </summary>
-        public DateTime? UsedTime { get; init; }
+        public DateTime UsedTime { get; init; } = DateTime.Now;
         #endregion
 
         public override string ToString() => this.Remark;

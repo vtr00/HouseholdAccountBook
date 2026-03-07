@@ -14,7 +14,7 @@ namespace HouseholdAccountBook.Models.UiDto
         public ActionIdObj ActionId { get; init; } = id;
 
         /// <summary>
-        /// 時刻
+        /// 日時
         /// </summary>
         public DateTime ActTime { get; init; } = actTime;
         /// <summary>
