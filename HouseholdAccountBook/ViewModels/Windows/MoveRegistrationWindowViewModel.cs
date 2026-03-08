@@ -60,7 +60,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 登録時イベント
         /// </summary>
-        public event EventHandler<EventArgs<List<ActionIdObj>>> Registrated;
+        public event EventHandler<EventArgs<IEnumerable<ActionIdObj>>> Registrated;
         #endregion
 
         #region Bindingプロパティ
@@ -322,11 +322,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         protected override async void OKCommand_Executed()
         {
             // DB登録
-            List<ActionIdObj> idList = null;
+            IEnumerable<ActionIdObj> idList = null;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 idList = await this.SaveAsync();
             }
-            this.Registrated?.Invoke(this, new EventArgs<List<ActionIdObj>>(idList));
+            this.Registrated?.Invoke(this, new EventArgs<IEnumerable<ActionIdObj>>(idList));
 
             base.OKCommand_Executed();
         }
@@ -542,7 +542,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// DBに登録する
         /// </summary>
         /// <returns>登録された帳簿項目IDリスト</returns>
-        protected override async Task<List<ActionIdObj>> SaveAsync()
+        protected override async Task<IEnumerable<ActionIdObj>> SaveAsync()
         {
             using FuncLog funcLog = new();
 
@@ -567,7 +567,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 Remark = this.SelectedRemark
             };
 
-            List<ActionIdObj> resActionIdList = [.. await this.mService.SaveMoveActionsAsync(fromAction, toAction, commissionAction)];
+            IEnumerable<ActionIdObj> resActionIdList = await this.mService.SaveMoveActionsAsync(fromAction, toAction, commissionAction);
 
             if (commissionAction.Amount != 0) {
                 if (commissionAction.Remark != null && commissionAction.Remark != string.Empty) {

@@ -17,7 +17,8 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         /// <summary>
         /// 接続情報
         /// </summary>
-        public abstract class ConnectInfoBase {
+        public abstract class ConnectInfoBase
+        {
             /// <summary>
             /// DB種別
             /// </summary>

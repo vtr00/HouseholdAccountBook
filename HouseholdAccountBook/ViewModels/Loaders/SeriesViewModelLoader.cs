@@ -8,7 +8,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
-namespace HouseholdAccountBook.ViewModels
+namespace HouseholdAccountBook.ViewModels.Loaders
 {
     /// <summary>
     /// 系列VMローダ

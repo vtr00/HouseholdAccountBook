@@ -119,7 +119,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             ActTime = tmpActTime,
                             ActValue = (int)action.Amount,
                             ShopName = action.Shop,
-                            GroupId = (int)assingedGroupId,
+                            GroupId = (int?)assingedGroupId,
                             Remark = action.Remark
                         });
 
@@ -189,7 +189,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                     ActTime = action.ActTime,
                                     ActValue = (int)action.Amount,
                                     ShopName = action.Shop,
-                                    GroupId = (int)action.GroupId,
+                                    GroupId = (int?)action.GroupId,
                                     Remark = action.Remark,
                                     IsMatch = 0, // 変更しない
                                     ActionId = (int)action.ActionId
@@ -230,7 +230,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             ActTime = tmpActTime,
                             ActValue = (int)action.Amount,
                             ShopName = action.Shop,
-                            GroupId = (int)assignedGroupId,
+                            GroupId = (int?)assignedGroupId,
                             Remark = action.Remark,
                             IsMatch = action.IsMatch ? 1 : 0,
                             ActionId = (int)action.ActionId
@@ -242,7 +242,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             ActionIdObj targetActionId = actionIdList[i];
 
                             if (i < count) { // 繰返し回数の範囲内のレコードを更新する
-                                                // 連動して編集時のみ変更する
+                                             // 連動して編集時のみ変更する
                                 if (isLink) {
                                     _ = await hstActionDao.UpdateWithoutIsMatchAsync(new HstActionDto {
                                         BookId = (int)action.Book.Id,
@@ -250,7 +250,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                         ActTime = tmpActTime,
                                         ActValue = (int)action.Amount,
                                         ShopName = action.Shop,
-                                        GroupId = (int)assignedGroupId,
+                                        GroupId = (int?)assignedGroupId,
                                         Remark = action.Remark,
                                         IsMatch = 0, // 変更しない
                                         ActionId = (int)targetActionId
@@ -273,7 +273,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 ActTime = tmpActTime,
                                 ActValue = (int)action.Amount,
                                 ShopName = action.Shop,
-                                GroupId = (int)assignedGroupId,
+                                GroupId = (int?)assignedGroupId,
                                 Remark = action.Remark,
                                 IsMatch = 0
                             });
@@ -342,7 +342,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             ActTime = action.ActTime,
                             ActValue = (int)action.Amount,
                             ShopName = action.Shop,
-                            GroupId = (int)assignedGroupId,
+                            GroupId = (int?)assignedGroupId,
                             Remark = action.Remark
                         });
                         resActionIdList.Add(id);
@@ -363,7 +363,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 ActValue = (int)action.Amount,
                                 ShopName = action.Shop,
                                 Remark = action.Remark,
-                                GroupId = (int)action.GroupId,
+                                GroupId = (int?)action.GroupId,
                                 ActionId = (int)action.ActionId
                             });
 
@@ -377,7 +377,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 ActValue = (int)action.Amount,
                                 ShopName = action.Shop,
                                 Remark = action.Remark,
-                                GroupId = (int)action.GroupId
+                                GroupId = (int?)action.GroupId
                             });
                             resActionIdList.Add(actionId);
                         }
@@ -453,7 +453,7 @@ namespace HouseholdAccountBook.Models.AppServices
                         BookId = (int)fromAction.Book.Id,
                         ActTime = fromAction.ActTime,
                         ActValue = (int)fromAction.Amount,
-                        GroupId = (int)assignedGroupId
+                        GroupId = (int?)assignedGroupId
                     }, (int)BalanceKind.Expenses);
                     resActionIdList.Add(fromActionId);
 
@@ -461,7 +461,7 @@ namespace HouseholdAccountBook.Models.AppServices
                         BookId = (int)toAction.Book.Id,
                         ActTime = toAction.ActTime,
                         ActValue = (int)toAction.Amount,
-                        GroupId = (int)assignedGroupId
+                        GroupId = (int?)assignedGroupId
                     }, (int)BalanceKind.Income);
                     resActionIdList.Add(toActionId);
                     #endregion
@@ -498,7 +498,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             ActTime = commissionAction.ActTime,
                             ActValue = (int)commissionAction.Amount,
                             Remark = commissionAction.Remark,
-                            GroupId = (int)assignedGroupId
+                            GroupId = (int?)assignedGroupId
                         });
                         resActionIdList.Add(commissionId);
                     }
@@ -511,7 +511,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             ActTime = commissionAction.ActTime,
                             ActValue = (int)commissionAction.Amount,
                             Remark = commissionAction.Remark,
-                            GroupId = (int)assignedGroupId,
+                            GroupId = (int?)assignedGroupId,
                             ActionId = (int)commissionAction.ActionId
                         });
                         resActionIdList.Add(commissionAction.ActionId);
@@ -540,7 +540,7 @@ namespace HouseholdAccountBook.Models.AppServices
         {
             using FuncLog funcLog = new(new { shop });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
-            
+
             // 店舗を追加/編集する
             HstShopDao hstShopDao = new(dbHandler);
             _ = await hstShopDao.UpsertAsync(new HstShopDto {

@@ -30,7 +30,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 帳簿項目変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<List<ActionIdObj>>> ActionChanged {
+        public event EventHandler<EventArgs<IEnumerable<ActionIdObj>>> ActionChanged {
             add => this.WVM.ActionChanged += value;
             remove => this.WVM.ActionChanged -= value;
         }

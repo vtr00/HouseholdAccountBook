@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HouseholdAccountBook.ViewModels
+namespace HouseholdAccountBook.ViewModels.Loaders
 {
     /// <summary>
     /// 設定VMローダー
@@ -39,7 +39,7 @@ namespace HouseholdAccountBook.ViewModels
 
             BookSettingViewModel vm = null;
 
-            List<BookModel> bmList = await this.mAppService.LoadBookListAsync(initialName: Properties.Resources.ListName_None);
+            IEnumerable<BookModel> bmList = await this.mAppService.LoadBookListAsync(initialName: Properties.Resources.ListName_None);
             BookModel bm = await this.mService.LoadBookAsync(bookId);
 
             vm = new BookSettingViewModel(bm) {
@@ -66,12 +66,12 @@ namespace HouseholdAccountBook.ViewModels
 
             foreach (ItemTreeViewModel balanceVM in vmList) {
                 // 分類
-                (await this.mService.LoadCategoryListAsync((BalanceKind)balanceVM.Id.Value))
+                new List<CategoryModel>(await this.mService.LoadCategoryListAsync((BalanceKind)balanceVM.Id.Value))
                     .ForEach(cm => balanceVM.ChildrenVMList.Add(new ItemTreeViewModel(cm) { ParentVM = balanceVM, ChildrenVMList = [] }));
 
                 foreach (ItemTreeViewModel categoryVM in balanceVM.ChildrenVMList) {
                     // 項目
-                    (await this.mService.LoadItemListAsync(categoryVM.Id.Value))
+                    new List<ItemModel>(await this.mService.LoadItemListAsync(categoryVM.Id.Value))
                         .ForEach(im => categoryVM.ChildrenVMList.Add(new ItemTreeViewModel(im) { ParentVM = categoryVM }));
                 }
             }

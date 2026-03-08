@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
 {
@@ -34,7 +35,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
         /// <summary>
         /// 結果ファイル(複数)
         /// </summary>
-        public string[] FileNames { get; set; }
+        public IEnumerable<string> FileNames { get; set; }
         /// <summary>
         /// ファイルが存在するフォルダが存在するか
         /// </summary>

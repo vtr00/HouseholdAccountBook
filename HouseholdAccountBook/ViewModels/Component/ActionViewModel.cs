@@ -43,7 +43,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 将来の日付か
         /// </summary>
-        public bool IsFuture => this.ActionWithBalance.Action.ActTime > DateTime.Now;
+        public bool IsFuture => DateTime.Now < this.ActionWithBalance.Action.ActTime;
         #endregion
     }
 }

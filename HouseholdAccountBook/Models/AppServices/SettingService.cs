@@ -162,7 +162,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <returns>関連Model</returns>
-        public async Task<List<RelationModel>> LoadRelationListAsync(BookIdObj bookId)
+        public async Task<IEnumerable<RelationModel>> LoadRelationListAsync(BookIdObj bookId)
         {
             using FuncLog funcLog = new(new { bookId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
@@ -190,14 +190,14 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <param name="kind">終始種別</param>
         /// <returns>分類Modelリスト</returns>
-        public async Task<List<CategoryModel>> LoadCategoryListAsync(BalanceKind kind)
+        public async Task<IEnumerable<CategoryModel>> LoadCategoryListAsync(BalanceKind kind)
         {
             using FuncLog funcLog = new(new { kind });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             MstCategoryDao mstCategoryDao = new(dbHandler);
             IEnumerable<MstCategoryDto> cDtoList = await mstCategoryDao.FindByBalanceKindAsync((int)kind);
-            List<CategoryModel> categoryList = [.. cDtoList.Select(dto => new CategoryModel(dto.CategoryId, dto.CategoryName, kind))];
+            IEnumerable<CategoryModel> categoryList = [.. cDtoList.Select(dto => new CategoryModel(dto.CategoryId, dto.CategoryName, kind))];
 
             return categoryList;
         }
@@ -207,7 +207,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <param name="categoryId">分類ID</param>
         /// <returns>項目Modelリスト</returns>
-        public async Task<List<ItemModel>> LoadItemListAsync(CategoryIdObj categoryId)
+        public async Task<IEnumerable<ItemModel>> LoadItemListAsync(CategoryIdObj categoryId)
         {
             using FuncLog funcLog = new(new { categoryId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
@@ -440,7 +440,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <param name="itemId">項目ID</param>
         /// <returns>関連Model</returns>
-        public async Task<List<RelationModel>> LoadRelationListAsync(ItemIdObj itemId)
+        public async Task<IEnumerable<RelationModel>> LoadRelationListAsync(ItemIdObj itemId)
         {
             using FuncLog funcLog = new(new { itemId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
@@ -469,7 +469,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns></returns>
         public async Task DeleteShopAsync(string shopName, ItemIdObj itemId)
         {
-            using FuncLog funcLog = new(new { shopName, itemId});
+            using FuncLog funcLog = new(new { shopName, itemId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             HstShopDao hstShopDao = new(dbHandler);
@@ -487,7 +487,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns></returns>
         public async Task DeleteRemarkAsync(string remark, ItemIdObj itemId)
         {
-            using FuncLog funcLog = new(new { remark, itemId});
+            using FuncLog funcLog = new(new { remark, itemId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             HstRemarkDao hstRemarkDao = new(dbHandler);
@@ -513,7 +513,7 @@ namespace HouseholdAccountBook.Models.AppServices
             bool result = false;
             await dbHandler.ExecTransactionAsync(async () => {
                 HstActionDao hstActionDao = new(dbHandler);
-                var hstActionDtoList = await hstActionDao.FindByBookIdAndItemIdAsync((int)bookId, (int)itemId);
+                IEnumerable<HstActionDto> hstActionDtoList = await hstActionDao.FindByBookIdAndItemIdAsync((int)bookId, (int)itemId);
 
                 if (hstActionDtoList.Any()) {
                     result = false;

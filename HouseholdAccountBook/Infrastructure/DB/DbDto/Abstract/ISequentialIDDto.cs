@@ -9,6 +9,6 @@
         /// シーケンスとなるIDを取得する
         /// </summary>
         /// <returns>ID</returns>
-        public int GetId();
+        int GetId();
     }
 }

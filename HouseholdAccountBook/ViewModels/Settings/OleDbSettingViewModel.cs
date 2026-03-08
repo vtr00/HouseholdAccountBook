@@ -47,7 +47,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             Properties.Settings settings = Properties.Settings.Default;
 
             this.ProviderNameDic.Clear();
-            OleDbHandler.GetOleDbProvider().ForEach(this.ProviderNameDic.Add);
+            new List<KeyValuePair<string, string>>(OleDbHandler.GetOleDbProvider()).ForEach(this.ProviderNameDic.Add);
             this.SelectedProviderName = settings.App_Access_Provider;
             this.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_Access_DBFilePath);
         }
@@ -60,7 +60,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             Properties.Settings settings = Properties.Settings.Default;
 
             this.ProviderNameDic.Clear();
-            OleDbHandler.GetOleDbProvider().FindAll(pair => pair.Key.Contains(OleDbHandler.ConnectInfo.AccessProviderHeader)).ForEach(this.ProviderNameDic.Add);
+            new List<KeyValuePair<string, string>>(OleDbHandler.GetOleDbProvider()).FindAll(static pair => pair.Key.Contains(OleDbHandler.ConnectInfo.AccessProviderHeader)).ForEach(this.ProviderNameDic.Add);
             this.SelectedProviderName = settings.App_Import_KichoFugetsu_Provider;
         }
 

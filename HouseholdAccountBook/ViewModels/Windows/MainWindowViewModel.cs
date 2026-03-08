@@ -1549,7 +1549,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public void UpdateOperationLogFileMenuList()
         {
             this.OperationLogFileMenuList.Clear();
-            List<string> logFileList = LogImpl.GetLogFiles();
+            List<string> logFileList = [.. LogImpl.GetLogFiles()];
             logFileList.Reverse();
             int count = 0;
             foreach (string logFile in logFileList) {
@@ -1580,9 +1580,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             AppService service = new(this.mDbHandlerFactory);
             BookIdObj tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            ObservableCollection<BookModel> tmpBookVMList = [.. await service.LoadBookListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllBooks)];
+            IEnumerable<BookModel> tmpBookVMList = await service.LoadBookListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllBooks);
             this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0); // 先に選択しておく
-            this.BookVMList = tmpBookVMList;
+            this.BookVMList = [.. tmpBookVMList];
         }
     }
 }

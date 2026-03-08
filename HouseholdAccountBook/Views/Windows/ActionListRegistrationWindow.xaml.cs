@@ -45,7 +45,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 登録時のイベント
         /// </summary>
-        public event EventHandler<EventArgs<List<ActionIdObj>>> Registrated {
+        public event EventHandler<EventArgs<IEnumerable<ActionIdObj>>> Registrated {
             add => this.WVM.Registrated += value;
             remove => this.WVM.Registrated -= value;
         }
@@ -70,7 +70,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="initialBookId">初期選択する帳簿のID</param>
         /// <param name="initialRecordList">初期表示するCSVレコードリスト</param>
-        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, List<ActionCsvDto> initialRecordList)
+        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, IEnumerable<ActionCsvDto> initialRecordList)
             : this(owner, dbHandlerFactory, initialBookId, null, null, initialRecordList, null, RegistrationKind.Add) { }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="targetGroupId">編集時、編集する帳簿項目のグループID</param>
         /// <param name="regKind">登録種別</param>
         private ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate,
-            List<ActionCsvDto> initialRecordList, GroupIdObj targetGroupId, RegistrationKind regKind)
+            IEnumerable<ActionCsvDto> initialRecordList, GroupIdObj targetGroupId, RegistrationKind regKind)
         {
             using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, initialRecordList, targetGroupId, regKind });
 

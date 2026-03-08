@@ -25,11 +25,11 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
         /// <summary>
         /// 初期表示するCSVレコードリスト
         /// </summary>
-        public List<ActionCsvDto> InitialRecordList { get; set; }
+        public IEnumerable<ActionCsvDto> InitialRecordList { get; set; }
 
         /// <summary>
         /// 登録完了時イベントハンドラ
         /// </summary>
-        public EventHandler<EventArgs<List<ActionIdObj>>> Registered { get; set; }
+        public EventHandler<EventArgs<IEnumerable<ActionIdObj>>> Registered { get; set; }
     }
 }

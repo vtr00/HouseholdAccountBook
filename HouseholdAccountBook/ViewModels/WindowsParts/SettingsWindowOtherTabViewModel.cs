@@ -324,7 +324,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             // カレンダー情報
             this.InputedStartMonth = settings.App_StartMonth;
             this.InputedNationalHolidayCsvURI = settings.App_NationalHolidayCsv_Uri;
-            this.NationalHolidayTextEncodingList = GetTextEncodingList();
+            this.NationalHolidayTextEncodingList = [.. GetTextEncodingList()];
             this.SelectedNationalHolidayTextEncoding = settings.App_NationalHolidayCsv_TextEncoding;
             this.InputedNationalHolidayCsvDateIndex = settings.App_NationalHolidayCsv_DateIndex + 1;
 

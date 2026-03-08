@@ -721,7 +721,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="itemId">選択対象の項目ID</param>
         /// <param name="isScroll">帳簿項目一覧をスクロールするか</param>
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
-        public async Task LoadAsync(List<ActionIdObj> actionIdList = null, BalanceKind? balanceKind = null, CategoryIdObj categoryId = null, ItemIdObj itemId = null,
+        public async Task LoadAsync(IEnumerable<ActionIdObj> actionIdList = null, BalanceKind? balanceKind = null, CategoryIdObj categoryId = null, ItemIdObj itemId = null,
                                       bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
             if (this.Parent.SelectedTab != Tabs.BooksTab) { return; }
@@ -729,7 +729,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             using FuncLog funcLog = new(new { actionIdList, balanceKind, categoryId, itemId, isScroll, isUpdateActDateLastEdited });
 
             // 指定がなければ、更新前の帳簿項目の選択を維持する
-            List<ActionIdObj> tmpActionIdList = actionIdList ?? [.. this.SelectedActionVMList.Select(tmp => tmp.ActionWithBalance.Action.ActionId)];
+            IEnumerable<ActionIdObj> tmpActionIdList = actionIdList ?? [.. this.SelectedActionVMList.Select(tmp => tmp.ActionWithBalance.Action.ActionId)];
             // 指定がなければ、更新前のサマリーの選択を維持する
             BalanceKind? tmpBalanceKind = balanceKind ?? this.Parent.SelectedBalanceKind;
             CategoryIdObj tmpCategoryId = categoryId ?? this.Parent.SelectedCategoryId;
@@ -774,7 +774,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             // 最後に操作した帳簿項目の日付を更新する
             if (isUpdateActDateLastEdited) {
-                this.ActDateLastEdited = actionIdList != null && actionIdList.Count != 0 ? await this.mMainService.LoadActDateAsync(actionIdList[0]) : null;
+                this.ActDateLastEdited = actionIdList != null && actionIdList.Any() ? await this.mMainService.LoadActDateAsync(actionIdList.First()) : null;
             }
         }
 

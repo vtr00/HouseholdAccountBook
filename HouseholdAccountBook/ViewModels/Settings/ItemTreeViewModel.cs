@@ -13,7 +13,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 階層種別
         /// </summary>
-        public HierarchicalKind Kind  => (HierarchicalKind)this.Depth;
+        public HierarchicalKind Kind => (HierarchicalKind)this.Depth;
 
         /// <summary>
         /// 項目ツリー 収支コンストラクタ

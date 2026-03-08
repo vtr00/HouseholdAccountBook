@@ -30,7 +30,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <param name="targetList">削除対象の帳簿項目IDとグループIDのペア</param>
         /// <returns></returns>
-        public async Task DeleteAction(IEnumerable<(ActionIdObj, GroupIdObj)>targetList)
+        public async Task DeleteAction(IEnumerable<(ActionIdObj, GroupIdObj)> targetList)
         {
             using FuncLog funcLog = new(new { targetList });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
                 List<GroupIdObj> groupIdList = [];
                 // 帳簿項目IDが0を超える項目についてループ
-                foreach ((ActionIdObj, GroupIdObj)target in targetList) {
+                foreach ((ActionIdObj, GroupIdObj) target in targetList) {
                     ActionIdObj actionId = target.Item1;
                     GroupIdObj groupId = target.Item2;
 
@@ -111,7 +111,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">月内の時刻</param>
         /// <returns>帳簿項目VMリスト</returns>
-        public async Task<List<ActionWithBalanceModel>> LoadActionListAsync(BookIdObj bookId, DateOnly includedTime)
+        public async Task<IEnumerable<ActionWithBalanceModel>> LoadActionListAsync(BookIdObj bookId, DateOnly includedTime)
         {
             using FuncLog funcLog = new(new { bookId, includedTime });
 
@@ -126,7 +126,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="bookId">帳簿ID</param>
         /// <param name="period">期間</param>
         /// <returns>帳簿項目VMリスト</returns>
-        public async Task<List<ActionWithBalanceModel>> LoadActionListAsync(BookIdObj bookId, PeriodObj<DateOnly> period)
+        public async Task<IEnumerable<ActionWithBalanceModel>> LoadActionListAsync(BookIdObj bookId, PeriodObj<DateOnly> period)
         {
             using FuncLog funcLog = new(new { bookId, period });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
@@ -217,7 +217,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">月内の時間</param>
         /// <returns>概要VMリスト</returns>
-        public async Task<List<SummaryModel>> LoadSummaryListAsync(BookIdObj bookId, DateOnly includedTime)
+        public async Task<IEnumerable<SummaryModel>> LoadSummaryListAsync(BookIdObj bookId, DateOnly includedTime)
         {
             using FuncLog funcLog = new(new { bookId, includedTime });
 
@@ -232,7 +232,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="bookId">帳簿ID</param>
         /// <param name="period">期間</param>
         /// <returns>概要VMリスト</returns>
-        public async Task<List<SummaryModel>> LoadSummaryListAsync(BookIdObj bookId, PeriodObj<DateOnly> period)
+        public async Task<IEnumerable<SummaryModel>> LoadSummaryListAsync(BookIdObj bookId, PeriodObj<DateOnly> period)
         {
             using FuncLog funcLog = new(new { bookId, period });
 

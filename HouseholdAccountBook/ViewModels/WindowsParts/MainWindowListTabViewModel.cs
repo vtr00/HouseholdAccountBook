@@ -6,6 +6,7 @@ using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
+using HouseholdAccountBook.ViewModels.Loaders;
 using HouseholdAccountBook.ViewModels.Windows;
 using System;
 using System.Collections.Generic;

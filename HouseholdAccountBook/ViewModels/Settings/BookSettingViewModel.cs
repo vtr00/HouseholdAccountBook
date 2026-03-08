@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
-using HouseholdAccountBook.Models;
+﻿using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
