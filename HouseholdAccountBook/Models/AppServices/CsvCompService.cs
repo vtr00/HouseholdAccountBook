@@ -29,7 +29,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// 帳簿Model(比較用)を取得する
         /// </summary>
         /// <returns>帳簿Model</returns>
-        public async Task<List<BookModel>> UpdateBookCompListAsync()
+        public async Task<IEnumerable<BookModel>> UpdateBookCompListAsync()
         {
             using FuncLog funcLog = new();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
@@ -37,7 +37,7 @@ namespace HouseholdAccountBook.Models.AppServices
             List<BookModel> bmList = [];
 
             MstBookDao mstBookDao = new(dbHandler);
-            var dtoList = await mstBookDao.FindIfJsonCodeExistsAsync();
+            IEnumerable<MstBookDto> dtoList = await mstBookDao.FindIfJsonCodeExistsAsync();
             foreach (MstBookDto dto in dtoList) {
                 MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
                 if (jsonObj is null) { continue; }
@@ -71,7 +71,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             ActionCompInfoDao actionCompInfoDao = new(dbHandler);
             IEnumerable<ActionCompInfoDto> dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(bookId.Value, dateTime, (int)value);
-            List<ActionModel> actionList = [.. dtoList.Select(dto => new ActionModel() {
+            IEnumerable<ActionModel> actionList = [.. dtoList.Select(static dto => new ActionModel() {
                     GroupId = dto.GroupId,
                     Item = new(dto.ItemId, dto.ItemName),
                     Base = new(dto.ActionId, dto.ActTime, dto.ActValue),

@@ -63,7 +63,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 登録時イベント
         /// </summary>
-        public event EventHandler<EventArgs<List<ActionIdObj>>> Registrated;
+        public event EventHandler<EventArgs<IEnumerable<ActionIdObj>>> Registrated;
         #endregion
 
         #region Bindingプロパティ
@@ -284,13 +284,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         protected override async void OKCommand_Executed()
         {
             // DB登録
-            List<ActionIdObj> idList = null;
+            IEnumerable<ActionIdObj> idList = null;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 idList = await this.SaveAsync();
             }
 
             // MainWindow更新
-            this.Registrated?.Invoke(this, new(idList ?? []));
+            this.Registrated?.Invoke(this, new(idList));
 
             base.OKCommand_Executed();
         }
@@ -334,7 +334,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="initialDate">追加時、初期選択する日付</param>
         /// <param name="initialRecordList">追加時、初期表示するCSVレコードリスト</param>
         /// <param name="targetGroupId">編集時、編集対象のグループID</param>
-        public async Task LoadAsync(BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate, List<ActionCsvDto> initialRecordList, GroupIdObj targetGroupId)
+        public async Task LoadAsync(BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate, IEnumerable<ActionCsvDto> initialRecordList, GroupIdObj targetGroupId)
         {
             using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, initialRecordList, targetGroupId });
 
@@ -365,7 +365,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     List<DateValueViewModel> dateValueVMList = [];
 
                     // DBから値を読み込む
-                    List<ActionModel> actionList = [.. await this.mService.LoadActionListAsync(targetGroupId)];
+                    IEnumerable<ActionModel> actionList = await this.mService.LoadActionListAsync(targetGroupId);
 
                     foreach (ActionModel action in actionList) {
                         // 日付金額リストに追加
@@ -538,7 +538,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// DBに登録する
         /// </summary>
         /// <returns>登録された帳簿項目IDリスト</returns>
-        protected override async Task<List<ActionIdObj>> SaveAsync()
+        protected override async Task<IEnumerable<ActionIdObj>> SaveAsync()
         {
             using FuncLog funcLog = new();
 
@@ -559,7 +559,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 actionList.Add(commonAction.WithChanges(baseAction));
             }
 
-            List<ActionIdObj> resActionIdList = [.. await this.mService.SaveActionListAsync(actionList)];
+            IEnumerable<ActionIdObj> resActionIdList = await this.mService.SaveActionListAsync(actionList);
 
             DateTime lastActTime = this.InputedDateValueVMList.Max(tmp => tmp.ActDate);
 

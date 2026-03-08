@@ -24,7 +24,7 @@ namespace HouseholdAccountBook.Infrastructure.CSV
         /// <param name="expensesIndex">支出インデックス</param>
         /// <param name="encoding">エンコーディング</param>
         /// <returns>読込結果</returns>
-        public static async Task<List<CsvComparisonViewModel>> LoadCsvCompListAsync(IEnumerable<string> csvFilePathList, int actDateIndex, int itemNameIndex, int expensesIndex, Encoding encoding)
+        public static async Task<IEnumerable<CsvComparisonViewModel>> LoadCsvCompListAsync(IEnumerable<string> csvFilePathList, int actDateIndex, int itemNameIndex, int expensesIndex, Encoding encoding)
         {
             CsvConfiguration csvConfig = new(CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,
@@ -55,7 +55,7 @@ namespace HouseholdAccountBook.Infrastructure.CSV
                     }
 
                     // 有効な行があれば追加する
-                    if (0 < tmpVMList2.Count) {
+                    if (tmpVMList2.Count != 0) {
                         tmpVMList.AddRange(tmpVMList2);
                     }
                 }

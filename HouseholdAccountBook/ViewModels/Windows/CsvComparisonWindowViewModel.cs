@@ -43,7 +43,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿項目変更時イベント
         /// </summary>
-        public event EventHandler<EventArgs<List<ActionIdObj>>> ActionChanged;
+        public event EventHandler<EventArgs<IEnumerable<ActionIdObj>>> ActionChanged;
         /// <summary>
         /// 一致フラグ変更時イベント
         /// </summary>
@@ -262,7 +262,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             };
             if (this.OpenFilesDialogRequest(e)) {
                 // 開いたCSVファイルのパスを設定として保存する(複数存在する場合は先頭のみ)
-                settings.App_CsvFilePath = e.FileNames[0];
+                settings.App_CsvFilePath = e.FileNames.First();
                 settings.Save();
 
                 foreach (string tmpFileName in e.FileNames) {
@@ -371,7 +371,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             List<CsvComparisonViewModel> vmList = [.. this.SelectedCsvComparisonVMList.Where(vm => vm.Action is null)];
             List<ActionCsvDto> recordList = [.. vmList.Select(vm => vm.Record)];
 
-            async void Registered(object sender, EventArgs<List<ActionIdObj>> e)
+            async void Registered(object sender, EventArgs<IEnumerable<ActionIdObj>> e)
             {
                 // CSVの項目をベースに追加したので既定で一致フラグを立てる
                 foreach (ActionIdObj actionId in e.Value) {
@@ -417,7 +417,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             AppService service = new(this.mDbHandlerFactory);
             GroupKind kind = await service.LoadGroupKind(this.SelectedCsvComparisonVM.Action.ActionId);
 
-            async void Registered(object sender, EventArgs<List<ActionIdObj>> e)
+            async void Registered(object sender, EventArgs<IEnumerable<ActionIdObj>> e)
             {
                 // 表示を更新する
                 this.ActionChanged?.Invoke(this, e);
@@ -637,7 +637,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 指定されたCSVファイルを追加で読み込む
         /// </summary>
-        public async Task LoadCsvFilesAsync(IList<string> csvFilePathList)
+        public async Task LoadCsvFilesAsync(IEnumerable<string> csvFilePathList)
         {
             using FuncLog funcLog = new(new { csvFilePathList });
 
@@ -651,8 +651,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             int expensesIndex = this.SelectedBookVM.ExpensesIndex.Value;
 
             // CSVファイルを読み込む
-            List<CsvComparisonViewModel> tmpVMList =
-                await CSVFileDao.LoadCsvCompListAsync(csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, Encoding.GetEncoding(this.SelectedBookVM.TextEncoding));
+            List<CsvComparisonViewModel> tmpVMList = [..
+                await CSVFileDao.LoadCsvCompListAsync(csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, Encoding.GetEncoding(this.SelectedBookVM.TextEncoding))];
 
             // 有効な行があればリストに追加する(日付昇順)
             if (0 < tmpVMList.Count) {

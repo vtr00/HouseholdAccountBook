@@ -37,7 +37,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="dest">移行先DTO</param>
         /// <param name="converter">型変換関数</param>
         /// <returns>件数差</returns>
-        private static async Task<int> Mapping<DTO1, DTO2>(IReadTableDao<DTO1> src, IWriteTableDao<DTO2> dest, 
+        private static async Task<int> Mapping<DTO1, DTO2>(IReadTableDao<DTO1> src, IWriteTableDao<DTO2> dest,
                                                            Func<IEnumerable<DTO1>, IEnumerable<DTO2>> converter) where DTO1 : DtoBase where DTO2 : DtoBase
         {
             ArgumentNullException.ThrowIfNull(src);

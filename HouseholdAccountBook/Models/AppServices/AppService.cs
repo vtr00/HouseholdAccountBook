@@ -10,6 +10,7 @@ using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Models.AppServices
@@ -31,7 +32,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="period">期間</param>
         /// <param name="initialName">1番目に追加する項目の名称(空文字の場合は追加しない)</param>
         /// <returns>帳簿Modelリスト</returns>
-        public async Task<List<BookModel>> LoadBookListAsync(PeriodObj<DateOnly> period = null, string initialName = "")
+        public async Task<IEnumerable<BookModel>> LoadBookListAsync(PeriodObj<DateOnly> period = null, string initialName = "")
         {
             using FuncLog funcLog = new(new { period, initialName });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
@@ -68,7 +69,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="bookId">絞り込み対象の帳簿ID</param>
         /// <param name="balanceKind">絞り込み対象の収支種別</param>
         /// <returns>分類Modelリスト</returns>
-        public async Task<List<CategoryModel>> LoadCategoryListAsync(BookIdObj bookId, BalanceKind balanceKind, string initialName = "")
+        public async Task<IEnumerable<CategoryModel>> LoadCategoryListAsync(BookIdObj bookId, BalanceKind balanceKind, string initialName = "")
         {
             using FuncLog funcLog = new(new { bookId, balanceKind });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
@@ -95,7 +96,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="balanceKind">絞り込み対象の収支種別</param>
         /// <param name="categoryId">絞り込み対象の分類ID</param>
         /// <returns>項目Modelリスト</returns>
-        public async Task<List<ItemModel>> LoadItemListAsync(BookIdObj bookId, BalanceKind balanceKind, CategoryIdObj categoryId)
+        public async Task<IEnumerable<ItemModel>> LoadItemListAsync(BookIdObj bookId, BalanceKind balanceKind, CategoryIdObj categoryId)
         {
             using FuncLog funcLog = new(new { bookId, balanceKind, categoryId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
@@ -103,7 +104,7 @@ namespace HouseholdAccountBook.Models.AppServices
             List<ItemModel> imList = [];
 
             CategoryItemInfoDao categoryItemInfoDao = new(dbHandler);
-            IEnumerable<CategoryItemInfoDto> dtoList = (int)categoryId == -1
+            IEnumerable<CategoryItemInfoDto> dtoList = (categoryId is null || categoryId == -1)
                 ? await categoryItemInfoDao.FindByBookIdAndBalanceKindAsync((int)bookId, (int)balanceKind)
                 : await categoryItemInfoDao.FindByBookIdAndCategoryIdAsync((int)bookId, (int)categoryId);
             foreach (CategoryItemInfoDto dto in dtoList) {
@@ -122,7 +123,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="itemId">絞り込み対象の項目ID</param>
         /// <param name="insertEmpty">空のデータを追加するか</param>
         /// <returns>店舗Modelリスト</returns>
-        public async Task<List<ShopModel>> LoadShopListAsync(ItemIdObj itemId, bool insertEmpty = false)
+        public async Task<IEnumerable<ShopModel>> LoadShopListAsync(ItemIdObj itemId, bool insertEmpty = false)
         {
             using FuncLog funcLog = new(new { itemId, insertEmpty });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
@@ -135,13 +136,10 @@ namespace HouseholdAccountBook.Models.AppServices
 
             ShopInfoDao shopInfoDao = new(dbHandler);
             IEnumerable<ShopInfoDto> dtoList = await shopInfoDao.FindByItemIdAsync((int)itemId);
-            foreach (ShopInfoDto dto in dtoList) {
-                ShopModel vm = new(dto.ShopName) {
-                    UsedCount = dto.Count,
-                    UsedTime = dto.UsedTime ?? DateTime.MinValue
-                };
-                smList.Add(vm);
-            }
+            smList.AddRange(dtoList.Select(static dto => new ShopModel(dto.ShopName) {
+                UsedCount = dto.Count,
+                UsedTime = dto.UsedTime ?? DateTime.MinValue
+            }));
 
             return smList;
         }
@@ -152,7 +150,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="itemId">絞り込み対象の項目ID</param>
         /// <param name="insertEmpty">空のデータを追加するか</param>
         /// <returns>備考Modelリスト</returns>
-        public async Task<List<RemarkModel>> LoadRemarkListAsync(ItemIdObj itemId, bool insertEmpty = false)
+        public async Task<IEnumerable<RemarkModel>> LoadRemarkListAsync(ItemIdObj itemId, bool insertEmpty = false)
         {
             using FuncLog funcLog = new(new { itemId, insertEmpty });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
@@ -165,13 +163,10 @@ namespace HouseholdAccountBook.Models.AppServices
 
             RemarkInfoDao remarkInfoDao = new(dbHandler);
             IEnumerable<RemarkInfoDto> dtoList = await remarkInfoDao.FindByItemIdAsync((int)itemId);
-            foreach (RemarkInfoDto dto in dtoList) {
-                RemarkModel vm = new(dto.Remark) {
-                    UsedCount = dto.Count,
-                    UsedTime = dto.UsedTime ?? DateTime.MinValue
-                };
-                rmList.Add(vm);
-            }
+            rmList.AddRange(dtoList.Select(static dto => new RemarkModel(dto.Remark) {
+                UsedCount = dto.Count,
+                UsedTime = dto.UsedTime ?? DateTime.MinValue
+            }));
 
             return rmList;
         }
@@ -211,7 +206,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// 全データの期間を取得する
         /// </summary>
-        /// <returns></returns>
+        /// <returns>期間</returns>
         public async Task<PeriodObj<DateTime>> LoadPeriodOfAll()
         {
             using FuncLog funcLog = new();

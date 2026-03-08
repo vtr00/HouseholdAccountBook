@@ -47,7 +47,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// Ole DBプロバイダの一覧を取得する
         /// </summary>
         /// <returns></returns>
-        public static List<KeyValuePair<string, string>> GetOleDbProvider()
+        public static IEnumerable<KeyValuePair<string, string>> GetOleDbProvider()
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 

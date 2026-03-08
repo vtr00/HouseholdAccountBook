@@ -14,7 +14,7 @@
     }
 
     /// <summary>
-    /// 帳簿項目ID
+    /// 帳簿項目ID VO
     /// </summary>
     /// <param name="Value">帳簿ID</param>
     public sealed record class ActionIdObj(int Value)
@@ -26,7 +26,7 @@
         public override string ToString() => $"{this.Value}";
     }
     /// <summary>
-    /// グループID
+    /// グループID VO
     /// </summary>
     /// <param name="Value">グループID</param>
     public sealed record class GroupIdObj(int Value)
@@ -39,7 +39,7 @@
     }
 
     /// <summary>
-    /// 帳簿ID
+    /// 帳簿ID VO
     /// </summary>
     /// <param name="Value">帳簿ID</param>
     public sealed record class BookIdObj(int Value)
@@ -52,7 +52,7 @@
     }
 
     /// <summary>
-    /// 分類ID
+    /// 分類ID VO
     /// </summary>
     /// <param name="Value">分類ID</param>
     public record class CategoryIdObj(int Value)
@@ -66,7 +66,7 @@
     }
 
     /// <summary>
-    /// 項目ID
+    /// 項目ID VO
     /// </summary>
     /// <param name="Value">項目ID</param>
     public sealed record class ItemIdObj(int Value)

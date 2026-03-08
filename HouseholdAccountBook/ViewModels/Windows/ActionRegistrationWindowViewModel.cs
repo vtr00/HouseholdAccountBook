@@ -65,7 +65,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 登録時イベント
         /// </summary>
-        public event EventHandler<EventArgs<List<ActionIdObj>>> Registrated;
+        public event EventHandler<EventArgs<IEnumerable<ActionIdObj>>> Registrated;
         #endregion
 
         #region Bindingプロパティ
@@ -366,8 +366,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             // 呼び出し元更新
-            List<ActionIdObj> value = id != null ? [id.Value] : [];
-            this.Registrated?.Invoke(this, new EventArgs<List<ActionIdObj>>(value));
+            IEnumerable<ActionIdObj> value = id != null ? [id.Value] : [];
+            this.Registrated?.Invoke(this, new EventArgs<IEnumerable<ActionIdObj>>(value));
 
             // 表示クリア
             this.InputedValue = null;
@@ -384,8 +384,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             // 呼び出し元更新
-            List<ActionIdObj> value = id != null ? [id.Value] : [];
-            this.Registrated?.Invoke(this, new EventArgs<List<ActionIdObj>>(value));
+            IEnumerable<ActionIdObj> value = id != null ? [id.Value] : [];
+            this.Registrated?.Invoke(this, new EventArgs<IEnumerable<ActionIdObj>>(value));
 
             base.OKCommand_Executed();
         }
@@ -498,9 +498,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { selectingBookId });
 
-            ObservableCollection<BookModel> tmpBookVMList = [.. await this.mAppService.LoadBookListAsync()];
+            IEnumerable<BookModel> tmpBookVMList = await this.mAppService.LoadBookListAsync();
             this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == selectingBookId, 0); // 先に選択しておく
-            this.BookVMList = tmpBookVMList;
+            this.BookVMList = [.. tmpBookVMList];
         }
 
         /// <summary>
@@ -516,9 +516,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             CategoryIdObj tmpCategoryId = selectingCategoryId ?? this.SelectedCategoryVM?.Id;
 
-            ObservableCollection<CategoryModel> tmpCategoryVMList = [.. await this.mAppService.LoadCategoryListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, Properties.Resources.ListName_NoSpecification)];
+            IEnumerable<CategoryModel> tmpCategoryVMList = await this.mAppService.LoadCategoryListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, Properties.Resources.ListName_NoSpecification);
             this.SelectedCategoryVM = tmpCategoryVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpCategoryId, 0); // 先に選択しておく
-            this.CategoryVMList = tmpCategoryVMList;
+            this.CategoryVMList = [.. tmpCategoryVMList];
         }
 
         /// <summary>
@@ -534,9 +534,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             ItemIdObj tmpItemId = selectingItemId ?? this.SelectedItemVM?.Id;
 
-            ObservableCollection<ItemModel> tmpItemVMList = [.. await this.mAppService.LoadItemListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, this.SelectedCategoryVM.Id)];
+            IEnumerable<ItemModel> tmpItemVMList = await this.mAppService.LoadItemListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, this.SelectedCategoryVM.Id);
             this.SelectedItemVM = tmpItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0); // 先に選択しておく
-            this.ItemVMList = tmpItemVMList;
+            this.ItemVMList = [.. tmpItemVMList];
         }
 
         /// <summary>
@@ -552,9 +552,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             string tmpShopName = selectingShopName ?? this.SelectedShopName;
 
-            ObservableCollection<ShopModel> tmpShopVMList = [.. await this.mAppService.LoadShopListAsync(this.SelectedItemVM.Id, true)];
+            IEnumerable<ShopModel> tmpShopVMList = await this.mAppService.LoadShopListAsync(this.SelectedItemVM.Id, true);
             this.SelectedShopName = tmpShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name; // 先に選択しておく
-            this.ShopVMList = tmpShopVMList;
+            this.ShopVMList = [.. tmpShopVMList];
         }
 
         /// <summary>
@@ -570,9 +570,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
 
-            ObservableCollection<RemarkModel> tmpRemarkVMList = [.. await this.mAppService.LoadRemarkListAsync(this.SelectedItemVM.Id, true)];
+            IEnumerable<RemarkModel> tmpRemarkVMList = await this.mAppService.LoadRemarkListAsync(this.SelectedItemVM.Id, true);
             this.SelectedRemark = tmpRemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark; // 先に選択しておく
-            this.RemarkVMList = tmpRemarkVMList;
+            this.RemarkVMList = [.. tmpRemarkVMList];
         }
 
         public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)

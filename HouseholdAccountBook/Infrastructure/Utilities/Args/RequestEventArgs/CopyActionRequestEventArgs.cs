@@ -17,6 +17,6 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
         /// <summary>
         /// 登録完了時イベントハンドラ
         /// </summary>
-        public EventHandler<EventArgs<List<ActionIdObj>>> Registered { get; set; }
+        public EventHandler<EventArgs<IEnumerable<ActionIdObj>>> Registered { get; set; }
     }
 }

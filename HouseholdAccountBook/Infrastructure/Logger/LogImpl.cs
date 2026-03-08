@@ -141,7 +141,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// ログファイル一覧を取得する
         /// </summary>
         /// <returns>ログファイル一覧</returns>
-        public static List<string> GetLogFiles() => FileUtil.GetFiles(LogFolderPath, LogFileNamePattern, SearchOption.TopDirectoryOnly);
+        public static IEnumerable<string> GetLogFiles() => FileUtil.GetFiles(LogFolderPath, LogFileNamePattern, SearchOption.TopDirectoryOnly);
 
         /// <summary>
         /// 古いログファイルを削除する

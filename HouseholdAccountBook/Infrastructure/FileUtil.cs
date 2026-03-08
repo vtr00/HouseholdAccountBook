@@ -55,7 +55,7 @@ namespace HouseholdAccountBook.Infrastructure
         /// <param name="searchPattern">ファイル名のパターン</param>
         /// <param name="searchOption"></param>
         /// <returns>ファイルパス一覧</returns>
-        public static List<string> GetFiles(string directoryPath, string searchPattern, SearchOption searchOption)
+        public static IEnumerable<string> GetFiles(string directoryPath, string searchPattern, SearchOption searchOption)
         {
             using FuncLog funcLog = new(new { directoryPath, searchPattern, searchOption });
 

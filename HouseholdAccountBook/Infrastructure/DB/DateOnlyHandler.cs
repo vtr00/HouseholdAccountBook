@@ -13,5 +13,4 @@ namespace HouseholdAccountBook.Infrastructure.DB
 
         public override DateOnly Parse(object value) => DateOnly.FromDateTime((DateTime)value);
     }
-
 }
