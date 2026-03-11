@@ -1,10 +1,15 @@
 ﻿namespace HouseholdAccountBook.Models.ValueObjects
 {
+    public interface IIdObj
+    {
+        int Value { get; init; }
+    }
+
     /// <summary>
     /// ID VO
     /// </summary>
     /// <param name="Value">ID</param>
-    public sealed record class IdObj(int Value)
+    public sealed record class IdObj(int Value) : IIdObj
     {
         public static implicit operator IdObj(int value) => new(value);
         public static explicit operator int?(IdObj obj) => obj?.Value;
@@ -17,7 +22,7 @@
     /// 帳簿項目ID VO
     /// </summary>
     /// <param name="Value">帳簿ID</param>
-    public sealed record class ActionIdObj(int Value)
+    public sealed record class ActionIdObj(int Value) : IIdObj
     {
         public static implicit operator ActionIdObj(int id) => new(id);
         public static explicit operator int?(ActionIdObj obj) => obj?.Value;
@@ -29,7 +34,7 @@
     /// グループID VO
     /// </summary>
     /// <param name="Value">グループID</param>
-    public sealed record class GroupIdObj(int Value)
+    public sealed record class GroupIdObj(int Value) : IIdObj
     {
         public static implicit operator GroupIdObj(int id) => new(id);
         public static explicit operator int?(GroupIdObj obj) => obj?.Value;
@@ -42,7 +47,7 @@
     /// 帳簿ID VO
     /// </summary>
     /// <param name="Value">帳簿ID</param>
-    public sealed record class BookIdObj(int Value)
+    public sealed record class BookIdObj(int Value) : IIdObj
     {
         public static implicit operator BookIdObj(int id) => new(id);
         public static explicit operator int?(BookIdObj obj) => obj?.Value;
@@ -55,7 +60,7 @@
     /// 分類ID VO
     /// </summary>
     /// <param name="Value">分類ID</param>
-    public record class CategoryIdObj(int Value)
+    public record class CategoryIdObj(int Value) : IIdObj
     {
         public static implicit operator CategoryIdObj(int id) => new(id);
         public static explicit operator int?(CategoryIdObj obj) => obj?.Value;
@@ -69,7 +74,7 @@
     /// 項目ID VO
     /// </summary>
     /// <param name="Value">項目ID</param>
-    public sealed record class ItemIdObj(int Value)
+    public sealed record class ItemIdObj(int Value) : IIdObj
     {
         public static implicit operator ItemIdObj(int id) => new(id);
         public static explicit operator int?(ItemIdObj obj) => obj?.Value;

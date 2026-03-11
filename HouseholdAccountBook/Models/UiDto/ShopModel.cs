@@ -23,7 +23,7 @@ namespace HouseholdAccountBook.Models.UiDto
         /// <summary>
         /// 最終使用日
         /// </summary>
-        public DateTime UsedTime { get; init; } = DateTime.Now;
+        public DateTime? UsedTime { get; init; }
         #endregion
 
         public override string ToString() => this.Name;

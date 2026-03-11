@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Infrastructure.Logger;
+﻿using HouseholdAccountBook.Infrastructure;
+using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
@@ -44,7 +45,8 @@ namespace HouseholdAccountBook.ViewModels.Loaders
 
             vm = new BookSettingViewModel(bm) {
                 DebitBookVMList = new ObservableCollection<BookModel>(bmList.Where(tmpVM => tmpVM.Id != bookId)),
-                RelationVMList = [.. await this.mService.LoadRelationListAsync(bookId)]
+                RelationVMList = [.. await this.mService.LoadRelationListAsync(bookId)],
+                TextEncodingList = [.. EncodingUtil.GetTextEncodingList()]
             };
             vm.SelectedDebitBookVM = vm.DebitBookVMList.FirstOrElementAtOrDefault(tmpVM => (int?)tmpVM.Id == bm.DebitBookId, 0);
 

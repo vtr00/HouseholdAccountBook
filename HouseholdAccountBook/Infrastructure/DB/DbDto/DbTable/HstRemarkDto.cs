@@ -42,6 +42,6 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable
         /// <summary>
         /// 使用日時
         /// </summary>
-        public DateTime UsedTime { get; set; } = DateTime.Now;
+        public DateTime? UsedTime { get; set; }
     }
 }

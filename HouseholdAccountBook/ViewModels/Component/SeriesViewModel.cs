@@ -15,7 +15,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 収支名
         /// </summary>
-        public string BalanceName => UiConstants.BalanceKindStr[this.Category.BalanceKind];
+        public string BalanceName => this.Category.BalanceKind == BalanceKind.Others ? string.Empty : UiConstants.BalanceKindStr[this.Category.BalanceKind];
 
         /// <summary>
         /// 分類

@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Infrastructure.Logger;
+﻿using HouseholdAccountBook.Infrastructure;
+using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;
@@ -7,7 +8,6 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using static HouseholdAccountBook.Infrastructure.EncodingUtil;
 using static HouseholdAccountBook.ViewModels.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
@@ -324,7 +324,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             // カレンダー情報
             this.InputedStartMonth = settings.App_StartMonth;
             this.InputedNationalHolidayCsvURI = settings.App_NationalHolidayCsv_Uri;
-            this.NationalHolidayTextEncodingList = [.. GetTextEncodingList()];
+            this.NationalHolidayTextEncodingList = [.. EncodingUtil.GetTextEncodingList()];
             this.SelectedNationalHolidayTextEncoding = settings.App_NationalHolidayCsv_TextEncoding;
             this.InputedNationalHolidayCsvDateIndex = settings.App_NationalHolidayCsv_DateIndex + 1;
 

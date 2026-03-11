@@ -372,7 +372,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         DateValueViewModel vm = new() {
                             ActionId = action.ActionId,
                             ActDate = action.ActTime,
-                            ActValue = action.Expenses is null ? null : Math.Abs(action.Expenses.Value)
+                            ActValue = Math.Abs(action.Amount)
                         };
 
                         selectingBookId = action.Book.Id;
@@ -380,7 +380,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         selectingShopName = action.Shop.Name;
                         selectingRemark = action.Remark;
 
-                        selectingBalanceKind = 0 < Math.Sign(action.Amount) ? BalanceKind.Income : BalanceKind.Expenses; // 収入 / 支出
+                        selectingBalanceKind = action.Category.BalanceKind;
 
                         dateValueVMList.Add(vm);
                     }
