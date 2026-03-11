@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
                     return dt.TimeOfDay == TimeSpan.Zero ? $"{dt:yyyy-MM-dd}" : $"{dt:yyyy-MM-dd HH:mm:ss}";
                 case IEnumerable enumerable:
                     return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => item.ToString2(depth)))}]";
-                case IdObj idObj:
+                case IIdObj idObj:
                     return $"{idObj.Value}";
                 default:
                     PropertyInfo[] propInfos = obj.GetType().GetProperties(); // クラスが保持しているプロパティの情報を取得

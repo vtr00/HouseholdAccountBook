@@ -5,6 +5,7 @@ using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Component;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
@@ -167,7 +168,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                 DateOnly tmpEndTime = tmpStartTime.GetLastDateOfMonth();
                 tmpPeriod = new(tmpStartTime, tmpEndTime);
             }
-            ObservableCollection<SummaryModel> summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(bookId, tmpPeriod)];
+            List<SummaryModel> summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(bookId, tmpPeriod)];
             balance += summaryVMList[0].Total;
             vmList[0].Values.Add(balance); // 残高
             vmList[0].Periods.Add(tmpPeriod);

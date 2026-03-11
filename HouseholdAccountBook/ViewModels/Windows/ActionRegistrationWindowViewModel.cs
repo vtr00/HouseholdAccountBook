@@ -237,7 +237,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 金額
         /// </summary>
         #region InputedValue
-        public int? InputedValue {
+        public decimal? InputedValue {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
@@ -467,7 +467,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         this.SelectedIfMatch = action.IsMatch;
                     }
                     this.SelectedDate = action.ActTime;
-                    this.InputedValue = (int)action.Amount;
+                    this.InputedValue = Math.Abs(action.Amount);
                     this.InputedCount = count;
 
                     selectingBookId = action.Book.Id;

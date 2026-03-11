@@ -33,6 +33,8 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns>帳簿項目Model</returns>
         public async Task<ActionModel> LoadActionAsync(ActionIdObj actionId)
         {
+            using FuncLog funcLog = new(new { actionId });
+
             ActionModel action;
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 HstActionDao hstActionDao = new(dbHandler);
@@ -42,7 +44,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
                     GroupId = dto.GroupId,
                     Book = new(dto.BookId, string.Empty),
-                    Category = new(-1, string.Empty, Math.Sign(dto.ActValue) > 0 ? BalanceKind.Income : BalanceKind.Expenses),
+                    Category = new(null, string.Empty, 0 < Math.Sign(dto.ActValue) ? BalanceKind.Income : BalanceKind.Expenses),
                     Item = new(dto.ItemId, string.Empty),
                     Shop = new(dto.ShopName),
                     Remark = new(dto.Remark),
@@ -59,6 +61,8 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns>繰り返し回数</returns>
         public async Task<int> LoadRepeatCount(ActionIdObj actionId)
         {
+            using FuncLog funcLog = new(new { actionId });
+
             int count = 1;
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 HstActionDao hstActionDao = new(dbHandler);
@@ -111,8 +115,9 @@ namespace HouseholdAccountBook.Models.AppServices
                     GroupIdObj assingedGroupId = count == 1 ? null : await hstGroupDao.InsertReturningIdAsync(new HstGroupDto { GroupKind = (int)GroupKind.Repeat });
 
                     // 帳簿項目を追加する
-                    DateTime tmpActTime = count == 1 ? action.ActTime : GetDateTimeWithHolidaySettingKind(holidaySettingKind, action.ActTime); // 登録日付
                     for (int i = 0; i < count; ++i) {
+                        // 日付を取得する
+                        DateTime tmpActTime = count == 1 ? action.ActTime : GetDateTimeWithHolidaySettingKind(holidaySettingKind, action.ActTime.AddMonths(i)); // 登録日付
                         ActionIdObj actionId = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
                             BookId = (int)action.Book.Id,
                             ItemId = (int)action.Item.Id,
@@ -126,10 +131,6 @@ namespace HouseholdAccountBook.Models.AppServices
                         // 繰り返しの最初の1回を選択するようにする
                         if (i == 0) {
                             resActionId = actionId;
-                        }
-                        else {
-                            // 次の日付を取得する
-                            tmpActTime = GetDateTimeWithHolidaySettingKind(holidaySettingKind, action.ActTime.AddMonths(i + 1));
                         }
                     }
                     #endregion
@@ -237,13 +238,13 @@ namespace HouseholdAccountBook.Models.AppServices
                         });
 
                         // 既存のレコードを更新する
-                        tmpActTime = GetDateTimeWithHolidaySettingKind(holidaySettingKind, action.ActTime.AddMonths(1)); // 登録日付
                         for (int i = 1; i < actionIdList.Count; ++i) {
                             ActionIdObj targetActionId = actionIdList[i];
+                            // 日付を取得する
+                            tmpActTime = GetDateTimeWithHolidaySettingKind(holidaySettingKind, action.ActTime.AddMonths(i)); // 登録日付
 
                             if (i < count) { // 繰返し回数の範囲内のレコードを更新する
-                                             // 連動して編集時のみ変更する
-                                if (isLink) {
+                                if (isLink) { // 連動して編集時のみ変更する
                                     _ = await hstActionDao.UpdateWithoutIsMatchAsync(new HstActionDto {
                                         BookId = (int)action.Book.Id,
                                         ItemId = (int)action.Item.Id,
@@ -260,13 +261,13 @@ namespace HouseholdAccountBook.Models.AppServices
                             else { // 繰返し回数が帳簿項目数を下回っていた場合に、越えたレコードを削除する
                                 _ = await hstActionDao.DeleteByIdAsync((int)targetActionId);
                             }
-
-                            // 次の日付を取得する
-                            tmpActTime = GetDateTimeWithHolidaySettingKind(holidaySettingKind, action.ActTime.AddMonths(i + 1));
                         }
 
                         // 繰返し回数が帳簿項目数を越えていた場合に、新規レコードを追加する
                         for (int i = actionIdList.Count; i < count; ++i) {
+                            // 日付を取得する
+                            tmpActTime = GetDateTimeWithHolidaySettingKind(holidaySettingKind, action.ActTime.AddMonths(i));
+
                             _ = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
                                 BookId = (int)action.Book.Id,
                                 ItemId = (int)action.Item.Id,
@@ -277,9 +278,6 @@ namespace HouseholdAccountBook.Models.AppServices
                                 Remark = action.Remark,
                                 IsMatch = 0
                             });
-
-                            // 次の日付を取得する
-                            tmpActTime = GetDateTimeWithHolidaySettingKind(holidaySettingKind, action.ActTime.AddMonths(i + 1));
                         }
                         #endregion
                     }
@@ -299,6 +297,8 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns>帳簿項目Modelリスト</returns>
         public async Task<IEnumerable<ActionModel>> LoadActionListAsync(GroupIdObj groupId)
         {
+            using FuncLog funcLog = new(new { groupId });
+
             List<ActionModel> actionList = [];
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 HstActionDao hstActionDao = new(dbHandler);
@@ -308,6 +308,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     ActionModel action = new() {
                         GroupId = groupId,
                         Book = new(dto.BookId, string.Empty),
+                        Category = new(null, string.Empty, 0 < Math.Sign(dto.ActValue) ? BalanceKind.Income : BalanceKind.Expenses),
                         Item = new(dto.ItemId, string.Empty),
                         Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
                         Shop = new(dto.ShopName),
@@ -320,6 +321,11 @@ namespace HouseholdAccountBook.Models.AppServices
             return actionList;
         }
 
+        /// <summary>
+        /// 帳簿項目Modelリストを保存する
+        /// </summary>
+        /// <param name="actionList">帳簿項目Modelリスト</param>
+        /// <returns>帳簿項目ID</returns>
         public async Task<IEnumerable<ActionIdObj>> SaveActionListAsync(IEnumerable<ActionModel> actionList)
         {
             using FuncLog funcLog = new(new { actionList });
@@ -403,6 +409,8 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns>移動元, 移動先, 手数料 帳簿項目Model</returns>
         public async Task<(ActionModel, ActionModel, ActionModel)> LoadMoveActionsAsync(GroupIdObj groupId)
         {
+            using FuncLog funcLog = new(new { groupId });
+
             List<ActionModel> actionList = [];
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 MoveActionInfoDao moveActionInfoDao = new(dbHandler);
@@ -436,8 +444,9 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns>対象の帳簿項目ID</returns>
         public async Task<IEnumerable<ActionIdObj>> SaveMoveActionsAsync(ActionModel fromAction, ActionModel toAction, ActionModel commissionAction)
         {
-            List<ActionIdObj> resActionIdList = [];
+            using FuncLog funcLog = new(new { fromAction, toAction, commissionAction });
 
+            List<ActionIdObj> resActionIdList = [];
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
             await dbHandler.ExecTransactionAsync(async () => {
                 GroupIdObj assignedGroupId = fromAction.GroupId;
