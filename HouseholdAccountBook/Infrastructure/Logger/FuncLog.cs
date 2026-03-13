@@ -10,6 +10,10 @@ namespace HouseholdAccountBook.Infrastructure.Logger
     {
         #region フィールド
         /// <summary>
+        /// ID(GUIDから生成)
+        /// </summary>
+        private readonly string mId;
+        /// <summary>
         /// ログレベル
         /// </summary>
         private readonly Log.LogLevel mLevel;
@@ -44,19 +48,20 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         public FuncLog(object args = null, Log.LogLevel level = Log.LogLevel.Info,
             [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
+            this.mId = Guid.NewGuid().ToString("N")[..8];
             this.mLevel = level;
             this.mFileName = fileName;
             this.mEthodName = methodName;
             this.mLineNumber = lineNumber;
 
             // コンストラクタで関数開始ログを出力
-            Log.FuncStart(args, level, fileName, methodName, lineNumber);
+            Log.Vars($"func({this.mId}) start", args, this.mLevel, this.mFileName, this.mEthodName, this.mLineNumber);
         }
 
         public void Dispose()
         {
             // 破棄時に関数終了ログを出力
-            Log.FuncEnd(this.Returns, this.mLevel, this.mFileName, this.mEthodName, (ushort)(Math.Log10(this.mLineNumber) + 1));
+            Log.Vars($"func({this.mId}) end", this.Returns, this.mLevel, this.mFileName, this.mEthodName, -(ushort)(Math.Log10(this.mLineNumber) + 1));
             GC.SuppressFinalize(this);
         }
     }

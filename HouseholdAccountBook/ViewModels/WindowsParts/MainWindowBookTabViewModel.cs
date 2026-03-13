@@ -651,7 +651,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private bool ChangeIsMatchCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab &&
                    this.SelectedActionVMList.Where(vm => 0 < (int)vm.ActionWithBalance.Action.ActionId).Any() && !this.Parent.IsRegistrationWindowOpened();
         /// <summary>
-        /// 一致ブラグ変更コマンド処理
+        /// 一致フラグ変更コマンド処理
         /// </summary>
         private async void ChangeIsMatchCommand_Executed()
         {
@@ -802,6 +802,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="rows">列表示値</param>
         public async Task ExportCSVFileAsync(List<List<string>> rows)
         {
+            using FuncLog funcLog = new();
+
             Properties.Settings settings = Properties.Settings.Default;
             (string folderPath, string fileName) = PathUtil.GetSeparatedPath(settings.App_ExportCsvFilePath, App.GetCurrentDir());
 

@@ -34,24 +34,6 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         public static IsOutputImplDelegate IsOutputImpl { get; set; }
 
         /// <summary>
-        /// 関数開始ログを1行出力する
-        /// </summary>
-        /// <param name="args">引数を含む匿名クラス</param>
-        /// <param name="fileName">出力元ファイル名</param>
-        /// <param name="methodName">出力元関数名</param>
-        /// <param name="lineNumber">出力元行数</param>
-        public static void FuncStart(object args = null, LogLevel level = LogLevel.Info, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
-            => Vars("func start", args, level, fileName, methodName, lineNumber);
-        /// <summary>
-        /// 関数終了ログを1行出力する
-        /// </summary>
-        /// <param name="returns">戻り値を含む匿名クラス</param>
-        /// <param name="fileName">出力元ファイル名</param>
-        /// <param name="methodName">出力元関数名</param>
-        /// <param name="digit">「-」の出力回数</param>
-        public static void FuncEnd(object returns = null, LogLevel level = LogLevel.Info, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, ushort digit = 0)
-            => Vars("func end", returns, level, fileName, methodName, -digit);
-        /// <summary>
         /// 変数ログを1行出力する
         /// </summary>
         /// <param name="message">出力メッセージ</param>
