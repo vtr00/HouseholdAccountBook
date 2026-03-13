@@ -26,6 +26,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
             }
 
             if (obj is null) { return "null"; }
+            if (obj is Delegate) { return "delegate"; }
 
             if (obj.GetType().IsPrimitive) { return $"{obj}"; }
             if (obj.GetType().IsEnum) { return $"{obj}"; }

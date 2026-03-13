@@ -5,6 +5,7 @@
 2026/03/13
   全体
     △Modelへの責務分離のために、ValueObject, Model, AppService, ViewModelLoader化を実施した - refs #86
+    ↑ログ出力時の変数にデリゲートが含まれていた場合に例外が発生するのを修正した - refs #89
   MainWindow
     △月別/年別一覧の平均列で、小数点以下3桁まで表示されるように変更した - refs #86
 2026/02/23 - v1.2.6.0
