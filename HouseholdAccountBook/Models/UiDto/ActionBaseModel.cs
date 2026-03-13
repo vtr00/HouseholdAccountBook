@@ -1,11 +1,13 @@
 ﻿using HouseholdAccountBook.Models.ValueObjects;
 using System;
+using System.Diagnostics;
 
 namespace HouseholdAccountBook.Models.UiDto
 {
     /// <summary>
     /// 帳簿項目 基本Model
     /// </summary>
+    [DebuggerDisplay("ActionId: {ActionId} Date: {ActTime} Amount: {Amount}")]
     public class ActionBaseModel(ActionIdObj id, DateTime actTime, decimal amount)
     {
         /// <summary>

@@ -8,6 +8,7 @@ namespace HouseholdAccountBook.ViewModels.Component
     /// <summary>
     /// 帳簿項目VM
     /// </summary>
+    /// <param name="model">残高付き帳簿項目Model</param>
     public class ActionViewModel(ActionWithBalanceModel model) : BindableBase, ISelectable
     {
         #region プロパティ

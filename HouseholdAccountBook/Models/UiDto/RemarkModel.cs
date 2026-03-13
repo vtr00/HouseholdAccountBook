@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Models.ValueObjects;
 using System;
+using System.Diagnostics;
 
 namespace HouseholdAccountBook.Models.UiDto
 {
@@ -7,6 +8,7 @@ namespace HouseholdAccountBook.Models.UiDto
     /// 備考Model
     /// </summary>
     /// <param name="Remark">備考</param>
+    [DebuggerDisplay("Remark: {Remark}")]
     public record class RemarkModel(string Remark)
     {
         #region プロパティ

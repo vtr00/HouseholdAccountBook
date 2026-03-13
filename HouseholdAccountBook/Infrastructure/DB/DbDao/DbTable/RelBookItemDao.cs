@@ -41,7 +41,8 @@ WHERE del_flg = 0;");
             var dto = includeDeleted
                 ? await this.mDbHandler.QuerySingleOrDefaultAsync<RelBookItemDto>(@"
 SELECT * FROM rel_book_item
-WHERE item_id = @ItemId AND book_id = @BookId;", new RelBookItemDto { BookId = bookId, ItemId = itemId })
+WHERE item_id = @ItemId AND book_id = @BookId;",
+new RelBookItemDto { BookId = bookId, ItemId = itemId })
                 : await this.mDbHandler.QuerySingleOrDefaultAsync<RelBookItemDto>(@"
 SELECT * FROM rel_book_item
 WHERE item_id = @ItemId AND book_id = @BookId AND del_flg = 0;",

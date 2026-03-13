@@ -3,6 +3,7 @@ using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Models.DbHandlers;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,9 @@ using System.Windows;
 
 namespace HouseholdAccountBook.Infrastructure.DB
 {
+    /// <summary>
+    /// DBバックアップマネージャ
+    /// </summary>
     public class DbBackUpManager : SingletonBase<DbBackUpManager>
     {
         #region プロパティ
@@ -114,7 +118,7 @@ namespace HouseholdAccountBook.Infrastructure.DB
         /// <returns>成功/失敗 または 未実施</returns>
         public async Task<bool> ExecuteAtMainWindowClosing(DateTime? lastBackupTime = null)
         {
-            using FuncLog funcLog = new();
+            using FuncLog funcLog = new(new { lastBackupTime });
 
             if (lastBackupTime.HasValue && lastBackupTime.Value >= await this.GetDbRowUpdateTime()) { return false; }
 
@@ -134,7 +138,7 @@ namespace HouseholdAccountBook.Infrastructure.DB
         /// <returns>成功/失敗 または 未実施</returns>
         public async Task<bool> ExecuteAtMainWindowStateChanged(WindowState windowState, DateTime? lastBackupTime = null)
         {
-            using FuncLog funcLog = new(new { windowState });
+            using FuncLog funcLog = new(new { windowState, lastBackupTime });
 
             if (lastBackupTime.HasValue && lastBackupTime.Value >= await this.GetDbRowUpdateTime()) { return false; }
 
@@ -177,7 +181,7 @@ namespace HouseholdAccountBook.Infrastructure.DB
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 selectedDBKind = dbHandler.Kind;
             }
-            if (tmpBackUpNum is (-1) or > 0) {
+            if (tmpBackUpNum is -1 or > 0) {
                 Log.Debug("Create backup file.");
                 // フォルダが存在しなければ作成する
                 if (!Directory.Exists(tmpBackUpFolderPath)) {

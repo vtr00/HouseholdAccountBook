@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace HouseholdAccountBook.Infrastructure
+namespace HouseholdAccountBook.Infrastructure.Utilities
 {
+    /// <summary>
+    /// ファイルユーティリティ
+    /// </summary>
     public static class FileUtil
     {
         /// <summary>

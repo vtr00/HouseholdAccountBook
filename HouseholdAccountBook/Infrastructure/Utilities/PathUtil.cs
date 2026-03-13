@@ -2,8 +2,11 @@
 using System;
 using System.IO;
 
-namespace HouseholdAccountBook.Infrastructure
+namespace HouseholdAccountBook.Infrastructure.Utilities
 {
+    /// <summary>
+    /// パスユーティリティ
+    /// </summary>
     public class PathUtil
     {
         /// <summary>

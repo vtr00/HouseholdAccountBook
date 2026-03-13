@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.ViewModels.Component;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,8 @@ namespace HouseholdAccountBook.Infrastructure.CSV
         /// <returns>読込結果</returns>
         public static async Task<IEnumerable<CsvComparisonViewModel>> LoadCsvCompListAsync(IEnumerable<string> csvFilePathList, int actDateIndex, int itemNameIndex, int expensesIndex, Encoding encoding)
         {
+            using FuncLog funcLog = new(new { csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, encoding });
+
             CsvConfiguration csvConfig = new(CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,
                 MissingFieldFound = mffa => { }
@@ -72,6 +75,8 @@ namespace HouseholdAccountBook.Infrastructure.CSV
         /// <returns></returns>
         public static async Task SaveDataAsync(string filePath, IEnumerable<IEnumerable<string>> saveData)
         {
+            using FuncLog funcLog = new(new { filePath });
+
             CsvConfiguration config = new(CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,              // ヘッダー出力
                 Delimiter = ",",                     // 区切り文字

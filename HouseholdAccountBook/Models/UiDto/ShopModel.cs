@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Models.ValueObjects;
 using System;
+using System.Diagnostics;
 
 namespace HouseholdAccountBook.Models.UiDto
 {
@@ -7,6 +8,7 @@ namespace HouseholdAccountBook.Models.UiDto
     /// 店舗Model
     /// </summary>
     /// <param name="Name">店名</param>
+    [DebuggerDisplay("Name: {Name}")]
     public record class ShopModel(string Name)
     {
         #region プロパティ
