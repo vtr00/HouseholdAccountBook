@@ -67,7 +67,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
         public async Task<int?> ExecuteDump(string backupFilePath, string dumpExePath, PostgresPasswordInput passwordInput, PostgresFormat format,
                                             NotifyResult notifyResult = null, bool waitForFinish = true)
         {
-            using FuncLog funcLog = new(new { backupFilePath, dumpExePath, passwordInput, format, notifyResult, waitForFinish }, Log.LogLevel.Trace);
+            using FuncLog funcLog = new(new { backupFilePath, dumpExePath, passwordInput, format, waitForFinish }, Log.LogLevel.Trace);
 
             bool pgPassConf = passwordInput == PostgresPasswordInput.PgPassConf;
             ConnectInfo connectInfo = this.mConnectInfoBase as ConnectInfo;
