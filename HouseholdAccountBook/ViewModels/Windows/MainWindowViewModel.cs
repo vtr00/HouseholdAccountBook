@@ -43,7 +43,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private DbImportService mDbImportService;
 
         /// <summary>
-        /// 表示日付の更新中か
+        /// 表示日付の更新中か(表示月/表示年の更新用)
         /// </summary>
         private bool mOnUpdateDisplayedDate;
         #endregion
@@ -1396,9 +1396,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
             };
             // グラフ種別1選択変更時
             this.SelectedGraphKind1Changed += async (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedGraphKind1));
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedGraphKind1Changed));
 
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create(methodName: nameof(this.SelectedGraphKind1))) {
+                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create(methodName: nameof(this.SelectedGraphKind1Changed))) {
                     settings.MainWindow_SelectedGraphKindIndex = (int)e.NewValue;
                     settings.Save();
 
