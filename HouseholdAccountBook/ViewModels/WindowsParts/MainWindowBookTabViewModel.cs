@@ -543,7 +543,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             switch (kind) {
                 case GroupKind.NotInOne:
-                case GroupKind.Repeat: {
+                case GroupKind.Repeat:
+                case GroupKind.ListReg: {
                     // 移動以外の帳簿項目の複製時の処理
                     CopyActionRequestEventArgs e = new() {
                         DbHandlerFactory = this.mDbHandlerFactory,
@@ -553,8 +554,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     this.CopyActionRequested?.Invoke(this, e);
                     break;
                 }
-                case GroupKind.Move:
-                case GroupKind.ListReg: {
+                case GroupKind.Move: {
                     // 移動の複製時の処理
                     CopyMoveRequestEventArgs e = new() {
                         DbHandlerFactory = this.mDbHandlerFactory,

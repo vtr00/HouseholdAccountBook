@@ -457,7 +457,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 case RegistrationKind.Copy: {
                     // DBから値を読み込む
                     ActionModel action = await this.mService.LoadActionAsync(targetActionId);
-                    // 回数を読み込む
+                    // 繰り返しの回数を読み込む
                     int count = await this.mService.LoadRepeatCount(targetActionId);
 
                     // WVMに値を設定する

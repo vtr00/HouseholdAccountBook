@@ -34,39 +34,44 @@ namespace HouseholdAccountBook.Models.AppServices
         public async Task<ActionModel> LoadActionAsync(ActionIdObj actionId)
         {
             using FuncLog funcLog = new(new { actionId });
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
-            ActionModel action;
-            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                HstActionDao hstActionDao = new(dbHandler);
-                var dto = await hstActionDao.FindByIdAsync(actionId.Value);
+            HstActionDao hstActionDao = new(dbHandler);
+            HstActionDto dto = await hstActionDao.FindByIdAsync(actionId.Value);
 
-                action = new() {
-                    Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
-                    GroupId = dto.GroupId,
-                    Book = new(dto.BookId, string.Empty),
-                    Category = new(null, string.Empty, 0 < Math.Sign(dto.ActValue) ? BalanceKind.Income : BalanceKind.Expenses),
-                    Item = new(dto.ItemId, string.Empty),
-                    Shop = new(dto.ShopName),
-                    Remark = new(dto.Remark),
-                    IsMatch = dto.IsMatch == 1
-                };
-            }
+            ActionModel action = new() {
+                Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
+                GroupId = dto.GroupId,
+                Book = new(dto.BookId, string.Empty),
+                Category = new(null, string.Empty, 0 < Math.Sign(dto.ActValue) ? BalanceKind.Income : BalanceKind.Expenses),
+                Item = new(dto.ItemId, string.Empty),
+                Shop = new(dto.ShopName),
+                Remark = new(dto.Remark),
+                IsMatch = dto.IsMatch == 1
+            };
             return action;
         }
 
         /// <summary>
-        /// 繰り返し回数を取得する
+        /// 繰り返しグループの繰り返し回数を取得する
         /// </summary>
-        /// <param name="actionId"></param>
+        /// <param name="actionId">帳簿項目ID</param>
         /// <returns>繰り返し回数</returns>
         public async Task<int> LoadRepeatCount(ActionIdObj actionId)
         {
             using FuncLog funcLog = new(new { actionId });
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
+
+            GroupInfoDao groupInfoDao = new(dbHandler);
+            GroupInfoDto dto = await groupInfoDao.FindByActionId((int)actionId);
+
+            GroupKind groupKind = (GroupKind)(dto.GroupKind ?? -1);
 
             int count = 1;
-            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
+            if (groupKind == GroupKind.Repeat) {
                 HstActionDao hstActionDao = new(dbHandler);
-                var dtoList = await hstActionDao.FindInGroupAfterDateByIdAsync(actionId.Value);
+                IEnumerable<HstActionDto> dtoList = await hstActionDao.FindInGroupAfterDateByIdAsync(actionId.Value);
+
                 count = Math.Max(1, dtoList.Count());
             }
             return count;
@@ -298,24 +303,23 @@ namespace HouseholdAccountBook.Models.AppServices
         public async Task<IEnumerable<ActionModel>> LoadActionListAsync(GroupIdObj groupId)
         {
             using FuncLog funcLog = new(new { groupId });
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
+
+            HstActionDao hstActionDao = new(dbHandler);
+            IEnumerable<HstActionDto> dtoList = await hstActionDao.FindByGroupIdAsync((int)groupId);
 
             List<ActionModel> actionList = [];
-            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                HstActionDao hstActionDao = new(dbHandler);
-                IEnumerable<HstActionDto> dtoList = await hstActionDao.FindByGroupIdAsync((int)groupId);
-
-                foreach (HstActionDto dto in dtoList) {
-                    ActionModel action = new() {
-                        GroupId = groupId,
-                        Book = new(dto.BookId, string.Empty),
-                        Category = new(null, string.Empty, 0 < Math.Sign(dto.ActValue) ? BalanceKind.Income : BalanceKind.Expenses),
-                        Item = new(dto.ItemId, string.Empty),
-                        Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
-                        Shop = new(dto.ShopName),
-                        Remark = new(dto.Remark)
-                    };
-                    actionList.Add(action);
-                }
+            foreach (HstActionDto dto in dtoList) {
+                ActionModel action = new() {
+                    GroupId = groupId,
+                    Book = new(dto.BookId, string.Empty),
+                    Category = new(null, string.Empty, 0 < Math.Sign(dto.ActValue) ? BalanceKind.Income : BalanceKind.Expenses),
+                    Item = new(dto.ItemId, string.Empty),
+                    Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
+                    Shop = new(dto.ShopName),
+                    Remark = new(dto.Remark)
+                };
+                actionList.Add(action);
             }
 
             return actionList;
@@ -329,10 +333,9 @@ namespace HouseholdAccountBook.Models.AppServices
         public async Task<IEnumerable<ActionIdObj>> SaveActionListAsync(IEnumerable<ActionModel> actionList)
         {
             using FuncLog funcLog = new(new { actionList });
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             List<ActionIdObj> resActionIdList = [];
-
-            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
             if (actionList.First().GroupId is null) {
                 #region 帳簿項目を追加する
                 await dbHandler.ExecTransactionAsync(async () => {
@@ -410,23 +413,22 @@ namespace HouseholdAccountBook.Models.AppServices
         public async Task<(ActionModel, ActionModel, ActionModel)> LoadMoveActionsAsync(GroupIdObj groupId)
         {
             using FuncLog funcLog = new(new { groupId });
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
+
+            MoveActionInfoDao moveActionInfoDao = new(dbHandler);
+            // 移動元、移動先、手数料の順に並び替え
+            IEnumerable<MoveActionInfoDto> dtoList = (await moveActionInfoDao.GetAllAsync(groupId.Value)).OrderBy(dto => dto.ActValue).OrderBy(dto => -dto.MoveFlg);
 
             List<ActionModel> actionList = [];
-            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                MoveActionInfoDao moveActionInfoDao = new(dbHandler);
-                // 移動元、移動先、手数料の順に並び替え
-                IEnumerable<MoveActionInfoDto> dtoList = (await moveActionInfoDao.GetAllAsync(groupId.Value)).OrderBy(dto => dto.ActValue).OrderBy(dto => -dto.MoveFlg);
-
-                foreach (MoveActionInfoDto dto in dtoList) {
-                    ActionModel action = new() {
-                        GroupId = groupId,
-                        Book = new(dto.BookId, string.Empty),
-                        Item = new(dto.ItemId, string.Empty),
-                        Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
-                        Remark = new(dto.Remark)
-                    };
-                    actionList.Add(action);
-                }
+            foreach (MoveActionInfoDto dto in dtoList) {
+                ActionModel action = new() {
+                    GroupId = groupId,
+                    Book = new(dto.BookId, string.Empty),
+                    Item = new(dto.ItemId, string.Empty),
+                    Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
+                    Remark = new(dto.Remark)
+                };
+                actionList.Add(action);
             }
             ActionModel fromAction = actionList[0];
             ActionModel toAction = actionList[1];
@@ -445,9 +447,9 @@ namespace HouseholdAccountBook.Models.AppServices
         public async Task<IEnumerable<ActionIdObj>> SaveMoveActionsAsync(ActionModel fromAction, ActionModel toAction, ActionModel commissionAction)
         {
             using FuncLog funcLog = new(new { fromAction, toAction, commissionAction });
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             List<ActionIdObj> resActionIdList = [];
-            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
             await dbHandler.ExecTransactionAsync(async () => {
                 GroupIdObj assignedGroupId = fromAction.GroupId;
 
