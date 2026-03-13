@@ -280,7 +280,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         #region コマンドイベントハンドラ
-        protected override bool OKCommand_CanExecute() => this.SelectedItemVM != null && this.InputedDateValueVMList.Any(static vm => vm.ActValue.HasValue);
+        protected override bool OKCommand_CanExecute() => this.SelectedItemVM != null && this.InputedDateValueVMList.Any(static vm => vm.ActValue is not null and not 0);
         protected override async void OKCommand_Executed()
         {
             // DB登録
@@ -553,7 +553,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 Remark = this.SelectedRemark
             };
             foreach (DateValueViewModel vm in this.InputedDateValueVMList) {
-                if (vm.ActValue == null) { continue; }
+                if (vm.ActValue is null or 0) { continue; }
 
                 ActionBaseModel baseAction = new(vm.ActionId, vm.ActDate, (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value);
                 actionList.Add(commonAction.WithChanges(baseAction));
