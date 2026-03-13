@@ -1,0 +1,12 @@
+﻿* text eol=crlf
+
+# バイナリ
+*.ico binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.bmp binary
+*.zip binary
+*.dll binary
+*.exe binary
+*.sqlite3 binary
