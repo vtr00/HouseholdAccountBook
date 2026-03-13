@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Models.ValueObjects;
 using System;
+using System.Diagnostics;
 
 namespace HouseholdAccountBook.Models.UiDto
 {
@@ -8,6 +9,7 @@ namespace HouseholdAccountBook.Models.UiDto
     /// </summary>
     /// <param name="id">帳簿ID</param>
     /// <param name="name">帳簿名</param>
+    [DebuggerDisplay("BookId: {BookId} Name: {Name}")]
     public class BookModel(BookIdObj id, string name)
     {
         #region プロパティ

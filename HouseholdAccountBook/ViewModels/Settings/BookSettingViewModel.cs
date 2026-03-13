@@ -12,6 +12,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
     /// <summary>
     /// 帳簿VM(設定用)
     /// </summary>
+    /// <param name="book">帳簿Model</param>
     public class BookSettingViewModel(BookModel book) : BindableBase
     {
         #region プロパティ

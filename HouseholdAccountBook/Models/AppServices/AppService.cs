@@ -71,7 +71,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns>分類Modelリスト</returns>
         public async Task<IEnumerable<CategoryModel>> LoadCategoryListAsync(BookIdObj bookId, BalanceKind balanceKind, string initialName = "")
         {
-            using FuncLog funcLog = new(new { bookId, balanceKind });
+            using FuncLog funcLog = new(new { bookId, balanceKind, initialName });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             List<CategoryModel> cmList = [];

@@ -1,9 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using HouseholdAccountBook.Infrastructure.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 
 namespace HouseholdAccountBook.Infrastructure.Logger
 {
+    /// <summary>
+    /// 例外ログ
+    /// </summary>
     public class ExceptionLog
     {
         #region プロパティ

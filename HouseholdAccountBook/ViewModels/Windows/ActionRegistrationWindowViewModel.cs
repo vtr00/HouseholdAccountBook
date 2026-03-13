@@ -498,9 +498,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { selectingBookId });
 
-            IEnumerable<BookModel> tmpBookVMList = await this.mAppService.LoadBookListAsync();
-            this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == selectingBookId, 0); // 先に選択しておく
-            this.BookVMList = [.. tmpBookVMList];
+            BookIdObj tmpBookId = selectingBookId ?? this.SelectedBookVM?.Id;
+
+            this.BookVMList = [.. await this.mAppService.LoadBookListAsync()];
+            this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
 
         /// <summary>
@@ -516,9 +517,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             CategoryIdObj tmpCategoryId = selectingCategoryId ?? this.SelectedCategoryVM?.Id;
 
-            IEnumerable<CategoryModel> tmpCategoryVMList = await this.mAppService.LoadCategoryListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, Properties.Resources.ListName_NoSpecification);
-            this.SelectedCategoryVM = tmpCategoryVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpCategoryId, 0); // 先に選択しておく
-            this.CategoryVMList = [.. tmpCategoryVMList];
+            this.CategoryVMList = [.. await this.mAppService.LoadCategoryListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, Properties.Resources.ListName_NoSpecification)];
+            this.SelectedCategoryVM = this.CategoryVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpCategoryId, 0);
         }
 
         /// <summary>
@@ -534,9 +534,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             ItemIdObj tmpItemId = selectingItemId ?? this.SelectedItemVM?.Id;
 
-            IEnumerable<ItemModel> tmpItemVMList = await this.mAppService.LoadItemListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, this.SelectedCategoryVM.Id);
-            this.SelectedItemVM = tmpItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0); // 先に選択しておく
-            this.ItemVMList = [.. tmpItemVMList];
+            this.ItemVMList = [.. await this.mAppService.LoadItemListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, this.SelectedCategoryVM.Id)];
+            this.SelectedItemVM = this.ItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0);
         }
 
         /// <summary>
@@ -552,9 +551,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             string tmpShopName = selectingShopName ?? this.SelectedShopName;
 
-            IEnumerable<ShopModel> tmpShopVMList = await this.mAppService.LoadShopListAsync(this.SelectedItemVM.Id, true);
-            this.SelectedShopName = tmpShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name; // 先に選択しておく
-            this.ShopVMList = [.. tmpShopVMList];
+            this.ShopVMList = [.. await this.mAppService.LoadShopListAsync(this.SelectedItemVM.Id, true)];
+            this.SelectedShopName = this.ShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name;
         }
 
         /// <summary>
@@ -570,9 +568,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             string tmpRemark = selectingRemark ?? this.SelectedRemark;
 
-            IEnumerable<RemarkModel> tmpRemarkVMList = await this.mAppService.LoadRemarkListAsync(this.SelectedItemVM.Id, true);
-            this.SelectedRemark = tmpRemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark; // 先に選択しておく
-            this.RemarkVMList = [.. tmpRemarkVMList];
+            this.RemarkVMList = [.. await this.mAppService.LoadRemarkListAsync(this.SelectedItemVM.Id, true)];
+            this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
         }
 
         public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)

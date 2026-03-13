@@ -1,11 +1,13 @@
 ﻿using HouseholdAccountBook.Models.ValueObjects;
 using System;
+using System.Diagnostics;
 
 namespace HouseholdAccountBook.Models.UiDto
 {
     /// <summary>
     /// 帳簿項目Model
     /// </summary>
+    [DebuggerDisplay("ActionId: {ActionId} Date: {ActTime} Amount: {Amount}")]
     public class ActionModel
     {
         #region プロパティ

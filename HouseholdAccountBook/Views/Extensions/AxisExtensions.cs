@@ -34,7 +34,7 @@ namespace HouseholdAccountBook.Views.Extensions
             decimal tmpMax = maxValue * (0 < maxValue ? 1.05m : 0.95m);
             // 0はログが計算できないので近い値に置き換える
             tmpMin = (tmpMin is 0 or 1) ? -1 : tmpMin - 1;
-            tmpMax = (tmpMax is (-1) or 0) ? 1 : tmpMax + 1;
+            tmpMax = (tmpMax is -1 or 0) ? 1 : tmpMax + 1;
 
             double minDigit = Math.Floor(Math.Log10((double)Math.Abs(tmpMin))); // 最小値 の桁数
             double maxDigit = Math.Floor(Math.Log10((double)Math.Abs(tmpMax))); // 最大値 の桁数

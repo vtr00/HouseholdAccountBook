@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Models.ValueObjects;
+using System.Diagnostics;
 
 namespace HouseholdAccountBook.Models.UiDto
 {
@@ -7,6 +8,7 @@ namespace HouseholdAccountBook.Models.UiDto
     /// </summary>
     /// <param name="id">項目ID</param>
     /// <param name="name">項目名</param>
+    [DebuggerDisplay("ItemId: {ItemId} Name: {Name}")]
     public class ItemModel(ItemIdObj id, string name)
     {
         #region プロパティ

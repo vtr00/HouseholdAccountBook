@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.Infrastructure;
-using HouseholdAccountBook.Infrastructure.DB;
+﻿using HouseholdAccountBook.Infrastructure.DB;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;

@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace HouseholdAccountBook.Infrastructure
+namespace HouseholdAccountBook.Infrastructure.Utilities
 {
+    /// <summary>
+    /// エンコーディングユーティリティ
+    /// </summary>
     public class EncodingUtil
     {
         /// <summary>

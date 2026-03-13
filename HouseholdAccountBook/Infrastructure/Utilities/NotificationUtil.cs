@@ -6,8 +6,11 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace HouseholdAccountBook.Infrastructure
+namespace HouseholdAccountBook.Infrastructure.Utilities
 {
+    /// <summary>
+    /// 通知ユーティリティ
+    /// </summary>
     public static class NotificationUtil
     {
         private static readonly Brush mInformationForeground = Brushes.Blue;
