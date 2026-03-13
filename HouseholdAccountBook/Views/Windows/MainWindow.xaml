@@ -41,15 +41,15 @@
         <Style x:Key="DayOfWeekStyle" TargetType="DataGridCell">
             <Style.Triggers>
                 <!-- 土曜日 -->
-                <DataTrigger Binding="{Binding ActionWithBalance.Action.ActTime.DayOfWeek}" Value="Saturday">
+                <DataTrigger Binding="{Binding ActionWithBalance.ActTime.DayOfWeek}" Value="Saturday">
                     <Setter Property="Foreground" Value="Blue"/>
                 </DataTrigger>
                 <!-- 日曜日 -->
-                <DataTrigger Binding="{Binding ActionWithBalance.Action.ActTime.DayOfWeek}" Value="Sunday">
+                <DataTrigger Binding="{Binding ActionWithBalance.ActTime.DayOfWeek}" Value="Sunday">
                     <Setter Property="Foreground" Value="Red"/>
                 </DataTrigger>
                 <!-- 祝日 -->
-                <DataTrigger Binding="{Binding ActionWithBalance.Action.ActTime, Converter={StaticResource DateTimeToIsNationalHolidayConverter}}" Value="true">
+                <DataTrigger Binding="{Binding ActionWithBalance.ActTime, Converter={StaticResource DateTimeToIsNationalHolidayConverter}}" Value="true">
                     <Setter Property="Foreground" Value="Red"/>
                 </DataTrigger>
             </Style.Triggers>
@@ -416,39 +416,39 @@
                                 </DataGrid.ColumnHeaderStyle>
                                 <DataGrid.Columns>
                                     <DataGridCheckBoxColumn Header="" Binding="{Binding SelectFlag}"
-                                                    Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                                            Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                     <!-- 帳簿ID -->
-                                    <DataGridTextColumn Header="Id" Binding="{Binding ActionWithBalance.Action.ActionId}"
-                                                    Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                    <DataGridTextColumn Header="Id" Binding="{Binding ActionId}"
+                                                        Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                     <!-- グループID -->
-                                    <DataGridTextColumn Header="GId" Binding="{Binding ActionWithBalance.Action.GroupId}"
-                                                    Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                    <DataGridTextColumn Header="GId" Binding="{Binding GroupId}"
+                                                        Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                     <!-- 日付 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Date}" Binding="{Binding ActionWithBalance.Action.ActTime, StringFormat='yyyy-MM-dd'}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Date}" Binding="{Binding ActTime, StringFormat='yyyy-MM-dd'}"/>
                                     <!-- 曜日 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Day}" Binding="{Binding ActionWithBalance.Action.ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}, ConverterCulture={StaticResource AppCulture}}"
-                                                    CellStyle="{StaticResource DayOfWeekStyle}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Day}" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}, ConverterCulture={StaticResource AppCulture}}"
+                                                        CellStyle="{StaticResource DayOfWeekStyle}"/>
                                     <!-- 帳簿名 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_BookName}" MinWidth="70" Binding="{Binding ActionWithBalance.Action.Book.Name}"
-                                                    Visibility="{Binding MainWindow_Show_BookName, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_BookName}" MinWidth="70" Binding="{Binding BookName}"
+                                                        Visibility="{Binding MainWindow_Show_BookName, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                     <!-- 分類名 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_CategoryName}" MinWidth="70" Binding="{Binding ActionWithBalance.Action.Category.Name}"
-                                                    Visibility="{Binding MainWindow_Show_CategoryName, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_CategoryName}" MinWidth="70" Binding="{Binding CategoryName}"
+                                                        Visibility="{Binding MainWindow_Show_CategoryName, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                     <!-- 項目名 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" MinWidth="70" Binding="{Binding ActionWithBalance.Action.Item.Name}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" MinWidth="70" Binding="{Binding ItemName}"/>
                                     <!-- 収入 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Income}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding ActionWithBalance.Action.Income, Converter={StaticResource IntToMoneyDisplayConverter}}" 
-                                                    ElementStyle="{StaticResource TextAlignRight}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Income}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Income, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                        ElementStyle="{StaticResource TextAlignRight}"/>
                                     <!-- 支出 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Expenses}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding ActionWithBalance.Action.Expenses, Converter={StaticResource IntToMoneyDisplayConverter}}" 
-                                                    ElementStyle="{StaticResource TextAlignRight}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Expenses}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Expenses, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                        ElementStyle="{StaticResource TextAlignRight}"/>
                                     <!-- 残高 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Balance}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding ActionWithBalance.Balance, Converter={StaticResource IntToMoneyDisplayConverter}}" 
-                                                    ElementStyle="{StaticResource TextAlignRight}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Balance}" Width="{Binding App_ColumnWidth_Value, Source={StaticResource Settings}}" Binding="{Binding Balance, Converter={StaticResource IntToMoneyDisplayConverter}}" 
+                                                        ElementStyle="{StaticResource TextAlignRight}"/>
                                     <!-- 店舗名 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding ActionWithBalance.Action.Shop.Name}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Shop}"/>
                                     <!-- 備考 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding ActionWithBalance.Action.Remark.Remark}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Remark}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
 
