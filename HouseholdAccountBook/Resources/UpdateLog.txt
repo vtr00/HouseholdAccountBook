@@ -4,6 +4,7 @@
 * 2026
 2026/03/13
   全体
+    △NuGetパッケージのバージョンを変更した
     △Modelへの責務分離のために、ValueObject, Model, AppService, ViewModelLoader化を実施した - refs #86
     ↑ログ出力時の変数にデリゲートが含まれていた場合に例外が発生するのを修正した - refs #89
   MainWindow
