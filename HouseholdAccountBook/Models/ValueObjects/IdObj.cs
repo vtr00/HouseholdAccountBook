@@ -11,7 +11,7 @@ namespace HouseholdAccountBook.Models.ValueObjects
     /// ID VO
     /// </summary>
     /// <param name="Value">ID</param>
-    [DebuggerDisplay("Id: {Value}")]
+    [DebuggerDisplay("{Value}")]
     public sealed record class IdObj(int Value) : IIdObj
     {
         public static implicit operator IdObj(int value) => new(value);
@@ -25,7 +25,7 @@ namespace HouseholdAccountBook.Models.ValueObjects
     /// 帳簿項目ID VO
     /// </summary>
     /// <param name="Value">帳簿ID</param>
-    [DebuggerDisplay("ActionId: {Value}")]
+    [DebuggerDisplay("{Value}")]
     public sealed record class ActionIdObj(int Value) : IIdObj
     {
         public static implicit operator ActionIdObj(int id) => new(id);
@@ -38,7 +38,7 @@ namespace HouseholdAccountBook.Models.ValueObjects
     /// グループID VO
     /// </summary>
     /// <param name="Value">グループID</param>
-    [DebuggerDisplay("GroupId: {Value}")]
+    [DebuggerDisplay("{Value}")]
     public sealed record class GroupIdObj(int Value) : IIdObj
     {
         public static implicit operator GroupIdObj(int id) => new(id);
@@ -52,7 +52,7 @@ namespace HouseholdAccountBook.Models.ValueObjects
     /// 帳簿ID VO
     /// </summary>
     /// <param name="Value">帳簿ID</param>
-    [DebuggerDisplay("BookId: {Value}")]
+    [DebuggerDisplay("{Value}")]
     public sealed record class BookIdObj(int Value) : IIdObj
     {
         public static implicit operator BookIdObj(int id) => new(id);
@@ -66,7 +66,7 @@ namespace HouseholdAccountBook.Models.ValueObjects
     /// 分類ID VO
     /// </summary>
     /// <param name="Value">分類ID</param>
-    [DebuggerDisplay("CategoryId: {Value}")]
+    [DebuggerDisplay("{Value}")]
     public record class CategoryIdObj(int Value) : IIdObj
     {
         public static implicit operator CategoryIdObj(int id) => new(id);
@@ -81,7 +81,7 @@ namespace HouseholdAccountBook.Models.ValueObjects
     /// 項目ID VO
     /// </summary>
     /// <param name="Value">項目ID</param>
-    [DebuggerDisplay("ItemId: {Value}")]
+    [DebuggerDisplay("{Value}")]
     public sealed record class ItemIdObj(int Value) : IIdObj
     {
         public static implicit operator ItemIdObj(int id) => new(id);

@@ -3,6 +3,7 @@
     /// <summary>
     /// 残高付き帳簿項目Model
     /// </summary>
+    [DebuggerDisplay("Id: {ActionId} Date: {ActTime} Amount: {Amount}")]
     public class ActionWithBalanceModel
     {
         /// <summary>
