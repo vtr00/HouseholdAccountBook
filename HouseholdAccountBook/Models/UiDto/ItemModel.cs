@@ -8,7 +8,7 @@ namespace HouseholdAccountBook.Models.UiDto
     /// </summary>
     /// <param name="id">項目ID</param>
     /// <param name="name">項目名</param>
-    [DebuggerDisplay("ItemId: {ItemId} Name: {Name}")]
+    [DebuggerDisplay("Id: {Id} Name: {Name}")]
     public class ItemModel(ItemIdObj id, string name)
     {
         #region プロパティ

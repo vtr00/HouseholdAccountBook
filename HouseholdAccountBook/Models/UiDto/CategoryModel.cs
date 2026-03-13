@@ -9,7 +9,7 @@ namespace HouseholdAccountBook.Models.UiDto
     /// <param name="id">分類ID</param>
     /// <param name="name">分類名</param>
     /// <param name="kind">収支種別</param>
-    [DebuggerDisplay("CategoryId: {CategoryId} Name: {Name}")]
+    [DebuggerDisplay("Id: {Id} Name: {Name}")]
     public class CategoryModel(CategoryIdObj id, string name, BalanceKind kind = BalanceKind.Others)
     {
         #region プロパティ

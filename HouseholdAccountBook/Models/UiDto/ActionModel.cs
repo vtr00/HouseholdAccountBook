@@ -7,7 +7,7 @@ namespace HouseholdAccountBook.Models.UiDto
     /// <summary>
     /// 帳簿項目Model
     /// </summary>
-    [DebuggerDisplay("ActionId: {ActionId} Date: {ActTime} Amount: {Amount}")]
+    [DebuggerDisplay("Id: {ActionId} Date: {ActTime} Amount: {Amount}")]
     public class ActionModel
     {
         #region プロパティ

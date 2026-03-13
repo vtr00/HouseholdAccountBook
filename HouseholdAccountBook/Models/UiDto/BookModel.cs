@@ -9,7 +9,7 @@ namespace HouseholdAccountBook.Models.UiDto
     /// </summary>
     /// <param name="id">帳簿ID</param>
     /// <param name="name">帳簿名</param>
-    [DebuggerDisplay("BookId: {BookId} Name: {Name}")]
+    [DebuggerDisplay("Id: {Id} Name: {Name}")]
     public class BookModel(BookIdObj id, string name)
     {
         #region プロパティ

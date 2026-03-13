@@ -8,7 +8,7 @@ namespace HouseholdAccountBook.Models.UiDto
     /// 備考Model
     /// </summary>
     /// <param name="Remark">備考</param>
-    [DebuggerDisplay("Remark: {Remark}")]
+    [DebuggerDisplay("{Remark}")]
     public record class RemarkModel(string Remark)
     {
         #region プロパティ
