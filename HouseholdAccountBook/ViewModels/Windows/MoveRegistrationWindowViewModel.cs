@@ -405,8 +405,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     }
                     selectingFromBookId = fromAction.Book.Id;
                     selectingToBookId = toAction.Book.Id;
-                    selectingCommissionItemId = commissionAction.Item.Id;
-                    selectingCommissionRemark = commissionAction.Remark;
+                    selectingCommissionItemId = commissionAction?.Item.Id;
+                    selectingCommissionRemark = commissionAction?.Remark;
 
                     this.IsLink = fromAction.ActTime == toAction.ActTime;
                     this.SelectedFromDate = fromAction.ActTime;
