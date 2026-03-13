@@ -34,6 +34,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
     {
         #region フィールド
         /// <summary>
+        /// アプリサービス
+        /// </summary>
+        private AppService mService;
+        /// <summary>
         /// DBインポートサービス
         /// </summary>
         private DbImportService mDbImportService;
@@ -1358,6 +1362,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
 
+            this.mService = new(this.mDbHandlerFactory);
             this.mDbImportService = new(this.mDbHandlerFactory);
         }
 
@@ -1578,11 +1583,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { bookId });
 
-            AppService service = new(this.mDbHandlerFactory);
             BookIdObj tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-            IEnumerable<BookModel> tmpBookVMList = await service.LoadBookListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllBooks);
-            this.SelectedBookVM = tmpBookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0); // 先に選択しておく
-            this.BookVMList = [.. tmpBookVMList];
+
+            this.BookVMList = [.. await this.mService.LoadBookListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllBooks)];
+            this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
     }
 }
