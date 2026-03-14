@@ -17,10 +17,8 @@ namespace HouseholdAccountBook.Views.Behaviors
         {
             base.OnAttached();
 
-            if (this.AssociatedObject != null) {
-                // TreeViewで選択された項目が変更された場合に発生するイベントを登録する
-                this.AssociatedObject.SelectedItemChanged += this.TreeView_SelectedItemChanged;
-            }
+            // TreeViewで選択された項目が変更された場合に発生するイベントを登録する
+            this.AssociatedObject?.SelectedItemChanged += this.TreeView_SelectedItemChanged;
         }
 
         /// <summary>
@@ -28,10 +26,8 @@ namespace HouseholdAccountBook.Views.Behaviors
         /// </summary>
         protected override void OnDetaching()
         {
-            if (this.AssociatedObject != null) {
-                // TreeViewで選択された項目が変更された場合に発生するイベントを解除する
-                this.AssociatedObject.SelectedItemChanged -= this.TreeView_SelectedItemChanged;
-            }
+            // TreeViewで選択された項目が変更された場合に発生するイベントを解除する
+            this.AssociatedObject?.SelectedItemChanged -= this.TreeView_SelectedItemChanged;
 
             base.OnDetaching();
         }
@@ -40,24 +36,19 @@ namespace HouseholdAccountBook.Views.Behaviors
         /// <summary>
         /// 選択されたアイテム
         /// </summary>
-        #region SelectedItem
         public object SelectedItem {
             get => this.GetValue(SelectedItemProperty);
             set => this.SetValue(SelectedItemProperty, value);
         }
-        #endregion
 
         /// <summary>
         /// <see cref="SelectedItem"/> 依存関係プロパティを識別します。
         /// </summary>
-        #region SelectedItemProperty
-        public static readonly DependencyProperty SelectedItemProperty =
-            DependencyProperty.Register(
+        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(
                 nameof(SelectedItem),
                 typeof(object),
                 typeof(BindSelectedItemToTreeViewBehavior),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, SelectedItemChanged));
-        #endregion
         #endregion
 
         #region イベントハンドラ

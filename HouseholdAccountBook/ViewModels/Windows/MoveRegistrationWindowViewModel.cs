@@ -67,54 +67,43 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 登録種別
         /// </summary>
-        #region RegKind
         public RegistrationKind RegKind {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 移動元帳簿項目ID
         /// </summary>
-        #region FromActionId
         public ActionIdObj FromActionId {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 移動先帳簿項目ID
         /// </summary>
-        #region ToActionId
         public ActionIdObj ToActionId {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// グループID
         /// </summary>
-        #region GroupId
         public GroupIdObj GroupId {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 帳簿VMリスト
         /// </summary>
-        #region BookVMList
         public ObservableCollection<BookModel> BookVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された移動元帳簿VM
         /// </summary>
-        #region SelectedFromBookVM
         public BookModel SelectedFromBookVM {
             get;
             set {
@@ -128,11 +117,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
         /// <summary>
         /// 選択された移動先帳簿VM
         /// </summary>
-        #region SelectedToBookVM
         public BookModel SelectedToBookVM {
             get;
             set {
@@ -146,12 +133,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 選択された日付(移動元)
         /// </summary>
-        #region SelectedFromDate
         public DateTime SelectedFromDate {
             get;
             set {
@@ -164,11 +149,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         } = DateTime.Today;
-        #endregion
         /// <summary>
         /// 選択された日付(移動先)
         /// </summary>
-        #region SelectedToDate
         public DateTime SelectedToDate {
             get;
             set {
@@ -182,11 +165,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         } = DateTime.Today;
-        #endregion
         /// <summary>
         /// 移動先日時が移動元日時に連動して編集
         /// </summary>
-        #region IsLink
         public bool IsLink {
             get;
             set {
@@ -197,12 +178,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         } = true;
-        #endregion
 
         /// <summary>
         /// 入力された金額
         /// </summary>
-        #region InputedValue
         public decimal? InputedValue {
             get;
             set {
@@ -211,28 +190,22 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 手数料の帳簿項目ID
         /// </summary>
-        #region CommissionId
         public ActionIdObj CommissionId {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 手数料種別辞書
         /// </summary>
-        #region CommissionKindDic
         public Dictionary<CommissionKind, string> CommissionKindDic { get; } = CommissionKindStr;
-        #endregion
         /// <summary>
         /// 選択された手数料種別
         /// </summary>
-        #region SelectedCommissionKind
         public CommissionKind SelectedCommissionKind {
             get;
             set {
@@ -246,21 +219,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 手数料項目VMリスト
         /// </summary>
-        #region ItemVMList
         public ObservableCollection<ItemModel> ItemVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された手数料項目VM
         /// </summary>
-        #region SelectedItemVM
         public ItemModel SelectedItemVM {
             get;
             set {
@@ -274,12 +243,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 入力された手数料
         /// </summary>
-        #region InputedCommission
         public decimal? InputedCommission {
             get;
             set {
@@ -288,26 +255,21 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 備考VMリスト
         /// </summary>
-        #region RemarkVMList
         public ObservableCollection<RemarkModel> RemarkVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された備考
         /// </summary>
-        #region SelectedRemark
         public string SelectedRemark {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         #region コマンド
         /// <summary>

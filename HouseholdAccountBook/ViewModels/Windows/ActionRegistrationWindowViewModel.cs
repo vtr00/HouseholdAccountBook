@@ -72,55 +72,44 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 登録モード
         /// </summary>
-        #region RegKind
         public RegistrationKind RegKind {
             get;
             set => this.SetProperty(ref field, value);
         } = RegistrationKind.Add;
-        #endregion
 
         /// <summary>
         /// 帳簿項目ID
         /// </summary>
-        #region ActionId
         public ActionIdObj ActionId {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// グループID
         /// </summary>
-        #region GroupId
         public GroupIdObj GroupId {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// CSV比較からの追加
         /// </summary>
-        #region AddedByCsvComparison
         public bool AddedByCsvComparison {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 帳簿VMリスト
         /// </summary>
-        #region BookVMList
         public ObservableCollection<BookModel> BookVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された帳簿VM
         /// </summary>
-        #region SelectedBookVM
         public BookModel SelectedBookVM {
             get;
             set {
@@ -134,12 +123,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 選択された日時
         /// </summary>
-        #region SelectedDate
         public DateTime SelectedDate {
             get;
             set {
@@ -150,18 +137,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         } = DateTime.Now;
-        #endregion
 
         /// <summary>
         /// 収支種別辞書
         /// </summary>
-        #region BalanceKindDic
         public Dictionary<BalanceKind, string> BalanceKindDic { get; } = BalanceKindStr;
-        #endregion
         /// <summary>
         /// 選択された収支種別
         /// </summary>
-        #region SelectedBalanceKind
         public BalanceKind SelectedBalanceKind {
             get;
             set {
@@ -175,21 +158,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 分類VMリスト
         /// </summary>
-        #region CategoryVMList
         public ObservableCollection<CategoryModel> CategoryVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された分類VM
         /// </summary>
-        #region SelectedCategoryVM
         public CategoryModel SelectedCategoryVM {
             get;
             set {
@@ -203,21 +182,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 項目VMリスト
         /// </summary>
-        #region ItemVMList
         public ObservableCollection<ItemModel> ItemVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された項目VM
         /// </summary>
-        #region SelectedItemVM
         public ItemModel SelectedItemVM {
             get;
             set {
@@ -231,12 +206,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 金額
         /// </summary>
-        #region InputedValue
         public decimal? InputedValue {
             get;
             set {
@@ -245,50 +218,40 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 店舗VMリスト
         /// </summary>
-        #region ShopVMList
         public ObservableCollection<ShopModel> ShopVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された店名
         /// </summary>
-        #region SelectedShopName
         public string SelectedShopName {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 備考VMリスト
         /// </summary>
-        #region RemarkVMList
         public ObservableCollection<RemarkModel> RemarkVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された備考
         /// </summary>
-        #region SelectedRemark
         public string SelectedRemark {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力された繰り返し回数
         /// </summary>
-        #region InputedCount
         public int InputedCount {
             get;
             set {
@@ -297,43 +260,34 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         } = 1;
-        #endregion
 
         /// <summary>
         /// 同じグループIDを持つ帳簿項目を連動して編集
         /// </summary>
-        #region SelectedIfLink
         public bool SelectedIfLink {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 休日設定種別辞書
         /// </summary>
-        #region HolidaySettingKindDic
         public Dictionary<HolidaySettingKind, string> HolidaySettingKindDic { get; } = HolidaySettingKindStr;
-        #endregion
         /// <summary>
         /// 選択された休日設定種別
         /// </summary>
-        #region SelectedHolidaySettingKind
         public HolidaySettingKind SelectedHolidaySettingKind {
             get;
             set => this.SetProperty(ref field, value);
         } = HolidaySettingKind.Nothing;
-        #endregion
 
         /// <summary>
         /// 選択された一致フラグ
         /// </summary>
-        #region SelectedIfMatch
         public bool SelectedIfMatch {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         #region コマンド
         /// <summary>

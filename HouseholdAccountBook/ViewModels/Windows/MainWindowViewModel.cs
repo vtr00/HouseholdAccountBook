@@ -182,7 +182,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 選択されたDB種別
         /// </summary>
-        #region SelectedDBKind
         public DBKind SelectedDBKind {
             get;
             set {
@@ -192,24 +191,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
         /// <summary>
         /// PostgreSQLか
         /// </summary>
-        #region IsPostgreSQL
         public bool IsPostgreSQL => this.SelectedDBKind == DBKind.PostgreSQL;
-        #endregion
         /// <summary>
         /// SQLiteか
         /// </summary>
-        #region IsSQLite
         public bool IsSQLite => this.SelectedDBKind == DBKind.SQLite;
-        #endregion
 
         /// <summary>
         /// 選択されたタブインデックス
         /// </summary>
-        #region SelectedTabIndex
         public int SelectedTabIndex {
             get;
             set {
@@ -221,16 +214,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
         /// <summary>
         /// 選択されたタブ種別
         /// </summary>
-        #region SelectedTab
         public Tabs SelectedTab {
             get => (Tabs)this.SelectedTabIndex;
             set => this.SelectedTabIndex = (int)value;
         }
-        #endregion
 
         /// <summary>
         /// 帳簿セレクタVM
@@ -253,18 +243,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 表示開始日付
         /// </summary>
-        #region DisplayedStart
         public DateOnly DisplayedStart => this.SelectedTab switch {
             Tabs.BooksTab or Tabs.DailyGraphTab => this.StartDate,
             Tabs.MonthlyListTab or Tabs.MonthlyGraphTab => this.DisplayedStartMonth,
             Tabs.YearlyGraphTab or Tabs.YearlyListTab => this.DisplayedStartYear,
             _ => this.StartDate,
         };
-        #endregion
         /// <summary>
         /// 表示終了日付
         /// </summary>
-        #region DisplayedEnd
         public DateOnly DisplayedEnd => this.SelectedTab switch {
             Tabs.BooksTab or Tabs.DailyGraphTab => this.EndDate,
             Tabs.MonthlyListTab or Tabs.MonthlyGraphTab => this.DisplayedEndMonth,
@@ -280,12 +267,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
             Tabs.YearlyGraphTab or Tabs.YearlyListTab => new(this.DisplayedStartYear, this.DisplayedEndYear),
             _ => new(this.StartDate, this.EndDate)
         };
-        #endregion
 
         /// <summary>
         /// 会計開始月
         /// </summary>
-        #region FiscalStartMonth
         public int FiscalStartMonth {
             get;
             set {
@@ -299,24 +284,20 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         } = 4;
-        #endregion
 
         /// <summary>
         /// 表示区間種別
         /// </summary>
-        #region DisplayedTermKind
         public PeriodKind DisplayedPeriodKind {
             get {
                 DateOnly lastDate = this.StartDate.GetLastDateOfMonth();
                 return (this.StartDate.Day == 1 && this.EndDate == lastDate) ? PeriodKind.Monthly : PeriodKind.Selected;
             }
         }
-        #endregion
 
         /// <summary>
         /// 表示月
         /// </summary>
-        #region DisplayedMonth
         public DateOnly? DisplayedMonth {
             get => this.DisplayedPeriodKind switch {
                 PeriodKind.Monthly => (DateOnly?)this.StartDate,
@@ -345,12 +326,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 表示開始日
         /// </summary>
-        #region StartDate
         public DateOnly StartDate {
             get;
             set {
@@ -359,11 +338,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         } = DateOnlyExtensions.Today.GetFirstDateOfMonth();
-        #endregion
         /// <summary>
         /// 表示終了日
         /// </summary>
-        #region EndDate
         public DateOnly EndDate {
             get;
             set {
@@ -372,12 +349,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         } = DateOnlyExtensions.Today.GetLastDateOfMonth();
-        #endregion
 
         /// <summary>
         /// 表示年
         /// </summary>
-        #region DisplayedYear
         public DateOnly DisplayedYear {
             get;
             set {
@@ -400,12 +375,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         } = DateOnlyExtensions.Today;
-        #endregion
 
         /// <summary>
         /// 表示月リスト(月別一覧の月)
         /// </summary>
-        #region DisplayedMonths
         public ObservableCollection<DateOnly> DisplayedMonths {
             get {
                 DateOnly tmpMonth = this.DisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
@@ -419,7 +392,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 return displayedMonths;
             }
         }
-        #endregion
         /// <summary>
         /// 表示開始月
         /// </summary>
@@ -432,7 +404,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 表示年リスト(年別一覧の年)
         /// </summary>
-        #region DisplayedYears
         public ObservableCollection<DateOnly> DisplayedYears {
             get {
                 DateOnly tmpYear = this.DisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth).AddYears(-9);
@@ -444,7 +415,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 return displayedYears;
             }
         }
-        #endregion
         /// <summary>
         /// 表示開始年
         /// </summary>
@@ -459,13 +429,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// グラフ種別1辞書
         /// </summary>
-        #region GraphKind1Dic
         public Dictionary<GraphKind1, string> GraphKind1Dic { get; } = GraphKind1Str;
-        #endregion
         /// <summary>
         /// 選択されたグラフ種別1
         /// </summary>
-        #region SelectedGraphKind1
         public GraphKind1 SelectedGraphKind1 {
             get;
             set {
@@ -475,27 +442,21 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
         /// <summary>
         /// 選択されたグラフ種別1インデックス
         /// </summary>
-        #region SelectedGraphKind1Index
         public int SelectedGraphKind1Index {
             get => (int)this.SelectedGraphKind1;
             set => this.SelectedGraphKind1 = (GraphKind1)value;
         }
-        #endregion
 
         /// <summary>
         /// グラフ種別2辞書
         /// </summary>
-        #region GraphKind2Dic
         public Dictionary<GraphKind2, string> GraphKind2Dic { get; } = GraphKind2Str;
-        #endregion
         /// <summary>
         /// 選択されたグラフ種別2
         /// </summary>
-        #region SelectedGraphKind2
         public GraphKind2 SelectedGraphKind2 {
             get;
             set {
@@ -505,16 +466,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
         /// <summary>
         /// 選択されたグラフ種別2インデックス
         /// </summary>
-        #region SelectedGraphKind2Index
         public int SelectedGraphKind2Index {
             get => (int)this.SelectedGraphKind2;
             set => this.SelectedGraphKind2 = (GraphKind2)value;
         }
-        #endregion
         #endregion
 
         #region タブVM

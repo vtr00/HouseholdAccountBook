@@ -30,7 +30,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 選択された開始日
         /// </summary>
-        #region SelectedStart
         public DateOnly SelectedStart {
             get;
             set {
@@ -40,11 +39,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
         /// <summary>
         /// 選択された終了日
         /// </summary>
-        #region SelectedEnd
         public DateOnly SelectedEnd {
             get;
             set {
@@ -53,11 +50,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
         /// <summary>
         /// 選択された期間
         /// </summary>
-        #region SelectedPeriod
         public PeriodObj<DateOnly> SelectedPeriod {
             get => new(this.SelectedStart, this.SelectedEnd);
             set {
@@ -65,7 +60,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 this.SelectedEnd = value.End;
             }
         }
-        #endregion
 
         #region コマンド
         /// <summary>

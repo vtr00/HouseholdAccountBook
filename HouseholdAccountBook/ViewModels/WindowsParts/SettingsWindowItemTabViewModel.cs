@@ -48,16 +48,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 項目ツリーVMリスト
         /// </summary>
-        #region ItemTreeVMList
         public ObservableCollection<ItemTreeViewModel> ItemTreeVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された項目ツリーVM
         /// </summary>
-        #region SelectedItemTreeVM
         public ItemTreeViewModel SelectedItemTreeVM {
             get;
             set {
@@ -66,17 +63,15 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
             }
         }
-        #endregion
         /// <summary>
         /// 表示された分類/項目設定VM
         /// </summary>
-        #region DisplayedItemSettingVM
         public ItemSettingViewModel DisplayedItemSettingVM {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
+        #region コマンド
         /// <summary>
         /// 分類追加コマンド
         /// </summary>
@@ -113,6 +108,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 備考削除コマンド
         /// </summary>
         public ICommand DeleteRemarkCommand => new RelayCommand(this.DeleteRemarkCommand_Executed, this.DeleteRemarkCommand_CanExecute);
+        #endregion
         #endregion
 
         #region コマンドイベントハンドラ

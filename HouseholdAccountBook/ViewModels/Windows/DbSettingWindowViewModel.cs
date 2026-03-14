@@ -32,58 +32,37 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 表示メッセージ
         /// </summary>
-        #region Message
         public string Message {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// DB種別辞書
         /// </summary>
-        #region DBKindDic
         public Dictionary<DBKind, string> DBKindDic { get; } = DBKindStr;
-        #endregion
         /// <summary>
         /// 選択されたDB種別
         /// </summary>
-        #region SelectedDBKind
         public DBKind SelectedDBKind {
             get;
             set => this.SetProperty(ref field, value);
         } = DBKind.PostgreSQL;
-        #endregion
 
         /// <summary>
         /// PostgreSQL設定
         /// </summary>
-        #region PostgreSQLDBSettingVM
-        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = new();
-        #endregion
+        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM { get; init; } = new();
 
         /// <summary>
         /// Access設定
         /// </summary>
-        #region AccessSettingVM
-        public OleDbSettingViewModel AccessSettingVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = new();
-        #endregion
+        public OleDbSettingViewModel AccessSettingVM { get; init;  } = new();
 
         /// <summary>
         /// SQLite設定
         /// </summary>
-        #region SQLiteSettingVM
-        public SQLiteSettingViewModel SQLiteSettingVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = new();
-        #endregion
+        public SQLiteSettingViewModel SQLiteSettingVM { get; init; } = new();
 
         #region コマンド
         public override ICommand SelectFilePathCommand => new RelayCommand<FilePathKind>(this.SelectFilePathCommand_Executed);

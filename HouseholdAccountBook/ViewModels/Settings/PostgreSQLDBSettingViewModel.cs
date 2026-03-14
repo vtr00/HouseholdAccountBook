@@ -15,92 +15,74 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 入力されたホスト
         /// </summary>
-        #region InputedHost
         public string InputedHost {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力されたポート
         /// </summary>
-        #region InputedPort
         public int? InputedPort {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力されたユーザ名
         /// </summary>
-        #region InputedUserName
         public string InputedUserName {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力されたパスワード
         /// </summary>
-        #region InputedPassword
         public string InputedPassword {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力されたデータベース名
         /// </summary>
-        #region InoutedDatabaseName
         public string InputedDatabaseName {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力されたロール名
         /// </summary>
-        #region InoutedRole
         public string InputedRole {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力されたpg_dump.exeパス
         /// </summary>
-        #region InputedDumpExePath
         public string InputedDumpExePath {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力されたpg_restore.exeパス
         /// </summary>
-        #region InputedRestoreExePath
         public string InputedRestoreExePath {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 選択されたパスワード入力方法
         /// </summary>
-        #region SelectedPasswordInput
         public PostgresPasswordInput SelectedPasswordInput {
             get;
             set => this.SetProperty(ref field, value);
         } = PostgresPasswordInput.InputWindow;
-        #endregion
         #endregion
 
         /// <summary>

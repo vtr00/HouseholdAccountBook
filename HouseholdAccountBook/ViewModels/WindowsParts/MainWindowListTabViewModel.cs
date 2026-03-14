@@ -35,21 +35,18 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public event EventHandler SelectedSeriesChanged;
         #endregion
 
-        #region プロパティ
+        #region Bindingプロパティ
         /// <summary>
         /// 系列VMリスト
         /// </summary>
-        #region SeriesVMList
         public ObservableCollection<SeriesViewModel> SeriesVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 選択された系列VM
         /// </summary>
-        #region SelectedSeriesVM
         public SeriesViewModel SelectedSeriesVM {
             get;
             set {
@@ -63,7 +60,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
             }
         }
-        #endregion
         #endregion
 
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null);
@@ -105,7 +101,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// DataGridの情報をCSVファイルにエクスポートする
         /// </summary>
         /// <param name="rows">列表示値</param>
-        public async Task ExportCSVFileAsync(List<List<string>> rows)
+        public async Task ExportCSVFileAsync(IEnumerable<IEnumerable<string>> rows)
         {
             Properties.Settings settings = Properties.Settings.Default;
             (string folderPath, string fileName) = PathUtil.GetSeparatedPath(settings.App_ExportCsvFilePath, App.GetCurrentDir());

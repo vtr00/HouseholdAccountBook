@@ -30,114 +30,83 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 選択されたDB種別
         /// </summary>
-        #region SelectedDBKind
         public DBKind SelectedDBKind {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// PostgreSQL設定
         /// </summary>
-        #region PostgreSQLDBSettingVM
-        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = new();
-        #endregion
+        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM { get; } = new();
 
         /// <summary>
         /// Access設定
         /// </summary>
-        #region AccessSettingVM
-        public OleDbSettingViewModel AccessSettingVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = new();
-        #endregion
+        public OleDbSettingViewModel AccessSettingVM { get; } = new();
 
         /// <summary>
         /// SQLite設定
         /// </summary>
-        #region SQLiteSettingVM
-        public SQLiteSettingViewModel SQLiteSettingVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = new();
-        #endregion
+        public SQLiteSettingViewModel SQLiteSettingVM { get; } = new();
         #endregion
 
         #region バックアップ
         /// <summary>
         /// 入力されたバックアップ数
         /// </summary>
-        #region InputedBackUpNum
         public int InputedBackUpNum {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力されたバックアップ先フォルダ
         /// </summary>
-        #region InputedBackUpFolderPath
         public string InputedBackUpFolderPath {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 選択されたメインウィンドウ最小化時バックアップするか
         /// </summary>
-        #region SelectedIfBackUpAtMinimizing
         public bool SelectedIfBackUpAtMinimizing {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力されたメインウィンドウ最小化時バックアップインターバル(分)
         /// </summary>
-        #region InputedBackUpIntervalAtMinimizing
         public int InputedBackUpIntervalAtMinimizing {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 選択されたメインウィンドウクローズ時バックアップするか
         /// </summary>
-        #region SelectedIfBackUpAtClosing
         public bool SelectedIfBackUpAtClosing {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 選択されたバックアップ条件
         /// </summary>
-        #region SelectedBackUpCondition
         public BackUpCondition SelectedBackUpCondition {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 選択されたメインウィンドウ最小化時バックアップを通知するか
         /// </summary>
-        #region SelectedIfNotifyBackUpAtMinimizing
         public bool SelectedIfNotifyBackUpAtMinimizing {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         #endregion
 
         #region コマンド

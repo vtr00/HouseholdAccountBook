@@ -35,21 +35,18 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public event EventHandler SelectedSeriesChanged;
         #endregion
 
-        #region プロパティ
+        #region Bindingプロパティ
         /// <summary>
         /// グラフ系列VMリスト
         /// </summary>
-        #region GraphSeriesVMList
         public ObservableCollection<SeriesViewModel> GraphSeriesVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 選択されたグラフ系列VM
         /// </summary>
-        #region SelectedGraphSeriesVM
         public SeriesViewModel SelectedGraphSeriesVM {
             get;
             set {
@@ -63,12 +60,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// グラフプロットモデル
         /// </summary>
-        #region GraphPlotModel
         public PlotModel GraphPlotModel {
             get;
             set => this.SetProperty(ref field, value);
@@ -76,12 +71,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             Title = string.Empty,
             IsLegendVisible = false
         };
-        #endregion
 
         /// <summary>
         /// 選択項目グラフプロットモデル
         /// </summary>
-        #region SelectedGraphPlotModel
         public PlotModel SelectedGraphPlotModel {
             get;
             set => this.SetProperty(ref field, value);
@@ -89,17 +82,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             Title = Properties.Resources.GraphTitle_SeparetelyGraph,
             IsLegendVisible = false
         };
-        #endregion
 
         /// <summary>
         /// グラフコントローラ
         /// </summary>
-        #region Controller
         public PlotController Controller {
             get;
             set => this.SetProperty(ref field, value);
         } = new();
-        #endregion
         #endregion
 
         /// <summary>

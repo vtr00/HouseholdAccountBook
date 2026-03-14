@@ -33,110 +33,89 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 選択された言語種別
         /// </summary>
-        #region SelectedCultureName
         public string SelectedCultureName {
             get;
             set => this.SetProperty(ref field, value);
         } = "ja-JP";
-        #endregion
         #endregion
 
         #region カレンダー
         /// <summary>
         /// 入力された開始月
         /// </summary>
-        #region InputedStartMonth
         public int InputedStartMonth {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力された国民の祝日CSV URI
         /// </summary>
-        #region InputedNationalHolidayCsvURI
         public string InputedNationalHolidayCsvURI {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 国民の祝日CSV 文字エンコーディング
         /// </summary>
-        #region NatioalHolidayTextEncodingList
         public ObservableCollection<KeyValuePair<int, string>> NationalHolidayTextEncodingList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 国民の祝日CSV 選択された文字エンコーディング
         /// </summary>
-        #region SelectedNationalHolidayTextEncoding
         public int SelectedNationalHolidayTextEncoding {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力された国民の祝日CSV 日付インデックス(1開始)
         /// </summary>
-        #region InoutedNationalHolidayCsvDateIndex
         public int InputedNationalHolidayCsvDateIndex {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         #endregion
 
         #region ウィンドウ
         /// <summary>
         /// ウィンドウ位置を保存するか
         /// </summary>
-        #region IsPositionSaved
         public bool IsPositionSaved {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// ウィンドウ設定
         /// </summary>
-        #region WindowSettingVMList
         public ObservableCollection<WindowSettingViewModel> WindowSettingVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         #endregion
 
         #region ログ
         /// <summary>
         /// 選択された操作ログ出力の有無
         /// </summary>
-        #region SelectedIfOutputOperationLog
         public bool SelectedIfOutputOperationLog {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 入力された操作ログ数
         /// </summary>
-        #region InputedOperationLogNum
         public int InputedOperationLogNum {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// ログレベル辞書
         /// </summary>
-        #region LogLevelDic
         public Dictionary<Log.LogLevel, string> LogLevelDic {
             get {
                 Dictionary<Log.LogLevel, string> dic = LogLevelStr;
@@ -146,45 +125,36 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 return dic;
             }
         }
-        #endregion
         /// <summary>
         /// 選択されたログレベル
         /// </summary>
-        #region SelectedLogLevel
         public Log.LogLevel SelectedLogLevel {
             get;
             set => this.SetProperty(ref field, value);
         } = Log.LogLevel.Debug;
-        #endregion
 
         /// <summary>
         /// 選択されたウィンドウログ出力の有無
         /// </summary>
-        #region SelectedIfOutputWindowLog
         public bool SelectedIfOutputWindowLog {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 入力されたウィンドウログ数
         /// </summary>
-        #region InputedWindowLogNum
         public int InputedWindowLogNum {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力された捕捉されない例外ログ数
         /// </summary>
-        #region InputedUnhandledExceptionLogNum
         public int InputedUnhandledExceptionLogNum {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         #endregion
 
         #region コマンド

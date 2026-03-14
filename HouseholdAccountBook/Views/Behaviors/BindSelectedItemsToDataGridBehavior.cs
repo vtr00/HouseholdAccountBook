@@ -24,10 +24,8 @@ namespace HouseholdAccountBook.Views.Behaviors
         {
             base.OnAttached();
 
-            if (this.AssociatedObject != null) {
-                // DataGridで選択項目変更時のイベントハンドラを登録する
-                this.AssociatedObject.SelectionChanged += this.DataGrid_SelectionChanged;
-            }
+            // DataGridで選択項目変更時のイベントハンドラを登録する
+            this.AssociatedObject?.SelectionChanged += this.DataGrid_SelectionChanged;
         }
 
         /// <summary>
@@ -35,10 +33,8 @@ namespace HouseholdAccountBook.Views.Behaviors
         /// </summary>
         protected override void OnDetaching()
         {
-            if (this.AssociatedObject != null) {
-                // DataGridで選択項目変更時のイベントハンドラを解除する
-                this.AssociatedObject.SelectionChanged -= this.DataGrid_SelectionChanged;
-            }
+            // DataGridで選択項目変更時のイベントハンドラを解除する
+            this.AssociatedObject?.SelectionChanged -= this.DataGrid_SelectionChanged;
 
             base.OnDetaching();
         }
@@ -47,24 +43,19 @@ namespace HouseholdAccountBook.Views.Behaviors
         /// <summary>
         /// 選択されたアイテムのコレクション
         /// </summary>
-        #region SelectedItems
         public IList SelectedItems {
             get => (IList)this.GetValue(SelectedItemsProperty);
             set => this.SetValue(SelectedItemsProperty, value);
         }
-        #endregion
 
         /// <summary>
         /// <see cref="SelectedItems"/> 依存関係プロパティを識別します。
         /// </summary>
-        #region SelectedItemsProperty
-        public static readonly DependencyProperty SelectedItemsProperty =
-            DependencyProperty.Register(
+        public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.Register(
                 nameof(SelectedItems),
                 typeof(IList),
                 typeof(BindSelectedItemsToDataGridBehavior),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, SelectedItemsChanged));
-        #endregion
         #endregion
 
         #region イベントハンドラ

@@ -54,7 +54,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿VMリスト
         /// </summary>
-        #region BookVMList
         public ObservableCollection<BookModel> BookVMList {
             get;
             set {
@@ -65,11 +64,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 this.RaisePropertyChanged(nameof(this.BookVMList));
             }
         } = [];
-        #endregion
         /// <summary>
         /// 選択された帳簿VM
         /// </summary>
-        #region SelectedBookVM
         public BookModel SelectedBookVM {
             get;
             set {
@@ -78,16 +75,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
             }
         }
-        #endregion
         /// <summary>
         /// 表示された帳簿設定VM
         /// </summary>
-        #region DisplayedBookSettingVM
         public BookSettingViewModel DisplayedBookSettingVM {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         #region コマンド
         /// <summary>

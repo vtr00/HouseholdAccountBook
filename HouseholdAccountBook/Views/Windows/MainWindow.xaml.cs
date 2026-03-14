@@ -23,11 +23,6 @@ namespace HouseholdAccountBook.Views.Windows
     {
         #region フィールド
         /// <summary>
-        /// DBハンドラファクトリ
-        /// </summary>
-        private readonly DbHandlerFactory mDbHandlerFactory;
-
-        /// <summary>
         /// 移動登録ウィンドウ
         /// </summary>
         private MoveRegistrationWindow mMRW;
@@ -64,7 +59,6 @@ namespace HouseholdAccountBook.Views.Windows
         {
             using FuncLog funcLog = new();
 
-            this.mDbHandlerFactory = dbHandlerFactory;
             this.Name = UiConstants.WindowNameStr[nameof(MainWindow)];
             WindowLocationManager.Instance.Add(this);
 
@@ -357,17 +351,17 @@ namespace HouseholdAccountBook.Views.Windows
         {
             switch (this.WVM.SelectedTab) {
                 case Tabs.BooksTab: {
-                    List<List<string>> rows = this._actionDataGrid.ExtractDisplayValues();
+                    IEnumerable<IEnumerable<string>> rows = this._actionDataGrid.ExtractDisplayValues();
                     await this.WVM.BookTabVM.ExportCSVFileAsync(rows);
                     break;
                 }
                 case Tabs.MonthlyListTab: {
-                    List<List<string>> rows = this._monthlyDataGrid.ExtractDisplayValues();
+                    IEnumerable<IEnumerable<string>> rows = this._monthlyDataGrid.ExtractDisplayValues();
                     await this.WVM.YearlySummaryTabVM.ExportCSVFileAsync(rows);
                     break;
                 }
                 case Tabs.YearlyListTab: {
-                    List<List<string>> rows = this._yearlyDataGrid.ExtractDisplayValues();
+                    IEnumerable<IEnumerable<string>> rows = this._yearlyDataGrid.ExtractDisplayValues();
                     await this.WVM.YearlySummaryTabVM.ExportCSVFileAsync(rows);
                     break;
                 }

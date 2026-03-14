@@ -70,7 +70,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 登録種別
         /// </summary>
-        #region RegKind
         public RegistrationKind RegKind {
             get;
             set {
@@ -80,31 +79,25 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 _ = this.SetProperty(ref field, value);
             }
         }
-        #endregion
 
         /// <summary>
         /// グループID
         /// </summary>
-        #region GroupId
         public GroupIdObj GroupId {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 帳簿VMリスト
         /// </summary>
-        #region BookVMList
         public ObservableCollection<BookModel> BookVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された帳簿VM
         /// </summary>
-        #region SelectedBookVM
         public BookModel SelectedBookVM {
             get;
             set {
@@ -118,18 +111,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 収支種別辞書
         /// </summary>
-        #region BalanceKindDic
         public Dictionary<BalanceKind, string> BalanceKindDic { get; } = BalanceKindStr;
-        #endregion
         /// <summary>
         /// 選択された収支種別
         /// </summary>
-        #region SelectedBalanceKind
         public BalanceKind SelectedBalanceKind {
             get;
             set {
@@ -143,21 +132,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 分類VMリスト
         /// </summary>
-        #region CategoryVMList
         public ObservableCollection<CategoryModel> CategoryVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された分類VM
         /// </summary>
-        #region SelectedCategoryVM
         public CategoryModel SelectedCategoryVM {
             get;
             set {
@@ -171,21 +156,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 項目VMリスト
         /// </summary>
-        #region ItemVMList
         public ObservableCollection<ItemModel> ItemVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された項目VM
         /// </summary>
-        #region SelectedItemVM
         public ItemModel SelectedItemVM {
             get;
             set {
@@ -199,75 +180,60 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 入力された日付金額VMリスト
         /// </summary>
-        #region InputedDateValueVMList
         public ObservableCollection<DateValueViewModel> InputedDateValueVMList {
             get;
             set => this.SetProperty(ref field, value);
         } = [];
-        #endregion
 
         /// <summary>
         /// 編集中か
         /// </summary>
-        #region IsEditing
         public bool IsEditing {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 日付自動インクリメント
         /// </summary>
-        #region IsDateAutoIncrement
         public bool IsDateAutoIncrement {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 店舗VMリスト
         /// </summary>
-        #region ShopNameList
         public ObservableCollection<ShopModel> ShopVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された店名
         /// </summary>
-        #region SelectedShopName
         public string SelectedShopName {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 備考VMリスト
         /// </summary>
-        #region RemarkVMList
         public ObservableCollection<RemarkModel> RemarkVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された備考
         /// </summary>
-        #region SelectedRemark
         public string SelectedRemark {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 数値入力ボタンの入力値

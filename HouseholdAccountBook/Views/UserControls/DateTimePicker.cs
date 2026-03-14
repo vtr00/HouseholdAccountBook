@@ -49,22 +49,18 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// <see cref="DateFormat"/> 依存関係プロパティを識別します。
         /// </summary>
-        #region DateFormatProperty
         public static readonly DependencyProperty DateFormatProperty = DependencyProperty.RegisterAttached(
                 nameof(DateFormat),
                 typeof(string),
                 typeof(DateTimePicker),
                 new PropertyMetadata(OnDateFormatChanged));
-        #endregion
         /// <summary>
         /// 日付フォーマット(yyyy,MM,ddのみ。区切り文字は/または-。順序に縛りなし)
         /// </summary>
-        #region DateFormat
         public string DateFormat {
             get => (string)this.GetValue(DateFormatProperty);
             set => this.SetValue(DateFormatProperty, value);
         }
-        #endregion
 
         /// <summary>
         /// <see cref="DateTimePicker.DateFormat"/> 変更時処理

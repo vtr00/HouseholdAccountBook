@@ -8,7 +8,12 @@ namespace HouseholdAccountBook.Views.Extensions
 {
     public static class DataGridExtensions
     {
-        public static List<List<string>> ExtractDisplayValues(this DataGrid dataGrid)
+        /// <summary>
+        /// DateGrid内の表示文字列のリストを取得する
+        /// </summary>
+        /// <param name="dataGrid"></param>
+        /// <returns></returns>
+        public static IEnumerable<IEnumerable<string>> ExtractDisplayValues(this DataGrid dataGrid)
         {
             List<List<string>> result = [];
 

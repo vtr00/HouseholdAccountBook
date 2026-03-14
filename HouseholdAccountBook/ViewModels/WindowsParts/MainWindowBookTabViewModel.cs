@@ -87,7 +87,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿項目VMリスト
         /// </summary>
-        #region ActionVMList
         public ObservableCollection<ActionViewModel> ActionVMList {
             get;
             set {
@@ -95,30 +94,24 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 this.UpdateDisplayedActionVMList();
             }
         }
-        #endregion
         /// <summary>
         /// 表示対象の帳簿項目VMリスト
         /// </summary>
-        #region DisplayedActionVMList
         public ObservableCollection<ActionViewModel> DisplayedActionVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 選択された帳簿項目VM(先頭)
         /// </summary>
-        #region SelectedActionVM
         public ActionViewModel SelectedActionVM {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された帳簿項目VMリスト
         /// </summary>
-        #region SelectedActionVMList
         public ObservableCollection<ActionViewModel> SelectedActionVMList {
             get;
             set {
@@ -141,12 +134,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
             }
         } = [];
-        #endregion
 
         /// <summary>
         /// CSVと一致したか
         /// </summary>
-        #region IsMatch
         public bool? IsMatch {
             get {
                 int count = this.SelectedActionVMList.Count(vm => vm.IsMatch);
@@ -163,12 +154,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 最後にバックアップした日時
         /// </summary>
-        #region CurrentBackUp
         public DateTime? CurrentBackUp {
             get {
                 Properties.Settings settings = Properties.Settings.Default;
@@ -176,16 +165,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 return backUpCurrent == DateTime.MinValue ? null : backUpCurrent;
             }
         }
-        #endregion
         /// <summary>
         /// 最後に操作した帳簿項目の日付
         /// </summary>
-        #region ActDateLastEdited
         public DateOnly? ActDateLastEdited {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 選択されたデータの平均値
@@ -211,7 +197,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 概要VMリスト
         /// </summary>
-        #region SummaryVMList
         public ObservableCollection<SummaryModel> SummaryVMList {
             get;
             set {
@@ -219,11 +204,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 this.UpdateDisplayedActionVMList();
             }
         }
-        #endregion
         /// <summary>
         /// 選択された概要VM
         /// </summary>
-        #region SelectedSummaryVM
         public SummaryModel SelectedSummaryVM {
             get;
             set {
@@ -236,12 +219,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 帳簿項目を概要によって絞り込むか
         /// </summary>
-        #region UseFilter
         public bool UseFilter {
             get;
             set {
@@ -250,12 +231,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 選択された検索種別
         /// </summary>
-        #region SelectedFindKind
         public FindKind SelectedFindKind {
             get;
             set {
@@ -265,26 +244,20 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
             }
         } = FindKind.None;
-        #endregion
         /// <summary>
         /// 検索欄を表示するか
         /// </summary>
-        #region ShowFindBox
         public bool ShowFindBox => this.SelectedFindKind != FindKind.None;
-        #endregion
         /// <summary>
         /// 検索入力テキスト
         /// </summary>
-        #region FindInputText
         public string FindInputText {
             get;
             set => this.SetProperty(ref field, value);
         } = string.Empty;
-        #endregion
         /// <summary>
         /// 検索テキスト(設定時に絞り込み)
         /// </summary>
-        #region FindText
         public string FindText {
             get;
             set {
@@ -293,22 +266,17 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 }
             }
         } = string.Empty;
-        #endregion
         /// <summary>
         /// 置換欄を表示するか
         /// </summary>
-        #region ShowReplaceBox
         public bool ShowReplaceBox => this.SelectedFindKind == FindKind.Replace;
-        #endregion
         /// <summary>
         /// 置換テキスト
         /// </summary>
-        #region ReplaceText
         public string ReplaceText {
             get;
             set => this.SetProperty(ref field, value);
         } = string.Empty;
-        #endregion
 
         #region コマンド
         /// <summary>
