@@ -54,10 +54,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public event EventHandler<ChangedEventArgs<int>> SelectedTabChanged;
         /// <summary>
-        /// 帳簿選択変更時イベント
-        /// </summary>
-        public event EventHandler<ChangedEventArgs<BookIdObj>> SelectedBookChanged;
-        /// <summary>
         /// グラフ種別1選択変更時イベント
         /// </summary>
         public event EventHandler<ChangedEventArgs<GraphKind1>> SelectedGraphKind1Changed;
@@ -152,7 +148,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 期間選択要求時イベント
         /// </summary>
-        public event EventHandler<SelectPeriodRequestEventArgs> SelectTermRequested;
+        public event EventHandler<SelectPeriodRequestEventArgs> SelectPeriodRequested;
         /// <summary>
         /// 設定要求時イベント
         /// </summary>
@@ -181,7 +177,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 操作ログファイルメニューリスト
         /// </summary>
-        public ObservableCollection<MenuItemViewModel> OperationLogFileMenuList { get; set; } = [];
+        public ObservableCollection<MenuItemViewModel> OperationLogFileMenuList { get; init; } = [];
 
         /// <summary>
         /// 選択されたDB種別
@@ -197,7 +193,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
         #endregion
-
         /// <summary>
         /// PostgreSQLか
         /// </summary>
@@ -238,28 +233,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         /// <summary>
-        /// 帳簿VMリスト
+        /// 帳簿セレクタVM
         /// </summary>
-        #region BookVMList
-        public ObservableCollection<BookModel> BookVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
-        /// <summary>
-        /// 選択された帳簿VM
-        /// </summary>
-        #region SelectedBookVM
-        public BookModel SelectedBookVM {
-            get;
-            set {
-                var oldVM = field;
-                if (this.SetProperty(ref field, value)) {
-                    this.SelectedBookChanged?.Invoke(this, new() { OldValue = oldVM?.Id, NewValue = value?.Id });
-                }
-            }
-        }
-        #endregion
+        public SingleSelectorViewModel<BookModel, BookIdObj> BookSelectorVM { get; } = new(vm => vm?.Id);
 
         /// <summary>
         /// 選択された収支種別
@@ -444,7 +420,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
         #endregion
-
         /// <summary>
         /// 表示開始月
         /// </summary>
@@ -470,7 +445,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
         #endregion
-
         /// <summary>
         /// 表示開始年
         /// </summary>
@@ -547,27 +521,27 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿タブVM
         /// </summary>
-        public MainWindowBookTabViewModel BookTabVM { get; private set; }
+        public MainWindowBookTabViewModel BookTabVM { get; private init; }
         /// <summary>
         /// 日別グラフタブVM
         /// </summary>
-        public MainWindowGraphTabViewModel DailyGraphTabVM { get; private set; }
+        public MainWindowGraphTabViewModel DailyGraphTabVM { get; private init; }
         /// <summary>
         /// 月別一覧タブVM
         /// </summary>
-        public MainWindowListTabViewModel MonthlySummaryTabVM { get; private set; }
+        public MainWindowListTabViewModel MonthlySummaryTabVM { get; private init; }
         /// <summary>
         /// 月別グラフタブVM
         /// </summary>
-        public MainWindowGraphTabViewModel MonthlyGraphTabVM { get; private set; }
+        public MainWindowGraphTabViewModel MonthlyGraphTabVM { get; private init; }
         /// <summary>
         /// 年別一覧タブVM
         /// </summary>
-        public MainWindowListTabViewModel YearlySummaryTabVM { get; private set; }
+        public MainWindowListTabViewModel YearlySummaryTabVM { get; private init; }
         /// <summary>
         /// 年別グラフタブVM
         /// </summary>
-        public MainWindowGraphTabViewModel YearlyGraphTabVM { get; private set; }
+        public MainWindowGraphTabViewModel YearlyGraphTabVM { get; private init; }
         #endregion
 
         #region コマンド
@@ -1167,7 +1141,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 Period = new(this.StartDate, this.EndDate)
             };
 
-            this.SelectTermRequested?.Invoke(this, e);
+            this.SelectPeriodRequested?.Invoke(this, e);
             if (e.Result) {
                 using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                     this.StartDate = e.Period.Start;
@@ -1300,7 +1274,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             CompareCsvFileRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
-                InitialBookId = this.SelectedBookVM.Id
+                InitialBookId = this.BookSelectorVM.SelectedKey
             };
             this.CompareCsvFileRequested?.Invoke(this, e);
         }
@@ -1356,6 +1330,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     this.YearlyGraphTabVM
                 ]
             );
+
+            this.BookSelectorVM.LoaderAsync = async () => await this.mService.LoadBookListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllBooks);
         }
 
         public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
@@ -1384,15 +1360,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             };
             // 帳簿選択変更時
-            this.SelectedBookChanged += async (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedBookChanged));
+            this.BookSelectorVM.SelectedChanged += async (sender, e) => {
+                using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create(methodName: nameof(this.BookSelectorVM.SelectedChanged));
 
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create(methodName: nameof(this.SelectedBookChanged))) {
-                    settings.MainWindow_SelectedBookId = (int?)e.NewValue ?? -1;
-                    settings.Save();
+                settings.MainWindow_SelectedBookId = (int?)e.NewValue ?? -1;
+                settings.Save();
 
-                    await this.UpdateAsync(isScroll: true);
-                }
+                await this.UpdateAsync(isScroll: true);
             };
             // グラフ種別1選択変更時
             this.SelectedGraphKind1Changed += async (sender, e) => {
@@ -1453,7 +1427,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedDBKind = this.mDbHandlerFactory.DBKind;
 
             // 帳簿リスト更新
-            await this.UpdateBookListAsync(settings.MainWindow_SelectedBookId);
+            await this.BookSelectorVM.LoadAsync(settings.MainWindow_SelectedBookId);
 
             // タブ選択
             if (settings.MainWindow_SelectedTabIndex != -1) {
@@ -1524,7 +1498,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new(new { isUpdateBookList, isScroll, isUpdateActDateLastEdited });
 
             this.UpdateOperationLogFileMenuList();
-            if (isUpdateBookList) { await this.UpdateBookListAsync(); }
+            if (isUpdateBookList) {
+                await this.BookSelectorVM.LoadAsync();
+            }
 
             switch (this.SelectedTab) {
                 case Tabs.BooksTab:
@@ -1573,20 +1549,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 });
                 if (10 <= count) { break; }
             }
-        }
-
-        /// <summary>
-        /// 帳簿リストを更新する
-        /// </summary>
-        /// <param name="bookId">選択対象の帳簿ID</param>
-        public async Task UpdateBookListAsync(BookIdObj bookId = null)
-        {
-            using FuncLog funcLog = new(new { bookId });
-
-            BookIdObj tmpBookId = bookId ?? this.SelectedBookVM?.Id;
-
-            this.BookVMList = [.. await this.mService.LoadBookListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllBooks)];
-            this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
         }
     }
 }

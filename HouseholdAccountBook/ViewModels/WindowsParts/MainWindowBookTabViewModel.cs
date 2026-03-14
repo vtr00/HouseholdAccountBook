@@ -123,14 +123,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             get;
             set {
                 if (value != null) {
-                    //Log.Debug($"Old SelectedActionVMList.InputedCount: {this._SelectedActionVMList.InputedCount}");
-                    //Log.Debug($"New SelectedActionVMList.InputedCount: {value.InputedCount}");
-
-                    List<ActionViewModel> added = [.. value.Except(field)];
-                    List<ActionViewModel> removed = [.. field.Except(value)];
-
-                    //Log.Debug($"added.InputedCount: {added.InputedCount}");
-                    //Log.Debug($"removed.InputedCount: {removed.InputedCount}");
+                    IEnumerable<ActionViewModel> added = [.. value.Except(field)];
+                    IEnumerable<ActionViewModel> removed = [.. field.Except(value)];
 
                     foreach (ActionViewModel vm in added) {
                         field.Add(vm);
@@ -140,11 +134,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     }
                 }
                 else {
-                    //Log.Debug($"Old SelectedActionVMList.InputedCount: {this._SelectedActionVMList.InputedCount}");
-                    //Log.Debug($"New SelectedActionVMList.InputedCount: 0(null)");
-
                     // null の場合はリストを空にする(ClearだとBehaviorが意図した挙動にならない)
-                    while (field.Count > 0) {
+                    while (0 < field.Count) {
                         field.RemoveAt(0);
                     }
                 }
@@ -468,7 +459,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         /// <returns></returns>
         /// <remarks>帳簿タブを選択 かつ 帳簿が2つ以上存在 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない</remarks>
-        private bool AddMoveCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookVMList?.Count >= 2 && this.Parent.SelectedBookVM != null && !this.Parent.IsChildrenWindowOpened();
+        private bool AddMoveCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookSelectorVM.Count >= 2 && this.Parent.BookSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened();
         /// <summary>
         /// 移動追加コマンド処理
         /// </summary>
@@ -476,7 +467,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             AddMoveRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
-                InitialBookId = this.Parent.SelectedBookVM?.Id,
+                InitialBookId = this.Parent.BookSelectorVM?.SelectedKey,
                 InitialMonth = this.Parent.DisplayedPeriodKind == PeriodKind.Monthly ? this.Parent.DisplayedMonth : null,
                 InitialDate = this.SelectedActionVM is null ? null : DateOnly.FromDateTime(this.SelectedActionVM.ActionWithBalance.Action.Base.ActTime),
                 Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
@@ -489,7 +480,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         /// <returns></returns>
         /// <remarks>帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない</remarks>
-        private bool AddActionCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.SelectedBookVM != null && !this.Parent.IsChildrenWindowOpened();
+        private bool AddActionCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened();
         /// <summary>
         /// 帳簿項目追加コマンド処理
         /// </summary>
@@ -497,7 +488,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             AddActionRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
-                InitialBookId = this.Parent.SelectedBookVM?.Id,
+                InitialBookId = this.Parent.BookSelectorVM?.SelectedKey,
                 InitialMonth = this.Parent.DisplayedPeriodKind == PeriodKind.Monthly ? this.Parent.DisplayedMonth : null,
                 InitialDate = this.SelectedActionVM is null ? null : DateOnly.FromDateTime(this.SelectedActionVM.ActionWithBalance.Action.Base.ActTime),
                 Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true)  // 帳簿一覧タブを更新する
@@ -510,7 +501,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         /// <returns></returns>
         /// <remarks>帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウを開いていない</remarks>
-        private bool AddActionListCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.SelectedBookVM != null && !this.Parent.IsChildrenWindowOpened();
+        private bool AddActionListCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened();
         /// <summary>
         /// 帳簿項目リスト追加コマンド処理
         /// </summary>
@@ -518,7 +509,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             AddActionListRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
-                InitialBookId = this.Parent.SelectedBookVM?.Id,
+                InitialBookId = this.Parent.BookSelectorVM?.SelectedKey,
                 InitialMonth = this.Parent.DisplayedPeriodKind == PeriodKind.Monthly ? this.Parent.DisplayedMonth : null,
                 InitialDate = this.SelectedActionVM is null ? null : DateOnly.FromDateTime(this.SelectedActionVM.ActionWithBalance.Action.Base.ActTime),
                 Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
@@ -740,22 +731,22 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             switch (this.Parent.DisplayedPeriodKind) {
                 case PeriodKind.Monthly:
                     var (tmp1, tmp2) = await (
-                        this.mMainService.LoadActionListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value),
-                        this.mMainService.LoadSummaryListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedMonth.Value)).WhenAll();
+                        this.mMainService.LoadActionListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value),
+                        this.mMainService.LoadSummaryListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value)).WhenAll();
                     this.ActionVMList = [.. tmp1.Select(tmp => new ActionViewModel(tmp))];
                     this.SummaryVMList = [.. tmp2];
                     break;
                 case PeriodKind.Selected:
                     var (tmp3, tmp4) = await (
-                        this.mMainService.LoadActionListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedPeriod),
-                        this.mMainService.LoadSummaryListAsync(this.Parent.SelectedBookVM?.Id, this.Parent.DisplayedPeriod)).WhenAll();
+                        this.mMainService.LoadActionListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedPeriod),
+                        this.mMainService.LoadSummaryListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedPeriod)).WhenAll();
                     this.ActionVMList = [.. tmp3.Select(tmp => new ActionViewModel(tmp))];
                     this.SummaryVMList = [.. tmp4];
                     break;
             }
 
             // 帳簿項目を選択する(サマリーの選択はこの段階では無視して処理する)
-            this.SelectedActionVMList = new ObservableCollection<ActionViewModel>(this.ActionVMList.Where(vm => tmpActionIdList.Contains(vm.ActionWithBalance.Action.ActionId)));
+            this.SelectedActionVMList = [.. this.ActionVMList.Where(vm => tmpActionIdList.Contains(vm.ActionWithBalance.Action.ActionId))];
 
             // サマリーを選択する
             this.SelectedSummaryVM = this.SummaryVMList.FirstOrDefault(vm => vm.Category?.BalanceKind == tmpBalanceKind && vm.Category?.Id == tmpCategoryId && vm.Item?.Id == tmpItemId);
@@ -800,7 +791,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// DataGridの情報をCSVファイルにエクスポートする
         /// </summary>
         /// <param name="rows">列表示値</param>
-        public async Task ExportCSVFileAsync(List<List<string>> rows)
+        public async Task ExportCSVFileAsync(IEnumerable<IEnumerable<string>> rows)
         {
             using FuncLog funcLog = new();
 

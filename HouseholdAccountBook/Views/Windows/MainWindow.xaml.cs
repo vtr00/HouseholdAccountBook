@@ -207,8 +207,8 @@ namespace HouseholdAccountBook.Views.Windows
                 this.mALRW.Show();
             };
             // 期間選択要求イベントを登録する
-            this.WVM.SelectTermRequested += (sender, e) => {
-                using FuncLog funcLog = new(methodName: nameof(this.WVM.SelectTermRequested));
+            this.WVM.SelectPeriodRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.SelectPeriodRequested));
 
                 TermWindow stw = null;
                 switch (e.TermKind) {
@@ -260,9 +260,9 @@ namespace HouseholdAccountBook.Views.Windows
                     this.mCCW.BookChanged += (sender, e) => {
                         using FuncLog funcLog = new(methodName: nameof(this.mCCW.BookChanged));
 
-                        var selectedVM = this.WVM.BookVMList.FirstOrDefault(vm => vm.Id == e.NewValue);
+                        var selectedVM = this.WVM.BookSelectorVM.ItemList.FirstOrDefault(vm => vm.Id == e.NewValue);
                         if (selectedVM != null) {
-                            this.WVM.SelectedBookVM = selectedVM;
+                            this.WVM.BookSelectorVM.SelectedItem = selectedVM;
                         }
                     };
                     // ウィンドウ非表示時イベントを登録する

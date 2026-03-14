@@ -1,19 +1,18 @@
 ﻿using HouseholdAccountBook.Models.ValueObjects;
-using HouseholdAccountBook.ViewModels.Abstract;
 using System.Collections.ObjectModel;
 
-namespace HouseholdAccountBook.ViewModels.Component
+namespace HouseholdAccountBook.ViewModels.Abstract
 {
     /// <summary>
     /// 階層構造VM
     /// </summary>
-    public class HierarchicalViewModel<T> : BindableBase, ISelectable
+    public abstract class HierarchicalViewModelBase<T> : BindableBase, ISelectable
     {
         #region プロパティ
         /// <summary>
         /// 階層の深さ
         /// </summary>
-        public int Depth { get; init; } = 0;
+        public int Depth { get; init; }
 
         /// <summary>
         /// ID

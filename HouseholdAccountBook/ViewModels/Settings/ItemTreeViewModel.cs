@@ -1,6 +1,6 @@
 ﻿using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.UiDto;
-using HouseholdAccountBook.ViewModels.Component;
+using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 
 namespace HouseholdAccountBook.ViewModels.Settings
@@ -8,7 +8,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
     /// <summary>
     /// 項目ツリーVM
     /// </summary>
-    public class ItemTreeViewModel : HierarchicalViewModel<ItemTreeViewModel>
+    public class ItemTreeViewModel : HierarchicalViewModelBase<ItemTreeViewModel>
     {
         /// <summary>
         /// 階層種別
