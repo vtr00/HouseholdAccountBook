@@ -21,22 +21,18 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 選択されたプロバイダ名
         /// </summary>
-        #region SelectedProviderName
         public string SelectedProviderName {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 入力されたDBファイルパス
         /// </summary>
-        #region InputedDBFilePath
         public string InputedDBFilePath {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         #endregion
 
         /// <summary>

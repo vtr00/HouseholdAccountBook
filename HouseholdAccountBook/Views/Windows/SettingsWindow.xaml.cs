@@ -45,9 +45,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
-                await using (DbHandlerBase dbHandler = await dbHandlerFactory.CreateAsync()) {
-                    this.WVM.DbTabVM.SelectedDBKind = dbHandler.Kind;
-                }
+                this.WVM.DbTabVM.SelectedDBKind = dbHandlerFactory.DBKind;
                 using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create(methodName: nameof(this.Loaded))) {
                     await this.WVM.LoadAsync();
                 }
@@ -106,14 +104,14 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (this.shopDataGrid.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.shopDataGrid) > 0) {
+            if (0 < this.shopDataGrid.Items.Count && 0 < VisualTreeHelper.GetChildrenCount(this.shopDataGrid)) {
                 if (VisualTreeHelper.GetChild(this.shopDataGrid, 0) is Decorator border) {
                     if (border.Child is ScrollViewer scroll) {
                         scroll.ScrollToTop();
                     }
                 }
             }
-            if (this.remarkDataGrid.Items.Count > 0 && VisualTreeHelper.GetChildrenCount(this.remarkDataGrid) > 0) {
+            if (0 < this.remarkDataGrid.Items.Count && 0 < VisualTreeHelper.GetChildrenCount(this.remarkDataGrid)) {
                 if (VisualTreeHelper.GetChild(this.remarkDataGrid, 0) is Decorator border) {
                     if (border.Child is ScrollViewer scroll) {
                         scroll.ScrollToTop();

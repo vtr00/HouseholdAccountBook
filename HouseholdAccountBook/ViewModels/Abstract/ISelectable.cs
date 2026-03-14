@@ -25,8 +25,6 @@
         /// <summary>
         /// 選択されているか
         /// </summary>
-        #region SelectFlag
         bool SelectFlag { get; set; }
-        #endregion
     }
 }

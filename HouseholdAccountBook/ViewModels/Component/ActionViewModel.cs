@@ -72,22 +72,18 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// CSVと一致したか
         /// </summary>
-        #region IsMatch
         public bool IsMatch {
             get;
             set => this.SetProperty(ref field, value);
         } = model.Action.IsMatch;
-        #endregion
 
         /// <summary>
         /// 選択されているか
         /// </summary>
-        #region SelectFlag
         public bool SelectFlag {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 将来の日付か

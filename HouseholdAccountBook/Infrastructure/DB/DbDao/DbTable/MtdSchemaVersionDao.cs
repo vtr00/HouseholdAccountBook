@@ -13,7 +13,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
     /// <summary>
     /// スキーマバージョンテーブルDAO
     /// </summary>
-    /// <param name="dbHandler"></param>
+    /// <param name="dbHandler">DBハンドラ</param>
     public class MtdSchemaVersionDao(DbHandlerBase dbHandler) : PhyTableDaoBase<MtdSchemaVersionDto>(dbHandler)
     {
         public override async Task CreateTableAsync()

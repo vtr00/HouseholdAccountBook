@@ -18,12 +18,10 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 関係があるか
         /// </summary>
-        #region IsRelated
         public bool IsRelated {
             get;
             set => this.SetProperty(ref field, value);
         } = relation.IsRelated;
-        #endregion
 
         /// <summary>
         /// 帳簿/項目ID

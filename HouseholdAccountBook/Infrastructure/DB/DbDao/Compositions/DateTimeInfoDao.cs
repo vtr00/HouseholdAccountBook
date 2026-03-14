@@ -27,9 +27,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
             if (!dto.TableName.IsValidDBIdentifier()) {
                 throw new ArgumentException($"Invalid table name: {dto.TableName}");
             }
+            
             return await this.mDbHandler.QuerySingleAsync<DateTime>($"SELECT MAX(update_time) FROM {dto.TableName};");
         }
-
+        
         /// <summary>
         /// テーブル内のデータの挿入日時を取得する
         /// </summary>
@@ -43,7 +44,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
             if (!dto.TableName.IsValidDBIdentifier()) {
                 throw new ArgumentException($"Invalid table name: {dto.TableName}");
             }
-
+            
             return await this.mDbHandler.QuerySingleAsync<DateTime>($"SELECT MAX(insert_time) FROM {dto.TableName};");
         }
     }

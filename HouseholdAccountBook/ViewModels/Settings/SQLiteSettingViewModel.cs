@@ -14,12 +14,10 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 入力されたDBファイルパス
         /// </summary>
-        #region InputedDBFilePath
         public string InputedDBFilePath {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 設定を読み込む

@@ -12,25 +12,21 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// <see cref="DataContext"/> 依存関係プロパティを識別します。
         /// </summary>
-        #region DataContextProperty
         public static readonly DependencyProperty DataContextProperty = DependencyProperty.Register(
                 nameof(DataContext),
                 typeof(object),
                 typeof(BindingProxy),
                 new UIPropertyMetadata(null)
             );
-        #endregion
 
         /// <summary>
         /// 間をとりもつプロパティ
         /// データバインドした場合は、このプロパティがViewModelの代わりになる。
         /// </summary>
-        #region DataContext
         public object DataContext {
             get => this.GetValue(DataContextProperty);
             set => this.SetValue(DataContextProperty, value);
         }
-        #endregion
         #endregion
 
         /// <summary>

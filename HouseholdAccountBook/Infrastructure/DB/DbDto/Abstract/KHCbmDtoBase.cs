@@ -5,6 +5,9 @@
     /// </summary>
     public abstract class KHCbmDtoBase : KHDtoBase, ISequentialIDDto
     {
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         public KHCbmDtoBase() { }
 
         public abstract int GetId();

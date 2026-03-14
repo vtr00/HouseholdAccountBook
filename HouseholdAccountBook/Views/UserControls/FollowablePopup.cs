@@ -57,10 +57,8 @@ namespace HouseholdAccountBook.Views.UserControls
                     }
                 }
 
-                if (scrollViewer != null) {
-                    // ListBoxなどのようなScrollViewerを持った要素内に設定された場合の動作
-                    scrollViewer.ScrollChanged -= followablePopup.OnScrollChanged;
-                }
+                // ListBoxなどのようなScrollViewerを持った要素内に設定された場合の動作
+                scrollViewer?.ScrollChanged -= followablePopup.OnScrollChanged;
             }
 
             // IsOpenプロパティをtrueに変更したので、各種イベントハンドラを登録する
@@ -77,10 +75,8 @@ namespace HouseholdAccountBook.Views.UserControls
                     window.Deactivated += followablePopup.OnFollowWindowDiactivated;
                 }
 
-                if (scrollViewer != null) {
-                    // ListBoxなどのようなScrollViewerを持った要素内に設定された場合の動作
-                    scrollViewer.ScrollChanged += followablePopup.OnScrollChanged;
-                }
+                // ListBoxなどのようなScrollViewerを持った要素内に設定された場合の動作
+                scrollViewer?.ScrollChanged += followablePopup.OnScrollChanged;
             }
         }
 

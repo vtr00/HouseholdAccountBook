@@ -13,127 +13,103 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// <see cref="Value"/> 依存関係プロパティを識別します。
         /// </summary>
-        #region ValueProperty
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(
                 nameof(Value),
                 typeof(int?),
                 typeof(NumericUpDown),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
             );
-        #endregion
         /// <summary>
         /// 値
         /// </summary>
-        #region Value
         public int? Value {
             get => (int?)this.GetValue(ValueProperty);
             set => this.SetValue(ValueProperty, value);
         }
-        #endregion
 
         /// <summary>
         /// <see cref="Stride"/> 依存関係プロパティを識別します。
         /// </summary>
-        #region StrideProperty
         public static readonly DependencyProperty StrideProperty = DependencyProperty.Register(
                 nameof(Stride),
                 typeof(int),
                 typeof(NumericUpDown),
                 new PropertyMetadata(1)
             );
-        #endregion
         /// <summary>
         /// 刻み幅
         /// </summary>
-        #region Stride
         public int Stride {
             get => (int)this.GetValue(StrideProperty);
             set => this.SetValue(StrideProperty, value);
         }
-        #endregion
 
         /// <summary>
         /// <see cref="NullValue"/> 依存関係プロパティを識別します。
         /// </summary>
-        #region NullValueProperty
         public static readonly DependencyProperty NullValueProperty = DependencyProperty.Register(
             nameof(NullValue),
             typeof(int),
             typeof(NumericUpDown),
             new PropertyMetadata(0));
-        #endregion
         /// <summary>
         /// ValueがnullのときValueを何と見做すか
         /// </summary>
-        #region NullValue
         public int NullValue {
             get => (int)this.GetValue(NullValueProperty);
             set => this.SetValue(NullValueProperty, value);
         }
-        #endregion
 
         /// <summary>
         /// <see cref="MaxValue"/> 依存関係プロパティを識別します。
         /// </summary>
-        #region MaxValueProperty
         public static readonly DependencyProperty MaxValueProperty = DependencyProperty.Register(
                 nameof(MaxValue),
                 typeof(int),
                 typeof(NumericUpDown),
                 new PropertyMetadata(int.MaxValue)
             );
-        #endregion
         /// <summary>
         /// 最大値
         /// </summary>
-        #region MaxValue
         public int MaxValue {
             get => (int)this.GetValue(MaxValueProperty);
             set => this.SetValue(MaxValueProperty, value);
         }
-        #endregion
 
         /// <summary>
         /// <see cref="MinValue"/> 依存関係プロパティを識別します。
         /// </summary>
-        #region MinValueProperty
         public static readonly DependencyProperty MinValueProperty = DependencyProperty.Register(
                 nameof(MinValue),
                 typeof(int),
                 typeof(NumericUpDown),
                 new PropertyMetadata(int.MinValue)
             );
-        #endregion
         /// <summary>
         /// 最小値
         /// </summary>
-        #region MinValue
         public int MinValue {
             get => (int)this.GetValue(MinValueProperty);
             set => this.SetValue(MinValueProperty, value);
         }
-        #endregion
 
         /// <summary>
         /// <see cref="IsAcceptableMouseWheel"/> 依存関係プロパティを識別します。
         /// </summary>
-        #region IsAcceptableMouseWheelProperty
         public static readonly DependencyProperty IsAcceptableMouseWheelProperty = DependencyProperty.Register(
                 nameof(IsAcceptableMouseWheel),
                 typeof(bool),
                 typeof(NumericUpDown),
                 new PropertyMetadata(true)
             );
-        #endregion
         /// <summary>
         /// マウスホイールによる入力を受け付けるか
         /// </summary>
-        #region IsAcceptableMouseWheel
         public bool IsAcceptableMouseWheel {
             get => (bool)this.GetValue(IsAcceptableMouseWheelProperty);
             set => this.SetValue(IsAcceptableMouseWheelProperty, value);
         }
-        #endregion
         #endregion
 
         /// <summary>

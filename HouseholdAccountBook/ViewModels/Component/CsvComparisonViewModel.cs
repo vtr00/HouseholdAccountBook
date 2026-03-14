@@ -23,7 +23,6 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 一致フラグ
         /// </summary>
-        #region IsMatch
         public bool IsMatch {
             get;
             set {
@@ -34,7 +33,6 @@ namespace HouseholdAccountBook.ViewModels.Component
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// CSVデータ
@@ -43,22 +41,18 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 帳簿項目
         /// </summary>
-        #region Action
         public ActionModel Action {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 選択フラグ
         /// </summary>
-        #region IsSelected
         public bool SelectFlag {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         #endregion
 
         /// <summary>

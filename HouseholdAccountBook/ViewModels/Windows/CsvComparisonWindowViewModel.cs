@@ -75,32 +75,25 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// CSVファイルパス
         /// </summary>
-        #region CsvFilePathes
         public string CsvFilePathes => 0 < this.CsvFilePathList.Count ? string.Join(",", this.CsvFilePathList) : null;
-        #endregion
         /// <summary>
         /// CSVファイルパスリスト
         /// </summary>
-        #region CsvFilePathList
         public ObservableCollection<string> CsvFilePathList {
             get;
             set => this.SetProperty(ref field, value);
         } = [];
-        #endregion
 
         /// <summary>
         /// 帳簿VMリスト
         /// </summary>
-        #region BookVMList
         public ObservableCollection<BookModel> BookVMList {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択された帳簿VM
         /// </summary>
-        #region SelectedBookVM
         public BookModel SelectedBookVM {
             get;
             set {
@@ -110,11 +103,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
         /// <summary>
         /// 選択された帳簿ID
         /// </summary>
-        #region SelectedBookId
         public BookIdObj SelectedBookId {
             get => this.SelectedBookVM?.Id;
             set {
@@ -130,69 +121,50 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// CSV比較VMリスト
         /// </summary>
-        #region CsvComparisonVMList
         public ObservableCollection<CsvComparisonViewModel> CsvComparisonVMList {
             get;
             set => this.SetProperty(ref field, value);
         } = [];
-        #endregion
         /// <summary>
         /// CSV比較VMのチェック数
         /// </summary>
-        #region AllCheckedNum
         public int AllCheckedCount => this.CsvComparisonVMList.Count(vm => vm.IsMatch);
-        #endregion
         /// <summary>
         /// CSV比較VMの個数
         /// </summary>
-        #region AllCount
         public int AllCount => this.CsvComparisonVMList.Count;
-        #endregion
         /// <summary>
         /// CSV比較VMの合計値
         /// </summary>
-        #region AllSumValue
         public int AllSumValue => this.CsvComparisonVMList.Sum(vm => vm.Record.Value);
-        #endregion
 
         /// <summary>
         /// 選択されたCSV比較VM(先頭)
         /// </summary>
-        #region SelectedCsvComparisonVM
         public CsvComparisonViewModel SelectedCsvComparisonVM {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         /// <summary>
         /// 選択されたCSV比較VMリスト
         /// </summary>
-        #region SelectedCsvComparisonVMList
         public ObservableCollection<CsvComparisonViewModel> SelectedCsvComparisonVMList { get; } = [];
-        #endregion
         /// <summary>
         /// 選択されたCSV比較VMのチェック数
         /// </summary>
-        #region SelectedCheckedNum
         public int SelectedCheckedCount => this.SelectedCsvComparisonVMList.Count(vm => vm.IsMatch);
-        #endregion
         /// <summary>
         /// 選択されたCSV比較VMの個数
         /// </summary>
-        #region SelectedCount
         public int SelectedCount => this.SelectedCsvComparisonVMList.Count;
-        #endregion
         /// <summary>
         /// 選択されたCSV比較VMの合計値
         /// </summary>
-        #region SelectedSumValue
         public int SelectedSumValue => this.SelectedCsvComparisonVMList.Sum(vm => vm.Record.Value);
-        #endregion
 
         /// <summary>
         /// チェック数変更を通知する

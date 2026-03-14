@@ -35,7 +35,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 選択された設定タブインデックス
         /// </summary>
-        #region SelectedTabIndex
         public int SelectedTabIndex {
             get;
             set {
@@ -44,11 +43,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
         /// <summary>
         /// 選択された設定タブ種別
         /// </summary>
-        #region SelectedTab
         public SettingsTabs SelectedTab {
             get;
             set {
@@ -57,7 +54,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
         /// <summary>
         /// 項目設定タブVM

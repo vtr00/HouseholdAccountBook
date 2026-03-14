@@ -42,12 +42,10 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// 選択されているか
         /// </summary>
-        #region SelectFlag
         public bool SelectFlag {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
         #endregion
     }
 }

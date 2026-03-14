@@ -24,7 +24,6 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 金額
         /// </summary>
-        #region ActValue
         public decimal? ActValue {
             get;
             set {
@@ -33,7 +32,6 @@ namespace HouseholdAccountBook.ViewModels.Component
                 }
             }
         }
-        #endregion
         #endregion
     }
 }

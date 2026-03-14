@@ -21,37 +21,30 @@ namespace HouseholdAccountBook.ViewModels.UserControls
         /// <summary>
         /// 数値入力ボタンの入力値
         /// </summary>
-        #region InputedValue
         public int? InputedValue {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// 数値入力ボタンの入力種別
         /// </summary>
-        #region InputedKind
         public NumericInputButton.InputKind InputedKind {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// <see cref="System.Windows.Controls.Primitives.Popup"/> の表示状態
         /// </summary>
-        #region IsOpen
         public bool IsOpen {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
         /// <see cref="NumericUpDown"/> のフォーカスの状態
         /// </summary>
-        #region NumericUpDownFocused
         public bool NumericUpDownFocused {
             get;
             set {
@@ -59,12 +52,10 @@ namespace HouseholdAccountBook.ViewModels.UserControls
                 this.UpdateIsOpenProperty();
             }
         }
-        #endregion
 
         /// <summary>
         /// <see cref="System.Windows.Controls.Primitives.Popup"/> のフォーカスの状態
         /// </summary>
-        #region PopupFocused
         public bool PopupFocused {
             get;
             set {
@@ -72,7 +63,6 @@ namespace HouseholdAccountBook.ViewModels.UserControls
                 this.UpdateIsOpenProperty();
             }
         }
-        #endregion
         #endregion
 
         /// <summary>
