@@ -278,9 +278,9 @@
            <TextBlock Text="{x:Static properties:Resources.TextBlock_Book}"/>:
         </TextBlock>
         <ComboBox Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" MinWidth="150"
-                  ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
+                  ItemsSource="{Binding BookSelectorVM.ItemList}" SelectedItem="{Binding BookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
         <TextBlock Grid.Row="1" Grid.Column="2" Margin="5,5,5,0" HorizontalAlignment="Left" VerticalAlignment="Center"
-                   Text="{Binding SelectedBookVM.Remark}"/>
+                   Text="{Binding BookSelectorVM.SelectedItem.Remark}"/>
 
         <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Width="Auto" Height="Auto" TabStripPlacement="Left"
                     SelectedIndex="{Binding SelectedTabIndex}">
