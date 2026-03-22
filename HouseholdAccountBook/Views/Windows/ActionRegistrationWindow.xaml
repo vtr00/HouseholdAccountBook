@@ -78,7 +78,7 @@
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Book}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
-                      ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
+                      ItemsSource="{Binding BookSelectorVM.ItemList}" SelectedItem="{Binding BookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 
             <!-- 日付 -->
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
@@ -91,19 +91,19 @@
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_IncomeOrExpenses}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
-                      ItemsSource="{Binding BalanceKindDic}" SelectedValue="{Binding SelectedBalanceKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                      ItemsSource="{Binding BalanceKindSelectorVM.ItemList}" SelectedItem="{Binding BalanceKindSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
 
             <!-- 分類 -->
             <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Category}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="5" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
-                     ItemsSource="{Binding CategoryVMList}" SelectedItem="{Binding SelectedCategoryVM}" DisplayMemberPath="Name"/>
+                     ItemsSource="{Binding CategorySelectorVM.ItemList}" SelectedItem="{Binding CategorySelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 
             <!-- 項目 -->
             <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Item}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="6" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
-                     ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="NameWithCategory"/>
+                     ItemsSource="{Binding ItemSelectorVM.ItemList}" SelectedItem="{Binding ItemSelectorVM.SelectedItem}" DisplayMemberPath="NameWithCategory"/>
 
             <!-- 金額 -->
             <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
@@ -116,13 +116,13 @@
             <TextBlock Grid.Row="8" Grid.Column="0" Margin="5"
                        Text="{x:Static properties:Resources.TextBlock_ShopName}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="8" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="2"
-                      ItemsSource="{Binding ShopVMList}" Text="{Binding SelectedShopName, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
+                      ItemsSource="{Binding ShopSelectorVM.ItemList}" Text="{Binding ShopSelectorVM.SelectedItem, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
 
             <!-- 備考 -->
             <TextBlock Grid.Row="9" Grid.Column="0" Margin="5"
                        Text="{x:Static properties:Resources.TextBlock_Remark}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="9" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="2"
-                      ItemsSource="{Binding RemarkVMList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
+                      ItemsSource="{Binding RemarkSelectorVM.ItemList}" Text="{Binding RemarkSelectorVM.SelectedItem, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
 
             <!-- チェック済 -->
             <TextBlock Grid.Row="10" Grid.Column="0" Margin="5" 

@@ -41,15 +41,15 @@
         <Style x:Key="DayOfWeekStyle" TargetType="DataGridCell">
             <Style.Triggers>
                 <!-- 土曜日 -->
-                <DataTrigger Binding="{Binding ActionWithBalance.ActTime.DayOfWeek}" Value="Saturday">
+                <DataTrigger Binding="{Binding ActTime.DayOfWeek}" Value="Saturday">
                     <Setter Property="Foreground" Value="Blue"/>
                 </DataTrigger>
                 <!-- 日曜日 -->
-                <DataTrigger Binding="{Binding ActionWithBalance.ActTime.DayOfWeek}" Value="Sunday">
+                <DataTrigger Binding="{Binding ActTime.DayOfWeek}" Value="Sunday">
                     <Setter Property="Foreground" Value="Red"/>
                 </DataTrigger>
                 <!-- 祝日 -->
-                <DataTrigger Binding="{Binding ActionWithBalance.ActTime, Converter={StaticResource DateTimeToIsNationalHolidayConverter}}" Value="true">
+                <DataTrigger Binding="{Binding ActTime, Converter={StaticResource DateTimeToIsNationalHolidayConverter}}" Value="true">
                     <Setter Property="Foreground" Value="Red"/>
                 </DataTrigger>
             </Style.Triggers>
@@ -622,13 +622,13 @@
                             </Button>
                             
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                      ItemsSource="{Binding GraphKind1SelectorVM.ItemList}" SelectedItem="{Binding GraphKind1SelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
+                                      ItemsSource="{Binding GraphKind2SelectorVM.ItemList}" SelectedItem="{Binding GraphKind2SelectorVM.SelectedItem}" DisplayMemberPath="Value">
                                 <ComboBox.Style>
                                     <Style TargetType="ComboBox">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                            <DataTrigger Binding="{Binding GraphKind1SelectorVM.SelectedKey}" Value="BalanceGraph">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -654,7 +654,7 @@
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedGraphKind1, ElementName=WVM}" Value="BalanceGraph">
+                                    <DataTrigger Binding="{Binding GraphKind1SelectorVM.SelectedKey, ElementName=WVM}" Value="BalanceGraph">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -724,7 +724,7 @@
                     <!-- データリスト -->
                     <Grid Grid.Row="1" Margin="2" Background="White" DataContext="{Binding MonthlySummaryTabVM}">
                         <DataGrid x:Name="_monthlyDataGrid" Grid.Column="1"
-                                  ItemsSource="{Binding SeriesVMList}" SelectedItem="{Binding SelectedSeriesVM}" IsReadOnly="True" SelectionUnit="FullRow"
+                                  ItemsSource="{Binding SeriesSelectorVM.ItemList}" SelectedItem="{Binding SeriesSelectorVM.SelectedItem}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
                                   HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
@@ -830,13 +830,13 @@
                                 </ToolTipService.ToolTip>
                             </Button>
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                      ItemsSource="{Binding GraphKind1SelectorVM.ItemList}" SelectedItem="{Binding GraphKind1SelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
+                                      ItemsSource="{Binding GraphKind2SelectorVM.ItemList}" SelectedItem="{Binding GraphKind2SelectorVM.SelectedItem}" DisplayMemberPath="Value">
                                 <ComboBox.Style>
                                     <Style TargetType="ComboBox">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                            <DataTrigger Binding="{Binding GraphKind1SelectorVM.SelectedKey}" Value="BalanceGraph">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -862,7 +862,7 @@
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedGraphKind1, ElementName=WVM}" Value="BalanceGraph">
+                                    <DataTrigger Binding="{Binding GraphKind1SelectorVM.SelectedKey, ElementName=WVM}" Value="BalanceGraph">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -922,7 +922,7 @@
                     <!-- データリスト -->
                     <Grid Grid.Row="1" Margin="2" Background="White" DataContext="{Binding YearlySummaryTabVM}">
                         <DataGrid x:Name="_yearlyDataGrid" Grid.Column="1"
-                                  ItemsSource="{Binding SeriesVMList}" SelectedItem="{Binding SelectedSeriesVM}" IsReadOnly="True" SelectionUnit="FullRow"
+                                  ItemsSource="{Binding SeriesSelectorVM.ItemList}" SelectedItem="{Binding SeriesSelectorVM.SelectedItem}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
                                   HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
@@ -1013,13 +1013,13 @@
                             <Button Width="80" Content="{x:Static properties:Resources.Button_LastDecade}" Command="{Binding GoToThisYearCommand}"/>
                             
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKind1Dic}" SelectedValue="{Binding SelectedGraphKind1}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                      ItemsSource="{Binding GraphKind1SelectorVM.ItemList}" SelectedItem="{Binding GraphKind1SelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKind2Dic}" SelectedValue="{Binding SelectedGraphKind2}" SelectedValuePath="Key" DisplayMemberPath="Value">
+                                      ItemsSource="{Binding GraphKind2SelectorVM.ItemList}" SelectedItem="{Binding GraphKind2SelectorVM.SelectedItem}" DisplayMemberPath="Value">
                                 <ComboBox.Style>
                                     <Style TargetType="ComboBox">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SelectedGraphKind1}" Value="BalanceGraph">
+                                            <DataTrigger Binding="{Binding GraphKind1SelectorVM.SelectedKey}" Value="BalanceGraph">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -1045,7 +1045,7 @@
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedGraphKind1, ElementName=WVM}" Value="BalanceGraph">
+                                    <DataTrigger Binding="{Binding GraphKind1SelectorVM.SelectedKey, ElementName=WVM}" Value="BalanceGraph">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>

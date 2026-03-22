@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Infrastructure.CSV;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
@@ -8,10 +9,9 @@ using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Loaders;
 using HouseholdAccountBook.ViewModels.Windows;
+using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -22,11 +22,19 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
     /// </summary>
     /// <param name="parent">親VM</param>
     /// <param name="tab">タブ</param>
-    public class MainWindowListTabViewModel(MainWindowViewModel parent, Tabs tab) : WindowPartViewModelBase
+    public class MainWindowListTabViewModel : WindowPartViewModelBase
     {
-        private MainWindowViewModel Parent { get; } = parent;
+        /// <summary>
+        /// <see cref="SeriesViewModel"/> のキー情報
+        /// </summary>
+        /// <param name="BalanceKind">終始種別</param>
+        /// <param name="CategoryId">分類ID</param>
+        /// <param name="ItemId">項目ID</param>
+        public record Keys(BalanceKind? BalanceKind, CategoryIdObj CategoryId, ItemIdObj ItemId) { }
 
-        private Tabs Tab { get; } = tab;
+        private MainWindowViewModel Parent { get; }
+
+        private Tabs Tab { get; }
 
         #region イベント
         /// <summary>
@@ -37,30 +45,32 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         #region Bindingプロパティ
         /// <summary>
-        /// 系列VMリスト
+        /// 系列セレクタVM
         /// </summary>
-        public ObservableCollection<SeriesViewModel> SeriesVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public SelectorViewModel<SeriesViewModel, Keys> SeriesSelectorVM { get; } = new(static vm => vm != null ? new(vm.Category.BalanceKind, vm.Category.Id, vm.Item.Id) : null);
+        #endregion
 
         /// <summary>
-        /// 選択された系列VM
+        /// コンストラクタ
         /// </summary>
-        public SeriesViewModel SelectedSeriesVM {
-            get;
-            set {
-                var oldVM = field;
-                if (this.SetProperty(ref field, value)) {
-                    this.Parent.SelectedBalanceKind = value?.Category.BalanceKind;
-                    this.Parent.SelectedCategoryId = value?.Category.Id;
-                    this.Parent.SelectedItemId = value?.Item.Id;
+        /// <param name="parent">親VM</param>
+        /// <param name="tab">タブ</param>
+        public MainWindowListTabViewModel(MainWindowViewModel parent, Tabs tab)
+        {
+            using FuncLog funcLog = new(new { tab });
 
-                    this.SelectedSeriesChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
+            this.Parent = parent;
+            this.Tab = tab;
+
+            this.SeriesSelectorVM.SetLoader(async _ => {
+                SeriesViewModelLoader loader = new(new(this.mDbHandlerFactory));
+                return this.Tab switch {
+                    Tabs.MonthlyListTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
+                    Tabs.YearlyListTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
+                    _ => throw new NotImplementedException(),
+                };
+            });
         }
-        #endregion
 
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null);
 
@@ -78,23 +88,25 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             using FuncLog funcLog = new(new { balanceKind, categoryId, itemId });
 
-            BalanceKind? tmpBalanceKind = balanceKind ?? this.Parent.SelectedBalanceKind;
-            CategoryIdObj tmpCategoryId = categoryId ?? this.Parent.SelectedCategoryId;
-            ItemIdObj tmpItemId = itemId ?? this.Parent.SelectedItemId;
-            Log.Vars(vars: new { tmpBalanceKind, tmpCategoryId, tmpItemId });
+            await this.SeriesSelectorVM.LoadAsync(new Keys(balanceKind, categoryId, itemId), SelectorMode.FirstOrDefault);
+        }
 
-            SeriesViewModelLoader loader = new(new(this.mDbHandlerFactory));
-            this.SeriesVMList = this.Tab switch {
-                Tabs.MonthlyListTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
-                Tabs.YearlyListTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
-                _ => throw new NotImplementedException(),
-            };
-            this.SelectedSeriesVM = this.SeriesVMList?.FirstOrDefault(vm => vm.Category.BalanceKind == tmpBalanceKind && vm.Category.Id == tmpCategoryId && vm.Item.Id == tmpItemId);
+        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        {
+            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+
+            this.SeriesSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
         }
 
         public override void AddEventHandlers()
         {
-            // NOP
+            this.SeriesSelectorVM.SelectionChanged += (sender, e) => {
+                this.Parent.SelectedBalanceKind = e.NewValue?.BalanceKind;
+                this.Parent.SelectedCategoryId = e.NewValue?.CategoryId;
+                this.Parent.SelectedItemId = e.NewValue?.ItemId;
+
+                this.SelectedSeriesChanged?.Invoke(sender, EventArgs.Empty);
+            };
         }
 
         /// <summary>

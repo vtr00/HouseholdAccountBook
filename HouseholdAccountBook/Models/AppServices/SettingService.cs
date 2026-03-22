@@ -150,7 +150,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 BookName = book.Name,
                 BookKind = (int)book.BookKind,
                 InitialValue = (int)book.InitialValue,
-                DebitBookId = (int)book.DebitBookId,
+                DebitBookId = book.DebitBookId == -1 ? null : (int)book.DebitBookId,
                 PayDay = book.PayDay,
                 JsonCode = jsonCode,
                 BookId = (int)book.Id

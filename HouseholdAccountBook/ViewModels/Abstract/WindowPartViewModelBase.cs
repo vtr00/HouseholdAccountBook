@@ -129,7 +129,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// 表示する情報を読み込む
         /// </summary>
-        /// <remarks><see cref="FrameworkElement.Loaded">内で呼び出す</remarks>
+        /// <remarks><see cref="FrameworkElement.Loaded">内で呼び出す. 初期表示値はここで設定する</remarks>
         public abstract Task LoadAsync();
 
         /// <summary>

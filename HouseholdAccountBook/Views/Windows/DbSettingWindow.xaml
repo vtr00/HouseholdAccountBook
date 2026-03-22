@@ -37,7 +37,7 @@
         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
                    Text="{x:Static properties:Resources.TextBlock_DBKind}"/>
         <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalAlignment="Center"
-                  ItemsSource="{Binding DBKindDic}" SelectedValue="{Binding SelectedDBKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                  ItemsSource="{Binding DBKindSelectorVM.ItemList}" SelectedItem="{Binding DBKindSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
 
         <!-- PostgreSQL -->
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
@@ -45,7 +45,7 @@
                 <Style TargetType="Grid">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding SelectedDBKind}" Value="PostgreSQL">
+                        <DataTrigger Binding="{Binding DBKindSelectorVM.SelectedKey}" Value="PostgreSQL">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
@@ -112,7 +112,7 @@
                 <Style TargetType="Grid">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding SelectedDBKind}" Value="Access">
+                        <DataTrigger Binding="{Binding DBKindSelectorVM.SelectedKey}" Value="Access">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
@@ -141,7 +141,7 @@
                     <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                                Text="{x:Static properties:Resources.TextBlock_Access_Provider}"/>
                     <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                               ItemsSource="{Binding ProviderNameDic}" SelectedValue="{Binding SelectedProviderName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                               ItemsSource="{Binding ProviderNameSelectorVM.ItemList}" SelectedItem="{Binding ProviderNameSelectorVM.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Value"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Access_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
                     <TextBox Grid.Row="1" Grid.Column="1" Margin="1" Text="{Binding InputedDBFilePath}" IsReadOnly="True"/>
@@ -158,7 +158,7 @@
                 <Style TargetType="Grid">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding SelectedDBKind}" Value="SQLite">
+                        <DataTrigger Binding="{Binding DBKindSelectorVM.SelectedKey}" Value="SQLite">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>

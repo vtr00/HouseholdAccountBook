@@ -174,7 +174,7 @@ namespace HouseholdAccountBook.Views.Windows
                     checkBox.IsChecked = !checkBox.IsChecked;
 
                     if (checkBox?.DataContext is CsvComparisonViewModel vm) {
-                        this.WVM.SelectedCsvComparisonVM = vm;
+                        this.WVM.CsvCompSelectorVM.SelectedItem = vm;
                         this.WVM.ChangeIsMatchCommand?.Execute(null);
                     }
                 }
