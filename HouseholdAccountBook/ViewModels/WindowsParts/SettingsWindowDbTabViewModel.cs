@@ -243,12 +243,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
-        public override Task LoadAsync() => throw new NotImplementedException();
-
         /// <summary>
         /// DB設定を読み込む
         /// </summary>
-        public void Load()
+        public override async Task LoadAsync()
         {
             using FuncLog funcLog = new();
 
@@ -261,7 +259,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             // SQLite
             this.SQLiteSettingVM.Load();
             // Access(記帳風月)
-            this.AccessSettingVM.LoadForKichoFugetsu();
+            await this.AccessSettingVM.LoadForKichoFugetsuAsync();
 
             // バックアップ
             this.InputedBackUpNum = settings.App_BackUpNum;

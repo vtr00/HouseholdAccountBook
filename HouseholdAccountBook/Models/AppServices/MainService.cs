@@ -97,7 +97,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
-            EndingBalanceInfoDto dto = bookId == null
+            EndingBalanceInfoDto dto = bookId == -1
                 ? await endingBalanceInfoDao.Find(startDate) // 全帳簿の繰越残高
                 : await endingBalanceInfoDao.FindByBookId(bookId.Value, startDate); // 各帳簿の繰越残高
             decimal balance = dto.EndingBalance;
@@ -152,7 +152,7 @@ namespace HouseholdAccountBook.Models.AppServices
             }
 
             ActionInfoDao actionInfoDao = new(dbHandler);
-            IEnumerable<ActionInfoDto> dtoList = bookId == null
+            IEnumerable<ActionInfoDto> dtoList = bookId == -1
                 ? await actionInfoDao.FindAllWithinTerm(period.Start, period.End) // 全帳簿項目
                 : await actionInfoDao.FindByBookIdWithinTerm(bookId.Value, period.Start, period.End); // 各帳簿項目
 
@@ -239,7 +239,7 @@ namespace HouseholdAccountBook.Models.AppServices
             List<SummaryModel> smList = [];
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 SummaryInfoDao summaryInfoDao = new(dbHandler);
-                IEnumerable<SummaryInfoDto> dtoList = bookId == null
+                IEnumerable<SummaryInfoDto> dtoList = bookId == -1
                     ? await summaryInfoDao.FindAllWithinPeriod(period.Start, period.End)
                     : await summaryInfoDao.FindByBookIdWithinPeriod(bookId.Value, period.Start, period.End);
 

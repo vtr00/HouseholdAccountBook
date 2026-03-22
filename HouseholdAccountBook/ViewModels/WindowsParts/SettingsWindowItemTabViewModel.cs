@@ -371,13 +371,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
                 ItemSettingViewModel vm = this.DisplayedItemSettingVM;
-                vm.SelectedRelationVM = viewModel as RelationViewModel; // チェックボックスを変更しただけでは変更されないため、引数で受け取る
+                vm.RelationSelectorVM.SelectedItem = viewModel as RelationViewModel; // チェックボックスを変更しただけでは変更されないため、引数で受け取る
 
-                if (await this.mSettingService.SaveBookItemRemationAsync((int)vm.SelectedRelationVM.Id, (int)vm.Id, vm.SelectedRelationVM.IsRelated)) {
+                if (await this.mSettingService.SaveBookItemRemationAsync(vm.RelationSelectorVM.SelectedKey, (int)vm.Id, vm.RelationSelectorVM.SelectedItem.IsRelated)) {
                     this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
                 }
                 else {
-                    vm.SelectedRelationVM.IsRelated = !vm.SelectedRelationVM.IsRelated; // 選択前の状態に戻す
+                    vm.RelationSelectorVM.SelectedItem.IsRelated = !vm.RelationSelectorVM.SelectedItem.IsRelated; // 選択前の状態に戻す
                     _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
                 }
             }
@@ -387,7 +387,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 店名削除コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool DeleteShopNameCommand_CanExecute() => this.DisplayedItemSettingVM?.SelectedShopVM != null;
+        private bool DeleteShopNameCommand_CanExecute() => this.DisplayedItemSettingVM?.ShopSelectorVM.SelectedItem != null;
 
         /// <summary>
         /// 店名削除コマンド処理
@@ -399,7 +399,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                     Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
-                    await this.mSettingService.DeleteShopAsync(this.DisplayedItemSettingVM.SelectedShopVM.Name, this.DisplayedItemSettingVM.Id.Value);
+                    await this.mSettingService.DeleteShopAsync(this.DisplayedItemSettingVM.ShopSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Value);
 
                     SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
                     this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
@@ -411,7 +411,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 備考削除コマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        private bool DeleteRemarkCommand_CanExecute() => this.DisplayedItemSettingVM?.SelectedRemarkVM != null;
+        private bool DeleteRemarkCommand_CanExecute() => this.DisplayedItemSettingVM?.RemarkSelectorVM.SelectedItem != null;
 
         /// <summary>
         /// 備考削除コマンド処理
@@ -423,7 +423,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                     Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
-                    await this.mSettingService.DeleteRemarkAsync(this.DisplayedItemSettingVM.SelectedRemarkVM.Remark, this.DisplayedItemSettingVM.Id.Value);
+                    await this.mSettingService.DeleteRemarkAsync(this.DisplayedItemSettingVM.RemarkSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Value);
 
                     SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
                     this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
@@ -452,8 +452,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             // InitializeComponent内で呼ばれる場合があるため、nullチェックを行う
             if (this.mDbHandlerFactory == null) { return; }
-
-            this.mSettingService = new(this.mDbHandlerFactory);
 
             // 指定がなければ現在選択中の項目を再選択する
             if (this.SelectedItemTreeVM != null && kind == null && id == null) {

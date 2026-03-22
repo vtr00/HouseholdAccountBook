@@ -90,7 +90,7 @@
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                                 Text="{x:Static properties:Resources.TextBlock_Book}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"  Grid.ColumnSpan="2"
-                                ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedFromBookVM}" DisplayMemberPath="Name"/>
+                                ItemsSource="{Binding FromBookSelectorVM.ItemList}" SelectedItem="{Binding FromBookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 
                     <!-- 日付 -->
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
@@ -126,7 +126,7 @@
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                                Text="{x:Static properties:Resources.TextBlock_Book}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"  Grid.ColumnSpan="2"
-                              ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedToBookVM}" DisplayMemberPath="Name"/>
+                              ItemsSource="{Binding ToBookSelectorVM.ItemList}" SelectedItem="{Binding ToBookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 
                     <!-- 日付 -->
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
@@ -185,13 +185,13 @@
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
                            Text="{x:Static properties:Resources.TextBlock_Burden}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ListBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
-                           ItemsSource="{Binding CommissionKindDic}" SelectedValue="{Binding SelectedCommissionKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                           ItemsSource="{Binding CommissionKindSelectorVM.ItemList}" SelectedItem="{Binding CommissionKindSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
 
                     <!-- 項目 -->
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                            Text="{x:Static properties:Resources.TextBlock_Item}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ListBox Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" 
-                           ItemsSource="{Binding ItemVMList}" SelectedItem="{Binding SelectedItemVM}" DisplayMemberPath="NameWithCategory"/>
+                           ItemsSource="{Binding ItemSelectorVM.ItemList}" SelectedItem="{Binding ItemSelectorVM.SelectedItem}" DisplayMemberPath="NameWithCategory"/>
 
                     <!-- 支出 -->
                     <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
@@ -205,7 +205,7 @@
                     <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                            Text="{x:Static properties:Resources.TextBlock_Remark}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsEditable="True"
-                           ItemsSource="{Binding RemarkVMList}" Text="{Binding SelectedRemark, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
+                           ItemsSource="{Binding RemarkSelectorVM.ItemList}" Text="{Binding RemarkSelectorVM.SelectedItem, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
                 </Grid>
             </GroupBox>
         </Grid>

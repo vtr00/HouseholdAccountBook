@@ -1,10 +1,10 @@
 ﻿using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
-using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
+using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Settings;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -43,12 +43,15 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             IEnumerable<BookModel> bmList = await this.mAppService.LoadBookListAsync(initialName: Properties.Resources.ListName_None);
             BookModel bm = await this.mService.LoadBookAsync(bookId);
 
-            vm = new BookSettingViewModel(bm) {
-                DebitBookVMList = new ObservableCollection<BookModel>(bmList.Where(tmpVM => tmpVM.Id != bookId)),
-                RelationVMList = [.. await this.mService.LoadRelationListAsync(bookId)],
-                TextEncodingList = [.. EncodingUtil.GetTextEncodingList()]
-            };
-            vm.SelectedDebitBookVM = vm.DebitBookVMList.FirstOrElementAtOrDefault(tmpVM => (int?)tmpVM.Id == bm.DebitBookId, 0);
+            vm = new(bm);
+            vm.BookKindSelectorVM.SetLoader(() => UiConstants.BookKindStr);
+            await vm.BookKindSelectorVM.LoadAsync(bm.BookKind);
+            vm.DebitBookSelectorVM.SetLoader(() => bmList.Where(tmpVM => tmpVM.Id != bookId));
+            await vm.DebitBookSelectorVM.LoadAsync(bm.DebitBookId);
+            vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(bookId)).Select(model => new RelationViewModel(model)));
+            await vm.RelationSelectorVM.LoadAsync();
+            vm.TextEncodingSelectorVM.SetLoader(() => EncodingUtil.GetTextEncodingList());
+            await vm.TextEncodingSelectorVM.LoadAsync(bm.TextEncoding);
 
             return vm;
         }
@@ -107,11 +110,13 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                 case HierarchicalKind.Item: {
                     // 項目
                     ItemIdObj itemId = id.Value;
-                    vm = new(await this.mService.LoadItemAsync(itemId)) {
-                        RelationVMList = [.. await this.mService.LoadRelationListAsync(itemId)],
-                        ShopVMList = [.. await this.mAppService.LoadShopListAsync(itemId)],
-                        RemarkVMList = [.. await this.mAppService.LoadRemarkListAsync(itemId)]
-                    };
+                    vm = new(await this.mService.LoadItemAsync(itemId));
+                    vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(itemId)).Select(model => new RelationViewModel(model)));
+                    await vm.RelationSelectorVM.LoadAsync();
+                    vm.ShopSelectorVM.SetLoader(async () => await this.mAppService.LoadShopListAsync(itemId));
+                    await vm.ShopSelectorVM.LoadAsync();
+                    vm.RemarkSelectorVM.SetLoader(async () => await this.mAppService.LoadRemarkListAsync(itemId));
+                    await vm.RemarkSelectorVM.LoadAsync();
                     break;
                 }
             }

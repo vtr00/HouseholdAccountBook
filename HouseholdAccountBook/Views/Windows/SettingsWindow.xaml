@@ -172,7 +172,7 @@
                         
                         <!-- 関連付け -->
                         <GroupBox Grid.Row="1" Header="{x:Static properties:Resources.GroupHeader_Linkage}">
-                            <ListBox Margin="5" ItemsSource="{Binding RelationVMList}" SelectedItem="{Binding SelectedRelationVM}" IsEnabled="{Binding IsSettable}">
+                            <ListBox Margin="5" ItemsSource="{Binding RelationSelectorVM.ItemList}" SelectedItem="{Binding RelationSelectorVM.SelectedItem}" IsEnabled="{Binding IsSettable}">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <Grid>
@@ -194,7 +194,7 @@
                         <!-- 店舗情報 -->
                         <GroupBox Grid.Row="2" Header="{x:Static properties:Resources.GroupHeader_Shop}">
                             <DataGrid Margin="5" x:Name="shopDataGrid" 
-                                      ItemsSource="{Binding ShopVMList}" SelectedItem="{Binding SelectedShopVM}" IsEnabled="{Binding IsSettable}"
+                                      ItemsSource="{Binding ShopSelectorVM.ItemList}" SelectedItem="{Binding ShopSelectorVM.SelectedItem}" IsEnabled="{Binding IsSettable}"
                                       IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
                                       CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                       AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
@@ -219,7 +219,7 @@
                         <!-- 備考情報 -->
                         <GroupBox Grid.Row="3" Header="{x:Static properties:Resources.GroupHeader_Remark}">
                             <DataGrid Margin="5" x:Name="remarkDataGrid" 
-                                      ItemsSource="{Binding RemarkVMList}" SelectedItem="{Binding SelectedRemarkVM}" IsEnabled="{Binding IsSettable}"
+                                      ItemsSource="{Binding RemarkSelectorVM.ItemList}" SelectedItem="{Binding RemarkSelectorVM.SelectedItem}" IsEnabled="{Binding IsSettable}"
                                       IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
                                       CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                       AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
@@ -271,7 +271,7 @@
                             </StackPanel>
 
                             <ListBox Grid.Row="1" Margin="5" 
-                                        ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name">
+                                     ItemsSource="{Binding BookSelectorVM.ItemList}" SelectedItem="{Binding BookSelectorVM.SelectedItem}" DisplayMemberPath="Name">
                                 <ListBox.InputBindings>
                                     <KeyBinding Gesture="Ctrl+OEMPlus" Command="{Binding DataContext.AddBookCommand, ElementName=_BookTab}"/>
                                     <KeyBinding Gesture="Ctrl+Add" Command="{Binding DataContext.AddBookCommand, ElementName=_BookTab}"/>
@@ -337,7 +337,7 @@
                                 <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                                            Text="{x:Static properties:Resources.TextBlock_BookKind}"/>
                                 <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                          ItemsSource="{Binding BookKindDic}" SelectedValue="{Binding SelectedBookKind}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                          ItemsSource="{Binding BookKindSelectorVM.ItemList}" SelectedItem="{Binding BookKindSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
 
                                 <!-- 備考 -->
                                 <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
@@ -402,7 +402,7 @@
 
                                         <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_PaymentBook}"/>
                                         <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                                                ItemsSource="{Binding DebitBookVMList}" SelectedItem="{Binding SelectedDebitBookVM}" DisplayMemberPath="Name"/>
+                                                                ItemsSource="{Binding DebitBookSelectorVM.ItemList}" SelectedItem="{Binding DebitBookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_PaymentDate}"/>
                                         <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" 
@@ -438,7 +438,7 @@
                                         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
                                                    Text="{x:Static properties:Resources.TextBlock_TextEncoding}"/>
                                         <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
-                                                  ItemsSource="{Binding TextEncodingList}" SelectedValue="{Binding SelectedTextEncoding}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                                  ItemsSource="{Binding TextEncodingSelectorVM.ItemList}" SelectedItem="{Binding TextEncodingSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
 
                                         <!-- 列番号 -->
                                         <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" 
@@ -487,7 +487,7 @@
                         <!-- 関連付け -->
                         <GroupBox Grid.Row="1" Header="{x:Static properties:Resources.GroupHeader_Linkage}">
                             <Grid>
-                                <ListBox Margin="5" ItemsSource="{Binding RelationVMList}" SelectedItem="{Binding SelectedRelationVM}">
+                                <ListBox Margin="5" ItemsSource="{Binding RelationSelectorVM.ItemList}" SelectedItem="{Binding RelationSelectorVM.SelectedItem}">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <Grid>
@@ -605,7 +605,7 @@
                                             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                                                        Text="{x:Static properties:Resources.TextBlock_Access_Provider}"/>
                                             <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                                                      ItemsSource="{Binding ProviderNameDic}" SelectedValue="{Binding SelectedProviderName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                                      ItemsSource="{Binding ProviderNameSelectorVM.ItemList}" SelectedItem="{Binding ProviderNameSelectorVM.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Value"/>
                                         </Grid>
                                     </GroupBox>
 
@@ -712,8 +712,8 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Language}"/>
-                                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" ItemsSource="{Binding CultureNameDic}" 
-                                              SelectedValue="{Binding SelectedCultureName, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" ItemsSource="{Binding CultureNameSelectorVM.ItemList}" 
+                                              SelectedItem="{Binding CultureNameSelectorVM.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Value"/>
                                     <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" 
                                             Content="{x:Static properties:Resources.Button_ApplyLanguage}" Command="{Binding RestartForLanguageCommand}"/>
                                 </Grid>
@@ -752,8 +752,8 @@
                                             <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Text="{Binding InputedNationalHolidayCsvURI}"/>
 
                                             <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_TextEncoding}"/>
-                                            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding NationalHolidayTextEncodingList}" 
-                                                      SelectedValue="{Binding SelectedNationalHolidayTextEncoding}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding NationalHolidayTextEncodingSelectorVM.ItemList}" 
+                                                      SelectedItem="{Binding NationalHolidayTextEncodingSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
 
                                             <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
                                                       Header="{x:Static properties:Resources.GroupHeader_ColumnIndex}">
@@ -855,8 +855,8 @@
                                             <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" MinValue="0" MaxValue="100" Value="{Binding InputedOperationLogNum}"/>
                                             <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center"
                                                        Text="{x:Static properties:Resources.TextBlock_OutoutLogLevel}"/>
-                                            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding LogLevelDic}"
-                                                      SelectedValue="{Binding SelectedLogLevel, Mode=TwoWay}" SelectedValuePath="Key" DisplayMemberPath="Value"/>
+                                            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding LogLevelSelectorVM.ItemList}"
+                                                      SelectedItem="{Binding LogLevelSelectorVM.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Value"/>
                                         </Grid>
                                     </GroupBox>
 

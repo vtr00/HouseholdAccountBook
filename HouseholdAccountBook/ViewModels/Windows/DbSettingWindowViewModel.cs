@@ -1,10 +1,12 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
+using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -38,26 +40,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// DB種別辞書
+        /// DB種別セレクタVM
         /// </summary>
-        public Dictionary<DBKind, string> DBKindDic { get; } = DBKindStr;
-        /// <summary>
-        /// 選択されたDB種別
-        /// </summary>
-        public DBKind SelectedDBKind {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = DBKind.PostgreSQL;
+        public SelectorViewModel<KeyValuePair<DBKind, string>, DBKind> DBKindSelectorVM { get; } = new(static p => p.Key);
 
         /// <summary>
         /// PostgreSQL設定
         /// </summary>
-        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM { get; init; } = new();
+        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM { get; } = new();
 
         /// <summary>
         /// Access設定
         /// </summary>
-        public OleDbSettingViewModel AccessSettingVM { get; init;  } = new();
+        public OleDbSettingViewModel AccessSettingVM { get; } = new();
 
         /// <summary>
         /// SQLite設定
@@ -98,7 +93,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     break;
                 }
                 case FilePathKind.DbFile: {
-                    switch (this.SelectedDBKind) {
+                    switch (this.DBKindSelectorVM.SelectedKey) {
                         case DBKind.SQLite: {
                             checkFileExists = false;
                             (directory, fileName) = PathUtil.GetSeparatedPath(this.SQLiteSettingVM.InputedDBFilePath, App.GetCurrentDir());
@@ -111,6 +106,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
                             filter = $"{Properties.Resources.FileSelectFilter_AccessFile}|*.mdb;*.accdb";
                             break;
                         }
+                        default:
+                            break;
                     }
                     break;
                 }
@@ -132,12 +129,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         this.PostgreSQLDBSettingVM.InputedRestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
                     case FilePathKind.DbFile:
-                        switch (this.SelectedDBKind) {
+                        switch (this.DBKindSelectorVM.SelectedKey) {
                             case DBKind.SQLite:
                                 this.SQLiteSettingVM.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                                 break;
                             case DBKind.Access:
                                 this.AccessSettingVM.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                                break;
+                            default:
                                 break;
                         }
                         break;
@@ -148,7 +147,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         protected override bool OKCommand_CanExecute()
         {
             bool canExecute;
-            switch (this.SelectedDBKind) {
+            switch (this.DBKindSelectorVM.SelectedKey) {
                 case DBKind.SQLite: {
                     canExecute = this.SQLiteSettingVM.CanSave();
                     break;
@@ -207,23 +206,33 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        public override Task LoadAsync() => throw new NotImplementedException();
+        public DbSettingWindowViewModel()
+        {
+            using FuncLog funcLog = new();
 
-        public void Load()
+            this.DBKindSelectorVM.SetLoader(static () => DBKindStr);
+        }
+
+        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        {
+            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+
+            this.DBKindSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+        }
+
+        public override async Task LoadAsync()
         {
             using FuncLog funcLog = new();
 
             Properties.Settings settings = Properties.Settings.Default;
-            this.SelectedDBKind = (DBKind)settings.App_SelectedDBKind;
+            await this.DBKindSelectorVM.LoadAsync((DBKind)settings.App_SelectedDBKind);
 
             // PostgreSQL
             this.PostgreSQLDBSettingVM.Load(this.SetPassword);
-
             // SQLite
             this.SQLiteSettingVM.Load();
-
             // Access
-            this.AccessSettingVM.Load();
+            await this.AccessSettingVM.LoadAsync();
         }
 
         /// <summary>
@@ -234,9 +243,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             bool result = false;
             Properties.Settings settings = Properties.Settings.Default;
-            settings.App_SelectedDBKind = (int)this.SelectedDBKind;
+            settings.App_SelectedDBKind = (int)this.DBKindSelectorVM.SelectedKey;
 
-            switch (this.SelectedDBKind) {
+            switch ((DBKind)settings.App_SelectedDBKind) {
                 case DBKind.PostgreSQL: {
                     result = this.PostgreSQLDBSettingVM.Save(this.GetPassword);
                     break;

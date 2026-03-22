@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             // 1番目に表示する項目を追加する
             if (initialName != string.Empty) {
-                bmList.Add(new(null, initialName));
+                bmList.Add(new(-1, initialName));
             }
 
             MstBookDao mstBookDao = new(dbHandler);

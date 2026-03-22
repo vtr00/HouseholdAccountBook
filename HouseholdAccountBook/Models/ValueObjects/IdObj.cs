@@ -25,6 +25,7 @@ namespace HouseholdAccountBook.Models.ValueObjects
     /// 帳簿項目ID VO
     /// </summary>
     /// <param name="Value">帳簿ID</param>
+    /// <remarks>-1 は 繰越残高</remarks>
     [DebuggerDisplay("{Value}")]
     public sealed record class ActionIdObj(int Value) : IIdObj
     {
@@ -52,6 +53,7 @@ namespace HouseholdAccountBook.Models.ValueObjects
     /// 帳簿ID VO
     /// </summary>
     /// <param name="Value">帳簿ID</param>
+    /// <remarks>-1 は 一覧 または 支払元帳簿:なし</remarks>
     [DebuggerDisplay("{Value}")]
     public sealed record class BookIdObj(int Value) : IIdObj
     {
@@ -66,6 +68,7 @@ namespace HouseholdAccountBook.Models.ValueObjects
     /// 分類ID VO
     /// </summary>
     /// <param name="Value">分類ID</param>
+    /// <remarks>-1 は (指定なし)</remarks>
     [DebuggerDisplay("{Value}")]
     public record class CategoryIdObj(int Value) : IIdObj
     {

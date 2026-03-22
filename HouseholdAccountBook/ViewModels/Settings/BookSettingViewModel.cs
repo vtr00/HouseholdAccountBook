@@ -5,19 +5,19 @@ using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {
     /// <summary>
     /// 帳簿VM(設定用)
     /// </summary>
-    /// <param name="book">帳簿Model</param>
-    public class BookSettingViewModel(BookModel book) : BindableBase
+    public class BookSettingViewModel : BindableBase
     {
         #region プロパティ
-
-        public BookModel Book { get; init; } = book;
+        /// <summary>
+        /// 帳簿モデル
+        /// </summary>
+        public BookModel Book { get; init; }
 
         /// <summary>
         /// 帳簿ID
@@ -35,23 +35,12 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public string InputedName {
             get;
             set => this.SetProperty(ref field, value);
-        } = book.Name;
+        }
 
         /// <summary>
-        /// 帳簿種別辞書
+        /// 帳簿種別セレクタVM
         /// </summary>
-        public Dictionary<BookKind, string> BookKindDic { get; } = UiConstants.BookKindStr;
-        /// <summary>
-        /// 選択された帳簿種別
-        /// </summary>
-        public BookKind SelectedBookKind {
-            get;
-            set {
-                _ = this.SetProperty(ref field, value);
-                this.RaisePropertyChanged(nameof(this.NeedToPay));
-                this.RaisePropertyChanged(nameof(this.CsvDataExists));
-            }
-        } = book.BookKind;
+        public SelectorViewModel<KeyValuePair<BookKind, string>, BookKind> BookKindSelectorVM { get; } = new(static p => p.Key);
 
         /// <summary>
         /// 入力された備考
@@ -59,7 +48,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public string InputedRemark {
             get;
             set => this.SetProperty(ref field, value);
-        } = book.Remark;
+        }
 
         /// <summary>
         /// 入力された初期残高
@@ -67,7 +56,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public decimal InputedInitialValue {
             get;
             set => this.SetProperty(ref field, value);
-        } = book.InitialValue;
+        }
 
         #region 期間情報
         /// <summary>
@@ -76,28 +65,28 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public bool SelectedIfStartDateExists {
             get;
             set => this.SetProperty(ref field, value);
-        } = book.StartDateExists;
+        }
         /// <summary>
         /// 指定された終了日の有無
         /// </summary>
         public bool SelectedIfEndDateExists {
             get;
             set => this.SetProperty(ref field, value);
-        } = book.EndDateExists;
+        }
         /// <summary>
         /// 指定された期間
         /// </summary>
         public PeriodObj<DateOnly> InputedPeriod {
             get;
             set => this.SetProperty(ref field, value);
-        } = book.Period;
+        }
         #endregion
 
         #region 支払情報
         /// <summary>
         /// 支払の必要があるか
         /// </summary>
-        public bool NeedToPay => this.SelectedBookKind == BookKind.CreditCard;
+        public bool NeedToPay => this.BookKindSelectorVM.SelectedKey == BookKind.CreditCard;
 
         /// <summary>
         /// 入力された支払日
@@ -105,29 +94,19 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public int? InputedPayDay {
             get;
             set => this.SetProperty(ref field, value);
-        } = book.PayDay;
+        }
 
         /// <summary>
-        /// 支払元帳簿VMリスト
+        /// 支払元帳簿セレクタVM
         /// </summary>
-        public ObservableCollection<BookModel> DebitBookVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        /// <summary>
-        /// 選択された支払元帳簿VM
-        /// </summary>
-        public BookModel SelectedDebitBookVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public SelectorViewModel<BookModel, BookIdObj> DebitBookSelectorVM { get; } = new(static vm => vm?.Id);
         #endregion
 
         #region CSV情報
         /// <summary>
         /// CSVデータがあるか
         /// </summary>
-        public bool CsvDataExists => this.SelectedBookKind != BookKind.Wallet;
+        public bool CsvDataExists => this.BookKindSelectorVM.SelectedKey != BookKind.Wallet;
 
         /// <summary>
         /// 入力されたCSVフォルダパス
@@ -135,22 +114,12 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public string InputedCsvFolderPath {
             get;
             set => this.SetProperty(ref field, value);
-        } = book.CsvFolderPath;
+        }
 
         /// <summary>
-        /// 文字エンコーディング
+        /// 文字エンコーディング セレクタVM
         /// </summary>
-        public ObservableCollection<KeyValuePair<int, string>> TextEncodingList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        /// <summary>
-        /// 選択された文字エンコーディング
-        /// </summary>
-        public int SelectedTextEncoding {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = book.TextEncoding;
+        public SelectorViewModel<KeyValuePair<int, string>, int> TextEncodingSelectorVM { get; } = new(static p => p.Key);
 
         /// <summary>
         /// 入力された日付 位置(1開始)
@@ -158,7 +127,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public int? InputedActDateIndex {
             get;
             set => this.SetProperty(ref field, value);
-        } = book.ActDateIndex;
+        }
 
         /// <summary>
         /// 入力された支出 位置(1開始)
@@ -166,7 +135,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public int? InputedExpensesIndex {
             get;
             set => this.SetProperty(ref field, value);
-        } = book.ExpensesIndex;
+        }
 
         /// <summary>
         /// 入力された項目名 位置(1開始)
@@ -174,23 +143,38 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public int? InputedItemNameIndex {
             get;
             set => this.SetProperty(ref field, value);
-        } = book.ItemNameIndex;
+        }
         #endregion
 
         /// <summary>
-        /// 関係性VMリスト
+        /// 関連性セレクタVM
         /// </summary>
-        public ObservableCollection<RelationModel> RelationVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        /// <summary>
-        /// 選択された関係性VM
-        /// </summary>
-        public RelationViewModel SelectedRelationVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public SelectorViewModel<RelationViewModel, ItemIdObj> RelationSelectorVM { get; } = new(static vm => (int)vm?.Id);
         #endregion
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="book">帳簿Model</param>
+        public BookSettingViewModel(BookModel book)
+        {
+            this.Book = book;
+            this.InputedName = book.Name;
+            this.InputedRemark = book.Remark;
+            this.InputedInitialValue = book.InitialValue;
+            this.InputedPayDay = book.PayDay;
+            this.SelectedIfStartDateExists = book.StartDateExists;
+            this.SelectedIfEndDateExists = book.EndDateExists;
+            this.InputedPeriod = book.Period;
+            this.InputedCsvFolderPath = book.CsvFolderPath;
+            this.InputedItemNameIndex = book.ItemNameIndex;
+            this.InputedActDateIndex = book.ActDateIndex;
+            this.InputedExpensesIndex = book.ExpensesIndex;
+
+            this.BookKindSelectorVM.SelectionChanged += (sender, e) => {
+                this.RaisePropertyChanged(nameof(this.NeedToPay));
+                this.RaisePropertyChanged(nameof(this.CsvDataExists));
+            };
+        }
     }
 }

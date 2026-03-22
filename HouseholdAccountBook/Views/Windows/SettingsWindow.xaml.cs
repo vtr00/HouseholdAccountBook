@@ -1,5 +1,4 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.ViewModels;
@@ -85,13 +84,13 @@ namespace HouseholdAccountBook.Views.Windows
                         await this.WVM.ItemTabVM.LoadAsync(this.WVM.ItemTabVM.SelectedItemTreeVM?.Kind, this.WVM.ItemTabVM.SelectedItemTreeVM?.Id);
                         break;
                     case SettingsTabs.BookSettingsTab:
-                        await this.WVM.BookTabVM.LoadAsync(this.WVM.BookTabVM.SelectedBookVM?.Id);
+                        await this.WVM.BookTabVM.LoadAsync(this.WVM.BookTabVM.BookSelectorVM?.SelectedKey);
                         break;
                     case SettingsTabs.DbSettingsTab:
-                        this.WVM.DbTabVM.Load();
+                        await this.WVM.DbTabVM.LoadAsync();
                         break;
                     case SettingsTabs.OtherSettingsTab:
-                        this.WVM.OtherTabVM.Load();
+                        await this.WVM.OtherTabVM.LoadAsync();
                         break;
                 }
             }

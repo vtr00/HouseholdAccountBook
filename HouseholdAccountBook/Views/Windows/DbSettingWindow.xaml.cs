@@ -34,11 +34,11 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.Initialize(new WaitCursorManagerFactory(this), null);
             this.WVM.Message = message;
 
-            this.Loaded += (sender, e) => {
+            this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
                 using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create(methodName: nameof(this.Loaded))) {
-                    this.WVM.Load();
+                    await this.WVM.LoadAsync();
                 }
 
                 this.WVM.AddEventHandlers();

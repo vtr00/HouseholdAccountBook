@@ -27,16 +27,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #region Bindingプロパティ
         #region 言語
         /// <summary>
-        /// 言語種別辞書
+        /// 言語種別セレクタVM
         /// </summary>
-        public Dictionary<string, string> CultureNameDic { get; } = CultureNameStr;
-        /// <summary>
-        /// 選択された言語種別
-        /// </summary>
-        public string SelectedCultureName {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = "ja-JP";
+        public SelectorViewModel<KeyValuePair<string, string>, string> CultureNameSelectorVM { get; } = new(static p => p.Key);
         #endregion
 
         #region カレンダー
@@ -57,19 +50,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 国民の祝日CSV 文字エンコーディング
+        /// 国民の祝日CSV 文字エンコーディング セレクタVM
         /// </summary>
-        public ObservableCollection<KeyValuePair<int, string>> NationalHolidayTextEncodingList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        /// <summary>
-        /// 国民の祝日CSV 選択された文字エンコーディング
-        /// </summary>
-        public int SelectedNationalHolidayTextEncoding {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public SelectorViewModel<KeyValuePair<int, string>, int> NationalHolidayTextEncodingSelectorVM { get; } = new(static p => p.Key);
 
         /// <summary>
         /// 入力された国民の祝日CSV 日付インデックス(1開始)
@@ -114,24 +97,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             set => this.SetProperty(ref field, value);
         }
         /// <summary>
-        /// ログレベル辞書
+        /// ログレベル セレクタVM
         /// </summary>
-        public Dictionary<Log.LogLevel, string> LogLevelDic {
-            get {
-                Dictionary<Log.LogLevel, string> dic = LogLevelStr;
-#if !DEBUG
-                _ = dic.Remove(Log.LogLevel.Trace);
-#endif
-                return dic;
-            }
-        }
-        /// <summary>
-        /// 選択されたログレベル
-        /// </summary>
-        public Log.LogLevel SelectedLogLevel {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = Log.LogLevel.Debug;
+        public SelectorViewModel<KeyValuePair<Log.LogLevel, string>, Log.LogLevel> LogLevelSelectorVM { get; } = new(static p => p.Key);
 
         /// <summary>
         /// 選択されたウィンドウログ出力の有無
@@ -185,7 +153,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             if (MessageBox.Show(Properties.Resources.Message_RestartNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                Properties.Settings.Default.App_CultureName = this.SelectedCultureName;
+                Properties.Settings.Default.App_CultureName = this.CultureNameSelectorVM.SelectedKey;
                 Properties.Settings.Default.Save();
 
                 ((App)Application.Current).Restart();
@@ -277,25 +245,37 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
-        public override Task LoadAsync() => throw new NotImplementedException();
+        public SettingsWindowOtherTabViewModel()
+        {
+            using FuncLog funcLog = new();
+
+            this.CultureNameSelectorVM.SetLoader(static () => CultureNameStr);
+            this.NationalHolidayTextEncodingSelectorVM.SetLoader(static () => EncodingUtil.GetTextEncodingList());
+            this.LogLevelSelectorVM.SetLoader(static () => {
+                Dictionary<Log.LogLevel, string> dic = LogLevelStr;
+#if !DEBUG
+                _ = dic.Remove(Log.LogLevel.Trace);
+#endif
+                return dic;
+            });
+        }
 
         /// <summary>
         /// その他設定を読み込む
         /// </summary>
-        public void Load()
+        public override async Task LoadAsync()
         {
             using FuncLog funcLog = new();
 
             Properties.Settings settings = Properties.Settings.Default;
 
             // 言語情報
-            this.SelectedCultureName = settings.App_CultureName;
+            await this.CultureNameSelectorVM.LoadAsync(settings.App_CultureName);
 
             // カレンダー情報
             this.InputedStartMonth = settings.App_StartMonth;
             this.InputedNationalHolidayCsvURI = settings.App_NationalHolidayCsv_Uri;
-            this.NationalHolidayTextEncodingList = [.. EncodingUtil.GetTextEncodingList()];
-            this.SelectedNationalHolidayTextEncoding = settings.App_NationalHolidayCsv_TextEncoding;
+            await this.NationalHolidayTextEncodingSelectorVM.LoadAsync(settings.App_NationalHolidayCsv_TextEncoding);
             this.InputedNationalHolidayCsvDateIndex = settings.App_NationalHolidayCsv_DateIndex + 1;
 
             // ウィンドウ情報
@@ -305,7 +285,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             // ログ情報
             this.SelectedIfOutputOperationLog = settings.App_OutputFlag_OperationLog;
             this.InputedOperationLogNum = settings.App_OperationLogNum;
-            this.SelectedLogLevel = (Log.LogLevel)settings.App_OperationLogLevel;
+            await this.LogLevelSelectorVM.LoadAsync((Log.LogLevel)settings.App_OperationLogLevel);
             this.SelectedIfOutputWindowLog = settings.App_OutputFlag_WindowLog;
             this.InputedWindowLogNum = settings.App_WindowLogNum;
             this.InputedUnhandledExceptionLogNum = settings.App_UnhandledExceptionLogNum;
@@ -385,12 +365,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             Properties.Settings settings = Properties.Settings.Default;
 
             // 言語情報
-            settings.App_CultureName = this.SelectedCultureName;
+            settings.App_CultureName = this.CultureNameSelectorVM.SelectedKey;
 
             // カレンダー情報
             settings.App_StartMonth = this.InputedStartMonth;
             settings.App_NationalHolidayCsv_Uri = this.InputedNationalHolidayCsvURI;
-            settings.App_NationalHolidayCsv_TextEncoding = this.SelectedNationalHolidayTextEncoding;
+            settings.App_NationalHolidayCsv_TextEncoding = this.NationalHolidayTextEncodingSelectorVM.SelectedKey;
             settings.App_NationalHolidayCsv_DateIndex = this.InputedNationalHolidayCsvDateIndex - 1;
 
             // ウィンドウ情報
@@ -399,7 +379,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             // ログ情報
             settings.App_OutputFlag_OperationLog = this.SelectedIfOutputOperationLog;
             settings.App_OperationLogNum = this.InputedOperationLogNum;
-            settings.App_OperationLogLevel = (int)this.SelectedLogLevel;
+            settings.App_OperationLogLevel = (int)this.LogLevelSelectorVM.SelectedKey;
             settings.App_OutputFlag_WindowLog = this.SelectedIfOutputWindowLog;
             settings.App_WindowLogNum = this.InputedWindowLogNum;
             settings.App_UnhandledExceptionLogNum = this.InputedUnhandledExceptionLogNum;

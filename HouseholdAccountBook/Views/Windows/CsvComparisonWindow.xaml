@@ -107,7 +107,7 @@
                 </Grid.ColumnDefinitions>
 
                 <ComboBox Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,5" MinWidth="150"
-                          ItemsSource="{Binding BookVMList}" SelectedItem="{Binding SelectedBookVM}" DisplayMemberPath="Name"/>
+                          ItemsSource="{Binding BookSelectorVM.ItemList}" SelectedItem="{Binding BookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
                 <Button Grid.Column="2" Margin="0,5" Width="50" Content="{x:Static properties:Resources.Button_Add}" Command="{Binding AddActionCommand}"/>
                 <Button Grid.Column="3" Margin="3,5,0,5" Width="50" Content="{x:Static properties:Resources.Button_Edit}" Command="{Binding EditActionCommand}"/>
                 <Button Grid.Column="4" Margin="3,5,0,5" Width="80" Content="{x:Static properties:Resources.Button_BulkCheck}" Command="{Binding BulkCheckCommand}"/>
@@ -115,15 +115,15 @@
 
             <Grid Grid.Row="3" Margin="25,0">
                 <TextBlock VerticalAlignment="Center">
-                    <TextBlock Text="{x:Static properties:Resources.TextBlock_CsvFolder}"/>: <TextBlock Text="{Binding SelectedBookVM.CsvFolderPath, TargetNullValue='--'}"/>
-                    <TextBlock Text="{x:Static properties:Resources.TextBlock_Date}"/>: <TextBlock Text="{Binding SelectedBookVM.ActDateIndex, TargetNullValue='--'}"/> <TextBlock Text="{x:Static properties:Resources.TextBlock_ColumnUnit}"/>
-                    <TextBlock Text="{x:Static properties:Resources.TextBlock_Expenses}"/>: <TextBlock Text="{Binding SelectedBookVM.ExpensesIndex, TargetNullValue='--'}"/> <TextBlock Text="{x:Static properties:Resources.TextBlock_ColumnUnit}"/>
-                    <TextBlock Text="{x:Static properties:Resources.TextBlock_ItemName}"/>: <TextBlock Text="{Binding SelectedBookVM.ItemNameIndex, TargetNullValue='--'}"/> <TextBlock Text="{x:Static properties:Resources.TextBlock_ColumnUnit}"/>
+                    <TextBlock Text="{x:Static properties:Resources.TextBlock_CsvFolder}"/>: <TextBlock Text="{Binding BookSelectorVM.SelectedItem.CsvFolderPath, TargetNullValue='--'}"/>
+                    <TextBlock Text="{x:Static properties:Resources.TextBlock_Date}"/>: <TextBlock Text="{Binding BookSelectorVM.SelectedItem.ActDateIndex, TargetNullValue='--'}"/> <TextBlock Text="{x:Static properties:Resources.TextBlock_ColumnUnit}"/>
+                    <TextBlock Text="{x:Static properties:Resources.TextBlock_Expenses}"/>: <TextBlock Text="{Binding BookSelectorVM.SelectedItem.ExpensesIndex, TargetNullValue='--'}"/> <TextBlock Text="{x:Static properties:Resources.TextBlock_ColumnUnit}"/>
+                    <TextBlock Text="{x:Static properties:Resources.TextBlock_ItemName}"/>: <TextBlock Text="{Binding BookSelectorVM.SelectedItem.ItemNameIndex, TargetNullValue='--'}"/> <TextBlock Text="{x:Static properties:Resources.TextBlock_ColumnUnit}"/>
                 </TextBlock>
             </Grid>
 
             <DataGrid x:Name="csvCompDataGrid" Grid.Row="4" Margin="5,5"
-                    ItemsSource="{Binding CsvComparisonVMList}" SelectedItem="{Binding SelectedCsvComparisonVM}" SelectionUnit="FullRow" IsReadOnly="True"
+                    ItemsSource="{Binding CsvCompSelectorVM.ItemList}" SelectedItem="{Binding CsvCompSelectorVM.SelectedItem}" SelectionUnit="FullRow" IsReadOnly="True"
                     CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="3"
                     AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True" 
                     HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
@@ -137,7 +137,7 @@
                     <MouseBinding Gesture="LeftDoubleClick" Command="{Binding AddOrEditActionCommand}"/>
                 </DataGrid.InputBindings>
                 <i:Interaction.Behaviors>
-                    <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding SelectedCsvComparisonVMList, Mode=OneWay}"/>
+                    <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding SelectedCsvCompVMList, Mode=OneWay}"/>
                 </i:Interaction.Behaviors>
                 <DataGrid.ItemContainerStyle>
                     <Style TargetType="DataGridRow">
@@ -185,7 +185,7 @@
                                         Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ItemName}" Width="*" Binding="{Binding Action.Item.Name, TargetNullValue=''}"/>
                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Action.Shop.Name, TargetNullValue=''}"/>
-                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Action.Remark.Text, TargetNullValue=''}"/>
+                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Action.Remark.Remark, TargetNullValue=''}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

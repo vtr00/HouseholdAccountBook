@@ -3,7 +3,6 @@ using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
-using System.Collections.ObjectModel;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {
@@ -31,69 +30,25 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 入力された名称
         /// </summary>
-        #region InputedName
         public string InputedName {
             get;
             set => this.SetProperty(ref field, value);
         }
-        #endregion
 
         /// <summary>
-        /// 関係性VMリスト
+        /// 関連性セレクタVM
         /// </summary>
-        #region RelationVMList
-        public ObservableCollection<RelationModel> RelationVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
-        /// <summary>
-        /// 選択された関係性VM
-        /// </summary>
-        #region SelectedRelationVM
-        public RelationViewModel SelectedRelationVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
+        public SelectorViewModel<RelationViewModel, BookIdObj> RelationSelectorVM { get; } = new(static vm => (int)vm?.Id);
 
         /// <summary>
-        /// 店舗VMリスト
+        /// 店舗セレクタVM
         /// </summary>
-        #region ShopVMList
-        public ObservableCollection<ShopModel> ShopVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
-        /// <summary>
-        /// 選択された店舗VM
-        /// </summary>
-        #region SelectedShopVM
-        public ShopModel SelectedShopVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
+        public SelectorViewModel<ShopModel, string> ShopSelectorVM { get; } = new(static vm => vm?.Name);
 
         /// <summary>
-        /// 備考VMリスト
+        /// 備考セレクタVM
         /// </summary>
-        #region RemarkVMList
-        public ObservableCollection<RemarkModel> RemarkVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
-        /// <summary>
-        /// 選択された備考VM
-        /// </summary>
-        #region SelectedRemarkVM
-        public RemarkModel SelectedRemarkVM {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
+        public SelectorViewModel<RemarkModel, string> RemarkSelectorVM { get; } = new(static vm => vm?.Remark);
 
         /// <summary>
         /// リネーム可能か

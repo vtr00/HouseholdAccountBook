@@ -10,7 +10,6 @@ using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -32,11 +31,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿項目登録サービス
         /// </summary>
         private ActionRegService mService;
-
-        /// <summary>
-        /// 変更時処理重複防止用フラグ
-        /// </summary>
-        private bool mIsUpdateOnChanged;
         #endregion
 
         #region イベント
@@ -95,44 +89,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 帳簿VMリスト
+        /// 移動元帳簿セレクタVM
         /// </summary>
-        public ObservableCollection<BookModel> BookVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public SelectorViewModel<BookModel, BookIdObj> FromBookSelectorVM { get; } = new(static vm => vm?.Id);
         /// <summary>
-        /// 選択された移動元帳簿VM
+        /// 移動先帳簿セレクタVM
         /// </summary>
-        public BookModel SelectedFromBookVM {
-            get;
-            set {
-                var oldValue = field;
-                if (this.SetProperty(ref field, value)) {
-                    if (!this.mIsUpdateOnChanged) {
-                        this.mIsUpdateOnChanged = true;
-                        this.FromBookChanged?.Invoke(this, new() { OldValue = oldValue?.Id, NewValue = value?.Id });
-                        this.mIsUpdateOnChanged = false;
-                    }
-                }
-            }
-        }
-        /// <summary>
-        /// 選択された移動先帳簿VM
-        /// </summary>
-        public BookModel SelectedToBookVM {
-            get;
-            set {
-                var oldValue = field;
-                if (this.SetProperty(ref field, value)) {
-                    if (!this.mIsUpdateOnChanged) {
-                        this.mIsUpdateOnChanged = true;
-                        this.ToBookChanged?.Invoke(this, new() { OldValue = oldValue?.Id, NewValue = value?.Id });
-                        this.mIsUpdateOnChanged = false;
-                    }
-                }
-            }
-        }
+        public SelectorViewModel<BookModel, BookIdObj> ToBookSelectorVM { get; } = new(static vm => vm?.Id);
 
         /// <summary>
         /// 選択された日付(移動元)
@@ -200,49 +163,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 手数料種別辞書
+        /// 手数料種別セレクタVM
         /// </summary>
-        public Dictionary<CommissionKind, string> CommissionKindDic { get; } = CommissionKindStr;
-        /// <summary>
-        /// 選択された手数料種別
-        /// </summary>
-        public CommissionKind SelectedCommissionKind {
-            get;
-            set {
-                var oldValue = field;
-                if (this.SetProperty(ref field, value)) {
-                    if (!this.mIsUpdateOnChanged) {
-                        this.mIsUpdateOnChanged = true;
-                        CommissionKindChanged?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
-                        this.mIsUpdateOnChanged = false;
-                    }
-                }
-            }
-        }
+        public SelectorViewModel<KeyValuePair<CommissionKind, string>, CommissionKind> CommissionKindSelectorVM { get; } = new(static p => p.Key);
 
         /// <summary>
-        /// 手数料項目VMリスト
+        /// 手数料項目セレクタVM
         /// </summary>
-        public ObservableCollection<ItemModel> ItemVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        /// <summary>
-        /// 選択された手数料項目VM
-        /// </summary>
-        public ItemModel SelectedItemVM {
-            get;
-            set {
-                var oldValue = field;
-                if (this.SetProperty(ref field, value)) {
-                    if (!this.mIsUpdateOnChanged) {
-                        this.mIsUpdateOnChanged = true;
-                        ItemChanged?.Invoke(this, new() { OldValue = oldValue?.Id, NewValue = value?.Id });
-                        this.mIsUpdateOnChanged = false;
-                    }
-                }
-            }
-        }
+        public SelectorViewModel<ItemModel, ItemIdObj> ItemSelectorVM { get; } = new(static vm => vm?.Id);
 
         /// <summary>
         /// 入力された手数料
@@ -257,19 +185,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 備考VMリスト
+        /// 備考セレクタVM
         /// </summary>
-        public ObservableCollection<RemarkModel> RemarkVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        /// <summary>
-        /// 選択された備考
-        /// </summary>
-        public string SelectedRemark {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public SelectorViewModel<RemarkModel, string> RemarkSelectorVM { get; } = new(static vm => vm?.Remark);
 
         #region コマンド
         /// <summary>
@@ -280,7 +198,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         #region コマンドイベントハンドラ
-        protected override bool OKCommand_CanExecute() => this.InputedValue is not null && this.SelectedFromBookVM != this.SelectedToBookVM;
+        protected override bool OKCommand_CanExecute() => this.InputedValue is not null && this.FromBookSelectorVM?.SelectedKey != this.ToBookSelectorVM?.SelectedKey;
         protected override async void OKCommand_Executed()
         {
             // DB登録
@@ -322,6 +240,46 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <exception cref="ArgumentException"></exception>
+        public MoveRegistrationWindowViewModel()
+        {
+            using FuncLog funcLog = new();
+
+            this.FromBookSelectorVM.SetLoader(async () => await this.mAppService.LoadBookListAsync());
+            this.ToBookSelectorVM.SetLoader(async () => await this.mAppService.LoadBookListAsync());
+            this.ItemSelectorVM.SetLoader(
+                async () => {
+                    BookIdObj bookId = this.CommissionKindSelectorVM.SelectedKey switch {
+                        CommissionKind.MoveFrom => this.FromBookSelectorVM.SelectedKey,
+                        CommissionKind.MoveTo => this.ToBookSelectorVM.SelectedKey,
+                        _ => throw new ArgumentException("SelectedComissionKind"),
+                    };
+                    return await this.mAppService.LoadItemListAsync(bookId, BalanceKind.Expenses, -1);
+                },
+                () => this.FromBookSelectorVM.SelectedKey != null && this.ToBookSelectorVM.SelectedKey != null);
+            this.CommissionKindSelectorVM.SetLoader(() => CommissionKindStr);
+            this.RemarkSelectorVM.SetLoader(
+                async () => await this.mAppService.LoadRemarkListAsync(this.ItemSelectorVM.SelectedKey, true),
+                () => this.ItemSelectorVM.SelectedKey != null);
+        }
+
+        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        {
+            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+
+            this.mAppService = new(this.mDbHandlerFactory);
+            this.mService = new(this.mDbHandlerFactory);
+
+            this.FromBookSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+            this.ToBookSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+            this.ItemSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+            this.CommissionKindSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+            this.RemarkSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+        }
+
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null, null);
 
         /// <summary>
@@ -339,14 +297,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
             BookIdObj selectingFromBookId = null;
             BookIdObj selectingToBookId = null;
             ItemIdObj selectingCommissionItemId = null;
+            CommissionKind selectingCommissionKind = default;
             string selectingCommissionRemark = null;
 
             switch (this.RegKind) {
                 case RegistrationKind.Add:
                     selectingFromBookId = initialBookId;
                     selectingToBookId = initialBookId;
+                    selectingCommissionKind = CommissionKind.MoveFrom;
 
                     // WVMに値を設定する
+                    this.IsLink = true;
                     this.SelectedFromDate = initialDate?.ToDateTime(TimeOnly.MinValue) ?? ((initialMonth == null || initialMonth?.Month == DateTime.Today.Month) ? DateTime.Today : initialMonth.Value.ToDateTime(TimeOnly.MinValue));
 
                     break;
@@ -368,12 +329,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     selectingFromBookId = fromAction.Book.Id;
                     selectingToBookId = toAction.Book.Id;
                     selectingCommissionItemId = commissionAction?.Item.Id;
+                    selectingCommissionKind = commissionAction?.Book.Id == toAction.Book.Id ? CommissionKind.MoveTo : CommissionKind.MoveFrom;
                     selectingCommissionRemark = commissionAction?.Remark;
 
                     this.IsLink = fromAction.ActTime == toAction.ActTime;
                     this.SelectedFromDate = fromAction.ActTime;
                     this.SelectedToDate = toAction.ActTime;
-                    this.SelectedCommissionKind = commissionAction?.Book.Id == toAction.Book.Id ? CommissionKind.MoveTo : CommissionKind.MoveFrom;
                     this.InputedValue = toAction.Amount;
                     this.InputedCommission = commissionAction?.Expenses;
 
@@ -382,122 +343,39 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             // リストを更新する
-            await this.UpdateBookListAsync(selectingFromBookId, selectingToBookId);
-            await this.UpdateItemListAsync(selectingCommissionItemId);
-            await this.UpdateRemarkListAsync(selectingCommissionRemark);
-        }
-
-        /// <summary>
-        /// 帳簿リストを更新する
-        /// </summary>
-        /// <param name="selectingFromBookId">選択対象の移動元帳簿ID</param>
-        /// <param name="selectingToBookId">選択対象の移動先帳簿ID</param>
-        /// <returns></returns>
-        private async Task UpdateBookListAsync(BookIdObj selectingFromBookId = null, BookIdObj selectingToBookId = null)
-        {
-            using FuncLog funcLog = new(new { selectingFromBookId, selectingToBookId });
-
-            this.BookVMList = [.. await this.mAppService.LoadBookListAsync()];
-            this.SelectedFromBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == selectingFromBookId, 0);
-            this.SelectedToBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == selectingToBookId, 0);
+            await this.FromBookSelectorVM.LoadAsync(selectingFromBookId);
+            await this.ToBookSelectorVM.LoadAsync(selectingToBookId);
+            await this.ItemSelectorVM.LoadAsync(selectingCommissionItemId);
+            await this.CommissionKindSelectorVM.LoadAsync(selectingCommissionKind);
+            await this.RemarkSelectorVM.LoadAsync(selectingCommissionRemark);
 
             switch (this.RegKind) {
                 case RegistrationKind.Add: {
-                    if (this.SelectedToBookVM.BookKind == BookKind.CreditCard) {
-                        if (this.SelectedToBookVM.DebitBookId != null) {
-                            this.SelectedFromBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == this.SelectedToBookVM.DebitBookId, 0);
+                    if (this.ToBookSelectorVM.SelectedItem?.BookKind == BookKind.CreditCard) {
+                        if (this.ToBookSelectorVM.SelectedItem.DebitBookId != null) {
+                            this.FromBookSelectorVM.SelectedItem = this.FromBookSelectorVM.ItemList.FirstOrElementAtOrDefault(vm => vm.Id == this.ToBookSelectorVM.SelectedItem.DebitBookId, 0);
                         }
-                        if (this.SelectedToBookVM.PayDay != null) {
-                            this.SelectedFromDate = this.SelectedFromDate.GetDateInMonth(this.SelectedToBookVM.PayDay.Value);
+                        if (this.ToBookSelectorVM.SelectedItem?.PayDay != null) {
+                            this.SelectedFromDate = this.SelectedFromDate.GetDateInMonth(this.ToBookSelectorVM.SelectedItem.PayDay.Value);
                         }
                     }
-                    this.IsLink = true;
-                    this.SelectedCommissionKind = CommissionKind.MoveFrom;
                 }
                 break;
             }
-        }
-
-        /// <summary>
-        /// 手数料項目リストを更新する
-        /// </summary>
-        /// <param name="selectingItemId">選択対象の項目</param>
-        /// <returns></returns>
-        private async Task UpdateItemListAsync(ItemIdObj selectingItemId = null)
-        {
-            if (this.SelectedFromBookVM == null || this.SelectedToBookVM == null) { return; }
-
-            using FuncLog funcLog = new(new { selectingItemId });
-
-            BookIdObj bookId = this.SelectedCommissionKind switch {
-                CommissionKind.MoveFrom => this.SelectedFromBookVM.Id,
-                CommissionKind.MoveTo => this.SelectedToBookVM.Id,
-                _ => throw new ArgumentException("SelectedComissionKind"),
-            };
-
-            ItemIdObj tmpItemId = selectingItemId ?? this.SelectedItemVM?.Id;
-
-            this.ItemVMList = [.. await this.mAppService.LoadItemListAsync(bookId, BalanceKind.Expenses, -1)];
-            this.SelectedItemVM = this.ItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0);
-        }
-
-        /// <summary>
-        /// 備考リストを更新する
-        /// </summary>
-        /// <param name="selectingRemark">選択対象の備考</param>
-        /// <returns></returns>
-        private async Task UpdateRemarkListAsync(string selectingRemark = null)
-        {
-            if (this.SelectedItemVM == null) { return; }
-
-            using FuncLog funcLog = new(new { selectingRemark });
-
-            string tmpRemark = selectingRemark ?? this.SelectedRemark;
-
-            this.RemarkVMList = [.. await this.mAppService.LoadRemarkListAsync(this.SelectedItemVM.Id, true)];
-            this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
-        }
-
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
-        {
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-
-            this.mAppService = new(this.mDbHandlerFactory);
-            this.mService = new(this.mDbHandlerFactory);
         }
 
         public override void AddEventHandlers()
         {
             using FuncLog funcLog = new();
 
-            this.FromBookChanged += async (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.FromBookChanged));
-
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    await this.UpdateItemListAsync();
-                }
-            };
-            this.ToBookChanged += async (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.ToBookChanged));
-
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    await this.UpdateItemListAsync();
-                }
-            };
-            this.CommissionKindChanged += async (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.CommissionKindChanged));
-
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    await this.UpdateItemListAsync();
-                }
-            };
-            this.ItemChanged += async (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.ItemChanged));
-
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    await this.UpdateRemarkListAsync();
-                }
-            };
+            this.FromBookSelectorVM.SelectionChanged += (sender, e) => this.FromBookChanged?.Invoke(sender, e);
+            this.FromBookSelectorVM.Children.Add(this.ItemSelectorVM);
+            this.ToBookSelectorVM.SelectionChanged += (sender, e) => this.ToBookChanged?.Invoke(sender, e);
+            this.ToBookSelectorVM.Children.Add(this.ItemSelectorVM);
+            this.CommissionKindSelectorVM.SelectionChanged += (sender, e) => this.CommissionKindChanged(sender, e);
+            this.CommissionKindSelectorVM.Children.Add(this.ItemSelectorVM);
+            this.ItemSelectorVM.SelectionChanged += (sender, e) => this.ItemChanged?.Invoke(sender, e);
+            this.ItemSelectorVM.Children.Add(this.RemarkSelectorVM);
         }
 
         /// <summary>
@@ -511,22 +389,22 @@ namespace HouseholdAccountBook.ViewModels.Windows
             ActionModel fromAction = new() {
                 Base = new(this.FromActionId, this.SelectedFromDate, (decimal)-this.InputedValue),
                 GroupId = this.GroupId,
-                Book = new(this.SelectedFromBookVM.Id, string.Empty)
+                Book = new(this.FromBookSelectorVM.SelectedKey, string.Empty)
             };
 
             ActionModel toAction = new() {
                 Base = new(this.ToActionId, this.SelectedToDate, (decimal)this.InputedValue),
                 GroupId = this.GroupId,
-                Book = new(this.SelectedToBookVM.Id, string.Empty)
+                Book = new(this.ToBookSelectorVM.SelectedKey, string.Empty)
             };
 
-            CommissionKind commissionKind = this.SelectedCommissionKind;
+            CommissionKind commissionKind = this.CommissionKindSelectorVM.SelectedKey;
             ActionModel commissionAction = new() {
                 Base = new(this.CommissionId, commissionKind switch { CommissionKind.MoveFrom => fromAction.ActTime, CommissionKind.MoveTo => toAction.ActTime, _ => DateTime.Now }, -this.InputedCommission ?? 0),
                 GroupId = this.GroupId,
                 Book = new(commissionKind switch { CommissionKind.MoveFrom => fromAction.Book.Id, CommissionKind.MoveTo => toAction.Book.Id, _ => -1 }, string.Empty),
-                Item = new(this.SelectedItemVM.Id, string.Empty),
-                Remark = this.SelectedRemark
+                Item = new(this.ItemSelectorVM.SelectedKey, string.Empty),
+                Remark = this.RemarkSelectorVM.SelectedKey
             };
 
             IEnumerable<ActionIdObj> resActionIdList = await this.mService.SaveMoveActionsAsync(fromAction, toAction, commissionAction);

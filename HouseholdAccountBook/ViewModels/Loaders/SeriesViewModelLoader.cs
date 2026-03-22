@@ -322,6 +322,5 @@ namespace HouseholdAccountBook.ViewModels.Loaders
 
             return vmList;
         }
-
     }
 }

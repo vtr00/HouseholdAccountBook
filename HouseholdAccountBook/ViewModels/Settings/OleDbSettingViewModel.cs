@@ -2,8 +2,8 @@
 using HouseholdAccountBook.Models.DbHandlers;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {
@@ -14,17 +14,9 @@ namespace HouseholdAccountBook.ViewModels.Settings
     {
         #region プロパティ
         /// <summary>
-        /// プロバイダ名
+        /// プロバイダ名セレクタVM
         /// </summary>
-        /// <remarks>動的に指定するため<see cref="ObservableCollection{T}"/>を用いる</remarks>
-        public ObservableCollection<KeyValuePair<string, string>> ProviderNameDic { get; } = [];
-        /// <summary>
-        /// 選択されたプロバイダ名
-        /// </summary>
-        public string SelectedProviderName {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public SelectorViewModel<KeyValuePair<string, string>, string> ProviderNameSelectorVM { get; } = new(static p => p.Key);
 
         /// <summary>
         /// 入力されたDBファイルパス
@@ -38,26 +30,25 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 設定を読み込む
         /// </summary>
-        public void Load()
+        public async Task LoadAsync()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            this.ProviderNameDic.Clear();
-            new List<KeyValuePair<string, string>>(OleDbHandler.GetOleDbProvider()).ForEach(this.ProviderNameDic.Add);
-            this.SelectedProviderName = settings.App_Access_Provider;
+            this.ProviderNameSelectorVM.SetLoader(static () => [.. OleDbHandler.GetOleDbProvider()]);
+            await this.ProviderNameSelectorVM.LoadAsync(settings.App_Access_Provider);
+
             this.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_Access_DBFilePath);
         }
 
         /// <summary>
         /// 記帳風月向け設定を読み込む
         /// </summary>
-        public void LoadForKichoFugetsu()
+        public async Task LoadForKichoFugetsuAsync()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            this.ProviderNameDic.Clear();
-            new List<KeyValuePair<string, string>>(OleDbHandler.GetOleDbProvider()).FindAll(static pair => pair.Key.Contains(OleDbHandler.ConnectInfo.AccessProviderHeader)).ForEach(this.ProviderNameDic.Add);
-            this.SelectedProviderName = settings.App_Import_KichoFugetsu_Provider;
+            this.ProviderNameSelectorVM.SetLoader(static () => new List<KeyValuePair<string, string>>(OleDbHandler.GetOleDbProvider()).FindAll(static pair => pair.Key.Contains(OleDbHandler.ConnectInfo.AccessProviderHeader)));
+            await this.ProviderNameSelectorVM.LoadAsync(settings.App_Import_KichoFugetsu_Provider);
         }
 
         /// <summary>
@@ -68,7 +59,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            settings.App_Access_Provider = this.SelectedProviderName;
+            settings.App_Access_Provider = this.ProviderNameSelectorVM.SelectedKey;
             settings.App_Access_DBFilePath = Path.GetFullPath(this.InputedDBFilePath, App.GetCurrentDir());
 
             return true;
@@ -82,7 +73,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            settings.App_Import_KichoFugetsu_Provider = this.SelectedProviderName;
+            settings.App_Import_KichoFugetsu_Provider = this.ProviderNameSelectorVM.SelectedKey;
 
             return true;
         }
@@ -91,6 +82,6 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 設定を保存可能か
         /// </summary>
         /// <returns>設定の保存可否</returns>
-        public bool CanSave() => !(string.IsNullOrWhiteSpace(this.SelectedProviderName) || string.IsNullOrWhiteSpace(this.InputedDBFilePath));
+        public bool CanSave() => !(string.IsNullOrWhiteSpace(this.ProviderNameSelectorVM.SelectedKey) || string.IsNullOrWhiteSpace(this.InputedDBFilePath));
     }
 }

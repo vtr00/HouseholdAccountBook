@@ -6,7 +6,7 @@ using System.Windows.Input;
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
-    /// コマンド
+    /// [同期] コマンド
     /// </summary>
     /// <param name="execute">コマンド実行デリゲート</param>
     /// <param name="canExecute">コマンド実行可否デリゲート</param>
@@ -48,7 +48,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
         public RelayCommand(Action execute, Func<bool> canExecute = null, [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : this(funcLog => execute(), canExecute, fileName, memberName)
+            : this(_ => execute(), canExecute, fileName, memberName)
         { }
         /// <summary>
         /// <see cref="RelayCommand"/> のインスタンスを生成します
@@ -57,7 +57,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
         public RelayCommand(Func<bool> canExecute = null, [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : this(static funcLog => { }, canExecute, fileName, memberName)
+            : this(static _ => { }, canExecute, fileName, memberName)
         { }
 
         public bool CanExecute(object parameter) => this.mCanExecute?.Invoke() ?? true;
@@ -113,7 +113,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
         public RelayCommand(Action<T> execute, Func<T, bool> canExecute = null, [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : this((parameter, funcLog) => execute(parameter), canExecute, fileName, memberName)
+            : this((parameter, _) => execute(parameter), canExecute, fileName, memberName)
         { }
         /// <summary>
         /// <see cref="RelayCommand"/> のインスタンスを生成します
@@ -122,7 +122,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
         public RelayCommand(Func<T, bool> canExecute, [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : this(static (parameter, funcLog) => { }, canExecute, fileName, memberName)
+            : this(static (parameter, _) => { }, canExecute, fileName, memberName)
         { }
 
         public bool CanExecute(object parameter) => this.mCanExecute?.Invoke((T)parameter) ?? true;
@@ -133,6 +133,6 @@ namespace HouseholdAccountBook.ViewModels
             this.mExecute?.Invoke((T)parameter, funcLog);
         }
 
-        public void RaiseCanExecuteChanged() => CommandManager.InvalidateRequerySuggested();
+        public static void RaiseCanExecuteChanged() => CommandManager.InvalidateRequerySuggested();
     }
 }

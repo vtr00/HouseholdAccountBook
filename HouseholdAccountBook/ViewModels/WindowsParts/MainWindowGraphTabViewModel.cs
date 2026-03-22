@@ -43,7 +43,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             get;
             set => this.SetProperty(ref field, value);
         }
-
         /// <summary>
         /// 選択されたグラフ系列VM
         /// </summary>
@@ -202,7 +201,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     MinorGridlineStyle = LineStyle.Dot,
                     StringFormat = "#,0",
                     Key = "Value",
-                    Title = GraphKind1Str[this.Parent.SelectedGraphKind1]
+                    Title = GraphKind1Str[this.Parent.GraphKind1SelectorVM.SelectedKey]
                 };
             }
 
@@ -249,7 +248,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
 
             SeriesViewModelLoader loader = new(new(this.mDbHandlerFactory));
-            switch (this.Parent.SelectedGraphKind1) {
+            switch (this.Parent.GraphKind1SelectorVM.SelectedKey) {
                 case GraphKind1.IncomeAndExpensesGraph: {
                     // グラフ表示データを取得する
                     async Task<ObservableCollection<SeriesViewModel>> GetSeriesVMList()
@@ -267,12 +266,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     }
                     ObservableCollection<SeriesViewModel> tmpVMList = await GetSeriesVMList();
                     // グラフ表示データを設定用に絞り込む
-                    switch (this.Parent.SelectedGraphKind2) {
+                    switch (this.Parent.GraphKind2SelectorVM.SelectedKey) {
                         case GraphKind2.CategoryGraph:
-                            tmpVMList = new(tmpVMList.Where(vm => (int)vm.Category.Id != -1 && (int)vm.Item.Id == -1));
+                            tmpVMList = [.. tmpVMList.Where(vm => (int)vm.Category.Id != -1 && (int)vm.Item.Id == -1)];
                             break;
                         case GraphKind2.ItemGraph:
-                            tmpVMList = new(tmpVMList.Where(vm => (int)vm.Item.Id != -1));
+                            tmpVMList = [.. tmpVMList.Where(vm => (int)vm.Item.Id != -1)];
                             break;
                     }
                     this.GraphSeriesVMList = tmpVMList;
@@ -379,7 +378,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public void UpdateSelectedGraph()
         {
             if (this.Parent.SelectedTab != this.Tab) { return; }
-            if (this.Parent.SelectedGraphKind1 != GraphKind1.IncomeAndExpensesGraph) { return; }
+            if (this.Parent.GraphKind1SelectorVM.SelectedKey != GraphKind1.IncomeAndExpensesGraph) { return; }
 
             using FuncLog funcLog = new();
 

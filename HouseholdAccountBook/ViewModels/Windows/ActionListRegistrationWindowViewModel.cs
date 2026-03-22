@@ -2,7 +2,6 @@
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities.Args;
-using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.UiDto;
@@ -35,11 +34,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿項目登録サービス
         /// </summary>
         private ActionRegService mService;
-
-        /// <summary>
-        /// 変更時処理重複防止用フラグ
-        /// </summary>
-        private bool mIsUpdateOnChanged;
         #endregion
 
         #region イベント
@@ -89,97 +83,24 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 帳簿VMリスト
+        /// 帳簿セレクタVM
         /// </summary>
-        public ObservableCollection<BookModel> BookVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        /// <summary>
-        /// 選択された帳簿VM
-        /// </summary>
-        public BookModel SelectedBookVM {
-            get;
-            set {
-                var oldVM = field;
-                if (this.SetProperty(ref field, value)) {
-                    if (!this.mIsUpdateOnChanged) {
-                        this.mIsUpdateOnChanged = true;
-                        this.BookChanged?.Invoke(this, new() { OldValue = oldVM?.Id, NewValue = value?.Id });
-                        this.mIsUpdateOnChanged = false;
-                    }
-                }
-            }
-        }
+        public SelectorViewModel<BookModel, BookIdObj> BookSelectorVM { get; } = new(static vm => vm?.Id);
 
         /// <summary>
-        /// 収支種別辞書
+        /// 収支種別セレクタVM
         /// </summary>
-        public Dictionary<BalanceKind, string> BalanceKindDic { get; } = BalanceKindStr;
-        /// <summary>
-        /// 選択された収支種別
-        /// </summary>
-        public BalanceKind SelectedBalanceKind {
-            get;
-            set {
-                var oldValue = field;
-                if (this.SetProperty(ref field, value)) {
-                    if (!this.mIsUpdateOnChanged) {
-                        this.mIsUpdateOnChanged = true;
-                        this.BalanceKindChanged?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
-                        this.mIsUpdateOnChanged = false;
-                    }
-                }
-            }
-        }
+        public SelectorViewModel<KeyValuePair<BalanceKind, string>, BalanceKind> BalanceKindSelectorVM { get; } = new(static p => p.Key);
 
         /// <summary>
-        /// 分類VMリスト
+        /// 分類セレクタVM
         /// </summary>
-        public ObservableCollection<CategoryModel> CategoryVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        /// <summary>
-        /// 選択された分類VM
-        /// </summary>
-        public CategoryModel SelectedCategoryVM {
-            get;
-            set {
-                var oldValue = field;
-                if (this.SetProperty(ref field, value)) {
-                    if (!this.mIsUpdateOnChanged) {
-                        this.mIsUpdateOnChanged = true;
-                        this.CategoryChanged?.Invoke(this, new() { OldValue = oldValue?.Id, NewValue = value?.Id });
-                        this.mIsUpdateOnChanged = false;
-                    }
-                }
-            }
-        }
+        public SelectorViewModel<CategoryModel, CategoryIdObj> CategorySelectorVM { get; } = new(static vm => vm?.Id);
 
         /// <summary>
-        /// 項目VMリスト
+        /// 項目セレクタVM
         /// </summary>
-        public ObservableCollection<ItemModel> ItemVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        /// <summary>
-        /// 選択された項目VM
-        /// </summary>
-        public ItemModel SelectedItemVM {
-            get;
-            set {
-                var oldValue = field;
-                if (this.SetProperty(ref field, value)) {
-                    if (!this.mIsUpdateOnChanged) {
-                        this.mIsUpdateOnChanged = true;
-                        this.ItemChanged?.Invoke(this, new() { OldValue = oldValue?.Id, NewValue = value?.Id });
-                        this.mIsUpdateOnChanged = false;
-                    }
-                }
-            }
-        }
+        public SelectorViewModel<ItemModel, ItemIdObj> ItemSelectorVM { get; } = new(static vm => vm?.Id);
 
         /// <summary>
         /// 入力された日付金額VMリスト
@@ -206,34 +127,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 店舗VMリスト
+        /// 店舗セレクタVM
         /// </summary>
-        public ObservableCollection<ShopModel> ShopVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        /// <summary>
-        /// 選択された店名
-        /// </summary>
-        public string SelectedShopName {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public SelectorViewModel<ShopModel, string> ShopSelectorVM { get; } = new(static vm => vm?.Name);
 
         /// <summary>
-        /// 備考VMリスト
+        /// 備考セレクタVM
         /// </summary>
-        public ObservableCollection<RemarkModel> RemarkVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        /// <summary>
-        /// 選択された備考
-        /// </summary>
-        public string SelectedRemark {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public SelectorViewModel<RemarkModel, string> RemarkSelectorVM { get; } = new(static vm => vm?.Remark);
 
         /// <summary>
         /// 数値入力ボタンの入力値
@@ -246,7 +147,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #endregion
 
         #region コマンドイベントハンドラ
-        protected override bool OKCommand_CanExecute() => this.SelectedItemVM != null && this.InputedDateValueVMList.Any(static vm => vm.ActValue is not null and not 0);
+        protected override bool OKCommand_CanExecute() => this.ItemSelectorVM.SelectedKey != null && this.InputedDateValueVMList.Any(static vm => vm.ActValue is not null and not 0);
         protected override async void OKCommand_Executed()
         {
             // DB登録
@@ -289,6 +190,44 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
         #endregion
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public ActionListRegistrationWindowViewModel()
+        {
+            using FuncLog funcLog = new();
+
+            this.BookSelectorVM.SetLoader(async () => await this.mAppService.LoadBookListAsync());
+            this.BalanceKindSelectorVM.SetLoader(() => BalanceKindStr);
+            this.CategorySelectorVM.SetLoader(
+                async () => await this.mAppService.LoadCategoryListAsync(this.BookSelectorVM.SelectedKey, this.BalanceKindSelectorVM.SelectedKey, Properties.Resources.ListName_NoSpecification),
+                () => this.BookSelectorVM.SelectedKey != null);
+            this.ItemSelectorVM.SetLoader(
+                async () => await this.mAppService.LoadItemListAsync(this.BookSelectorVM.SelectedKey, this.BalanceKindSelectorVM.SelectedKey, this.CategorySelectorVM.SelectedKey),
+                () => this.BookSelectorVM.SelectedKey != null && this.CategorySelectorVM.SelectedKey != null);
+            this.ShopSelectorVM.SetLoader(
+                async () => await this.mAppService.LoadShopListAsync(this.ItemSelectorVM.SelectedKey, true),
+                () => this.ItemSelectorVM.SelectedKey != null);
+            this.RemarkSelectorVM.SetLoader(
+                async () => await this.mAppService.LoadRemarkListAsync(this.ItemSelectorVM.SelectedKey, true),
+                () => this.ItemSelectorVM.SelectedKey != null);
+        }
+
+        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        {
+            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+
+            this.mAppService = new(this.mDbHandlerFactory);
+            this.mService = new(this.mDbHandlerFactory);
+
+            this.BookSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+            this.BalanceKindSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+            this.CategorySelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+            this.ItemSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+            this.ShopSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+            this.RemarkSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+        }
 
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null, null, null);
 
@@ -364,140 +303,26 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             // リストを更新する
-            await this.UpdateBookListAsync(selectingBookId);
-            this.SelectedBalanceKind = selectingBalanceKind;
-            await this.UpdateCategoryListAsync();
-            await this.UpdateItemListAsync(selectingItemId);
-            await this.UpdateShopListAsync(selectingShopName);
-            await this.UpdateRemarkListAsync(selectingRemark);
-        }
-
-        /// <summary>
-        /// 帳簿リストを更新する
-        /// </summary>
-        /// <param name="selectingBookId">選択対象の帳簿ID</param>
-        /// <returns></returns>
-        private async Task UpdateBookListAsync(BookIdObj selectingBookId = null)
-        {
-            using FuncLog funcLog = new(new { selectingBookId });
-
-            BookIdObj tmpBookId = selectingBookId ?? this.SelectedBookVM?.Id;
-
-            this.BookVMList = [.. await this.mAppService.LoadBookListAsync()];
-            this.SelectedBookVM = this.BookVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpBookId, 0);
-        }
-
-        /// <summary>
-        /// 分類リストを更新する
-        /// </summary>
-        /// <param name="selectingCategoryId">選択対象の分類ID</param>
-        /// <returns></returns>
-        private async Task UpdateCategoryListAsync(CategoryIdObj selectingCategoryId = null)
-        {
-            if (this.SelectedBookVM == null) { return; }
-
-            using FuncLog funcLog = new(new { selectingCategoryId });
-
-            CategoryIdObj tmpCategoryId = selectingCategoryId ?? this.SelectedCategoryVM?.Id;
-
-            this.CategoryVMList = [.. await this.mAppService.LoadCategoryListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, Properties.Resources.ListName_NoSpecification)];
-            this.SelectedCategoryVM = this.CategoryVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpCategoryId, 0);
-        }
-
-        /// <summary>
-        /// 項目リストを更新する
-        /// </summary>
-        /// <param name="selectingItemId">選択対象の項目ID</param>
-        /// <returns></returns>
-        private async Task UpdateItemListAsync(ItemIdObj selectingItemId = null)
-        {
-            if (this.SelectedBookVM == null || this.SelectedCategoryVM == null) { return; }
-
-            using FuncLog funcLog = new(new { selectingItemId });
-
-            ItemIdObj tmpItemId = selectingItemId ?? this.SelectedItemVM?.Id;
-
-            this.ItemVMList = [.. await this.mAppService.LoadItemListAsync(this.SelectedBookVM.Id, this.SelectedBalanceKind, this.SelectedCategoryVM.Id)];
-            this.SelectedItemVM = this.ItemVMList.FirstOrElementAtOrDefault(vm => vm.Id == tmpItemId, 0);
-        }
-
-        /// <summary>
-        /// 店舗リストを更新する
-        /// </summary>
-        /// <param name="selectingShopName">選択対象の店舗名</param>
-        /// <returns></returns>
-        private async Task UpdateShopListAsync(string selectingShopName = null)
-        {
-            if (this.SelectedItemVM == null) { return; }
-
-            using FuncLog funcLog = new(new { selectingShopName });
-
-            string tmpShopName = selectingShopName ?? this.SelectedShopName;
-
-            this.ShopVMList = [.. await this.mAppService.LoadShopListAsync(this.SelectedItemVM.Id, true)];
-            this.SelectedShopName = this.ShopVMList.FirstOrElementAtOrDefault(vm => vm.Name == tmpShopName, 0).Name;
-        }
-
-        /// <summary>
-        /// 備考リストを更新する
-        /// </summary>
-        /// <param name="selectingRemark">選択対象の備考</param>
-        /// <returns></returns>
-        private async Task UpdateRemarkListAsync(string selectingRemark = null)
-        {
-            if (this.SelectedItemVM == null) { return; }
-
-            using FuncLog funcLog = new(new { selectingRemark });
-
-            string tmpRemark = selectingRemark ?? this.SelectedRemark;
-
-            this.RemarkVMList = [.. await this.mAppService.LoadRemarkListAsync(this.SelectedItemVM.Id, true)];
-            this.SelectedRemark = this.RemarkVMList.FirstOrElementAtOrDefault(vm => vm.Remark == tmpRemark, 0).Remark;
-        }
-
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
-        {
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-
-            this.mAppService = new(this.mDbHandlerFactory);
-            this.mService = new(this.mDbHandlerFactory);
+            await this.BookSelectorVM.LoadAsync(selectingBookId);
+            await this.BalanceKindSelectorVM.LoadAsync(selectingBalanceKind);
+            await this.CategorySelectorVM.LoadAsync();
+            await this.ItemSelectorVM.LoadAsync(selectingItemId);
+            await this.ShopSelectorVM.LoadAsync(selectingShopName);
+            await this.RemarkSelectorVM.LoadAsync(selectingRemark);
         }
 
         public override void AddEventHandlers()
         {
             using FuncLog funcLog = new();
 
-            this.BookChanged += async (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.BookChanged));
-
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    await this.UpdateCategoryListAsync();
-                    await this.UpdateItemListAsync();
-                }
-            };
-            this.BalanceKindChanged += async (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.BalanceKindChanged));
-
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    await this.UpdateCategoryListAsync();
-                    await this.UpdateItemListAsync();
-                }
-            };
-            this.CategoryChanged += async (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.CategoryChanged));
-
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    await this.UpdateItemListAsync();
-                }
-            };
-            this.ItemChanged += async (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.ItemChanged));
-
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    await this.UpdateShopListAsync();
-                    await this.UpdateRemarkListAsync();
-                }
-            };
+            this.BookSelectorVM.SelectionChanged += (sender, e) => this.BookChanged?.Invoke(sender, e);
+            this.BookSelectorVM.Children.Add(this.CategorySelectorVM);
+            this.BalanceKindSelectorVM.SelectionChanged += (sender, e) => this.BalanceKindChanged?.Invoke(sender, e);
+            this.BalanceKindSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
+            this.CategorySelectorVM.SelectionChanged += (sender, e) => this.CategoryChanged?.Invoke(sender, e);
+            this.CategorySelectorVM.Children.Add(this.ItemSelectorVM);
+            this.ItemSelectorVM.SelectionChanged += (sender, e) => this.ItemChanged?.Invoke(sender, e);
+            this.ItemSelectorVM.Children.AddRange([this.ShopSelectorVM, this.RemarkSelectorVM]);
         }
 
         /// <summary>
@@ -509,14 +334,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             List<ActionModel> actionList = [];
-            BalanceKind balanceKind = this.SelectedBalanceKind; // 収支種別
+            BalanceKind balanceKind = this.BalanceKindSelectorVM.SelectedKey;
             ActionModel commonAction = new() {
                 Base = new(null, DateTime.Now, 0),
                 GroupId = this.GroupId,
-                Book = new(this.SelectedBookVM.Id, string.Empty),
-                Item = new(this.SelectedItemVM.Id, string.Empty),
-                Shop = this.SelectedShopName,
-                Remark = this.SelectedRemark
+                Book = new(this.BookSelectorVM.SelectedKey, string.Empty),
+                Item = new(this.ItemSelectorVM.SelectedKey, string.Empty),
+                Shop = this.ShopSelectorVM.SelectedKey,
+                Remark = this.RemarkSelectorVM.SelectedKey
             };
             foreach (DateValueViewModel vm in this.InputedDateValueVMList) {
                 if (vm.ActValue is null or 0) { continue; }
@@ -529,15 +354,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             DateTime lastActTime = this.InputedDateValueVMList.Max(tmp => tmp.ActDate);
 
-            string shopName = this.SelectedShopName;            // 店舗名
-            if (shopName != null && shopName != string.Empty) {
-                ShopModel shop = new(shopName) { ItemId = this.SelectedItemVM.Id, UsedTime = lastActTime };
+            if (commonAction.Shop != null && commonAction.Shop != string.Empty) {
+                ShopModel shop = new(commonAction.Shop) { ItemId = commonAction.Item.Id, UsedTime = commonAction.ActTime };
                 await this.mService.SaveShopAsync(shop);
             }
 
-            string remarkText = this.SelectedRemark;            // 備考
-            if (remarkText != null && remarkText != string.Empty) {
-                RemarkModel remark = new(remarkText) { ItemId = this.SelectedItemVM.Id, UsedTime = lastActTime };
+            if (commonAction.Remark != null && commonAction.Remark != string.Empty) {
+                RemarkModel remark = new(commonAction.Remark) { ItemId = commonAction.Item.Id, UsedTime = commonAction.ActTime };
                 await this.mService.SaveRemarkAsync(remark);
             }
 

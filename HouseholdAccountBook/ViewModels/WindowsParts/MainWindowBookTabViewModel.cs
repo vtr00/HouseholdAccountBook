@@ -681,7 +681,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="isScroll">帳簿項目一覧をスクロールするか</param>
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
         public async Task LoadAsync(IEnumerable<ActionIdObj> actionIdList = null, BalanceKind? balanceKind = null, CategoryIdObj categoryId = null, ItemIdObj itemId = null,
-                                      bool isScroll = false, bool isUpdateActDateLastEdited = false)
+                                    bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
             if (this.Parent.SelectedTab != Tabs.BooksTab) { return; }
 

@@ -128,10 +128,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     await this.BookTabVM.LoadAsync();
                     break;
                 case SettingsTabs.DbSettingsTab:
-                    this.DbTabVM.Load();
+                    await this.DbTabVM.LoadAsync();
                     break;
                 case SettingsTabs.OtherSettingsTab:
-                    this.OtherTabVM.Load();
+                    await this.OtherTabVM.LoadAsync();
                     break;
             }
         }
