@@ -27,7 +27,7 @@ namespace HouseholdAccountBook.Infrastructure.CSV
         /// <returns>読込結果</returns>
         public static async Task<IEnumerable<CsvComparisonViewModel>> LoadCsvCompListAsync(IEnumerable<string> csvFilePathList, int actDateIndex, int itemNameIndex, int expensesIndex, Encoding encoding)
         {
-            using FuncLog funcLog = new(new { csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, encoding });
+            using FuncLog funcLog = new(new { csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, encoding.EncodingName });
 
             CsvConfiguration csvConfig = new(CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,
