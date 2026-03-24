@@ -45,6 +45,10 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// 支出
         /// </summary>
         public decimal? Expenses => this.ActionWithBalance.Action.Expenses;
+        /// <summary>
+        /// 残高
+        /// </summary>
+        public decimal? Balance => this.ActionWithBalance.Balance;
 
         /// <summary>
         /// 帳簿名

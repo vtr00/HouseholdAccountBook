@@ -1,6 +1,4 @@
-﻿using HouseholdAccountBook.Models.ValueObjects;
-using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace HouseholdAccountBook.Models.UiDto
 {
