@@ -128,7 +128,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public SelectorViewModel<ItemModel, ItemIdObj> ItemSelectorVM { get; } = new(static vm => vm?.Id);
 
         /// <summary>
-        /// 金額
+        /// 入力された金額
         /// </summary>
         public decimal? InputedValue {
             get;
@@ -170,16 +170,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 休日設定種別辞書
+        /// 休日設定セレクタVM
         /// </summary>
-        public Dictionary<HolidaySettingKind, string> HolidaySettingKindDic { get; } = HolidaySettingKindStr;
-        /// <summary>
-        /// 選択された休日設定種別
-        /// </summary>
-        public HolidaySettingKind SelectedHolidaySettingKind {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = HolidaySettingKind.Nothing;
+        public SelectorViewModel<KeyValuePair<HolidaySettingKind, string>, HolidaySettingKind> HolidaySettingSelectorVM { get; } = new(static p => p.Key);
 
         /// <summary>
         /// 選択された一致フラグ
@@ -197,7 +190,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 続けて入力コマンド
         /// </summary>
-        public ICommand ContinueToOKCommand => new RelayCommand(this.ContinueToOKCommand_Executed, this.ContinueToOKCommand_CanExecute);
+        public ICommand ContinueToOKCommand => new AsyncRelayCommand(this.ContinueToOKCommand_ExecuteAsync, this.ContinueToOKCommand_CanExecute);
+        /// <summary>
+        /// OKコマンド
+        /// </summary>
+        public new ICommand OKCommand => new AsyncRelayCommand(this.OKCommand_ExecuteAsync, this.OKCommand_CanExecute);
         #endregion
         #endregion
 
@@ -211,7 +208,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 続けて入力コマンド処理
         /// </summary>
-        protected async void ContinueToOKCommand_Executed()
+        protected async Task ContinueToOKCommand_ExecuteAsync()
         {
             // DB登録
             ActionIdObj id = null;
@@ -229,7 +226,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         protected override bool OKCommand_CanExecute() => this.ItemSelectorVM.SelectedKey != null && this.InputedValue.HasValue && 0 < this.InputedValue;
-        protected override async void OKCommand_Executed()
+        protected async Task OKCommand_ExecuteAsync()
         {
             // DB登録
             ActionIdObj id = null;
@@ -241,7 +238,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             IEnumerable<ActionIdObj> value = id != null ? [id.Value] : [];
             this.Registrated?.Invoke(this, new EventArgs<IEnumerable<ActionIdObj>>(value));
 
-            base.OKCommand_Executed();
+            base.OKCommand_Execute();
         }
         #endregion
 
@@ -294,6 +291,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.RemarkSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadRemarkListAsync(this.ItemSelectorVM.SelectedKey, true),
                 () => this.ItemSelectorVM.SelectedKey != null);
+            this.HolidaySettingSelectorVM.SetLoader(() => HolidaySettingKindStr);
         }
 
         public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
@@ -309,6 +307,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.ItemSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
             this.ShopSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
             this.RemarkSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+            this.HolidaySettingSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null, null, null);
@@ -379,6 +378,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.ItemSelectorVM.LoadAsync(selectingItemId);
             await this.ShopSelectorVM.LoadAsync(selectingShopName);
             await this.RemarkSelectorVM.LoadAsync(selectingRemark);
+            await this.HolidaySettingSelectorVM.LoadAsync(HolidaySettingKind.Nothing);
         }
 
         public override void AddEventHandlers()
@@ -414,7 +414,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 IsMatch = this.SelectedIfMatch
             };
 
-            ActionIdObj resActionId = await this.mService.SaveActionAsync(action, this.InputedCount, this.SelectedIfLink, this.SelectedHolidaySettingKind);
+            ActionIdObj resActionId = await this.mService.SaveActionAsync(action, this.InputedCount, this.SelectedIfLink, this.HolidaySettingSelectorVM.SelectedKey);
 
             if (action.Shop != null && action.Shop != string.Empty) {
                 ShopModel shop = new(action.Shop) { ItemId = action.Item.Id, UsedTime = action.ActTime };

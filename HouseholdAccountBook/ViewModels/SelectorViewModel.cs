@@ -31,9 +31,8 @@ namespace HouseholdAccountBook.ViewModels
     /// </summary>
     /// <typeparam name="VM">VM</typeparam>
     /// <typeparam name="KEY">VMを特定するキー(IDなど)</typeparam>
-    public class SelectorViewModel<VM, KEY> : BindableBase, ILoadableAsync
+    public class SelectorViewModel<VM, KEY> : BindableBase, ILoadableAsync, IDisposable
     {
-
         #region フィールド
         /// <summary>
         /// <see cref="VM"/> から <see cref="KEY"/> への変換処理
@@ -159,6 +158,18 @@ namespace HouseholdAccountBook.ViewModels
             this.mMemberName = memberName;
         }
 
+        ~SelectorViewModel()
+        {
+            this.Dispose();
+        }
+
+        public void Dispose()
+        {
+            this.mSelectionCts?.Cancel();
+            this.mSelectionCts?.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
         /// <summary>
         /// <see cref="VM"> リスト読込処理を設定する
         /// </summary>
@@ -206,6 +217,12 @@ namespace HouseholdAccountBook.ViewModels
         }
 
         /// <summary>
+        /// 読込み可能か
+        /// </summary>
+        /// <returns></returns>
+        private bool CanLoad() => this.mCanLoad?.Invoke() ?? true;
+
+        /// <summary>
         /// [非同期] <see cref="VM"/> リストを読込む
         /// </summary>
         /// <param name="token">キャンセル用トークン</param>
@@ -238,7 +255,8 @@ namespace HouseholdAccountBook.ViewModels
             if (this.mLoad is null && this.mLoadAsync is null) { throw new InvalidOperationException(); }
             if (this.mLoad is not null && this.mLoadAsync is not null) { throw new InvalidOperationException(); }
 
-            if (!(this.mCanLoad?.Invoke() ?? true)) {
+            if (!this.CanLoad()) {
+                Log.Debug($"{nameof(this.CanLoad)} is false");
                 return;
             }
 
@@ -287,6 +305,12 @@ namespace HouseholdAccountBook.ViewModels
                     }
                 }
             }
+            catch (OperationCanceledException) {
+                Log.Debug($"{this.mMemberName}.{nameof(LoadAsync)} Canceled.");
+                if (token != default) {
+                    throw;
+                }
+            }
             finally {
                 this.mOnLoad = false;
             }
@@ -297,6 +321,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="oldVM">前回の選択 <see cref="VM"/></param>
         /// <param name="newVM">今回の選択 <see cref="VM"/></param>
+        /// <param name="token">キャンセル用トークン</param>
         protected async Task OnSelectionChangedAsync(KEY? oldKey, KEY? newKey, CancellationToken token = default)
         {
             ChangedEventArgs<KEY> args = new() { OldValue = oldKey, NewValue = newKey };
@@ -304,24 +329,31 @@ namespace HouseholdAccountBook.ViewModels
 
             using WaitCursorManager? wcm = this.WaitCursorManagerFactory?.Create(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(OnSelectionChangedAsync)}");
 
-            if (token == default) {
+            CancellationToken tmpToken = token;
+            if (tmpToken == default) {
                 this.mSelectionCts?.Cancel();
                 this.mSelectionCts?.Dispose();
                 this.mSelectionCts = new();
-                token = this.mSelectionCts.Token;
+                tmpToken = this.mSelectionCts.Token;
             }
 
             this.SelectionChanged?.Invoke(this, args);
 
             try {
                 Task[] tasks = [.. this.Children.Select(async c => {
-                    token.ThrowIfCancellationRequested();
-                    await c.LoadAsync(token);
-                    token.ThrowIfCancellationRequested();
+                    tmpToken.ThrowIfCancellationRequested();
+                    await c.LoadAsync(tmpToken);
+                    tmpToken.ThrowIfCancellationRequested();
                 })];
                 await Task.WhenAll(tasks);
             }
-            catch (OperationCanceledException) { }
+            catch (OperationCanceledException) {
+                Log.Debug($"{this.mMemberName}.{nameof(OnSelectionChangedAsync)} Canceled.");
+                // キャンセル用トークンが引数で与えられていた場合は再スロー
+                if (token != default) {
+                    throw;
+                }
+            }
         }
     }
 

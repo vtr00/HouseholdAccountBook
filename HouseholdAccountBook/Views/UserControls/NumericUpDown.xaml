@@ -18,11 +18,11 @@
 
     <UserControl.CommandBindings>
         <CommandBinding Command="{StaticResource IncreaseCommand}" 
-                        CanExecute="IncreaseCommand_CanExecute" Executed="IncreaseCommand_Executed"/>
+                        CanExecute="IncreaseCommand_CanExecute" Executed="IncreaseCommand_Execute"/>
         <CommandBinding Command="{StaticResource DecreaseCommand}" 
-                        CanExecute="DecreaseCommand_CanExecute" Executed="DecreaseCommand_Executed"/>
+                        CanExecute="DecreaseCommand_CanExecute" Executed="DecreaseCommand_Execute"/>
         <CommandBinding Command="{StaticResource ButtonInputCommand}" 
-                        Executed="ButtonInputCommand_Executed"/>
+                        Executed="ButtonInputCommand_Execute"/>
     </UserControl.CommandBindings>
 
     <!-- UserControl.DataContextは外部から設定される -->

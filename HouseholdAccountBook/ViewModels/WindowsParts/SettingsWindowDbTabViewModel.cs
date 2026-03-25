@@ -113,19 +113,19 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// ファイル選択コマンド
         /// </summary>
-        public override ICommand SelectFilePathCommand => new RelayCommand<FilePathKind>(this.SelectFilePathCommand_Executed);
+        public override ICommand SelectFilePathCommand => new RelayCommand<FilePathKind>(this.SelectFilePathCommand_Execute);
         /// <summary>
         /// データベース再設定コマンド
         /// </summary>
-        public ICommand RestartForDbSettingCommand => new RelayCommand(this.RestartForDbSettingCommand_Executed);
+        public ICommand RestartForDbSettingCommand => new RelayCommand(this.RestartForDbSettingCommand_Execute);
         /// <summary>
         /// フォルダ選択コマンド
         /// </summary>
-        public override ICommand SelectFolderPathCommand => new RelayCommand<FolderPathKind>(this.SelectFolderPathCommand_Executed);
+        public override ICommand SelectFolderPathCommand => new RelayCommand<FolderPathKind>(this.SelectFolderPathCommand_Execute);
         /// <summary>
         /// DB設定保存コマンド
         /// </summary>
-        public ICommand SaveDbSettingsCommand => new RelayCommand(this.SaveDbSettingsCommand_Executed);
+        public ICommand SaveDbSettingsCommand => new RelayCommand(this.SaveDbSettingsCommand_Execute);
         #endregion
         #endregion
 
@@ -134,7 +134,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// ファイル選択コマンド処理
         /// </summary>
         /// <param name="kind">ファイルパス種別</param>
-        private void SelectFilePathCommand_Executed(FilePathKind kind)
+        private void SelectFilePathCommand_Execute(FilePathKind kind)
         {
             bool checkFileExists = true;
             string directory = string.Empty;
@@ -185,7 +185,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// データベース設定コマンド処理
         /// </summary>
-        private void RestartForDbSettingCommand_Executed()
+        private void RestartForDbSettingCommand_Execute()
         {
             if (MessageBox.Show(Properties.Resources.Message_RestartNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
@@ -199,7 +199,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// フォルダ選択コマンド処理
         /// </summary>
-        private void SelectFolderPathCommand_Executed(FolderPathKind kind)
+        private void SelectFolderPathCommand_Execute(FolderPathKind kind)
         {
             string folderFullPath = string.Empty;
             string title = string.Empty;
@@ -236,7 +236,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// DB設定保存コマンド処理
         /// </summary>
-        private void SaveDbSettingsCommand_Executed()
+        private void SaveDbSettingsCommand_Execute()
         {
             this.Save();
             this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);

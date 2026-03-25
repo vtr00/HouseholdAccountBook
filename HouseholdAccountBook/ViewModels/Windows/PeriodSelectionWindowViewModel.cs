@@ -65,11 +65,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 今月コマンド
         /// </summary>
-        public ICommand ThisMonthCommand => new RelayCommand(this.ThisMonthCommand_Executed);
+        public ICommand ThisMonthCommand => new RelayCommand(this.ThisMonthCommand_Execute);
         /// <summary>
         /// 全期間コマンド
         /// </summary>
-        public ICommand AllPeriodCommand => new RelayCommand(this.AllPeriodCommand_Executed);
+        public ICommand AllPeriodCommand => new AsyncRelayCommand(this.AllPeriodCommand_ExecuteAsync);
         #endregion
         #endregion
 
@@ -77,12 +77,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 今月コマンド処理
         /// </summary>
-        void ThisMonthCommand_Executed() => this.SelectedPeriod = new PeriodObj<DateOnly>(DateOnlyExtensions.Today.GetFirstDateOfMonth(), DateOnlyExtensions.Today.GetLastDateOfMonth());
+        void ThisMonthCommand_Execute() => this.SelectedPeriod = new PeriodObj<DateOnly>(DateOnlyExtensions.Today.GetFirstDateOfMonth(), DateOnlyExtensions.Today.GetLastDateOfMonth());
 
         /// <summary>
         /// 全期間コマンド処理
         /// </summary>
-        async void AllPeriodCommand_Executed() => this.SelectedPeriod = await this.LoadFirstLastDate();
+        async Task AllPeriodCommand_ExecuteAsync() => this.SelectedPeriod = await this.LoadFirstLastDate();
         #endregion
 
         #region ウィンドウ設定プロパティ

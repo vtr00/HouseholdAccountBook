@@ -59,31 +59,31 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿追加コマンド
         /// </summary>
-        public ICommand AddBookCommand => new RelayCommand(this.AddBookCommand_Executed);
+        public ICommand AddBookCommand => new AsyncRelayCommand(this.AddBookCommand_ExecuteAsync);
         /// <summary>
         /// 帳簿削除コマンド
         /// </summary>
-        public ICommand DeleteBookCommand => new RelayCommand(this.DeleteBookCommand_Executed, this.DeleteBookCommand_CanExecute);
+        public ICommand DeleteBookCommand => new AsyncRelayCommand(this.DeleteBookCommand_ExecuteAsync, this.DeleteBookCommand_CanExecute);
         /// <summary>
         /// 帳簿表示順上昇コマンド
         /// </summary>
-        public ICommand RaiseBookSortOrderCommand => new RelayCommand(this.RaiseBookSortOrderCommand_Executed, this.RaiseBookSortOrderCommand_CanExecute);
+        public ICommand RaiseBookSortOrderCommand => new AsyncRelayCommand(this.RaiseBookSortOrderCommand_ExecuteAsync, this.RaiseBookSortOrderCommand_CanExecute);
         /// <summary>
         /// 帳簿表示順下降コマンド
         /// </summary>
-        public ICommand DropBookSortOrderCommand => new RelayCommand(this.DropBookSortOrderCommand_Executed, this.DropBookSortOrderCommand_CanExecute);
+        public ICommand DropBookSortOrderCommand => new AsyncRelayCommand(this.DropBookSortOrderCommand_ExecuteAsync, this.DropBookSortOrderCommand_CanExecute);
         /// <summary>
         /// 帳簿情報保存コマンド
         /// </summary>
-        public ICommand SaveBookInfoCommand => new RelayCommand(this.SaveBookInfoCommand_Executed, this.SaveBookInfoCommand_CanExecute);
+        public ICommand SaveBookInfoCommand => new AsyncRelayCommand(this.SaveBookInfoCommand_ExecuteAsync, this.SaveBookInfoCommand_CanExecute);
         /// <summary>
         /// フォルダパス選択コマンド
         /// </summary>
-        public override ICommand SelectFolderPathCommand => new RelayCommand<FolderPathKind>(this.SelectFolderPathCommand_Executed);
+        public override ICommand SelectFolderPathCommand => new RelayCommand<FolderPathKind>(this.SelectFolderPathCommand_Execute);
         /// <summary>
         /// 帳簿-項目関係変更コマンド
         /// </summary>
-        public ICommand ChangeBookRelationCommand => new RelayCommand<object>(this.ChangeBookRelationCommand_Executed);
+        public ICommand ChangeBookRelationCommand => new AsyncRelayCommand<object>(this.ChangeBookRelationCommand_ExecuteAsync);
         #endregion
         #endregion
 
@@ -91,7 +91,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿追加コマンド処理
         /// </summary>
-        private async void AddBookCommand_Executed()
+        private async Task AddBookCommand_ExecuteAsync()
         {
             using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
@@ -110,7 +110,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿削除コマンド処理
         /// </summary>
-        private async void DeleteBookCommand_Executed()
+        private async Task DeleteBookCommand_ExecuteAsync()
         {
             using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
@@ -132,7 +132,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿表示順上昇コマンド処理
         /// </summary>
-        private async void RaiseBookSortOrderCommand_Executed()
+        private async Task RaiseBookSortOrderCommand_ExecuteAsync()
         {
             using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
@@ -160,7 +160,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿表示順下降コマンド処理
         /// </summary>
-        private async void DropBookSortOrderCommand_Executed()
+        private async Task DropBookSortOrderCommand_ExecuteAsync()
         {
             using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
@@ -183,7 +183,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿情報保存コマンド処理
         /// </summary>
-        private async void SaveBookInfoCommand_Executed()
+        private async Task SaveBookInfoCommand_ExecuteAsync()
         {
             using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
@@ -213,7 +213,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// フォルダパス選択コマンド処理
         /// </summary>
-        private void SelectFolderPathCommand_Executed(FolderPathKind kind)
+        private void SelectFolderPathCommand_Execute(FolderPathKind kind)
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -253,7 +253,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 帳簿-項目関係変更コマンド処理
         /// </summary>
         /// <param name="viewModel">チェックされた対象の<see cref="RelationModel"/></param>
-        private async void ChangeBookRelationCommand_Executed(object viewModel)
+        private async Task ChangeBookRelationCommand_ExecuteAsync(object viewModel)
         {
             using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 

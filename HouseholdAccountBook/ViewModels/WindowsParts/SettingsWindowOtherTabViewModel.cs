@@ -8,7 +8,6 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using static HouseholdAccountBook.ViewModels.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
 {
@@ -129,19 +128,19 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 言語設定適用コマンド
         /// </summary>
-        public ICommand RestartForLanguageCommand => new RelayCommand(this.RestartForLanguageCommand_Executed);
+        public ICommand RestartForLanguageCommand => new RelayCommand(this.RestartForLanguageCommand_Execute);
         /// <summary>
         /// ウィンドウ設定再読込コマンド
         /// </summary>
-        public ICommand ReloadWindowSettingCommand => new RelayCommand(this.ReloadWindowSettingCommand_Executed);
+        public ICommand ReloadWindowSettingCommand => new RelayCommand(this.ReloadWindowSettingCommand_Execute);
         /// <summary>
         /// ウィンドウ設定初期化コマンド
         /// </summary>
-        public ICommand InitializeWindowSettingCommand => new RelayCommand(this.InitializeWindowSettingCommand_Executed);
+        public ICommand InitializeWindowSettingCommand => new RelayCommand(this.InitializeWindowSettingCommand_Execute);
         /// <summary>
         /// その他設定保存コマンド
         /// </summary>
-        public ICommand SaveOtherSettingsCommand => new RelayCommand(this.SaveOtherSettingsCommand_Executed);
+        public ICommand SaveOtherSettingsCommand => new RelayCommand(this.SaveOtherSettingsCommand_Execute);
         #endregion
         #endregion
 
@@ -149,7 +148,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 言語設定適用コマンド処理
         /// </summary>
-        private void RestartForLanguageCommand_Executed()
+        private void RestartForLanguageCommand_Execute()
         {
             if (MessageBox.Show(Properties.Resources.Message_RestartNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
@@ -163,12 +162,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// ウィンドウ設定再読込コマンド処理
         /// </summary>
-        private void ReloadWindowSettingCommand_Executed() => this.WindowSettingVMList = LoadWindowSettings();
+        private void ReloadWindowSettingCommand_Execute() => this.WindowSettingVMList = LoadWindowSettings();
 
         /// <summary>
         /// ウィンドウ設定初期化コマンド処理
         /// </summary>
-        private void InitializeWindowSettingCommand_Executed()
+        private void InitializeWindowSettingCommand_Execute()
         {
             if (MessageBox.Show(Properties.Resources.Message_RestartNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
@@ -238,7 +237,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// その他設定保存コマンド処理
         /// </summary>
-        private void SaveOtherSettingsCommand_Executed()
+        private void SaveOtherSettingsCommand_Execute()
         {
             this.Save();
             this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
@@ -249,10 +248,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using FuncLog funcLog = new();
 
-            this.CultureNameSelectorVM.SetLoader(static () => CultureNameStr);
+            this.CultureNameSelectorVM.SetLoader(static () => UiConstants.CultureNameStr);
             this.NationalHolidayTextEncodingSelectorVM.SetLoader(static () => EncodingUtil.GetTextEncodingList());
             this.LogLevelSelectorVM.SetLoader(static () => {
-                Dictionary<Log.LogLevel, string> dic = LogLevelStr;
+                Dictionary<Log.LogLevel, string> dic = UiConstants.LogLevelStr;
 #if !DEBUG
                 _ = dic.Remove(Log.LogLevel.Trace);
 #endif

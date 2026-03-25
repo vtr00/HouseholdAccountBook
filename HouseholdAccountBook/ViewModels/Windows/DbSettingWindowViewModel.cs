@@ -60,7 +60,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public SQLiteSettingViewModel SQLiteSettingVM { get; init; } = new();
 
         #region コマンド
-        public override ICommand SelectFilePathCommand => new RelayCommand<FilePathKind>(this.SelectFilePathCommand_Executed);
+        public override ICommand SelectFilePathCommand => new RelayCommand<FilePathKind>(this.SelectFilePathCommand_Execute);
         #endregion
         #endregion
 
@@ -69,7 +69,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// ファイル選択コマンド処理
         /// </summary>
         /// <param name="kind">ファイルパス種別</param>
-        public void SelectFilePathCommand_Executed(FilePathKind kind)
+        public void SelectFilePathCommand_Execute(FilePathKind kind)
         {
             bool checkFileExists = true;
             string directory = string.Empty;
@@ -168,12 +168,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
             return canExecute;
         }
 
-        protected override void OKCommand_Executed()
+        protected override void OKCommand_Execute()
         {
             bool result = this.Save();
 
             if (result) {
-                base.OKCommand_Executed();
+                base.OKCommand_Execute();
             }
         }
         #endregion
