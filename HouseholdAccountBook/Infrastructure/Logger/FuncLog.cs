@@ -24,7 +24,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <summary>
         /// 呼び出し元関数名
         /// </summary>
-        private readonly string mEthodName;
+        private readonly string mMethodName;
         /// <summary>
         /// 呼び出し元行数
         /// </summary>
@@ -51,17 +51,17 @@ namespace HouseholdAccountBook.Infrastructure.Logger
             this.mId = Guid.NewGuid().ToString("N")[..8];
             this.mLevel = level;
             this.mFileName = fileName;
-            this.mEthodName = methodName;
+            this.mMethodName = methodName;
             this.mLineNumber = lineNumber;
 
             // コンストラクタで関数開始ログを出力
-            Log.Vars($"func({this.mId}) start", args, this.mLevel, this.mFileName, this.mEthodName, this.mLineNumber);
+            Log.Vars($"func({this.mId}) start", args, this.mLevel, this.mFileName, this.mMethodName, this.mLineNumber);
         }
 
         public void Dispose()
         {
             // 破棄時に関数終了ログを出力
-            Log.Vars($"func({this.mId}) end", this.Returns, this.mLevel, this.mFileName, this.mEthodName, -(ushort)(Math.Log10(this.mLineNumber) + 1));
+            Log.Vars($"func({this.mId}) end", this.Returns, this.mLevel, this.mFileName, this.mMethodName, -(ushort)(Math.Log10(this.mLineNumber) + 1));
             GC.SuppressFinalize(this);
         }
     }

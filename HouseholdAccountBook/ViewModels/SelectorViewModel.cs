@@ -148,8 +148,6 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="memberName">出力元関数名</param>
         public SelectorViewModel(Func<VM?, KEY?> selector, bool itemChangedIfNull = false, [CallerFilePath] string? fileName = null, [CallerMemberName] string memberName = "")
         {
-            using FuncLog funcLog = new(new { itemChangedIfNull, fileName, memberName });
-
             ArgumentNullException.ThrowIfNull(selector);
 
             this.mSelector = selector;
@@ -252,6 +250,7 @@ namespace HouseholdAccountBook.ViewModels
         public async Task LoadAsync(KEY? selection, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault, CancellationToken token = default)
         {
             using FuncLog funcLog = new(new { selection }, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(LoadAsync)}");
+
             if (this.mLoad is null && this.mLoadAsync is null) { throw new InvalidOperationException(); }
             if (this.mLoad is not null && this.mLoadAsync is not null) { throw new InvalidOperationException(); }
 

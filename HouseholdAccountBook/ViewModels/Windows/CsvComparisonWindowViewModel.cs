@@ -361,7 +361,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async Task EditActionCommand_ExecuteAsync()
         {
             // グループ種別を特定する
-            AppService service = new(this.mDbHandlerFactory);
+            AppCommonService service = new(this.mDbHandlerFactory);
             GroupKind kind = await service.LoadGroupKind(this.CsvCompSelectorVM.SelectedItem.Action.ActionId);
 
             async void Registered(object sender, EventArgs<IEnumerable<ActionIdObj>> e)
@@ -661,7 +661,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { actionId, isMatch });
 
-            AppService service = new(this.mDbHandlerFactory);
+            AppCommonService service = new(this.mDbHandlerFactory);
             await service.SaveIsMatchAsync(actionId, isMatch);
         }
     }

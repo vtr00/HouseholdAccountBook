@@ -268,6 +268,11 @@
             </MenuItem>
             <!-- ヘルプ -->
             <MenuItem Header="{x:Static properties:Resources.Menu_Help}" Command="{Binding HelpMenuCommand}">
+                <!-- 更新の確認 -->
+                <MenuItem Header="{x:Static properties:Resources.Menu_Help_CheckUpdate}" Command="{Binding CheckUpdateCommand}"/>
+                <!-- リリースノート -->
+                <MenuItem Header="{x:Static properties:Resources.Menu_Help_ReleaseNote}" Command="{Binding OpenReleaseNoteCommand}"/>
+                <Separator/>
                 <!-- バージョン情報 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Help_VersionInfo}" Command="{Binding ShowVersionCommand}" InputGestureText="F1"/>
             </MenuItem>

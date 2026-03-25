@@ -15,7 +15,8 @@ namespace HouseholdAccountBook.ViewModels
     /// <param name="allowConcurrent">多重実行可能か</param>
     /// <param name="fileName">出力元ファイル名</param>
     /// <param name="memberName">出力元関数名</param>
-    public class AsyncRelayCommand(Func<FuncLog, CancellationToken, Task> executeAsync, Func<bool> canExecute, bool allowConcurrent = true, [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "") : ICommand, IDisposable
+    public class AsyncRelayCommand(Func<FuncLog, CancellationToken, Task> executeAsync, Func<bool> canExecute, bool allowConcurrent = true,
+                                   [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "") : ICommand, IDisposable
     {
         #region フィールド
         /// <summary>
@@ -65,7 +66,8 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="allowConcurrent">多重実行可能か</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public AsyncRelayCommand(Func<Task> executeAsync, Func<bool> canExecute = null, bool allowConcurrent = true, [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
+        public AsyncRelayCommand(Func<Task> executeAsync, Func<bool> canExecute = null, bool allowConcurrent = true,
+                                 [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
             : this((_1, _2) => executeAsync(), canExecute, allowConcurrent, fileName, memberName)
         { }
         /// <summary>
@@ -76,7 +78,8 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="allowConcurrent">多重実行可能か</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public AsyncRelayCommand(Func<CancellationToken, Task> executeAsync, Func<bool> canExecute = null, bool allowConcurrent = true, [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
+        public AsyncRelayCommand(Func<CancellationToken, Task> executeAsync, Func<bool> canExecute = null, bool allowConcurrent = true,
+                                 [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
             : this((_, token) => executeAsync(token), canExecute, allowConcurrent, fileName, memberName)
         { }
 

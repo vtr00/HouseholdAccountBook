@@ -4,6 +4,7 @@ using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.DbHandlers;
 using System;
 using System.Collections.Generic;
@@ -238,10 +239,10 @@ namespace HouseholdAccountBook.Infrastructure.DB
                             exitCode => {
                                 // ダンプ結果を通知する
                                 if (exitCode == 0) {
-                                    NotificationUtil.NotifyFinishingToBackup();
+                                    NotificationService.NotifyFinishingToBackup();
                                 }
                                 else if (exitCode != null) {
-                                    NotificationUtil.NotifyFailingToBackup();
+                                    NotificationService.NotifyFailingToBackup();
                                 }
                             }, waitForFinish)
                         : await npgsqlDbHandler.ExecuteDump(backupFilePath, this.PostgresDumpExePath, this.PostgresPasswordInput, format, null, waitForFinish);
@@ -300,10 +301,10 @@ namespace HouseholdAccountBook.Infrastructure.DB
 
             if (notifyResult) {
                 if (result) {
-                    NotificationUtil.NotifyFinishingToBackup();
+                    NotificationService.NotifyFinishingToBackup();
                 }
                 else {
-                    NotificationUtil.NotifyFailingToBackup();
+                    NotificationService.NotifyFailingToBackup();
                 }
             }
 

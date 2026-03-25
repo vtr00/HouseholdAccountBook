@@ -29,11 +29,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// アプリサービス
         /// </summary>
-        private AppService mAppService;
+        private AppCommonService mAppService;
         /// <summary>
         /// メインサービス
         /// </summary>
-        private MainService mMainService;
+        private ActionViewService mMainService;
         #endregion
 
         /// <summary>

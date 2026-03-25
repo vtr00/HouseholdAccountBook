@@ -22,6 +22,7 @@ namespace HouseholdAccountBook.Models.AppServices
     /// 設定サービス
     /// </summary>
     /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
+    /// <remarks>主に設定ウィンドウで使用する</remarks>
     public class SettingService(DbHandlerFactory dbHandlerFactory)
     {
         /// <summary>

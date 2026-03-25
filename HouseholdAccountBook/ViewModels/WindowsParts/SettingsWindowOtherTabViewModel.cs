@@ -24,6 +24,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
 
         #region Bindingプロパティ
+        #region バージョン
+        /// <summary>
+        /// 入力されたアプリ起動時最新バージョン通知
+        /// </summary>
+        public bool SelectedIfNotifyLatestAtAppLaunched {
+            get;
+            set => this.SetProperty(ref field, value);
+        }
+        #endregion
+
         #region 言語
         /// <summary>
         /// 言語種別セレクタVM
@@ -244,6 +254,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         public SettingsWindowOtherTabViewModel()
         {
             using FuncLog funcLog = new();
@@ -267,6 +280,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             using FuncLog funcLog = new();
 
             Properties.Settings settings = Properties.Settings.Default;
+
+            // バージョン情報
+            this.SelectedIfNotifyLatestAtAppLaunched = settings.App_LatestVersionNotifyAtAppLaunched;
 
             // 言語情報
             await this.CultureNameSelectorVM.LoadAsync(settings.App_CultureName);
@@ -362,6 +378,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             using FuncLog funcLog = new();
 
             Properties.Settings settings = Properties.Settings.Default;
+
+            // バージョン情報
+            settings.App_LatestVersionNotifyAtAppLaunched = this.SelectedIfNotifyLatestAtAppLaunched;
 
             // 言語情報
             settings.App_CultureName = this.CultureNameSelectorVM.SelectedKey;

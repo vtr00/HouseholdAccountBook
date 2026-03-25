@@ -16,10 +16,10 @@ using System.Threading.Tasks;
 namespace HouseholdAccountBook.Models.AppServices
 {
     /// <summary>
-    /// アプリサービス
+    /// アプリ共通サービス
     /// </summary>
     /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-    public class AppService(DbHandlerFactory dbHandlerFactory)
+    public class AppCommonService(DbHandlerFactory dbHandlerFactory)
     {
         /// <summary>
         /// DBハンドラファクトリ

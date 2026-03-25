@@ -15,12 +15,12 @@ namespace HouseholdAccountBook.ViewModels.Loaders
     /// 系列VMローダ
     /// </summary>
     /// <param name="appService">アプリサービス</param>
-    public class SeriesViewModelLoader(MainService appService)
+    public class SeriesViewModelLoader(ActionViewService appService)
     {
         /// <summary>
         /// アプリサービス
         /// </summary>
-        private readonly MainService mAppService = appService;
+        private readonly ActionViewService mAppService = appService;
 
         /// <summary>
         /// 月内日別系列VMリストを取得する(日別グラフタブ)
