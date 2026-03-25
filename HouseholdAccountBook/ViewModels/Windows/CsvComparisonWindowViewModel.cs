@@ -152,39 +152,39 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// CSVファイルオープンコマンド
         /// </summary>
-        public ICommand OpenCsvFilesCommand => new RelayCommand(this.OpenCsvFilesCommand_Executed);
+        public ICommand OpenCsvFilesCommand => new AsyncRelayCommand(this.OpenCsvFilesCommand_ExecuteAsync);
         /// <summary>
         /// CSVファイル移動コマンド
         /// </summary>
-        public ICommand MoveCsvFilesCommand => new RelayCommand(this.MoveCsvFilesCommand_Executed, this.MoveCsvFilesCommand_CanExecute);
+        public ICommand MoveCsvFilesCommand => new AsyncRelayCommand(this.MoveCsvFilesCommand_ExecuteAsync, this.MoveCsvFilesCommand_CanExecute);
         /// <summary>
         /// CSVファイルクローズコマンド
         /// </summary>
-        public ICommand CloseCsvFilesCommand => new RelayCommand(this.CloseCsvFilesCommand_Executed, this.CloseCsvFilesCommand_CanExecute);
+        public ICommand CloseCsvFilesCommand => new RelayCommand(this.CloseCsvFilesCommand_Execute, this.CloseCsvFilesCommand_CanExecute);
         /// <summary>
         /// 帳簿項目追加コマンド
         /// </summary>
-        public ICommand AddActionCommand => new RelayCommand(this.AddActionCommand_Executed, this.AddActionCommand_CanExecute);
+        public ICommand AddActionCommand => new RelayCommand(this.AddActionCommand_Execute, this.AddActionCommand_CanExecute);
         /// <summary>
         /// 帳簿項目編集コマンド
         /// </summary>
-        public ICommand EditActionCommand => new RelayCommand(this.EditActionCommand_Executed, this.EditActionCommand_CanExecute);
+        public ICommand EditActionCommand => new AsyncRelayCommand(this.EditActionCommand_ExecuteAsync, this.EditActionCommand_CanExecute);
         /// <summary>
         /// 帳簿項目追加/編集コマンド
         /// </summary>
-        public ICommand AddOrEditActionCommand => new RelayCommand(this.AddOrEditActionCommand_Executed, this.AddOrEditActionCommand_CanExecute);
+        public ICommand AddOrEditActionCommand => new AsyncRelayCommand(this.AddOrEditActionCommand_ExecuteAsync, this.AddOrEditActionCommand_CanExecute);
         /// <summary>
         /// 一括チェックコマンド
         /// </summary>
-        public ICommand BulkCheckCommand => new RelayCommand(this.BulkCheckCommand_Executed, this.BulkCheckCommand_CanExecute);
+        public ICommand BulkCheckCommand => new RelayCommand(this.BulkCheckCommand_Execute, this.BulkCheckCommand_CanExecute);
         /// <summary>
         /// リスト更新コマンド
         /// </summary>
-        public ICommand UpdateListCommand => new RelayCommand(this.UpdateListCommand_Executed, this.UpdateListCommand_CanExecute);
+        public ICommand UpdateListCommand => new RelayCommand(this.UpdateListCommand_Execute, this.UpdateListCommand_CanExecute);
         /// <summary>
         /// 一致チェック変更コマンド
         /// </summary>
-        public ICommand ChangeIsMatchCommand => new RelayCommand(this.ChangeIsMatchCommand_Executed);
+        public ICommand ChangeIsMatchCommand => new RelayCommand(this.ChangeIsMatchCommand_Execute);
         #endregion
         #endregion
 
@@ -192,7 +192,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// CSVファイルオープンコマンド処理
         /// </summary>
-        private async void OpenCsvFilesCommand_Executed()
+        private async Task OpenCsvFilesCommand_ExecuteAsync()
         {
             Properties.Settings settings = Properties.Settings.Default;
             (string folderPath, string fileName) = PathUtil.GetSeparatedPath(settings.App_CsvFilePath, App.GetCurrentDir());
@@ -244,46 +244,46 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// CSVファイル移動コマンド処理
         /// </summary>
-        private async void MoveCsvFilesCommand_Executed()
+        private async Task MoveCsvFilesCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                // ファイルの移動を試みる
-                List<string> tmpCsvFilePathList = [];
-                string dstFolderPath = this.BookSelectorVM.SelectedItem.CsvFolderPath;
-                foreach (string srcFilePath in this.CsvFilePathList) {
-                    if (!File.Exists(srcFilePath)) { continue; }
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
-                    // 移動元と移動先が一致するなら移動しない
-                    string dstFilePath = Path.Combine(dstFolderPath, Path.GetFileName(srcFilePath));
-                    if (srcFilePath.CompareTo(dstFilePath) == 0) {
-                        tmpCsvFilePathList.Add(srcFilePath);
-                        continue;
-                    }
+            // ファイルの移動を試みる
+            List<string> tmpCsvFilePathList = [];
+            string dstFolderPath = this.BookSelectorVM.SelectedItem.CsvFolderPath;
+            foreach (string srcFilePath in this.CsvFilePathList) {
+                if (!File.Exists(srcFilePath)) { continue; }
 
-                    // ファイルを移動する(既に存在すれば上書き)
-                    try {
-                        if (File.Exists(dstFilePath)) {
-                            File.Delete(dstFilePath);
-                        }
-
-                        File.Move(srcFilePath, dstFilePath);
-                        tmpCsvFilePathList.Add(dstFilePath);
-                    }
-                    catch (Exception exp) {
-                        _ = MessageBox.Show($"{Properties.Resources.Message_FoultToMoveCsv}({exp.Message})", Properties.Resources.Title_Conformation);
-                    }
+                // 移動元と移動先が一致するなら移動しない
+                string dstFilePath = Path.Combine(dstFolderPath, Path.GetFileName(srcFilePath));
+                if (srcFilePath.CompareTo(dstFilePath) == 0) {
+                    tmpCsvFilePathList.Add(srcFilePath);
+                    continue;
                 }
 
-                // 移動に成功したファイルだけ記録する
-                this.CsvFilePathList.Clear();
-                foreach (string tmpCsvFilePath in tmpCsvFilePathList) {
-                    this.CsvFilePathList.Add(tmpCsvFilePath);
-                }
+                // ファイルを移動する(既に存在すれば上書き)
+                try {
+                    if (File.Exists(dstFilePath)) {
+                        File.Delete(dstFilePath);
+                    }
 
-                // CSVファイルを再読み込みする
-                await this.ReloadCsvFilesAsync();
-                await this.UpdateComparisonVMListAsync();
+                    File.Move(srcFilePath, dstFilePath);
+                    tmpCsvFilePathList.Add(dstFilePath);
+                }
+                catch (Exception exp) {
+                    _ = MessageBox.Show($"{Properties.Resources.Message_FoultToMoveCsv}({exp.Message})", Properties.Resources.Title_Conformation);
+                }
             }
+
+            // 移動に成功したファイルだけ記録する
+            this.CsvFilePathList.Clear();
+            foreach (string tmpCsvFilePath in tmpCsvFilePathList) {
+                this.CsvFilePathList.Add(tmpCsvFilePath);
+            }
+
+            // CSVファイルを再読み込みする
+            await this.ReloadCsvFilesAsync();
+            await this.UpdateComparisonVMListAsync();
         }
 
         /// <summary>
@@ -294,7 +294,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// CSVファイルクローズコマンド処理
         /// </summary>
-        private void CloseCsvFilesCommand_Executed()
+        private void CloseCsvFilesCommand_Execute()
         {
             // リストをクリアする
             this.CsvCompSelectorVM.ItemList.Clear();
@@ -311,13 +311,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿項目追加コマンド処理
         /// </summary>
-        private void AddActionCommand_Executed()
+        private void AddActionCommand_Execute()
         {
             List<CsvComparisonViewModel> vmList = [.. this.SelectedCsvCompVMList.Where(vm => vm.Action is null)];
             List<ActionCsvDto> recordList = [.. vmList.Select(vm => vm.Record)];
 
             async void Registered(object sender, EventArgs<IEnumerable<ActionIdObj>> e)
             {
+                using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
+
                 // CSVの項目をベースに追加したので既定で一致フラグを立てる
                 foreach (ActionIdObj actionId in e.Value) {
                     await this.SaveIsMatchAsync(actionId, true);
@@ -356,7 +358,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿項目編集コマンド処理
         /// </summary>
-        private async void EditActionCommand_Executed()
+        private async Task EditActionCommand_ExecuteAsync()
         {
             // グループ種別を特定する
             AppService service = new(this.mDbHandlerFactory);
@@ -364,6 +366,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             async void Registered(object sender, EventArgs<IEnumerable<ActionIdObj>> e)
             {
+                using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
+
                 // 表示を更新する
                 this.ActionChanged?.Invoke(this, e);
                 await this.UpdateComparisonVMListAsync();
@@ -400,14 +404,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿項目追加/編集コマンド処理
         /// </summary>
-        private void AddOrEditActionCommand_Executed()
+        private async Task AddOrEditActionCommand_ExecuteAsync()
         {
             // 選択されているCSVデータが1つ以上存在していて、帳簿項目に紐づかない項目が1つ以上ある
             if (0 < this.SelectedCsvCompVMList.Count && this.SelectedCsvCompVMList.Any(vm => vm.Action is null)) {
-                this.AddActionCommand_Executed();
+                this.AddActionCommand_Execute();
             }
             else {
-                this.EditActionCommand_Executed();
+                await this.EditActionCommand_ExecuteAsync();
             }
         }
 
@@ -428,7 +432,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 一括チェックコマンド処理
         /// </summary>
-        private async void BulkCheckCommand_Executed()
+        private async void BulkCheckCommand_Execute()
         {
             using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
@@ -449,7 +453,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 更新コマンド処理
         /// </summary>
-        private async void UpdateListCommand_Executed()
+        private async void UpdateListCommand_Execute()
         {
             using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
             await this.UpdateComparisonVMListAsync();
@@ -458,7 +462,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 一致チェック変更コマンド処理
         /// </summary>
-        private async void ChangeIsMatchCommand_Executed()
+        private async void ChangeIsMatchCommand_Execute()
         {
             if (this.CsvCompSelectorVM.SelectedItem.Action is not null) {
                 this.IsMatchChanged?.Invoke(this, new EventArgs<ActionIdObj, bool>(this.CsvCompSelectorVM.SelectedItem.Action.ActionId, this.CsvCompSelectorVM.SelectedItem.IsMatch));

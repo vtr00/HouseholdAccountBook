@@ -286,55 +286,55 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 検索欄表示コマンド
         /// </summary>
-        public ICommand ShowFindBoxCommand => new RelayCommand(this.ShowFindBoxCommand_Executed, this.ShowFindBoxCommand_CanExecute);
+        public ICommand ShowFindBoxCommand => new RelayCommand(this.ShowFindBoxCommand_Execute, this.ShowFindBoxCommand_CanExecute);
         /// <summary>
         /// 検索欄非表示コマンド
         /// </summary>
-        public ICommand HideFindBoxCommand => new RelayCommand(this.HideFindBoxCommand_Executed);
+        public ICommand HideFindBoxCommand => new RelayCommand(this.HideFindBoxCommand_Execute);
         /// <summary>
         /// 置換欄表示コマンド
         /// </summary>
-        public ICommand ShowReplaceBoxCommand => new RelayCommand(this.ShowReplaceBoxCommand_Executed, this.ShowReplaceBoxCommand_CanExecute);
+        public ICommand ShowReplaceBoxCommand => new RelayCommand(this.ShowReplaceBoxCommand_Execute, this.ShowReplaceBoxCommand_CanExecute);
         /// <summary>
         /// 置換欄非表示コマンド
         /// </summary>
-        public ICommand HideReplaceBoxCommand => new RelayCommand(this.HideReplaceBoxCommand_Executed);
+        public ICommand HideReplaceBoxCommand => new RelayCommand(this.HideReplaceBoxCommand_Execute);
         /// <summary>
         /// 帳簿項目検索コマンド
         /// </summary>
-        public ICommand FindActionCommand => new RelayCommand(this.FindActionCommand_Executed, this.FindActionCommand_CanExecute);
+        public ICommand FindActionCommand => new RelayCommand(this.FindActionCommand_Execute, this.FindActionCommand_CanExecute);
         /// <summary>
         /// 帳簿項目置換コマンド
         /// </summary>
-        public ICommand ReplaceActionCommand => new RelayCommand(this.ReplaceActionCommand_Executed, this.ReplaceActionCommand_CanExecute);
+        public ICommand ReplaceActionCommand => new AsyncRelayCommand(this.ReplaceActionCommand_ExecuteAsync, this.ReplaceActionCommand_CanExecute);
         /// <summary>
         /// 移動追加コマンド
         /// </summary>
-        public ICommand AddMoveCommand => new RelayCommand(this.AddMoveCommand_Executed, this.AddMoveCommand_CanExecute);
+        public ICommand AddMoveCommand => new RelayCommand(this.AddMoveCommand_Execute, this.AddMoveCommand_CanExecute);
         /// <summary>
         /// 帳簿項目追加コマンド
         /// </summary>
-        public ICommand AddActionCommand => new RelayCommand(this.AddActionCommand_Executed, this.AddActionCommand_CanExecute);
+        public ICommand AddActionCommand => new RelayCommand(this.AddActionCommand_Execute, this.AddActionCommand_CanExecute);
         /// <summary>
         /// 帳簿項目リスト追加コマンド
         /// </summary>
-        public ICommand AddActionListCommand => new RelayCommand(this.AddActionListCommand_Executed, this.AddActionListCommand_CanExecute);
+        public ICommand AddActionListCommand => new RelayCommand(this.AddActionListCommand_Execute, this.AddActionListCommand_CanExecute);
         /// <summary>
         /// 複製コマンド
         /// </summary>
-        public ICommand CopyCommand => new RelayCommand(this.CopyCommand_Executed, this.CopyCommand_CanExecute);
+        public ICommand CopyCommand => new AsyncRelayCommand(this.CopyCommand_ExecuteAsync, this.CopyCommand_CanExecute);
         /// <summary>
         /// 編集コマンド
         /// </summary>
-        public ICommand EditCommand => new RelayCommand(this.EditCommand_Executed, this.EditCommand_CanExecute);
+        public ICommand EditCommand => new AsyncRelayCommand(this.EditCommand_ExecuteAsync, this.EditCommand_CanExecute);
         /// <summary>
         /// 削除コマンド
         /// </summary>
-        public ICommand DeleteCommand => new RelayCommand(this.DeleteCommand_Executed, this.DeleteCommand_CanExecute);
+        public ICommand DeleteCommand => new AsyncRelayCommand(this.DeleteCommand_ExecuteAsync, this.DeleteCommand_CanExecute);
         /// <summary>
         /// 一致フラグ変更コマンド
         /// </summary>
-        public ICommand ChangeIsMatchCommand => new RelayCommand(this.ChangeIsMatchCommand_Executed, this.ChangeIsMatchCommand_CanExecute);
+        public ICommand ChangeIsMatchCommand => new AsyncRelayCommand(this.ChangeIsMatchCommand_ExecuteAsync, this.ChangeIsMatchCommand_CanExecute);
         #endregion
         #endregion
 
@@ -354,12 +354,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 検索欄表示コマンド処理
         /// </summary>
-        private void ShowFindBoxCommand_Executed() => this.SelectedFindKind = FindKind.Find;
+        private void ShowFindBoxCommand_Execute() => this.SelectedFindKind = FindKind.Find;
 
         /// <summary>
         /// 検索欄非表示コマンド処理
         /// </summary>
-        private void HideFindBoxCommand_Executed()
+        private void HideFindBoxCommand_Execute()
         {
             this.FindText = string.Empty;
             this.SelectedFindKind = FindKind.None;
@@ -374,12 +374,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 置換欄表示コマンド処理
         /// </summary>
-        private void ShowReplaceBoxCommand_Executed() => this.SelectedFindKind = FindKind.Replace;
+        private void ShowReplaceBoxCommand_Execute() => this.SelectedFindKind = FindKind.Replace;
 
         /// <summary>
         /// 置換欄非表示コマンド処理
         /// </summary>
-        private void HideReplaceBoxCommand_Executed() => this.SelectedFindKind = FindKind.Find;
+        private void HideReplaceBoxCommand_Execute() => this.SelectedFindKind = FindKind.Find;
 
         /// <summary>
         /// 帳簿項目検索コマンド実行可能か
@@ -389,7 +389,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿項目検索コマンド処理
         /// </summary>
-        private void FindActionCommand_Executed() => this.FindText = this.FindInputText;
+        private void FindActionCommand_Execute() => this.FindText = this.FindInputText;
         /// <summary>
         /// 帳簿項目置換コマンド実行可能か
         /// </summary>
@@ -398,7 +398,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿項目置換コマンド処理
         /// </summary>
-        private async void ReplaceActionCommand_Executed()
+        private async Task ReplaceActionCommand_ExecuteAsync()
         {
             this.FindText = this.FindInputText;
 
@@ -431,7 +431,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 移動追加コマンド処理
         /// </summary>
-        private void AddMoveCommand_Executed()
+        private void AddMoveCommand_Execute()
         {
             AddMoveRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
@@ -452,7 +452,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿項目追加コマンド処理
         /// </summary>
-        private void AddActionCommand_Executed()
+        private void AddActionCommand_Execute()
         {
             AddActionRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
@@ -473,7 +473,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿項目リスト追加コマンド処理
         /// </summary>
-        private void AddActionListCommand_Executed()
+        private void AddActionListCommand_Execute()
         {
             AddActionListRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
@@ -495,7 +495,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 複製コマンド処理
         /// </summary>
-        private async void CopyCommand_Executed()
+        private async Task CopyCommand_ExecuteAsync()
         {
             // グループ種別を特定する
             GroupKind kind = await this.mAppService.LoadGroupKind(this.SelectedActionVM.ActionWithBalance.Action.ActionId);
@@ -538,7 +538,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 編集コマンド処理
         /// </summary>
-        private async void EditCommand_Executed()
+        private async Task EditCommand_ExecuteAsync()
         {
             // グループ種別を特定する
             GroupKind kind = await this.mAppService.LoadGroupKind(this.SelectedActionVM.ActionWithBalance.Action.ActionId);
@@ -589,7 +589,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 削除コマンド処理
         /// </summary>
-        private async void DeleteCommand_Executed()
+        private async Task DeleteCommand_ExecuteAsync()
         {
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
@@ -612,7 +612,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 一致フラグ変更コマンド処理
         /// </summary>
-        private async void ChangeIsMatchCommand_Executed()
+        private async Task ChangeIsMatchCommand_ExecuteAsync()
         {
             // 帳簿項目IDが0を超える項目についてループ
             foreach (ActionViewModel vm in this.SelectedActionVMList.Where(vm => 0 < (int)vm.ActionWithBalance.Action.ActionId)) {

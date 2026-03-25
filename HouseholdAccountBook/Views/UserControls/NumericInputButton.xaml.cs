@@ -109,7 +109,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void NumberInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void NumberInputCommand_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             ContentControl control = e.OriginalSource as ContentControl;
             int value = int.Parse(control.Content.ToString()); // 入力値
@@ -126,7 +126,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void BackSpaceInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void BackSpaceInputCommand_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             this.InputedKind = InputKind.BackSpace;
             this.ExecuteCommand();
@@ -139,7 +139,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ClearCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void ClearCommand_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             this.InputedKind = InputKind.Clear;
             this.ExecuteCommand();
@@ -152,7 +152,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void CloseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void CloseCommand_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             this.InputedKind = InputKind.Close;
             this.ExecuteCommand();

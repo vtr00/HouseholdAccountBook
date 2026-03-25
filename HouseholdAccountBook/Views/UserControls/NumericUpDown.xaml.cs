@@ -132,7 +132,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IncreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void IncreaseCommand_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             this.IncreaseNumber();
             e.Handled = true;
@@ -151,7 +151,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DecreaseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void DecreaseCommand_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             this.DecreaseNumber();
             e.Handled = true;
@@ -162,7 +162,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ButtonInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void ButtonInputCommand_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             TextBox textBox = this._textBox;
 

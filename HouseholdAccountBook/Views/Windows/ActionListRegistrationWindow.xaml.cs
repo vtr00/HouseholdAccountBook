@@ -126,7 +126,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ButtonInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void ButtonInputCommand_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             TextBox textBox = this._popup.PlacementTarget as TextBox;
             if (textBox.DataContext is not DateValueViewModel vm) {

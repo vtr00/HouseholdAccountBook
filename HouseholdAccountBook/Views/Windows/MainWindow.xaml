@@ -59,7 +59,7 @@
     </Window.Resources>
 
     <Window.CommandBindings>
-        <CommandBinding Command="{StaticResource ExportCSVFileCommand}" Executed="ExportCSVFileCommand_Executed" CanExecute="ExportCSVFileCommand_CanExecute"/>
+        <CommandBinding Command="{StaticResource ExportCSVFileCommand}" Executed="ExportCSVFileCommand_Execute" CanExecute="ExportCSVFileCommand_CanExecute"/>
     </Window.CommandBindings>
 
     <Window.InputBindings>

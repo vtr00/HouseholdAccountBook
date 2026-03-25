@@ -31,6 +31,11 @@ namespace HouseholdAccountBook.ViewModels
         /// 呼び出し元メンバー名
         /// </summary>
         private readonly string mMemberName = memberName;
+
+        /// <summary>
+        /// 実行中か
+        /// </summary>
+        private bool mIsExecuting = false;
         #endregion
 
         #region イベント
@@ -60,12 +65,21 @@ namespace HouseholdAccountBook.ViewModels
             : this(static _ => { }, canExecute, fileName, memberName)
         { }
 
-        public bool CanExecute(object parameter) => this.mCanExecute?.Invoke() ?? true;
+        public bool CanExecute(object parameter) => !this.mIsExecuting && (this.mCanExecute?.Invoke() ?? true);
 
         public void Execute(object parameter)
         {
             using FuncLog funcLog = new(args: parameter, fileName: this.mFileName, methodName: this.mMemberName);
-            this.mExecute?.Invoke(funcLog);
+
+            this.mIsExecuting = true;
+            RaiseCanExecuteChanged();
+            try {
+                this.mExecute?.Invoke(funcLog);
+            }
+            finally {
+                this.mIsExecuting = false;
+                RaiseCanExecuteChanged();
+            }
         }
 
         public static void RaiseCanExecuteChanged() => CommandManager.InvalidateRequerySuggested();
@@ -96,6 +110,11 @@ namespace HouseholdAccountBook.ViewModels
         /// 呼び出し元メンバー名
         /// </summary>
         private readonly string mMemberName = memberName;
+
+        /// <summary>
+        /// 実行中か
+        /// </summary>
+        private bool mIsExecuting = false;
         #endregion
 
         #region イベント
@@ -125,12 +144,21 @@ namespace HouseholdAccountBook.ViewModels
             : this(static (parameter, _) => { }, canExecute, fileName, memberName)
         { }
 
-        public bool CanExecute(object parameter) => this.mCanExecute?.Invoke((T)parameter) ?? true;
+        public bool CanExecute(object parameter) => !this.mIsExecuting && (this.mCanExecute?.Invoke((T)parameter) ?? true);
 
         public void Execute(object parameter)
         {
             using FuncLog funcLog = new(args: parameter, fileName: this.mFileName, methodName: this.mMemberName);
-            this.mExecute?.Invoke((T)parameter, funcLog);
+
+            this.mIsExecuting = true;
+            RaiseCanExecuteChanged();
+            try {
+                this.mExecute?.Invoke((T)parameter, funcLog);
+            }
+            finally {
+                this.mIsExecuting = false;
+                RaiseCanExecuteChanged();
+            }
         }
 
         public static void RaiseCanExecuteChanged() => CommandManager.InvalidateRequerySuggested();

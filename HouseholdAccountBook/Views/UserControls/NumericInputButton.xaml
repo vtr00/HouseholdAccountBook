@@ -14,13 +14,13 @@
 
     <UserControl.CommandBindings>
         <CommandBinding Command="{StaticResource NumberInputCommand}" 
-                        Executed="NumberInputCommand_Executed"/>
+                        Executed="NumberInputCommand_Execute"/>
         <CommandBinding Command="{StaticResource BackSpaceInputCommand}" 
-                        Executed="BackSpaceInputCommand_Executed"/>
+                        Executed="BackSpaceInputCommand_Execute"/>
         <CommandBinding Command="{StaticResource ClearCommand}" 
-                        Executed="ClearCommand_Executed"/>
+                        Executed="ClearCommand_Execute"/>
         <CommandBinding Command="{StaticResource CloseCommand}" 
-                        Executed="CloseCommand_Executed"/>
+                        Executed="CloseCommand_Execute"/>
     </UserControl.CommandBindings>
 
     <Grid Background="Transparent">

@@ -19,7 +19,7 @@
 
     <Window.CommandBindings>
         <CommandBinding Command="{StaticResource ButtonInputCommand}"
-                        Executed="ButtonInputCommand_Executed"/>
+                        Executed="ButtonInputCommand_Execute"/>
     </Window.CommandBindings>
 
     <Window.InputBindings>

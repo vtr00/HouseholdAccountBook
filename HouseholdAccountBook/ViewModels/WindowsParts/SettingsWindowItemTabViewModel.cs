@@ -75,39 +75,39 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 分類追加コマンド
         /// </summary>
-        public ICommand AddCategoryCommand => new RelayCommand(this.AddCategoryCommand_Executed, this.AddCategoryCommand_CanExecute);
+        public ICommand AddCategoryCommand => new AsyncRelayCommand(this.AddCategoryCommand_ExecuteAsync, this.AddCategoryCommand_CanExecute);
         /// <summary>
         /// 項目追加コマンド
         /// </summary>
-        public ICommand AddItemCommand => new RelayCommand(this.AddItemCommand_Executed, this.AddItemCommand_CanExecute);
+        public ICommand AddItemCommand => new AsyncRelayCommand(this.AddItemCommand_ExecuteAsync, this.AddItemCommand_CanExecute);
         /// <summary>
         /// 分類/項目削除コマンド
         /// </summary>
-        public ICommand DeleteItemCommand => new RelayCommand(this.DeleteItemCommand_Executed, this.DeleteItemCommand_CanExecute);
+        public ICommand DeleteItemCommand => new AsyncRelayCommand(this.DeleteItemCommand_ExecuteAsync, this.DeleteItemCommand_CanExecute);
         /// <summary>
         /// 分類/項目表示順上昇コマンド
         /// </summary>
-        public ICommand RaiseItemSortOrderCommand => new RelayCommand(this.RaiseItemSortOrderCommand_Executed, this.RaiseItemSortOrderCommand_CanExecute);
+        public ICommand RaiseItemSortOrderCommand => new AsyncRelayCommand(this.RaiseItemSortOrderCommand_ExecuteAsync, this.RaiseItemSortOrderCommand_CanExecute);
         /// <summary>
         /// 分類/項目表示順下降コマンド
         /// </summary>
-        public ICommand DropItemSortOrderCommand => new RelayCommand(this.DropItemSortOrderCommand_Executed, this.DropItemSortOrderCommand_CanExecute);
+        public ICommand DropItemSortOrderCommand => new AsyncRelayCommand(this.DropItemSortOrderCommand_ExecuteAsync, this.DropItemSortOrderCommand_CanExecute);
         /// <summary>
         /// 分類/項目情報保存コマンド
         /// </summary>
-        public ICommand SaveItemInfoCommand => new RelayCommand(this.SaveItemInfoCommand_Executed, this.SaveItemInfoCommand_CanExecute);
+        public ICommand SaveItemInfoCommand => new AsyncRelayCommand(this.SaveItemInfoCommand_ExecuteAsync, this.SaveItemInfoCommand_CanExecute);
         /// <summary>
         /// 項目-帳簿関係変更コマンド
         /// </summary>
-        public ICommand ChangeItemRelationCommand => new RelayCommand<object>(this.ChangeItemRelationCommand_Executed);
+        public ICommand ChangeItemRelationCommand => new AsyncRelayCommand<object>(this.ChangeItemRelationCommand_ExecuteAsync);
         /// <summary>
         /// 店名削除コマンド
         /// </summary>
-        public ICommand DeleteShopNameCommand => new RelayCommand(this.DeleteShopNameCommand_Executed, this.DeleteShopNameCommand_CanExecute);
+        public ICommand DeleteShopNameCommand => new AsyncRelayCommand(this.DeleteShopNameCommand_ExecuteAsync, this.DeleteShopNameCommand_CanExecute);
         /// <summary>
         /// 備考削除コマンド
         /// </summary>
-        public ICommand DeleteRemarkCommand => new RelayCommand(this.DeleteRemarkCommand_Executed, this.DeleteRemarkCommand_CanExecute);
+        public ICommand DeleteRemarkCommand => new AsyncRelayCommand(this.DeleteRemarkCommand_ExecuteAsync, this.DeleteRemarkCommand_CanExecute);
         #endregion
         #endregion
 
@@ -121,7 +121,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 分類追加コマンド処理
         /// </summary>
-        private async void AddCategoryCommand_Executed()
+        private async Task AddCategoryCommand_ExecuteAsync()
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 ItemTreeViewModel vm = this.SelectedItemTreeVM;
@@ -144,7 +144,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 項目追加コマンド処理
         /// </summary>
-        private async void AddItemCommand_Executed()
+        private async Task AddItemCommand_ExecuteAsync()
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 ItemTreeViewModel vm = this.SelectedItemTreeVM;
@@ -168,7 +168,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 分類/項目削除コマンド処理
         /// </summary>
-        private async void DeleteItemCommand_Executed()
+        private async Task DeleteItemCommand_ExecuteAsync()
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 HierarchicalKind? kind = this.SelectedItemTreeVM?.Kind;
@@ -231,7 +231,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 分類/項目表示順上昇コマンド処理
         /// </summary>
-        private async void RaiseItemSortOrderCommand_Executed()
+        private async Task RaiseItemSortOrderCommand_ExecuteAsync()
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 var parentVM = this.SelectedItemTreeVM.ParentVM;
@@ -292,7 +292,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 分類/項目表示順下降コマンド処理
         /// </summary>
-        private async void DropItemSortOrderCommand_Executed()
+        private async Task DropItemSortOrderCommand_ExecuteAsync()
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 var parentVM = this.SelectedItemTreeVM.ParentVM;
@@ -339,7 +339,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 分類/項目情報保存コマンド処理
         /// </summary>
-        private async void SaveItemInfoCommand_Executed()
+        private async Task SaveItemInfoCommand_ExecuteAsync()
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 ItemSettingViewModel vm = this.DisplayedItemSettingVM;
@@ -365,7 +365,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 項目-帳簿関係変更コマンド処理
         /// </summary>
         /// <param name="viewModel">チェック対象に紐づくVM</param>
-        private async void ChangeItemRelationCommand_Executed(object viewModel)
+        private async Task ChangeItemRelationCommand_ExecuteAsync(object viewModel)
         {
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
@@ -392,7 +392,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 店名削除コマンド処理
         /// </summary>
-        private async void DeleteShopNameCommand_Executed()
+        private async Task DeleteShopNameCommand_ExecuteAsync()
         {
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
@@ -416,7 +416,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 備考削除コマンド処理
         /// </summary>
-        private async void DeleteRemarkCommand_Executed()
+        private async Task DeleteRemarkCommand_ExecuteAsync()
         {
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {

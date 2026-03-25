@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using static HouseholdAccountBook.ViewModels.UiConstants;
 
 namespace HouseholdAccountBook.ViewModels.Windows
@@ -144,11 +145,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 数値入力ボタンの入力種別
         /// </summary>
         public NumericInputButton.InputKind InputedKind { get; set; }
+
+        #region コマンド
+        /// <summary>
+        /// OKコマンド
+        /// </summary>
+        public new ICommand OKCommand => new AsyncRelayCommand(this.OKCommand_ExecuteAsync, this.OKCommand_CanExecute);
+        #endregion
         #endregion
 
         #region コマンドイベントハンドラ
         protected override bool OKCommand_CanExecute() => this.ItemSelectorVM.SelectedKey != null && this.InputedDateValueVMList.Any(static vm => vm.ActValue is not null and not 0);
-        protected override async void OKCommand_Executed()
+        protected async Task OKCommand_ExecuteAsync()
         {
             // DB登録
             IEnumerable<ActionIdObj> idList = null;
@@ -159,7 +167,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             // MainWindow更新
             this.Registrated?.Invoke(this, new(idList));
 
-            base.OKCommand_Executed();
+            base.OKCommand_Execute();
         }
         #endregion
 
@@ -352,7 +360,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             IEnumerable<ActionIdObj> resActionIdList = await this.mService.SaveActionListAsync(actionList);
 
-            DateTime lastActTime = this.InputedDateValueVMList.Max(tmp => tmp.ActDate);
+            DateTime lastActTime = this.InputedDateValueVMList.Max(static tmp => tmp.ActDate);
 
             if (commonAction.Shop != null && commonAction.Shop != string.Empty) {
                 ShopModel shop = new(commonAction.Shop) { ItemId = commonAction.Item.Id, UsedTime = commonAction.ActTime };

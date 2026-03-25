@@ -58,19 +58,19 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// OKコマンド
         /// </summary>
-        public ICommand OKCommand => new RelayCommand(this.OKCommand_Executed, this.OKCommand_CanExecute);
+        public ICommand OKCommand => new RelayCommand(this.OKCommand_Execute, this.OKCommand_CanExecute);
         /// <summary>
         /// キャンセルコマンド
         /// </summary>
-        public ICommand CancelCommand => new RelayCommand(this.CanncelCommand_Executed);
+        public ICommand CancelCommand => new RelayCommand(this.CanncelCommand_Execute);
         /// <summary>
         /// クローズコマンド
         /// </summary>
-        public ICommand CloseCommand => new RelayCommand(this.CloseCommand_Executed);
+        public ICommand CloseCommand => new RelayCommand(this.CloseCommand_Execute);
         /// <summary>
         /// 非表示コマンド
         /// </summary>
-        public ICommand HideCommand => new RelayCommand(this.HideCommand_Executed);
+        public ICommand HideCommand => new RelayCommand(this.HideCommand_Execute);
         /// <summary>
         /// ファイル選択コマンド
         /// </summary>
@@ -90,22 +90,22 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// OKコマンド処理
         /// </summary>
-        protected virtual void OKCommand_Executed() => this.CloseRequest(new DialogCloseRequestEventArgs(true));
+        protected virtual void OKCommand_Execute() => this.CloseRequest(new DialogCloseRequestEventArgs(true));
 
         /// <summary>
         /// キャンセルコマンド処理
         /// </summary>
-        protected virtual void CanncelCommand_Executed() => this.CloseRequest(new DialogCloseRequestEventArgs(false));
+        protected virtual void CanncelCommand_Execute() => this.CloseRequest(new DialogCloseRequestEventArgs(false));
 
         /// <summary>
         /// クローズコマンド処理
         /// </summary>
-        protected virtual void CloseCommand_Executed() => this.CloseRequest(new DialogCloseRequestEventArgs(null));
+        protected virtual void CloseCommand_Execute() => this.CloseRequest(new DialogCloseRequestEventArgs(null));
 
         /// <summary>
         /// 非表示コマンド処理
         /// </summary>
-        protected virtual void HideCommand_Executed() => this.HideRequest();
+        protected virtual void HideCommand_Execute() => this.HideRequest();
         #endregion
 
         /// <summary>

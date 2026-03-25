@@ -495,19 +495,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 記帳風月インポートコマンド
         /// </summary>
-        public ICommand ImportKichoFugetsuDbCommand => new RelayCommand(this.ImportKichoFugetsuDbCommand_Executed, this.ImportKichoFugetsuDbCommand_CanExecute);
+        public ICommand ImportKichoFugetsuDbCommand => new AsyncRelayCommand(this.ImportKichoFugetsuDbCommand_ExecuteAsync, this.ImportKichoFugetsuDbCommand_CanExecute, false);
         /// <summary>
         /// PostgreSQL -> SQLite インポートコマンド
         /// </summary>
-        public ICommand ImportPostgreSQLCommand => new RelayCommand(this.ImportPostgreSQLCommand_Executed, this.ImportPostgreSQLCommand_CanExecute);
+        public ICommand ImportPostgreSQLCommand => new AsyncRelayCommand(this.ImportPostgreSQLCommand_ExecuteAsync, this.ImportPostgreSQLCommand_CanExecute, false);
         /// <summary>
         /// カスタムファイル -> PostgreSQL インポートコマンド
         /// </summary>
-        public ICommand ImportCustomFileCommand => new RelayCommand(this.ImportCustomFileCommand_Executed, this.ImportCustomFileCommand_CanExecute);
+        public ICommand ImportCustomFileCommand => new AsyncRelayCommand(this.ImportCustomFileCommand_ExecuteAsync, this.ImportCustomFileCommand_CanExecute, false);
         /// <summary>
         /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド
         /// </summary>
-        public ICommand ImportSQLiteFileCommand => new RelayCommand(this.ImportSQLiteFileCommand_Executed, this.ImportSQLiteFileCommand_CanExecute);
+        public ICommand ImportSQLiteFileCommand => new AsyncRelayCommand(this.ImportSQLiteFileCommand_ExecuteAsync, this.ImportSQLiteFileCommand_CanExecute, false);
         /// <summary>
         /// エクスポートコマンド
         /// </summary>
@@ -515,15 +515,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// カスタムファイルエクスポートコマンド
         /// </summary>
-        public ICommand ExportCustomFileCommand => new RelayCommand(this.ExportCustomFileCommand_Executed, this.ExportCustomFileCommand_CanExecute);
+        public ICommand ExportCustomFileCommand => new AsyncRelayCommand(this.ExportCustomFileCommand_ExecuteAsync, this.ExportCustomFileCommand_CanExecute, false);
         /// <summary>
         /// SQLファイルエクスポートコマンド
         /// </summary>
-        public ICommand ExportSQLFileCommand => new RelayCommand(this.ExportSQLFileCommand_Executed, this.ExportSQLFileCommand_CanExecute);
+        public ICommand ExportSQLFileCommand => new AsyncRelayCommand(this.ExportSQLFileCommand_ExecuteAsync, this.ExportSQLFileCommand_CanExecute, false);
         /// <summary>
         /// バックアップコマンド
         /// </summary>
-        public ICommand BackUpCommand => new RelayCommand(this.BackUpCommand_Executed, this.BackUpCommand_CanExecute);
+        public ICommand BackUpCommand => new AsyncRelayCommand(this.BackUpCommand_ExecuteAsync, this.BackUpCommand_CanExecute, false);
         /// <summary>
         /// 操作ログファイルコマンド
         /// </summary>
@@ -531,7 +531,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// ウィンドウ終了コマンド
         /// </summary>
-        public ICommand ExitWindowCommand => new RelayCommand(this.ExitWindowCommand_Executed, this.ExitWindowCommand_CanExecute);
+        public ICommand ExitWindowCommand => new RelayCommand(this.ExitWindowCommand_Execute, this.ExitWindowCommand_CanExecute);
         #endregion
 
         #region 表示コマンド
@@ -542,60 +542,60 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿項目タブ表示コマンド
         /// </summary>
-        public ICommand ShowBookTabCommand => new RelayCommand(this.ShowBookTabCommand_Executed, this.ShowBookTabCommand_CanExecute);
+        public ICommand ShowBookTabCommand => new RelayCommand(this.ShowBookTabCommand_Execute, this.ShowBookTabCommand_CanExecute);
         /// <summary>
         /// 日別グラフタブ表示コマンド
         /// </summary>
-        public ICommand ShowDailyGraphTabCommand => new RelayCommand(this.ShowDailyGraphTabCommand_Executed, this.ShowDailyGraphTabCommand_CanExecute);
+        public ICommand ShowDailyGraphTabCommand => new RelayCommand(this.ShowDailyGraphTabCommand_Execute, this.ShowDailyGraphTabCommand_CanExecute);
         /// <summary>
         /// 月別リストタブ表示コマンド
         /// </summary>
-        public ICommand ShowMonthlyListTabCommand => new RelayCommand(this.ShowMonthlyListTabCommand_Executed, this.ShowMonthlyListTabCommand_CanExecute);
+        public ICommand ShowMonthlyListTabCommand => new RelayCommand(this.ShowMonthlyListTabCommand_Execute, this.ShowMonthlyListTabCommand_CanExecute);
         /// <summary>
         /// 月別グラフタブ表示コマンド
         /// </summary>
-        public ICommand ShowMonthlyGraphTabCommand => new RelayCommand(this.ShowMonthlyGraphTabCommand_Executed, this.ShowMonthlyGraphTabCommand_CanExecute);
+        public ICommand ShowMonthlyGraphTabCommand => new RelayCommand(this.ShowMonthlyGraphTabCommand_Execute, this.ShowMonthlyGraphTabCommand_CanExecute);
         /// <summary>
         /// 年別リストタブ表示コマンド
         /// </summary>
-        public ICommand ShowYearlyListTabCommand => new RelayCommand(this.ShowYearlyListTabCommand_Executed, this.ShowYearlyListTabCommand_CanExecute);
+        public ICommand ShowYearlyListTabCommand => new RelayCommand(this.ShowYearlyListTabCommand_Execute, this.ShowYearlyListTabCommand_CanExecute);
         /// <summary>
         /// 年別グラフタブ表示コマンド
         /// </summary>
-        public ICommand ShowYearlyGraphTabCommand => new RelayCommand(this.ShowYearlyGraphTabCommand_Executed, this.ShowYearlyGraphTabCommand_CanExecute);
+        public ICommand ShowYearlyGraphTabCommand => new RelayCommand(this.ShowYearlyGraphTabCommand_Execute, this.ShowYearlyGraphTabCommand_CanExecute);
 
         /// <summary>
         /// 先月表示コマンド
         /// </summary>
-        public ICommand GoToLastMonthCommand => new RelayCommand(this.GoToLastMonthCommand_Executed, this.GoToLastMonthCommand_CanExecute);
+        public ICommand GoToLastMonthCommand => new AsyncRelayCommand(this.GoToLastMonthCommand_ExecuteAsync, this.GoToLastMonthCommand_CanExecute);
         /// <summary>
         /// 期間選択コマンド
         /// </summary>
-        public ICommand SelectTermCommand => new RelayCommand(this.SelectTermCommand_Executed, this.SelectTermCommand_CanExecute);
+        public ICommand SelectTermCommand => new AsyncRelayCommand(this.SelectTermCommand_ExecuteAsync, this.SelectTermCommand_CanExecute);
         /// <summary>
         /// 翌月表示コマンド
         /// </summary>
-        public ICommand GoToNextMonthCommand => new RelayCommand(this.GoToNextMonthCommand_Executed, this.GoToNextMonthCommand_CanExecute);
+        public ICommand GoToNextMonthCommand => new AsyncRelayCommand(this.GoToNextMonthCommand_ExecuteAsync, this.GoToNextMonthCommand_CanExecute);
         /// <summary>
         /// 今月表示コマンド
         /// </summary>
-        public ICommand GoToThisMonthCommand => new RelayCommand(this.GoToThisMonthCommand_Executed, this.GoToThisMonthCommand_CanExecute);
+        public ICommand GoToThisMonthCommand => new AsyncRelayCommand(this.GoToThisMonthCommand_ExecuteAsync, this.GoToThisMonthCommand_CanExecute);
         /// <summary>
         /// 前年表示コマンド
         /// </summary>
-        public ICommand GoToLastYearCommand => new RelayCommand(this.GoToLastYearCommand_Executed, this.GoToLastYearCommand_CanExecute);
+        public ICommand GoToLastYearCommand => new AsyncRelayCommand(this.GoToLastYearCommand_ExecuteAsync, this.GoToLastYearCommand_CanExecute);
         /// <summary>
         /// 翌年表示コマンド
         /// </summary>
-        public ICommand GoToNextYearCommand => new RelayCommand(this.GoToNextYearCommand_Executed, this.GoToNextYearCommand_CanExecute);
+        public ICommand GoToNextYearCommand => new AsyncRelayCommand(this.GoToNextYearCommand_ExecuteAsync, this.GoToNextYearCommand_CanExecute);
         /// <summary>
         /// 今年表示コマンド
         /// </summary>
-        public ICommand GoToThisYearCommand => new RelayCommand(this.GoToThisYearCommand_Executed, this.GoToThisYearCommand_CanExecute);
+        public ICommand GoToThisYearCommand => new AsyncRelayCommand(this.GoToThisYearCommand_ExecuteAsync, this.GoToThisYearCommand_CanExecute);
         /// <summary>
         /// 更新コマンド
         /// </summary>
-        public ICommand UpdateCommand => new RelayCommand(this.UpdateCommand_Executed);
+        public ICommand UpdateCommand => new AsyncRelayCommand(this.UpdateCommand_ExecuteAsync);
         #endregion
 
         #region ツールコマンド
@@ -606,7 +606,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 設定コマンド
         /// </summary>
-        public ICommand SettingsCommand => new RelayCommand(this.SettingsCommand_Executed, this.SettingsWindowCommand_CanExecute);
+        public ICommand SettingsCommand => new AsyncRelayCommand(this.SettingsCommand_ExecuteAsync, this.SettingsWindowCommand_CanExecute);
         /// <summary>
         /// 帳簿内ツールコマンド
         /// </summary>
@@ -614,7 +614,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// CSVファイル比較コマンド
         /// </summary>
-        public ICommand CompareCsvFileCommand => new RelayCommand(this.CompareCsvFileCommand_Executed, this.CompareCsvFileCommand_CanExecute);
+        public ICommand CompareCsvFileCommand => new RelayCommand(this.CompareCsvFileCommand_Execute, this.CompareCsvFileCommand_CanExecute);
         #endregion
 
         #region ヘルプコマンド
@@ -625,7 +625,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// バージョン表示コマンド
         /// </summary>
-        public ICommand ShowVersionCommand => new RelayCommand(this.OpenVersionWindowCommand_Executed, this.OpenVersionWindowCommand_CanExecute);
+        public ICommand ShowVersionCommand => new RelayCommand(this.OpenVersionWindowCommand_Execute, this.OpenVersionWindowCommand_CanExecute);
         #endregion
         #endregion
         #endregion
@@ -646,7 +646,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 記帳風月インポートコマンド処理
         /// </summary>
-        public async void ImportKichoFugetsuDbCommand_Executed()
+        public async Task ImportKichoFugetsuDbCommand_ExecuteAsync()
         {
             Properties.Settings settings = Properties.Settings.Default;
             (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_Import_KichoFugetsu_FilePath, App.GetCurrentDir());
@@ -694,7 +694,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// PostgreSQL -> SQLite インポートコマンド処理
         /// </summary>
-        public async void ImportPostgreSQLCommand_Executed()
+        public async Task ImportPostgreSQLCommand_ExecuteAsync()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -737,7 +737,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// カスタムファイル -> PostgreSQL インポートコマンド処理
         /// </summary>
-        public async void ImportCustomFileCommand_Executed()
+        public async Task ImportCustomFileCommand_ExecuteAsync()
         {
             Properties.Settings settings = Properties.Settings.Default;
             (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_Import_CustomFormat_FilePath, App.GetCurrentDir());
@@ -781,7 +781,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド処理
         /// </summary>
-        public async void ImportSQLiteFileCommand_Executed()
+        public async Task ImportSQLiteFileCommand_ExecuteAsync()
         {
             Properties.Settings settings = Properties.Settings.Default;
             (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_SQLite_DBFilePath, App.GetCurrentDir());
@@ -831,7 +831,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// カスタムファイルエクスポートコマンド処理
         /// </summary>
-        public async void ExportCustomFileCommand_Executed()
+        public async Task ExportCustomFileCommand_ExecuteAsync()
         {
             Properties.Settings settings = Properties.Settings.Default;
             (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_Export_CustomFormat_FilePath, App.GetCurrentDir());
@@ -865,7 +865,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// SQLファイルエクスポートコマンド処理
         /// </summary>
-        public async void ExportSQLFileCommand_Executed()
+        public async Task ExportSQLFileCommand_ExecuteAsync()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -900,7 +900,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// バックアップコマンド処理
         /// </summary>
-        public async void BackUpCommand_Executed()
+        public async Task BackUpCommand_ExecuteAsync()
         {
             bool result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
@@ -933,7 +933,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// ウィンドウ終了コマンド処理
         /// </summary>
-        public void ExitWindowCommand_Executed() => this.CloseRequest(new DialogCloseRequestEventArgs(true));
+        public void ExitWindowCommand_Execute() => this.CloseRequest(new DialogCloseRequestEventArgs(true));
         #endregion
 
         #region 表示メニュー
@@ -952,7 +952,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿タブ表示コマンド処理
         /// </summary>
-        private void ShowBookTabCommand_Executed() => this.SelectedTab = Tabs.BooksTab;
+        private void ShowBookTabCommand_Execute() => this.SelectedTab = Tabs.BooksTab;
 
         /// <summary>
         /// 日別グラフタブ表示コマンド実行可能か
@@ -962,7 +962,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 日別グラフタブ表示コマンド処理
         /// </summary>
-        private void ShowDailyGraphTabCommand_Executed() => this.SelectedTab = Tabs.DailyGraphTab;
+        private void ShowDailyGraphTabCommand_Execute() => this.SelectedTab = Tabs.DailyGraphTab;
 
         /// <summary>
         /// 月別一覧タブ表示コマンド実行可能か
@@ -972,7 +972,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 月別一覧タブ表示コマンド処理
         /// </summary>
-        private void ShowMonthlyListTabCommand_Executed() => this.SelectedTab = Tabs.MonthlyListTab;
+        private void ShowMonthlyListTabCommand_Execute() => this.SelectedTab = Tabs.MonthlyListTab;
 
         /// <summary>
         /// 月別グラフタブ表示コマンド実行可能か
@@ -982,7 +982,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 月別グラフタブ表示コマンド処理
         /// </summary>
-        private void ShowMonthlyGraphTabCommand_Executed() => this.SelectedTab = Tabs.MonthlyGraphTab;
+        private void ShowMonthlyGraphTabCommand_Execute() => this.SelectedTab = Tabs.MonthlyGraphTab;
 
         /// <summary>
         /// 年別一覧タブ表示コマンド実行可能か
@@ -992,7 +992,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 年別一覧タブ表示コマンド処理
         /// </summary>
-        private void ShowYearlyListTabCommand_Executed() => this.SelectedTab = Tabs.YearlyListTab;
+        private void ShowYearlyListTabCommand_Execute() => this.SelectedTab = Tabs.YearlyListTab;
 
         /// <summary>
         /// 年別グラフタブ表示コマンド実行可能か
@@ -1002,7 +1002,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 年別グラフタブ表示コマンド処理
         /// </summary>
-        private void ShowYearlyGraphTabCommand_Executed() => this.SelectedTab = Tabs.YearlyGraphTab;
+        private void ShowYearlyGraphTabCommand_Execute() => this.SelectedTab = Tabs.YearlyGraphTab;
         #endregion
 
         #region 月間表示
@@ -1015,12 +1015,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 先月表示コマンド処理
         /// </summary>
-        private async void GoToLastMonthCommand_Executed()
+        private async Task GoToLastMonthCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                this.DisplayedMonth = this.DisplayedMonth.Value.AddMonths(-1);
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
-            }
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
+
+            this.DisplayedMonth = this.DisplayedMonth.Value.AddMonths(-1);
+            await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
         }
 
         /// <summary>
@@ -1037,12 +1037,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 今月表示コマンド処理
         /// </summary>
-        private async void GoToThisMonthCommand_Executed()
+        private async Task GoToThisMonthCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                this.DisplayedMonth = DateOnlyExtensions.Today.GetFirstDateOfMonth();
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
-            }
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
+
+            this.DisplayedMonth = DateOnlyExtensions.Today.GetFirstDateOfMonth();
+            await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
         }
 
         /// <summary>
@@ -1054,12 +1054,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 翌月表示コマンド処理
         /// </summary>
-        private async void GoToNextMonthCommand_Executed()
+        private async Task GoToNextMonthCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                this.DisplayedMonth = this.DisplayedMonth.Value.AddMonths(1);
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
-            }
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
+
+            this.DisplayedMonth = this.DisplayedMonth.Value.AddMonths(1);
+            await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
         }
 
         /// <summary>
@@ -1070,7 +1070,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 期間選択コマンド処理
         /// </summary>
-        private async void SelectTermCommand_Executed()
+        private async Task SelectTermCommand_ExecuteAsync()
         {
             SelectPeriodRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
@@ -1101,12 +1101,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 前年表示コマンド処理
         /// </summary>
-        private async void GoToLastYearCommand_Executed()
+        private async Task GoToLastYearCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                this.DisplayedYear = this.DisplayedYear.AddYears(-1);
-                await this.UpdateAsync(isUpdateBookList: true);
-            }
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
+
+            this.DisplayedYear = this.DisplayedYear.AddYears(-1);
+            await this.UpdateAsync(isUpdateBookList: true);
         }
 
         /// <summary>
@@ -1123,12 +1123,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 今年表示コマンド処理
         /// </summary>
-        private async void GoToThisYearCommand_Executed()
+        private async Task GoToThisYearCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                this.DisplayedYear = DateOnlyExtensions.Today.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
-                await this.UpdateAsync(isUpdateBookList: true);
-            }
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
+
+            this.DisplayedYear = DateOnlyExtensions.Today.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
+            await this.UpdateAsync(isUpdateBookList: true);
         }
 
         /// <summary>
@@ -1140,23 +1140,23 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 来年表示コマンド処理
         /// </summary>
-        private async void GoToNextYearCommand_Executed()
+        private async Task GoToNextYearCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                this.DisplayedYear = this.DisplayedYear.AddYears(1);
-                await this.UpdateAsync(isUpdateBookList: true);
-            }
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
+
+            this.DisplayedYear = this.DisplayedYear.AddYears(1);
+            await this.UpdateAsync(isUpdateBookList: true);
         }
         #endregion
 
         /// <summary>
         /// 画面更新コマンド処理
         /// </summary>
-        private async void UpdateCommand_Executed()
+        private async Task UpdateCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                await this.UpdateAsync(isUpdateBookList: true);
-            }
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
+
+            await this.UpdateAsync(isUpdateBookList: true);
         }
         #endregion
 
@@ -1174,7 +1174,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 設定コマンド処理
         /// </summary>
-        private async void SettingsCommand_Executed()
+        private async Task SettingsCommand_ExecuteAsync()
         {
             SettingsRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory
@@ -1208,7 +1208,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// CSV比較コマンド処理
         /// </summary>
-        private void CompareCsvFileCommand_Executed()
+        private void CompareCsvFileCommand_Execute()
         {
             CompareCsvFileRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
@@ -1229,7 +1229,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// バージョン表示コマンド処理
         /// </summary>
-        private void OpenVersionWindowCommand_Executed() => this.ShowVersionRequested?.Invoke(this, EventArgs.Empty);
+        private void OpenVersionWindowCommand_Execute() => this.ShowVersionRequested?.Invoke(this, EventArgs.Empty);
         #endregion
         #endregion
 

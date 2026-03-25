@@ -347,7 +347,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void ExportCSVFileCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private async void ExportCSVFileCommand_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             switch (this.WVM.SelectedTab) {
                 case Tabs.BooksTab: {

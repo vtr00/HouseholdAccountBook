@@ -194,12 +194,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 今日コマンド
         /// </summary>
         public ICommand TodayCommand => new RelayCommand(() => this.SelectedFromDate = DateTime.Today, () => this.SelectedFromDate != DateTime.Today);
+        /// <summary>
+        /// OKコマンド
+        /// </summary>
+        public new ICommand OKCommand => new AsyncRelayCommand(this.OKCommand_ExecuteAsync, this.OKCommand_CanExecute);
         #endregion
         #endregion
 
         #region コマンドイベントハンドラ
         protected override bool OKCommand_CanExecute() => this.InputedValue is not null && this.FromBookSelectorVM?.SelectedKey != this.ToBookSelectorVM?.SelectedKey;
-        protected override async void OKCommand_Executed()
+        protected async Task OKCommand_ExecuteAsync()
         {
             // DB登録
             IEnumerable<ActionIdObj> idList = null;
@@ -208,7 +212,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
             this.Registrated?.Invoke(this, new EventArgs<IEnumerable<ActionIdObj>>(idList));
 
-            base.OKCommand_Executed();
+            base.OKCommand_Execute();
         }
         #endregion
 
