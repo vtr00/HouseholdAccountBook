@@ -115,7 +115,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
-            AppService service = new(this.mDbHandlerFactory);
+            AppCommonService service = new(this.mDbHandlerFactory);
             return (await service.LoadPeriodOfAll()).Convert(DateOnly.FromDateTime);
         }
     }

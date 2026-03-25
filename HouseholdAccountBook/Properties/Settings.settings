@@ -275,5 +275,8 @@
     <Setting Name="App_ExportCsvFilePath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="App_LatestVersionNotifyAtAppLaunched" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

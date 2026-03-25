@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Models.AppServices
 {
+    /// <summary>
+    /// 祝日サービス
+    /// </summary>
     public class HolidayService : SingletonBase<HolidayService>
     {
         /// <summary>

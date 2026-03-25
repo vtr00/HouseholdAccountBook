@@ -1099,4 +1099,25 @@
   <data name="Menu_View_BookItems_AlwaysDisplay_CategoryName" xml:space="preserve">
     <value>分類名を常に表示</value>
   </data>
+  <data name="GroupHeader_VersionInformation" xml:space="preserve">
+    <value>バージョン情報</value>
+  </data>
+  <data name="CheckBox_Notifications_LaunchingApplication" xml:space="preserve">
+    <value>アプリ起動時</value>
+  </data>
+  <data name="Message_FoultToGetLatestVersionNumber" xml:space="preserve">
+    <value>最新バージョン番号の取得に失敗しました。</value>
+  </data>
+  <data name="Message_NotifyLatestVersionNumber" xml:space="preserve">
+    <value>最新バージョン(Ver. {0})があります。こちらからダウンロードできます。</value>
+  </data>
+  <data name="Menu_Help_CheckUpdate" xml:space="preserve">
+    <value>更新の確認(_U)</value>
+  </data>
+  <data name="Message_NotifyCurrentIsLatestVersion" xml:space="preserve">
+    <value>アプリは最新です。</value>
+  </data>
+  <data name="Menu_Help_ReleaseNote" xml:space="preserve">
+    <value>リリースノート(_N)...</value>
+  </data>
 </root>

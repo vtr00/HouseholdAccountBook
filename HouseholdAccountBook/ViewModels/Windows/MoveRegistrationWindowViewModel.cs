@@ -26,7 +26,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// アプリサービス
         /// </summary>
-        private AppService mAppService;
+        private AppCommonService mAppService;
         /// <summary>
         /// 帳簿項目登録サービス
         /// </summary>

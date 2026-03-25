@@ -15,10 +15,11 @@ using System.Threading.Tasks;
 namespace HouseholdAccountBook.Models.AppServices
 {
     /// <summary>
-    /// メインサービス
+    /// 帳簿項目表示サービス
     /// </summary>
     /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-    public class MainService(DbHandlerFactory dbHandlerFactory)
+    /// <remarks>主にメインウィンドウで使用する</remarks>
+    public class ActionViewService(DbHandlerFactory dbHandlerFactory)
     {
         /// <summary>
         /// DBハンドラファクトリ

@@ -41,7 +41,8 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数(負の場合は「-」桁数)</param>
-        public static void Vars(string message = "", object vars = null, LogLevel level = LogLevel.Info, [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+        public static void Vars(string message = "", object vars = null, LogLevel level = LogLevel.Info,
+                                [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
             if (IsOutputImpl?.Invoke(level) != true) { return; }
 
@@ -61,7 +62,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
-        public static void Critical(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+        public static void Critical(string message = "", [CallerFilePath] string fileName = null,[CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
             => OutputImpl?.Invoke(LogLevel.Critical, message, fileName, methodName, lineNumber);
         /// <summary>
         /// エラーログを1行出力する

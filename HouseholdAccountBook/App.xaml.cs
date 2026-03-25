@@ -2,7 +2,6 @@
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.DbHandlers;
 using HouseholdAccountBook.Views.Extensions;
@@ -164,7 +163,12 @@ namespace HouseholdAccountBook
             // 休日リストを取得する
             if (!await HolidayService.Instance.DownloadHolidayListAsync(settings.App_NationalHolidayCsv_Uri, settings.App_NationalHolidayCsv_TextEncoding, settings.App_NationalHolidayCsv_DateIndex)) {
                 // 祝日取得失敗を通知する
-                NotificationUtil.NotifyFailingToGetHolidayList();
+                Log.Warning("Failed to get holiday list.");
+                NotificationService.NotifyFailingToGetHolidayList();
+            }
+            if (settings.App_LatestVersionNotifyAtAppLaunched) {
+                // 最新バージョンを通知する
+                await App.NotifyLatestVersionAsync(false);
             }
 
             // メインウィンドウを開く
@@ -196,7 +200,7 @@ namespace HouseholdAccountBook
 
                 // ハンドルされない例外の発生を通知する
                 string absoluteFilePath = Path.Combine(GetCurrentDir(), log.RelatedFilePath);
-                NotificationUtil.NotifyUnhandledException(absoluteFilePath);
+                NotificationService.NotifyUnhandledException(absoluteFilePath);
             }
             catch (Exception ex) {
                 Log.Error($"Exception Occured in Unhandled Exception Handler: {ex.Message}");
@@ -411,5 +415,32 @@ namespace HouseholdAccountBook
         /// </summary>
         /// <returns></returns>
         public static Version GetAssemblyVersion() => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+
+        /// <summary>
+        /// 最新バージョンを通知する
+        /// </summary>
+        /// <param name="notifyCurrentIsLatest">現バージョンが最新でも通知するか</param>
+        /// <returns></returns>
+        public static async Task NotifyLatestVersionAsync(bool notifyCurrentIsLatest)
+        {
+            // 最新バージョン情報を取得する
+            if (!await AppVersionService.Instance.GetLatestInfoAsync()) {
+                // 最新バージョン情報取得失敗を通知する
+                Log.Warning("Failed to get letest info.");
+                NotificationService.NotifyFailingToGetLatestVersionNumber();
+            }
+            else {
+                Version latest = AppVersionService.Instance.GetLatestVersion();
+                string latestHtmlUrl = AppVersionService.Instance.GetLatestHtmlUrl();
+                Log.Info($"Latest: Ver. {latest}");
+
+                if (App.GetAssemblyVersion() < latest) {
+                    NotificationService.NotifyLatestVersionNumber(latest, latestHtmlUrl);
+                }
+                else if (notifyCurrentIsLatest) {
+                    NotificationService.NotifyCurrentIsLatestVersion();
+                }
+            }
+        }
     }
 }

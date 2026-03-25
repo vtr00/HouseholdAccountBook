@@ -1052,7 +1052,7 @@ list</value>
     <value>Window log</value>
   </data>
   <data name="Menu_File_OperationLog" xml:space="preserve">
-    <value>Operation log file(_O)</value>
+    <value>Operation log file (_O)</value>
   </data>
   <data name="Menu_View_DebugMode" xml:space="preserve">
     <value>Debug mode (_D)</value>
@@ -1098,5 +1098,26 @@ list</value>
   </data>
   <data name="Menu_View_BookItems_AlwaysDisplay_CategoryName" xml:space="preserve">
     <value>Always show category names</value>
+  </data>
+  <data name="GroupHeader_VersionInformation" xml:space="preserve">
+    <value>Version information</value>
+  </data>
+  <data name="CheckBox_Notifications_LaunchingApplication" xml:space="preserve">
+    <value>When the application is launched</value>
+  </data>
+  <data name="Message_FoultToGetLatestVersionNumber" xml:space="preserve">
+    <value>Failed to get latest version number.</value>
+  </data>
+  <data name="Message_NotifyLatestVersionNumber" xml:space="preserve">
+    <value>Latest version exists: Ver. {0}. Please click here to open the download page.</value>
+  </data>
+  <data name="Menu_Help_CheckUpdate" xml:space="preserve">
+    <value>Check update (_U)</value>
+  </data>
+  <data name="Message_NotifyCurrentIsLatestVersion" xml:space="preserve">
+    <value>This application is latest.</value>
+  </data>
+  <data name="Menu_Help_ReleaseNote" xml:space="preserve">
+    <value>Release note (_N)...</value>
   </data>
 </root>

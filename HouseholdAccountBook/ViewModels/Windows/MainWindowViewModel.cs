@@ -36,7 +36,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// アプリサービス
         /// </summary>
-        private AppService mService;
+        private AppCommonService mService;
         /// <summary>
         /// DBインポートサービス
         /// </summary>
@@ -623,6 +623,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand HelpMenuCommand => new RelayCommand(this.HelpMenuCommand_CanExecute);
         /// <summary>
+        /// 更新の確認コマンド
+        /// </summary>
+        public ICommand CheckUpdateCommand => new AsyncRelayCommand(this.CheckUpdateCommand_ExecuteAsync);
+        /// <summary>
+        /// リリースノートコマンド
+        /// </summary>
+        public ICommand OpenReleaseNoteCommand => new RelayCommand(this.OpenReleaseNoteCommand_Execute);
+        /// <summary>
         /// バージョン表示コマンド
         /// </summary>
         public ICommand ShowVersionCommand => new RelayCommand(this.OpenVersionWindowCommand_Execute, this.OpenVersionWindowCommand_CanExecute);
@@ -1187,7 +1195,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     this.FiscalStartMonth = settings.App_StartMonth;
                     if (!await HolidayService.Instance.DownloadHolidayListAsync(settings.App_NationalHolidayCsv_Uri, settings.App_NationalHolidayCsv_TextEncoding, settings.App_NationalHolidayCsv_DateIndex)) {
                         // 祝日取得失敗を通知する
-                        NotificationUtil.NotifyFailingToGetHolidayList();
+                        NotificationService.NotifyFailingToGetHolidayList();
                     }
 
                     await this.UpdateAsync(isUpdateBookList: true);
@@ -1221,6 +1229,28 @@ namespace HouseholdAccountBook.ViewModels.Windows
         #region ヘルプメニュー
         private bool HelpMenuCommand_CanExecute() => true;
 
+        /// <summary>
+        /// 更新の確認コマンド処理
+        /// </summary>
+        /// <returns></returns>
+        private async Task CheckUpdateCommand_ExecuteAsync() => await App.NotifyLatestVersionAsync(true);
+        /// <summary>
+        /// リリースノートコマンド処理
+        /// </summary>
+        private void OpenReleaseNoteCommand_Execute()
+        {
+            string releasesUrl = "https://github.com/vtr00/HouseholdAccountBook/releases";
+            if (releasesUrl != null) {
+                Log.Info($"Open releases url: {releasesUrl}");
+                try {
+                    _ = Process.Start(new ProcessStartInfo() {
+                        FileName = releasesUrl,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception) { }
+            }
+        }
         /// <summary>
         /// バージョン表示コマンド実行可能か
         /// </summary>

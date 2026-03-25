@@ -6,12 +6,12 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace HouseholdAccountBook.Infrastructure.Utilities
+namespace HouseholdAccountBook.Models.AppServices
 {
     /// <summary>
     /// 通知ユーティリティ
     /// </summary>
-    public static class NotificationUtil
+    public static class NotificationService
     {
         private static readonly Brush mInformationForeground = Brushes.Blue;
         private static readonly Brush mInformationBackground = Brushes.LightBlue;
@@ -69,6 +69,73 @@ namespace HouseholdAccountBook.Infrastructure.Utilities
                 Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
             };
             nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+        }
+
+        /// <summary>
+        /// 最新バージョン番号の取得に失敗したことを通知する
+        /// </summary>
+        public static void NotifyFailingToGetLatestVersionNumber()
+        {
+            // 最新バージョン取得失敗を通知する
+            NotificationManager nm = new();
+            NotificationContent nc = new() {
+                Title = Properties.Resources.Title_MainWindow,
+                Message = Properties.Resources.Message_FoultToGetLatestVersionNumber,
+                Type = NotificationType.Warning,
+                Background = mWarningBackground,
+                Foreground = mWarningForeground,
+                Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
+            };
+            nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+        }
+
+        /// <summary>
+        /// 現在バージョンが最新バージョンと同じことを通知する
+        /// </summary>
+        public static void NotifyCurrentIsLatestVersion()
+        {
+            // 最新バージョンを通知する
+            NotificationManager nm = new();
+            NotificationContent nc = new() {
+                Title = Properties.Resources.Title_MainWindow,
+                Message = Properties.Resources.Message_NotifyCurrentIsLatestVersion,
+                Type = NotificationType.Information,
+                Background = mInformationBackground,
+                Foreground = mInformationForeground,
+                Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
+            };
+            nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
+        }
+
+        /// <summary>
+        /// 最新バージョン番号を通知する
+        /// </summary>
+        /// <param name="latest">最新バージョン番号</param>
+        /// <param name="latestHtmlUrl">最新バージョンのURL</param>
+        public static void NotifyLatestVersionNumber(Version latest, string latestHtmlUrl)
+        {
+            // 最新バージョンを通知する
+            NotificationManager nm = new();
+            NotificationContent nc = new() {
+                Title = Properties.Resources.Title_MainWindow,
+                Message = string.Format(Properties.Resources.Message_NotifyLatestVersionNumber, latest.ToString()),
+                Type = NotificationType.Information,
+                Background = mInformationBackground,
+                Foreground = mInformationForeground,
+                Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
+            };
+            nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
+                if (latestHtmlUrl != null) {
+                    Log.Info($"Open latest html url: {latestHtmlUrl}");
+                    try {
+                        _ = Process.Start(new ProcessStartInfo() {
+                            FileName = latestHtmlUrl,
+                            UseShellExecute = true
+                        });
+                    }
+                    catch (Exception) { }
+                }
+            });
         }
 
         /// <summary>

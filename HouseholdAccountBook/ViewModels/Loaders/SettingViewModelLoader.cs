@@ -18,12 +18,12 @@ namespace HouseholdAccountBook.ViewModels.Loaders
     /// </summary>
     /// <param name="appService">アプリサービス</param>
     /// <param name="settingService">設定サービス</param>
-    public class SettingViewModelLoader(AppService appService, SettingService settingService)
+    public class SettingViewModelLoader(AppCommonService appService, SettingService settingService)
     {
         /// <summary>
         /// アプリサービス
         /// </summary>
-        private readonly AppService mAppService = appService;
+        private readonly AppCommonService mAppService = appService;
         /// <summary>
         /// 設定サービス
         /// </summary>
