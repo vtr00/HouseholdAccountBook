@@ -210,7 +210,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="token">キャンセル用トークン</param>
         /// <returns></returns>
-        public async Task LoadAsync(CancellationToken token = default) => await this.LoadAsync(default, token);
+        public async Task LoadAsync(CancellationToken token = default) => await this.LoadAsync(default, SelectorMode.FirstOrElementAtOrDefault, token);
         /// <summary>
         /// [非同期] <see cref="VM"/> リストを読込み、指定の <see cref="VM"/> を選択する
         /// </summary>
@@ -218,6 +218,13 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="token">キャンセル用トークン</param>
         /// <returns></returns>
         public async Task LoadAsync(KEY? selection, CancellationToken token) => await this.LoadAsync(selection, SelectorMode.FirstOrElementAtOrDefault, token);
+        /// <summary>
+        /// [非同期] <see cref="VM"/> リストを読込み、指定の <see cref="VM"/> を選択する
+        /// </summary>
+        /// <param name="mode"><see cref="VM"> を選択するモード</param>
+        /// <param name="token">キャンセル用トークン</param>
+        /// <returns></returns>
+        public async Task LoadAsync(SelectorMode mode, CancellationToken token = default) => await this.LoadAsync(default, mode, token);
         /// <summary>
         /// [非同期] <see cref="VM"/> リストを読込み、指定の <see cref="VM"/> を選択する
         /// </summary>

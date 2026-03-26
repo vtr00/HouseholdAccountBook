@@ -48,10 +48,10 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             await vm.BookKindSelectorVM.LoadAsync(bm.BookKind);
             vm.DebitBookSelectorVM.SetLoader(() => bmList.Where(tmpVM => tmpVM.Id != bookId));
             await vm.DebitBookSelectorVM.LoadAsync(bm.DebitBookId);
-            vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(bookId)).Select(model => new RelationViewModel(model)));
-            await vm.RelationSelectorVM.LoadAsync();
             vm.TextEncodingSelectorVM.SetLoader(() => EncodingUtil.GetTextEncodingList());
             await vm.TextEncodingSelectorVM.LoadAsync(bm.TextEncoding);
+            vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(bookId)).Select(model => new RelationViewModel(model)));
+            await vm.RelationSelectorVM.LoadAsync(SelectorMode.FirstOrDefault);
 
             return vm;
         }
@@ -112,11 +112,11 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                     ItemIdObj itemId = id.Value;
                     vm = new(await this.mService.LoadItemAsync(itemId));
                     vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(itemId)).Select(model => new RelationViewModel(model)));
-                    await vm.RelationSelectorVM.LoadAsync();
+                    await vm.RelationSelectorVM.LoadAsync(SelectorMode.FirstOrDefault);
                     vm.ShopSelectorVM.SetLoader(async () => await this.mAppService.LoadShopListAsync(itemId));
-                    await vm.ShopSelectorVM.LoadAsync();
+                    await vm.ShopSelectorVM.LoadAsync(SelectorMode.FirstOrDefault);
                     vm.RemarkSelectorVM.SetLoader(async () => await this.mAppService.LoadRemarkListAsync(itemId));
-                    await vm.RemarkSelectorVM.LoadAsync();
+                    await vm.RemarkSelectorVM.LoadAsync(SelectorMode.FirstOrDefault);
                     break;
                 }
             }
