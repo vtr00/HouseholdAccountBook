@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Models.AppServices;
 using System;
 using System.Globalization;
 using System.Windows.Data;
@@ -19,10 +20,10 @@ namespace HouseholdAccountBook.Views.Converters
                 return null;
             }
             else if (value is DateTime dateTime) {
-                return dateTime.IsNationalHoliday();
+                return HolidayService.Instance.IsNationalHoliday(dateTime.ToDateOnly());
             }
             else if (value is DateOnly dateOnly) {
-                return dateOnly.IsNationalHoliday();
+                return HolidayService.Instance.IsNationalHoliday(dateOnly);
             }
 
             throw new NotImplementedException();
