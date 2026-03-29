@@ -1,13 +1,5 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using HouseholdAccountBook.Infrastructure.Logger;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
 {
@@ -16,67 +8,6 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
     /// </summary>
     public static class DateOnlyExtensions
     {
-        /// <summary>
-        /// 国民の祝日リスト
-        /// </summary>
-        private static readonly List<DateOnly> mHolidayList = [];
-
-        /// <summary>
-        /// 国民の祝日リストを取得する
-        /// </summary>
-        /// <param name="url">CSVファイルのURL</param>
-        /// <param name="textEncoding">CSVファイルの文字エンコード</param>
-        /// <param name="dateIndex">日付のインデックス</param>
-        /// <returns>成功/失敗</returns>
-        public static async Task<bool> DownloadHolidayListAsync(string url, int textEncoding, int dateIndex)
-        {
-            using FuncLog funcLog = new(new { url, textEncoding, dateIndex });
-
-            if (url != string.Empty) {
-                Uri uri = new(url);
-
-                CsvConfiguration csvConfig = new(System.Globalization.CultureInfo.CurrentCulture) {
-                    HasHeaderRecord = true,
-                    MissingFieldFound = mffa => { }
-                };
-
-                HttpClientHandler handler = new() { SslProtocols = System.Security.Authentication.SslProtocols.Tls12 };
-                try {
-                    using (HttpClient client = new(handler)) {
-                        Stream stream = await client.GetStreamAsync(uri);
-                        if (stream.CanRead) {
-                            mHolidayList.Clear();
-                            // CSVファイルを読み込む
-                            using (CsvReader reader = new(new StreamReader(stream, Encoding.GetEncoding(textEncoding)), csvConfig)) {
-                                while (reader.Read()) {
-                                    if (reader.TryGetField(dateIndex, out string dateString)) {
-                                        if (DateOnly.TryParse(dateString, out DateOnly dateTime)) {
-                                            mHolidayList.Add(dateTime);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception) { }
-
-                return mHolidayList.Count != 0;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// 国民の祝日かどうかを取得する
-        /// </summary>
-        /// <param name="date">対象の日付</param>
-        /// <returns>国民の祝日かどうか</returns>
-        public static bool IsNationalHoliday(this DateOnly date)
-        {
-            bool ans = mHolidayList.Contains(date);
-            return ans;
-        }
-
         /// <summary>
         /// 年始めを取得する
         /// </summary>

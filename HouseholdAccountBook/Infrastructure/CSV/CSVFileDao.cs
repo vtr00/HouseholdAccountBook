@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -65,6 +66,50 @@ namespace HouseholdAccountBook.Infrastructure.CSV
             }
 
             return tmpVMList;
+        }
+
+        /// <summary>
+        /// 国民の祝日リストを取得する
+        /// </summary>
+        /// <param name="url">CSVファイルのURL</param>
+        /// <param name="textEncoding">CSVファイルの文字エンコード</param>
+        /// <param name="dateIndex">日付のインデックス</param>
+        /// <returns>祝日リスト</returns>
+        public static async Task<IEnumerable<DateOnly>> DownloadHolidayListAsync(string url, int textEncoding, int dateIndex)
+        {
+            List<DateOnly> holidayList = [];
+
+            if (url != string.Empty) {
+                Uri uri = new(url);
+
+                CsvConfiguration csvConfig = new(CultureInfo.CurrentCulture) {
+                    HasHeaderRecord = true,
+                    MissingFieldFound = mffa => { }
+                };
+
+                HttpClientHandler handler = new() { SslProtocols = System.Security.Authentication.SslProtocols.Tls12 };
+                try {
+                    using (HttpClient client = new(handler)) {
+                        Stream stream = await client.GetStreamAsync(uri);
+                        if (stream.CanRead) {
+                            holidayList.Clear();
+                            // CSVファイルを読み込む
+                            using (CsvReader reader = new(new StreamReader(stream, Encoding.GetEncoding(textEncoding)), csvConfig)) {
+                                while (reader.Read()) {
+                                    if (reader.TryGetField(dateIndex, out string dateString)) {
+                                        if (DateOnly.TryParse(dateString, out DateOnly dateTime)) {
+                                            holidayList.Add(dateTime);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception) { }
+            }
+
+            return holidayList;
         }
 
         /// <summary>

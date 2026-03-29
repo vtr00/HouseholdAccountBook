@@ -96,12 +96,12 @@ namespace HouseholdAccountBook.Models.AppServices
             {
                 switch (holidaySettingKind) {
                     case HolidaySettingKind.BeforeHoliday:
-                        while (tmpDateTime.IsNationalHoliday() || tmpDateTime.DayOfWeek == DayOfWeek.Saturday || tmpDateTime.DayOfWeek == DayOfWeek.Sunday) {
+                        while (HolidayService.Instance.IsNationalHoliday(tmpDateTime.ToDateOnly()) || tmpDateTime.DayOfWeek == DayOfWeek.Saturday || tmpDateTime.DayOfWeek == DayOfWeek.Sunday) {
                             tmpDateTime = tmpDateTime.AddDays(-1);
                         }
                         break;
                     case HolidaySettingKind.AfterHoliday:
-                        while (tmpDateTime.IsNationalHoliday() || tmpDateTime.DayOfWeek == DayOfWeek.Saturday || tmpDateTime.DayOfWeek == DayOfWeek.Sunday) {
+                        while (HolidayService.Instance.IsNationalHoliday(tmpDateTime.ToDateOnly()) || tmpDateTime.DayOfWeek == DayOfWeek.Saturday || tmpDateTime.DayOfWeek == DayOfWeek.Sunday) {
                             tmpDateTime = tmpDateTime.AddDays(1);
                         }
                         break;
