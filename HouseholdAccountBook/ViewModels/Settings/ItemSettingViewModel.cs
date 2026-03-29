@@ -38,7 +38,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 関連性セレクタVM
         /// </summary>
-        public SelectorViewModel<RelationViewModel, BookIdObj> RelationSelectorVM { get; } = new(static vm => (int)vm?.Id);
+        public SelectorViewModel<RelationViewModel, BookIdObj> RelationSelectorVM { get; } = new(static vm => vm?.Id);
 
         /// <summary>
         /// 店舗セレクタVM
@@ -67,7 +67,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public ItemSettingViewModel()
         {
             this.Kind = HierarchicalKind.Balance;
-            this.Id = -1;
+            this.Id = IdObj.System;
             this.SortOrder = -1;
             this.InputedName = string.Empty;
         }

@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             BookInfoDao bookInfoDao = new(dbHandler);
-            var dto = await bookInfoDao.FindByBookId((int)bookId);
+            BookInfoDto dto = await bookInfoDao.FindByBookId((int)bookId);
 
             MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
 
@@ -54,7 +54,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 EndDateExists = jsonObj?.EndDate != null,
                 Period = new(jsonObj?.StartDate?.ToDateOnly() ?? dto.StartDate?.ToDateOnly() ?? DateOnlyExtensions.Today,
                                 jsonObj?.EndDate?.ToDateOnly() ?? dto.EndDate?.ToDateOnly() ?? DateOnlyExtensions.Today),
-                DebitBookId = dto.DebitBookId,
+                DebitBookId = dto.DebitBookId ?? BookIdObj.System,
                 PayDay = dto.PayDay,
                 CsvFolderPath = jsonObj == null ? "" : PathUtil.GetSmartPath(App.GetCurrentDir(), jsonObj.CsvFolderPath),
                 TextEncoding = jsonObj?.TextEncoding ?? Encoding.UTF8.CodePage,
@@ -150,7 +150,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 BookName = book.Name,
                 BookKind = (int)book.BookKind,
                 InitialValue = (int)book.InitialValue,
-                DebitBookId = book.DebitBookId == -1 ? null : (int)book.DebitBookId,
+                DebitBookId = book.DebitBookId == BookIdObj.System ? null : (int)book.DebitBookId,
                 PayDay = book.PayDay,
                 JsonCode = jsonCode,
                 BookId = (int)book.Id
@@ -197,7 +197,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             MstCategoryDao mstCategoryDao = new(dbHandler);
             IEnumerable<MstCategoryDto> cDtoList = await mstCategoryDao.FindByBalanceKindAsync((int)kind);
-            IEnumerable<CategoryModel> categoryList = [.. cDtoList.Select(dto => new CategoryModel(dto.CategoryId, dto.CategoryName, kind))];
+            IEnumerable<CategoryModel> categoryList = cDtoList.Select(dto => new CategoryModel(dto.CategoryId, dto.CategoryName, kind));
 
             return categoryList;
         }
@@ -214,7 +214,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             MstItemDao mstItemDao = new(dbHandler);
             IEnumerable<MstItemDto> iDtoList = await mstItemDao.FindByCategoryIdAsync((int)categoryId);
-            List<ItemModel> itemList = [.. iDtoList.Select(static dto => new ItemModel(dto.ItemId, dto.ItemName))];
+            IEnumerable<ItemModel> itemList = iDtoList.Select(static dto => new ItemModel(dto.ItemId, dto.ItemName));
 
             return itemList;
         }
@@ -349,7 +349,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             MstItemDao mstItemDao = new(dbHandler);
-            _ = await mstItemDao.UpdateSortOrderToMaximumAsync(categoryId.Value, itemId.Value);
+            _ = await mstItemDao.UpdateSortOrderToMaximumAsync(categoryId.Id, itemId.Id);
         }
 
         /// <summary>
@@ -364,7 +364,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             MstItemDao mstItemDao = new(dbHandler);
-            _ = await mstItemDao.UpdateSortOrderToMinimumAsync(categoryId.Value, itemId.Value);
+            _ = await mstItemDao.UpdateSortOrderToMinimumAsync(categoryId.Id, itemId.Id);
         }
 
         /// <summary>

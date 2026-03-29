@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// ID
         /// </summary>
-        public IdObj Id { get; init; } = -1;
+        public IdObj Id { get; init; }
 
         /// <summary>
         /// 親要素VM

@@ -1306,7 +1306,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.BookSelectorVM.SelectionChanged += async (sender, e) => {
                 this.SelectedBookChanged?.Invoke(sender, e);
 
-                settings.MainWindow_SelectedBookId = (int?)e.NewValue ?? -1;
+                settings.MainWindow_SelectedBookId = (int?)e.NewValue ?? (int)BookIdObj.System;
                 settings.Save();
 
                 await this.UpdateAsync(isUpdateBookList: false, isScroll: true);
@@ -1365,7 +1365,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedDBKind = this.mDbHandlerFactory.DBKind;
 
             // 帳簿リスト更新
-            await this.BookSelectorVM.LoadAsync(settings.MainWindow_SelectedBookId);
+            await this.BookSelectorVM.LoadAsync(settings.MainWindow_SelectedBookId == (int)BookIdObj.System ? BookIdObj.System : settings.MainWindow_SelectedBookId);
             // タブ選択
             if (settings.MainWindow_SelectedTabIndex != -1) {
                 this.SelectedTabIndex = settings.MainWindow_SelectedTabIndex;

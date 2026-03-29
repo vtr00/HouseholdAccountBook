@@ -37,7 +37,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             HstActionDao hstActionDao = new(dbHandler);
-            HstActionDto dto = await hstActionDao.FindByIdAsync(actionId.Value);
+            HstActionDto dto = await hstActionDao.FindByIdAsync(actionId.Id);
 
             ActionModel action = new() {
                 Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
@@ -70,7 +70,7 @@ namespace HouseholdAccountBook.Models.AppServices
             int count = 1;
             if (groupKind == GroupKind.Repeat) {
                 HstActionDao hstActionDao = new(dbHandler);
-                IEnumerable<HstActionDto> dtoList = await hstActionDao.FindInGroupAfterDateByIdAsync(actionId.Value);
+                IEnumerable<HstActionDto> dtoList = await hstActionDao.FindInGroupAfterDateByIdAsync(actionId.Id);
 
                 count = Math.Max(1, dtoList.Count());
             }
@@ -417,7 +417,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             MoveActionInfoDao moveActionInfoDao = new(dbHandler);
             // 移動元、移動先、手数料の順に並び替え
-            IEnumerable<MoveActionInfoDto> dtoList = (await moveActionInfoDao.GetAllAsync(groupId.Value)).OrderBy(dto => dto.ActValue).OrderBy(dto => -dto.MoveFlg);
+            IEnumerable<MoveActionInfoDto> dtoList = (await moveActionInfoDao.GetAllAsync(groupId.Id)).OrderBy(dto => dto.ActValue).OrderBy(dto => -dto.MoveFlg);
 
             List<ActionModel> actionList = [];
             foreach (MoveActionInfoDto dto in dtoList) {

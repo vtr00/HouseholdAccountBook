@@ -631,7 +631,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 vm.ClearActionInfo();
 
                 // 一致する帳簿項目を取得する
-                List<ActionModel> actionList = [.. await this.mService.LoadMatchedActionAsync((int)this.BookSelectorVM.SelectedKey, vm.Record.Date, vm.Record.Value)];
+                IEnumerable<ActionModel> actionList = await this.mService.LoadMatchedActionAsync((int)this.BookSelectorVM.SelectedKey, vm.Record.Date, vm.Record.Value);
 
                 foreach (ActionModel action in actionList) {
                     // 帳簿項目IDが使用済なら次のレコードを調べるようにする

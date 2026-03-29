@@ -97,9 +97,9 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
-            EndingBalanceInfoDto dto = bookId == -1
+            EndingBalanceInfoDto dto = bookId == BookIdObj.System
                 ? await endingBalanceInfoDao.Find(startDate) // 全帳簿の繰越残高
-                : await endingBalanceInfoDao.FindByBookId(bookId.Value, startDate); // 各帳簿の繰越残高
+                : await endingBalanceInfoDao.FindByBookId(bookId.Id, startDate); // 各帳簿の繰越残高
             decimal balance = dto.EndingBalance;
 
             return balance;
@@ -138,10 +138,10 @@ namespace HouseholdAccountBook.Models.AppServices
             {
                 ActionWithBalanceModel am = new() {
                     Action = new() {
-                        Book = new(-1, string.Empty),
-                        Category = new(-1, string.Empty, BalanceKind.Others),
-                        Item = new(-1, Properties.Resources.ListName_CarryForward),
-                        Base = new(-1, period.Start.ToDateTime(TimeOnly.MinValue), 0),
+                        Book = new(BookIdObj.System, string.Empty),
+                        Category = new(CategoryIdObj.System, string.Empty, BalanceKind.Others),
+                        Item = new(ItemIdObj.System, Properties.Resources.ListName_CarryForward),
+                        Base = new(ActionIdObj.System, period.Start.ToDateTime(TimeOnly.MinValue), 0),
                         Shop = null,
                         Remark = null,
                         IsMatch = false
@@ -152,9 +152,9 @@ namespace HouseholdAccountBook.Models.AppServices
             }
 
             ActionInfoDao actionInfoDao = new(dbHandler);
-            IEnumerable<ActionInfoDto> dtoList = bookId == -1
+            IEnumerable<ActionInfoDto> dtoList = bookId == BookIdObj.System
                 ? await actionInfoDao.FindAllWithinTerm(period.Start, period.End) // 全帳簿項目
-                : await actionInfoDao.FindByBookIdWithinTerm(bookId.Value, period.Start, period.End); // 各帳簿項目
+                : await actionInfoDao.FindByBookIdWithinTerm(bookId.Id, period.Start, period.End); // 各帳簿項目
 
             foreach (ActionInfoDto aDto in dtoList) {
                 balance += aDto.ActValue;
@@ -191,7 +191,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             HstActionDao hstActionDao = new(dbHandler);
-            _ = await hstActionDao.UpdateShopNameAndRemarkByIdAsync(actionId.Value, shopName, remark);
+            _ = await hstActionDao.UpdateShopNameAndRemarkByIdAsync(actionId.Id, shopName, remark);
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             HstActionDao hstActionDao = new(dbHandler);
-            var dto = await hstActionDao.FindByIdAsync(actionId.Value);
+            var dto = await hstActionDao.FindByIdAsync(actionId.Id);
             DateOnly actDate = DateOnly.FromDateTime(dto.ActTime);
 
             return actDate;
@@ -239,9 +239,9 @@ namespace HouseholdAccountBook.Models.AppServices
             List<SummaryModel> smList = [];
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 SummaryInfoDao summaryInfoDao = new(dbHandler);
-                IEnumerable<SummaryInfoDto> dtoList = bookId == -1
+                IEnumerable<SummaryInfoDto> dtoList = bookId == BookIdObj.System
                     ? await summaryInfoDao.FindAllWithinPeriod(period.Start, period.End)
-                    : await summaryInfoDao.FindByBookIdWithinPeriod(bookId.Value, period.Start, period.End);
+                    : await summaryInfoDao.FindByBookIdWithinPeriod(bookId.Id, period.Start, period.End);
 
                 foreach (SummaryInfoDto dto in dtoList) {
                     smList.Add(new() {
@@ -263,7 +263,7 @@ namespace HouseholdAccountBook.Models.AppServices
             foreach (var g1 in smList.GroupBy(obj => obj.Category.BalanceKind)) {
                 // 収入/支出の小計を計算する
                 totalAsBalanceKindList.Add(new() {
-                    Category = new(-1, string.Empty, g1.Key),
+                    Category = new(CategoryIdObj.System, string.Empty, g1.Key),
                     Total = g1.Sum(obj => obj.Total)
                 });
                 // 分類別の小計を計算する

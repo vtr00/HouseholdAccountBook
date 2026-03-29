@@ -69,7 +69,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                 DateOnly tmpEndTime = tmpStartTime;
                 tmpPeriod = new(tmpStartTime, tmpEndTime);
             }
-            ObservableCollection<SummaryModel> summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(bookId, tmpPeriod)];
+            List<SummaryModel> summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(bookId, tmpPeriod)];
             balance += summaryVMList[0].Total;
             vmList[0].Values.Add(balance); // 残高
             vmList[0].Periods.Add(tmpPeriod);

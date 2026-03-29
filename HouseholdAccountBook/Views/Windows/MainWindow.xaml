@@ -24,11 +24,11 @@
             <Setter Property="Background" Value="#FFEEE3FB"/>
             <Style.Triggers>
                 <!-- 分類小計 -->
-                <DataTrigger Binding="{Binding Item.Id.Value}" Value="-1">
+                <DataTrigger Binding="{Binding Item.Id.Id}" Value="-1">
                     <Setter Property="Background" Value="#FFFFFFB0"/>
                 </DataTrigger>
                 <!-- 収支小計 -->
-                <DataTrigger Binding="{Binding Category.Id.Value}" Value="-1">
+                <DataTrigger Binding="{Binding Category.Id.Id}" Value="-1">
                     <Setter Property="Background" Value="#FFB0FFB0"/>
                 </DataTrigger>
                 <!-- 差引損益/残高 -->

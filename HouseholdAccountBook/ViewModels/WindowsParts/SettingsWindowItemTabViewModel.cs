@@ -128,7 +128,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 while (vm?.Kind != HierarchicalKind.Balance) {
                     vm = vm.ParentVM;
                 }
-                CategoryIdObj categoryId = await this.mSettingService.AddCategoryAsync((BalanceKind)vm.Id.Value);
+                CategoryIdObj categoryId = await this.mSettingService.AddCategoryAsync((BalanceKind)vm.Id.Id);
 
                 await this.LoadAsync(HierarchicalKind.Category, categoryId);
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
@@ -152,7 +152,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     vm = vm.ParentVM;
                 }
 
-                ItemIdObj itemId = await this.mSettingService.AddItemAsync(vm.Id.Value);
+                ItemIdObj itemId = await this.mSettingService.AddItemAsync(vm.Id.Id);
 
                 await this.LoadAsync(HierarchicalKind.Item, itemId);
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
@@ -257,7 +257,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     CategoryIdObj toCategoryId = new((int)grandparentVM.ChildrenVMList[index2 - 1].Id);
 
-                    await this.mSettingService.UpdateItemSortOrderToMaximumAsync(toCategoryId, changingId.Value);
+                    await this.mSettingService.UpdateItemSortOrderToMaximumAsync(toCategoryId, changingId.Id);
                 }
 
                 await this.LoadAsync(this.SelectedItemTreeVM?.Kind, this.SelectedItemTreeVM.Id);
@@ -318,7 +318,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     CategoryIdObj toCategoryId = new((int)grandparentVM.ChildrenVMList[index2 + 1].Id);
 
-                    await this.mSettingService.UpdateItemSortOrderToMinimumAsync(toCategoryId, changingId.Value);
+                    await this.mSettingService.UpdateItemSortOrderToMinimumAsync(toCategoryId, changingId.Id);
                 }
 
                 await this.LoadAsync(this.SelectedItemTreeVM?.Kind, this.SelectedItemTreeVM.Id);
@@ -346,11 +346,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
                 switch (vm.Kind) {
                     case HierarchicalKind.Category: {
-                        await this.mSettingService.SaveCategoryAsync(new(vm.Id.Value, vm.InputedName));
+                        await this.mSettingService.SaveCategoryAsync(new(vm.Id.Id, vm.InputedName));
                     }
                     break;
                     case HierarchicalKind.Item: {
-                        await this.mSettingService.SaveItemAsync(new(vm.Id.Value, vm.InputedName));
+                        await this.mSettingService.SaveItemAsync(new(vm.Id.Id, vm.InputedName));
                     }
                     break;
                 }
@@ -399,7 +399,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                     Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
-                    await this.mSettingService.DeleteShopAsync(this.DisplayedItemSettingVM.ShopSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Value);
+                    await this.mSettingService.DeleteShopAsync(this.DisplayedItemSettingVM.ShopSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Id);
 
                     SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
                     this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
@@ -423,7 +423,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                     Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
-                    await this.mSettingService.DeleteRemarkAsync(this.DisplayedItemSettingVM.RemarkSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Value);
+                    await this.mSettingService.DeleteRemarkAsync(this.DisplayedItemSettingVM.RemarkSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Id);
 
                     SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
                     this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
