@@ -268,10 +268,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     // グラフ表示データを設定用に絞り込む
                     switch (this.Parent.GraphKind2SelectorVM.SelectedKey) {
                         case GraphKind2.CategoryGraph:
-                            tmpVMList = [.. tmpVMList.Where(vm => (int)vm.Category.Id != -1 && (int)vm.Item.Id == -1)];
+                            tmpVMList = [.. tmpVMList.Where(vm => vm.Category.Id != CategoryIdObj.System && vm.Item.Id == ItemIdObj.System)];
                             break;
                         case GraphKind2.ItemGraph:
-                            tmpVMList = [.. tmpVMList.Where(vm => (int)vm.Item.Id != -1)];
+                            tmpVMList = [.. tmpVMList.Where(vm => vm.Item.Id != ItemIdObj.System)];
                             break;
                     }
                     this.GraphSeriesVMList = tmpVMList;

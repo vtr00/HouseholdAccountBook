@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.ViewModels;
+﻿using HouseholdAccountBook.Models.ValueObjects;
+using HouseholdAccountBook.ViewModels;
 
 namespace HouseholdAccountBook.Models.UiDto
 {
@@ -16,11 +17,11 @@ namespace HouseholdAccountBook.Models.UiDto
         /// <summary>
         /// 分類
         /// </summary>
-        public CategoryModel Category { get; init; } = new(-1, string.Empty, BalanceKind.Others);
+        public CategoryModel Category { get; init; } = new(CategoryIdObj.System, string.Empty, BalanceKind.Others);
         /// <summary>
         /// 項目
         /// </summary>
-        public ItemModel Item { get; init; } = new(-1, string.Empty);
+        public ItemModel Item { get; init; } = new(ItemIdObj.System, string.Empty);
         /// <summary>
         /// その他名称
         /// </summary>

@@ -14,25 +14,25 @@ namespace HouseholdAccountBook.Models.UiDto
         /// <summary>
         /// グループID
         /// </summary>
-        public GroupIdObj GroupId { get; init; } = -1;
+        public GroupIdObj GroupId { get; init; } // = null;
 
         /// <summary>
         /// 帳簿
         /// </summary>
-        public BookModel Book { get; init; } = new(-1, string.Empty);
+        public BookModel Book { get; init; } = new(BookIdObj.System, string.Empty);
         /// <summary>
         /// 分類
         /// </summary>
-        public CategoryModel Category { get; init; } = new(-1, string.Empty, BalanceKind.Others);
+        public CategoryModel Category { get; init; } = new(CategoryIdObj.System, string.Empty, BalanceKind.Others);
         /// <summary>
         /// 項目
         /// </summary>
-        public ItemModel Item { get; init; } = new(-1, string.Empty);
+        public ItemModel Item { get; init; } = new(ItemIdObj.System, string.Empty);
 
         /// <summary>
         /// 帳簿項目 基本Model
         /// </summary>
-        public ActionBaseModel Base { get; init; } = new(-1, DateTime.Now, 0);
+        public ActionBaseModel Base { get; init; } = new(ActionIdObj.System, DateTime.Now, 0);
 
         /// <summary>
         /// 店舗名

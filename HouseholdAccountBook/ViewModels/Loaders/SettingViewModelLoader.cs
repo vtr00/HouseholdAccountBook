@@ -71,12 +71,12 @@ namespace HouseholdAccountBook.ViewModels.Loaders
 
             foreach (ItemTreeViewModel balanceVM in vmList) {
                 // 分類
-                new List<CategoryModel>(await this.mService.LoadCategoryListAsync((BalanceKind)balanceVM.Id.Value))
+                new List<CategoryModel>(await this.mService.LoadCategoryListAsync((BalanceKind)balanceVM.Id.Id))
                     .ForEach(cm => balanceVM.ChildrenVMList.Add(new ItemTreeViewModel(cm) { ParentVM = balanceVM, ChildrenVMList = [] }));
 
                 foreach (ItemTreeViewModel categoryVM in balanceVM.ChildrenVMList) {
                     // 項目
-                    new List<ItemModel>(await this.mService.LoadItemListAsync(categoryVM.Id.Value))
+                    new List<ItemModel>(await this.mService.LoadItemListAsync(categoryVM.Id.Id))
                         .ForEach(im => categoryVM.ChildrenVMList.Add(new ItemTreeViewModel(im) { ParentVM = categoryVM }));
                 }
             }
@@ -104,12 +104,13 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                 }
                 case HierarchicalKind.Category: {
                     // 分類
-                    vm = new(await this.mService.LoadCategoryAsync(id.Value));
+                    CategoryIdObj categoryId = id.Id;
+                    vm = new(await this.mService.LoadCategoryAsync(categoryId));
                     break;
                 }
                 case HierarchicalKind.Item: {
                     // 項目
-                    ItemIdObj itemId = id.Value;
+                    ItemIdObj itemId = id.Id;
                     vm = new(await this.mService.LoadItemAsync(itemId));
                     vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(itemId)).Select(model => new RelationViewModel(model)));
                     await vm.RelationSelectorVM.LoadAsync(SelectorMode.FirstOrDefault);

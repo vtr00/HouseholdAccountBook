@@ -20,11 +20,11 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 分類
         /// </summary>
-        public CategoryModel Category { get; set; } = new(-1, string.Empty, BalanceKind.Others);
+        public CategoryModel Category { get; set; } = new(CategoryIdObj.System, string.Empty, BalanceKind.Others);
         /// <summary>
         /// 項目
         /// </summary>
-        public ItemModel Item { get; set; } = new(-1, string.Empty);
+        public ItemModel Item { get; set; } = new(ItemIdObj.System, string.Empty);
 
         /// <summary>
         /// 値

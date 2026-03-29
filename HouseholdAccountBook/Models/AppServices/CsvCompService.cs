@@ -70,7 +70,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             ActionCompInfoDao actionCompInfoDao = new(dbHandler);
-            IEnumerable<ActionCompInfoDto> dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(bookId.Value, dateTime, (int)value);
+            IEnumerable<ActionCompInfoDto> dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(bookId.Id, dateTime, (int)value);
             IEnumerable<ActionModel> actionList = [.. dtoList.Select(static dto => new ActionModel() {
                     GroupId = dto.GroupId,
                     Item = new(dto.ItemId, dto.ItemName),

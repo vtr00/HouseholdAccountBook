@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             // 1番目に表示する項目を追加する
             if (initialName != string.Empty) {
-                bmList.Add(new(-1, initialName));
+                bmList.Add(new(BookIdObj.System, initialName));
             }
 
             MstBookDao mstBookDao = new(dbHandler);
@@ -77,7 +77,7 @@ namespace HouseholdAccountBook.Models.AppServices
             List<CategoryModel> cmList = [];
 
             if (initialName != string.Empty) {
-                cmList.Add(new CategoryModel(-1, initialName, BalanceKind.Others));
+                cmList.Add(new CategoryModel(CategoryIdObj.System, initialName, BalanceKind.Others));
             }
 
             MstCategoryWithinBookDao mstCategoryWithinBookDao = new(dbHandler);
@@ -104,12 +104,12 @@ namespace HouseholdAccountBook.Models.AppServices
             List<ItemModel> imList = [];
 
             CategoryItemInfoDao categoryItemInfoDao = new(dbHandler);
-            IEnumerable<CategoryItemInfoDto> dtoList = (categoryId is null || categoryId == -1)
+            IEnumerable<CategoryItemInfoDto> dtoList = (categoryId is null || categoryId == CategoryIdObj.System)
                 ? await categoryItemInfoDao.FindByBookIdAndBalanceKindAsync((int)bookId, (int)balanceKind)
                 : await categoryItemInfoDao.FindByBookIdAndCategoryIdAsync((int)bookId, (int)categoryId);
             foreach (CategoryItemInfoDto dto in dtoList) {
                 ItemModel vm = new(dto.ItemId, dto.ItemName) {
-                    CategoryName = (int)categoryId == -1 ? dto.CategoryName : ""
+                    CategoryName = categoryId == CategoryIdObj.System ? dto.CategoryName : ""
                 };
                 imList.Add(vm);
             }

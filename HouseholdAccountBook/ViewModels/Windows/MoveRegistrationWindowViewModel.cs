@@ -261,7 +261,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         CommissionKind.MoveTo => this.ToBookSelectorVM.SelectedKey,
                         _ => throw new ArgumentException("SelectedComissionKind"),
                     };
-                    return await this.mAppService.LoadItemListAsync(bookId, BalanceKind.Expenses, -1);
+                    return await this.mAppService.LoadItemListAsync(bookId, BalanceKind.Expenses, CategoryIdObj.System);
                 },
                 () => this.FromBookSelectorVM.SelectedKey != null && this.ToBookSelectorVM.SelectedKey != null);
             this.CommissionKindSelectorVM.SetLoader(() => CommissionKindStr);
@@ -406,7 +406,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             ActionModel commissionAction = new() {
                 Base = new(this.CommissionId, commissionKind switch { CommissionKind.MoveFrom => fromAction.ActTime, CommissionKind.MoveTo => toAction.ActTime, _ => DateTime.Now }, -this.InputedCommission ?? 0),
                 GroupId = this.GroupId,
-                Book = new(commissionKind switch { CommissionKind.MoveFrom => fromAction.Book.Id, CommissionKind.MoveTo => toAction.Book.Id, _ => -1 }, string.Empty),
+                Book = new(commissionKind switch { CommissionKind.MoveFrom => fromAction.Book.Id, CommissionKind.MoveTo => toAction.Book.Id, _ => BookIdObj.System }, string.Empty),
                 Item = new(this.ItemSelectorVM.SelectedKey, string.Empty),
                 Remark = this.RemarkSelectorVM.SelectedKey
             };

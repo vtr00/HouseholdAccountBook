@@ -43,7 +43,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
                 case IEnumerable enumerable:
                     return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => item.ToString2(depth)))}]";
                 case IIdObj idObj:
-                    return $"{idObj.Value}";
+                    return $"{idObj.Id}";
                 default:
                     PropertyInfo[] propInfos = obj.GetType().GetProperties(); // クラスが保持しているプロパティの情報を取得
 

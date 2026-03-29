@@ -217,7 +217,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             // 呼び出し元更新
-            IEnumerable<ActionIdObj> value = id != null ? [id.Value] : [];
+            IEnumerable<ActionIdObj> value = id != null ? [id.Id] : [];
             this.Registrated?.Invoke(this, new EventArgs<IEnumerable<ActionIdObj>>(value));
 
             // 表示クリア
@@ -235,7 +235,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             // 呼び出し元更新
-            IEnumerable<ActionIdObj> value = id != null ? [id.Value] : [];
+            IEnumerable<ActionIdObj> value = id != null ? [id.Id] : [];
             this.Registrated?.Invoke(this, new EventArgs<IEnumerable<ActionIdObj>>(value));
 
             base.OKCommand_Execute();
@@ -332,7 +332,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             switch (this.RegKind) {
                 case RegistrationKind.Add: {
-                    selectingBookId = initialBookId ?? -1;
+                    selectingBookId = initialBookId ?? BookIdObj.System;
                     selectingBalanceKind = BalanceKind.Expenses;
                     if (initialRecord == null) {
                         this.SelectedDate = initialDate?.ToDateTime(TimeOnly.MinValue) ?? ((initialMonth == null || initialMonth?.Month == DateTime.Today.Month) ? DateTime.Today : initialMonth.Value.ToDateTime(TimeOnly.MinValue));
@@ -407,7 +407,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 Base = new(this.ActionId, this.SelectedDate, (this.BalanceKindSelectorVM.SelectedKey == BalanceKind.Income ? 1 : -1) * this.InputedValue.Value),
                 GroupId = this.GroupId,
                 Book = new(this.BookSelectorVM.SelectedKey, string.Empty),
-                Category = new(-1, string.Empty, this.BalanceKindSelectorVM.SelectedKey),
+                Category = new(CategoryIdObj.System, string.Empty, this.BalanceKindSelectorVM.SelectedKey),
                 Item = new(this.ItemSelectorVM.SelectedKey, string.Empty),
                 Shop = new(this.ShopSelectorVM.SelectedKey),
                 Remark = new(this.RemarkSelectorVM.SelectedKey),

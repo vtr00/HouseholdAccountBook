@@ -594,7 +594,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
 
-                IEnumerable<(ActionIdObj, GroupIdObj)> targetList = this.SelectedActionVMList.Where(vm => 0 < vm.ActionWithBalance.Action.ActionId.Value).Select(vm => (vm.ActionId, vm.GroupId));
+                IEnumerable<(ActionIdObj, GroupIdObj)> targetList = this.SelectedActionVMList.Where(vm => 0 < vm.ActionWithBalance.Action.ActionId.Id).Select(vm => (vm.ActionId, vm.GroupId));
                 await this.mMainService.DeleteAction(targetList);
 
                 // 帳簿一覧タブを更新する
@@ -641,11 +641,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 if (this.SelectedSummaryVM != null) {
                     // 収支が選択されている場合
                     if (this.SelectedSummaryVM.Category.BalanceKind != BalanceKind.Others) {
-                        tmp = (int)this.SelectedSummaryVM.Item.Id != -1 // 項目が選択されている場合
-                            ? [.. tmp.Where(vm => vm.ActionWithBalance.Action.Item.Id == this.SelectedSummaryVM.Item.Id || (int)vm.ActionWithBalance.Action.ActionId == -1)]
-                            : (int)this.SelectedSummaryVM.Category.Id != -1 // 分類が選択されている場合
-                                ? [.. tmp.Where(vm => vm.ActionWithBalance.Action.Category.Id == this.SelectedSummaryVM.Category.Id || (int)vm.ActionWithBalance.Action.ActionId == -1)]
-                                : [.. tmp.Where(vm => vm.ActionWithBalance.Action.Category.BalanceKind == this.SelectedSummaryVM.Category.BalanceKind || (int)vm.ActionWithBalance.Action.ActionId == -1)];
+                        tmp = this.SelectedSummaryVM.Item.Id != ItemIdObj.System // 項目が選択されている場合
+                            ? [.. tmp.Where(vm => vm.ActionWithBalance.Action.Item.Id == this.SelectedSummaryVM.Item.Id || vm.ActionWithBalance.Action.ActionId == ActionIdObj.System)]
+                            : this.SelectedSummaryVM.Category.Id != CategoryIdObj.System // 分類が選択されている場合
+                                ? [.. tmp.Where(vm => vm.ActionWithBalance.Action.Category.Id == this.SelectedSummaryVM.Category.Id || vm.ActionWithBalance.Action.ActionId == ActionIdObj.System)]
+                                : [.. tmp.Where(vm => vm.ActionWithBalance.Action.Category.BalanceKind == this.SelectedSummaryVM.Category.BalanceKind || vm.ActionWithBalance.Action.ActionId == ActionIdObj.System)];
                     }
                 }
             }
@@ -688,7 +688,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             using FuncLog funcLog = new(new { actionIdList, balanceKind, categoryId, itemId, isScroll, isUpdateActDateLastEdited });
 
             // 指定がなければ、更新前の帳簿項目の選択を維持する
-            IEnumerable<ActionIdObj> tmpActionIdList = actionIdList ?? [.. this.SelectedActionVMList.Select(tmp => tmp.ActionWithBalance.Action.ActionId)];
+            IEnumerable<ActionIdObj> tmpActionIdList = actionIdList ?? this.SelectedActionVMList.Select(tmp => tmp.ActionWithBalance.Action.ActionId);
             // 指定がなければ、更新前のサマリーの選択を維持する
             BalanceKind? tmpBalanceKind = balanceKind ?? this.Parent.SelectedBalanceKind;
             CategoryIdObj tmpCategoryId = categoryId ?? this.Parent.SelectedCategoryId;

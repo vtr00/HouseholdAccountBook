@@ -149,7 +149,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 関連性セレクタVM
         /// </summary>
-        public SelectorViewModel<RelationViewModel, ItemIdObj> RelationSelectorVM { get; } = new(static vm => (int)vm?.Id);
+        public SelectorViewModel<RelationViewModel, ItemIdObj> RelationSelectorVM { get; } = new(static vm => vm?.Id);
         #endregion
 
         /// <summary>
