@@ -178,6 +178,9 @@
   <data name="Message_FinishToImport" xml:space="preserve">
     <value>The import is complete.</value>
   </data>
+  <data name="Message_CanceledToImport" xml:space="preserve">
+    <value>The import was canceled.</value>
+  </data>
   <data name="Message_DeletedZeroValueInformation" xml:space="preserve">
     <value>Deleted book items the value is zero.</value>
   </data>
@@ -984,6 +987,9 @@ list</value>
   </data>
   <data name="TextBlock_Whole" xml:space="preserve">
     <value>Whole</value>
+  </data>
+  <data name="TextBlock_Processing" xml:space="preserve">
+    <value>Processing...</value>
   </data>
   <data name="TextBlock_CurrentBackUp" xml:space="preserve">
     <value>Current back up</value>

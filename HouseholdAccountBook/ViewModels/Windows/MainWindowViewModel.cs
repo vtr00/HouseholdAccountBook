@@ -20,6 +20,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -495,19 +496,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 記帳風月インポートコマンド
         /// </summary>
-        public ICommand ImportKichoFugetsuDbCommand => new AsyncRelayCommand(this.ImportKichoFugetsuDbCommand_ExecuteAsync, this.ImportKichoFugetsuDbCommand_CanExecute, false);
+        public ICommand ImportKichoFugetsuDbCommand => new AsyncRelayCommand(this.ImportKichoFugetsuDbCommand_ExecuteAsync, this.ImportKichoFugetsuDbCommand_CanExecute);
         /// <summary>
         /// PostgreSQL -> SQLite インポートコマンド
         /// </summary>
-        public ICommand ImportPostgreSQLCommand => new AsyncRelayCommand(this.ImportPostgreSQLCommand_ExecuteAsync, this.ImportPostgreSQLCommand_CanExecute, false);
+        public ICommand ImportPostgreSQLCommand => new AsyncRelayCommand(this.ImportPostgreSQLCommand_ExecuteAsync, this.ImportPostgreSQLCommand_CanExecute);
         /// <summary>
         /// カスタムファイル -> PostgreSQL インポートコマンド
         /// </summary>
-        public ICommand ImportCustomFileCommand => new AsyncRelayCommand(this.ImportCustomFileCommand_ExecuteAsync, this.ImportCustomFileCommand_CanExecute, false);
+        public ICommand ImportCustomFileCommand => new AsyncRelayCommand(this.ImportCustomFileCommand_ExecuteAsync, this.ImportCustomFileCommand_CanExecute, ExecutionMode.ProgressWindow);
         /// <summary>
         /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド
         /// </summary>
-        public ICommand ImportSQLiteFileCommand => new AsyncRelayCommand(this.ImportSQLiteFileCommand_ExecuteAsync, this.ImportSQLiteFileCommand_CanExecute, false);
+        public ICommand ImportSQLiteFileCommand => new AsyncRelayCommand(this.ImportSQLiteFileCommand_ExecuteAsync, this.ImportSQLiteFileCommand_CanExecute);
         /// <summary>
         /// エクスポートコマンド
         /// </summary>
@@ -515,15 +516,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// カスタムファイルエクスポートコマンド
         /// </summary>
-        public ICommand ExportCustomFileCommand => new AsyncRelayCommand(this.ExportCustomFileCommand_ExecuteAsync, this.ExportCustomFileCommand_CanExecute, false);
+        public ICommand ExportCustomFileCommand => new AsyncRelayCommand(this.ExportCustomFileCommand_ExecuteAsync, this.ExportCustomFileCommand_CanExecute, ExecutionMode.ProgressWindow);
         /// <summary>
         /// SQLファイルエクスポートコマンド
         /// </summary>
-        public ICommand ExportSQLFileCommand => new AsyncRelayCommand(this.ExportSQLFileCommand_ExecuteAsync, this.ExportSQLFileCommand_CanExecute, false);
+        public ICommand ExportSQLFileCommand => new AsyncRelayCommand(this.ExportSQLFileCommand_ExecuteAsync, this.ExportSQLFileCommand_CanExecute, ExecutionMode.ProgressWindow);
         /// <summary>
         /// バックアップコマンド
         /// </summary>
-        public ICommand BackUpCommand => new AsyncRelayCommand(this.BackUpCommand_ExecuteAsync, this.BackUpCommand_CanExecute, false);
+        public ICommand BackUpCommand => new AsyncRelayCommand(this.BackUpCommand_ExecuteAsync, this.BackUpCommand_CanExecute, ExecutionMode.ProgressWindow);
         /// <summary>
         /// 操作ログファイルコマンド
         /// </summary>
@@ -654,7 +655,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 記帳風月インポートコマンド処理
         /// </summary>
-        public async Task ImportKichoFugetsuDbCommand_ExecuteAsync()
+        /// <param name="token">キャンセル用トークン</param>
+        /// <param name="progress">進捗</param>
+        public async Task ImportKichoFugetsuDbCommand_ExecuteAsync(CancellationToken token, IProgress<int> progress)
         {
             Properties.Settings settings = Properties.Settings.Default;
             (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_Import_KichoFugetsu_FilePath, App.GetCurrentDir());
@@ -675,23 +678,36 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.App_Import_KichoFugetsu_FilePath = e.FileName;
             settings.Save();
 
-            bool result = false;
+            bool? result = false;
             int actRowsDiff = 0;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 OleDbHandler.ConnectInfo info = new(settings.App_Access_Provider) {
                     DataSource = e.FileName
                 };
-                (result, actRowsDiff) = await this.mDbImportService.ImportKichoFugetsuDbAsync(info);
+                try {
+                    (result, actRowsDiff) = await this.mDbImportService.ImportKichoFugetsuDbAsync(info, token, progress);
+                }
+                catch (OperationCanceledException) {
+                    result = null;
+                }
 
-                if (result) {
+                if (result == true) {
                     await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
                 }
             }
 
-            _ = result
-                ? MessageBox.Show(Properties.Resources.Message_FinishToImport + (0 < actRowsDiff ? Environment.NewLine + Properties.Resources.Message_DeletedZeroValueInformation : string.Empty),
-                    Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
-                : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            switch (result) {
+                case true:
+                    _ = MessageBox.Show(Properties.Resources.Message_FinishToImport + (0 < actRowsDiff ? Environment.NewLine + Properties.Resources.Message_DeletedZeroValueInformation : string.Empty),
+                                        Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                    break;
+                case null:
+                    _ = MessageBox.Show(Properties.Resources.Message_CanceledToImport, Properties.Resources.Title_Warning, MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                    break;
+                case false:
+                    _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                    break;
+            }
         }
 
         /// <summary>
@@ -702,7 +718,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// PostgreSQL -> SQLite インポートコマンド処理
         /// </summary>
-        public async Task ImportPostgreSQLCommand_ExecuteAsync()
+        /// <param name="token">キャンセル用トークン</param>
+        /// <param name="progress">進捗</param>
+        public async Task ImportPostgreSQLCommand_ExecuteAsync(CancellationToken token, IProgress<int> progress)
         {
             Properties.Settings settings = Properties.Settings.Default;
 
@@ -711,7 +729,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 return;
             }
 
-            bool result = false;
+            bool? result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 NpgsqlDbHandler.ConnectInfo info = new() {
                     Host = settings.App_Postgres_Host,
@@ -725,16 +743,29 @@ namespace HouseholdAccountBook.ViewModels.Windows
 #endif
                     Role = settings.App_Postgres_Role
                 };
-                result = await this.mDbImportService.ImportPostgreSQLAsync(info);
+                try {
+                    result = await this.mDbImportService.ImportPostgreSQLAsync(info, token, progress);
+                }
+                catch (OperationCanceledException) {
+                    result = null;
+                }
 
-                if (result) {
+                if (result == true) {
                     await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
                 }
             }
 
-            _ = result
-                ? MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
-                : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            switch (result) {
+                case true:
+                    _ = MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                    break;
+                case null:
+                    _ = MessageBox.Show(Properties.Resources.Message_CanceledToImport, Properties.Resources.Title_Warning, MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                    break;
+                case false:
+                    _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                    break;
+            }
         }
 
         /// <summary>
@@ -778,7 +809,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             _ = result
                 ? MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
-                : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -789,7 +820,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド処理
         /// </summary>
-        public async Task ImportSQLiteFileCommand_ExecuteAsync()
+        /// <param name="token">キャンセル用トークン</param>
+        /// <param name="progress">進捗</param>
+        public async Task ImportSQLiteFileCommand_ExecuteAsync(CancellationToken token, IProgress<int> progress)
         {
             Properties.Settings settings = Properties.Settings.Default;
             (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_SQLite_DBFilePath, App.GetCurrentDir());
@@ -811,18 +844,31 @@ namespace HouseholdAccountBook.ViewModels.Windows
             settings.App_Import_SQLite_FilePath = e.FileName;
             settings.Save();
 
-            bool result = false;
+            bool? result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                result = await this.mDbImportService.ImportSQLiteAsync(this.SelectedDBKind, e.FileName, settings.App_SQLite_DBFilePath);
+                try {
+                    result = await this.mDbImportService.ImportSQLiteAsync(this.SelectedDBKind, e.FileName, settings.App_SQLite_DBFilePath, token, progress);
+                }
+                catch (OperationCanceledException) {
+                    result = null;
+                }
 
-                if (result) {
+                if (result == true) {
                     await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
                 }
             }
 
-            _ = result
-                ? MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
-                : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            switch (result) {
+                case true:
+                    _ = MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                    break;
+                case null:
+                    _ = MessageBox.Show(Properties.Resources.Message_CanceledToImport, Properties.Resources.Title_Warning, MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                    break;
+                case false:
+                    _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                    break;
+            }
         }
 
         /// <summary>
@@ -862,7 +908,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             _ = result
                 ? MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
-                : MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                : MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -897,7 +943,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             _ = result
                 ? MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
-                : MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                : MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -924,7 +970,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             _ = result
                 ? MessageBox.Show(Properties.Resources.Message_FinishToBackup, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
-                : MessageBox.Show(Properties.Resources.Message_FoultToBackup, Properties.Resources.Title_Conformation, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                : MessageBox.Show(Properties.Resources.Message_FoultToBackup, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>

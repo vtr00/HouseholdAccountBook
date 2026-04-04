@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Models.AppServices
@@ -82,8 +83,11 @@ namespace HouseholdAccountBook.Models.AppServices
         /// 記帳風月からインポートする
         /// </summary>
         /// <param name="info">Dle Db接続情報</param>
+        /// <param name="token">キャンセル用トークン</param>
+        /// <param name="progress">進捗</param>
+        /// <exception cref="OperationCanceledException">キャンセル例外</exception>
         /// <returns>(成功/失敗, 列数の差分)</returns>
-        public async Task<(bool, int)> ImportKichoFugetsuDbAsync(OleDbHandler.ConnectInfo info)
+        public async Task<(bool, int)> ImportKichoFugetsuDbAsync(OleDbHandler.ConnectInfo info, CancellationToken token, IProgress<int> progress)
         {
             using FuncLog funcLog = new(new { info });
 
@@ -98,18 +102,26 @@ namespace HouseholdAccountBook.Models.AppServices
                     CbmBookDao cbmBookDao = new(dbHandlerOle);
                     MstBookDao mstBookDao = new(dbHandler);
                     _ = await Mapping(cbmBookDao, mstBookDao, src => src.Select(dto => new MstBookDto(dto)));
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(10);
 
                     CbmCategoryDao cbmCategoryDao = new(dbHandlerOle);
                     MstCategoryDao mstCategoryDao = new(dbHandler);
                     _ = await Mapping(cbmCategoryDao, mstCategoryDao, src => src.Select(dto => new MstCategoryDto(dto)));
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(20);
 
                     CbmItemDao cbmItemDao = new(dbHandlerOle);
                     MstItemDao mstItemDao = new(dbHandler);
                     _ = await Mapping(cbmItemDao, mstItemDao, src => src.Select(dto => new MstItemDto(dto)));
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(30);
 
                     CbtActDao cbtActDao = new(dbHandlerOle);
                     HstActionDao hstActionDao = new(dbHandler);
                     actRowsDiff = await Mapping(cbtActDao, hstActionDao, src => src.Where(dto => !(dto.INCOME == 0 && dto.EXPENSE == 0)).Select(dto => new HstActionDto(dto)));
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(60);
 
                     HstGroupDao hstGroupDao = new(dbHandler);
                     var cbtActDtoList = await cbtActDao.FindAllAsync();
@@ -158,17 +170,25 @@ namespace HouseholdAccountBook.Models.AppServices
                         await hstGroupDao.SetIdSequenceAsync(maxGroupId);
                         _ = await hstGroupDao.BulkInsertAsync(hstGroupDtoList);
                     }
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(70);
 
                     HstShopDao hstShopDao = new(dbHandler);
                     _ = await hstShopDao.DeleteAllAsync();
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(80);
 
                     CbtNoteDao cbtNoteDao = new(dbHandlerOle);
                     HstRemarkDao hstRemarkDao = new(dbHandler);
                     _ = await Mapping(cbtNoteDao, hstRemarkDao, src => src.Select(dto => new HstRemarkDto(dto)));
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(90);
 
                     CbrBookDao cbrBookDao = new(dbHandlerOle);
                     RelBookItemDao relBookItemDao = new(dbHandler);
                     _ = await Mapping(cbrBookDao, relBookItemDao, src => src.Select(dto => new RelBookItemDto(dto)));
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(100);
 
                     result = true;
                 }, () => result = false);
@@ -184,8 +204,11 @@ namespace HouseholdAccountBook.Models.AppServices
         /// PostgreSQLからインポートする
         /// </summary>
         /// <param name="info">PostgreSQL接続情報</param>
+        /// <param name="token">キャンセル用トークン</param>
+        /// <param name="progress">進捗</param>
+        /// <exception cref="OperationCanceledException">キャンセル例外</exception>
         /// <returns>成功/失敗</returns>
-        public async Task<bool> ImportPostgreSQLAsync(NpgsqlDbHandler.ConnectInfo info)
+        public async Task<bool> ImportPostgreSQLAsync(NpgsqlDbHandler.ConnectInfo info, CancellationToken token, IProgress<int> progress)
         {
             using FuncLog funcLog = new(new { info });
 
@@ -199,34 +222,50 @@ namespace HouseholdAccountBook.Models.AppServices
                     MstBookDao mstBookDao1 = new(dbHandlerNpgsql);
                     MstBookDao mstBookDao2 = new(dbHandlerSQLite);
                     _ = await Mapping(mstBookDao1, mstBookDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(10);
 
                     MstCategoryDao mstCategoryDao1 = new(dbHandlerNpgsql);
                     MstCategoryDao mstCategoryDao2 = new(dbHandlerSQLite);
                     _ = await Mapping(mstCategoryDao1, mstCategoryDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(20);
 
                     MstItemDao mstItemDao1 = new(dbHandlerNpgsql);
                     MstItemDao mstItemDao2 = new(dbHandlerSQLite);
                     _ = await Mapping(mstItemDao1, mstItemDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(30);
 
                     HstActionDao hstActionDao1 = new(dbHandlerNpgsql);
                     HstActionDao hstActionDao2 = new(dbHandlerSQLite);
                     _ = await Mapping(hstActionDao1, hstActionDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(60);
 
                     HstGroupDao hstGroupDao1 = new(dbHandlerNpgsql);
                     HstGroupDao hstGroupDao2 = new(dbHandlerSQLite);
                     _ = await Mapping(hstGroupDao1, hstGroupDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(70);
 
                     HstShopDao hstShopDao1 = new(dbHandlerNpgsql);
                     HstShopDao hstShopDao2 = new(dbHandlerSQLite);
                     _ = await Mapping(hstShopDao1, hstShopDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(80);
 
                     HstRemarkDao hstRemarkDao1 = new(dbHandlerNpgsql);
                     HstRemarkDao hstRemarkDao2 = new(dbHandlerSQLite);
                     _ = await Mapping(hstRemarkDao1, hstRemarkDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(90);
 
                     RelBookItemDao relBookItemDao1 = new(dbHandlerNpgsql);
                     RelBookItemDao relBookItemDao2 = new(dbHandlerSQLite);
                     _ = await Mapping(relBookItemDao1, relBookItemDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(100);
 
                     // スキーマバージョンは移行しない
 
@@ -296,8 +335,11 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="dbKind">インポート先のDB種別</param>
         /// <param name="fromFilePath">インポート元のSQLiteファイルパス</param>
         /// <param name="destFilePath">インポート先のSQLiteファイルパス</param>
-        /// <returns></returns>
-        public async Task<bool> ImportSQLiteAsync(DBKind dbKind, string fromFilePath, string destFilePath = "")
+        /// <param name="token">キャンセル用トークン</param>
+        /// <param name="progress">進捗</param>
+        /// <exception cref="OperationCanceledException">キャンセル例外</exception>
+        /// <returns>成功/失敗</returns>
+        public async Task<bool> ImportSQLiteAsync(DBKind dbKind, string fromFilePath, string destFilePath = "", CancellationToken token = default, IProgress<int> progress = null)
         {
             using FuncLog funcLog = new(new { dbKind, fromFilePath, destFilePath });
 
@@ -306,6 +348,8 @@ namespace HouseholdAccountBook.Models.AppServices
             switch (dbKind) {
                 case DBKind.SQLite: {
                     try {
+                        progress.Report(-1);
+
                         // ファイルをコピーするだけ
                         File.Copy(fromFilePath, destFilePath, true);
                         result = true;
@@ -329,34 +373,50 @@ namespace HouseholdAccountBook.Models.AppServices
                             MstBookDao mstBookDao1 = new(dbHandlerSqlite);
                             MstBookDao mstBookDao2 = new(dbHandlerNpgsql);
                             _ = await Mapping(mstBookDao1, mstBookDao2);
+                            token.ThrowIfCancellationRequested();
+                            progress.Report(10);
 
                             MstCategoryDao mstCategoryDao1 = new(dbHandlerSqlite);
                             MstCategoryDao mstCategoryDao2 = new(dbHandlerNpgsql);
                             _ = await Mapping(mstCategoryDao1, mstCategoryDao2);
+                            token.ThrowIfCancellationRequested();
+                            progress.Report(20);
 
                             MstItemDao mstItemDao1 = new(dbHandlerSqlite);
                             MstItemDao mstItemDao2 = new(dbHandlerNpgsql);
                             _ = await Mapping(mstItemDao1, mstItemDao2);
+                            token.ThrowIfCancellationRequested();
+                            progress.Report(30);
 
                             HstActionDao hstActionDao1 = new(dbHandlerSqlite);
                             HstActionDao hstActionDao2 = new(dbHandlerNpgsql);
                             _ = await Mapping(hstActionDao1, hstActionDao2);
+                            token.ThrowIfCancellationRequested();
+                            progress.Report(60);
 
                             HstGroupDao hstGroupDao1 = new(dbHandlerSqlite);
                             HstGroupDao hstGroupDao2 = new(dbHandlerNpgsql);
                             _ = await Mapping(hstGroupDao1, hstGroupDao2);
+                            token.ThrowIfCancellationRequested();
+                            progress.Report(70);
 
                             HstShopDao hstShopDao1 = new(dbHandlerSqlite);
                             HstShopDao hstShopDao2 = new(dbHandlerNpgsql);
                             _ = await Mapping(hstShopDao1, hstShopDao2);
+                            token.ThrowIfCancellationRequested();
+                            progress.Report(80);
 
                             HstRemarkDao hstRemarkDao1 = new(dbHandlerSqlite);
                             HstRemarkDao hstRemarkDao2 = new(dbHandlerNpgsql);
                             _ = await Mapping(hstRemarkDao1, hstRemarkDao2);
+                            token.ThrowIfCancellationRequested();
+                            progress.Report(90);
 
                             RelBookItemDao relBookItemDao1 = new(dbHandlerSqlite);
                             RelBookItemDao relBookItemDao2 = new(dbHandlerNpgsql);
                             _ = await Mapping(relBookItemDao1, relBookItemDao2);
+                            token.ThrowIfCancellationRequested();
+                            progress.Report(100);
 
                             // スキーマバージョンは移行しない
 
