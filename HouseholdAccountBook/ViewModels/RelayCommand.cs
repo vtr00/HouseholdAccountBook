@@ -144,7 +144,7 @@ namespace HouseholdAccountBook.ViewModels
             : this(static (parameter, _) => { }, canExecute, fileName, memberName)
         { }
 
-        public bool CanExecute(object parameter) => !this.mIsExecuting && (this.mCanExecute?.Invoke((T)parameter) ?? true);
+        public bool CanExecute(object parameter) => !this.mIsExecuting && (parameter is not T p || (this.mCanExecute?.Invoke(p) ?? true));
 
         public void Execute(object parameter)
         {
