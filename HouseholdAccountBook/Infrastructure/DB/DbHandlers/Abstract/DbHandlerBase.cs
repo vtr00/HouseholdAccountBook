@@ -272,18 +272,24 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
             }
             catch (DbException e) {
                 Console.WriteLine(e.Message);
-                await this.mDbTransaction.RollbackAsync();
+                if (this.mDbTransaction != null) {
+                    await this.mDbTransaction.RollbackAsync();
+                }
                 onRollbacked?.Invoke();
                 throw;
             }
             catch (Exception e) {
                 Console.WriteLine(e.Message);
-                await this.mDbTransaction.RollbackAsync();
+                if (this.mDbTransaction != null) {
+                    await this.mDbTransaction.RollbackAsync();
+                }
                 onRollbacked?.Invoke();
                 throw;
             }
             finally {
-                await this.mDbTransaction.DisposeAsync();
+                if (this.mDbTransaction != null) {
+                    await this.mDbTransaction.DisposeAsync();
+                }
                 this.mDbTransaction = null;
             }
         }

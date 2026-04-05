@@ -214,7 +214,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
                     HstGroupDao hstGroupDao1 = new(dbHandlerNpgsql);
                     HstGroupDao hstGroupDao2 = new(dbHandlerSQLite);
-                    _ = Mapping(hstGroupDao1, hstGroupDao2);
+                    _ = await Mapping(hstGroupDao1, hstGroupDao2);
 
                     HstShopDao hstShopDao1 = new(dbHandlerNpgsql);
                     HstShopDao hstShopDao2 = new(dbHandlerSQLite);
@@ -244,7 +244,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns>成功/失敗</returns>
         public async Task<bool> ImportCustomFileAsync(string filePath)
         {
-            FuncLog funcLog = new(new { filePath });
+            using FuncLog funcLog = new(new { filePath });
 
             bool result = true;
             int schemaVersion = 0;
@@ -299,7 +299,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns></returns>
         public async Task<bool> ImportSQLiteAsync(DBKind dbKind, string fromFilePath, string destFilePath = "")
         {
-            FuncLog funcLog = new(new { dbKind, fromFilePath, destFilePath });
+            using FuncLog funcLog = new(new { dbKind, fromFilePath, destFilePath });
 
             bool result = false;
 
@@ -310,7 +310,10 @@ namespace HouseholdAccountBook.Models.AppServices
                         File.Copy(fromFilePath, destFilePath, true);
                         result = true;
                     }
-                    catch (Exception) { }
+                    catch (Exception) {
+                        Log.Error("Failed to copy SQLite file.");
+                        throw;
+                    }
                     break;
                 }
                 case DBKind.PostgreSQL: {

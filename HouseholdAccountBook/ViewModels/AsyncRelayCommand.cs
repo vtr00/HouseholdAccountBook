@@ -113,7 +113,9 @@ namespace HouseholdAccountBook.ViewModels
             this.mIsExecuting = true;
             RaiseCanExecuteChanged();
             try {
-                await this.mExecuteAsync?.Invoke(funcLog, token);
+                if (this.mExecuteAsync != null) {
+                    await this.mExecuteAsync.Invoke(funcLog, token);
+                }
             }
             catch (OperationCanceledException) {
                 Log.Debug($"{this.mMemberName} Canceled.");
@@ -212,7 +214,7 @@ namespace HouseholdAccountBook.ViewModels
             GC.SuppressFinalize(this);
         }
 
-        public bool CanExecute(object parameter) => (!this.mIsExecuting || this.mAllowConcurrent) && (this.mCanExecute?.Invoke((T)parameter) ?? true);
+        public bool CanExecute(object parameter) => (!this.mIsExecuting || this.mAllowConcurrent) && (parameter is not T p || (this.mCanExecute?.Invoke(p) ?? true));
 
         public async void Execute(object parameter)
         {
@@ -226,7 +228,9 @@ namespace HouseholdAccountBook.ViewModels
             this.mIsExecuting = true;
             RaiseCanExecuteChanged();
             try {
-                await this.mExecuteAsync?.Invoke((T)parameter, funcLog, token);
+                if (this.mExecuteAsync != null) {
+                    await this.mExecuteAsync.Invoke((T)parameter, funcLog, token);
+                }
             }
             catch (OperationCanceledException) {
                 Log.Debug($"{this.mMemberName} Canceled.");
