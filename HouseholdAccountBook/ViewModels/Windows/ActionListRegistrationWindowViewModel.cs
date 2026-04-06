@@ -363,12 +363,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
             DateTime lastActTime = this.InputedDateValueVMList.Max(static tmp => tmp.ActDate);
 
             if (commonAction.Shop != null && commonAction.Shop != string.Empty) {
-                ShopModel shop = new(commonAction.Shop) { ItemId = commonAction.Item.Id, UsedTime = commonAction.ActTime };
+                ShopModel shop = new(commonAction.Shop) { ItemId = commonAction.Item.Id, CurrentActTime = commonAction.ActTime };
                 await this.mService.SaveShopAsync(shop);
             }
 
             if (commonAction.Remark != null && commonAction.Remark != string.Empty) {
-                RemarkModel remark = new(commonAction.Remark) { ItemId = commonAction.Item.Id, UsedTime = commonAction.ActTime };
+                RemarkModel remark = new(commonAction.Remark) { ItemId = commonAction.Item.Id, CurrentActTime = commonAction.ActTime };
                 await this.mService.SaveRemarkAsync(remark);
             }
 

@@ -211,7 +211,7 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Name}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_UsageCount}" Width="*" Binding="{Binding UsedCount}"/>
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding CurrentActTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>
@@ -236,7 +236,7 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Remark}"/>
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_UsageCount}" Width="*" Binding="{Binding UsedCount}"/>
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding UsedTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding CurrentActTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>
@@ -484,6 +484,7 @@
                                         Command="{Binding DataContext.SaveBookInfoCommand, ElementName=_BookTab}" ToolTip="Ctrl+S"/>
                             </Grid>
                         </GroupBox>
+                        
                         <!-- 関連付け -->
                         <GroupBox Grid.Row="1" Header="{x:Static properties:Resources.GroupHeader_Linkage}">
                             <Grid>

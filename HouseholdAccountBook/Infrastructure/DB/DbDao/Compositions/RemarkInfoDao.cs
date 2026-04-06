@@ -24,7 +24,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
             using FuncLog funcLog = new(new { itemId }, Log.LogLevel.Trace);
 
             var dtoList = await this.mDbHandler.QueryAsync<RemarkInfoDto>(@"
-SELECT R.remark, COUNT(A.remark) AS count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
+SELECT R.remark, COUNT(A.remark) AS count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS current_act_time
 FROM hst_remark R
 LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.remark = R.remark AND A.item_id = R.item_id
 WHERE R.del_flg = 0 AND R.item_id = @ItemId

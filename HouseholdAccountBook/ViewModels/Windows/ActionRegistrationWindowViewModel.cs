@@ -417,12 +417,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
             ActionIdObj resActionId = await this.mService.SaveActionAsync(action, this.InputedCount, this.SelectedIfLink, this.HolidaySettingSelectorVM.SelectedKey);
 
             if (action.Shop != null && action.Shop != string.Empty) {
-                ShopModel shop = new(action.Shop) { ItemId = action.Item.Id, UsedTime = action.ActTime };
+                ShopModel shop = new(action.Shop) { ItemId = action.Item.Id, CurrentActTime = action.ActTime };
                 await this.mService.SaveShopAsync(shop);
             }
 
             if (action.Remark != null && action.Remark != string.Empty) {
-                RemarkModel remark = new(action.Remark) { ItemId = action.Item.Id, UsedTime = action.ActTime };
+                RemarkModel remark = new(action.Remark) { ItemId = action.Item.Id, CurrentActTime = action.ActTime };
                 await this.mService.SaveRemarkAsync(remark);
             }
 

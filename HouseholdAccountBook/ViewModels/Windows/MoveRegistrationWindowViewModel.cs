@@ -415,7 +415,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             if (commissionAction.Amount != 0) {
                 if (commissionAction.Remark != null && commissionAction.Remark != string.Empty) {
-                    RemarkModel remark = new(commissionAction.Remark) { ItemId = commissionAction.Item.Id, UsedTime = commissionAction.ActTime };
+                    RemarkModel remark = new(commissionAction.Remark) { ItemId = commissionAction.Item.Id, CurrentActTime = commissionAction.ActTime };
                     await this.mService.SaveRemarkAsync(remark);
                 }
             }

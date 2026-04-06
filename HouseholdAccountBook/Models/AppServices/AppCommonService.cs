@@ -138,7 +138,7 @@ namespace HouseholdAccountBook.Models.AppServices
             IEnumerable<ShopInfoDto> dtoList = await shopInfoDao.FindByItemIdAsync((int)itemId);
             smList.AddRange(dtoList.Select(static dto => new ShopModel(dto.ShopName) {
                 UsedCount = dto.Count,
-                UsedTime = dto.UsedTime
+                CurrentActTime = dto.CurrentActTime
             }));
 
             return smList;
@@ -165,7 +165,7 @@ namespace HouseholdAccountBook.Models.AppServices
             IEnumerable<RemarkInfoDto> dtoList = await remarkInfoDao.FindByItemIdAsync((int)itemId);
             rmList.AddRange(dtoList.Select(static dto => new RemarkModel(dto.Remark) {
                 UsedCount = dto.Count,
-                UsedTime = dto.UsedTime
+                CurrentActTime = dto.CurrentActTime
             }));
 
             return rmList;
