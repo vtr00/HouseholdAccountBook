@@ -23,9 +23,9 @@ namespace HouseholdAccountBook.Models.UiDto
         public int UsedCount { get; init; }
 
         /// <summary>
-        /// 最終使用日
+        /// 最新帳簿項目日時
         /// </summary>
-        public DateTime? UsedTime { get; init; }
+        public DateTime? CurrentActTime { get; init; }
         #endregion
 
         public override string ToString() => this.Name;

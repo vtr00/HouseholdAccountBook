@@ -557,7 +557,7 @@ namespace HouseholdAccountBook.Models.AppServices
             _ = await hstShopDao.UpsertAsync(new HstShopDto {
                 ItemId = (int)shop.ItemId,
                 ShopName = shop.Name,
-                UsedTime = shop.UsedTime
+                UsedTime = shop.CurrentActTime ?? DateTime.MinValue
             });
         }
 
@@ -576,7 +576,7 @@ namespace HouseholdAccountBook.Models.AppServices
             _ = await hstRemarkDao.UpsertAsync(new HstRemarkDto {
                 ItemId = (int)remark.ItemId,
                 Remark = remark.Remark,
-                UsedTime = remark.UsedTime
+                UsedTime = remark.CurrentActTime ?? DateTime.MinValue
             });
         }
     }

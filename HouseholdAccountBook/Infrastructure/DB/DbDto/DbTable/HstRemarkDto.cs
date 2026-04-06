@@ -25,6 +25,8 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable
             this.ItemId = dto.ITEM_ID;
             this.Remark = dto.NOTE_NAME;
             this.RemarkKind = 0;
+            // 使用日時は記帳風月の管理外なので最小値で埋める
+            this.UsedTime = DateTime.MinValue;
         }
 
         /// <summary>
@@ -42,6 +44,6 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable
         /// <summary>
         /// 使用日時
         /// </summary>
-        public DateTime? UsedTime { get; set; }
+        public DateTime UsedTime { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
             using FuncLog funcLog = new(new { itemId }, Log.LogLevel.Trace);
 
             var dtoList = await this.mDbHandler.QueryAsync<ShopInfoDto>(@"
-SELECT S.shop_name, COUNT(A.shop_name) AS count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS used_time
+SELECT S.shop_name, COUNT(A.shop_name) AS count, COALESCE(MAX(A.act_time), '1970-01-01') AS sort_time, COALESCE(MAX(A.act_time), null) AS current_act_time
 FROM hst_shop S
 LEFT OUTER JOIN (SELECT * FROM hst_action WHERE del_flg = 0) A ON A.shop_name = S.shop_name AND A.item_id = S.item_id
 WHERE S.del_flg = 0 AND S.item_id = @ItemId

@@ -22,8 +22,8 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Others
         /// </summary>
         public int Count { get; set; }
         /// <summary>
-        /// 使用時刻
+        /// 最新帳簿項目日時
         /// </summary>
-        public DateTime? UsedTime { get; set; }
+        public DateTime? CurrentActTime { get; set; }
     }
 }
