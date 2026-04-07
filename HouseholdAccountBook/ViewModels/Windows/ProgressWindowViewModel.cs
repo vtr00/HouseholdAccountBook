@@ -43,6 +43,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// キャンセルコマンド処理
         /// </summary>
-        public void CancelCommand_Execute() => this.Canceled.Invoke(this, EventArgs.Empty);
+        public void CancelCommand_Execute() => this.Canceled?.Invoke(this, EventArgs.Empty);
     }
 }
