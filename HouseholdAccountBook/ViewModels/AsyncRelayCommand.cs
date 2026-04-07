@@ -204,7 +204,8 @@ namespace HouseholdAccountBook.ViewModels
             GC.SuppressFinalize(this);
         }
 
-        public bool CanExecute(object parameter) => (!this.mIsExecuting || this.mMode == ExecutionMode.AllowConcurrent) && (parameter is not T p || (this.mCanExecute?.Invoke(p) ?? true));
+        public bool CanExecute(object parameter) => (!this.mIsExecuting || this.mMode == ExecutionMode.AllowConcurrent) &&
+                                                    ((parameter is T p ? this.mCanExecute?.Invoke(p) : this.mCanExecute?.Invoke(default)) ?? true);
 
         public async void Execute(object parameter)
         {
@@ -276,7 +277,7 @@ namespace HouseholdAccountBook.ViewModels
                 throw;
             }
             catch (Exception) {
-                Log.Error("Unhandled Exception Occured.", this.mFileName, this.mMemberName);
+                Log.Error("Unhandled Exception Occurred.", this.mFileName, this.mMemberName);
                 throw;
             }
             finally {

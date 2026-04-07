@@ -349,10 +349,14 @@ namespace HouseholdAccountBook.Models.AppServices
                 case DBKind.SQLite: {
                     try {
                         progress.Report(-1);
+                        token.ThrowIfCancellationRequested();
 
                         // ファイルをコピーするだけ
                         File.Copy(fromFilePath, destFilePath, true);
                         result = true;
+                    }
+                    catch (OperationCanceledException) {
+                        throw;
                     }
                     catch (Exception) {
                         Log.Error("Failed to copy SQLite file.");
