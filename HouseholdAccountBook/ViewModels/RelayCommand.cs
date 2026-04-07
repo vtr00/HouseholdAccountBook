@@ -12,7 +12,8 @@ namespace HouseholdAccountBook.ViewModels
     /// <param name="canExecute">コマンド実行可否デリゲート</param>
     /// <param name="fileName">出力元ファイル名</param>
     /// <param name="memberName">出力元関数名</param>
-    public class RelayCommand(Action<FuncLog> execute, Func<bool> canExecute = null, [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "") : ICommand
+    public class RelayCommand(Action<FuncLog> execute, Func<bool> canExecute = null,
+                              [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "") : ICommand
     {
         #region フィールド
         /// <summary>
@@ -52,7 +53,8 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="canExecute">コマンド実行可否デリゲート</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public RelayCommand(Action execute, Func<bool> canExecute = null, [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
+        public RelayCommand(Action execute, Func<bool> canExecute = null,
+                            [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
             : this(_ => execute(), canExecute, fileName, memberName)
         { }
         /// <summary>
@@ -61,7 +63,8 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="canExecute">コマンド実行可否デリゲート</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public RelayCommand(Func<bool> canExecute = null, [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
+        public RelayCommand(Func<bool> canExecute = null,
+                            [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
             : this(static _ => { }, canExecute, fileName, memberName)
         { }
 
@@ -86,12 +89,13 @@ namespace HouseholdAccountBook.ViewModels
     }
 
     /// <summary>
-    /// パラメータ付コマンド
+    /// [同期] パラメータ付コマンド
     /// </summary>
     /// <typeparam name="T">パラメータの型</typeparam>
     /// <param name="execute">コマンド実行デリゲート</param>
     /// <param name="canExecute">コマンド実行可否デリゲート</param>
-    public class RelayCommand<T>(Action<T, FuncLog> execute, Func<T, bool> canExecute = null, [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "") : ICommand
+    public class RelayCommand<T>(Action<T, FuncLog> execute, Func<T, bool> canExecute = null, 
+                                 [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "") : ICommand
     {
         #region フィールド
         /// <summary>
@@ -131,7 +135,8 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="canExecute">コマンド実行可否デリゲート</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public RelayCommand(Action<T> execute, Func<T, bool> canExecute = null, [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
+        public RelayCommand(Action<T> execute, Func<T, bool> canExecute = null,
+                            [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
             : this((parameter, _) => execute(parameter), canExecute, fileName, memberName)
         { }
         /// <summary>
@@ -140,11 +145,12 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="canExecute">コマンド実行可否デリゲート</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public RelayCommand(Func<T, bool> canExecute, [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
+        public RelayCommand(Func<T, bool> canExecute,
+                            [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
             : this(static (parameter, _) => { }, canExecute, fileName, memberName)
         { }
 
-        public bool CanExecute(object parameter) => !this.mIsExecuting && (parameter is not T p || (this.mCanExecute?.Invoke(p) ?? true));
+        public bool CanExecute(object parameter) => !this.mIsExecuting && ((parameter is T p ? this.mCanExecute?.Invoke(p) : this.mCanExecute?.Invoke(default)) ?? true);
 
         public void Execute(object parameter)
         {

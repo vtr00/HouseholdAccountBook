@@ -181,6 +181,9 @@
   <data name="Message_FinishToImport" xml:space="preserve">
     <value>インポートが完了しました。</value>
   </data>
+  <data name="Message_CanceledToImport" xml:space="preserve">
+    <value>インポートがキャンセルされました。</value>
+  </data>
   <data name="Message_DeletedZeroValueInformation" xml:space="preserve">
     <value>値が0の帳簿項目を削除しました。</value>
   </data>
@@ -984,6 +987,9 @@
   </data>
   <data name="TextBlock_Whole" xml:space="preserve">
     <value>全体</value>
+  </data>
+  <data name="TextBlock_Processing" xml:space="preserve">
+    <value>処理中...</value>
   </data>
   <data name="TextBlock_CurrentBackUp" xml:space="preserve">
     <value>最後のバックアップ</value>

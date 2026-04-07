@@ -256,7 +256,8 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         /// <param name="target">対象データベース</param>
         /// <param name="actionAsync">トランザクション内の処理</param>
         /// <exception cref="DbException">DB関連の例外</exception>
-        /// <exception cref="Exception">DB以外の例外</exception>
+        /// <exception cref="OperationCanceledException">キャンセル例外</exception>
+        /// <exception cref="Exception">その他の例外</exception>
         public async Task ExecTransactionAsync(ActionAsync actionAsync, OnRollbacked onRollbacked = null, DBKindMask target = DBKindMask.All)
         {
             using FuncLog funcLog = new(new { target }, Log.LogLevel.Trace);
@@ -271,6 +272,14 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
                 await this.mDbTransaction.CommitAsync();
             }
             catch (DbException e) {
+                Console.WriteLine(e.Message);
+                if (this.mDbTransaction != null) {
+                    await this.mDbTransaction.RollbackAsync();
+                }
+                onRollbacked?.Invoke();
+                throw;
+            }
+            catch (OperationCanceledException e) {
                 Console.WriteLine(e.Message);
                 if (this.mDbTransaction != null) {
                     await this.mDbTransaction.RollbackAsync();
