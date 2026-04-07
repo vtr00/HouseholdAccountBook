@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Threading;
 using System.Windows;
+using System.Windows.Input;
 
 namespace HouseholdAccountBook.Views.Windows
 {
@@ -26,6 +27,7 @@ namespace HouseholdAccountBook.Views.Windows
 
             if (cts != null) {
                 this.WVM.Canceled += (sender, e) => cts?.Cancel();
+                CommandManager.InvalidateRequerySuggested();
             }
             this.Progress = new Progress<int>(value => this.WVM.ProgressValue = value);
             this.Progress.Report(-1);
@@ -34,7 +36,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// コード側からウィンドウを閉じる
         /// </summary>
-        public new void Close()
+        public void CloseOnCode()
         {
             this.mAllowClose = true;
             base.Close();

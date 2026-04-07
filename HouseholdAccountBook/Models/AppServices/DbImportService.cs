@@ -339,7 +339,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="progress">進捗</param>
         /// <exception cref="OperationCanceledException">キャンセル例外</exception>
         /// <returns>成功/失敗</returns>
-        public async Task<bool> ImportSQLiteAsync(DBKind dbKind, string fromFilePath, string destFilePath = "", CancellationToken token = default, IProgress<int> progress = null)
+        public async Task<bool> ImportSQLiteAsync(DBKind dbKind, string fromFilePath, string destFilePath, CancellationToken token, IProgress<int> progress)
         {
             using FuncLog funcLog = new(new { dbKind, fromFilePath, destFilePath });
 

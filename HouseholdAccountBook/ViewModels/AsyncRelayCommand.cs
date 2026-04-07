@@ -242,7 +242,7 @@ namespace HouseholdAccountBook.ViewModels
                     _ = tcs.TrySetException(ex);
                 }
                 finally {
-                    progressWindow?.Close();
+                    progressWindow?.CloseOnCode();
                 }
             }
 

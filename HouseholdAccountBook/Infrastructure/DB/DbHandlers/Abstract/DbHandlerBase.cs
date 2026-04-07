@@ -281,7 +281,9 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
             }
             catch (OperationCanceledException e) {
                 Console.WriteLine(e.Message);
-                await this.mDbTransaction.RollbackAsync();
+                if (this.mDbTransaction != null) {
+                    await this.mDbTransaction.RollbackAsync();
+                }
                 onRollbacked?.Invoke();
                 throw;
             }
