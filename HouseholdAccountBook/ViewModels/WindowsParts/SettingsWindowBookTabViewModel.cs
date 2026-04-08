@@ -59,31 +59,31 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿追加コマンド
         /// </summary>
-        public ICommand AddBookCommand => new AsyncRelayCommand(this.AddBookCommand_ExecuteAsync);
+        public ICommand AddBookCommand => field ??= new AsyncRelayCommand(this.AddBookCommand_ExecuteAsync);
         /// <summary>
         /// 帳簿削除コマンド
         /// </summary>
-        public ICommand DeleteBookCommand => new AsyncRelayCommand(this.DeleteBookCommand_ExecuteAsync, this.DeleteBookCommand_CanExecute);
+        public ICommand DeleteBookCommand => field ??= new AsyncRelayCommand(this.DeleteBookCommand_ExecuteAsync, this.DeleteBookCommand_CanExecute);
         /// <summary>
         /// 帳簿表示順上昇コマンド
         /// </summary>
-        public ICommand RaiseBookSortOrderCommand => new AsyncRelayCommand(this.RaiseBookSortOrderCommand_ExecuteAsync, this.RaiseBookSortOrderCommand_CanExecute);
+        public ICommand RaiseBookSortOrderCommand => field ??= new AsyncRelayCommand(this.RaiseBookSortOrderCommand_ExecuteAsync, this.RaiseBookSortOrderCommand_CanExecute);
         /// <summary>
         /// 帳簿表示順下降コマンド
         /// </summary>
-        public ICommand DropBookSortOrderCommand => new AsyncRelayCommand(this.DropBookSortOrderCommand_ExecuteAsync, this.DropBookSortOrderCommand_CanExecute);
+        public ICommand DropBookSortOrderCommand => field ??= new AsyncRelayCommand(this.DropBookSortOrderCommand_ExecuteAsync, this.DropBookSortOrderCommand_CanExecute);
         /// <summary>
         /// 帳簿情報保存コマンド
         /// </summary>
-        public ICommand SaveBookInfoCommand => new AsyncRelayCommand(this.SaveBookInfoCommand_ExecuteAsync, this.SaveBookInfoCommand_CanExecute);
+        public ICommand SaveBookInfoCommand => field ??= new AsyncRelayCommand(this.SaveBookInfoCommand_ExecuteAsync, this.SaveBookInfoCommand_CanExecute);
         /// <summary>
-        /// フォルダパス選択コマンド
+        /// CSVフォルダパス選択コマンド
         /// </summary>
-        public override ICommand SelectFolderPathCommand => new RelayCommand<FolderPathKind>(this.SelectFolderPathCommand_Execute);
+        public ICommand SelectCsvFolderPathCommand => field ??= new RelayCommand(this.SelectCsvFolderPathCommand_Execute);
         /// <summary>
         /// 帳簿-項目関係変更コマンド
         /// </summary>
-        public ICommand ChangeBookRelationCommand => new AsyncRelayCommand<object>(this.ChangeBookRelationCommand_ExecuteAsync);
+        public ICommand ChangeBookRelationCommand => field ??= new AsyncRelayCommand<object>(this.ChangeBookRelationCommand_ExecuteAsync);
         #endregion
         #endregion
 
@@ -211,41 +211,27 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// フォルダパス選択コマンド処理
+        /// CSVフォルダパス選択コマンド処理
         /// </summary>
-        private void SelectFolderPathCommand_Execute(FolderPathKind kind)
+        private void SelectCsvFolderPathCommand_Execute()
         {
             Properties.Settings settings = Properties.Settings.Default;
 
-            string folderFullPath = string.Empty;
-            string title = string.Empty;
-            switch (kind) {
-                case FolderPathKind.CsvFolder:
-                    if (string.IsNullOrWhiteSpace(this.DisplayedBookSettingVM.InputedCsvFolderPath)) {
-                        folderFullPath = Path.GetDirectoryName(settings.App_CsvFilePath);
-                    }
-                    else {
-                        (string folderPath, string fileName) = PathUtil.GetSeparatedPath(this.DisplayedBookSettingVM.InputedCsvFolderPath, App.GetCurrentDir());
-                        folderFullPath = Path.Combine(folderPath, fileName);
-                    }
-                    title = Properties.Resources.Title_CsvFolderSelection;
-                    break;
-                default:
-                    break;
+            string folderFullPath;
+            if (string.IsNullOrWhiteSpace(this.DisplayedBookSettingVM.InputedCsvFolderPath)) {
+                folderFullPath = Path.GetDirectoryName(settings.App_CsvFilePath);
+            }
+            else {
+                (string folderPath, string fileName) = PathUtil.GetSeparatedPath(this.DisplayedBookSettingVM.InputedCsvFolderPath, App.GetCurrentDir());
+                folderFullPath = Path.Combine(folderPath, fileName);
             }
 
             OpenFolderDialogRequestEventArgs e = new() {
                 InitialDirectory = folderFullPath,
-                Title = title
+                Title = Properties.Resources.Title_CsvFolderSelection
             };
             if (this.OpenFolderDialogRequest(e)) {
-                switch (kind) {
-                    case FolderPathKind.CsvFolder:
-                        this.DisplayedBookSettingVM.InputedCsvFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FolderName);
-                        break;
-                    default:
-                        break;
-                }
+                this.DisplayedBookSettingVM.InputedCsvFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FolderName);
             }
         }
 

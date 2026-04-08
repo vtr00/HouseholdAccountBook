@@ -269,22 +269,4 @@ namespace HouseholdAccountBook.Models
         /// </summary>
         Item
     }
-
-    /// <summary>
-    /// ファイルパス種別
-    /// </summary>
-    public enum FilePathKind
-    {
-        DumpExeFile,
-        RestoreExeFile,
-        DbFile
-    }
-    /// <summary>
-    /// フォルダパス種別
-    /// </summary>
-    public enum FolderPathKind
-    {
-        CsvFolder,
-        BackUpFolder
-    }
 }

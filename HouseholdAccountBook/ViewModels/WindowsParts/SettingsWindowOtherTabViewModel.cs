@@ -138,19 +138,19 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 言語設定適用コマンド
         /// </summary>
-        public ICommand RestartForLanguageCommand => new RelayCommand(this.RestartForLanguageCommand_Execute);
+        public ICommand RestartForLanguageCommand => field ??= new RelayCommand(this.RestartForLanguageCommand_Execute);
         /// <summary>
         /// ウィンドウ設定再読込コマンド
         /// </summary>
-        public ICommand ReloadWindowSettingCommand => new RelayCommand(this.ReloadWindowSettingCommand_Execute);
+        public ICommand ReloadWindowSettingCommand => field ??= new RelayCommand(this.ReloadWindowSettingCommand_Execute);
         /// <summary>
         /// ウィンドウ設定初期化コマンド
         /// </summary>
-        public ICommand InitializeWindowSettingCommand => new RelayCommand(this.InitializeWindowSettingCommand_Execute);
+        public ICommand InitializeWindowSettingCommand => field ??= new RelayCommand(this.InitializeWindowSettingCommand_Execute);
         /// <summary>
         /// その他設定保存コマンド
         /// </summary>
-        public ICommand SaveOtherSettingsCommand => new RelayCommand(this.SaveOtherSettingsCommand_Execute);
+        public ICommand SaveOtherSettingsCommand => field ??= new RelayCommand(this.SaveOtherSettingsCommand_Execute);
         #endregion
         #endregion
 

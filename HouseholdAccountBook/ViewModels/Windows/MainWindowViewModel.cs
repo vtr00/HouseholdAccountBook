@@ -488,153 +488,153 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// ファイルコマンド
         /// </summary>
-        public ICommand FileMenuCommand => new RelayCommand();
+        public ICommand FileMenuCommand => field ??= new RelayCommand();
         /// <summary>
         /// インポートコマンド
         /// </summary>
-        public ICommand ImportCommand => new RelayCommand(this.ImportCommand_CanExecute);
+        public ICommand ImportCommand => field ??= new RelayCommand(this.ImportCommand_CanExecute);
         /// <summary>
         /// 記帳風月インポートコマンド
         /// </summary>
-        public ICommand ImportKichoFugetsuDbCommand => new AsyncRelayCommand(this.ImportKichoFugetsuDbCommand_ExecuteAsync, this.ImportKichoFugetsuDbCommand_CanExecute);
+        public ICommand ImportKichoFugetsuDbCommand => field ??= new AsyncRelayCommand(this.ImportKichoFugetsuDbCommand_ExecuteAsync, this.ImportKichoFugetsuDbCommand_CanExecute);
         /// <summary>
         /// PostgreSQL -> SQLite インポートコマンド
         /// </summary>
-        public ICommand ImportPostgreSQLCommand => new AsyncRelayCommand(this.ImportPostgreSQLCommand_ExecuteAsync, this.ImportPostgreSQLCommand_CanExecute);
+        public ICommand ImportPostgreSQLCommand => field ??= new AsyncRelayCommand(this.ImportPostgreSQLCommand_ExecuteAsync, this.ImportPostgreSQLCommand_CanExecute);
         /// <summary>
         /// カスタムファイル -> PostgreSQL インポートコマンド
         /// </summary>
-        public ICommand ImportCustomFileCommand => new AsyncRelayCommand(this.ImportCustomFileCommand_ExecuteAsync, this.ImportCustomFileCommand_CanExecute, ExecutionMode.ProgressWindow);
+        public ICommand ImportCustomFileCommand => field ??= new AsyncRelayCommand(this.ImportCustomFileCommand_ExecuteAsync, this.ImportCustomFileCommand_CanExecute, ExecutionMode.ProgressWindow);
         /// <summary>
         /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド
         /// </summary>
-        public ICommand ImportSQLiteFileCommand => new AsyncRelayCommand(this.ImportSQLiteFileCommand_ExecuteAsync, this.ImportSQLiteFileCommand_CanExecute);
+        public ICommand ImportSQLiteFileCommand => field ??= new AsyncRelayCommand(this.ImportSQLiteFileCommand_ExecuteAsync, this.ImportSQLiteFileCommand_CanExecute);
         /// <summary>
         /// エクスポートコマンド
         /// </summary>
-        public ICommand ExportCommand => new RelayCommand(this.ExportCommand_CanExecute);
+        public ICommand ExportCommand => field ??= new RelayCommand(this.ExportCommand_CanExecute);
         /// <summary>
         /// カスタムファイルエクスポートコマンド
         /// </summary>
-        public ICommand ExportCustomFileCommand => new AsyncRelayCommand(this.ExportCustomFileCommand_ExecuteAsync, this.ExportCustomFileCommand_CanExecute, ExecutionMode.ProgressWindow);
+        public ICommand ExportCustomFileCommand => field ??= new AsyncRelayCommand(this.ExportCustomFileCommand_ExecuteAsync, this.ExportCustomFileCommand_CanExecute, ExecutionMode.ProgressWindow);
         /// <summary>
         /// SQLファイルエクスポートコマンド
         /// </summary>
-        public ICommand ExportSQLFileCommand => new AsyncRelayCommand(this.ExportSQLFileCommand_ExecuteAsync, this.ExportSQLFileCommand_CanExecute, ExecutionMode.ProgressWindow);
+        public ICommand ExportSQLFileCommand => field ??= new AsyncRelayCommand(this.ExportSQLFileCommand_ExecuteAsync, this.ExportSQLFileCommand_CanExecute, ExecutionMode.ProgressWindow);
         /// <summary>
         /// バックアップコマンド
         /// </summary>
-        public ICommand BackUpCommand => new AsyncRelayCommand(this.BackUpCommand_ExecuteAsync, this.BackUpCommand_CanExecute, ExecutionMode.ProgressWindow);
+        public ICommand BackUpCommand => field ??= new AsyncRelayCommand(this.BackUpCommand_ExecuteAsync, this.BackUpCommand_CanExecute, ExecutionMode.ProgressWindow);
         /// <summary>
         /// 操作ログファイルコマンド
         /// </summary>
-        public ICommand OperationLogFileCommand => new RelayCommand(this.OperationLogFileCommand_CanExecute);
+        public ICommand OperationLogFileCommand => field ??= new RelayCommand(this.OperationLogFileCommand_CanExecute);
         /// <summary>
         /// ウィンドウ終了コマンド
         /// </summary>
-        public ICommand ExitWindowCommand => new RelayCommand(this.ExitWindowCommand_Execute, this.ExitWindowCommand_CanExecute);
+        public ICommand ExitWindowCommand => field ??= new RelayCommand(this.ExitWindowCommand_Execute, this.ExitWindowCommand_CanExecute);
         #endregion
 
         #region 表示コマンド
         /// <summary>
         /// 表示コマンド
         /// </summary>
-        public ICommand ShowMenuCommand => new RelayCommand(this.ShowMenuCommand_CanExecute);
+        public ICommand ShowMenuCommand => field ??= new RelayCommand(this.ShowMenuCommand_CanExecute);
         /// <summary>
         /// 帳簿項目タブ表示コマンド
         /// </summary>
-        public ICommand ShowBookTabCommand => new RelayCommand(this.ShowBookTabCommand_Execute, this.ShowBookTabCommand_CanExecute);
+        public ICommand ShowBookTabCommand => field ??= new RelayCommand(this.ShowBookTabCommand_Execute, this.ShowBookTabCommand_CanExecute);
         /// <summary>
         /// 日別グラフタブ表示コマンド
         /// </summary>
-        public ICommand ShowDailyGraphTabCommand => new RelayCommand(this.ShowDailyGraphTabCommand_Execute, this.ShowDailyGraphTabCommand_CanExecute);
+        public ICommand ShowDailyGraphTabCommand => field ??= new RelayCommand(this.ShowDailyGraphTabCommand_Execute, this.ShowDailyGraphTabCommand_CanExecute);
         /// <summary>
         /// 月別リストタブ表示コマンド
         /// </summary>
-        public ICommand ShowMonthlyListTabCommand => new RelayCommand(this.ShowMonthlyListTabCommand_Execute, this.ShowMonthlyListTabCommand_CanExecute);
+        public ICommand ShowMonthlyListTabCommand => field ??= new RelayCommand(this.ShowMonthlyListTabCommand_Execute, this.ShowMonthlyListTabCommand_CanExecute);
         /// <summary>
         /// 月別グラフタブ表示コマンド
         /// </summary>
-        public ICommand ShowMonthlyGraphTabCommand => new RelayCommand(this.ShowMonthlyGraphTabCommand_Execute, this.ShowMonthlyGraphTabCommand_CanExecute);
+        public ICommand ShowMonthlyGraphTabCommand => field ??= new RelayCommand(this.ShowMonthlyGraphTabCommand_Execute, this.ShowMonthlyGraphTabCommand_CanExecute);
         /// <summary>
         /// 年別リストタブ表示コマンド
         /// </summary>
-        public ICommand ShowYearlyListTabCommand => new RelayCommand(this.ShowYearlyListTabCommand_Execute, this.ShowYearlyListTabCommand_CanExecute);
+        public ICommand ShowYearlyListTabCommand => field ??= new RelayCommand(this.ShowYearlyListTabCommand_Execute, this.ShowYearlyListTabCommand_CanExecute);
         /// <summary>
         /// 年別グラフタブ表示コマンド
         /// </summary>
-        public ICommand ShowYearlyGraphTabCommand => new RelayCommand(this.ShowYearlyGraphTabCommand_Execute, this.ShowYearlyGraphTabCommand_CanExecute);
+        public ICommand ShowYearlyGraphTabCommand => field ??= new RelayCommand(this.ShowYearlyGraphTabCommand_Execute, this.ShowYearlyGraphTabCommand_CanExecute);
 
         /// <summary>
         /// 先月表示コマンド
         /// </summary>
-        public ICommand GoToLastMonthCommand => new AsyncRelayCommand(this.GoToLastMonthCommand_ExecuteAsync, this.GoToLastMonthCommand_CanExecute);
+        public ICommand GoToLastMonthCommand => field ??= new AsyncRelayCommand(this.GoToLastMonthCommand_ExecuteAsync, this.GoToLastMonthCommand_CanExecute);
         /// <summary>
         /// 期間選択コマンド
         /// </summary>
-        public ICommand SelectTermCommand => new AsyncRelayCommand(this.SelectTermCommand_ExecuteAsync, this.SelectTermCommand_CanExecute);
+        public ICommand SelectTermCommand => field ??= new AsyncRelayCommand(this.SelectTermCommand_ExecuteAsync, this.SelectTermCommand_CanExecute);
         /// <summary>
         /// 翌月表示コマンド
         /// </summary>
-        public ICommand GoToNextMonthCommand => new AsyncRelayCommand(this.GoToNextMonthCommand_ExecuteAsync, this.GoToNextMonthCommand_CanExecute);
+        public ICommand GoToNextMonthCommand => field ??= new AsyncRelayCommand(this.GoToNextMonthCommand_ExecuteAsync, this.GoToNextMonthCommand_CanExecute);
         /// <summary>
         /// 今月表示コマンド
         /// </summary>
-        public ICommand GoToThisMonthCommand => new AsyncRelayCommand(this.GoToThisMonthCommand_ExecuteAsync, this.GoToThisMonthCommand_CanExecute);
+        public ICommand GoToThisMonthCommand => field ??= new AsyncRelayCommand(this.GoToThisMonthCommand_ExecuteAsync, this.GoToThisMonthCommand_CanExecute);
         /// <summary>
         /// 前年表示コマンド
         /// </summary>
-        public ICommand GoToLastYearCommand => new AsyncRelayCommand(this.GoToLastYearCommand_ExecuteAsync, this.GoToLastYearCommand_CanExecute);
+        public ICommand GoToLastYearCommand => field ??= new AsyncRelayCommand(this.GoToLastYearCommand_ExecuteAsync, this.GoToLastYearCommand_CanExecute);
         /// <summary>
         /// 翌年表示コマンド
         /// </summary>
-        public ICommand GoToNextYearCommand => new AsyncRelayCommand(this.GoToNextYearCommand_ExecuteAsync, this.GoToNextYearCommand_CanExecute);
+        public ICommand GoToNextYearCommand => field ??= new AsyncRelayCommand(this.GoToNextYearCommand_ExecuteAsync, this.GoToNextYearCommand_CanExecute);
         /// <summary>
         /// 今年表示コマンド
         /// </summary>
-        public ICommand GoToThisYearCommand => new AsyncRelayCommand(this.GoToThisYearCommand_ExecuteAsync, this.GoToThisYearCommand_CanExecute);
+        public ICommand GoToThisYearCommand => field ??= new AsyncRelayCommand(this.GoToThisYearCommand_ExecuteAsync, this.GoToThisYearCommand_CanExecute);
         /// <summary>
         /// 更新コマンド
         /// </summary>
-        public ICommand UpdateCommand => new AsyncRelayCommand(this.UpdateCommand_ExecuteAsync);
+        public ICommand UpdateCommand => field ??= new AsyncRelayCommand(this.UpdateCommand_ExecuteAsync);
         #endregion
 
         #region ツールコマンド
         /// <summary>
         /// ツールメニューコマンド
         /// </summary>
-        public ICommand ToolMenuCommand => new RelayCommand(this.ToolCommand_CanExecute);
+        public ICommand ToolMenuCommand => field ??= new RelayCommand(this.ToolCommand_CanExecute);
         /// <summary>
         /// 設定コマンド
         /// </summary>
-        public ICommand SettingsCommand => new AsyncRelayCommand(this.SettingsCommand_ExecuteAsync, this.SettingsWindowCommand_CanExecute);
+        public ICommand SettingsCommand => field ??= new AsyncRelayCommand(this.SettingsCommand_ExecuteAsync, this.SettingsWindowCommand_CanExecute);
         /// <summary>
         /// 帳簿内ツールコマンド
         /// </summary>
-        public ICommand ToolInBookCommand => new RelayCommand(this.ToolInBookCommand_CanExecute);
+        public ICommand ToolInBookCommand => field ??= new RelayCommand(this.ToolInBookCommand_CanExecute);
         /// <summary>
         /// CSVファイル比較コマンド
         /// </summary>
-        public ICommand CompareCsvFileCommand => new RelayCommand(this.CompareCsvFileCommand_Execute, this.CompareCsvFileCommand_CanExecute);
+        public ICommand CompareCsvFileCommand => field ??= new RelayCommand(this.CompareCsvFileCommand_Execute, this.CompareCsvFileCommand_CanExecute);
         #endregion
 
         #region ヘルプコマンド
         /// <summary>
         /// ヘルプメニューコマンド
         /// </summary>
-        public ICommand HelpMenuCommand => new RelayCommand(this.HelpMenuCommand_CanExecute);
+        public ICommand HelpMenuCommand => field ??= new RelayCommand(this.HelpMenuCommand_CanExecute);
         /// <summary>
         /// 更新の確認コマンド
         /// </summary>
-        public ICommand CheckUpdateCommand => new AsyncRelayCommand(this.CheckUpdateCommand_ExecuteAsync);
+        public ICommand CheckUpdateCommand => field ??= new AsyncRelayCommand(this.CheckUpdateCommand_ExecuteAsync);
         /// <summary>
         /// リリースノートコマンド
         /// </summary>
-        public ICommand OpenReleaseNoteCommand => new RelayCommand(this.OpenReleaseNoteCommand_Execute);
+        public ICommand OpenReleaseNoteCommand => field ??= new RelayCommand(this.OpenReleaseNoteCommand_Execute);
         /// <summary>
         /// バージョン表示コマンド
         /// </summary>
-        public ICommand ShowVersionCommand => new RelayCommand(this.OpenVersionWindowCommand_Execute, this.OpenVersionWindowCommand_CanExecute);
+        public ICommand ShowVersionCommand => field ??= new RelayCommand(this.OpenVersionWindowCommand_Execute, this.OpenVersionWindowCommand_CanExecute);
         #endregion
         #endregion
         #endregion

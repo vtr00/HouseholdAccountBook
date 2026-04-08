@@ -75,39 +75,39 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 分類追加コマンド
         /// </summary>
-        public ICommand AddCategoryCommand => new AsyncRelayCommand(this.AddCategoryCommand_ExecuteAsync, this.AddCategoryCommand_CanExecute);
+        public ICommand AddCategoryCommand => field ??= new AsyncRelayCommand(this.AddCategoryCommand_ExecuteAsync, this.AddCategoryCommand_CanExecute);
         /// <summary>
         /// 項目追加コマンド
         /// </summary>
-        public ICommand AddItemCommand => new AsyncRelayCommand(this.AddItemCommand_ExecuteAsync, this.AddItemCommand_CanExecute);
+        public ICommand AddItemCommand => field ??= new AsyncRelayCommand(this.AddItemCommand_ExecuteAsync, this.AddItemCommand_CanExecute);
         /// <summary>
         /// 分類/項目削除コマンド
         /// </summary>
-        public ICommand DeleteItemCommand => new AsyncRelayCommand(this.DeleteItemCommand_ExecuteAsync, this.DeleteItemCommand_CanExecute);
+        public ICommand DeleteItemCommand => field ??= new AsyncRelayCommand(this.DeleteItemCommand_ExecuteAsync, this.DeleteItemCommand_CanExecute);
         /// <summary>
         /// 分類/項目表示順上昇コマンド
         /// </summary>
-        public ICommand RaiseItemSortOrderCommand => new AsyncRelayCommand(this.RaiseItemSortOrderCommand_ExecuteAsync, this.RaiseItemSortOrderCommand_CanExecute);
+        public ICommand RaiseItemSortOrderCommand => field ??= new AsyncRelayCommand(this.RaiseItemSortOrderCommand_ExecuteAsync, this.RaiseItemSortOrderCommand_CanExecute);
         /// <summary>
         /// 分類/項目表示順下降コマンド
         /// </summary>
-        public ICommand DropItemSortOrderCommand => new AsyncRelayCommand(this.DropItemSortOrderCommand_ExecuteAsync, this.DropItemSortOrderCommand_CanExecute);
+        public ICommand DropItemSortOrderCommand => field ??= new AsyncRelayCommand(this.DropItemSortOrderCommand_ExecuteAsync, this.DropItemSortOrderCommand_CanExecute);
         /// <summary>
         /// 分類/項目情報保存コマンド
         /// </summary>
-        public ICommand SaveItemInfoCommand => new AsyncRelayCommand(this.SaveItemInfoCommand_ExecuteAsync, this.SaveItemInfoCommand_CanExecute);
+        public ICommand SaveItemInfoCommand => field ??= new AsyncRelayCommand(this.SaveItemInfoCommand_ExecuteAsync, this.SaveItemInfoCommand_CanExecute);
         /// <summary>
         /// 項目-帳簿関係変更コマンド
         /// </summary>
-        public ICommand ChangeItemRelationCommand => new AsyncRelayCommand<object>(this.ChangeItemRelationCommand_ExecuteAsync);
+        public ICommand ChangeItemRelationCommand => field ??= new AsyncRelayCommand<object>(this.ChangeItemRelationCommand_ExecuteAsync);
         /// <summary>
         /// 店名削除コマンド
         /// </summary>
-        public ICommand DeleteShopNameCommand => new AsyncRelayCommand(this.DeleteShopNameCommand_ExecuteAsync, this.DeleteShopNameCommand_CanExecute);
+        public ICommand DeleteShopNameCommand => field ??= new AsyncRelayCommand(this.DeleteShopNameCommand_ExecuteAsync, this.DeleteShopNameCommand_CanExecute);
         /// <summary>
         /// 備考削除コマンド
         /// </summary>
-        public ICommand DeleteRemarkCommand => new AsyncRelayCommand(this.DeleteRemarkCommand_ExecuteAsync, this.DeleteRemarkCommand_CanExecute);
+        public ICommand DeleteRemarkCommand => field ??= new AsyncRelayCommand(this.DeleteRemarkCommand_ExecuteAsync, this.DeleteRemarkCommand_CanExecute);
         #endregion
         #endregion
 

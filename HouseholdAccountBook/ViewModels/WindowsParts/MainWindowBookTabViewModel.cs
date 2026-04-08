@@ -282,59 +282,59 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 編集コマンド
         /// </summary>
-        public ICommand EditMenuCommand => new RelayCommand(this.EditMenuCommand_CanExecute);
+        public ICommand EditMenuCommand => field ??= new RelayCommand(this.EditMenuCommand_CanExecute);
         /// <summary>
         /// 検索欄表示コマンド
         /// </summary>
-        public ICommand ShowFindBoxCommand => new RelayCommand(this.ShowFindBoxCommand_Execute, this.ShowFindBoxCommand_CanExecute);
+        public ICommand ShowFindBoxCommand => field ??= new RelayCommand(this.ShowFindBoxCommand_Execute, this.ShowFindBoxCommand_CanExecute);
         /// <summary>
         /// 検索欄非表示コマンド
         /// </summary>
-        public ICommand HideFindBoxCommand => new RelayCommand(this.HideFindBoxCommand_Execute);
+        public ICommand HideFindBoxCommand => field ??= new RelayCommand(this.HideFindBoxCommand_Execute);
         /// <summary>
         /// 置換欄表示コマンド
         /// </summary>
-        public ICommand ShowReplaceBoxCommand => new RelayCommand(this.ShowReplaceBoxCommand_Execute, this.ShowReplaceBoxCommand_CanExecute);
+        public ICommand ShowReplaceBoxCommand => field ??= new RelayCommand(this.ShowReplaceBoxCommand_Execute, this.ShowReplaceBoxCommand_CanExecute);
         /// <summary>
         /// 置換欄非表示コマンド
         /// </summary>
-        public ICommand HideReplaceBoxCommand => new RelayCommand(this.HideReplaceBoxCommand_Execute);
+        public ICommand HideReplaceBoxCommand => field ??= new RelayCommand(this.HideReplaceBoxCommand_Execute);
         /// <summary>
         /// 帳簿項目検索コマンド
         /// </summary>
-        public ICommand FindActionCommand => new RelayCommand(this.FindActionCommand_Execute, this.FindActionCommand_CanExecute);
+        public ICommand FindActionCommand => field ??= new RelayCommand(this.FindActionCommand_Execute, this.FindActionCommand_CanExecute);
         /// <summary>
         /// 帳簿項目置換コマンド
         /// </summary>
-        public ICommand ReplaceActionCommand => new AsyncRelayCommand(this.ReplaceActionCommand_ExecuteAsync, this.ReplaceActionCommand_CanExecute);
+        public ICommand ReplaceActionCommand => field ??= new AsyncRelayCommand(this.ReplaceActionCommand_ExecuteAsync, this.ReplaceActionCommand_CanExecute);
         /// <summary>
         /// 移動追加コマンド
         /// </summary>
-        public ICommand AddMoveCommand => new RelayCommand(this.AddMoveCommand_Execute, this.AddMoveCommand_CanExecute);
+        public ICommand AddMoveCommand => field ??= new RelayCommand(this.AddMoveCommand_Execute, this.AddMoveCommand_CanExecute);
         /// <summary>
         /// 帳簿項目追加コマンド
         /// </summary>
-        public ICommand AddActionCommand => new RelayCommand(this.AddActionCommand_Execute, this.AddActionCommand_CanExecute);
+        public ICommand AddActionCommand => field ??= new RelayCommand(this.AddActionCommand_Execute, this.AddActionCommand_CanExecute);
         /// <summary>
         /// 帳簿項目リスト追加コマンド
         /// </summary>
-        public ICommand AddActionListCommand => new RelayCommand(this.AddActionListCommand_Execute, this.AddActionListCommand_CanExecute);
+        public ICommand AddActionListCommand => field ??= new RelayCommand(this.AddActionListCommand_Execute, this.AddActionListCommand_CanExecute);
         /// <summary>
         /// 複製コマンド
         /// </summary>
-        public ICommand CopyCommand => new AsyncRelayCommand(this.CopyCommand_ExecuteAsync, this.CopyCommand_CanExecute);
+        public ICommand CopyCommand => field ??= new AsyncRelayCommand(this.CopyCommand_ExecuteAsync, this.CopyCommand_CanExecute);
         /// <summary>
         /// 編集コマンド
         /// </summary>
-        public ICommand EditCommand => new AsyncRelayCommand(this.EditCommand_ExecuteAsync, this.EditCommand_CanExecute);
+        public ICommand EditCommand => field ??= new AsyncRelayCommand(this.EditCommand_ExecuteAsync, this.EditCommand_CanExecute);
         /// <summary>
         /// 削除コマンド
         /// </summary>
-        public ICommand DeleteCommand => new AsyncRelayCommand(this.DeleteCommand_ExecuteAsync, this.DeleteCommand_CanExecute);
+        public ICommand DeleteCommand => field ??= new AsyncRelayCommand(this.DeleteCommand_ExecuteAsync, this.DeleteCommand_CanExecute);
         /// <summary>
         /// 一致フラグ変更コマンド
         /// </summary>
-        public ICommand ChangeIsMatchCommand => new AsyncRelayCommand(this.ChangeIsMatchCommand_ExecuteAsync, this.ChangeIsMatchCommand_CanExecute);
+        public ICommand ChangeIsMatchCommand => field ??= new AsyncRelayCommand(this.ChangeIsMatchCommand_ExecuteAsync, this.ChangeIsMatchCommand_CanExecute);
         #endregion
         #endregion
 

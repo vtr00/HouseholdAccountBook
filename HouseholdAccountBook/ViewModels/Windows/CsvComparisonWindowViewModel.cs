@@ -152,39 +152,39 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// CSVファイルオープンコマンド
         /// </summary>
-        public ICommand OpenCsvFilesCommand => new AsyncRelayCommand(this.OpenCsvFilesCommand_ExecuteAsync);
+        public ICommand OpenCsvFilesCommand => field ??= new AsyncRelayCommand(this.OpenCsvFilesCommand_ExecuteAsync);
         /// <summary>
         /// CSVファイル移動コマンド
         /// </summary>
-        public ICommand MoveCsvFilesCommand => new AsyncRelayCommand(this.MoveCsvFilesCommand_ExecuteAsync, this.MoveCsvFilesCommand_CanExecute);
+        public ICommand MoveCsvFilesCommand => field ??= new AsyncRelayCommand(this.MoveCsvFilesCommand_ExecuteAsync, this.MoveCsvFilesCommand_CanExecute);
         /// <summary>
         /// CSVファイルクローズコマンド
         /// </summary>
-        public ICommand CloseCsvFilesCommand => new RelayCommand(this.CloseCsvFilesCommand_Execute, this.CloseCsvFilesCommand_CanExecute);
+        public ICommand CloseCsvFilesCommand => field ??= new RelayCommand(this.CloseCsvFilesCommand_Execute, this.CloseCsvFilesCommand_CanExecute);
         /// <summary>
         /// 帳簿項目追加コマンド
         /// </summary>
-        public ICommand AddActionCommand => new RelayCommand(this.AddActionCommand_Execute, this.AddActionCommand_CanExecute);
+        public ICommand AddActionCommand => field ??= new RelayCommand(this.AddActionCommand_Execute, this.AddActionCommand_CanExecute);
         /// <summary>
         /// 帳簿項目編集コマンド
         /// </summary>
-        public ICommand EditActionCommand => new AsyncRelayCommand(this.EditActionCommand_ExecuteAsync, this.EditActionCommand_CanExecute);
+        public ICommand EditActionCommand => field ??= new AsyncRelayCommand(this.EditActionCommand_ExecuteAsync, this.EditActionCommand_CanExecute);
         /// <summary>
         /// 帳簿項目追加/編集コマンド
         /// </summary>
-        public ICommand AddOrEditActionCommand => new AsyncRelayCommand(this.AddOrEditActionCommand_ExecuteAsync, this.AddOrEditActionCommand_CanExecute);
+        public ICommand AddOrEditActionCommand => field ??= new AsyncRelayCommand(this.AddOrEditActionCommand_ExecuteAsync, this.AddOrEditActionCommand_CanExecute);
         /// <summary>
         /// 一括チェックコマンド
         /// </summary>
-        public ICommand BulkCheckCommand => new RelayCommand(this.BulkCheckCommand_Execute, this.BulkCheckCommand_CanExecute);
+        public ICommand BulkCheckCommand => field ??= new RelayCommand(this.BulkCheckCommand_Execute, this.BulkCheckCommand_CanExecute);
         /// <summary>
         /// リスト更新コマンド
         /// </summary>
-        public ICommand UpdateListCommand => new RelayCommand(this.UpdateListCommand_Execute, this.UpdateListCommand_CanExecute);
+        public ICommand UpdateListCommand => field ??= new RelayCommand(this.UpdateListCommand_Execute, this.UpdateListCommand_CanExecute);
         /// <summary>
         /// 一致チェック変更コマンド
         /// </summary>
-        public ICommand ChangeIsMatchCommand => new RelayCommand(this.ChangeIsMatchCommand_Execute);
+        public ICommand ChangeIsMatchCommand => field ??= new RelayCommand(this.ChangeIsMatchCommand_Execute);
         #endregion
         #endregion
 

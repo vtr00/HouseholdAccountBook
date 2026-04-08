@@ -27,7 +27,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// URIオープンコマンド
         /// </summary>
-        public ICommand OpenUriCommand => new RelayCommand<string>(this.OpenUriCommand_Execute);
+        public ICommand OpenUriCommand => field ??= new RelayCommand<string>(this.OpenUriCommand_Execute);
         #endregion
 
         #region コマンドイベントハンドラ

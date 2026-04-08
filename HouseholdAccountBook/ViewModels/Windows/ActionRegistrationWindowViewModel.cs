@@ -186,15 +186,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 今日コマンド
         /// </summary>
-        public ICommand TodayCommand => new RelayCommand(() => this.SelectedDate = DateTime.Today, () => this.SelectedDate != DateTime.Today);
+        public ICommand TodayCommand => field ??= new RelayCommand(() => this.SelectedDate = DateTime.Today, () => this.SelectedDate != DateTime.Today);
         /// <summary>
         /// 続けて入力コマンド
         /// </summary>
-        public ICommand ContinueToOKCommand => new AsyncRelayCommand(this.ContinueToOKCommand_ExecuteAsync, this.ContinueToOKCommand_CanExecute);
+        public ICommand ContinueToOKCommand => field ??= new AsyncRelayCommand(this.ContinueToOKCommand_ExecuteAsync, this.ContinueToOKCommand_CanExecute);
         /// <summary>
         /// OKコマンド
         /// </summary>
-        public new ICommand OKCommand => new AsyncRelayCommand(this.OKCommand_ExecuteAsync, this.OKCommand_CanExecute);
+        public new ICommand OKCommand => field ??= new AsyncRelayCommand(this.OKCommand_ExecuteAsync, this.OKCommand_CanExecute);
         #endregion
         #endregion
 

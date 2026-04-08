@@ -65,11 +65,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 今月コマンド
         /// </summary>
-        public ICommand ThisMonthCommand => new RelayCommand(this.ThisMonthCommand_Execute);
+        public ICommand ThisMonthCommand => field ??= new RelayCommand(this.ThisMonthCommand_Execute);
         /// <summary>
         /// 全期間コマンド
         /// </summary>
-        public ICommand AllPeriodCommand => new AsyncRelayCommand(this.AllPeriodCommand_ExecuteAsync);
+        public ICommand AllPeriodCommand => field ??= new AsyncRelayCommand(this.AllPeriodCommand_ExecuteAsync);
         #endregion
         #endregion
 
