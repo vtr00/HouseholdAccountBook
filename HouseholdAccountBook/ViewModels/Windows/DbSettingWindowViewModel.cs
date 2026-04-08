@@ -60,85 +60,105 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public SQLiteSettingViewModel SQLiteSettingVM { get; init; } = new();
 
         #region コマンド
-        public override ICommand SelectFilePathCommand => new RelayCommand<FilePathKind>(this.SelectFilePathCommand_Execute);
+        /// <summary>
+        /// pg_dump.exeファイル選択コマンド
+        /// </summary>
+        public ICommand SelectPgDumpFilePathCommand => field ??= new RelayCommand(this.SelectPgDumpFilePathCommand_Execute);
+        /// <summary>
+        /// pg_restore.exeファイル選択コマンド
+        /// </summary>
+        public ICommand SelectPgRestoreFilePathCommand => field ??= new RelayCommand(this.SelectPgRestoreFilePathCommand_Execute);
+        /// <summary>
+        /// DBファイル選択コマンド
+        /// </summary>
+        public ICommand SelectDBFilePathCommand => field ??= new RelayCommand(this.SelectDBFilePathCommand_Execute);
         #endregion
         #endregion
 
         #region コマンドイベントハンドラ
         /// <summary>
-        /// ファイル選択コマンド処理
+        /// pg_dump.exeファイル選択コマンド処理
         /// </summary>
-        /// <param name="kind">ファイルパス種別</param>
-        public void SelectFilePathCommand_Execute(FilePathKind kind)
+        public void SelectPgDumpFilePathCommand_Execute()
         {
-            bool checkFileExists = true;
-            string directory = string.Empty;
-            string fileName = string.Empty;
-            string filter = string.Empty;
-            switch (kind) {
-                case FilePathKind.DumpExeFile: {
-                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.InputedDumpExePath, App.GetCurrentDir());
-                    if (string.IsNullOrWhiteSpace(directory)) {
-                        directory = App.GetCurrentDir();
-                    }
-                    filter = "pg_dump.exe|pg_dump.exe";
-                    break;
-                }
-                case FilePathKind.RestoreExeFile: {
-                    (directory, fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.InputedRestoreExePath, App.GetCurrentDir());
-                    if (string.IsNullOrWhiteSpace(directory)) {
-                        directory = App.GetCurrentDir();
-                    }
-                    filter = "pg_restore.exe|pg_restore.exe";
-                    break;
-                }
-                case FilePathKind.DbFile: {
-                    switch (this.DBKindSelectorVM.SelectedKey) {
-                        case DBKind.SQLite: {
-                            checkFileExists = false;
-                            (directory, fileName) = PathUtil.GetSeparatedPath(this.SQLiteSettingVM.InputedDBFilePath, App.GetCurrentDir());
-                            filter = $"{Properties.Resources.FileSelectFilter_SQLiteFile}|*.db;*.sqlite;*.sqlite3";
-                            break;
-                        }
-                        case DBKind.Access: {
-                            checkFileExists = false;
-                            (directory, fileName) = PathUtil.GetSeparatedPath(this.AccessSettingVM.InputedDBFilePath, App.GetCurrentDir());
-                            filter = $"{Properties.Resources.FileSelectFilter_AccessFile}|*.mdb;*.accdb";
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                    break;
-                }
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.InputedDumpExePath, App.GetCurrentDir());
+            if (string.IsNullOrWhiteSpace(directory)) {
+                directory = App.GetCurrentDir();
             }
 
             OpenFileDialogRequestEventArgs e = new() {
-                CheckFileExists = checkFileExists,
+                CheckFileExists = true,
+                InitialDirectory = directory,
+                FileName = fileName,
+                Title = Properties.Resources.Title_FileSelection,
+                Filter = "pg_dump.exe|pg_dump.exe",
+            };
+            if (this.OpenFileDialogRequest(e)) {
+                this.PostgreSQLDBSettingVM.InputedDumpExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+            }
+        }
+
+        /// <summary>
+        /// pg_restore.exeファイル選択コマンド処理
+        /// </summary>
+        public void SelectPgRestoreFilePathCommand_Execute()
+        {
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.InputedRestoreExePath, App.GetCurrentDir());
+            if (string.IsNullOrWhiteSpace(directory)) {
+                directory = App.GetCurrentDir();
+            }
+
+            OpenFileDialogRequestEventArgs e = new() {
+                CheckFileExists = true,
+                InitialDirectory = directory,
+                FileName = fileName,
+                Title = Properties.Resources.Title_FileSelection,
+                Filter = "pg_restore.exe|pg_restore.exe",
+            };
+            if (this.OpenFileDialogRequest(e)) {
+                this.PostgreSQLDBSettingVM.InputedRestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+            }
+        }
+
+        /// <summary>
+        /// DBファイル選択コマンド処理
+        /// </summary>
+        public void SelectDBFilePathCommand_Execute()
+        {
+            string directory = string.Empty;
+            string fileName = string.Empty;
+            string filter = string.Empty;
+            switch (this.DBKindSelectorVM.SelectedKey) {
+                case DBKind.SQLite: {
+                    (directory, fileName) = PathUtil.GetSeparatedPath(this.SQLiteSettingVM.InputedDBFilePath, App.GetCurrentDir());
+                    filter = $"{Properties.Resources.FileSelectFilter_SQLiteFile}|*.db;*.sqlite;*.sqlite3";
+                    break;
+                }
+                case DBKind.Access: {
+                    (directory, fileName) = PathUtil.GetSeparatedPath(this.AccessSettingVM.InputedDBFilePath, App.GetCurrentDir());
+                    filter = $"{Properties.Resources.FileSelectFilter_AccessFile}|*.mdb;*.accdb";
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            OpenFileDialogRequestEventArgs e = new() {
+                CheckFileExists = false,
                 InitialDirectory = directory,
                 FileName = fileName,
                 Title = Properties.Resources.Title_FileSelection,
                 Filter = filter,
             };
             if (this.OpenFileDialogRequest(e)) {
-                switch (kind) {
-                    case FilePathKind.DumpExeFile:
-                        this.PostgreSQLDBSettingVM.InputedDumpExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                switch (this.DBKindSelectorVM.SelectedKey) {
+                    case DBKind.SQLite:
+                        this.SQLiteSettingVM.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
-                    case FilePathKind.RestoreExeFile:
-                        this.PostgreSQLDBSettingVM.InputedRestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                    case DBKind.Access:
+                        this.AccessSettingVM.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
-                    case FilePathKind.DbFile:
-                        switch (this.DBKindSelectorVM.SelectedKey) {
-                            case DBKind.SQLite:
-                                this.SQLiteSettingVM.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
-                                break;
-                            case DBKind.Access:
-                                this.AccessSettingVM.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
-                                break;
-                            default:
-                                break;
-                        }
+                    default:
                         break;
                 }
             }

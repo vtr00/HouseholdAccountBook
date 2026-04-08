@@ -33,7 +33,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// キャンセルコマンド
         /// </summary>
-        public ICommand CancelCommand => new RelayCommand(this.CancelCommand_Execute, this.CancelCommand_CanExecute);
+        public ICommand CancelCommand => field ??= new RelayCommand(this.CancelCommand_Execute, this.CancelCommand_CanExecute);
 
         /// <summary>
         /// キャンセルコマンド実行可能か

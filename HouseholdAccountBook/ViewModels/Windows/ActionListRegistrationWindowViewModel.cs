@@ -150,7 +150,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// OKコマンド
         /// </summary>
-        public new ICommand OKCommand => new AsyncRelayCommand(this.OKCommand_ExecuteAsync, this.OKCommand_CanExecute);
+        public new ICommand OKCommand => field ??= new AsyncRelayCommand(this.OKCommand_ExecuteAsync, this.OKCommand_CanExecute);
         #endregion
         #endregion
 

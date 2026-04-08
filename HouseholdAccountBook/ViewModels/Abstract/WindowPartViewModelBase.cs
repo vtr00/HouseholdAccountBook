@@ -58,27 +58,19 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// OKコマンド
         /// </summary>
-        public ICommand OKCommand => new RelayCommand(this.OKCommand_Execute, this.OKCommand_CanExecute);
+        public ICommand OKCommand => field ??= new RelayCommand(this.OKCommand_Execute, this.OKCommand_CanExecute);
         /// <summary>
         /// キャンセルコマンド
         /// </summary>
-        public ICommand CancelCommand => new RelayCommand(this.CanncelCommand_Execute);
+        public ICommand CancelCommand => field ??= new RelayCommand(this.CanncelCommand_Execute);
         /// <summary>
         /// クローズコマンド
         /// </summary>
-        public ICommand CloseCommand => new RelayCommand(this.CloseCommand_Execute);
+        public ICommand CloseCommand => field ??= new RelayCommand(this.CloseCommand_Execute);
         /// <summary>
         /// 非表示コマンド
         /// </summary>
-        public ICommand HideCommand => new RelayCommand(this.HideCommand_Execute);
-        /// <summary>
-        /// ファイル選択コマンド
-        /// </summary>
-        public virtual ICommand SelectFilePathCommand { get; set; }
-        /// <summary>
-        /// フォルダ選択コマンド
-        /// </summary>
-        public virtual ICommand SelectFolderPathCommand { get; set; }
+        public ICommand HideCommand => field ??= new RelayCommand(this.HideCommand_Execute);
         #endregion
 
         #region コマンドイベントハンドラ
