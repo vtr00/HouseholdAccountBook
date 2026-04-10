@@ -57,7 +57,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// タブ選択変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<int>> SelectedTabChanged;
+        public event EventHandler<ChangedEventArgs<Tabs>> SelectedTabChanged;
         /// <summary>
         /// グラフ種別1選択変更時イベント
         /// </summary>
@@ -209,22 +209,22 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択されたタブインデックス
         /// </summary>
         public int SelectedTabIndex {
+            get => (int)this.SelectedTab;
+            set => this.SelectedTab = EnumUtil.SafeParseEnum(value, Tabs.BooksTab);
+        }
+        /// <summary>
+        /// 選択されたタブ種別
+        /// </summary>
+        public Tabs SelectedTab {
             get;
             set {
-                int oldValue = field;
+                Tabs oldValue = field;
                 if (this.SetProperty(ref field, value)) {
                     this.SelectedTabChanged?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
                     this.RaisePropertyChanged(nameof(this.DisplayedStart));
                     this.RaisePropertyChanged(nameof(this.DisplayedEnd));
                 }
             }
-        }
-        /// <summary>
-        /// 選択されたタブ種別
-        /// </summary>
-        public Tabs SelectedTab {
-            get => (Tabs)this.SelectedTabIndex;
-            set => this.SelectedTabIndex = (int)value;
         }
 
         /// <summary>
@@ -659,8 +659,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="progress">進捗</param>
         public async Task ImportKichoFugetsuDbCommand_ExecuteAsync(CancellationToken token, IProgress<int> progress)
         {
-            Properties.Settings settings = Properties.Settings.Default;
-            (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_Import_KichoFugetsu_FilePath, App.GetCurrentDir());
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(UserSettingService.Instance.KichoFugetsuFilePath, App.GetCurrentDir());
 
             OpenFileDialogRequestEventArgs e = new() {
                 InitialDirectory = directory,
@@ -675,13 +674,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 return;
             }
 
-            settings.App_Import_KichoFugetsu_FilePath = e.FileName;
-            settings.Save();
+            UserSettingService.Instance.KichoFugetsuFilePath = e.FileName;
 
             bool? result = false;
             int actRowsDiff = 0;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                OleDbHandler.ConnectInfo info = new(settings.App_Access_Provider) {
+                OleDbHandler.ConnectInfo info = new(UserSettingService.Instance.KichoFugetsuConnectInfo.Provider) {
                     DataSource = e.FileName
                 };
                 try {
@@ -722,8 +720,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="progress">進捗</param>
         public async Task ImportPostgreSQLCommand_ExecuteAsync(CancellationToken token, IProgress<int> progress)
         {
-            Properties.Settings settings = Properties.Settings.Default;
-
             if (MessageBox.Show(Properties.Resources.Message_DeleteOldDataNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) != MessageBoxResult.OK) {
                 return;
@@ -731,18 +727,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             bool? result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                NpgsqlDbHandler.ConnectInfo info = new() {
-                    Host = settings.App_Postgres_Host,
-                    Port = settings.App_Postgres_Port,
-                    UserName = settings.App_Postgres_UserName,
-                    Password = settings.App_Postgres_Password,
-#if DEBUG
-                    DatabaseName = settings.App_Postgres_DatabaseName_Debug,
-#else
-                    DatabaseName = settings.App_Postgres_DatabaseName,
-#endif
-                    Role = settings.App_Postgres_Role
-                };
+                NpgsqlDbHandler.ConnectInfo info = UserSettingService.Instance.NpgsqlConnectInfo;
                 try {
                     result = await this.mDbImportService.ImportPostgreSQLAsync(info, token, progress);
                 }
@@ -772,14 +757,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// カスタムファイル -> PostgreSQL インポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool ImportCustomFileCommand_CanExecute() => this.IsPostgreSQL && DbBackUpManager.Instance.PostgresRestoreExePath != string.Empty && !this.IsChildrenWindowOpened();
+        public bool ImportCustomFileCommand_CanExecute() => this.IsPostgreSQL && DbBackUpManager.Instance.NpgsqlBackupConfig?.RestoreExePath != string.Empty && !this.IsChildrenWindowOpened();
         /// <summary>
         /// カスタムファイル -> PostgreSQL インポートコマンド処理
         /// </summary>
         public async Task ImportCustomFileCommand_ExecuteAsync()
         {
-            Properties.Settings settings = Properties.Settings.Default;
-            (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_Import_CustomFormat_FilePath, App.GetCurrentDir());
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(UserSettingService.Instance.ImportCustomFilePath, App.GetCurrentDir());
 
             OpenFileDialogRequestEventArgs e = new() {
                 InitialDirectory = directory,
@@ -795,8 +779,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 return;
             }
 
-            settings.App_Import_CustomFormat_FilePath = e.FileName;
-            settings.Save();
+            UserSettingService.Instance.ImportCustomFilePath = e.FileName;
 
             bool result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
@@ -824,8 +807,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="progress">進捗</param>
         public async Task ImportSQLiteFileCommand_ExecuteAsync(CancellationToken token, IProgress<int> progress)
         {
-            Properties.Settings settings = Properties.Settings.Default;
-            (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_SQLite_DBFilePath, App.GetCurrentDir());
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(UserSettingService.Instance.ImportSQLiteFilePath, App.GetCurrentDir());
 
             OpenFileDialogRequestEventArgs e = new() {
                 InitialDirectory = directory,
@@ -841,13 +823,21 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 return;
             }
 
-            settings.App_Import_SQLite_FilePath = e.FileName;
-            settings.Save();
+            UserSettingService.Instance.ImportSQLiteFilePath = e.FileName;
 
             bool? result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
                 try {
-                    result = await this.mDbImportService.ImportSQLiteAsync(this.SelectedDBKind, e.FileName, settings.App_SQLite_DBFilePath, token, progress);
+                    switch (this.SelectedDBKind) {
+                        case DBKind.SQLite: {
+                            result = DbImportService.ImportSQLite(e.FileName, UserSettingService.Instance.SQLiteConnectInfo.FilePath, token, progress);
+                            break;
+                        }
+                        case DBKind.PostgreSQL: {
+                            result = await this.mDbImportService.ImportSQLiteAsync(e.FileName, token, progress);
+                            break;
+                        }
+                    }
                 }
                 catch (OperationCanceledException) {
                     result = null;
@@ -881,14 +871,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// カスタムファイルエクスポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool ExportCustomFileCommand_CanExecute() => this.IsPostgreSQL && DbBackUpManager.Instance.PostgresDumpExePath != string.Empty && !this.IsChildrenWindowOpened();
+        public bool ExportCustomFileCommand_CanExecute() => this.IsPostgreSQL && DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath != string.Empty && !this.IsChildrenWindowOpened();
         /// <summary>
         /// カスタムファイルエクスポートコマンド処理
         /// </summary>
         public async Task ExportCustomFileCommand_ExecuteAsync()
         {
-            Properties.Settings settings = Properties.Settings.Default;
-            (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_Export_CustomFormat_FilePath, App.GetCurrentDir());
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(UserSettingService.Instance.ExportCustomFilePath, App.GetCurrentDir());
 
             SaveFileDialogRequestEventArgs e = new() {
                 InitialDirectory = directory,
@@ -898,8 +887,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             };
             if (!this.SaveFileDialogRequest(e)) { return; }
 
-            settings.App_Export_CustomFormat_FilePath = e.FileName;
-            settings.Save();
+            UserSettingService.Instance.ExportCustomFilePath = e.FileName;
 
             bool result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
@@ -915,15 +903,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// SQLファイルエクスポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool ExportSQLFileCommand_CanExecute() => this.IsPostgreSQL && DbBackUpManager.Instance.PostgresDumpExePath != string.Empty && !this.IsChildrenWindowOpened();
+        public bool ExportSQLFileCommand_CanExecute() => this.IsPostgreSQL && DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath != string.Empty && !this.IsChildrenWindowOpened();
         /// <summary>
         /// SQLファイルエクスポートコマンド処理
         /// </summary>
         public async Task ExportSQLFileCommand_ExecuteAsync()
         {
-            Properties.Settings settings = Properties.Settings.Default;
-
-            (string directory, string fileName) = PathUtil.GetSeparatedPath(settings.App_Export_SQLFilePath, App.GetCurrentDir());
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(UserSettingService.Instance.ExportSQLFilePath, App.GetCurrentDir());
 
             SaveFileDialogRequestEventArgs e = new() {
                 InitialDirectory = directory,
@@ -933,8 +919,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             };
             if (!this.SaveFileDialogRequest(e)) { return; }
 
-            settings.App_Export_SQLFilePath = e.FileName;
-            settings.Save();
+            UserSettingService.Instance.ExportSQLFilePath = e.FileName;
 
             bool result = false;
             using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
@@ -961,9 +946,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 result = await DbBackUpManager.Instance.CreateBackUpFileAsync(backUpNum: -1);
 
                 if (result) {
-                    Properties.Settings settings = Properties.Settings.Default;
-                    settings.App_BackUpCurrentBySelf = DateTime.Now;
-                    settings.Save();
+                    UserSettingService.Instance.CurrentBackUpBySelf = DateTime.Now;
                     this.BookTabVM.RaiseCurrentBackUpChanged();
                 }
             }
@@ -1237,9 +1220,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             if (e.Result) {
                 using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    Properties.Settings settings = Properties.Settings.Default;
-                    this.FiscalStartMonth = settings.App_StartMonth;
-                    if (!await HolidayService.Instance.DownloadHolidayListAsync(settings.App_NationalHolidayCsv_Uri, settings.App_NationalHolidayCsv_TextEncoding, settings.App_NationalHolidayCsv_DateIndex)) {
+                    this.FiscalStartMonth = UserSettingService.Instance.FiscalStartMonth;
+                    if (!await HolidayService.Instance.DownloadHolidayListAsync(UserSettingService.Instance.HolidayCSVConfig)) {
                         // 祝日取得失敗を通知する
                         NotificationService.NotifyFailingToGetHolidayList();
                     }
@@ -1279,7 +1261,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 更新の確認コマンド処理
         /// </summary>
         /// <returns></returns>
-        private async Task CheckUpdateCommand_ExecuteAsync() => await App.NotifyLatestVersionAsync(true);
+        private async Task CheckUpdateCommand_ExecuteAsync() => await App.CheckLatestVersionAsync(true);
         /// <summary>
         /// リリースノートコマンド処理
         /// </summary>
@@ -1366,15 +1348,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
-            Properties.Settings settings = Properties.Settings.Default;
-
             // タブ選択変更時
             this.SelectedTabChanged += async (sender, e) => {
                 using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedTabChanged));
 
                 using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create(methodName: nameof(this.SelectedTabChanged));
-                settings.MainWindow_SelectedTabIndex = e.NewValue;
-                settings.Save();
+                UserSettingService.Instance.SelectedTab = e.NewValue;
 
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
             };
@@ -1382,8 +1361,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.BookSelectorVM.SelectionChanged += async (sender, e) => {
                 this.SelectedBookChanged?.Invoke(sender, e);
 
-                settings.MainWindow_SelectedBookId = (int?)e.NewValue ?? (int)BookIdObj.System;
-                settings.Save();
+                UserSettingService.Instance.SelectedBookId = e.NewValue ?? BookIdObj.System;
 
                 await this.UpdateAsync(isUpdateBookList: false, isScroll: true);
             };
@@ -1391,8 +1369,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.GraphKind1SelectorVM.SelectionChanged += async (sender, e) => {
                 this.SelectedGraphKind1Changed?.Invoke(sender, e);
 
-                settings.MainWindow_SelectedGraphKindIndex = (int)e.NewValue;
-                settings.Save();
+                UserSettingService.Instance.SelectedGraphKind1 = e.NewValue;
 
                 await this.UpdateAsync(isUpdateBookList: false);
             };
@@ -1400,8 +1377,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.GraphKind2SelectorVM.SelectionChanged += async (sender, e) => {
                 this.SelectedGraphKind2Changed?.Invoke(sender, e);
 
-                settings.MainWindow_SelectedGraphKind2Index = (int)e.NewValue;
-                settings.Save();
+                UserSettingService.Instance.SelectedGraphKind2 = e.NewValue;
 
                 await this.UpdateAsync(isUpdateBookList: false);
             };
@@ -1435,21 +1411,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
-            Properties.Settings settings = Properties.Settings.Default;
-            this.FiscalStartMonth = settings.App_StartMonth;
+            this.FiscalStartMonth = UserSettingService.Instance.FiscalStartMonth;
 
             this.SelectedDBKind = this.mDbHandlerFactory.DBKind;
 
             // 帳簿リスト更新
-            await this.BookSelectorVM.LoadAsync(settings.MainWindow_SelectedBookId == (int)BookIdObj.System ? BookIdObj.System : settings.MainWindow_SelectedBookId);
+            await this.BookSelectorVM.LoadAsync(UserSettingService.Instance.SelectedBookId);
             // タブ選択
-            if (settings.MainWindow_SelectedTabIndex != -1) {
-                this.SelectedTabIndex = settings.MainWindow_SelectedTabIndex;
-            }
+            this.SelectedTab = UserSettingService.Instance.SelectedTab;
             // グラフ種別1更新
-            await this.GraphKind1SelectorVM.LoadAsync((GraphKind1)settings.MainWindow_SelectedGraphKindIndex);
+            await this.GraphKind1SelectorVM.LoadAsync(UserSettingService.Instance.SelectedGraphKind1);
             // グラフ種別2更新
-            await this.GraphKind2SelectorVM.LoadAsync((GraphKind2)settings.MainWindow_SelectedGraphKind2Index);
+            await this.GraphKind2SelectorVM.LoadAsync(UserSettingService.Instance.SelectedGraphKind2);
 
             Log.Vars(vars: new { this.SelectedTabIndex, this.SelectedGraphKind1Index, this.SelectedGraphKind2Index });
 
@@ -1458,41 +1431,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         #region ウィンドウ設定プロパティ
         protected override (double, double) WindowSizeSettingRaw {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                return (settings.MainWindow_Width, settings.MainWindow_Height);
-            }
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-                settings.MainWindow_Width = value.Item1;
-                settings.MainWindow_Height = value.Item2;
-                settings.Save();
-            }
+            get => UserSettingService.Instance.MainWindowSize;
+            set => UserSettingService.Instance.MainWindowSize = value;
         }
 
         public override Point WindowPointSetting {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                return new Point(settings.MainWindow_Left, settings.MainWindow_Top);
-            }
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-                settings.MainWindow_Left = value.X;
-                settings.MainWindow_Top = value.Y;
-                settings.Save();
-            }
+            get => UserSettingService.Instance.MainWindowPoint;
+            set => UserSettingService.Instance.MainWindowPoint = value;
         }
 
         public override int WindowStateSetting {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                return settings.MainWindow_WindowState;
-            }
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-                settings.MainWindow_WindowState = value;
-                settings.Save();
-            }
+            get => UserSettingService.Instance.MainWindowState;
+            set => UserSettingService.Instance.MainWindowState = value;
         }
         #endregion
 

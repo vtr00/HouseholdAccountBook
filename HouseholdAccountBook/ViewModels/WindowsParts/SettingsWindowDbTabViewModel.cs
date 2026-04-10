@@ -2,7 +2,7 @@
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
-using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;
@@ -185,8 +185,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             if (MessageBox.Show(Properties.Resources.Message_RestartNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                Properties.Settings.Default.App_InitFlag = true;
-                Properties.Settings.Default.Save();
+                UserSettingService.Instance.InitFlag = true;
 
                 ((App)Application.Current).Restart();
             }
@@ -232,9 +231,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using FuncLog funcLog = new();
 
-            Properties.Settings settings = Properties.Settings.Default;
-
-            this.SelectedDBKind = (DBKind)settings.App_SelectedDBKind;
+            this.SelectedDBKind = UserSettingService.Instance.SelectedDBKind;
 
             // PostgreSQL
             this.PostgreSQLDBSettingVM.Load(null);
@@ -244,13 +241,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             await this.AccessSettingVM.LoadForKichoFugetsuAsync();
 
             // バックアップ
-            this.InputedBackUpNum = settings.App_BackUpNum;
-            this.InputedBackUpFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_BackUpFolderPath);
-            this.SelectedIfBackUpAtMinimizing = settings.App_BackUpFlagAtMinimizing;
-            this.InputedBackUpIntervalAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
-            this.SelectedIfNotifyBackUpAtMinimizing = settings.App_BackUpNotifyAtMinimizing;
-            this.SelectedIfBackUpAtClosing = settings.App_BackUpFlagAtClosing;
-            this.SelectedBackUpCondition = (BackUpCondition)settings.App_BackUpCondition;
+            DbBackUpManager.Configuration config = UserSettingService.Instance.DbBackupConfig;
+            this.InputedBackUpNum = config.Amount;
+            this.InputedBackUpFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), config.TargetFolderPath);
+            this.SelectedIfBackUpAtMinimizing = config.ExecuteAtMinimizing;
+            this.InputedBackUpIntervalAtMinimizing = config.IntervalMinAtMinimizing;
+            this.SelectedIfNotifyBackUpAtMinimizing = config.NotifyAtMinimizing;
+            this.SelectedIfBackUpAtClosing = config.ExecuteAtClosing;
+            this.SelectedBackUpCondition = config.Condition;
         }
 
         public override void AddEventHandlers()
@@ -265,35 +263,26 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using FuncLog funcLog = new();
 
-            Properties.Settings settings = Properties.Settings.Default;
-
             // PostgreSQL
             _ = this.PostgreSQLDBSettingVM.Save(null);
             // Access(記帳風月)
             _ = this.AccessSettingVM.SaveForKichoFugetsu();
 
             // バックアップ
-            settings.App_BackUpNum = this.InputedBackUpNum;
-            settings.App_BackUpFolderPath = Path.GetFullPath(this.InputedBackUpFolderPath, App.GetCurrentDir());
-            settings.App_BackUpFlagAtMinimizing = this.SelectedIfBackUpAtMinimizing;
-            settings.App_BackUpIntervalMinAtMinimizing = this.InputedBackUpIntervalAtMinimizing;
-            settings.App_BackUpNotifyAtMinimizing = this.SelectedIfNotifyBackUpAtMinimizing;
-            settings.App_BackUpFlagAtClosing = this.SelectedIfBackUpAtClosing;
-            settings.App_BackUpCondition = (int)this.SelectedBackUpCondition;
+            UserSettingService.Instance.DbBackupConfig = new() {
+                Amount = this.InputedBackUpNum,
+                TargetFolderPath = Path.GetFullPath(this.InputedBackUpFolderPath, App.GetCurrentDir()),
+                ExecuteAtMinimizing = this.SelectedIfBackUpAtMinimizing,
+                IntervalMinAtMinimizing = this.InputedBackUpIntervalAtMinimizing,
+                NotifyAtMinimizing = this.SelectedIfNotifyBackUpAtMinimizing,
+                ExecuteAtClosing = this.SelectedIfBackUpAtClosing,
+                Condition = this.SelectedBackUpCondition
+            };
 
             // DbBackUpManagerへ設定を反映する
-            DbBackUpManager.Instance.PostgresDumpExePath = settings.App_Postgres_DumpExePath;
-            DbBackUpManager.Instance.PostgresRestoreExePath = settings.App_Postgres_RestoreExePath;
-            DbBackUpManager.Instance.PostgresPasswordInput = (PostgresPasswordInput)settings.App_Postgres_Password_Input;
+            DbBackUpManager.Instance.Config = UserSettingService.Instance.DbBackupConfig;
 
-            DbBackUpManager.Instance.BackUpNum = settings.App_BackUpNum;
-            DbBackUpManager.Instance.BackUpFolderPath = settings.App_BackUpFolderPath;
-            DbBackUpManager.Instance.BackUpFlagAtMinimizing = settings.App_BackUpFlagAtMinimizing;
-            DbBackUpManager.Instance.BackUpIntervalMinAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
-            DbBackUpManager.Instance.BackUpNotifyAtMinimizing = settings.App_BackUpNotifyAtMinimizing;
-            DbBackUpManager.Instance.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
-
-            settings.Save();
+            DbBackUpManager.Instance.NpgsqlBackupConfig = UserSettingService.Instance.PostgreSQLBackupConfig;
         }
     }
 }

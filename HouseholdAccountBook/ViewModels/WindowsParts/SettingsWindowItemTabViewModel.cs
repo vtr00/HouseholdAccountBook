@@ -29,7 +29,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 設定サービス
         /// </summary>
-        private SettingService mSettingService;
+        private MasterSettingService mSettingService;
         #endregion
 
         #region イベント

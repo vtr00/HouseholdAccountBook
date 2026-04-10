@@ -330,107 +330,114 @@ namespace HouseholdAccountBook.Models.AppServices
         }
 
         /// <summary>
-        /// SQLiteからインポートする
+        /// SQLiteからSQLiteへインポートする
         /// </summary>
-        /// <param name="dbKind">インポート先のDB種別</param>
         /// <param name="fromFilePath">インポート元のSQLiteファイルパス</param>
-        /// <param name="destFilePath">インポート先のSQLiteファイルパス</param>
+        /// <param name="sqliteFilePath">インポート先のSQLiteファイルパス</param>
         /// <param name="token">キャンセル用トークン</param>
         /// <param name="progress">進捗</param>
         /// <exception cref="OperationCanceledException">キャンセル例外</exception>
         /// <returns>成功/失敗</returns>
-        public async Task<bool> ImportSQLiteAsync(DBKind dbKind, string fromFilePath, string destFilePath, CancellationToken token, IProgress<int> progress)
+        public static bool ImportSQLite(string fromFilePath, string sqliteFilePath, CancellationToken token, IProgress<int> progress)
         {
-            using FuncLog funcLog = new(new { dbKind, fromFilePath, destFilePath });
+            using FuncLog funcLog = new(new { fromFilePath, sqliteFilePath });
+
+            bool result = false;
+            try {
+                progress.Report(-1);
+                token.ThrowIfCancellationRequested();
+
+                // ファイルをコピーするだけ
+                File.Copy(fromFilePath, sqliteFilePath, true);
+                result = true;
+            }
+            catch (OperationCanceledException) {
+                throw;
+            }
+            catch (Exception) {
+                Log.Error("Failed to copy SQLite file.");
+                throw;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// SQLiteからPostgreSQLへインポートする
+        /// </summary>
+        /// <param name="fromFilePath">インポート元のSQLiteファイルパス</param>
+        /// <param name="sqliteFilePath">インポート先のSQLiteファイルパス</param>
+        /// <param name="token">キャンセル用トークン</param>
+        /// <param name="progress">進捗</param>
+        /// <exception cref="OperationCanceledException">キャンセル例外</exception>
+        /// <returns>成功/失敗</returns>
+        public async Task<bool> ImportSQLiteAsync(string fromFilePath, CancellationToken token, IProgress<int> progress)
+        {
+            using FuncLog funcLog = new(new { fromFilePath });
 
             bool result = false;
 
-            switch (dbKind) {
-                case DBKind.SQLite: {
-                    try {
-                        progress.Report(-1);
-                        token.ThrowIfCancellationRequested();
+            SQLiteDbHandler.ConnectInfo info = new() {
+                FilePath = fromFilePath
+            };
 
-                        // ファイルをコピーするだけ
-                        File.Copy(fromFilePath, destFilePath, true);
-                        result = true;
-                    }
-                    catch (OperationCanceledException) {
-                        throw;
-                    }
-                    catch (Exception) {
-                        Log.Error("Failed to copy SQLite file.");
-                        throw;
-                    }
-                    break;
-                }
-                case DBKind.PostgreSQL: {
-                    SQLiteDbHandler.ConnectInfo info = new() {
-                        FilePath = fromFilePath
-                    };
+            await using SQLiteDbHandler dbHandlerSqlite = await new DbHandlerFactory(info).CreateAsync() as SQLiteDbHandler;
+            await using DbHandlerBase dbHandlerNpgsql = await this.mDbHandlerFactory.CreateAsync();
 
-                    await using SQLiteDbHandler dbHandlerSqlite = await new DbHandlerFactory(info).CreateAsync() as SQLiteDbHandler;
-                    await using DbHandlerBase dbHandlerNpgsql = await this.mDbHandlerFactory.CreateAsync();
+            if (dbHandlerSqlite.IsOpen) {
+                await dbHandlerNpgsql.ExecTransactionAsync(async () => {
+                    MstBookDao mstBookDao1 = new(dbHandlerSqlite);
+                    MstBookDao mstBookDao2 = new(dbHandlerNpgsql);
+                    _ = await Mapping(mstBookDao1, mstBookDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(10);
 
-                    if (dbHandlerSqlite.IsOpen) {
-                        await dbHandlerNpgsql.ExecTransactionAsync(async () => {
-                            MstBookDao mstBookDao1 = new(dbHandlerSqlite);
-                            MstBookDao mstBookDao2 = new(dbHandlerNpgsql);
-                            _ = await Mapping(mstBookDao1, mstBookDao2);
-                            token.ThrowIfCancellationRequested();
-                            progress.Report(10);
+                    MstCategoryDao mstCategoryDao1 = new(dbHandlerSqlite);
+                    MstCategoryDao mstCategoryDao2 = new(dbHandlerNpgsql);
+                    _ = await Mapping(mstCategoryDao1, mstCategoryDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(20);
 
-                            MstCategoryDao mstCategoryDao1 = new(dbHandlerSqlite);
-                            MstCategoryDao mstCategoryDao2 = new(dbHandlerNpgsql);
-                            _ = await Mapping(mstCategoryDao1, mstCategoryDao2);
-                            token.ThrowIfCancellationRequested();
-                            progress.Report(20);
+                    MstItemDao mstItemDao1 = new(dbHandlerSqlite);
+                    MstItemDao mstItemDao2 = new(dbHandlerNpgsql);
+                    _ = await Mapping(mstItemDao1, mstItemDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(30);
 
-                            MstItemDao mstItemDao1 = new(dbHandlerSqlite);
-                            MstItemDao mstItemDao2 = new(dbHandlerNpgsql);
-                            _ = await Mapping(mstItemDao1, mstItemDao2);
-                            token.ThrowIfCancellationRequested();
-                            progress.Report(30);
+                    HstActionDao hstActionDao1 = new(dbHandlerSqlite);
+                    HstActionDao hstActionDao2 = new(dbHandlerNpgsql);
+                    _ = await Mapping(hstActionDao1, hstActionDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(60);
 
-                            HstActionDao hstActionDao1 = new(dbHandlerSqlite);
-                            HstActionDao hstActionDao2 = new(dbHandlerNpgsql);
-                            _ = await Mapping(hstActionDao1, hstActionDao2);
-                            token.ThrowIfCancellationRequested();
-                            progress.Report(60);
+                    HstGroupDao hstGroupDao1 = new(dbHandlerSqlite);
+                    HstGroupDao hstGroupDao2 = new(dbHandlerNpgsql);
+                    _ = await Mapping(hstGroupDao1, hstGroupDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(70);
 
-                            HstGroupDao hstGroupDao1 = new(dbHandlerSqlite);
-                            HstGroupDao hstGroupDao2 = new(dbHandlerNpgsql);
-                            _ = await Mapping(hstGroupDao1, hstGroupDao2);
-                            token.ThrowIfCancellationRequested();
-                            progress.Report(70);
+                    HstShopDao hstShopDao1 = new(dbHandlerSqlite);
+                    HstShopDao hstShopDao2 = new(dbHandlerNpgsql);
+                    _ = await Mapping(hstShopDao1, hstShopDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(80);
 
-                            HstShopDao hstShopDao1 = new(dbHandlerSqlite);
-                            HstShopDao hstShopDao2 = new(dbHandlerNpgsql);
-                            _ = await Mapping(hstShopDao1, hstShopDao2);
-                            token.ThrowIfCancellationRequested();
-                            progress.Report(80);
+                    HstRemarkDao hstRemarkDao1 = new(dbHandlerSqlite);
+                    HstRemarkDao hstRemarkDao2 = new(dbHandlerNpgsql);
+                    _ = await Mapping(hstRemarkDao1, hstRemarkDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(90);
 
-                            HstRemarkDao hstRemarkDao1 = new(dbHandlerSqlite);
-                            HstRemarkDao hstRemarkDao2 = new(dbHandlerNpgsql);
-                            _ = await Mapping(hstRemarkDao1, hstRemarkDao2);
-                            token.ThrowIfCancellationRequested();
-                            progress.Report(90);
+                    RelBookItemDao relBookItemDao1 = new(dbHandlerSqlite);
+                    RelBookItemDao relBookItemDao2 = new(dbHandlerNpgsql);
+                    _ = await Mapping(relBookItemDao1, relBookItemDao2);
+                    token.ThrowIfCancellationRequested();
+                    progress.Report(100);
 
-                            RelBookItemDao relBookItemDao1 = new(dbHandlerSqlite);
-                            RelBookItemDao relBookItemDao2 = new(dbHandlerNpgsql);
-                            _ = await Mapping(relBookItemDao1, relBookItemDao2);
-                            token.ThrowIfCancellationRequested();
-                            progress.Report(100);
+                    // スキーマバージョンは移行しない
 
-                            // スキーマバージョンは移行しない
-
-                            result = true;
-                        }, () => result = false);
-                    }
-                    break;
-                }
-                default:
-                    break;
+                    result = true;
+                }, () => result = false);
             }
 
             return result;

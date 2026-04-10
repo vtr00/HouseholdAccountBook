@@ -1,10 +1,14 @@
-﻿using HouseholdAccountBook.Infrastructure.Logger;
+﻿using HouseholdAccountBook.Infrastructure.CSV;
+using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
+using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -162,8 +166,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             if (MessageBox.Show(Properties.Resources.Message_RestartNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                Properties.Settings.Default.App_CultureName = this.CultureNameSelectorVM.SelectedKey;
-                Properties.Settings.Default.Save();
+                UserSettingService.Instance.SelectedCaltureName = this.CultureNameSelectorVM.SelectedKey;
 
                 ((App)Application.Current).Restart();
             }
@@ -181,66 +184,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             if (MessageBox.Show(Properties.Resources.Message_RestartNotification, Properties.Resources.Title_Conformation,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                Properties.Settings settings = Properties.Settings.Default;
+                UserSettingService.Instance.InitializeWindowLocation();
 
-                // DB設定
-                settings.DbSettingWindow_Left = -1;
-                settings.DbSettingWindow_Top = -1;
-                settings.DbSettingWindow_Width = -1;
-                settings.DbSettingWindow_Height = -1;
-
-                // メイン
-                settings.MainWindow_Left = -1;
-                settings.MainWindow_Top = -1;
-                settings.MainWindow_Width = -1;
-                settings.MainWindow_Height = -1;
-
-                // 移動
-                settings.MoveRegistrationWindow_Left = -1;
-                settings.MoveRegistrationWindow_Top = -1;
-                settings.MoveRegistrationWindow_Width = -1;
-                settings.MoveRegistrationWindow_Height = -1;
-
-                // 追加・変更
-                settings.ActionRegistrationWindow_Left = -1;
-                settings.ActionRegistrationWindow_Top = -1;
-                settings.ActionRegistrationWindow_Width = -1;
-                settings.ActionRegistrationWindow_Height = -1;
-
-                // リスト追加
-                settings.ActionListRegistrationWindow_Left = -1;
-                settings.ActionListRegistrationWindow_Top = -1;
-                settings.ActionListRegistrationWindow_Width = -1;
-                settings.ActionListRegistrationWindow_Height = -1;
-
-                // CSV比較
-                settings.CsvComparisonWindow_Left = -1;
-                settings.CsvComparisonWindow_Top = -1;
-                settings.CsvComparisonWindow_Width = -1;
-                settings.CsvComparisonWindow_Height = -1;
-
-                // 設定
-                settings.SettingsWindow_Left = -1;
-                settings.SettingsWindow_Top = -1;
-                settings.SettingsWindow_Width = -1;
-                settings.SettingsWindow_Height = -1;
-
-                // 期間選択
-                settings.TermWindow_Left = -1;
-                settings.TermWindow_Top = -1;
-                // settings.TermWindow_Width = -1;
-                // settings.TermWindow_Height = -1;
-
-                // バージョン
-                settings.VersionWindow_Left = -1;
-                settings.VersionWindow_Top = -1;
-                settings.VersionWindow_Width = -1;
-                settings.VersionWindow_Height = -1;
-
-                settings.App_InitSizeFlag = true;
-                settings.Save();
-
-                ((App)Application.Current).Restart();
+                ((App)Application.Current).Restart(false);
             }
         }
 
@@ -279,31 +225,34 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using FuncLog funcLog = new();
 
-            Properties.Settings settings = Properties.Settings.Default;
-
             // バージョン情報
-            this.SelectedIfNotifyLatestAtAppLaunched = settings.App_LatestVersionNotifyAtAppLaunched;
+            this.SelectedIfNotifyLatestAtAppLaunched = UserSettingService.Instance.CheckLatestVersionAtAppLaunched;
 
             // 言語情報
-            await this.CultureNameSelectorVM.LoadAsync(settings.App_CultureName);
+            await this.CultureNameSelectorVM.LoadAsync(UserSettingService.Instance.SelectedCaltureName);
 
             // カレンダー情報
-            this.InputedStartMonth = settings.App_StartMonth;
-            this.InputedNationalHolidayCsvURI = settings.App_NationalHolidayCsv_Uri;
-            await this.NationalHolidayTextEncodingSelectorVM.LoadAsync(settings.App_NationalHolidayCsv_TextEncoding);
-            this.InputedNationalHolidayCsvDateIndex = settings.App_NationalHolidayCsv_DateIndex + 1;
+            this.InputedStartMonth = UserSettingService.Instance.FiscalStartMonth;
+            CSVFileDao.HolidayCSVConfigulation holidayCsvConfig = UserSettingService.Instance.HolidayCSVConfig;
+            this.InputedNationalHolidayCsvURI = holidayCsvConfig.Url;
+            await this.NationalHolidayTextEncodingSelectorVM.LoadAsync(holidayCsvConfig.TextEncoding.CodePage);
+            this.InputedNationalHolidayCsvDateIndex = holidayCsvConfig.DateIndex + 1;
 
             // ウィンドウ情報
-            this.IsPositionSaved = settings.App_IsPositionSaved;
+            WindowLocationManager.Configuration locationConfig = UserSettingService.Instance.WindowLocationConfig;
+            this.IsPositionSaved = locationConfig.IsPositionSaved;
             this.WindowSettingVMList = LoadWindowSettings();
 
             // ログ情報
-            this.SelectedIfOutputOperationLog = settings.App_OutputFlag_OperationLog;
-            this.InputedOperationLogNum = settings.App_OperationLogNum;
-            await this.LogLevelSelectorVM.LoadAsync((Log.LogLevel)settings.App_OperationLogLevel);
-            this.SelectedIfOutputWindowLog = settings.App_OutputFlag_WindowLog;
-            this.InputedWindowLogNum = settings.App_WindowLogNum;
-            this.InputedUnhandledExceptionLogNum = settings.App_UnhandledExceptionLogNum;
+            LogImpl.Configuration logConfig = UserSettingService.Instance.LogConfig;
+            this.SelectedIfOutputOperationLog = logConfig.OutputLogToFile;
+            this.InputedOperationLogNum = logConfig.LogFileAmount;
+            await this.LogLevelSelectorVM.LoadAsync(logConfig.OutputLogLevel);
+            WindowLog.Configulation windowLogConfig = UserSettingService.Instance.WindowLogConfig;
+            this.SelectedIfOutputWindowLog = windowLogConfig.OutputLog;
+            this.InputedWindowLogNum = windowLogConfig.LogFileAmount;
+            ExceptionLog.Configuration exceptionLogConfig = UserSettingService.Instance.ExceptionLogConfig;
+            this.InputedUnhandledExceptionLogNum = exceptionLogConfig.LogFileAmount;
         }
 
         public override void AddEventHandlers()
@@ -318,53 +267,51 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using FuncLog funcLog = new();
 
-            Properties.Settings settings = Properties.Settings.Default;
-
             ObservableCollection<WindowSettingViewModel> list = [
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_DbSettingWindow,
-                    Left = settings.DbSettingWindow_Left, Top = settings.DbSettingWindow_Top,
-                    Width = settings.DbSettingWindow_Width, Height = settings.DbSettingWindow_Height
+                    Point = UserSettingService.Instance.DbSettingWindowPoint,
+                    Size = UserSettingService.Instance.DbSettingWindowSize
                 },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_MainWindow,
-                    Left = settings.MainWindow_Left, Top = settings.MainWindow_Top,
-                    Width = settings.MainWindow_Width, Height = settings.MainWindow_Height
+                    Point = UserSettingService.Instance.MainWindowPoint,
+                    Size = UserSettingService.Instance.MainWindowSize
                 },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_AddMoveWindow,
-                    Left = settings.MoveRegistrationWindow_Left, Top = settings.MoveRegistrationWindow_Top,
-                    Width = settings.MoveRegistrationWindow_Width, Height = settings.MoveRegistrationWindow_Height
+                    Point = UserSettingService.Instance.MoveRegistrationWindowPoint,
+                    Size = UserSettingService.Instance.MoveRegistrationWindowSize
                 },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_AddWindow,
-                    Left = settings.ActionRegistrationWindow_Left, Top = settings.ActionRegistrationWindow_Top,
-                    Width = settings.ActionRegistrationWindow_Width, Height = settings.ActionRegistrationWindow_Height
+                    Point = UserSettingService.Instance.ActionRegistrationWindowPoint,
+                    Size = UserSettingService.Instance.ActionRegistrationWindowSize
                 },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_AddListWindow,
-                    Left = settings.ActionListRegistrationWindow_Left, Top = settings.ActionListRegistrationWindow_Top,
-                    Width = settings.ActionListRegistrationWindow_Width, Height = settings.ActionListRegistrationWindow_Height
+                    Point = UserSettingService.Instance.ActionListRegistrationWindowPoint,
+                    Size = UserSettingService.Instance.ActionListRegistrationWindowSize
                 },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_CsvComparisonWindow,
-                    Left = settings.CsvComparisonWindow_Left, Top = settings.CsvComparisonWindow_Top,
-                    Width = settings.CsvComparisonWindow_Width, Height = settings.CsvComparisonWindow_Height
+                    Point = UserSettingService.Instance.CsvComparisonWindowPoint,
+                    Size = UserSettingService.Instance.CsvComparisonWindowSize
                 },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_SettingsWindow,
-                    Left = settings.SettingsWindow_Left, Top = settings.SettingsWindow_Top,
-                    Width = settings.SettingsWindow_Width, Height = settings.SettingsWindow_Height
+                    Point = UserSettingService.Instance.SettingsWindowPoint,
+                    Size = UserSettingService.Instance.SettingsWindowSize
                 },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_PeriodSelectionWindow,
-                    Left = settings.TermWindow_Left, Top = settings.TermWindow_Top,
-                    Width = -1, Height = -1
+                    Point = UserSettingService.Instance.TermWindowPoint,
+                    Size = (-1, -1)
                 },
                 new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_VersionWindow,
-                    Left = settings.VersionWindow_Left, Top = settings.VersionWindow_Top,
-                    Width = settings.VersionWindow_Width, Height = settings.VersionWindow_Height
+                    Point = UserSettingService.Instance.VersionWindowPoint,
+                    Size = UserSettingService.Instance.VersionWindowSize
                 }
             ];
             return list;
@@ -377,39 +324,43 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using FuncLog funcLog = new();
 
-            Properties.Settings settings = Properties.Settings.Default;
-
             // バージョン情報
-            settings.App_LatestVersionNotifyAtAppLaunched = this.SelectedIfNotifyLatestAtAppLaunched;
+            UserSettingService.Instance.CheckLatestVersionAtAppLaunched = this.SelectedIfNotifyLatestAtAppLaunched;
 
             // 言語情報
-            settings.App_CultureName = this.CultureNameSelectorVM.SelectedKey;
+            UserSettingService.Instance.SelectedCaltureName = this.CultureNameSelectorVM.SelectedKey;
 
             // カレンダー情報
-            settings.App_StartMonth = this.InputedStartMonth;
-            settings.App_NationalHolidayCsv_Uri = this.InputedNationalHolidayCsvURI;
-            settings.App_NationalHolidayCsv_TextEncoding = this.NationalHolidayTextEncodingSelectorVM.SelectedKey;
-            settings.App_NationalHolidayCsv_DateIndex = this.InputedNationalHolidayCsvDateIndex - 1;
+            UserSettingService.Instance.FiscalStartMonth = this.InputedStartMonth;
+            UserSettingService.Instance.HolidayCSVConfig = new() {
+                Url = this.InputedNationalHolidayCsvURI,
+                TextEncoding = Encoding.GetEncoding(this.NationalHolidayTextEncodingSelectorVM.SelectedKey),
+                DateIndex = this.InputedNationalHolidayCsvDateIndex - 1
+            };
 
             // ウィンドウ情報
-            settings.App_IsPositionSaved = this.IsPositionSaved;
+            UserSettingService.Instance.WindowLocationConfig = new() {
+                IsPositionSaved = this.IsPositionSaved
+            };
 
             // ログ情報
-            settings.App_OutputFlag_OperationLog = this.SelectedIfOutputOperationLog;
-            settings.App_OperationLogNum = this.InputedOperationLogNum;
-            settings.App_OperationLogLevel = (int)this.LogLevelSelectorVM.SelectedKey;
-            settings.App_OutputFlag_WindowLog = this.SelectedIfOutputWindowLog;
-            settings.App_WindowLogNum = this.InputedWindowLogNum;
-            settings.App_UnhandledExceptionLogNum = this.InputedUnhandledExceptionLogNum;
+            UserSettingService.Instance.LogConfig = new() {
+                OutputLogToFile = this.SelectedIfOutputOperationLog,
+                LogFileAmount = this.InputedOperationLogNum,
+                OutputLogLevel = this.LogLevelSelectorVM.SelectedKey
+            };
+            UserSettingService.Instance.WindowLogConfig = new() {
+                OutputLog = this.SelectedIfOutputOperationLog,
+                LogFileAmount = this.InputedOperationLogNum
+            };
+            UserSettingService.Instance.ExceptionLogConfig = new() {
+                LogFileAmount = this.InputedUnhandledExceptionLogNum
+            };
 
-            settings.Save();
-
-            LogImpl.Instance.OutputLogToFile = settings.App_OutputFlag_OperationLog;
-            LogImpl.Instance.LogFileAmount = settings.App_OperationLogNum;
-            LogImpl.Instance.OutputLogLevel = (Log.LogLevel)settings.App_OperationLogLevel;
-            ExceptionLog.LogFileAmount = settings.App_UnhandledExceptionLogNum;
-            WindowLog.OutputLog = settings.App_OutputFlag_WindowLog;
-            WindowLog.LogFileAmount = settings.App_WindowLogNum;
+            // 設定をログクラスに反映する
+            LogImpl.Config = UserSettingService.Instance.LogConfig;
+            ExceptionLog.Config = UserSettingService.Instance.ExceptionLogConfig;
+            WindowLog.Config = UserSettingService.Instance.WindowLogConfig;
 
             // 新しい設定に合わせて古いログファイルを削除する
             LogImpl.DeleteOldLogFiles();

@@ -12,6 +12,21 @@ namespace HouseholdAccountBook.Infrastructure.Logger
     /// </summary>
     public class WindowLog
     {
+        /// <summary>
+        /// ウィンドウ情報ログ設定
+        /// </summary>
+        public class Configulation
+        {
+            /// <summary>
+            /// ログ出力有無
+            /// </summary>
+            public bool OutputLog { get; set; }
+            /// <summary>
+            /// ログ出力数
+            /// </summary>
+            public int LogFileAmount { get; set; }
+        }
+
         #region フィールド
         /// <summary>
         /// 保存対象のウィンドウ
@@ -51,17 +66,14 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         public static string WindowLocationFileNamePattern(string windowName) => $"{windowName}_*_*.{WindowLocationFileExt}";
 
         /// <summary>
-        /// ログ出力有無
+        /// ログ設定
         /// </summary>
-        public static bool OutputLog { get; set; } = false;
-        /// <summary>
-        /// ログ出力数
-        /// </summary>
-        public static int LogFileAmount { get; set; } = 0;
+        public static Configulation Config { get; set; } = new();
+
         /// <summary>
         /// アプリ起動時間
         /// </summary>
-        public static DateTime AppStartupTime { get; set; } = DateTime.Now;
+        public static DateTime AppStartupTime { get; } = DateTime.Now;
         #endregion
 
         /// <summary>
@@ -96,7 +108,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <param name="forceLog">状態、位置が変わっていなくても保存するか</param>
         public void Log(string comment = "", bool forceLog = false)
         {
-            if (OutputLog && 0 < LogFileAmount) {
+            if (Config.OutputLog && 0 < Config.LogFileAmount) {
                 if (!forceLog &&
                     this.mLastSavedWindowState == this.mWindow.WindowState &&
                     this.mLastSavedRect == this.mWindow.RestoreBounds) { return; }
@@ -157,6 +169,6 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// </summary>
         /// <param name="windowName">ウィンドウ名</param>
         public static void DeleteOldWindowLogs(string windowName) =>
-            FileUtil.DeleteOldFiles(WindowLocationFolderPath, WindowLocationFileNamePattern(windowName), LogFileAmount);
+            FileUtil.DeleteOldFiles(WindowLocationFolderPath, WindowLocationFileNamePattern(windowName), Config.LogFileAmount);
     }
 }

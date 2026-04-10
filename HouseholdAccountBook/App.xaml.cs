@@ -4,6 +4,7 @@ using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.DbHandlers;
+using HouseholdAccountBook.Views;
 using HouseholdAccountBook.Views.Extensions;
 using HouseholdAccountBook.Views.Windows;
 using System;
@@ -16,7 +17,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using MyResources = HouseholdAccountBook.Properties.Resources;
-using MySettings = HouseholdAccountBook.Properties.Settings;
 
 namespace HouseholdAccountBook
 {
@@ -56,36 +56,28 @@ namespace HouseholdAccountBook
         /// <param name="e"></param>
         private async void App_Startup(object sender, StartupEventArgs e)
         {
-            MySettings settings = MySettings.Default;
-
-            LogImpl.Instance.OutputLogToFile = settings.App_OutputFlag_OperationLog;
-            LogImpl.Instance.LogFileAmount = settings.App_OperationLogNum;
-            LogImpl.Instance.OutputLogLevel = (Log.LogLevel)settings.App_OperationLogLevel;
-            ExceptionLog.LogFileAmount = settings.App_UnhandledExceptionLogNum;
-            WindowLog.OutputLog = settings.App_OutputFlag_WindowLog;
-            WindowLog.LogFileAmount = settings.App_WindowLogNum;
-
+            // ログ関連の設定
+            LogImpl.Instance.Config = UserSettingService.Instance.LogConfig;
             using FuncLog funcLog = new();
-
-            this.DispatcherUnhandledException += this.App_DispatcherUnhandledException;
-            this.Exit += this.App_Exit;
+            ExceptionLog.Config = UserSettingService.Instance.ExceptionLogConfig;
+            WindowLog.Config = UserSettingService.Instance.WindowLogConfig;
+            WindowLocationManager.Config = UserSettingService.Instance.WindowLocationConfig;
 
             // shift-jis を使用するために必要
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            Log.Debug($"App_InitFlag: {settings.App_InitFlag}");
+            Log.Debug($"App_InitFlag: {UserSettingService.Instance.InitFlag}");
 
             Log.Info($"Current Culture: {CultureInfo.CurrentCulture.Name}");
-            Log.Info($"Application Culture: {settings.App_CultureName}");
+            Log.Info($"Application Culture: {UserSettingService.Instance.SelectedCaltureName}");
             // 言語の初期設定がない場合
-            if (string.IsNullOrEmpty(settings.App_CultureName)) {
-                settings.App_CultureName = CultureInfo.CurrentCulture.Name switch {
+            if (string.IsNullOrEmpty(UserSettingService.Instance.SelectedCaltureName)) {
+                UserSettingService.Instance.SelectedCaltureName = CultureInfo.CurrentCulture.Name switch {
                     "ja-JP" => "ja-JP", // 日本語
                     _ => "en-001", // 英語
                 };
-                settings.Save();
             }
-            CultureInfo cultureInfo = new(settings.App_CultureName);
+            CultureInfo cultureInfo = new(UserSettingService.Instance.SelectedCaltureName);
 
             MyResources.Culture = cultureInfo;
             Thread.CurrentThread.CurrentCulture = cultureInfo;
@@ -119,9 +111,9 @@ namespace HouseholdAccountBook
 
             // 前バージョンからのUpgradeを実行していないときはUpgradeを実施する
             Version assemblyVersion = GetAssemblyVersion();
-            if (!Version.TryParse(settings.App_Version, out Version preVersion) || preVersion < assemblyVersion) {
+            if (UserSettingService.Instance.LastAppVersion < assemblyVersion) {
                 // Upgradeを実行する
-                settings.Upgrade();
+                HouseholdAccountBook.Properties.Settings.Default.Upgrade();
             }
 
             DbHandlerFactory dbHandlerFactory = await this.GetDbHandlerFactory();
@@ -133,19 +125,8 @@ namespace HouseholdAccountBook
 
             // DBバックアップマネージャーを初期化する
             DbBackUpManager.Instance.DbHandlerFactory = dbHandlerFactory;
-
-            DbBackUpManager.Instance.BackUpFlagAtMinimizing = settings.App_BackUpFlagAtMinimizing;
-            DbBackUpManager.Instance.BackUpIntervalMinAtMinimizing = settings.App_BackUpIntervalMinAtMinimizing;
-            DbBackUpManager.Instance.BackUpNotifyAtMinimizing = settings.App_BackUpNotifyAtMinimizing;
-            DbBackUpManager.Instance.BackUpFlagAtClosing = settings.App_BackUpFlagAtClosing;
-
-            DbBackUpManager.Instance.BackUpNum = settings.App_BackUpNum;
-            DbBackUpManager.Instance.BackUpFolderPath = settings.App_BackUpFolderPath;
-            DbBackUpManager.Instance.PostgresDumpExePath = settings.App_Postgres_DumpExePath;
-            DbBackUpManager.Instance.PostgresRestoreExePath = settings.App_Postgres_RestoreExePath;
-            DbBackUpManager.Instance.PostgresPasswordInput = (PostgresPasswordInput)settings.App_Postgres_Password_Input;
-
-            DbBackUpManager.Instance.BackUpCurrentAtMinimizing = settings.App_BackUpCurrentAtMinimizing;
+            DbBackUpManager.Instance.Config = UserSettingService.Instance.DbBackupConfig;
+            DbBackUpManager.Instance.NpgsqlBackupConfig = UserSettingService.Instance.PostgreSQLBackupConfig;
 
             // DBのマイグレーションを実行する
             bool migrateResult = await DbUtil.UpMigrateAsync(dbHandlerFactory);
@@ -156,19 +137,17 @@ namespace HouseholdAccountBook
             }
 
             // 初期化フラグを解除する
-            settings.App_InitFlag = false;
-            settings.App_InitSizeFlag = false;
-            settings.Save();
+            UserSettingService.Instance.InitFlag = false;
 
             // 休日リストを取得する
-            if (!await HolidayService.Instance.DownloadHolidayListAsync(settings.App_NationalHolidayCsv_Uri, settings.App_NationalHolidayCsv_TextEncoding, settings.App_NationalHolidayCsv_DateIndex)) {
+            if (!await HolidayService.Instance.DownloadHolidayListAsync(UserSettingService.Instance.HolidayCSVConfig)) {
                 // 祝日取得失敗を通知する
                 Log.Warning("Failed to get holiday list.");
                 NotificationService.NotifyFailingToGetHolidayList();
             }
-            if (settings.App_LatestVersionNotifyAtAppLaunched) {
-                // 最新バージョンを通知する
-                await App.NotifyLatestVersionAsync(false);
+            if (UserSettingService.Instance.CheckLatestVersionAtAppLaunched) {
+                // 最新バージョンを確認する
+                await App.CheckLatestVersionAsync(false);
             }
 
             // メインウィンドウを開く
@@ -230,7 +209,7 @@ namespace HouseholdAccountBook
 
             ResourceDictionary rd = Current.Resources;
             if (rd.Contains("Settings")) {
-                rd["Settings"] = MySettings.Default;
+                rd["Settings"] = HouseholdAccountBook.Properties.Settings.Default;
             }
             if (rd.Contains("AppCulture")) {
                 rd["AppCulture"] = MyResources.Culture;
@@ -246,11 +225,9 @@ namespace HouseholdAccountBook
         {
             using FuncLog funcLog = new();
 
-            MySettings settings = MySettings.Default;
-
             DbHandlerFactory dbHandlerFactory = null;
             bool isOpen = false;
-            bool tryConnect = !settings.App_InitFlag; // 接続を試みるか
+            bool tryConnect = !UserSettingService.Instance.InitFlag; // 接続を試みるか
             string message = MyResources.Message_PleaseInputDbSetting;
 
             while (true) {
@@ -320,40 +297,14 @@ namespace HouseholdAccountBook
         {
             using FuncLog funcLog = new();
 
-            MySettings settings = MySettings.Default;
-
             DbHandlerBase.ConnectInfoBase connInfo = null;
-            switch ((DBKind)settings.App_SelectedDBKind) {
+            switch (UserSettingService.Instance.SelectedDBKind) {
                 case DBKind.PostgreSQL: {
-                    NpgsqlDbHandler.ConnectInfo connectInfo = new() {
-                        Host = settings.App_Postgres_Host,
-                        Port = settings.App_Postgres_Port,
-                        UserName = settings.App_Postgres_UserName,
-                        Password = settings.App_Postgres_Password,
-#if DEBUG
-                        DatabaseName = settings.App_Postgres_DatabaseName_Debug,
-#else
-                        DatabaseName = settings.App_Postgres_DatabaseName,
-#endif
-                        Role = settings.App_Postgres_Role
-                    };
-                    if (settings.App_Postgres_Password == string.Empty) {
-                        connectInfo.EncryptedPassword = settings.App_Postgres_EncryptedPassword;
-                    }
-                    else {
-                        // 平文が保存されている場合は暗号化して保存し直す
-                        connectInfo.Password = settings.App_Postgres_Password;
-                        settings.App_Postgres_EncryptedPassword = connectInfo.EncryptedPassword;
-                        settings.App_Postgres_Password = string.Empty; // パスワードは保存しない
-                        settings.Save();
-                    }
-                    connInfo = connectInfo;
+                    connInfo = UserSettingService.Instance.NpgsqlConnectInfo;
                     break;
                 }
                 case DBKind.SQLite:
-                    connInfo = new SQLiteDbHandler.ConnectInfo() {
-                        FilePath = settings.App_SQLite_DBFilePath
-                    };
+                    connInfo = UserSettingService.Instance.SQLiteConnectInfo;
                     break;
                 case DBKind.Access:
                 case DBKind.Undefined:
@@ -383,9 +334,11 @@ namespace HouseholdAccountBook
         /// <summary>
         /// アプリケーションを再起動する
         /// </summary>
-        public void Restart()
+        public void Restart(bool locationSaveEnabled = true)
         {
             using FuncLog funcLog = new();
+
+            WindowLocationManager.SaveEnabled = locationSaveEnabled;
 
             string targetExe = GetCurrentExe();
             Log.Debug($"target: {targetExe}");
@@ -417,11 +370,11 @@ namespace HouseholdAccountBook
         public static Version GetAssemblyVersion() => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
 
         /// <summary>
-        /// 最新バージョンを通知する
+        /// 最新バージョンを確認する
         /// </summary>
         /// <param name="notifyCurrentIsLatest">現バージョンが最新でも通知するか</param>
         /// <returns></returns>
-        public static async Task NotifyLatestVersionAsync(bool notifyCurrentIsLatest)
+        public static async Task CheckLatestVersionAsync(bool notifyCurrentIsLatest)
         {
             // 最新バージョン情報を取得する
             if (!await AppVersionService.Instance.GetLatestInfoAsync()) {

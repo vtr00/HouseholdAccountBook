@@ -194,8 +194,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async Task OpenCsvFilesCommand_ExecuteAsync()
         {
-            Properties.Settings settings = Properties.Settings.Default;
-            (string folderPath, string fileName) = PathUtil.GetSeparatedPath(settings.App_CsvFilePath, App.GetCurrentDir());
+            (string folderPath, string fileName) = PathUtil.GetSeparatedPath(UserSettingService.Instance.CsvCompFile, App.GetCurrentDir());
 
             OpenFileDialogRequestEventArgs e = new() {
                 CheckFileExists = true,
@@ -207,8 +206,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             };
             if (this.OpenFilesDialogRequest(e)) {
                 // 開いたCSVファイルのパスを設定として保存する(複数存在する場合は先頭のみ)
-                settings.App_CsvFilePath = e.FileNames.First();
-                settings.Save();
+                UserSettingService.Instance.CsvCompFile = e.FileNames.First();
 
                 foreach (string tmpFileName in e.FileNames) {
                     if (!this.CsvFilePathList.Contains(tmpFileName)) {
@@ -473,29 +471,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         #region ウィンドウ設定プロパティ
         protected override (double, double) WindowSizeSettingRaw {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                return (settings.CsvComparisonWindow_Width, settings.CsvComparisonWindow_Height);
-            }
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-                settings.CsvComparisonWindow_Width = value.Item1;
-                settings.CsvComparisonWindow_Height = value.Item2;
-                settings.Save();
-            }
+            get => UserSettingService.Instance.CsvComparisonWindowSize;
+            set => UserSettingService.Instance.CsvComparisonWindowSize = value;
         }
 
         public override Point WindowPointSetting {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                return new Point(settings.CsvComparisonWindow_Left, settings.CsvComparisonWindow_Top);
-            }
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-                settings.CsvComparisonWindow_Left = value.X;
-                settings.CsvComparisonWindow_Top = value.Y;
-                settings.Save();
-            }
+            get => UserSettingService.Instance.CsvComparisonWindowPoint;
+            set => UserSettingService.Instance.CsvComparisonWindowPoint = value;
         }
         #endregion
 

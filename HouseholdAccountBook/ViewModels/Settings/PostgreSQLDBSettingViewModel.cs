@@ -1,5 +1,7 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB;
 using HouseholdAccountBook.Infrastructure.Utilities;
+using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.DbHandlers;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 using System.IO;
@@ -91,22 +93,18 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <param name="setPassword">パスワードを設定するデリゲート</param>
         public void Load(Action<string> setPassword)
         {
-            Properties.Settings settings = Properties.Settings.Default;
+            NpgsqlDbHandler.ConnectInfo connectInfo = UserSettingService.Instance.NpgsqlConnectInfo;
+            this.InputedHost = connectInfo.Host;
+            this.InputedPort = connectInfo.Port;
+            this.InputedUserName = connectInfo.UserName;
+            setPassword?.Invoke(connectInfo.Password);
+            this.InputedDatabaseName = connectInfo.DatabaseName;
+            this.InputedRole = connectInfo.Role;
 
-            this.InputedHost = settings.App_Postgres_Host;
-            this.InputedPort = settings.App_Postgres_Port;
-            this.InputedUserName = settings.App_Postgres_UserName;
-            setPassword?.Invoke(settings.App_Postgres_Password == string.Empty ?
-                ProtectedDataUtil.DecryptPassword(settings.App_Postgres_EncryptedPassword) : settings.App_Postgres_Password);
-#if DEBUG
-            this.InputedDatabaseName = settings.App_Postgres_DatabaseName_Debug;
-#else
-            this.DatabaseName = settings.App_Postgres_DatabaseName;
-#endif
-            this.InputedRole = settings.App_Postgres_Role;
-            this.InputedDumpExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_DumpExePath);
-            this.InputedRestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_Postgres_RestoreExePath);
-            this.SelectedPasswordInput = (PostgresPasswordInput)settings.App_Postgres_Password_Input;
+            NpgsqlDbHandler.BackupConfiguration config = UserSettingService.Instance.PostgreSQLBackupConfig;
+            this.InputedDumpExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), config.DumpExePath);
+            this.InputedRestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), config.RestoreExePath);
+            this.SelectedPasswordInput = config.PasswordInput;
         }
 
         /// <summary>
@@ -116,20 +114,20 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <returns>設定の保存成否</returns>
         public bool Save(Func<string> getPassword)
         {
-            Properties.Settings settings = Properties.Settings.Default;
+            UserSettingService.Instance.NpgsqlConnectInfo = new() {
+                Host = this.InputedHost,
+                Port = this.InputedPort.Value,
+                UserName = this.InputedUserName,
+                Password = getPassword?.Invoke() ?? string.Empty,
+                DatabaseName = this.InputedDatabaseName,
+                Role = this.InputedRole
+            };
 
-            settings.App_Postgres_Host = this.InputedHost;
-            settings.App_Postgres_Port = this.InputedPort.Value;
-            settings.App_Postgres_UserName = this.InputedUserName;
-            settings.App_Postgres_Password = string.Empty; // パスワードは暗号化して保存するので、空にしておく
-            if (getPassword != null) {
-                settings.App_Postgres_EncryptedPassword = ProtectedDataUtil.EncryptPassword(getPassword?.Invoke());
-            }
-            settings.App_Postgres_DatabaseName = this.InputedDatabaseName;
-            settings.App_Postgres_Role = this.InputedRole;
-            settings.App_Postgres_DumpExePath = Path.GetFullPath(this.InputedDumpExePath, App.GetCurrentDir());
-            settings.App_Postgres_RestoreExePath = Path.GetFullPath(this.InputedRestoreExePath, App.GetCurrentDir());
-            settings.App_Postgres_Password_Input = (int)this.SelectedPasswordInput;
+            UserSettingService.Instance.PostgreSQLBackupConfig = new() {
+                DumpExePath = this.InputedRestoreExePath,
+                RestoreExePath = this.InputedRestoreExePath,
+                PasswordInput = this.SelectedPasswordInput
+            };
 
             return true;
         }

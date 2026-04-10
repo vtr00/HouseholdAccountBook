@@ -20,6 +20,41 @@ namespace HouseholdAccountBook.Infrastructure.DB
     /// </summary>
     public class DbBackUpManager : SingletonBase<DbBackUpManager>
     {
+        /// <summary>
+        /// バックアップ設定
+        /// </summary>
+        public class Configuration
+        {
+            /// <summary>
+            /// メインウィンドウを閉じるときにバックアップを行うか
+            /// </summary>
+            public bool ExecuteAtClosing { get; set; }
+            /// <summary>
+            /// メインウィンドウを最小化したときにバックアップを行うか
+            /// </summary>
+            public bool ExecuteAtMinimizing { get; set; }
+            /// <summary>
+            /// メインウィンドウを最小化したときにバックアップを行う間隔[ms]
+            /// </summary>
+            public int IntervalMinAtMinimizing { get; set; }
+            /// <summary>
+            /// メインウィンドウを最小化したときにバックアップを行ったあと通知するか
+            /// </summary>
+            public bool NotifyAtMinimizing { get; set; }
+            /// <summary>
+            /// バックアップの個数
+            /// </summary>
+            public int Amount { get; set; }
+            /// <summary>
+            /// バックアップを行うフォルダパス
+            /// </summary>
+            public string TargetFolderPath { get; set; }
+            /// <summary>
+            /// バックアップ条件
+            /// </summary>
+            public BackUpCondition Condition { get; set; }
+        }
+
         #region プロパティ
         /// <summary>
         /// PostgreSQL バックアップファイル ポストフィックス
@@ -62,45 +97,18 @@ namespace HouseholdAccountBook.Infrastructure.DB
         public DbHandlerFactory DbHandlerFactory { get; set; }
 
         /// <summary>
-        /// メインウィンドウを閉じるときにバックアップを行うか
+        /// バックアップ設定
         /// </summary>
-        public bool BackUpFlagAtClosing { get; set; }
+        public Configuration Config { get; set; }
         /// <summary>
-        /// メインウィンドウを最小化したときにバックアップを行うか
+        /// Npgsqlバックアップ設定
         /// </summary>
-        public bool BackUpFlagAtMinimizing { get; set; }
+        public NpgsqlDbHandler.BackupConfiguration NpgsqlBackupConfig { get; set; }
+
         /// <summary>
         /// メインウィンドウを最小化したときにバックアップを行った時刻
         /// </summary>
         public DateTime BackUpCurrentAtMinimizing { get; set; }
-        /// <summary>
-        /// メインウィンドウを最小化したときにバックアップを行う間隔[ms]
-        /// </summary>
-        public int BackUpIntervalMinAtMinimizing { get; set; }
-        /// <summary>
-        /// メインウィンドウを最小化したときにバックアップを行ったあと通知するか
-        /// </summary>
-        public bool BackUpNotifyAtMinimizing { get; set; }
-        /// <summary>
-        /// バックアップの個数
-        /// </summary>
-        public int BackUpNum { get; set; }
-        /// <summary>
-        /// バックアップを行うフォルダパス
-        /// </summary>
-        public string BackUpFolderPath { get; set; }
-        /// <summary>
-        /// pg_dump.exeのパス
-        /// </summary>
-        public string PostgresDumpExePath { get; set; }
-        /// <summary>
-        /// pg_restore.exeのパス
-        /// </summary>
-        public string PostgresRestoreExePath { get; set; }
-        /// <summary>
-        /// PostgreSQL パスワード入力方法
-        /// </summary>
-        public PostgresPasswordInput PostgresPasswordInput { get; set; }
         #endregion
 
         /// <summary>
@@ -117,14 +125,14 @@ namespace HouseholdAccountBook.Infrastructure.DB
         /// </summary>
         /// <param name="lastBackupTime">最後にバックアップした日時</param>
         /// <returns>成功/失敗 または 未実施</returns>
-        public async Task<bool> ExecuteAtMainWindowClosing(DateTime? lastBackupTime = null)
+        public async Task<bool> ExecuteAtMainWindowClosing(DateTime? lastBackupTime)
         {
             using FuncLog funcLog = new(new { lastBackupTime });
 
-            if (lastBackupTime.HasValue && lastBackupTime.Value >= await this.GetDbRowUpdateTime()) { return false; }
+            if (this.Config.Condition == BackUpCondition.Updated && lastBackupTime.HasValue && lastBackupTime.Value >= await this.GetDbRowUpdateTime()) { return false; }
 
             bool result = false;
-            if (this.BackUpFlagAtClosing) {
+            if (this.Config.ExecuteAtClosing) {
                 // 通知しても即座に終了するため通知しない
                 result = await this.CreateBackUpFileAsync();
             }
@@ -137,21 +145,21 @@ namespace HouseholdAccountBook.Infrastructure.DB
         /// <param name="windowState">ウィンドウの状態</param>
         /// <param name="lastBackupTime">最後にバックアップした日時</param>
         /// <returns>成功/失敗 または 未実施</returns>
-        public async Task<bool> ExecuteAtMainWindowStateChanged(WindowState windowState, DateTime? lastBackupTime = null)
+        public async Task<bool> ExecuteAtMainWindowStateChanged(WindowState windowState, DateTime? lastBackupTime)
         {
             using FuncLog funcLog = new(new { windowState, lastBackupTime });
 
-            if (lastBackupTime.HasValue && lastBackupTime.Value >= await this.GetDbRowUpdateTime()) { return false; }
+            if (this.Config.Condition == BackUpCondition.Updated && lastBackupTime.HasValue && lastBackupTime.Value >= await this.GetDbRowUpdateTime()) { return false; }
 
             bool result = false;
             if (windowState == WindowState.Minimized) {
-                if (this.BackUpFlagAtMinimizing) {
+                if (this.Config.ExecuteAtMinimizing) {
                     Log.Info(string.Format($"BackUpCurrentAtMinimizing: {this.BackUpCurrentAtMinimizing}"));
-                    DateTime nextBackup = this.BackUpCurrentAtMinimizing.AddMinutes(this.BackUpIntervalMinAtMinimizing);
+                    DateTime nextBackup = this.BackUpCurrentAtMinimizing.AddMinutes(this.Config.IntervalMinAtMinimizing);
                     Log.Info(string.Format($"NextBackup: {nextBackup}"));
 
                     if (nextBackup <= DateTime.Now) {
-                        result = await this.CreateBackUpFileAsync(this.BackUpNotifyAtMinimizing);
+                        result = await this.CreateBackUpFileAsync(this.Config.NotifyAtMinimizing);
                     }
                 }
             }
@@ -171,8 +179,8 @@ namespace HouseholdAccountBook.Infrastructure.DB
         {
             using FuncLog funcLog = new(new { notifyResult, waitForFinish, backUpNum, backUpFolderPath });
 
-            int tmpBackUpNum = backUpNum ?? this.BackUpNum;
-            string tmpBackUpFolderPath = backUpFolderPath ?? this.BackUpFolderPath;
+            int tmpBackUpNum = backUpNum ?? this.Config.Amount;
+            string tmpBackUpFolderPath = backUpFolderPath ?? this.Config.TargetFolderPath;
 
             if (tmpBackUpFolderPath == string.Empty) { return false; }
 
@@ -229,13 +237,13 @@ namespace HouseholdAccountBook.Infrastructure.DB
         {
             using FuncLog funcLog = new(new { backupFilePath, format, notifyResult, waitForFinish });
 
-            if (this.PostgresDumpExePath == string.Empty) { return false; }
+            if (this.NpgsqlBackupConfig.DumpExePath == string.Empty) { return false; }
 
             int? errorCode = -1;
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
                     errorCode = notifyResult
-                        ? await npgsqlDbHandler.ExecuteDump(backupFilePath, this.PostgresDumpExePath, this.PostgresPasswordInput, format,
+                        ? await npgsqlDbHandler.ExecuteDump(backupFilePath, this.NpgsqlBackupConfig, format,
                             exitCode => {
                                 // ダンプ結果を通知する
                                 if (exitCode == 0) {
@@ -245,7 +253,7 @@ namespace HouseholdAccountBook.Infrastructure.DB
                                     NotificationService.NotifyFailingToBackup();
                                 }
                             }, waitForFinish)
-                        : await npgsqlDbHandler.ExecuteDump(backupFilePath, this.PostgresDumpExePath, this.PostgresPasswordInput, format, null, waitForFinish);
+                        : await npgsqlDbHandler.ExecuteDump(backupFilePath, this.NpgsqlBackupConfig, format, null, waitForFinish);
                 }
             }
             return errorCode == null ? null : (errorCode == 0);
@@ -260,12 +268,12 @@ namespace HouseholdAccountBook.Infrastructure.DB
         {
             using FuncLog funcLog = new(new { backupFilePath });
 
-            if (this.PostgresRestoreExePath == string.Empty) { return false; }
+            if (this.NpgsqlBackupConfig.RestoreExePath == string.Empty) { return false; }
 
             int errorCode = -1;
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
-                    errorCode = await npgsqlDbHandler.ExecuteRestore(backupFilePath, this.PostgresRestoreExePath, this.PostgresPasswordInput);
+                    errorCode = await npgsqlDbHandler.ExecuteRestore(backupFilePath, this.NpgsqlBackupConfig);
                 }
             }
             return errorCode == 0;

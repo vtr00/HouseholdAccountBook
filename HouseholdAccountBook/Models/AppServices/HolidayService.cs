@@ -29,15 +29,13 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// 国民の祝日リストを取得する
         /// </summary>
-        /// <param name="url">CSVファイルのURL</param>
-        /// <param name="textEncoding">CSVファイルの文字エンコード</param>
-        /// <param name="dateIndex">日付のインデックス</param>
+        /// <param name="config">CSV設定</param>
         /// <returns>成功/失敗</returns>
-        public async Task<bool> DownloadHolidayListAsync(string url, int textEncoding, int dateIndex)
+        public async Task<bool> DownloadHolidayListAsync(CSVFileDao.HolidayCSVConfigulation config)
         {
-            using FuncLog funcLog = new(new { url, textEncoding, dateIndex });
+            using FuncLog funcLog = new(new { config });
 
-            this.mHolidayList = [.. await CSVFileDao.DownloadHolidayListAsync(url, textEncoding, dateIndex)];
+            this.mHolidayList = [.. await CSVFileDao.DownloadHolidayListAsync(config)];
 
             return this.mHolidayList != null && this.mHolidayList.Count != 0;
         }

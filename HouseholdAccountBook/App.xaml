@@ -6,7 +6,8 @@
              xmlns:converters="clr-namespace:HouseholdAccountBook.Views.Converters"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:sysglb="clr-namespace:System.Globalization;assembly=mscorlib"
-             Startup="App_Startup">
+             Startup="App_Startup" Exit="App_Exit"
+             DispatcherUnhandledException="App_DispatcherUnhandledException">
 
     <Application.Resources>
         <!-- コンバータ -->

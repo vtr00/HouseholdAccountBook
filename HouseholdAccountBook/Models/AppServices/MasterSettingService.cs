@@ -19,11 +19,11 @@ using static HouseholdAccountBook.ViewModels.UiConstants;
 namespace HouseholdAccountBook.Models.AppServices
 {
     /// <summary>
-    /// 設定サービス
+    /// マスタ設定サービス
     /// </summary>
     /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
     /// <remarks>主に設定ウィンドウで使用する</remarks>
-    public class SettingService(DbHandlerFactory dbHandlerFactory)
+    public class MasterSettingService(DbHandlerFactory dbHandlerFactory)
     {
         /// <summary>
         /// DBハンドラファクトリ

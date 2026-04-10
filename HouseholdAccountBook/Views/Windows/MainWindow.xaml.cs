@@ -3,6 +3,7 @@ using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views.Extensions;
@@ -305,12 +306,9 @@ namespace HouseholdAccountBook.Views.Windows
 
             this.Hide();
 
-            Properties.Settings settings = Properties.Settings.Default;
-            DateTime? currentBackUp = settings.App_BackUpCondition == (int)BackUpCondition.Updated ? this.WVM.BookTabVM.CurrentBackUp : null;
-            if (await DbBackUpManager.Instance.ExecuteAtMainWindowClosing(currentBackUp)) {
-                settings.App_BackUpCurrentAtClosing = DateTime.Now;
-                settings.Save();
-                Log.Info($"Update BackUpCurrentAtClosing: {settings.App_BackUpCurrentAtClosing}");
+            if (await DbBackUpManager.Instance.ExecuteAtMainWindowClosing(UserSettingService.Instance.CurrentBackUp)) {
+                UserSettingService.Instance.CurrentBackUpAtClosing = DateTime.Now;
+                Log.Info($"Update BackUpCurrentAtClosing: {UserSettingService.Instance.CurrentBackUpAtClosing}");
             }
         }
 
@@ -321,15 +319,12 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void MainWindow_StateChanged(object sender, EventArgs e)
         {
-            Properties.Settings settings = Properties.Settings.Default;
-            DateTime? currentBackUp = settings.App_BackUpCondition == (int)BackUpCondition.Updated ? this.WVM.BookTabVM.CurrentBackUp : null;
-            if (await DbBackUpManager.Instance.ExecuteAtMainWindowStateChanged(this.WindowState, currentBackUp)) {
-                settings.App_BackUpCurrentAtMinimizing = DateTime.Now;
-                settings.Save();
+            if (await DbBackUpManager.Instance.ExecuteAtMainWindowStateChanged(this.WindowState, UserSettingService.Instance.CurrentBackUp)) {
+                UserSettingService.Instance.CurrentBackUpAtMinimizing = DateTime.Now;
                 this.WVM.BookTabVM.RaiseCurrentBackUpChanged();
-                Log.Info($"Update BackUpCurrentAtMinimizing: {settings.App_BackUpCurrentAtMinimizing}");
+                Log.Info($"Update BackUpCurrentAtMinimizing: {UserSettingService.Instance.CurrentBackUpAtMinimizing}");
 
-                DbBackUpManager.Instance.BackUpCurrentAtMinimizing = settings.App_BackUpCurrentAtMinimizing;
+                DbBackUpManager.Instance.BackUpCurrentAtMinimizing = UserSettingService.Instance.CurrentBackUpAtMinimizing;
             }
         }
         #endregion
@@ -412,10 +407,8 @@ namespace HouseholdAccountBook.Views.Windows
 
                     if (col is >= 1 and <= 10) {
                         // 選択された年の月別一覧タブを開く
-                        Properties.Settings settings = Properties.Settings.Default;
-
                         Log.Info($"{this.WVM.DisplayedStartYear:yyyy-MM-dd} + year:{col - 1}");
-                        this.WVM.DisplayedYear = this.WVM.DisplayedStartYear.GetFirstDateOfFiscalYear(settings.App_StartMonth).AddYears(col - 1);
+                        this.WVM.DisplayedYear = this.WVM.DisplayedStartYear.GetFirstDateOfFiscalYear(this.WVM.FiscalStartMonth).AddYears(col - 1);
                         Log.Info($"{this.WVM.DisplayedYear:yyyy-MM-dd}");
                         this.WVM.SelectedTab = Tabs.MonthlyListTab;
                         e.Handled = true;

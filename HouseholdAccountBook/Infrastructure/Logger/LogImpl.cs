@@ -13,8 +13,26 @@ namespace HouseholdAccountBook.Infrastructure.Logger
     /// </summary>
     public class LogImpl : SingletonBase<LogImpl>
     {
-        #region ログファイル
-        #endregion
+        /// <summary>
+        /// ログ出力設定
+        /// </summary>
+        public class Configuration
+        {
+            /// <summary>
+            /// 出力ログレベル
+            /// </summary>
+            public Log.LogLevel OutputLogLevel { get; set; } = Log.LogLevel.Debug;
+
+            /// <summary>
+            /// ログファイル出力有無
+            /// </summary>
+            public bool OutputLogToFile { get; set; } = true;
+
+            /// <summary>
+            /// ログファイル出力数
+            /// </summary>
+            public int LogFileAmount { get; set; } = int.MaxValue;
+        }
 
         #region フィールド
         private static readonly string mLogFileListenerName = "logFileOutput";
@@ -46,25 +64,19 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         public static string LogFileNamePattern => $"*_*.{LogFileExt}";
 
         /// <summary>
-        /// 出力ログレベル
+        /// ログ設定
         /// </summary>
-        public Log.LogLevel OutputLogLevel {
+        public static Configuration Config {
             get;
             set {
-                field = Log.LogLevel.Info;
-                Log.Info($"Set OutputLogLevel to {value}");
                 field = value;
+                if (field != null) {
+                    field.OutputLogLevel = Log.LogLevel.Info;
+                    Log.Info($"Set OutputLogLevel to {value.OutputLogLevel}");
+                    field.OutputLogLevel = value.OutputLogLevel;
+                }
             }
-        } = Log.LogLevel.Debug;
-
-        /// <summary>
-        /// ログファイル出力有無
-        /// </summary>
-        public bool OutputLogToFile { get; set; } = true;
-        /// <summary>
-        /// ログファイル出力数
-        /// </summary>
-        public int LogFileAmount { get; set; } = 1;
+        } = new();
         #endregion
 
         /// <summary>
@@ -80,7 +92,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         private LogImpl()
         {
             Log.OutputImpl = this.WriteLine;
-            Log.IsOutputImpl = level => level >= this.OutputLogLevel;
+            Log.IsVarsOutputImpl = level => Config.OutputLogLevel <= level;
 
             Trace.AutoFlush = true;
             _ = Trace.Listeners.Add(new ConsoleTraceListener());
@@ -147,7 +159,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <summary>
         /// 古いログファイルを削除する
         /// </summary>
-        public static void DeleteOldLogFiles() => FileUtil.DeleteOldFiles(LogFolderPath, LogFileNamePattern, Instance.LogFileAmount);
+        public static void DeleteOldLogFiles() => FileUtil.DeleteOldFiles(LogFolderPath, LogFileNamePattern, Config.LogFileAmount);
 
         /// <summary>
         /// ログファイルにログを1行出力する
@@ -159,14 +171,14 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <param name="lineNumber">出力元行数(負の場合は絶対値の数だけ「-」を繰り返す)</param>
         private void WriteLine(Log.LogLevel level, string message, string filePath, string methodName, int lineNumber)
         {
-            if (this.OutputLogToFile && 0 < this.LogFileAmount) {
+            if (Config.OutputLogToFile && 0 < Config.LogFileAmount) {
                 this.CreateLogFileListener();
             }
             else {
                 this.DeleteLogFileListener();
             }
 
-            if (level < this.OutputLogLevel) { return; }
+            if (level < Config.OutputLogLevel) { return; }
 
             int index = filePath.LastIndexOf('\\');
             string fileName = filePath.Substring(index + 1, filePath.IndexOf('.', index + 1) - index - 1);

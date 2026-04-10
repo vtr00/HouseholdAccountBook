@@ -173,29 +173,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         #region ウィンドウ設定プロパティ
         protected override (double, double) WindowSizeSettingRaw {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                return (settings.ActionListRegistrationWindow_Width, settings.ActionListRegistrationWindow_Height);
-            }
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-                settings.ActionListRegistrationWindow_Width = value.Item1;
-                settings.ActionListRegistrationWindow_Height = value.Item2;
-                settings.Save();
-            }
+            get => UserSettingService.Instance.ActionListRegistrationWindowSize;
+            set => UserSettingService.Instance.ActionListRegistrationWindowSize = value;
         }
 
         public override Point WindowPointSetting {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                return new Point(settings.ActionListRegistrationWindow_Left, settings.ActionListRegistrationWindow_Top);
-            }
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-                settings.ActionListRegistrationWindow_Left = value.X;
-                settings.ActionListRegistrationWindow_Top = value.Y;
-                settings.Save();
-            }
+            get => UserSettingService.Instance.ActionListRegistrationWindowPoint;
+            set => UserSettingService.Instance.ActionListRegistrationWindowPoint = value;
         }
         #endregion
 

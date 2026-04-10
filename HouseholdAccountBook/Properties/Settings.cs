@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using HouseholdAccountBook.Models.AppServices;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -110,9 +111,7 @@ namespace HouseholdAccountBook.Properties
             #endregion
 
             // Upgrade時のバージョン番号を保存する
-            Version assemblyVersion = App.GetAssemblyVersion();
-            this.App_Version = assemblyVersion.ToString();
-            this.Save();
+            UserSettingService.Instance.LastAppVersion = App.GetAssemblyVersion();
         }
     }
 }

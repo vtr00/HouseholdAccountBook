@@ -10,6 +10,14 @@ namespace HouseholdAccountBook.Infrastructure.Logger
     /// </summary>
     public class ExceptionLog
     {
+        public class Configuration
+        {
+            /// <summary>
+            /// 例外ログファイル数
+            /// </summary>
+            public int LogFileAmount { get; set; } = 1;
+        }
+
         #region プロパティ
         /// <summary>
         /// フォルダパス
@@ -34,9 +42,9 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         public static string FileNamePattern => $"*_*.{FileExt}";
 
         /// <summary>
-        /// 例外ログファイル数
+        /// 例外ログ設定
         /// </summary>
-        public static int LogFileAmount { get; set; } = 1;
+        public static Configuration Config { get; set; } = new();
 
         /// <summary>
         /// 保存先ファイルパス
@@ -52,7 +60,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <param name="e">出力対象の例外</param>
         public void Log(Exception e)
         {
-            if (0 < LogFileAmount) {
+            if (0 < Config.LogFileAmount) {
                 if (!Directory.Exists(FolderPath)) {
                     _ = Directory.CreateDirectory(FolderPath);
                 }
@@ -70,6 +78,6 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <summary>
         /// 古い例外情報ファイルを削除する
         /// </summary>
-        public static void DeleteOldExceptionLogs() => FileUtil.DeleteOldFiles(FolderPath, FileNamePattern, LogFileAmount);
+        public static void DeleteOldExceptionLogs() => FileUtil.DeleteOldFiles(FolderPath, FileNamePattern, Config.LogFileAmount);
     }
 }
