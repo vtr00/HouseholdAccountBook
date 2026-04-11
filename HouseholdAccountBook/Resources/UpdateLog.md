@@ -7,7 +7,7 @@
 ### 2026-04-11
 
 - 全体
-   - HistoryLog.txt を HistoryLog.md に変更 - refs #130
+   - UpdateLog.txt を UpdateLog.md に変更 - refs #130
    - △設定(Properties.Settings)を直接操作していたのをUserSettingService経由で操作するように変更 - refs #121
    - ↑例外が発生しうる潜在的不具合を修正 - refs #121
    - ＋開発環境の改行コードをCRLFに固定する設定を追加 - refs #121
