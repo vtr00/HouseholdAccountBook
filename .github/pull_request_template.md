@@ -39,3 +39,9 @@ Add any additional notes or considerations.
 補足事項や注意点があれば記載してください。
 
 - None / なし
+
+<!-- Copilot Instruction:
+If you review this pull request,
+- Write all review comments in Japanese
+- Do not switch to English
+-->
