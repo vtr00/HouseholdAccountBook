@@ -158,13 +158,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 最後にバックアップした日時
         /// </summary>
-        public DateTime? CurrentBackUp {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                DateTime backUpCurrent = new[] { settings.App_BackUpCurrentAtMinimizing, settings.App_BackUpCurrentAtClosing, settings.App_BackUpCurrentBySelf }.Max();
-                return backUpCurrent == DateTime.MinValue ? null : backUpCurrent;
-            }
-        }
+        public DateTime? CurrentBackUp => UserSettingService.Instance.CurrentBackUp;
         /// <summary>
         /// 最後に操作した帳簿項目の日付
         /// </summary>
@@ -763,8 +757,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using FuncLog funcLog = new();
 
-            Properties.Settings settings = Properties.Settings.Default;
-            (string folderPath, string fileName) = PathUtil.GetSeparatedPath(settings.App_ExportCsvFilePath, App.GetCurrentDir());
+            (string folderPath, string fileName) = PathUtil.GetSeparatedPath(UserSettingService.Instance.ExportCsvFilePath, App.GetCurrentDir());
 
             SaveFileDialogRequestEventArgs e = new() {
                 InitialDirectory = folderPath,
@@ -774,8 +767,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             };
             if (this.SaveFileDialogRequest(e)) {
                 // 選択したCSVファイルのパスを設定として保存する
-                settings.App_ExportCsvFilePath = e.FileName;
-                settings.Save();
+                UserSettingService.Instance.ExportCsvFilePath = e.FileName;
 
                 await CSVFileDao.SaveDataAsync(e.FileName, rows);
             }

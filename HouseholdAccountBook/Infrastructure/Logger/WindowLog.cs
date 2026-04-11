@@ -10,8 +10,23 @@ namespace HouseholdAccountBook.Infrastructure.Logger
     /// <summary>
     /// ウィンドウ情報ログ
     /// </summary>
-    public class WindowLog
+    public class WindowLog : IDisposable
     {
+        /// <summary>
+        /// ウィンドウ情報ログ設定
+        /// </summary>
+        public class Configulation
+        {
+            /// <summary>
+            /// ログ出力有無
+            /// </summary>
+            public bool OutputLog { get; set; }
+            /// <summary>
+            /// ログ出力数
+            /// </summary>
+            public int LogFileAmount { get; set; }
+        }
+
         #region フィールド
         /// <summary>
         /// 保存対象のウィンドウ
@@ -42,6 +57,21 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// </summary>
         public static string WindowLocationFileExt { get; set; } = "txt";
         /// <summary>
+        /// アプリ起動時間
+        /// </summary>
+        public static DateTime AppStartupTime {
+            get {
+                if (field == default) {
+                    DateTime dt = DateTime.Now;
+                    if (Application.Current is App app) {
+                        dt = app.StartupTime;
+                    }
+                    field = dt;
+                }
+                return field;
+            }
+        }
+        /// <summary>
         /// ファイルパス
         /// </summary>
         public static string WindowLocationFilePath(string windowName) => string.Format($@"{WindowLocationFolderPath}\{windowName}_{AppStartupTime:yyyyMMdd_HHmmss}.{WindowLocationFileExt}");
@@ -51,17 +81,9 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         public static string WindowLocationFileNamePattern(string windowName) => $"{windowName}_*_*.{WindowLocationFileExt}";
 
         /// <summary>
-        /// ログ出力有無
+        /// ログ設定
         /// </summary>
-        public static bool OutputLog { get; set; } = false;
-        /// <summary>
-        /// ログ出力数
-        /// </summary>
-        public static int LogFileAmount { get; set; } = 0;
-        /// <summary>
-        /// アプリ起動時間
-        /// </summary>
-        public static DateTime AppStartupTime { get; set; } = DateTime.Now;
+        public static Configulation Config { get; set; } = new();
         #endregion
 
         /// <summary>
@@ -81,8 +103,14 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// </summary>
         ~WindowLog()
         {
+            this.Dispose();
+        }
+
+        public void Dispose()
+        {
             SystemEvents.DisplaySettingsChanging -= this.SystemEvents_DisplaySettingsChanging;
             SystemEvents.DisplaySettingsChanged -= this.SystemEvents_DisplaySettingsChanged;
+            GC.SuppressFinalize(this);
         }
 
         private void SystemEvents_DisplaySettingsChanging(object sender, EventArgs e) => this.Log("DisplaySettingsChanging", true);
@@ -96,7 +124,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <param name="forceLog">状態、位置が変わっていなくても保存するか</param>
         public void Log(string comment = "", bool forceLog = false)
         {
-            if (OutputLog && 0 < LogFileAmount) {
+            if (Config.OutputLog && 0 < Config.LogFileAmount) {
                 if (!forceLog &&
                     this.mLastSavedWindowState == this.mWindow.WindowState &&
                     this.mLastSavedRect == this.mWindow.RestoreBounds) { return; }
@@ -157,6 +185,6 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// </summary>
         /// <param name="windowName">ウィンドウ名</param>
         public static void DeleteOldWindowLogs(string windowName) =>
-            FileUtil.DeleteOldFiles(WindowLocationFolderPath, WindowLocationFileNamePattern(windowName), LogFileAmount);
+            FileUtil.DeleteOldFiles(WindowLocationFolderPath, WindowLocationFileNamePattern(windowName), Config.LogFileAmount);
     }
 }

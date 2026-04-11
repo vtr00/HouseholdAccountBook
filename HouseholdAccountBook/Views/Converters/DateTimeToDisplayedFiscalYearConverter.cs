@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.Models.AppServices;
+using System;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -15,9 +16,8 @@ namespace HouseholdAccountBook.Views.Converters
                 return null;
             }
 
-            Properties.Settings settings = Properties.Settings.Default;
-            string unit_pre = settings.App_StartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Pre;
-            string unit_post = settings.App_StartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Post;
+            string unit_pre = UserSettingService.Instance.FiscalStartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Pre;
+            string unit_post = UserSettingService.Instance.FiscalStartMonth == 1 ? "" : Properties.Resources.Unit_FiscalYear_Post;
 
             if (value is DateTime dateTime) {
                 return $"{unit_pre}{dateTime:yyyy}{unit_post}";

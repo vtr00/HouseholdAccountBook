@@ -6,6 +6,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
     /// <summary>
     /// ログ出力クラス
     /// </summary>
+    /// <remarks>出力の実体は継承先またはデリゲートの指定によって実装する</remarks>
     public class Log
     {
         /// <summary>
@@ -29,9 +30,14 @@ namespace HouseholdAccountBook.Infrastructure.Logger
 
         public delegate bool IsOutputImplDelegate(LogLevel level);
         /// <summary>
-        /// 出力判定デリゲート
+        /// 変数ログ出力判定デリゲート
         /// </summary>
-        public static IsOutputImplDelegate IsOutputImpl { get; set; }
+        public static IsOutputImplDelegate IsVarsOutputImpl { get; set; }
+
+        /// <summary>
+        /// プライベートコンストラクタ
+        /// </summary>
+        private Log() { }
 
         /// <summary>
         /// 変数ログを1行出力する
@@ -44,7 +50,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         public static void Vars(string message = "", object vars = null, LogLevel level = LogLevel.Info,
                                 [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
-            if (IsOutputImpl?.Invoke(level) != true) { return; }
+            if (!(IsVarsOutputImpl?.Invoke(level) ?? true)) { return; }
 
             string varsStr = string.Empty;
             if (vars != null) {
@@ -62,7 +68,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="methodName">出力元関数名</param>
         /// <param name="lineNumber">出力元行数</param>
-        public static void Critical(string message = "", [CallerFilePath] string fileName = null,[CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+        public static void Critical(string message = "", [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
             => OutputImpl?.Invoke(LogLevel.Critical, message, fileName, methodName, lineNumber);
         /// <summary>
         /// エラーログを1行出力する

@@ -87,16 +87,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         #region ウィンドウ設定プロパティ
         public override Point WindowPointSetting {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                return new Point(settings.TermWindow_Left, settings.TermWindow_Top);
-            }
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-                settings.TermWindow_Left = value.X;
-                settings.TermWindow_Top = value.Y;
-                settings.Save();
-            }
+            get => UserSettingService.Instance.TermWindowPoint;
+            set => UserSettingService.Instance.TermWindowPoint = value;
         }
         #endregion
 

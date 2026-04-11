@@ -3,7 +3,7 @@ using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
-using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using HouseholdAccountBook.Views;
@@ -200,29 +200,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         #region ウィンドウ設定プロパティ
         protected override (double, double) WindowSizeSettingRaw {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                return (settings.DbSettingWindow_Width, settings.DbSettingWindow_Height);
-            }
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-                settings.DbSettingWindow_Width = value.Item1;
-                settings.DbSettingWindow_Height = value.Item2;
-                settings.Save();
-            }
+            get => UserSettingService.Instance.DbSettingWindowSize;
+            set => UserSettingService.Instance.DbSettingWindowSize = value;
         }
 
         public override Point WindowPointSetting {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                return new Point(settings.DbSettingWindow_Left, settings.DbSettingWindow_Top);
-            }
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-                settings.DbSettingWindow_Left = value.X;
-                settings.DbSettingWindow_Top = value.Y;
-                settings.Save();
-            }
+            get => UserSettingService.Instance.DbSettingWindowPoint;
+            set => UserSettingService.Instance.DbSettingWindowPoint = value;
         }
         #endregion
 
@@ -244,8 +228,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
-            Properties.Settings settings = Properties.Settings.Default;
-            await this.DBKindSelectorVM.LoadAsync((DBKind)settings.App_SelectedDBKind);
+            await this.DBKindSelectorVM.LoadAsync(UserSettingService.Instance.SelectedDBKind);
 
             // PostgreSQL
             this.PostgreSQLDBSettingVM.Load(this.SetPassword);
@@ -262,10 +245,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public bool Save()
         {
             bool result = false;
-            Properties.Settings settings = Properties.Settings.Default;
-            settings.App_SelectedDBKind = (int)this.DBKindSelectorVM.SelectedKey;
 
-            switch ((DBKind)settings.App_SelectedDBKind) {
+            switch (this.DBKindSelectorVM.SelectedKey) {
                 case DBKind.PostgreSQL: {
                     result = this.PostgreSQLDBSettingVM.Save(this.GetPassword);
                     break;
@@ -280,10 +261,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
                 case DBKind.Undefined:
                 default:
+                    result = false;
                     break;
             }
             if (result) {
-                settings.Save();
+                UserSettingService.Instance.SelectedDBKind = this.DBKindSelectorVM.SelectedKey;
             }
             return result;
         }

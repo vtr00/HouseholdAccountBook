@@ -94,7 +94,7 @@ namespace HouseholdAccountBook.ViewModels
     /// <typeparam name="T">パラメータの型</typeparam>
     /// <param name="execute">コマンド実行デリゲート</param>
     /// <param name="canExecute">コマンド実行可否デリゲート</param>
-    public class RelayCommand<T>(Action<T, FuncLog> execute, Func<T, bool> canExecute = null, 
+    public class RelayCommand<T>(Action<T, FuncLog> execute, Func<T, bool> canExecute = null,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "") : ICommand
     {
         #region フィールド

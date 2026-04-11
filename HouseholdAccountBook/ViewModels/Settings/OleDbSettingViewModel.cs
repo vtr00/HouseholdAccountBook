@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Infrastructure.Utilities;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.DbHandlers;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System.Collections.Generic;
@@ -32,12 +33,12 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// </summary>
         public async Task LoadAsync()
         {
-            Properties.Settings settings = Properties.Settings.Default;
+            OleDbHandler.ConnectInfo connectInfo = UserSettingService.Instance.AccessConnectInfo;
 
             this.ProviderNameSelectorVM.SetLoader(static () => [.. OleDbHandler.GetOleDbProvider()]);
-            await this.ProviderNameSelectorVM.LoadAsync(settings.App_Access_Provider);
+            await this.ProviderNameSelectorVM.LoadAsync(connectInfo.Provider);
 
-            this.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_Access_DBFilePath);
+            this.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), connectInfo.DataSource);
         }
 
         /// <summary>
@@ -45,10 +46,10 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// </summary>
         public async Task LoadForKichoFugetsuAsync()
         {
-            Properties.Settings settings = Properties.Settings.Default;
+            OleDbHandler.ConnectInfo connectInfo = UserSettingService.Instance.KichoFugetsuConnectInfo;
 
             this.ProviderNameSelectorVM.SetLoader(static () => new List<KeyValuePair<string, string>>(OleDbHandler.GetOleDbProvider()).FindAll(static pair => pair.Key.Contains(OleDbHandler.ConnectInfo.AccessProviderHeader)));
-            await this.ProviderNameSelectorVM.LoadAsync(settings.App_Import_KichoFugetsu_Provider);
+            await this.ProviderNameSelectorVM.LoadAsync(connectInfo.Provider);
         }
 
         /// <summary>
@@ -57,10 +58,9 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <returns>設定の保存成否</returns>
         public bool Save()
         {
-            Properties.Settings settings = Properties.Settings.Default;
-
-            settings.App_Access_Provider = this.ProviderNameSelectorVM.SelectedKey;
-            settings.App_Access_DBFilePath = Path.GetFullPath(this.InputedDBFilePath, App.GetCurrentDir());
+            UserSettingService.Instance.AccessConnectInfo = new(this.ProviderNameSelectorVM.SelectedKey) {
+                DataSource = Path.GetFullPath(this.InputedDBFilePath, App.GetCurrentDir())
+            };
 
             return true;
         }
@@ -71,9 +71,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <returns>設定の保存成否</returns>
         public bool SaveForKichoFugetsu()
         {
-            Properties.Settings settings = Properties.Settings.Default;
-
-            settings.App_Import_KichoFugetsu_Provider = this.ProviderNameSelectorVM.SelectedKey;
+            UserSettingService.Instance.KichoFugetsuConnectInfo = new(this.ProviderNameSelectorVM.SelectedKey);
 
             return true;
         }

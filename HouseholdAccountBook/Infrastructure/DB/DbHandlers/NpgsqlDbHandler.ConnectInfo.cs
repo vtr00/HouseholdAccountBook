@@ -8,6 +8,9 @@ using System;
 
 namespace HouseholdAccountBook.Models.DbHandlers
 {
+    /// <summary>
+    /// Npgsql DB Handler
+    /// </summary>
     public partial class NpgsqlDbHandler : DbHandlerBase
     {
         /// <summary>
@@ -39,6 +42,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
             /// <summary>
             /// パスワード
             /// </summary>
+            /// <remarks><see cref="EncryptedPassword"/> のラッパープロパティ</remarks>
             [IgnoreToString]
             public string Password {
                 get => ProtectedDataUtil.DecryptPassword(this.EncryptedPassword);

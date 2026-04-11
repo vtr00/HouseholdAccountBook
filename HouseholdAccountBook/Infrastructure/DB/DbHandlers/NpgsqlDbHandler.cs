@@ -13,6 +13,25 @@ namespace HouseholdAccountBook.Models.DbHandlers
     /// </summary>
     public partial class NpgsqlDbHandler : DbHandlerBase
     {
+        /// <summary>
+        /// バックアップ設定
+        /// </summary>
+        public class BackupConfiguration
+        {
+            /// <summary>
+            /// pg_dump.exeのパス
+            /// </summary>
+            public string DumpExePath { get; set; }
+            /// <summary>
+            /// pg_restore.exeのパス
+            /// </summary>
+            public string RestoreExePath { get; set; }
+            /// <summary>
+            /// パスワード入力方法
+            /// </summary>
+            public PostgresPasswordInput PasswordInput { get; set; }
+        }
+
         #region フィールド
         /// <summary>
         /// 接続文字列
@@ -64,17 +83,17 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// <param name="notifyResult">実行結果を通知するデリゲート</param>
         /// <param name="waitForFinish">処理の完了を待機するか</param>
         /// <returns>エラーコード</returns>
-        public async Task<int?> ExecuteDump(string backupFilePath, string dumpExePath, PostgresPasswordInput passwordInput, PostgresFormat format,
+        public async Task<int?> ExecuteDump(string backupFilePath, BackupConfiguration config, PostgresFormat format,
                                             NotifyResult notifyResult = null, bool waitForFinish = true)
         {
-            using FuncLog funcLog = new(new { backupFilePath, dumpExePath, passwordInput, format, waitForFinish }, Log.LogLevel.Trace);
+            using FuncLog funcLog = new(new { backupFilePath, config, format, waitForFinish }, Log.LogLevel.Trace);
 
-            bool pgPassConf = passwordInput == PostgresPasswordInput.PgPassConf;
+            bool pgPassConf = config.PasswordInput == PostgresPasswordInput.PgPassConf;
             ConnectInfo connectInfo = this.mConnectInfoBase as ConnectInfo;
 
             // 起動情報を設定する
             ProcessStartInfo info = new() {
-                FileName = dumpExePath,
+                FileName = config.DumpExePath,
                 Arguments = string.Format(
                     "--host {0} --port {1} --username \"{2}\" --role \"{3}\" {4} --format {5} --data-only --verbose --column-inserts --file \"{6}\" \"{7}\"",
                     connectInfo.Host,
@@ -133,16 +152,16 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// <param name="backupFilePath">バックアップファイルパス</param>
         /// <param name="restoreExePath"></param>
         /// <returns>エラーコード</returns>
-        public async Task<int> ExecuteRestore(string backupFilePath, string restoreExePath, PostgresPasswordInput passwordInput)
+        public async Task<int> ExecuteRestore(string backupFilePath, BackupConfiguration config)
         {
-            using FuncLog funcLog = new(new { backupFilePath, restoreExePath, passwordInput }, Log.LogLevel.Trace);
+            using FuncLog funcLog = new(new { backupFilePath, config }, Log.LogLevel.Trace);
 
-            bool pgPassConf = passwordInput == PostgresPasswordInput.PgPassConf;
+            bool pgPassConf = config.PasswordInput == PostgresPasswordInput.PgPassConf;
             ConnectInfo connectInfo = this.mConnectInfoBase as ConnectInfo;
 
             // 起動情報を設定する
             ProcessStartInfo info = new() {
-                FileName = restoreExePath,
+                FileName = config.RestoreExePath,
                 Arguments = string.Format(
                     "--host {0} --port {1} --username \"{2}\" --role \"{3}\" {4} --data-only --verbose --dbname \"{5}\" \"{6}\"",
                     connectInfo.Host,

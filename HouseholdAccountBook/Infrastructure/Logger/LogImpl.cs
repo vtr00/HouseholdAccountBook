@@ -13,8 +13,26 @@ namespace HouseholdAccountBook.Infrastructure.Logger
     /// </summary>
     public class LogImpl : SingletonBase<LogImpl>
     {
-        #region ログファイル
-        #endregion
+        /// <summary>
+        /// ログ出力設定
+        /// </summary>
+        public class Configuration
+        {
+            /// <summary>
+            /// 出力ログレベル
+            /// </summary>
+            public Log.LogLevel OutputLogLevel { get; set; } = Log.LogLevel.Debug;
+
+            /// <summary>
+            /// ログファイル出力有無
+            /// </summary>
+            public bool OutputLogToFile { get; set; } = true;
+
+            /// <summary>
+            /// ログファイル出力数
+            /// </summary>
+            public int LogFileAmount { get; set; } = int.MaxValue;
+        }
 
         #region フィールド
         private static readonly string mLogFileListenerName = "logFileOutput";
@@ -31,40 +49,43 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// </summary>
         public static string LogFileExt { get; set; } = "txt";
         /// <summary>
-        /// ログファイルパス
+        /// アプリ起動時間
         /// </summary>
-        public static string LogFilePath {
+        public static DateTime AppStartupTime {
             get {
-                App app = Application.Current as App;
-                DateTime dt = app.StartupTime;
-                return string.Format($@"{LogFolderPath}\{dt:yyyyMMdd_HHmmss}.{LogFileExt}");
+                if (field == default) {
+                    DateTime dt = DateTime.Now;
+                    if (Application.Current is App app) {
+                        dt = app.StartupTime;
+                    }
+                    field = dt;
+                }
+                return field;
             }
         }
+        /// <summary>
+        /// ログファイルパス
+        /// </summary>
+        public static string LogFilePath => string.Format($@"{LogFolderPath}\{AppStartupTime:yyyyMMdd_HHmmss}.{LogFileExt}");
         /// <summary>
         /// ログファイル名パターン
         /// </summary>
         public static string LogFileNamePattern => $"*_*.{LogFileExt}";
 
         /// <summary>
-        /// 出力ログレベル
+        /// ログ設定
         /// </summary>
-        public Log.LogLevel OutputLogLevel {
+        public Configuration Config {
             get;
             set {
-                field = Log.LogLevel.Info;
-                Log.Info($"Set OutputLogLevel to {value}");
                 field = value;
+                if (field != null) {
+                    field.OutputLogLevel = Log.LogLevel.Info;
+                    Log.Info($"Set OutputLogLevel to {value.OutputLogLevel}");
+                    field.OutputLogLevel = value.OutputLogLevel;
+                }
             }
-        } = Log.LogLevel.Debug;
-
-        /// <summary>
-        /// ログファイル出力有無
-        /// </summary>
-        public bool OutputLogToFile { get; set; } = true;
-        /// <summary>
-        /// ログファイル出力数
-        /// </summary>
-        public int LogFileAmount { get; set; } = 1;
+        } = new();
         #endregion
 
         /// <summary>
@@ -80,7 +101,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         private LogImpl()
         {
             Log.OutputImpl = this.WriteLine;
-            Log.IsOutputImpl = level => level >= this.OutputLogLevel;
+            Log.IsVarsOutputImpl = level => this.Config.OutputLogLevel <= level;
 
             Trace.AutoFlush = true;
             _ = Trace.Listeners.Add(new ConsoleTraceListener());
@@ -147,7 +168,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <summary>
         /// 古いログファイルを削除する
         /// </summary>
-        public static void DeleteOldLogFiles() => FileUtil.DeleteOldFiles(LogFolderPath, LogFileNamePattern, Instance.LogFileAmount);
+        public static void DeleteOldLogFiles() => FileUtil.DeleteOldFiles(LogFolderPath, LogFileNamePattern, Instance.Config.LogFileAmount);
 
         /// <summary>
         /// ログファイルにログを1行出力する
@@ -159,17 +180,17 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <param name="lineNumber">出力元行数(負の場合は絶対値の数だけ「-」を繰り返す)</param>
         private void WriteLine(Log.LogLevel level, string message, string filePath, string methodName, int lineNumber)
         {
-            if (this.OutputLogToFile && 0 < this.LogFileAmount) {
+            if (this.Config.OutputLogToFile && 0 < this.Config.LogFileAmount) {
                 this.CreateLogFileListener();
             }
             else {
                 this.DeleteLogFileListener();
             }
 
-            if (level < this.OutputLogLevel) { return; }
+            if (level < this.Config.OutputLogLevel) { return; }
 
-            int index = filePath.LastIndexOf('\\');
-            string fileName = filePath.Substring(index + 1, filePath.IndexOf('.', index + 1) - index - 1);
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            fileName = fileName.Replace(".xaml", "");
 
             string callerStr = fileName;
             if (methodName != ".ctor") {

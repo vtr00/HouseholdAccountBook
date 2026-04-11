@@ -18,6 +18,25 @@ namespace HouseholdAccountBook.Infrastructure.CSV
     public static class CSVFileDao
     {
         /// <summary>
+        /// 祝日CSV設定
+        /// </summary>
+        public class HolidayCSVConfigulation
+        {
+            /// <summary>
+            /// URL
+            /// </summary>
+            public string Url { get; set; }
+            /// <summary>
+            /// テキストエンコーディング
+            /// </summary>
+            public Encoding TextEncoding { get; set; }
+            /// <summary>
+            /// 日付のインデックス
+            /// </summary>
+            public int DateIndex { get; set; }
+        }
+
+        /// <summary>
         /// CSV比較で用いるデータを読み込む
         /// </summary>
         /// <param name="csvFilePathList">読み込むCSVファイルのパスリスト</param>
@@ -28,7 +47,7 @@ namespace HouseholdAccountBook.Infrastructure.CSV
         /// <returns>読込結果</returns>
         public static async Task<IEnumerable<CsvComparisonViewModel>> LoadCsvCompListAsync(IEnumerable<string> csvFilePathList, int actDateIndex, int itemNameIndex, int expensesIndex, Encoding encoding)
         {
-            using FuncLog funcLog = new(new { csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, encoding.EncodingName });
+            using FuncLog funcLog = new(new { csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, encoding });
 
             CsvConfiguration csvConfig = new(CultureInfo.CurrentCulture) {
                 HasHeaderRecord = true,
@@ -71,16 +90,16 @@ namespace HouseholdAccountBook.Infrastructure.CSV
         /// <summary>
         /// 国民の祝日リストを取得する
         /// </summary>
-        /// <param name="url">CSVファイルのURL</param>
-        /// <param name="textEncoding">CSVファイルの文字エンコード</param>
-        /// <param name="dateIndex">日付のインデックス</param>
+        /// <param name="config">CSV設定</param>
         /// <returns>祝日リスト</returns>
-        public static async Task<IEnumerable<DateOnly>> DownloadHolidayListAsync(string url, int textEncoding, int dateIndex)
+        public static async Task<IEnumerable<DateOnly>> DownloadHolidayListAsync(HolidayCSVConfigulation config)
         {
+            using FuncLog funcLog = new(config);
+
             List<DateOnly> holidayList = [];
 
-            if (url != string.Empty) {
-                Uri uri = new(url);
+            if (config.Url != string.Empty) {
+                Uri uri = new(config.Url);
 
                 CsvConfiguration csvConfig = new(CultureInfo.CurrentCulture) {
                     HasHeaderRecord = true,
@@ -94,9 +113,9 @@ namespace HouseholdAccountBook.Infrastructure.CSV
                         if (stream.CanRead) {
                             holidayList.Clear();
                             // CSVファイルを読み込む
-                            using (CsvReader reader = new(new StreamReader(stream, Encoding.GetEncoding(textEncoding)), csvConfig)) {
+                            using (CsvReader reader = new(new StreamReader(stream, config.TextEncoding), csvConfig)) {
                                 while (reader.Read()) {
-                                    if (reader.TryGetField(dateIndex, out string dateString)) {
+                                    if (reader.TryGetField(config.DateIndex, out string dateString)) {
                                         if (DateOnly.TryParse(dateString, out DateOnly dateTime)) {
                                             holidayList.Add(dateTime);
                                         }

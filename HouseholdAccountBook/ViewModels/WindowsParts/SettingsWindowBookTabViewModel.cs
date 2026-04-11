@@ -2,7 +2,6 @@
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
-using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
@@ -32,7 +31,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 設定サービス
         /// </summary>
-        private SettingService mSettingService;
+        private MasterSettingService mSettingService;
         #endregion
 
         #region イベント
@@ -215,11 +214,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private void SelectCsvFolderPathCommand_Execute()
         {
-            Properties.Settings settings = Properties.Settings.Default;
-
             string folderFullPath;
             if (string.IsNullOrWhiteSpace(this.DisplayedBookSettingVM.InputedCsvFolderPath)) {
-                folderFullPath = Path.GetDirectoryName(settings.App_CsvFilePath);
+                folderFullPath = Path.GetDirectoryName(UserSettingService.Instance.CsvCompFile);
             }
             else {
                 (string folderPath, string fileName) = PathUtil.GetSeparatedPath(this.DisplayedBookSettingVM.InputedCsvFolderPath, App.GetCurrentDir());

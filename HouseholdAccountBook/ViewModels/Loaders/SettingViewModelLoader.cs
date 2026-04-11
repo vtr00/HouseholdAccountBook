@@ -18,7 +18,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
     /// </summary>
     /// <param name="appService">アプリサービス</param>
     /// <param name="settingService">設定サービス</param>
-    public class SettingViewModelLoader(AppCommonService appService, SettingService settingService)
+    public class SettingViewModelLoader(AppCommonService appService, MasterSettingService settingService)
     {
         /// <summary>
         /// アプリサービス
@@ -27,7 +27,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
         /// <summary>
         /// 設定サービス
         /// </summary>
-        private readonly SettingService mService = settingService;
+        private readonly MasterSettingService mService = settingService;
 
         /// <summary>
         /// 帳簿設定VMを取得する

@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Infrastructure.Utilities;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.DbHandlers;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System.IO;
@@ -24,8 +25,8 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// </summary>
         public void Load()
         {
-            Properties.Settings settings = Properties.Settings.Default;
-            this.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), settings.App_SQLite_DBFilePath);
+            SQLiteDbHandler.ConnectInfo connectInfo = UserSettingService.Instance.SQLiteConnectInfo;
+            this.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), connectInfo.FilePath);
         }
 
         /// <summary>
@@ -50,8 +51,10 @@ namespace HouseholdAccountBook.ViewModels.Settings
             }
             // ファイルが存在する場合、設定を保存する
             if (exists) {
-                Properties.Settings settings = Properties.Settings.Default;
-                settings.App_SQLite_DBFilePath = Path.GetFullPath(sqliteFilePath, App.GetCurrentDir());
+                SQLiteDbHandler.ConnectInfo connectInfo = new() {
+                    FilePath = Path.GetFullPath(sqliteFilePath, App.GetCurrentDir())
+                };
+                UserSettingService.Instance.SQLiteConnectInfo = connectInfo;
                 result = true;
             }
 

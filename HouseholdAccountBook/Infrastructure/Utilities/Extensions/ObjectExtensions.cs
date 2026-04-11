@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 #nullable enable
 
@@ -44,6 +45,8 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
                     return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => item.ToString2(depth)))}]";
                 case IIdObj idObj:
                     return $"{idObj.Id}";
+                case Encoding encoding:
+                    return $"{encoding.EncodingName}";
                 default:
                     PropertyInfo[] propInfos = obj.GetType().GetProperties(); // クラスが保持しているプロパティの情報を取得
 

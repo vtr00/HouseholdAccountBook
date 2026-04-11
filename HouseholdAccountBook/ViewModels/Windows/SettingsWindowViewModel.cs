@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.WindowsParts;
 using System;
@@ -78,29 +79,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         #region ウィンドウ設定プロパティ
         protected override (double, double) WindowSizeSettingRaw {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                return (settings.SettingsWindow_Width, settings.SettingsWindow_Height);
-            }
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-                settings.SettingsWindow_Width = value.Item1;
-                settings.SettingsWindow_Height = value.Item2;
-                settings.Save();
-            }
+            get => UserSettingService.Instance.SettingsWindowSize;
+            set => UserSettingService.Instance.SettingsWindowSize = value;
         }
 
         public override Point WindowPointSetting {
-            get {
-                Properties.Settings settings = Properties.Settings.Default;
-                return new Point(settings.SettingsWindow_Left, settings.SettingsWindow_Top);
-            }
-            set {
-                Properties.Settings settings = Properties.Settings.Default;
-                settings.SettingsWindow_Left = value.X;
-                settings.SettingsWindow_Top = value.Y;
-                settings.Save();
-            }
+            get => UserSettingService.Instance.SettingsWindowPoint;
+            set => UserSettingService.Instance.SettingsWindowPoint = value;
         }
         #endregion
 

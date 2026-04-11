@@ -4,6 +4,7 @@ using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
 using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
@@ -115,8 +116,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="rows">列表示値</param>
         public async Task ExportCSVFileAsync(IEnumerable<IEnumerable<string>> rows)
         {
-            Properties.Settings settings = Properties.Settings.Default;
-            (string folderPath, string fileName) = PathUtil.GetSeparatedPath(settings.App_ExportCsvFilePath, App.GetCurrentDir());
+            (string folderPath, string fileName) = PathUtil.GetSeparatedPath(UserSettingService.Instance.ExportCsvFilePath, App.GetCurrentDir());
 
             SaveFileDialogRequestEventArgs e = new() {
                 InitialDirectory = folderPath,
@@ -126,8 +126,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             };
             if (this.SaveFileDialogRequest(e)) {
                 // 選択したCSVファイルのパスを設定として保存する
-                settings.App_ExportCsvFilePath = e.FileName;
-                settings.Save();
+                UserSettingService.Instance.ExportCsvFilePath = e.FileName;
 
                 await CSVFileDao.SaveDataAsync(e.FileName, rows);
             }

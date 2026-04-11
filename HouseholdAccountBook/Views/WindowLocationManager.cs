@@ -16,6 +16,18 @@ namespace HouseholdAccountBook.Views
     public class WindowLocationManager : SingletonBase<WindowLocationManager>
     {
         /// <summary>
+        /// ウィンドウ位置管理設定
+        /// </summary>
+        public class Configuration
+        {
+            /// <summary>
+            /// メインウィンドウ以外の位置を保存するか
+            /// </summary>
+            public bool IsPositionSaved { get; set; }
+        }
+
+        #region フィールド
+        /// <summary>
         /// ウィンドウログ
         /// </summary>
         private readonly Dictionary<Window, WindowLog> mLogDic = [];
@@ -27,6 +39,16 @@ namespace HouseholdAccountBook.Views
         /// 最終補正値
         /// </summary>
         private readonly Dictionary<Window, Rect> mLastRectDic = [];
+        #endregion
+
+        /// <summary>
+        /// ウィンドウ位置管理設定
+        /// </summary>
+        public static Configuration Config { get; set; } = new();
+        /// <summary>
+        /// ウィンドウ位置/サイズの保存が有効か
+        /// </summary>
+        public static bool SaveEnabled { get; set; } = true;
 
         /// <summary>
         /// スタティックコンストラクタ
@@ -72,6 +94,8 @@ namespace HouseholdAccountBook.Views
         /// <param name="window">対象のウィンドウ</param>
         public void Remove(Window window)
         {
+            if (!this.mLogDic.TryGetValue(window, out WindowLog log)) { return; }
+
             this.Log(window, "Unmanaged", true);
 
             window.Initialized -= this.Window_Initialized;
@@ -86,6 +110,7 @@ namespace HouseholdAccountBook.Views
             window.Unloaded -= this.Window_Unloaded;
 
             _ = this.mLastRectDic.Remove(window);
+            log.Dispose();
             _ = this.mLogDic.Remove(window);
         }
 
@@ -163,7 +188,12 @@ namespace HouseholdAccountBook.Views
             this.Remove(window);
         }
 
-        private void Log(Window window, string comment, bool forceLog = false) => this.mLogDic[window].Log(comment, forceLog);
+        private void Log(Window window, string comment, bool forceLog = false)
+        {
+            if (this.mLogDic.TryGetValue(window, out WindowLog log)) {
+                log.Log(comment, forceLog);
+            }
+        }
 
         /// <summary>
         /// ウィンドウの初期領域を保存する
@@ -204,8 +234,6 @@ namespace HouseholdAccountBook.Views
 
             bool isMainWindow = window is MainWindow;
 
-            Properties.Settings settings = Properties.Settings.Default;
-
             Size? size = wvm.WindowSizeSetting;
             if (size is not null && 40 < size.Value.Width && 40 < size.Value.Height) {
                 window.Width = size.Value.Width;
@@ -213,7 +241,7 @@ namespace HouseholdAccountBook.Views
             }
 
             Point point = wvm.WindowPointSetting;
-            if ((isMainWindow || settings.App_IsPositionSaved) && 0 <= point.X && 0 <= point.Y) {
+            if ((isMainWindow || Config.IsPositionSaved) && 0 <= point.X && 0 <= point.Y) {
                 window.Left = point.X;
                 window.Top = point.Y;
             }
@@ -246,8 +274,7 @@ namespace HouseholdAccountBook.Views
             bool isMainWindow = window is MainWindow;
 
             if (window.WindowState == WindowState.Normal) {
-                Properties.Settings settings = Properties.Settings.Default;
-                if (!settings.App_InitSizeFlag) {
+                if (SaveEnabled) {
                     if (40 < window.Width && 40 < window.Height) {
                         Size size = new() {
                             Width = window.Width,
@@ -256,7 +283,7 @@ namespace HouseholdAccountBook.Views
                         wvm.WindowSizeSetting = size;
                     }
 
-                    if (isMainWindow || settings.App_IsPositionSaved) {
+                    if (isMainWindow || Config.IsPositionSaved) {
                         if (0 < window.Left && 0 < window.Top) {
                             Point point = new() {
                                 X = window.Left,
