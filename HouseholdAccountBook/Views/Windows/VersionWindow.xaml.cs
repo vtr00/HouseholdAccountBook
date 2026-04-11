@@ -48,8 +48,9 @@ namespace HouseholdAccountBook.Views.Windows
             Paragraph p = new();
 
             string text = Properties.Resources.UpdateLog;
-            string pattern = @"refs\s+#(\d+)";
-            MatchCollection matches = Regex.Matches(text, pattern);
+            text = text.Replace("\r\n\r\n", "\r\n"); // 空行を削除する
+            string patternIssuesId = @"refs\s+#(\d+)";
+            MatchCollection matches = Regex.Matches(text, patternIssuesId);
 
             int lastIndex = 0;
 
