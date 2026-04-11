@@ -4,6 +4,13 @@
 
 ## 2026
 
+### 2026-04-12
+
+- ActionRegistrationWindow, ActionListRegistrationWindow, MoveRegistrationWindow
+   - ↑編集時、店舗 / 備考が表示されないのを修正 - refs #133
+   - ↑登録時、店舗 / 備考が保存されないのを修正 - refs #133
+   - △項目変更時、店舗 / 備考の選択が維持されるように変更 - refs #133 
+
 ### 2026-04-11
 
 - 全体

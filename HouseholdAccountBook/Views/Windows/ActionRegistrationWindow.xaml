@@ -116,13 +116,13 @@
             <TextBlock Grid.Row="8" Grid.Column="0" Margin="5"
                        Text="{x:Static properties:Resources.TextBlock_ShopName}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="8" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="2"
-                      ItemsSource="{Binding ShopSelectorVM.ItemList}" Text="{Binding ShopSelectorVM.SelectedItem, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
+                      ItemsSource="{Binding ShopSelectorVM.ItemList}" Text="{Binding ShopSelectorVM.SelectedKey, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
 
             <!-- 備考 -->
             <TextBlock Grid.Row="9" Grid.Column="0" Margin="5"
                        Text="{x:Static properties:Resources.TextBlock_Remark}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="9" Grid.Column="1" Margin="5" IsEditable="True" Grid.ColumnSpan="2"
-                      ItemsSource="{Binding RemarkSelectorVM.ItemList}" Text="{Binding RemarkSelectorVM.SelectedItem, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
+                      ItemsSource="{Binding RemarkSelectorVM.ItemList}" Text="{Binding RemarkSelectorVM.SelectedKey, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
 
             <!-- チェック済 -->
             <TextBlock Grid.Row="10" Grid.Column="0" Margin="5" 

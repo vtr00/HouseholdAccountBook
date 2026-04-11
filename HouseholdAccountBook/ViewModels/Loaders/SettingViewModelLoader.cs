@@ -50,8 +50,8 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             await vm.DebitBookSelectorVM.LoadAsync(bm.DebitBookId);
             vm.TextEncodingSelectorVM.SetLoader(() => EncodingUtil.GetTextEncodingList());
             await vm.TextEncodingSelectorVM.LoadAsync(bm.TextEncoding);
-            vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(bookId)).Select(model => new RelationViewModel(model)));
-            await vm.RelationSelectorVM.LoadAsync(SelectorMode.FirstOrDefault);
+            vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(bookId)).Select(model => new RelationViewModel(model)), mode: SelectorMode.FirstOrDefault);
+            await vm.RelationSelectorVM.LoadAsync();
 
             return vm;
         }
@@ -112,12 +112,12 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                     // 項目
                     ItemIdObj itemId = id.Id;
                     vm = new(await this.mService.LoadItemAsync(itemId));
-                    vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(itemId)).Select(model => new RelationViewModel(model)));
-                    await vm.RelationSelectorVM.LoadAsync(SelectorMode.FirstOrDefault);
-                    vm.ShopSelectorVM.SetLoader(async () => await this.mAppService.LoadShopListAsync(itemId));
-                    await vm.ShopSelectorVM.LoadAsync(SelectorMode.FirstOrDefault);
-                    vm.RemarkSelectorVM.SetLoader(async () => await this.mAppService.LoadRemarkListAsync(itemId));
-                    await vm.RemarkSelectorVM.LoadAsync(SelectorMode.FirstOrDefault);
+                    vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(itemId)).Select(model => new RelationViewModel(model)), mode: SelectorMode.FirstOrDefault);
+                    await vm.RelationSelectorVM.LoadAsync();
+                    vm.ShopSelectorVM.SetLoader(async () => await this.mAppService.LoadShopListAsync(itemId), mode: SelectorMode.FirstOrDefault);
+                    await vm.ShopSelectorVM.LoadAsync();
+                    vm.RemarkSelectorVM.SetLoader(async () => await this.mAppService.LoadRemarkListAsync(itemId), mode: SelectorMode.FirstOrDefault);
+                    await vm.RemarkSelectorVM.LoadAsync();
                     break;
                 }
             }

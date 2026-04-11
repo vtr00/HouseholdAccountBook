@@ -70,7 +70,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     Tabs.YearlyListTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
                     _ => throw new NotImplementedException(),
                 };
-            });
+            }, mode: SelectorMode.FirstOrDefault);
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null);
@@ -89,7 +89,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             using FuncLog funcLog = new(new { balanceKind, categoryId, itemId });
 
-            await this.SeriesSelectorVM.LoadAsync(new Keys(balanceKind, categoryId, itemId), SelectorMode.FirstOrDefault);
+            await this.SeriesSelectorVM.LoadAsync(new Keys(balanceKind, categoryId, itemId));
         }
 
         public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)

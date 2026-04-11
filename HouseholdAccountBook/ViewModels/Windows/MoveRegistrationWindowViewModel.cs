@@ -251,7 +251,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.CommissionKindSelectorVM.SetLoader(() => CommissionKindStr);
             this.RemarkSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadRemarkListAsync(this.ItemSelectorVM.SelectedKey, true),
-                () => this.ItemSelectorVM.SelectedKey != null);
+                () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
         }
 
         public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
@@ -398,7 +398,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             IEnumerable<ActionIdObj> resActionIdList = await this.mService.SaveMoveActionsAsync(fromAction, toAction, commissionAction);
 
             if (commissionAction.Amount != 0) {
-                if (commissionAction.Remark != null && commissionAction.Remark != string.Empty) {
+                if (!string.IsNullOrEmpty(commissionAction.Remark)) {
                     RemarkModel remark = new(commissionAction.Remark) { ItemId = commissionAction.Item.Id, CurrentActTime = commissionAction.ActTime };
                     await this.mService.SaveRemarkAsync(remark);
                 }
