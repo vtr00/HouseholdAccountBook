@@ -10,7 +10,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
     /// <summary>
     /// ウィンドウ情報ログ
     /// </summary>
-    public class WindowLog
+    public class WindowLog : IDisposable
     {
         /// <summary>
         /// ウィンドウ情報ログ設定
@@ -57,6 +57,21 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// </summary>
         public static string WindowLocationFileExt { get; set; } = "txt";
         /// <summary>
+        /// アプリ起動時間
+        /// </summary>
+        public static DateTime AppStartupTime {
+            get {
+                if (field == default) {
+                    DateTime dt = DateTime.Now;
+                    if (Application.Current is App app) {
+                        dt = app.StartupTime;
+                    }
+                    field = dt;
+                }
+                return field;
+            }
+        }
+        /// <summary>
         /// ファイルパス
         /// </summary>
         public static string WindowLocationFilePath(string windowName) => string.Format($@"{WindowLocationFolderPath}\{windowName}_{AppStartupTime:yyyyMMdd_HHmmss}.{WindowLocationFileExt}");
@@ -69,11 +84,6 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// ログ設定
         /// </summary>
         public static Configulation Config { get; set; } = new();
-
-        /// <summary>
-        /// アプリ起動時間
-        /// </summary>
-        public static DateTime AppStartupTime { get; } = DateTime.Now;
         #endregion
 
         /// <summary>
@@ -93,8 +103,14 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// </summary>
         ~WindowLog()
         {
+            this.Dispose();
+        }
+
+        public void Dispose()
+        {
             SystemEvents.DisplaySettingsChanging -= this.SystemEvents_DisplaySettingsChanging;
             SystemEvents.DisplaySettingsChanged -= this.SystemEvents_DisplaySettingsChanged;
+            GC.SuppressFinalize(this);
         }
 
         private void SystemEvents_DisplaySettingsChanging(object sender, EventArgs e) => this.Log("DisplaySettingsChanging", true);

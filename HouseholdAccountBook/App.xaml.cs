@@ -57,7 +57,7 @@ namespace HouseholdAccountBook
         private async void App_Startup(object sender, StartupEventArgs e)
         {
             // ログ関連の設定
-            LogImpl.Instance.Config = UserSettingService.Instance.LogConfig;
+            LogImpl.Config = UserSettingService.Instance.LogConfig;
             using FuncLog funcLog = new();
             ExceptionLog.Config = UserSettingService.Instance.ExceptionLogConfig;
             WindowLog.Config = UserSettingService.Instance.WindowLogConfig;

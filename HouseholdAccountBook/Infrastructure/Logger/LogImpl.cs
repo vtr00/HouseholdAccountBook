@@ -49,15 +49,24 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// </summary>
         public static string LogFileExt { get; set; } = "txt";
         /// <summary>
-        /// ログファイルパス
+        /// アプリ起動時間
         /// </summary>
-        public static string LogFilePath {
+        public static DateTime AppStartupTime {
             get {
-                App app = Application.Current as App;
-                DateTime dt = app.StartupTime;
-                return string.Format($@"{LogFolderPath}\{dt:yyyyMMdd_HHmmss}.{LogFileExt}");
+                if (field == default) {
+                    DateTime dt = DateTime.Now;
+                    if (Application.Current is App app) {
+                        dt = app.StartupTime;
+                    }
+                    field = dt;
+                }
+                return field;
             }
         }
+        /// <summary>
+        /// ログファイルパス
+        /// </summary>
+        public static string LogFilePath => string.Format($@"{LogFolderPath}\{AppStartupTime:yyyyMMdd_HHmmss}.{LogFileExt}");
         /// <summary>
         /// ログファイル名パターン
         /// </summary>
@@ -180,8 +189,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
 
             if (level < Config.OutputLogLevel) { return; }
 
-            int index = filePath.LastIndexOf('\\');
-            string fileName = filePath.Substring(index + 1, filePath.IndexOf('.', index + 1) - index - 1);
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
 
             string callerStr = fileName;
             if (methodName != ".ctor") {
