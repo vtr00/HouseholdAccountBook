@@ -350,8 +350,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 OutputLogLevel = this.LogLevelSelectorVM.SelectedKey
             };
             UserSettingService.Instance.WindowLogConfig = new() {
-                OutputLog = this.SelectedIfOutputOperationLog,
-                LogFileAmount = this.InputedOperationLogNum
+                OutputLog = this.SelectedIfOutputWindowLog,
+                LogFileAmount = this.InputedWindowLogNum
             };
             UserSettingService.Instance.ExceptionLogConfig = new() {
                 LogFileAmount = this.InputedUnhandledExceptionLogNum

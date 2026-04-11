@@ -124,7 +124,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             };
 
             UserSettingService.Instance.PostgreSQLBackupConfig = new() {
-                DumpExePath = this.InputedRestoreExePath,
+                DumpExePath = this.InputedDumpExePath,
                 RestoreExePath = this.InputedRestoreExePath,
                 PasswordInput = this.SelectedPasswordInput
             };

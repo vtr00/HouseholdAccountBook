@@ -606,7 +606,11 @@ namespace HouseholdAccountBook.Models.AppServices
                 this.mSettings.App_Postgres_UserName = value.UserName;
                 this.mSettings.App_Postgres_Password = string.Empty; // 暗号化して保存するため空にする
                 this.mSettings.App_Postgres_EncryptedPassword = value.EncryptedPassword;
+#if DEBUG
+                this.mSettings.App_Postgres_DatabaseName_Debug = value.DatabaseName;
+#else
                 this.mSettings.App_Postgres_DatabaseName = value.DatabaseName;
+#endif
                 this.mSettings.App_Postgres_Role = value.Role;
                 this.mSettings.Save();
             }

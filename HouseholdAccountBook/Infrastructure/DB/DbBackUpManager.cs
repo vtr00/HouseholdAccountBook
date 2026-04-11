@@ -34,7 +34,7 @@ namespace HouseholdAccountBook.Infrastructure.DB
             /// </summary>
             public bool ExecuteAtMinimizing { get; set; }
             /// <summary>
-            /// メインウィンドウを最小化したときにバックアップを行う間隔[ms]
+            /// メインウィンドウを最小化したときにバックアップを行う間隔[min.]
             /// </summary>
             public int IntervalMinAtMinimizing { get; set; }
             /// <summary>

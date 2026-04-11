@@ -127,6 +127,7 @@ namespace HouseholdAccountBook
             DbBackUpManager.Instance.DbHandlerFactory = dbHandlerFactory;
             DbBackUpManager.Instance.Config = UserSettingService.Instance.DbBackupConfig;
             DbBackUpManager.Instance.NpgsqlBackupConfig = UserSettingService.Instance.PostgreSQLBackupConfig;
+            DbBackUpManager.Instance.BackUpCurrentAtMinimizing = UserSettingService.Instance.CurrentBackUpAtMinimizing;
 
             // DBのマイグレーションを実行する
             bool migrateResult = await DbUtil.UpMigrateAsync(dbHandlerFactory);

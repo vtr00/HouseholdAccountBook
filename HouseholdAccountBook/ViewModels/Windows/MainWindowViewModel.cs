@@ -757,7 +757,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// カスタムファイル -> PostgreSQL インポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool ImportCustomFileCommand_CanExecute() => this.IsPostgreSQL && DbBackUpManager.Instance.NpgsqlBackupConfig?.RestoreExePath != string.Empty && !this.IsChildrenWindowOpened();
+        public bool ImportCustomFileCommand_CanExecute() => this.IsPostgreSQL && (DbBackUpManager.Instance.NpgsqlBackupConfig?.RestoreExePath ?? string.Empty) != string.Empty && !this.IsChildrenWindowOpened();
         /// <summary>
         /// カスタムファイル -> PostgreSQL インポートコマンド処理
         /// </summary>
@@ -871,7 +871,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// カスタムファイルエクスポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool ExportCustomFileCommand_CanExecute() => this.IsPostgreSQL && DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath != string.Empty && !this.IsChildrenWindowOpened();
+        public bool ExportCustomFileCommand_CanExecute() => this.IsPostgreSQL && (DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath ?? string.Empty) != string.Empty && !this.IsChildrenWindowOpened();
         /// <summary>
         /// カスタムファイルエクスポートコマンド処理
         /// </summary>
@@ -903,7 +903,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// SQLファイルエクスポートコマンド実行可能か
         /// </summary>
         /// <returns></returns>
-        public bool ExportSQLFileCommand_CanExecute() => this.IsPostgreSQL && DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath != string.Empty && !this.IsChildrenWindowOpened();
+        public bool ExportSQLFileCommand_CanExecute() => this.IsPostgreSQL && (DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath ?? string.Empty) != string.Empty && !this.IsChildrenWindowOpened();
         /// <summary>
         /// SQLファイルエクスポートコマンド処理
         /// </summary>
