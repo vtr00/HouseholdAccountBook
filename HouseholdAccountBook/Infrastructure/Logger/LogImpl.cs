@@ -75,7 +75,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <summary>
         /// ログ設定
         /// </summary>
-        public static Configuration Config {
+        public Configuration Config {
             get;
             set {
                 field = value;
@@ -101,7 +101,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         private LogImpl()
         {
             Log.OutputImpl = this.WriteLine;
-            Log.IsVarsOutputImpl = level => Config.OutputLogLevel <= level;
+            Log.IsVarsOutputImpl = level => this.Config.OutputLogLevel <= level;
 
             Trace.AutoFlush = true;
             _ = Trace.Listeners.Add(new ConsoleTraceListener());
@@ -168,7 +168,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <summary>
         /// 古いログファイルを削除する
         /// </summary>
-        public static void DeleteOldLogFiles() => FileUtil.DeleteOldFiles(LogFolderPath, LogFileNamePattern, Config.LogFileAmount);
+        public static void DeleteOldLogFiles() => FileUtil.DeleteOldFiles(LogFolderPath, LogFileNamePattern, Instance.Config.LogFileAmount);
 
         /// <summary>
         /// ログファイルにログを1行出力する
@@ -180,16 +180,17 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// <param name="lineNumber">出力元行数(負の場合は絶対値の数だけ「-」を繰り返す)</param>
         private void WriteLine(Log.LogLevel level, string message, string filePath, string methodName, int lineNumber)
         {
-            if (Config.OutputLogToFile && 0 < Config.LogFileAmount) {
+            if (this.Config.OutputLogToFile && 0 < this.Config.LogFileAmount) {
                 this.CreateLogFileListener();
             }
             else {
                 this.DeleteLogFileListener();
             }
 
-            if (level < Config.OutputLogLevel) { return; }
+            if (level < this.Config.OutputLogLevel) { return; }
 
             string fileName = Path.GetFileNameWithoutExtension(filePath);
+            fileName = fileName.Replace(".xaml", "");
 
             string callerStr = fileName;
             if (methodName != ".ctor") {

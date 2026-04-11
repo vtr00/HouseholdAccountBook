@@ -358,7 +358,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             };
 
             // 設定をログクラスに反映する
-            LogImpl.Config = UserSettingService.Instance.LogConfig;
+            LogImpl.Instance.Config = UserSettingService.Instance.LogConfig;
             ExceptionLog.Config = UserSettingService.Instance.ExceptionLogConfig;
             WindowLog.Config = UserSettingService.Instance.WindowLogConfig;
 
