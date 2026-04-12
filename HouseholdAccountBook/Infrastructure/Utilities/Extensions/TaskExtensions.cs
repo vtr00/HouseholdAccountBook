@@ -11,7 +11,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
     public static class TaskExtensions
     {
         /// <summary>
-        /// <see cref="Task"/> を呼び出し元で待機せずに実行し、完了後に例外をUIスレッドで処理する
+        /// <see cref="Task"/> を呼び出し元で待機せずに実行し、完了後の例外を現在の継続コンテキストで処理する
         /// </summary>
         /// <remarks>
         /// <see cref="OperationCanceledException"/> は無視し、それ以外の例外は再スローする
@@ -28,7 +28,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
                 Log.Info($"{methodName} Canceled.", fileName, methodName);
             }
             catch (Exception) {
-                Log.Error("Exception Occured.", fileName, methodName, lineNumber);
+                Log.Error("Exception Occurred.", fileName, methodName, lineNumber);
                 throw;
             }
         }

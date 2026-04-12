@@ -243,7 +243,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     BookIdObj bookId = this.CommissionKindSelectorVM.SelectedKey switch {
                         CommissionKind.MoveFrom => this.FromBookSelectorVM.SelectedKey,
                         CommissionKind.MoveTo => this.ToBookSelectorVM.SelectedKey,
-                        _ => throw new NotSupportedException("SelectedComissionKind"),
+                        _ => throw new NotSupportedException("SelectedCommissionKind"),
                     };
                     return await this.mAppService.LoadItemListAsync(bookId, BalanceKind.Expenses, CategoryIdObj.System);
                 },
@@ -390,13 +390,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 Base = new(this.CommissionId, commissionKind switch {
                     CommissionKind.MoveFrom => fromAction.ActTime,
                     CommissionKind.MoveTo => toAction.ActTime,
-                    _ => throw new NotSupportedException("SelectedComissionKind")
+                    _ => throw new NotSupportedException("SelectedCommissionKind")
                 }, -this.InputedCommission ?? 0),
                 GroupId = this.GroupId,
                 Book = new(commissionKind switch {
                     CommissionKind.MoveFrom => fromAction.Book.Id,
                     CommissionKind.MoveTo => toAction.Book.Id,
-                    _ => throw new NotSupportedException("SelectedComissionKind")
+                    _ => throw new NotSupportedException("SelectedCommissionKind")
                 }, string.Empty),
                 Item = new(this.ItemSelectorVM.SelectedKey, string.Empty),
                 Remark = this.RemarkSelectorVM.SelectedKey

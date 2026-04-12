@@ -173,7 +173,18 @@ namespace HouseholdAccountBook
             using FuncLog funcLog = new();
 
             if (!e.Observed) {
-                NotifyException(e.Exception);
+                // UIスレッドを取得する
+                Dispatcher dispatcher = Application.Current?.Dispatcher;
+                if (dispatcher is not null) {
+                    // 現在のスレッドをチェックする
+                    if (dispatcher.CheckAccess()) {
+                        NotifyException(e.Exception);
+                    }
+                    else {
+                        // UIスレッドで非同期に実行する
+                        _ = dispatcher.BeginInvoke(NotifyException, e.Exception);
+                    }
+                }
             }
             e.SetObserved();
         }
@@ -202,7 +213,7 @@ namespace HouseholdAccountBook
             using FuncLog funcLog = new();
 
             try {
-                Log.Error("Unhandled Exception Occured.");
+                Log.Error("Unhandled Exception Occurred.");
 
                 Log.Error($"Unhandled Exception Message: {exp.Message}");
 
@@ -216,7 +227,7 @@ namespace HouseholdAccountBook
                 NotificationService.NotifyUnhandledException(absoluteFilePath);
             }
             catch (Exception ex) {
-                Log.Error($"Exception Occured in Unhandled Exception Handler: {ex.Message}");
+                Log.Error($"Exception Occurred in Unhandled Exception Handler: {ex.Message}");
                 Current.Shutdown(1); // 例外処理中に例外が発生した場合は強制終了
             }
         }
