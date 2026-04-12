@@ -1126,4 +1126,13 @@ list</value>
   <data name="Menu_Help_ReleaseNote" xml:space="preserve">
     <value>Release note (_N)...</value>
   </data>
+  <data name="Menu_Debug" xml:space="preserve">
+    <value>Debug (_D)</value>
+  </data>
+  <data name="Menu_Debug_ThrowUnobservedTaskException" xml:space="preserve">
+    <value>Throw unobserved task exception (_O)</value>
+  </data>
+  <data name="Menu_Debug_ThrowUnhandledException" xml:space="preserve">
+    <value>Throw unhandled exception (_H)</value>
+  </data>
 </root>

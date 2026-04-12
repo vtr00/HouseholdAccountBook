@@ -164,8 +164,6 @@ namespace HouseholdAccountBook
         /// <summary>
         /// 未観測のタスク例外が発生したときに処理を行う
         /// </summary>
-        ///
-        /// <remarks>このメソッドは、未観測のタスク例外が発生した際に例外通知を行い、例外が観測済みであることをマークする</remarks>
         /// <param name="sender">イベントの発生元となるオブジェクト</param>
         /// <param name="e">未観測のタスク例外に関するデータを格納するイベント引数</param>
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
@@ -173,17 +171,11 @@ namespace HouseholdAccountBook
             using FuncLog funcLog = new();
 
             if (!e.Observed) {
-                // UIスレッドを取得する
-                Dispatcher dispatcher = Application.Current?.Dispatcher;
-                if (dispatcher is not null) {
-                    // 現在のスレッドをチェックする
-                    if (dispatcher.CheckAccess()) {
-                        NotifyException(e.Exception);
-                    }
-                    else {
-                        // UIスレッドで非同期に実行する
-                        _ = dispatcher.BeginInvoke(NotifyException, e.Exception);
-                    }
+                if (e.Exception is AggregateException exp && exp.InnerException is not null) {
+                    NotifyException(exp.InnerException);
+                }
+                else {
+                    NotifyException(e.Exception);
                 }
             }
             e.SetObserved();
@@ -197,9 +189,9 @@ namespace HouseholdAccountBook
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             using FuncLog funcLog = new();
-            e.Handled = true;
 
             NotifyException(e.Exception);
+            e.Handled = true;
         }
 
         /// <summary>
@@ -208,11 +200,27 @@ namespace HouseholdAccountBook
         ///
         /// <remarks>このメソッドは例外情報をファイルに保存し、そのファイルのパスを通知サービスに渡して通知を行う。例外処理中にさらに例外が発生した場合は、アプリケーションを強制終了する</remarks>
         /// <param name="exp">通知対象となる未処理例外を表す <see cref="Exception"/> オブジェクト</param>
-        private static void NotifyException(Exception exp)
+        /// <param name="onlyLogging">ログ出力のみとするか</param>
+        private static void NotifyException(Exception exp, bool onlyLogging = false)
         {
             using FuncLog funcLog = new();
 
             try {
+                // UIスレッドを取得する
+                Dispatcher dispatcher = Application.Current?.Dispatcher;
+                if (dispatcher is not null) {
+                    // 現在のスレッドがUIスレッドでない場合は、UIスレッドで非同期に実行する
+                    if (!dispatcher.CheckAccess()) {
+                        _ = dispatcher.BeginInvoke(() => NotifyException(exp));
+                        return;
+                    }
+                }
+                else {
+                    // UIスレッドが取得できない場合は、ログ出力だけ行う
+                    NotifyException(exp, true);
+                    return;
+                }
+
                 Log.Error("Unhandled Exception Occurred.");
 
                 Log.Error($"Unhandled Exception Message: {exp.Message}");
@@ -222,9 +230,11 @@ namespace HouseholdAccountBook
                 log.Log(exp);
                 Log.Info($"Create Unhandled Exception Info File: {log.RelatedFilePath}");
 
-                // ハンドルされない例外の発生を通知する
-                string absoluteFilePath = Path.Combine(GetCurrentDir(), log.RelatedFilePath);
-                NotificationService.NotifyUnhandledException(absoluteFilePath);
+                if (!onlyLogging) {
+                    // ハンドルされない例外の発生を通知する
+                    string absoluteFilePath = Path.Combine(GetCurrentDir(), log.RelatedFilePath);
+                    NotificationService.NotifyUnhandledException(absoluteFilePath);
+                }
             }
             catch (Exception ex) {
                 Log.Error($"Exception Occurred in Unhandled Exception Handler: {ex.Message}");

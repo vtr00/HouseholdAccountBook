@@ -1126,4 +1126,13 @@
   <data name="Menu_Help_ReleaseNote" xml:space="preserve">
     <value>リリースノート(_N)...</value>
   </data>
+  <data name="Menu_Debug" xml:space="preserve">
+    <value>デバッグ(_D)</value>
+  </data>
+  <data name="Menu_Debug_ThrowUnobservedTaskException" xml:space="preserve">
+    <value>未観測タスク例外スロー(_O)</value>
+  </data>
+  <data name="Menu_Debug_ThrowUnhandledException" xml:space="preserve">
+    <value>未処理例外スロー(_H)</value>
+  </data>
 </root>

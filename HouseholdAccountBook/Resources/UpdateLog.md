@@ -8,10 +8,11 @@
 
 - 全体
    - ＋デタッチしたタスクで観測されない例外が発生した場合に通知する機能を追加 - refs #136
-   - △SelectorViewModelでの選択変更処理後に発生した例外を処理するように変更 - refs #136
+   - △SelectorViewModelでの選択変更処理後に発生した例外を捕捉するように変更 - refs #136
 
 - MainWindow
    - ↑SelectedTabの変更時にSelectedTabIndexの更新通知が漏れていたため修正 - refs #134
+   - ＋デバッグモード時に、例外を故意に起こすメニューを追加 - refs #136
 
 - ActionRegistrationWindow, ActionListRegistrationWindow, MoveRegistrationWindow
    - ↑編集時、店舗 / 備考が表示されないのを修正 - refs #133
@@ -19,12 +20,12 @@
    - △項目変更時、店舗 / 備考の選択が維持されるように変更 - refs #133
 
 - MoveRegistrationWindow
-   - ↑手数料の負担帳簿を変更したときに例外が発生するのを修正 - refs #136
+   - ↑手数料を負担する帳簿を変更したときに例外が発生するのを修正 - refs #136
 
 ### 2026-04-11
 
 - 全体
-   - UpdateLog.txt を UpdateLog.md に変更 - refs #130
+   - △UpdateLog.txt を UpdateLog.md に変更 - refs #130
    - △設定(Properties.Settings)を直接操作していたのをUserSettingService経由で操作するように変更 - refs #121
    - ↑例外が発生しうる潜在的不具合を修正 - refs #121
    - ＋開発環境の改行コードをCRLFに固定する設定を追加 - refs #121
