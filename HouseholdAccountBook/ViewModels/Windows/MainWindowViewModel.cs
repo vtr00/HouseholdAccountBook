@@ -221,6 +221,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 Tabs oldValue = field;
                 if (this.SetProperty(ref field, value)) {
                     this.SelectedTabChanged?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
+                    this.RaisePropertyChanged(nameof(this.SelectedTabIndex));
                     this.RaisePropertyChanged(nameof(this.DisplayedStart));
                     this.RaisePropertyChanged(nameof(this.DisplayedEnd));
                 }
