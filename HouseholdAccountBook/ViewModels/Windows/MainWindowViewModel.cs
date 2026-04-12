@@ -600,6 +600,21 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public ICommand UpdateCommand => field ??= new AsyncRelayCommand(this.UpdateCommand_ExecuteAsync);
         #endregion
 
+        #region デバッグコマンド
+        /// <summary>
+        /// デバッグコマンド
+        /// </summary>
+        public ICommand DebugCommand => field ?? new RelayCommand(this.DebugCommand_CanExecute);
+        /// <summary>
+        /// 未処理例外スローコマンド
+        /// </summary>
+        public ICommand ThrowUnhandledExceptionCommand => field ?? new RelayCommand(this.ThrowUnhandledExceptionCommand_Execute);
+        /// <summary>
+        /// 未観測タスク例外スローコマンド
+        /// </summary>
+        public ICommand ThrowUnobservedTaskExceptionCommand => field ?? new RelayCommand(this.ThrowUnobservedTaskExceptionCommand_Execute);
+        #endregion
+
         #region ツールコマンド
         /// <summary>
         /// ツールメニューコマンド
@@ -1198,10 +1213,31 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
+        #region デバッグメニュー
+        /// <summary>
+        /// デバッグコマンド実行可能か
+        /// </summary>
+        /// <returns></returns>
+        private bool DebugCommand_CanExecute() => !this.IsChildrenWindowOpened();
+
+        /// <summary>
+        /// 未処理例外スローコマンド処理
+        /// </summary>
+        /// <exception cref="Exception"></exception>
+        private void ThrowUnhandledExceptionCommand_Execute() => throw new Exception("for debug");
+
+        /// <summary>
+        /// 未観測タスク例外スローコマンド処理
+        /// </summary>
+        /// <exception cref="Exception"></exception>
+        private void ThrowUnobservedTaskExceptionCommand_Execute() => new Task(static () => throw new Exception("for debug")).Start();
+        #endregion
+
         #region ツールメニュー
         /// <summary>
         /// ツールコマンド実行可能か
         /// </summary>
+        /// <returns></returns>
         private bool ToolCommand_CanExecute() => !this.IsChildrenWindowOpened();
 
         /// <summary>

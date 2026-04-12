@@ -252,6 +252,14 @@
                 <!-- 更新 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Update}" Command="{Binding UpdateCommand}" InputGestureText="F5"/>
             </MenuItem>
+            <!-- デバッグ -->
+            <MenuItem Header="{x:Static properties:Resources.Menu_Debug}" Command="{Binding DebugCommand}"
+                      Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}">
+                <!-- 未処理例外スロー -->
+                <MenuItem Header="{x:Static properties:Resources.Menu_Debug_ThrowUnhandledException}" Command="{Binding ThrowUnhandledExceptionCommand}"/>
+                <!-- 未観測タスク例外スロー -->
+                <MenuItem Header="{x:Static properties:Resources.Menu_Debug_ThrowUnobservedTaskException}" Command="{Binding ThrowUnobservedTaskExceptionCommand}"/>
+            </MenuItem>
             <!-- ツール -->
             <MenuItem Header="{x:Static properties:Resources.Menu_Tool}" Command="{Binding ToolMenuCommand}">
                 <!-- CSV比較 -->

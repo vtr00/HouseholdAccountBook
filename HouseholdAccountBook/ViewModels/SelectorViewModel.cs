@@ -117,8 +117,8 @@ namespace HouseholdAccountBook.ViewModels
                     if (!this.mOnLoad) {
                         // NULLの場合に通知するか
                         if (this.mSelectedKey != null || this.mItemChangedIfNull) {
-                            // 待機せずデタッチして選択時の処理をする
-                            _ = this.OnSelectionChangedAsync(old, this.mSelectedKey);
+                            // 待機せず選択時の処理をする
+                            this.OnSelectionChangedAsync(old, this.mSelectedKey).FireAndForget();
                         }
                     }
 
@@ -147,8 +147,8 @@ namespace HouseholdAccountBook.ViewModels
                     if (!this.mOnLoad) {
                         // NULLの場合に通知するか
                         if (this.mSelectedKey != null || this.mItemChangedIfNull) {
-                            // 待機せずデタッチして選択時の処理をする
-                            _ = this.OnSelectionChangedAsync(old, this.mSelectedKey);
+                            // 待機せず選択時の処理をする
+                            this.OnSelectionChangedAsync(old, this.mSelectedKey).FireAndForget();
                         }
                     }
 

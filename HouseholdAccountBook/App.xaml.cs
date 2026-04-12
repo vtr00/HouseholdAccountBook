@@ -63,6 +63,9 @@ namespace HouseholdAccountBook
             WindowLog.Config = UserSettingService.Instance.WindowLogConfig;
             WindowLocationManager.Config = UserSettingService.Instance.WindowLocationConfig;
 
+            // タスク例外発生時の処理を登録する
+            TaskScheduler.UnobservedTaskException += this.TaskScheduler_UnobservedTaskException;
+
             // shift-jis を使用するために必要
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -159,6 +162,26 @@ namespace HouseholdAccountBook
         }
 
         /// <summary>
+        /// 未観測のタスク例外が発生したときに処理を行う
+        /// </summary>
+        /// <param name="sender">イベントの発生元となるオブジェクト</param>
+        /// <param name="e">未観測のタスク例外に関するデータを格納するイベント引数</param>
+        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            using FuncLog funcLog = new();
+
+            if (!e.Observed) {
+                if (e.Exception is AggregateException exp && exp.InnerException is not null) {
+                    NotifyException(exp.InnerException);
+                }
+                else {
+                    NotifyException(e.Exception);
+                }
+            }
+            e.SetObserved();
+        }
+
+        /// <summary>
         /// ハンドルされない例外発生時
         /// </summary>
         /// <param name="sender"></param>
@@ -167,23 +190,54 @@ namespace HouseholdAccountBook
         {
             using FuncLog funcLog = new();
 
-            try {
-                Log.Error("Unhandled Exception Occured.");
+            NotifyException(e.Exception);
+            e.Handled = true;
+        }
 
-                e.Handled = true;
-                Log.Error($"Unhandled Exception Message: {e.Exception.Message}");
+        /// <summary>
+        /// 未処理の例外が発生した際に、例外情報をログに記録し、通知サービスを通じて通知する
+        /// </summary>
+        ///
+        /// <remarks>このメソッドは例外情報をファイルに保存し、そのファイルのパスを通知サービスに渡して通知を行う。例外処理中にさらに例外が発生した場合は、アプリケーションを強制終了する</remarks>
+        /// <param name="exp">通知対象となる未処理例外を表す <see cref="Exception"/> オブジェクト</param>
+        /// <param name="onlyLogging">ログ出力のみとするか</param>
+        private static void NotifyException(Exception exp, bool onlyLogging = false)
+        {
+            using FuncLog funcLog = new();
+
+            try {
+                // UIスレッドを取得する
+                Dispatcher dispatcher = Application.Current?.Dispatcher;
+                if (dispatcher is not null) {
+                    // 現在のスレッドがUIスレッドでない場合は、UIスレッドで非同期に実行する
+                    if (!dispatcher.CheckAccess()) {
+                        _ = dispatcher.BeginInvoke(() => NotifyException(exp));
+                        return;
+                    }
+                }
+                else {
+                    // UIスレッドが取得できない場合は、ログ出力だけ行う
+                    NotifyException(exp, true);
+                    return;
+                }
+
+                Log.Error("Unhandled Exception Occurred.");
+
+                Log.Error($"Unhandled Exception Message: {exp.Message}");
 
                 // 例外情報をファイルに保存する
                 ExceptionLog log = new();
-                log.Log(e.Exception);
+                log.Log(exp);
                 Log.Info($"Create Unhandled Exception Info File: {log.RelatedFilePath}");
 
-                // ハンドルされない例外の発生を通知する
-                string absoluteFilePath = Path.Combine(GetCurrentDir(), log.RelatedFilePath);
-                NotificationService.NotifyUnhandledException(absoluteFilePath);
+                if (!onlyLogging) {
+                    // ハンドルされない例外の発生を通知する
+                    string absoluteFilePath = Path.Combine(GetCurrentDir(), log.RelatedFilePath);
+                    NotificationService.NotifyUnhandledException(absoluteFilePath);
+                }
             }
             catch (Exception ex) {
-                Log.Error($"Exception Occured in Unhandled Exception Handler: {ex.Message}");
+                Log.Error($"Exception Occurred in Unhandled Exception Handler: {ex.Message}");
                 Current.Shutdown(1); // 例外処理中に例外が発生した場合は強制終了
             }
         }

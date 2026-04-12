@@ -239,8 +239,8 @@ namespace HouseholdAccountBook.ViewModels
                 catch (OperationCanceledException) {
                     _ = tcs.TrySetCanceled();
                 }
-                catch (Exception ex) {
-                    _ = tcs.TrySetException(ex);
+                catch (Exception exp) {
+                    _ = tcs.TrySetException(exp);
                 }
                 finally {
                     progressWindow?.CloseOnCode();
@@ -272,9 +272,7 @@ namespace HouseholdAccountBook.ViewModels
                 await (this.mMode != ExecutionMode.ProgressWindow ? ExecWrapper(null) : tcs.Task);
             }
             catch (OperationCanceledException) {
-                // ここに至るまでにキャンセルが処理されていないなら例外をrethrowする
-                Log.Debug($"{this.mMemberName} Canceled.", this.mFileName, this.mMemberName);
-                throw;
+                Log.Info($"{this.mMemberName} Canceled.", this.mFileName, this.mMemberName);
             }
             catch (Exception) {
                 Log.Error("Unhandled Exception Occurred.", this.mFileName, this.mMemberName);
