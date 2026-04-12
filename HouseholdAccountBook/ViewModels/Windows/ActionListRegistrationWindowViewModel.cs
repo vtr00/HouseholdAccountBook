@@ -200,10 +200,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 () => this.BookSelectorVM.SelectedKey != null && this.CategorySelectorVM.SelectedKey != null);
             this.ShopSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadShopListAsync(this.ItemSelectorVM.SelectedKey, true),
-                () => this.ItemSelectorVM.SelectedKey != null);
+                () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
             this.RemarkSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadRemarkListAsync(this.ItemSelectorVM.SelectedKey, true),
-                () => this.ItemSelectorVM.SelectedKey != null);
+                () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
         }
 
         public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
@@ -346,12 +346,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             DateTime lastActTime = this.InputedDateValueVMList.Max(static tmp => tmp.ActDate);
 
-            if (commonAction.Shop != null && commonAction.Shop != string.Empty) {
+            if (!string.IsNullOrEmpty(commonAction.Shop)) {
                 ShopModel shop = new(commonAction.Shop) { ItemId = commonAction.Item.Id, CurrentActTime = commonAction.ActTime };
                 await this.mService.SaveShopAsync(shop);
             }
 
-            if (commonAction.Remark != null && commonAction.Remark != string.Empty) {
+            if (!string.IsNullOrEmpty(commonAction.Remark)) {
                 RemarkModel remark = new(commonAction.Remark) { ItemId = commonAction.Item.Id, CurrentActTime = commonAction.ActTime };
                 await this.mService.SaveRemarkAsync(remark);
             }

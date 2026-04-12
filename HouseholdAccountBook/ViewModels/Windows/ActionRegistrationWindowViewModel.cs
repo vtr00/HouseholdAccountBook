@@ -271,10 +271,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 () => this.BookSelectorVM.SelectedKey != null && this.CategorySelectorVM.SelectedKey != null);
             this.ShopSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadShopListAsync(this.ItemSelectorVM.SelectedKey, true),
-                () => this.ItemSelectorVM.SelectedKey != null);
+                () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
             this.RemarkSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadRemarkListAsync(this.ItemSelectorVM.SelectedKey, true),
-                () => this.ItemSelectorVM.SelectedKey != null);
+                () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
             this.HolidaySettingSelectorVM.SetLoader(() => HolidaySettingKindStr);
         }
 
@@ -400,12 +400,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             ActionIdObj resActionId = await this.mService.SaveActionAsync(action, this.InputedCount, this.SelectedIfLink, this.HolidaySettingSelectorVM.SelectedKey);
 
-            if (action.Shop != null && action.Shop != string.Empty) {
+            if (!string.IsNullOrEmpty(action.Shop)) {
                 ShopModel shop = new(action.Shop) { ItemId = action.Item.Id, CurrentActTime = action.ActTime };
                 await this.mService.SaveShopAsync(shop);
             }
 
-            if (action.Remark != null && action.Remark != string.Empty) {
+            if (!string.IsNullOrEmpty(action.Remark)) {
                 RemarkModel remark = new(action.Remark) { ItemId = action.Item.Id, CurrentActTime = action.ActTime };
                 await this.mService.SaveRemarkAsync(remark);
             }

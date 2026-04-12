@@ -10,20 +10,23 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 #nullable enable
 
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
-    /// <see cref="SelectorViewModel"/> で <see cref="KEY"/> を選択するモード
+    /// <see cref="SelectorViewModel{VM, KEY}"/> で読み込み時に KEY を選択するモード
     /// </summary>
     public enum SelectorMode
     {
         // 一致する項目がなければデフォルト(KEYがクラスなら選択なし状態)を選択する
         FirstOrDefault,
         // 一致する項目がなければ先頭の項目を選択する
-        FirstOrElementAtOrDefault
+        FirstOrElementAtOrDefault,
+        // 一致する項目がなくとも選択する
+        Force
     }
 
     /// <summary>
@@ -64,6 +67,10 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         private Func<FuncLog, CancellationToken, Task<IEnumerable<VM>>>? mLoadAsync;
         /// <summary>
+        /// 読み込み時の選択モード
+        /// </summary>
+        private SelectorMode mMode;
+        /// <summary>
         /// 読込処理中か
         /// </summary>
         private bool mOnLoad = false;
@@ -100,16 +107,18 @@ namespace HouseholdAccountBook.ViewModels
         /// 選択 <see cref="VM"/>
         /// </summary>
         public VM? SelectedItem {
-            get;
+            get => this.mSelectedItem;
             set {
-                KEY? old = this.SelectedKey;
-                if (this.SetProperty(ref field, value)) {
+                KEY? old = this.mSelectedKey;
+                if (this.SetProperty(ref this.mSelectedItem, value)) {
+                    this.mSelectedKey = this.mSelector(value);
+
                     // 読込処理中以外か
                     if (!this.mOnLoad) {
                         // NULLの場合に通知するか
-                        if (this.SelectedKey != null || this.mItemChangedIfNull) {
+                        if (this.mSelectedKey != null || this.mItemChangedIfNull) {
                             // 待機せずデタッチして選択時の処理をする
-                            _ = this.OnSelectionChangedAsync(old, this.SelectedKey);
+                            _ = this.OnSelectionChangedAsync(old, this.mSelectedKey);
                         }
                     }
 
@@ -119,12 +128,39 @@ namespace HouseholdAccountBook.ViewModels
             }
         }
         /// <summary>
+        /// 選択 <see cref="VM"/> 内部値
+        /// </summary>
+        private VM? mSelectedItem = default;
+        /// <summary>
         /// 選択 <see cref="KEY"/>
         /// </summary>
+        /// <remarks>編集可能な <see cref="ComboBox"/> では <see cref="ComboBox.Text"/> とこのプロパティを Bind する</remarks>
         public KEY? SelectedKey {
-            get => this.mSelector.Invoke(this.SelectedItem) ?? default;
-            set => this.SelectedItem = this.ItemList.FirstOrElementAtOrDefault(vm => EqualityComparer<KEY>.Default.Equals(this.mSelector.Invoke(vm), value), 0);
+            get => this.mSelectedKey;
+            set {
+                KEY? old = this.mSelectedKey;
+                if (this.SetProperty(ref this.mSelectedKey, value)) {
+                    // KEYの一致するVMが存在するならSelectedItemに設定する。なければdefaultにしてfieldに入力値を保持する
+                    this.mSelectedItem = this.ItemList.FirstOrDefault(vm => KeyEquals(this.mSelector(vm), value));
+
+                    // 読込処理中以外か
+                    if (!this.mOnLoad) {
+                        // NULLの場合に通知するか
+                        if (this.mSelectedKey != null || this.mItemChangedIfNull) {
+                            // 待機せずデタッチして選択時の処理をする
+                            _ = this.OnSelectionChangedAsync(old, this.mSelectedKey);
+                        }
+                    }
+
+                    this.RaisePropertyChanged(nameof(this.SelectedItem));
+                    this.RaisePropertyChanged(nameof(this.SelectedIndex));
+                }
+            }
         }
+        /// <summary>
+        /// 選択 <see cref="KEY"/> 内部値
+        /// </summary>
+        private KEY? mSelectedKey = default;
         /// <summary>
         /// 選択インデックス
         /// </summary>
@@ -169,23 +205,34 @@ namespace HouseholdAccountBook.ViewModels
         }
 
         /// <summary>
-        /// <see cref="VM"> リスト読込処理を設定する
+        /// 2 つのキー値が等しいかどうかを判定する
         /// </summary>
-        /// <param name="load">[同期] <see cref="VM"/> リスト読込処理</param>
-        /// <param name="canLoad">Load可能判定処理</param>
-        public void SetLoader(Func<IEnumerable<VM>> load, Func<bool>? canLoad = null) => this.SetLoader(funcLog => load(), canLoad);
+        /// <remarks>このメソッドは型パラメーター KEY の既定の等値比較子を使用して比較を行う</remarks>
+        /// <param name="key1">比較する最初のキー値</param>
+        /// <param name="key2">比較する 2 番目のキー値</param>
+        /// <returns>キー値が等しい場合は <see langword="true"/>。それ以外の場合は <see langword="false"/></returns>
+        private static bool KeyEquals(KEY? key1, KEY? key2) => EqualityComparer<KEY>.Default.Equals(key1, key2);
+
         /// <summary>
         /// <see cref="VM"> リスト読込処理を設定する
         /// </summary>
         /// <param name="load">[同期] <see cref="VM"/> リスト読込処理</param>
         /// <param name="canLoad">Load可能判定処理</param>
-        public void SetLoader(Func<FuncLog, IEnumerable<VM>> load, Func<bool>? canLoad = null)
+        public void SetLoader(Func<IEnumerable<VM>> load, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault) =>
+            this.SetLoader(funcLog => load(), canLoad, mode);
+        /// <summary>
+        /// <see cref="VM"> リスト読込処理を設定する
+        /// </summary>
+        /// <param name="load">[同期] <see cref="VM"/> リスト読込処理</param>
+        /// <param name="canLoad">Load可能判定処理</param>
+        public void SetLoader(Func<FuncLog, IEnumerable<VM>> load, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault)
         {
             using FuncLog funcLog = new(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(SetLoader)}");
 
             this.mCanLoad = canLoad;
             this.mLoad = load;
             this.mLoadAsync = null;
+            this.mMode = mode;
         }
 
         /// <summary>
@@ -193,25 +240,28 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="loadAsync">[非同期] <see cref="VM"> リスト読込処理</param>
         /// <param name="canLoad">Load可能判定処理</param>
-        public void SetLoader(Func<Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null) => this.SetLoader((funcLog, token) => loadAsync(), canLoad);
+        public void SetLoader(Func<Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault) =>
+            this.SetLoader((funcLog, token) => loadAsync(), canLoad, mode);
         /// <summary>
         /// <see cref="VM"> リスト読込処理を設定する
         /// </summary>
         /// <param name="loadAsync">[非同期] <see cref="VM"> リスト読込処理</param>
         /// <param name="canLoad">Load可能判定処理</param>
-        public void SetLoader(Func<CancellationToken, Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null) => this.SetLoader((funcLog, token) => loadAsync(token), canLoad);
+        public void SetLoader(Func<CancellationToken, Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault) =>
+            this.SetLoader((funcLog, token) => loadAsync(token), canLoad, mode);
         /// <summary>
         /// <see cref="VM"> リスト読込処理を設定する
         /// </summary>
         /// <param name="loadAsync">[非同期] <see cref="VM"> リスト読込処理</param>
         /// <param name="canLoad">Load可能判定処理</param>
-        public void SetLoader(Func<FuncLog, CancellationToken, Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null)
+        public void SetLoader(Func<FuncLog, CancellationToken, Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault)
         {
             using FuncLog funcLog = new(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(SetLoader)}");
 
             this.mCanLoad = canLoad;
             this.mLoad = null;
             this.mLoadAsync = loadAsync;
+            this.mMode = mode;
         }
 
         /// <summary>
@@ -221,33 +271,18 @@ namespace HouseholdAccountBook.ViewModels
         private bool CanLoad() => this.mCanLoad?.Invoke() ?? true;
 
         /// <summary>
-        /// [非同期] <see cref="VM"/> リストを読込む
+        /// [非同期] <see cref="VM"/> リストを読込み、指定の <see cref="VM"/> を選択する
         /// </summary>
         /// <param name="token">キャンセル用トークン</param>
         /// <returns></returns>
-        public async Task LoadAsync(CancellationToken token = default) => await this.LoadAsync(default, SelectorMode.FirstOrElementAtOrDefault, token);
+        public async Task LoadAsync(CancellationToken token = default) => await this.LoadAsync(default, token);
         /// <summary>
         /// [非同期] <see cref="VM"/> リストを読込み、指定の <see cref="VM"/> を選択する
         /// </summary>
         /// <param name="selection"><see cref="VM"/> を選択するキー. nullの場合は現在選択中の <see cref="VM"/> を選択する</param>
         /// <param name="token">キャンセル用トークン</param>
         /// <returns></returns>
-        public async Task LoadAsync(KEY? selection, CancellationToken token) => await this.LoadAsync(selection, SelectorMode.FirstOrElementAtOrDefault, token);
-        /// <summary>
-        /// [非同期] <see cref="VM"/> リストを読込み、指定の <see cref="VM"/> を選択する
-        /// </summary>
-        /// <param name="mode"><see cref="VM"> を選択するモード</param>
-        /// <param name="token">キャンセル用トークン</param>
-        /// <returns></returns>
-        public async Task LoadAsync(SelectorMode mode, CancellationToken token = default) => await this.LoadAsync(default, mode, token);
-        /// <summary>
-        /// [非同期] <see cref="VM"/> リストを読込み、指定の <see cref="VM"/> を選択する
-        /// </summary>
-        /// <param name="selection"><see cref="VM"/> を選択するキー. nullの場合は現在選択中の <see cref="VM"/> を選択する</param>
-        /// <param name="mode"><see cref="VM"> を選択するモード</param>
-        /// <param name="token">キャンセル用トークン</param>
-        /// <returns></returns>
-        public async Task LoadAsync(KEY? selection, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault, CancellationToken token = default)
+        public async Task LoadAsync(KEY? selection, CancellationToken token = default)
         {
             using FuncLog funcLog = new(new { selection }, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(LoadAsync)}");
 
@@ -287,13 +322,21 @@ namespace HouseholdAccountBook.ViewModels
                 }
 
                 KEY? tmpSelection = selection ?? oldKey;
-                // ジェネリックで安全に比較するために、 EqualityComparer<T>.Default を用いる
-                this.SelectedItem = mode switch {
-                    SelectorMode.FirstOrElementAtOrDefault => this.ItemList.FirstOrElementAtOrDefault(vm => EqualityComparer<KEY>.Default.Equals(this.mSelector(vm), tmpSelection), 0),
-                    SelectorMode.FirstOrDefault => this.ItemList.FirstOrDefault(vm => EqualityComparer<KEY>.Default.Equals(this.mSelector(vm), tmpSelection)),
-                    _ => throw new NotImplementedException()
-                };
-                if (!EqualityComparer<KEY>.Default.Equals(this.SelectedKey, oldKey)) {
+                switch (this.mMode) {
+                    case SelectorMode.FirstOrElementAtOrDefault:
+                        this.SelectedItem = this.ItemList.FirstOrElementAtOrDefault(vm => KeyEquals(this.mSelector(vm), tmpSelection), 0);
+                        break;
+                    case SelectorMode.FirstOrDefault:
+                        this.SelectedItem = this.ItemList.FirstOrDefault(vm => KeyEquals(this.mSelector(vm), tmpSelection));
+                        break;
+                    case SelectorMode.Force:
+                        this.SelectedKey = tmpSelection;
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+
+                if (!KeyEquals(this.SelectedKey, oldKey)) {
                     // NULLの場合に通知するか
                     if (this.SelectedItem != null || this.mItemChangedIfNull) {
                         // 子の読込処理を待機するためにここで呼ぶ

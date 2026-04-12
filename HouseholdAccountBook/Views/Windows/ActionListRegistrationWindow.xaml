@@ -164,13 +164,13 @@
             <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_ShopName}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="7" Grid.Column="1" Margin="5" IsEditable="True"
-                      ItemsSource="{Binding ShopSelectorVM.ItemList}" Text="{Binding ShopSelectorVM.SelectedItem, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
+                      ItemsSource="{Binding ShopSelectorVM.ItemList}" Text="{Binding ShopSelectorVM.SelectedKey, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
 
             <!-- 備考 -->
             <TextBlock Grid.Row="8" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Remark}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="8" Grid.Column="1" Margin="5" IsEditable="True"
-                      ItemsSource="{Binding RemarkSelectorVM.ItemList}" Text="{Binding RemarkSelectorVM.SelectedItem, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
+                      ItemsSource="{Binding RemarkSelectorVM.ItemList}" Text="{Binding RemarkSelectorVM.SelectedKey, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
 
             <!-- 数値入力ポップアップ -->
             <controls:FollowablePopup x:Name="_popup" IsOpen="{Binding IsEditing, Mode=TwoWay}" AllowsTransparency="True" Placement="Bottom">
