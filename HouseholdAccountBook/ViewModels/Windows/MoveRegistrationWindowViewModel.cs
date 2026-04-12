@@ -231,24 +231,23 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <exception cref="ArgumentException"></exception>
         public MoveRegistrationWindowViewModel()
         {
             using FuncLog funcLog = new();
 
             this.FromBookSelectorVM.SetLoader(async () => await this.mAppService.LoadBookListAsync());
             this.ToBookSelectorVM.SetLoader(async () => await this.mAppService.LoadBookListAsync());
+            this.CommissionKindSelectorVM.SetLoader(() => CommissionKindStr);
             this.ItemSelectorVM.SetLoader(
                 async () => {
                     BookIdObj bookId = this.CommissionKindSelectorVM.SelectedKey switch {
                         CommissionKind.MoveFrom => this.FromBookSelectorVM.SelectedKey,
                         CommissionKind.MoveTo => this.ToBookSelectorVM.SelectedKey,
-                        _ => throw new ArgumentException("SelectedComissionKind"),
+                        _ => throw new NotSupportedException("SelectedComissionKind"),
                     };
                     return await this.mAppService.LoadItemListAsync(bookId, BalanceKind.Expenses, CategoryIdObj.System);
                 },
                 () => this.FromBookSelectorVM.SelectedKey != null && this.ToBookSelectorVM.SelectedKey != null);
-            this.CommissionKindSelectorVM.SetLoader(() => CommissionKindStr);
             this.RemarkSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadRemarkListAsync(this.ItemSelectorVM.SelectedKey, true),
                 () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
@@ -263,8 +262,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             this.FromBookSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
             this.ToBookSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-            this.ItemSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
             this.CommissionKindSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+            this.ItemSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
             this.RemarkSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
         }
 
@@ -316,8 +315,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     }
                     selectingFromBookId = fromAction.Book.Id;
                     selectingToBookId = toAction.Book.Id;
-                    selectingCommissionItemId = commissionAction?.Item.Id;
                     selectingCommissionKind = commissionAction?.Book.Id == toAction.Book.Id ? CommissionKind.MoveTo : CommissionKind.MoveFrom;
+                    selectingCommissionItemId = commissionAction?.Item.Id;
                     selectingCommissionRemark = commissionAction?.Remark;
 
                     this.IsLink = fromAction.ActTime == toAction.ActTime;
@@ -333,8 +332,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             // リストを更新する
             await this.FromBookSelectorVM.LoadAsync(selectingFromBookId);
             await this.ToBookSelectorVM.LoadAsync(selectingToBookId);
-            await this.ItemSelectorVM.LoadAsync(selectingCommissionItemId);
             await this.CommissionKindSelectorVM.LoadAsync(selectingCommissionKind);
+            await this.ItemSelectorVM.LoadAsync(selectingCommissionItemId);
             await this.RemarkSelectorVM.LoadAsync(selectingCommissionRemark);
 
             switch (this.RegKind) {
@@ -360,7 +359,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.FromBookSelectorVM.Children.Add(this.ItemSelectorVM);
             this.ToBookSelectorVM.SelectionChanged += (sender, e) => this.ToBookChanged?.Invoke(sender, e);
             this.ToBookSelectorVM.Children.Add(this.ItemSelectorVM);
-            this.CommissionKindSelectorVM.SelectionChanged += (sender, e) => this.CommissionKindChanged(sender, e);
+            this.CommissionKindSelectorVM.SelectionChanged += (sender, e) => this.CommissionKindChanged?.Invoke(sender, e);
             this.CommissionKindSelectorVM.Children.Add(this.ItemSelectorVM);
             this.ItemSelectorVM.SelectionChanged += (sender, e) => this.ItemChanged?.Invoke(sender, e);
             this.ItemSelectorVM.Children.Add(this.RemarkSelectorVM);
@@ -388,9 +387,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             CommissionKind commissionKind = this.CommissionKindSelectorVM.SelectedKey;
             ActionModel commissionAction = new() {
-                Base = new(this.CommissionId, commissionKind switch { CommissionKind.MoveFrom => fromAction.ActTime, CommissionKind.MoveTo => toAction.ActTime, _ => DateTime.Now }, -this.InputedCommission ?? 0),
+                Base = new(this.CommissionId, commissionKind switch {
+                    CommissionKind.MoveFrom => fromAction.ActTime,
+                    CommissionKind.MoveTo => toAction.ActTime,
+                    _ => throw new NotSupportedException("SelectedComissionKind")
+                }, -this.InputedCommission ?? 0),
                 GroupId = this.GroupId,
-                Book = new(commissionKind switch { CommissionKind.MoveFrom => fromAction.Book.Id, CommissionKind.MoveTo => toAction.Book.Id, _ => BookIdObj.System }, string.Empty),
+                Book = new(commissionKind switch {
+                    CommissionKind.MoveFrom => fromAction.Book.Id,
+                    CommissionKind.MoveTo => toAction.Book.Id,
+                    _ => throw new NotSupportedException("SelectedComissionKind")
+                }, string.Empty),
                 Item = new(this.ItemSelectorVM.SelectedKey, string.Empty),
                 Remark = this.RemarkSelectorVM.SelectedKey
             };

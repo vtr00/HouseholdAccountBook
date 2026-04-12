@@ -6,13 +6,19 @@
 
 ### 2026-04-12
 
+- 全体
+   - ＋デタッチしたタスクで観測されない例外が発生した場合に通知する機能を追加 - refs #136
+
 - MainWindow
-   - ↑SelectedTabの変更時にSelectedTabIndexの更新通知が漏れていたため追加 - refs #134
+   - ↑SelectedTabの変更時にSelectedTabIndexの更新通知が漏れていたため修正 - refs #134
 
 - ActionRegistrationWindow, ActionListRegistrationWindow, MoveRegistrationWindow
    - ↑編集時、店舗 / 備考が表示されないのを修正 - refs #133
    - ↑登録時、店舗 / 備考が保存されないのを修正 - refs #133
    - △項目変更時、店舗 / 備考の選択が維持されるように変更 - refs #133
+
+- MoveRegistrationWindow
+   - ↑手数料の負担帳簿を変更したときに例外が発生するのを修正 - refs #136
 
 ### 2026-04-11
 

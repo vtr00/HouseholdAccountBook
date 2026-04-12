@@ -63,6 +63,9 @@ namespace HouseholdAccountBook
             WindowLog.Config = UserSettingService.Instance.WindowLogConfig;
             WindowLocationManager.Config = UserSettingService.Instance.WindowLocationConfig;
 
+            // タスク例外発生時の処理を登録する
+            TaskScheduler.UnobservedTaskException += this.TaskScheduler_UnobservedTaskException;
+
             // shift-jis を使用するために必要
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -159,6 +162,23 @@ namespace HouseholdAccountBook
         }
 
         /// <summary>
+        /// 未観測のタスク例外が発生したときに処理を行う
+        /// </summary>
+        ///
+        /// <remarks>このメソッドは、未観測のタスク例外が発生した際に例外通知を行い、例外が観測済みであることをマークする</remarks>
+        /// <param name="sender">イベントの発生元となるオブジェクト</param>
+        /// <param name="e">未観測のタスク例外に関するデータを格納するイベント引数</param>
+        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            using FuncLog funcLog = new();
+
+            if (!e.Observed) {
+                NotifyException(e.Exception);
+            }
+            e.SetObserved();
+        }
+
+        /// <summary>
         /// ハンドルされない例外発生時
         /// </summary>
         /// <param name="sender"></param>
@@ -166,16 +186,29 @@ namespace HouseholdAccountBook
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             using FuncLog funcLog = new();
+            e.Handled = true;
+
+            NotifyException(e.Exception);
+        }
+
+        /// <summary>
+        /// 未処理の例外が発生した際に、例外情報をログに記録し、通知サービスを通じて通知する
+        /// </summary>
+        ///
+        /// <remarks>このメソッドは例外情報をファイルに保存し、そのファイルのパスを通知サービスに渡して通知を行う。例外処理中にさらに例外が発生した場合は、アプリケーションを強制終了する</remarks>
+        /// <param name="exp">通知対象となる未処理例外を表す <see cref="Exception"/> オブジェクト</param>
+        private static void NotifyException(Exception exp)
+        {
+            using FuncLog funcLog = new();
 
             try {
                 Log.Error("Unhandled Exception Occured.");
 
-                e.Handled = true;
-                Log.Error($"Unhandled Exception Message: {e.Exception.Message}");
+                Log.Error($"Unhandled Exception Message: {exp.Message}");
 
                 // 例外情報をファイルに保存する
                 ExceptionLog log = new();
-                log.Log(e.Exception);
+                log.Log(exp);
                 Log.Info($"Create Unhandled Exception Info File: {log.RelatedFilePath}");
 
                 // ハンドルされない例外の発生を通知する
