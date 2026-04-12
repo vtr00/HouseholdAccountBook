@@ -17,7 +17,7 @@ using System.Windows.Controls;
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
-    /// <see cref="SelectorViewModel{VM, KEY}"/> で <see cref="SelectorViewModel{VM, KEY}.SelectorViewModel"/> 時に KEY を選択するモード
+    /// <see cref="SelectorViewModel{VM, KEY}"/> で読み込み時に KEY を選択するモード
     /// </summary>
     public enum SelectorMode
     {
@@ -141,9 +141,7 @@ namespace HouseholdAccountBook.ViewModels
                 KEY? old = this.mSelectedKey;
                 if (this.SetProperty(ref this.mSelectedKey, value)) {
                     // KEYの一致するVMが存在するならSelectedItemに設定する。なければdefaultにしてfieldに入力値を保持する
-                    this.mSelectedItem = this.ItemList.Any(vm => KeyEquals(this.mSelector(vm), value))
-                        ? this.ItemList.First(vm => KeyEquals(this.mSelector(vm), value))
-                        : default;
+                    this.mSelectedItem = this.ItemList.FirstOrDefault(vm => KeyEquals(this.mSelector(vm), value));
 
                     // 読込処理中以外か
                     if (!this.mOnLoad) {
@@ -334,6 +332,8 @@ namespace HouseholdAccountBook.ViewModels
                     case SelectorMode.Force:
                         this.SelectedKey = tmpSelection;
                         break;
+                    default:
+                        throw new NotSupportedException();
                 }
 
                 if (!KeyEquals(this.SelectedKey, oldKey)) {
