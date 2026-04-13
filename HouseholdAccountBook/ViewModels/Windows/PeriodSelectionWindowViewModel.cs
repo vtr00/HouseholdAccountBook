@@ -5,7 +5,6 @@ using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
-using System.ComponentModel.Design;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
