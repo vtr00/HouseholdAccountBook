@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -17,47 +18,74 @@ namespace HouseholdAccountBook.ViewModels.Windows
     {
         #region Bindingプロパティ
         /// <summary>
-        /// 選択された月
+        /// 選択期間種別
         /// </summary>
-        public DateTime SelectedMonth {
+        public PeriodKind SelectedPeriodKind {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
-                    this.SelectedStart = value.GetFirstDateOfMonth().ToDateOnly();
+                    switch (value) {
+                        case PeriodKind.Monthly:
+                            this.SelectedMonth = this.SelectedStart.ToDateTime(TimeOnly.MinValue);
+                            break;
+                        case PeriodKind.Selected:
+                            break;
+                    }
                 }
             }
         }
+
+        /// <summary>
+        /// 選択された月
+        /// </summary>
+        public DateTime SelectedMonth {
+            get => this.mSelectedMonth;
+            set => this.SelectedPeriod = new(value.GetFirstDateOfMonth().ToDateOnly(), value.GetLastDateOfMonth().ToDateOnly());
+        }
+        private DateTime mSelectedMonth;
+
         /// <summary>
         /// 選択された開始日
         /// </summary>
         public DateOnly SelectedStart {
-            get;
+            get => this.mSelectedStart;
             set {
-                if (this.SetProperty(ref field, value)) {
-                    this.SelectedMonth = value.ToDateTime(TimeOnly.MinValue);
-                    // TODO: SelectedStartよりも後になった場合の処理
+                DateOnly selectedEnd = this.SelectedEnd;
+                if (selectedEnd < value) {
+                    selectedEnd = value;
                 }
+                this.SelectedPeriod = new(value, selectedEnd);
             }
         }
+        private DateOnly mSelectedStart;
+
         /// <summary>
         /// 選択された終了日
         /// </summary>
         public DateOnly SelectedEnd {
-            get;
+            get => this.mSelectedEnd;
             set {
-                if (this.SetProperty(ref field, value)) {
-                    // TODO: SelectedStartよりも前になった場合の処理
+                DateOnly selectedStart = this.SelectedStart;
+                if (value < selectedStart) {
+                    selectedStart = value;
                 }
+                this.SelectedPeriod = new(selectedStart, value);
             }
         }
+        private DateOnly mSelectedEnd;
+
         /// <summary>
         /// 選択された期間
         /// </summary>
         public PeriodObj<DateOnly> SelectedPeriod {
             get => new(this.SelectedStart, this.SelectedEnd);
             set {
-                this.SelectedStart = value.Start;
-                this.SelectedEnd = value.End;
+                this.mSelectedMonth = value.Start.ToDateTime(TimeOnly.MinValue);
+                this.mSelectedStart = value.Start;
+                this.mSelectedEnd = value.End;
+                this.RaisePropertyChanged(nameof(this.SelectedMonth));
+                this.RaisePropertyChanged(nameof(this.SelectedStart));
+                this.RaisePropertyChanged(nameof(this.SelectedEnd));
             }
         }
 
@@ -77,12 +105,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 今月コマンド処理
         /// </summary>
-        void ThisMonthCommand_Execute() => this.SelectedPeriod = new PeriodObj<DateOnly>(DateOnlyExtensions.Today.GetFirstDateOfMonth(), DateOnlyExtensions.Today.GetLastDateOfMonth());
+        private void ThisMonthCommand_Execute() => this.SelectedMonth = DateTime.Today;
 
         /// <summary>
         /// 全期間コマンド処理
         /// </summary>
-        async Task AllPeriodCommand_ExecuteAsync() => this.SelectedPeriod = await this.LoadFirstLastDate();
+        private async Task AllPeriodCommand_ExecuteAsync() => this.SelectedPeriod = await this.LoadFirstLastDate();
         #endregion
 
         #region ウィンドウ設定プロパティ

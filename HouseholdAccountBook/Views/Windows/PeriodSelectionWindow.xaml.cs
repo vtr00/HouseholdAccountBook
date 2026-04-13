@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.Views.Extensions;
@@ -24,7 +25,8 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="dateWithinMonth">月内日付</param>
         public TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, DateOnly dateWithinMonth)
-            : this(owner, dbHandlerFactory, dateWithinMonth, null) => this.selectedMonthRadioButton.IsChecked = true;
+            : this(owner, dbHandlerFactory, dateWithinMonth, null)
+        { }
 
         /// <summary>
         /// <see cref="TermWindow"/> クラスの新しいインスタンスを初期化します。
@@ -34,7 +36,8 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="startDate">開始日</param>
         /// <param name="endDate">終了日</param>
         public TermWindow(Window owner, DbHandlerFactory dbHandlerFactory, PeriodObj<DateOnly> period)
-            : this(owner, dbHandlerFactory, null, period) => this.selectedPeriodRadioButton.IsChecked = true;
+            : this(owner, dbHandlerFactory, null, period)
+        { }
 
         /// <summary>
         /// <see cref="TermWindow"/> クラスの新しいインスタンスを初期化します。
@@ -64,9 +67,18 @@ namespace HouseholdAccountBook.Views.Windows
                 // xamlで指定するとCalendarが正しく表示されないため、ここで指定する
                 this.calendar.DisplayMode = CalendarMode.Year;
 
-                this.WVM.SelectedPeriod = dateWithinMonth.HasValue
-                    ? new(dateWithinMonth.Value.GetFirstDateOfMonth(), dateWithinMonth.Value.GetLastDateOfMonth())
-                    : period;
+                this.WVM.SelectedPeriodKind = dateWithinMonth.HasValue ? PeriodKind.Monthly : PeriodKind.Selected;
+                switch (this.WVM.SelectedPeriodKind) {
+                    case PeriodKind.Monthly:
+                        this.WVM.SelectedMonth = dateWithinMonth.Value.ToDateTime(TimeOnly.MinValue);
+                        break;
+                    case PeriodKind.Selected:
+                        this.WVM.SelectedPeriod = period;
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+
                 this.WVM.AddEventHandlers();
             };
         }
@@ -74,14 +86,7 @@ namespace HouseholdAccountBook.Views.Windows
 
         #region イベントハンドラ
         #region ウィンドウ
-        private void PeriodSelectionWindow_Closed(object sender, EventArgs e)
-        {
-            using FuncLog funcLog = new();
-
-            if (this.selectedMonthRadioButton.IsChecked.Value) {
-                this.WVM.SelectedPeriod = new(this.WVM.SelectedMonth.GetFirstDateOfMonth().ToDateOnly(), this.WVM.SelectedMonth.GetLastDateOfMonth().ToDateOnly());
-            }
-        }
+        // NOP
         #endregion
 
         /// <summary>
@@ -93,9 +98,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             using FuncLog funcLog = new();
 
-            if (e.NewMode == CalendarMode.Month) {
-                DateOnly displayDate = this.calendar.DisplayDate.ToDateOnly();
-                this.WVM.SelectedPeriod = new(displayDate.GetFirstDateOfMonth(), displayDate.GetLastDateOfMonth());
+            if (e.NewMode != CalendarMode.Year) {
                 this.calendar.DisplayMode = CalendarMode.Year;
 
                 _ = Mouse.Capture(null);
