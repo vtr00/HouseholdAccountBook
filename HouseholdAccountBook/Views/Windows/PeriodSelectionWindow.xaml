@@ -8,8 +8,7 @@
         xmlns:controls="clr-namespace:HouseholdAccountBook.Views.UserControls"
         mc:Ignorable="d" 
         Height="430" Width="300" ShowInTaskbar="False" WindowStyle="ToolWindow" ResizeMode="NoResize"
-        Title="{x:Static properties:Resources.Title_PeriodSelectionWindow}"
-        Closed="PeriodSelectionWindow_Closed">
+        Title="{x:Static properties:Resources.Title_PeriodSelectionWindow}">
     
     <Window.DataContext>
         <vmw:PeriodSelectionWindowViewModel x:Name="WVM"/>
@@ -27,31 +26,35 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
+            <!-- 指定月 -->
             <GroupBox Grid.Row="0">
                 <GroupBox.Header>
-                    <RadioButton x:Name="selectedMonthRadioButton" Content="{x:Static properties:Resources.GroupHeader_MonthSelection}" 
-                                 GroupName="PeriodKind" IsChecked="True"/>
+                    <RadioButton Content="{x:Static properties:Resources.GroupHeader_MonthSelection}"
+                                 IsChecked="{Binding SelectedPeriodKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Monthly}"
+                                 GroupName="PeriodKind"/>
                 </GroupBox.Header>
-                
-                <Grid IsEnabled="{Binding IsChecked, ElementName=selectedMonthRadioButton}">
+
+                <Grid IsEnabled="{Binding SelectedPeriodKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Monthly}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <Button Grid.Row="0" Margin="5" Content="{x:Static properties:Resources.Button_ThisMonth}" Command="{Binding ThisMonthCommand}"/>
-                    <Calendar Grid.Row="1" x:Name="calendar" DisplayDate="{Binding SelectedMonth, Mode=TwoWay}" SelectedDate="{Binding SelectedMonth, Mode=TwoWay}" 
+                    <Calendar Grid.Row="1" x:Name="calendar" DisplayDate="{Binding SelectedMonth, Mode=TwoWay}"
                               DisplayModeChanged="Calendar_DisplayModeChanged"/>
                 </Grid>
             </GroupBox>
-            
+
+            <!-- 指定期間 -->
             <GroupBox Grid.Row="1">
                 <GroupBox.Header>
-                    <RadioButton x:Name="selectedPeriodRadioButton" Content="{x:Static properties:Resources.GroupHeader_TermSelection}" 
+                    <RadioButton Content="{x:Static properties:Resources.GroupHeader_TermSelection}" 
+                                 IsChecked="{Binding SelectedPeriodKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Selected}"
                                  GroupName="PeriodKind"/>
                 </GroupBox.Header>
-                
-                <Grid IsEnabled="{Binding IsChecked, ElementName=selectedPeriodRadioButton}">
+
+                <Grid IsEnabled="{Binding SelectedPeriodKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Selected}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
