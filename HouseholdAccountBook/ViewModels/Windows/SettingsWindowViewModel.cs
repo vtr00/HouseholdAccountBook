@@ -20,13 +20,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public event EventHandler NeedToUpdateChanged {
             add {
-                this.ItemTabVM.NeedToUpdateChanged += value;
                 this.BookTabVM.NeedToUpdateChanged += value;
+                this.ItemTabVM.NeedToUpdateChanged += value;
                 this.OtherTabVM.NeedToUpdateChanged += value;
             }
             remove {
-                this.ItemTabVM.NeedToUpdateChanged -= value;
                 this.BookTabVM.NeedToUpdateChanged -= value;
+                this.ItemTabVM.NeedToUpdateChanged -= value;
                 this.OtherTabVM.NeedToUpdateChanged -= value;
             }
         }
@@ -57,14 +57,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 項目設定タブVM
-        /// </summary>
-        public SettingsWindowItemTabViewModel ItemTabVM { get; } = new();
-
-        /// <summary>
         /// 帳簿設定タブVM
         /// </summary>
         public SettingsWindowBookTabViewModel BookTabVM { get; } = new();
+
+        /// <summary>
+        /// 項目設定タブVM
+        /// </summary>
+        public SettingsWindowItemTabViewModel ItemTabVM { get; } = new();
 
         /// <summary>
         /// DB設定タブVM
@@ -93,8 +93,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             this.mChildrenVM.AddRange(
                 [
-                    this.ItemTabVM,
                     this.BookTabVM,
+                    this.ItemTabVM,
                     this.DbTabVM,
                     this.OtherTabVM
                 ]
@@ -106,11 +106,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             switch (this.SelectedTab) {
-                case SettingsTabs.ItemSettingsTab:
-                    await this.ItemTabVM.LoadAsync();
-                    break;
                 case SettingsTabs.BookSettingsTab:
                     await this.BookTabVM.LoadAsync();
+                    break;
+                case SettingsTabs.ItemSettingsTab:
+                    await this.ItemTabVM.LoadAsync();
                     break;
                 case SettingsTabs.DbSettingsTab:
                     await this.DbTabVM.LoadAsync();

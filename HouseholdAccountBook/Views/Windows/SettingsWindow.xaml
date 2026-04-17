@@ -45,204 +45,6 @@
                 </Style>
             </TabControl.ItemContainerStyle>
             
-            <!-- 項目設定 -->
-            <TabItem x:Name="_ItemTab" DataContext="{Binding ItemTabVM}">
-                <TabItem.Header>
-                    <TextBlock Text="{x:Static properties:Resources.TabHeader_ItemSettings}" TextAlignment="Center"/>
-                </TabItem.Header>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.3*"/>
-                        <ColumnDefinition Width="5"/>
-                        <ColumnDefinition Width="0.6*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <GroupBox Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_ItemList}">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-
-                            <StackPanel Grid.Row="0" Margin="5" Orientation="Horizontal">
-                                <Button Width="80" Content="{x:Static properties:Resources.Button_AddCategory}" Command="{Binding AddCategoryCommand}" ToolTip="Shift+Ctrl++"/>
-                                <Button Width="80" Content="{x:Static properties:Resources.Button_AddItem}" Command="{Binding AddItemCommand}" ToolTip="Ctrl++"/>
-                                <Button Width="50" Content="{x:Static properties:Resources.Button_Delete}" Command="{Binding DeleteItemCommand}" ToolTip="Delete"/>
-                                <Button Width="25" Content="{x:Static properties:Resources.Button_RaiseSortOrder}" Command="{Binding RaiseItemSortOrderCommand}" ToolTip="Ctrl+↑"/>
-                                <Button Width="25" Content="{x:Static properties:Resources.Button_DropSortOrder}" Command="{Binding DropItemSortOrderCommand}" ToolTip="Ctrl+↓"/>
-                            </StackPanel>
-
-                            <TreeView x:Name="hierarchicalTreeView" Grid.Row="1" Margin="5" ItemsSource="{Binding ItemTreeVMList}"
-                                      SelectedItemChanged="TreeView_SelectedItemChanged">
-                                <TreeView.InputBindings>
-                                    <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{Binding DataContext.AddCategoryCommand, ElementName=_ItemTab}"/>
-                                    <KeyBinding Gesture="Shift+Ctrl+Add" Command="{Binding DataContext.AddCategoryCommand, ElementName=_ItemTab}"/>
-                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{Binding DataContext.AddItemCommand, ElementName=_ItemTab}"/>
-                                    <KeyBinding Gesture="Ctrl+Add" Command="{Binding DataContext.AddItemCommand, ElementName=_ItemTab}"/>
-                                    <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteItemCommand, ElementName=_ItemTab}"/>
-                                    <KeyBinding Gesture="Ctrl+Up" Command="{Binding DataContext.RaiseItemSortOrderCommand, ElementName=_ItemTab}"/>
-                                    <KeyBinding Gesture="Ctrl+Down" Command="{Binding DataContext.DropItemSortOrderCommand, ElementName=_ItemTab}"/>
-                                </TreeView.InputBindings>
-                                <TreeView.ItemContainerStyle>
-                                    <Style TargetType="TreeViewItem">
-                                        <Setter Property="IsExpanded" Value="True"/>
-                                        <Setter Property="IsSelected" Value="{Binding SelectFlag}"/>
-                                    </Style>
-                                </TreeView.ItemContainerStyle>
-                                <i:Interaction.Behaviors>
-                                    <behaviors:BindSelectedItemToTreeViewBehavior SelectedItem="{Binding SelectedItemTreeVM}"/>
-                                </i:Interaction.Behaviors>
-                                <TreeView.ItemTemplate>
-                                    <HierarchicalDataTemplate DataType="viewmodels:HierarchicalViewModel" 
-                                                              ItemsSource="{Binding ChildrenVMList}">
-                                        <TextBlock Text="{Binding Name}"/>
-                                    </HierarchicalDataTemplate>
-                                </TreeView.ItemTemplate>
-                            </TreeView>
-                        </Grid>
-                    </GroupBox>
-
-                    <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
-
-                    <Grid Grid.Column="2" DataContext="{Binding DisplayedItemSettingVM}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="0.3*"/>
-                            <RowDefinition Height="0.3*"/>
-                            <RowDefinition Height="0.3*"/>
-                        </Grid.RowDefinitions>
-                        <!-- 項目情報 -->
-                        <GroupBox Grid.Row="0" Header="{x:Static properties:Resources.GroupHeader_ItemInformation}">
-                            <GroupBox.InputBindings>
-                                <KeyBinding Gesture="Ctrl+S" Command="{Binding DataContext.SaveItemInfoCommand, ElementName=_ItemTab}"/>
-                            </GroupBox.InputBindings>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="0.5*"/>
-                                    <ColumnDefinition Width="0.5*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
-                                           Text="Id"/>
-                                <TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
-                                           Text="{Binding Id, TargetNullValue='--'}"/>
-                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
-                                           Text="{x:Static properties:Resources.TextBlock_SortOrder}"/>
-                                <TextBlock Grid.Row="1" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
-                                           Text="{Binding SortOrder}"/>
-                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5"
-                                           Text="{x:Static properties:Resources.TextBlock_ItemName}">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Kind}" Value="Item">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5"
-                                           Text="{x:Static properties:Resources.TextBlock_CategoryName}">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Kind}" Value="Category">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                                <TextBox Grid.Row="2" Grid.Column="1" Margin="5" 
-                                                    Text="{Binding InputedName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsRenamable, Converter={StaticResource NegationConverter}}"/>
-                                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Content="{x:Static properties:Resources.Button_Save}" 
-                                        Command="{Binding DataContext.SaveItemInfoCommand, ElementName=_ItemTab}" ToolTip="Ctrl+S"/>
-                            </Grid>
-                        </GroupBox>
-                        
-                        <!-- 関連付け -->
-                        <GroupBox Grid.Row="1" Header="{x:Static properties:Resources.GroupHeader_Linkage}">
-                            <ListBox Margin="5" ItemsSource="{Binding RelationSelectorVM.ItemList}" SelectedItem="{Binding RelationSelectorVM.SelectedItem}" IsEnabled="{Binding IsSettable}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            
-                                            <CheckBox Grid.Column="0" IsChecked="{Binding IsRelated}"
-                                                      Command="{Binding DataContext.ChangeItemRelationCommand, ElementName=_ItemTab}"
-                                                      CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Self}}"/>
-                                            <TextBlock Grid.Column="1" Text="{Binding Name}"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                        </GroupBox>
-                        
-                        <!-- 店舗情報 -->
-                        <GroupBox Grid.Row="2" Header="{x:Static properties:Resources.GroupHeader_Shop}">
-                            <DataGrid Margin="5" x:Name="shopDataGrid" 
-                                      ItemsSource="{Binding ShopSelectorVM.ItemList}" SelectedItem="{Binding ShopSelectorVM.SelectedItem}" IsEnabled="{Binding IsSettable}"
-                                      IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
-                                      CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
-                                      AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
-                                      HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
-
-                                <DataGrid.ColumnHeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                    </Style>
-                                </DataGrid.ColumnHeaderStyle>
-                                <DataGrid.InputBindings>
-                                    <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteShopNameCommand, ElementName=_ItemTab}"/>
-                                </DataGrid.InputBindings>
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Name}"/>
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_UsageCount}" Width="*" Binding="{Binding UsedCount}"/>
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding CurrentActTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </GroupBox>
-                        
-                        <!-- 備考情報 -->
-                        <GroupBox Grid.Row="3" Header="{x:Static properties:Resources.GroupHeader_Remark}">
-                            <DataGrid Margin="5" x:Name="remarkDataGrid" 
-                                      ItemsSource="{Binding RemarkSelectorVM.ItemList}" SelectedItem="{Binding RemarkSelectorVM.SelectedItem}" IsEnabled="{Binding IsSettable}"
-                                      IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
-                                      CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
-                                      AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
-                                      HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
-
-                                <DataGrid.ColumnHeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                    </Style>
-                                </DataGrid.ColumnHeaderStyle>
-                                <DataGrid.InputBindings>
-                                    <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteRemarkCommand, ElementName=_ItemTab}"/>
-                                </DataGrid.InputBindings>
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Remark}"/>
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_UsageCount}" Width="*" Binding="{Binding UsedCount}"/>
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding CurrentActTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </GroupBox>
-                    </Grid>
-                </Grid>
-            </TabItem>
-            
             <!-- 帳簿設定 -->
             <TabItem x:Name="_BookTab" DataContext="{Binding BookTabVM}">
                 <TabItem.Header>
@@ -508,6 +310,204 @@
                 </Grid>
             </TabItem>
 
+            <!-- 項目設定 -->
+            <TabItem x:Name="_ItemTab" DataContext="{Binding ItemTabVM}">
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_ItemSettings}" TextAlignment="Center"/>
+                </TabItem.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.3*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="0.6*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <GroupBox Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_ItemList}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Margin="5" Orientation="Horizontal">
+                                <Button Width="80" Content="{x:Static properties:Resources.Button_AddCategory}" Command="{Binding AddCategoryCommand}" ToolTip="Shift+Ctrl++"/>
+                                <Button Width="80" Content="{x:Static properties:Resources.Button_AddItem}" Command="{Binding AddItemCommand}" ToolTip="Ctrl++"/>
+                                <Button Width="50" Content="{x:Static properties:Resources.Button_Delete}" Command="{Binding DeleteItemCommand}" ToolTip="Delete"/>
+                                <Button Width="25" Content="{x:Static properties:Resources.Button_RaiseSortOrder}" Command="{Binding RaiseItemSortOrderCommand}" ToolTip="Ctrl+↑"/>
+                                <Button Width="25" Content="{x:Static properties:Resources.Button_DropSortOrder}" Command="{Binding DropItemSortOrderCommand}" ToolTip="Ctrl+↓"/>
+                            </StackPanel>
+
+                            <TreeView x:Name="hierarchicalTreeView" Grid.Row="1" Margin="5" ItemsSource="{Binding ItemTreeVMList}"
+                                      SelectedItemChanged="TreeView_SelectedItemChanged">
+                                <TreeView.InputBindings>
+                                    <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{Binding DataContext.AddCategoryCommand, ElementName=_ItemTab}"/>
+                                    <KeyBinding Gesture="Shift+Ctrl+Add" Command="{Binding DataContext.AddCategoryCommand, ElementName=_ItemTab}"/>
+                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{Binding DataContext.AddItemCommand, ElementName=_ItemTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Add" Command="{Binding DataContext.AddItemCommand, ElementName=_ItemTab}"/>
+                                    <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteItemCommand, ElementName=_ItemTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Up" Command="{Binding DataContext.RaiseItemSortOrderCommand, ElementName=_ItemTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Down" Command="{Binding DataContext.DropItemSortOrderCommand, ElementName=_ItemTab}"/>
+                                </TreeView.InputBindings>
+                                <TreeView.ItemContainerStyle>
+                                    <Style TargetType="TreeViewItem">
+                                        <Setter Property="IsExpanded" Value="True"/>
+                                        <Setter Property="IsSelected" Value="{Binding SelectFlag}"/>
+                                    </Style>
+                                </TreeView.ItemContainerStyle>
+                                <i:Interaction.Behaviors>
+                                    <behaviors:BindSelectedItemToTreeViewBehavior SelectedItem="{Binding SelectedItemTreeVM}"/>
+                                </i:Interaction.Behaviors>
+                                <TreeView.ItemTemplate>
+                                    <HierarchicalDataTemplate DataType="viewmodels:HierarchicalViewModel" 
+                                                              ItemsSource="{Binding ChildrenVMList}">
+                                        <TextBlock Text="{Binding Name}"/>
+                                    </HierarchicalDataTemplate>
+                                </TreeView.ItemTemplate>
+                            </TreeView>
+                        </Grid>
+                    </GroupBox>
+
+                    <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
+
+                    <Grid Grid.Column="2" DataContext="{Binding DisplayedItemSettingVM}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="0.3*"/>
+                            <RowDefinition Height="0.3*"/>
+                            <RowDefinition Height="0.3*"/>
+                        </Grid.RowDefinitions>
+                        <!-- 項目情報 -->
+                        <GroupBox Grid.Row="0" Header="{x:Static properties:Resources.GroupHeader_ItemInformation}">
+                            <GroupBox.InputBindings>
+                                <KeyBinding Gesture="Ctrl+S" Command="{Binding DataContext.SaveItemInfoCommand, ElementName=_ItemTab}"/>
+                            </GroupBox.InputBindings>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.5*"/>
+                                    <ColumnDefinition Width="0.5*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
+                                           Text="Id"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
+                                           Text="{Binding Id, TargetNullValue='--'}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
+                                           Text="{x:Static properties:Resources.TextBlock_SortOrder}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
+                                           Text="{Binding SortOrder}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5"
+                                           Text="{x:Static properties:Resources.TextBlock_ItemName}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Kind}" Value="Item">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5"
+                                           Text="{x:Static properties:Resources.TextBlock_CategoryName}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Kind}" Value="Category">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBox Grid.Row="2" Grid.Column="1" Margin="5" 
+                                                    Text="{Binding InputedName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsRenamable, Converter={StaticResource NegationConverter}}"/>
+                                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Content="{x:Static properties:Resources.Button_Save}" 
+                                        Command="{Binding DataContext.SaveItemInfoCommand, ElementName=_ItemTab}" ToolTip="Ctrl+S"/>
+                            </Grid>
+                        </GroupBox>
+                        
+                        <!-- 関連付け -->
+                        <GroupBox Grid.Row="1" Header="{x:Static properties:Resources.GroupHeader_Linkage}">
+                            <ListBox Margin="5" ItemsSource="{Binding RelationSelectorVM.ItemList}" SelectedItem="{Binding RelationSelectorVM.SelectedItem}" IsEnabled="{Binding IsSettable}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <CheckBox Grid.Column="0" IsChecked="{Binding IsRelated}"
+                                                      Command="{Binding DataContext.ChangeItemRelationCommand, ElementName=_ItemTab}"
+                                                      CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Self}}"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Name}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </GroupBox>
+                        
+                        <!-- 店舗情報 -->
+                        <GroupBox Grid.Row="2" Header="{x:Static properties:Resources.GroupHeader_Shop}">
+                            <DataGrid Margin="5" x:Name="shopDataGrid" 
+                                      ItemsSource="{Binding ShopSelectorVM.ItemList}" SelectedItem="{Binding ShopSelectorVM.SelectedItem}" IsEnabled="{Binding IsSettable}"
+                                      IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
+                                      CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
+                                      AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
+                                      HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
+
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.InputBindings>
+                                    <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteShopNameCommand, ElementName=_ItemTab}"/>
+                                </DataGrid.InputBindings>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_ShopName}" Width="*" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_UsageCount}" Width="*" Binding="{Binding UsedCount}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding CurrentActTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </GroupBox>
+                        
+                        <!-- 備考情報 -->
+                        <GroupBox Grid.Row="3" Header="{x:Static properties:Resources.GroupHeader_Remark}">
+                            <DataGrid Margin="5" x:Name="remarkDataGrid" 
+                                      ItemsSource="{Binding RemarkSelectorVM.ItemList}" SelectedItem="{Binding RemarkSelectorVM.SelectedItem}" IsEnabled="{Binding IsSettable}"
+                                      IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
+                                      CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
+                                      AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
+                                      HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
+
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.InputBindings>
+                                    <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteRemarkCommand, ElementName=_ItemTab}"/>
+                                </DataGrid.InputBindings>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Remark}" Width="*" Binding="{Binding Remark}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_UsageCount}" Width="*" Binding="{Binding UsedCount}"/>
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_LastUsageDate}" Width="*" Binding="{Binding CurrentActTime, StringFormat='yyyy-MM-dd', TargetNullValue='-'}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </GroupBox>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            
             <!-- DB設定 -->
             <TabItem x:Name="_DbTab" DataContext="{Binding DbTabVM}">
                 <TabItem.Header>

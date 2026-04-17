@@ -77,22 +77,21 @@ namespace HouseholdAccountBook.Views.Windows
             if (e.OriginalSource != sender) { return; }
 
             using FuncLog funcLog = new(); // ここで e.OldItems, e.NewItems をログに出すと、StackOverflow になる
+            using WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create();
 
-            using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create()) {
-                switch (this.WVM.SelectedTab) {
-                    case SettingsTabs.ItemSettingsTab:
-                        await this.WVM.ItemTabVM.LoadAsync(this.WVM.ItemTabVM.SelectedItemTreeVM?.Kind, this.WVM.ItemTabVM.SelectedItemTreeVM?.Id);
-                        break;
-                    case SettingsTabs.BookSettingsTab:
-                        await this.WVM.BookTabVM.LoadAsync(this.WVM.BookTabVM.BookSelectorVM?.SelectedKey);
-                        break;
-                    case SettingsTabs.DbSettingsTab:
-                        await this.WVM.DbTabVM.LoadAsync();
-                        break;
-                    case SettingsTabs.OtherSettingsTab:
-                        await this.WVM.OtherTabVM.LoadAsync();
-                        break;
-                }
+            switch (this.WVM.SelectedTab) {
+                case SettingsTabs.BookSettingsTab:
+                    await this.WVM.BookTabVM.LoadAsync(this.WVM.BookTabVM.BookSelectorVM?.SelectedKey);
+                    break;
+                case SettingsTabs.ItemSettingsTab:
+                    await this.WVM.ItemTabVM.LoadAsync(this.WVM.ItemTabVM.SelectedItemTreeVM?.Kind, this.WVM.ItemTabVM.SelectedItemTreeVM?.Id);
+                    break;
+                case SettingsTabs.DbSettingsTab:
+                    await this.WVM.DbTabVM.LoadAsync();
+                    break;
+                case SettingsTabs.OtherSettingsTab:
+                    await this.WVM.OtherTabVM.LoadAsync();
+                    break;
             }
         }
 

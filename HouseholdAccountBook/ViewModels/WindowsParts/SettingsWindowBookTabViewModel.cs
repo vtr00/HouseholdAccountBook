@@ -266,6 +266,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             this.mAppService = new(this.mDbHandlerFactory);
             this.mSettingService = new(this.mDbHandlerFactory);
+
+            this.BookSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null);
@@ -284,6 +286,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
 
             await this.BookSelectorVM.LoadAsync(bookId);
+            // この時点では選択時イベントハンドラは未登録なので明示的に読み込む
+            if (this.BookSelectorVM.SelectedItem != null) {
+                using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
+
+                SettingViewModelLoader loader = new(this.mAppService, this.mSettingService);
+                this.DisplayedBookSettingVM = await loader.LoadBookSettingViewModelAsync(this.BookSelectorVM.SelectedKey);
+            }
         }
 
         public override void AddEventHandlers()
