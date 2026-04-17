@@ -4,6 +4,11 @@
 
 ## 2026
 
+### 2026-04-17
+
+- SettingsWindow
+   - △帳簿タブと項目タブの順序を変更 - refs #93
+
 ### 2026-04-13
 
 - PeriodSelectionWindow

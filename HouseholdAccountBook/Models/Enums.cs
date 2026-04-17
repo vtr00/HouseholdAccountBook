@@ -233,13 +233,13 @@ namespace HouseholdAccountBook.Models
     public enum SettingsTabs
     {
         /// <summary>
-        /// 項目設定タブ
-        /// </summary>
-        ItemSettingsTab = 0,
-        /// <summary>
         /// 帳簿設定タブ
         /// </summary>
-        BookSettingsTab = 1,
+        BookSettingsTab = 0,
+        /// <summary>
+        /// 項目設定タブ
+        /// </summary>
+        ItemSettingsTab = 1,
         /// <summary>
         /// DB設定タブ
         /// </summary>
