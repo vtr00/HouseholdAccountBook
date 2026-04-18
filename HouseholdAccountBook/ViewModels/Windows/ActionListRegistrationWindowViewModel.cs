@@ -145,16 +145,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 数値入力ボタンの入力種別
         /// </summary>
         public NumericInputButton.InputKind InputedKind { get; set; }
+        #endregion
 
         #region コマンド
         /// <summary>
         /// OKコマンド
         /// </summary>
         public new ICommand OKCommand => field ??= new AsyncRelayCommand(this.OKCommand_ExecuteAsync, this.OKCommand_CanExecute);
-        #endregion
-        #endregion
-
-        #region コマンドイベントハンドラ
         protected override bool OKCommand_CanExecute() => this.ItemSelectorVM.SelectedKey != null && this.InputedDateValueVMList.Any(static vm => vm.ActValue is not null and not 0);
         protected async Task OKCommand_ExecuteAsync()
         {
@@ -309,10 +306,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             this.BookSelectorVM.SelectionChanged += (sender, e) => this.BookChanged?.Invoke(sender, e);
             this.BookSelectorVM.Children.Add(this.CategorySelectorVM);
+
             this.BalanceKindSelectorVM.SelectionChanged += (sender, e) => this.BalanceKindChanged?.Invoke(sender, e);
             this.BalanceKindSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
+
             this.CategorySelectorVM.SelectionChanged += (sender, e) => this.CategoryChanged?.Invoke(sender, e);
             this.CategorySelectorVM.Children.Add(this.ItemSelectorVM);
+
             this.ItemSelectorVM.SelectionChanged += (sender, e) => this.ItemChanged?.Invoke(sender, e);
             this.ItemSelectorVM.Children.AddRange([this.ShopSelectorVM, this.RemarkSelectorVM]);
         }

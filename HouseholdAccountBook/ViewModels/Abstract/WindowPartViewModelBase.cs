@@ -60,21 +60,6 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// </summary>
         public ICommand OKCommand => field ??= new RelayCommand(this.OKCommand_Execute, this.OKCommand_CanExecute);
         /// <summary>
-        /// キャンセルコマンド
-        /// </summary>
-        public ICommand CancelCommand => field ??= new RelayCommand(this.CanncelCommand_Execute);
-        /// <summary>
-        /// クローズコマンド
-        /// </summary>
-        public ICommand CloseCommand => field ??= new RelayCommand(this.CloseCommand_Execute);
-        /// <summary>
-        /// 非表示コマンド
-        /// </summary>
-        public ICommand HideCommand => field ??= new RelayCommand(this.HideCommand_Execute);
-        #endregion
-
-        #region コマンドイベントハンドラ
-        /// <summary>
         /// OKコマンド実行可能か
         /// </summary>
         /// <returns></returns>
@@ -85,15 +70,27 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         protected virtual void OKCommand_Execute() => this.CloseRequest(new DialogCloseRequestEventArgs(true));
 
         /// <summary>
+        /// キャンセルコマンド
+        /// </summary>
+        public ICommand CancelCommand => field ??= new RelayCommand(this.CanncelCommand_Execute);
+        /// <summary>
         /// キャンセルコマンド処理
         /// </summary>
         protected virtual void CanncelCommand_Execute() => this.CloseRequest(new DialogCloseRequestEventArgs(false));
 
         /// <summary>
+        /// クローズコマンド
+        /// </summary>
+        public ICommand CloseCommand => field ??= new RelayCommand(this.CloseCommand_Execute);
+        /// <summary>
         /// クローズコマンド処理
         /// </summary>
         protected virtual void CloseCommand_Execute() => this.CloseRequest(new DialogCloseRequestEventArgs(null));
 
+        /// <summary>
+        /// 非表示コマンド
+        /// </summary>
+        public ICommand HideCommand => field ??= new RelayCommand(this.HideCommand_Execute);
         /// <summary>
         /// 非表示コマンド処理
         /// </summary>
@@ -101,7 +98,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         #endregion
 
         /// <summary>
-        /// ViewModelの初期化を行いイベントハンドラを登録する
+        /// ViewModelの初期化を行う
         /// </summary>
         /// <param name="waitCursorManagerFactory">WaitCursorマネージャファクトリ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>

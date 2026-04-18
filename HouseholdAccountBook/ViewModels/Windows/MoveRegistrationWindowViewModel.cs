@@ -188,21 +188,20 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 備考セレクタVM
         /// </summary>
         public SelectorViewModel<RemarkModel, string> RemarkSelectorVM { get; } = new(static vm => vm?.Remark);
+        #endregion
 
         #region コマンド
         /// <summary>
         /// 今日コマンド
         /// </summary>
         public ICommand TodayCommand => field ??= new RelayCommand(() => this.SelectedFromDate = DateTime.Today, () => this.SelectedFromDate != DateTime.Today);
+
         /// <summary>
         /// OKコマンド
         /// </summary>
-        public new ICommand OKCommand => field ??= new AsyncRelayCommand(this.OKCommand_ExecuteAsync, this.OKCommand_CanExecute);
-        #endregion
-        #endregion
-
-        #region コマンドイベントハンドラ
-        protected override bool OKCommand_CanExecute() => this.InputedValue is not null && this.FromBookSelectorVM?.SelectedKey != this.ToBookSelectorVM?.SelectedKey;
+        public new ICommand OKCommand => field ??= new AsyncRelayCommand(
+            this.OKCommand_ExecuteAsync,
+            () => this.InputedValue is not null && this.FromBookSelectorVM?.SelectedKey != this.ToBookSelectorVM?.SelectedKey);
         protected async Task OKCommand_ExecuteAsync()
         {
             // DB登録

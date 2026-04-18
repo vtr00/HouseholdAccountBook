@@ -181,30 +181,23 @@ namespace HouseholdAccountBook.ViewModels.Windows
             get;
             set => this.SetProperty(ref field, value);
         }
+        #endregion
 
         #region コマンド
         /// <summary>
         /// 今日コマンド
         /// </summary>
         public ICommand TodayCommand => field ??= new RelayCommand(() => this.SelectedDate = DateTime.Today, () => this.SelectedDate != DateTime.Today);
+
         /// <summary>
         /// 続けて入力コマンド
         /// </summary>
         public ICommand ContinueToOKCommand => field ??= new AsyncRelayCommand(this.ContinueToOKCommand_ExecuteAsync, this.ContinueToOKCommand_CanExecute);
         /// <summary>
-        /// OKコマンド
-        /// </summary>
-        public new ICommand OKCommand => field ??= new AsyncRelayCommand(this.OKCommand_ExecuteAsync, this.OKCommand_CanExecute);
-        #endregion
-        #endregion
-
-        #region コマンドイベントハンドラ
-        /// <summary>
         /// 続けて入力コマンド実行可能か
         /// </summary>
         /// <returns></returns>
         protected bool ContinueToOKCommand_CanExecute() => this.OKCommand_CanExecute() && this.RegKind == RegistrationKind.Add;
-
         /// <summary>
         /// 続けて入力コマンド処理
         /// </summary>
@@ -225,6 +218,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.InputedCount = 1;
         }
 
+        /// <summary>
+        /// OKコマンド
+        /// </summary>
+        public new ICommand OKCommand => field ??= new AsyncRelayCommand(this.OKCommand_ExecuteAsync, this.OKCommand_CanExecute);
         protected override bool OKCommand_CanExecute() => this.ItemSelectorVM.SelectedKey != null && this.InputedValue.HasValue && 0 < this.InputedValue;
         protected async Task OKCommand_ExecuteAsync()
         {

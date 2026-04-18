@@ -171,7 +171,7 @@
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_NextMonth}" Command="{Binding GoToNextMonthCommand}" InputGestureText="Alt+→"/>
                     <Separator/>
                     <!-- 期間指定 -->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_DailyTermSelection}" Command="{Binding SelectTermCommand}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_DailyTermSelection}" Command="{Binding SelectPeriodCommand}"/>
                     <Separator/>
                     <!-- 帳簿名を常に表示-->
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_AlwaysDisplay_BookName}" IsCheckable="True" IsChecked="{Binding MainWindow_Show_BookName, Source={StaticResource Settings}}"/>
@@ -191,7 +191,7 @@
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_NextMonth}" Command="{Binding GoToNextMonthCommand}" InputGestureText="Alt+→"/>
                     <Separator/>
                     <!-- 期間指定 -->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_DailyTermSelection}" Command="{Binding SelectTermCommand}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_DailyTermSelection}" Command="{Binding SelectPeriodCommand}"/>
                 </MenuItem>
                 <!-- 月別 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Monthly}">
@@ -335,7 +335,7 @@
                         <StackPanel Grid.Column="0" Orientation="Horizontal">
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastMonthCommand}"/>
                             <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToDisplayedMonthConverter}, TargetNullValue={x:Static properties:Resources.Button_DateRange}}"
-                                    Command="{Binding SelectTermCommand}">
+                                    Command="{Binding SelectPeriodCommand}">
                                 <ToolTipService.ToolTip>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -612,7 +612,7 @@
                         <StackPanel Orientation="Horizontal">
                             <Button Width="20" Content="{x:Static properties:Resources.Button_Backward}" Command="{Binding GoToLastMonthCommand}"/>
                             <Button Width="120" Content="{Binding DisplayedMonth, Converter={StaticResource DateTimeToDisplayedMonthConverter}, TargetNullValue={x:Static properties:Resources.Button_DateRange}}"
-                                    Command="{Binding SelectTermCommand}">
+                                    Command="{Binding SelectPeriodCommand}">
                                 <ToolTipService.ToolTip>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
