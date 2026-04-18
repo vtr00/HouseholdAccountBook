@@ -58,24 +58,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// SQLite設定
         /// </summary>
         public SQLiteSettingViewModel SQLiteSettingVM { get; init; } = new();
+        #endregion
 
         #region コマンド
         /// <summary>
         /// pg_dump.exeファイル選択コマンド
         /// </summary>
         public ICommand SelectPgDumpFilePathCommand => field ??= new RelayCommand(this.SelectPgDumpFilePathCommand_Execute);
-        /// <summary>
-        /// pg_restore.exeファイル選択コマンド
-        /// </summary>
-        public ICommand SelectPgRestoreFilePathCommand => field ??= new RelayCommand(this.SelectPgRestoreFilePathCommand_Execute);
-        /// <summary>
-        /// DBファイル選択コマンド
-        /// </summary>
-        public ICommand SelectDBFilePathCommand => field ??= new RelayCommand(this.SelectDBFilePathCommand_Execute);
-        #endregion
-        #endregion
-
-        #region コマンドイベントハンドラ
         /// <summary>
         /// pg_dump.exeファイル選択コマンド処理
         /// </summary>
@@ -99,6 +88,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
+        /// pg_restore.exeファイル選択コマンド
+        /// </summary>
+        public ICommand SelectPgRestoreFilePathCommand => field ??= new RelayCommand(this.SelectPgRestoreFilePathCommand_Execute);
+        /// <summary>
         /// pg_restore.exeファイル選択コマンド処理
         /// </summary>
         public void SelectPgRestoreFilePathCommand_Execute()
@@ -120,6 +113,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
 
+        /// <summary>
+        /// DBファイル選択コマンド
+        /// </summary>
+        public ICommand SelectDBFilePathCommand => field ??= new RelayCommand(this.SelectDBFilePathCommand_Execute);
         /// <summary>
         /// DBファイル選択コマンド処理
         /// </summary>
@@ -187,7 +184,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
             return canExecute;
         }
-
         protected override void OKCommand_Execute()
         {
             bool result = this.Save();

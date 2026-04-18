@@ -271,85 +271,24 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             get;
             set => this.SetProperty(ref field, value);
         } = string.Empty;
+        #endregion
 
         #region コマンド
         /// <summary>
         /// 編集コマンド
         /// </summary>
-        public ICommand EditMenuCommand => field ??= new RelayCommand(this.EditMenuCommand_CanExecute);
+        public ICommand EditMenuCommand => field ??= new RelayCommand(() => !this.Parent.IsChildrenWindowOpened());
+
         /// <summary>
         /// 検索欄表示コマンド
         /// </summary>
-        public ICommand ShowFindBoxCommand => field ??= new RelayCommand(this.ShowFindBoxCommand_Execute, this.ShowFindBoxCommand_CanExecute);
+        /// <remarks>帳簿タブを選択しているか</remarks>
+        public ICommand ShowFindBoxCommand => field ??= new RelayCommand(() => this.SelectedFindKind = FindKind.Find, () => this.Parent.SelectedTab == Tabs.BooksTab);
+
         /// <summary>
         /// 検索欄非表示コマンド
         /// </summary>
         public ICommand HideFindBoxCommand => field ??= new RelayCommand(this.HideFindBoxCommand_Execute);
-        /// <summary>
-        /// 置換欄表示コマンド
-        /// </summary>
-        public ICommand ShowReplaceBoxCommand => field ??= new RelayCommand(this.ShowReplaceBoxCommand_Execute, this.ShowReplaceBoxCommand_CanExecute);
-        /// <summary>
-        /// 置換欄非表示コマンド
-        /// </summary>
-        public ICommand HideReplaceBoxCommand => field ??= new RelayCommand(this.HideReplaceBoxCommand_Execute);
-        /// <summary>
-        /// 帳簿項目検索コマンド
-        /// </summary>
-        public ICommand FindActionCommand => field ??= new RelayCommand(this.FindActionCommand_Execute, this.FindActionCommand_CanExecute);
-        /// <summary>
-        /// 帳簿項目置換コマンド
-        /// </summary>
-        public ICommand ReplaceActionCommand => field ??= new AsyncRelayCommand(this.ReplaceActionCommand_ExecuteAsync, this.ReplaceActionCommand_CanExecute);
-        /// <summary>
-        /// 移動追加コマンド
-        /// </summary>
-        public ICommand AddMoveCommand => field ??= new RelayCommand(this.AddMoveCommand_Execute, this.AddMoveCommand_CanExecute);
-        /// <summary>
-        /// 帳簿項目追加コマンド
-        /// </summary>
-        public ICommand AddActionCommand => field ??= new RelayCommand(this.AddActionCommand_Execute, this.AddActionCommand_CanExecute);
-        /// <summary>
-        /// 帳簿項目リスト追加コマンド
-        /// </summary>
-        public ICommand AddActionListCommand => field ??= new RelayCommand(this.AddActionListCommand_Execute, this.AddActionListCommand_CanExecute);
-        /// <summary>
-        /// 複製コマンド
-        /// </summary>
-        public ICommand CopyCommand => field ??= new AsyncRelayCommand(this.CopyCommand_ExecuteAsync, this.CopyCommand_CanExecute);
-        /// <summary>
-        /// 編集コマンド
-        /// </summary>
-        public ICommand EditCommand => field ??= new AsyncRelayCommand(this.EditCommand_ExecuteAsync, this.EditCommand_CanExecute);
-        /// <summary>
-        /// 削除コマンド
-        /// </summary>
-        public ICommand DeleteCommand => field ??= new AsyncRelayCommand(this.DeleteCommand_ExecuteAsync, this.DeleteCommand_CanExecute);
-        /// <summary>
-        /// 一致フラグ変更コマンド
-        /// </summary>
-        public ICommand ChangeIsMatchCommand => field ??= new AsyncRelayCommand(this.ChangeIsMatchCommand_ExecuteAsync, this.ChangeIsMatchCommand_CanExecute);
-        #endregion
-        #endregion
-
-        #region コマンドイベントハンドラ
-        /// <summary>
-        /// 編集コマンド実行可能か
-        /// </summary>
-        /// <returns></returns>
-        private bool EditMenuCommand_CanExecute() => !this.Parent.IsChildrenWindowOpened();
-
-        /// <summary>
-        /// 検索欄表示コマンド実行可能か
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>帳簿タブを選択しているか</remarks>
-        private bool ShowFindBoxCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab;
-        /// <summary>
-        /// 検索欄表示コマンド処理
-        /// </summary>
-        private void ShowFindBoxCommand_Execute() => this.SelectedFindKind = FindKind.Find;
-
         /// <summary>
         /// 検索欄非表示コマンド処理
         /// </summary>
@@ -360,35 +299,27 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 置換欄表示コマンド実行可能か
+        /// 置換欄表示コマンド
         /// </summary>
-        /// <returns></returns>
         /// <remarks>帳簿タブを選択しているか</remarks>
-        private bool ShowReplaceBoxCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab;
-        /// <summary>
-        /// 置換欄表示コマンド処理
-        /// </summary>
-        private void ShowReplaceBoxCommand_Execute() => this.SelectedFindKind = FindKind.Replace;
+        public ICommand ShowReplaceBoxCommand => field ??= new RelayCommand(() => this.SelectedFindKind = FindKind.Replace, () => this.Parent.SelectedTab == Tabs.BooksTab);
 
         /// <summary>
-        /// 置換欄非表示コマンド処理
+        /// 置換欄非表示コマンド
         /// </summary>
-        private void HideReplaceBoxCommand_Execute() => this.SelectedFindKind = FindKind.Find;
+        public ICommand HideReplaceBoxCommand => field ??= new RelayCommand(() => this.SelectedFindKind = FindKind.Find);
 
         /// <summary>
-        /// 帳簿項目検索コマンド実行可能か
+        /// 帳簿項目検索コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool FindActionCommand_CanExecute() => !string.IsNullOrWhiteSpace(this.FindInputText);
+        public ICommand FindActionCommand => field ??= new RelayCommand(() => this.FindText = this.FindInputText, () => !string.IsNullOrWhiteSpace(this.FindInputText));
+
         /// <summary>
-        /// 帳簿項目検索コマンド処理
+        /// 帳簿項目置換コマンド
         /// </summary>
-        private void FindActionCommand_Execute() => this.FindText = this.FindInputText;
-        /// <summary>
-        /// 帳簿項目置換コマンド実行可能か
-        /// </summary>
-        /// <returns></returns>
-        private bool ReplaceActionCommand_CanExecute() => !string.IsNullOrWhiteSpace(this.FindInputText) && this.FindInputText != this.ReplaceText;
+        public ICommand ReplaceActionCommand => field ??= new AsyncRelayCommand(
+            this.ReplaceActionCommand_ExecuteAsync,
+            () => !string.IsNullOrWhiteSpace(this.FindInputText) && this.FindInputText != this.ReplaceText);
         /// <summary>
         /// 帳簿項目置換コマンド処理
         /// </summary>
@@ -417,11 +348,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 移動追加コマンド実行可能か
+        /// 移動追加コマンド
         /// </summary>
-        /// <returns></returns>
         /// <remarks>帳簿タブを選択 かつ 帳簿が2つ以上存在 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない</remarks>
-        private bool AddMoveCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookSelectorVM.Count >= 2 && this.Parent.BookSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened();
+        public ICommand AddMoveCommand => field ??= new RelayCommand(
+            this.AddMoveCommand_Execute,
+            () => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookSelectorVM.Count >= 2 && this.Parent.BookSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 移動追加コマンド処理
         /// </summary>
@@ -438,11 +370,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 帳簿項目追加コマンド実行可能か
+        /// 帳簿項目追加コマンド
         /// </summary>
-        /// <returns></returns>
         /// <remarks>帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない</remarks>
-        private bool AddActionCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened();
+        public ICommand AddActionCommand => field ??= new RelayCommand(
+            this.AddActionCommand_Execute,
+            () => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 帳簿項目追加コマンド処理
         /// </summary>
@@ -459,11 +392,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 帳簿項目リスト追加コマンド実行可能か
+        /// 帳簿項目リスト追加コマンド
         /// </summary>
-        /// <returns></returns>
         /// <remarks>帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウを開いていない</remarks>
-        private bool AddActionListCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened();
+        public ICommand AddActionListCommand => field ??= new RelayCommand(
+            this.AddActionListCommand_Execute,
+            () => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 帳簿項目リスト追加コマンド処理
         /// </summary>
@@ -480,12 +414,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 複製コマンド実行可能か
+        /// 複製コマンド
         /// </summary>
-        /// <returns></returns>
         /// <remarks>帳簿タブを選択 かつ 選択されている帳簿項目が1つだけ存在 かつ 選択している帳簿項目のIDが0より大きい かつ 子ウィンドウを開いていない</remarks>
-        private bool CopyCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab &&
-                   this.SelectedActionVMList.Count == 1 && 0 < (int)this.SelectedActionVM.ActionWithBalance.Action.ActionId && !this.Parent.IsChildrenWindowOpened();
+        public ICommand CopyCommand => field ??= new AsyncRelayCommand(
+            this.CopyCommand_ExecuteAsync,
+            () => this.Parent.SelectedTab == Tabs.BooksTab &&
+                  this.SelectedActionVMList.Count == 1 && 0 < (int)this.SelectedActionVM.ActionWithBalance.Action.ActionId && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 複製コマンド処理
         /// </summary>
@@ -523,12 +458,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 編集コマンド実行可能か
+        /// 編集コマンド
         /// </summary>
-        /// <returns></returns>
         /// <remarks>帳簿タブを選択 かつ 選択されている帳簿項目が1つだけ存在 かつ 選択している帳簿項目のIDが0より大きい かつ 子ウィンドウを開いていない</remarks>
-        private bool EditCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab &&
-                   this.SelectedActionVMList.Count == 1 && 0 < (int)this.SelectedActionVM.ActionWithBalance.Action.ActionId && !this.Parent.IsChildrenWindowOpened();
+        public ICommand EditCommand => field ??= new AsyncRelayCommand(
+            this.EditCommand_ExecuteAsync,
+            () => this.Parent.SelectedTab == Tabs.BooksTab &&
+                  this.SelectedActionVMList.Count == 1 && 0 < (int)this.SelectedActionVM.ActionWithBalance.Action.ActionId && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 編集コマンド処理
         /// </summary>
@@ -574,12 +510,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 削除コマンド実行可能か
+        /// 削除コマンド
         /// </summary>
-        /// <returns></returns>
         /// <remarks>帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 子ウィンドウが開いていない</remarks>
-        private bool DeleteCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab &&
-                   this.SelectedActionVMList.Where(vm => 0 < (int)vm.ActionWithBalance.Action.ActionId).Any() && !this.Parent.IsChildrenWindowOpened();
+        public ICommand DeleteCommand => field ??= new AsyncRelayCommand(
+            this.DeleteCommand_ExecuteAsync,
+            () => this.Parent.SelectedTab == Tabs.BooksTab &&
+                  this.SelectedActionVMList.Any(static vm => 0 < (int)vm.ActionWithBalance.Action.ActionId) && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 削除コマンド処理
         /// </summary>
@@ -597,12 +534,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 一致フラグ変更コマンド実行可能か
+        /// 一致フラグ変更コマンド
         /// </summary>
-        /// <returns></returns>
         /// <remarks>帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 登録ウィンドウが開いていない</remarks>
-        private bool ChangeIsMatchCommand_CanExecute() => this.Parent.SelectedTab == Tabs.BooksTab &&
-                   this.SelectedActionVMList.Where(vm => 0 < (int)vm.ActionWithBalance.Action.ActionId).Any() && !this.Parent.IsRegistrationWindowOpened();
+        public ICommand ChangeIsMatchCommand => field ??= new AsyncRelayCommand(
+            this.ChangeIsMatchCommand_ExecuteAsync,
+            () => this.Parent.SelectedTab == Tabs.BooksTab &&
+                  this.SelectedActionVMList.Any(vm => 0 < (int)vm.ActionWithBalance.Action.ActionId) && !this.Parent.IsRegistrationWindowOpened());
         /// <summary>
         /// 一致フラグ変更コマンド処理
         /// </summary>

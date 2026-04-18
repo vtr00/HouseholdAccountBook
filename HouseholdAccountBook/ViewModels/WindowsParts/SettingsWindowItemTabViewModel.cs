@@ -70,140 +70,103 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             get;
             set => this.SetProperty(ref field, value);
         }
+        #endregion
 
         #region コマンド
         /// <summary>
         /// 分類追加コマンド
         /// </summary>
-        public ICommand AddCategoryCommand => field ??= new AsyncRelayCommand(this.AddCategoryCommand_ExecuteAsync, this.AddCategoryCommand_CanExecute);
-        /// <summary>
-        /// 項目追加コマンド
-        /// </summary>
-        public ICommand AddItemCommand => field ??= new AsyncRelayCommand(this.AddItemCommand_ExecuteAsync, this.AddItemCommand_CanExecute);
-        /// <summary>
-        /// 分類/項目削除コマンド
-        /// </summary>
-        public ICommand DeleteItemCommand => field ??= new AsyncRelayCommand(this.DeleteItemCommand_ExecuteAsync, this.DeleteItemCommand_CanExecute);
-        /// <summary>
-        /// 分類/項目表示順上昇コマンド
-        /// </summary>
-        public ICommand RaiseItemSortOrderCommand => field ??= new AsyncRelayCommand(this.RaiseItemSortOrderCommand_ExecuteAsync, this.RaiseItemSortOrderCommand_CanExecute);
-        /// <summary>
-        /// 分類/項目表示順下降コマンド
-        /// </summary>
-        public ICommand DropItemSortOrderCommand => field ??= new AsyncRelayCommand(this.DropItemSortOrderCommand_ExecuteAsync, this.DropItemSortOrderCommand_CanExecute);
-        /// <summary>
-        /// 分類/項目情報保存コマンド
-        /// </summary>
-        public ICommand SaveItemInfoCommand => field ??= new AsyncRelayCommand(this.SaveItemInfoCommand_ExecuteAsync, this.SaveItemInfoCommand_CanExecute);
-        /// <summary>
-        /// 項目-帳簿関係変更コマンド
-        /// </summary>
-        public ICommand ChangeItemRelationCommand => field ??= new AsyncRelayCommand<object>(this.ChangeItemRelationCommand_ExecuteAsync);
-        /// <summary>
-        /// 店名削除コマンド
-        /// </summary>
-        public ICommand DeleteShopNameCommand => field ??= new AsyncRelayCommand(this.DeleteShopNameCommand_ExecuteAsync, this.DeleteShopNameCommand_CanExecute);
-        /// <summary>
-        /// 備考削除コマンド
-        /// </summary>
-        public ICommand DeleteRemarkCommand => field ??= new AsyncRelayCommand(this.DeleteRemarkCommand_ExecuteAsync, this.DeleteRemarkCommand_CanExecute);
-        #endregion
-        #endregion
-
-        #region コマンドイベントハンドラ
-        /// <summary>
-        /// 分類追加コマンド実行可能か
-        /// </summary>
-        /// <returns></returns>
-        private bool AddCategoryCommand_CanExecute() => this.SelectedItemTreeVM != null;
-
+        public ICommand AddCategoryCommand => field ??= new AsyncRelayCommand(this.AddCategoryCommand_ExecuteAsync, () => this.SelectedItemTreeVM != null);
         /// <summary>
         /// 分類追加コマンド処理
         /// </summary>
         private async Task AddCategoryCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                ItemTreeViewModel vm = this.SelectedItemTreeVM;
-                while (vm?.Kind != HierarchicalKind.Balance) {
-                    vm = vm.ParentVM;
-                }
-                CategoryIdObj categoryId = await this.mSettingService.AddCategoryAsync((BalanceKind)vm.Id.Id);
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
-                await this.LoadAsync(HierarchicalKind.Category, categoryId);
-                this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
+            ItemTreeViewModel vm = this.SelectedItemTreeVM;
+            while (vm?.Kind != HierarchicalKind.Balance) {
+                vm = vm.ParentVM;
             }
+            CategoryIdObj categoryId = await this.mSettingService.AddCategoryAsync((BalanceKind)vm.Id.Id);
+
+            await this.LoadAsync(HierarchicalKind.Category, categoryId);
+            this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
-        /// 項目追加コマンド実行可能か
+        /// 項目追加コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool AddItemCommand_CanExecute() => this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance;
-
+        public ICommand AddItemCommand => field ??= new AsyncRelayCommand(
+            this.AddItemCommand_ExecuteAsync,
+            () => this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance);
         /// <summary>
         /// 項目追加コマンド処理
         /// </summary>
         private async Task AddItemCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                ItemTreeViewModel vm = this.SelectedItemTreeVM;
-                while (vm?.Kind != HierarchicalKind.Category) {
-                    vm = vm.ParentVM;
-                }
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
-                ItemIdObj itemId = await this.mSettingService.AddItemAsync(vm.Id.Id);
-
-                await this.LoadAsync(HierarchicalKind.Item, itemId);
-                this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
+            ItemTreeViewModel vm = this.SelectedItemTreeVM;
+            while (vm?.Kind != HierarchicalKind.Category) {
+                vm = vm.ParentVM;
             }
+
+            ItemIdObj itemId = await this.mSettingService.AddItemAsync(vm.Id.Id);
+
+            await this.LoadAsync(HierarchicalKind.Item, itemId);
+            this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
-        /// 分類/項目削除コマンド実行可能か
+        /// 分類/項目削除コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool DeleteItemCommand_CanExecute() => this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance;
-
+        public ICommand DeleteItemCommand => field ??= new AsyncRelayCommand(
+            this.DeleteItemCommand_ExecuteAsync,
+            () => this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance);
         /// <summary>
         /// 分類/項目削除コマンド処理
         /// </summary>
         private async Task DeleteItemCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                HierarchicalKind? kind = this.SelectedItemTreeVM?.Kind;
-                IdObj id = this.SelectedItemTreeVM.Id;
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
-                bool result = false;
+            HierarchicalKind? kind = this.SelectedItemTreeVM?.Kind;
+            IdObj id = this.SelectedItemTreeVM.Id;
+
+            bool result = false;
+            switch (kind) {
+                case HierarchicalKind.Category: {
+                    result = await this.mSettingService.DeleteCategoryAsync((int)id);
+                }
+                break;
+                case HierarchicalKind.Item: {
+                    result = await this.mSettingService.DeleteItemAsync((int)id);
+                }
+                break;
+            }
+            if (result) {
+                await this.LoadAsync(this.SelectedItemTreeVM.ParentVM?.Kind, this.SelectedItemTreeVM.ParentVM.Id);
+                this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
+            }
+            else {
                 switch (kind) {
                     case HierarchicalKind.Category: {
-                        result = await this.mSettingService.DeleteCategoryAsync((int)id);
+                        _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInCategory, Properties.Resources.Title_Error);
+                        break;
                     }
-                    break;
                     case HierarchicalKind.Item: {
-                        result = await this.mSettingService.DeleteItemAsync((int)id);
-                    }
-                    break;
-                }
-                if (result) {
-                    await this.LoadAsync(this.SelectedItemTreeVM.ParentVM?.Kind, this.SelectedItemTreeVM.ParentVM.Id);
-                    this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
-                }
-                else {
-                    switch (kind) {
-                        case HierarchicalKind.Category: {
-                            _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInCategory, Properties.Resources.Title_Error);
-                            break;
-                        }
-                        case HierarchicalKind.Item: {
-                            _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItem, Properties.Resources.Title_Error);
-                            break;
-                        }
+                        _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItem, Properties.Resources.Title_Error);
+                        break;
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// 分類/項目表示順上昇コマンド
+        /// </summary>
+        public ICommand RaiseItemSortOrderCommand => field ??= new AsyncRelayCommand(this.RaiseItemSortOrderCommand_ExecuteAsync, this.RaiseItemSortOrderCommand_CanExecute);
         /// <summary>
         /// 分類/項目表示順上昇コマンド実行可能か
         /// </summary>
@@ -227,44 +190,47 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
             return canExecute;
         }
-
         /// <summary>
         /// 分類/項目表示順上昇コマンド処理
         /// </summary>
         private async Task RaiseItemSortOrderCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                var parentVM = this.SelectedItemTreeVM.ParentVM;
-                int index = parentVM.ChildrenVMList.IndexOf(this.SelectedItemTreeVM);
-                IdObj changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
-                if (0 < index) {
-                    IdObj changedId = parentVM.ChildrenVMList[index - 1].Id; // 入れ替え対象の項目のID
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
-                    switch (this.SelectedItemTreeVM?.Kind) {
-                        case HierarchicalKind.Category: {
-                            await this.mSettingService.SwapCategorySortOrderAsync((int)changingId, (int)changedId);
-                        }
-                        break;
-                        case HierarchicalKind.Item: {
-                            await this.mSettingService.SwapItemSortOrderAsync((int)changingId, (int)changedId);
-                        }
-                        break;
+            ItemTreeViewModel parentVM = this.SelectedItemTreeVM.ParentVM;
+            int index = parentVM.ChildrenVMList.IndexOf(this.SelectedItemTreeVM);
+            IdObj changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
+            if (0 < index) {
+                IdObj changedId = parentVM.ChildrenVMList[index - 1].Id; // 入れ替え対象の項目のID
+
+                switch (this.SelectedItemTreeVM?.Kind) {
+                    case HierarchicalKind.Category: {
+                        await this.mSettingService.SwapCategorySortOrderAsync((int)changingId, (int)changedId);
                     }
+                    break;
+                    case HierarchicalKind.Item: {
+                        await this.mSettingService.SwapItemSortOrderAsync((int)changingId, (int)changedId);
+                    }
+                    break;
                 }
-                else { // 分類を跨いで項目の表示順を変更するとき
-                    Debug.Assert(this.SelectedItemTreeVM?.Kind == HierarchicalKind.Item);
-                    var grandparentVM = parentVM.ParentVM;
-                    int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
-                    CategoryIdObj toCategoryId = new((int)grandparentVM.ChildrenVMList[index2 - 1].Id);
-
-                    await this.mSettingService.UpdateItemSortOrderToMaximumAsync(toCategoryId, changingId.Id);
-                }
-
-                await this.LoadAsync(this.SelectedItemTreeVM?.Kind, this.SelectedItemTreeVM.Id);
-                this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
+            else { // 分類を跨いで項目の表示順を変更するとき
+                Debug.Assert(this.SelectedItemTreeVM?.Kind == HierarchicalKind.Item);
+                var grandparentVM = parentVM.ParentVM;
+                int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
+                CategoryIdObj toCategoryId = new((int)grandparentVM.ChildrenVMList[index2 - 1].Id);
+
+                await this.mSettingService.UpdateItemSortOrderToMaximumAsync(toCategoryId, changingId.Id);
+            }
+
+            await this.LoadAsync(this.SelectedItemTreeVM?.Kind, this.SelectedItemTreeVM.Id);
+            this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// 分類/項目表示順下降コマンド
+        /// </summary>
+        public ICommand DropItemSortOrderCommand => field ??= new AsyncRelayCommand(this.DropItemSortOrderCommand_ExecuteAsync, this.DropItemSortOrderCommand_CanExecute);
         /// <summary>
         /// 分類/項目表示順下降コマンド実行可能か
         /// </summary>
@@ -288,107 +254,105 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
             return canExecute;
         }
-
         /// <summary>
         /// 分類/項目表示順下降コマンド処理
         /// </summary>
         private async Task DropItemSortOrderCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                var parentVM = this.SelectedItemTreeVM.ParentVM;
-                int index = parentVM.ChildrenVMList.IndexOf(this.SelectedItemTreeVM);
-                IdObj changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
-                if (parentVM.ChildrenVMList.Count - 1 > index) {
-                    IdObj changedId = parentVM.ChildrenVMList[index + 1].Id; // 入れ替え対象の項目のID
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
-                    switch (this.SelectedItemTreeVM?.Kind) {
-                        case HierarchicalKind.Category: {
-                            await this.mSettingService.SwapCategorySortOrderAsync((int)changingId, (int)changedId);
-                        }
-                        break;
-                        case HierarchicalKind.Item: {
-                            await this.mSettingService.SwapItemSortOrderAsync((int)changingId, (int)changedId);
-                        }
-                        break;
+            ItemTreeViewModel parentVM = this.SelectedItemTreeVM.ParentVM;
+            int index = parentVM.ChildrenVMList.IndexOf(this.SelectedItemTreeVM);
+            IdObj changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
+            if (parentVM.ChildrenVMList.Count - 1 > index) {
+                IdObj changedId = parentVM.ChildrenVMList[index + 1].Id; // 入れ替え対象の項目のID
+
+                switch (this.SelectedItemTreeVM?.Kind) {
+                    case HierarchicalKind.Category: {
+                        await this.mSettingService.SwapCategorySortOrderAsync((int)changingId, (int)changedId);
                     }
+                    break;
+                    case HierarchicalKind.Item: {
+                        await this.mSettingService.SwapItemSortOrderAsync((int)changingId, (int)changedId);
+                    }
+                    break;
                 }
-                else { // 分類を跨いで項目の表示順を変更するとき
-                    Debug.Assert(this.SelectedItemTreeVM?.Kind == HierarchicalKind.Item);
-                    var grandparentVM = parentVM.ParentVM;
-                    int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
-                    CategoryIdObj toCategoryId = new((int)grandparentVM.ChildrenVMList[index2 + 1].Id);
-
-                    await this.mSettingService.UpdateItemSortOrderToMinimumAsync(toCategoryId, changingId.Id);
-                }
-
-                await this.LoadAsync(this.SelectedItemTreeVM?.Kind, this.SelectedItemTreeVM.Id);
-                this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
+            else { // 分類を跨いで項目の表示順を変更するとき
+                Debug.Assert(this.SelectedItemTreeVM?.Kind == HierarchicalKind.Item);
+                var grandparentVM = parentVM.ParentVM;
+                int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
+                CategoryIdObj toCategoryId = new((int)grandparentVM.ChildrenVMList[index2 + 1].Id);
+
+                await this.mSettingService.UpdateItemSortOrderToMinimumAsync(toCategoryId, changingId.Id);
+            }
+
+            await this.LoadAsync(this.SelectedItemTreeVM?.Kind, this.SelectedItemTreeVM.Id);
+            this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
-        /// 分類/項目情報保存コマンド実行可能か
+        /// 分類/項目情報保存コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool SaveItemInfoCommand_CanExecute()
-        {
-            return this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance &&
-                   !string.IsNullOrWhiteSpace(this.SelectedItemTreeVM.Name);
-        }
-
+        public ICommand SaveItemInfoCommand => field ??= new AsyncRelayCommand(
+            this.SaveItemInfoCommand_ExecuteAsync,
+            () => this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance && !string.IsNullOrWhiteSpace(this.SelectedItemTreeVM.Name));
         /// <summary>
         /// 分類/項目情報保存コマンド処理
         /// </summary>
         private async Task SaveItemInfoCommand_ExecuteAsync()
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                ItemSettingViewModel vm = this.DisplayedItemSettingVM;
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
-                switch (vm.Kind) {
-                    case HierarchicalKind.Category: {
-                        await this.mSettingService.SaveCategoryAsync(new(vm.Id.Id, vm.InputedName));
-                    }
-                    break;
-                    case HierarchicalKind.Item: {
-                        await this.mSettingService.SaveItemAsync(new(vm.Id.Id, vm.InputedName));
-                    }
-                    break;
+            ItemSettingViewModel vm = this.DisplayedItemSettingVM;
+            switch (vm.Kind) {
+                case HierarchicalKind.Category: {
+                    await this.mSettingService.SaveCategoryAsync(new(vm.Id.Id, vm.InputedName));
                 }
-
-                await this.LoadAsync(vm.Kind, vm.Id);
-                _ = MessageBox.Show(Properties.Resources.Message_FinishToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
-                this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
+                break;
+                case HierarchicalKind.Item: {
+                    await this.mSettingService.SaveItemAsync(new(vm.Id.Id, vm.InputedName));
+                }
+                break;
             }
+
+            await this.LoadAsync(vm.Kind, vm.Id);
+            _ = MessageBox.Show(Properties.Resources.Message_FinishToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
+            this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// 項目-帳簿関係変更コマンド
+        /// </summary>
+        public ICommand ChangeItemRelationCommand => field ??= new AsyncRelayCommand<object>(this.ChangeItemRelationCommand_ExecuteAsync);
         /// <summary>
         /// 項目-帳簿関係変更コマンド処理
         /// </summary>
         /// <param name="viewModel">チェック対象に紐づくVM</param>
         private async Task ChangeItemRelationCommand_ExecuteAsync(object viewModel)
         {
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
+            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
-                ItemSettingViewModel vm = this.DisplayedItemSettingVM;
-                vm.RelationSelectorVM.SelectedItem = viewModel as RelationViewModel; // チェックボックスを変更しただけでは変更されないため、引数で受け取る
+            Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
-                if (await this.mSettingService.SaveBookItemRemationAsync(vm.RelationSelectorVM.SelectedKey, (int)vm.Id, vm.RelationSelectorVM.SelectedItem.IsRelated)) {
-                    this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
-                }
-                else {
-                    vm.RelationSelectorVM.SelectedItem.IsRelated = !vm.RelationSelectorVM.SelectedItem.IsRelated; // 選択前の状態に戻す
-                    _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
-                }
+            ItemSettingViewModel vm = this.DisplayedItemSettingVM;
+            vm.RelationSelectorVM.SelectedItem = viewModel as RelationViewModel; // チェックボックスを変更しただけでは変更されないため、引数で受け取る
+
+            if (await this.mSettingService.SaveBookItemRemationAsync(vm.RelationSelectorVM.SelectedKey, (int)vm.Id, vm.RelationSelectorVM.SelectedItem.IsRelated)) {
+                this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
+            }
+            else {
+                vm.RelationSelectorVM.SelectedItem.IsRelated = !vm.RelationSelectorVM.SelectedItem.IsRelated; // 選択前の状態に戻す
+                _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
             }
         }
 
         /// <summary>
-        /// 店名削除コマンド実行可能か
+        /// 店名削除コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool DeleteShopNameCommand_CanExecute() => this.DisplayedItemSettingVM?.ShopSelectorVM.SelectedItem != null;
-
+        public ICommand DeleteShopNameCommand => field ??= new AsyncRelayCommand(
+            this.DeleteShopNameCommand_ExecuteAsync,
+            () => this.DisplayedItemSettingVM?.ShopSelectorVM.SelectedItem != null);
         /// <summary>
         /// 店名削除コマンド処理
         /// </summary>
@@ -396,23 +360,23 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
+                using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
-                    await this.mSettingService.DeleteShopAsync(this.DisplayedItemSettingVM.ShopSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Id);
+                Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
-                    SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
-                    this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
-                }
+                await this.mSettingService.DeleteShopAsync(this.DisplayedItemSettingVM.ShopSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Id);
+
+                SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
+                this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
             }
         }
 
         /// <summary>
-        /// 備考削除コマンド実行可能か
+        /// 備考削除コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool DeleteRemarkCommand_CanExecute() => this.DisplayedItemSettingVM?.RemarkSelectorVM.SelectedItem != null;
-
+        public ICommand DeleteRemarkCommand => field ??= new AsyncRelayCommand(
+            this.DeleteRemarkCommand_ExecuteAsync,
+            () => this.DisplayedItemSettingVM?.RemarkSelectorVM.SelectedItem != null);
         /// <summary>
         /// 備考削除コマンド処理
         /// </summary>
@@ -420,14 +384,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
+                using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
 
-                    await this.mSettingService.DeleteRemarkAsync(this.DisplayedItemSettingVM.RemarkSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Id);
+                Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
-                    SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
-                    this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
-                }
+                await this.mSettingService.DeleteRemarkAsync(this.DisplayedItemSettingVM.RemarkSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Id);
+
+                SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
+                this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
             }
         }
         #endregion

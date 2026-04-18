@@ -108,32 +108,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             set => this.SetProperty(ref field, value);
         }
         #endregion
+        #endregion
 
         #region コマンド
         /// <summary>
         /// pg_dump.exeファイル選択コマンド
         /// </summary>
         public ICommand SelectPgDumpFilePathCommand => field ??= new RelayCommand(this.SelectPgDumpFilePathCommand_Execute);
-        /// <summary>
-        /// pg_restore.exeファイル選択コマンド
-        /// </summary>
-        public ICommand SelectPgRestoreFilePathCommand => field ??= new RelayCommand(this.SelectPgRestoreFilePathCommand_Execute);
-        /// <summary>
-        /// データベース再設定コマンド
-        /// </summary>
-        public ICommand RestartForDbSettingCommand => field ??= new RelayCommand(this.RestartForDbSettingCommand_Execute);
-        /// <summary>
-        /// CSVフォルダ選択コマンド
-        /// </summary>
-        public ICommand SelectCsvFolderPathCommand => field ??= new RelayCommand(this.SelectCsvFolderPathCommand_Execute);
-        /// <summary>
-        /// DB設定保存コマンド
-        /// </summary>
-        public ICommand SaveDbSettingsCommand => field ??= new RelayCommand(this.SaveDbSettingsCommand_Execute);
-        #endregion
-        #endregion
-
-        #region コマンドイベントハンドラ
         /// <summary>
         /// ファイル選択コマンド処理
         /// </summary>
@@ -157,6 +138,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
+        /// pg_restore.exeファイル選択コマンド
+        /// </summary>
+        public ICommand SelectPgRestoreFilePathCommand => field ??= new RelayCommand(this.SelectPgRestoreFilePathCommand_Execute);
+        /// <summary>
         /// ファイル選択コマンド処理
         /// </summary>
         private void SelectPgRestoreFilePathCommand_Execute()
@@ -179,6 +164,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
+        /// データベース再設定コマンド
+        /// </summary>
+        public ICommand RestartForDbSettingCommand => field ??= new RelayCommand(this.RestartForDbSettingCommand_Execute);
+        /// <summary>
         /// データベース設定コマンド処理
         /// </summary>
         private void RestartForDbSettingCommand_Execute()
@@ -191,6 +180,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
         }
 
+        /// <summary>
+        /// CSVフォルダ選択コマンド
+        /// </summary>
+        public ICommand SelectCsvFolderPathCommand => field ??= new RelayCommand(this.SelectCsvFolderPathCommand_Execute);
         /// <summary>
         /// CSVフォルダ選択コマンド処理
         /// </summary>
@@ -214,6 +207,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
         }
 
+        /// <summary>
+        /// DB設定保存コマンド
+        /// </summary>
+        public ICommand SaveDbSettingsCommand => field ??= new RelayCommand(this.SaveDbSettingsCommand_Execute);
         /// <summary>
         /// DB設定保存コマンド処理
         /// </summary>

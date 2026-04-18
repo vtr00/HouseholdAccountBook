@@ -137,28 +137,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             set => this.SetProperty(ref field, value);
         }
         #endregion
+        #endregion
 
         #region コマンド
         /// <summary>
         /// 言語設定適用コマンド
         /// </summary>
         public ICommand RestartForLanguageCommand => field ??= new RelayCommand(this.RestartForLanguageCommand_Execute);
-        /// <summary>
-        /// ウィンドウ設定再読込コマンド
-        /// </summary>
-        public ICommand ReloadWindowSettingCommand => field ??= new RelayCommand(this.ReloadWindowSettingCommand_Execute);
-        /// <summary>
-        /// ウィンドウ設定初期化コマンド
-        /// </summary>
-        public ICommand InitializeWindowSettingCommand => field ??= new RelayCommand(this.InitializeWindowSettingCommand_Execute);
-        /// <summary>
-        /// その他設定保存コマンド
-        /// </summary>
-        public ICommand SaveOtherSettingsCommand => field ??= new RelayCommand(this.SaveOtherSettingsCommand_Execute);
-        #endregion
-        #endregion
-
-        #region コマンドイベントハンドラ
         /// <summary>
         /// 言語設定適用コマンド処理
         /// </summary>
@@ -173,10 +158,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// ウィンドウ設定再読込コマンド処理
+        /// ウィンドウ設定再読込コマンド
         /// </summary>
-        private void ReloadWindowSettingCommand_Execute() => this.WindowSettingVMList = LoadWindowSettings();
+        public ICommand ReloadWindowSettingCommand => field ??= new RelayCommand(() => this.WindowSettingVMList = LoadWindowSettings());
 
+        /// <summary>
+        /// ウィンドウ設定初期化コマンド
+        /// </summary>
+        public ICommand InitializeWindowSettingCommand => field ??= new RelayCommand(this.InitializeWindowSettingCommand_Execute);
         /// <summary>
         /// ウィンドウ設定初期化コマンド処理
         /// </summary>
@@ -190,6 +179,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
         }
 
+        /// <summary>
+        /// その他設定保存コマンド
+        /// </summary>
+        public ICommand SaveOtherSettingsCommand => field ??= new RelayCommand(this.SaveOtherSettingsCommand_Execute);
         /// <summary>
         /// その他設定保存コマンド処理
         /// </summary>

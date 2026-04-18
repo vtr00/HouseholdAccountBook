@@ -53,40 +53,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             get;
             set => this.SetProperty(ref field, value);
         }
+        #endregion
 
         #region コマンド
         /// <summary>
         /// 帳簿追加コマンド
         /// </summary>
         public ICommand AddBookCommand => field ??= new AsyncRelayCommand(this.AddBookCommand_ExecuteAsync);
-        /// <summary>
-        /// 帳簿削除コマンド
-        /// </summary>
-        public ICommand DeleteBookCommand => field ??= new AsyncRelayCommand(this.DeleteBookCommand_ExecuteAsync, this.DeleteBookCommand_CanExecute);
-        /// <summary>
-        /// 帳簿表示順上昇コマンド
-        /// </summary>
-        public ICommand RaiseBookSortOrderCommand => field ??= new AsyncRelayCommand(this.RaiseBookSortOrderCommand_ExecuteAsync, this.RaiseBookSortOrderCommand_CanExecute);
-        /// <summary>
-        /// 帳簿表示順下降コマンド
-        /// </summary>
-        public ICommand DropBookSortOrderCommand => field ??= new AsyncRelayCommand(this.DropBookSortOrderCommand_ExecuteAsync, this.DropBookSortOrderCommand_CanExecute);
-        /// <summary>
-        /// 帳簿情報保存コマンド
-        /// </summary>
-        public ICommand SaveBookInfoCommand => field ??= new AsyncRelayCommand(this.SaveBookInfoCommand_ExecuteAsync, this.SaveBookInfoCommand_CanExecute);
-        /// <summary>
-        /// CSVフォルダパス選択コマンド
-        /// </summary>
-        public ICommand SelectCsvFolderPathCommand => field ??= new RelayCommand(this.SelectCsvFolderPathCommand_Execute);
-        /// <summary>
-        /// 帳簿-項目関係変更コマンド
-        /// </summary>
-        public ICommand ChangeBookRelationCommand => field ??= new AsyncRelayCommand<object>(this.ChangeBookRelationCommand_ExecuteAsync);
-        #endregion
-        #endregion
-
-        #region コマンドイベントハンドラ
         /// <summary>
         /// 帳簿追加コマンド処理
         /// </summary>
@@ -101,11 +74,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 帳簿削除コマンド実行可能か
+        /// 帳簿削除コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool DeleteBookCommand_CanExecute() => this.BookSelectorVM.SelectedItem != null;
-
+        public ICommand DeleteBookCommand => field ??= new AsyncRelayCommand(this.DeleteBookCommand_ExecuteAsync, () => this.BookSelectorVM.SelectedItem != null);
         /// <summary>
         /// 帳簿削除コマンド処理
         /// </summary>
@@ -123,11 +94,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 帳簿表示順上昇コマンド実行可能か
+        /// 帳簿表示順上昇コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool RaiseBookSortOrderCommand_CanExecute() => 0 < this.BookSelectorVM.SelectedIndex;
-
+        public ICommand RaiseBookSortOrderCommand => field ??= new AsyncRelayCommand(this.RaiseBookSortOrderCommand_ExecuteAsync, () => 0 < this.BookSelectorVM.SelectedIndex);
         /// <summary>
         /// 帳簿表示順上昇コマンド処理
         /// </summary>
@@ -146,16 +115,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 帳簿表示順下降コマンド実行可能か
+        /// 帳簿表示順下降コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool DropBookSortOrderCommand_CanExecute()
-        {
-            int index = this.BookSelectorVM.SelectedIndex;
-            bool canExecute = index != -1 && index < this.BookSelectorVM.Count - 1;
-            return canExecute;
-        }
-
+        public ICommand DropBookSortOrderCommand => field ??= new AsyncRelayCommand(
+            this.DropBookSortOrderCommand_ExecuteAsync,
+            () => this.BookSelectorVM.SelectedIndex != -1 && this.BookSelectorVM.SelectedIndex < this.BookSelectorVM.Count - 1);
         /// <summary>
         /// 帳簿表示順下降コマンド処理
         /// </summary>
@@ -174,11 +138,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
-        /// 帳簿情報保存コマンド実行可能か
+        /// 帳簿情報保存コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool SaveBookInfoCommand_CanExecute() => !string.IsNullOrWhiteSpace(this.DisplayedBookSettingVM?.InputedName);
-
+        public ICommand SaveBookInfoCommand => field ??= new AsyncRelayCommand(this.SaveBookInfoCommand_ExecuteAsync, () => !string.IsNullOrWhiteSpace(this.DisplayedBookSettingVM?.InputedName));
         /// <summary>
         /// 帳簿情報保存コマンド処理
         /// </summary>
@@ -210,6 +172,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
+        /// CSVフォルダパス選択コマンド
+        /// </summary>
+        public ICommand SelectCsvFolderPathCommand => field ??= new RelayCommand(this.SelectCsvFolderPathCommand_Execute);
+        /// <summary>
         /// CSVフォルダパス選択コマンド処理
         /// </summary>
         private void SelectCsvFolderPathCommand_Execute()
@@ -232,6 +198,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
         }
 
+        /// <summary>
+        /// 帳簿-項目関係変更コマンド
+        /// </summary>
+        public ICommand ChangeBookRelationCommand => field ??= new AsyncRelayCommand<object>(this.ChangeBookRelationCommand_ExecuteAsync);
         /// <summary>
         /// 帳簿-項目関係変更コマンド処理
         /// </summary>

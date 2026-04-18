@@ -147,48 +147,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.RaisePropertyChanged(nameof(this.AllCheckedCount));
             this.RaisePropertyChanged(nameof(this.SelectedCheckedCount));
         }
+        #endregion
 
         #region コマンド
         /// <summary>
         /// CSVファイルオープンコマンド
         /// </summary>
         public ICommand OpenCsvFilesCommand => field ??= new AsyncRelayCommand(this.OpenCsvFilesCommand_ExecuteAsync);
-        /// <summary>
-        /// CSVファイル移動コマンド
-        /// </summary>
-        public ICommand MoveCsvFilesCommand => field ??= new AsyncRelayCommand(this.MoveCsvFilesCommand_ExecuteAsync, this.MoveCsvFilesCommand_CanExecute);
-        /// <summary>
-        /// CSVファイルクローズコマンド
-        /// </summary>
-        public ICommand CloseCsvFilesCommand => field ??= new RelayCommand(this.CloseCsvFilesCommand_Execute, this.CloseCsvFilesCommand_CanExecute);
-        /// <summary>
-        /// 帳簿項目追加コマンド
-        /// </summary>
-        public ICommand AddActionCommand => field ??= new RelayCommand(this.AddActionCommand_Execute, this.AddActionCommand_CanExecute);
-        /// <summary>
-        /// 帳簿項目編集コマンド
-        /// </summary>
-        public ICommand EditActionCommand => field ??= new AsyncRelayCommand(this.EditActionCommand_ExecuteAsync, this.EditActionCommand_CanExecute);
-        /// <summary>
-        /// 帳簿項目追加/編集コマンド
-        /// </summary>
-        public ICommand AddOrEditActionCommand => field ??= new AsyncRelayCommand(this.AddOrEditActionCommand_ExecuteAsync, this.AddOrEditActionCommand_CanExecute);
-        /// <summary>
-        /// 一括チェックコマンド
-        /// </summary>
-        public ICommand BulkCheckCommand => field ??= new RelayCommand(this.BulkCheckCommand_Execute, this.BulkCheckCommand_CanExecute);
-        /// <summary>
-        /// リスト更新コマンド
-        /// </summary>
-        public ICommand UpdateListCommand => field ??= new RelayCommand(this.UpdateListCommand_Execute, this.UpdateListCommand_CanExecute);
-        /// <summary>
-        /// 一致チェック変更コマンド
-        /// </summary>
-        public ICommand ChangeIsMatchCommand => field ??= new RelayCommand(this.ChangeIsMatchCommand_Execute);
-        #endregion
-        #endregion
-
-        #region コマンドイベントハンドラ
         /// <summary>
         /// CSVファイルオープンコマンド処理
         /// </summary>
@@ -218,6 +183,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
 
+        /// <summary>
+        /// CSVファイル移動コマンド
+        /// </summary>
+        public ICommand MoveCsvFilesCommand => field ??= new AsyncRelayCommand(this.MoveCsvFilesCommand_ExecuteAsync, this.MoveCsvFilesCommand_CanExecute);
         /// <summary>
         /// CSVファイル移動コマンド実行可能か
         /// </summary>
@@ -285,6 +254,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
+        /// CSVファイルクローズコマンド
+        /// </summary>
+        public ICommand CloseCsvFilesCommand => field ??= new RelayCommand(this.CloseCsvFilesCommand_Execute, this.CloseCsvFilesCommand_CanExecute);
+        /// <summary>
         /// CSVファイルクローズコマンド実行可能か
         /// </summary>
         /// <returns></returns>
@@ -300,6 +273,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.CsvFilePathList.Clear();
         }
 
+        /// <summary>
+        /// 帳簿項目追加コマンド
+        /// </summary>
+        public ICommand AddActionCommand => field ??= new RelayCommand(this.AddActionCommand_Execute, this.AddActionCommand_CanExecute);
         /// <summary>
         /// 帳簿項目追加コマンド実行可能か
         /// </summary>
@@ -348,6 +325,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
+        /// 帳簿項目編集コマンド
+        /// </summary>
+        public ICommand EditActionCommand => field ??= new AsyncRelayCommand(this.EditActionCommand_ExecuteAsync, this.EditActionCommand_CanExecute);
+        /// <summary>
         /// 帳簿項目編集コマンド実行可能か
         /// </summary>
         /// <returns></returns>
@@ -395,6 +376,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
+        /// 帳簿項目追加/編集コマンド
+        /// </summary>
+        public ICommand AddOrEditActionCommand => field ??= new AsyncRelayCommand(this.AddOrEditActionCommand_ExecuteAsync, this.AddOrEditActionCommand_CanExecute);
+        /// <summary>
         /// 帳簿項目追加/編集コマンド実行可能か
         /// </summary>
         /// <returns></returns>
@@ -413,6 +398,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
 
+        /// <summary>
+        /// 一括チェックコマンド
+        /// </summary>
+        public ICommand BulkCheckCommand => field ??= new RelayCommand(this.BulkCheckCommand_Execute, this.BulkCheckCommand_CanExecute);
         /// <summary>
         /// 一括チェックコマンド実行可能か
         /// </summary>
@@ -444,12 +433,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 更新コマンド実行可能か
+        /// リスト更新コマンド
+        /// </summary>
+        public ICommand UpdateListCommand => field ??= new RelayCommand(this.UpdateListCommand_Execute, this.UpdateListCommand_CanExecute);
+        /// <summary>
+        /// リスト更新コマンド実行可能か
         /// </summary>
         /// <returns></returns>
         private bool UpdateListCommand_CanExecute() => 0 < this.CsvFilePathList.Count && this.BookSelectorVM.SelectedItem != null && 0 < this.CsvCompSelectorVM.ItemList.Count;
         /// <summary>
-        /// 更新コマンド処理
+        /// リスト更新コマンド処理
         /// </summary>
         private async void UpdateListCommand_Execute()
         {
@@ -457,6 +450,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.UpdateComparisonVMListAsync();
         }
 
+        /// <summary>
+        /// 一致チェック変更コマンド
+        /// </summary>
+        public ICommand ChangeIsMatchCommand => field ??= new RelayCommand(this.ChangeIsMatchCommand_Execute);
         /// <summary>
         /// 一致チェック変更コマンド処理
         /// </summary>

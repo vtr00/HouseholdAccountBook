@@ -88,29 +88,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 this.RaisePropertyChanged(nameof(this.SelectedEnd));
             }
         }
+        #endregion
 
         #region コマンド
         /// <summary>
         /// 今月コマンド
         /// </summary>
-        public ICommand ThisMonthCommand => field ??= new RelayCommand(this.ThisMonthCommand_Execute);
+        public ICommand ThisMonthCommand => field ??= new RelayCommand(() => this.SelectedMonth = DateTime.Today, () => this.SelectedMonth != DateTime.Today.GetFirstDateOfMonth());
+
         /// <summary>
         /// 全期間コマンド
         /// </summary>
-        public ICommand AllPeriodCommand => field ??= new AsyncRelayCommand(this.AllPeriodCommand_ExecuteAsync);
-        #endregion
-        #endregion
-
-        #region コマンドイベントハンドラ
-        /// <summary>
-        /// 今月コマンド処理
-        /// </summary>
-        private void ThisMonthCommand_Execute() => this.SelectedMonth = DateTime.Today;
-
-        /// <summary>
-        /// 全期間コマンド処理
-        /// </summary>
-        private async Task AllPeriodCommand_ExecuteAsync() => this.SelectedPeriod = await this.LoadFirstLastDate();
+        public ICommand AllPeriodCommand => field ??= new AsyncRelayCommand(async () => this.SelectedPeriod = await this.LoadFirstLastDate());
         #endregion
 
         #region ウィンドウ設定プロパティ

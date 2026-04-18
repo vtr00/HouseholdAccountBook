@@ -483,6 +483,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public MainWindowGraphTabViewModel YearlyGraphTabVM { get; private init; }
         #endregion
+        #endregion
 
         #region コマンド
         #region ファイルコマンド
@@ -490,184 +491,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// ファイルコマンド
         /// </summary>
         public ICommand FileMenuCommand => field ??= new RelayCommand();
+
         /// <summary>
         /// インポートコマンド
         /// </summary>
-        public ICommand ImportCommand => field ??= new RelayCommand(this.ImportCommand_CanExecute);
+        public ICommand ImportCommand => field ??= new RelayCommand(() => !this.IsChildrenWindowOpened());
+
         /// <summary>
         /// 記帳風月インポートコマンド
         /// </summary>
-        public ICommand ImportKichoFugetsuDbCommand => field ??= new AsyncRelayCommand(this.ImportKichoFugetsuDbCommand_ExecuteAsync, this.ImportKichoFugetsuDbCommand_CanExecute);
-        /// <summary>
-        /// PostgreSQL -> SQLite インポートコマンド
-        /// </summary>
-        public ICommand ImportPostgreSQLCommand => field ??= new AsyncRelayCommand(this.ImportPostgreSQLCommand_ExecuteAsync, this.ImportPostgreSQLCommand_CanExecute);
-        /// <summary>
-        /// カスタムファイル -> PostgreSQL インポートコマンド
-        /// </summary>
-        public ICommand ImportCustomFileCommand => field ??= new AsyncRelayCommand(this.ImportCustomFileCommand_ExecuteAsync, this.ImportCustomFileCommand_CanExecute, ExecutionMode.ProgressWindow);
-        /// <summary>
-        /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド
-        /// </summary>
-        public ICommand ImportSQLiteFileCommand => field ??= new AsyncRelayCommand(this.ImportSQLiteFileCommand_ExecuteAsync, this.ImportSQLiteFileCommand_CanExecute);
-        /// <summary>
-        /// エクスポートコマンド
-        /// </summary>
-        public ICommand ExportCommand => field ??= new RelayCommand(this.ExportCommand_CanExecute);
-        /// <summary>
-        /// カスタムファイルエクスポートコマンド
-        /// </summary>
-        public ICommand ExportCustomFileCommand => field ??= new AsyncRelayCommand(this.ExportCustomFileCommand_ExecuteAsync, this.ExportCustomFileCommand_CanExecute, ExecutionMode.ProgressWindow);
-        /// <summary>
-        /// SQLファイルエクスポートコマンド
-        /// </summary>
-        public ICommand ExportSQLFileCommand => field ??= new AsyncRelayCommand(this.ExportSQLFileCommand_ExecuteAsync, this.ExportSQLFileCommand_CanExecute, ExecutionMode.ProgressWindow);
-        /// <summary>
-        /// バックアップコマンド
-        /// </summary>
-        public ICommand BackUpCommand => field ??= new AsyncRelayCommand(this.BackUpCommand_ExecuteAsync, this.BackUpCommand_CanExecute, ExecutionMode.ProgressWindow);
-        /// <summary>
-        /// 操作ログファイルコマンド
-        /// </summary>
-        public ICommand OperationLogFileCommand => field ??= new RelayCommand(this.OperationLogFileCommand_CanExecute);
-        /// <summary>
-        /// ウィンドウ終了コマンド
-        /// </summary>
-        public ICommand ExitWindowCommand => field ??= new RelayCommand(this.ExitWindowCommand_Execute, this.ExitWindowCommand_CanExecute);
-        #endregion
-
-        #region 表示コマンド
-        /// <summary>
-        /// 表示コマンド
-        /// </summary>
-        public ICommand ShowMenuCommand => field ??= new RelayCommand(this.ShowMenuCommand_CanExecute);
-        /// <summary>
-        /// 帳簿項目タブ表示コマンド
-        /// </summary>
-        public ICommand ShowBookTabCommand => field ??= new RelayCommand(this.ShowBookTabCommand_Execute, this.ShowBookTabCommand_CanExecute);
-        /// <summary>
-        /// 日別グラフタブ表示コマンド
-        /// </summary>
-        public ICommand ShowDailyGraphTabCommand => field ??= new RelayCommand(this.ShowDailyGraphTabCommand_Execute, this.ShowDailyGraphTabCommand_CanExecute);
-        /// <summary>
-        /// 月別リストタブ表示コマンド
-        /// </summary>
-        public ICommand ShowMonthlyListTabCommand => field ??= new RelayCommand(this.ShowMonthlyListTabCommand_Execute, this.ShowMonthlyListTabCommand_CanExecute);
-        /// <summary>
-        /// 月別グラフタブ表示コマンド
-        /// </summary>
-        public ICommand ShowMonthlyGraphTabCommand => field ??= new RelayCommand(this.ShowMonthlyGraphTabCommand_Execute, this.ShowMonthlyGraphTabCommand_CanExecute);
-        /// <summary>
-        /// 年別リストタブ表示コマンド
-        /// </summary>
-        public ICommand ShowYearlyListTabCommand => field ??= new RelayCommand(this.ShowYearlyListTabCommand_Execute, this.ShowYearlyListTabCommand_CanExecute);
-        /// <summary>
-        /// 年別グラフタブ表示コマンド
-        /// </summary>
-        public ICommand ShowYearlyGraphTabCommand => field ??= new RelayCommand(this.ShowYearlyGraphTabCommand_Execute, this.ShowYearlyGraphTabCommand_CanExecute);
-
-        /// <summary>
-        /// 先月表示コマンド
-        /// </summary>
-        public ICommand GoToLastMonthCommand => field ??= new AsyncRelayCommand(this.GoToLastMonthCommand_ExecuteAsync, this.GoToLastMonthCommand_CanExecute);
-        /// <summary>
-        /// 期間選択コマンド
-        /// </summary>
-        public ICommand SelectTermCommand => field ??= new AsyncRelayCommand(this.SelectTermCommand_ExecuteAsync, this.SelectTermCommand_CanExecute);
-        /// <summary>
-        /// 翌月表示コマンド
-        /// </summary>
-        public ICommand GoToNextMonthCommand => field ??= new AsyncRelayCommand(this.GoToNextMonthCommand_ExecuteAsync, this.GoToNextMonthCommand_CanExecute);
-        /// <summary>
-        /// 今月表示コマンド
-        /// </summary>
-        public ICommand GoToThisMonthCommand => field ??= new AsyncRelayCommand(this.GoToThisMonthCommand_ExecuteAsync, this.GoToThisMonthCommand_CanExecute);
-        /// <summary>
-        /// 前年表示コマンド
-        /// </summary>
-        public ICommand GoToLastYearCommand => field ??= new AsyncRelayCommand(this.GoToLastYearCommand_ExecuteAsync, this.GoToLastYearCommand_CanExecute);
-        /// <summary>
-        /// 翌年表示コマンド
-        /// </summary>
-        public ICommand GoToNextYearCommand => field ??= new AsyncRelayCommand(this.GoToNextYearCommand_ExecuteAsync, this.GoToNextYearCommand_CanExecute);
-        /// <summary>
-        /// 今年表示コマンド
-        /// </summary>
-        public ICommand GoToThisYearCommand => field ??= new AsyncRelayCommand(this.GoToThisYearCommand_ExecuteAsync, this.GoToThisYearCommand_CanExecute);
-        /// <summary>
-        /// 更新コマンド
-        /// </summary>
-        public ICommand UpdateCommand => field ??= new AsyncRelayCommand(this.UpdateCommand_ExecuteAsync);
-        #endregion
-
-        #region デバッグコマンド
-        /// <summary>
-        /// デバッグコマンド
-        /// </summary>
-        public ICommand DebugCommand => field ?? new RelayCommand(this.DebugCommand_CanExecute);
-        /// <summary>
-        /// 未処理例外スローコマンド
-        /// </summary>
-        public ICommand ThrowUnhandledExceptionCommand => field ?? new RelayCommand(this.ThrowUnhandledExceptionCommand_Execute);
-        /// <summary>
-        /// 未観測タスク例外スローコマンド
-        /// </summary>
-        public ICommand ThrowUnobservedTaskExceptionCommand => field ?? new RelayCommand(this.ThrowUnobservedTaskExceptionCommand_Execute);
-        #endregion
-
-        #region ツールコマンド
-        /// <summary>
-        /// ツールメニューコマンド
-        /// </summary>
-        public ICommand ToolMenuCommand => field ??= new RelayCommand(this.ToolCommand_CanExecute);
-        /// <summary>
-        /// 設定コマンド
-        /// </summary>
-        public ICommand SettingsCommand => field ??= new AsyncRelayCommand(this.SettingsCommand_ExecuteAsync, this.SettingsWindowCommand_CanExecute);
-        /// <summary>
-        /// 帳簿内ツールコマンド
-        /// </summary>
-        public ICommand ToolInBookCommand => field ??= new RelayCommand(this.ToolInBookCommand_CanExecute);
-        /// <summary>
-        /// CSVファイル比較コマンド
-        /// </summary>
-        public ICommand CompareCsvFileCommand => field ??= new RelayCommand(this.CompareCsvFileCommand_Execute, this.CompareCsvFileCommand_CanExecute);
-        #endregion
-
-        #region ヘルプコマンド
-        /// <summary>
-        /// ヘルプメニューコマンド
-        /// </summary>
-        public ICommand HelpMenuCommand => field ??= new RelayCommand(this.HelpMenuCommand_CanExecute);
-        /// <summary>
-        /// 更新の確認コマンド
-        /// </summary>
-        public ICommand CheckUpdateCommand => field ??= new AsyncRelayCommand(this.CheckUpdateCommand_ExecuteAsync);
-        /// <summary>
-        /// リリースノートコマンド
-        /// </summary>
-        public ICommand OpenReleaseNoteCommand => field ??= new RelayCommand(this.OpenReleaseNoteCommand_Execute);
-        /// <summary>
-        /// バージョン表示コマンド
-        /// </summary>
-        public ICommand ShowVersionCommand => field ??= new RelayCommand(this.OpenVersionWindowCommand_Execute, this.OpenVersionWindowCommand_CanExecute);
-        #endregion
-        #endregion
-        #endregion
-
-        #region イベントハンドラ
-        #region ファイルメニュー
-        /// <summary>
-        /// インポートコマンド実行可能か
-        /// </summary>
-        /// <returns></returns>
-        public bool ImportCommand_CanExecute() => !this.IsChildrenWindowOpened();
-
-        /// <summary>
-        /// 記帳風月インポートコマンド実行可能か
-        /// </summary>
-        /// <returns></returns>
-        public bool ImportKichoFugetsuDbCommand_CanExecute() => !this.IsChildrenWindowOpened();
+        public ICommand ImportKichoFugetsuDbCommand => field ??= new AsyncRelayCommand(this.ImportKichoFugetsuDbCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened());
         /// <summary>
         /// 記帳風月インポートコマンド処理
         /// </summary>
@@ -725,10 +558,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// PostgreSQL -> SQLite インポートコマンド実行可能か
+        /// PostgreSQL -> SQLite インポートコマンド
         /// </summary>
-        /// <returns></returns>
-        public bool ImportPostgreSQLCommand_CanExecute() => this.IsSQLite && !this.IsChildrenWindowOpened();
+        public ICommand ImportPostgreSQLCommand => field ??= new AsyncRelayCommand(this.ImportPostgreSQLCommand_ExecuteAsync, () => this.IsSQLite && !this.IsChildrenWindowOpened());
         /// <summary>
         /// PostgreSQL -> SQLite インポートコマンド処理
         /// </summary>
@@ -770,10 +602,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// カスタムファイル -> PostgreSQL インポートコマンド実行可能か
+        /// カスタムファイル -> PostgreSQL インポートコマンド
         /// </summary>
-        /// <returns></returns>
-        public bool ImportCustomFileCommand_CanExecute() => this.IsPostgreSQL && (DbBackUpManager.Instance.NpgsqlBackupConfig?.RestoreExePath ?? string.Empty) != string.Empty && !this.IsChildrenWindowOpened();
+        public ICommand ImportCustomFileCommand => field ??= new AsyncRelayCommand(
+            this.ImportCustomFileCommand_ExecuteAsync,
+            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlBackupConfig?.RestoreExePath) && !this.IsChildrenWindowOpened(),
+            ExecutionMode.ProgressWindow);
         /// <summary>
         /// カスタムファイル -> PostgreSQL インポートコマンド処理
         /// </summary>
@@ -812,10 +646,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド実行可能か
+        /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド
         /// </summary>
-        /// <returns></returns>
-        public bool ImportSQLiteFileCommand_CanExecute() => (this.IsPostgreSQL || this.IsSQLite) && !this.IsChildrenWindowOpened();
+        public ICommand ImportSQLiteFileCommand => field ??= new AsyncRelayCommand(
+            this.ImportSQLiteFileCommand_ExecuteAsync,
+            () => (this.IsPostgreSQL || this.IsSQLite) && !this.IsChildrenWindowOpened());
         /// <summary>
         /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド処理
         /// </summary>
@@ -878,16 +713,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// エクスポートコマンド実行可能か
+        /// エクスポートコマンド
         /// </summary>
-        /// <returns></returns>
-        public bool ExportCommand_CanExecute() => !this.IsChildrenWindowOpened();
+        public ICommand ExportCommand => field ??= new RelayCommand(() => !this.IsChildrenWindowOpened());
 
         /// <summary>
-        /// カスタムファイルエクスポートコマンド実行可能か
+        /// カスタムファイルエクスポートコマンド
         /// </summary>
-        /// <returns></returns>
-        public bool ExportCustomFileCommand_CanExecute() => this.IsPostgreSQL && (DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath ?? string.Empty) != string.Empty && !this.IsChildrenWindowOpened();
+        public ICommand ExportCustomFileCommand => field ??= new AsyncRelayCommand(
+            this.ExportCustomFileCommand_ExecuteAsync,
+            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
+            ExecutionMode.ProgressWindow);
         /// <summary>
         /// カスタムファイルエクスポートコマンド処理
         /// </summary>
@@ -916,10 +752,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// SQLファイルエクスポートコマンド実行可能か
+        /// SQLファイルエクスポートコマンド
         /// </summary>
-        /// <returns></returns>
-        public bool ExportSQLFileCommand_CanExecute() => this.IsPostgreSQL && (DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath ?? string.Empty) != string.Empty && !this.IsChildrenWindowOpened();
+        public ICommand ExportSQLFileCommand => field ??= new AsyncRelayCommand(
+            this.ExportSQLFileCommand_ExecuteAsync,
+            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
+            ExecutionMode.ProgressWindow);
         /// <summary>
         /// SQLファイルエクスポートコマンド処理
         /// </summary>
@@ -948,10 +786,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// バックアップコマンド実行可能か
+        /// バックアップコマンド
         /// </summary>
-        /// <returns></returns>
-        public bool BackUpCommand_CanExecute() => !this.IsChildrenWindowOpened();
+        public ICommand BackUpCommand => field ??= new AsyncRelayCommand(this.BackUpCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened(), ExecutionMode.ProgressWindow);
         /// <summary>
         /// バックアップコマンド処理
         /// </summary>
@@ -973,98 +810,43 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 操作ログファイルコマンド実行可能か
+        /// 操作ログファイルコマンド
         /// </summary>
-        /// <returns></returns>
-        public bool OperationLogFileCommand_CanExecute() => 0 < this.OperationLogFileMenuList.Count;
+        public ICommand OperationLogFileCommand => field ??= new RelayCommand(() => 0 < this.OperationLogFileMenuList.Count);
 
         /// <summary>
-        /// ウィンドウ終了コマンド実行可能か
+        /// ウィンドウ終了コマンド
         /// </summary>
-        /// <returns></returns>
-        public bool ExitWindowCommand_CanExecute() => !this.IsChildrenWindowOpened();
+        public ICommand ExitWindowCommand => field ??= new RelayCommand(this.ExitWindowCommand_Execute, () => !this.IsChildrenWindowOpened());
         /// <summary>
         /// ウィンドウ終了コマンド処理
         /// </summary>
         public void ExitWindowCommand_Execute() => this.CloseRequest(new DialogCloseRequestEventArgs(true));
         #endregion
 
-        #region 表示メニュー
+        #region 表示コマンド
         /// <summary>
-        /// 表示メニューコマンド実行可能か
+        /// 表示コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool ShowMenuCommand_CanExecute() => true;
-
-        #region タブ切替
-        /// <summary>
-        /// 帳簿タブ表示コマンド実行可能か
-        /// </summary>
-        /// <returns></returns>
-        private bool ShowBookTabCommand_CanExecute() => this.SelectedTab != Tabs.BooksTab;
-        /// <summary>
-        /// 帳簿タブ表示コマンド処理
-        /// </summary>
-        private void ShowBookTabCommand_Execute() => this.SelectedTab = Tabs.BooksTab;
+        public ICommand ShowMenuCommand => field ??= new RelayCommand();
 
         /// <summary>
-        /// 日別グラフタブ表示コマンド実行可能か
+        /// 帳簿項目タブ表示コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool ShowDailyGraphTabCommand_CanExecute() => this.SelectedTab != Tabs.DailyGraphTab;
-        /// <summary>
-        /// 日別グラフタブ表示コマンド処理
-        /// </summary>
-        private void ShowDailyGraphTabCommand_Execute() => this.SelectedTab = Tabs.DailyGraphTab;
+        public ICommand ShowBookTabCommand => field ??= new RelayCommand(() => this.SelectedTab = Tabs.BooksTab, () => this.SelectedTab != Tabs.BooksTab);
 
         /// <summary>
-        /// 月別一覧タブ表示コマンド実行可能か
+        /// 日別グラフタブ表示コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool ShowMonthlyListTabCommand_CanExecute() => this.SelectedTab != Tabs.MonthlyListTab;
-        /// <summary>
-        /// 月別一覧タブ表示コマンド処理
-        /// </summary>
-        private void ShowMonthlyListTabCommand_Execute() => this.SelectedTab = Tabs.MonthlyListTab;
+        public ICommand ShowDailyGraphTabCommand => field ??= new RelayCommand(() => this.SelectedTab = Tabs.DailyGraphTab, () => this.SelectedTab != Tabs.DailyGraphTab);
 
         /// <summary>
-        /// 月別グラフタブ表示コマンド実行可能か
+        /// 先月表示コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool ShowMonthlyGraphTabCommand_CanExecute() => this.SelectedTab != Tabs.MonthlyGraphTab;
-        /// <summary>
-        /// 月別グラフタブ表示コマンド処理
-        /// </summary>
-        private void ShowMonthlyGraphTabCommand_Execute() => this.SelectedTab = Tabs.MonthlyGraphTab;
-
-        /// <summary>
-        /// 年別一覧タブ表示コマンド実行可能か
-        /// </summary>
-        /// <returns></returns>
-        private bool ShowYearlyListTabCommand_CanExecute() => this.SelectedTab != Tabs.YearlyListTab;
-        /// <summary>
-        /// 年別一覧タブ表示コマンド処理
-        /// </summary>
-        private void ShowYearlyListTabCommand_Execute() => this.SelectedTab = Tabs.YearlyListTab;
-
-        /// <summary>
-        /// 年別グラフタブ表示コマンド実行可能か
-        /// </summary>
-        /// <returns></returns>
-        private bool ShowYearlyGraphTabCommand_CanExecute() => this.SelectedTab != Tabs.YearlyGraphTab;
-        /// <summary>
-        /// 年別グラフタブ表示コマンド処理
-        /// </summary>
-        private void ShowYearlyGraphTabCommand_Execute() => this.SelectedTab = Tabs.YearlyGraphTab;
-        #endregion
-
-        #region 月間表示
-        /// <summary>
-        /// 先月表示コマンド実行可能か
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>帳簿/日別一覧タブを選択している</remarks>
-        private bool GoToLastMonthCommand_CanExecute() => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly;
+        /// <remarks>帳簿/月間一覧タブを選択している</remarks>
+        public ICommand GoToLastMonthCommand => field ??= new AsyncRelayCommand(
+            this.GoToLastMonthCommand_ExecuteAsync,
+            () => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly);
         /// <summary>
         /// 先月表示コマンド処理
         /// </summary>
@@ -1077,6 +859,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
+        /// 今月表示コマンド
+        /// </summary>
+        public ICommand GoToThisMonthCommand => field ??= new AsyncRelayCommand(this.GoToThisMonthCommand_ExecuteAsync, this.GoToThisMonthCommand_CanExecute);
+        /// <summary>
         /// 今月表示コマンド実行可能か
         /// </summary>
         /// <returns></returns>
@@ -1085,7 +871,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             DateOnly thisMonth = DateOnlyExtensions.Today.GetFirstDateOfMonth();
             // 帳簿/月間一覧タブを選択している かつ 今月が表示されていない
             return (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) &&
-                   (this.DisplayedPeriodKind == PeriodKind.Selected || !(thisMonth <= this.DisplayedMonth && this.DisplayedMonth < thisMonth.AddMonths(1)));
+                   (this.DisplayedPeriodKind == PeriodKind.Selected || this.DisplayedMonth < thisMonth || thisMonth.AddMonths(1) <= this.DisplayedMonth);
         }
         /// <summary>
         /// 今月表示コマンド処理
@@ -1099,13 +885,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 翌月表示コマンド実行可能か
+        /// 来月表示コマンド
         /// </summary>
-        /// <returns></returns>
-        /// <remarks>帳簿/月間一覧タブを選択している</remarks>
-        private bool GoToNextMonthCommand_CanExecute() => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly;
+        /// <remarks>帳簿/日別一覧タブを選択している</remarks>
+        public ICommand GoToNextMonthCommand => field ??= new AsyncRelayCommand(
+            this.GoToNextMonthCommand_ExecuteAsync,
+            () => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly);
         /// <summary>
-        /// 翌月表示コマンド処理
+        /// 来月表示コマンド処理
         /// </summary>
         private async Task GoToNextMonthCommand_ExecuteAsync()
         {
@@ -1116,14 +903,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 期間選択コマンド実行可能か
+        /// 期間選択コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool SelectTermCommand_CanExecute() => !this.IsChildrenWindowOpened();
+        public ICommand SelectPeriodCommand => field ??= new AsyncRelayCommand(this.SelectPeriodCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened());
         /// <summary>
         /// 期間選択コマンド処理
         /// </summary>
-        private async Task SelectTermCommand_ExecuteAsync()
+        private async Task SelectPeriodCommand_ExecuteAsync()
         {
             SelectPeriodRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
@@ -1142,17 +928,36 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
-        #endregion
 
-        #region 年間表示
         /// <summary>
-        /// 前年表示コマンド実行可能か
+        /// 月別一覧タブ表示コマンド
         /// </summary>
-        /// <returns></returns>
-        /// <remarks>月別一覧/月別グラフ/年別一覧/年別グラフタブを選択している</remarks>
-        private bool GoToLastYearCommand_CanExecute() => this.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab;
+        public ICommand ShowMonthlyListTabCommand => field ??= new RelayCommand(() => this.SelectedTab = Tabs.MonthlyListTab, () => this.SelectedTab != Tabs.MonthlyListTab);
+
         /// <summary>
-        /// 前年表示コマンド処理
+        /// 月別グラフタブ表示コマンド
+        /// </summary>
+        public ICommand ShowMonthlyGraphTabCommand => field ??= new RelayCommand(() => this.SelectedTab = Tabs.MonthlyGraphTab, () => this.SelectedTab != Tabs.MonthlyGraphTab);
+
+        /// <summary>
+        /// 年別一覧タブ表示コマンド
+        /// </summary>
+        public ICommand ShowYearlyListTabCommand => field ??= new RelayCommand(() => this.SelectedTab = Tabs.YearlyListTab, () => this.SelectedTab != Tabs.YearlyListTab);
+
+        /// <summary>
+        /// 年別グラフタブ表示コマンド
+        /// </summary>
+        public ICommand ShowYearlyGraphTabCommand => field ??= new RelayCommand(() => this.SelectedTab = Tabs.YearlyGraphTab, () => this.SelectedTab != Tabs.YearlyGraphTab);
+
+        /// <summary>
+        /// 去年表示コマンド
+        /// </summary>
+        /// <remarks>月別一覧/月別グラフ/年別一覧/年別グラフタブを選択している</remarks>
+        public ICommand GoToLastYearCommand => field ??= new AsyncRelayCommand(
+            this.GoToLastYearCommand_ExecuteAsync,
+            () => this.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab);
+        /// <summary>
+        /// 去年表示コマンド処理
         /// </summary>
         private async Task GoToLastYearCommand_ExecuteAsync()
         {
@@ -1162,6 +967,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.UpdateAsync(isUpdateBookList: true);
         }
 
+        /// <summary>
+        /// 今年表示コマンド
+        /// </summary>
+        public ICommand GoToThisYearCommand => field ??= new AsyncRelayCommand(this.GoToThisYearCommand_ExecuteAsync, this.GoToThisYearCommand_CanExecute);
         /// <summary>
         /// 今年表示コマンド実行可能か
         /// </summary>
@@ -1185,11 +994,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 来年表示コマンド実行可能か
+        /// 来年表示コマンド
         /// </summary>
-        /// <returns></returns>
         /// <remarks>月別一覧/月別グラフ/年別一覧/年別グラフタブを選択している</remarks>
-        private bool GoToNextYearCommand_CanExecute() => this.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab;
+        public ICommand GoToNextYearCommand => field ??= new AsyncRelayCommand(
+            this.GoToNextYearCommand_ExecuteAsync,
+            () => this.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab);
         /// <summary>
         /// 来年表示コマンド処理
         /// </summary>
@@ -1200,8 +1010,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.DisplayedYear = this.DisplayedYear.AddYears(1);
             await this.UpdateAsync(isUpdateBookList: true);
         }
-        #endregion
 
+        /// <summary>
+        /// 更新コマンド
+        /// </summary>
+        public ICommand UpdateCommand => field ??= new AsyncRelayCommand(this.UpdateCommand_ExecuteAsync);
         /// <summary>
         /// 画面更新コマンド処理
         /// </summary>
@@ -1213,38 +1026,33 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        #region デバッグメニュー
+        #region デバッグコマンド
         /// <summary>
-        /// デバッグコマンド実行可能か
+        /// デバッグコマンド
         /// </summary>
-        /// <returns></returns>
-        private bool DebugCommand_CanExecute() => !this.IsChildrenWindowOpened();
+        public ICommand DebugCommand => field ?? new RelayCommand(() => !this.IsChildrenWindowOpened());
 
         /// <summary>
-        /// 未処理例外スローコマンド処理
+        /// 未処理例外スローコマンド
         /// </summary>
-        /// <exception cref="Exception"></exception>
-        private void ThrowUnhandledExceptionCommand_Execute() => throw new Exception("for debug");
+        public ICommand ThrowUnhandledExceptionCommand => field ?? new RelayCommand(static () => throw new Exception("for debug"));
 
         /// <summary>
-        /// 未観測タスク例外スローコマンド処理
+        /// 未観測タスク例外スローコマンド
         /// </summary>
-        /// <exception cref="Exception"></exception>
-        private void ThrowUnobservedTaskExceptionCommand_Execute() => new Task(static () => throw new Exception("for debug")).Start();
+        public ICommand ThrowUnobservedTaskExceptionCommand => field ?? new RelayCommand(static () => new Task(static () => throw new Exception("for debug")).Start());
         #endregion
 
-        #region ツールメニュー
+        #region ツールコマンド
         /// <summary>
-        /// ツールコマンド実行可能か
+        /// ツールメニューコマンド
         /// </summary>
-        /// <returns></returns>
-        private bool ToolCommand_CanExecute() => !this.IsChildrenWindowOpened();
+        public ICommand ToolMenuCommand => field ??= new RelayCommand(() => !this.IsChildrenWindowOpened());
 
         /// <summary>
-        /// 設定コマンド実行可能か
+        /// 設定コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool SettingsWindowCommand_CanExecute() => !this.IsChildrenWindowOpened();
+        public ICommand SettingsCommand => field ??= new AsyncRelayCommand(this.SettingsCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened());
         /// <summary>
         /// 設定コマンド処理
         /// </summary>
@@ -1269,15 +1077,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 帳簿内ツールコマンド実行可能か
+        /// 帳簿内ツールコマンド
         /// </summary>
-        private bool ToolInBookCommand_CanExecute() => this.SelectedTab == Tabs.BooksTab;
+        public ICommand ToolInBookCommand => field ??= new RelayCommand(() => this.SelectedTab == Tabs.BooksTab);
 
         /// <summary>
-        /// CSV比較コマンド実行可能か
+        /// CSVファイル比較コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool CompareCsvFileCommand_CanExecute() => !this.IsChildrenWindowOpened();
+        public ICommand CompareCsvFileCommand => field ??= new RelayCommand(this.CompareCsvFileCommand_Execute, () => !this.IsChildrenWindowOpened());
         /// <summary>
         /// CSV比較コマンド処理
         /// </summary>
@@ -1291,14 +1098,21 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        #region ヘルプメニュー
-        private bool HelpMenuCommand_CanExecute() => true;
+        #region ヘルプコマンド
+        /// <summary>
+        /// ヘルプメニューコマンド
+        /// </summary>
+        public ICommand HelpMenuCommand => field ??= new RelayCommand(() => true);
 
         /// <summary>
-        /// 更新の確認コマンド処理
+        /// 更新の確認コマンド
         /// </summary>
-        /// <returns></returns>
-        private async Task CheckUpdateCommand_ExecuteAsync() => await App.CheckLatestVersionAsync(true);
+        public ICommand CheckUpdateCommand => field ??= new AsyncRelayCommand(static async () => await App.CheckLatestVersionAsync(true));
+
+        /// <summary>
+        /// リリースノートコマンド
+        /// </summary>
+        public ICommand OpenReleaseNoteCommand => field ??= new RelayCommand(this.OpenReleaseNoteCommand_Execute);
         /// <summary>
         /// リリースノートコマンド処理
         /// </summary>
@@ -1316,15 +1130,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 catch (Exception) { }
             }
         }
+
         /// <summary>
-        /// バージョン表示コマンド実行可能か
+        /// バージョン表示コマンド
         /// </summary>
-        /// <returns></returns>
-        private bool OpenVersionWindowCommand_CanExecute() => !this.IsChildrenWindowOpened();
-        /// <summary>
-        /// バージョン表示コマンド処理
-        /// </summary>
-        private void OpenVersionWindowCommand_Execute() => this.ShowVersionRequested?.Invoke(this, EventArgs.Empty);
+        public ICommand ShowVersionCommand => field ??= new RelayCommand(() => this.ShowVersionRequested?.Invoke(this, EventArgs.Empty), () => !this.IsChildrenWindowOpened());
         #endregion
         #endregion
 
