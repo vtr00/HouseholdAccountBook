@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Views.Extensions;
 using HouseholdAccountBook.Views.Windows;
 using System;
@@ -44,6 +45,11 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         private readonly Func<T, bool> mCanExecute;
         /// <summary>
+        /// 処理中状態サービス
+        /// </summary>
+        private readonly BusyService mBusyService;
+
+        /// <summary>
         /// 実行モード(コマンド実行デリゲートがプログレス受付可能か)
         /// </summary>
         private readonly ExecutionMode mMode;
@@ -51,6 +57,16 @@ namespace HouseholdAccountBook.ViewModels
         /// コマンドがキャンセル可能か(コマンド実行デリゲートがトークン受付可能か)
         /// </summary>
         protected readonly bool mCanCancel = true;
+
+        /// <summary>
+        /// 実行中か
+        /// </summary>
+        private bool mIsExecuting = false;
+        /// <summary>
+        /// 多重読込処理防止トークン源
+        /// </summary>
+        private CancellationTokenSource mSelectionCts;
+
         /// <summary>
         /// 呼び出し元ファイル名
         /// </summary>
@@ -59,16 +75,6 @@ namespace HouseholdAccountBook.ViewModels
         /// 呼び出し元メンバー名
         /// </summary>
         private readonly string mMemberName;
-
-        /// <summary>
-        /// 実行中か
-        /// </summary>
-        private bool mIsExecuting = false;
-
-        /// <summary>
-        /// 多重読込処理防止トークン源
-        /// </summary>
-        private CancellationTokenSource mSelectionCts;
         #endregion
 
         #region イベント
@@ -87,11 +93,15 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="canCancel">キャンセル可能か</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        protected AsyncRelayCommand(Func<T, FuncLog, CancellationToken, IProgress<int>, Task> executeAsync, Func<T, bool> canExecute, ExecutionMode mode, bool canCancel,
+        protected AsyncRelayCommand(Func<T, FuncLog, CancellationToken, IProgress<int>, Task> executeAsync, Func<T, bool> canExecute,
+                                    BusyService busyService, ExecutionMode mode, bool canCancel,
                                     [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
         {
+            using FuncLog funcLog = new(level: Log.LogLevel.Trace, fileName: fileName, methodName: memberName);
+
             this.mExecuteAsync = executeAsync;
             this.mCanExecute = canExecute;
+            this.mBusyService = busyService;
             this.mMode = mode;
             this.mCanCancel = canCancel;
             this.mFileName = fileName;
@@ -106,9 +116,10 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="mode">実行モード</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public AsyncRelayCommand(Func<T, FuncLog, Task> executeAsync, Func<T, bool> canExecute = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
+        public AsyncRelayCommand(Func<T, FuncLog, Task> executeAsync, Func<T, bool> canExecute = null,
+                                 BusyService busyService = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : this(async (param, funcLog, _, progress) => { progress?.Report(-1); await executeAsync(param, funcLog); }, canExecute, mode, false, fileName, memberName)
+            : this(async (param, funcLog, _, progress) => { progress?.Report(-1); await executeAsync(param, funcLog); }, canExecute, busyService, mode, false, fileName, memberName)
         { }
         /// <summary>
         /// <see cref="AsyncRelayCommand"/> のインスタンスを生成します
@@ -118,8 +129,9 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
         public AsyncRelayCommand(Func<T, FuncLog, IProgress<int>, Task> executeAsync, Func<T, bool> canExecute = null,
+                                 BusyService busyService = null,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : this(async (param, funcLog, _, progress) => await executeAsync(param, funcLog, progress), canExecute, ExecutionMode.ProgressWindow, false, fileName, memberName)
+            : this(async (param, funcLog, _, progress) => await executeAsync(param, funcLog, progress), canExecute, busyService, ExecutionMode.ProgressWindow, false, fileName, memberName)
         { }
         /// <summary>
         /// <see cref="AsyncRelayCommand"/> のインスタンスを生成します
@@ -129,9 +141,10 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="mode">実行モード</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public AsyncRelayCommand(Func<T, FuncLog, CancellationToken, Task> executeAsync, Func<T, bool> canExecute = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
+        public AsyncRelayCommand(Func<T, FuncLog, CancellationToken, Task> executeAsync, Func<T, bool> canExecute = null,
+                                 BusyService busyService = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : this(async (param, funcLog, token, progress) => { progress?.Report(-1); await executeAsync(param, funcLog, token); }, canExecute, mode, true, fileName, memberName)
+            : this(async (param, funcLog, token, progress) => { progress?.Report(-1); await executeAsync(param, funcLog, token); }, canExecute, busyService, mode, true, fileName, memberName)
         { }
         /// <summary>
         /// <see cref="AsyncRelayCommand"/> のインスタンスを生成します
@@ -141,8 +154,9 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
         public AsyncRelayCommand(Func<T, FuncLog, CancellationToken, IProgress<int>, Task> executeAsync, Func<T, bool> canExecute = null,
+                                 BusyService busyService = null,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : this(async (param, funcLog, token, progress) => await executeAsync(param, funcLog, token, progress), canExecute, ExecutionMode.ProgressWindow, true, fileName, memberName)
+            : this(async (param, funcLog, token, progress) => await executeAsync(param, funcLog, token, progress), canExecute, busyService, ExecutionMode.ProgressWindow, true, fileName, memberName)
         { }
 
         /// <summary>
@@ -153,9 +167,10 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="mode">実行モード</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public AsyncRelayCommand(Func<T, Task> executeAsync, Func<T, bool> canExecute = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
+        public AsyncRelayCommand(Func<T, Task> executeAsync, Func<T, bool> canExecute = null,
+                                 BusyService busyService = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : this(async (param, _, _, progress) => { progress?.Report(-1); await executeAsync(param); }, canExecute, mode, false, fileName, memberName)
+            : this(async (param, _, _, progress) => { progress?.Report(-1); await executeAsync(param); }, canExecute, busyService, mode, false, fileName, memberName)
         { }
         /// <summary>
         /// <see cref="AsyncRelayCommand"/> のインスタンスを生成します
@@ -165,8 +180,9 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
         public AsyncRelayCommand(Func<T, IProgress<int>, Task> executeAsync, Func<T, bool> canExecute = null,
+                                 BusyService busyService = null,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : this(async (param, _, _, progress) => await executeAsync(param, progress), canExecute, ExecutionMode.ProgressWindow, false, fileName, memberName)
+            : this(async (param, _, _, progress) => await executeAsync(param, progress), canExecute, busyService, ExecutionMode.ProgressWindow, false, fileName, memberName)
         { }
         /// <summary>
         /// <see cref="AsyncRelayCommand"/> のインスタンスを生成します
@@ -176,9 +192,10 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="mode">実行モード</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public AsyncRelayCommand(Func<T, CancellationToken, Task> executeAsync, Func<T, bool> canExecute = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
+        public AsyncRelayCommand(Func<T, CancellationToken, Task> executeAsync, Func<T, bool> canExecute = null,
+                                 BusyService busyService = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : this(async (param, _, token, progress) => { progress?.Report(-1); await executeAsync(param, token); }, canExecute, mode, true, fileName, memberName)
+            : this(async (param, _, token, progress) => { progress?.Report(-1); await executeAsync(param, token); }, canExecute, busyService, mode, true, fileName, memberName)
         { }
         /// <summary>
         /// <see cref="AsyncRelayCommand"/> のインスタンスを生成します
@@ -188,8 +205,9 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
         public AsyncRelayCommand(Func<T, CancellationToken, IProgress<int>, Task> executeAsync, Func<T, bool> canExecute = null,
+                                 BusyService busyService = null,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : this(async (param, _, token, progress) => await executeAsync(param, token, progress), canExecute, ExecutionMode.ProgressWindow, true, fileName, memberName)
+            : this(async (param, _, token, progress) => await executeAsync(param, token, progress), canExecute, busyService, ExecutionMode.ProgressWindow, true, fileName, memberName)
         { }
 
         ~AsyncRelayCommand()
@@ -232,6 +250,7 @@ namespace HouseholdAccountBook.ViewModels
 
                 try {
                     if (this.mExecuteAsync != null) {
+                        using IDisposable disposable = this.mBusyService?.Enter();
                         await this.mExecuteAsync.Invoke((T)parameter, funcLog, cts.Token, progressWindow?.Progress);
                     }
                     _ = tcs.TrySetResult();
@@ -301,9 +320,10 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="mode">実行モード</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public AsyncRelayCommand(Func<FuncLog, Task> executeAsync, Func<bool> canExecute = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
+        public AsyncRelayCommand(Func<FuncLog, Task> executeAsync, Func<bool> canExecute = null,
+                                 BusyService busyService = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : base(async (_, funcLog) => await executeAsync(funcLog), _ => canExecute?.Invoke() ?? true, mode, fileName, memberName)
+            : base(async (_, funcLog) => await executeAsync(funcLog), _ => canExecute?.Invoke() ?? true, busyService, mode, fileName, memberName)
         { }
         /// <summary>
         /// <see cref="AsyncRelayCommand"/> のインスタンスを生成します
@@ -313,8 +333,9 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
         public AsyncRelayCommand(Func<FuncLog, IProgress<int>, Task> executeAsync, Func<bool> canExecute = null,
+                                 BusyService busyService = null,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : base(async (_, funcLog, progress) => await executeAsync(funcLog, progress), _ => canExecute?.Invoke() ?? true, fileName, memberName)
+            : base(async (_, funcLog, progress) => await executeAsync(funcLog, progress), _ => canExecute?.Invoke() ?? true, busyService, fileName, memberName)
         { }
         /// <summary>
         /// <see cref="AsyncRelayCommand"/> のインスタンスを生成します
@@ -324,9 +345,10 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="mode">実行モード</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public AsyncRelayCommand(Func<FuncLog, CancellationToken, Task> executeAsync, Func<bool> canExecute = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
+        public AsyncRelayCommand(Func<FuncLog, CancellationToken, Task> executeAsync, Func<bool> canExecute = null,
+                                 BusyService busyService = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : base(async (_, funcLog, token) => await executeAsync(funcLog, token), _ => canExecute?.Invoke() ?? true, mode, fileName, memberName)
+            : base(async (_, funcLog, token) => await executeAsync(funcLog, token), _ => canExecute?.Invoke() ?? true, busyService, mode, fileName, memberName)
         { }
         /// <summary>
         /// <see cref="AsyncRelayCommand"/> のインスタンスを生成します
@@ -336,8 +358,9 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
         public AsyncRelayCommand(Func<FuncLog, CancellationToken, IProgress<int>, Task> executeAsync, Func<bool> canExecute = null,
+                                 BusyService busyService = null,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : base(async (_, funcLog, token, progress) => await executeAsync(funcLog, token, progress), _ => canExecute?.Invoke() ?? true, fileName, memberName)
+            : base(async (_, funcLog, token, progress) => await executeAsync(funcLog, token, progress), _ => canExecute?.Invoke() ?? true, busyService, fileName, memberName)
         { }
         /// <see cref="AsyncRelayCommand"/> のインスタンスを生成します
         /// <param name="executeAsync">コマンド実行デリゲート(中断なし、進捗表示なし)</param>
@@ -345,9 +368,10 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="mode">実行モード</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public AsyncRelayCommand(Func<Task> executeAsync, Func<bool> canExecute = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
+        public AsyncRelayCommand(Func<Task> executeAsync, Func<bool> canExecute = null,
+                                 BusyService busyService = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : base(async _ => await executeAsync(), _ => canExecute?.Invoke() ?? true, mode, fileName, memberName)
+            : base(async _ => await executeAsync(), _ => canExecute?.Invoke() ?? true, busyService, mode, fileName, memberName)
         { }
         /// <see cref="AsyncRelayCommand"/> のインスタンスを生成します
         /// <param name="executeAsync">コマンド実行デリゲート(中断なし、進捗表示あり)</param>
@@ -355,21 +379,24 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
         public AsyncRelayCommand(Func<IProgress<int>, Task> executeAsync, Func<bool> canExecute = null,
+                                 BusyService busyService = null,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : base(async (_, progress) => await executeAsync(progress), _ => canExecute?.Invoke() ?? true, fileName, memberName)
+            : base(async (_, progress) => await executeAsync(progress), _ => canExecute?.Invoke() ?? true, busyService, fileName, memberName)
         { }
         /// <see cref="AsyncRelayCommand"/> のインスタンスを生成します
         /// <param name="executeAsync">コマンド実行デリゲート(中断あり、進捗表示なし)</param>
         /// <param name="mode">実行モード</param>
-        public AsyncRelayCommand(Func<CancellationToken, Task> executeAsync, Func<bool> canExecute = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
+        public AsyncRelayCommand(Func<CancellationToken, Task> executeAsync, Func<bool> canExecute = null,
+                                 BusyService busyService = null, ExecutionMode mode = ExecutionMode.AllowConcurrent,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : base(async (_, token) => await executeAsync(token), _ => canExecute?.Invoke() ?? true, mode, fileName, memberName)
+            : base(async (_, token) => await executeAsync(token), _ => canExecute?.Invoke() ?? true, busyService, mode, fileName, memberName)
         { }
         /// <see cref="AsyncRelayCommand"/> のインスタンスを生成します
         /// <param name="executeAsync">コマンド実行デリゲート(中断あり、進捗表示あり)</param>
         public AsyncRelayCommand(Func<CancellationToken, IProgress<int>, Task> executeAsync, Func<bool> canExecute = null,
+                                 BusyService busyService = null,
                                  [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
-            : base(async (_, token, progress) => await executeAsync(token, progress), _ => canExecute?.Invoke() ?? true, fileName, memberName)
+            : base(async (_, token, progress) => await executeAsync(token, progress), _ => canExecute?.Invoke() ?? true, busyService, fileName, memberName)
         { }
     }
 }

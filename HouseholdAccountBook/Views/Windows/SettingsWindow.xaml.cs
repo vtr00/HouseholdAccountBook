@@ -3,6 +3,7 @@ using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.Views.Extensions;
+using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,15 +40,13 @@ namespace HouseholdAccountBook.Views.Windows
             this.AddCommonEventHandlersToVM();
             this.WVM.NeedToUpdateChanged += (sender, e) => this.mNeedToUpdate = true;
 
-            this.WVM.Initialize(new WaitCursorManagerFactory(this), dbHandlerFactory);
+            this.WVM.Initialize(dbHandlerFactory);
 
             this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
                 this.WVM.DbTabVM.SelectedDBKind = dbHandlerFactory.DBKind;
-                using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create(methodName: nameof(this.Loaded))) {
-                    await this.WVM.LoadAsync();
-                }
+                await this.WVM.LoadAsync();
                 this.WVM.AddEventHandlers();
             };
         }
@@ -75,9 +74,10 @@ namespace HouseholdAccountBook.Views.Windows
         private async void SettingsTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.OriginalSource != sender) { return; }
+            if (!this.WVM.Initialized) { return; }
 
             using FuncLog funcLog = new(); // ここで e.OldItems, e.NewItems をログに出すと、StackOverflow になる
-            using WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create();
+            using IDisposable disposable = this.WVM.BusyState.Enter();
 
             switch (this.WVM.SelectedTab) {
                 case SettingsTabs.BookSettingsTab:

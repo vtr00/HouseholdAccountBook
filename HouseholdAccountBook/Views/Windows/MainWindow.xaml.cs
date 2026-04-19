@@ -67,14 +67,12 @@ namespace HouseholdAccountBook.Views.Windows
             this.AddCommonEventHandlersToVM();
             this.AddEventHandlersToVM();
 
-            this.WVM.Initialize(new WaitCursorManagerFactory(this), dbHandlerFactory);
+            this.WVM.Initialize(dbHandlerFactory);
 
             this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
-                using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create(methodName: nameof(this.Loaded))) {
-                    await this.WVM.LoadAsync();
-                }
+                await this.WVM.LoadAsync();
                 this.WVM.AddEventHandlers();
             };
         }
@@ -245,11 +243,10 @@ namespace HouseholdAccountBook.Views.Windows
                     // 帳簿項目変更時のイベントを登録する
                     this.mCCW.ActionChanged += async (sender, e) => {
                         using FuncLog funcLog = new(methodName: nameof(this.mCCW.ActionChanged));
+                        using IDisposable disposable = this.WVM.BusyState.Enter();
 
-                        using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create()) {
-                            // 帳簿一覧タブを更新する
-                            await this.WVM.BookTabVM.LoadAsync(e.Value, isScroll: false, isUpdateActDateLastEdited: true);
-                        }
+                        // 帳簿一覧タブを更新する
+                        await this.WVM.BookTabVM.LoadAsync(e.Value, isScroll: false, isUpdateActDateLastEdited: true);
                     };
                     // 帳簿変更時のイベントを登録する
                     this.mCCW.BookChanged += (sender, e) => {

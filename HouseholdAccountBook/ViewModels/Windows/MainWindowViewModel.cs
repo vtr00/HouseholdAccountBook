@@ -13,7 +13,6 @@ using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.WindowsParts;
-using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -231,7 +230,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿セレクタVM
         /// </summary>
-        public SelectorViewModel<BookModel, BookIdObj> BookSelectorVM { get; } = new(static vm => vm?.Id);
+        public SelectorViewModel<BookModel, BookIdObj> BookSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 選択された収支種別
@@ -435,7 +434,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// グラフ種別1セレクタVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<GraphKind1, string>, GraphKind1> GraphKind1SelectorVM { get; } = new(static p => p.Key);
+        public SelectorViewModel<KeyValuePair<GraphKind1, string>, GraphKind1> GraphKind1SelectorVM => field ??= new(static p => p.Key);
         /// <summary>
         /// 選択されたグラフ種別1インデックス
         /// </summary>
@@ -447,7 +446,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// グラフ種別2セレクタVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<GraphKind2, string>, GraphKind2> GraphKind2SelectorVM { get; } = new(static p => p.Key);
+        public SelectorViewModel<KeyValuePair<GraphKind2, string>, GraphKind2> GraphKind2SelectorVM => field ??= new(static p => p.Key);
         /// <summary>
         /// 選択されたグラフ種別2インデックス
         /// </summary>
@@ -500,7 +499,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 記帳風月インポートコマンド
         /// </summary>
-        public ICommand ImportKichoFugetsuDbCommand => field ??= new AsyncRelayCommand(this.ImportKichoFugetsuDbCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened());
+        public ICommand ImportKichoFugetsuDbCommand => field ??= new AsyncRelayCommand(this.ImportKichoFugetsuDbCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened(), this.mBusyService);
         /// <summary>
         /// 記帳風月インポートコマンド処理
         /// </summary>
@@ -525,22 +524,20 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             UserSettingService.Instance.KichoFugetsuFilePath = e.FileName;
 
-            bool? result = false;
+            bool? result;
             int actRowsDiff = 0;
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                OleDbHandler.ConnectInfo info = new(UserSettingService.Instance.KichoFugetsuConnectInfo.Provider) {
-                    DataSource = e.FileName
-                };
-                try {
-                    (result, actRowsDiff) = await this.mDbImportService.ImportKichoFugetsuDbAsync(info, token, progress);
-                }
-                catch (OperationCanceledException) {
-                    result = null;
-                }
+            OleDbHandler.ConnectInfo info = new(UserSettingService.Instance.KichoFugetsuConnectInfo.Provider) {
+                DataSource = e.FileName
+            };
+            try {
+                (result, actRowsDiff) = await this.mDbImportService.ImportKichoFugetsuDbAsync(info, token, progress);
+            }
+            catch (OperationCanceledException) {
+                result = null;
+            }
 
-                if (result == true) {
-                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
-                }
+            if (result == true) {
+                await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
             }
 
             switch (result) {
@@ -560,7 +557,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// PostgreSQL -> SQLite インポートコマンド
         /// </summary>
-        public ICommand ImportPostgreSQLCommand => field ??= new AsyncRelayCommand(this.ImportPostgreSQLCommand_ExecuteAsync, () => this.IsSQLite && !this.IsChildrenWindowOpened());
+        public ICommand ImportPostgreSQLCommand => field ??= new AsyncRelayCommand(this.ImportPostgreSQLCommand_ExecuteAsync, () => this.IsSQLite && !this.IsChildrenWindowOpened(), this.mBusyService);
         /// <summary>
         /// PostgreSQL -> SQLite インポートコマンド処理
         /// </summary>
@@ -573,19 +570,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 return;
             }
 
-            bool? result = false;
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                NpgsqlDbHandler.ConnectInfo info = UserSettingService.Instance.NpgsqlConnectInfo;
-                try {
-                    result = await this.mDbImportService.ImportPostgreSQLAsync(info, token, progress);
-                }
-                catch (OperationCanceledException) {
-                    result = null;
-                }
+            bool? result;
+            NpgsqlDbHandler.ConnectInfo info = UserSettingService.Instance.NpgsqlConnectInfo;
+            try {
+                result = await this.mDbImportService.ImportPostgreSQLAsync(info, token, progress);
+            }
+            catch (OperationCanceledException) {
+                result = null;
+            }
 
-                if (result == true) {
-                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
-                }
+            if (result == true) {
+                await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
             }
 
             switch (result) {
@@ -607,7 +602,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public ICommand ImportCustomFileCommand => field ??= new AsyncRelayCommand(
             this.ImportCustomFileCommand_ExecuteAsync,
             () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlBackupConfig?.RestoreExePath) && !this.IsChildrenWindowOpened(),
-            ExecutionMode.ProgressWindow);
+            this.mBusyService, ExecutionMode.ProgressWindow);
         /// <summary>
         /// カスタムファイル -> PostgreSQL インポートコマンド処理
         /// </summary>
@@ -631,13 +626,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             UserSettingService.Instance.ImportCustomFilePath = e.FileName;
 
-            bool result = false;
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                result = await this.mDbImportService.ImportCustomFileAsync(e.FileName);
-
-                if (result) {
-                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
-                }
+            bool result = await this.mDbImportService.ImportCustomFileAsync(e.FileName);
+            if (result) {
+                await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
             }
 
             _ = result
@@ -650,7 +641,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand ImportSQLiteFileCommand => field ??= new AsyncRelayCommand(
             this.ImportSQLiteFileCommand_ExecuteAsync,
-            () => (this.IsPostgreSQL || this.IsSQLite) && !this.IsChildrenWindowOpened());
+            () => (this.IsPostgreSQL || this.IsSQLite) && !this.IsChildrenWindowOpened(), this.mBusyService);
         /// <summary>
         /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド処理
         /// </summary>
@@ -677,26 +668,24 @@ namespace HouseholdAccountBook.ViewModels.Windows
             UserSettingService.Instance.ImportSQLiteFilePath = e.FileName;
 
             bool? result = false;
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                try {
-                    switch (this.SelectedDBKind) {
-                        case DBKind.SQLite: {
-                            result = DbImportService.ImportSQLite(e.FileName, UserSettingService.Instance.SQLiteConnectInfo.FilePath, token, progress);
-                            break;
-                        }
-                        case DBKind.PostgreSQL: {
-                            result = await this.mDbImportService.ImportSQLiteAsync(e.FileName, token, progress);
-                            break;
-                        }
+            try {
+                switch (this.SelectedDBKind) {
+                    case DBKind.SQLite: {
+                        result = DbImportService.ImportSQLite(e.FileName, UserSettingService.Instance.SQLiteConnectInfo.FilePath, token, progress);
+                        break;
+                    }
+                    case DBKind.PostgreSQL: {
+                        result = await this.mDbImportService.ImportSQLiteAsync(e.FileName, token, progress);
+                        break;
                     }
                 }
-                catch (OperationCanceledException) {
-                    result = null;
-                }
+            }
+            catch (OperationCanceledException) {
+                result = null;
+            }
 
-                if (result == true) {
-                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
-                }
+            if (result == true) {
+                await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
             }
 
             switch (result) {
@@ -723,7 +712,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public ICommand ExportCustomFileCommand => field ??= new AsyncRelayCommand(
             this.ExportCustomFileCommand_ExecuteAsync,
             () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
-            ExecutionMode.ProgressWindow);
+            this.mBusyService, ExecutionMode.ProgressWindow);
         /// <summary>
         /// カスタムファイルエクスポートコマンド処理
         /// </summary>
@@ -741,10 +730,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             UserSettingService.Instance.ExportCustomFilePath = e.FileName;
 
-            bool result = false;
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQLAsync(e.FileName, PostgresFormat.Custom) == true;
-            }
+            bool result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQLAsync(e.FileName, PostgresFormat.Custom) == true;
 
             _ = result
                 ? MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
@@ -757,7 +743,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public ICommand ExportSQLFileCommand => field ??= new AsyncRelayCommand(
             this.ExportSQLFileCommand_ExecuteAsync,
             () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
-            ExecutionMode.ProgressWindow);
+            this.mBusyService, ExecutionMode.ProgressWindow);
         /// <summary>
         /// SQLファイルエクスポートコマンド処理
         /// </summary>
@@ -775,10 +761,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             UserSettingService.Instance.ExportSQLFilePath = e.FileName;
 
-            bool result = false;
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQLAsync(e.FileName, PostgresFormat.Plain) == true;
-            }
+            bool result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQLAsync(e.FileName, PostgresFormat.Plain) == true;
 
             _ = result
                 ? MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
@@ -788,20 +771,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// バックアップコマンド
         /// </summary>
-        public ICommand BackUpCommand => field ??= new AsyncRelayCommand(this.BackUpCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened(), ExecutionMode.ProgressWindow);
+        public ICommand BackUpCommand => field ??= new AsyncRelayCommand(this.BackUpCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened(), this.mBusyService, ExecutionMode.ProgressWindow);
         /// <summary>
         /// バックアップコマンド処理
         /// </summary>
         public async Task BackUpCommand_ExecuteAsync()
         {
-            bool result = false;
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                result = await DbBackUpManager.Instance.CreateBackUpFileAsync(backUpNum: -1);
+            bool result = await DbBackUpManager.Instance.CreateBackUpFileAsync(backUpNum: -1);
 
-                if (result) {
-                    UserSettingService.Instance.CurrentBackUpBySelf = DateTime.Now;
-                    this.BookTabVM.RaiseCurrentBackUpChanged();
-                }
+            if (result) {
+                UserSettingService.Instance.CurrentBackUpBySelf = DateTime.Now;
+                this.BookTabVM.RaiseCurrentBackUpChanged();
             }
 
             _ = result
@@ -846,14 +826,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <remarks>帳簿/月間一覧タブを選択している</remarks>
         public ICommand GoToLastMonthCommand => field ??= new AsyncRelayCommand(
             this.GoToLastMonthCommand_ExecuteAsync,
-            () => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly);
+            () => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly, this.mBusyService);
         /// <summary>
         /// 先月表示コマンド処理
         /// </summary>
         private async Task GoToLastMonthCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             this.DisplayedMonth = this.DisplayedMonth.Value.AddMonths(-1);
             await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
         }
@@ -861,7 +839,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 今月表示コマンド
         /// </summary>
-        public ICommand GoToThisMonthCommand => field ??= new AsyncRelayCommand(this.GoToThisMonthCommand_ExecuteAsync, this.GoToThisMonthCommand_CanExecute);
+        public ICommand GoToThisMonthCommand => field ??= new AsyncRelayCommand(this.GoToThisMonthCommand_ExecuteAsync, this.GoToThisMonthCommand_CanExecute, this.mBusyService);
         /// <summary>
         /// 今月表示コマンド実行可能か
         /// </summary>
@@ -878,8 +856,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async Task GoToThisMonthCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             this.DisplayedMonth = DateOnlyExtensions.Today.GetFirstDateOfMonth();
             await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
         }
@@ -890,14 +866,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <remarks>帳簿/日別一覧タブを選択している</remarks>
         public ICommand GoToNextMonthCommand => field ??= new AsyncRelayCommand(
             this.GoToNextMonthCommand_ExecuteAsync,
-            () => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly);
+            () => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly, this.mBusyService);
         /// <summary>
         /// 来月表示コマンド処理
         /// </summary>
         private async Task GoToNextMonthCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             this.DisplayedMonth = this.DisplayedMonth.Value.AddMonths(1);
             await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
         }
@@ -905,7 +879,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 期間選択コマンド
         /// </summary>
-        public ICommand SelectPeriodCommand => field ??= new AsyncRelayCommand(this.SelectPeriodCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened());
+        public ICommand SelectPeriodCommand => field ??= new AsyncRelayCommand(this.SelectPeriodCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened(), this.mBusyService);
         /// <summary>
         /// 期間選択コマンド処理
         /// </summary>
@@ -920,12 +894,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             this.SelectPeriodRequested?.Invoke(this, e);
             if (e.Result) {
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    this.StartDate = e.Period.Start;
-                    this.EndDate = e.Period.End;
+                this.StartDate = e.Period.Start;
+                this.EndDate = e.Period.End;
 
-                    await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
-                }
+                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
             }
         }
 
@@ -955,14 +927,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <remarks>月別一覧/月別グラフ/年別一覧/年別グラフタブを選択している</remarks>
         public ICommand GoToLastYearCommand => field ??= new AsyncRelayCommand(
             this.GoToLastYearCommand_ExecuteAsync,
-            () => this.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab);
+            () => this.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab, this.mBusyService);
         /// <summary>
         /// 去年表示コマンド処理
         /// </summary>
         private async Task GoToLastYearCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             this.DisplayedYear = this.DisplayedYear.AddYears(-1);
             await this.UpdateAsync(isUpdateBookList: true);
         }
@@ -970,7 +940,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 今年表示コマンド
         /// </summary>
-        public ICommand GoToThisYearCommand => field ??= new AsyncRelayCommand(this.GoToThisYearCommand_ExecuteAsync, this.GoToThisYearCommand_CanExecute);
+        public ICommand GoToThisYearCommand => field ??= new AsyncRelayCommand(this.GoToThisYearCommand_ExecuteAsync, this.GoToThisYearCommand_CanExecute, this.mBusyService);
         /// <summary>
         /// 今年表示コマンド実行可能か
         /// </summary>
@@ -987,8 +957,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async Task GoToThisYearCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             this.DisplayedYear = DateOnlyExtensions.Today.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
             await this.UpdateAsync(isUpdateBookList: true);
         }
@@ -999,14 +967,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <remarks>月別一覧/月別グラフ/年別一覧/年別グラフタブを選択している</remarks>
         public ICommand GoToNextYearCommand => field ??= new AsyncRelayCommand(
             this.GoToNextYearCommand_ExecuteAsync,
-            () => this.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab);
+            () => this.SelectedTab is Tabs.MonthlyListTab or Tabs.MonthlyGraphTab or Tabs.YearlyListTab or Tabs.YearlyGraphTab, this.mBusyService);
         /// <summary>
         /// 来年表示コマンド処理
         /// </summary>
         private async Task GoToNextYearCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             this.DisplayedYear = this.DisplayedYear.AddYears(1);
             await this.UpdateAsync(isUpdateBookList: true);
         }
@@ -1014,33 +980,24 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 更新コマンド
         /// </summary>
-        public ICommand UpdateCommand => field ??= new AsyncRelayCommand(this.UpdateCommand_ExecuteAsync);
-        /// <summary>
-        /// 画面更新コマンド処理
-        /// </summary>
-        private async Task UpdateCommand_ExecuteAsync()
-        {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
-            await this.UpdateAsync(isUpdateBookList: true);
-        }
+        public ICommand UpdateCommand => field ??= new AsyncRelayCommand(async () => await this.UpdateAsync(isUpdateBookList: true), null, this.mBusyService);
         #endregion
 
         #region デバッグコマンド
         /// <summary>
         /// デバッグコマンド
         /// </summary>
-        public ICommand DebugCommand => field ?? new RelayCommand(() => !this.IsChildrenWindowOpened());
+        public ICommand DebugCommand => field ??= new RelayCommand(() => !this.IsChildrenWindowOpened());
 
         /// <summary>
         /// 未処理例外スローコマンド
         /// </summary>
-        public ICommand ThrowUnhandledExceptionCommand => field ?? new RelayCommand(static () => throw new Exception("for debug"));
+        public ICommand ThrowUnhandledExceptionCommand => field ??= new RelayCommand(static () => throw new Exception("for debug"), () => true);
 
         /// <summary>
         /// 未観測タスク例外スローコマンド
         /// </summary>
-        public ICommand ThrowUnobservedTaskExceptionCommand => field ?? new RelayCommand(static () => new Task(static () => throw new Exception("for debug")).Start());
+        public ICommand ThrowUnobservedTaskExceptionCommand => field ??= new RelayCommand(static () => new Task(static () => throw new Exception("for debug")).Start(), () => true);
         #endregion
 
         #region ツールコマンド
@@ -1052,7 +1009,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 設定コマンド
         /// </summary>
-        public ICommand SettingsCommand => field ??= new AsyncRelayCommand(this.SettingsCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened());
+        public ICommand SettingsCommand => field ??= new AsyncRelayCommand(this.SettingsCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened(), this.mBusyService);
         /// <summary>
         /// 設定コマンド処理
         /// </summary>
@@ -1064,15 +1021,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SettingsRequested?.Invoke(this, e);
 
             if (e.Result) {
-                using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                    this.FiscalStartMonth = UserSettingService.Instance.FiscalStartMonth;
-                    if (!await HolidayService.Instance.DownloadHolidayListAsync(UserSettingService.Instance.HolidayCSVConfig)) {
-                        // 祝日取得失敗を通知する
-                        NotificationService.NotifyFailingToGetHolidayList();
-                    }
-
-                    await this.UpdateAsync(isUpdateBookList: true);
+                this.FiscalStartMonth = UserSettingService.Instance.FiscalStartMonth;
+                if (!await HolidayService.Instance.DownloadHolidayListAsync(UserSettingService.Instance.HolidayCSVConfig)) {
+                    // 祝日取得失敗を通知する
+                    NotificationService.NotifyFailingToGetHolidayList();
                 }
+
+                await this.UpdateAsync(isUpdateBookList: true);
             }
         }
 
@@ -1173,22 +1128,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     this.YearlyGraphTabVM
                 ]
             );
-
-            this.BookSelectorVM.SetLoader(async () => await this.mService.LoadBookListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllBooks));
-            this.GraphKind1SelectorVM.SetLoader(() => GraphKind1Str);
-            this.GraphKind2SelectorVM.SetLoader(() => GraphKind2Str);
         }
 
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        public override void Initialize(DbHandlerFactory dbHandlerFactory)
         {
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+            base.Initialize(dbHandlerFactory);
 
             this.mService = new(this.mDbHandlerFactory);
             this.mDbImportService = new(this.mDbHandlerFactory);
 
-            this.BookSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-            this.GraphKind1SelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-            this.GraphKind2SelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+            this.BookSelectorVM.SetLoader(async () => await this.mService.LoadBookListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllBooks));
+            this.GraphKind1SelectorVM.SetLoader(() => GraphKind1Str);
+            this.GraphKind2SelectorVM.SetLoader(() => GraphKind2Str);
         }
 
         public override void AddEventHandlers()
@@ -1199,7 +1150,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedTabChanged += async (sender, e) => {
                 using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedTabChanged));
 
-                using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create(methodName: nameof(this.SelectedTabChanged));
+                using IDisposable disposable = this.mBusyService.Enter();
                 UserSettingService.Instance.SelectedTab = e.NewValue;
 
                 await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
@@ -1232,7 +1183,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedSeriesChanged += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedSeriesChanged));
 
-                using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create(methodName: nameof(this.SelectedSeriesChanged));
+                using IDisposable disposable = this.mBusyService.Enter();
                 switch (this.SelectedTab) {
                     case Tabs.DailyGraphTab:
                         this.DailyGraphTabVM.UpdateSelectedGraph();
@@ -1257,6 +1208,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public override async Task LoadAsync()
         {
             using FuncLog funcLog = new();
+            using IDisposable disposable = this.mBusyService.Enter();
 
             this.FiscalStartMonth = UserSettingService.Instance.FiscalStartMonth;
 

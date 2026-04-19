@@ -13,6 +13,10 @@
     <Window.DataContext>
         <vmw:PeriodSelectionWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
+
+    <Window.Style>
+        <StaticResource ResourceKey="BusyCursor"/>
+    </Window.Style>
     
     <Grid Margin="10">
         <Grid.RowDefinitions>

@@ -20,6 +20,10 @@
         <KeyBinding Gesture="Alt+F4" Command="{Binding CloseCommand}"/>
     </Window.InputBindings>
 
+    <Window.Style>
+        <StaticResource ResourceKey="BusyCursor"/>
+    </Window.Style>
+
     <Grid Background="WhiteSmoke">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

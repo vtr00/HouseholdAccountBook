@@ -17,7 +17,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// プロバイダ名セレクタVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<string, string>, string> ProviderNameSelectorVM { get; } = new(static p => p.Key);
+        public SelectorViewModel<KeyValuePair<string, string>, string> ProviderNameSelectorVM => field ??= new(static p => p.Key);
 
         /// <summary>
         /// 入力されたDBファイルパス

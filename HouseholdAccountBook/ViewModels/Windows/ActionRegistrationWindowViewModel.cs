@@ -7,7 +7,6 @@ using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
-using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -96,7 +95,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿セレクタVM
         /// </summary>
-        public SelectorViewModel<BookModel, BookIdObj> BookSelectorVM { get; } = new(static vm => vm?.Id);
+        public SelectorViewModel<BookModel, BookIdObj> BookSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 選択された日時
@@ -115,17 +114,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 収支種別セレクタVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<BalanceKind, string>, BalanceKind> BalanceKindSelectorVM { get; } = new(static p => p.Key);
+        public SelectorViewModel<KeyValuePair<BalanceKind, string>, BalanceKind> BalanceKindSelectorVM => field ??= new(static p => p.Key);
 
         /// <summary>
         /// 分類セレクタVM
         /// </summary>
-        public SelectorViewModel<CategoryModel, CategoryIdObj> CategorySelectorVM { get; } = new(static vm => vm?.Id);
+        public SelectorViewModel<CategoryModel, CategoryIdObj> CategorySelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 項目セレクタVM
         /// </summary>
-        public SelectorViewModel<ItemModel, ItemIdObj> ItemSelectorVM { get; } = new(static vm => vm?.Id);
+        public SelectorViewModel<ItemModel, ItemIdObj> ItemSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 入力された金額
@@ -142,12 +141,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 店舗セレクタVM
         /// </summary>
-        public SelectorViewModel<ShopModel, string> ShopSelectorVM { get; } = new(static vm => vm?.Name);
+        public SelectorViewModel<ShopModel, string> ShopSelectorVM => field ??= new(static vm => vm?.Name, this.mBusyService);
 
         /// <summary>
         /// 備考セレクタVM
         /// </summary>
-        public SelectorViewModel<RemarkModel, string> RemarkSelectorVM { get; } = new(static vm => vm?.Remark);
+        public SelectorViewModel<RemarkModel, string> RemarkSelectorVM => field ??= new(static vm => vm?.Remark, this.mBusyService);
 
         /// <summary>
         /// 入力された繰り返し回数
@@ -172,7 +171,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 休日設定セレクタVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<HolidaySettingKind, string>, HolidaySettingKind> HolidaySettingSelectorVM { get; } = new(static p => p.Key);
+        public SelectorViewModel<KeyValuePair<HolidaySettingKind, string>, HolidaySettingKind> HolidaySettingSelectorVM => field ??= new(static p => p.Key);
 
         /// <summary>
         /// 選択された一致フラグ
@@ -192,22 +191,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 続けて入力コマンド
         /// </summary>
-        public ICommand ContinueToOKCommand => field ??= new AsyncRelayCommand(this.ContinueToOKCommand_ExecuteAsync, this.ContinueToOKCommand_CanExecute);
-        /// <summary>
-        /// 続けて入力コマンド実行可能か
-        /// </summary>
-        /// <returns></returns>
-        protected bool ContinueToOKCommand_CanExecute() => this.OKCommand_CanExecute() && this.RegKind == RegistrationKind.Add;
+        public ICommand ContinueToOKCommand => field ??= new AsyncRelayCommand(
+            this.ContinueToOKCommand_ExecuteAsync,
+            () => this.ItemSelectorVM.SelectedKey != null && this.InputedValue.HasValue && 0 < this.InputedValue && this.RegKind == RegistrationKind.Add, this.mBusyService);
         /// <summary>
         /// 続けて入力コマンド処理
         /// </summary>
         protected async Task ContinueToOKCommand_ExecuteAsync()
         {
             // DB登録
-            ActionIdObj id = null;
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                id = await this.SaveAsync();
-            }
+            ActionIdObj id = await this.SaveAsync();
 
             // 呼び出し元更新
             IEnumerable<ActionIdObj> value = id != null ? [id.Id] : [];
@@ -221,15 +214,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// OKコマンド
         /// </summary>
-        public new ICommand OKCommand => field ??= new AsyncRelayCommand(this.OKCommand_ExecuteAsync, this.OKCommand_CanExecute);
-        protected override bool OKCommand_CanExecute() => this.ItemSelectorVM.SelectedKey != null && this.InputedValue.HasValue && 0 < this.InputedValue;
+        public new ICommand OKCommand => field ??= new AsyncRelayCommand(
+            this.OKCommand_ExecuteAsync,
+            () => this.ItemSelectorVM.SelectedKey != null && this.InputedValue.HasValue && 0 < this.InputedValue, this.mBusyService);
         protected async Task OKCommand_ExecuteAsync()
         {
             // DB登録
-            ActionIdObj id = null;
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                id = await this.SaveAsync();
-            }
+            ActionIdObj id = await this.SaveAsync();
 
             // 呼び出し元更新
             IEnumerable<ActionIdObj> value = id != null ? [id.Id] : [];
@@ -251,12 +242,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public ActionRegistrationWindowViewModel()
+        public override void Initialize(DbHandlerFactory dbHandlerFactory)
         {
-            using FuncLog funcLog = new();
+            base.Initialize(dbHandlerFactory);
+
+            this.mAppService = new(this.mDbHandlerFactory);
+            this.mService = new(this.mDbHandlerFactory);
 
             this.BookSelectorVM.SetLoader(async () => await this.mAppService.LoadBookListAsync());
             this.BalanceKindSelectorVM.SetLoader(() => BalanceKindStr);
@@ -275,22 +266,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.HolidaySettingSelectorVM.SetLoader(() => HolidaySettingKindStr);
         }
 
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
-        {
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-
-            this.mAppService = new(this.mDbHandlerFactory);
-            this.mService = new(this.mDbHandlerFactory);
-
-            this.BookSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-            this.BalanceKindSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-            this.CategorySelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-            this.ItemSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-            this.ShopSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-            this.RemarkSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-            this.HolidaySettingSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-        }
-
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null, null, null);
 
         /// <summary>
@@ -304,6 +279,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public async Task LoadAsync(BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate, ActionCsvDto initialRecord, ActionIdObj targetActionId)
         {
             using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, initialRecord, targetActionId });
+            using IDisposable disposable = this.mBusyService.Enter();
 
             BookIdObj selectingBookId = null;
             BalanceKind selectingBalanceKind = BalanceKind.Expenses;

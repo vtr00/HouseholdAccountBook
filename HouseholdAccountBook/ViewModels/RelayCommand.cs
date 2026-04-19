@@ -24,6 +24,12 @@ namespace HouseholdAccountBook.ViewModels
         /// コマンド実行可否デリゲート
         /// </summary>
         private readonly Func<bool> mCanExecute = canExecute;
+
+        /// <summary>
+        /// 実行中か
+        /// </summary>
+        private bool mIsExecuting = false;
+
         /// <summary>
         /// 呼び出し元ファイル名
         /// </summary>
@@ -32,11 +38,6 @@ namespace HouseholdAccountBook.ViewModels
         /// 呼び出し元メンバー名
         /// </summary>
         private readonly string mMemberName = memberName;
-
-        /// <summary>
-        /// 実行中か
-        /// </summary>
-        private bool mIsExecuting = false;
         #endregion
 
         #region イベント
@@ -106,6 +107,12 @@ namespace HouseholdAccountBook.ViewModels
         /// コマンド実行可否デリゲート
         /// </summary>
         private readonly Func<T, bool> mCanExecute = canExecute;
+
+        /// <summary>
+        /// 実行中か
+        /// </summary>
+        private bool mIsExecuting = false;
+
         /// <summary>
         /// 呼び出し元ファイル名
         /// </summary>
@@ -114,11 +121,6 @@ namespace HouseholdAccountBook.ViewModels
         /// 呼び出し元メンバー名
         /// </summary>
         private readonly string mMemberName = memberName;
-
-        /// <summary>
-        /// 実行中か
-        /// </summary>
-        private bool mIsExecuting = false;
         #endregion
 
         #region イベント

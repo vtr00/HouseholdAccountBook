@@ -10,7 +10,6 @@ using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Loaders;
 using HouseholdAccountBook.ViewModels.Windows;
-using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -48,7 +47,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 系列セレクタVM
         /// </summary>
-        public SelectorViewModel<SeriesViewModel, Keys> SeriesSelectorVM { get; } = new(static vm => vm != null ? new(vm.Category.BalanceKind, vm.Category.Id, vm.Item.Id) : null);
+        public SelectorViewModel<SeriesViewModel, Keys> SeriesSelectorVM => field ??= new(static vm => vm != null ? new(vm.Category.BalanceKind, vm.Category.Id, vm.Item.Id) : null, this.mBusyService);
         #endregion
 
         /// <summary>
@@ -62,6 +61,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             this.Parent = parent;
             this.Tab = tab;
+        }
+
+        public override void Initialize(BusyService busyService, DbHandlerFactory dbHandlerFactory)
+        {
+            base.Initialize(busyService, dbHandlerFactory);
 
             this.SeriesSelectorVM.SetLoader(async _ => {
                 SeriesViewModelLoader loader = new(new(this.mDbHandlerFactory));
@@ -88,15 +92,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             if (this.Parent.SelectedTab != this.Tab) { return; }
 
             using FuncLog funcLog = new(new { balanceKind, categoryId, itemId });
+            using IDisposable disposable = this.mBusyService.Enter();
 
             await this.SeriesSelectorVM.LoadAsync(new Keys(balanceKind, categoryId, itemId));
-        }
-
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
-        {
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-
-            this.SeriesSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
         }
 
         public override void AddEventHandlers()

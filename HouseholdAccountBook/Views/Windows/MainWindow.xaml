@@ -18,6 +18,10 @@
         <vmw:MainWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
 
+    <Window.Style>
+        <StaticResource ResourceKey="BusyCursor"/>
+    </Window.Style>
+
     <Window.Resources>
         <!-- スタイル -->
         <Style x:Key="SummaryStyle" TargetType="DataGridRow">
@@ -57,7 +61,7 @@
 
         <RoutedCommand x:Key="ExportCSVFileCommand"/>
     </Window.Resources>
-
+    
     <Window.CommandBindings>
         <CommandBinding Command="{StaticResource ExportCSVFileCommand}" Executed="ExportCSVFileCommand_Execute" CanExecute="ExportCSVFileCommand_CanExecute"/>
     </Window.CommandBindings>

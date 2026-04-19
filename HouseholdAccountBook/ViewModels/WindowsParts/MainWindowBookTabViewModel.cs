@@ -12,7 +12,6 @@ using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Windows;
-using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -593,9 +592,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.SelectedActionVMList = [.. this.SelectedActionVMList.Where(vm => this.DisplayedActionVMList.Contains(vm))];
         }
 
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        public override void Initialize(BusyService busyService, DbHandlerFactory dbHandlerFactory)
         {
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+            base.Initialize(busyService, dbHandlerFactory);
 
             this.mAppService = new(this.mDbHandlerFactory);
             this.mMainService = new(this.mDbHandlerFactory);
@@ -618,6 +617,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             if (this.Parent.SelectedTab != Tabs.BooksTab) { return; }
 
             using FuncLog funcLog = new(new { actionIdList, balanceKind, categoryId, itemId, isScroll, isUpdateActDateLastEdited });
+            using IDisposable disposable = this.mBusyService.Enter();
 
             // 指定がなければ、更新前の帳簿項目の選択を維持する
             IEnumerable<ActionIdObj> tmpActionIdList = actionIdList ?? this.SelectedActionVMList.Select(tmp => tmp.ActionWithBalance.Action.ActionId);

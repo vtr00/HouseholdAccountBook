@@ -17,6 +17,10 @@
         <vmw:CsvComparisonWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
 
+    <Window.Style>
+        <StaticResource ResourceKey="BusyCursor"/>
+    </Window.Style>
+
     <Window.Resources>
         <!-- スタイル -->
         <Style x:Key="DayOfWeekStyle" TargetType="DataGridCell">

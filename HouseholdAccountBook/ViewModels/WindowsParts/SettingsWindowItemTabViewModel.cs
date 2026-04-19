@@ -8,7 +8,6 @@ using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Loaders;
 using HouseholdAccountBook.ViewModels.Settings;
-using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -76,14 +75,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 分類追加コマンド
         /// </summary>
-        public ICommand AddCategoryCommand => field ??= new AsyncRelayCommand(this.AddCategoryCommand_ExecuteAsync, () => this.SelectedItemTreeVM != null);
+        public ICommand AddCategoryCommand => field ??= new AsyncRelayCommand(this.AddCategoryCommand_ExecuteAsync, () => this.SelectedItemTreeVM != null, this.mBusyService);
         /// <summary>
         /// 分類追加コマンド処理
         /// </summary>
         private async Task AddCategoryCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             ItemTreeViewModel vm = this.SelectedItemTreeVM;
             while (vm?.Kind != HierarchicalKind.Balance) {
                 vm = vm.ParentVM;
@@ -99,14 +96,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand AddItemCommand => field ??= new AsyncRelayCommand(
             this.AddItemCommand_ExecuteAsync,
-            () => this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance);
+            () => this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance, this.mBusyService);
         /// <summary>
         /// 項目追加コマンド処理
         /// </summary>
         private async Task AddItemCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             ItemTreeViewModel vm = this.SelectedItemTreeVM;
             while (vm?.Kind != HierarchicalKind.Category) {
                 vm = vm.ParentVM;
@@ -123,14 +118,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand DeleteItemCommand => field ??= new AsyncRelayCommand(
             this.DeleteItemCommand_ExecuteAsync,
-            () => this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance);
+            () => this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance, this.mBusyService);
         /// <summary>
         /// 分類/項目削除コマンド処理
         /// </summary>
         private async Task DeleteItemCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             HierarchicalKind? kind = this.SelectedItemTreeVM?.Kind;
             IdObj id = this.SelectedItemTreeVM.Id;
 
@@ -166,7 +159,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 分類/項目表示順上昇コマンド
         /// </summary>
-        public ICommand RaiseItemSortOrderCommand => field ??= new AsyncRelayCommand(this.RaiseItemSortOrderCommand_ExecuteAsync, this.RaiseItemSortOrderCommand_CanExecute);
+        public ICommand RaiseItemSortOrderCommand => field ??= new AsyncRelayCommand(this.RaiseItemSortOrderCommand_ExecuteAsync, this.RaiseItemSortOrderCommand_CanExecute, this.mBusyService);
         /// <summary>
         /// 分類/項目表示順上昇コマンド実行可能か
         /// </summary>
@@ -195,8 +188,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async Task RaiseItemSortOrderCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             ItemTreeViewModel parentVM = this.SelectedItemTreeVM.ParentVM;
             int index = parentVM.ChildrenVMList.IndexOf(this.SelectedItemTreeVM);
             IdObj changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
@@ -230,7 +221,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 分類/項目表示順下降コマンド
         /// </summary>
-        public ICommand DropItemSortOrderCommand => field ??= new AsyncRelayCommand(this.DropItemSortOrderCommand_ExecuteAsync, this.DropItemSortOrderCommand_CanExecute);
+        public ICommand DropItemSortOrderCommand => field ??= new AsyncRelayCommand(this.DropItemSortOrderCommand_ExecuteAsync, this.DropItemSortOrderCommand_CanExecute, this.mBusyService);
         /// <summary>
         /// 分類/項目表示順下降コマンド実行可能か
         /// </summary>
@@ -259,8 +250,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         private async Task DropItemSortOrderCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             ItemTreeViewModel parentVM = this.SelectedItemTreeVM.ParentVM;
             int index = parentVM.ChildrenVMList.IndexOf(this.SelectedItemTreeVM);
             IdObj changingId = parentVM.ChildrenVMList[index].Id; // 選択中の項目のID
@@ -296,14 +285,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand SaveItemInfoCommand => field ??= new AsyncRelayCommand(
             this.SaveItemInfoCommand_ExecuteAsync,
-            () => this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance && !string.IsNullOrWhiteSpace(this.SelectedItemTreeVM.Name));
+            () => this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance && !string.IsNullOrWhiteSpace(this.SelectedItemTreeVM.Name), this.mBusyService);
         /// <summary>
         /// 分類/項目情報保存コマンド処理
         /// </summary>
         private async Task SaveItemInfoCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             ItemSettingViewModel vm = this.DisplayedItemSettingVM;
             switch (vm.Kind) {
                 case HierarchicalKind.Category: {
@@ -324,15 +311,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 項目-帳簿関係変更コマンド
         /// </summary>
-        public ICommand ChangeItemRelationCommand => field ??= new AsyncRelayCommand<object>(this.ChangeItemRelationCommand_ExecuteAsync);
+        public ICommand ChangeItemRelationCommand => field ??= new AsyncRelayCommand<object>(this.ChangeItemRelationCommand_ExecuteAsync, null, this.mBusyService);
         /// <summary>
         /// 項目-帳簿関係変更コマンド処理
         /// </summary>
         /// <param name="viewModel">チェック対象に紐づくVM</param>
         private async Task ChangeItemRelationCommand_ExecuteAsync(object viewModel)
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
             ItemSettingViewModel vm = this.DisplayedItemSettingVM;
@@ -352,7 +337,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand DeleteShopNameCommand => field ??= new AsyncRelayCommand(
             this.DeleteShopNameCommand_ExecuteAsync,
-            () => this.DisplayedItemSettingVM?.ShopSelectorVM.SelectedItem != null);
+            () => this.DisplayedItemSettingVM?.ShopSelectorVM.SelectedItem != null, this.mBusyService);
         /// <summary>
         /// 店名削除コマンド処理
         /// </summary>
@@ -360,8 +345,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
                 Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
                 await this.mSettingService.DeleteShopAsync(this.DisplayedItemSettingVM.ShopSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Id);
@@ -376,7 +359,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand DeleteRemarkCommand => field ??= new AsyncRelayCommand(
             this.DeleteRemarkCommand_ExecuteAsync,
-            () => this.DisplayedItemSettingVM?.RemarkSelectorVM.SelectedItem != null);
+            () => this.DisplayedItemSettingVM?.RemarkSelectorVM.SelectedItem != null, this.mBusyService);
         /// <summary>
         /// 備考削除コマンド処理
         /// </summary>
@@ -384,8 +367,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             if (MessageBox.Show(Properties.Resources.Message_DeleteNotification, Properties.Resources.Title_Information,
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
                 Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
                 await this.mSettingService.DeleteRemarkAsync(this.DisplayedItemSettingVM.RemarkSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Id);
@@ -396,9 +377,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        public override void Initialize(BusyService busyService, DbHandlerFactory dbHandlerFactory)
         {
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+            base.Initialize(busyService, dbHandlerFactory);
 
             this.mSettingService = new(this.mDbHandlerFactory);
         }
@@ -413,6 +394,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public async Task LoadAsync(HierarchicalKind? kind = null, IdObj id = null)
         {
             using FuncLog funcLog = new(new { kind, id });
+            using IDisposable disposable = this.mBusyService.Enter();
 
             // InitializeComponent内で呼ばれる場合があるため、nullチェックを行う
             if (this.mDbHandlerFactory == null) { return; }
@@ -467,6 +449,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             this.SelectedItemTreeVMChanged += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.SelectedItemTreeVMChanged));
+                using IDisposable disposable = this.mBusyService.Enter();
 
                 if (e.Value != null) {
                     SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
