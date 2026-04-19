@@ -6,7 +6,6 @@ using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
-using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -42,17 +41,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// DB種別セレクタVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<DBKind, string>, DBKind> DBKindSelectorVM { get; } = new(static p => p.Key);
+        public SelectorViewModel<KeyValuePair<DBKind, string>, DBKind> DBKindSelectorVM => field ??= new(static p => p.Key);
 
         /// <summary>
         /// PostgreSQL設定
         /// </summary>
-        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM { get; } = new();
+        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM { get; init; } = new();
 
         /// <summary>
         /// Access設定
         /// </summary>
-        public OleDbSettingViewModel AccessSettingVM { get; } = new();
+        public OleDbSettingViewModel AccessSettingVM { get; init; } = new();
 
         /// <summary>
         /// SQLite設定
@@ -206,23 +205,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        public DbSettingWindowViewModel()
+        public override void Initialize(DbHandlerFactory dbHandlerFactory)
         {
-            using FuncLog funcLog = new();
+            base.Initialize(dbHandlerFactory);
 
             this.DBKindSelectorVM.SetLoader(static () => DBKindStr);
-        }
-
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
-        {
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-
-            this.DBKindSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
         }
 
         public override async Task LoadAsync()
         {
             using FuncLog funcLog = new();
+            using IDisposable disposable = this.mBusyService.Enter();
 
             await this.DBKindSelectorVM.LoadAsync(UserSettingService.Instance.SelectedDBKind);
 

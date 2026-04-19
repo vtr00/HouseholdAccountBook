@@ -65,7 +65,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 国民の祝日CSV 文字エンコーディング セレクタVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<int, string>, int> NationalHolidayTextEncodingSelectorVM { get; } = new(static p => p.Key);
+        public SelectorViewModel<KeyValuePair<int, string>, int> NationalHolidayTextEncodingSelectorVM => field ??= new(static p => p.Key);
 
         /// <summary>
         /// 入力された国民の祝日CSV 日付インデックス(1開始)
@@ -112,7 +112,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// ログレベル セレクタVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<Log.LogLevel, string>, Log.LogLevel> LogLevelSelectorVM { get; } = new(static p => p.Key);
+        public SelectorViewModel<KeyValuePair<Log.LogLevel, string>, Log.LogLevel> LogLevelSelectorVM => field ??= new(static p => p.Key);
 
         /// <summary>
         /// 選択されたウィンドウログ出力の有無

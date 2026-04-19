@@ -38,17 +38,17 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 関連性セレクタVM
         /// </summary>
-        public SelectorViewModel<RelationViewModel, BookIdObj> RelationSelectorVM { get; } = new(static vm => vm?.Id);
+        public SelectorViewModel<RelationViewModel, BookIdObj> RelationSelectorVM => field ??= new(static vm => vm?.Id);
 
         /// <summary>
         /// 店舗セレクタVM
         /// </summary>
-        public SelectorViewModel<ShopModel, string> ShopSelectorVM { get; } = new(static vm => vm?.Name);
+        public SelectorViewModel<ShopModel, string> ShopSelectorVM => field ??= new(static vm => vm?.Name);
 
         /// <summary>
         /// 備考セレクタVM
         /// </summary>
-        public SelectorViewModel<RemarkModel, string> RemarkSelectorVM { get; } = new(static vm => vm?.Remark);
+        public SelectorViewModel<RemarkModel, string> RemarkSelectorVM => field ??= new(static vm => vm?.Remark);
 
         /// <summary>
         /// リネーム可能か

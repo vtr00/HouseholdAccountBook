@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
-using HouseholdAccountBook.Views;
+using HouseholdAccountBook.Models.AppServices;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,9 +22,9 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         protected readonly List<WindowPartViewModelBase> mChildrenVM = [];
 
         /// <summary>
-        /// WaitCursorマネージャファクトリ
+        /// 処理中状態サービス
         /// </summary>
-        protected WaitCursorManagerFactory mWaitCursorManagerFactory;
+        protected BusyService mBusyService;
         /// <summary>
         /// DBハンドラファクトリ
         /// </summary>
@@ -98,21 +98,28 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         #endregion
 
         /// <summary>
+        /// 初期化済か
+        /// </summary>
+        public bool Initialized { get; protected set; }
+
+        /// <summary>
         /// ViewModelの初期化を行う
         /// </summary>
-        /// <param name="waitCursorManagerFactory">WaitCursorマネージャファクトリ</param>
+        /// <param name="busyService">処理中状態サービス</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <remarks><see cref="FrameworkElement">のコンストラクタで呼び出す</remarks>
-        public virtual void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        public virtual void Initialize(BusyService busyService, DbHandlerFactory dbHandlerFactory)
         {
             using FuncLog funcLog = new();
 
-            this.mWaitCursorManagerFactory = waitCursorManagerFactory;
+            this.mBusyService = busyService;
             this.mDbHandlerFactory = dbHandlerFactory;
 
             foreach (WindowPartViewModelBase childVM in this.mChildrenVM) {
-                childVM.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+                childVM.Initialize(this.mBusyService, this.mDbHandlerFactory);
             }
+
+            this.Initialized = true;
         }
 
         /// <summary>

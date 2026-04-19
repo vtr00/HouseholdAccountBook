@@ -9,7 +9,6 @@ using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Loaders;
 using HouseholdAccountBook.ViewModels.Settings;
-using HouseholdAccountBook.Views;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -45,7 +44,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿セレクタVM
         /// </summary>
-        public SelectorViewModel<BookModel, BookIdObj> BookSelectorVM { get; } = new(static vm => vm?.Id);
+        public SelectorViewModel<BookModel, BookIdObj> BookSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
         /// <summary>
         /// 表示された帳簿設定VM
         /// </summary>
@@ -59,14 +58,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿追加コマンド
         /// </summary>
-        public ICommand AddBookCommand => field ??= new AsyncRelayCommand(this.AddBookCommand_ExecuteAsync);
+        public ICommand AddBookCommand => field ??= new AsyncRelayCommand(this.AddBookCommand_ExecuteAsync, null, this.mBusyService);
         /// <summary>
         /// 帳簿追加コマンド処理
         /// </summary>
         private async Task AddBookCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             BookIdObj bookId = await this.mSettingService.AddBookAsync();
             await this.LoadAsync(bookId);
 
@@ -76,14 +73,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿削除コマンド
         /// </summary>
-        public ICommand DeleteBookCommand => field ??= new AsyncRelayCommand(this.DeleteBookCommand_ExecuteAsync, () => this.BookSelectorVM.SelectedItem != null);
+        public ICommand DeleteBookCommand => field ??= new AsyncRelayCommand(this.DeleteBookCommand_ExecuteAsync, () => this.BookSelectorVM.SelectedItem != null, this.mBusyService);
         /// <summary>
         /// 帳簿削除コマンド処理
         /// </summary>
         private async Task DeleteBookCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             if (await this.mSettingService.DeleteBookAsync(this.BookSelectorVM.SelectedKey)) {
                 await this.LoadAsync();
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
@@ -96,14 +91,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿表示順上昇コマンド
         /// </summary>
-        public ICommand RaiseBookSortOrderCommand => field ??= new AsyncRelayCommand(this.RaiseBookSortOrderCommand_ExecuteAsync, () => 0 < this.BookSelectorVM.SelectedIndex);
+        public ICommand RaiseBookSortOrderCommand => field ??= new AsyncRelayCommand(this.RaiseBookSortOrderCommand_ExecuteAsync, () => 0 < this.BookSelectorVM.SelectedIndex, this.mBusyService);
         /// <summary>
         /// 帳簿表示順上昇コマンド処理
         /// </summary>
         private async Task RaiseBookSortOrderCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             int index = this.BookSelectorVM.SelectedIndex;
             BookIdObj changingId = this.BookSelectorVM.ItemList[index].Id;
             BookIdObj changedId = this.BookSelectorVM.ItemList[index - 1].Id;
@@ -119,14 +112,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand DropBookSortOrderCommand => field ??= new AsyncRelayCommand(
             this.DropBookSortOrderCommand_ExecuteAsync,
-            () => this.BookSelectorVM.SelectedIndex != -1 && this.BookSelectorVM.SelectedIndex < this.BookSelectorVM.Count - 1);
+            () => this.BookSelectorVM.SelectedIndex != -1 && this.BookSelectorVM.SelectedIndex < this.BookSelectorVM.Count - 1, this.mBusyService);
         /// <summary>
         /// 帳簿表示順下降コマンド処理
         /// </summary>
         private async Task DropBookSortOrderCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             int index = this.BookSelectorVM.SelectedIndex;
             BookIdObj changingId = this.BookSelectorVM.ItemList[index].Id;
             BookIdObj changedId = this.BookSelectorVM.ItemList[index + 1].Id;
@@ -140,14 +131,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿情報保存コマンド
         /// </summary>
-        public ICommand SaveBookInfoCommand => field ??= new AsyncRelayCommand(this.SaveBookInfoCommand_ExecuteAsync, () => !string.IsNullOrWhiteSpace(this.DisplayedBookSettingVM?.InputedName));
+        public ICommand SaveBookInfoCommand => field ??= new AsyncRelayCommand(
+            this.SaveBookInfoCommand_ExecuteAsync,
+            () => !string.IsNullOrWhiteSpace(this.DisplayedBookSettingVM?.InputedName), this.mBusyService);
         /// <summary>
         /// 帳簿情報保存コマンド処理
         /// </summary>
         private async Task SaveBookInfoCommand_ExecuteAsync()
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             BookSettingViewModel vm = this.DisplayedBookSettingVM;
             BookModel book = new(vm.Id, vm.InputedName) {
                 BookKind = vm.BookKindSelectorVM.SelectedKey,
@@ -201,15 +192,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿-項目関係変更コマンド
         /// </summary>
-        public ICommand ChangeBookRelationCommand => field ??= new AsyncRelayCommand<object>(this.ChangeBookRelationCommand_ExecuteAsync);
+        public ICommand ChangeBookRelationCommand => field ??= new AsyncRelayCommand<object>(this.ChangeBookRelationCommand_ExecuteAsync, null, this.mBusyService);
         /// <summary>
         /// 帳簿-項目関係変更コマンド処理
         /// </summary>
         /// <param name="viewModel">チェックされた対象の<see cref="RelationModel"/></param>
         private async Task ChangeBookRelationCommand_ExecuteAsync(object viewModel)
         {
-            using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
             BookSettingViewModel vm = this.DisplayedBookSettingVM;
             vm.RelationSelectorVM.SelectedItem = viewModel as RelationViewModel; // チェックボックスを変更しただけでは変更されないため、引数で受け取る
 
@@ -226,18 +215,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public SettingsWindowBookTabViewModel()
         {
             using FuncLog funcLog = new();
-
-            this.BookSelectorVM.SetLoader(async _ => await this.mAppService.LoadBookListAsync());
         }
 
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
+        public override void Initialize(BusyService busyService, DbHandlerFactory dbHandlerFactory)
         {
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
+            base.Initialize(busyService, dbHandlerFactory);
 
             this.mAppService = new(this.mDbHandlerFactory);
             this.mSettingService = new(this.mDbHandlerFactory);
 
-            this.BookSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
+            this.BookSelectorVM.SetLoader(async _ => await this.mAppService.LoadBookListAsync());
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null);
@@ -249,6 +236,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public async Task LoadAsync(BookIdObj bookId = null)
         {
             using FuncLog funcLog = new(new { bookId });
+            using IDisposable disposable = this.mBusyService.Enter();
 
             // InitializeComponent内で呼ばれる場合があるため、nullチェックを行う
             if (this.mAppService == null) {
@@ -258,8 +246,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             await this.BookSelectorVM.LoadAsync(bookId);
             // この時点では選択時イベントハンドラは未登録なので明示的に読み込む
             if (this.BookSelectorVM.SelectedItem != null) {
-                using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
-
                 SettingViewModelLoader loader = new(this.mAppService, this.mSettingService);
                 this.DisplayedBookSettingVM = await loader.LoadBookSettingViewModelAsync(this.BookSelectorVM.SelectedKey);
             }
@@ -269,7 +255,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             this.BookSelectorVM.SelectionChanged += async (sender, e) => {
                 if (e.NewValue != null) {
-                    using WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create();
+                    using IDisposable disposable = this.mBusyService.Enter();
 
                     SettingViewModelLoader loader = new(this.mAppService, this.mSettingService);
                     this.DisplayedBookSettingVM = await loader.LoadBookSettingViewModelAsync(e.NewValue);

@@ -26,6 +26,16 @@
             <Setter Property="TextAlignment" Value="Right"/>
         </Style>
 
+        <!-- BusyStateによるカーソル切替スタイル -->
+        <Style x:Key="BusyCursor" TargetType="Window">
+            <Setter Property="Cursor" Value="Arrow"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding BusyState.IsBusy}" Value="True">
+                    <Setter Property="Cursor" Value="Wait"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <!-- 設定 -->
         <properties:Settings x:Key="Settings"/>
         <!-- 言語 -->

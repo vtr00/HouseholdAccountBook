@@ -17,9 +17,9 @@
         <KeyBinding Gesture="Shift+Enter" Command="{Binding ContinueToOKCommand}"/>
         <KeyBinding Gesture="Esc" Command="{Binding CancelCommand}"/>
     </Window.InputBindings>
-    
+
     <Window.Style>
-        <Style TargetType="Window">
+        <Style TargetType="Window" BasedOn="{StaticResource BusyCursor}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding RegKind}" Value="Add">
                     <Setter Property="Title" Value="{x:Static properties:Resources.Title_AddWindow}"/>

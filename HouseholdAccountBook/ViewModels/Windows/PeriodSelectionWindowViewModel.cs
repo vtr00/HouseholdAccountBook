@@ -99,7 +99,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 全期間コマンド
         /// </summary>
-        public ICommand AllPeriodCommand => field ??= new AsyncRelayCommand(async () => this.SelectedPeriod = await this.LoadFirstLastDate());
+        public ICommand AllPeriodCommand => field ??= new AsyncRelayCommand(async () => this.SelectedPeriod = await this.LoadFirstLastDate(), null, this.mBusyService);
         #endregion
 
         #region ウィンドウ設定プロパティ

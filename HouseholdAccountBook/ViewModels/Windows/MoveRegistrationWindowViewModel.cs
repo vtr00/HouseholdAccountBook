@@ -7,7 +7,6 @@ using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
-using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -91,11 +90,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 移動元帳簿セレクタVM
         /// </summary>
-        public SelectorViewModel<BookModel, BookIdObj> FromBookSelectorVM { get; } = new(static vm => vm?.Id);
+        public SelectorViewModel<BookModel, BookIdObj> FromBookSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
         /// <summary>
         /// 移動先帳簿セレクタVM
         /// </summary>
-        public SelectorViewModel<BookModel, BookIdObj> ToBookSelectorVM { get; } = new(static vm => vm?.Id);
+        public SelectorViewModel<BookModel, BookIdObj> ToBookSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 選択された日付(移動元)
@@ -165,12 +164,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 手数料種別セレクタVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<CommissionKind, string>, CommissionKind> CommissionKindSelectorVM { get; } = new(static p => p.Key);
+        public SelectorViewModel<KeyValuePair<CommissionKind, string>, CommissionKind> CommissionKindSelectorVM => field ??= new(static p => p.Key);
 
         /// <summary>
         /// 手数料項目セレクタVM
         /// </summary>
-        public SelectorViewModel<ItemModel, ItemIdObj> ItemSelectorVM { get; } = new(static vm => vm?.Id);
+        public SelectorViewModel<ItemModel, ItemIdObj> ItemSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 入力された手数料
@@ -187,7 +186,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 備考セレクタVM
         /// </summary>
-        public SelectorViewModel<RemarkModel, string> RemarkSelectorVM { get; } = new(static vm => vm?.Remark);
+        public SelectorViewModel<RemarkModel, string> RemarkSelectorVM => field ??= new(static vm => vm?.Remark, this.mBusyService);
         #endregion
 
         #region コマンド
@@ -201,14 +200,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public new ICommand OKCommand => field ??= new AsyncRelayCommand(
             this.OKCommand_ExecuteAsync,
-            () => this.InputedValue is not null && this.FromBookSelectorVM?.SelectedKey != this.ToBookSelectorVM?.SelectedKey);
+            () => this.InputedValue is not null && this.FromBookSelectorVM?.SelectedKey != this.ToBookSelectorVM?.SelectedKey, this.mBusyService);
         protected async Task OKCommand_ExecuteAsync()
         {
             // DB登録
-            IEnumerable<ActionIdObj> idList = null;
-            using (WaitCursorManager wcm = this.mWaitCursorManagerFactory.Create()) {
-                idList = await this.SaveAsync();
-            }
+            IEnumerable<ActionIdObj> idList = await this.SaveAsync();
             this.Registrated?.Invoke(this, new EventArgs<IEnumerable<ActionIdObj>>(idList));
 
             base.OKCommand_Execute();
@@ -227,12 +223,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public MoveRegistrationWindowViewModel()
+        public override void Initialize(DbHandlerFactory dbHandlerFactory)
         {
-            using FuncLog funcLog = new();
+            base.Initialize(dbHandlerFactory);
+
+            this.mAppService = new(this.mDbHandlerFactory);
+            this.mService = new(this.mDbHandlerFactory);
 
             this.FromBookSelectorVM.SetLoader(async () => await this.mAppService.LoadBookListAsync());
             this.ToBookSelectorVM.SetLoader(async () => await this.mAppService.LoadBookListAsync());
@@ -252,20 +248,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
         }
 
-        public override void Initialize(WaitCursorManagerFactory waitCursorManagerFactory, DbHandlerFactory dbHandlerFactory)
-        {
-            base.Initialize(waitCursorManagerFactory, dbHandlerFactory);
-
-            this.mAppService = new(this.mDbHandlerFactory);
-            this.mService = new(this.mDbHandlerFactory);
-
-            this.FromBookSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-            this.ToBookSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-            this.CommissionKindSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-            this.ItemSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-            this.RemarkSelectorVM.WaitCursorManagerFactory = waitCursorManagerFactory;
-        }
-
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null, null);
 
         /// <summary>
@@ -279,6 +261,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public async Task LoadAsync(BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate, GroupIdObj targetGroupId)
         {
             using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, targetGroupId });
+            using IDisposable disposable = this.mBusyService.Enter();
 
             BookIdObj selectingFromBookId = null;
             BookIdObj selectingToBookId = null;

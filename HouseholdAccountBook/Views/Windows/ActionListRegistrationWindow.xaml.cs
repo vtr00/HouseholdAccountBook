@@ -105,15 +105,13 @@ namespace HouseholdAccountBook.Views.Windows
             this.InitializeComponent();
             this.AddCommonEventHandlersToVM();
 
-            this.WVM.Initialize(new WaitCursorManagerFactory(this), dbHandlerFactory);
+            this.WVM.Initialize(dbHandlerFactory);
             this.WVM.RegKind = regKind;
 
             this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
-                using (WaitCursorManager wcm = new WaitCursorManagerFactory(this).Create(methodName: nameof(this.Loaded))) {
-                    await this.WVM.LoadAsync(initialBookId, initialMonth, initialDate, initialRecordList, targetGroupId);
-                }
+                await this.WVM.LoadAsync(initialBookId, initialMonth, initialDate, initialRecordList, targetGroupId);
                 this.WVM.AddEventHandlers();
             };
         }

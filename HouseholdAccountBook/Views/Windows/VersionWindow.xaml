@@ -12,6 +12,10 @@
     <Window.DataContext>
         <vmw:VersionWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
+
+    <Window.Style>
+        <StaticResource ResourceKey="BusyCursor"/>
+    </Window.Style>
     
     <Grid Margin="5">
         <Grid.RowDefinitions>

@@ -1,8 +1,8 @@
 ﻿using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.ViewModels.Abstract;
-using HouseholdAccountBook.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -42,17 +42,13 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         private readonly Func<VM?, KEY?> mSelector;
         /// <summary>
+        /// 処理中状態サービス
+        /// </summary>
+        private readonly BusyService? mBusyService;
+        /// <summary>
         /// 選択 <see cref="VM"/> がNullの場合でも変更を通知するか
         /// </summary>
         private readonly bool mItemChangedIfNull;
-        /// <summary>
-        /// 出力元ファイル名
-        /// </summary>
-        private readonly string? mFileName;
-        /// <summary>
-        /// 出力元メンバー名
-        /// </summary>
-        private readonly string mMemberName;
 
         /// <summary>
         /// <see cref="VM"> リスト読込可能か
@@ -79,6 +75,15 @@ namespace HouseholdAccountBook.ViewModels
         /// 多重読込処理防止トークン源
         /// </summary>
         private CancellationTokenSource? mSelectionCts;
+
+        /// <summary>
+        /// 出力元ファイル名
+        /// </summary>
+        private readonly string? mFileName;
+        /// <summary>
+        /// 出力元メンバー名
+        /// </summary>
+        private readonly string mMemberName;
         #endregion
 
         #region イベント
@@ -168,25 +173,25 @@ namespace HouseholdAccountBook.ViewModels
             get => this.SelectedItem == null ? -1 : this.ItemList.IndexOf(this.SelectedItem);
             set => this.SelectedItem = (value < 0 || this.ItemList.Count <= value) ? default : this.ItemList[value];
         }
-
-        /// <summary>
-        /// WaitCursorマネージャファクトリ
-        /// </summary>
-        public WaitCursorManagerFactory? WaitCursorManagerFactory { get; set; }
         #endregion
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="selector"><see cref="KEY"/><see cref="VM"/> から <see cref="KEY"/> への変換処理</param>
+        /// <param name="busyService">処理中状態サービス</param>
         /// <param name="itemChangedIfNull">選択 <see cref="VM"/> がNullの場合でも変更を通知するか</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public SelectorViewModel(Func<VM?, KEY?> selector, bool itemChangedIfNull = false, [CallerFilePath] string? fileName = null, [CallerMemberName] string memberName = "")
+        public SelectorViewModel(Func<VM?, KEY?> selector, BusyService? busyService = null, bool itemChangedIfNull = false,
+                                 [CallerFilePath] string? fileName = null, [CallerMemberName] string memberName = "")
         {
             ArgumentNullException.ThrowIfNull(selector);
 
+            using FuncLog funcLog = new(level: Log.LogLevel.Trace, fileName: fileName, methodName: memberName);
+
             this.mSelector = selector;
+            this.mBusyService = busyService;
             this.mItemChangedIfNull = itemChangedIfNull;
             this.mFileName = fileName;
             this.mMemberName = memberName;
@@ -218,6 +223,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="load">[同期] <see cref="VM"/> リスト読込処理</param>
         /// <param name="canLoad">Load可能判定処理</param>
+        /// <param name="mode">読み込み時に <see cref="KEY"/> を選択するモード</param>
         public void SetLoader(Func<IEnumerable<VM>> load, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault) =>
             this.SetLoader(funcLog => load(), canLoad, mode);
         /// <summary>
@@ -225,6 +231,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="load">[同期] <see cref="VM"/> リスト読込処理</param>
         /// <param name="canLoad">Load可能判定処理</param>
+        /// <param name="mode">読み込み時に <see cref="KEY"/> を選択するモード</param>
         public void SetLoader(Func<FuncLog, IEnumerable<VM>> load, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault)
         {
             using FuncLog funcLog = new(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(SetLoader)}");
@@ -240,6 +247,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="loadAsync">[非同期] <see cref="VM"> リスト読込処理</param>
         /// <param name="canLoad">Load可能判定処理</param>
+        /// <param name="mode">読み込み時に <see cref="KEY"/> を選択するモード</param>
         public void SetLoader(Func<Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault) =>
             this.SetLoader((funcLog, token) => loadAsync(), canLoad, mode);
         /// <summary>
@@ -247,6 +255,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="loadAsync">[非同期] <see cref="VM"> リスト読込処理</param>
         /// <param name="canLoad">Load可能判定処理</param>
+        /// <param name="mode">読み込み時に <see cref="KEY"/> を選択するモード</param>
         public void SetLoader(Func<CancellationToken, Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault) =>
             this.SetLoader((funcLog, token) => loadAsync(token), canLoad, mode);
         /// <summary>
@@ -254,6 +263,7 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="loadAsync">[非同期] <see cref="VM"> リスト読込処理</param>
         /// <param name="canLoad">Load可能判定処理</param>
+        /// <param name="mode">読み込み時に <see cref="KEY"/> を選択するモード</param>
         public void SetLoader(Func<FuncLog, CancellationToken, Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault)
         {
             using FuncLog funcLog = new(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(SetLoader)}");
@@ -294,7 +304,7 @@ namespace HouseholdAccountBook.ViewModels
                 return;
             }
 
-            using WaitCursorManager? wcm = this.WaitCursorManagerFactory?.Create(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(LoadAsync)}");
+            using IDisposable? disposable = this.mBusyService?.Enter();
 
             this.mOnLoad = true;
             try {
@@ -361,15 +371,15 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// <see cref="VM"/> リストの選択変更時処理
         /// </summary>
-        /// <param name="oldVM">前回の選択 <see cref="VM"/></param>
-        /// <param name="newVM">今回の選択 <see cref="VM"/></param>
+        /// <param name="oldKey">前回の選択 <see cref="KEY"/></param>
+        /// <param name="newKey">今回の選択 <see cref="KEY"/></param>
         /// <param name="token">キャンセル用トークン</param>
         protected async Task OnSelectionChangedAsync(KEY? oldKey, KEY? newKey, CancellationToken token = default)
         {
             ChangedEventArgs<KEY> args = new() { OldValue = oldKey, NewValue = newKey };
             using FuncLog funcLog = new(args, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(OnSelectionChangedAsync)}");
 
-            using WaitCursorManager? wcm = this.WaitCursorManagerFactory?.Create(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(OnSelectionChangedAsync)}");
+            using IDisposable? disposable = this.mBusyService?.Enter();
 
             CancellationToken tmpToken = token;
             if (tmpToken == default) {
@@ -402,10 +412,11 @@ namespace HouseholdAccountBook.ViewModels
     /// <summary>
     /// コンストラクタ
     /// </summary>
+    /// <param name="busyService">処理中状態サービス</param>
     /// <param name="itemChangedIfNull">選択 <see cref="VM"/> がNullの場合でも変更を通知するか</param>
     /// <param name="fileName">出力元ファイル名</param>
     /// <param name="memberName">出力元関数名</param>
-    public class SelectorViewModel<VM>(bool itemChangedIfNull = false, [CallerFilePath] string? fileName = null, [CallerMemberName] string memberName = "") :
-        SelectorViewModel<VM, VM>(static vm => vm, itemChangedIfNull, fileName, memberName)
+    public class SelectorViewModel<VM>(BusyService? busyService = null, bool itemChangedIfNull = false, [CallerFilePath] string? fileName = null, [CallerMemberName] string memberName = "") :
+        SelectorViewModel<VM, VM>(static vm => vm, busyService, itemChangedIfNull, fileName, memberName)
     { }
 }

@@ -40,7 +40,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 帳簿種別セレクタVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<BookKind, string>, BookKind> BookKindSelectorVM { get; } = new(static p => p.Key);
+        public SelectorViewModel<KeyValuePair<BookKind, string>, BookKind> BookKindSelectorVM => field ??= new(static p => p.Key);
 
         /// <summary>
         /// 入力された備考
@@ -99,7 +99,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 支払元帳簿セレクタVM
         /// </summary>
-        public SelectorViewModel<BookModel, BookIdObj> DebitBookSelectorVM { get; } = new(static vm => vm?.Id);
+        public SelectorViewModel<BookModel, BookIdObj> DebitBookSelectorVM => field ??= new(static vm => vm?.Id);
         #endregion
 
         #region CSV情報
@@ -119,7 +119,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 文字エンコーディング セレクタVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<int, string>, int> TextEncodingSelectorVM { get; } = new(static p => p.Key);
+        public SelectorViewModel<KeyValuePair<int, string>, int> TextEncodingSelectorVM => field ??= new(static p => p.Key);
 
         /// <summary>
         /// 入力された日付 位置(1開始)
@@ -149,7 +149,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 関連性セレクタVM
         /// </summary>
-        public SelectorViewModel<RelationViewModel, ItemIdObj> RelationSelectorVM { get; } = new(static vm => vm?.Id);
+        public SelectorViewModel<RelationViewModel, ItemIdObj> RelationSelectorVM => field ??= new(static vm => vm?.Id);
         #endregion
 
         /// <summary>

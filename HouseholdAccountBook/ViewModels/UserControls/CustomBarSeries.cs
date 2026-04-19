@@ -3,7 +3,7 @@ using OxyPlot;
 using OxyPlot.Series;
 using System;
 
-namespace HouseholdAccountBook.Views.UserControls
+namespace HouseholdAccountBook.ViewModels.UserControls
 {
     /// <summary>
     /// <see cref="TrackerHitResult"/> の変化を通知する機能付き <see cref="BarSeries"/>

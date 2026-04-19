@@ -17,6 +17,10 @@
         <KeyBinding Gesture="Esc" Command="{Binding CancelCommand}"/>
     </Window.InputBindings>
 
+    <Window.Style>
+        <StaticResource ResourceKey="BusyCursor"/>
+    </Window.Style>
+
     <Grid Margin="5" Grid.IsSharedSizeScope="True">
         <Grid.ColumnDefinitions>
             <ColumnDefinition SharedSizeGroup="Header"/>

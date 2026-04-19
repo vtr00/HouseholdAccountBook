@@ -4,7 +4,7 @@ using OxyPlot.Axes;
 using System;
 using System.Diagnostics;
 
-namespace HouseholdAccountBook.Views.Extensions
+namespace HouseholdAccountBook.ViewModels.Extensions
 {
     public static class AxisExtensions
     {

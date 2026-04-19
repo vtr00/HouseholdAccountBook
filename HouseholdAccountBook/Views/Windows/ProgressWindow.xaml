@@ -14,7 +14,11 @@
     <Window.DataContext>
         <vmw:ProgressWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
-    
+
+    <Window.Style>
+        <StaticResource ResourceKey="BusyCursor"/>
+    </Window.Style>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
