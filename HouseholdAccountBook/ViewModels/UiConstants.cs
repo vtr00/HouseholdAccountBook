@@ -99,7 +99,8 @@ namespace HouseholdAccountBook.ViewModels
             { nameof(CsvComparisonWindow),          "CsvComp" },
             { nameof(MoveRegistrationWindow),       "MoveReg" },
             { nameof(ActionRegistrationWindow),     "ActReg" },
-            { nameof(ActionListRegistrationWindow), "ActListReg" }
+            { nameof(ActionListRegistrationWindow), "ActListReg" },
+            { nameof(ProgressWindow),               "Progress" }
         };
 
     }

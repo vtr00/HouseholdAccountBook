@@ -13,7 +13,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
     /// <summary>
     /// ウィンドウ内の一部を構成するViewModelの基底クラス
     /// </summary>
-    public abstract class WindowPartViewModelBase : BindableBase
+    public abstract class WindowPartViewModelBase : BindableBase, IProgressDialogRequestable
     {
         #region フィールド
         /// <summary>
@@ -52,6 +52,10 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// ファイル保存ダイアログ要求イベント
         /// </summary>
         public event EventHandler<SaveFileDialogRequestEventArgs> SaveFileDialogRequested;
+        /// <summary>
+        /// 進捗ダイアログ要求イベント
+        /// </summary>
+        public event EventHandler<ProgressDialogRequestEventArgs> ProgressDialogRequested;
         #endregion
 
         #region Bindingプロパティ
@@ -164,6 +168,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// ファイル選択ダイアログ要求を発行する
         /// </summary>
         /// <param name="e"></param>
+        /// <returns>実行結果</returns>
         protected bool OpenFileDialogRequest(OpenFileDialogRequestEventArgs e)
         {
             using FuncLog funcLog = new(new { e });
@@ -177,6 +182,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// ファイル選択ダイアログ要求を発行する(複数選択版)
         /// </summary>
         /// <param name="e"></param>
+        /// <returns>実行結果</returns>
         protected bool OpenFilesDialogRequest(OpenFileDialogRequestEventArgs e)
         {
             using FuncLog funcLog = new(new { e });
@@ -190,6 +196,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// フォルダ選択ダイアログ要求を発行する
         /// </summary>
         /// <param name="e"></param>
+        /// <returns>実行結果</returns>
         protected bool OpenFolderDialogRequest(OpenFolderDialogRequestEventArgs e)
         {
             using FuncLog funcLog = new(new { e });
@@ -202,13 +209,26 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// ファイル保存ダイアログ要求を発行する
         /// </summary>
         /// <param name="e"></param>
-        /// <returns></returns>
+        /// <returns>実行結果</returns>
         protected bool SaveFileDialogRequest(SaveFileDialogRequestEventArgs e)
         {
             using FuncLog funcLog = new(new { e });
 
             this.SaveFileDialogRequested?.Invoke(this, e);
             return e.Result;
+        }
+
+        /// <summary>
+        /// 進捗ダイアログ要求を発行する
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns>完了タスク</returns>
+        public Task ProgressDialogRequest(ProgressDialogRequestEventArgs e)
+        {
+            using FuncLog funcLog = new(new { e });
+
+            this.ProgressDialogRequested?.Invoke(this, e);
+            return e.CompletionTask;
         }
     }
 }

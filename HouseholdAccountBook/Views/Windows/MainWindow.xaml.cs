@@ -95,6 +95,18 @@ namespace HouseholdAccountBook.Views.Windows
                     this._actionDataGrid.ScrollToButtom();
                 }
             };
+            // 進捗ダイアログ要求イベントを登録する
+            this.WVM.ProgressDialogRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.ProgressDialogRequested));
+
+                // 進捗ウィンドウをメインウィンドウの中央位置に表示する
+                ProgressWindow window = new(this, e.FuncAsync, e.CanCancel, e.TokenSource);
+                window.MoveOwnersCenter();
+
+                // モーダル表示(ここでUI操作はブロック)
+                _ = window.ShowDialog();
+                e.CompletionTask = window.CompletionTask;
+            };
             // 移動追加要求イベントを登録する
             this.WVM.AddMoveRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddMoveRequested));
