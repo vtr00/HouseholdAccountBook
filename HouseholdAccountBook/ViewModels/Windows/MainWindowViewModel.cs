@@ -499,7 +499,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 記帳風月インポートコマンド
         /// </summary>
-        public ICommand ImportKichoFugetsuDbCommand => field ??= new AsyncRelayCommand(this.ImportKichoFugetsuDbCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened(), this.mBusyService);
+        public ICommand ImportKichoFugetsuDbCommand => field ??= new AsyncRelayCommand(
+            this.ImportKichoFugetsuDbCommand_ExecuteAsync, this,
+            () => !this.IsChildrenWindowOpened(), this.mBusyService);
         /// <summary>
         /// 記帳風月インポートコマンド処理
         /// </summary>
@@ -557,7 +559,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// PostgreSQL -> SQLite インポートコマンド
         /// </summary>
-        public ICommand ImportPostgreSQLCommand => field ??= new AsyncRelayCommand(this.ImportPostgreSQLCommand_ExecuteAsync, () => this.IsSQLite && !this.IsChildrenWindowOpened(), this.mBusyService);
+        public ICommand ImportPostgreSQLCommand => field ??= new AsyncRelayCommand(
+            this.ImportPostgreSQLCommand_ExecuteAsync, this,
+            () => this.IsSQLite && !this.IsChildrenWindowOpened(), this.mBusyService);
         /// <summary>
         /// PostgreSQL -> SQLite インポートコマンド処理
         /// </summary>
@@ -600,13 +604,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// カスタムファイル -> PostgreSQL インポートコマンド
         /// </summary>
         public ICommand ImportCustomFileCommand => field ??= new AsyncRelayCommand(
-            this.ImportCustomFileCommand_ExecuteAsync,
+            this.ImportCustomFileCommand_ExecuteAsync, this,
             () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlBackupConfig?.RestoreExePath) && !this.IsChildrenWindowOpened(),
-            this.mBusyService, ExecutionMode.ProgressWindow);
+            this.mBusyService);
         /// <summary>
         /// カスタムファイル -> PostgreSQL インポートコマンド処理
         /// </summary>
-        public async Task ImportCustomFileCommand_ExecuteAsync()
+        /// <param name="progress">進捗</param>
+        public async Task ImportCustomFileCommand_ExecuteAsync(IProgress<int> progress)
         {
             (string directory, string fileName) = PathUtil.GetSeparatedPath(UserSettingService.Instance.ImportCustomFilePath, App.GetCurrentDir());
 
@@ -640,7 +645,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド
         /// </summary>
         public ICommand ImportSQLiteFileCommand => field ??= new AsyncRelayCommand(
-            this.ImportSQLiteFileCommand_ExecuteAsync,
+            this.ImportSQLiteFileCommand_ExecuteAsync, this,
             () => (this.IsPostgreSQL || this.IsSQLite) && !this.IsChildrenWindowOpened(), this.mBusyService);
         /// <summary>
         /// SQLiteファイル -> PostgreSQL/SQLite インポートコマンド処理
@@ -710,13 +715,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// カスタムファイルエクスポートコマンド
         /// </summary>
         public ICommand ExportCustomFileCommand => field ??= new AsyncRelayCommand(
-            this.ExportCustomFileCommand_ExecuteAsync,
+            this.ExportCustomFileCommand_ExecuteAsync, this,
             () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
-            this.mBusyService, ExecutionMode.ProgressWindow);
+            this.mBusyService);
         /// <summary>
         /// カスタムファイルエクスポートコマンド処理
         /// </summary>
-        public async Task ExportCustomFileCommand_ExecuteAsync()
+        /// <param name="progress">進捗</param>
+        public async Task ExportCustomFileCommand_ExecuteAsync(IProgress<int> progress)
         {
             (string directory, string fileName) = PathUtil.GetSeparatedPath(UserSettingService.Instance.ExportCustomFilePath, App.GetCurrentDir());
 
@@ -741,13 +747,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// SQLファイルエクスポートコマンド
         /// </summary>
         public ICommand ExportSQLFileCommand => field ??= new AsyncRelayCommand(
-            this.ExportSQLFileCommand_ExecuteAsync,
+            this.ExportSQLFileCommand_ExecuteAsync, this,
             () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
-            this.mBusyService, ExecutionMode.ProgressWindow);
+            this.mBusyService);
         /// <summary>
         /// SQLファイルエクスポートコマンド処理
         /// </summary>
-        public async Task ExportSQLFileCommand_ExecuteAsync()
+        /// <param name="progress">進捗</param>
+        public async Task ExportSQLFileCommand_ExecuteAsync(IProgress<int> progress)
         {
             (string directory, string fileName) = PathUtil.GetSeparatedPath(UserSettingService.Instance.ExportSQLFilePath, App.GetCurrentDir());
 
@@ -771,11 +778,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// バックアップコマンド
         /// </summary>
-        public ICommand BackUpCommand => field ??= new AsyncRelayCommand(this.BackUpCommand_ExecuteAsync, () => !this.IsChildrenWindowOpened(), this.mBusyService, ExecutionMode.ProgressWindow);
+        public ICommand BackUpCommand => field ??= new AsyncRelayCommand(this.BackUpCommand_ExecuteAsync, this, () => !this.IsChildrenWindowOpened(), this.mBusyService);
         /// <summary>
         /// バックアップコマンド処理
         /// </summary>
-        public async Task BackUpCommand_ExecuteAsync()
+        public async Task BackUpCommand_ExecuteAsync(IProgress<int> progress)
         {
             bool result = await DbBackUpManager.Instance.CreateBackUpFileAsync(backUpNum: -1);
 

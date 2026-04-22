@@ -4,6 +4,11 @@
 
 ## 2026
 
+### 2026-04-23
+
+- MainWindow
+   - △AsyncRelayCommandからProgressWindowを直接呼び出さないように変更 - refs #147
+
 ### 2026-04-19
 
 - 全体
