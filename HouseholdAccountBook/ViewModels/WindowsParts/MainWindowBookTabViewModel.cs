@@ -419,7 +419,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public ICommand CopyCommand => field ??= new AsyncRelayCommand(
             this.CopyCommand_ExecuteAsync,
             () => this.Parent.SelectedTab == Tabs.BooksTab &&
-                  this.SelectedActionVMList.Count == 1 && 0 < (int)this.SelectedActionVM.ActionWithBalance.Action.ActionId && !this.Parent.IsChildrenWindowOpened());
+                  this.SelectedActionVMList.Count == 1 && 0 < (int)(this.SelectedActionVM?.ActionWithBalance.Action.ActionId ?? 0) && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 複製コマンド処理
         /// </summary>
@@ -463,7 +463,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public ICommand EditCommand => field ??= new AsyncRelayCommand(
             this.EditCommand_ExecuteAsync,
             () => this.Parent.SelectedTab == Tabs.BooksTab &&
-                  this.SelectedActionVMList.Count == 1 && 0 < (int)this.SelectedActionVM.ActionWithBalance.Action.ActionId && !this.Parent.IsChildrenWindowOpened());
+                  this.SelectedActionVMList.Count == 1 && 0 < (int)(this.SelectedActionVM?.ActionWithBalance.Action.ActionId ?? 0) && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 編集コマンド処理
         /// </summary>

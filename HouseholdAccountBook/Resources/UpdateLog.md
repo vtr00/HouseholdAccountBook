@@ -4,6 +4,11 @@
 
 ## 2026
 
+### 2026-04-28
+
+- MainWindow
+   - ↑CopyCommand で NullReferenceException が発生するのを修正 - refs #148 
+
 ### 2026-04-23
 
 - MainWindow
