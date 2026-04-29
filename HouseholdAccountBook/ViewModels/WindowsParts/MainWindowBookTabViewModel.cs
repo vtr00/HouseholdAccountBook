@@ -22,6 +22,11 @@ using System.Windows.Input;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
 {
+    /// <summary>
+    /// メインウィンドウ 帳簿項目タブVM
+    /// </summary>
+    /// <param name="parent">親VM</param>
+    /// <param name="tab">タブ</param>
     public class MainWindowBookTabViewModel(MainWindowViewModel parent, Tabs tab) : WindowPartViewModelBase
     {
         #region フィールド
@@ -80,6 +85,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 帳簿項目リスト編集要求時イベント
         /// </summary>
         public event EventHandler<EditActionListRequestEventArgs> EditActionListRequested;
+
+        /// <summary>
+        /// 系列選択変更時イベント
+        /// </summary>
+        public event EventHandler<ChangedEventArgs<(BalanceKind?, CategoryIdObj, ItemIdObj)?>> SelectedSeriesChanged;
         #endregion
 
         #region Bindingプロパティ
@@ -181,37 +191,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 選択されたデータの収入合計値
         /// </summary>
-        public decimal IncomeSumValue => this.SelectedActionVMList.Sum(static vm => vm.ActionWithBalance.Action.Category.BalanceKind == BalanceKind.Income ? vm.ActionWithBalance.Action.Base.Amount : 0);
+        public decimal IncomeSumValue => this.SelectedActionVMList.Sum(static vm => vm.ActionWithBalance.Action.Category.BalanceKind == BalanceKind.Income ? vm.ActionWithBalance.Action.Amount : 0);
         /// <summary>
         /// 選択されたデータの支出合計値
         /// </summary>
-        public decimal ExpensesSumValue => this.SelectedActionVMList.Sum(static vm => vm.ActionWithBalance.Action.Category.BalanceKind == BalanceKind.Expenses ? vm.ActionWithBalance.Action.Base.Amount : 0);
+        public decimal ExpensesSumValue => this.SelectedActionVMList.Sum(static vm => vm.ActionWithBalance.Action.Category.BalanceKind == BalanceKind.Expenses ? vm.ActionWithBalance.Action.Amount : 0);
 
         /// <summary>
-        /// 概要VMリスト
+        /// 概要セレクタVM
         /// </summary>
-        public ObservableCollection<SummaryModel> SummaryVMList {
-            get;
-            set {
-                _ = this.SetProperty(ref field, value);
-                this.UpdateDisplayedActionVMList();
-            }
-        }
-        /// <summary>
-        /// 選択された概要VM
-        /// </summary>
-        public SummaryModel SelectedSummaryVM {
-            get;
-            set {
-                if (this.SetProperty(ref field, value)) {
-                    this.Parent.SelectedBalanceKind = value?.Category.BalanceKind;
-                    this.Parent.SelectedCategoryId = value?.Category.Id;
-                    this.Parent.SelectedItemId = value?.Item.Id;
-
-                    this.UpdateDisplayedActionVMList();
-                }
-            }
-        }
+        public SelectorViewModel<SummaryModel, (BalanceKind?, CategoryIdObj, ItemIdObj)?> SummarySelectorVM => field ??= new(static vm => vm?.ToTuple(), this.mBusyService);
 
         /// <summary>
         /// 帳簿項目を概要によって絞り込むか
@@ -569,14 +558,15 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             if (this.UseFilter) {   // フィルタ有効の場合
                 // 概要が選択されている場合
-                if (this.SelectedSummaryVM != null) {
+                if (this.SummarySelectorVM.SelectedKey.HasValue) {
+                    var selectedKey = this.SummarySelectorVM.SelectedKey.Value;
                     // 収支が選択されている場合
-                    if (this.SelectedSummaryVM.Category.BalanceKind != BalanceKind.Others) {
-                        tmp = this.SelectedSummaryVM.Item.Id != ItemIdObj.System // 項目が選択されている場合
-                            ? [.. tmp.Where(vm => vm.ActionWithBalance.Action.Item.Id == this.SelectedSummaryVM.Item.Id || vm.ActionWithBalance.Action.ActionId == ActionIdObj.System)]
-                            : this.SelectedSummaryVM.Category.Id != CategoryIdObj.System // 分類が選択されている場合
-                                ? [.. tmp.Where(vm => vm.ActionWithBalance.Action.Category.Id == this.SelectedSummaryVM.Category.Id || vm.ActionWithBalance.Action.ActionId == ActionIdObj.System)]
-                                : [.. tmp.Where(vm => vm.ActionWithBalance.Action.Category.BalanceKind == this.SelectedSummaryVM.Category.BalanceKind || vm.ActionWithBalance.Action.ActionId == ActionIdObj.System)];
+                    if (selectedKey.Item1 != BalanceKind.Others) {
+                        tmp = selectedKey.Item2 == CategoryIdObj.System // 分類が選択されていない場合
+                            ? [.. tmp.Where(vm => vm.ActionWithBalance.Action.Category.BalanceKind == selectedKey.Item1 || vm.ActionWithBalance.Action.ActionId == ActionIdObj.System)]
+                            : selectedKey.Item3 == ItemIdObj.System // 項目が選択されていない場合
+                                ? [.. tmp.Where(vm => vm.ActionWithBalance.Action.Category.Id == selectedKey.Item2 || vm.ActionWithBalance.Action.ActionId == ActionIdObj.System)]
+                                : [.. tmp.Where(vm => vm.ActionWithBalance.Action.Item.Id == selectedKey.Item3 || vm.ActionWithBalance.Action.ActionId == ActionIdObj.System)];
                     }
                 }
             }
@@ -598,6 +588,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             this.mAppService = new(this.mDbHandlerFactory);
             this.mMainService = new(this.mDbHandlerFactory);
+
+            this.SummarySelectorVM.SetLoader(async () => this.Parent.DisplayedPeriodKind switch {
+                PeriodKind.Monthly => await this.mMainService.LoadSummaryListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value),
+                PeriodKind.Selected => await this.mMainService.LoadSummaryListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedPeriod),
+                _ => null
+            }, mode: SelectorMode.FirstOrDefault);
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null, null, false, false);
@@ -629,27 +625,21 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             // 表示するデータを指定する
             switch (this.Parent.DisplayedPeriodKind) {
-                case PeriodKind.Monthly:
-                    var (tmp1, tmp2) = await (
-                        this.mMainService.LoadActionListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value),
-                        this.mMainService.LoadSummaryListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value)).WhenAll();
+                case PeriodKind.Monthly: {
+                    var tmp1 = await this.mMainService.LoadActionListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value);
                     this.ActionVMList = [.. tmp1.Select(tmp => new ActionViewModel(tmp))];
-                    this.SummaryVMList = [.. tmp2];
                     break;
-                case PeriodKind.Selected:
-                    var (tmp3, tmp4) = await (
-                        this.mMainService.LoadActionListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedPeriod),
-                        this.mMainService.LoadSummaryListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedPeriod)).WhenAll();
-                    this.ActionVMList = [.. tmp3.Select(tmp => new ActionViewModel(tmp))];
-                    this.SummaryVMList = [.. tmp4];
+                }
+                case PeriodKind.Selected: {
+                    var tmp1 = await this.mMainService.LoadActionListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedPeriod);
+                    this.ActionVMList = [.. tmp1.Select(tmp => new ActionViewModel(tmp))];
                     break;
+                }
             }
+            await this.SummarySelectorVM.LoadAsync((tmpBalanceKind, tmpCategoryId, tmpItemId));
 
             // 帳簿項目を選択する(サマリーの選択はこの段階では無視して処理する)
             this.SelectedActionVMList = [.. this.ActionVMList.Where(vm => tmpActionIdList.Contains(vm.ActionWithBalance.Action.ActionId))];
-
-            // サマリーを選択する
-            this.SelectedSummaryVM = this.SummaryVMList.FirstOrDefault(vm => vm.Category?.BalanceKind == tmpBalanceKind && vm.Category?.Id == tmpCategoryId && vm.Item?.Id == tmpItemId);
 
             if (isScroll) {
                 if (this.Parent.DisplayedPeriodKind == PeriodKind.Monthly &&
@@ -684,6 +674,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 this.RaisePropertyChanged(nameof(this.ExpensesSumValue));
 
                 this.RaisePropertyChanged(nameof(this.IsMatch));
+            };
+            this.SummarySelectorVM.SelectionChanged += (sender, e) => {
+                this.SelectedSeriesChanged?.Invoke(this, e);
+
+                this.UpdateDisplayedActionVMList();
             };
         }
 

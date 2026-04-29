@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -37,12 +38,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 選択された設定タブインデックス
         /// </summary>
         public int SelectedTabIndex {
-            get;
-            set {
-                if (this.SetProperty(ref field, value)) {
-                    this.SelectedTab = (SettingsTabs)value;
-                }
-            }
+            get => (int)this.SelectedTab;
+            set => this.SelectedTab = EnumUtil.SafeParseEnum(value, SettingsTabs.BookSettingsTab);
         }
         /// <summary>
         /// 選択された設定タブ種別
@@ -51,7 +48,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
-                    this.SelectedTabIndex = (int)value;
+                    this.RaisePropertyChanged(nameof(this.SelectedTabIndex));
                 }
             }
         }
@@ -59,22 +56,22 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿設定タブVM
         /// </summary>
-        public SettingsWindowBookTabViewModel BookTabVM { get; } = new();
+        public SettingsWindowBookTabViewModel BookTabVM => field ??= new();
 
         /// <summary>
         /// 項目設定タブVM
         /// </summary>
-        public SettingsWindowItemTabViewModel ItemTabVM { get; } = new();
+        public SettingsWindowItemTabViewModel ItemTabVM => field ??= new();
 
         /// <summary>
         /// DB設定タブVM
         /// </summary>
-        public SettingsWindowDbTabViewModel DbTabVM { get; } = new();
+        public SettingsWindowDbTabViewModel DbTabVM => field ??= new();
 
         /// <summary>
         /// その他設定タブVM
         /// </summary>
-        public SettingsWindowOtherTabViewModel OtherTabVM { get; } = new();
+        public SettingsWindowOtherTabViewModel OtherTabVM => field ??= new();
         #endregion
 
         #region ウィンドウ設定プロパティ
@@ -89,6 +86,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
         #endregion
 
+        /// <summary>
+        /// <see cref="SettingsWindowViewModel"/> クラスの新しいインスタンスを初期化します。
+        /// </summary>
         public SettingsWindowViewModel()
         {
             this.mChildrenVM.AddRange(
