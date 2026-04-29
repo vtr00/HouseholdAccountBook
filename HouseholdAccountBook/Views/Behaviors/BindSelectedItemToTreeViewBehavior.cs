@@ -8,7 +8,7 @@ namespace HouseholdAccountBook.Views.Behaviors
     /// <summary>
     /// <see cref="TreeView"/> 内で選択されたアイテムを保持するビヘイビア
     /// </summary>
-    class BindSelectedItemToTreeViewBehavior : Behavior<TreeView>
+    public class BindSelectedItemToTreeViewBehavior : Behavior<TreeView>
     {
         /// <summary>
         /// アタッチ時

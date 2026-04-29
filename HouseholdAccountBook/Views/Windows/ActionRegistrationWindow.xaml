@@ -2,9 +2,11 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:vmw="clr-namespace:HouseholdAccountBook.ViewModels.Windows"
+        xmlns:behaviors="clr-namespace:HouseholdAccountBook.Views.Behaviors"
         xmlns:controls="clr-namespace:HouseholdAccountBook.Views.UserControls"
         mc:Ignorable="d"
         Height="Auto" Width="350" ShowInTaskbar="False" WindowStyle="ToolWindow">
@@ -97,13 +99,21 @@
             <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Category}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="5" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
-                     ItemsSource="{Binding CategorySelectorVM.ItemList}" SelectedItem="{Binding CategorySelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                     ItemsSource="{Binding CategorySelectorVM.ItemList}" SelectedItem="{Binding CategorySelectorVM.SelectedItem}" DisplayMemberPath="Name">
+                <i:Interaction.Behaviors>
+                    <behaviors:ScrollToSelectedItemListBoxBehavior/>
+                </i:Interaction.Behaviors>
+            </ListBox>
 
             <!-- 項目 -->
             <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Item}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="6" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
-                     ItemsSource="{Binding ItemSelectorVM.ItemList}" SelectedItem="{Binding ItemSelectorVM.SelectedItem}" DisplayMemberPath="NameWithCategory"/>
+                     ItemsSource="{Binding ItemSelectorVM.ItemList}" SelectedItem="{Binding ItemSelectorVM.SelectedItem}" DisplayMemberPath="NameWithCategory">
+                <i:Interaction.Behaviors>
+                    <behaviors:ScrollToSelectedItemListBoxBehavior/>
+                </i:Interaction.Behaviors>
+            </ListBox>
 
             <!-- 金額 -->
             <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
