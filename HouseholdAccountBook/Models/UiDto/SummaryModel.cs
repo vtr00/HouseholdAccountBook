@@ -47,5 +47,11 @@ namespace HouseholdAccountBook.Models.UiDto
         /// </summary>
         public decimal Total { get; init; } = 0;
         #endregion
+
+        /// <summary>
+        /// 収支種別/分類ID/項目IDをタプルとして取得する
+        /// </summary>
+        /// <returns>(収支種別, 分類ID, 項目ID)</returns>
+        public (BalanceKind? balanceKind, CategoryIdObj categoryId, ItemIdObj itemId)? ToTuple() => (this.Category.BalanceKind, this.Category.Id, this.Item.Id);
     }
 }

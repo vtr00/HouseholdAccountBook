@@ -25,14 +25,14 @@ namespace HouseholdAccountBook.ViewModels.Component
         public int Index { get; init; }
 
         /// <summary>
-        /// 項目
-        /// </summary>
-        public ItemModel Item { get; init; }
-
-        /// <summary>
         /// 分類
         /// </summary>
         public CategoryModel Category { get; init; }
+
+        /// <summary>
+        /// 項目
+        /// </summary>
+        public ItemModel Item { get; init; }
         #endregion
     }
 }

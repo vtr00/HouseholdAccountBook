@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
+using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
@@ -20,34 +21,24 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
     /// <summary>
     /// メインウィンドウ リストタブVM
     /// </summary>
-    /// <param name="parent">親VM</param>
-    /// <param name="tab">タブ</param>
     public class MainWindowListTabViewModel : WindowPartViewModelBase
     {
-        /// <summary>
-        /// <see cref="SeriesViewModel"/> のキー情報
-        /// </summary>
-        /// <param name="BalanceKind">終始種別</param>
-        /// <param name="CategoryId">分類ID</param>
-        /// <param name="ItemId">項目ID</param>
-        public record Keys(BalanceKind? BalanceKind, CategoryIdObj CategoryId, ItemIdObj ItemId) { }
+        private MainWindowViewModel Parent { get; init; }
 
-        private MainWindowViewModel Parent { get; }
-
-        private Tabs Tab { get; }
+        private Tabs Tab { get; init; }
 
         #region イベント
         /// <summary>
         /// 系列選択変更時イベント
         /// </summary>
-        public event EventHandler SelectedSeriesChanged;
+        public event EventHandler<ChangedEventArgs<(BalanceKind?, CategoryIdObj, ItemIdObj)?>> SelectedSeriesChanged;
         #endregion
 
         #region Bindingプロパティ
         /// <summary>
         /// 系列セレクタVM
         /// </summary>
-        public SelectorViewModel<SeriesViewModel, Keys> SeriesSelectorVM => field ??= new(static vm => vm != null ? new(vm.Category.BalanceKind, vm.Category.Id, vm.Item.Id) : null, this.mBusyService);
+        public SelectorViewModel<SeriesViewModel, (BalanceKind?, CategoryIdObj, ItemIdObj)?> SeriesSelectorVM => field ??= new(static vm => vm?.ToTuple(), this.mBusyService);
         #endregion
 
         /// <summary>
@@ -94,18 +85,20 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             using FuncLog funcLog = new(new { balanceKind, categoryId, itemId });
             using IDisposable disposable = this.mBusyService.Enter();
 
-            await this.SeriesSelectorVM.LoadAsync(new Keys(balanceKind, categoryId, itemId));
+            // 指定がなければ、更新前のサマリーの選択を維持する
+            BalanceKind? tmpBalanceKind = balanceKind ?? this.Parent.SelectedBalanceKind;
+            CategoryIdObj tmpCategoryId = categoryId ?? this.Parent.SelectedCategoryId;
+            ItemIdObj tmpItemId = itemId ?? this.Parent.SelectedItemId;
+            Log.Vars(vars: new { tmpBalanceKind, tmpCategoryId, tmpItemId });
+
+            await this.SeriesSelectorVM.LoadAsync((tmpBalanceKind, tmpCategoryId, tmpItemId));
         }
 
         public override void AddEventHandlers()
         {
-            this.SeriesSelectorVM.SelectionChanged += (sender, e) => {
-                this.Parent.SelectedBalanceKind = e.NewValue?.BalanceKind;
-                this.Parent.SelectedCategoryId = e.NewValue?.CategoryId;
-                this.Parent.SelectedItemId = e.NewValue?.ItemId;
-
-                this.SelectedSeriesChanged?.Invoke(sender, EventArgs.Empty);
-            };
+#pragma warning disable IDE0022 // メソッドに式本体を使用する
+            this.SeriesSelectorVM.SelectionChanged += (sender, e) => this.SelectedSeriesChanged?.Invoke(sender, e);
+#pragma warning restore IDE0022 // メソッドに式本体を使用する
         }
 
         /// <summary>

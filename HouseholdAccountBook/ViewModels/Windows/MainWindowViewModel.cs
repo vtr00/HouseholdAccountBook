@@ -68,19 +68,21 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 系列選択変更時イベント
         /// </summary>
-        public event EventHandler SelectedSeriesChanged {
+        public event EventHandler<ChangedEventArgs<(BalanceKind?, CategoryIdObj, ItemIdObj)?>> SelectedSeriesChanged {
             add {
-                this.MonthlySummaryTabVM.SelectedSeriesChanged += value;
-                this.YearlySummaryTabVM.SelectedSeriesChanged += value;
+                this.BookTabVM.SelectedSeriesChanged += value;
                 this.DailyGraphTabVM.SelectedSeriesChanged += value;
+                this.MonthlySummaryTabVM.SelectedSeriesChanged += value;
                 this.MonthlyGraphTabVM.SelectedSeriesChanged += value;
+                this.YearlySummaryTabVM.SelectedSeriesChanged += value;
                 this.YearlyGraphTabVM.SelectedSeriesChanged += value;
             }
             remove {
-                this.MonthlySummaryTabVM.SelectedSeriesChanged -= value;
-                this.YearlySummaryTabVM.SelectedSeriesChanged -= value;
+                this.BookTabVM.SelectedSeriesChanged -= value;
                 this.DailyGraphTabVM.SelectedSeriesChanged -= value;
+                this.MonthlySummaryTabVM.SelectedSeriesChanged -= value;
                 this.MonthlyGraphTabVM.SelectedSeriesChanged -= value;
+                this.YearlySummaryTabVM.SelectedSeriesChanged -= value;
                 this.YearlyGraphTabVM.SelectedSeriesChanged -= value;
             }
         }
@@ -235,15 +237,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 選択された収支種別
         /// </summary>
-        public BalanceKind? SelectedBalanceKind { get; set; }
+        public BalanceKind? SelectedBalanceKind { get; private set; }
         /// <summary>
         /// 選択された分類ID
         /// </summary>
-        public CategoryIdObj SelectedCategoryId { get; set; }
+        public CategoryIdObj SelectedCategoryId { get; private set; }
         /// <summary>
         /// 選択された項目ID
         /// </summary>
-        public ItemIdObj SelectedItemId { get; set; }
+        public ItemIdObj SelectedItemId { get; private set; }
 
         /// <summary>
         /// 表示開始日付
@@ -440,7 +442,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public int SelectedGraphKind1Index {
             get => (int)this.GraphKind1SelectorVM.SelectedKey;
-            set => this.GraphKind1SelectorVM.SelectedKey = (GraphKind1)value;
+            set => this.GraphKind1SelectorVM.SelectedKey = EnumUtil.SafeParseEnum(value, GraphKind1.IncomeAndExpensesGraph);
         }
 
         /// <summary>
@@ -452,7 +454,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public int SelectedGraphKind2Index {
             get => (int)this.GraphKind2SelectorVM.SelectedKey;
-            set => this.GraphKind2SelectorVM.SelectedKey = (GraphKind2)value;
+            set => this.GraphKind2SelectorVM.SelectedKey = EnumUtil.SafeParseEnum(value, GraphKind2.CategoryGraph);
         }
         #endregion
 
@@ -460,27 +462,27 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿タブVM
         /// </summary>
-        public MainWindowBookTabViewModel BookTabVM { get; private init; }
+        public MainWindowBookTabViewModel BookTabVM => field ??= new(this, Tabs.BooksTab);
         /// <summary>
         /// 日別グラフタブVM
         /// </summary>
-        public MainWindowGraphTabViewModel DailyGraphTabVM { get; private init; }
+        public MainWindowGraphTabViewModel DailyGraphTabVM => field ??= new(this, Tabs.DailyGraphTab);
         /// <summary>
         /// 月別一覧タブVM
         /// </summary>
-        public MainWindowListTabViewModel MonthlySummaryTabVM { get; private init; }
+        public MainWindowListTabViewModel MonthlySummaryTabVM => field ??= new(this, Tabs.MonthlyListTab);
         /// <summary>
         /// 月別グラフタブVM
         /// </summary>
-        public MainWindowGraphTabViewModel MonthlyGraphTabVM { get; private init; }
+        public MainWindowGraphTabViewModel MonthlyGraphTabVM => field ??= new(this, Tabs.MonthlyGraphTab);
         /// <summary>
         /// 年別一覧タブVM
         /// </summary>
-        public MainWindowListTabViewModel YearlySummaryTabVM { get; private init; }
+        public MainWindowListTabViewModel YearlySummaryTabVM => field ??= new(this, Tabs.YearlyListTab);
         /// <summary>
         /// 年別グラフタブVM
         /// </summary>
-        public MainWindowGraphTabViewModel YearlyGraphTabVM { get; private init; }
+        public MainWindowGraphTabViewModel YearlyGraphTabVM => field ??= new(this, Tabs.YearlyGraphTab);
         #endregion
         #endregion
 
@@ -1118,13 +1120,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
-            this.BookTabVM = new(this, Tabs.BooksTab);
-            this.DailyGraphTabVM = new(this, Tabs.DailyGraphTab);
-            this.MonthlySummaryTabVM = new(this, Tabs.MonthlyListTab);
-            this.MonthlyGraphTabVM = new(this, Tabs.MonthlyGraphTab);
-            this.YearlySummaryTabVM = new(this, Tabs.YearlyListTab);
-            this.YearlyGraphTabVM = new(this, Tabs.YearlyGraphTab);
-
             this.mChildrenVM.AddRange(
                 [
                     this.BookTabVM,
@@ -1188,20 +1183,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
             };
             // 系列選択変更時
             this.SelectedSeriesChanged += (sender, e) => {
-                using FuncLog funcLog = new(methodName: nameof(this.SelectedSeriesChanged));
+                using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedSeriesChanged));
 
-                using IDisposable disposable = this.mBusyService.Enter();
-                switch (this.SelectedTab) {
-                    case Tabs.DailyGraphTab:
-                        this.DailyGraphTabVM.UpdateSelectedGraph();
-                        break;
-                    case Tabs.MonthlyGraphTab:
-                        this.MonthlyGraphTabVM.UpdateSelectedGraph();
-                        break;
-                    case Tabs.YearlyGraphTab:
-                        this.YearlyGraphTabVM.UpdateSelectedGraph();
-                        break;
-                }
+                this.SelectedBalanceKind = e.NewValue?.Item1;
+                this.SelectedCategoryId = e.NewValue?.Item2;
+                this.SelectedItemId = e.NewValue?.Item3;
             };
 
             this.mChildrenVM.ForEach(childVM => {

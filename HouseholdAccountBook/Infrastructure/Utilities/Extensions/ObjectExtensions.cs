@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 #nullable enable
@@ -47,14 +48,19 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
                     return $"{idObj.Id}";
                 case Encoding encoding:
                     return $"{encoding.EncodingName}";
-                default:
+                case ITuple tuple when obj.GetType().FullName?.StartsWith("System.ValueTuple`") == true: {
+                    FieldInfo[] fieldInfos = obj.GetType().GetFields(); // タプルが保持しているフィールドの情報を取得
+                    string tmp = string.Join(", ", fieldInfos.Select(fieldInfo => $"{fieldInfo.GetValue(obj)?.ToString2(depth) ?? "null"}"));
+                    return $"({tmp})";
+                }
+                default: {
                     PropertyInfo[] propInfos = obj.GetType().GetProperties(); // クラスが保持しているプロパティの情報を取得
-
                     string tmp = string.Join(", ", propInfos.Select(propInfo => {
                         IgnoreToStringAttribute? attr = propInfo.GetCustomAttribute<IgnoreToStringAttribute>(); // この属性が付与されているプロパティは出力しない
                         return attr != null ? $"{propInfo.Name}:{attr.Alternative}" : $"{propInfo.Name}:{propInfo.GetValue(obj)?.ToString2(depth) ?? "null"}";
                     }));
                     return depth == 1 ? tmp : $"[{tmp}]";
+                }
             }
         }
     }

@@ -522,14 +522,14 @@
 
                         <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
 
-                        <!-- サマリーリスト -->
+                        <!-- 概要リスト -->
                         <Grid Grid.Column="2">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="1.0*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             
-                            <DataGrid Grid.Row="0" ItemsSource="{Binding SummaryVMList}" SelectedItem="{Binding SelectedSummaryVM}" 
+                            <DataGrid Grid.Row="0" ItemsSource="{Binding SummarySelectorVM.ItemList}" SelectedItem="{Binding SummarySelectorVM.SelectedItem}" 
                                       IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
                                       CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                       AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
@@ -686,7 +686,7 @@
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="200"
-                                          ItemsSource="{Binding GraphSeriesVMList}" SelectedItem="{Binding SelectedGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
+                                          ItemsSource="{Binding SeriesSelectorVM.ItemList}" SelectedItem="{Binding SeriesSelectorVM.SelectedItem}" DisplayMemberPath="DisplayedName"/>
                             </StackPanel>
                         </Grid>
                         <oxy:PlotView Grid.Row="1" Model="{Binding SelectedGraphPlotModel}" Controller="{Binding Controller}"/>
@@ -894,7 +894,7 @@
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox HorizontalAlignment="Stretch" MinWidth="200"
-                                          ItemsSource="{Binding GraphSeriesVMList}" SelectedItem="{Binding SelectedGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
+                                          ItemsSource="{Binding SeriesSelectorVM.ItemList}" SelectedItem="{Binding SeriesSelectorVM.SelectedItem}" DisplayMemberPath="DisplayedName"/>
                             </StackPanel>
                         </Grid>
                         <oxy:PlotView Grid.Row="1" Model="{Binding SelectedGraphPlotModel}" Controller="{Binding Controller}"/>
@@ -1077,7 +1077,7 @@
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox HorizontalAlignment="Stretch" MinWidth="200"
-                                          ItemsSource="{Binding GraphSeriesVMList}" SelectedItem="{Binding SelectedGraphSeriesVM}" DisplayMemberPath="DisplayedName"/>
+                                          ItemsSource="{Binding SeriesSelectorVM.ItemList}" SelectedItem="{Binding SeriesSelectorVM.SelectedItem}" DisplayMemberPath="DisplayedName"/>
                             </StackPanel>
                         </Grid>
                         
