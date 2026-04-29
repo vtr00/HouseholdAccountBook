@@ -30,7 +30,7 @@ namespace HouseholdAccountBook.Models.UiDto
 
         public override string ToString() => this.Name;
 
-        public static implicit operator string(ShopModel shop) => shop.Name;
+        public static implicit operator string(ShopModel shop) => shop?.Name;
         public static implicit operator ShopModel(string name) => new(name);
     }
 }

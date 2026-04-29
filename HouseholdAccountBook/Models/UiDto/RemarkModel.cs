@@ -30,7 +30,7 @@ namespace HouseholdAccountBook.Models.UiDto
 
         public override string ToString() => this.Remark;
 
-        public static implicit operator string(RemarkModel remark) => remark.Remark;
+        public static implicit operator string(RemarkModel remark) => remark?.Remark;
         public static implicit operator RemarkModel(string remark) => new(remark);
     }
 }
