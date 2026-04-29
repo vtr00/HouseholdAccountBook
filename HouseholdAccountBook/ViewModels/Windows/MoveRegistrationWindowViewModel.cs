@@ -299,7 +299,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     selectingToBookId = toAction.Book.Id;
                     selectingCommissionKind = commissionAction?.Book.Id == toAction.Book.Id ? CommissionKind.MoveTo : CommissionKind.MoveFrom;
                     selectingCommissionItemId = commissionAction?.Item.Id;
-                    selectingCommissionRemark = commissionAction?.Remark;
+                    selectingCommissionRemark = commissionAction?.Remark?.Remark;
 
                     this.IsLink = fromAction.ActTime == toAction.ActTime;
                     this.SelectedFromDate = fromAction.ActTime;

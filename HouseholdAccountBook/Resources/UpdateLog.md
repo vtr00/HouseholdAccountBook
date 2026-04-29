@@ -15,6 +15,9 @@
 - ActionRegistrationWindow, ActionListRegistrationWindow, MoveRegistrationWindow
    - △ListBoxで選択された項目が表示される位置にスクロールするように変更した - refs #142
 
+- MoveRegistrationWindow
+   - ↑手数料のない移動ダイアログを開くと例外が発生するのを修正した - refs #154
+
 ### 2026-04-28
 
 - MainWindow
