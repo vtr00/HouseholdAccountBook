@@ -12,6 +12,9 @@
    - ↑月別一覧/年別一覧タブで選択した収支種別/分類/項目が、タブを切り替えて戻ってくると維持されないのを修正した - refs #150
    - ↑ログ出力対象の変数がValueTupleのときに値が出力されないのを修正した - refs #150
 
+- ActionRegistrationWindow, ActionListRegistrationWindow, MoveRegistrationWindow
+   - △ListBoxで選択された項目が表示される位置にスクロールするように変更した - refs #142
+
 ### 2026-04-28
 
 - MainWindow
