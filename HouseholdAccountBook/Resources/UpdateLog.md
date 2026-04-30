@@ -4,10 +4,15 @@
 
 ## 2026
 
+### 2026-04-30
+
+- CsvComparisonWindow
+   - △SelectedListをSelectorViewModelに含めるように変更した - refs #151
+
 ### 2026-04-29
 
 - MainWindow
-   - △概要一覧に、SelectorViewModel を適用するように変更した - refs #150
+   - △概要一覧に、SelectorViewModelを適用するように変更した - refs #150
    - ↑月別一覧/年別一覧タブ以外のタブで選択した収支種別/分類/項目が、月別一覧/年別一覧タブの選択に引き継がれないのを修正した - refs #150
    - ↑月別一覧/年別一覧タブで選択した収支種別/分類/項目が、タブを切り替えて戻ってくると維持されないのを修正した - refs #150
    - ↑ログ出力対象の変数がValueTupleのときに値が出力されないのを修正した - refs #150
@@ -21,7 +26,7 @@
 ### 2026-04-28
 
 - MainWindow
-   - ↑CopyCommand で NullReferenceException が発生するのを修正した - refs #148 
+   - ↑CopyCommandでNullReferenceExceptionが発生するのを修正した - refs #148 
 
 ### 2026-04-23
 

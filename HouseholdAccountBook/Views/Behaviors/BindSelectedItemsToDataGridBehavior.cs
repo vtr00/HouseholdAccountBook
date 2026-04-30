@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
+using System;
 
 namespace HouseholdAccountBook.Views.Behaviors
 {
@@ -104,10 +105,16 @@ namespace HouseholdAccountBook.Views.Behaviors
         /// <param name="e"></param>
         private static void SelectedItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            bool unsupportedFlag = false;
+
             if (e.OldItems != null) {
                 foreach (object oldItem in e.OldItems) {
                     if (oldItem is ISelectable oldV) {
                         oldV.SelectFlag = false;
+                    }
+                    else {
+                        unsupportedFlag = true;
+                        break;
                     }
                 }
             }
@@ -116,7 +123,15 @@ namespace HouseholdAccountBook.Views.Behaviors
                     if (newItem is ISelectable newV) {
                         newV.SelectFlag = true;
                     }
+                    else {
+                        unsupportedFlag = true;
+                        break;
+                    }
                 }
+            }
+
+            if (unsupportedFlag) {
+                throw new NotSupportedException($"{nameof(SelectedItems)} are not {nameof(ISelectable)}");
             }
         }
         #endregion
