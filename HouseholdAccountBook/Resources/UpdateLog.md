@@ -6,6 +6,9 @@
 
 ### 2026-04-30
 
+- 全体
+   - ↑ログ出力対象の変数がdecimalのときに値が出力されないのを修正した - refs #151
+
 - CsvComparisonWindow
    - △SelectedListをSelectorViewModelに含めるように変更した - refs #151
 

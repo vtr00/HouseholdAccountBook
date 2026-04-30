@@ -80,6 +80,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     IsMatch = dto.IsMatch == 1
                 })];
 
+            funcLog.Returns = actionList.Select(static m => m.ActionId);
             return actionList;
         }
     }

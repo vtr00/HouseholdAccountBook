@@ -36,6 +36,8 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
             switch (obj) {
                 case string s:
                     return $"\"{s.Replace(Environment.NewLine, "\\r\\n")}\"";
+                case decimal decim:
+                    return $"{decim}";
                 case DateOnly d:
                     return $"{d:yyyy-MM-dd}";
                 case TimeOnly t:
