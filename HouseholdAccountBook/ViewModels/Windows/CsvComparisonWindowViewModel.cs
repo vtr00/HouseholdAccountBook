@@ -92,9 +92,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public BookIdObj SelectedBookId {
             get => this.BookSelectorVM.SelectedKey;
             set {
-                BookIdObj oldValue = this.SelectedBookId;
+                BookIdObj oldValue = this.BookSelectorVM.SelectedKey;
                 // 現在の選択と異なる場合
-                if (this.BookSelectorVM.SelectedKey != value) {
+                if (oldValue != value) {
                     this.BookSelectorVM.SelectedKey = value;
                     // 当てはまる帳簿がなく現在の選択と同じになった場合に変更イベントを発行する
                     if (oldValue == this.BookSelectorVM.SelectedKey) {
@@ -113,30 +113,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public int AllCheckedCount => this.CsvCompSelectorVM.ItemList.Count(static vm => vm.IsMatch);
         /// <summary>
-        /// CSV比較VMの個数
-        /// </summary>
-        public int AllCount => this.CsvCompSelectorVM.ItemList.Count;
-        /// <summary>
         /// CSV比較VMの合計値
         /// </summary>
         public int AllSumValue => this.CsvCompSelectorVM.ItemList.Sum(static vm => vm.Record.Value);
 
         /// <summary>
-        /// 選択されたCSV比較VMリスト
-        /// </summary>
-        public ObservableCollection<CsvComparisonViewModel> SelectedCsvCompVMList { get; } = [];
-        /// <summary>
         /// 選択されたCSV比較VMのチェック数
         /// </summary>
-        public int SelectedCheckedCount => this.SelectedCsvCompVMList.Count(static vm => vm.IsMatch);
-        /// <summary>
-        /// 選択されたCSV比較VMの個数
-        /// </summary>
-        public int SelectedCount => this.SelectedCsvCompVMList.Count;
+        public int SelectedCheckedCount => this.CsvCompSelectorVM.SelectedItemList.Count(static vm => vm.IsMatch);
         /// <summary>
         /// 選択されたCSV比較VMの合計値
         /// </summary>
-        public int SelectedSumValue => this.SelectedCsvCompVMList.Sum(static vm => vm.Record.Value);
+        public int SelectedSumValue => this.CsvCompSelectorVM.SelectedItemList.Sum(static vm => vm.Record.Value);
 
         /// <summary>
         /// チェック数変更を通知する
@@ -279,13 +267,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         /// <returns></returns>
         /// <remarks>選択されているCSVデータが1つ以上存在していて、帳簿に紐づかない項目が1つ以上ある</remarks>
-        private bool AddActionCommand_CanExecute() => this.SelectedCsvCompVMList.Count != 0 && this.SelectedCsvCompVMList.Any(vm => vm.Action is null);
+        private bool AddActionCommand_CanExecute() => this.CsvCompSelectorVM.SelectedCount != 0 && this.CsvCompSelectorVM.SelectedItemList.Any(vm => vm.Action is null);
         /// <summary>
         /// 帳簿項目追加コマンド処理
         /// </summary>
         private void AddActionCommand_Execute()
         {
-            List<CsvComparisonViewModel> vmList = [.. this.SelectedCsvCompVMList.Where(vm => vm.Action is null)];
+            List<CsvComparisonViewModel> vmList = [.. this.CsvCompSelectorVM.SelectedItemList.Where(vm => vm.Action is null)];
             List<ActionCsvDto> recordList = [.. vmList.Select(vm => vm.Record)];
 
             async void Registered(object sender, EventArgs<IEnumerable<ActionIdObj>> e)
@@ -328,7 +316,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         /// <returns></returns>
         /// <remarks>選択されているCSVデータが1つだけ存在していて、帳簿項目に紐づいている</remarks>
-        private bool EditActionCommand_CanExecute() => this.SelectedCsvCompVMList.Count == 1 && this.CsvCompSelectorVM.SelectedItem.Action is not null;
+        private bool EditActionCommand_CanExecute() => this.CsvCompSelectorVM.SelectedCount == 1 && this.CsvCompSelectorVM.SelectedItem.Action is not null;
         /// <summary>
         /// 帳簿項目編集コマンド処理
         /// </summary>
@@ -383,7 +371,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async Task AddOrEditActionCommand_ExecuteAsync()
         {
             // 選択されているCSVデータが1つ以上存在していて、帳簿項目に紐づかない項目が1つ以上ある
-            if (0 < this.SelectedCsvCompVMList.Count && this.SelectedCsvCompVMList.Any(vm => vm.Action is null)) {
+            if (0 < this.CsvCompSelectorVM.SelectedCount && this.CsvCompSelectorVM.SelectedItemList.Any(vm => vm.Action is null)) {
                 this.AddActionCommand_Execute();
             }
             else {
@@ -491,11 +479,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
                 this.RaisePropertyChanged(nameof(this.CsvFilePathes));
             };
-            this.CsvCompSelectorVM.ItemList.CollectionChanged += (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldItems, e.NewItems }, methodName: nameof(this.CsvCompSelectorVM.ItemList.CollectionChanged));
+            this.BookSelectorVM.SelectionChanged += async (sender, e) => {
+                this.BookChanged?.Invoke(sender, e);
 
+                await this.ReloadCsvFilesAsync();
+                await this.UpdateComparisonVMListAsync(true);
+            };
+            this.CsvCompSelectorVM.CollectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.AllCheckedCount));
-                this.RaisePropertyChanged(nameof(this.AllCount));
                 this.RaisePropertyChanged(nameof(this.AllSumValue));
 
                 if (e.OldItems != null) {
@@ -513,18 +504,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     }
                 }
             };
-            this.BookSelectorVM.SelectionChanged += async (sender, e) => {
-                this.BookChanged?.Invoke(sender, e);
-
-                await this.ReloadCsvFilesAsync();
-                await this.UpdateComparisonVMListAsync(true);
-            };
-
-            this.SelectedCsvCompVMList.CollectionChanged += (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldItems, e.NewItems }, methodName: nameof(this.SelectedCsvCompVMList.CollectionChanged));
-
+            this.CsvCompSelectorVM.SelectedCollectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.SelectedCheckedCount));
-                this.RaisePropertyChanged(nameof(this.SelectedCount));
                 this.RaisePropertyChanged(nameof(this.SelectedSumValue));
             };
         }

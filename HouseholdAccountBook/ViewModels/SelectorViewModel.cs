@@ -6,6 +6,7 @@ using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -88,9 +89,17 @@ namespace HouseholdAccountBook.ViewModels
 
         #region イベント
         /// <summary>
+        /// <see cref="VM"/> リスト変更時イベント
+        /// </summary>
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+        /// <summary>
         /// 選択 <see cref="VM"> 変更時イベント
         /// </summary>
         public event EventHandler<ChangedEventArgs<KEY>>? SelectionChanged;
+        /// <summary>
+        /// 選択 <see cref="VM"/> リスト変更時イベント
+        /// </summary>
+        public event NotifyCollectionChangedEventHandler? SelectedCollectionChanged;
         #endregion
 
         #region プロパティ
@@ -173,12 +182,22 @@ namespace HouseholdAccountBook.ViewModels
             get => this.SelectedItem == null ? -1 : this.ItemList.IndexOf(this.SelectedItem);
             set => this.SelectedItem = (value < 0 || this.ItemList.Count <= value) ? default : this.ItemList[value];
         }
+
+        /// <summary>
+        /// 選択 <see cref="VM"/> リスト
+        /// </summary>
+        /// <remarks>BehaviorにBindするには<see cref="VM"> が <see cref="ISelectable"/> を継承している必要がある</remarks>
+        public ObservableCollection<VM> SelectedItemList { get; } = [];
+        /// <summary>
+        /// 選択 <see cref="VM"/> リストのアイテム数
+        /// </summary>
+        public int SelectedCount => this.SelectedItemList.Count;
         #endregion
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="selector"><see cref="KEY"/><see cref="VM"/> から <see cref="KEY"/> への変換処理</param>
+        /// <param name="selector"><see cref="VM"/> から <see cref="KEY"/> への変換処理</param>
         /// <param name="busyService">処理中状態サービス</param>
         /// <param name="itemChangedIfNull">選択 <see cref="VM"/> がNullの場合でも変更を通知するか</param>
         /// <param name="fileName">出力元ファイル名</param>
@@ -186,8 +205,6 @@ namespace HouseholdAccountBook.ViewModels
         public SelectorViewModel(Func<VM?, KEY?> selector, BusyService? busyService = null, bool itemChangedIfNull = false,
                                  [CallerFilePath] string? fileName = null, [CallerMemberName] string memberName = "")
         {
-            ArgumentNullException.ThrowIfNull(selector);
-
             using FuncLog funcLog = new(level: Log.LogLevel.Trace, fileName: fileName, methodName: memberName);
 
             this.mSelector = selector;
@@ -195,6 +212,19 @@ namespace HouseholdAccountBook.ViewModels
             this.mItemChangedIfNull = itemChangedIfNull;
             this.mFileName = fileName;
             this.mMemberName = memberName;
+
+            this.ItemList.CollectionChanged += (sender, e) => {
+                using FuncLog funcLog = new(new { e.OldItems, e.NewItems }, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.CollectionChanged)}");
+
+                this.RaisePropertyChanged(nameof(this.Count));
+                this.CollectionChanged?.Invoke(sender, e);
+            };
+            this.SelectedItemList.CollectionChanged += (sender, e) => {
+                using FuncLog funcLog = new(new { e.OldItems, e.NewItems }, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.SelectedCollectionChanged)}");
+
+                this.RaisePropertyChanged(nameof(this.SelectedCount));
+                this.SelectedCollectionChanged?.Invoke(sender, e);
+            };
         }
 
         ~SelectorViewModel()
@@ -218,6 +248,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <returns>キー値が等しい場合は <see langword="true"/>。それ以外の場合は <see langword="false"/></returns>
         private static bool KeyEquals(KEY? key1, KEY? key2) => EqualityComparer<KEY>.Default.Equals(key1, key2);
 
+        #region SetLoader
         /// <summary>
         /// <see cref="VM"> リスト読込処理を設定する
         /// </summary>
@@ -273,11 +304,12 @@ namespace HouseholdAccountBook.ViewModels
             this.mLoadAsync = loadAsync;
             this.mMode = mode;
         }
+        #endregion
 
         /// <summary>
         /// 読込み可能か
         /// </summary>
-        /// <returns></returns>
+        /// <returns>読込み可能/不可能</returns>
         private bool CanLoad() => this.mCanLoad?.Invoke() ?? true;
 
         /// <summary>
@@ -378,6 +410,12 @@ namespace HouseholdAccountBook.ViewModels
         {
             ChangedEventArgs<KEY> args = new() { OldValue = oldKey, NewValue = newKey };
             using FuncLog funcLog = new(args, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(OnSelectionChangedAsync)}");
+
+            // 変更時に外部に作用する要素がなければ処理しない(BusyService.Enterを防ぐ)
+            if (this.SelectionChanged is null && this.Children.Count is 0) {
+                Log.Debug("Nothing to do.");
+                return;
+            }
 
             using IDisposable? disposable = this.mBusyService?.Enter();
 

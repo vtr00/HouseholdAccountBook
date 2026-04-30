@@ -141,7 +141,7 @@
                     <MouseBinding Gesture="LeftDoubleClick" Command="{Binding AddOrEditActionCommand}"/>
                 </DataGrid.InputBindings>
                 <i:Interaction.Behaviors>
-                    <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding SelectedCsvCompVMList, Mode=OneWay}"/>
+                    <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding CsvCompSelectorVM.SelectedItemList, Mode=OneWay}"/>
                 </i:Interaction.Behaviors>
                 <DataGrid.ItemContainerStyle>
                     <Style TargetType="DataGridRow">
@@ -199,12 +199,12 @@
                 <TextBlock Margin="5,0" VerticalAlignment="Center">
                     [<TextBlock Text="{x:Static properties:Resources.TextBlock_Whole}"/>]
                     <TextBlock Text="{x:Static properties:Resources.TextBlock_Checked}"/>: 
-                    <TextBlock Text="{Binding AllCheckedCount}"/> / <TextBlock Text="{Binding AllCount}"/><TextBlock Text="  "/>
+                    <TextBlock Text="{Binding AllCheckedCount}"/> / <TextBlock Text="{Binding CsvCompSelectorVM.Count}"/><TextBlock Text="  "/>
                     <TextBlock Text="{x:Static properties:Resources.TextBlock_Sum}"/>:
                     <TextBlock Text="{Binding AllSumValue, Converter={StaticResource IntToMoneyDisplayConverter}}"/><TextBlock Text="  "/>
                     [<TextBlock Text="{x:Static properties:Resources.TextBlock_Selection}"/>]
                     <TextBlock Text="{x:Static properties:Resources.TextBlock_Checked}"/>:
-                    <TextBlock Text="{Binding SelectedCheckedCount}"/> / <TextBlock Text="{Binding SelectedCount}"/><TextBlock Text="  "/>
+                    <TextBlock Text="{Binding SelectedCheckedCount}"/> / <TextBlock Text="{Binding CsvCompSelectorVM.SelectedCount}"/><TextBlock Text="  "/>
                     <TextBlock Text="{x:Static properties:Resources.TextBlock_Sum}"/>:
                     <TextBlock Text="{Binding SelectedSumValue, Converter={StaticResource IntToMoneyDisplayConverter}}"/>
                 </TextBlock>
