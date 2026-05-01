@@ -1,10 +1,10 @@
 ﻿using HouseholdAccountBook.ViewModels.Abstract;
 using Microsoft.Xaml.Behaviors;
+using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
-using System;
 
 namespace HouseholdAccountBook.Views.Behaviors
 {

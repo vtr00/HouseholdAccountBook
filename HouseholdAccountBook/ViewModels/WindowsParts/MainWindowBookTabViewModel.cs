@@ -14,10 +14,11 @@ using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Windows;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace HouseholdAccountBook.ViewModels.WindowsParts
@@ -25,9 +26,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
     /// <summary>
     /// メインウィンドウ 帳簿項目タブVM
     /// </summary>
-    /// <param name="parent">親VM</param>
-    /// <param name="tab">タブ</param>
-    public class MainWindowBookTabViewModel(MainWindowViewModel parent, Tabs tab) : WindowPartViewModelBase
+    public class MainWindowBookTabViewModel : WindowPartViewModelBase
     {
         #region フィールド
         /// <summary>
@@ -43,9 +42,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 親VM
         /// </summary>
-        private MainWindowViewModel Parent { get; } = parent;
+        private MainWindowViewModel Parent { get; init; }
 
-        private Tabs Tab { get; } = tab;
+        private Tabs Tab { get; init; }
 
         #region イベント
         /// <summary>
@@ -101,10 +100,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 表示対象の帳簿項目VMリスト
         /// </summary>
-        public ObservableCollection<ActionViewModel> DisplayedActionVMList {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public ICollectionView FilteredActionVMList { get; init; }
 
         /// <summary>
         /// CSVと一致したか
@@ -171,7 +167,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
-                    this.UpdateDisplayedActionVMList();
+                    this.RefreshFilteredActionVMList();
                 }
             }
         }
@@ -206,7 +202,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
-                    this.UpdateDisplayedActionVMList();
+                    this.RefreshFilteredActionVMList();
                 }
             }
         } = string.Empty;
@@ -284,7 +280,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
 
             List<ActionIdObj> actionIdList = [];
-            foreach (ActionViewModel vm in this.DisplayedActionVMList) {
+            foreach (ActionViewModel vm in this.FilteredActionVMList) {
                 actionIdList.Add(vm.ActionId);
 
                 string shopName = vm.Shop?.Replace(this.FindText, this.ReplaceText);
@@ -509,39 +505,60 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public void RaiseCurrentBackUpChanged() => this.RaisePropertyChanged(nameof(this.CurrentBackUp));
 
         /// <summary>
-        /// <see cref="DisplayedActionVMList"/> を更新する
+        /// <see cref="FilteredActionVMList"/> を更新する
         /// </summary>
-        /// <remarks>表示されている項目のみ選択する</remarks>
-        private void UpdateDisplayedActionVMList()
+        private void RefreshFilteredActionVMList()
         {
-            using FuncLog funcLog = new();
+            this.FilteredActionVMList.Refresh();
+            // 選択項目を表示項目に限定する
+            this.ActionSelectorVM.SelectedItemList = [.. this.ActionSelectorVM.SelectedItemList.Where(vm => this.FilteredActionVMList.Contains(vm))];
+        }
+        /// <summary>
+        /// <see cref="FilteredActionVMList"/> のフィルタ
+        /// </summary>
+        /// <param name="obj">フィルタ対象のVM</param>
+        private bool ActionVMListFilter(object obj)
+        {
+            if (obj is not ActionViewModel vm) { return false; }
 
-            ObservableCollection<ActionViewModel> tmp = this.ActionSelectorVM.ItemList;
+            bool result = true;
 
             if (this.UseFilter) {   // フィルタ有効の場合
-                // 概要が選択されている場合
-                if (this.SummarySelectorVM.SelectedKey.HasValue) {
+                if (this.SummarySelectorVM.SelectedKey.HasValue) { // 概要が選択されている場合
                     (BalanceKind?, CategoryIdObj, ItemIdObj) selectedKey = this.SummarySelectorVM.SelectedKey.Value;
-                    // 収支が選択されている場合
-                    if (selectedKey.Item1 != BalanceKind.Others) {
-                        tmp = selectedKey.Item2 == CategoryIdObj.System // 分類が選択されていない場合
-                            ? [.. tmp.Where(vm => vm.BalanceKind == selectedKey.Item1 || vm.ActionId == ActionIdObj.System)]
-                            : selectedKey.Item3 == ItemIdObj.System // 項目が選択されていない場合
-                                ? [.. tmp.Where(vm => vm.CategoryId == selectedKey.Item2 || vm.ActionId == ActionIdObj.System)]
-                                : [.. tmp.Where(vm => vm.ItemId == selectedKey.Item3 || vm.ActionId == ActionIdObj.System)];
+
+                    if (selectedKey.Item1 != BalanceKind.Others) { // 収支が選択されている場合
+                        result &= selectedKey.Item2 == CategoryIdObj.System // 分類が選択されていない場合
+                                ? vm.BalanceKind == selectedKey.Item1 || vm.ActionId == ActionIdObj.System
+                                : selectedKey.Item3 == ItemIdObj.System // 項目が選択されていない場合
+                                   ? vm.CategoryId == selectedKey.Item2 || vm.ActionId == ActionIdObj.System
+                                   : vm.ItemId == selectedKey.Item3 || vm.ActionId == ActionIdObj.System;
                     }
                 }
             }
 
             // 検索テキストで絞り込む
             if (this.FindText != string.Empty) {
-                tmp = [.. tmp.Where(vm => (vm.Shop?.Contains(this.FindText) ?? false) || (vm.Remark?.Contains(this.FindText) ?? false))];
+                result &= (vm.Shop?.Contains(this.FindText) ?? false) || (vm.Remark?.Contains(this.FindText) ?? false);
             }
 
-            this.DisplayedActionVMList = tmp;
+            return result;
+        }
 
-            // 選択項目を表示項目に限定する
-            this.ActionSelectorVM.SelectedItemList = [.. this.ActionSelectorVM.SelectedItemList.Where(vm => this.DisplayedActionVMList.Contains(vm))];
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="parent">親VM</param>
+        /// <param name="tab">タブ</param>
+        public MainWindowBookTabViewModel(MainWindowViewModel parent, Tabs tab)
+        {
+            using FuncLog funcLog = new(new { tab });
+
+            this.Parent = parent;
+            this.Tab = tab;
+
+            this.FilteredActionVMList = CollectionViewSource.GetDefaultView(this.ActionSelectorVM.ItemList);
+            this.FilteredActionVMList.Filter = this.ActionVMListFilter;
         }
 
         public override void Initialize(BusyService busyService, DbHandlerFactory dbHandlerFactory)
@@ -596,7 +613,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 this.SummarySelectorVM.LoadAsync((tmpBalanceKind, tmpCategoryId, tmpItemId))
             ];
             await Task.WhenAll(tasks);
-            this.UpdateDisplayedActionVMList();
+            this.RefreshFilteredActionVMList();
 
             if (isScroll) {
                 if (this.Parent.DisplayedPeriodKind == PeriodKind.Monthly &&
@@ -633,7 +650,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.SummarySelectorVM.SelectionChanged += (sender, e) => {
                 this.SelectedSeriesChanged?.Invoke(this, e);
 
-                this.UpdateDisplayedActionVMList();
+                this.RefreshFilteredActionVMList();
             };
         }
 

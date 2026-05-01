@@ -6,7 +6,6 @@ using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Component;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.ViewModels.Loaders
@@ -28,7 +27,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
         /// <param name="bookId">帳簿ID</param>
         /// <param name="includedTime">月内の時間</param>
         /// <returns>月内日別系列VMリスト</returns>
-        public async Task<ObservableCollection<SeriesViewModel>> LoadDailySeriesViewModelListWithinMonthAsync(BookIdObj bookId, DateOnly includedTime)
+        public async Task<IEnumerable<SeriesViewModel>> LoadDailySeriesViewModelListWithinMonthAsync(BookIdObj bookId, DateOnly includedTime)
         {
             using FuncLog funcLog = new(new { bookId, includedTime });
 
@@ -45,7 +44,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
         /// <param name="startTime">開始時刻</param>
         /// <param name="endTime">終了時刻</param>
         /// <returns>日別系列VMリスト</returns>
-        public async Task<ObservableCollection<SeriesViewModel>> LoadDailySeriesViewModelListAsync(BookIdObj bookId, PeriodObj<DateOnly> period)
+        public async Task<IEnumerable<SeriesViewModel>> LoadDailySeriesViewModelListAsync(BookIdObj bookId, PeriodObj<DateOnly> period)
         {
             using FuncLog funcLog = new(new { bookId, period });
 
@@ -53,8 +52,8 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             decimal balance = await this.mAppService.LoadEndingBalance(bookId, period.Start);
 
             // 系列データ
-            ObservableCollection<SeriesViewModel> vmList = [
-                new SeriesViewModel() {
+            IList<SeriesViewModel> vmList = [
+                new() {
                     OtherName = Properties.Resources.ListName_Balance,
                     Values = [],
                     Periods = []
@@ -138,7 +137,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
         /// <param name="includedTime">年度内の日付</param>
         /// <param name="startMonth">年度開始月</param>
         /// <returns>年度内月別系列VMリスト</returns>
-        public async Task<ObservableCollection<SeriesViewModel>> LoadMonthlySeriesViewModelListWithinYearAsync(BookIdObj bookId, DateOnly includedTime, int startMonth)
+        public async Task<IEnumerable<SeriesViewModel>> LoadMonthlySeriesViewModelListWithinYearAsync(BookIdObj bookId, DateOnly includedTime, int startMonth)
         {
             using FuncLog funcLog = new(new { bookId, includedTime, startMonth });
 
@@ -152,8 +151,8 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             // 開始日までの収支を取得する
             decimal balance = await this.mAppService.LoadEndingBalance(bookId, period.Start);
 
-            ObservableCollection<SeriesViewModel> vmList = [
-                new SeriesViewModel() {
+            IList<SeriesViewModel> vmList = [
+                new() {
                     OtherName = Properties.Resources.ListName_Balance,
                     Values = [],
                     Periods = []
@@ -234,7 +233,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
         /// <returns>年別系列VMリスト</returns>
-        public async Task<ObservableCollection<SeriesViewModel>> LoadYearlySeriesViewModelListWithinDecadeAsync(BookIdObj bookId, DateOnly startYear, int startMonth)
+        public async Task<IEnumerable<SeriesViewModel>> LoadYearlySeriesViewModelListWithinDecadeAsync(BookIdObj bookId, DateOnly startYear, int startMonth)
         {
             using FuncLog funcLog = new(new { bookId, startYear, startMonth });
 
@@ -243,8 +242,8 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             // 開始日までの収支を取得する
             decimal balance = await this.mAppService.LoadEndingBalance(bookId, startTime);
 
-            ObservableCollection<SeriesViewModel> vmList = [
-                new SeriesViewModel() {
+            IList<SeriesViewModel> vmList = [
+                new() {
                     OtherName = Properties.Resources.ListName_Balance,
                     Values = [],
                     Periods = []
@@ -259,7 +258,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                 DateOnly tmpEndTime = tmpStartTime.GetLastDateOfFiscalYear(startMonth);
                 tmpPeriod = new(tmpStartTime, tmpEndTime);
             }
-            ObservableCollection<SummaryModel> summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(bookId, tmpPeriod)];
+            IList<SummaryModel> summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(bookId, tmpPeriod)];
             balance += summaryVMList[0].Total;
             vmList[0].Values.Add(balance); // 残高
             vmList[0].Periods.Add(tmpPeriod);

@@ -102,7 +102,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             this.SeriesSelectorVM.SetLoader(async () => {
                 SeriesViewModelLoader loader = new(new(this.mDbHandlerFactory));
-                var tmpVMList = this.Tab switch {
+                IEnumerable<SeriesViewModel> tmpVMList = this.Tab switch {
                     Tabs.DailyGraphTab => this.Parent.DisplayedPeriodKind switch {
                         PeriodKind.Monthly => await loader.LoadDailySeriesViewModelListWithinMonthAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value),
                         PeriodKind.Selected => await loader.LoadDailySeriesViewModelListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedPeriod),

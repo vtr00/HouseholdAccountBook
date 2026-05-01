@@ -243,7 +243,7 @@ namespace HouseholdAccountBook.ViewModels
 
             this.ItemList.CollectionChanged += (sender, e) => {
                 if (!this.mOnLoad) {
-                    using FuncLog funcLog = new(level:Log.LogLevel.Debug, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.CollectionChanged)}");
+                    using FuncLog funcLog = new(level: Log.LogLevel.Debug, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.CollectionChanged)}");
                 }
 
                 this.RaisePropertyChanged(nameof(this.Count));
@@ -251,7 +251,7 @@ namespace HouseholdAccountBook.ViewModels
             };
             this.SelectedItemList.CollectionChanged += (sender, e) => {
                 if (!this.mOnLoad) {
-                    using FuncLog funcLog = new(level:Log.LogLevel.Debug, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.SelectedCollectionChanged)}");
+                    using FuncLog funcLog = new(level: Log.LogLevel.Debug, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.SelectedCollectionChanged)}");
                 }
 
                 this.RaisePropertyChanged(nameof(this.SelectedCount));

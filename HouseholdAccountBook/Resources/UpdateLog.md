@@ -4,13 +4,14 @@
 
 ## 2026
 
-### 2026-04-30
+### 2026-05-02
 
 - 全体
    - ↑ログ出力対象の変数がdecimalのときに値が出力されないのを修正した - refs #151
 
 - MainWindow
    - △帳簿項目一覧に、SelectorViewModelを適用するように変更した - refs #151
+   - △表示対象の帳簿項目一覧のフィルタ方法を変更した - refs #151 
 
 - CsvComparisonWindow
    - △SelectedItemListをSelectorViewModelに含めるように変更した - refs #151
