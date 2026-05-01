@@ -386,12 +386,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 表示月リスト(月別一覧の月)
         /// </summary>
-        public ObservableCollection<DateOnly> DisplayedMonths {
+        public IList<DateOnly> DisplayedMonths {
             get {
                 DateOnly tmpMonth = this.DisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
 
                 // 表示する月の文字列を作成する
-                ObservableCollection<DateOnly> displayedMonths = [];
+                IList<DateOnly> displayedMonths = [];
                 for (int i = 0; i < 12; ++i) {
                     displayedMonths.Add(tmpMonth);
                     tmpMonth = tmpMonth.AddMonths(1);
@@ -411,10 +411,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 表示年リスト(年別一覧の年)
         /// </summary>
-        public ObservableCollection<DateOnly> DisplayedYears {
+        public IList<DateOnly> DisplayedYears {
             get {
                 DateOnly tmpYear = this.DisplayedYear.GetFirstDateOfFiscalYear(this.FiscalStartMonth).AddYears(-9);
-                ObservableCollection<DateOnly> displayedYears = [];
+                IList<DateOnly> displayedYears = [];
                 for (int i = 0; i < 10; ++i) {
                     displayedYears.Add(tmpYear);
                     tmpYear = tmpYear.AddYears(1);
