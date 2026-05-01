@@ -9,8 +9,11 @@
 - 全体
    - ↑ログ出力対象の変数がdecimalのときに値が出力されないのを修正した - refs #151
 
+- MainWindow
+   - △帳簿項目一覧に、SelectorViewModelを適用するように変更した - refs #151
+
 - CsvComparisonWindow
-   - △SelectedListをSelectorViewModelに含めるように変更した - refs #151
+   - △SelectedItemListをSelectorViewModelに含めるように変更した - refs #151
 
 ### 2026-04-29
 
