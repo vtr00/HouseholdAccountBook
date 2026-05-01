@@ -390,7 +390,7 @@
                             </Grid.RowDefinitions>
 
                             <DataGrid x:Name="_actionDataGrid" Grid.Row="0" SelectionMode="Extended"
-                                  ItemsSource="{Binding DisplayedActionVMList}" SelectedItem="{Binding SelectedActionVM}" IsReadOnly="True" SelectionUnit="FullRow"
+                                  ItemsSource="{Binding DisplayedActionVMList}" SelectedItem="{Binding ActionSelectorVM.SelectedItem}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="4"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
                                   HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
@@ -411,7 +411,7 @@
                                     <MouseBinding Gesture="LeftDoubleClick" Command="{Binding EditCommand}"/>
                                 </DataGrid.InputBindings>
                                 <i:Interaction.Behaviors>
-                                    <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding SelectedActionVMList}"/>
+                                    <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding ActionSelectorVM.SelectedItemList}"/>
                                 </i:Interaction.Behaviors>
                                 <DataGrid.ItemContainerStyle>
                                     <Style TargetType="DataGridRow">

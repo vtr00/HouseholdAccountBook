@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Models.UiDto;
+﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
@@ -38,6 +39,10 @@ namespace HouseholdAccountBook.ViewModels.Component
         public decimal Amount => this.ActionWithBalance.Action.Amount;
 
         /// <summary>
+        /// 収支種別
+        /// </summary>
+        public BalanceKind BalanceKind => this.ActionWithBalance.Action.Category.BalanceKind;
+        /// <summary>
         /// 収入
         /// </summary>
         public decimal? Income => this.ActionWithBalance.Action.Income;
@@ -51,13 +56,25 @@ namespace HouseholdAccountBook.ViewModels.Component
         public decimal? Balance => this.ActionWithBalance.Balance;
 
         /// <summary>
+        /// 帳簿ID
+        /// </summary>
+        public BookIdObj BookId => this.ActionWithBalance.Action.Book.Id;
+        /// <summary>
         /// 帳簿名
         /// </summary>
         public string BookName => this.ActionWithBalance.Action.Book.Name;
         /// <summary>
+        /// 分類ID
+        /// </summary>
+        public CategoryIdObj CategoryId => this.ActionWithBalance.Action.Category.Id;
+        /// <summary>
         /// 分類名
         /// </summary>
         public string CategoryName => this.ActionWithBalance.Action.Category.Name;
+        /// <summary>
+        /// 項目ID
+        /// </summary>
+        public ItemIdObj ItemId => this.ActionWithBalance.Action.Item.Id;
         /// <summary>
         /// 項目名
         /// </summary>

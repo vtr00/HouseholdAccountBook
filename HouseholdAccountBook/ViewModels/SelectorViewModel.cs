@@ -31,10 +31,10 @@ namespace HouseholdAccountBook.ViewModels
     }
 
     /// <summary>
-    /// VMリストとその選択VMを保持するVM
+    /// VMリストとその選択VM(リスト)を保持するVM
     /// </summary>
-    /// <typeparam name="VM">VM</typeparam>
-    /// <typeparam name="KEY">VMを特定するキー(IDなど)</typeparam>
+    /// <typeparam name="VM">ViewModel</typeparam>
+    /// <typeparam name="KEY">ViewModelを特定するキー(IDなど)</typeparam>
     public class SelectorViewModel<VM, KEY> : BindableBase, ILoadableAsync, IDisposable
     {
         #region フィールド
@@ -187,11 +187,39 @@ namespace HouseholdAccountBook.ViewModels
         /// 選択 <see cref="VM"/> リスト
         /// </summary>
         /// <remarks>BehaviorにBindするには<see cref="VM"> が <see cref="ISelectable"/> を継承している必要がある</remarks>
-        public ObservableCollection<VM> SelectedItemList { get; } = [];
+        public ObservableCollection<VM>? SelectedItemList {
+            get;
+            set {
+                if (value != null) {
+                    IEnumerable<VM> added = [.. value.Except(field ?? [])];
+                    IEnumerable<VM> removed = [.. field?.Except(value) ?? []];
+
+                    foreach (VM vm in added) {
+                        field?.Add(vm);
+                    }
+                    foreach (VM vm in removed) {
+                        _ = field?.Remove(vm);
+                    }
+                }
+                else {
+                    // null の場合はリストを空にする(ClearだとBehaviorが意図した挙動にならない)
+                    while (0 < (field?.Count ?? 0)) {
+                        field?.RemoveAt(0);
+                    }
+                }
+            }
+        } = [];
         /// <summary>
         /// 選択 <see cref="VM"/> リストのアイテム数
         /// </summary>
-        public int SelectedCount => this.SelectedItemList.Count;
+        public int SelectedCount => this.SelectedItemList?.Count ?? 0;
+        /// <summary>
+        /// 選択 <see cref="KEY"/> リスト
+        /// </summary>
+        public IEnumerable<KEY?> SelectedKeys {
+            get => this.SelectedItemList?.Select(vm => this.mSelector(vm)) ?? [];
+            set => throw new NotImplementedException();
+        }
         #endregion
 
         /// <summary>
@@ -214,13 +242,17 @@ namespace HouseholdAccountBook.ViewModels
             this.mMemberName = memberName;
 
             this.ItemList.CollectionChanged += (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldItems, e.NewItems }, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.CollectionChanged)}");
+                if (!this.mOnLoad) {
+                    using FuncLog funcLog = new(level:Log.LogLevel.Debug, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.CollectionChanged)}");
+                }
 
                 this.RaisePropertyChanged(nameof(this.Count));
                 this.CollectionChanged?.Invoke(sender, e);
             };
             this.SelectedItemList.CollectionChanged += (sender, e) => {
-                using FuncLog funcLog = new(new { e.OldItems, e.NewItems }, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.SelectedCollectionChanged)}");
+                if (!this.mOnLoad) {
+                    using FuncLog funcLog = new(level:Log.LogLevel.Debug, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.SelectedCollectionChanged)}");
+                }
 
                 this.RaisePropertyChanged(nameof(this.SelectedCount));
                 this.SelectedCollectionChanged?.Invoke(sender, e);
@@ -239,6 +271,7 @@ namespace HouseholdAccountBook.ViewModels
             GC.SuppressFinalize(this);
         }
 
+        private static readonly EqualityComparer<KEY?> mComparer = EqualityComparer<KEY?>.Default;
         /// <summary>
         /// 2 つのキー値が等しいかどうかを判定する
         /// </summary>
@@ -246,7 +279,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="key1">比較する最初のキー値</param>
         /// <param name="key2">比較する 2 番目のキー値</param>
         /// <returns>キー値が等しい場合は <see langword="true"/>。それ以外の場合は <see langword="false"/></returns>
-        private static bool KeyEquals(KEY? key1, KEY? key2) => EqualityComparer<KEY>.Default.Equals(key1, key2);
+        private static bool KeyEquals(KEY? key1, KEY? key2) => mComparer.Equals(key1, key2);
 
         #region SetLoader
         /// <summary>
@@ -313,20 +346,34 @@ namespace HouseholdAccountBook.ViewModels
         private bool CanLoad() => this.mCanLoad?.Invoke() ?? true;
 
         /// <summary>
-        /// [非同期] <see cref="VM"/> リストを読込み、指定の <see cref="VM"/> を選択する
+        /// [非同期] <see cref="VM"/> リストを読込み、現在選択中の <see cref="VM"/> の選択を維持する
         /// </summary>
         /// <param name="token">キャンセル用トークン</param>
         /// <returns></returns>
-        public async Task LoadAsync(CancellationToken token = default) => await this.LoadAsync(default, token);
+        public async Task LoadAsync(CancellationToken token = default) => await this.LoadAsyncCore(default, token);
         /// <summary>
         /// [非同期] <see cref="VM"/> リストを読込み、指定の <see cref="VM"/> を選択する
         /// </summary>
-        /// <param name="selection"><see cref="VM"/> を選択するキー. nullの場合は現在選択中の <see cref="VM"/> を選択する</param>
+        /// <param name="selection"><see cref="VM"/> を選択するキー. nullの場合は現在選択中の <see cref="VM"/> の選択を維持する</param>
         /// <param name="token">キャンセル用トークン</param>
         /// <returns></returns>
-        public async Task LoadAsync(KEY? selection, CancellationToken token = default)
+        public async Task LoadAsync(KEY? selection, CancellationToken token = default) => await this.LoadAsyncCore([selection], token);
+        /// <summary>
+        /// [非同期] <see cref="VM"/> リストを読込み、指定の <see cref="VM"/> を選択する
+        /// </summary>
+        /// <param name="selections"><see cref="VM"/> を選択するキー. nullの場合は現在選択中の <see cref="VM"/> の選択を維持する</param>
+        /// <param name="token">キャンセル用トークン</param>
+        /// <returns></returns>
+        public async Task LoadAsync(IEnumerable<KEY?>? selections, CancellationToken token = default) => await this.LoadAsyncCore(selections, token);
+        /// <summary>
+        /// [非同期] <see cref="VM"/> リストを読込み、指定の <see cref="VM"/> を選択する
+        /// </summary>
+        /// <param name="selections"><see cref="VM"/> を選択するキーのリスト. nullの場合は現在選択中の <see cref="VM"/> の選択を維持する</param>
+        /// <param name="token">キャンセル用トークン</param>
+        /// <returns></returns>
+        protected async Task LoadAsyncCore(IEnumerable<KEY?>? selections, CancellationToken token = default)
         {
-            using FuncLog funcLog = new(new { selection }, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(LoadAsync)}");
+            using FuncLog funcLog = new(new { selections }, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(LoadAsyncCore)}");
 
             if (this.mLoad is null && this.mLoadAsync is null) { throw new InvalidOperationException(); }
             if (this.mLoad is not null && this.mLoadAsync is not null) { throw new InvalidOperationException(); }
@@ -342,6 +389,7 @@ namespace HouseholdAccountBook.ViewModels
             try {
                 // リスト読込前の値を取得する
                 KEY? oldKey = this.SelectedKey;
+                IEnumerable<KEY?> oldKeys = this.SelectedKeys;
 
                 // 表示するVMを取得する
                 token.ThrowIfCancellationRequested();
@@ -354,8 +402,9 @@ namespace HouseholdAccountBook.ViewModels
                 }
                 token.ThrowIfCancellationRequested();
 
-                // 一旦未選択状態にする
+                // 一旦未選択状態にする(ClearだとBehaviorが意図した挙動にならないのでRemoveAtで空にする)
                 this.SelectedItem = default;
+                this.SelectedItemList = default;
 
                 // 取得したVMを反映する
                 this.ItemList.Clear();
@@ -363,7 +412,8 @@ namespace HouseholdAccountBook.ViewModels
                     this.ItemList.Add(tmp);
                 }
 
-                KEY? tmpSelection = selection ?? oldKey;
+                // 先頭の一つを選択する
+                KEY? tmpSelection = selections != null ? selections.FirstOrDefault() : oldKey;
                 switch (this.mMode) {
                     case SelectorMode.FirstOrElementAtOrDefault:
                         this.SelectedItem = this.ItemList.FirstOrElementAtOrDefault(vm => KeyEquals(this.mSelector(vm), tmpSelection), 0);
@@ -377,6 +427,9 @@ namespace HouseholdAccountBook.ViewModels
                     default:
                         throw new NotSupportedException();
                 }
+                // 全部を選択する
+                IList<KEY?> newKeys = [.. selections ?? oldKeys];
+                this.SelectedItemList = [.. this.ItemList.Where(vm => newKeys.Contains(this.mSelector(vm), mComparer))];
 
                 if (!KeyEquals(this.SelectedKey, oldKey)) {
                     // NULLの場合に通知するか
@@ -419,36 +472,38 @@ namespace HouseholdAccountBook.ViewModels
 
             using IDisposable? disposable = this.mBusyService?.Enter();
 
-            CancellationToken tmpToken = token;
-            if (tmpToken == default) {
-                this.mSelectionCts?.Cancel();
-                this.mSelectionCts?.Dispose();
-                this.mSelectionCts = new();
-                tmpToken = this.mSelectionCts.Token;
-            }
-
             this.SelectionChanged?.Invoke(this, args);
 
-            try {
-                Task[] tasks = [.. this.Children.Select(async c => {
+            if (this.Children.Count != 0) {
+                CancellationToken tmpToken = token;
+                if (tmpToken == default) {
+                    this.mSelectionCts?.Cancel();
+                    this.mSelectionCts?.Dispose();
+                    this.mSelectionCts = new();
+                    tmpToken = this.mSelectionCts.Token;
+                }
+
+                try {
+                    Task[] tasks = [.. this.Children.Select(async c => {
                     tmpToken.ThrowIfCancellationRequested();
                     await c.LoadAsync(tmpToken);
                     tmpToken.ThrowIfCancellationRequested();
                 })];
-                await Task.WhenAll(tasks);
-            }
-            catch (OperationCanceledException) {
-                Log.Debug($"{this.mMemberName}.{nameof(OnSelectionChangedAsync)} Canceled.");
-                // キャンセル用トークンが引数で与えられていた場合は再スロー
-                if (token != default) {
-                    throw;
+                    await Task.WhenAll(tasks);
+                }
+                catch (OperationCanceledException) {
+                    Log.Debug($"{this.mMemberName}.{nameof(OnSelectionChangedAsync)} Canceled.");
+                    // キャンセル用トークンが引数で与えられていた場合は再スロー
+                    if (token != default) {
+                        throw;
+                    }
                 }
             }
         }
     }
 
     /// <summary>
-    /// コンストラクタ
+    /// VMリストとその選択VM(リスト)を保持するVM
     /// </summary>
     /// <param name="busyService">処理中状態サービス</param>
     /// <param name="itemChangedIfNull">選択 <see cref="VM"/> がNullの場合でも変更を通知するか</param>
