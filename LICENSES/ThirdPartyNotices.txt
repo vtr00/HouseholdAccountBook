@@ -2,16 +2,6 @@
 
 This project incorporates material from the following third-party projects:
 
-# Azure.Core 1.50.0
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://github.com/Azure/azure-sdk-for-net/blob/Azure.Core_1.50.0/sdk/core/Azure.Core/README.md
-
-# Azure.Identity 1.17.1
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://github.com/Azure/azure-sdk-for-net/blob/Azure.Identity_1.17.1/sdk/identity/Azure.Identity/README.md
-
 # CalcBinding 2.5.2
    License: Apache-2.0
    Copyright © Alexander Zinchenko 2014-2019
@@ -22,7 +12,7 @@ This project incorporates material from the following third-party projects:
    Copyright © 2009-2024 Josh Close
    https://joshclose.github.io/CsvHelper/
 
-# Dapper 2.1.66
+# Dapper 2.1.72
    License: Apache-2.0
    2019 Stack Exchange, Inc.
    https://github.com/DapperLib/Dapper
@@ -32,12 +22,22 @@ This project incorporates material from the following third-party projects:
    Davide Icardi
    https://github.com/dynamicexpresso/DynamicExpresso
 
-# Microsoft.Bcl.AsyncInterfaces 8.0.0
+# Microsoft.Bcl.Cryptography 9.0.13
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Data.SqlClient 6.1.4
+# Microsoft.Data.SqlClient 7.0.1
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://aka.ms/sqlclientproject
+
+# Microsoft.Data.SqlClient.Extensions.Abstractions 1.0.0
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://aka.ms/sqlclientproject
+
+# Microsoft.Data.SqlClient.Internal.Logging 1.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
@@ -47,107 +47,97 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Data.Sqlite 10.0.3
+# Microsoft.Data.Sqlite 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.Data.Sqlite.Core 10.0.3
+# Microsoft.Data.Sqlite.Core 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.EntityFrameworkCore 10.0.3
+# Microsoft.EntityFrameworkCore 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Abstractions 10.0.3
+# Microsoft.EntityFrameworkCore.Abstractions 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Analyzers 10.0.3
+# Microsoft.EntityFrameworkCore.Analyzers 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.Extensions.Caching.Abstractions 10.0.3
+# Microsoft.Extensions.Caching.Abstractions 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Caching.Memory 10.0.3
+# Microsoft.Extensions.Caching.Memory 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection 10.0.3
+# Microsoft.Extensions.DependencyInjection 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection.Abstractions 10.0.3
+# Microsoft.Extensions.DependencyInjection.Abstractions 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging 10.0.3
+# Microsoft.Extensions.Logging 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging.Abstractions 10.0.3
+# Microsoft.Extensions.Logging.Abstractions 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Options 10.0.3
+# Microsoft.Extensions.Options 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Primitives 10.0.3
+# Microsoft.Extensions.Primitives 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Identity.Client 4.80.0
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://go.microsoft.com/fwlink/?linkid=844761
-
-# Microsoft.Identity.Client.Extensions.Msal 4.78.0
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://go.microsoft.com/fwlink/?linkid=844761
-
-# Microsoft.IdentityModel.Abstractions 8.14.0
+# Microsoft.IdentityModel.Abstractions 8.16.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet
 
-# Microsoft.IdentityModel.JsonWebTokens 7.7.1
+# Microsoft.IdentityModel.JsonWebTokens 8.16.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet
 
-# Microsoft.IdentityModel.Logging 7.7.1
+# Microsoft.IdentityModel.Logging 8.16.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet
 
-# Microsoft.IdentityModel.Protocols 7.7.1
+# Microsoft.IdentityModel.Protocols 8.16.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet
 
-# Microsoft.IdentityModel.Protocols.OpenIdConnect 7.7.1
+# Microsoft.IdentityModel.Protocols.OpenIdConnect 8.16.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet
 
-# Microsoft.IdentityModel.Tokens 7.7.1
+# Microsoft.IdentityModel.Tokens 8.16.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet
@@ -157,7 +147,7 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Xaml.Behaviors.Wpf 1.1.135
+# Microsoft.Xaml.Behaviors.Wpf 1.1.142
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/Microsoft/XamlBehaviorsWpf
@@ -172,24 +162,24 @@ This project incorporates material from the following third-party projects:
    https://github.com/Platonenkov
    https://github.com/Platonenkov/Notification.Wpf
 
-# Npgsql 10.0.1
+# Npgsql 10.0.2
    License: PostgreSQL
    Copyright 2025 © The Npgsql Development Team
    https://github.com/npgsql/npgsql
 
-# OxyPlot.Core 2.1.0
+# OxyPlot.Core 2.2.0
    License: MIT
-   Copyright (c) 2014 OxyPlot contributors
+   Copyright (c) 2014-2022 OxyPlot Contributors
    https://oxyplot.github.io/
 
-# OxyPlot.Wpf 2.1.0
+# OxyPlot.Wpf 2.2.0
    License: MIT
-   OxyPlot contributors
+   Copyright (c) 2014-2022 OxyPlot Contributors
    https://oxyplot.github.io/
 
-# OxyPlot.Wpf.Shared 2.1.0
+# OxyPlot.Wpf.Shared 2.2.0
    License: MIT
-   OxyPlot contributors
+   Copyright (c) 2014-2022 OxyPlot Contributors
    https://oxyplot.github.io/
 
 # SQLitePCLRaw.bundle_e_sqlite3 2.1.11
@@ -208,28 +198,18 @@ This project incorporates material from the following third-party projects:
    License: Apache-2.0
    Copyright 2014-2024 SourceGear, LLC
 
-# System.ClientModel 1.8.0
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://github.com/Azure/azure-sdk-for-net/blob/System.ClientModel_1.8.0/sdk/core/System.ClientModel/README.md
-
 # System.ComponentModel.Annotations 5.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/dotnet/runtime
 
-# System.Data.OleDb 10.0.3
+# System.Data.OleDb 10.0.7
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# System.IdentityModel.Tokens.Jwt 7.7.1
+# System.IdentityModel.Tokens.Jwt 8.16.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet
-
-# System.Memory.Data 8.0.1
-   License: MIT
-   © Microsoft Corporation. All rights reserved.
-   https://dot.net/
 
