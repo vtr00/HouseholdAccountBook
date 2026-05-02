@@ -48,9 +48,9 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.6" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Notification.Wpf" Version="8.0.0" />
     <PackageReference Include="CalcBinding" Version="2.5.2" />
@@ -59,10 +59,10 @@
     <PackageReference Include="DynamicExpresso.Core" Version="2.19.3" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.142" />
     <PackageReference Include="Npgsql" Version="10.0.2" />
-    <PackageReference Include="OxyPlot.Core" Version="2.1.0" />
-    <PackageReference Include="OxyPlot.Wpf" Version="2.1.0" />
+    <PackageReference Include="OxyPlot.Core" Version="2.2.0" />
+    <PackageReference Include="OxyPlot.Wpf" Version="2.2.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageReference Include="System.Data.OleDb" Version="10.0.6" />
+    <PackageReference Include="System.Data.OleDb" Version="10.0.7" />
   </ItemGroup>
   <ItemGroup>
     <AppDesigner Include="Properties\" />
