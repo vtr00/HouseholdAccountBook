@@ -4,6 +4,7 @@ using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views.Extensions;
@@ -264,7 +265,7 @@ namespace HouseholdAccountBook.Views.Windows
                     this.mCCW.BookChanged += (sender, e) => {
                         using FuncLog funcLog = new(methodName: nameof(this.mCCW.BookChanged));
 
-                        var selectedVM = this.WVM.BookSelectorVM.ItemList.FirstOrDefault(vm => vm.Id == e.NewValue);
+                        BookModel selectedVM = this.WVM.BookSelectorVM.ItemList.FirstOrDefault(vm => vm.Id == e.NewValue);
                         if (selectedVM != null) {
                             this.WVM.BookSelectorVM.SelectedItem = selectedVM;
                         }

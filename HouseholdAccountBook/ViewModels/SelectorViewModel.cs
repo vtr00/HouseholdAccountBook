@@ -18,15 +18,21 @@ using System.Windows.Controls;
 namespace HouseholdAccountBook.ViewModels
 {
     /// <summary>
-    /// <see cref="SelectorViewModel{VM, KEY}"/> で読み込み時に KEY を選択するモード
+    /// <see cref="SelectorViewModel{VM, KEY}"/> で KEY を選択するモード
     /// </summary>
     public enum SelectorMode
     {
-        // 一致する項目がなければデフォルト(KEYがクラスなら選択なし状態)を選択する
+        /// <summary>
+        /// 一致する項目がなければデフォルト(KEYがクラスなら選択なし状態)を選択する
+        /// </summary>
         FirstOrDefault,
-        // 一致する項目がなければ先頭の項目を選択する
+        /// <summary>
+        /// 一致する項目がなければ先頭の項目を選択する
+        /// </summary>
         FirstOrElementAtOrDefault,
-        // 一致する項目がなくとも選択する
+        /// <summary>
+        /// 一致する項目がなくとも選択する
+        /// </summary>
         Force
     }
 
@@ -46,10 +52,6 @@ namespace HouseholdAccountBook.ViewModels
         /// 処理中状態サービス
         /// </summary>
         private readonly BusyService? mBusyService;
-        /// <summary>
-        /// 選択 <see cref="VM"/> がNullの場合でも変更を通知するか
-        /// </summary>
-        private readonly bool mItemChangedIfNull;
 
         /// <summary>
         /// <see cref="VM"> リスト読込可能か
@@ -64,18 +66,18 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         private Func<FuncLog, CancellationToken, Task<IEnumerable<VM>>>? mLoadAsync;
         /// <summary>
-        /// 読み込み時の選択モード
+        /// <see cref="KEY"/> の選択モード
         /// </summary>
-        private SelectorMode mMode;
+        private SelectorMode mSelectorMode;
         /// <summary>
         /// 読込処理中か
         /// </summary>
         private bool mOnLoad = false;
 
         /// <summary>
-        /// 多重読込処理防止トークン源
+        /// 子要素多重読込処理防止トークン源
         /// </summary>
-        private CancellationTokenSource? mSelectionCts;
+        private CancellationTokenSource? mLoadChildrenCts;
 
         /// <summary>
         /// 出力元ファイル名
@@ -123,16 +125,16 @@ namespace HouseholdAccountBook.ViewModels
         public VM? SelectedItem {
             get => this.mSelectedItem;
             set {
-                KEY? old = this.mSelectedKey;
-                if (this.SetProperty(ref this.mSelectedItem, value)) {
+                KEY? oldKey = this.mSelectedKey;
+                if (this.SetProperty(ref this.mSelectedItem, value) || this.IsSelectionChangedEnabledIfEqual) {
                     this.mSelectedKey = this.mSelector(value);
 
                     // 読込処理中以外か
                     if (!this.mOnLoad) {
                         // NULLの場合に通知するか
-                        if (this.mSelectedKey != null || this.mItemChangedIfNull) {
+                        if (this.mSelectedKey != null || this.IsSelectionChangedEnabledIfNull) {
                             // 待機せず選択時の処理をする
-                            this.OnSelectionChangedAsync(old, this.mSelectedKey).FireAndForget();
+                            this.OnSelectionChangedAsync(oldKey, this.mSelectedKey).FireAndForget();
                         }
                     }
 
@@ -152,21 +154,22 @@ namespace HouseholdAccountBook.ViewModels
         public KEY? SelectedKey {
             get => this.mSelectedKey;
             set {
-                KEY? old = this.mSelectedKey;
-                if (this.SetProperty(ref this.mSelectedKey, value)) {
-                    // KEYの一致するVMが存在するならSelectedItemに設定する。なければdefaultにしてfieldに入力値を保持する
-                    this.mSelectedItem = this.ItemList.FirstOrDefault(vm => KeyEquals(this.mSelector(vm), value));
+                KEY? oldKey = this.mSelectedKey;
 
+                this.UpdateSelectedItemAndKey(this.mSelectorMode, value);
+
+                if (!KeyEquals(oldKey, this.mSelectedKey) || this.IsSelectionChangedEnabledIfEqual) {
                     // 読込処理中以外か
                     if (!this.mOnLoad) {
                         // NULLの場合に通知するか
-                        if (this.mSelectedKey != null || this.mItemChangedIfNull) {
+                        if (this.mSelectedKey != null || this.IsSelectionChangedEnabledIfNull) {
                             // 待機せず選択時の処理をする
-                            this.OnSelectionChangedAsync(old, this.mSelectedKey).FireAndForget();
+                            this.OnSelectionChangedAsync(oldKey, this.mSelectedKey).FireAndForget();
                         }
                     }
 
                     this.RaisePropertyChanged(nameof(this.SelectedItem));
+                    this.RaisePropertyChanged(nameof(this.SelectedKey));
                     this.RaisePropertyChanged(nameof(this.SelectedIndex));
                 }
             }
@@ -220,6 +223,15 @@ namespace HouseholdAccountBook.ViewModels
             get => this.SelectedItemList?.Select(vm => this.mSelector(vm)) ?? [];
             set => throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// 選択 <see cref="VM"/> がNullの場合でも変更として通知するか
+        /// </summary>
+        public bool IsSelectionChangedEnabledIfNull { get; set; }
+        /// <summary>
+        /// 選択 <see cref="VM"/> が同値の場合でも変更として通知するか
+        /// </summary>
+        public bool IsSelectionChangedEnabledIfEqual { get; set; }
         #endregion
 
         /// <summary>
@@ -230,14 +242,13 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="itemChangedIfNull">選択 <see cref="VM"/> がNullの場合でも変更を通知するか</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public SelectorViewModel(Func<VM?, KEY?> selector, BusyService? busyService = null, bool itemChangedIfNull = false,
+        public SelectorViewModel(Func<VM?, KEY?> selector, BusyService? busyService = null,
                                  [CallerFilePath] string? fileName = null, [CallerMemberName] string memberName = "")
         {
             using FuncLog funcLog = new(level: Log.LogLevel.Trace, fileName: fileName, methodName: memberName);
 
             this.mSelector = selector;
             this.mBusyService = busyService;
-            this.mItemChangedIfNull = itemChangedIfNull;
             this.mFileName = fileName;
             this.mMemberName = memberName;
 
@@ -266,8 +277,8 @@ namespace HouseholdAccountBook.ViewModels
 
         public void Dispose()
         {
-            this.mSelectionCts?.Cancel();
-            this.mSelectionCts?.Dispose();
+            this.mLoadChildrenCts?.Cancel();
+            this.mLoadChildrenCts?.Dispose();
             GC.SuppressFinalize(this);
         }
 
@@ -303,7 +314,7 @@ namespace HouseholdAccountBook.ViewModels
             this.mCanLoad = canLoad;
             this.mLoad = load;
             this.mLoadAsync = null;
-            this.mMode = mode;
+            this.mSelectorMode = mode;
         }
 
         /// <summary>
@@ -335,7 +346,7 @@ namespace HouseholdAccountBook.ViewModels
             this.mCanLoad = canLoad;
             this.mLoad = null;
             this.mLoadAsync = loadAsync;
-            this.mMode = mode;
+            this.mSelectorMode = mode;
         }
         #endregion
 
@@ -414,32 +425,24 @@ namespace HouseholdAccountBook.ViewModels
 
                 // 先頭の一つを選択する
                 KEY? tmpSelection = selections != null ? selections.FirstOrDefault() : oldKey;
-                switch (this.mMode) {
-                    case SelectorMode.FirstOrElementAtOrDefault:
-                        this.SelectedItem = this.ItemList.FirstOrElementAtOrDefault(vm => KeyEquals(this.mSelector(vm), tmpSelection), 0);
-                        break;
-                    case SelectorMode.FirstOrDefault:
-                        this.SelectedItem = this.ItemList.FirstOrDefault(vm => KeyEquals(this.mSelector(vm), tmpSelection));
-                        break;
-                    case SelectorMode.Force:
-                        this.SelectedKey = tmpSelection;
-                        break;
-                    default:
-                        throw new NotSupportedException();
-                }
+                this.UpdateSelectedItemAndKey(this.mSelectorMode, tmpSelection);
                 // 全部を選択する
                 IList<KEY?> newKeys = [.. selections ?? oldKeys];
                 this.SelectedItemList = [.. this.ItemList.Where(vm => newKeys.Contains(this.mSelector(vm), mComparer))];
 
-                if (!KeyEquals(this.SelectedKey, oldKey)) {
+                if (!KeyEquals(this.SelectedKey, oldKey) || this.IsSelectionChangedEnabledIfEqual) {
                     // NULLの場合に通知するか
-                    if (this.SelectedItem != null || this.mItemChangedIfNull) {
+                    if (this.SelectedItem != null || this.IsSelectionChangedEnabledIfNull) {
                         // 子の読込処理を待機するためにここで呼ぶ
                         await this.OnSelectionChangedAsync(oldKey, this.SelectedKey, token);
                     }
                     else {
                         Log.Debug($"{nameof(this.SelectedItem)} is null");
                     }
+
+                    this.RaisePropertyChanged(nameof(this.SelectedItem));
+                    this.RaisePropertyChanged(nameof(this.SelectedKey));
+                    this.RaisePropertyChanged(nameof(this.SelectedIndex));
                 }
             }
             catch (OperationCanceledException) {
@@ -477,10 +480,10 @@ namespace HouseholdAccountBook.ViewModels
             if (this.Children.Count != 0) {
                 CancellationToken tmpToken = token;
                 if (tmpToken == default) {
-                    this.mSelectionCts?.Cancel();
-                    this.mSelectionCts?.Dispose();
-                    this.mSelectionCts = new();
-                    tmpToken = this.mSelectionCts.Token;
+                    this.mLoadChildrenCts?.Cancel();
+                    this.mLoadChildrenCts?.Dispose();
+                    this.mLoadChildrenCts = new();
+                    tmpToken = this.mLoadChildrenCts.Token;
                 }
 
                 try {
@@ -500,16 +503,43 @@ namespace HouseholdAccountBook.ViewModels
                 }
             }
         }
+
+        /// <summary>
+        /// 指定された <see cref="SelectorMode"/> に応じて、<see cref="SelectedItem"/> と <see cref="SelectedKey"/> を更新する
+        /// </summary>
+        /// <param name="mode">KEYを選択するモード</param>
+        /// <param name="newKey">選択候補のKEY</param>
+        private void UpdateSelectedItemAndKey(SelectorMode mode, KEY? newKey)
+        {
+            switch (mode) {
+                case SelectorMode.FirstOrElementAtOrDefault:
+                    // KEYの一致するVMが存在するならSelectedItemに設定する。なければ1番目の要素をSelectedItemに設定する。なければdefaultを設定する
+                    this.mSelectedItem = this.ItemList.FirstOrElementAtOrDefault(vm => KeyEquals(this.mSelector(vm), newKey), 0);
+                    this.mSelectedKey = this.mSelector(this.mSelectedItem);
+                    break;
+                case SelectorMode.FirstOrDefault:
+                    // KEYの一致するVMが存在するならSelectedItemに設定する。なければdefaultを設定する
+                    this.mSelectedItem = this.ItemList.FirstOrDefault(vm => KeyEquals(this.mSelector(vm), newKey));
+                    this.mSelectedKey = this.mSelector(this.mSelectedItem);
+                    break;
+                case SelectorMode.Force:
+                    // KEYの一致するVMが存在するならSelectedItemに設定し、なければdefaultを設定する。SelectedKeyはItemの有無に依らず値を保持する
+                    this.mSelectedItem = this.ItemList.FirstOrDefault(vm => KeyEquals(this.mSelector(vm), newKey));
+                    this.mSelectedKey = newKey;
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
     }
 
     /// <summary>
     /// VMリストとその選択VM(リスト)を保持するVM
     /// </summary>
     /// <param name="busyService">処理中状態サービス</param>
-    /// <param name="itemChangedIfNull">選択 <see cref="VM"/> がNullの場合でも変更を通知するか</param>
     /// <param name="fileName">出力元ファイル名</param>
     /// <param name="memberName">出力元関数名</param>
-    public class SelectorViewModel<VM>(BusyService? busyService = null, bool itemChangedIfNull = false, [CallerFilePath] string? fileName = null, [CallerMemberName] string memberName = "") :
-        SelectorViewModel<VM, VM>(static vm => vm, busyService, itemChangedIfNull, fileName, memberName)
+    public class SelectorViewModel<VM>(BusyService? busyService = null, [CallerFilePath] string? fileName = null, [CallerMemberName] string memberName = "") :
+        SelectorViewModel<VM, VM>(static vm => vm, busyService, fileName, memberName)
     { }
 }
