@@ -86,23 +86,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿セレクタVM
         /// </summary>
         public SelectorViewModel<BookModel, BookIdObj> BookSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
-        /// <summary>
-        /// 選択された帳簿ID
-        /// </summary>
-        public BookIdObj SelectedBookId {
-            get => this.BookSelectorVM.SelectedKey;
-            set {
-                BookIdObj oldValue = this.BookSelectorVM.SelectedKey;
-                // 現在の選択と異なる場合
-                if (oldValue != value) {
-                    this.BookSelectorVM.SelectedKey = value;
-                    // 当てはまる帳簿がなく現在の選択と同じになった場合に変更イベントを発行する
-                    if (oldValue == this.BookSelectorVM.SelectedKey) {
-                        this.BookChanged?.Invoke(this, new ChangedEventArgs<BookIdObj>() { OldValue = oldValue, NewValue = this.BookSelectorVM.SelectedKey });
-                    }
-                }
-            }
-        }
 
         /// <summary>
         /// CSV比較セレクタVM
@@ -453,6 +436,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.mService = new(this.mDbHandlerFactory);
 
             this.BookSelectorVM.SetLoader(async () => await this.mService.UpdateBookCompListAsync());
+            this.BookSelectorVM.IsSelectionChangedEnabledIfEqual = true;
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null);
@@ -468,6 +452,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using IDisposable disposable = this.mBusyService.Enter();
 
             await this.BookSelectorVM.LoadAsync(initialBookId);
+            // 初回のウィンドウのオープン時に選択された帳簿を通知する
+            this.BookChanged?.Invoke(this, new() { OldValue = null, NewValue = this.BookSelectorVM.SelectedKey });
         }
 
         public override void AddEventHandlers()
@@ -518,6 +504,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new(new { csvFilePathList });
 
             if (this.BookSelectorVM.SelectedKey == null) {
+                return;
+            }
+            if (!csvFilePathList.Any()) {
                 return;
             }
 

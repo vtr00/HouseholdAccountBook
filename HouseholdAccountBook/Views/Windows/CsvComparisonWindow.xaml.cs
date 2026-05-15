@@ -188,7 +188,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             using FuncLog funcLog = new(new { bookId });
 
-            this.WVM.SelectedBookId = bookId;
+            this.WVM.BookSelectorVM.SelectedKey = bookId;
         }
     }
 }
