@@ -78,12 +78,11 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         public Configuration Config {
             get;
             set {
-                field = value;
                 if (field != null) {
                     field.OutputLogLevel = Log.LogLevel.Info;
-                    Log.Info($"Set OutputLogLevel to {value.OutputLogLevel}");
-                    field.OutputLogLevel = value.OutputLogLevel;
+                    Log.Info($"Set {nameof(value.OutputLogLevel)} to {value.OutputLogLevel}");
                 }
+                field = value;
             }
         } = new();
         #endregion

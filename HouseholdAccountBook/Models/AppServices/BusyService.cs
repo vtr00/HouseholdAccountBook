@@ -40,12 +40,12 @@ namespace HouseholdAccountBook.Models.AppServices
         public IDisposable Enter()
         {
             _ = Interlocked.Increment(ref this.mCount);
-            Log.Debug($"count:{this.mCount}");
+            Log.Debug($"Increment to count:{this.mCount}");
             this.OnPropertyChanged(nameof(this.IsBusy));
 
             return new ActionOnDispose(() => {
                 _ = Interlocked.Decrement(ref this.mCount);
-                Log.Debug($"count:{this.mCount}");
+                Log.Debug($"Decrement to count:{this.mCount}");
                 this.OnPropertyChanged(nameof(this.IsBusy));
             });
         }
