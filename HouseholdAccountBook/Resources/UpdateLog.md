@@ -9,6 +9,10 @@
 - 全体
    - △ログ出力時の文字列化対象がstatic propertyの場合は対象から除外するように変更した - refs #161
    - ↑読込済のSelectorViewModelを再読込したときに選択状態がクリアされてしまうのを修正した - refs #162
+   - ↑DBからの読込等のときにカーソルが変化しないのを修正した - refs #164
+
+- ActionListRegistrationWindow, ActionRegistrationWindow
+   - ↑帳簿を変更したときに項目リストが更新されないのを修正した - refs #166
 
 ### 2026-05-16
 

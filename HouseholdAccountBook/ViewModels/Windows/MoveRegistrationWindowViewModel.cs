@@ -339,10 +339,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             this.FromBookSelectorVM.SelectionChanged += (sender, e) => this.FromBookChanged?.Invoke(sender, e);
             this.FromBookSelectorVM.Children.Add(this.ItemSelectorVM);
+
             this.ToBookSelectorVM.SelectionChanged += (sender, e) => this.ToBookChanged?.Invoke(sender, e);
             this.ToBookSelectorVM.Children.Add(this.ItemSelectorVM);
+
             this.CommissionKindSelectorVM.SelectionChanged += (sender, e) => this.CommissionKindChanged?.Invoke(sender, e);
             this.CommissionKindSelectorVM.Children.Add(this.ItemSelectorVM);
+
             this.ItemSelectorVM.SelectionChanged += (sender, e) => this.ItemChanged?.Invoke(sender, e);
             this.ItemSelectorVM.Children.Add(this.RemarkSelectorVM);
         }

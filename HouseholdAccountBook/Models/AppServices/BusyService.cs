@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.Infrastructure.Logger;
+using System;
 using System.ComponentModel;
 using System.Threading;
 
@@ -39,9 +40,12 @@ namespace HouseholdAccountBook.Models.AppServices
         public IDisposable Enter()
         {
             _ = Interlocked.Increment(ref this.mCount);
+            Log.Debug($"count:{this.mCount}");
             this.OnPropertyChanged(nameof(this.IsBusy));
+
             return new ActionOnDispose(() => {
                 _ = Interlocked.Decrement(ref this.mCount);
+                Log.Debug($"count:{this.mCount}");
                 this.OnPropertyChanged(nameof(this.IsBusy));
             });
         }
