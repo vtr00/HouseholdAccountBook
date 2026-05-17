@@ -8,7 +8,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
     /// <summary>
     /// WindowViewModelの基底クラス
     /// </summary>
-    public abstract class WindowViewModelBase : WindowPartViewModelBase
+    public abstract class WindowViewModelBase() : WindowPartViewModelBase(new())
     {
         #region プロパティ
         /// <summary>
@@ -45,17 +45,5 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// </summary>
         protected virtual (double width, double height) WindowSizeSettingRaw { get; set; }
         #endregion
-
-        /// <summary>
-        /// ViewModelの初期化を行う
-        /// </summary>
-        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <remarks>
-        /// <see cref="FrameworkElement">のコンストラクタで呼び出す.
-        /// <see cref="BusyService"/>のインスタンスを生成する.
-        /// </remarks>
-        public virtual void Initialize(DbHandlerFactory dbHandlerFactory) => base.Initialize(new(), dbHandlerFactory);
-
-        public override void Initialize(BusyService busyService, DbHandlerFactory dbHandlerFactory) => throw new InvalidOperationException();
     }
 }

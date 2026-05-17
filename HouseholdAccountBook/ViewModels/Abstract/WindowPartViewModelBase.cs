@@ -13,7 +13,8 @@ namespace HouseholdAccountBook.ViewModels.Abstract
     /// <summary>
     /// ウィンドウ内の一部を構成するViewModelの基底クラス
     /// </summary>
-    public abstract class WindowPartViewModelBase : BindableBase, IProgressDialogRequestable
+    /// <param name="busyService">処理中状態サービス</param>
+    public abstract class WindowPartViewModelBase(BusyService busyService) : BindableBase, IProgressDialogRequestable
     {
         #region フィールド
         /// <summary>
@@ -24,7 +25,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// 処理中状態サービス
         /// </summary>
-        protected BusyService mBusyService;
+        protected readonly BusyService mBusyService = busyService;
         /// <summary>
         /// DBハンドラファクトリ
         /// </summary>
@@ -109,18 +110,16 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <summary>
         /// ViewModelの初期化を行う
         /// </summary>
-        /// <param name="busyService">処理中状態サービス</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <remarks><see cref="FrameworkElement">のコンストラクタで呼び出す</remarks>
-        public virtual void Initialize(BusyService busyService, DbHandlerFactory dbHandlerFactory)
+        public virtual void Initialize(DbHandlerFactory dbHandlerFactory)
         {
             using FuncLog funcLog = new();
 
-            this.mBusyService = busyService;
             this.mDbHandlerFactory = dbHandlerFactory;
 
             foreach (WindowPartViewModelBase childVM in this.mChildrenVM) {
-                childVM.Initialize(this.mBusyService, this.mDbHandlerFactory);
+                childVM.Initialize(this.mDbHandlerFactory);
             }
 
             this.Initialized = true;

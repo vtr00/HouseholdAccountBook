@@ -377,9 +377,20 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
         #endregion
 
-        public override void Initialize(BusyService busyService, DbHandlerFactory dbHandlerFactory)
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="busyService">処理中状態サービス</param>
+        public SettingsWindowItemTabViewModel(BusyService busyService) : base(busyService)
         {
-            base.Initialize(busyService, dbHandlerFactory);
+            using FuncLog funcLog = new();
+        }
+
+        public override void Initialize(DbHandlerFactory dbHandlerFactory)
+        {
+            using FuncLog funcLog = new();
+
+            base.Initialize(dbHandlerFactory);
 
             this.mSettingService = new(this.mDbHandlerFactory);
         }

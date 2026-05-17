@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Infrastructure.CSV;
+using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Models.AppServices;
@@ -196,9 +197,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public SettingsWindowOtherTabViewModel()
+        public SettingsWindowOtherTabViewModel(BusyService busyService) : base(busyService)
         {
             using FuncLog funcLog = new();
+        }
+
+        public override void Initialize(DbHandlerFactory dbHandlerFactory)
+        {
+            using FuncLog funcLog = new();
+
+            base.Initialize(dbHandlerFactory);
 
             this.CultureNameSelectorVM.SetLoader(static () => UiConstants.CultureNameStr);
             this.NationalHolidayTextEncodingSelectorVM.SetLoader(static () => EncodingUtil.GetTextEncodingList());
