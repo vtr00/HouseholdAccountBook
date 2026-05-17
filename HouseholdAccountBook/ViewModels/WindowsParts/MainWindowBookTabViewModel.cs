@@ -100,7 +100,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 表示対象の帳簿項目VMリスト
         /// </summary>
-        public ICollectionView FilteredActionVMList { get; init; }
+        public ICollectionView FilteredActionVMList => field ??= CollectionViewSource.GetDefaultView(this.ActionSelectorVM.ItemList);
 
         /// <summary>
         /// CSVと一致したか
@@ -550,20 +550,18 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         /// <param name="parent">親VM</param>
         /// <param name="tab">タブ</param>
-        public MainWindowBookTabViewModel(MainWindowViewModel parent, Tabs tab)
+        /// <param name="busyService">処理中状態サービス</param>
+        public MainWindowBookTabViewModel(MainWindowViewModel parent, Tabs tab, BusyService busyService) : base(busyService)
         {
             using FuncLog funcLog = new(new { tab });
 
             this.Parent = parent;
             this.Tab = tab;
-
-            this.FilteredActionVMList = CollectionViewSource.GetDefaultView(this.ActionSelectorVM.ItemList);
-            this.FilteredActionVMList.Filter = this.ActionVMListFilter;
         }
 
-        public override void Initialize(BusyService busyService, DbHandlerFactory dbHandlerFactory)
+        public override void Initialize(DbHandlerFactory dbHandlerFactory)
         {
-            base.Initialize(busyService, dbHandlerFactory);
+            base.Initialize(dbHandlerFactory);
 
             this.mAppService = new(this.mDbHandlerFactory);
             this.mMainService = new(this.mDbHandlerFactory);
@@ -578,6 +576,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 PeriodKind.Selected => await this.mMainService.LoadSummaryListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedPeriod),
                 _ => null
             }, mode: SelectorMode.FirstOrDefault);
+
+            this.FilteredActionVMList.Filter = this.ActionVMListFilter;
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null, null, false, false);

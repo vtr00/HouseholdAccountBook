@@ -222,6 +222,15 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
 
         /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="busyService">処理中状態サービス</param>
+        public SettingsWindowDbTabViewModel(BusyService busyService) : base(busyService)
+        {
+            using FuncLog funcLog = new();
+        }
+
+        /// <summary>
         /// DB設定を読み込む
         /// </summary>
         public override async Task LoadAsync()

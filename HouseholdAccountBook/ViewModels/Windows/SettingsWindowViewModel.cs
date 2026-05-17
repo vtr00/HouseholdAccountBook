@@ -56,22 +56,22 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿設定タブVM
         /// </summary>
-        public SettingsWindowBookTabViewModel BookTabVM => field ??= new();
+        public SettingsWindowBookTabViewModel BookTabVM => field ??= new(this.mBusyService);
 
         /// <summary>
         /// 項目設定タブVM
         /// </summary>
-        public SettingsWindowItemTabViewModel ItemTabVM => field ??= new();
+        public SettingsWindowItemTabViewModel ItemTabVM => field ??= new(this.mBusyService);
 
         /// <summary>
         /// DB設定タブVM
         /// </summary>
-        public SettingsWindowDbTabViewModel DbTabVM => field ??= new();
+        public SettingsWindowDbTabViewModel DbTabVM => field ??= new(this.mBusyService);
 
         /// <summary>
         /// その他設定タブVM
         /// </summary>
-        public SettingsWindowOtherTabViewModel OtherTabVM => field ??= new();
+        public SettingsWindowOtherTabViewModel OtherTabVM => field ??= new(this.mBusyService);
         #endregion
 
         #region ウィンドウ設定プロパティ

@@ -462,27 +462,27 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿タブVM
         /// </summary>
-        public MainWindowBookTabViewModel BookTabVM => field ??= new(this, Tabs.BooksTab);
+        public MainWindowBookTabViewModel BookTabVM => field ??= new(this, Tabs.BooksTab, this.mBusyService);
         /// <summary>
         /// 日別グラフタブVM
         /// </summary>
-        public MainWindowGraphTabViewModel DailyGraphTabVM => field ??= new(this, Tabs.DailyGraphTab);
+        public MainWindowGraphTabViewModel DailyGraphTabVM => field ??= new(this, Tabs.DailyGraphTab, this.mBusyService);
         /// <summary>
         /// 月別一覧タブVM
         /// </summary>
-        public MainWindowListTabViewModel MonthlySummaryTabVM => field ??= new(this, Tabs.MonthlyListTab);
+        public MainWindowListTabViewModel MonthlySummaryTabVM => field ??= new(this, Tabs.MonthlyListTab, this.mBusyService);
         /// <summary>
         /// 月別グラフタブVM
         /// </summary>
-        public MainWindowGraphTabViewModel MonthlyGraphTabVM => field ??= new(this, Tabs.MonthlyGraphTab);
+        public MainWindowGraphTabViewModel MonthlyGraphTabVM => field ??= new(this, Tabs.MonthlyGraphTab, this.mBusyService);
         /// <summary>
         /// 年別一覧タブVM
         /// </summary>
-        public MainWindowListTabViewModel YearlySummaryTabVM => field ??= new(this, Tabs.YearlyListTab);
+        public MainWindowListTabViewModel YearlySummaryTabVM => field ??= new(this, Tabs.YearlyListTab, this.mBusyService);
         /// <summary>
         /// 年別グラフタブVM
         /// </summary>
-        public MainWindowGraphTabViewModel YearlyGraphTabVM => field ??= new(this, Tabs.YearlyGraphTab);
+        public MainWindowGraphTabViewModel YearlyGraphTabVM => field ??= new(this, Tabs.YearlyGraphTab, this.mBusyService);
         #endregion
         #endregion
 

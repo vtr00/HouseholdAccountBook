@@ -46,7 +46,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         /// <param name="parent">親VM</param>
         /// <param name="tab">タブ</param>
-        public MainWindowListTabViewModel(MainWindowViewModel parent, Tabs tab)
+        /// <param name="busyService">処理中状態サービス</param>
+        public MainWindowListTabViewModel(MainWindowViewModel parent, Tabs tab, BusyService busyService) : base(busyService)
         {
             using FuncLog funcLog = new(new { tab });
 
@@ -54,9 +55,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.Tab = tab;
         }
 
-        public override void Initialize(BusyService busyService, DbHandlerFactory dbHandlerFactory)
+        public override void Initialize(DbHandlerFactory dbHandlerFactory)
         {
-            base.Initialize(busyService, dbHandlerFactory);
+            base.Initialize(dbHandlerFactory);
 
             this.SeriesSelectorVM.SetLoader(async _ => {
                 SeriesViewModelLoader loader = new(new(this.mDbHandlerFactory));
