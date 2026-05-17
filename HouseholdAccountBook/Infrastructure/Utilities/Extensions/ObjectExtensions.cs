@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Models.ValueObjects;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -56,7 +57,12 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
                     return $"({tmp})";
                 }
                 default: {
-                    PropertyInfo[] propInfos = obj.GetType().GetProperties(); // クラスが保持しているプロパティの情報を取得
+                    List<PropertyInfo> propInfos = [.. obj.GetType().GetProperties()]; // クラスが保持しているプロパティの情報を取得
+                    // static properties を除く
+                    _ = propInfos.RemoveAll(propInfo => {
+                        MethodInfo? accessor = propInfo.GetMethod ?? propInfo.SetMethod;
+                        return accessor?.IsStatic ?? false;
+                    });
                     string tmp = string.Join(", ", propInfos.Select(propInfo => {
                         IgnoreToStringAttribute? attr = propInfo.GetCustomAttribute<IgnoreToStringAttribute>(); // この属性が付与されているプロパティは出力しない
                         return attr != null ? $"{propInfo.Name}:{attr.Alternative}" : $"{propInfo.Name}:{propInfo.GetValue(obj)?.ToString2(depth) ?? "null"}";
