@@ -288,7 +288,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             this.BookSelectorVM.SelectionChanged += (sender, e) => this.BookChanged?.Invoke(sender, e);
-            this.BookSelectorVM.Children.Add(this.CategorySelectorVM);
+            this.BookSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
 
             this.BalanceKindSelectorVM.SelectionChanged += (sender, e) => this.BalanceKindChanged?.Invoke(sender, e);
             this.BalanceKindSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);

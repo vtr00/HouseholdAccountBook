@@ -1,6 +1,4 @@
-﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
-using HouseholdAccountBook.Models.AppServices;
-using System;
+﻿using HouseholdAccountBook.Models.AppServices;
 using System.Windows;
 
 namespace HouseholdAccountBook.ViewModels.Abstract
