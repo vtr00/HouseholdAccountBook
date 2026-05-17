@@ -126,9 +126,10 @@ namespace HouseholdAccountBook.ViewModels
             get => this.mSelectedItem;
             set {
                 KEY? oldKey = this.mSelectedKey;
-                if (this.SetProperty(ref this.mSelectedItem, value) || this.IsSelectionChangedEnabledIfEqual) {
-                    this.mSelectedKey = this.mSelector(value);
 
+                this.UpdateSelectedItemAndKey(this.mSelectorMode, this.mSelector(value));
+
+                if (!KeyEquals(oldKey, this.SelectedKey) || this.IsSelectionChangedEnabledIfEqual) {
                     // 読込処理中以外か
                     if (!this.mOnLoad) {
                         // NULLの場合に通知するか
@@ -137,9 +138,6 @@ namespace HouseholdAccountBook.ViewModels
                             this.OnSelectionChangedAsync(oldKey, this.mSelectedKey).FireAndForget();
                         }
                     }
-
-                    this.RaisePropertyChanged(nameof(this.SelectedKey));
-                    this.RaisePropertyChanged(nameof(this.SelectedIndex));
                 }
             }
         }
@@ -167,10 +165,6 @@ namespace HouseholdAccountBook.ViewModels
                             this.OnSelectionChangedAsync(oldKey, this.mSelectedKey).FireAndForget();
                         }
                     }
-
-                    this.RaisePropertyChanged(nameof(this.SelectedItem));
-                    this.RaisePropertyChanged(nameof(this.SelectedKey));
-                    this.RaisePropertyChanged(nameof(this.SelectedIndex));
                 }
             }
         }
@@ -239,7 +233,6 @@ namespace HouseholdAccountBook.ViewModels
         /// </summary>
         /// <param name="selector"><see cref="VM"/> から <see cref="KEY"/> への変換処理</param>
         /// <param name="busyService">処理中状態サービス</param>
-        /// <param name="itemChangedIfNull">選択 <see cref="VM"/> がNullの場合でも変更を通知するか</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
         public SelectorViewModel(Func<VM?, KEY?> selector, BusyService? busyService = null,
@@ -439,10 +432,6 @@ namespace HouseholdAccountBook.ViewModels
                     else {
                         Log.Debug($"{nameof(this.SelectedItem)} is null");
                     }
-
-                    this.RaisePropertyChanged(nameof(this.SelectedItem));
-                    this.RaisePropertyChanged(nameof(this.SelectedKey));
-                    this.RaisePropertyChanged(nameof(this.SelectedIndex));
                 }
             }
             catch (OperationCanceledException) {
@@ -530,6 +519,10 @@ namespace HouseholdAccountBook.ViewModels
                 default:
                     throw new NotSupportedException();
             }
+
+            this.RaisePropertyChanged(nameof(this.SelectedItem));
+            this.RaisePropertyChanged(nameof(this.SelectedKey));
+            this.RaisePropertyChanged(nameof(this.SelectedIndex));
         }
     }
 
