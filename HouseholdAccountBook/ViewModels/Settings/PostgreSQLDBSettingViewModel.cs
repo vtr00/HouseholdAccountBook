@@ -4,7 +4,6 @@ using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.DbHandlers;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
-using System.IO;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {
