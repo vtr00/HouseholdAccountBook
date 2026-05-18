@@ -4,13 +4,18 @@
 
 ## 2026
 
+### 2026-05-19
+
+- SettingWindow
+   - ↑PostgreSQLの設定がない状態で設定ウィンドウのDB設定タブを開くと例外が発生するのを修正した - refs #170
+
 ### 2026-05-17
 
 - 全体
    - △ログ出力時の文字列化対象がstatic propertyの場合は対象から除外するように変更した - refs #161
    - ↑読込済のSelectorViewModelを再読込したときに選択状態がクリアされてしまうのを修正した - refs #162
    - ↑DBからの読込等のときにカーソルが変化しないのを修正した - refs #164
-   - ↑ログ出力レベルが設定に依らずInfoになるのを修正した - refs #169 
+   - ↑ログ出力レベルが設定に依らずInfoになるのを修正した - refs #169
 
 - ActionListRegistrationWindow, ActionRegistrationWindow
    - ↑帳簿を変更したときに項目リストが更新されないのを修正した - refs #166

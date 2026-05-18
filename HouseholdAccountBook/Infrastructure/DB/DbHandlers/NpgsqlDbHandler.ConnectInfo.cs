@@ -1,10 +1,8 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
-using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Attributes;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
-using System;
 
 namespace HouseholdAccountBook.Models.DbHandlers
 {
@@ -31,14 +29,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
             /// <summary>
             /// ユーザー名
             /// </summary>
-            public string UserName {
-                get;
-                set {
-                    if (!SetValidIdentifier(ref field, value)) {
-                        throw new ArgumentException($"Invalid UserName: {value}", nameof(this.UserName));
-                    }
-                }
-            }
+            public string UserName { get; set; }
             /// <summary>
             /// パスワード
             /// </summary>
@@ -51,25 +42,11 @@ namespace HouseholdAccountBook.Models.DbHandlers
             /// <summary>
             /// データベース名
             /// </summary>
-            public string DatabaseName {
-                get;
-                set {
-                    if (!SetValidIdentifier(ref field, value)) {
-                        throw new ArgumentException($"Invalid DatabaseName: {value}", nameof(this.DatabaseName));
-                    }
-                }
-            }
+            public string DatabaseName { get; set; }
             /// <summary>
             /// ロール名
             /// </summary>
-            public string Role {
-                get;
-                set {
-                    if (!SetValidIdentifier(ref field, value)) {
-                        throw new ArgumentException($"Invalid Role: {value}", nameof(this.Role));
-                    }
-                }
-            }
+            public string Role { get; set; }
 
             /// <summary>
             /// 暗号化済パスワード
@@ -78,21 +55,19 @@ namespace HouseholdAccountBook.Models.DbHandlers
             public string EncryptedPassword { get; set; }
 
             /// <summary>
-            /// 適切な識別子かどうかを検証して、フィールドに設定する
+            /// パラメータが妥当か検証する
             /// </summary>
-            /// <param name="field">設定対象のフィールド</param>
-            /// <param name="str">設定値</param>
-            /// <returns>適切か</returns>
-            public static bool SetValidIdentifier(ref string field, string str)
+            /// <returns></returns>
+            public bool CheckValidation()
             {
-                using FuncLog funcLog = new(new { str }, Log.LogLevel.Trace);
+                bool ret = true;
+                ret = ret && (this.Host?.IsValidDBIdentifier() ?? false);
+                ret = ret && (this.Port is >= 0 and <= 65535);
+                ret = ret && (this.UserName?.IsValidDBIdentifier() ?? false);
+                ret = ret && (this.DatabaseName?.IsValidDBIdentifier() ?? false);
+                ret = ret && (this.Role?.IsValidDBIdentifier() ?? false);
 
-                if (!str.IsValidDBIdentifier()) {
-                    return false;
-                }
-
-                field = str;
-                return true;
+                return ret;
             }
         }
     }

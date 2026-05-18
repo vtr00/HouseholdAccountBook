@@ -30,6 +30,21 @@ namespace HouseholdAccountBook.Models.DbHandlers
             /// パスワード入力方法
             /// </summary>
             public PostgresPasswordInput PasswordInput { get; set; }
+
+            /// <summary>
+            /// パラメータが妥当か検証する
+            /// </summary>
+            /// <returns></returns>
+            public bool CheckValidation()
+            {
+                bool ret = true;
+                ret = ret && !string.IsNullOrWhiteSpace(this.DumpExePath);
+                ret = ret && File.Exists(this.DumpExePath);
+                ret = ret && !string.IsNullOrWhiteSpace(this.RestoreExePath);
+                ret = ret && File.Exists(this.RestoreExePath);
+
+                return ret;
+            }
         }
 
         #region フィールド
