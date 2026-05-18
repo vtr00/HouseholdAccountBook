@@ -108,13 +108,13 @@ namespace HouseholdAccountBook.ViewModels.Settings
         }
 
         /// <summary>
-        /// 設定を保存する
+        /// 接続情報の入力値を得る
         /// </summary>
         /// <param name="getPassword">パスワードを取得するデリゲート</param>
-        /// <returns>設定の保存成否</returns>
-        public bool Save(Func<string> getPassword)
+        /// <returns>接続情報</returns>
+        private NpgsqlDbHandler.ConnectInfo GetConnectInfo(Func<string> getPassword)
         {
-            UserSettingService.Instance.NpgsqlConnectInfo = new() {
+            return new() {
                 Host = this.InputedHost,
                 Port = this.InputedPort.Value,
                 UserName = this.InputedUserName,
@@ -122,12 +122,39 @@ namespace HouseholdAccountBook.ViewModels.Settings
                 DatabaseName = this.InputedDatabaseName,
                 Role = this.InputedRole
             };
+        }
 
-            UserSettingService.Instance.PostgreSQLBackupConfig = new() {
+        /// <summary>
+        /// バックアップ設定の入力値を得る
+        /// </summary>
+        /// <returns>バックアップ設定</returns>
+        private NpgsqlDbHandler.BackupConfiguration GetBackupConfiguration()
+        {
+            return new() {
                 DumpExePath = this.InputedDumpExePath,
                 RestoreExePath = this.InputedRestoreExePath,
                 PasswordInput = this.SelectedPasswordInput
             };
+        }
+
+        /// <summary>
+        /// 設定を保存する
+        /// </summary>
+        /// <param name="getPassword">パスワードを取得するデリゲート</param>
+        /// <returns>設定の保存成否</returns>
+        public bool Save(Func<string> getPassword)
+        {
+            NpgsqlDbHandler.ConnectInfo connInfo = this.GetConnectInfo(getPassword);
+            if (!connInfo.CheckValidation()) {
+                return false;
+            }
+            NpgsqlDbHandler.BackupConfiguration config = this.GetBackupConfiguration();
+            if (!config.CheckValidation()) {
+                return false;
+            }
+
+            UserSettingService.Instance.NpgsqlConnectInfo = connInfo;
+            UserSettingService.Instance.PostgreSQLBackupConfig = config;
 
             return true;
         }
@@ -137,12 +164,6 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// </summary>
         /// <param name="getPassword">パスワードを取得するデリゲート</param>
         /// <returns>設定の保存可否</returns>
-        public bool CanSave(Func<string> getPassword) => !(
-            string.IsNullOrWhiteSpace(this.InputedHost) || !this.InputedPort.HasValue || this.InputedPort < 1 || this.InputedPort > 65535
-            || string.IsNullOrWhiteSpace(this.InputedUserName) || string.IsNullOrWhiteSpace(getPassword?.Invoke())
-            || string.IsNullOrWhiteSpace(this.InputedDatabaseName)
-            || string.IsNullOrWhiteSpace(this.InputedDumpExePath) || !File.Exists(this.InputedDumpExePath)
-            || string.IsNullOrWhiteSpace(this.InputedRestoreExePath) || !File.Exists(this.InputedRestoreExePath)
-            );
+        public bool CanSave(Func<string> getPassword) => this.InputedPort.HasValue && this.GetConnectInfo(getPassword).CheckValidation() && this.GetBackupConfiguration().CheckValidation();
     }
 }
