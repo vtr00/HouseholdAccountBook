@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:HouseholdAccountBook.ViewModels"
         xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
+        xmlns:models="clr-namespace:HouseholdAccountBook.Models"
         xmlns:vmw="clr-namespace:HouseholdAccountBook.ViewModels.Windows"
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Views.Behaviors"
         xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
@@ -925,9 +926,9 @@
                             <Button Width="120">
                                 <Button.Content>
                                     <TextBlock>
-                                        <TextBlock Text="{Binding DisplayedStart, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                        <TextBlock Text="{Binding DisplayedStart, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}, ConverterParameter={x:Static models:UnitType.Pre}}"/>
                                         <TextBlock Text=" - "/>
-                                        <TextBlock Text="{Binding DisplayedEnd, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}}"/>
+                                        <TextBlock Text="{Binding DisplayedEnd, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}, ConverterParameter={x:Static models:UnitType.Post}}"/>
                                     </TextBlock>
                                 </Button.Content>
                             </Button>
@@ -1020,9 +1021,9 @@
                             <Button Width="120">
                                 <Button.Content>
                                     <TextBlock>
-                                        <TextBlock Text="{Binding DisplayedStart, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                        <TextBlock Text="{Binding DisplayedStart, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}, ConverterParameter={x:Static models:UnitType.Pre}}"/>
                                         <TextBlock Text=" - "/>
-                                        <TextBlock Text="{Binding DisplayedEnd, Converter={StaticResource DateTimeToDisplayedYearConverter}}"/>
+                                        <TextBlock Text="{Binding DisplayedEnd, Converter={StaticResource DateTimeToDisplayedFiscalYearConverter}, ConverterParameter={x:Static models:UnitType.Post}}"/>
                                     </TextBlock>
                                 </Button.Content>
                             </Button>

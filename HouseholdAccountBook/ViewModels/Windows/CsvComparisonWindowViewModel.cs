@@ -206,7 +206,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     tmpCsvFilePathList.Add(dstFilePath);
                 }
                 catch (Exception exp) {
-                    _ = MessageBox.Show($"{Properties.Resources.Message_FoultToMoveCsv}({exp.Message})", Properties.Resources.Title_Conformation);
+                    _ = MessageBox.Show($"{Properties.Resources.Message_FailedToMoveCsv}({exp.Message})", Properties.Resources.Title_Conformation);
                 }
             }
 

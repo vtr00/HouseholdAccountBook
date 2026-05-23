@@ -269,4 +269,27 @@ namespace HouseholdAccountBook.Models
         /// </summary>
         Item
     }
+
+    /// <summary>
+    /// 単位タイプ
+    /// </summary>
+    public enum UnitType
+    {
+        /// <summary>
+        /// なし
+        /// </summary>
+        None = 0,
+        /// <summary>
+        /// 前のみ
+        /// </summary>
+        Pre = 1,
+        /// <summary>
+        /// 後ろのみ
+        /// </summary>
+        Post = 2,
+        /// <summary>
+        /// 両方
+        /// </summary>
+        Both = 3
+    }
 }

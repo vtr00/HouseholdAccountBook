@@ -140,13 +140,13 @@
     <value>Interval</value>
   </data>
   <data name="TextBlock_MinutesUnit" xml:space="preserve">
-    <value>Min</value>
+    <value>min.</value>
   </data>
   <data name="CheckBox_DateAutoIncrement" xml:space="preserve">
     <value>Automatic date increment</value>
   </data>
   <data name="CheckBox_Setting" xml:space="preserve">
-    <value>Setting</value>
+    <value>Settings</value>
   </data>
   <data name="ColumnHeader_Income" xml:space="preserve">
     <value>Income</value>
@@ -158,52 +158,52 @@
     <value>Bank account</value>
   </data>
   <data name="BookKind_BrokerageAccount" xml:space="preserve">
-    <value>Securities account</value>
+    <value>Brokerage account</value>
   </data>
   <data name="BookKind_CreditCard" xml:space="preserve">
     <value>Credit card</value>
   </data>
   <data name="Message_DeleteNotification" xml:space="preserve">
-    <value>Deletes the selected item. Is that okay?</value>
+    <value>Are you sure you want to delete the selected item(s)?</value>
   </data>
   <data name="Message_DeleteOldDataNotification" xml:space="preserve">
-    <value>Deletes existing data. Is that okay?</value>
+    <value>Are you sure you want to delete existing data?</value>
   </data>
-  <data name="Message_FinishToBackup" xml:space="preserve">
-    <value>The backup is complete.</value>
+  <data name="Message_CompletedToBackup" xml:space="preserve">
+    <value>Backup completed.</value>
   </data>
-  <data name="Message_FinishToExport" xml:space="preserve">
-    <value>The export is complete.</value>
+  <data name="Message_CompletedToExport" xml:space="preserve">
+    <value>Export completed.</value>
   </data>
-  <data name="Message_FinishToImport" xml:space="preserve">
-    <value>The import is complete.</value>
+  <data name="Message_CompletedToImport" xml:space="preserve">
+    <value>Import completed.</value>
   </data>
   <data name="Message_CanceledToImport" xml:space="preserve">
     <value>The import was canceled.</value>
   </data>
   <data name="Message_DeletedZeroValueInformation" xml:space="preserve">
-    <value>Deleted book items the value is zero.</value>
+    <value>Deleted book items with value 0.</value>
   </data>
-  <data name="Message_FinishToSave" xml:space="preserve">
-    <value>The saving is complete.</value>
+  <data name="Message_CompletedToSave" xml:space="preserve">
+    <value>Save completed.</value>
   </data>
-  <data name="Message_FoultToBackup" xml:space="preserve">
-    <value>Failed to backup.</value>
+  <data name="Message_FailedToBackup" xml:space="preserve">
+    <value>Backup failed.</value>
   </data>
-  <data name="Message_FoultToExport" xml:space="preserve">
-    <value>Failed to export.</value>
+  <data name="Message_FailedToExport" xml:space="preserve">
+    <value>Export failed.</value>
   </data>
-  <data name="Message_FoultToImport" xml:space="preserve">
-    <value>Failed to import.</value>
+  <data name="Message_FailedToImport" xml:space="preserve">
+    <value>Import failed.</value>
   </data>
-  <data name="Message_FoultToMoveCsv" xml:space="preserve">
+  <data name="Message_FailedToMoveCsv" xml:space="preserve">
     <value>Failed to move CSV file.</value>
   </data>
   <data name="Message_ReplaceShopNameRemarkNotification" xml:space="preserve">
-    <value>Replace {0} with {1}. Is that okay?</value>
+    <value>Are you sure you want to replace {0} with {1}?</value>
   </data>
   <data name="Message_RestartNotification" xml:space="preserve">
-    <value>Reboot. Is that okay?</value>
+    <value>Restart the application?</value>
   </data>
   <data name="Message_UnhandledExceptionOccurred" xml:space="preserve">
     <value>An unhandled exception occurred. Click to see the exception information.</value>
@@ -233,13 +233,13 @@
     <value>After holidays</value>
   </data>
   <data name="CommissionKind_MoveFrom" xml:space="preserve">
-    <value>Moved from</value>
+    <value>Move from</value>
   </data>
   <data name="CommissionKind_MoveTo" xml:space="preserve">
     <value>Move to</value>
   </data>
   <data name="GraphKind1_IncomeAndExpensesGraph" xml:space="preserve">
-    <value>Expenses</value>
+    <value>Income/Expenses</value>
   </data>
   <data name="GraphKind1_BalanceGraph" xml:space="preserve">
     <value>Balance</value>
@@ -287,7 +287,7 @@
     <value>Calendar information</value>
   </data>
   <data name="GroupHeader_ColumnIndex" xml:space="preserve">
-    <value>Column No</value>
+    <value>Column No.</value>
   </data>
   <data name="GroupHeader_TermInformation" xml:space="preserve">
     <value>Period information</value>
@@ -304,14 +304,14 @@
   <data name="GroupHeader_ItemInformation" xml:space="preserve">
     <value>Item information</value>
   </data>
-  <data name="Message_FoultToConnectDb" xml:space="preserve">
-    <value>Failed to Connect. Please review your connection settings.</value>
+  <data name="Message_FailedToConnectDb" xml:space="preserve">
+    <value>Failed to connect to the database. Please review your connection settings.</value>
   </data>
   <data name="Message_PleaseInputDbSetting" xml:space="preserve">
     <value>Please enter the DB connection settings.</value>
   </data>
   <data name="Message_DoNotDuplicateProcess" xml:space="preserve">
-    <value>Multiple launches cannot be performed at the same time.</value>
+    <value>Cannot launch multiple instances simultaneously.</value>
   </data>
   <data name="ListName_NoSpecification" xml:space="preserve">
     <value>(No specification)</value>
@@ -371,16 +371,16 @@
     <value>SQL file</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInCategory" xml:space="preserve">
-    <value>The book items are in the classification so they cannot be deleted.</value>
+    <value>Cannot delete because book items exist in the category.</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInItem" xml:space="preserve">
-    <value>The booking item exists within the item, so it cannot be deleted.</value>
+    <value>Cannot delete because book items exist in the item.</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInItemWithinBook" xml:space="preserve">
-    <value>The book item cannot be deleted because it exists in the relevant item in the book.</value>
+    <value>Cannot delete because book items exist in the corresponding item within the book.</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInBook" xml:space="preserve">
-    <value>Book items cannot be deleted because they exist in the books.</value>
+    <value>Cannot delete because book items exist in the book.</value>
   </data>
   <data name="Title_CsvFolderSelection" xml:space="preserve">
     <value>Select CSV folder</value>
@@ -1042,7 +1042,7 @@ list</value>
   <data name="TextBlock_ApplicationName" xml:space="preserve">
     <value>Household Account Book</value>
   </data>
-  <data name="Message_FoultToGetHolidayList" xml:space="preserve">
+  <data name="Message_FailedToGetHolidayList" xml:space="preserve">
     <value>Failed to get holoday list.</value>
   </data>
   <data name="Unit_FiscalYear_Pre" xml:space="preserve">
@@ -1084,7 +1084,7 @@ list</value>
   <data name="TextBlock_OutoutLogLevel" xml:space="preserve">
     <value>OutputLevel</value>
   </data>
-  <data name="Message_FoultToMigrateDb" xml:space="preserve">
+  <data name="Message_FailedToMigrateDb" xml:space="preserve">
     <value>Failed to migrate database.</value>
   </data>
   <data name="CheckBox_Notifications_MinimizingMainWindow" xml:space="preserve">
@@ -1111,7 +1111,7 @@ list</value>
   <data name="CheckBox_Notifications_LaunchingApplication" xml:space="preserve">
     <value>When the application is launched</value>
   </data>
-  <data name="Message_FoultToGetLatestVersionNumber" xml:space="preserve">
+  <data name="Message_FailedToGetLatestVersionNumber" xml:space="preserve">
     <value>Failed to get latest version number.</value>
   </data>
   <data name="Message_NotifyLatestVersionNumber" xml:space="preserve">

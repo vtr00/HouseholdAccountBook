@@ -135,7 +135,7 @@ namespace HouseholdAccountBook
             // DBのマイグレーションを実行する
             bool migrateResult = await DbUtil.UpMigrateAsync(dbHandlerFactory);
             if (!migrateResult) {
-                MessageBox.Show(MyResources.Message_FoultToMigrateDb, MyResources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(MyResources.Message_FailedToMigrateDb, MyResources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Shutdown();
                 return;
             }
@@ -337,7 +337,7 @@ namespace HouseholdAccountBook
 
                 // 接続を試みる(SQLiteの場合はこの時点でファイルが作成済となっている)
                 tryConnect = true;
-                message = MyResources.Message_FoultToConnectDb;
+                message = MyResources.Message_FailedToConnectDb;
             }
 
             return dbHandlerFactory;

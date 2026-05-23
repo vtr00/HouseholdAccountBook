@@ -247,10 +247,10 @@ namespace HouseholdAccountBook.Infrastructure.DB
                             exitCode => {
                                 // ダンプ結果を通知する
                                 if (exitCode == 0) {
-                                    NotificationService.NotifyFinishingToBackup();
+                                    NotificationService.NotifyCompletedToBackup();
                                 }
                                 else if (exitCode != null) {
-                                    NotificationService.NotifyFailingToBackup();
+                                    NotificationService.NotifyFailedToBackup();
                                 }
                             }, waitForFinish)
                         : await npgsqlDbHandler.ExecuteDump(backupFilePath, this.NpgsqlBackupConfig, format, null, waitForFinish);
@@ -309,10 +309,10 @@ namespace HouseholdAccountBook.Infrastructure.DB
 
             if (notifyResult) {
                 if (result) {
-                    NotificationService.NotifyFinishingToBackup();
+                    NotificationService.NotifyCompletedToBackup();
                 }
                 else {
-                    NotificationService.NotifyFailingToBackup();
+                    NotificationService.NotifyFailedToBackup();
                 }
             }
 
