@@ -62,7 +62,7 @@ namespace HouseholdAccountBook.Models.AppServices
             NotificationManager nm = new();
             NotificationContent nc = new() {
                 Title = Properties.Resources.Title_MainWindow,
-                Message = Properties.Resources.Message_FoultToGetHolidayList,
+                Message = Properties.Resources.Message_FailedToGetHolidayList,
                 Type = NotificationType.Warning,
                 Background = mWarningBackground,
                 Foreground = mWarningForeground,
@@ -80,7 +80,7 @@ namespace HouseholdAccountBook.Models.AppServices
             NotificationManager nm = new();
             NotificationContent nc = new() {
                 Title = Properties.Resources.Title_MainWindow,
-                Message = Properties.Resources.Message_FoultToGetLatestVersionNumber,
+                Message = Properties.Resources.Message_FailedToGetLatestVersionNumber,
                 Type = NotificationType.Warning,
                 Background = mWarningBackground,
                 Foreground = mWarningForeground,
@@ -141,12 +141,12 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// バックアップ完了を通知する
         /// </summary>
-        public static void NotifyFinishingToBackup()
+        public static void NotifyCompletedToBackup()
         {
             NotificationManager nm = new();
             NotificationContent nc = new() {
                 Title = Properties.Resources.Title_MainWindow,
-                Message = Properties.Resources.Message_FinishToBackup,
+                Message = Properties.Resources.Message_CompletedToBackup,
                 Type = NotificationType.Information,
                 Background = mInformationBackground,
                 Foreground = mInformationForeground,
@@ -158,12 +158,12 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// バックアップ失敗を通知する
         /// </summary>
-        public static void NotifyFailingToBackup()
+        public static void NotifyFailedToBackup()
         {
             NotificationManager nm = new();
             NotificationContent nc = new() {
                 Title = Properties.Resources.Title_MainWindow,
-                Message = Properties.Resources.Message_FoultToBackup,
+                Message = Properties.Resources.Message_FailedToBackup,
                 Type = NotificationType.Error,
                 Background = mErrorBackground,
                 Foreground = mErrorForeground,

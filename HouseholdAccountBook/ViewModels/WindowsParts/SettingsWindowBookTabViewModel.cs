@@ -158,7 +158,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             await this.mSettingService.SaveBookAsync(book);
             await this.LoadAsync(vm.Id);
 
-            _ = MessageBox.Show(Properties.Resources.Message_FinishToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
+            _ = MessageBox.Show(Properties.Resources.Message_CompletedToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
             this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
         }
 

@@ -172,13 +172,13 @@
   <data name="Message_DeleteOldDataNotification" xml:space="preserve">
     <value>既存のデータを削除します。よろしいですか？</value>
   </data>
-  <data name="Message_FinishToBackup" xml:space="preserve">
+  <data name="Message_CompletedToBackup" xml:space="preserve">
     <value>バックアップが完了しました。</value>
   </data>
-  <data name="Message_FinishToExport" xml:space="preserve">
+  <data name="Message_CompletedToExport" xml:space="preserve">
     <value>エクスポートが完了しました。</value>
   </data>
-  <data name="Message_FinishToImport" xml:space="preserve">
+  <data name="Message_CompletedToImport" xml:space="preserve">
     <value>インポートが完了しました。</value>
   </data>
   <data name="Message_CanceledToImport" xml:space="preserve">
@@ -187,19 +187,19 @@
   <data name="Message_DeletedZeroValueInformation" xml:space="preserve">
     <value>値が0の帳簿項目を削除しました。</value>
   </data>
-  <data name="Message_FinishToSave" xml:space="preserve">
+  <data name="Message_CompletedToSave" xml:space="preserve">
     <value>保存が完了しました。</value>
   </data>
-  <data name="Message_FoultToBackup" xml:space="preserve">
+  <data name="Message_FailedToBackup" xml:space="preserve">
     <value>バックアップに失敗しました。</value>
   </data>
-  <data name="Message_FoultToExport" xml:space="preserve">
+  <data name="Message_FailedToExport" xml:space="preserve">
     <value>エクスポートに失敗しました。</value>
   </data>
-  <data name="Message_FoultToImport" xml:space="preserve">
+  <data name="Message_FailedToImport" xml:space="preserve">
     <value>インポートに失敗しました。</value>
   </data>
-  <data name="Message_FoultToMoveCsv" xml:space="preserve">
+  <data name="Message_FailedToMoveCsv" xml:space="preserve">
     <value>CSVファイルの移動に失敗しました。</value>
   </data>
   <data name="Message_ReplaceShopNameRemarkNotification" xml:space="preserve">
@@ -307,7 +307,7 @@
   <data name="GroupHeader_ItemInformation" xml:space="preserve">
     <value>項目情報</value>
   </data>
-  <data name="Message_FoultToConnectDb" xml:space="preserve">
+  <data name="Message_FailedToConnectDb" xml:space="preserve">
     <value>接続に失敗しました。接続設定を見直してください。</value>
   </data>
   <data name="Message_PleaseInputDbSetting" xml:space="preserve">
@@ -1042,7 +1042,7 @@
   <data name="TextBlock_ApplicationName" xml:space="preserve">
     <value>歳時記帳</value>
   </data>
-  <data name="Message_FoultToGetHolidayList" xml:space="preserve">
+  <data name="Message_FailedToGetHolidayList" xml:space="preserve">
     <value>祝日の一覧の取得に失敗しました。</value>
   </data>
   <data name="Unit_FiscalYear_Pre" xml:space="preserve">
@@ -1084,7 +1084,7 @@
   <data name="TextBlock_OutoutLogLevel" xml:space="preserve">
     <value>出力レベル</value>
   </data>
-  <data name="Message_FoultToMigrateDb" xml:space="preserve">
+  <data name="Message_FailedToMigrateDb" xml:space="preserve">
     <value>データベースのバージョンアップに失敗しました。</value>
   </data>
   <data name="CheckBox_Notifications_MinimizingMainWindow" xml:space="preserve">
@@ -1111,7 +1111,7 @@
   <data name="CheckBox_Notifications_LaunchingApplication" xml:space="preserve">
     <value>アプリ起動時</value>
   </data>
-  <data name="Message_FoultToGetLatestVersionNumber" xml:space="preserve">
+  <data name="Message_FailedToGetLatestVersionNumber" xml:space="preserve">
     <value>最新バージョン番号の取得に失敗しました。</value>
   </data>
   <data name="Message_NotifyLatestVersionNumber" xml:space="preserve">

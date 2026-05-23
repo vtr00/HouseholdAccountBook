@@ -546,14 +546,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             switch (result) {
                 case true:
-                    _ = MessageBox.Show(Properties.Resources.Message_FinishToImport + (0 < actRowsDiff ? Environment.NewLine + Properties.Resources.Message_DeletedZeroValueInformation : string.Empty),
+                    _ = MessageBox.Show(Properties.Resources.Message_CompletedToImport + (0 < actRowsDiff ? Environment.NewLine + Properties.Resources.Message_DeletedZeroValueInformation : string.Empty),
                                         Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
                     break;
                 case null:
                     _ = MessageBox.Show(Properties.Resources.Message_CanceledToImport, Properties.Resources.Title_Warning, MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
                     break;
                 case false:
-                    _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                    _ = MessageBox.Show(Properties.Resources.Message_FailedToImport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
                     break;
             }
         }
@@ -591,13 +591,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             switch (result) {
                 case true:
-                    _ = MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                    _ = MessageBox.Show(Properties.Resources.Message_CompletedToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
                     break;
                 case null:
                     _ = MessageBox.Show(Properties.Resources.Message_CanceledToImport, Properties.Resources.Title_Warning, MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
                     break;
                 case false:
-                    _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                    _ = MessageBox.Show(Properties.Resources.Message_FailedToImport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
                     break;
             }
         }
@@ -639,8 +639,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             _ = result
-                ? MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
-                : MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                ? MessageBox.Show(Properties.Resources.Message_CompletedToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
+                : MessageBox.Show(Properties.Resources.Message_FailedToImport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -697,13 +697,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             switch (result) {
                 case true:
-                    _ = MessageBox.Show(Properties.Resources.Message_FinishToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                    _ = MessageBox.Show(Properties.Resources.Message_CompletedToImport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
                     break;
                 case null:
                     _ = MessageBox.Show(Properties.Resources.Message_CanceledToImport, Properties.Resources.Title_Warning, MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
                     break;
                 case false:
-                    _ = MessageBox.Show(Properties.Resources.Message_FoultToImport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                    _ = MessageBox.Show(Properties.Resources.Message_FailedToImport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
                     break;
             }
         }
@@ -741,8 +741,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             bool result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQLAsync(e.FileName, PostgresFormat.Custom) == true;
 
             _ = result
-                ? MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
-                : MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                ? MessageBox.Show(Properties.Resources.Message_CompletedToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
+                : MessageBox.Show(Properties.Resources.Message_FailedToExport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -773,8 +773,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             bool result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQLAsync(e.FileName, PostgresFormat.Plain) == true;
 
             _ = result
-                ? MessageBox.Show(Properties.Resources.Message_FinishToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
-                : MessageBox.Show(Properties.Resources.Message_FoultToExport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                ? MessageBox.Show(Properties.Resources.Message_CompletedToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
+                : MessageBox.Show(Properties.Resources.Message_FailedToExport, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -794,8 +794,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             _ = result
-                ? MessageBox.Show(Properties.Resources.Message_FinishToBackup, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
-                : MessageBox.Show(Properties.Resources.Message_FoultToBackup, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                ? MessageBox.Show(Properties.Resources.Message_CompletedToBackup, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
+                : MessageBox.Show(Properties.Resources.Message_FailedToBackup, Properties.Resources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
         }
 
         /// <summary>
