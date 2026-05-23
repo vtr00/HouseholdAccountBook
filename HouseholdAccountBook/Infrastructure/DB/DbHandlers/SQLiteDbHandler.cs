@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
 using Microsoft.Data.Sqlite;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -12,6 +13,22 @@ namespace HouseholdAccountBook.Models.DbHandlers
     /// </summary>
     public partial class SQLiteDbHandler : DbHandlerBase
     {
+        /// <summary>
+        /// pragma設定
+        /// </summary>
+        public class PragmaConfiguration
+        {
+            /// <summary>
+            /// キャッシュサイズの最大値[MB]
+            /// </summary>
+            public uint CacheSize { get; set; } = 64;
+
+            /// <summary>
+            /// メモリマップドI/Oサイズの最大値[MB]
+            /// </summary>
+            public uint MmapSize { get; set; } = 256;
+        }
+
         #region フィールド
         /// <summary>
         /// 接続文字列
@@ -24,6 +41,10 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// DBファイルパス
         /// </summary>
         public string DbFilePath => (this.mConnectInfoBase as ConnectInfo).FilePath;
+        /// <summary>
+        /// gragma設定
+        /// </summary>
+        public static PragmaConfiguration Config { get; set; } = new();
         #endregion
 
         /// <summary>
@@ -46,6 +67,52 @@ namespace HouseholdAccountBook.Models.DbHandlers
             if (!File.Exists(filePath)) {
                 this.CanOpen = false;
             }
+        }
+
+        public override async Task<bool> OpenAsync(int timeoutMs = 0)
+        {
+            using FuncLog funcLog = new(new { timeoutMs }, Log.LogLevel.Trace);
+
+            bool opened = await base.OpenAsync(timeoutMs);
+            if (opened) {
+                try {
+                    // WALモード：Write-Ahead Logging による同時実行性の向上
+                    _ = await this.ExecuteAsync("PRAGMA journal_mode = WAL;");
+
+                    // キャッシュサイズ[KB]を設定
+                    _ = await this.ExecuteAsync($"PRAGMA cache_size = -{Config.CacheSize * 1024};");
+
+                    // メモリマッピング[bytes]を設定
+                    _ = await this.ExecuteAsync($"PRAGMA mmap_size = {Config.MmapSize * 1024 * 1024};");
+
+                    // 同期レベルを落とす（NORMAL: ディスクフラッシュを最小化）
+                    _ = await this.ExecuteAsync("PRAGMA synchronous = NORMAL;");
+
+                    // テンポラリストレージを使用
+                    _ = await this.ExecuteAsync("PRAGMA temp_store = MEMORY;");
+                }
+                catch {
+                    // 最適化設定が失敗してもDBは使用可能にする
+                }
+            }
+
+            return opened;
+        }
+
+        public override async ValueTask DisposeAsync()
+        {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
+            if (this.mConnection != null) {
+                try {
+                    // クエリ最適化レベルを上げる
+                    _ = await this.ExecuteAsync("PRAGMA optimize;");
+                }
+                catch { }
+            }
+            await base.DisposeAsync();
+
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>

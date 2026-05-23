@@ -84,7 +84,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         /// <param name="timeoutMs">タイムアウト時間(ms)。0以下の場合は無制限</param>
         /// <returns>接続結果</returns>
         /// <exception cref="TimeoutException">接続タイムアウトが発生した場合</exception>
-        public async Task<bool> OpenAsync(int timeoutMs = 0)
+        public virtual async Task<bool> OpenAsync(int timeoutMs = 0)
         {
             using FuncLog funcLog = new(new { timeoutMs }, Log.LogLevel.Trace);
 
@@ -117,17 +117,17 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         /// <summary>
         /// [非同期]接続を終了する
         /// </summary>
-        public async ValueTask DisposeAsync()
+        public virtual async ValueTask DisposeAsync()
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
-
-            GC.SuppressFinalize(this);
 
             if (this.mConnection != null) {
                 await this.mConnection.CloseAsync();
                 await this.mConnection.DisposeAsync();
             }
             this.mConnection = null;
+
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>

@@ -126,10 +126,13 @@ namespace HouseholdAccountBook
                 return;
             }
 
-            // DBバックアップマネージャーを初期化する
+            // SQLiteDbHandlerを初期化する
+            SQLiteDbHandler.Config = UserSettingService.Instance.SQLiteConfig;
+
+            // DBBackUpManagerを初期化する
             DbBackUpManager.Instance.DbHandlerFactory = dbHandlerFactory;
             DbBackUpManager.Instance.Config = UserSettingService.Instance.DbBackupConfig;
-            DbBackUpManager.Instance.NpgsqlBackupConfig = UserSettingService.Instance.PostgreSQLBackupConfig;
+            DbBackUpManager.Instance.NpgsqlConfig = UserSettingService.Instance.PostgreSQLBackupConfig;
             DbBackUpManager.Instance.BackUpCurrentAtMinimizing = UserSettingService.Instance.CurrentBackUpAtMinimizing;
 
             // DBのマイグレーションを実行する
