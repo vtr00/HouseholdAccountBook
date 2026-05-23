@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Infrastructure.Logger;
+using Notification.Core;
 using Notification.Wpf;
 using System;
 using System.Diagnostics;
