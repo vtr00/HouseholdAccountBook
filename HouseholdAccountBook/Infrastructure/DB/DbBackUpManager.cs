@@ -103,7 +103,7 @@ namespace HouseholdAccountBook.Infrastructure.DB
         /// <summary>
         /// Npgsqlバックアップ設定
         /// </summary>
-        public NpgsqlDbHandler.BackupConfiguration NpgsqlBackupConfig { get; set; }
+        public NpgsqlDbHandler.BackupConfiguration NpgsqlConfig { get; set; }
 
         /// <summary>
         /// メインウィンドウを最小化したときにバックアップを行った時刻
@@ -237,13 +237,13 @@ namespace HouseholdAccountBook.Infrastructure.DB
         {
             using FuncLog funcLog = new(new { backupFilePath, format, notifyResult, waitForFinish });
 
-            if (this.NpgsqlBackupConfig.DumpExePath == string.Empty) { return false; }
+            if (this.NpgsqlConfig.DumpExePath == string.Empty) { return false; }
 
             int? errorCode = -1;
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
                     errorCode = notifyResult
-                        ? await npgsqlDbHandler.ExecuteDump(backupFilePath, this.NpgsqlBackupConfig, format,
+                        ? await npgsqlDbHandler.ExecuteDump(backupFilePath, this.NpgsqlConfig, format,
                             exitCode => {
                                 // ダンプ結果を通知する
                                 if (exitCode == 0) {
@@ -253,7 +253,7 @@ namespace HouseholdAccountBook.Infrastructure.DB
                                     NotificationService.NotifyFailedToBackup();
                                 }
                             }, waitForFinish)
-                        : await npgsqlDbHandler.ExecuteDump(backupFilePath, this.NpgsqlBackupConfig, format, null, waitForFinish);
+                        : await npgsqlDbHandler.ExecuteDump(backupFilePath, this.NpgsqlConfig, format, null, waitForFinish);
                 }
             }
             return errorCode == null ? null : (errorCode == 0);
@@ -268,12 +268,12 @@ namespace HouseholdAccountBook.Infrastructure.DB
         {
             using FuncLog funcLog = new(new { backupFilePath });
 
-            if (this.NpgsqlBackupConfig.RestoreExePath == string.Empty) { return false; }
+            if (this.NpgsqlConfig.RestoreExePath == string.Empty) { return false; }
 
             int errorCode = -1;
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 if (dbHandler is NpgsqlDbHandler npgsqlDbHandler) {
-                    errorCode = await npgsqlDbHandler.ExecuteRestore(backupFilePath, this.NpgsqlBackupConfig);
+                    errorCode = await npgsqlDbHandler.ExecuteRestore(backupFilePath, this.NpgsqlConfig);
                 }
             }
             return errorCode == 0;

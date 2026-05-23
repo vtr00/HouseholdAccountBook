@@ -630,6 +630,21 @@ namespace HouseholdAccountBook.Models.AppServices
         }
 
         /// <summary>
+        /// SQLite pragma設定情報
+        /// </summary>
+        public SQLiteDbHandler.PragmaConfiguration SQLiteConfig {
+            get => new() {
+                CacheSize = this.mSettings.App_SQLite_CacheSize_MB,
+                MmapSize = this.mSettings.App_SQLite_MmapSize_MB
+            };
+            set {
+                this.mSettings.App_SQLite_CacheSize_MB = value.CacheSize;
+                this.mSettings.App_SQLite_MmapSize_MB = value.MmapSize;
+                this.mSettings.Save();
+            }
+        }
+
+        /// <summary>
         /// Access接続情報
         /// </summary>
         public OleDbHandler.ConnectInfo AccessConnectInfo {
@@ -710,7 +725,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 IntervalMinAtMinimizing = this.mSettings.App_BackUpIntervalMinAtMinimizing,
                 NotifyAtMinimizing = this.mSettings.App_BackUpNotifyAtMinimizing,
                 ExecuteAtClosing = this.mSettings.App_BackUpFlagAtClosing,
-                Condition = (BackUpCondition)this.mSettings.App_BackUpCondition
+                Condition = EnumUtil.SafeCastEnum(this.mSettings.App_BackUpCondition, BackUpCondition.Always)
             };
             set {
                 this.mSettings.App_BackUpNum = value.Amount;
@@ -731,7 +746,7 @@ namespace HouseholdAccountBook.Models.AppServices
             get => new() {
                 DumpExePath = this.mSettings.App_Postgres_DumpExePath,
                 RestoreExePath = this.mSettings.App_Postgres_RestoreExePath,
-                PasswordInput = (PostgresPasswordInput)this.mSettings.App_Postgres_Password_Input
+                PasswordInput = EnumUtil.SafeCastEnum(this.mSettings.App_Postgres_Password_Input, PostgresPasswordInput.InputWindow)
             };
             set {
                 this.mSettings.App_Postgres_DumpExePath = value.DumpExePath;

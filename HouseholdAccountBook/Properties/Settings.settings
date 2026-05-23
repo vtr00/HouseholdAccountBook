@@ -278,5 +278,11 @@
     <Setting Name="App_LatestVersionNotifyAtAppLaunched" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="App_SQLite_CacheSize_MB" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">64</Value>
+    </Setting>
+    <Setting Name="App_SQLite_MmapSize_MB" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">256</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

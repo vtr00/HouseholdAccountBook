@@ -536,31 +536,43 @@
                                     </Grid.RowDefinitions>
 
                                     <!-- SQLite -->
-                                    <GroupBox Grid.Row="0" Grid.Column="0">
+                                    <GroupBox Grid.Row="0" Grid.Column="0" IsEnabled="{Binding SelectedDBKind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SQLite}">
                                         <GroupBox.Header>
                                             <RadioButton Content="{x:Static properties:Resources.GroupHeader_SQLite}" 
-                                                         IsChecked="{Binding SelectedDBKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=SQLite}"
+                                                         IsChecked="{Binding SelectedDBKind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SQLite}"
                                                          GroupName="DBkindGroup" IsEnabled="False"/>
                                         </GroupBox.Header>
                                         <Grid DataContext="{Binding SQLiteSettingVM}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
+                                                <ColumnDefinition Width="100" SharedSizeGroup="Number"/>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="30" SharedSizeGroup="Button"/>
                                             </Grid.ColumnDefinitions>
 
+                                            <!-- DBファイル名 -->
                                             <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_SQLite_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
-                                            <TextBox Grid.Row="0" Grid.Column="1" Margin="1" Text="{Binding InputedDBFilePath}" IsReadOnly="True"/>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding InputedDBFilePath}" IsReadOnly="True"/>
+                                            <!-- キャッシュサイズ -->
+                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_SQLite_CacheSize}" Margin="5" VerticalAlignment="Center"/>
+                                            <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" MinValue="0" MaxValue="1024" Value="{Binding InputedCacheSize}"/>
+                                            <TextBlock Grid.Row="1" Grid.Column="2" Text="MB" Margin="5" VerticalAlignment="Center"/>
+                                            <!-- メモリマップドI/Oサイズ -->
+                                            <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_SQLite_MmapSize}" Margin="5" VerticalAlignment="Center"/>
+                                            <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" MinValue="0" MaxValue="1024" Value="{Binding InputedMmapSize}"/>
+                                            <TextBlock Grid.Row="2" Grid.Column="2" Text="MB" Margin="5" VerticalAlignment="Center"/>
                                         </Grid>
                                     </GroupBox>
                                     <!-- PostgreSQL -->
-                                    <GroupBox Grid.Row="1" Grid.Column="0">
+                                    <GroupBox Grid.Row="1" Grid.Column="0" IsEnabled="{Binding SelectedDBKind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=PostgreSQL}">
                                         <GroupBox.Header>
                                             <RadioButton Content="{x:Static properties:Resources.GroupHeader_PostgreSQL}" 
-                                                         IsChecked="{Binding SelectedDBKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=PostgreSQL}"
+                                                         IsChecked="{Binding SelectedDBKind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=PostgreSQL}"
                                                          GroupName="DBKindGroup" IsEnabled="False"/>
                                         </GroupBox.Header>
                                         <Grid DataContext="{Binding PostgreSQLDBSettingVM}">
@@ -589,10 +601,10 @@
                                             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Password}"/>
                                             <RadioButton Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_input" Margin="5" 
                                                          Content="{x:Static properties:Resources.RadioButton_Password_ShowInputWindow}"
-                                                         IsChecked="{Binding SelectedPasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=InputWindow}"/>
+                                                         IsChecked="{Binding SelectedPasswordInput, Converter={StaticResource EnumToBoolConverter}, Mode=TwoWay, ConverterParameter=InputWindow}"/>
                                             <RadioButton Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_pgpass" Margin="5" 
                                                          Content="{x:Static properties:Resources.RadioButton_Password_SpecifyPgpassConf}"
-                                                         IsChecked="{Binding SelectedPasswordInput, Converter={StaticResource BoolToEnumConverter}, Mode=TwoWay, ConverterParameter=PgPassConf}"/>
+                                                         IsChecked="{Binding SelectedPasswordInput, Converter={StaticResource EnumToBoolConverter}, Mode=TwoWay, ConverterParameter=PgPassConf}"/>
                                         </Grid>
                                     </GroupBox>
                                     <!-- Microsoft Access -->
@@ -668,10 +680,10 @@
                                     <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" VerticalAlignment="Center"
                                                Text="{x:Static properties:Resources.TextBlock_BackUpCondition}"/>
                                     <RadioButton Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="{x:Static properties:Resources.RadioButton_BackUpCondition_Always}" 
-                                                 IsChecked="{Binding SelectedBackUpCondition, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Always}"
+                                                 IsChecked="{Binding SelectedBackUpCondition, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Always}"
                                                  GroupName="BackupCondition"/>
                                     <RadioButton Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="{x:Static properties:Resources.RadioButton_BackUpCondition_Updated}" 
-                                                 IsChecked="{Binding SelectedBackUpCondition, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Updated}"
+                                                 IsChecked="{Binding SelectedBackUpCondition, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Updated}"
                                                  GroupName="BackupCondition"/>
                                     <!-- 通知 -->
                                     <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Notifications}"/>

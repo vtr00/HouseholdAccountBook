@@ -34,11 +34,11 @@
             <GroupBox Grid.Row="0">
                 <GroupBox.Header>
                     <RadioButton Content="{x:Static properties:Resources.GroupHeader_MonthSelection}"
-                                 IsChecked="{Binding SelectedPeriodKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Monthly}"
+                                 IsChecked="{Binding SelectedPeriodKind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Monthly}"
                                  GroupName="PeriodKind"/>
                 </GroupBox.Header>
 
-                <Grid IsEnabled="{Binding SelectedPeriodKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Monthly}">
+                <Grid IsEnabled="{Binding SelectedPeriodKind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Monthly}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -54,11 +54,11 @@
             <GroupBox Grid.Row="1">
                 <GroupBox.Header>
                     <RadioButton Content="{x:Static properties:Resources.GroupHeader_TermSelection}" 
-                                 IsChecked="{Binding SelectedPeriodKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Selected}"
+                                 IsChecked="{Binding SelectedPeriodKind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Selected}"
                                  GroupName="PeriodKind"/>
                 </GroupBox.Header>
 
-                <Grid IsEnabled="{Binding SelectedPeriodKind, Converter={StaticResource BoolToEnumConverter}, ConverterParameter=Selected}">
+                <Grid IsEnabled="{Binding SelectedPeriodKind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Selected}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>

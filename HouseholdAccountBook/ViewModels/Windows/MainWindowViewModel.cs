@@ -607,7 +607,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand ImportCustomFileCommand => field ??= new AsyncRelayCommand(
             this.ImportCustomFileCommand_ExecuteAsync, this,
-            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlBackupConfig?.RestoreExePath) && !this.IsChildrenWindowOpened(),
+            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlConfig?.RestoreExePath) && !this.IsChildrenWindowOpened(),
             this.mBusyService);
         /// <summary>
         /// カスタムファイル -> PostgreSQL インポートコマンド処理
@@ -718,7 +718,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand ExportCustomFileCommand => field ??= new AsyncRelayCommand(
             this.ExportCustomFileCommand_ExecuteAsync, this,
-            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
+            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
             this.mBusyService);
         /// <summary>
         /// カスタムファイルエクスポートコマンド処理
@@ -750,7 +750,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand ExportSQLFileCommand => field ??= new AsyncRelayCommand(
             this.ExportSQLFileCommand_ExecuteAsync, this,
-            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlBackupConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
+            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
             this.mBusyService);
         /// <summary>
         /// SQLファイルエクスポートコマンド処理

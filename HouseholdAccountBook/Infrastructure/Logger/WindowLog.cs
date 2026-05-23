@@ -106,9 +106,9 @@ namespace HouseholdAccountBook.Infrastructure.Logger
             GC.SuppressFinalize(this);
         }
 
-        private void SystemEvents_DisplaySettingsChanging(object sender, EventArgs e) => this.Log("DisplaySettingsChanging", true);
+        private void SystemEvents_DisplaySettingsChanging(object sender, EventArgs e) => this.Log(nameof(SystemEvents.DisplaySettingsChanging), true);
 
-        private void SystemEvents_DisplaySettingsChanged(object sender, EventArgs e) => this.Log("DisplaySettingsChanged", true);
+        private void SystemEvents_DisplaySettingsChanged(object sender, EventArgs e) => this.Log(nameof(SystemEvents.DisplaySettingsChanged), true);
 
         /// <summary>
         /// ウィンドウの状態、位置をログファイルに保存する

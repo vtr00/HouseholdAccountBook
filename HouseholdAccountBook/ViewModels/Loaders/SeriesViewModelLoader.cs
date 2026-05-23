@@ -41,8 +41,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
         /// 期間内日別系列VMリストを取得する(日別グラフタブ)
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
-        /// <param name="startTime">開始時刻</param>
-        /// <param name="endTime">終了時刻</param>
+        /// <param name="period">期間</param>
         /// <returns>日別系列VMリスト</returns>
         public async Task<IEnumerable<SeriesViewModel>> LoadDailySeriesViewModelListAsync(BookIdObj bookId, PeriodObj<DateOnly> period)
         {

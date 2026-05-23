@@ -3,6 +3,7 @@ using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
 using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.DbHandlers;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;
@@ -271,6 +272,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             // PostgreSQL
             _ = this.PostgreSQLDBSettingVM.Save(null);
+            // SQLite
+            _ = this.SQLiteSettingVM.Save();
             // Access(記帳風月)
             _ = this.AccessSettingVM.SaveForKichoFugetsu();
 
@@ -285,10 +288,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Condition = this.SelectedBackUpCondition
             };
 
+            // SQLiteDbHandlerへ設定を反映する
+            SQLiteDbHandler.Config = UserSettingService.Instance.SQLiteConfig;
+
             // DbBackUpManagerへ設定を反映する
             DbBackUpManager.Instance.Config = UserSettingService.Instance.DbBackupConfig;
-
-            DbBackUpManager.Instance.NpgsqlBackupConfig = UserSettingService.Instance.PostgreSQLBackupConfig;
+            DbBackUpManager.Instance.NpgsqlConfig = UserSettingService.Instance.PostgreSQLBackupConfig;
         }
     }
 }

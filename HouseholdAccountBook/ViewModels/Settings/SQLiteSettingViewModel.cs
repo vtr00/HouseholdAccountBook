@@ -19,6 +19,20 @@ namespace HouseholdAccountBook.ViewModels.Settings
             get;
             set => this.SetProperty(ref field, value);
         }
+        /// <summary>
+        /// 入力されたキャッシュサイズ[MB]
+        /// </summary>
+        public uint? InputedCacheSize {
+            get;
+            set => this.SetProperty(ref field, value);
+        }
+        /// <summary>
+        /// 入力されたメモリマップドI/Oサイズ[MB]
+        /// </summary>
+        public uint? InputedMmapSize {
+            get;
+            set => this.SetProperty(ref field, value);
+        }
 
         /// <summary>
         /// 設定を読み込む
@@ -27,6 +41,9 @@ namespace HouseholdAccountBook.ViewModels.Settings
         {
             SQLiteDbHandler.ConnectInfo connectInfo = UserSettingService.Instance.SQLiteConnectInfo;
             this.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), connectInfo.FilePath);
+            SQLiteDbHandler.PragmaConfiguration config = UserSettingService.Instance.SQLiteConfig;
+            this.InputedCacheSize = config.CacheSize;
+            this.InputedMmapSize = config.MmapSize;
         }
 
         /// <summary>
@@ -49,7 +66,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
                     }
                 }
             }
-            // ファイルが存在する場合、設定を保存する
+            // ファイルが存在する場合、接続設定を保存する
             if (exists) {
                 SQLiteDbHandler.ConnectInfo connectInfo = new() {
                     FilePath = Path.GetFullPath(sqliteFilePath, App.GetCurrentDir())
@@ -58,6 +75,12 @@ namespace HouseholdAccountBook.ViewModels.Settings
                 result = true;
             }
 
+            SQLiteDbHandler.PragmaConfiguration config = new() {
+                CacheSize = this.InputedCacheSize.Value,
+                MmapSize = this.InputedMmapSize.Value
+            };
+            UserSettingService.Instance.SQLiteConfig = config;
+
             return result;
         }
 
@@ -65,6 +88,6 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 設定を保存可能か
         /// </summary>
         /// <returns>設定の保存可否</returns>
-        public bool CanSave() => !string.IsNullOrWhiteSpace(this.InputedDBFilePath);
+        public bool CanSave() => !string.IsNullOrWhiteSpace(this.InputedDBFilePath) && this.InputedCacheSize.HasValue && this.InputedMmapSize.HasValue;
     }
 }

@@ -1135,4 +1135,10 @@
   <data name="Menu_Debug_ThrowUnhandledException" xml:space="preserve">
     <value>未処理例外スロー(_H)</value>
   </data>
+  <data name="TextBlock_SQLite_CacheSize" xml:space="preserve">
+    <value>キャッシュサイズ</value>
+  </data>
+  <data name="TextBlock_SQLite_MmapSize" xml:space="preserve">
+    <value>メモリマップドI/Oサイズ</value>
+  </data>
 </root>

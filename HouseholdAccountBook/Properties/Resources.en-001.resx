@@ -1135,4 +1135,10 @@ list</value>
   <data name="Menu_Debug_ThrowUnhandledException" xml:space="preserve">
     <value>Throw unhandled exception (_H)</value>
   </data>
+  <data name="TextBlock_SQLite_CacheSize" xml:space="preserve">
+    <value>Cache size</value>
+  </data>
+  <data name="TextBlock_SQLite_MmapSize" xml:space="preserve">
+    <value>Memory-mapped I/O size</value>
+  </data>
 </root>

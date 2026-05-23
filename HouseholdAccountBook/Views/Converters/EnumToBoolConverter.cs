@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace HouseholdAccountBook.Views.Converters
 {
-    public class BoolToEnumConverter : IValueConverter
+    public class EnumToBoolConverter : IValueConverter
     {
         /// <summary>
         /// Enum -> Bool変換
