@@ -62,6 +62,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         {
             // 破棄時に関数終了ログを出力
             Log.Vars($"func({this.mId}) end", this.Returns, this.mLevel, this.mFileName, this.mMethodName, -(ushort)(Math.Log10(this.mLineNumber) + 1));
+
             GC.SuppressFinalize(this);
         }
     }

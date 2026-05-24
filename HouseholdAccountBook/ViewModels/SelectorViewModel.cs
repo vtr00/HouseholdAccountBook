@@ -263,15 +263,11 @@ namespace HouseholdAccountBook.ViewModels
             };
         }
 
-        ~SelectorViewModel()
-        {
-            this.Dispose();
-        }
-
         public void Dispose()
         {
             this.mLoadChildrenCts?.Cancel();
             this.mLoadChildrenCts?.Dispose();
+
             GC.SuppressFinalize(this);
         }
 

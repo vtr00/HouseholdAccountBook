@@ -98,18 +98,11 @@ namespace HouseholdAccountBook.Infrastructure.Logger
             SystemEvents.DisplaySettingsChanged += this.SystemEvents_DisplaySettingsChanged;
         }
 
-        /// <summary>
-        /// <see cref="WindowLog"/> クラスのインスタンスを破棄します。
-        /// </summary>
-        ~WindowLog()
-        {
-            this.Dispose();
-        }
-
         public void Dispose()
         {
             SystemEvents.DisplaySettingsChanging -= this.SystemEvents_DisplaySettingsChanging;
             SystemEvents.DisplaySettingsChanged -= this.SystemEvents_DisplaySettingsChanged;
+
             GC.SuppressFinalize(this);
         }
 
