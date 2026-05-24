@@ -11,8 +11,9 @@
    - △SQLite接続時/切断時に、pragma journal_mode/cache_size/mmap_size/synchronous/temp_store/optimize を指定するように変更した - refs #176
 
 - SettingWindow
-  - +SQLiteの cache_size/mmap_size の指定を追加した - refs #176
-  - △接続していないDBの接続設定を変更不可に変更した - refs #176
+   - +SQLiteの cache_size/mmap_size の指定を追加した - refs #176
+   - △接続していないDBの接続設定を変更不可に変更した - refs #176
+   - △帳簿情報をスクロール可能に変更した - refs #175
 
 ### 2026-05-23
 
