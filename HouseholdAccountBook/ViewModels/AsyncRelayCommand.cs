@@ -227,15 +227,11 @@ namespace HouseholdAccountBook.ViewModels
             : this(async (param, _, token, progress) => await executeAsync(param, token, progress), requestable, canExecute, busyService, ExecutionMode.DisallowConcurrent, true, fileName, memberName)
         { }
 
-        ~AsyncRelayCommand()
-        {
-            this.Dispose();
-        }
-
         public void Dispose()
         {
             this.mSelectionCts?.Cancel();
             this.mSelectionCts?.Dispose();
+
             GC.SuppressFinalize(this);
         }
 

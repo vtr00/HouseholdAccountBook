@@ -110,8 +110,8 @@ namespace HouseholdAccountBook.Views
             window.Unloaded -= this.Window_Unloaded;
 
             _ = this.mLastRectDic.Remove(window);
-            log.Dispose();
             _ = this.mLogDic.Remove(window);
+            log.Dispose();
         }
 
         private void Window_Initialized(object sender, EventArgs e)
