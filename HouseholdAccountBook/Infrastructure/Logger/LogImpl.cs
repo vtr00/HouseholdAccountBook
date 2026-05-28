@@ -32,6 +32,15 @@ namespace HouseholdAccountBook.Infrastructure.Logger
             /// ログファイル出力数
             /// </summary>
             public int LogFileAmount { get; set; } = int.MaxValue;
+
+            public Configuration() { }
+
+            public Configuration(Configuration config)
+            {
+                this.OutputLogLevel = config.OutputLogLevel;
+                this.OutputLogToFile = config.OutputLogToFile;
+                this.LogFileAmount = config.LogFileAmount;
+            }
         }
 
         #region フィールド
@@ -79,7 +88,9 @@ namespace HouseholdAccountBook.Infrastructure.Logger
             get;
             set {
                 if (field != null) {
-                    field.OutputLogLevel = Log.LogLevel.Info;
+                    field = new(value) {
+                        OutputLogLevel = Log.LogLevel.Info
+                    };
                     Log.Info($"Set {nameof(value.OutputLogLevel)} to {value.OutputLogLevel}");
                 }
                 field = value;
