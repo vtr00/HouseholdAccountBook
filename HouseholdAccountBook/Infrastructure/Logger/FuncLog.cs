@@ -29,6 +29,10 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         /// 呼び出し元行数
         /// </summary>
         private readonly int mLineNumber;
+        /// <summary>
+        /// 開始日時
+        /// </summary>
+        private readonly DateTime mStartTime;
         #endregion
 
         #region プロパティ
@@ -48,7 +52,8 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         public FuncLog(object args = null, Log.LogLevel level = Log.LogLevel.Info,
             [CallerFilePath] string fileName = null, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
         {
-            this.mId = Guid.NewGuid().ToString("N")[..8];
+            this.mStartTime = DateTime.Now;
+            this.mId = Guid.NewGuid().ToString("N")[..7];
             this.mLevel = level;
             this.mFileName = fileName;
             this.mMethodName = methodName;
@@ -60,8 +65,22 @@ namespace HouseholdAccountBook.Infrastructure.Logger
 
         public void Dispose()
         {
+            DateTime finishTime = DateTime.Now;
+            TimeSpan spendTime = finishTime - this.mStartTime;
+            string timeLog = string.Empty;
+            switch (spendTime) {
+                case TimeSpan ts when ts > TimeSpan.FromMinutes(1):
+                    timeLog = $"({spendTime:m\\:ss\\.fff})";
+                    break;
+                case TimeSpan ts when ts > TimeSpan.FromSeconds(1):
+                    timeLog = $"({spendTime:s\\.fff})";
+                    break;
+                default:
+                    break;
+            }
+
             // 破棄時に関数終了ログを出力
-            Log.Vars($"func({this.mId}) end", this.Returns, this.mLevel, this.mFileName, this.mMethodName, -(ushort)(Math.Log10(this.mLineNumber) + 1));
+            Log.Vars($"func({this.mId}) end{timeLog}", this.Returns, this.mLevel, this.mFileName, this.mMethodName, -(ushort)(Math.Log10(this.mLineNumber) + 1));
 
             GC.SuppressFinalize(this);
         }
