@@ -23,7 +23,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         {
             using FuncLog funcLog = new(new { bookId, balanceKind }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<MstCategoryDto>(@"
+            IEnumerable<MstCategoryDto> dtoList = await this.mDbHandler.QueryAsync<MstCategoryDto>(@"
 SELECT C.category_id, C.category_name
 FROM mst_category C
 WHERE EXISTS (

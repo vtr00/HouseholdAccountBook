@@ -23,10 +23,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         {
             using FuncLog funcLog = new(new { startDate }, Log.LogLevel.Trace);
 
-            var dto = await this.mDbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"
+            EndingBalanceInfoDto dto = await this.mDbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0) AS ending_balance
 FROM hst_action AA
-INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
+INNER JOIN mst_book BB ON BB.book_id = AA.book_id AND BB.del_flg = 0
 WHERE AA.del_flg = 0 AND AA.act_time < @StartDate;",
 new { StartDate = startDate });
 
@@ -43,10 +43,10 @@ new { StartDate = startDate });
         {
             using FuncLog funcLog = new(new { bookId, startDate }, Log.LogLevel.Trace);
 
-            var dto = await this.mDbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"
+            EndingBalanceInfoDto dto = await this.mDbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"
 SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @BookId) AS ending_balance
 FROM hst_action AA
-INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) BB ON BB.book_id = AA.book_id
+INNER JOIN mst_book BB ON BB.book_id = AA.book_id AND BB.del_flg = 0
 WHERE AA.book_id = @BookId AND AA.del_flg = 0 AND AA.act_time < @StartDate;",
 new { BookId = bookId, StartDate = startDate });
 

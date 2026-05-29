@@ -21,7 +21,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
+            IEnumerable<HstActionDto> dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT * 
 FROM hst_action
 WHERE del_flg = 0;");
@@ -38,7 +38,7 @@ WHERE del_flg = 0;");
         {
             using FuncLog funcLog = new(new { actionId }, Log.LogLevel.Trace);
 
-            var dto = await this.mDbHandler.QuerySingleOrDefaultAsync<HstActionDto>(@"
+            HstActionDto dto = await this.mDbHandler.QuerySingleOrDefaultAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
 WHERE action_id = @ActionId AND del_flg = 0;",
@@ -56,7 +56,7 @@ new HstActionDto { ActionId = actionId });
         {
             using FuncLog funcLog = new(new { groupId }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
+            IEnumerable<HstActionDto> dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
 WHERE group_id = @GroupId AND del_flg = 0;",
@@ -75,7 +75,7 @@ new HstActionDto { GroupId = groupId });
         {
             using FuncLog funcLog = new(new { actionId }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
+            IEnumerable<HstActionDto> dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action 
 WHERE del_flg = 0 AND group_id = (SELECT group_id FROM hst_action WHERE action_id = @ActionId) AND (SELECT act_time FROM hst_action WHERE action_id = @ActionId) <= act_time
@@ -94,7 +94,7 @@ new HstActionDto { ActionId = actionId });
         {
             using FuncLog funcLog = new(new { bookId }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
+            IEnumerable<HstActionDto> dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
 WHERE book_id = @BookId AND del_flg = 0;",
@@ -112,7 +112,7 @@ new HstActionDto { BookId = bookId });
         {
             using FuncLog funcLog = new(new { itemId }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
+            IEnumerable<HstActionDto> dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
 WHERE del_flg = 0 AND item_id = @ItemId;",
@@ -131,7 +131,7 @@ new HstActionDto { ItemId = itemId });
         {
             using FuncLog funcLog = new(new { bookId, itemId }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
+            IEnumerable<HstActionDto> dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action
 WHERE book_id = @BookId AND item_id = @ItemId AND del_flg = 0;",

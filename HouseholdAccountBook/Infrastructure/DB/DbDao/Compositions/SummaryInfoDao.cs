@@ -25,18 +25,15 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         {
             using FuncLog funcLog = new(new { startDate, finishDate }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<SummaryInfoDto>(@"
-SELECT C.balance_kind, C.category_id, C.category_name, SQ.item_id, I.item_name, SQ.total
-FROM (
-  SELECT I.item_id AS item_id, COALESCE(SUM(A.act_value), 0) AS total
-  FROM mst_item I
-  LEFT JOIN (SELECT * FROM hst_action WHERE @StartDate <= act_time AND act_time < @FinishDate AND del_flg = 0) A ON A.item_id = I.item_id
-  WHERE I.item_id IN (SELECT item_id FROM rel_book_item WHERE del_flg = 0) AND I.del_flg = 0
-  GROUP BY I.item_id
-) SQ -- Sub Query
-INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = SQ.item_id
-INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
-ORDER BY C.balance_kind, C.sort_order, I.move_flg DESC, I.sort_order;",
+            IEnumerable<SummaryInfoDto> dtoList = await this.mDbHandler.QueryAsync<SummaryInfoDto>(@"
+SELECT C.balance_kind, C.category_id, C.category_name, I.item_id, I.item_name, COALESCE(SUM(A.act_value), 0) AS total
+FROM mst_item I
+INNER JOIN rel_book_item RBI ON RBI.item_id = I.item_id AND RBI.del_flg = 0
+INNER JOIN mst_category C ON C.category_id = I.category_id AND C.del_flg = 0
+LEFT JOIN hst_action A ON A.item_id = I.item_id AND A.book_id = RBI.book_id AND A.del_flg = 0 AND @StartDate <= A.act_time AND A.act_time < @FinishDate
+WHERE I.move_flg = 0 AND I.del_flg = 0
+GROUP BY C.balance_kind, C.category_id, C.category_name, I.item_id, I.item_name, C.sort_order, I.sort_order
+ORDER BY C.balance_kind, C.sort_order, I.sort_order;",
 new { StartDate = startDate, FinishDate = finishDate.AddDays(1) });
 
             return dtoList;
@@ -53,17 +50,15 @@ new { StartDate = startDate, FinishDate = finishDate.AddDays(1) });
         {
             using FuncLog funcLog = new(new { bookId, startDate, finishDate }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<SummaryInfoDto>(@"
-SELECT C.balance_kind, C.category_id, C.category_name, SQ.item_id, I.item_name, SQ.total
-FROM (
-  SELECT I.item_id AS item_id, COALESCE(SUM(A.act_value), 0) AS total
-  FROM mst_item I
-  LEFT JOIN (SELECT * FROM hst_action WHERE book_id = @BookId AND @StartDate <= act_time AND act_time < @FinishDate AND del_flg = 0) A ON A.item_id = I.item_id
-  WHERE (I.move_flg = 1 OR I.item_id IN (SELECT item_id FROM rel_book_item WHERE book_id = @BookId AND del_flg = 0)) AND I.del_flg = 0
-  GROUP BY I.item_id
-) SQ -- Sub Query
-INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = SQ.item_id
-INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
+            IEnumerable<SummaryInfoDto> dtoList = await this.mDbHandler.QueryAsync<SummaryInfoDto>(@"
+SELECT C.balance_kind, C.category_id, C.category_name, I.item_id, I.item_name, COALESCE(SUM(A.act_value), 0) AS total
+FROM mst_item I
+INNER JOIN mst_category C ON C.category_id = I.category_id AND C.del_flg = 0
+LEFT JOIN hst_action A ON A.item_id = I.item_id AND A.book_id = @BookId AND A.del_flg = 0 AND @StartDate <= A.act_time AND A.act_time < @FinishDate
+WHERE (EXISTS (
+    SELECT * FROM rel_book_item RBI
+    WHERE RBI.item_id = I.item_id AND RBI.book_id = @BookId AND RBI.del_flg = 0) OR I.move_flg = 1) AND I.del_flg = 0
+GROUP BY C.balance_kind, C.category_id, C.category_name, I.item_id, I.item_name, C.sort_order, I.move_flg, I.sort_order
 ORDER BY C.balance_kind, C.sort_order, I.move_flg DESC, I.sort_order;",
 new { BookId = bookId, StartDate = startDate, FinishDate = finishDate.AddDays(1) });
 

@@ -22,7 +22,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<MstItemDto>(@"
+            IEnumerable<MstItemDto> dtoList = await this.mDbHandler.QueryAsync<MstItemDto>(@"
 SELECT * 
 FROM mst_item
 WHERE del_flg = 0;");
@@ -39,7 +39,7 @@ WHERE del_flg = 0;");
         {
             using FuncLog funcLog = new(new { itemId }, Log.LogLevel.Trace);
 
-            var dto = await this.mDbHandler.QuerySingleOrDefaultAsync<MstItemDto>(@"
+            MstItemDto dto = await this.mDbHandler.QuerySingleOrDefaultAsync<MstItemDto>(@"
 SELECT *
 FROM mst_item
 WHERE item_id = @ItemId AND del_flg = 0;",
@@ -57,7 +57,7 @@ new MstItemDto { ItemId = itemId });
         {
             using FuncLog funcLog = new(new { categoryId }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<MstItemDto>(@"
+            IEnumerable<MstItemDto> dtoList = await this.mDbHandler.QueryAsync<MstItemDto>(@"
 SELECT item_id, item_name, advance_flg, sort_order
 FROM mst_item
 WHERE category_id = @CategoryId AND del_flg = 0

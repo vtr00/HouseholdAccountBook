@@ -22,7 +22,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<MstCategoryDto>(@"
+            IEnumerable<MstCategoryDto> dtoList = await this.mDbHandler.QueryAsync<MstCategoryDto>(@"
 SELECT * 
 FROM mst_category
 WHERE del_flg = 0;");
@@ -39,7 +39,7 @@ WHERE del_flg = 0;");
         {
             using FuncLog funcLog = new(new { categoryId }, Log.LogLevel.Trace);
 
-            var dto = await this.mDbHandler.QuerySingleOrDefaultAsync<MstCategoryDto>(@"
+            MstCategoryDto dto = await this.mDbHandler.QuerySingleOrDefaultAsync<MstCategoryDto>(@"
 SELECT *
 FROM mst_category
 WHERE category_id = @CategoryId AND del_flg = 0;",
@@ -58,7 +58,7 @@ new MstCategoryDto { CategoryId = categoryId });
         {
             using FuncLog funcLog = new(new { balanceKind }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<MstCategoryDto>(@"
+            IEnumerable<MstCategoryDto> dtoList = await this.mDbHandler.QueryAsync<MstCategoryDto>(@"
 SELECT *
 FROM mst_category
 WHERE balance_kind = @BalanceKind AND del_flg = 0 AND sort_order <> 0

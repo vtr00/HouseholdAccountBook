@@ -23,10 +23,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         {
             using FuncLog funcLog = new(new { groupId }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<MoveActionInfoDto>(@"
+            IEnumerable<MoveActionInfoDto> dtoList = await this.mDbHandler.QueryAsync<MoveActionInfoDto>(@"
 SELECT A.book_id, A.action_id, A.item_id, A.act_time, A.act_value, A.remark, I.move_flg
 FROM hst_action A
-INNER JOIN (SELECT * FROM mst_item WHERE del_flg = 0) I ON I.item_id = A.item_id
+INNER JOIN mst_item I ON I.item_id = A.item_id AND I.del_flg = 0
 WHERE A.del_flg = 0 AND A.group_id = @GroupId
 ORDER BY I.move_flg DESC;",
 new { GroupId = groupId });

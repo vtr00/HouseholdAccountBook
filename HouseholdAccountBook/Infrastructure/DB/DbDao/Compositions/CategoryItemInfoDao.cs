@@ -24,10 +24,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         {
             using FuncLog funcLog = new(new { bookId, balanceKind }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<CategoryItemInfoDto>(@"
+            IEnumerable<CategoryItemInfoDto> dtoList = await this.mDbHandler.QueryAsync<CategoryItemInfoDto>(@"
 SELECT I.item_id, I.item_name, C.category_name
 FROM mst_item I
-INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
+INNER JOIN mst_category C ON C.category_id = I.category_id AND C.del_flg = 0
 WHERE I.del_flg = 0 AND C.balance_kind = @BalanceKind AND
       EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @BookId AND RBI.item_id = I.item_id AND del_flg = 0)
 ORDER BY C.sort_order, I.sort_order;",
@@ -46,10 +46,10 @@ new { BalanceKind = balanceKind, BookId = bookId });
         {
             using FuncLog funcLog = new(new { bookId, categoryId }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<CategoryItemInfoDto>(@"
+            IEnumerable<CategoryItemInfoDto> dtoList = await this.mDbHandler.QueryAsync<CategoryItemInfoDto>(@"
 SELECT I.item_id, I.item_name, C.category_name
 FROM mst_item I
-INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
+INNER JOIN mst_category C ON C.category_id = I.category_id AND C.del_flg = 0
 WHERE I.del_flg = 0 AND C.category_id = @CategoryId AND
       EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @BookId AND RBI.item_id = I.item_id AND del_flg = 0)
 ORDER BY I.sort_order;",

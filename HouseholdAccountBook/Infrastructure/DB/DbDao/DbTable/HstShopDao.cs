@@ -25,7 +25,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<HstShopDto>(@"
+            IEnumerable<HstShopDto> dtoList = await this.mDbHandler.QueryAsync<HstShopDto>(@"
 SELECT * 
 FROM hst_shop
 WHERE del_flg = 0;");

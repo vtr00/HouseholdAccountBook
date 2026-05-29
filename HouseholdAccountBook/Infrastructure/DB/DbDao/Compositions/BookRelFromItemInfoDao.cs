@@ -23,11 +23,11 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         {
             using FuncLog funcLog = new(new { itemId }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<BookRelFromItemInfoDto>(@"
+            IEnumerable<BookRelFromItemInfoDto> dtoList = await this.mDbHandler.QueryAsync<BookRelFromItemInfoDto>(@"
 SELECT B.book_id AS book_id, B.book_name, RBI.book_id IS NOT NULL AS is_related
 FROM mst_book B
-LEFT JOIN (SELECT book_id FROM rel_book_item WHERE del_flg = 0 AND item_id = @ItemId) RBI ON RBI.book_id = B.book_id
-WHERE del_flg = 0
+LEFT JOIN rel_book_item RBI ON RBI.book_id = B.book_id AND RBI.item_id = @ItemId AND RBI.del_flg = 0
+WHERE B.del_flg = 0
 ORDER BY B.sort_order;",
 new { ItemId = itemId });
 
