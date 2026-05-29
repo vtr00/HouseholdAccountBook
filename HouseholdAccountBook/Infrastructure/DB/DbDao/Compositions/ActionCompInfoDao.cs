@@ -30,8 +30,8 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
 SELECT A.action_id, A.act_time, I.item_id, I.item_name, A.act_value, A.shop_name, A.remark, A.is_match, A.group_id
 FROM hst_action A
 INNER JOIN mst_item I ON I.item_id = A.item_id AND I.del_flg = 0
-WHERE to_date(to_char(act_time, 'YYYY-MM-DD'), 'YYYY-MM-DD') = @Date AND A.act_value = -@Value AND book_id = @BookId AND A.del_flg = 0;",
-new { Date = date, Value = value, BookId = bookId });
+WHERE @StartDate <= act_time AND act_time < @EndDate AND A.act_value = -@Value AND book_id = @BookId AND A.del_flg = 0;",
+new { StartDate = date, EndDate = date.AddDays(1), Value = value, BookId = bookId });
 
             return dtoList;
         }
