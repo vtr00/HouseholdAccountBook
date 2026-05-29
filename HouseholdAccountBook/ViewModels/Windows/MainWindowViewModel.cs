@@ -211,7 +211,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public int SelectedTabIndex {
             get => (int)this.SelectedTab;
-            set => this.SelectedTab = EnumUtil.SafeParseEnum(value, Tabs.BooksTab);
+            set => this.SelectedTab = EnumUtil.SafeCastEnum(value, Tabs.BooksTab);
         }
         /// <summary>
         /// 選択されたタブ種別
@@ -442,7 +442,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public int SelectedGraphKind1Index {
             get => (int)this.GraphKind1SelectorVM.SelectedKey;
-            set => this.GraphKind1SelectorVM.SelectedKey = EnumUtil.SafeParseEnum(value, GraphKind1.IncomeAndExpensesGraph);
+            set => this.GraphKind1SelectorVM.SelectedKey = EnumUtil.SafeCastEnum(value, GraphKind1.IncomeAndExpensesGraph);
         }
 
         /// <summary>
@@ -454,7 +454,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public int SelectedGraphKind2Index {
             get => (int)this.GraphKind2SelectorVM.SelectedKey;
-            set => this.GraphKind2SelectorVM.SelectedKey = EnumUtil.SafeParseEnum(value, GraphKind2.CategoryGraph);
+            set => this.GraphKind2SelectorVM.SelectedKey = EnumUtil.SafeCastEnum(value, GraphKind2.CategoryGraph);
         }
         #endregion
 

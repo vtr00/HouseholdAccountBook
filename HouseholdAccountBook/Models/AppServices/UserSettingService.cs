@@ -67,7 +67,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// 選択DB種別
         /// </summary>
         public DBKind SelectedDBKind {
-            get => EnumUtil.SafeParseEnum(this.mSettings.App_SelectedDBKind, DBKind.SQLite);
+            get => EnumUtil.SafeCastEnum(this.mSettings.App_SelectedDBKind, DBKind.SQLite);
             set {
                 this.mSettings.App_SelectedDBKind = (int)value;
                 this.mSettings.Save();
@@ -90,7 +90,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// 選択タブ
         /// </summary>
         public Tabs SelectedTab {
-            get => EnumUtil.SafeParseEnum(this.mSettings.MainWindow_SelectedTabIndex, Tabs.BooksTab);
+            get => EnumUtil.SafeCastEnum(this.mSettings.MainWindow_SelectedTabIndex, Tabs.BooksTab);
             set {
                 this.mSettings.MainWindow_SelectedTabIndex = (int)value;
                 this.mSettings.Save();
@@ -110,7 +110,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// 選択グラフ種別1
         /// </summary>
         public GraphKind1 SelectedGraphKind1 {
-            get => EnumUtil.SafeParseEnum(this.mSettings.MainWindow_SelectedGraphKindIndex, GraphKind1.IncomeAndExpensesGraph);
+            get => EnumUtil.SafeCastEnum(this.mSettings.MainWindow_SelectedGraphKindIndex, GraphKind1.IncomeAndExpensesGraph);
             set {
                 this.mSettings.MainWindow_SelectedGraphKindIndex = (int)value;
                 this.mSettings.Save();
@@ -120,7 +120,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// 選択グラフ種別2
         /// </summary>
         public GraphKind2 SelectedGraphKind2 {
-            get => EnumUtil.SafeParseEnum(this.mSettings.MainWindow_SelectedGraphKind2Index, GraphKind2.CategoryGraph);
+            get => EnumUtil.SafeCastEnum(this.mSettings.MainWindow_SelectedGraphKind2Index, GraphKind2.CategoryGraph);
             set {
                 this.mSettings.MainWindow_SelectedGraphKind2Index = (int)value;
                 this.mSettings.Save();

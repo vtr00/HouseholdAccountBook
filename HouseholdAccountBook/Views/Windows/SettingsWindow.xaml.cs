@@ -45,7 +45,6 @@ namespace HouseholdAccountBook.Views.Windows
             this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
-                this.WVM.DbTabVM.SelectedDBKind = dbHandlerFactory.DBKind;
                 await this.WVM.LoadAsync();
                 this.WVM.AddEventHandlers();
             };

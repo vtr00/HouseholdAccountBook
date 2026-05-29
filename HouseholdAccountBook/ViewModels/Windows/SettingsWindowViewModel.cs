@@ -39,7 +39,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public int SelectedTabIndex {
             get => (int)this.SelectedTab;
-            set => this.SelectedTab = EnumUtil.SafeParseEnum(value, SettingsTabs.BookSettingsTab);
+            set => this.SelectedTab = EnumUtil.SafeCastEnum(value, SettingsTabs.BookSettingsTab);
         }
         /// <summary>
         /// 選択された設定タブ種別

@@ -14,7 +14,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities
         /// <param name="value">変換対象の値</param>
         /// <param name="defaultValue">範囲外の場合の値</param>
         /// <returns>変換後の値</returns>
-        public static T SafeParseEnum<T>(int value, T defaultValue) where T : struct, Enum => Enum.IsDefined(typeof(T), value) ? (T)Enum.ToObject(typeof(T), value) : defaultValue;
+        public static T SafeCastEnum<T>(int value, T defaultValue) where T : struct, Enum => Enum.IsDefined(typeof(T), value) ? (T)Enum.ToObject(typeof(T), value) : defaultValue;
 
         /// <summary>
         /// 指定されたオブジェクトを安全にEnumに変換し、範囲外なら指定値を返す
@@ -23,6 +23,17 @@ namespace HouseholdAccountBook.Infrastructure.Utilities
         /// <param name="obj">変換対象の値</param>
         /// <param name="defaultValue">範囲外の場合の値</param>
         /// <returns>変換後の値</returns>
-        public static T SafeCastEnum<T>(object obj, T defaultValue) where T : struct, Enum => obj is not null ? (obj is T t ? t : defaultValue) : defaultValue;
+        public static T SafeCastEnum<T>(object obj, T defaultValue) where T : struct, Enum
+        {
+            if (obj is not null) {
+                if (obj is T t) {
+                    return t;
+                }
+                else if (obj is int i) {
+                    return SafeCastEnum(i, defaultValue);
+                }
+            }
+            return defaultValue;
+        }
     }
 }
