@@ -218,6 +218,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private void SaveDbSettingsCommand_Execute()
         {
             this.Save();
+            _ = MessageBox.Show(Properties.Resources.Message_CompletedToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
             this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
         }
         #endregion
@@ -240,10 +241,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             this.SelectedDBKind = UserSettingService.Instance.SelectedDBKind;
 
-            // PostgreSQL
-            this.PostgreSQLDBSettingVM.Load(null);
             // SQLite
             this.SQLiteSettingVM.Load();
+            // PostgreSQL
+            this.PostgreSQLDBSettingVM.Load(null);
             // Access(記帳風月)
             await this.AccessSettingVM.LoadForKichoFugetsuAsync();
 
@@ -270,10 +271,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             using FuncLog funcLog = new();
 
-            // PostgreSQL
-            _ = this.PostgreSQLDBSettingVM.Save(null);
-            // SQLite
-            _ = this.SQLiteSettingVM.Save();
+            switch (this.SelectedDBKind) {
+                case DBKind.SQLite:
+                    // SQLite
+                    _ = this.SQLiteSettingVM.Save();
+                    break;
+                case DBKind.PostgreSQL:
+                    // PostgreSQL
+                    _ = this.PostgreSQLDBSettingVM.Save(null);
+                    break;
+            }
             // Access(記帳風月)
             _ = this.AccessSettingVM.SaveForKichoFugetsu();
 

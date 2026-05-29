@@ -367,6 +367,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             LogImpl.DeleteOldLogFiles();
             ExceptionLog.DeleteOldExceptionLogs();
             WindowLog.DeleteAllOldWindowLogs([.. UiConstants.WindowNameStr.Values]);
+
+            _ = MessageBox.Show(Properties.Resources.Message_CompletedToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }
