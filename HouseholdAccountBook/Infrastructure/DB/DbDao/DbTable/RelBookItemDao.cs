@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<RelBookItemDto>(@"
+            IEnumerable<RelBookItemDto> dtoList = await this.mDbHandler.QueryAsync<RelBookItemDto>(@"
 SELECT * 
 FROM rel_book_item
 WHERE del_flg = 0;");
@@ -38,7 +38,7 @@ WHERE del_flg = 0;");
         {
             using FuncLog funcLog = new(new { bookId, itemId, includeDeleted }, Log.LogLevel.Trace);
 
-            var dto = includeDeleted
+            RelBookItemDto dto = includeDeleted
                 ? await this.mDbHandler.QuerySingleOrDefaultAsync<RelBookItemDto>(@"
 SELECT * FROM rel_book_item
 WHERE item_id = @ItemId AND book_id = @BookId;",

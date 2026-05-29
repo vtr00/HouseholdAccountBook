@@ -21,7 +21,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<HstRemarkDto>(@"
+            IEnumerable<HstRemarkDto> dtoList = await this.mDbHandler.QueryAsync<HstRemarkDto>(@"
 SELECT * 
 FROM hst_remark
 WHERE del_flg = 0;");
@@ -40,7 +40,7 @@ WHERE del_flg = 0;");
         {
             using FuncLog funcLog = new(new { remark, itemId, includeDeleted }, Log.LogLevel.Trace);
 
-            var dto = includeDeleted
+            HstRemarkDto dto = includeDeleted
                 ? await this.mDbHandler.QuerySingleOrDefaultAsync<HstRemarkDto>(@"
 SELECT * FROM hst_remark
 WHERE item_id = @ItemId AND remark = @Remark;",

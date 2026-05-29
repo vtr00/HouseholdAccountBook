@@ -22,7 +22,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<MstBookDto>(@"
+            IEnumerable<MstBookDto> dtoList = await this.mDbHandler.QueryAsync<MstBookDto>(@"
 SELECT * 
 FROM mst_book
 WHERE del_flg = 0
@@ -40,7 +40,7 @@ ORDER BY sort_order;");
         {
             using FuncLog funcLog = new(new { bookId }, Log.LogLevel.Trace);
 
-            var dto = await this.mDbHandler.QuerySingleOrDefaultAsync<MstBookDto>(@"
+            MstBookDto dto = await this.mDbHandler.QuerySingleOrDefaultAsync<MstBookDto>(@"
 SELECT *
 FROM mst_book
 WHERE book_id = @BookId AND del_flg = 0;",
@@ -57,7 +57,7 @@ new MstBookDto { BookId = bookId });
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<MstBookDto>(@"
+            IEnumerable<MstBookDto> dtoList = await this.mDbHandler.QueryAsync<MstBookDto>(@"
 SELECT * 
 FROM mst_book 
 WHERE del_flg = 0 AND json_code IS NOT NULL

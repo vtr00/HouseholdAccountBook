@@ -23,12 +23,12 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         {
             using FuncLog funcLog = new(new { bookId }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<ItemRelFromBookInfoDto>(@"
+            IEnumerable<ItemRelFromBookInfoDto> dtoList = await this.mDbHandler.QueryAsync<ItemRelFromBookInfoDto>(@"
 SELECT I.item_id AS item_id, C.balance_kind AS balance_kind, C.category_name AS category_name, I.item_name AS item_name, RBI.item_id IS NOT NULL AS is_related
 FROM mst_item I
-INNER JOIN (SELECT category_id, category_name, balance_kind, sort_order FROM mst_category WHERE del_flg = 0) C ON C.category_id = I.category_id
-LEFT JOIN (SELECT item_id FROM rel_book_item WHERE del_flg = 0 AND book_id = @BookId) RBI ON RBI.item_id = I.item_id
-WHERE del_flg = 0 AND move_flg = 0
+INNER JOIN mst_category C ON C.category_id = I.category_id AND C.del_flg = 0
+LEFT JOIN rel_book_item RBI ON RBI.item_id = I.item_id AND RBI.book_id = @BookId AND RBI.del_flg = 0
+WHERE I.del_flg = 0 AND I.move_flg = 0
 ORDER BY C.balance_kind, C.sort_order, I.sort_order;",
 new { BookId = bookId });
 

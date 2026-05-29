@@ -55,7 +55,7 @@ WHERE NOT EXISTS (SELECT 1 FROM mtd_schema_version);");
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<MtdSchemaVersionDto>(@"
+            IEnumerable<MtdSchemaVersionDto> dtoList = await this.mDbHandler.QueryAsync<MtdSchemaVersionDto>(@"
 SELECT * 
 FROM mtd_schema_version;");
 

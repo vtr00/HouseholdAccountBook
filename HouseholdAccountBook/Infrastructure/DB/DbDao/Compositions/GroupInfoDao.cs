@@ -22,10 +22,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         {
             using FuncLog funcLog = new(new { actionId }, Log.LogLevel.Trace);
 
-            var dto = await this.mDbHandler.QuerySingleAsync<GroupInfoDto>(@"
+            GroupInfoDto dto = await this.mDbHandler.QuerySingleAsync<GroupInfoDto>(@"
 SELECT A.group_id, G.group_kind
 FROM hst_action A
-LEFT JOIN (SELECT * FROM hst_group WHERE del_flg = 0) G ON G.group_id = A.group_id
+LEFT JOIN hst_group G ON G.group_id = A.group_id AND G.del_flg = 0
 WHERE A.action_id = @ActionId AND A.del_flg = 0;",
 new HstActionDto { ActionId = actionId });
 

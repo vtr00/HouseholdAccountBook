@@ -21,7 +21,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<HstGroupDto>(@"
+            IEnumerable<HstGroupDto> dtoList = await this.mDbHandler.QueryAsync<HstGroupDto>(@"
 SELECT * 
 FROM hst_group
 WHERE del_flg = 0;");
@@ -38,7 +38,7 @@ WHERE del_flg = 0;");
         {
             using FuncLog funcLog = new(new { groupId }, Log.LogLevel.Trace);
 
-            var dto = await this.mDbHandler.QuerySingleOrDefaultAsync<HstGroupDto>(@"
+            HstGroupDto dto = await this.mDbHandler.QuerySingleOrDefaultAsync<HstGroupDto>(@"
 SELECT * FROM hst_group
 WHERE group_id = @GroupId AND del_flg = 0;",
 new HstGroupDto { GroupId = groupId });

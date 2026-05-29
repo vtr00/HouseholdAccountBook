@@ -22,10 +22,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         {
             using FuncLog funcLog = new(new { categoryId }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
+            IEnumerable<HstActionDto> dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
 SELECT *
 FROM hst_action A
-INNER JOIN (SELECT item_id FROM mst_item WHERE del_flg = 0 AND category_id = @CategoryId) I ON A.item_id = I.item_id
+INNER JOIN mst_item I ON A.item_id = I.item_id AND I.category_id = @CategoryId AND I.del_flg = 0
 WHERE A.del_flg = 0;",
 new MstItemDto { CategoryId = categoryId });
 

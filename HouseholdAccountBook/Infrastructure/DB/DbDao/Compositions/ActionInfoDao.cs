@@ -25,20 +25,16 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         {
             using FuncLog funcLog = new(new { startDate, finishDate }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<ActionInfoDto>(@"
-SELECT A.action_id, A.act_time, B.book_id, C.category_id, I.item_id, B.book_name, C.category_name, I.item_name, A.act_value, 
-       A.shop_name, A.group_id, A.remark, A.is_match
+            IEnumerable<ActionInfoDto> dtoList = await this.mDbHandler.QueryAsync<ActionInfoDto>(@"
+SELECT A.action_id, A.act_time, B.book_id, C.category_id, I.item_id, B.book_name, C.category_name, 
+       I.item_name, A.act_value, A.shop_name, A.group_id, A.remark, A.is_match
 FROM hst_action A
-INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) B ON B.book_id = A.book_id
-INNER JOIN (SELECT * FROM mst_item WHERE item_id IN (
-    SELECT RBI.item_id 
-    FROM rel_book_item RBI
-    INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) B ON B.book_id = RBI.book_id
-    WHERE RBI.del_flg = 0
-) AND del_flg = 0) I ON I.item_id = A.item_id
-INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON I.category_id = C.category_id
+INNER JOIN mst_book B ON B.book_id = A.book_id AND B.del_flg = 0 
+INNER JOIN mst_item I ON I.item_id = A.item_id AND I.move_flg = 0 AND I.del_flg = 0 
+INNER JOIN rel_book_item RBI ON RBI.item_id = I.item_id AND RBI.book_id = A.book_id AND RBI.del_flg = 0
+INNER JOIN mst_category C ON I.category_id = C.category_id AND C.del_flg = 0
 WHERE A.del_flg = 0 AND @StartDate <= A.act_time AND A.act_time < @FinishDate
-ORDER BY act_time, balance_kind, C.sort_order, I.move_flg DESC, I.sort_order, B.sort_order, action_id;",
+ORDER BY act_time, balance_kind, C.sort_order, I.sort_order, B.sort_order, action_id;",
 new { StartDate = startDate, FinishDate = finishDate.AddDays(1) });
 
             return dtoList;
@@ -55,19 +51,17 @@ new { StartDate = startDate, FinishDate = finishDate.AddDays(1) });
         {
             using FuncLog funcLog = new(new { bookId, startDate, finishDate }, Log.LogLevel.Trace);
 
-            var dtoList = await this.mDbHandler.QueryAsync<ActionInfoDto>(@"
-SELECT A.action_id, A.act_time, B.book_id, C.category_id, I.item_id, B.book_name, C.category_name, I.item_name, A.act_value,
-       A.shop_name, A.group_id, A.remark, A.is_match
+            IEnumerable<ActionInfoDto> dtoList = await this.mDbHandler.QueryAsync<ActionInfoDto>(@"
+SELECT A.action_id, A.act_time, B.book_id, C.category_id, I.item_id, B.book_name, C.category_name,
+       I.item_name, A.act_value, A.shop_name, A.group_id, A.remark, A.is_match
 FROM hst_action A
-INNER JOIN (SELECT * FROM mst_book WHERE del_flg = 0) B ON B.book_id = A.book_id
-INNER JOIN (SELECT * FROM mst_item WHERE (move_flg = 1 OR item_id IN (
-    SELECT RBI.item_id
-    FROM rel_book_item RBI
-    WHERE RBI.book_id = @BookId AND RBI.del_flg = 0
-)) AND del_flg = 0) I ON I.item_id = A.item_id
-INNER JOIN (SELECT * FROM mst_category WHERE del_flg = 0) C ON I.category_id = C.category_id
-WHERE A.book_id = @BookId AND A.del_flg = 0 AND @StartDate <= A.act_time AND A.act_time < @FinishDate
-ORDER BY act_time, balance_kind, C.sort_order, I.move_flg DESC, I.sort_order, action_id;",
+INNER JOIN mst_book B ON B.book_id = A.book_id AND B.del_flg = 0
+INNER JOIN mst_item I ON I.item_id = A.item_id AND (EXISTS (
+    SELECT * FROM rel_book_item RBI 
+    WHERE RBI.item_id = I.item_id AND RBI.book_id = B.book_id AND RBI.del_flg = 0) OR I.move_flg = 1) AND I.del_flg = 0
+INNER JOIN mst_category C ON I.category_id = C.category_id AND C.del_flg = 0
+WHERE A.del_flg = 0 AND B.book_id = @BookId AND @StartDate <= A.act_time AND A.act_time < @FinishDate
+ORDER BY act_time, balance_kind, C.sort_order, I.move_flg DESC, I.sort_order, B.sort_order, action_id;",
 new { BookId = bookId, StartDate = startDate, FinishDate = finishDate.AddDays(1) });
 
             return dtoList;
