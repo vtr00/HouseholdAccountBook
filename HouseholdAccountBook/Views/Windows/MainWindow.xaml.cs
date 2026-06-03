@@ -240,7 +240,7 @@ namespace HouseholdAccountBook.Views.Windows
                 e.Result = sw.ShowDialog() == true;
             };
             // CSV比較要求イベントを登録する
-            this.WVM.CompareCsvFileRequested += (sender, e) => {
+            this.WVM.CompareCsvFileRequested += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.CompareCsvFileRequested));
 
                 if (this.mCCW is null) {
@@ -279,7 +279,8 @@ namespace HouseholdAccountBook.Views.Windows
                     };
                 }
                 else {
-                    this.mCCW.SetSelectedBookId(e.InitialBookId);
+                    // 設定で変更されている可能性があるため、帳簿を読み込み直す
+                    await this.mCCW.WVM.BookSelectorVM.LoadAsync(e.InitialBookId);
                 }
 
                 this.mCCW.Show();

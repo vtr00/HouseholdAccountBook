@@ -179,16 +179,5 @@ namespace HouseholdAccountBook.Views.Windows
             }
         }
         #endregion
-
-        /// <summary>
-        /// 選択対象の帳簿IDを設定する
-        /// </summary>
-        /// <param name="bookId">選択する帳簿ID</param>
-        public void SetSelectedBookId(BookIdObj bookId)
-        {
-            using FuncLog funcLog = new(new { bookId });
-
-            this.WVM.BookSelectorVM.SelectedKey = bookId;
-        }
     }
 }
