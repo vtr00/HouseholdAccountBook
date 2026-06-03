@@ -1,4 +1,4 @@
-# __歳時記帳(Household Account Book)__
+# __歳時記帳(Saiji-Kicho)__
 
 ## __Abstract__
 This software is for your household accounts book via PostgreSQL or SQLite.  
