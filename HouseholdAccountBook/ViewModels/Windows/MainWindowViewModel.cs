@@ -674,18 +674,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             UserSettingService.Instance.ImportSQLiteFilePath = e.FileName;
 
-            bool? result = false;
+            bool? result;
             try {
-                switch (this.SelectedDBKind) {
-                    case DBKind.SQLite: {
-                        result = DbImportService.ImportSQLite(e.FileName, UserSettingService.Instance.SQLiteConnectInfo.FilePath, token, progress);
-                        break;
-                    }
-                    case DBKind.PostgreSQL: {
-                        result = await this.mDbImportService.ImportSQLiteAsync(e.FileName, token, progress);
-                        break;
-                    }
-                }
+                result = await this.mDbImportService.ImportSQLiteAsync(e.FileName, token, progress);
             }
             catch (OperationCanceledException) {
                 result = null;
