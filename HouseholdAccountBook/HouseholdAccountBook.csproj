@@ -25,9 +25,9 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>resheet.png</PackageIcon>
     <PackageProjectUrl>https://github.com/vtr00/HouseholdAccountBook</PackageProjectUrl>
-    <Title>Household Account Book</Title>
+    <Title>Saiji-Kicho</Title>
     <Copyright>Copyright (c) toresebu All rights reserved</Copyright>
-    <Description>Your household accounts book</Description>
+    <Description>For your household account book</Description>
     <RepositoryUrl>https://github.com/vtr00/HouseholdAccountBook</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <NeutralLanguage>ja-JP</NeutralLanguage>
@@ -39,6 +39,8 @@
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyTitle>For your household account book</AssemblyTitle>
+    <Product>$(Title)</Product>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>

@@ -124,6 +124,9 @@
     <value>Wallet</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="UpdateLog" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
   <data name="AppIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\resheet.ico;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -389,10 +392,10 @@
     <value>Select a backup folder</value>
   </data>
   <data name="Title_MainWindow" xml:space="preserve">
-    <value>Household Account Book</value>
+    <value>Saiji-Kicho</value>
   </data>
   <data name="Title_DbSettingWindow" xml:space="preserve">
-    <value>Database settings</value>
+    <value>Saiji-Kicho - Database settings</value>
   </data>
   <data name="Title_CsvComparisonWindow" xml:space="preserve">
     <value>CSV comparison</value>
@@ -1040,7 +1043,7 @@ list</value>
     <value>Encoding</value>
   </data>
   <data name="TextBlock_ApplicationName" xml:space="preserve">
-    <value>Household Account Book</value>
+    <value>Saiji-Kicho</value>
   </data>
   <data name="Message_FailedToGetHolidayList" xml:space="preserve">
     <value>Failed to get holoday list.</value>
