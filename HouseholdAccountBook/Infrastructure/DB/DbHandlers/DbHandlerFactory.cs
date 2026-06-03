@@ -63,17 +63,18 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers
         /// <summary>
         /// [非同期] <see cref="DbHandlerBase"/> を生成する
         /// </summary>
+        /// <param name="optimizing">最適化設定を行うか</param>
         /// <param name="timeoutMs">タイムアウト時間(ms)。0以下の場合は無制限</param>
         /// <returns>DbHandler</returns>
         /// <exception cref="TimeoutException">接続タイムアウトが発生した場合</exception>
         /// <remarks>このタイミングではSQLiteファイルは生成されない</remarks>
-        public async Task<DbHandlerBase> CreateAsync(int timeoutMs = 0)
+        public async Task<DbHandlerBase> CreateAsync(bool optimizing = true, int timeoutMs = 0)
         {
             using FuncLog funcLog = new(new { timeoutMs }, Log.LogLevel.Trace);
 
             try {
                 DbHandlerBase dbHandler = this.DBLibKind switch {
-                    DBLibraryKind.SQLite => new SQLiteDbHandler(this.mConnectInfo as SQLiteDbHandler.ConnectInfo),
+                    DBLibraryKind.SQLite => new SQLiteDbHandler(this.mConnectInfo as SQLiteDbHandler.ConnectInfo, optimizing),
                     DBLibraryKind.PostgreSQL => new NpgsqlDbHandler(this.mConnectInfo as NpgsqlDbHandler.ConnectInfo),
                     DBLibraryKind.OleDb => new OleDbHandler(this.mConnectInfo as OleDbHandler.ConnectInfo),
                     _ => null,

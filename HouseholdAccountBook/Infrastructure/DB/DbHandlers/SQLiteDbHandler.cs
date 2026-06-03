@@ -41,6 +41,11 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// DBファイルパス
         /// </summary>
         public string DbFilePath => (this.mConnectInfoBase as ConnectInfo).FilePath;
+
+        /// <summary>
+        /// 最適化設定を行うか
+        /// </summary>
+        public bool Optimizing { get; init; } = true;
         /// <summary>
         /// gragma設定
         /// </summary>
@@ -51,17 +56,20 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// <see cref="SQLiteDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="info">接続情報</param>
-        public SQLiteDbHandler(ConnectInfo info) : this(info.FilePath) => this.mConnectInfoBase = info;
+        /// <param name="optimizing">最適化設定を行うか</param>
+        public SQLiteDbHandler(ConnectInfo info, bool optimizing) : this(info.FilePath, optimizing) => this.mConnectInfoBase = info;
 
         /// <summary>
         /// <see cref="SQLiteDbHandler"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
-        private SQLiteDbHandler(string filePath) : base(new SqliteConnection(string.Format(mStringFormat, filePath)))
+        /// <param name="optimizing">最適化設定を行うか</param>
+        private SQLiteDbHandler(string filePath, bool optimizing) : base(new SqliteConnection(string.Format(mStringFormat, filePath)))
         {
-            using FuncLog funcLog = new(new { filePath }, Log.LogLevel.Trace);
+            using FuncLog funcLog = new(new { filePath, optimizing }, Log.LogLevel.Trace);
 
             this.LibKind = DBLibraryKind.SQLite;
+            this.Optimizing = optimizing;
 
             // SQLiteはファイルがない状態で接続するとファイルが作成される仕様のため、ファイルがない場合は接続しない
             if (!File.Exists(filePath)) {
@@ -74,7 +82,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
             using FuncLog funcLog = new(new { timeoutMs }, Log.LogLevel.Trace);
 
             bool opened = await base.OpenAsync(timeoutMs);
-            if (opened) {
+            if (opened && this.Optimizing) {
                 try {
                     // WALモード：Write-Ahead Logging による同時実行性の向上
                     _ = await this.ExecuteAsync("PRAGMA journal_mode = WAL;");
@@ -103,7 +111,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
-            if (this.mConnection != null) {
+            if (this.mConnection != null && this.Optimizing) {
                 try {
                     // クエリ最適化レベルを上げる
                     _ = await this.ExecuteAsync("PRAGMA optimize;");

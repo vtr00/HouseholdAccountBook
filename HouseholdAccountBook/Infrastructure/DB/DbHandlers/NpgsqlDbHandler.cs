@@ -92,8 +92,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// ダンプを実行する
         /// </summary>
         /// <param name="backupFilePath">バックアップファイルパス</param>
-        /// <param name="dumpExePath">pg_dump.exeパス</param>
-        /// <param name="passwordInput">パスワード入力方法</param>
+        /// <param name="config">バックアップ設定</param>
         /// <param name="format">ダンプフォーマット</param>
         /// <param name="notifyResult">実行結果を通知するデリゲート</param>
         /// <param name="waitForFinish">処理の完了を待機するか</param>
@@ -165,7 +164,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// リストアを実行する
         /// </summary>
         /// <param name="backupFilePath">バックアップファイルパス</param>
-        /// <param name="restoreExePath"></param>
+        /// <param name="config">バックアップ設定</param>
         /// <returns>エラーコード</returns>
         public async Task<int> ExecuteRestore(string backupFilePath, BackupConfiguration config)
         {
