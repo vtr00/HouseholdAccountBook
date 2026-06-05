@@ -12,7 +12,7 @@ This project incorporates material from the following third-party projects:
    Copyright © 2009-2024 Josh Close
    https://joshclose.github.io/CsvHelper/
 
-# Dapper 2.1.72
+# Dapper 2.1.79
    License: Apache-2.0
    2019 Stack Exchange, Inc.
    https://github.com/DapperLib/Dapper
@@ -47,67 +47,67 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Data.Sqlite 10.0.7
+# Microsoft.Data.Sqlite 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.Data.Sqlite.Core 10.0.7
+# Microsoft.Data.Sqlite.Core 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.EntityFrameworkCore 10.0.7
+# Microsoft.EntityFrameworkCore 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Abstractions 10.0.7
+# Microsoft.EntityFrameworkCore.Abstractions 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Analyzers 10.0.7
+# Microsoft.EntityFrameworkCore.Analyzers 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.Extensions.Caching.Abstractions 10.0.7
+# Microsoft.Extensions.Caching.Abstractions 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Caching.Memory 10.0.7
+# Microsoft.Extensions.Caching.Memory 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection 10.0.7
+# Microsoft.Extensions.DependencyInjection 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection.Abstractions 10.0.7
+# Microsoft.Extensions.DependencyInjection.Abstractions 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging 10.0.7
+# Microsoft.Extensions.Logging 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging.Abstractions 10.0.7
+# Microsoft.Extensions.Logging.Abstractions 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Options 10.0.7
+# Microsoft.Extensions.Options 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Primitives 10.0.7
+# Microsoft.Extensions.Primitives 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
@@ -157,12 +157,17 @@ This project incorporates material from the following third-party projects:
    Copyright © James Newton-King 2008
    https://www.newtonsoft.com/json
 
-# Notification.Wpf 8.0.0
-   License: MIT
+# Notification.CoreUI 10.1.0
+   License: LICENSE
    https://github.com/Platonenkov
    https://github.com/Platonenkov/Notification.Wpf
 
-# Npgsql 10.0.2
+# Notification.Wpf 10.1.0
+   License: LICENSE
+   https://github.com/Platonenkov
+   https://github.com/Platonenkov/Notification.Wpf
+
+# Npgsql 10.0.3
    License: PostgreSQL
    Copyright 2025 © The Npgsql Development Team
    https://github.com/npgsql/npgsql
@@ -203,7 +208,7 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://github.com/dotnet/runtime
 
-# System.Data.OleDb 10.0.7
+# System.Data.OleDb 10.0.8
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
@@ -212,4 +217,9 @@ This project incorporates material from the following third-party projects:
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet
+
+# System.ValueTuple 4.6.2
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://github.com/dotnet/maintenance-packages
 
