@@ -52,7 +52,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿選択変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<BookIdObj>> SelectedBookChanged;
+        public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedAccountChanged;
         /// <summary>
         /// タブ選択変更時イベント
         /// </summary>
@@ -70,7 +70,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public event EventHandler<ChangedEventArgs<(BalanceKind?, CategoryIdObj, ItemIdObj)?>> SelectedSeriesChanged {
             add {
-                this.BookTabVM.SelectedSeriesChanged += value;
+                this.AccountTabVM.SelectedSeriesChanged += value;
                 this.DailyGraphTabVM.SelectedSeriesChanged += value;
                 this.MonthlySummaryTabVM.SelectedSeriesChanged += value;
                 this.MonthlyGraphTabVM.SelectedSeriesChanged += value;
@@ -78,7 +78,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 this.YearlyGraphTabVM.SelectedSeriesChanged += value;
             }
             remove {
-                this.BookTabVM.SelectedSeriesChanged -= value;
+                this.AccountTabVM.SelectedSeriesChanged -= value;
                 this.DailyGraphTabVM.SelectedSeriesChanged -= value;
                 this.MonthlySummaryTabVM.SelectedSeriesChanged -= value;
                 this.MonthlyGraphTabVM.SelectedSeriesChanged -= value;
@@ -91,65 +91,65 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// スクロール要求時イベント
         /// </summary>
         public event EventHandler<EventArgs<int>> ScrollRequested {
-            add => this.BookTabVM.ScrollRequested += value;
-            remove => this.BookTabVM.ScrollRequested -= value;
+            add => this.AccountTabVM.ScrollRequested += value;
+            remove => this.AccountTabVM.ScrollRequested -= value;
         }
 
         /// <summary>
         /// 移動追加要求時イベント
         /// </summary>
         public event EventHandler<AddMoveRequestEventArgs> AddMoveRequested {
-            add => this.BookTabVM.AddMoveRequested += value;
-            remove => this.BookTabVM.AddMoveRequested -= value;
+            add => this.AccountTabVM.AddMoveRequested += value;
+            remove => this.AccountTabVM.AddMoveRequested -= value;
         }
         /// <summary>
         /// 帳簿項目追加要求時イベント
         /// </summary>
         public event EventHandler<AddActionRequestEventArgs> AddActionRequested {
-            add => this.BookTabVM.AddActionRequested += value;
-            remove => this.BookTabVM.AddActionRequested -= value;
+            add => this.AccountTabVM.AddActionRequested += value;
+            remove => this.AccountTabVM.AddActionRequested -= value;
         }
         /// <summary>
         /// 帳簿項目リスト追加要求時イベント
         /// </summary>
         public event EventHandler<AddActionListRequestEventArgs> AddActionListRequested {
-            add => this.BookTabVM.AddActionListRequested += value;
-            remove => this.BookTabVM.AddActionListRequested -= value;
+            add => this.AccountTabVM.AddActionListRequested += value;
+            remove => this.AccountTabVM.AddActionListRequested -= value;
         }
         /// <summary>
         /// 移動複製要求時イベント
         /// </summary>
         public event EventHandler<CopyMoveRequestEventArgs> CopyMoveRequested {
-            add => this.BookTabVM.CopyMoveRequested += value;
-            remove => this.BookTabVM.CopyMoveRequested -= value;
+            add => this.AccountTabVM.CopyMoveRequested += value;
+            remove => this.AccountTabVM.CopyMoveRequested -= value;
         }
         /// <summary>
         /// 帳簿項目複製要求時イベント
         /// </summary>
         public event EventHandler<CopyActionRequestEventArgs> CopyActionRequested {
-            add => this.BookTabVM.CopyActionRequested += value;
-            remove => this.BookTabVM.CopyActionRequested -= value;
+            add => this.AccountTabVM.CopyActionRequested += value;
+            remove => this.AccountTabVM.CopyActionRequested -= value;
         }
         /// <summary>
         /// 移動編集要求時イベント
         /// </summary>
         public event EventHandler<EditMoveRequestEventArgs> EditMoveRequested {
-            add => this.BookTabVM.EditMoveRequested += value;
-            remove => this.BookTabVM.EditMoveRequested -= value;
+            add => this.AccountTabVM.EditMoveRequested += value;
+            remove => this.AccountTabVM.EditMoveRequested -= value;
         }
         /// <summary>
         /// 帳簿項目編集要求時イベント
         /// </summary>
         public event EventHandler<EditActionRequestEventArgs> EditActionRequested {
-            add => this.BookTabVM.EditActionRequested += value;
-            remove => this.BookTabVM.EditActionRequested -= value;
+            add => this.AccountTabVM.EditActionRequested += value;
+            remove => this.AccountTabVM.EditActionRequested -= value;
         }
         /// <summary>
         /// 帳簿項目リスト編集要求時イベント
         /// </summary>
         public event EventHandler<EditActionListRequestEventArgs> EditActionListRequested {
-            add => this.BookTabVM.EditActionListRequested += value;
-            remove => this.BookTabVM.EditActionListRequested -= value;
+            add => this.AccountTabVM.EditActionListRequested += value;
+            remove => this.AccountTabVM.EditActionListRequested -= value;
         }
         /// <summary>
         /// 期間選択要求時イベント
@@ -211,7 +211,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public int SelectedTabIndex {
             get => (int)this.SelectedTab;
-            set => this.SelectedTab = EnumUtil.SafeCastEnum(value, Tabs.BooksTab);
+            set => this.SelectedTab = EnumUtil.SafeCastEnum(value, Tabs.AccountTab);
         }
         /// <summary>
         /// 選択されたタブ種別
@@ -232,7 +232,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿セレクタVM
         /// </summary>
-        public SelectorViewModel<BookModel, BookIdObj> BookSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        public SelectorViewModel<AccountModel, AccountIdObj> AccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 選択された収支種別
@@ -251,7 +251,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 表示開始日付
         /// </summary>
         public DateOnly DisplayedStart => this.SelectedTab switch {
-            Tabs.BooksTab or Tabs.DailyGraphTab => this.StartDate,
+            Tabs.AccountTab or Tabs.DailyGraphTab => this.StartDate,
             Tabs.MonthlyListTab or Tabs.MonthlyGraphTab => this.DisplayedStartMonth,
             Tabs.YearlyGraphTab or Tabs.YearlyListTab => this.DisplayedStartYear,
             _ => this.StartDate,
@@ -260,7 +260,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 表示終了日付
         /// </summary>
         public DateOnly DisplayedEnd => this.SelectedTab switch {
-            Tabs.BooksTab or Tabs.DailyGraphTab => this.EndDate,
+            Tabs.AccountTab or Tabs.DailyGraphTab => this.EndDate,
             Tabs.MonthlyListTab or Tabs.MonthlyGraphTab => this.DisplayedEndMonth,
             Tabs.YearlyGraphTab or Tabs.YearlyListTab => this.DisplayedEndYear,
             _ => this.EndDate
@@ -269,7 +269,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 表示期間
         /// </summary>
         public PeriodObj<DateOnly> DisplayedPeriod => this.SelectedTab switch {
-            Tabs.BooksTab or Tabs.DailyGraphTab => new(this.StartDate, this.EndDate),
+            Tabs.AccountTab or Tabs.DailyGraphTab => new(this.StartDate, this.EndDate),
             Tabs.MonthlyListTab or Tabs.MonthlyGraphTab => new(this.DisplayedStartMonth, this.DisplayedEndMonth),
             Tabs.YearlyGraphTab or Tabs.YearlyListTab => new(this.DisplayedStartYear, this.DisplayedEndYear),
             _ => new(this.StartDate, this.EndDate)
@@ -462,7 +462,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿タブVM
         /// </summary>
-        public MainWindowBookTabViewModel BookTabVM => field ??= new(this, Tabs.BooksTab, this.mBusyService);
+        public MainWindowAccountTabViewModel AccountTabVM => field ??= new(this, Tabs.AccountTab, this.mBusyService);
         /// <summary>
         /// 日別グラフタブVM
         /// </summary>
@@ -541,7 +541,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             if (result == true) {
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
+                await this.UpdateAsync(isUpdateAccountList: true, isScroll: true, isUpdateActDateLastEdited: true);
             }
 
             switch (result) {
@@ -586,7 +586,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             if (result == true) {
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
+                await this.UpdateAsync(isUpdateAccountList: true, isScroll: true, isUpdateActDateLastEdited: true);
             }
 
             switch (result) {
@@ -635,7 +635,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             bool result = await this.mDbImportService.ImportCustomFileAsync(e.FileName);
             if (result) {
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
+                await this.UpdateAsync(isUpdateAccountList: true, isScroll: true, isUpdateActDateLastEdited: true);
             }
 
             _ = result
@@ -683,7 +683,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             if (result == true) {
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true, isUpdateActDateLastEdited: true);
+                await this.UpdateAsync(isUpdateAccountList: true, isScroll: true, isUpdateActDateLastEdited: true);
             }
 
             switch (result) {
@@ -781,7 +781,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             if (result) {
                 UserSettingService.Instance.CurrentBackUpBySelf = DateTime.Now;
-                this.BookTabVM.RaiseCurrentBackUpChanged();
+                this.AccountTabVM.RaiseCurrentBackUpChanged();
             }
 
             _ = result
@@ -813,7 +813,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿項目タブ表示コマンド
         /// </summary>
-        public ICommand ShowBookTabCommand => field ??= new RelayCommand(() => this.SelectedTab = Tabs.BooksTab, () => this.SelectedTab != Tabs.BooksTab);
+        public ICommand ShowAccountTabCommand => field ??= new RelayCommand(() => this.SelectedTab = Tabs.AccountTab, () => this.SelectedTab != Tabs.AccountTab);
 
         /// <summary>
         /// 日別グラフタブ表示コマンド
@@ -826,14 +826,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <remarks>帳簿/月間一覧タブを選択している</remarks>
         public ICommand GoToLastMonthCommand => field ??= new AsyncRelayCommand(
             this.GoToLastMonthCommand_ExecuteAsync,
-            () => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly, this.mBusyService);
+            () => (this.SelectedTab == Tabs.AccountTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly, this.mBusyService);
         /// <summary>
         /// 先月表示コマンド処理
         /// </summary>
         private async Task GoToLastMonthCommand_ExecuteAsync()
         {
             this.DisplayedMonth = this.DisplayedMonth.Value.AddMonths(-1);
-            await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
+            await this.UpdateAsync(isUpdateAccountList: true, isScroll: true);
         }
 
         /// <summary>
@@ -848,7 +848,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             DateOnly thisMonth = DateOnlyExtensions.Today.GetFirstDateOfMonth();
             // 帳簿/月間一覧タブを選択している かつ 今月が表示されていない
-            return (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) &&
+            return (this.SelectedTab == Tabs.AccountTab || this.SelectedTab == Tabs.DailyGraphTab) &&
                    (this.DisplayedPeriodKind == PeriodKind.Selected || this.DisplayedMonth < thisMonth || thisMonth.AddMonths(1) <= this.DisplayedMonth);
         }
         /// <summary>
@@ -857,7 +857,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async Task GoToThisMonthCommand_ExecuteAsync()
         {
             this.DisplayedMonth = DateOnlyExtensions.Today.GetFirstDateOfMonth();
-            await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
+            await this.UpdateAsync(isUpdateAccountList: true, isScroll: true);
         }
 
         /// <summary>
@@ -866,14 +866,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <remarks>帳簿/日別一覧タブを選択している</remarks>
         public ICommand GoToNextMonthCommand => field ??= new AsyncRelayCommand(
             this.GoToNextMonthCommand_ExecuteAsync,
-            () => (this.SelectedTab == Tabs.BooksTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly, this.mBusyService);
+            () => (this.SelectedTab == Tabs.AccountTab || this.SelectedTab == Tabs.DailyGraphTab) && this.DisplayedPeriodKind == PeriodKind.Monthly, this.mBusyService);
         /// <summary>
         /// 来月表示コマンド処理
         /// </summary>
         private async Task GoToNextMonthCommand_ExecuteAsync()
         {
             this.DisplayedMonth = this.DisplayedMonth.Value.AddMonths(1);
-            await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
+            await this.UpdateAsync(isUpdateAccountList: true, isScroll: true);
         }
 
         /// <summary>
@@ -897,7 +897,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 this.StartDate = e.Period.Start;
                 this.EndDate = e.Period.End;
 
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
+                await this.UpdateAsync(isUpdateAccountList: true, isScroll: true);
             }
         }
 
@@ -934,7 +934,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async Task GoToLastYearCommand_ExecuteAsync()
         {
             this.DisplayedYear = this.DisplayedYear.AddYears(-1);
-            await this.UpdateAsync(isUpdateBookList: true);
+            await this.UpdateAsync(isUpdateAccountList: true);
         }
 
         /// <summary>
@@ -958,7 +958,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async Task GoToThisYearCommand_ExecuteAsync()
         {
             this.DisplayedYear = DateOnlyExtensions.Today.GetFirstDateOfFiscalYear(this.FiscalStartMonth);
-            await this.UpdateAsync(isUpdateBookList: true);
+            await this.UpdateAsync(isUpdateAccountList: true);
         }
 
         /// <summary>
@@ -974,13 +974,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async Task GoToNextYearCommand_ExecuteAsync()
         {
             this.DisplayedYear = this.DisplayedYear.AddYears(1);
-            await this.UpdateAsync(isUpdateBookList: true);
+            await this.UpdateAsync(isUpdateAccountList: true);
         }
 
         /// <summary>
         /// 更新コマンド
         /// </summary>
-        public ICommand UpdateCommand => field ??= new AsyncRelayCommand(async () => await this.UpdateAsync(isUpdateBookList: true), null, this.mBusyService);
+        public ICommand UpdateCommand => field ??= new AsyncRelayCommand(async () => await this.UpdateAsync(isUpdateAccountList: true), null, this.mBusyService);
         #endregion
 
         #region デバッグコマンド
@@ -1027,14 +1027,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     NotificationService.NotifyFailingToGetHolidayList();
                 }
 
-                await this.UpdateAsync(isUpdateBookList: true);
+                await this.UpdateAsync(isUpdateAccountList: true);
             }
         }
 
         /// <summary>
         /// 帳簿内ツールコマンド
         /// </summary>
-        public ICommand ToolInBookCommand => field ??= new RelayCommand(() => this.SelectedTab == Tabs.BooksTab);
+        public ICommand ToolInAccountCommand => field ??= new RelayCommand(() => this.SelectedTab == Tabs.AccountTab);
 
         /// <summary>
         /// CSVファイル比較コマンド
@@ -1047,7 +1047,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             CompareCsvFileRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
-                InitialBookId = this.BookSelectorVM.SelectedKey
+                InitialAccountId = this.AccountSelectorVM.SelectedKey
             };
             this.CompareCsvFileRequested?.Invoke(this, e);
         }
@@ -1113,7 +1113,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             this.mChildrenVM.AddRange(
                 [
-                    this.BookTabVM,
+                    this.AccountTabVM,
                     this.DailyGraphTabVM,
                     this.MonthlySummaryTabVM,
                     this.MonthlyGraphTabVM,
@@ -1130,7 +1130,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.mService = new(this.mDbHandlerFactory);
             this.mDbImportService = new(this.mDbHandlerFactory);
 
-            this.BookSelectorVM.SetLoader(async () => await this.mService.LoadBookListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllAccounts));
+            this.AccountSelectorVM.SetLoader(async () => await this.mService.LoadAccountListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllAccounts));
             this.GraphKind1SelectorVM.SetLoader(() => GraphKind1Str);
             this.GraphKind2SelectorVM.SetLoader(() => GraphKind2Str);
         }
@@ -1146,15 +1146,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 using IDisposable disposable = this.mBusyService.Enter();
                 UserSettingService.Instance.SelectedTab = e.NewValue;
 
-                await this.UpdateAsync(isUpdateBookList: true, isScroll: true);
+                await this.UpdateAsync(isUpdateAccountList: true, isScroll: true);
             };
             // 帳簿選択変更時
-            this.BookSelectorVM.SelectionChanged += async (sender, e) => {
-                this.SelectedBookChanged?.Invoke(sender, e);
+            this.AccountSelectorVM.SelectionChanged += async (sender, e) => {
+                this.SelectedAccountChanged?.Invoke(sender, e);
 
-                UserSettingService.Instance.SelectedBookId = e.NewValue ?? BookIdObj.System;
+                UserSettingService.Instance.SelectedAccountId = e.NewValue ?? AccountIdObj.System;
 
-                await this.UpdateAsync(isUpdateBookList: false, isScroll: true);
+                await this.UpdateAsync(isUpdateAccountList: false, isScroll: true);
             };
             // グラフ種別1選択変更時
             this.GraphKind1SelectorVM.SelectionChanged += async (sender, e) => {
@@ -1162,7 +1162,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
                 UserSettingService.Instance.SelectedGraphKind1 = e.NewValue;
 
-                await this.UpdateAsync(isUpdateBookList: false);
+                await this.UpdateAsync(isUpdateAccountList: false);
             };
             // グラフ種別2選択変更時
             this.GraphKind2SelectorVM.SelectionChanged += async (sender, e) => {
@@ -1170,7 +1170,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
                 UserSettingService.Instance.SelectedGraphKind2 = e.NewValue;
 
-                await this.UpdateAsync(isUpdateBookList: false);
+                await this.UpdateAsync(isUpdateAccountList: false);
             };
             // 系列選択変更時
             this.SelectedSeriesChanged += (sender, e) => {
@@ -1199,7 +1199,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedDBKind = this.mDbHandlerFactory.DBKind;
 
             // 帳簿リスト更新
-            await this.BookSelectorVM.LoadAsync(UserSettingService.Instance.SelectedBookId);
+            await this.AccountSelectorVM.LoadAsync(UserSettingService.Instance.SelectedAccountId);
             // タブ選択
             this.SelectedTab = UserSettingService.Instance.SelectedTab;
             // グラフ種別1更新
@@ -1209,7 +1209,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             Log.Vars(vars: new { this.SelectedTabIndex, this.SelectedGraphKind1Index, this.SelectedGraphKind2Index });
 
-            await this.UpdateAsync(isUpdateBookList: false, isScroll: true, isUpdateActDateLastEdited: true);
+            await this.UpdateAsync(isUpdateAccountList: false, isScroll: true, isUpdateActDateLastEdited: true);
         }
 
         #region ウィンドウ設定プロパティ
@@ -1232,21 +1232,21 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 画面更新(タブ非依存)
         /// </summary>
-        /// <param name="isUpdateBookList">帳簿リストを更新するか</param>
+        /// <param name="isUpdateAccountList">帳簿リストを更新するか</param>
         /// <param name="isScroll">帳簿項目一覧をスクロールするか</param>
         /// <param name="isUpdateActDateLastEdited">最後に操作した帳簿項目を更新するか</param>
-        public async Task UpdateAsync(bool isUpdateBookList = true, bool isScroll = false, bool isUpdateActDateLastEdited = false)
+        public async Task UpdateAsync(bool isUpdateAccountList = true, bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
-            using FuncLog funcLog = new(new { isUpdateBookList, isScroll, isUpdateActDateLastEdited });
+            using FuncLog funcLog = new(new { isUpdateAccountList, isScroll, isUpdateActDateLastEdited });
 
             this.UpdateOperationLogFileMenuList();
-            if (isUpdateBookList) {
-                await this.BookSelectorVM.LoadAsync();
+            if (isUpdateAccountList) {
+                await this.AccountSelectorVM.LoadAsync();
             }
 
             switch (this.SelectedTab) {
-                case Tabs.BooksTab:
-                    await this.BookTabVM.LoadAsync(isScroll: isScroll, isUpdateActDateLastEdited: isUpdateActDateLastEdited);
+                case Tabs.AccountTab:
+                    await this.AccountTabVM.LoadAsync(isScroll: isScroll, isUpdateActDateLastEdited: isUpdateActDateLastEdited);
                     break;
                 case Tabs.DailyGraphTab:
                     await this.DailyGraphTabVM.LoadAsync();

@@ -105,12 +105,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 SeriesViewModelLoader loader = new(new(this.mDbHandlerFactory));
                 IEnumerable<SeriesViewModel> tmpVMList = this.Tab switch {
                     Tabs.DailyGraphTab => this.Parent.DisplayedPeriodKind switch {
-                        PeriodKind.Monthly => await loader.LoadDailySeriesViewModelListWithinMonthAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value),
-                        PeriodKind.Selected => await loader.LoadDailySeriesViewModelListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedPeriod),
+                        PeriodKind.Monthly => await loader.LoadDailySeriesViewModelListWithinMonthAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value),
+                        PeriodKind.Selected => await loader.LoadDailySeriesViewModelListAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedPeriod),
                         _ => throw new InvalidOperationException(),
                     },
-                    Tabs.MonthlyGraphTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
-                    Tabs.YearlyGraphTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
+                    Tabs.MonthlyGraphTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
+                    Tabs.YearlyGraphTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
                     _ => throw new InvalidOperationException(),
                 };
 

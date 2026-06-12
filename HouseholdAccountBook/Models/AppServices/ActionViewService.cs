@@ -89,18 +89,18 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// 繰越残高を取得する
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="accountId">帳簿ID</param>
         /// <param name="startDate">開始日付</param>
         /// <returns>繰越残高</returns>
-        public async Task<decimal> LoadEndingBalance(BookIdObj bookId, DateOnly startDate)
+        public async Task<decimal> LoadEndingBalance(AccountIdObj accountId, DateOnly startDate)
         {
-            using FuncLog funcLog = new(new { bookId, startDate });
+            using FuncLog funcLog = new(new { accountId, startDate });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
-            EndingBalanceInfoDto dto = bookId == BookIdObj.System
+            EndingBalanceInfoDto dto = accountId == AccountIdObj.System
                 ? await endingBalanceInfoDao.Find(startDate) // 全帳簿の繰越残高
-                : await endingBalanceInfoDao.FindByBookId(bookId.Id, startDate); // 各帳簿の繰越残高
+                : await endingBalanceInfoDao.FindByBookId(accountId.Id, startDate); // 各帳簿の繰越残高
             decimal balance = dto.EndingBalance;
 
             return balance;
@@ -109,37 +109,37 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// 月内帳簿項目VMリストを取得する(帳簿タブ)
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="accountId">帳簿ID</param>
         /// <param name="includedTime">月内の時刻</param>
         /// <returns>帳簿項目VMリスト</returns>
-        public async Task<IEnumerable<ActionWithBalanceModel>> LoadActionListAsync(BookIdObj bookId, DateOnly includedTime)
+        public async Task<IEnumerable<ActionWithBalanceModel>> LoadActionListAsync(AccountIdObj accountId, DateOnly includedTime)
         {
-            using FuncLog funcLog = new(new { bookId, includedTime });
+            using FuncLog funcLog = new(new { accountId, includedTime });
 
             DateOnly startTime = includedTime.GetFirstDateOfMonth();
             DateOnly endTime = startTime.GetLastDateOfMonth();
-            return await this.LoadActionListAsync(bookId, (PeriodObj<DateOnly>)new(startTime, endTime));
+            return await this.LoadActionListAsync(accountId, (PeriodObj<DateOnly>)new(startTime, endTime));
         }
 
         /// <summary>
         /// 期間内帳簿項目VMリストを取得する(帳簿タブ)
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="accountId">帳簿ID</param>
         /// <param name="period">期間</param>
         /// <returns>帳簿項目VMリスト</returns>
-        public async Task<IEnumerable<ActionWithBalanceModel>> LoadActionListAsync(BookIdObj bookId, PeriodObj<DateOnly> period)
+        public async Task<IEnumerable<ActionWithBalanceModel>> LoadActionListAsync(AccountIdObj accountId, PeriodObj<DateOnly> period)
         {
-            using FuncLog funcLog = new(new { bookId, period });
+            using FuncLog funcLog = new(new { accountId, period });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             List<ActionWithBalanceModel> amList = [];
-            decimal balance = await this.LoadEndingBalance(bookId, period.Start);
+            decimal balance = await this.LoadEndingBalance(accountId, period.Start);
 
             // 繰越残高を追加
             {
                 ActionWithBalanceModel am = new() {
                     Action = new() {
-                        Book = new(BookIdObj.System, string.Empty),
+                        Account = new(AccountIdObj.System, string.Empty),
                         Category = new(CategoryIdObj.System, string.Empty, BalanceKind.Others),
                         Item = new(ItemIdObj.System, Properties.Resources.ListName_CarryForward),
                         Base = new(ActionIdObj.System, period.Start.ToDateTime(TimeOnly.MinValue), 0),
@@ -153,9 +153,9 @@ namespace HouseholdAccountBook.Models.AppServices
             }
 
             ActionInfoDao actionInfoDao = new(dbHandler);
-            IEnumerable<ActionInfoDto> dtoList = bookId == BookIdObj.System
+            IEnumerable<ActionInfoDto> dtoList = accountId == AccountIdObj.System
                 ? await actionInfoDao.FindAllWithinTerm(period.Start, period.End) // 全帳簿項目
-                : await actionInfoDao.FindByBookIdWithinTerm(bookId.Id, period.Start, period.End); // 各帳簿項目
+                : await actionInfoDao.FindByBookIdWithinTerm(accountId.Id, period.Start, period.End); // 各帳簿項目
 
             foreach (ActionInfoDto aDto in dtoList) {
                 balance += aDto.ActValue;
@@ -163,7 +163,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 ActionWithBalanceModel am = new() {
                     Action = new() {
                         GroupId = aDto.GroupId,
-                        Book = new(aDto.BookId, aDto.BookName),
+                        Account = new(aDto.BookId, aDto.BookName),
                         Category = new(aDto.CategoryId, aDto.CategoryName, aDto.ActValue < 0 ? BalanceKind.Expenses : BalanceKind.Income),
                         Item = new(aDto.ItemId, aDto.ItemName),
                         Base = new(aDto.ActionId, aDto.ActTime, aDto.ActValue),
@@ -215,34 +215,34 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// 月内概要VMリストを取得する(帳簿タブ)
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="accountId">帳簿ID</param>
         /// <param name="includedTime">月内の時間</param>
         /// <returns>概要VMリスト</returns>
-        public async Task<IEnumerable<SummaryModel>> LoadSummaryListAsync(BookIdObj bookId, DateOnly includedTime)
+        public async Task<IEnumerable<SummaryModel>> LoadSummaryListAsync(AccountIdObj accountId, DateOnly includedTime)
         {
-            using FuncLog funcLog = new(new { bookId, includedTime });
+            using FuncLog funcLog = new(new { accountId, includedTime });
 
             DateOnly startTime = includedTime.GetFirstDateOfMonth();
             DateOnly endTime = startTime.GetLastDateOfMonth();
-            return await this.LoadSummaryListAsync(bookId, (PeriodObj<DateOnly>)new(startTime, endTime));
+            return await this.LoadSummaryListAsync(accountId, (PeriodObj<DateOnly>)new(startTime, endTime));
         }
 
         /// <summary>
         /// 期間内概要VMリストを取得する(帳簿タブ)
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="accountId">帳簿ID</param>
         /// <param name="period">期間</param>
         /// <returns>概要VMリスト</returns>
-        public async Task<IEnumerable<SummaryModel>> LoadSummaryListAsync(BookIdObj bookId, PeriodObj<DateOnly> period)
+        public async Task<IEnumerable<SummaryModel>> LoadSummaryListAsync(AccountIdObj accountId, PeriodObj<DateOnly> period)
         {
-            using FuncLog funcLog = new(new { bookId, period });
+            using FuncLog funcLog = new(new { accountId, period });
 
             List<SummaryModel> smList = [];
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 SummaryInfoDao summaryInfoDao = new(dbHandler);
-                IEnumerable<SummaryInfoDto> dtoList = bookId == BookIdObj.System
+                IEnumerable<SummaryInfoDto> dtoList = accountId == AccountIdObj.System
                     ? await summaryInfoDao.FindAllWithinPeriod(period.Start, period.End)
-                    : await summaryInfoDao.FindByBookIdWithinPeriod(bookId.Id, period.Start, period.End);
+                    : await summaryInfoDao.FindByBookIdWithinPeriod(accountId.Id, period.Start, period.End);
 
                 foreach (SummaryInfoDto dto in dtoList) {
                     smList.Add(new() {

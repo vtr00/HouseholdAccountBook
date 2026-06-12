@@ -29,12 +29,12 @@ namespace HouseholdAccountBook.Models.AppServices
         /// 帳簿Model(比較用)を取得する
         /// </summary>
         /// <returns>帳簿Model</returns>
-        public async Task<IEnumerable<BookModel>> UpdateBookCompListAsync()
+        public async Task<IEnumerable<AccountModel>> UpdateAccountCompListAsync()
         {
             using FuncLog funcLog = new();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
-            List<BookModel> bmList = [];
+            List<AccountModel> amList = [];
 
             MstBookDao mstBookDao = new(dbHandler);
             IEnumerable<MstBookDto> dtoList = await mstBookDao.FindIfJsonCodeExistsAsync();
@@ -42,7 +42,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
                 if (jsonObj is null) { continue; }
 
-                BookModel vm = new(dto.BookId, dto.BookName) {
+                AccountModel vm = new(dto.BookId, dto.BookName) {
                     CsvFolderPath = jsonObj.CsvFolderPath == string.Empty ? null : jsonObj.CsvFolderPath,
                     TextEncoding = jsonObj.TextEncoding,
                     ActDateIndex = jsonObj.CsvActDateIndex + 1,
@@ -51,26 +51,26 @@ namespace HouseholdAccountBook.Models.AppServices
                 };
                 if (vm.CsvFolderPath == null || vm.ActDateIndex == null || vm.ExpensesIndex == null || vm.ItemNameIndex == null) { continue; }
 
-                bmList.Add(vm);
+                amList.Add(vm);
             }
 
-            return bmList;
+            return amList;
         }
 
         /// <summary>
         /// 一致する帳簿項目Modelリストを取得する
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="accountId">帳簿ID</param>
         /// <param name="dateTime">日付</param>
         /// <param name="value">支出</param>
         /// <returns>帳簿Modelリスト</returns>
-        public async Task<IEnumerable<ActionModel>> LoadMatchedActionAsync(BookIdObj bookId, DateTime dateTime, decimal value)
+        public async Task<IEnumerable<ActionModel>> LoadMatchedActionAsync(AccountIdObj accountId, DateTime dateTime, decimal value)
         {
-            using FuncLog funcLog = new(new { bookId, dateTime, value });
+            using FuncLog funcLog = new(new { accountId, dateTime, value });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             ActionCompInfoDao actionCompInfoDao = new(dbHandler);
-            IEnumerable<ActionCompInfoDto> dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(bookId.Id, dateTime, (int)value);
+            IEnumerable<ActionCompInfoDto> dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(accountId.Id, dateTime, (int)value);
             IEnumerable<ActionModel> actionList = [.. dtoList.Select(static dto => new ActionModel() {
                     GroupId = dto.GroupId,
                     Item = new(dto.ItemId, dto.ItemName),

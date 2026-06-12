@@ -40,7 +40,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<BookIdObj>> BookChanged;
+        public event EventHandler<ChangedEventArgs<AccountIdObj>> AccountChanged;
         /// <summary>
         /// 収支変更時イベント
         /// </summary>
@@ -85,7 +85,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿セレクタVM
         /// </summary>
-        public SelectorViewModel<BookModel, BookIdObj> BookSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        public SelectorViewModel<AccountModel, AccountIdObj> AccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 収支種別セレクタVM
@@ -184,14 +184,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.mAppService = new(this.mDbHandlerFactory);
             this.mService = new(this.mDbHandlerFactory);
 
-            this.BookSelectorVM.SetLoader(async () => await this.mAppService.LoadBookListAsync());
+            this.AccountSelectorVM.SetLoader(async () => await this.mAppService.LoadAccountListAsync());
             this.BalanceKindSelectorVM.SetLoader(() => BalanceKindStr);
             this.CategorySelectorVM.SetLoader(
-                async () => await this.mAppService.LoadCategoryListAsync(this.BookSelectorVM.SelectedKey, this.BalanceKindSelectorVM.SelectedKey, Properties.Resources.ListName_NoSpecification),
-                () => this.BookSelectorVM.SelectedKey != null);
+                async () => await this.mAppService.LoadCategoryListAsync(this.AccountSelectorVM.SelectedKey, this.BalanceKindSelectorVM.SelectedKey, Properties.Resources.ListName_NoSpecification),
+                () => this.AccountSelectorVM.SelectedKey != null);
             this.ItemSelectorVM.SetLoader(
-                async () => await this.mAppService.LoadItemListAsync(this.BookSelectorVM.SelectedKey, this.BalanceKindSelectorVM.SelectedKey, this.CategorySelectorVM.SelectedKey),
-                () => this.BookSelectorVM.SelectedKey != null && this.CategorySelectorVM.SelectedKey != null);
+                async () => await this.mAppService.LoadItemListAsync(this.AccountSelectorVM.SelectedKey, this.BalanceKindSelectorVM.SelectedKey, this.CategorySelectorVM.SelectedKey),
+                () => this.AccountSelectorVM.SelectedKey != null && this.CategorySelectorVM.SelectedKey != null);
             this.ShopSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadShopListAsync(this.ItemSelectorVM.SelectedKey, true),
                 () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
@@ -205,17 +205,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// DBから読み込む
         /// </summary>
-        /// <param name="initialBookId">追加時、初期選択する帳簿のID</param>
+        /// <param name="initialAccountId">追加時、初期選択する帳簿のID</param>
         /// <param name="initialMonth">追加時、初期選択する年月</param>
         /// <param name="initialDate">追加時、初期選択する日付</param>
         /// <param name="initialRecordList">追加時、初期表示するCSVレコードリスト</param>
         /// <param name="targetGroupId">編集時、編集対象のグループID</param>
-        public async Task LoadAsync(BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate, IEnumerable<ActionCsvDto> initialRecordList, GroupIdObj targetGroupId)
+        public async Task LoadAsync(AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate, IEnumerable<ActionCsvDto> initialRecordList, GroupIdObj targetGroupId)
         {
-            using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, initialRecordList, targetGroupId });
+            using FuncLog funcLog = new(new { initialAccountId, initialMonth, initialDate, initialRecordList, targetGroupId });
             using IDisposable disposable = this.mBusyService.Enter();
 
-            BookIdObj selectingBookId = null;
+            AccountIdObj selectingAccountId = null;
             BalanceKind selectingBalanceKind = BalanceKind.Expenses;
             ItemIdObj selectingItemId = null;
             string selectingShopName = null;
@@ -223,7 +223,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             switch (this.RegKind) {
                 case RegistrationKind.Add: {
-                    selectingBookId = initialBookId;
+                    selectingAccountId = initialAccountId;
 
                     // WVMに値を設定する
                     if (initialRecordList == null) {
@@ -252,7 +252,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                             ActValue = Math.Abs(action.Amount)
                         };
 
-                        selectingBookId = action.Book.Id;
+                        selectingAccountId = action.Account.Id;
                         selectingItemId = action.Item.Id;
                         selectingShopName = action.Shop.Name;
                         selectingRemark = action.Remark;
@@ -275,7 +275,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             // リストを更新する
-            await this.BookSelectorVM.LoadAsync(selectingBookId);
+            await this.AccountSelectorVM.LoadAsync(selectingAccountId);
             await this.BalanceKindSelectorVM.LoadAsync(selectingBalanceKind);
             await this.CategorySelectorVM.LoadAsync();
             await this.ItemSelectorVM.LoadAsync(selectingItemId);
@@ -287,8 +287,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
-            this.BookSelectorVM.SelectionChanged += (sender, e) => this.BookChanged?.Invoke(sender, e);
-            this.BookSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
+            this.AccountSelectorVM.SelectionChanged += (sender, e) => this.AccountChanged?.Invoke(sender, e);
+            this.AccountSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
 
             this.BalanceKindSelectorVM.SelectionChanged += (sender, e) => this.BalanceKindChanged?.Invoke(sender, e);
             this.BalanceKindSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
@@ -313,7 +313,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             ActionModel commonAction = new() {
                 Base = new(null, DateTime.Now, 0),
                 GroupId = this.GroupId,
-                Book = new(this.BookSelectorVM.SelectedKey, string.Empty),
+                Account = new(this.AccountSelectorVM.SelectedKey, string.Empty),
                 Item = new(this.ItemSelectorVM.SelectedKey, string.Empty),
                 Shop = this.ShopSelectorVM.SelectedKey,
                 Remark = this.RemarkSelectorVM.SelectedKey

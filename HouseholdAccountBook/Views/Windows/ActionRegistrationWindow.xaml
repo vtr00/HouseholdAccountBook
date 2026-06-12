@@ -80,7 +80,7 @@
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Account}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
-                      ItemsSource="{Binding BookSelectorVM.ItemList}" SelectedItem="{Binding BookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                      ItemsSource="{Binding AccountSelectorVM.ItemList}" SelectedItem="{Binding AccountSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 
             <!-- 日付 -->
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 

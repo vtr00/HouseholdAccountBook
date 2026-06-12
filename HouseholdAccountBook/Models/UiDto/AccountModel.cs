@@ -10,13 +10,13 @@ namespace HouseholdAccountBook.Models.UiDto
     /// <param name="id">帳簿ID</param>
     /// <param name="name">帳簿名</param>
     [DebuggerDisplay("Id: {Id} Name: {Name}")]
-    public class BookModel(BookIdObj id, string name)
+    public class AccountModel(AccountIdObj id, string name)
     {
         #region プロパティ
         /// <summary>
         /// 帳簿ID
         /// </summary>
-        public BookIdObj Id { get; init; } = id;
+        public AccountIdObj Id { get; init; } = id;
 
         /// <summary>
         /// ソート順
@@ -31,7 +31,7 @@ namespace HouseholdAccountBook.Models.UiDto
         /// <summary>
         /// 帳簿種別
         /// </summary>
-        public BookKind BookKind { get; init; }
+        public AccountKind AccountKind { get; init; }
 
         /// <summary>
         /// 備考
@@ -66,7 +66,7 @@ namespace HouseholdAccountBook.Models.UiDto
         /// <summary>
         /// 支払い元帳簿ID
         /// </summary>
-        public BookIdObj DebitBookId { get; init; }
+        public AccountIdObj DebitAccountId { get; init; }
         #endregion
 
         #region CSV情報

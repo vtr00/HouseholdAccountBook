@@ -58,11 +58,11 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 帳簿ID
         /// </summary>
-        public BookIdObj BookId => this.ActionWithBalance.Action.Book.Id;
+        public AccountIdObj AccountId => this.ActionWithBalance.Action.Account.Id;
         /// <summary>
         /// 帳簿名
         /// </summary>
-        public string BookName => this.ActionWithBalance.Action.Book.Name;
+        public string AccountName => this.ActionWithBalance.Action.Account.Name;
         /// <summary>
         /// 分類ID
         /// </summary>

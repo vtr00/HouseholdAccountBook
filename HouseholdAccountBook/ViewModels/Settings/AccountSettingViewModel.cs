@@ -11,23 +11,23 @@ namespace HouseholdAccountBook.ViewModels.Settings
     /// <summary>
     /// 帳簿VM(設定用)
     /// </summary>
-    public class BookSettingViewModel : BindableBase
+    public class AccountSettingViewModel : BindableBase
     {
         #region プロパティ
         /// <summary>
         /// 帳簿モデル
         /// </summary>
-        public BookModel Book { get; init; }
+        public AccountModel Account { get; init; }
 
         /// <summary>
         /// 帳簿ID
         /// </summary>
-        public BookIdObj Id => this.Book.Id;
+        public AccountIdObj Id => this.Account.Id;
 
         /// <summary>
         /// ソート順
         /// </summary>
-        public int SortOrder => this.Book.SortOrder;
+        public int SortOrder => this.Account.SortOrder;
 
         /// <summary>
         /// 入力された帳簿名
@@ -40,7 +40,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 帳簿種別セレクタVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<BookKind, string>, BookKind> BookKindSelectorVM => field ??= new(static p => p.Key);
+        public SelectorViewModel<KeyValuePair<AccountKind, string>, AccountKind> AccountKindSelectorVM => field ??= new(static p => p.Key);
 
         /// <summary>
         /// 入力された備考
@@ -86,7 +86,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 支払の必要があるか
         /// </summary>
-        public bool NeedToPay => this.BookKindSelectorVM.SelectedKey == BookKind.CreditCard;
+        public bool NeedToPay => this.AccountKindSelectorVM.SelectedKey == AccountKind.CreditCard;
 
         /// <summary>
         /// 入力された支払日
@@ -99,14 +99,14 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 支払元帳簿セレクタVM
         /// </summary>
-        public SelectorViewModel<BookModel, BookIdObj> DebitBookSelectorVM => field ??= new(static vm => vm?.Id);
+        public SelectorViewModel<AccountModel, AccountIdObj> DebitAccountSelectorVM => field ??= new(static vm => vm?.Id);
         #endregion
 
         #region CSV情報
         /// <summary>
         /// CSVデータがあるか
         /// </summary>
-        public bool CsvDataExists => this.BookKindSelectorVM.SelectedKey != BookKind.Wallet;
+        public bool CsvDataExists => this.AccountKindSelectorVM.SelectedKey != AccountKind.Wallet;
 
         /// <summary>
         /// 入力されたCSVフォルダパス
@@ -155,23 +155,23 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="book">帳簿Model</param>
-        public BookSettingViewModel(BookModel book)
+        /// <param name="account">帳簿Model</param>
+        public AccountSettingViewModel(AccountModel account)
         {
-            this.Book = book;
-            this.InputedName = book.Name;
-            this.InputedRemark = book.Remark;
-            this.InputedInitialValue = book.InitialValue;
-            this.InputedPayDay = book.PayDay;
-            this.SelectedIfStartDateExists = book.StartDateExists;
-            this.SelectedIfEndDateExists = book.EndDateExists;
-            this.InputedPeriod = book.Period;
-            this.InputedCsvFolderPath = book.CsvFolderPath;
-            this.InputedItemNameIndex = book.ItemNameIndex;
-            this.InputedActDateIndex = book.ActDateIndex;
-            this.InputedExpensesIndex = book.ExpensesIndex;
+            this.Account = account;
+            this.InputedName = account.Name;
+            this.InputedRemark = account.Remark;
+            this.InputedInitialValue = account.InitialValue;
+            this.InputedPayDay = account.PayDay;
+            this.SelectedIfStartDateExists = account.StartDateExists;
+            this.SelectedIfEndDateExists = account.EndDateExists;
+            this.InputedPeriod = account.Period;
+            this.InputedCsvFolderPath = account.CsvFolderPath;
+            this.InputedItemNameIndex = account.ItemNameIndex;
+            this.InputedActDateIndex = account.ActDateIndex;
+            this.InputedExpensesIndex = account.ExpensesIndex;
 
-            this.BookKindSelectorVM.SelectionChanged += (sender, e) => {
+            this.AccountKindSelectorVM.SelectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.NeedToPay));
                 this.RaisePropertyChanged(nameof(this.CsvDataExists));
             };

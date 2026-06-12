@@ -32,11 +32,11 @@ namespace HouseholdAccountBook.Views.Windows
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="initialBookId">初期選択する帳簿ID</param>
+        /// <param name="initialAccountId">初期選択する帳簿ID</param>
         /// <param name="initialMonth">初期選択する年月</param>
         /// <param name="initialDate">初期選択する日付</param>
-        public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate)
-            : this(owner, dbHandlerFactory, initialBookId, initialMonth, initialDate, null, RegistrationKind.Add) { }
+        public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate)
+            : this(owner, dbHandlerFactory, initialAccountId, initialMonth, initialDate, null, RegistrationKind.Add) { }
 
         /// <summary>
         /// 帳簿項目(移動)の複製/編集のために <see cref="MoveRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
@@ -53,15 +53,15 @@ namespace HouseholdAccountBook.Views.Windows
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="initialBookId">追加時、初期選択する帳簿ID</param>
+        /// <param name="initialAccountId">追加時、初期選択する帳簿ID</param>
         /// <param name="initialMonth">追加時、初期選択する年月</param>
         /// <param name="initialDate">追加時、初期選択する日付</param>
         /// <param name="targetGroupId">複製/編集時、複製/編集対象の帳簿項目のグループID</param>
         /// <param name="regKind">登録種別</param>
-        private MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate, GroupIdObj targetGroupId,
+        private MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate, GroupIdObj targetGroupId,
             RegistrationKind regKind)
         {
-            using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, targetGroupId, regKind });
+            using FuncLog funcLog = new(new { initialAccountId, initialMonth, initialDate, targetGroupId, regKind });
 
             this.Owner = owner;
             this.Name = UiConstants.WindowNameStr[nameof(MoveRegistrationWindow)];
@@ -76,7 +76,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
-                await this.WVM.LoadAsync(initialBookId, initialMonth, initialDate, targetGroupId);
+                await this.WVM.LoadAsync(initialAccountId, initialMonth, initialDate, targetGroupId);
                 this.WVM.AddEventHandlers();
             };
         }

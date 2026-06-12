@@ -7,7 +7,7 @@ namespace HouseholdAccountBook.Models
     /// <summary>
     /// 帳簿種別
     /// </summary>
-    public enum BookKind
+    public enum AccountKind
     {
         /// <summary>
         /// 未分類
@@ -203,7 +203,7 @@ namespace HouseholdAccountBook.Models
         /// <summary>
         /// 帳簿タブ
         /// </summary>
-        BooksTab = 0,
+        AccountTab = 0,
         /// <summary>
         /// 日別グラフタブ
         /// </summary>
@@ -235,7 +235,7 @@ namespace HouseholdAccountBook.Models
         /// <summary>
         /// 帳簿設定タブ
         /// </summary>
-        BookSettingsTab = 0,
+        AccountSettingsTab = 0,
         /// <summary>
         /// 項目設定タブ
         /// </summary>

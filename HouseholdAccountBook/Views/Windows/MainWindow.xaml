@@ -139,34 +139,34 @@
                 <MenuItem Header="{x:Static properties:Resources.Menu_File_Exit}" Command="{Binding ExitWindowCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>
             <!-- 編集 -->
-            <MenuItem Header="{x:Static properties:Resources.Menu_Edit}" Command="{Binding BookTabVM.EditMenuCommand}">
+            <MenuItem Header="{x:Static properties:Resources.Menu_Edit}" Command="{Binding AccountTabVM.EditMenuCommand}">
                 <!-- 検索 -->
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Find}" Command="{Binding BookTabVM.ShowFindBoxCommand}" InputGestureText="Ctrl+F"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Find}" Command="{Binding AccountTabVM.ShowFindBoxCommand}" InputGestureText="Ctrl+F"/>
                 <!-- 置換 -->
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Replace}" Command="{Binding BookTabVM.ShowReplaceBoxCommand}" InputGestureText="Ctrl+H"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Replace}" Command="{Binding AccountTabVM.ShowReplaceBoxCommand}" InputGestureText="Ctrl+H"/>
                 <Separator/>
                 <!-- 移動 -->
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Move}" Command="{Binding BookTabVM.AddMoveCommand}" InputGestureText="Ctrl+M"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Move}" Command="{Binding AccountTabVM.AddMoveCommand}" InputGestureText="Ctrl+M"/>
                 <Separator/>
                 <!-- 追加 -->
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Add}" Command="{Binding BookTabVM.AddActionCommand}" InputGestureText="Ctrl++"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Add}" Command="{Binding AccountTabVM.AddActionCommand}" InputGestureText="Ctrl++"/>
                 <!-- リスト追加 -->
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_AddList}" Command="{Binding BookTabVM.AddActionListCommand}" InputGestureText="Ctrl+Shift++"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_AddList}" Command="{Binding AccountTabVM.AddActionListCommand}" InputGestureText="Ctrl+Shift++"/>
                 <!-- 複製 -->
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Copy}" Command="{Binding BookTabVM.CopyCommand}" InputGestureText="Ctrl+Shift+C"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Copy}" Command="{Binding AccountTabVM.CopyCommand}" InputGestureText="Ctrl+Shift+C"/>
                 <Separator/>
                 <!-- 編集 -->
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Edit}" Command="{Binding BookTabVM.EditCommand}" InputGestureText="F2"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Edit}" Command="{Binding AccountTabVM.EditCommand}" InputGestureText="F2"/>
                 <Separator/>
                 <!-- 削除 -->
-                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Delete}" Command="{Binding BookTabVM.DeleteCommand}" InputGestureText="Del"/>
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Delete}" Command="{Binding AccountTabVM.DeleteCommand}" InputGestureText="Del"/>
             </MenuItem>
             <!-- 表示 -->
             <MenuItem Header="{x:Static properties:Resources.Menu_View}" Command="{Binding ShowMenuCommand}">
                 <!-- 帳簿項目 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_AccountItems}">
                     <!-- 切替 -->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_AccountItems_Change}" Command="{Binding ShowBookTabCommand}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_AccountItems_Change}" Command="{Binding ShowAccountTabCommand}"/>
                     <Separator/>
                     <!-- 先月 -->
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_AccountItems_LastMonth}" Command="{Binding GoToLastMonthCommand}" InputGestureText="Alt+←"/>
@@ -271,9 +271,9 @@
                 <MenuItem Header="{x:Static properties:Resources.Menu_Tool_CsvComparison}" Command="{Binding CompareCsvFileCommand}"/>
                 <Separator/>
                 <!-- 帳簿 -->
-                <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Account}" Command="{Binding ToolInBookCommand}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Account}" Command="{Binding ToolInAccountCommand}">
                     <!-- フィルタ -->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Account_Filter}" IsCheckable="True" IsChecked="{Binding BookTabVM.UseFilter}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Account_Filter}" IsCheckable="True" IsChecked="{Binding AccountTabVM.UseFilter}"/>
                 </MenuItem>
                 <Separator/>
                 <!-- 設定 -->
@@ -296,9 +296,9 @@
            <TextBlock Text="{x:Static properties:Resources.TextBlock_Account}"/>:
         </TextBlock>
         <ComboBox Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" MinWidth="150"
-                  ItemsSource="{Binding BookSelectorVM.ItemList}" SelectedItem="{Binding BookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                  ItemsSource="{Binding AccountSelectorVM.ItemList}" SelectedItem="{Binding AccountSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
         <TextBlock Grid.Row="1" Grid.Column="2" Margin="5,5,5,0" HorizontalAlignment="Left" VerticalAlignment="Center"
-                   Text="{Binding BookSelectorVM.SelectedItem.Remark}"/>
+                   Text="{Binding AccountSelectorVM.SelectedItem.Remark}"/>
 
         <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Width="Auto" Height="Auto" TabStripPlacement="Left"
                     SelectedIndex="{Binding SelectedTabIndex}">
@@ -308,7 +308,7 @@
                 </Style>
             </TabControl.ItemContainerStyle>
             <!-- 帳簿項目 -->
-            <TabItem x:Name="_bookTab">
+            <TabItem x:Name="_accountTab">
                 <TabItem.Header>
                     <TextBlock Text="{x:Static properties:Resources.TabHeader_AccountItems}" TextAlignment="Center"/>
                 </TabItem.Header>
@@ -319,8 +319,8 @@
                     <KeyBinding Gesture="Alt+Left" Command="{Binding GoToLastMonthCommand}"/>
                     <KeyBinding Gesture="Alt+Right" Command="{Binding GoToNextMonthCommand}"/>
 
-                    <KeyBinding Gesture="Ctrl+F" Command="{Binding BookTabVM.ShowFindBoxCommand}"/>
-                    <KeyBinding Gesture="Ctrl+H" Command="{Binding BookTabVM.ShowReplaceBoxCommand}"/>
+                    <KeyBinding Gesture="Ctrl+F" Command="{Binding AccountTabVM.ShowFindBoxCommand}"/>
+                    <KeyBinding Gesture="Ctrl+H" Command="{Binding AccountTabVM.ShowReplaceBoxCommand}"/>
                 </TabItem.InputBindings>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -364,19 +364,19 @@
                         </StackPanel>
                             
                         <StackPanel Grid.Column="2" Orientation="Horizontal">
-                            <Button Width="50" Margin="0,0,3,0" Content="{x:Static properties:Resources.Button_Move}" Command="{Binding BookTabVM.AddMoveCommand}"/>
-                            <Button Width="50" Content="{x:Static properties:Resources.Button_Add}" Command="{Binding BookTabVM.AddActionCommand}"/>
-                            <Button Width="80" Content="{x:Static properties:Resources.Button_AddList}" Command="{Binding BookTabVM.AddActionListCommand}"/>
-                            <Button Width="50" Content="{x:Static properties:Resources.Button_Copy}" Command="{Binding BookTabVM.CopyCommand}"/>
-                            <Button Width="50" Margin="3,0,0,0" Content="{x:Static properties:Resources.Button_Edit}" Command="{Binding BookTabVM.EditCommand}"/>
-                            <Button Width="50" Margin="3,0,0,0" Content="{x:Static properties:Resources.Button_Delete}" Command="{Binding BookTabVM.DeleteCommand}"/>
+                            <Button Width="50" Margin="0,0,3,0" Content="{x:Static properties:Resources.Button_Move}" Command="{Binding AccountTabVM.AddMoveCommand}"/>
+                            <Button Width="50" Content="{x:Static properties:Resources.Button_Add}" Command="{Binding AccountTabVM.AddActionCommand}"/>
+                            <Button Width="80" Content="{x:Static properties:Resources.Button_AddList}" Command="{Binding AccountTabVM.AddActionListCommand}"/>
+                            <Button Width="50" Content="{x:Static properties:Resources.Button_Copy}" Command="{Binding AccountTabVM.CopyCommand}"/>
+                            <Button Width="50" Margin="3,0,0,0" Content="{x:Static properties:Resources.Button_Edit}" Command="{Binding AccountTabVM.EditCommand}"/>
+                            <Button Width="50" Margin="3,0,0,0" Content="{x:Static properties:Resources.Button_Delete}" Command="{Binding AccountTabVM.DeleteCommand}"/>
                             <CheckBox Margin="3,3,0,3" ToolTip="{x:Static properties:Resources.ToolTip_CheckIsMatch}" VerticalAlignment="Center"
-                                      IsChecked="{Binding BookTabVM.IsMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding BookTabVM.ChangeIsMatchCommand}"/>
+                                      IsChecked="{Binding AccountTabVM.IsMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding AccountTabVM.ChangeIsMatchCommand}"/>
                         </StackPanel>
                     </Grid>
 
                     <!-- データリスト -->
-                    <Grid Grid.Row="1" Grid.Column="0" Margin="2" DataContext="{Binding BookTabVM}">
+                    <Grid Grid.Row="1" Grid.Column="0" Margin="2" DataContext="{Binding AccountTabVM}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1.0*" MinWidth="200"/>
                             <ColumnDefinition Width="5"/>
@@ -447,7 +447,7 @@
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Day}" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}, ConverterCulture={StaticResource AppCulture}}"
                                                         CellStyle="{StaticResource DayOfWeekStyle}"/>
                                     <!-- 帳簿名 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_AccountName}" MinWidth="70" Binding="{Binding BookName}"
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_AccountName}" MinWidth="70" Binding="{Binding AccountName}"
                                                         Visibility="{Binding MainWindow_Show_BookName, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                     <!-- 分類名 -->
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_CategoryName}" MinWidth="70" Binding="{Binding CategoryName}"
@@ -567,7 +567,7 @@
                     </Grid>
 
                     <!-- ステータスバー -->
-                    <StatusBar Grid.Row="2" Grid.Column="0" Margin="2" DataContext="{Binding BookTabVM}" Background="White">
+                    <StatusBar Grid.Row="2" Grid.Column="0" Margin="2" DataContext="{Binding AccountTabVM}" Background="White">
                         <StatusBarItem HorizontalAlignment="Left">
                             <TextBlock>
                                 <TextBlock Text="{x:Static properties:Resources.TextBlock_CurrentBackUp}"/>:

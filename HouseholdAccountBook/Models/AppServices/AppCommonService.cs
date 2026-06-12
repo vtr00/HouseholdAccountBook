@@ -32,16 +32,16 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="period">期間</param>
         /// <param name="initialName">1番目に追加する項目の名称(空文字の場合は追加しない)</param>
         /// <returns>帳簿Modelリスト</returns>
-        public async Task<IEnumerable<BookModel>> LoadBookListAsync(PeriodObj<DateOnly> period = null, string initialName = "")
+        public async Task<IEnumerable<AccountModel>> LoadAccountListAsync(PeriodObj<DateOnly> period = null, string initialName = "")
         {
             using FuncLog funcLog = new(new { period, initialName });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
-            List<BookModel> bmList = [];
+            List<AccountModel> bmList = [];
 
             // 1番目に表示する項目を追加する
             if (initialName != string.Empty) {
-                bmList.Add(new(BookIdObj.System, initialName));
+                bmList.Add(new(AccountIdObj.System, initialName));
             }
 
             MstBookDao mstBookDao = new(dbHandler);
@@ -50,10 +50,10 @@ namespace HouseholdAccountBook.Models.AppServices
                 MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
 
                 if (DateOnlyExtensions.IsWithIn(period?.Start, period?.End, jsonObj?.StartDate?.ToDateOnly(), jsonObj?.EndDate?.ToDateOnly())) {
-                    BookModel vm = new(dto.BookId, dto.BookName) {
+                    AccountModel vm = new(dto.BookId, dto.BookName) {
                         Remark = jsonObj?.Remark ?? string.Empty,
-                        BookKind = (BookKind)dto.BookKind,
-                        DebitBookId = dto.DebitBookId,
+                        AccountKind = (AccountKind)dto.BookKind,
+                        DebitAccountId = dto.DebitBookId,
                         PayDay = dto.PayDay
                     };
                     bmList.Add(vm);
@@ -66,12 +66,12 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// 分類Modelリストを取得する
         /// </summary>
-        /// <param name="bookId">絞り込み対象の帳簿ID</param>
+        /// <param name="accountId">絞り込み対象の帳簿ID</param>
         /// <param name="balanceKind">絞り込み対象の収支種別</param>
         /// <returns>分類Modelリスト</returns>
-        public async Task<IEnumerable<CategoryModel>> LoadCategoryListAsync(BookIdObj bookId, BalanceKind balanceKind, string initialName = "")
+        public async Task<IEnumerable<CategoryModel>> LoadCategoryListAsync(AccountIdObj accountId, BalanceKind balanceKind, string initialName = "")
         {
-            using FuncLog funcLog = new(new { bookId, balanceKind, initialName });
+            using FuncLog funcLog = new(new { accountId, balanceKind, initialName });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             List<CategoryModel> cmList = [];
@@ -81,7 +81,7 @@ namespace HouseholdAccountBook.Models.AppServices
             }
 
             MstCategoryWithinBookDao mstCategoryWithinBookDao = new(dbHandler);
-            IEnumerable<MstCategoryDto> dtoList = await mstCategoryWithinBookDao.FindByBookIdAndBalanceKindAsync((int)bookId, (int)balanceKind);
+            IEnumerable<MstCategoryDto> dtoList = await mstCategoryWithinBookDao.FindByBookIdAndBalanceKindAsync((int)accountId, (int)balanceKind);
             foreach (MstCategoryDto dto in dtoList) {
                 cmList.Add(new(dto.CategoryId, dto.CategoryName, (BalanceKind)dto.BalanceKind));
             }
@@ -92,21 +92,21 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// 項目Modelリストを取得する
         /// </summary>
-        /// <param name="bookId">絞り込み対象の帳簿ID</param>
+        /// <param name="accountId">絞り込み対象の帳簿ID</param>
         /// <param name="balanceKind">絞り込み対象の収支種別</param>
         /// <param name="categoryId">絞り込み対象の分類ID</param>
         /// <returns>項目Modelリスト</returns>
-        public async Task<IEnumerable<ItemModel>> LoadItemListAsync(BookIdObj bookId, BalanceKind balanceKind, CategoryIdObj categoryId)
+        public async Task<IEnumerable<ItemModel>> LoadItemListAsync(AccountIdObj accountId, BalanceKind balanceKind, CategoryIdObj categoryId)
         {
-            using FuncLog funcLog = new(new { bookId, balanceKind, categoryId });
+            using FuncLog funcLog = new(new { accountId, balanceKind, categoryId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             List<ItemModel> imList = [];
 
             CategoryItemInfoDao categoryItemInfoDao = new(dbHandler);
             IEnumerable<CategoryItemInfoDto> dtoList = (categoryId is null || categoryId == CategoryIdObj.System)
-                ? await categoryItemInfoDao.FindByBookIdAndBalanceKindAsync((int)bookId, (int)balanceKind)
-                : await categoryItemInfoDao.FindByBookIdAndCategoryIdAsync((int)bookId, (int)categoryId);
+                ? await categoryItemInfoDao.FindByBookIdAndBalanceKindAsync((int)accountId, (int)balanceKind)
+                : await categoryItemInfoDao.FindByBookIdAndCategoryIdAsync((int)accountId, (int)categoryId);
             foreach (CategoryItemInfoDto dto in dtoList) {
                 ItemModel vm = new(dto.ItemId, dto.ItemName) {
                     CategoryName = categoryId == CategoryIdObj.System ? dto.CategoryName : ""

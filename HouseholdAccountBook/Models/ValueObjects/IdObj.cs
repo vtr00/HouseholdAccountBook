@@ -41,7 +41,7 @@ namespace HouseholdAccountBook.Models.ValueObjects
         public static implicit operator IdObj(int id) => new(id);
         public static explicit operator int?(IdObj obj) => obj?.Id;
         public static explicit operator int(IdObj obj) => obj is null ? -1 : obj.Id;
-        public static implicit operator BookIdObj(IdObj obj) => obj?.Id;
+        public static implicit operator AccountIdObj(IdObj obj) => obj?.Id;
         public static implicit operator ItemIdObj(IdObj obj) => obj?.Id;
 
         public override string ToString() => $"{this.Id}";
@@ -51,33 +51,33 @@ namespace HouseholdAccountBook.Models.ValueObjects
     /// 帳簿ID VO
     /// </summary>
     [DebuggerDisplay("{Id}")]
-    public sealed record class BookIdObj : IIdObj
+    public sealed record class AccountIdObj : IIdObj
     {
         public int Id { get; init; }
 
         /// <summary>
         /// 内部管理値
         /// </summary>
-        public static BookIdObj System { get; } = new();
+        public static AccountIdObj System { get; } = new();
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        private BookIdObj() => this.Id = -1;
+        private AccountIdObj() => this.Id = -1;
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="id">帳簿ID</param>
-        public BookIdObj(int id)
+        public AccountIdObj(int id)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(id, nameof(id));
             this.Id = id;
         }
 
-        public static implicit operator BookIdObj(int id) => new(id);
-        public static explicit operator int?(BookIdObj obj) => obj?.Id;
-        public static explicit operator int(BookIdObj obj) => obj is null ? -1 : obj.Id;
-        public static implicit operator IdObj(BookIdObj obj) => obj?.Id;
+        public static implicit operator AccountIdObj(int id) => new(id);
+        public static explicit operator int?(AccountIdObj obj) => obj?.Id;
+        public static explicit operator int(AccountIdObj obj) => obj is null ? -1 : obj.Id;
+        public static implicit operator IdObj(AccountIdObj obj) => obj?.Id;
 
         public override string ToString() => $"{this.Id}";
     }

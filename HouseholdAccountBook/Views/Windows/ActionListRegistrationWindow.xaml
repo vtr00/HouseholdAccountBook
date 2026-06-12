@@ -79,7 +79,7 @@
             <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Account}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" 
-                      ItemsSource="{Binding BookSelectorVM.ItemList}" SelectedItem="{Binding BookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                      ItemsSource="{Binding AccountSelectorVM.ItemList}" SelectedItem="{Binding AccountSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 
             <!-- 収支 -->
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 

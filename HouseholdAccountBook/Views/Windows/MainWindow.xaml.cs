@@ -112,7 +112,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.AddMoveRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddMoveRequested));
 
-                this.mMRW = new(this, e.DbHandlerFactory, e.InitialBookId, e.InitialMonth, e.InitialDate);
+                this.mMRW = new(this, e.DbHandlerFactory, e.InitialAccountId, e.InitialMonth, e.InitialDate);
                 this.mMRW.Registrated += e.Registered;
                 this.mMRW.Closed += (sender, e) => {
                     this.mMRW = null;
@@ -125,7 +125,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.AddActionRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionRequested));
 
-                this.mARW = new(this, e.DbHandlerFactory, e.InitialBookId, e.InitialMonth, e.InitialDate);
+                this.mARW = new(this, e.DbHandlerFactory, e.InitialAccountId, e.InitialMonth, e.InitialDate);
                 this.mARW.Registrated += e.Registered;
                 this.mARW.Closed += (sender, e) => {
                     this.mARW = null;
@@ -138,7 +138,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.AddActionListRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionListRequested));
 
-                this.mALRW = new(this, e.DbHandlerFactory, e.InitialBookId, e.InitialMonth, e.InitialDate);
+                this.mALRW = new(this, e.DbHandlerFactory, e.InitialAccountId, e.InitialMonth, e.InitialDate);
                 this.mALRW.Registrated += e.Registered;
                 this.mALRW.Closed += (sender, e) => {
                     this.mALRW = null;
@@ -244,12 +244,12 @@ namespace HouseholdAccountBook.Views.Windows
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.CompareCsvFileRequested));
 
                 if (this.mCCW is null) {
-                    this.mCCW = new CsvComparisonWindow(this, e.DbHandlerFactory, e.InitialBookId);
+                    this.mCCW = new CsvComparisonWindow(this, e.DbHandlerFactory, e.InitialAccountId);
                     // 帳簿項目の一致フラグ変更時のイベントを登録する
                     this.mCCW.IsMatchChanged += (sender, e) => {
                         using FuncLog funcLog = new(methodName: nameof(this.mCCW.IsMatchChanged));
 
-                        ActionViewModel vm = this.WVM.BookTabVM.ActionSelectorVM.ItemList.FirstOrDefault(tmpVM => tmpVM.ActionWithBalance.Action.ActionId == e.Value1);
+                        ActionViewModel vm = this.WVM.AccountTabVM.ActionSelectorVM.ItemList.FirstOrDefault(tmpVM => tmpVM.ActionWithBalance.Action.ActionId == e.Value1);
                         // UI上の表記だけを更新する
                         _ = (vm?.IsMatch = e.Value2);
                     };
@@ -259,15 +259,15 @@ namespace HouseholdAccountBook.Views.Windows
                         using IDisposable disposable = this.WVM.BusyState.Enter();
 
                         // 帳簿一覧タブを更新する
-                        await this.WVM.BookTabVM.LoadAsync(e.Value, isScroll: false, isUpdateActDateLastEdited: true);
+                        await this.WVM.AccountTabVM.LoadAsync(e.Value, isScroll: false, isUpdateActDateLastEdited: true);
                     };
                     // 帳簿変更時のイベントを登録する
-                    this.mCCW.BookChanged += (sender, e) => {
-                        using FuncLog funcLog = new(methodName: nameof(this.mCCW.BookChanged));
+                    this.mCCW.AccountChanged += (sender, e) => {
+                        using FuncLog funcLog = new(methodName: nameof(this.mCCW.AccountChanged));
 
-                        BookModel selectedVM = this.WVM.BookSelectorVM.ItemList.FirstOrDefault(vm => vm.Id == e.NewValue);
+                        AccountModel selectedVM = this.WVM.AccountSelectorVM.ItemList.FirstOrDefault(vm => vm.Id == e.NewValue);
                         if (selectedVM != null) {
-                            this.WVM.BookSelectorVM.SelectedItem = selectedVM;
+                            this.WVM.AccountSelectorVM.SelectedItem = selectedVM;
                         }
                     };
                     // ウィンドウ非表示時イベントを登録する
@@ -280,7 +280,7 @@ namespace HouseholdAccountBook.Views.Windows
                 }
                 else {
                     // 設定で変更されている可能性があるため、帳簿を読み込み直す
-                    await this.mCCW.WVM.BookSelectorVM.LoadAsync(e.InitialBookId);
+                    await this.mCCW.WVM.AccountSelectorVM.LoadAsync(e.InitialAccountId);
                 }
 
                 this.mCCW.Show();
@@ -332,7 +332,7 @@ namespace HouseholdAccountBook.Views.Windows
         {
             if (await DbBackUpManager.Instance.ExecuteAtMainWindowStateChanged(this.WindowState, UserSettingService.Instance.CurrentBackUp)) {
                 UserSettingService.Instance.CurrentBackUpAtMinimizing = DateTime.Now;
-                this.WVM.BookTabVM.RaiseCurrentBackUpChanged();
+                this.WVM.AccountTabVM.RaiseCurrentBackUpChanged();
                 Log.Info($"Update BackUpCurrentAtMinimizing: {UserSettingService.Instance.CurrentBackUpAtMinimizing}");
 
                 DbBackUpManager.Instance.BackUpCurrentAtMinimizing = UserSettingService.Instance.CurrentBackUpAtMinimizing;
@@ -346,7 +346,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void ExportCSVFileCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e) =>
-            e.CanExecute = this.WVM.SelectedTab is Tabs.BooksTab or Tabs.MonthlyListTab or Tabs.YearlyListTab;
+            e.CanExecute = this.WVM.SelectedTab is Tabs.AccountTab or Tabs.MonthlyListTab or Tabs.YearlyListTab;
 
         /// <summary>
         /// CSVエクスポート処理実行
@@ -356,9 +356,9 @@ namespace HouseholdAccountBook.Views.Windows
         private async void ExportCSVFileCommand_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             switch (this.WVM.SelectedTab) {
-                case Tabs.BooksTab: {
+                case Tabs.AccountTab: {
                     IEnumerable<IEnumerable<string>> rows = this._actionDataGrid.ExtractDisplayValues();
-                    await this.WVM.BookTabVM.ExportCSVFileAsync(rows);
+                    await this.WVM.AccountTabVM.ExportCSVFileAsync(rows);
                     break;
                 }
                 case Tabs.MonthlyListTab: {
@@ -394,7 +394,7 @@ namespace HouseholdAccountBook.Views.Windows
                         Log.Info($"{this.WVM.DisplayedYear:yyyy-MM-dd} + month:{col - 1}");
                         this.WVM.DisplayedMonth = this.WVM.DisplayedYear.AddMonths(col - 1);
                         Log.Info($"{this.WVM.DisplayedMonth:yyyy-MM-dd}");
-                        this.WVM.SelectedTab = Tabs.BooksTab;
+                        this.WVM.SelectedTab = Tabs.AccountTab;
                         e.Handled = true;
                     }
                 }
