@@ -52,7 +52,7 @@
             <!-- 帳簿設定 -->
             <TabItem x:Name="_BookTab" DataContext="{Binding BookTabVM}">
                 <TabItem.Header>
-                    <TextBlock Text="{x:Static properties:Resources.TabHeader_BookSettings}" TextAlignment="Center"/>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_AccountSettings}" TextAlignment="Center"/>
                 </TabItem.Header>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -61,7 +61,7 @@
                         <ColumnDefinition Width="0.6*"/>
                     </Grid.ColumnDefinitions>
 
-                    <GroupBox Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_BookList}">
+                    <GroupBox Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_AccountList}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -99,7 +99,7 @@
 
                         <ScrollViewer Grid.Row="0">
                             <StackPanel Grid.IsSharedSizeScope="True" Margin="0,0,5,0">
-                                <GroupBox Grid.Row="0" Header="{x:Static properties:Resources.GroupHeader_BookInformation}">
+                                <GroupBox Grid.Row="0" Header="{x:Static properties:Resources.GroupHeader_AccountInformation}">
                                     <GroupBox.InputBindings>
                                         <KeyBinding Gesture="Ctrl+S" Command="{Binding DataContext.SaveBookInfoCommand, ElementName=_BookTab}"/>
                                     </GroupBox.InputBindings>
@@ -125,7 +125,7 @@
 
                                         <!-- 帳簿ID -->
                                         <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
-                                                   Text="BookId"/>
+                                                   Text="Account Id"/>
                                         <TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                                    Text="{Binding Id, TargetNullValue='--'}"/>
 
@@ -137,13 +137,13 @@
 
                                         <!-- 帳簿名 -->
                                         <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
-                                                   Text="{x:Static properties:Resources.TextBlock_BookName}"/>
+                                                   Text="{x:Static properties:Resources.TextBlock_AccountName}"/>
                                         <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                  Text="{Binding InputedName, UpdateSourceTrigger=PropertyChanged}"/>
 
                                         <!-- 帳簿種別 -->
                                         <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
-                                                   Text="{x:Static properties:Resources.TextBlock_BookKind}"/>
+                                                   Text="{x:Static properties:Resources.TextBlock_AccountKind}"/>
                                         <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                   ItemsSource="{Binding BookKindSelectorVM.ItemList}" SelectedItem="{Binding BookKindSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
 
@@ -161,7 +161,7 @@
                                                    Text="{Binding InputedInitialValue, Converter={StaticResource IntToMoneyDisplayConverter}, TargetNullValue=0}"/>
 
                                         <!-- 期間情報 -->
-                                        <GroupBox Grid.Row="6" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_TermInformation}">
+                                        <GroupBox Grid.Row="6" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_PeriodInformation}">
                                             <Grid>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto"/>
@@ -208,7 +208,7 @@
                                                     <ColumnDefinition SharedSizeGroup="Button"/>
                                                 </Grid.ColumnDefinitions>
 
-                                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_PaymentBook}"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_PaymentAccount}"/>
                                                 <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                           ItemsSource="{Binding DebitBookSelectorVM.ItemList}" SelectedItem="{Binding DebitBookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 
@@ -520,7 +520,7 @@
             <!-- DB設定 -->
             <TabItem x:Name="_DbTab" DataContext="{Binding DbTabVM}">
                 <TabItem.Header>
-                    <TextBlock Text="{x:Static properties:Resources.TabHeader_DbSettings}" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_DbSettings}" TextAlignment="Center"/>
                 </TabItem.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -706,7 +706,7 @@
             <!-- その他 -->
             <TabItem x:Name="_OtherTab" DataContext="{Binding OtherTabVM}">
                 <TabItem.Header>
-                    <TextBlock Text="{x:Static properties:Resources.TabHeader_OtherSettings}" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_OtherSettings}" TextAlignment="Center"/>
                 </TabItem.Header>
                 <Grid>
                     <Grid.RowDefinitions>

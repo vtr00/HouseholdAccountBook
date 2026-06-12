@@ -90,7 +90,7 @@
 
                     <!-- 帳簿 -->
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
-                               Text="{x:Static properties:Resources.TextBlock_Book}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                               Text="{x:Static properties:Resources.TextBlock_Account}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"  Grid.ColumnSpan="2"
                               ItemsSource="{Binding FromBookSelectorVM.ItemList}" SelectedItem="{Binding FromBookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 
@@ -126,7 +126,7 @@
 
                     <!-- 帳簿 -->
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
-                               Text="{x:Static properties:Resources.TextBlock_Book}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                               Text="{x:Static properties:Resources.TextBlock_Account}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"  Grid.ColumnSpan="2"
                               ItemsSource="{Binding ToBookSelectorVM.ItemList}" SelectedItem="{Binding ToBookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 

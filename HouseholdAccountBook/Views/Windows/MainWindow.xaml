@@ -164,24 +164,24 @@
             <!-- 表示 -->
             <MenuItem Header="{x:Static properties:Resources.Menu_View}" Command="{Binding ShowMenuCommand}">
                 <!-- 帳簿項目 -->
-                <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_View_AccountItems}">
                     <!-- 切替 -->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_Change}" Command="{Binding ShowBookTabCommand}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_AccountItems_Change}" Command="{Binding ShowBookTabCommand}"/>
                     <Separator/>
                     <!-- 先月 -->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_LastMonth}" Command="{Binding GoToLastMonthCommand}" InputGestureText="Alt+←"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_AccountItems_LastMonth}" Command="{Binding GoToLastMonthCommand}" InputGestureText="Alt+←"/>
                     <!-- 今月 -->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_ThisMonth}" Command="{Binding GoToThisMonthCommand}" InputGestureText="Alt+↓"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_AccountItems_ThisMonth}" Command="{Binding GoToThisMonthCommand}" InputGestureText="Alt+↓"/>
                     <!-- 来月 -->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_NextMonth}" Command="{Binding GoToNextMonthCommand}" InputGestureText="Alt+→"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_AccountItems_NextMonth}" Command="{Binding GoToNextMonthCommand}" InputGestureText="Alt+→"/>
                     <Separator/>
                     <!-- 期間指定 -->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_DailyTermSelection}" Command="{Binding SelectPeriodCommand}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_AccountItems_DailyPeriodSelection}" Command="{Binding SelectPeriodCommand}"/>
                     <Separator/>
                     <!-- 帳簿名を常に表示-->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_AlwaysDisplay_BookName}" IsCheckable="True" IsChecked="{Binding MainWindow_Show_BookName, Source={StaticResource Settings}}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_AccountItems_AlwaysDisplay_AccountName}" IsCheckable="True" IsChecked="{Binding MainWindow_Show_BookName, Source={StaticResource Settings}}"/>
                     <!-- 分類名を常に表示-->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_BookItems_AlwaysDisplay_CategoryName}" IsCheckable="True" IsChecked="{Binding MainWindow_Show_CategoryName, Source={StaticResource Settings}}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_AccountItems_AlwaysDisplay_CategoryName}" IsCheckable="True" IsChecked="{Binding MainWindow_Show_CategoryName, Source={StaticResource Settings}}"/>
                 </MenuItem>
                 <!-- 日別グラフ -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph}">
@@ -196,7 +196,7 @@
                     <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_NextMonth}" Command="{Binding GoToNextMonthCommand}" InputGestureText="Alt+→"/>
                     <Separator/>
                     <!-- 期間指定 -->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_DailyTermSelection}" Command="{Binding SelectPeriodCommand}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_View_DailyGraph_DailyPeriodSelection}" Command="{Binding SelectPeriodCommand}"/>
                 </MenuItem>
                 <!-- 月別 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_Monthly}">
@@ -271,9 +271,9 @@
                 <MenuItem Header="{x:Static properties:Resources.Menu_Tool_CsvComparison}" Command="{Binding CompareCsvFileCommand}"/>
                 <Separator/>
                 <!-- 帳簿 -->
-                <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Book}" Command="{Binding ToolInBookCommand}">
+                <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Account}" Command="{Binding ToolInBookCommand}">
                     <!-- フィルタ -->
-                    <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Book_Filter}" IsCheckable="True" IsChecked="{Binding BookTabVM.UseFilter}"/>
+                    <MenuItem Header="{x:Static properties:Resources.Menu_Tool_Account_Filter}" IsCheckable="True" IsChecked="{Binding BookTabVM.UseFilter}"/>
                 </MenuItem>
                 <Separator/>
                 <!-- 設定 -->
@@ -293,7 +293,7 @@
 
         <!-- 帳簿 -->
         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5,5,5,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-           <TextBlock Text="{x:Static properties:Resources.TextBlock_Book}"/>:
+           <TextBlock Text="{x:Static properties:Resources.TextBlock_Account}"/>:
         </TextBlock>
         <ComboBox Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" MinWidth="150"
                   ItemsSource="{Binding BookSelectorVM.ItemList}" SelectedItem="{Binding BookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
@@ -310,7 +310,7 @@
             <!-- 帳簿項目 -->
             <TabItem x:Name="_bookTab">
                 <TabItem.Header>
-                    <TextBlock Text="{x:Static properties:Resources.TabHeader_BookItems}" TextAlignment="Center"/>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_AccountItems}" TextAlignment="Center"/>
                 </TabItem.Header>
                 <TabItem.InputBindings>
                     <KeyBinding Gesture="F5" Command="{Binding UpdateCommand}"/>
@@ -447,7 +447,7 @@
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_Day}" Binding="{Binding ActTime, Converter={StaticResource DateTimeToDayOfWeekConverter}, ConverterCulture={StaticResource AppCulture}}"
                                                         CellStyle="{StaticResource DayOfWeekStyle}"/>
                                     <!-- 帳簿名 -->
-                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_BookName}" MinWidth="70" Binding="{Binding BookName}"
+                                    <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_AccountName}" MinWidth="70" Binding="{Binding BookName}"
                                                         Visibility="{Binding MainWindow_Show_BookName, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"/>
                                     <!-- 分類名 -->
                                     <DataGridTextColumn Header="{x:Static properties:Resources.ColumnHeader_CategoryName}" MinWidth="70" Binding="{Binding CategoryName}"
@@ -572,7 +572,7 @@
                             <TextBlock>
                                 <TextBlock Text="{x:Static properties:Resources.TextBlock_CurrentBackUp}"/>:
                                 <TextBlock Text="{Binding CurrentBackUp, TargetNullValue='-', StringFormat='yyyy-MM-dd HH:mm:ss'}"/>
-                                <TextBlock Text="{x:Static properties:Resources.TextBlock_LastOperatedBookItem}"/>:
+                                <TextBlock Text="{x:Static properties:Resources.TextBlock_LastOperatedAccountItem}"/>:
                                 <TextBlock Text="{Binding ActDateLastEdited, TargetNullValue='-', StringFormat='yyyy-MM-dd'}"/>
                             </TextBlock>
                         </StatusBarItem>

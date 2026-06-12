@@ -24,11 +24,11 @@ namespace HouseholdAccountBook.ViewModels
         /// 帳簿種別文字列
         /// </summary>
         public static Dictionary<BookKind, string> BookKindStr => new() {
-            { BookKind.Uncategorized,       Properties.Resources.BookKind_Uncategorized },
-            { BookKind.Wallet,              Properties.Resources.BookKind_Wallet },
-            { BookKind.BankAccount,         Properties.Resources.BookKind_BankAccount },
-            { BookKind.CreditCard,          Properties.Resources.BookKind_CreditCard },
-            { BookKind.BrokerageAccount,    Properties.Resources.BookKind_BrokerageAccount }
+            { BookKind.Uncategorized,       Properties.Resources.AccountKind_Uncategorized },
+            { BookKind.Wallet,              Properties.Resources.AccountKind_Wallet },
+            { BookKind.BankAccount,         Properties.Resources.AccountKind_BankAccount },
+            { BookKind.CreditCard,          Properties.Resources.AccountKind_CreditCard },
+            { BookKind.BrokerageAccount,    Properties.Resources.AccountKind_BrokerageAccount }
         };
         /// <summary>
         /// 収支種別文字列
