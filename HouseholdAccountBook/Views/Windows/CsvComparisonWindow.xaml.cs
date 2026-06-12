@@ -37,9 +37,9 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<BookIdObj>> BookChanged {
-            add => this.WVM.BookChanged += value;
-            remove => this.WVM.BookChanged -= value;
+        public event EventHandler<ChangedEventArgs<AccountIdObj>> AccountChanged {
+            add => this.WVM.AccountChanged += value;
+            remove => this.WVM.AccountChanged -= value;
         }
 
         /// <summary>
@@ -53,10 +53,10 @@ namespace HouseholdAccountBook.Views.Windows
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="initialBookId">初期選択する帳簿のID</param>
-        public CsvComparisonWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId)
+        /// <param name="initialAccountId">初期選択する帳簿のID</param>
+        public CsvComparisonWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId)
         {
-            using FuncLog funcLog = new(new { initialBookId });
+            using FuncLog funcLog = new(new { initialAccountId });
 
             this.Owner = owner;
             this.Name = UiConstants.WindowNameStr[nameof(CsvComparisonWindow)];
@@ -71,7 +71,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
-                await this.WVM.LoadAsync(initialBookId);
+                await this.WVM.LoadAsync(initialAccountId);
                 this.WVM.AddEventHandlers();
             };
         }
@@ -88,7 +88,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.AddActionRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionRequested));
 
-                ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.InitialBookId, e.InitialRecord);
+                ActionRegistrationWindow arw = new(this, e.DbHandlerFactory, e.InitialAccountId, e.InitialRecord);
                 arw.Registrated += e.Registered;
                 arw.SetIsModal(true);
                 _ = arw.ShowDialog();
@@ -96,7 +96,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.WVM.AddActionListRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionListRequested));
 
-                ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.InitialBookId, e.InitialRecordList);
+                ActionListRegistrationWindow alrw = new(this, e.DbHandlerFactory, e.InitialAccountId, e.InitialRecordList);
                 alrw.Registrated += e.Registered;
                 alrw.SetIsModal(true);
                 _ = alrw.ShowDialog();

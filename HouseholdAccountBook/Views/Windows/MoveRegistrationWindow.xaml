@@ -92,7 +92,7 @@
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                                Text="{x:Static properties:Resources.TextBlock_Account}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"  Grid.ColumnSpan="2"
-                              ItemsSource="{Binding FromBookSelectorVM.ItemList}" SelectedItem="{Binding FromBookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                              ItemsSource="{Binding FromAccountSelectorVM.ItemList}" SelectedItem="{Binding FromAccountSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 
                     <!-- 日付 -->
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
@@ -128,7 +128,7 @@
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                                Text="{x:Static properties:Resources.TextBlock_Account}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"  Grid.ColumnSpan="2"
-                              ItemsSource="{Binding ToBookSelectorVM.ItemList}" SelectedItem="{Binding ToBookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                              ItemsSource="{Binding ToAccountSelectorVM.ItemList}" SelectedItem="{Binding ToAccountSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 
                     <!-- 日付 -->
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 

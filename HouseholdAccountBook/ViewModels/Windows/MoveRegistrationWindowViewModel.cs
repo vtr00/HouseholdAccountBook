@@ -36,11 +36,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 移動元帳簿変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<BookIdObj>> FromBookChanged;
+        public event EventHandler<ChangedEventArgs<AccountIdObj>> FromAccountChanged;
         /// <summary>
         /// 移動先帳簿変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<BookIdObj>> ToBookChanged;
+        public event EventHandler<ChangedEventArgs<AccountIdObj>> ToAccountChanged;
         /// <summary>
         /// 手数料種別変更時イベント
         /// </summary>
@@ -90,11 +90,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 移動元帳簿セレクタVM
         /// </summary>
-        public SelectorViewModel<BookModel, BookIdObj> FromBookSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        public SelectorViewModel<AccountModel, AccountIdObj> FromAccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
         /// <summary>
         /// 移動先帳簿セレクタVM
         /// </summary>
-        public SelectorViewModel<BookModel, BookIdObj> ToBookSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        public SelectorViewModel<AccountModel, AccountIdObj> ToAccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 選択された日付(移動元)
@@ -200,7 +200,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public new ICommand OKCommand => field ??= new AsyncRelayCommand(
             this.OKCommand_ExecuteAsync,
-            () => this.InputedValue is not null && this.FromBookSelectorVM?.SelectedKey != this.ToBookSelectorVM?.SelectedKey, this.mBusyService);
+            () => this.InputedValue is not null && this.FromAccountSelectorVM?.SelectedKey != this.ToAccountSelectorVM?.SelectedKey, this.mBusyService);
         protected async Task OKCommand_ExecuteAsync()
         {
             // DB登録
@@ -230,19 +230,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.mAppService = new(this.mDbHandlerFactory);
             this.mService = new(this.mDbHandlerFactory);
 
-            this.FromBookSelectorVM.SetLoader(async () => await this.mAppService.LoadBookListAsync());
-            this.ToBookSelectorVM.SetLoader(async () => await this.mAppService.LoadBookListAsync());
+            this.FromAccountSelectorVM.SetLoader(async () => await this.mAppService.LoadAccountListAsync());
+            this.ToAccountSelectorVM.SetLoader(async () => await this.mAppService.LoadAccountListAsync());
             this.CommissionKindSelectorVM.SetLoader(() => CommissionKindStr);
             this.ItemSelectorVM.SetLoader(
                 async () => {
-                    BookIdObj bookId = this.CommissionKindSelectorVM.SelectedKey switch {
-                        CommissionKind.MoveFrom => this.FromBookSelectorVM.SelectedKey,
-                        CommissionKind.MoveTo => this.ToBookSelectorVM.SelectedKey,
+                    AccountIdObj accountId = this.CommissionKindSelectorVM.SelectedKey switch {
+                        CommissionKind.MoveFrom => this.FromAccountSelectorVM.SelectedKey,
+                        CommissionKind.MoveTo => this.ToAccountSelectorVM.SelectedKey,
                         _ => throw new NotSupportedException("SelectedCommissionKind"),
                     };
-                    return await this.mAppService.LoadItemListAsync(bookId, BalanceKind.Expenses, CategoryIdObj.System);
+                    return await this.mAppService.LoadItemListAsync(accountId, BalanceKind.Expenses, CategoryIdObj.System);
                 },
-                () => this.FromBookSelectorVM.SelectedKey != null && this.ToBookSelectorVM.SelectedKey != null);
+                () => this.FromAccountSelectorVM.SelectedKey != null && this.ToAccountSelectorVM.SelectedKey != null);
             this.RemarkSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadRemarkListAsync(this.ItemSelectorVM.SelectedKey, true),
                 () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
@@ -253,26 +253,26 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// DBから読み込む
         /// </summary>
-        /// <param name="initialBookId">追加時、初期選択する帳簿のID</param>
+        /// <param name="initialAccountId">追加時、初期選択する帳簿のID</param>
         /// <param name="initialMonth">追加時、初期選択する年月</param>
         /// <param name="initialDate">追加時、初期選択する日付</param>
         /// <param name="targetGroupId">複製/編集時、複製/編集対象の帳簿項目のグループID</param>
         /// <returns></returns>
-        public async Task LoadAsync(BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate, GroupIdObj targetGroupId)
+        public async Task LoadAsync(AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate, GroupIdObj targetGroupId)
         {
-            using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, targetGroupId });
+            using FuncLog funcLog = new(new { initialAccountId, initialMonth, initialDate, targetGroupId });
             using IDisposable disposable = this.mBusyService.Enter();
 
-            BookIdObj selectingFromBookId = null;
-            BookIdObj selectingToBookId = null;
+            AccountIdObj selectingFromAccountId = null;
+            AccountIdObj selectingToAccountId = null;
             ItemIdObj selectingCommissionItemId = null;
             CommissionKind selectingCommissionKind = default;
             string selectingCommissionRemark = null;
 
             switch (this.RegKind) {
                 case RegistrationKind.Add:
-                    selectingFromBookId = initialBookId;
-                    selectingToBookId = initialBookId;
+                    selectingFromAccountId = initialAccountId;
+                    selectingToAccountId = initialAccountId;
                     selectingCommissionKind = CommissionKind.MoveFrom;
 
                     // WVMに値を設定する
@@ -295,9 +295,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         this.GroupId = targetGroupId;
                         this.CommissionId = commissionAction?.ActionId;
                     }
-                    selectingFromBookId = fromAction.Book.Id;
-                    selectingToBookId = toAction.Book.Id;
-                    selectingCommissionKind = commissionAction?.Book.Id == toAction.Book.Id ? CommissionKind.MoveTo : CommissionKind.MoveFrom;
+                    selectingFromAccountId = fromAction.Account.Id;
+                    selectingToAccountId = toAction.Account.Id;
+                    selectingCommissionKind = commissionAction?.Account.Id == toAction.Account.Id ? CommissionKind.MoveTo : CommissionKind.MoveFrom;
                     selectingCommissionItemId = commissionAction?.Item.Id;
                     selectingCommissionRemark = commissionAction?.Remark?.Remark;
 
@@ -312,20 +312,20 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             // リストを更新する
-            await this.FromBookSelectorVM.LoadAsync(selectingFromBookId);
-            await this.ToBookSelectorVM.LoadAsync(selectingToBookId);
+            await this.FromAccountSelectorVM.LoadAsync(selectingFromAccountId);
+            await this.ToAccountSelectorVM.LoadAsync(selectingToAccountId);
             await this.CommissionKindSelectorVM.LoadAsync(selectingCommissionKind);
             await this.ItemSelectorVM.LoadAsync(selectingCommissionItemId);
             await this.RemarkSelectorVM.LoadAsync(selectingCommissionRemark);
 
             switch (this.RegKind) {
                 case RegistrationKind.Add: {
-                    if (this.ToBookSelectorVM.SelectedItem?.BookKind == BookKind.CreditCard) {
-                        if (this.ToBookSelectorVM.SelectedItem.DebitBookId != null) {
-                            this.FromBookSelectorVM.SelectedItem = this.FromBookSelectorVM.ItemList.FirstOrElementAtOrDefault(vm => vm.Id == this.ToBookSelectorVM.SelectedItem.DebitBookId, 0);
+                    if (this.ToAccountSelectorVM.SelectedItem?.AccountKind == AccountKind.CreditCard) {
+                        if (this.ToAccountSelectorVM.SelectedItem.DebitAccountId != null) {
+                            this.FromAccountSelectorVM.SelectedItem = this.FromAccountSelectorVM.ItemList.FirstOrElementAtOrDefault(vm => vm.Id == this.ToAccountSelectorVM.SelectedItem.DebitAccountId, 0);
                         }
-                        if (this.ToBookSelectorVM.SelectedItem?.PayDay != null) {
-                            this.SelectedFromDate = this.SelectedFromDate.GetDateInMonth(this.ToBookSelectorVM.SelectedItem.PayDay.Value);
+                        if (this.ToAccountSelectorVM.SelectedItem?.PayDay != null) {
+                            this.SelectedFromDate = this.SelectedFromDate.GetDateInMonth(this.ToAccountSelectorVM.SelectedItem.PayDay.Value);
                         }
                     }
                 }
@@ -337,11 +337,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
-            this.FromBookSelectorVM.SelectionChanged += (sender, e) => this.FromBookChanged?.Invoke(sender, e);
-            this.FromBookSelectorVM.Children.Add(this.ItemSelectorVM);
+            this.FromAccountSelectorVM.SelectionChanged += (sender, e) => this.FromAccountChanged?.Invoke(sender, e);
+            this.FromAccountSelectorVM.Children.Add(this.ItemSelectorVM);
 
-            this.ToBookSelectorVM.SelectionChanged += (sender, e) => this.ToBookChanged?.Invoke(sender, e);
-            this.ToBookSelectorVM.Children.Add(this.ItemSelectorVM);
+            this.ToAccountSelectorVM.SelectionChanged += (sender, e) => this.ToAccountChanged?.Invoke(sender, e);
+            this.ToAccountSelectorVM.Children.Add(this.ItemSelectorVM);
 
             this.CommissionKindSelectorVM.SelectionChanged += (sender, e) => this.CommissionKindChanged?.Invoke(sender, e);
             this.CommissionKindSelectorVM.Children.Add(this.ItemSelectorVM);
@@ -361,13 +361,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
             ActionModel fromAction = new() {
                 Base = new(this.FromActionId, this.SelectedFromDate, (decimal)-this.InputedValue),
                 GroupId = this.GroupId,
-                Book = new(this.FromBookSelectorVM.SelectedKey, string.Empty)
+                Account = new(this.FromAccountSelectorVM.SelectedKey, string.Empty)
             };
 
             ActionModel toAction = new() {
                 Base = new(this.ToActionId, this.SelectedToDate, (decimal)this.InputedValue),
                 GroupId = this.GroupId,
-                Book = new(this.ToBookSelectorVM.SelectedKey, string.Empty)
+                Account = new(this.ToAccountSelectorVM.SelectedKey, string.Empty)
             };
 
             CommissionKind commissionKind = this.CommissionKindSelectorVM.SelectedKey;
@@ -378,9 +378,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     _ => throw new NotSupportedException("SelectedCommissionKind")
                 }, -this.InputedCommission ?? 0),
                 GroupId = this.GroupId,
-                Book = new(commissionKind switch {
-                    CommissionKind.MoveFrom => fromAction.Book.Id,
-                    CommissionKind.MoveTo => toAction.Book.Id,
+                Account = new(commissionKind switch {
+                    CommissionKind.MoveFrom => fromAction.Account.Id,
+                    CommissionKind.MoveTo => toAction.Account.Id,
                     _ => throw new NotSupportedException("SelectedCommissionKind")
                 }, string.Empty),
                 Item = new(this.ItemSelectorVM.SelectedKey, string.Empty),

@@ -323,12 +323,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             ItemSettingViewModel vm = this.DisplayedItemSettingVM;
             vm.RelationSelectorVM.SelectedItem = viewModel as RelationViewModel; // チェックボックスを変更しただけでは変更されないため、引数で受け取る
 
-            if (await this.mSettingService.SaveBookItemRemationAsync(vm.RelationSelectorVM.SelectedKey, (int)vm.Id, vm.RelationSelectorVM.SelectedItem.IsRelated)) {
+            if (await this.mSettingService.SaveAccountItemRemationAsync(vm.RelationSelectorVM.SelectedKey, (int)vm.Id, vm.RelationSelectorVM.SelectedItem.IsRelated)) {
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
             else {
                 vm.RelationSelectorVM.SelectedItem.IsRelated = !vm.RelationSelectorVM.SelectedItem.IsRelated; // 選択前の状態に戻す
-                _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinBook, Properties.Resources.Title_Error);
+                _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinAccount, Properties.Resources.Title_Error);
             }
         }
 

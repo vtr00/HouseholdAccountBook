@@ -90,7 +90,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// 選択タブ
         /// </summary>
         public Tabs SelectedTab {
-            get => EnumUtil.SafeCastEnum(this.mSettings.MainWindow_SelectedTabIndex, Tabs.BooksTab);
+            get => EnumUtil.SafeCastEnum(this.mSettings.MainWindow_SelectedTabIndex, Tabs.AccountTab);
             set {
                 this.mSettings.MainWindow_SelectedTabIndex = (int)value;
                 this.mSettings.Save();
@@ -99,8 +99,8 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// 選択帳簿ID
         /// </summary>
-        public BookIdObj SelectedBookId {
-            get => this.mSettings.MainWindow_SelectedBookId == (int)BookIdObj.System ? BookIdObj.System : this.mSettings.MainWindow_SelectedBookId;
+        public AccountIdObj SelectedAccountId {
+            get => this.mSettings.MainWindow_SelectedBookId == (int)AccountIdObj.System ? AccountIdObj.System : this.mSettings.MainWindow_SelectedBookId;
             set {
                 this.mSettings.MainWindow_SelectedBookId = (int)value;
                 this.mSettings.Save();

@@ -34,28 +34,28 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// 帳簿Modelを取得する
         /// </summary>
-        /// <param name="bookId">対象の帳簿ID</param>
+        /// <param name="accountId">対象の帳簿ID</param>
         /// <returns>帳簿Model</returns>
-        public async Task<BookModel> LoadBookAsync(BookIdObj bookId)
+        public async Task<AccountModel> LoadAccountAsync(AccountIdObj accountId)
         {
-            using FuncLog funcLog = new(new { bookId });
+            using FuncLog funcLog = new(new { accountId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             BookInfoDao bookInfoDao = new(dbHandler);
-            BookInfoDto dto = await bookInfoDao.FindByBookId((int)bookId);
+            BookInfoDto dto = await bookInfoDao.FindByBookId((int)accountId);
 
             MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
 
-            BookModel bm = new(bookId, dto.BookName) {
+            AccountModel bm = new(accountId, dto.BookName) {
                 SortOrder = dto.SortOrder,
-                BookKind = (BookKind)dto.BookKind,
+                AccountKind = (AccountKind)dto.BookKind,
                 Remark = jsonObj?.Remark ?? string.Empty,
                 InitialValue = dto.InitialValue,
                 StartDateExists = jsonObj?.StartDate != null,
                 EndDateExists = jsonObj?.EndDate != null,
                 Period = new(jsonObj?.StartDate?.ToDateOnly() ?? dto.StartDate?.ToDateOnly() ?? DateOnlyExtensions.Today,
                                 jsonObj?.EndDate?.ToDateOnly() ?? dto.EndDate?.ToDateOnly() ?? DateOnlyExtensions.Today),
-                DebitBookId = dto.DebitBookId ?? BookIdObj.System,
+                DebitAccountId = dto.DebitBookId ?? AccountIdObj.System,
                 PayDay = dto.PayDay,
                 CsvFolderPath = jsonObj == null ? "" : PathUtil.GetSmartPath(App.GetCurrentDir(), jsonObj.CsvFolderPath),
                 TextEncoding = jsonObj?.TextEncoding ?? Encoding.UTF8.CodePage,
@@ -71,37 +71,37 @@ namespace HouseholdAccountBook.Models.AppServices
         /// 帳簿を追加する
         /// </summary>
         /// <returns>帳簿ID</returns>
-        public async Task<BookIdObj> AddBookAsync()
+        public async Task<AccountIdObj> AddAccountAsync()
         {
             using FuncLog funcLog = new();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             MstBookDao mstBookDao = new(dbHandler);
-            BookIdObj bookId = await mstBookDao.InsertReturningIdAsync(new MstBookDto { });
+            AccountIdObj accountId = await mstBookDao.InsertReturningIdAsync(new MstBookDto { });
 
-            return bookId;
+            return accountId;
         }
 
         /// <summary>
         /// 帳簿に紐づく帳簿項目が存在しなければ帳簿を削除する
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="accountId">帳簿ID</param>
         /// <returns>削除したか</returns>
-        public async Task<bool> DeleteBookAsync(BookIdObj bookId)
+        public async Task<bool> DeleteAccountAsync(AccountIdObj accountId)
         {
-            using FuncLog funcLog = new(new { bookId });
+            using FuncLog funcLog = new(new { accountId });
 
             bool result = false;
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 await dbHandler.ExecTransactionAsync(async () => {
                     HstActionDao hstActionDao = new(dbHandler);
-                    IEnumerable<HstActionDto> dtoList = await hstActionDao.FindByBookIdAsync((int)bookId);
+                    IEnumerable<HstActionDto> dtoList = await hstActionDao.FindByBookIdAsync((int)accountId);
                     if (dtoList.Any()) {
                         result = false;
                     }
                     else {
                         MstBookDao hstBookDao = new(dbHandler);
-                        _ = await hstBookDao.DeleteByIdAsync((int)bookId);
+                        _ = await hstBookDao.DeleteByIdAsync((int)accountId);
                         result = true;
                     }
                 });
@@ -112,65 +112,65 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// 帳簿のソート順を入れ替える
         /// </summary>
-        /// <param name="bookId1">帳簿ID1</param>
-        /// <param name="bookId2">帳簿ID2</param>
+        /// <param name="accountId1">帳簿ID1</param>
+        /// <param name="accountId2">帳簿ID2</param>
         /// <returns></returns>
-        public async Task SwapBookSortOrderAsync(BookIdObj bookId1, BookIdObj bookId2)
+        public async Task SwapAccountSortOrderAsync(AccountIdObj accountId1, AccountIdObj accountId2)
         {
-            using FuncLog funcLog = new(new { bookId1, bookId2 });
+            using FuncLog funcLog = new(new { accountId1, accountId2 });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             MstBookDao mstBookDao = new(dbHandler);
-            _ = await mstBookDao.SwapSortOrderAsync((int)bookId1, (int)bookId2);
+            _ = await mstBookDao.SwapSortOrderAsync((int)accountId1, (int)accountId2);
         }
 
         /// <summary>
         /// 帳簿Modelを保存する
         /// </summary>
-        /// <param name="book">帳簿Model</param>
+        /// <param name="account">帳簿Model</param>
         /// <returns></returns>
-        public async Task SaveBookAsync(BookModel book)
+        public async Task SaveAccountAsync(AccountModel account)
         {
-            using FuncLog funcLog = new(new { book });
+            using FuncLog funcLog = new(new { account });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             MstBookDto.JsonDto jsonObj = new() {
-                Remark = book.Remark,
-                StartDate = book.StartDateExists ? book.Period.Start.ToDateTime(TimeOnly.MinValue) : null,
-                EndDate = book.EndDateExists ? book.Period.End.ToDateTime(TimeOnly.MinValue) : null,
-                CsvFolderPath = book.CsvFolderPath,
-                TextEncoding = book.TextEncoding,
-                CsvActDateIndex = book.ActDateIndex - 1,
-                CsvOutgoIndex = book.ExpensesIndex - 1,
-                CsvItemNameIndex = book.ItemNameIndex - 1
+                Remark = account.Remark,
+                StartDate = account.StartDateExists ? account.Period.Start.ToDateTime(TimeOnly.MinValue) : null,
+                EndDate = account.EndDateExists ? account.Period.End.ToDateTime(TimeOnly.MinValue) : null,
+                CsvFolderPath = account.CsvFolderPath,
+                TextEncoding = account.TextEncoding,
+                CsvActDateIndex = account.ActDateIndex - 1,
+                CsvOutgoIndex = account.ExpensesIndex - 1,
+                CsvItemNameIndex = account.ItemNameIndex - 1
             };
             string jsonCode = jsonObj.ToJson();
 
             MstBookDao mstBookDao = new(dbHandler);
             _ = await mstBookDao.UpdateSetableAsync(new() {
-                BookName = book.Name,
-                BookKind = (int)book.BookKind,
-                InitialValue = (int)book.InitialValue,
-                DebitBookId = book.DebitBookId == BookIdObj.System ? null : (int)book.DebitBookId,
-                PayDay = book.PayDay,
+                BookName = account.Name,
+                BookKind = (int)account.AccountKind,
+                InitialValue = (int)account.InitialValue,
+                DebitBookId = account.DebitAccountId == AccountIdObj.System ? null : (int)account.DebitAccountId,
+                PayDay = account.PayDay,
                 JsonCode = jsonCode,
-                BookId = (int)book.Id
+                BookId = (int)account.Id
             });
         }
 
         /// <summary>
         /// 関連Model(帳簿主体)を取得する
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="accountId">帳簿ID</param>
         /// <returns>関連Model</returns>
-        public async Task<IEnumerable<RelationModel>> LoadRelationListAsync(BookIdObj bookId)
+        public async Task<IEnumerable<RelationModel>> LoadRelationListAsync(AccountIdObj accountId)
         {
-            using FuncLog funcLog = new(new { bookId });
+            using FuncLog funcLog = new(new { accountId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             List<RelationModel> rvmList = [];
             ItemRelFromBookInfoDao itemRelFromBookInfoDao = new(dbHandler);
-            IEnumerable<ItemRelFromBookInfoDto> dtoList = await itemRelFromBookInfoDao.FindByBookIdAsync((int)bookId);
+            IEnumerable<ItemRelFromBookInfoDto> dtoList = await itemRelFromBookInfoDao.FindByBookIdAsync((int)accountId);
 
             foreach (ItemRelFromBookInfoDto dto in dtoList) {
                 RelationModel rvm = new() {
@@ -502,19 +502,19 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// 帳簿と項目に紐づく帳簿項目が存在しなければ関連付けを変更する
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="accountId">帳簿ID</param>
         /// <param name="itemId">項目ID</param>
         /// <param name="isRelated">更新後の関連付け</param>
         /// <returns>変更したか</returns>
-        public async Task<bool> SaveBookItemRemationAsync(BookIdObj bookId, ItemIdObj itemId, bool isRelated)
+        public async Task<bool> SaveAccountItemRemationAsync(AccountIdObj accountId, ItemIdObj itemId, bool isRelated)
         {
-            using FuncLog funcLog = new(new { bookId, itemId, isRelated });
+            using FuncLog funcLog = new(new { accountId, itemId, isRelated });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             bool result = false;
             await dbHandler.ExecTransactionAsync(async () => {
                 HstActionDao hstActionDao = new(dbHandler);
-                IEnumerable<HstActionDto> hstActionDtoList = await hstActionDao.FindByBookIdAndItemIdAsync((int)bookId, (int)itemId);
+                IEnumerable<HstActionDto> hstActionDtoList = await hstActionDao.FindByBookIdAndItemIdAsync((int)accountId, (int)itemId);
 
                 if (hstActionDtoList.Any()) {
                     result = false;
@@ -522,7 +522,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 else {
                     RelBookItemDao relBookItemDao = new(dbHandler);
                     _ = await relBookItemDao.UpsertAsync(new RelBookItemDto {
-                        BookId = (int)bookId,
+                        BookId = (int)accountId,
                         ItemId = (int)itemId,
                         DelFlg = isRelated ? 0 : 1
                     });

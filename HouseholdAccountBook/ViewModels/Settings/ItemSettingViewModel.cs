@@ -38,7 +38,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 関連性セレクタVM
         /// </summary>
-        public SelectorViewModel<RelationViewModel, BookIdObj> RelationSelectorVM => field ??= new(static vm => vm?.Id);
+        public SelectorViewModel<RelationViewModel, AccountIdObj> RelationSelectorVM => field ??= new(static vm => vm?.Id);
 
         /// <summary>
         /// 店舗セレクタVM

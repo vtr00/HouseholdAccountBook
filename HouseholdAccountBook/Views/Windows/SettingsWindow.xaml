@@ -50,7 +50,7 @@
             </TabControl.ItemContainerStyle>
             
             <!-- 帳簿設定 -->
-            <TabItem x:Name="_BookTab" DataContext="{Binding BookTabVM}">
+            <TabItem x:Name="_AccountTab" DataContext="{Binding AccountTabVM}">
                 <TabItem.Header>
                     <TextBlock Text="{x:Static properties:Resources.TabHeader_AccountSettings}" TextAlignment="Center"/>
                 </TabItem.Header>
@@ -69,20 +69,20 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Grid.Row="0" Margin="5" Orientation="Horizontal">
-                                <Button Content="{x:Static properties:Resources.Button_Add}" Width="50" Command="{Binding AddBookCommand}" ToolTip="Ctrl++"/>
-                                <Button Content="{x:Static properties:Resources.Button_Delete}" Width="50" Command="{Binding DeleteBookCommand}" ToolTip="Del"/>
-                                <Button Content="{x:Static properties:Resources.Button_RaiseSortOrder}" Width="25" Command="{Binding RaiseBookSortOrderCommand}" ToolTip="Ctrl+↑"/>
-                                <Button Content="{x:Static properties:Resources.Button_DropSortOrder}" Width="25" Command="{Binding DropBookSortOrderCommand}" ToolTip="Ctrl+↓"/>
+                                <Button Content="{x:Static properties:Resources.Button_Add}" Width="50" Command="{Binding AddAccountCommand}" ToolTip="Ctrl++"/>
+                                <Button Content="{x:Static properties:Resources.Button_Delete}" Width="50" Command="{Binding DeleteAccountCommand}" ToolTip="Del"/>
+                                <Button Content="{x:Static properties:Resources.Button_RaiseSortOrder}" Width="25" Command="{Binding RaiseAccountSortOrderCommand}" ToolTip="Ctrl+↑"/>
+                                <Button Content="{x:Static properties:Resources.Button_DropSortOrder}" Width="25" Command="{Binding DropAccountSortOrderCommand}" ToolTip="Ctrl+↓"/>
                             </StackPanel>
 
                             <ListBox Grid.Row="1" Margin="5" 
-                                     ItemsSource="{Binding BookSelectorVM.ItemList}" SelectedItem="{Binding BookSelectorVM.SelectedItem}" DisplayMemberPath="Name">
+                                     ItemsSource="{Binding AccountSelectorVM.ItemList}" SelectedItem="{Binding AccountSelectorVM.SelectedItem}" DisplayMemberPath="Name">
                                 <ListBox.InputBindings>
-                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{Binding DataContext.AddBookCommand, ElementName=_BookTab}"/>
-                                    <KeyBinding Gesture="Ctrl+Add" Command="{Binding DataContext.AddBookCommand, ElementName=_BookTab}"/>
-                                    <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteBookCommand, ElementName=_BookTab}"/>
-                                    <KeyBinding Gesture="Ctrl+Up" Command="{Binding DataContext.RaiseBookSortOrderCommand, ElementName=_BookTab}"/>
-                                    <KeyBinding Gesture="Ctrl+Down" Command="{Binding DataContext.DropBookSortOrderCommand, ElementName=_BookTab}"/>
+                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{Binding DataContext.AddAccountCommand, ElementName=_AccountTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Add" Command="{Binding DataContext.AddAccountCommand, ElementName=_AccountTab}"/>
+                                    <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteAccountCommand, ElementName=_AccountTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Up" Command="{Binding DataContext.RaiseAccountSortOrderCommand, ElementName=_AccountTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Down" Command="{Binding DataContext.DropAccountSortOrderCommand, ElementName=_AccountTab}"/>
                                 </ListBox.InputBindings>
                             </ListBox>
                         </Grid>
@@ -90,7 +90,7 @@
                         
                     <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
 
-                    <Grid Grid.Column="2" Grid.IsSharedSizeScope="True" DataContext="{Binding DisplayedBookSettingVM}">
+                    <Grid Grid.Column="2" Grid.IsSharedSizeScope="True" DataContext="{Binding DisplayedAccountSettingVM}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="3*"/>
                             <RowDefinition Height="Auto"/>
@@ -101,7 +101,7 @@
                             <StackPanel Grid.IsSharedSizeScope="True" Margin="0,0,5,0">
                                 <GroupBox Grid.Row="0" Header="{x:Static properties:Resources.GroupHeader_AccountInformation}">
                                     <GroupBox.InputBindings>
-                                        <KeyBinding Gesture="Ctrl+S" Command="{Binding DataContext.SaveBookInfoCommand, ElementName=_BookTab}"/>
+                                        <KeyBinding Gesture="Ctrl+S" Command="{Binding DataContext.SaveAccountInfoCommand, ElementName=_AccountTab}"/>
                                     </GroupBox.InputBindings>
 
                                     <Grid>
@@ -145,7 +145,7 @@
                                         <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_AccountKind}"/>
                                         <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                                  ItemsSource="{Binding BookKindSelectorVM.ItemList}" SelectedItem="{Binding BookKindSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
+                                                  ItemsSource="{Binding AccountKindSelectorVM.ItemList}" SelectedItem="{Binding AccountKindSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
 
                                         <!-- 備考 -->
                                         <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
@@ -210,7 +210,7 @@
 
                                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_PaymentAccount}"/>
                                                 <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                                          ItemsSource="{Binding DebitBookSelectorVM.ItemList}" SelectedItem="{Binding DebitBookSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                                                          ItemsSource="{Binding DebitAccountSelectorVM.ItemList}" SelectedItem="{Binding DebitAccountSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_PaymentDate}"/>
                                                 <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" 
@@ -239,7 +239,7 @@
                                                 <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                          Text="{Binding InputedCsvFolderPath, UpdateSourceTrigger=PropertyChanged}"/>
                                                 <Button Grid.Row="0" Grid.Column="3" Margin="5" Content="..." 
-                                                        Command="{Binding DataContext.SelectCsvFolderPathCommand, ElementName=_BookTab}"/>
+                                                        Command="{Binding DataContext.SelectCsvFolderPathCommand, ElementName=_AccountTab}"/>
 
                                                 <!-- エンコード -->
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
@@ -292,7 +292,7 @@
                         <!-- 保存 -->
                         <Button Grid.Row="1" Margin="5" 
                                 Content="{x:Static properties:Resources.Button_Save}"
-                                Command="{Binding DataContext.SaveBookInfoCommand, ElementName=_BookTab}" ToolTip="Ctrl+S"/>
+                                Command="{Binding DataContext.SaveAccountInfoCommand, ElementName=_AccountTab}" ToolTip="Ctrl+S"/>
 
                         <!-- 関連付け -->
                         <GroupBox Grid.Row="2" Header="{x:Static properties:Resources.GroupHeader_Linkage}">
@@ -306,7 +306,7 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <CheckBox Grid.Column="0" IsChecked="{Binding IsRelated}"
-                                                          Command="{Binding DataContext.ChangeBookRelationCommand, ElementName=_BookTab}"
+                                                          Command="{Binding DataContext.ChangeAccountRelationCommand, ElementName=_AccountTab}"
                                                           CommandParameter="{Binding DataContext, RelativeSource={RelativeSource Self}}"/>
                                                 <TextBlock Grid.Column="1" Text="{Binding Name}"/>
                                             </Grid>

@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.Models.UiDto
         /// <summary>
         /// 帳簿
         /// </summary>
-        public BookModel Book { get; init; } = new(BookIdObj.System, string.Empty);
+        public AccountModel Account { get; init; } = new(AccountIdObj.System, string.Empty);
         /// <summary>
         /// 分類
         /// </summary>
@@ -84,7 +84,7 @@ namespace HouseholdAccountBook.Models.UiDto
         {
             return new() {
                 GroupId = this.GroupId,
-                Book = this.Book,
+                Account = this.Account,
                 Category = this.Category,
                 Item = this.Item,
                 Base = baseModel,

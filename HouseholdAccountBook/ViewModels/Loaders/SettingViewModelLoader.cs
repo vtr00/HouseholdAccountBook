@@ -32,25 +32,25 @@ namespace HouseholdAccountBook.ViewModels.Loaders
         /// <summary>
         /// 帳簿設定VMを取得する
         /// </summary>
-        /// <param name="bookId">表示対象の帳簿ID</param>
+        /// <param name="accountId">表示対象の帳簿ID</param>
         /// <returns>帳簿設定VM</returns>
-        public async Task<BookSettingViewModel> LoadBookSettingViewModelAsync(BookIdObj bookId)
+        public async Task<AccountSettingViewModel> LoadAccountSettingViewModelAsync(AccountIdObj accountId)
         {
-            using FuncLog funcLog = new(new { bookId });
+            using FuncLog funcLog = new(new { accountId });
 
-            BookSettingViewModel vm = null;
+            AccountSettingViewModel vm = null;
 
-            IEnumerable<BookModel> bmList = await this.mAppService.LoadBookListAsync(initialName: Properties.Resources.ListName_None);
-            BookModel bm = await this.mService.LoadBookAsync(bookId);
+            IEnumerable<AccountModel> bmList = await this.mAppService.LoadAccountListAsync(initialName: Properties.Resources.ListName_None);
+            AccountModel am = await this.mService.LoadAccountAsync(accountId);
 
-            vm = new(bm);
-            vm.BookKindSelectorVM.SetLoader(() => UiConstants.BookKindStr);
-            await vm.BookKindSelectorVM.LoadAsync(bm.BookKind);
-            vm.DebitBookSelectorVM.SetLoader(() => bmList.Where(tmpVM => tmpVM.Id != bookId));
-            await vm.DebitBookSelectorVM.LoadAsync(bm.DebitBookId);
+            vm = new(am);
+            vm.AccountKindSelectorVM.SetLoader(() => UiConstants.AccountKindStr);
+            await vm.AccountKindSelectorVM.LoadAsync(am.AccountKind);
+            vm.DebitAccountSelectorVM.SetLoader(() => bmList.Where(tmpVM => tmpVM.Id != accountId));
+            await vm.DebitAccountSelectorVM.LoadAsync(am.DebitAccountId);
             vm.TextEncodingSelectorVM.SetLoader(() => EncodingUtil.GetTextEncodingList());
-            await vm.TextEncodingSelectorVM.LoadAsync(bm.TextEncoding);
-            vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(bookId)).Select(model => new RelationViewModel(model)), mode: SelectorMode.FirstOrDefault);
+            await vm.TextEncodingSelectorVM.LoadAsync(am.TextEncoding);
+            vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(accountId)).Select(model => new RelationViewModel(model)), mode: SelectorMode.FirstOrDefault);
             await vm.RelationSelectorVM.LoadAsync();
 
             return vm;

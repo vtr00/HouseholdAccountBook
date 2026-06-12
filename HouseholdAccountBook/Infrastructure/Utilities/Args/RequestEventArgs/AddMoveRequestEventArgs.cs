@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
         /// <summary>
         /// 初期選択する帳簿のID
         /// </summary>
-        public BookIdObj InitialBookId { get; set; }
+        public AccountIdObj InitialAccountId { get; set; }
         /// <summary>
         /// 初期選択する月
         /// </summary>

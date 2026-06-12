@@ -26,7 +26,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
     /// <summary>
     /// メインウィンドウ 帳簿項目タブVM
     /// </summary>
-    public class MainWindowBookTabViewModel : WindowPartViewModelBase
+    public class MainWindowAccountTabViewModel : WindowPartViewModelBase
     {
         #region フィールド
         /// <summary>
@@ -229,7 +229,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 検索欄表示コマンド
         /// </summary>
         /// <remarks>帳簿タブを選択しているか</remarks>
-        public ICommand ShowFindBoxCommand => field ??= new RelayCommand(() => this.SelectedFindKind = FindKind.Find, () => this.Parent.SelectedTab == Tabs.BooksTab);
+        public ICommand ShowFindBoxCommand => field ??= new RelayCommand(() => this.SelectedFindKind = FindKind.Find, () => this.Parent.SelectedTab == Tabs.AccountTab);
 
         /// <summary>
         /// 検索欄非表示コマンド
@@ -248,7 +248,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 置換欄表示コマンド
         /// </summary>
         /// <remarks>帳簿タブを選択しているか</remarks>
-        public ICommand ShowReplaceBoxCommand => field ??= new RelayCommand(() => this.SelectedFindKind = FindKind.Replace, () => this.Parent.SelectedTab == Tabs.BooksTab);
+        public ICommand ShowReplaceBoxCommand => field ??= new RelayCommand(() => this.SelectedFindKind = FindKind.Replace, () => this.Parent.SelectedTab == Tabs.AccountTab);
 
         /// <summary>
         /// 置換欄非表示コマンド
@@ -299,7 +299,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <remarks>帳簿タブを選択 かつ 帳簿が2つ以上存在 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない</remarks>
         public ICommand AddMoveCommand => field ??= new RelayCommand(
             this.AddMoveCommand_Execute,
-            () => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookSelectorVM.Count >= 2 && this.Parent.BookSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened());
+            () => this.Parent.SelectedTab == Tabs.AccountTab && this.Parent.AccountSelectorVM.Count >= 2 && this.Parent.AccountSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 移動追加コマンド処理
         /// </summary>
@@ -307,7 +307,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             AddMoveRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
-                InitialBookId = this.Parent.BookSelectorVM?.SelectedKey,
+                InitialAccountId = this.Parent.AccountSelectorVM?.SelectedKey,
                 InitialMonth = this.Parent.DisplayedPeriodKind == PeriodKind.Monthly ? this.Parent.DisplayedMonth : null,
                 InitialDate = this.ActionSelectorVM.SelectedItem is null ? null : DateOnly.FromDateTime(this.ActionSelectorVM.SelectedItem.ActTime),
                 Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
@@ -321,7 +321,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <remarks>帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない</remarks>
         public ICommand AddActionCommand => field ??= new RelayCommand(
             this.AddActionCommand_Execute,
-            () => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened());
+            () => this.Parent.SelectedTab == Tabs.AccountTab && this.Parent.AccountSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 帳簿項目追加コマンド処理
         /// </summary>
@@ -329,7 +329,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             AddActionRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
-                InitialBookId = this.Parent.BookSelectorVM?.SelectedKey,
+                InitialAccountId = this.Parent.AccountSelectorVM?.SelectedKey,
                 InitialMonth = this.Parent.DisplayedPeriodKind == PeriodKind.Monthly ? this.Parent.DisplayedMonth : null,
                 InitialDate = this.ActionSelectorVM.SelectedItem is null ? null : DateOnly.FromDateTime(this.ActionSelectorVM.SelectedItem.ActTime),
                 Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true)  // 帳簿一覧タブを更新する
@@ -343,7 +343,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <remarks>帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウを開いていない</remarks>
         public ICommand AddActionListCommand => field ??= new RelayCommand(
             this.AddActionListCommand_Execute,
-            () => this.Parent.SelectedTab == Tabs.BooksTab && this.Parent.BookSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened());
+            () => this.Parent.SelectedTab == Tabs.AccountTab && this.Parent.AccountSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 帳簿項目リスト追加コマンド処理
         /// </summary>
@@ -351,7 +351,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             AddActionListRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
-                InitialBookId = this.Parent.BookSelectorVM?.SelectedKey,
+                InitialAccountId = this.Parent.AccountSelectorVM?.SelectedKey,
                 InitialMonth = this.Parent.DisplayedPeriodKind == PeriodKind.Monthly ? this.Parent.DisplayedMonth : null,
                 InitialDate = this.ActionSelectorVM.SelectedItem is null ? null : DateOnly.FromDateTime(this.ActionSelectorVM.SelectedItem.ActTime),
                 Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
@@ -365,7 +365,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <remarks>帳簿タブを選択 かつ 選択されている帳簿項目が1つだけ存在 かつ 選択している帳簿項目のIDが0より大きい かつ 子ウィンドウを開いていない</remarks>
         public ICommand CopyCommand => field ??= new AsyncRelayCommand(
             this.CopyCommand_ExecuteAsync,
-            () => this.Parent.SelectedTab == Tabs.BooksTab &&
+            () => this.Parent.SelectedTab == Tabs.AccountTab &&
                   this.ActionSelectorVM.SelectedCount == 1 && 0 < (int)(this.ActionSelectorVM.SelectedKey ?? 0) && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 複製コマンド処理
@@ -409,7 +409,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <remarks>帳簿タブを選択 かつ 選択されている帳簿項目が1つだけ存在 かつ 選択している帳簿項目のIDが0より大きい かつ 子ウィンドウを開いていない</remarks>
         public ICommand EditCommand => field ??= new AsyncRelayCommand(
             this.EditCommand_ExecuteAsync,
-            () => this.Parent.SelectedTab == Tabs.BooksTab &&
+            () => this.Parent.SelectedTab == Tabs.AccountTab &&
                   this.ActionSelectorVM.SelectedCount == 1 && 0 < (int)(this.ActionSelectorVM?.SelectedKey ?? 0) && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 編集コマンド処理
@@ -461,7 +461,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <remarks>帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 子ウィンドウが開いていない</remarks>
         public ICommand DeleteCommand => field ??= new AsyncRelayCommand(
             this.DeleteCommand_ExecuteAsync,
-            () => this.Parent.SelectedTab == Tabs.BooksTab &&
+            () => this.Parent.SelectedTab == Tabs.AccountTab &&
                   this.ActionSelectorVM.SelectedItemList.Any(static vm => 0 < (int)vm.ActionId) && !this.Parent.IsChildrenWindowOpened());
         /// <summary>
         /// 削除コマンド処理
@@ -485,7 +485,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <remarks>帳簿タブを選択 かつ 選択している帳簿項目が存在 かつ 選択している帳簿項目にIDが0より大きいものが存在 かつ 登録ウィンドウが開いていない</remarks>
         public ICommand ChangeIsMatchCommand => field ??= new AsyncRelayCommand(
             this.ChangeIsMatchCommand_ExecuteAsync,
-            () => this.Parent.SelectedTab == Tabs.BooksTab &&
+            () => this.Parent.SelectedTab == Tabs.AccountTab &&
                   this.ActionSelectorVM.SelectedItemList.Any(vm => 0 < (int)vm.ActionId) && !this.Parent.IsRegistrationWindowOpened());
         /// <summary>
         /// 一致フラグ変更コマンド処理
@@ -551,7 +551,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <param name="parent">親VM</param>
         /// <param name="tab">タブ</param>
         /// <param name="busyService">処理中状態サービス</param>
-        public MainWindowBookTabViewModel(MainWindowViewModel parent, Tabs tab, BusyService busyService) : base(busyService)
+        public MainWindowAccountTabViewModel(MainWindowViewModel parent, Tabs tab, BusyService busyService) : base(busyService)
         {
             using FuncLog funcLog = new(new { tab });
 
@@ -567,13 +567,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.mMainService = new(this.mDbHandlerFactory);
 
             this.ActionSelectorVM.SetLoader(async () => this.Parent.DisplayedPeriodKind switch {
-                PeriodKind.Monthly => (await this.mMainService.LoadActionListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value)).Select(tmp => new ActionViewModel(tmp)),
-                PeriodKind.Selected => (await this.mMainService.LoadActionListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedPeriod)).Select(tmp => new ActionViewModel(tmp)),
+                PeriodKind.Monthly => (await this.mMainService.LoadActionListAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value)).Select(tmp => new ActionViewModel(tmp)),
+                PeriodKind.Selected => (await this.mMainService.LoadActionListAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedPeriod)).Select(tmp => new ActionViewModel(tmp)),
                 _ => null
             }, mode: SelectorMode.FirstOrDefault);
             this.SummarySelectorVM.SetLoader(async () => this.Parent.DisplayedPeriodKind switch {
-                PeriodKind.Monthly => await this.mMainService.LoadSummaryListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value),
-                PeriodKind.Selected => await this.mMainService.LoadSummaryListAsync(this.Parent.BookSelectorVM.SelectedKey, this.Parent.DisplayedPeriod),
+                PeriodKind.Monthly => await this.mMainService.LoadSummaryListAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value),
+                PeriodKind.Selected => await this.mMainService.LoadSummaryListAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedPeriod),
                 _ => null
             }, mode: SelectorMode.FirstOrDefault);
 
@@ -594,7 +594,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public async Task LoadAsync(IEnumerable<ActionIdObj> actionIdList = null, BalanceKind? balanceKind = null, CategoryIdObj categoryId = null, ItemIdObj itemId = null,
                                     bool isScroll = false, bool isUpdateActDateLastEdited = false)
         {
-            if (this.Parent.SelectedTab != Tabs.BooksTab) { return; }
+            if (this.Parent.SelectedTab != Tabs.AccountTab) { return; }
 
             using FuncLog funcLog = new(new { actionIdList, balanceKind, categoryId, itemId, isScroll, isUpdateActDateLastEdited });
             using IDisposable disposable = this.mBusyService.Enter();

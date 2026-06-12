@@ -379,10 +379,10 @@
   <data name="Message_CantDeleteBecauseActionItemExistsInItem" xml:space="preserve">
     <value>Cannot delete because account items exist in the item.</value>
   </data>
-  <data name="Message_CantDeleteBecauseActionItemExistsInItemWithinBook" xml:space="preserve">
+  <data name="Message_CantDeleteBecauseActionItemExistsInItemWithinAccount" xml:space="preserve">
     <value>Cannot delete because account items exist in the corresponding item within the account.</value>
   </data>
-  <data name="Message_CantDeleteBecauseActionItemExistsInBook" xml:space="preserve">
+  <data name="Message_CantDeleteBecauseActionItemExistsInAccount" xml:space="preserve">
     <value>Cannot delete because account items exist in the account.</value>
   </data>
   <data name="Title_CsvFolderSelection" xml:space="preserve">

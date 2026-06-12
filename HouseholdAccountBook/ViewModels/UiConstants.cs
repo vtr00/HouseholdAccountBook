@@ -18,17 +18,17 @@ namespace HouseholdAccountBook.ViewModels
         public static Dictionary<DBKind, string> DBKindStr => new() {
             { DBKind.SQLite,        "SQLite" },
             { DBKind.PostgreSQL,    "PostgreSQL" },
-//            { DBKind.Access,        "Access" },
+//          { DBKind.Access,        "Access" },
         };
         /// <summary>
         /// 帳簿種別文字列
         /// </summary>
-        public static Dictionary<BookKind, string> BookKindStr => new() {
-            { BookKind.Uncategorized,       Properties.Resources.AccountKind_Uncategorized },
-            { BookKind.Wallet,              Properties.Resources.AccountKind_Wallet },
-            { BookKind.BankAccount,         Properties.Resources.AccountKind_BankAccount },
-            { BookKind.CreditCard,          Properties.Resources.AccountKind_CreditCard },
-            { BookKind.BrokerageAccount,    Properties.Resources.AccountKind_BrokerageAccount }
+        public static Dictionary<AccountKind, string> AccountKindStr => new() {
+            { AccountKind.Uncategorized,       Properties.Resources.AccountKind_Uncategorized },
+            { AccountKind.Wallet,              Properties.Resources.AccountKind_Wallet },
+            { AccountKind.BankAccount,         Properties.Resources.AccountKind_BankAccount },
+            { AccountKind.CreditCard,          Properties.Resources.AccountKind_CreditCard },
+            { AccountKind.BrokerageAccount,    Properties.Resources.AccountKind_BrokerageAccount }
         };
         /// <summary>
         /// 収支種別文字列

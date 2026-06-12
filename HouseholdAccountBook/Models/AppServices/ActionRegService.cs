@@ -42,7 +42,7 @@ namespace HouseholdAccountBook.Models.AppServices
             ActionModel action = new() {
                 Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
                 GroupId = dto.GroupId,
-                Book = new(dto.BookId, string.Empty),
+                Account = new(dto.BookId, string.Empty),
                 Category = new(null, string.Empty, 0 < Math.Sign(dto.ActValue) ? BalanceKind.Income : BalanceKind.Expenses),
                 Item = new(dto.ItemId, string.Empty),
                 Shop = new(dto.ShopName),
@@ -124,7 +124,7 @@ namespace HouseholdAccountBook.Models.AppServices
                         // 日付を取得する
                         DateTime tmpActTime = count == 1 ? action.ActTime : GetDateTimeWithHolidaySettingKind(holidaySettingKind, action.ActTime.AddMonths(i)); // 登録日付
                         ActionIdObj actionId = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
-                            BookId = (int)action.Book.Id,
+                            BookId = (int)action.Account.Id,
                             ItemId = (int)action.Item.Id,
                             ActTime = tmpActTime,
                             ActValue = (int)action.Amount,
@@ -147,7 +147,7 @@ namespace HouseholdAccountBook.Models.AppServices
                         if (action.GroupId == null) {
                             #region グループに属していない
                             _ = await hstActionDao.UpdateAsync(new HstActionDto {
-                                BookId = (int)action.Book.Id,
+                                BookId = (int)action.Account.Id,
                                 ItemId = (int)action.Item.Id,
                                 ActTime = action.ActTime,
                                 ActValue = (int)action.Amount,
@@ -171,7 +171,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 #region グループに属する項目が1項目以下
                                 // この帳簿項目のグループIDをクリアする
                                 _ = await hstActionDao.UpdateAsync(new HstActionDto {
-                                    BookId = (int)action.Book.Id,
+                                    BookId = (int)action.Account.Id,
                                     ItemId = (int)action.Item.Id,
                                     ActTime = action.ActTime,
                                     ActValue = (int)action.Amount,
@@ -190,7 +190,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 #region グループに属する項目が2項目以上
                                 // この帳簿項目のグループIDをクリアせずに残す(過去分と同じグループIDになる)
                                 _ = await hstActionDao.UpdateWithoutIsMatchAsync(new HstActionDto {
-                                    BookId = (int)action.Book.Id,
+                                    BookId = (int)action.Account.Id,
                                     ItemId = (int)action.Item.Id,
                                     ActTime = action.ActTime,
                                     ActValue = (int)action.Amount,
@@ -231,7 +231,7 @@ namespace HouseholdAccountBook.Models.AppServices
                         // この帳簿項目にだけis_matchを反映する
                         Debug.Assert(actionIdList[0] == action.ActionId);
                         _ = await hstActionDao.UpdateAsync(new HstActionDto {
-                            BookId = (int)action.Book.Id,
+                            BookId = (int)action.Account.Id,
                             ItemId = (int)action.Item.Id,
                             ActTime = tmpActTime,
                             ActValue = (int)action.Amount,
@@ -251,7 +251,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             if (i < count) { // 繰返し回数の範囲内のレコードを更新する
                                 if (isLink) { // 連動して編集時のみ変更する
                                     _ = await hstActionDao.UpdateWithoutIsMatchAsync(new HstActionDto {
-                                        BookId = (int)action.Book.Id,
+                                        BookId = (int)action.Account.Id,
                                         ItemId = (int)action.Item.Id,
                                         ActTime = tmpActTime,
                                         ActValue = (int)action.Amount,
@@ -274,7 +274,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             tmpActTime = GetDateTimeWithHolidaySettingKind(holidaySettingKind, action.ActTime.AddMonths(i));
 
                             _ = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
-                                BookId = (int)action.Book.Id,
+                                BookId = (int)action.Account.Id,
                                 ItemId = (int)action.Item.Id,
                                 ActTime = tmpActTime,
                                 ActValue = (int)action.Amount,
@@ -312,7 +312,7 @@ namespace HouseholdAccountBook.Models.AppServices
             foreach (HstActionDto dto in dtoList) {
                 ActionModel action = new() {
                     GroupId = groupId,
-                    Book = new(dto.BookId, string.Empty),
+                    Account = new(dto.BookId, string.Empty),
                     Category = new(null, string.Empty, 0 < Math.Sign(dto.ActValue) ? BalanceKind.Income : BalanceKind.Expenses),
                     Item = new(dto.ItemId, string.Empty),
                     Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
@@ -346,7 +346,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     HstActionDao hstActionDao = new(dbHandler);
                     foreach (ActionModel action in actionList) {
                         int id = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
-                            BookId = (int)action.Book.Id,
+                            BookId = (int)action.Account.Id,
                             ItemId = (int)action.Item.Id,
                             ActTime = action.ActTime,
                             ActValue = (int)action.Amount,
@@ -366,7 +366,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     foreach (ActionModel action in actionList) {
                         if (action.ActionId is not null) {
                             _ = await hstActionDao.UpdateWithoutIsMatchAsync(new HstActionDto {
-                                BookId = (int)action.Book.Id,
+                                BookId = (int)action.Account.Id,
                                 ItemId = (int)action.Item.Id,
                                 ActTime = action.ActTime,
                                 ActValue = (int)action.Amount,
@@ -380,7 +380,7 @@ namespace HouseholdAccountBook.Models.AppServices
                         }
                         else {
                             ActionIdObj actionId = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
-                                BookId = (int)action.Book.Id,
+                                BookId = (int)action.Account.Id,
                                 ItemId = (int)action.Item.Id,
                                 ActTime = action.ActTime,
                                 ActValue = (int)action.Amount,
@@ -423,7 +423,7 @@ namespace HouseholdAccountBook.Models.AppServices
             foreach (MoveActionInfoDto dto in dtoList) {
                 ActionModel action = new() {
                     GroupId = groupId,
-                    Book = new(dto.BookId, string.Empty),
+                    Account = new(dto.BookId, string.Empty),
                     Item = new(dto.ItemId, string.Empty),
                     Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
                     Remark = new(dto.Remark)
@@ -461,7 +461,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
                     HstActionDao hstActionDao = new(dbHandler);
                     ActionIdObj fromActionId = await hstActionDao.InsertMoveActionReturningIdAsync(new HstActionDto {
-                        BookId = (int)fromAction.Book.Id,
+                        BookId = (int)fromAction.Account.Id,
                         ActTime = fromAction.ActTime,
                         ActValue = (int)fromAction.Amount,
                         GroupId = (int?)assignedGroupId
@@ -469,7 +469,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     resActionIdList.Add(fromActionId);
 
                     ActionIdObj toActionId = await hstActionDao.InsertMoveActionReturningIdAsync(new HstActionDto {
-                        BookId = (int)toAction.Book.Id,
+                        BookId = (int)toAction.Account.Id,
                         ActTime = toAction.ActTime,
                         ActValue = (int)toAction.Amount,
                         GroupId = (int?)assignedGroupId
@@ -481,7 +481,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     #region 帳簿項目を変更する
                     HstActionDao hstActionDao = new(dbHandler);
                     _ = await hstActionDao.UpdateMoveActionAsync(new HstActionDto {
-                        BookId = (int)fromAction.Book.Id,
+                        BookId = (int)fromAction.Account.Id,
                         ActTime = fromAction.ActTime,
                         ActValue = (int)fromAction.Amount,
                         ActionId = (int)fromAction.ActionId
@@ -489,7 +489,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     resActionIdList.Add(fromAction.ActionId);
 
                     _ = await hstActionDao.UpdateMoveActionAsync(new HstActionDto {
-                        BookId = (int)toAction.Book.Id,
+                        BookId = (int)toAction.Account.Id,
                         ActTime = toAction.ActTime,
                         ActValue = (int)toAction.Amount,
                         ActionId = (int)toAction.ActionId
@@ -504,7 +504,7 @@ namespace HouseholdAccountBook.Models.AppServices
                         // 手数料が未登録のとき追加する
                         HstActionDao hstActionDao = new(dbHandler);
                         ActionIdObj commissionId = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
-                            BookId = (int)commissionAction.Book.Id,
+                            BookId = (int)commissionAction.Account.Id,
                             ItemId = (int)commissionAction.Item.Id,
                             ActTime = commissionAction.ActTime,
                             ActValue = (int)commissionAction.Amount,
@@ -517,7 +517,7 @@ namespace HouseholdAccountBook.Models.AppServices
                         // 手数料が登録済のとき更新する
                         HstActionDao hstActionDao = new(dbHandler);
                         _ = await hstActionDao.UpdateAsync(new HstActionDto {
-                            BookId = (int)commissionAction.Book.Id,
+                            BookId = (int)commissionAction.Account.Id,
                             ItemId = (int)commissionAction.Item.Id,
                             ActTime = commissionAction.ActTime,
                             ActValue = (int)commissionAction.Amount,

@@ -29,9 +29,9 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 帳簿変更時のイベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<BookIdObj>> BookChanged {
-            add => this.WVM.BookChanged += value;
-            remove => this.WVM.BookChanged -= value;
+        public event EventHandler<ChangedEventArgs<AccountIdObj>> AccountChanged {
+            add => this.WVM.AccountChanged += value;
+            remove => this.WVM.AccountChanged -= value;
         }
         /// <summary>
         /// 日時変更時のイベント
@@ -48,21 +48,21 @@ namespace HouseholdAccountBook.Views.Windows
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="initialBookId">初期選択する帳簿のID</param>
+        /// <param name="initialAccountId">初期選択する帳簿のID</param>
         /// <param name="initialMonth">初期選択する年月</param>
         /// <param name="initialDate">初期選択する日付</param>
-        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate)
-            : this(owner, dbHandlerFactory, initialBookId, initialMonth, initialDate, null, null, RegistrationKind.Add) { }
+        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate)
+            : this(owner, dbHandlerFactory, initialAccountId, initialMonth, initialDate, null, null, RegistrationKind.Add) { }
 
         /// <summary>
         /// 帳簿項目の追加のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="initialBookId">初期選択する帳簿ID</param>
+        /// <param name="initialAccountId">初期選択する帳簿ID</param>
         /// <param name="initialRecord">初期表示するCSVレコード</param>
-        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, ActionCsvDto initialRecord)
-            : this(owner, dbHandlerFactory, initialBookId, null, null, initialRecord, null, RegistrationKind.Add) { }
+        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, ActionCsvDto initialRecord)
+            : this(owner, dbHandlerFactory, initialAccountId, null, null, initialRecord, null, RegistrationKind.Add) { }
 
         /// <summary>
         /// 帳簿項目の複製/編集のために <see cref="ActionRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
@@ -79,16 +79,16 @@ namespace HouseholdAccountBook.Views.Windows
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
-        /// <param name="initialBookId">初期選択する帳簿ID</param>
+        /// <param name="initialAccountId">初期選択する帳簿ID</param>
         /// <param name="initialMonth">初期選択する年月</param>
         /// <param name="initialDate">初期選択する日付</param>
         /// <param name="initialRecord">初期表示するCSVレコード</param>
         /// <param name="targetActionId">複製/編集する帳簿項目ID</param>
         /// <param name="regKind">登録種別</param>
-        private ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, BookIdObj initialBookId, DateOnly? initialMonth, DateOnly? initialDate,
+        private ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate,
                                          ActionCsvDto initialRecord, ActionIdObj targetActionId, RegistrationKind regKind)
         {
-            using FuncLog funcLog = new(new { initialBookId, initialMonth, initialDate, initialRecord, targetActionId, regKind });
+            using FuncLog funcLog = new(new { initialAccountId, initialMonth, initialDate, initialRecord, targetActionId, regKind });
 
             this.Owner = owner;
             this.Name = UiConstants.WindowNameStr[nameof(ActionRegistrationWindow)];
@@ -104,7 +104,7 @@ namespace HouseholdAccountBook.Views.Windows
             this.Loaded += async (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.Loaded));
 
-                await this.WVM.LoadAsync(initialBookId, initialMonth, initialDate, initialRecord, targetActionId);
+                await this.WVM.LoadAsync(initialAccountId, initialMonth, initialDate, initialRecord, targetActionId);
                 this.WVM.AddEventHandlers();
             };
         }

@@ -79,8 +79,8 @@ namespace HouseholdAccountBook.Views.Windows
             using IDisposable disposable = this.WVM.BusyState.Enter();
 
             switch (this.WVM.SelectedTab) {
-                case SettingsTabs.BookSettingsTab:
-                    await this.WVM.BookTabVM.LoadAsync(this.WVM.BookTabVM.BookSelectorVM?.SelectedKey);
+                case SettingsTabs.AccountSettingsTab:
+                    await this.WVM.AccountTabVM.LoadAsync(this.WVM.AccountTabVM.AccountSelectorVM?.SelectedKey);
                     break;
                 case SettingsTabs.ItemSettingsTab:
                     await this.WVM.ItemTabVM.LoadAsync(this.WVM.ItemTabVM.SelectedItemTreeVM?.Kind, this.WVM.ItemTabVM.SelectedItemTreeVM?.Id);

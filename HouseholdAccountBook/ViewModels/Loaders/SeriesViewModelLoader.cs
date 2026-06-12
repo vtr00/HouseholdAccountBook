@@ -24,31 +24,31 @@ namespace HouseholdAccountBook.ViewModels.Loaders
         /// <summary>
         /// 月内日別系列VMリストを取得する(日別グラフタブ)
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="accountId">帳簿ID</param>
         /// <param name="includedTime">月内の時間</param>
         /// <returns>月内日別系列VMリスト</returns>
-        public async Task<IEnumerable<SeriesViewModel>> LoadDailySeriesViewModelListWithinMonthAsync(BookIdObj bookId, DateOnly includedTime)
+        public async Task<IEnumerable<SeriesViewModel>> LoadDailySeriesViewModelListWithinMonthAsync(AccountIdObj accountId, DateOnly includedTime)
         {
-            using FuncLog funcLog = new(new { bookId, includedTime });
+            using FuncLog funcLog = new(new { accountId, includedTime });
 
             DateOnly startTime = includedTime.GetFirstDateOfMonth();
             DateOnly endTime = startTime.GetLastDateOfMonth();
 
-            return await this.LoadDailySeriesViewModelListAsync(bookId, new(startTime, endTime));
+            return await this.LoadDailySeriesViewModelListAsync(accountId, new(startTime, endTime));
         }
 
         /// <summary>
         /// 期間内日別系列VMリストを取得する(日別グラフタブ)
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="accountId">帳簿ID</param>
         /// <param name="period">期間</param>
         /// <returns>日別系列VMリスト</returns>
-        public async Task<IEnumerable<SeriesViewModel>> LoadDailySeriesViewModelListAsync(BookIdObj bookId, PeriodObj<DateOnly> period)
+        public async Task<IEnumerable<SeriesViewModel>> LoadDailySeriesViewModelListAsync(AccountIdObj accountId, PeriodObj<DateOnly> period)
         {
-            using FuncLog funcLog = new(new { bookId, period });
+            using FuncLog funcLog = new(new { accountId, period });
 
             // 開始日までの収支を取得する
-            decimal balance = await this.mAppService.LoadEndingBalance(bookId, period.Start);
+            decimal balance = await this.mAppService.LoadEndingBalance(accountId, period.Start);
 
             // 系列データ
             IList<SeriesViewModel> vmList = [
@@ -67,7 +67,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                 DateOnly tmpEndTime = tmpStartTime;
                 tmpPeriod = new(tmpStartTime, tmpEndTime);
             }
-            List<SummaryModel> summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(bookId, tmpPeriod)];
+            List<SummaryModel> summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(accountId, tmpPeriod)];
             balance += summaryVMList[0].Total;
             vmList[0].Values.Add(balance); // 残高
             vmList[0].Periods.Add(tmpPeriod);
@@ -94,7 +94,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                     DateOnly tmpEndTime = tmpStartTime;
                     tmpPeriod = new(tmpStartTime, tmpEndTime);
                 }
-                summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(bookId, tmpPeriod)];
+                summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(accountId, tmpPeriod)];
                 balance += summaryVMList[0].Total;
                 vmList[0].Values.Add(balance); // 残高
                 vmList[0].Periods.Add(tmpPeriod);
@@ -132,13 +132,13 @@ namespace HouseholdAccountBook.ViewModels.Loaders
         /// <summary>
         /// 年度内月別系列VMリストを取得する(月別一覧/月別グラフタブ)
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="accountId">帳簿ID</param>
         /// <param name="includedTime">年度内の日付</param>
         /// <param name="startMonth">年度開始月</param>
         /// <returns>年度内月別系列VMリスト</returns>
-        public async Task<IEnumerable<SeriesViewModel>> LoadMonthlySeriesViewModelListWithinYearAsync(BookIdObj bookId, DateOnly includedTime, int startMonth)
+        public async Task<IEnumerable<SeriesViewModel>> LoadMonthlySeriesViewModelListWithinYearAsync(AccountIdObj accountId, DateOnly includedTime, int startMonth)
         {
-            using FuncLog funcLog = new(new { bookId, includedTime, startMonth });
+            using FuncLog funcLog = new(new { accountId, includedTime, startMonth });
 
             PeriodObj<DateOnly> period;
             {
@@ -148,7 +148,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             }
 
             // 開始日までの収支を取得する
-            decimal balance = await this.mAppService.LoadEndingBalance(bookId, period.Start);
+            decimal balance = await this.mAppService.LoadEndingBalance(accountId, period.Start);
 
             IList<SeriesViewModel> vmList = [
                 new() {
@@ -166,7 +166,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                 DateOnly tmpEndTime = tmpStartTime.GetLastDateOfMonth();
                 tmpPeriod = new(tmpStartTime, tmpEndTime);
             }
-            List<SummaryModel> summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(bookId, tmpPeriod)];
+            List<SummaryModel> summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(accountId, tmpPeriod)];
             balance += summaryVMList[0].Total;
             vmList[0].Values.Add(balance); // 残高
             vmList[0].Periods.Add(tmpPeriod);
@@ -192,7 +192,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                     DateOnly tmpEndTime = tmpStartTime.GetLastDateOfMonth();
                     tmpPeriod = new(tmpStartTime, tmpEndTime);
                 }
-                summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(bookId, tmpPeriod)];
+                summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(accountId, tmpPeriod)];
                 balance += summaryVMList[0].Total;
                 vmList[0].Values.Add(balance); // 残高
                 vmList[0].Periods.Add(tmpPeriod);
@@ -230,16 +230,16 @@ namespace HouseholdAccountBook.ViewModels.Loaders
         /// <summary>
         /// 10年内年別系列VMリストを取得する(年別一覧/年別グラフタブ)
         /// </summary>
-        /// <param name="bookId">帳簿ID</param>
+        /// <param name="accountId">帳簿ID</param>
         /// <returns>年別系列VMリスト</returns>
-        public async Task<IEnumerable<SeriesViewModel>> LoadYearlySeriesViewModelListWithinDecadeAsync(BookIdObj bookId, DateOnly startYear, int startMonth)
+        public async Task<IEnumerable<SeriesViewModel>> LoadYearlySeriesViewModelListWithinDecadeAsync(AccountIdObj accountId, DateOnly startYear, int startMonth)
         {
-            using FuncLog funcLog = new(new { bookId, startYear, startMonth });
+            using FuncLog funcLog = new(new { accountId, startYear, startMonth });
 
             DateOnly startTime = startYear;
 
             // 開始日までの収支を取得する
-            decimal balance = await this.mAppService.LoadEndingBalance(bookId, startTime);
+            decimal balance = await this.mAppService.LoadEndingBalance(accountId, startTime);
 
             IList<SeriesViewModel> vmList = [
                 new() {
@@ -257,7 +257,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                 DateOnly tmpEndTime = tmpStartTime.GetLastDateOfFiscalYear(startMonth);
                 tmpPeriod = new(tmpStartTime, tmpEndTime);
             }
-            IList<SummaryModel> summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(bookId, tmpPeriod)];
+            IList<SummaryModel> summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(accountId, tmpPeriod)];
             balance += summaryVMList[0].Total;
             vmList[0].Values.Add(balance); // 残高
             vmList[0].Periods.Add(tmpPeriod);
@@ -286,7 +286,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                     tmpPeriod = new(tmpStartTime, tmpEndTime);
                 }
 
-                summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(bookId, tmpPeriod)];
+                summaryVMList = [.. await this.mAppService.LoadSummaryListAsync(accountId, tmpPeriod)];
                 balance += summaryVMList[0].Total;
                 vmList[0].Values.Add(balance); // 残高
                 vmList[0].Periods.Add(tmpPeriod);
