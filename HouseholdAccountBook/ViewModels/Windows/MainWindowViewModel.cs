@@ -1130,7 +1130,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.mService = new(this.mDbHandlerFactory);
             this.mDbImportService = new(this.mDbHandlerFactory);
 
-            this.BookSelectorVM.SetLoader(async () => await this.mService.LoadBookListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllBooks));
+            this.BookSelectorVM.SetLoader(async () => await this.mService.LoadBookListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllAccounts));
             this.GraphKind1SelectorVM.SetLoader(() => GraphKind1Str);
             this.GraphKind2SelectorVM.SetLoader(() => GraphKind2Str);
         }

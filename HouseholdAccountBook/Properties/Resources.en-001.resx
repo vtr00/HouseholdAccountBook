@@ -117,10 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BookKind_Uncategorized" xml:space="preserve">
+  <data name="AccountKind_Uncategorized" xml:space="preserve">
     <value>Uncategorized</value>
   </data>
-  <data name="BookKind_Wallet" xml:space="preserve">
+  <data name="AccountKind_Wallet" xml:space="preserve">
     <value>Wallet</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
@@ -157,13 +157,13 @@
   <data name="ColumnHeader_Balance" xml:space="preserve">
     <value>Balance</value>
   </data>
-  <data name="BookKind_BankAccount" xml:space="preserve">
+  <data name="AccountKind_BankAccount" xml:space="preserve">
     <value>Bank account</value>
   </data>
-  <data name="BookKind_BrokerageAccount" xml:space="preserve">
+  <data name="AccountKind_BrokerageAccount" xml:space="preserve">
     <value>Brokerage account</value>
   </data>
-  <data name="BookKind_CreditCard" xml:space="preserve">
+  <data name="AccountKind_CreditCard" xml:space="preserve">
     <value>Credit card</value>
   </data>
   <data name="Message_DeleteNotification" xml:space="preserve">
@@ -185,7 +185,7 @@
     <value>The import was canceled.</value>
   </data>
   <data name="Message_DeletedZeroValueInformation" xml:space="preserve">
-    <value>Deleted book items with value 0.</value>
+    <value>Deleted account items with value 0.</value>
   </data>
   <data name="Message_CompletedToSave" xml:space="preserve">
     <value>Save completed.</value>
@@ -256,17 +256,17 @@
   <data name="GroupHeader_ItemList" xml:space="preserve">
     <value>Item list</value>
   </data>
-  <data name="GroupHeader_BookList" xml:space="preserve">
-    <value>Book list</value>
+  <data name="GroupHeader_AccountList" xml:space="preserve">
+    <value>Account list</value>
   </data>
   <data name="GroupHeader_MonthSelection" xml:space="preserve">
     <value>Month selection</value>
   </data>
-  <data name="GroupHeader_TermSelection" xml:space="preserve">
+  <data name="GroupHeader_PeriodSelection" xml:space="preserve">
     <value>Period selection</value>
   </data>
-  <data name="GroupHeader_BookInformation" xml:space="preserve">
-    <value>Book information</value>
+  <data name="GroupHeader_AccountInformation" xml:space="preserve">
+    <value>Account information</value>
   </data>
   <data name="GroupHeader_WindowInformation" xml:space="preserve">
     <value>Window information</value>
@@ -292,7 +292,7 @@
   <data name="GroupHeader_ColumnIndex" xml:space="preserve">
     <value>Column No.</value>
   </data>
-  <data name="GroupHeader_TermInformation" xml:space="preserve">
+  <data name="GroupHeader_PeriodInformation" xml:space="preserve">
     <value>Period information</value>
   </data>
   <data name="GroupHeader_Linkage" xml:space="preserve">
@@ -358,8 +358,8 @@
   <data name="ListName_CarryForward" xml:space="preserve">
     <value>Carrying over</value>
   </data>
-  <data name="ListName_AllBooks" xml:space="preserve">
-    <value>All books</value>
+  <data name="ListName_AllAccounts" xml:space="preserve">
+    <value>All accounts</value>
   </data>
   <data name="ListName_None" xml:space="preserve">
     <value>None</value>
@@ -374,16 +374,16 @@
     <value>SQL file</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInCategory" xml:space="preserve">
-    <value>Cannot delete because book items exist in the category.</value>
+    <value>Cannot delete because account items exist in the category.</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInItem" xml:space="preserve">
-    <value>Cannot delete because book items exist in the item.</value>
+    <value>Cannot delete because account items exist in the item.</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInItemWithinBook" xml:space="preserve">
-    <value>Cannot delete because book items exist in the corresponding item within the book.</value>
+    <value>Cannot delete because account items exist in the corresponding item within the account.</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInBook" xml:space="preserve">
-    <value>Cannot delete because book items exist in the book.</value>
+    <value>Cannot delete because account items exist in the account.</value>
   </data>
   <data name="Title_CsvFolderSelection" xml:space="preserve">
     <value>Select CSV folder</value>
@@ -427,10 +427,10 @@
   <data name="Menu_Help_VersionInfo" xml:space="preserve">
     <value>Version information (_V)...</value>
   </data>
-  <data name="Menu_Tool_Book" xml:space="preserve">
-    <value>Books (_B)</value>
+  <data name="Menu_Tool_Account" xml:space="preserve">
+    <value>Accounts (_B)</value>
   </data>
-  <data name="Menu_Tool_Book_Filter" xml:space="preserve">
+  <data name="Menu_Tool_Account_Filter" xml:space="preserve">
     <value>Filter (_F)</value>
   </data>
   <data name="Menu_Tool_CsvComparison" xml:space="preserve">
@@ -502,28 +502,28 @@
   <data name="Menu_View_DailyGraph_ThisMonth" xml:space="preserve">
     <value>This month (_T)</value>
   </data>
-  <data name="Menu_View_DailyGraph_DailyTermSelection" xml:space="preserve">
+  <data name="Menu_View_DailyGraph_DailyPeriodSelection" xml:space="preserve">
     <value>Specify the period (_S)...</value>
   </data>
   <data name="Menu_View_DailyGraph_NextMonth" xml:space="preserve">
     <value>Next month (_N)</value>
   </data>
-  <data name="Menu_View_BookItems" xml:space="preserve">
-    <value>Book items (_B)</value>
+  <data name="Menu_View_AccountItems" xml:space="preserve">
+    <value>Account items (_B)</value>
   </data>
-  <data name="Menu_View_BookItems_Change" xml:space="preserve">
+  <data name="Menu_View_AccountItems_Change" xml:space="preserve">
     <value>Switching (_C)</value>
   </data>
-  <data name="Menu_View_BookItems_LastMonth" xml:space="preserve">
+  <data name="Menu_View_AccountItems_LastMonth" xml:space="preserve">
     <value>Last month (_L)</value>
   </data>
-  <data name="Menu_View_BookItems_ThisMonth" xml:space="preserve">
+  <data name="Menu_View_AccountItems_ThisMonth" xml:space="preserve">
     <value>This month (_T)</value>
   </data>
-  <data name="Menu_View_BookItems_DailyTermSelection" xml:space="preserve">
+  <data name="Menu_View_AccountItems_DailyPeriodSelection" xml:space="preserve">
     <value>Specify the period (_S)...</value>
   </data>
-  <data name="Menu_View_BookItems_NextMonth" xml:space="preserve">
+  <data name="Menu_View_AccountItems_NextMonth" xml:space="preserve">
     <value>Next month (_N)</value>
   </data>
   <data name="Menu_Edit_Edit" xml:space="preserve">
@@ -664,16 +664,16 @@
   <data name="ColumnHeader_LastUsageDate" xml:space="preserve">
     <value>Last used date</value>
   </data>
-  <data name="TabHeader_BookItems" xml:space="preserve">
-    <value>Book
+  <data name="TabHeader_AccountItems" xml:space="preserve">
+    <value>Account
 items</value>
   </data>
   <data name="TabHeader_ItemSettings" xml:space="preserve">
     <value>Item
 settings</value>
   </data>
-  <data name="TabHeader_BookSettings" xml:space="preserve">
-    <value>Book
+  <data name="TabHeader_AccountSettings" xml:space="preserve">
+    <value>Account
 settings</value>
   </data>
   <data name="TabHeader_DbSettings" xml:space="preserve">
@@ -709,8 +709,8 @@ list</value>
   <data name="ToolTip_CheckIsMatch" xml:space="preserve">
     <value>CSV match check</value>
   </data>
-  <data name="ColumnHeader_BookName" xml:space="preserve">
-    <value>Book names</value>
+  <data name="ColumnHeader_AccountName" xml:space="preserve">
+    <value>Account names</value>
   </data>
   <data name="ColumnHeader_ShopName" xml:space="preserve">
     <value>Store names</value>
@@ -778,7 +778,7 @@ list</value>
   <data name="Title_PeriodSelectionWindow" xml:space="preserve">
     <value>Select period</value>
   </data>
-  <data name="Button_AllTerm" xml:space="preserve">
+  <data name="Button_AllPeriod" xml:space="preserve">
     <value>All period</value>
   </data>
   <data name="Title_VersionWindow" xml:space="preserve">
@@ -811,17 +811,14 @@ list</value>
   <data name="TextBlock_Sum" xml:space="preserve">
     <value>Sum</value>
   </data>
-  <data name="TextBlock_Book" xml:space="preserve">
-    <value>Book</value>
+  <data name="TextBlock_Account" xml:space="preserve">
+    <value>Account</value>
   </data>
-  <data name="TextBlock_Books" xml:space="preserve">
-    <value>Books</value>
+  <data name="TextBlock_AccountName" xml:space="preserve">
+    <value>Account name</value>
   </data>
-  <data name="TextBlock_BookName" xml:space="preserve">
-    <value>Book name</value>
-  </data>
-  <data name="TextBlock_BookKind" xml:space="preserve">
-    <value>Book type</value>
+  <data name="TextBlock_AccountKind" xml:space="preserve">
+    <value>Account type</value>
   </data>
   <data name="TextBlock_InitialBalance" xml:space="preserve">
     <value>Initial balance</value>
@@ -916,8 +913,8 @@ list</value>
   <data name="TextBlock_Repeat" xml:space="preserve">
     <value>Repetition</value>
   </data>
-  <data name="TextBlock_LastOperatedBookItem" xml:space="preserve">
-    <value>Last book item operated</value>
+  <data name="TextBlock_LastOperatedAccountItem" xml:space="preserve">
+    <value>Last account item operated</value>
   </data>
   <data name="TextBlock_Burden" xml:space="preserve">
     <value>Burden</value>
@@ -946,8 +943,8 @@ list</value>
   <data name="TextBlock_PaymentDate" xml:space="preserve">
     <value>Payment date</value>
   </data>
-  <data name="TextBlock_PaymentBook" xml:space="preserve">
-    <value>Payment book</value>
+  <data name="TextBlock_PaymentAccount" xml:space="preserve">
+    <value>Payment account</value>
   </data>
   <data name="TextBlock_Password" xml:space="preserve">
     <value>Password</value>
@@ -1102,10 +1099,10 @@ list</value>
   <data name="RadioButton_BackUpCondition_Updated" xml:space="preserve">
     <value>Database updated</value>
   </data>
-  <data name="Menu_View_BookItems_AlwaysDisplay_BookName" xml:space="preserve">
-    <value>Always show book names</value>
+  <data name="Menu_View_AccountItems_AlwaysDisplay_AccountName" xml:space="preserve">
+    <value>Always show account names</value>
   </data>
-  <data name="Menu_View_BookItems_AlwaysDisplay_CategoryName" xml:space="preserve">
+  <data name="Menu_View_AccountItems_AlwaysDisplay_CategoryName" xml:space="preserve">
     <value>Always show category names</value>
   </data>
   <data name="GroupHeader_VersionInformation" xml:space="preserve">
