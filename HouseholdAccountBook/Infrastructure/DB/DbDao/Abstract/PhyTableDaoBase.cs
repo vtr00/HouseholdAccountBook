@@ -27,7 +27,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract
             using FuncLog funcLog = new(new { dtoList }, Log.LogLevel.Trace);
 
             int count = 0;
-            foreach (var dto in dtoList) {
+            foreach (DTO dto in dtoList) {
                 count += await this.InsertAsync(dto);
             }
             return count;

@@ -123,7 +123,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     progress.Report(60);
 
                     HstGroupDao hstGroupDao = new(dbHandler);
-                    var cbtActDtoList = await cbtActDao.FindAllAsync();
+                    IEnumerable<CbtActDto> cbtActDtoList = await cbtActDao.FindAllAsync();
                     _ = await hstGroupDao.DeleteAllAsync();
                     int maxGroupId = 0; // グループIDの最大値
                     IEnumerable<HstGroupDto> hstGroupDtoList = [];
@@ -138,7 +138,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             if (maxGroupId < groupId) { maxGroupId = groupId; }
 
                             // グループの種類を調べる
-                            var cbtActDtoList2 = cbtActDtoList.Where(dto => dto.GROUP_ID == groupId);
+                            IEnumerable<CbtActDto> cbtActDtoList2 = cbtActDtoList.Where(dto => dto.GROUP_ID == groupId);
                             GroupKind groupKind = GroupKind.Repeat;
                             int? tmpBookId = null;
                             foreach (CbtActDto cbtActDto2 in cbtActDtoList2) {

@@ -127,7 +127,7 @@ namespace HouseholdAccountBook.Views.UserControls
 
         private static DependencyObject GetDependencyObjectFromVisualTree(DependencyObject startObject, Type type)
         {
-            var target = startObject;
+            DependencyObject target = startObject;
             while (target != null) {
                 if (type.IsInstanceOfType(target)) {
                     break;

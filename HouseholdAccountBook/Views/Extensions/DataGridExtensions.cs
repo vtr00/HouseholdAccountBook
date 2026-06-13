@@ -29,7 +29,7 @@ namespace HouseholdAccountBook.Views.Extensions
 
                 List<string> row = [];
 
-                foreach (var column in columns) {
+                foreach (DataGridBoundColumn column in columns) {
                     if (column.Binding is not Binding binding) {
                         row.Add(string.Empty);
                         continue;

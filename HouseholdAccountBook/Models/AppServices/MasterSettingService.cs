@@ -57,7 +57,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 jsonObj?.EndDate?.ToDateOnly() ?? dto.EndDate?.ToDateOnly() ?? DateOnlyExtensions.Today),
                 DebitAccountId = dto.DebitBookId ?? AccountIdObj.System,
                 PayDay = dto.PayDay,
-                CsvFolderPath = jsonObj == null ? "" : PathUtil.GetSmartPath(App.GetCurrentDir(), jsonObj.CsvFolderPath),
+                CsvFolderPath = jsonObj == null ? string.Empty : PathUtil.GetSmartPath(App.GetCurrentDir(), jsonObj.CsvFolderPath),
                 TextEncoding = jsonObj?.TextEncoding ?? Encoding.UTF8.CodePage,
                 ActDateIndex = jsonObj?.CsvActDateIndex + 1,
                 ExpensesIndex = jsonObj?.CsvOutgoIndex + 1,
@@ -379,7 +379,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             MstCategoryDao mstCategoryDao = new(dbHandler);
-            var dto = await mstCategoryDao.FindByIdAsync((int)categoryId);
+            MstCategoryDto dto = await mstCategoryDao.FindByIdAsync((int)categoryId);
 
             CategoryModel category = new(categoryId, dto.CategoryName, (BalanceKind)dto.BalanceKind) {
                 SortOrder = dto.SortOrder
@@ -399,7 +399,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             MstItemDao mstItemDao = new(dbHandler);
-            var dto = await mstItemDao.FindByIdAsync((int)itemId);
+            MstItemDto dto = await mstItemDao.FindByIdAsync((int)itemId);
 
             ItemModel item = new(itemId, dto.ItemName) {
                 SortOrder = dto.SortOrder

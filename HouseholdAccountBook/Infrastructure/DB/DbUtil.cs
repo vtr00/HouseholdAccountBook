@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Infrastructure.DB
 {
+    /// <summary>
+    /// DBユーティリティ
+    /// </summary>
     public static class DbUtil
     {
         #region マイグレーション
@@ -35,7 +38,7 @@ namespace HouseholdAccountBook.Infrastructure.DB
         /// <summary>
         /// PostgreSQLのアップマイグレーションを実行する
         /// </summary>
-        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
+        /// <param name="dbHandler">DBハンドラ</param>
         /// <returns>成功/失敗</returns>
         private static async Task<bool> UpMigratePostgreSQLAsync(DbHandlerBase dbHandler)
         {
@@ -67,7 +70,7 @@ namespace HouseholdAccountBook.Infrastructure.DB
         /// <summary>
         /// SQLiteのアップマイグレーションを実行する
         /// </summary>
-        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
+        /// <param name="dbHandler">DBハンドラ</param>
         /// <returns>成功/失敗</returns>
         private static async Task<bool> UpMigrateSQLiteAsync(DbHandlerBase dbHandler)
         {

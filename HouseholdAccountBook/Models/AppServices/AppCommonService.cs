@@ -45,7 +45,7 @@ namespace HouseholdAccountBook.Models.AppServices
             }
 
             MstBookDao mstBookDao = new(dbHandler);
-            var dtoList = await mstBookDao.FindAllAsync();
+            IEnumerable<MstBookDto> dtoList = await mstBookDao.FindAllAsync();
             foreach (MstBookDto dto in dtoList) {
                 MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
 
@@ -68,6 +68,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <param name="accountId">絞り込み対象の帳簿ID</param>
         /// <param name="balanceKind">絞り込み対象の収支種別</param>
+        /// <param name="initialName">初期名</param>
         /// <returns>分類Modelリスト</returns>
         public async Task<IEnumerable<CategoryModel>> LoadCategoryListAsync(AccountIdObj accountId, BalanceKind balanceKind, string initialName = "")
         {
@@ -76,6 +77,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             List<CategoryModel> cmList = [];
 
+            // 初期名の指定があれば先頭に項目を追加する
             if (initialName != string.Empty) {
                 cmList.Add(new CategoryModel(CategoryIdObj.System, initialName, BalanceKind.Others));
             }
@@ -109,7 +111,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 : await categoryItemInfoDao.FindByBookIdAndCategoryIdAsync((int)accountId, (int)categoryId);
             foreach (CategoryItemInfoDto dto in dtoList) {
                 ItemModel vm = new(dto.ItemId, dto.ItemName) {
-                    CategoryName = categoryId == CategoryIdObj.System ? dto.CategoryName : ""
+                    CategoryName = categoryId == CategoryIdObj.System ? dto.CategoryName : string.Empty
                 };
                 imList.Add(vm);
             }
@@ -182,7 +184,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             GroupInfoDao groupInfoDao = new(dbHandler);
-            var dto = await groupInfoDao.FindByActionId((int)actionId);
+            GroupInfoDto dto = await groupInfoDao.FindByActionId((int)actionId);
             int groupKind = dto.GroupKind ?? -1;
 
             return (GroupKind)groupKind;
@@ -213,7 +215,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             PeriodInfoDao periodInfoDao = new(dbHandler);
-            var dto = await periodInfoDao.Find();
+            PeriodInfoDto dto = await periodInfoDao.Find();
             PeriodObj<DateTime> result = new(dto.FirstTime, dto.LastTime);
 
             return result;

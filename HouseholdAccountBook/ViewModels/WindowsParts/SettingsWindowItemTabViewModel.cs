@@ -169,14 +169,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             bool canExecute = this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.ParentVM != null;
             if (canExecute) {
                 // 同じ階層で、よりソート順序が上の分類/項目がある場合trueになる
-                var parentVM = this.SelectedItemTreeVM.ParentVM;
+                ItemTreeViewModel parentVM = this.SelectedItemTreeVM.ParentVM;
                 int index = parentVM.ChildrenVMList.IndexOf(this.SelectedItemTreeVM);
                 canExecute = 0 < index;
 
                 // 選択された対象が項目で分類内の最も上位にいる場合
                 if (!canExecute && parentVM.ParentVM != null) {
                     // 項目の属する分類について、同じ階層内によりソート順序が上の分類がある場合trueになる
-                    var grandparentVM = parentVM.ParentVM;
+                    ItemTreeViewModel grandparentVM = parentVM.ParentVM;
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     canExecute = 0 < index2;
                 }
@@ -207,7 +207,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
             else { // 分類を跨いで項目の表示順を変更するとき
                 Debug.Assert(this.SelectedItemTreeVM?.Kind == HierarchicalKind.Item);
-                var grandparentVM = parentVM.ParentVM;
+                ItemTreeViewModel grandparentVM = parentVM.ParentVM;
                 int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                 CategoryIdObj toCategoryId = new((int)grandparentVM.ChildrenVMList[index2 - 1].Id);
 
@@ -231,14 +231,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             bool canExecute = this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.ParentVM != null;
             if (canExecute) {
                 // 同じ階層で、よりソート順序が下の分類/項目がある場合trueになる
-                var parentVM = this.SelectedItemTreeVM.ParentVM;
+                ItemTreeViewModel parentVM = this.SelectedItemTreeVM.ParentVM;
                 int index = parentVM.ChildrenVMList.IndexOf(this.SelectedItemTreeVM);
                 canExecute = parentVM.ChildrenVMList.Count - 1 > index;
 
                 // 選択された対象が項目で分類内の最も上位にいる場合
                 if (!canExecute && parentVM.ParentVM != null) {
                     // 項目の属する分類について、同じ階層内によりソート順序が下の分類がある場合trueになる
-                    var grandparentVM = parentVM.ParentVM;
+                    ItemTreeViewModel grandparentVM = parentVM.ParentVM;
                     int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                     canExecute = grandparentVM.ChildrenVMList.Count - 1 > index2;
                 }
@@ -269,7 +269,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
             else { // 分類を跨いで項目の表示順を変更するとき
                 Debug.Assert(this.SelectedItemTreeVM?.Kind == HierarchicalKind.Item);
-                var grandparentVM = parentVM.ParentVM;
+                ItemTreeViewModel grandparentVM = parentVM.ParentVM;
                 int index2 = grandparentVM.ChildrenVMList.IndexOf(parentVM);
                 CategoryIdObj toCategoryId = new((int)grandparentVM.ChildrenVMList[index2 + 1].Id);
 

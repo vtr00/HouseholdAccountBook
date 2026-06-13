@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions;
 using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
+using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
 using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
@@ -52,7 +53,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     // グループIDがない場合は次の項目へ
                     if (groupId is null) { continue; }
 
-                    var groupDto = await hstGroupDao.FindByIdAsync((int)groupId);
+                    HstGroupDto groupDto = await hstGroupDao.FindByIdAsync((int)groupId);
                     groupIdList.Add((int)groupId);
                     int groupKind = groupDto.GroupKind;
 
@@ -70,7 +71,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     }
 
                     // 削除対象と同じグループIDを持つ帳簿項目が1つだけの場合にグループIDをクリアする(移動以外の場合に該当する)
-                    var actionDtoList = await hstActionDao.FindByGroupIdAsync((int)groupId);
+                    IEnumerable<HstActionDto> actionDtoList = await hstActionDao.FindByGroupIdAsync((int)groupId);
                     if (actionDtoList.Count() == 1) {
                         _ = await hstActionDao.ClearGroupIdByIdAsync(actionDtoList.First().ActionId);
                     }
@@ -78,7 +79,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
                 foreach (GroupIdObj groupId in groupIdList) {
                     // 同じグループIDを持つ帳簿項目が存在しなくなる場合にグループを削除する
-                    var actionDtoList = await hstActionDao.FindByGroupIdAsync((int)groupId);
+                    IEnumerable<HstActionDto> actionDtoList = await hstActionDao.FindByGroupIdAsync((int)groupId);
                     if (!actionDtoList.Any()) {
                         _ = await hstGroupDao.DeleteByIdAsync((int)groupId);
                     }
@@ -206,7 +207,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             HstActionDao hstActionDao = new(dbHandler);
-            var dto = await hstActionDao.FindByIdAsync(actionId.Id);
+            HstActionDto dto = await hstActionDao.FindByIdAsync(actionId.Id);
             DateOnly actDate = DateOnly.FromDateTime(dto.ActTime);
 
             return actDate;
@@ -261,14 +262,14 @@ namespace HouseholdAccountBook.Models.AppServices
             List<SummaryModel> totalAsCategoryList = [];
 
             // 収支別に計算する
-            foreach (var g1 in smList.GroupBy(obj => obj.Category.BalanceKind)) {
+            foreach (IGrouping<BalanceKind, SummaryModel> g1 in smList.GroupBy(obj => obj.Category.BalanceKind)) {
                 // 収入/支出の小計を計算する
                 totalAsBalanceKindList.Add(new() {
                     Category = new(CategoryIdObj.System, string.Empty, g1.Key),
                     Total = g1.Sum(obj => obj.Total)
                 });
                 // 分類別の小計を計算する
-                foreach (var g2 in g1.GroupBy(obj => (int)obj.Category.Id)) {
+                foreach (IGrouping<int, SummaryModel> g2 in g1.GroupBy(obj => (int)obj.Category.Id)) {
                     totalAsCategoryList.Add(new() {
                         Category = new(g2.Key, g2.First().Category.Name, g1.Key),
                         Total = g2.Sum(obj => obj.Total)

@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Models.AppServices
 {
+    /// <summary>
+    /// GitHubからバージョン情報を取得するサービス
+    /// </summary>
     public class AppVersionService : SingletonBase<AppVersionService>
     {
         /// <summary>
@@ -44,7 +47,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns>最新バージョン番号</returns>
         public Version GetLatestVersion()
         {
-            if (!Version.TryParse(this.mLatestInfo?.TagName?.Replace("v", ""), out Version version)) {
+            if (!Version.TryParse(this.mLatestInfo?.TagName?.Replace("v", string.Empty), out Version version)) {
                 version = null;
             }
             return version;
