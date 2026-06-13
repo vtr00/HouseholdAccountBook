@@ -91,7 +91,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Tabs.DailyGraphTab => Properties.Resources.GraphTitle_DailyGraph,
                 Tabs.MonthlyGraphTab => Properties.Resources.GraphTitle_MonthlyGraph,
                 Tabs.YearlyGraphTab => Properties.Resources.GraphTitle_YearlyGraph,
-                _ => "",
+                _ => string.Empty,
             };
 
             this.Controller.BindMouseEnter(PlotCommands.HoverPointsOnlyTrack);
@@ -261,7 +261,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             {
                 string unit_pre = UnitUtil.GetYearPreUnit(this.Parent.FiscalStartMonth);
                 string unit_post = UnitUtil.GetYearPostUnit(this.Parent.FiscalStartMonth);
-                return (addItemName ? "{0}\n" : "") + this.Tab switch {                             //{項目名}\n
+                return (addItemName ? "{0}\n" : string.Empty) + this.Tab switch {                   //{項目名}\n
                     Tabs.DailyGraphTab => "{Date:yyyy-MM-dd}: {Value:#,0}",                         //{日付}: {金額}
                     Tabs.MonthlyGraphTab => "{Date:yyyy-MM}: {Value:#,0}",                          //{月}: {金額}
                     Tabs.YearlyGraphTab => unit_pre + "{Date:yyyy}" + unit_post + ": {Value:#,0}",  //{単位}{年}{単位}: {金額}

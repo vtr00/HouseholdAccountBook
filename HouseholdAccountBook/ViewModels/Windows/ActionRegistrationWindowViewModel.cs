@@ -103,7 +103,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public DateTime SelectedDate {
             get;
             set {
-                var oldValue = field;
+                DateTime oldValue = field;
                 if (this.SetProperty(ref field, value)) {
                     this.DateChanged?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
                     CommandManager.InvalidateRequerySuggested();

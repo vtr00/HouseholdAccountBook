@@ -165,7 +165,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             _ = await hstActionDao.DeleteInGroupAfterDateByIdAsync((int)action.ActionId, false);
 
                             // グループに属する項目の個数を調べる
-                            var dtoList = await hstActionDao.FindByGroupIdAsync((int)action.GroupId);
+                            IEnumerable<HstActionDto> dtoList = await hstActionDao.FindByGroupIdAsync((int)action.GroupId);
 
                             if (dtoList.Count() <= 1) {
                                 #region グループに属する項目が1項目以下
@@ -221,7 +221,7 @@ namespace HouseholdAccountBook.Models.AppServices
                         else {
                             #region グループIDが割当て済
                             // 変更の対象となる帳簿項目を洗い出す
-                            var dtoList = await hstActionDao.FindInGroupAfterDateByIdAsync((int)action.ActionId);
+                            IEnumerable<HstActionDto> dtoList = await hstActionDao.FindInGroupAfterDateByIdAsync((int)action.ActionId);
                             dtoList.Select(dto => dto.ActionId).ToList().ForEach(id => actionIdList.Add(id));
                             #endregion
                         }
@@ -393,7 +393,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     }
 
                     // UI上から削除された帳簿項目を削除する
-                    var dtoList = await hstActionDao.FindByGroupIdAsync((int)actionList.First().GroupId);
+                    IEnumerable<HstActionDto> dtoList = await hstActionDao.FindByGroupIdAsync((int)actionList.First().GroupId);
                     IEnumerable<int> expected = dtoList.Select(dto => dto.ActionId).Except(resActionIdList.Select(tmp => (int)tmp));
                     foreach (int actionId in expected) {
                         _ = await hstActionDao.DeleteByIdAsync(actionId);

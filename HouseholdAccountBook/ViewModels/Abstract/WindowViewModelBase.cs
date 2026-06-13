@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// </summary>
         public Size? WindowSizeSetting {
             get {
-                var (width, height) = this.WindowSizeSettingRaw;
+                (double width, double height) = this.WindowSizeSettingRaw;
                 return width <= 0 || height <= 0 ? null : new Size(width, height);
             }
             set {

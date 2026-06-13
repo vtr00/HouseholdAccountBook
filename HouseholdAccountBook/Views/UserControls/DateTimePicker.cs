@@ -283,7 +283,7 @@ namespace HouseholdAccountBook.Views.UserControls
         private void DateTimePicker_CalendarOpened(object sender, RoutedEventArgs e)
         {
             DateTimePicker dateTimePicker = sender as DateTimePicker;
-            var textBox = GetTemplateTextBox(dateTimePicker);
+            TextBox textBox = GetTemplateTextBox(dateTimePicker);
             this.mSelectedPositionBeforeCalendarOpened = textBox.SelectionStart;
         }
 
@@ -295,7 +295,7 @@ namespace HouseholdAccountBook.Views.UserControls
         private void DateTimePicker_CalendarClosed(object sender, RoutedEventArgs e)
         {
             DateTimePicker dateTimePicker = sender as DateTimePicker;
-            var textBox = GetTemplateTextBox(dateTimePicker);
+            TextBox textBox = GetTemplateTextBox(dateTimePicker);
             textBox.SelectionStart = this.mSelectedPositionBeforeCalendarOpened;
         }
         #endregion

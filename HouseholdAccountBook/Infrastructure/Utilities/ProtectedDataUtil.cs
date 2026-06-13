@@ -4,6 +4,9 @@ using System.Text;
 
 namespace HouseholdAccountBook.Infrastructure.Utilities
 {
+    /// <summary>
+    /// 保護データユーティリティ
+    /// </summary>
     public class ProtectedDataUtil
     {
         /// <summary>

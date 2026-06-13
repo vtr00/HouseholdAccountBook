@@ -92,7 +92,7 @@ namespace HouseholdAccountBook.Views.Windows
                 return;
             }
 
-            var uri = parent.NavigateUri;
+            Uri uri = parent.NavigateUri;
             if (uri != null) {
                 _ = Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
                 e.Handled = true;

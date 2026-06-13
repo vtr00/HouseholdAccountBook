@@ -200,7 +200,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
             if (level < this.Config.OutputLogLevel) { return; }
 
             string fileName = Path.GetFileNameWithoutExtension(filePath);
-            fileName = fileName.Replace(".xaml", "");
+            fileName = fileName.Replace(".xaml", string.Empty);
 
             string callerStr = fileName;
             if (methodName != ".ctor") {

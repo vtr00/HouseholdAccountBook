@@ -57,7 +57,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
                 varsStr += vars.ToString2();
             }
 
-            string tmpMessage = string.Join((message != string.Empty && varsStr != string.Empty) ? " - " : "", message, varsStr);
+            string tmpMessage = string.Join((message != string.Empty && varsStr != string.Empty) ? " - " : string.Empty, message, varsStr);
             OutputImpl?.Invoke(level, tmpMessage, fileName, methodName, lineNumber);
         }
 
