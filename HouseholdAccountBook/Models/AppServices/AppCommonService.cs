@@ -5,6 +5,7 @@ using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
@@ -52,7 +53,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 if (DateOnlyExtensions.IsWithIn(period?.Start, period?.End, jsonObj?.StartDate?.ToDateOnly(), jsonObj?.EndDate?.ToDateOnly())) {
                     AccountModel vm = new(dto.BookId, dto.BookName) {
                         Remark = jsonObj?.Remark ?? string.Empty,
-                        AccountKind = (AccountKind)dto.BookKind,
+                        AccountKind = EnumUtil.SafeCastEnum(dto.BookKind, AccountKind.Uncategorized),
                         DebitAccountId = dto.DebitBookId,
                         PayDay = dto.PayDay
                     };
@@ -85,7 +86,7 @@ namespace HouseholdAccountBook.Models.AppServices
             MstCategoryWithinBookDao mstCategoryWithinBookDao = new(dbHandler);
             IEnumerable<MstCategoryDto> dtoList = await mstCategoryWithinBookDao.FindByBookIdAndBalanceKindAsync((int)accountId, (int)balanceKind);
             foreach (MstCategoryDto dto in dtoList) {
-                cmList.Add(new(dto.CategoryId, dto.CategoryName, (BalanceKind)dto.BalanceKind));
+                cmList.Add(new(dto.CategoryId, dto.CategoryName, EnumUtil.SafeCastEnum(dto.BalanceKind, BalanceKind.Income)));
             }
 
             return cmList;
@@ -185,9 +186,9 @@ namespace HouseholdAccountBook.Models.AppServices
 
             GroupInfoDao groupInfoDao = new(dbHandler);
             GroupInfoDto dto = await groupInfoDao.FindByActionId((int)actionId);
-            int groupKind = dto.GroupKind ?? -1;
+            GroupKind groupKind = EnumUtil.SafeCastEnum(dto.GroupKind, GroupKind.NotInOne);
 
-            return (GroupKind)groupKind;
+            return groupKind;
         }
 
         /// <summary>
