@@ -1,4 +1,3 @@
-using HouseholdAccountBook.Infrastructure.DB;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
@@ -317,7 +316,7 @@ namespace HouseholdAccountBook.Views.Windows
 
             this.Hide();
 
-            if (await DbBackUpManager.Instance.ExecuteAtMainWindowClosing(UserSettingService.Instance.CurrentBackUp)) {
+            if (await DbBackUpService.Instance.ExecuteAtMainWindowClosing(UserSettingService.Instance.CurrentBackUp)) {
                 UserSettingService.Instance.CurrentBackUpAtClosing = DateTime.Now;
                 Log.Info($"Update BackUpCurrentAtClosing: {UserSettingService.Instance.CurrentBackUpAtClosing}");
             }
@@ -330,12 +329,12 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void MainWindow_StateChanged(object sender, EventArgs e)
         {
-            if (await DbBackUpManager.Instance.ExecuteAtMainWindowStateChanged(this.WindowState, UserSettingService.Instance.CurrentBackUp)) {
+            if (await DbBackUpService.Instance.ExecuteAtMainWindowStateChanged(this.WindowState, UserSettingService.Instance.CurrentBackUp)) {
                 UserSettingService.Instance.CurrentBackUpAtMinimizing = DateTime.Now;
                 this.WVM.AccountTabVM.RaiseCurrentBackUpChanged();
                 Log.Info($"Update BackUpCurrentAtMinimizing: {UserSettingService.Instance.CurrentBackUpAtMinimizing}");
 
-                DbBackUpManager.Instance.BackUpCurrentAtMinimizing = UserSettingService.Instance.CurrentBackUpAtMinimizing;
+                DbBackUpService.Instance.BackUpCurrentAtMinimizing = UserSettingService.Instance.CurrentBackUpAtMinimizing;
             }
         }
         #endregion

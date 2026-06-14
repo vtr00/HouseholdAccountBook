@@ -25,7 +25,8 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
             IEnumerable<MstCategoryDto> dtoList = await this.mDbHandler.QueryAsync<MstCategoryDto>(@"
 SELECT * 
 FROM mst_category
-WHERE del_flg = 0;");
+WHERE del_flg = 0
+ORDER BY sort_order;");
 
             return dtoList;
         }

@@ -21,11 +21,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public event EventHandler NeedToUpdateChanged {
             add {
+                this.AssetTabVM.NeedToUpdateChanged += value;
                 this.AccountTabVM.NeedToUpdateChanged += value;
                 this.ItemTabVM.NeedToUpdateChanged += value;
                 this.OtherTabVM.NeedToUpdateChanged += value;
             }
             remove {
+                this.AssetTabVM.NeedToUpdateChanged -= value;
                 this.AccountTabVM.NeedToUpdateChanged -= value;
                 this.ItemTabVM.NeedToUpdateChanged -= value;
                 this.OtherTabVM.NeedToUpdateChanged -= value;
@@ -52,6 +54,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
             }
         }
+
+        /// <summary>
+        /// アセット設定タブVM
+        /// </summary>
+        public SettingsWindowAssetTabViewModel AssetTabVM => field ??= new(this.mBusyService);
 
         /// <summary>
         /// 帳簿設定タブVM
@@ -93,6 +100,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             this.mChildrenVM.AddRange(
                 [
+                    this.AssetTabVM,
                     this.AccountTabVM,
                     this.ItemTabVM,
                     this.DbTabVM,
@@ -106,6 +114,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             switch (this.SelectedTab) {
+                case SettingsTabs.AssetSettingsTab:
+                    await this.AssetTabVM.LoadAsync();
+                    break;
                 case SettingsTabs.AccountSettingsTab:
                     await this.AccountTabVM.LoadAsync();
                     break;

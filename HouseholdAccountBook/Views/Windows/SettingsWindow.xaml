@@ -48,6 +48,209 @@
                     <Setter Property="Height" Value="75"/>
                 </Style>
             </TabControl.ItemContainerStyle>
+
+            <!-- アセット設定 -->
+            <TabItem x:Name="_AssetTab" DataContext="{Binding AssetTabVM}">
+                <TabItem.Header>
+                    <TextBlock Text="{x:Static properties:Resources.TabHeader_AssetSettings}" TextAlignment="Center"/>
+                </TabItem.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.3*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="0.6*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- アセット一覧 -->
+                    <GroupBox Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_AssetList}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Margin="5" Orientation="Horizontal">
+                                <Button Content="{x:Static properties:Resources.Button_Add}" Width="50" Command="{Binding AddAssetCommand}" ToolTip="Ctrl++"/>
+                                <Button Content="{x:Static properties:Resources.Button_Delete}" Width="50" Command="{Binding DeleteAssetCommand}" ToolTip="Del"/>
+                                <Button Content="{x:Static properties:Resources.Button_RaiseSortOrder}" Width="25" Command="{Binding RaiseAssetSortOrderCommand}" ToolTip="Ctrl+↑"/>
+                                <Button Content="{x:Static properties:Resources.Button_DropSortOrder}" Width="25" Command="{Binding DropAssetSortOrderCommand}" ToolTip="Ctrl+↓"/>
+                                <Button Content="{x:Static properties:Resources.Button_SetDefault}" Width="90" Command="{Binding SetDefaultAssetCommand}"/>
+                            </StackPanel>
+
+                            <ListBox Grid.Row="1" Margin="5" 
+                                     ItemsSource="{Binding AssetSelectorVM.ItemList}" SelectedItem="{Binding AssetSelectorVM.SelectedItem}">
+                                <ListBox.InputBindings>
+                                    <KeyBinding Gesture="Ctrl+OEMPlus" Command="{Binding DataContext.AddAssetCommand, ElementName=_AssetTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Add" Command="{Binding DataContext.AddAssetCommand, ElementName=_AssetTab}"/>
+                                    <KeyBinding Gesture="Delete" Command="{Binding DataContext.DeleteAssetCommand, ElementName=_AssetTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Up" Command="{Binding DataContext.RaiseAssetSortOrderCommand, ElementName=_AssetTab}"/>
+                                    <KeyBinding Gesture="Ctrl+Down" Command="{Binding DataContext.DropAssetSortOrderCommand, ElementName=_AssetTab}"/>
+                                </ListBox.InputBindings>
+
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox IsChecked="{Binding IsDefault}" IsEnabled="False"/>
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </GroupBox>
+
+                    <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
+
+                    <!-- アセット情報 -->
+                    <Grid Grid.Column="2" Grid.IsSharedSizeScope="True" DataContext="{Binding DisplayedAssetSettingVM}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <ScrollViewer Grid.Row="0">
+                            <StackPanel Grid.IsSharedSizeScope="True">
+                                <GroupBox Header="{x:Static properties:Resources.GroupHeader_AssetInformation}">
+                                    <GroupBox.InputBindings>
+                                        <KeyBinding Gesture="Ctrl+S" Command="{Binding DataContext.SaveAssetInfoCommand, ElementName=_AssetTab}"/>
+                                    </GroupBox.InputBindings>
+
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
+                                            <ColumnDefinition Width="100" SharedSizeGroup="Number"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="30" SharedSizeGroup="Button" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- アセットID -->
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
+                                                   Text="Asset Id"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
+                                                   Text="{Binding Id, TargetNullValue='--'}"/>
+
+                                        <!-- ソート順 -->
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
+                                                   Text="{x:Static properties:Resources.TextBlock_SortOrder}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Margin="5" Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
+                                                   Text="{Binding SortOrder}"/>
+
+                                        <!-- アセット名 -->
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
+                                                   Text="{x:Static properties:Resources.TextBlock_AssetName}"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
+                                                 Text="{Binding InputedName, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                        <!-- アセット種別 -->
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
+                                                   Text="{x:Static properties:Resources.TextBlock_AssetKind}"/>
+                                        <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
+                                                  ItemsSource="{Binding AssetKindSelectorVM.ItemList}" SelectedItem="{Binding AssetKindSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
+
+                                        <!-- アセットコード -->
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
+                                                   Text="{x:Static properties:Resources.TextBlock_AssetCode}"/>
+                                        <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
+                                                 Text="{Binding InputedAssetCode, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                        <!-- 主単位 -->
+                                        <GroupBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_MainUnit}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
+                                                    <ColumnDefinition Width="100" SharedSizeGroup="Number"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="30" SharedSizeGroup="Button" />
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <!-- 単位(前置) -->
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
+                                                           Text="{x:Static properties:Resources.TextBlock_UnitPrefix}"/>
+                                                <TextBox Grid.Row="0" Grid.Column="1" Margin="5" 
+                                                         Text="{Binding InputedPrefix, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <!-- 単位(後置) -->
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
+                                                           Text="{x:Static properties:Resources.TextBlock_UnitSuffix}"/>
+                                                <TextBox Grid.Row="1" Grid.Column="1" Margin="5" 
+                                                         Text="{Binding InputedSuffix, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </Grid>
+                                        </GroupBox>
+
+                                        <!-- ベースレート -->
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" 
+                                                   Text="{x:Static properties:Resources.TextBlock_AssetBaseRate}"/>
+                                        <TextBox Grid.Row="6" Grid.Column="1" Margin="5" IsEnabled="False"
+                                                 Text="{Binding InputedBaseRate, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                        <!-- スケール -->
+                                        <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
+                                                   Text="{x:Static properties:Resources.TextBlock_AssetScale}"/>
+                                        <controls:NumericUpDown Grid.Row="7" Grid.Column="1" Margin="5" IsEnabled="False" Value="{Binding InputedScale}" MinValue="0"/>
+
+                                        <!-- 補助単位 -->
+                                        <GroupBox Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4" IsEnabled="False" Header="{x:Static properties:Resources.GroupHeader_SubUnit}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
+                                                    <ColumnDefinition Width="100" SharedSizeGroup="Number"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="30" SharedSizeGroup="Button" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- サブ単位名 -->
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
+                                                           Text="{x:Static properties:Resources.TextBlock_SubUnitName}"/>
+                                                <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
+                                                         Text="{Binding InputedSubunitName, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <!-- サブ単位(前置) -->
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
+                                                           Text="{x:Static properties:Resources.TextBlock_UnitPrefix}"/>
+                                                <TextBox Grid.Row="1" Grid.Column="1" Margin="5" 
+                                                         Text="{Binding InputedSubPrefix, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <!-- サブ単位(後置) -->
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
+                                                           Text="{x:Static properties:Resources.TextBlock_UnitSuffix}"/>
+                                                <TextBox Grid.Row="2" Grid.Column="1" Margin="5" 
+                                                         Text="{Binding InputedSubPrefix, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
+                                </GroupBox>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- 保存 -->
+                        <Button Grid.Row="1" Margin="5" 
+                                Content="{x:Static properties:Resources.Button_Save}"
+                                Command="{Binding DataContext.SaveAssetInfoCommand, ElementName=_AssetTab}" ToolTip="Ctrl+S"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
             
             <!-- 帳簿設定 -->
             <TabItem x:Name="_AccountTab" DataContext="{Binding AccountTabVM}">
@@ -87,7 +290,7 @@
                             </ListBox>
                         </Grid>
                     </GroupBox>
-                        
+                    
                     <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
 
                     <Grid Grid.Column="2" Grid.IsSharedSizeScope="True" DataContext="{Binding DisplayedAccountSettingVM}">
@@ -98,8 +301,8 @@
                         </Grid.RowDefinitions>
 
                         <ScrollViewer Grid.Row="0">
-                            <StackPanel Grid.IsSharedSizeScope="True" Margin="0,0,5,0">
-                                <GroupBox Grid.Row="0" Header="{x:Static properties:Resources.GroupHeader_AccountInformation}">
+                            <StackPanel Grid.IsSharedSizeScope="True">
+                                <GroupBox Header="{x:Static properties:Resources.GroupHeader_AccountInformation}">
                                     <GroupBox.InputBindings>
                                         <KeyBinding Gesture="Ctrl+S" Command="{Binding DataContext.SaveAccountInfoCommand, ElementName=_AccountTab}"/>
                                     </GroupBox.InputBindings>
@@ -529,7 +732,7 @@
                     </Grid.RowDefinitions>
 
                     <ScrollViewer Grid.Row="0">
-                        <StackPanel Grid.IsSharedSizeScope="True" Margin="0,0,5,0">
+                        <StackPanel Grid.IsSharedSizeScope="True">
                             <!-- 接続情報 -->
                             <GroupBox Header="{x:Static properties:Resources.GroupHeader_DataBaseInformation}">
                                 <Grid>
@@ -715,7 +918,7 @@
                     </Grid.RowDefinitions>
 
                     <ScrollViewer Grid.Row="0">
-                        <StackPanel Grid.IsSharedSizeScope="True" Margin="0,0,5,0">
+                        <StackPanel Grid.IsSharedSizeScope="True">
                             <!-- バージョン情報 -->
                             <GroupBox Header="{x:Static properties:Resources.GroupHeader_VersionInformation}">
                                 <Grid>

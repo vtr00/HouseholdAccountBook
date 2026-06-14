@@ -5,6 +5,33 @@ namespace HouseholdAccountBook.Models
 {
     #region DB関連
     /// <summary>
+    /// アセット種別
+    /// </summary>
+    public enum AssetKind
+    {
+        /// <summary>
+        /// 通貨
+        /// </summary>
+        Currency = 0,
+        /// <summary>
+        /// 有価証券
+        /// </summary>
+        Security = 1,
+        /// <summary>
+        /// 暗号資産
+        /// </summary>
+        Crypto = 2,
+        /// <summary>
+        /// ポイント
+        /// </summary>
+        Point = 3,
+        /// <summary>
+        /// その他
+        /// </summary>
+        Other = 4
+    }
+
+    /// <summary>
     /// 帳簿種別
     /// </summary>
     public enum AccountKind
@@ -233,21 +260,25 @@ namespace HouseholdAccountBook.Models
     public enum SettingsTabs
     {
         /// <summary>
+        /// アセット設定タブ
+        /// </summary>
+        AssetSettingsTab = 0,
+        /// <summary>
         /// 帳簿設定タブ
         /// </summary>
-        AccountSettingsTab = 0,
+        AccountSettingsTab = 1,
         /// <summary>
         /// 項目設定タブ
         /// </summary>
-        ItemSettingsTab = 1,
+        ItemSettingsTab = 2,
         /// <summary>
         /// DB設定タブ
         /// </summary>
-        DbSettingsTab = 2,
+        DbSettingsTab = 3,
         /// <summary>
         /// その他タブ
         /// </summary>
-        OtherSettingsTab = 3
+        OtherSettingsTab = 4
     }
     #endregion
 
@@ -271,9 +302,24 @@ namespace HouseholdAccountBook.Models
     }
 
     /// <summary>
-    /// 単位タイプ
+    /// 単位種別
     /// </summary>
-    public enum UnitType
+    public enum UnitKind
+    {
+        /// <summary>
+        /// 主単位
+        /// </summary>
+        MainUnit,
+        /// <summary>
+        /// 補助単位
+        /// </summary>
+        SubUnit
+    }
+
+    /// <summary>
+    /// 単位位置
+    /// </summary>
+    public enum UnitPosition
     {
         /// <summary>
         /// なし

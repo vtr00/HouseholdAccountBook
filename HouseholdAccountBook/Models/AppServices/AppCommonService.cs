@@ -28,6 +28,41 @@ namespace HouseholdAccountBook.Models.AppServices
         private readonly DbHandlerFactory mDbHandlerFactory = dbHandlerFactory;
 
         /// <summary>
+        /// アセットModelリストを取得する
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<AssetModel>> LoadAssetListAsync()
+        {
+            using FuncLog funcLog = new(new { });
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
+
+            AssetIdObj defaultAssetId = UserSettingService.Instance.DefaultAssetId;
+
+            List<AssetModel> amList = [];
+
+            MstAssetDao mstAssetDao = new(dbHandler);
+            IEnumerable<MstAssetDto> dtoList = await mstAssetDao.FindAllAsync();
+            foreach (MstAssetDto dto in dtoList) {
+                AssetModel vm = new(dto.AssetId, dto.AssetName) {
+                    SortOrder = dto.SortOrder,
+                    SubunitName = dto.SubunitName ?? string.Empty,
+                    AssetCode = dto.AssetCode ?? string.Empty,
+                    AssetKind = EnumUtil.SafeCastEnum(dto.AssetKind, AssetKind.Currency),
+                    Scale = dto.Scale,
+                    Prefix = dto.Prefix,
+                    Suffix = dto.Suffix,
+                    SubPrefix = dto.SubPrefix ?? string.Empty,
+                    SubSuffix = dto.SubSuffix ?? string.Empty,
+                    BaseRate = dto.BaseRate,
+                    IsDefault = dto.AssetId == defaultAssetId
+                };
+                amList.Add(vm);
+            }
+
+            return amList;
+        }
+
+        /// <summary>
         /// 帳簿Modelリストを取得する
         /// </summary>
         /// <param name="period">期間</param>
@@ -38,11 +73,11 @@ namespace HouseholdAccountBook.Models.AppServices
             using FuncLog funcLog = new(new { period, initialName });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
-            List<AccountModel> bmList = [];
+            List<AccountModel> amList = [];
 
             // 1番目に表示する項目を追加する
             if (initialName != string.Empty) {
-                bmList.Add(new(AccountIdObj.System, initialName));
+                amList.Add(new(AccountIdObj.System, initialName));
             }
 
             MstBookDao mstBookDao = new(dbHandler);
@@ -57,11 +92,11 @@ namespace HouseholdAccountBook.Models.AppServices
                         DebitAccountId = dto.DebitBookId,
                         PayDay = dto.PayDay
                     };
-                    bmList.Add(vm);
+                    amList.Add(vm);
                 }
             }
 
-            return bmList;
+            return amList;
         }
 
         /// <summary>

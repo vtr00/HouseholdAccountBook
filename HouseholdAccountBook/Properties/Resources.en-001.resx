@@ -259,6 +259,9 @@
   <data name="GroupHeader_AccountList" xml:space="preserve">
     <value>Account list</value>
   </data>
+  <data name="GroupHeader_AssetList" xml:space="preserve">
+    <value>Asset list</value>
+  </data>
   <data name="GroupHeader_MonthSelection" xml:space="preserve">
     <value>Month selection</value>
   </data>
@@ -267,6 +270,9 @@
   </data>
   <data name="GroupHeader_AccountInformation" xml:space="preserve">
     <value>Account information</value>
+  </data>
+  <data name="GroupHeader_AssetInformation" xml:space="preserve">
+    <value>Asset information</value>
   </data>
   <data name="GroupHeader_WindowInformation" xml:space="preserve">
     <value>Window information</value>
@@ -331,9 +337,6 @@
   <data name="TextBlock_CsvFolder" xml:space="preserve">
     <value>CSV folder</value>
   </data>
-  <data name="Unit_Money" xml:space="preserve">
-    <value>Yen</value>
-  </data>
   <data name="Unit_FiscalYear" xml:space="preserve">
     <value>Fiscal years</value>
   </data>
@@ -381,6 +384,9 @@
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInItemWithinAccount" xml:space="preserve">
     <value>Cannot delete because account items exist in the corresponding item within the account.</value>
+  </data>
+  <data name="Message_CantDeleteBecauseAssetIsUsed" xml:space="preserve">
+    <value>Cannot delete because asset is used.</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInAccount" xml:space="preserve">
     <value>Cannot delete because account items exist in the account.</value>
@@ -676,6 +682,10 @@ settings</value>
     <value>Account
 settings</value>
   </data>
+  <data name="TabHeader_AssetSettings" xml:space="preserve">
+    <value>Asset
+settings</value>
+  </data>
   <data name="TabHeader_DbSettings" xml:space="preserve">
     <value>Database
 settings</value>
@@ -787,6 +797,9 @@ list</value>
   <data name="Button_ShowReplace" xml:space="preserve">
     <value>▼</value>
   </data>
+  <data name="Button_SetDefault" xml:space="preserve">
+    <value>Set Default</value>
+  </data>
   <data name="TextBlock_Search" xml:space="preserve">
     <value>Search</value>
   </data>
@@ -811,14 +824,38 @@ list</value>
   <data name="TextBlock_Sum" xml:space="preserve">
     <value>Sum</value>
   </data>
+  <data name="TextBlock_AssetScale" xml:space="preserve">
+    <value>Scale</value>
+  </data>
   <data name="TextBlock_Account" xml:space="preserve">
     <value>Account</value>
   </data>
   <data name="TextBlock_AccountName" xml:space="preserve">
     <value>Account name</value>
   </data>
+  <data name="TextBlock_AssetName" xml:space="preserve">
+    <value>Asset name</value>
+  </data>
+  <data name="TextBlock_SubUnitName" xml:space="preserve">
+    <value>Sub Unit Name</value>
+  </data>
+  <data name="TextBlock_UnitPrefix" xml:space="preserve">
+    <value>Prefix</value>
+  </data>
+  <data name="TextBlock_UnitSuffix" xml:space="preserve">
+    <value>Suffix</value>
+  </data>
   <data name="TextBlock_AccountKind" xml:space="preserve">
     <value>Account type</value>
+  </data>
+  <data name="TextBlock_AssetKind" xml:space="preserve">
+    <value>Asset type</value>
+  </data>
+  <data name="TextBlock_AssetCode" xml:space="preserve">
+    <value>Asset code</value>
+  </data>
+  <data name="TextBlock_AssetBaseRate" xml:space="preserve">
+    <value>Base rate</value>
   </data>
   <data name="TextBlock_InitialBalance" xml:space="preserve">
     <value>Initial balance</value>
@@ -1054,6 +1091,12 @@ list</value>
   <data name="GroupHeader_UnhandledExceptionLog" xml:space="preserve">
     <value>Unhandled exception log</value>
   </data>
+  <data name="GroupHeader_MainUnit" xml:space="preserve">
+    <value>Main Unit</value>
+  </data>
+  <data name="GroupHeader_SubUnit" xml:space="preserve">
+    <value>Sub Unit</value>
+  </data>
   <data name="GroupHeader_WindowLog" xml:space="preserve">
     <value>Window log</value>
   </data>
@@ -1140,5 +1183,23 @@ list</value>
   </data>
   <data name="TextBlock_SQLite_MmapSize" xml:space="preserve">
     <value>Memory-mapped I/O size</value>
+  </data>
+  <data name="Unit_DefaultMoney" xml:space="preserve">
+    <value>Yen</value>
+  </data>
+  <data name="AssetKind_Currency" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="AssetKind_Crypto" xml:space="preserve">
+    <value>Crypto</value>
+  </data>
+  <data name="AssetKind_Point" xml:space="preserve">
+    <value>Point</value>
+  </data>
+  <data name="AssetKind_Security" xml:space="preserve">
+    <value>Security</value>
+  </data>
+  <data name="AssetKind_Other" xml:space="preserve">
+    <value>Other</value>
   </data>
 </root>

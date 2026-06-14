@@ -19,16 +19,16 @@ namespace HouseholdAccountBook.Views.Converters
                 return null;
             }
 
-            UnitType unitType = EnumUtil.SafeCastEnum(parameter, UnitType.Both);
+            UnitPosition unitPosition = EnumUtil.SafeCastEnum(parameter, UnitPosition.Both);
 
-            string unit_pre = unitType switch {
-                UnitType.Pre or UnitType.Both => UnitUtil.GetYearPreUnit(UserSettingService.Instance.FiscalStartMonth),
-                UnitType.None or UnitType.Post => string.Empty,
+            string unit_pre = unitPosition switch {
+                UnitPosition.Pre or UnitPosition.Both => UnitUtil.GetYearPreUnit(UserSettingService.Instance.FiscalStartMonth),
+                UnitPosition.None or UnitPosition.Post => string.Empty,
                 _ => string.Empty
             };
-            string unit_post = unitType switch {
-                UnitType.Post or UnitType.Both => UnitUtil.GetYearPostUnit(UserSettingService.Instance.FiscalStartMonth),
-                UnitType.None or UnitType.Pre => string.Empty,
+            string unit_post = unitPosition switch {
+                UnitPosition.Post or UnitPosition.Both => UnitUtil.GetYearPostUnit(UserSettingService.Instance.FiscalStartMonth),
+                UnitPosition.None or UnitPosition.Pre => string.Empty,
                 _ => string.Empty
             };
 

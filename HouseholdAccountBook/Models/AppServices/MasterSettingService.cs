@@ -30,6 +30,122 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         private readonly DbHandlerFactory mDbHandlerFactory = dbHandlerFactory;
 
+        #region アセット設定
+        /// <summary>
+        /// アセットModelを取得する
+        /// </summary>
+        /// <param name="assetId"></param>
+        /// <returns></returns>
+        public async Task<AssetModel> LoadAssetAsync(AssetIdObj assetId)
+        {
+            using FuncLog funcLog = new(new { assetId });
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
+
+            AssetIdObj defaultAssetId = UserSettingService.Instance.DefaultAssetId;
+
+            MstAssetDao mstAssetDao = new(dbHandler);
+            MstAssetDto dto = await mstAssetDao.FindByIdAsync((int)assetId);
+
+            AssetModel am = new(assetId, dto.AssetName) {
+                SortOrder = dto.SortOrder,
+                SubunitName = dto.SubunitName ?? string.Empty,
+                AssetCode = dto.AssetCode ?? string.Empty,
+                AssetKind = EnumUtil.SafeCastEnum(dto.AssetKind, AssetKind.Currency),
+                Scale = dto.Scale,
+                Prefix = dto.Prefix,
+                Suffix = dto.Suffix,
+                SubPrefix = dto.SubPrefix ?? string.Empty,
+                SubSuffix = dto.SubSuffix ?? string.Empty,
+                BaseRate = dto.BaseRate,
+                IsDefault = assetId == defaultAssetId
+            };
+
+            return am;
+        }
+        
+        /// <summary>
+        /// アセットを追加する
+        /// </summary>
+        /// <returns>アセットID</returns>
+        public async Task<AssetIdObj> AddAssetAsync()
+        {
+            using FuncLog funcLog = new();
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
+
+            MstAssetDao mstAssetDao = new(dbHandler);
+            AssetIdObj assetId = await mstAssetDao.InsertReturningIdAsync(new MstAssetDto { });
+
+            return assetId;
+        }
+
+        /// <summary>
+        /// アセットに紐づくデフォルトアセットが存在しなければアセットを削除する
+        /// </summary>
+        /// <param name="assetId"></param>
+        /// <returns>削除したか</returns>
+        public async Task<bool> DeleteAssetAsync(AssetIdObj assetId)
+        {
+            using FuncLog funcLog = new(new { assetId });
+
+            bool result = false;
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
+            await dbHandler.ExecTransactionAsync(async () => {
+                // TODO: 紐づく帳簿を探す、紐づく帳簿項目を探す
+
+                if (UserSettingService.Instance.DefaultAssetId == assetId) {
+                    result = false;
+                }
+                else {
+                    MstAssetDao mstAssetDao = new(dbHandler);
+                    _ = await mstAssetDao.DeleteByIdAsync((int)assetId);
+                    result = true;
+                }
+            });
+            return result;
+        }
+
+        /// <summary>
+        /// アセットのソート順を入れ替える
+        /// </summary>
+        /// <param name="assetId1">アセットID1</param>
+        /// <param name="assetId2">アセットID2</param>
+        /// <returns></returns>
+        public async Task SwapAssetSortOrderAsync(AssetIdObj assetId1, AssetIdObj assetId2)
+        {
+            using FuncLog funcLog = new(new { assetId1, assetId2 });
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
+
+            MstAssetDao mstAssetDao = new(dbHandler);
+            _ = await mstAssetDao.SwapSortOrderAsync((int)assetId1, (int)assetId2);
+        }
+
+        /// <summary>
+        /// アセットModelを保存する
+        /// </summary>
+        /// <param name="asset">アセットModel</param>
+        /// <returns></returns>
+        public async Task SaveAssetAsync(AssetModel asset)
+        {
+            using FuncLog funcLog = new(new { asset });
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
+
+            MstAssetDao mstAssetDao = new(dbHandler);
+            _ = await mstAssetDao.UpdateSetableAsync(new() {
+                AssetName = asset.Name,
+                SubunitName = asset.SubunitName,
+                AssetCode = asset.AssetCode,
+                AssetKind = (int)asset.AssetKind,
+                Scale = asset.Scale,
+                Prefix = asset.Prefix,
+                Suffix = asset.Suffix,
+                SubPrefix = asset.SubPrefix,
+                SubSuffix = asset.SubSuffix,
+                BaseRate = asset.BaseRate,
+                AssetId = (int)asset.Id
+            });
+        }
+        #endregion
+
         #region 帳簿設定
         /// <summary>
         /// 帳簿Modelを取得する
@@ -92,20 +208,19 @@ namespace HouseholdAccountBook.Models.AppServices
             using FuncLog funcLog = new(new { accountId });
 
             bool result = false;
-            await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                await dbHandler.ExecTransactionAsync(async () => {
-                    HstActionDao hstActionDao = new(dbHandler);
-                    IEnumerable<HstActionDto> dtoList = await hstActionDao.FindByBookIdAsync((int)accountId);
-                    if (dtoList.Any()) {
-                        result = false;
-                    }
-                    else {
-                        MstBookDao hstBookDao = new(dbHandler);
-                        _ = await hstBookDao.DeleteByIdAsync((int)accountId);
-                        result = true;
-                    }
-                });
-            }
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
+            await dbHandler.ExecTransactionAsync(async () => {
+                HstActionDao hstActionDao = new(dbHandler);
+                IEnumerable<HstActionDto> dtoList = await hstActionDao.FindByBookIdAsync((int)accountId);
+                if (dtoList.Any()) {
+                    result = false;
+                }
+                else {
+                    MstBookDao mstBookDao = new(dbHandler);
+                    _ = await mstBookDao.DeleteByIdAsync((int)accountId);
+                    result = true;
+                }
+            });
             return result;
         }
 

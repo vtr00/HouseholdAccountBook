@@ -130,13 +130,14 @@ namespace HouseholdAccountBook
             SQLiteDbHandler.Config = UserSettingService.Instance.SQLiteConfig;
 
             // DBBackUpManagerを初期化する
-            DbBackUpManager.Instance.DbHandlerFactory = dbHandlerFactory;
-            DbBackUpManager.Instance.Config = UserSettingService.Instance.DbBackupConfig;
-            DbBackUpManager.Instance.NpgsqlConfig = UserSettingService.Instance.PostgreSQLBackupConfig;
-            DbBackUpManager.Instance.BackUpCurrentAtMinimizing = UserSettingService.Instance.CurrentBackUpAtMinimizing;
+            DbBackUpService.Instance.DbHandlerFactory = dbHandlerFactory;
+            DbBackUpService.Instance.Config = UserSettingService.Instance.DbBackupConfig;
+            DbBackUpService.Instance.NpgsqlConfig = UserSettingService.Instance.PostgreSQLBackupConfig;
+            DbBackUpService.Instance.BackUpCurrentAtMinimizing = UserSettingService.Instance.CurrentBackUpAtMinimizing;
 
             // DBのマイグレーションを実行する
-            bool migrateResult = await DbUtil.UpMigrateAsync(dbHandlerFactory);
+            DbMigrationService migService = new(dbHandlerFactory);
+            bool migrateResult = await migService.UpMigrateAsync();
             if (!migrateResult) {
                 MessageBox.Show(MyResources.Message_FailedToMigrateDb, MyResources.Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Shutdown();
@@ -152,6 +153,10 @@ namespace HouseholdAccountBook
                 Log.Warning("Failed to get holiday list.");
                 NotificationService.NotifyFailingToGetHolidayList();
             }
+            // アセットリストを更新する
+            await AssetService.Instance.UpdateAssets(dbHandlerFactory);
+
+            // 最新バージョンを確認するか
             if (UserSettingService.Instance.CheckLatestVersionAtAppLaunched) {
                 // 最新バージョンを確認する
                 await App.CheckLatestVersionAsync(false);
