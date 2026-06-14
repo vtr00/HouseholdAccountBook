@@ -33,16 +33,7 @@ CREATE TABLE IF NOT EXISTS mtd_schema_version (
     version INTEGER NOT NULL,
     update_time timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT mtd_schema_version_check CHECK (version >= 0)
-) TABLESPACE pg_default;");
-
-            if (this.mDbHandler is NpgsqlDbHandler npgsqlDbHandler) {
-                string roll = npgsqlDbHandler.DbCreationRole;
-                // オーナーを設定する
-                _ = await npgsqlDbHandler.ExecuteAsync($@"
-ALTER TABLE IF EXISTS mtd_schema_version
-    OWNER to ""{roll}"";
-");
-            }
+);");
 
             // レコードがなければ、初期レコードを挿入する
             _ = await this.mDbHandler.ExecuteAsync(@"

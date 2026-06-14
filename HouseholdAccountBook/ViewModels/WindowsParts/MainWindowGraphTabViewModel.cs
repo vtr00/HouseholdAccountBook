@@ -211,7 +211,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
 
             // 縦軸 - 線形軸
-            string unitY = Properties.Resources.Unit_Money;
+            string unitY = Properties.Resources.Unit_DefaultMoney;
             LinearAxis GetVerticalAxis()
             {
                 return new() {

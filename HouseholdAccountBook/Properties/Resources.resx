@@ -259,6 +259,9 @@
   <data name="GroupHeader_AccountList" xml:space="preserve">
     <value>帳簿一覧</value>
   </data>
+  <data name="GroupHeader_AssetList" xml:space="preserve">
+    <value>アセット一覧</value>
+  </data>
   <data name="GroupHeader_MonthSelection" xml:space="preserve">
     <value>指定月</value>
   </data>
@@ -267,6 +270,9 @@
   </data>
   <data name="GroupHeader_AccountInformation" xml:space="preserve">
     <value>帳簿情報</value>
+  </data>
+  <data name="GroupHeader_AssetInformation" xml:space="preserve">
+    <value>アセット情報</value>
   </data>
   <data name="GroupHeader_WindowInformation" xml:space="preserve">
     <value>ウィンドウ情報</value>
@@ -331,9 +337,6 @@
   <data name="TextBlock_CsvFolder" xml:space="preserve">
     <value>CSVフォルダ</value>
   </data>
-  <data name="Unit_Money" xml:space="preserve">
-    <value>円</value>
-  </data>
   <data name="Unit_FiscalYear" xml:space="preserve">
     <value>年度</value>
   </data>
@@ -381,6 +384,9 @@
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInItemWithinAccount" xml:space="preserve">
     <value>帳簿内の該当する項目に帳簿項目が存在するので削除できません。</value>
+  </data>
+  <data name="Message_CantDeleteBecauseAssetIsUsed" xml:space="preserve">
+    <value>アセットが使用されているので削除できません。</value>
   </data>
   <data name="Message_CantDeleteBecauseActionItemExistsInAccount" xml:space="preserve">
     <value>帳簿内に帳簿項目が存在するので削除できません。</value>
@@ -669,13 +675,20 @@
 項目</value>
   </data>
   <data name="TabHeader_ItemSettings" xml:space="preserve">
-    <value>項目設定</value>
+    <value>項目
+設定</value>
   </data>
   <data name="TabHeader_AccountSettings" xml:space="preserve">
-    <value>帳簿設定</value>
+    <value>帳簿
+設定</value>
+  </data>
+  <data name="TabHeader_AssetSettings" xml:space="preserve">
+    <value>アセット
+設定</value>
   </data>
   <data name="TabHeader_DbSettings" xml:space="preserve">
-    <value>DB設定</value>
+    <value>DB
+設定</value>
   </data>
   <data name="TabHeader_OtherSettings" xml:space="preserve">
     <value>その他</value>
@@ -784,6 +797,9 @@
   <data name="Button_ShowReplace" xml:space="preserve">
     <value>▼</value>
   </data>
+  <data name="Button_SetDefault" xml:space="preserve">
+    <value>デフォルト設定</value>
+  </data>
   <data name="TextBlock_Search" xml:space="preserve">
     <value>検索</value>
   </data>
@@ -808,14 +824,38 @@
   <data name="TextBlock_Sum" xml:space="preserve">
     <value>合計</value>
   </data>
+  <data name="TextBlock_AssetScale" xml:space="preserve">
+    <value>スケール</value>
+  </data>
   <data name="TextBlock_Account" xml:space="preserve">
     <value>帳簿</value>
   </data>
   <data name="TextBlock_AccountName" xml:space="preserve">
     <value>帳簿名</value>
   </data>
+  <data name="TextBlock_AssetName" xml:space="preserve">
+    <value>アセット名</value>
+  </data>
+  <data name="TextBlock_SubUnitName" xml:space="preserve">
+    <value>補助単位名</value>
+  </data>
+  <data name="TextBlock_UnitPrefix" xml:space="preserve">
+    <value>前置</value>
+  </data>
+  <data name="TextBlock_UnitSuffix" xml:space="preserve">
+    <value>後置</value>
+  </data>
   <data name="TextBlock_AccountKind" xml:space="preserve">
     <value>帳簿種別</value>
+  </data>
+  <data name="TextBlock_AssetKind" xml:space="preserve">
+    <value>アセット種別</value>
+  </data>
+  <data name="TextBlock_AssetCode" xml:space="preserve">
+    <value>アセットコード</value>
+  </data>
+  <data name="TextBlock_AssetBaseRate" xml:space="preserve">
+    <value>ベースレート</value>
   </data>
   <data name="TextBlock_InitialBalance" xml:space="preserve">
     <value>初期残高</value>
@@ -1051,6 +1091,12 @@
   <data name="GroupHeader_UnhandledExceptionLog" xml:space="preserve">
     <value>例外ログ</value>
   </data>
+  <data name="GroupHeader_MainUnit" xml:space="preserve">
+    <value>主単位</value>
+  </data>
+  <data name="GroupHeader_SubUnit" xml:space="preserve">
+    <value>補助単位</value>
+  </data>
   <data name="GroupHeader_WindowLog" xml:space="preserve">
     <value>ウィンドウログ</value>
   </data>
@@ -1137,5 +1183,23 @@
   </data>
   <data name="TextBlock_SQLite_MmapSize" xml:space="preserve">
     <value>メモリマップドI/Oサイズ</value>
+  </data>
+  <data name="Unit_DefaultMoney" xml:space="preserve">
+    <value>円</value>
+  </data>
+  <data name="AssetKind_Currency" xml:space="preserve">
+    <value>通貨</value>
+  </data>
+  <data name="AssetKind_Crypto" xml:space="preserve">
+    <value>暗号資産</value>
+  </data>
+  <data name="AssetKind_Point" xml:space="preserve">
+    <value>ポイント</value>
+  </data>
+  <data name="AssetKind_Security" xml:space="preserve">
+    <value>有価証券</value>
+  </data>
+  <data name="AssetKind_Other" xml:space="preserve">
+    <value>その他</value>
   </data>
 </root>

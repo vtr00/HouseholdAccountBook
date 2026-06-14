@@ -47,6 +47,28 @@ namespace HouseholdAccountBook.Models.ValueObjects
         public override string ToString() => $"{this.Id}";
     }
 
+    [DebuggerDisplay("{Id}")]
+    public sealed record class AssetIdObj : IIdObj
+    {
+        public int Id { get; init; }
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="id">アセットID</param>
+        public AssetIdObj(int id)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(id, nameof(id));
+            this.Id = id;
+        }
+
+        public static implicit operator AssetIdObj(int id) => new(id);
+        public static explicit operator int?(AssetIdObj obj) => obj?.Id;
+        public static explicit operator int(AssetIdObj obj) => obj is null ? -1 : obj.Id;
+
+        public override string ToString() => $"{this.Id}";
+    }
+
     /// <summary>
     /// 帳簿ID VO
     /// </summary>

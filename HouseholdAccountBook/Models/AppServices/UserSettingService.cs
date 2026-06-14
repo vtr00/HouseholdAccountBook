@@ -84,6 +84,17 @@ namespace HouseholdAccountBook.Models.AppServices
                 this.mSettings.Save();
             }
         }
+        /// <summary>
+        /// デフォルトアセットID
+        /// </summary>
+        /// <remarks>帳簿項目/帳簿のアセットIDが未指定時に使用する</remarks>
+        public AssetIdObj DefaultAssetId {
+            get => this.mSettings.App_DefaultAssetId;
+            set {
+                this.mSettings.App_DefaultAssetId = (int)value;
+                this.mSettings.Save();
+            }
+        }
         #endregion
 
         #region 初期表示
@@ -718,7 +729,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// DBバックアップ設定
         /// </summary>
-        public DbBackUpManager.Configuration DbBackupConfig {
+        public DbBackUpService.Configuration DbBackupConfig {
             get => new() {
                 Amount = Math.Max(0, this.mSettings.App_BackUpNum),
                 TargetFolderPath = this.mSettings.App_BackUpFolderPath,

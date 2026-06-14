@@ -607,7 +607,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand ImportCustomFileCommand => field ??= new AsyncRelayCommand(
             this.ImportCustomFileCommand_ExecuteAsync, this,
-            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlConfig?.RestoreExePath) && !this.IsChildrenWindowOpened(),
+            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpService.Instance.NpgsqlConfig?.RestoreExePath) && !this.IsChildrenWindowOpened(),
             this.mBusyService);
         /// <summary>
         /// カスタムファイル -> PostgreSQL インポートコマンド処理
@@ -709,7 +709,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand ExportCustomFileCommand => field ??= new AsyncRelayCommand(
             this.ExportCustomFileCommand_ExecuteAsync, this,
-            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
+            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpService.Instance.NpgsqlConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
             this.mBusyService);
         /// <summary>
         /// カスタムファイルエクスポートコマンド処理
@@ -729,7 +729,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             UserSettingService.Instance.ExportCustomFilePath = e.FileName;
 
-            bool result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQLAsync(e.FileName, PostgresFormat.Custom) == true;
+            bool result = await DbBackUpService.Instance.ExecuteDumpPostgreSQLAsync(e.FileName, PostgresFormat.Custom) == true;
 
             _ = result
                 ? MessageBox.Show(Properties.Resources.Message_CompletedToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
@@ -741,7 +741,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand ExportSQLFileCommand => field ??= new AsyncRelayCommand(
             this.ExportSQLFileCommand_ExecuteAsync, this,
-            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpManager.Instance.NpgsqlConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
+            () => this.IsPostgreSQL && !string.IsNullOrEmpty(DbBackUpService.Instance.NpgsqlConfig?.DumpExePath) && !this.IsChildrenWindowOpened(),
             this.mBusyService);
         /// <summary>
         /// SQLファイルエクスポートコマンド処理
@@ -761,7 +761,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             UserSettingService.Instance.ExportSQLFilePath = e.FileName;
 
-            bool result = await DbBackUpManager.Instance.ExecuteDumpPostgreSQLAsync(e.FileName, PostgresFormat.Plain) == true;
+            bool result = await DbBackUpService.Instance.ExecuteDumpPostgreSQLAsync(e.FileName, PostgresFormat.Plain) == true;
 
             _ = result
                 ? MessageBox.Show(Properties.Resources.Message_CompletedToExport, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK)
@@ -777,7 +777,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public async Task BackUpCommand_ExecuteAsync(IProgress<int> progress)
         {
-            bool result = await DbBackUpManager.Instance.CreateBackUpFileAsync(backUpNum: -1);
+            bool result = await DbBackUpService.Instance.CreateBackUpFileAsync(backUpNum: -1);
 
             if (result) {
                 UserSettingService.Instance.CurrentBackUpBySelf = DateTime.Now;

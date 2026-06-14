@@ -249,7 +249,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             await this.AccessSettingVM.LoadForKichoFugetsuAsync();
 
             // バックアップ
-            DbBackUpManager.Configuration config = UserSettingService.Instance.DbBackupConfig;
+            DbBackUpService.Configuration config = UserSettingService.Instance.DbBackupConfig;
             this.InputedBackUpNum = config.Amount;
             this.InputedBackUpFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), config.TargetFolderPath);
             this.SelectedIfBackUpAtMinimizing = config.ExecuteAtMinimizing;
@@ -299,8 +299,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             SQLiteDbHandler.Config = UserSettingService.Instance.SQLiteConfig;
 
             // DbBackUpManagerへ設定を反映する
-            DbBackUpManager.Instance.Config = UserSettingService.Instance.DbBackupConfig;
-            DbBackUpManager.Instance.NpgsqlConfig = UserSettingService.Instance.PostgreSQLBackupConfig;
+            DbBackUpService.Instance.Config = UserSettingService.Instance.DbBackupConfig;
+            DbBackUpService.Instance.NpgsqlConfig = UserSettingService.Instance.PostgreSQLBackupConfig;
         }
     }
 }

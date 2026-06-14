@@ -143,7 +143,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
         {
             using FuncLog funcLog = new(new { version }, Log.LogLevel.Trace);
 
-            return await this.ExecuteAsync($"PRAGMA USER_VERSION = @UserVersion;", new { UserVersion = version });
+            return await this.ExecuteAsync($"PRAGMA USER_VERSION = {version};");
         }
 
         /// <summary>

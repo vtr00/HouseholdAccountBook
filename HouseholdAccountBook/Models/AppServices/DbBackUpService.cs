@@ -1,10 +1,11 @@
-﻿using HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions;
+﻿using HouseholdAccountBook.Infrastructure;
+using HouseholdAccountBook.Infrastructure.DB;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions;
 using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
-using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.DbHandlers;
 using System;
 using System.Collections.Generic;
@@ -13,12 +14,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace HouseholdAccountBook.Infrastructure.DB
+namespace HouseholdAccountBook.Models.AppServices
 {
     /// <summary>
     /// DBバックアップマネージャ
     /// </summary>
-    public class DbBackUpManager : SingletonBase<DbBackUpManager>
+    public class DbBackUpService : SingletonBase<DbBackUpService>
     {
         /// <summary>
         /// バックアップ設定
@@ -94,7 +95,7 @@ namespace HouseholdAccountBook.Infrastructure.DB
         /// <summary>
         /// DBハンドラファクトリ
         /// </summary>
-        public DbHandlerFactory DbHandlerFactory { get; set; }
+        public DbHandlerFactory DbHandlerFactory { protected get; set; }
 
         /// <summary>
         /// バックアップ設定
@@ -114,11 +115,11 @@ namespace HouseholdAccountBook.Infrastructure.DB
         /// <summary>
         /// スタティックコンストラクタ
         /// </summary>
-        static DbBackUpManager() => Register(static () => new DbBackUpManager());
+        static DbBackUpService() => Register(static () => new DbBackUpService());
         /// <summary>
         /// プライベートコンストラクタ
         /// </summary>
-        private DbBackUpManager() { }
+        private DbBackUpService() { }
 
         /// <summary>
         /// メインウィンドウクローズ時のバックアップを実行する

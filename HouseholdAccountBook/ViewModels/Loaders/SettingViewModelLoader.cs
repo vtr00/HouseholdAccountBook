@@ -30,6 +30,26 @@ namespace HouseholdAccountBook.ViewModels.Loaders
         private readonly MasterSettingService mService = settingService;
 
         /// <summary>
+        /// アセット設定VMを取得する
+        /// </summary>
+        /// <param name="assetId">表示対象のアセットID</param>
+        /// <returns>アセット設定VM</returns>
+        public async Task<AssetSettingViewModel> LoadAssetSettingViewModelAsync(AssetIdObj assetId)
+        {
+            using FuncLog funcLog = new(new { assetId });
+
+            AssetSettingViewModel vm = null;
+
+            AssetModel am = await this.mService.LoadAssetAsync(assetId);
+
+            vm = new(am);
+            vm.AssetKindSelectorVM.SetLoader(() => UiConstants.AssetKindStr);
+            await vm.AssetKindSelectorVM.LoadAsync(am.AssetKind);
+
+            return vm;
+        }
+
+        /// <summary>
         /// 帳簿設定VMを取得する
         /// </summary>
         /// <param name="accountId">表示対象の帳簿ID</param>
@@ -40,13 +60,13 @@ namespace HouseholdAccountBook.ViewModels.Loaders
 
             AccountSettingViewModel vm = null;
 
-            IEnumerable<AccountModel> bmList = await this.mAppService.LoadAccountListAsync(initialName: Properties.Resources.ListName_None);
+            IEnumerable<AccountModel> amList = await this.mAppService.LoadAccountListAsync(initialName: Properties.Resources.ListName_None);
             AccountModel am = await this.mService.LoadAccountAsync(accountId);
 
             vm = new(am);
             vm.AccountKindSelectorVM.SetLoader(() => UiConstants.AccountKindStr);
             await vm.AccountKindSelectorVM.LoadAsync(am.AccountKind);
-            vm.DebitAccountSelectorVM.SetLoader(() => bmList.Where(tmpVM => tmpVM.Id != accountId));
+            vm.DebitAccountSelectorVM.SetLoader(() => amList.Where(tmpVM => tmpVM.Id != accountId));
             await vm.DebitAccountSelectorVM.LoadAsync(am.DebitAccountId);
             vm.TextEncodingSelectorVM.SetLoader(() => EncodingUtil.GetTextEncodingList());
             await vm.TextEncodingSelectorVM.LoadAsync(am.TextEncoding);

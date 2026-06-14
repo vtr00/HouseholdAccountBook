@@ -21,6 +21,16 @@ namespace HouseholdAccountBook.ViewModels
 //          { DBKind.Access,        "Access" },
         };
         /// <summary>
+        /// アセット種別文字列
+        /// </summary>
+        public static Dictionary<AssetKind, string> AssetKindStr => new() {
+            { AssetKind.Currency,   Properties.Resources.AssetKind_Currency },
+            { AssetKind.Security,   Properties.Resources.AssetKind_Security },
+            { AssetKind.Crypto,     Properties.Resources.AssetKind_Crypto },
+            { AssetKind.Point,      Properties.Resources.AssetKind_Point },
+            { AssetKind.Other,      Properties.Resources.AssetKind_Other }
+        };
+        /// <summary>
         /// 帳簿種別文字列
         /// </summary>
         public static Dictionary<AccountKind, string> AccountKindStr => new() {
