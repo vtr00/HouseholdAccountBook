@@ -48,7 +48,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             AccountModel bm = new(accountId, dto.BookName) {
                 SortOrder = dto.SortOrder,
-                AccountKind = (AccountKind)dto.BookKind,
+                AccountKind = EnumUtil.SafeCastEnum(dto.BookKind, AccountKind.Uncategorized),
                 Remark = jsonObj?.Remark ?? string.Empty,
                 InitialValue = dto.InitialValue,
                 StartDateExists = jsonObj?.StartDate != null,
@@ -175,7 +175,7 @@ namespace HouseholdAccountBook.Models.AppServices
             foreach (ItemRelFromBookInfoDto dto in dtoList) {
                 RelationModel rvm = new() {
                     Id = dto.ItemId,
-                    Name = $"{BalanceKindStr[(BalanceKind)dto.BalanceKind]} > {dto.CategoryName} > {dto.ItemName}",
+                    Name = $"{BalanceKindStr[EnumUtil.SafeCastEnum(dto.BalanceKind, BalanceKind.Income)]} > {dto.CategoryName} > {dto.ItemName}",
                     IsRelated = dto.IsRelated
                 };
                 rvmList.Add(rvm);
@@ -381,7 +381,7 @@ namespace HouseholdAccountBook.Models.AppServices
             MstCategoryDao mstCategoryDao = new(dbHandler);
             MstCategoryDto dto = await mstCategoryDao.FindByIdAsync((int)categoryId);
 
-            CategoryModel category = new(categoryId, dto.CategoryName, (BalanceKind)dto.BalanceKind) {
+            CategoryModel category = new(categoryId, dto.CategoryName, EnumUtil.SafeCastEnum(dto.BalanceKind, BalanceKind.Income)) {
                 SortOrder = dto.SortOrder
             };
 

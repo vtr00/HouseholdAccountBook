@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
@@ -85,7 +86,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             while (vm?.Kind != HierarchicalKind.Balance) {
                 vm = vm.ParentVM;
             }
-            CategoryIdObj categoryId = await this.mSettingService.AddCategoryAsync((BalanceKind)vm.Id.Id);
+            CategoryIdObj categoryId = await this.mSettingService.AddCategoryAsync(EnumUtil.SafeCastEnum(vm.Id.Id, BalanceKind.Income));
 
             await this.LoadAsync(HierarchicalKind.Category, categoryId);
             this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);

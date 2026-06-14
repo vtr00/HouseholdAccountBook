@@ -8,6 +8,7 @@ using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.Views;
 using System;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Windows;
 
@@ -100,7 +101,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// 選択帳簿ID
         /// </summary>
         public AccountIdObj SelectedAccountId {
-            get => this.mSettings.MainWindow_SelectedBookId == (int)AccountIdObj.System ? AccountIdObj.System : this.mSettings.MainWindow_SelectedBookId;
+            get => this.mSettings.MainWindow_SelectedBookId == (int)AccountIdObj.System ? AccountIdObj.System : Math.Max(0, this.mSettings.MainWindow_SelectedBookId);
             set {
                 this.mSettings.MainWindow_SelectedBookId = (int)value;
                 this.mSettings.Save();
@@ -206,9 +207,9 @@ namespace HouseholdAccountBook.Models.AppServices
         /// 開始月
         /// </summary>
         public int FiscalStartMonth {
-            get => this.mSettings.App_StartMonth;
+            get => Math.Clamp(this.mSettings.App_StartMonth, 1, 12);
             set {
-                this.mSettings.App_StartMonth = value;
+                this.mSettings.App_StartMonth = Math.Clamp(value, 1, 12);
                 this.mSettings.Save();
             }
         }
@@ -220,12 +221,12 @@ namespace HouseholdAccountBook.Models.AppServices
             get => new() {
                 Url = this.mSettings.App_NationalHolidayCsv_Uri,
                 TextEncoding = Encoding.GetEncoding(this.mSettings.App_NationalHolidayCsv_TextEncoding),
-                DateIndex = this.mSettings.App_NationalHolidayCsv_DateIndex
+                DateIndex = Math.Max(0, this.mSettings.App_NationalHolidayCsv_DateIndex)
             };
             set {
                 this.mSettings.App_NationalHolidayCsv_Uri = value.Url;
                 this.mSettings.App_NationalHolidayCsv_TextEncoding = value.TextEncoding.CodePage;
-                this.mSettings.App_NationalHolidayCsv_DateIndex = value.DateIndex;
+                this.mSettings.App_NationalHolidayCsv_DateIndex = Math.Max(0, value.DateIndex);
                 this.mSettings.Save();
             }
         }
@@ -238,12 +239,12 @@ namespace HouseholdAccountBook.Models.AppServices
         public LogImpl.Configuration LogConfig {
             get => new() {
                 OutputLogToFile = this.mSettings.App_OutputFlag_OperationLog,
-                LogFileAmount = this.mSettings.App_OperationLogNum,
+                LogFileAmount = Math.Max(0, this.mSettings.App_OperationLogNum),
                 OutputLogLevel = (Log.LogLevel)this.mSettings.App_OperationLogLevel
             };
             set {
                 this.mSettings.App_OutputFlag_OperationLog = value.OutputLogToFile;
-                this.mSettings.App_OperationLogNum = value.LogFileAmount;
+                this.mSettings.App_OperationLogNum = Math.Max(0, value.LogFileAmount);
                 this.mSettings.App_OperationLogLevel = (int)value.OutputLogLevel;
                 this.mSettings.Save();
             }
@@ -254,10 +255,10 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         public ExceptionLog.Configuration ExceptionLogConfig {
             get => new() {
-                LogFileAmount = this.mSettings.App_UnhandledExceptionLogNum
+                LogFileAmount = Math.Max(0, this.mSettings.App_UnhandledExceptionLogNum)
             };
             set {
-                this.mSettings.App_UnhandledExceptionLogNum = value.LogFileAmount;
+                this.mSettings.App_UnhandledExceptionLogNum = Math.Max(0, value.LogFileAmount);
                 this.mSettings.Save();
             }
         }
@@ -268,11 +269,11 @@ namespace HouseholdAccountBook.Models.AppServices
         public WindowLog.Configulation WindowLogConfig {
             get => new() {
                 OutputLog = this.mSettings.App_OutputFlag_WindowLog,
-                LogFileAmount = this.mSettings.App_WindowLogNum
+                LogFileAmount = Math.Max(0, this.mSettings.App_WindowLogNum)
             };
             set {
                 this.mSettings.App_OutputFlag_WindowLog = value.OutputLog;
-                this.mSettings.App_WindowLogNum = value.LogFileAmount;
+                this.mSettings.App_WindowLogNum = Math.Max(0, value.LogFileAmount);
                 this.mSettings.Save();
             }
         }
@@ -578,7 +579,7 @@ namespace HouseholdAccountBook.Models.AppServices
             get {
                 NpgsqlDbHandler.ConnectInfo connectInfo = new() {
                     Host = this.mSettings.App_Postgres_Host,
-                    Port = this.mSettings.App_Postgres_Port,
+                    Port = Math.Clamp(this.mSettings.App_Postgres_Port, IPEndPoint.MinPort, IPEndPoint.MaxPort),
                     UserName = this.mSettings.App_Postgres_UserName,
                     Password = this.mSettings.App_Postgres_Password,
 #if DEBUG
@@ -719,19 +720,19 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         public DbBackUpManager.Configuration DbBackupConfig {
             get => new() {
-                Amount = this.mSettings.App_BackUpNum,
+                Amount = Math.Max(0, this.mSettings.App_BackUpNum),
                 TargetFolderPath = this.mSettings.App_BackUpFolderPath,
                 ExecuteAtMinimizing = this.mSettings.App_BackUpFlagAtMinimizing,
-                IntervalMinAtMinimizing = this.mSettings.App_BackUpIntervalMinAtMinimizing,
+                IntervalMinAtMinimizing = Math.Max(0, this.mSettings.App_BackUpIntervalMinAtMinimizing),
                 NotifyAtMinimizing = this.mSettings.App_BackUpNotifyAtMinimizing,
                 ExecuteAtClosing = this.mSettings.App_BackUpFlagAtClosing,
                 Condition = EnumUtil.SafeCastEnum(this.mSettings.App_BackUpCondition, BackUpCondition.Always)
             };
             set {
-                this.mSettings.App_BackUpNum = value.Amount;
+                this.mSettings.App_BackUpNum = Math.Max(0, value.Amount);
                 this.mSettings.App_BackUpFolderPath = value.TargetFolderPath;
                 this.mSettings.App_BackUpFlagAtMinimizing = value.ExecuteAtMinimizing;
-                this.mSettings.App_BackUpIntervalMinAtMinimizing = value.IntervalMinAtMinimizing;
+                this.mSettings.App_BackUpIntervalMinAtMinimizing = Math.Max(0, value.IntervalMinAtMinimizing);
                 this.mSettings.App_BackUpNotifyAtMinimizing = value.NotifyAtMinimizing;
                 this.mSettings.App_BackUpFlagAtClosing = value.ExecuteAtClosing;
                 this.mSettings.App_BackUpCondition = (int)value.Condition;

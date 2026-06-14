@@ -5,6 +5,7 @@ using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
@@ -247,7 +248,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
                 foreach (SummaryInfoDto dto in dtoList) {
                     smList.Add(new() {
-                        Category = new(dto.CategoryId, dto.CategoryName, (BalanceKind)dto.BalanceKind),
+                        Category = new(dto.CategoryId, dto.CategoryName, EnumUtil.SafeCastEnum(dto.BalanceKind, BalanceKind.Income)),
                         Item = new(dto.ItemId, dto.ItemName),
                         Total = dto.Total
                     });

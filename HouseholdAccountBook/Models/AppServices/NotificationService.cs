@@ -23,6 +23,8 @@ namespace HouseholdAccountBook.Models.AppServices
         private static readonly Brush mErrorForeground = Brushes.LightPink;
         private static readonly Brush mErrorBackground = Brushes.DarkRed;
 
+        private static readonly BitmapImage mIcon = new(new Uri("pack://application:,,,/Resources/resheet.ico"));
+
         /// <summary>
         /// 捕捉されない例外を通知する
         /// </summary>
@@ -37,7 +39,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 Type = NotificationType.Error,
                 Background = mErrorBackground,
                 Foreground = mErrorForeground,
-                Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
+                Icon = mIcon
             };
             nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
                 Log.Info($"Create Unhandled Exception Info Absolute File: {absoluteLogFilePath}");
@@ -67,7 +69,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 Type = NotificationType.Warning,
                 Background = mWarningBackground,
                 Foreground = mWarningForeground,
-                Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
+                Icon = mIcon
             };
             nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
         }
@@ -85,7 +87,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 Type = NotificationType.Warning,
                 Background = mWarningBackground,
                 Foreground = mWarningForeground,
-                Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
+                Icon = mIcon
             };
             nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
         }
@@ -103,7 +105,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 Type = NotificationType.Information,
                 Background = mInformationBackground,
                 Foreground = mInformationForeground,
-                Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
+                Icon = mIcon
             };
             nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
         }
@@ -123,7 +125,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 Type = NotificationType.Information,
                 Background = mInformationBackground,
                 Foreground = mInformationForeground,
-                Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
+                Icon = mIcon
             };
             nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10), onClick: () => {
                 if (latestHtmlUrl != null) {
@@ -151,7 +153,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 Type = NotificationType.Information,
                 Background = mInformationBackground,
                 Foreground = mInformationForeground,
-                Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
+                Icon = mIcon
             };
             nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
         }
@@ -168,7 +170,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 Type = NotificationType.Error,
                 Background = mErrorBackground,
                 Foreground = mErrorForeground,
-                Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/resheet.ico"))
+                Icon = mIcon
             };
             nm.Show(nc, expirationTime: new TimeSpan(0, 0, 10));
         }

@@ -71,7 +71,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
 
             foreach (ItemTreeViewModel balanceVM in vmList) {
                 // 分類
-                new List<CategoryModel>(await this.mService.LoadCategoryListAsync((BalanceKind)balanceVM.Id.Id))
+                new List<CategoryModel>(await this.mService.LoadCategoryListAsync(EnumUtil.SafeCastEnum(balanceVM.Id.Id, BalanceKind.Income)))
                     .ForEach(cm => balanceVM.ChildrenVMList.Add(new ItemTreeViewModel(cm) { ParentVM = balanceVM, ChildrenVMList = [] }));
 
                 foreach (ItemTreeViewModel categoryVM in balanceVM.ChildrenVMList) {

@@ -3,6 +3,7 @@ using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Attributes;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using System.Net;
 
 namespace HouseholdAccountBook.Models.DbHandlers
 {
@@ -62,7 +63,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
             {
                 bool ret = true;
                 ret = ret && (this.Host?.IsValidDBIdentifier() ?? false);
-                ret = ret && (this.Port is >= 0 and <= 65535);
+                ret = ret && (this.Port is >= IPEndPoint.MinPort and <= IPEndPoint.MaxPort);
                 ret = ret && (this.UserName?.IsValidDBIdentifier() ?? false);
                 ret = ret && (this.DatabaseName?.IsValidDBIdentifier() ?? false);
                 ret = ret && (this.Role?.IsValidDBIdentifier() ?? false);

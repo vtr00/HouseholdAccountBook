@@ -5,6 +5,7 @@ using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
@@ -65,7 +66,7 @@ namespace HouseholdAccountBook.Models.AppServices
             GroupInfoDao groupInfoDao = new(dbHandler);
             GroupInfoDto dto = await groupInfoDao.FindByActionId((int)actionId);
 
-            GroupKind groupKind = (GroupKind)(dto.GroupKind ?? -1);
+            GroupKind groupKind = EnumUtil.SafeCastEnum(dto.GroupKind, GroupKind.NotInOne);
 
             int count = 1;
             if (groupKind == GroupKind.Repeat) {
