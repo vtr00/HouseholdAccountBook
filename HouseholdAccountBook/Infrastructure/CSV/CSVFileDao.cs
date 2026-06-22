@@ -68,7 +68,7 @@ namespace HouseholdAccountBook.Infrastructure.CSV
                                 name = null;
                             }
                             if (!reader.TryGetField(expensesIndex - 1, out string valueStr) ||
-                                !int.TryParse(valueStr, NumberStyles.Any, NumberFormatInfo.CurrentInfo, out int value)) {
+                                !decimal.TryParse(valueStr, NumberStyles.Any, NumberFormatInfo.CurrentInfo, out decimal value)) {
                                 continue;
                             }
 

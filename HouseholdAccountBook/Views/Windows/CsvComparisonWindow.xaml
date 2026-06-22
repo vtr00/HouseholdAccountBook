@@ -201,12 +201,12 @@
                     <TextBlock Text="{x:Static properties:Resources.TextBlock_Checked}"/>: 
                     <TextBlock Text="{Binding AllCheckedCount}"/> / <TextBlock Text="{Binding CsvCompSelectorVM.Count}"/><TextBlock Text="  "/>
                     <TextBlock Text="{x:Static properties:Resources.TextBlock_Sum}"/>:
-                    <TextBlock Text="{Binding AllSumValue, Converter={StaticResource IntToMoneyDisplayConverter}}"/><TextBlock Text="  "/>
+                    <TextBlock Text="{Binding AllSumValueStr}"/><TextBlock Text="  "/>
                     [<TextBlock Text="{x:Static properties:Resources.TextBlock_Selection}"/>]
                     <TextBlock Text="{x:Static properties:Resources.TextBlock_Checked}"/>:
                     <TextBlock Text="{Binding SelectedCheckedCount}"/> / <TextBlock Text="{Binding CsvCompSelectorVM.SelectedCount}"/><TextBlock Text="  "/>
                     <TextBlock Text="{x:Static properties:Resources.TextBlock_Sum}"/>:
-                    <TextBlock Text="{Binding SelectedSumValue, Converter={StaticResource IntToMoneyDisplayConverter}}"/>
+                    <TextBlock Text="{Binding SelectedSumValueStr}"/>
                 </TextBlock>
             </StatusBarItem>
         </StatusBar>

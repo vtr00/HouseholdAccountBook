@@ -4,6 +4,7 @@ using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.ValueObjects;
+using HouseholdAccountBook.Properties;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Extensions;
@@ -211,7 +212,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
 
             // 縦軸 - 線形軸
-            string unitY = Properties.Resources.Unit_DefaultMoney;
+            string unitY = AssetService.Instance.GetDefaultAssetModel()?.Name ?? Resources.Unit_DefaultMoney;
             LinearAxis GetVerticalAxis()
             {
                 return new() {

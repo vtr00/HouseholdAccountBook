@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -55,8 +56,16 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// </summary>
         public decimal InputedInitialValue {
             get;
-            set => this.SetProperty(ref field, value);
+            set {
+                if (this.SetProperty(ref field, value)) {
+                    this.RaisePropertyChanged(nameof(this.InputedInitialValue));
+                }
+            }
         }
+        /// <summary>
+        /// 入力された初期残高(表示値)
+        /// </summary>
+        public string InputedInitialValueStr => AssetService.Instance.ToAssetString(this.InputedInitialValue, null, UnitKind.MainUnit);
 
         #region 期間情報
         /// <summary>

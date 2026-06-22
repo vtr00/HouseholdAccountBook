@@ -139,6 +139,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public decimal? AverageValue => this.Count != 0 ? (this.SumValue / this.Count) : null;
         /// <summary>
+        /// 選択されたデータの平均値(平均値)
+        /// </summary>
+        public string AverageValueStr => AssetService.Instance.ToAssetString(this.AverageValue, null, UnitKind.MainUnit);
+        /// <summary>
         /// 選択されたデータの個数
         /// </summary>
         public int Count => this.ActionSelectorVM.SelectedItemList.Count(static vm => vm.BalanceKind != BalanceKind.Others);
@@ -147,13 +151,25 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public decimal SumValue => this.IncomeSumValue + this.ExpensesSumValue;
         /// <summary>
+        /// 選択されたデータの合計値(文字列)
+        /// </summary>
+        public string SumValueStr => AssetService.Instance.ToAssetString(this.SumValue, null, UnitKind.MainUnit);
+        /// <summary>
         /// 選択されたデータの収入合計値
         /// </summary>
         public decimal IncomeSumValue => this.ActionSelectorVM.SelectedItemList.Sum(static vm => vm.BalanceKind == BalanceKind.Income ? vm.Amount : 0);
         /// <summary>
+        /// 選択されたデータの収入合計値(文字列)
+        /// </summary>
+        public string IncomeSumValueStr => AssetService.Instance.ToAssetString(this.IncomeSumValue, null, UnitKind.MainUnit);
+        /// <summary>
         /// 選択されたデータの支出合計値
         /// </summary>
         public decimal ExpensesSumValue => this.ActionSelectorVM.SelectedItemList.Sum(static vm => vm.BalanceKind == BalanceKind.Expenses ? vm.Amount : 0);
+        /// <summary>
+        /// 選択されたデータの支出合計値(文字列)
+        /// </summary>
+        public string ExpensesSumValueStr => AssetService.Instance.ToAssetString(this.ExpensesSumValue, null, UnitKind.MainUnit);
 
         /// <summary>
         /// 概要セレクタVM
@@ -640,10 +656,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             // 帳簿項目選択変更時
             this.ActionSelectorVM.SelectedCollectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.AverageValue));
+                this.RaisePropertyChanged(nameof(this.AverageValueStr));
                 this.RaisePropertyChanged(nameof(this.Count));
                 this.RaisePropertyChanged(nameof(this.SumValue));
+                this.RaisePropertyChanged(nameof(this.SumValueStr));
                 this.RaisePropertyChanged(nameof(this.IncomeSumValue));
+                this.RaisePropertyChanged(nameof(this.IncomeSumValueStr));
                 this.RaisePropertyChanged(nameof(this.ExpensesSumValue));
+                this.RaisePropertyChanged(nameof(this.ExpensesSumValueStr));
 
                 this.RaisePropertyChanged(nameof(this.IsMatch));
             };
