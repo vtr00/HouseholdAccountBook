@@ -39,6 +39,12 @@ namespace HouseholdAccountBook.Models.AppServices
         }
 
         /// <summary>
+        /// デフォルトアセットモデルを取得する
+        /// </summary>
+        /// <returns>デフォルトアセットモデル</returns>
+        public AssetModel GetDefaultAssetModel() => this.mAssets.FirstOrDefault(asset => asset.Id == UserSettingService.Instance.DefaultAssetId);
+
+        /// <summary>
         /// 金額を文字列表現に変換する
         /// </summary>
         /// <param name="value">DB管理値(補助単位値)</param>
@@ -46,33 +52,35 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="kind">単位種別</param>
         /// <param name="position">単位位置</param>
         /// <returns>金額の文字列表現</returns>
-        public string ToAssetString(decimal value, AssetIdObj assetId, UnitKind kind, UnitPosition position)
+        public string ToAssetString(decimal? value, AssetIdObj assetId, UnitKind kind, UnitPosition position = UnitPosition.Both)
         {
             using FuncLog funcLog = new(new { value, assetId, kind, position }, Log.LogLevel.Trace);
 
-            AssetModel asset = this.mAssets.FirstOrDefault(asset => asset.Id == assetId);
+            AssetModel asset = this.mAssets.FirstOrDefault(asset => asset.Id == assetId, this.GetDefaultAssetModel());
             if (asset is null) { return value.ToString(); }
 
-            string valueStr = value.ToString();
-            string ret = value.ToString();
+            decimal tmpValue = value ?? 0;
+            string signStr = Math.Sign(tmpValue) < 0 ? "-" : string.Empty;
+            string absValueStr = Math.Abs(tmpValue).ToString();
+            string ret = Math.Abs(tmpValue).ToString();
 
             switch (kind) {
                 case UnitKind.MainUnit:
-                    valueStr = (value / (decimal)Math.Pow(10, asset.Scale)).ToString($"N{asset.Scale}"); // 数値のみの文字列表現
+                    absValueStr = Math.Abs(tmpValue / (decimal)Math.Pow(10, asset.Scale)).ToString($"N{asset.Scale}"); // 数値のみの文字列表現
                     ret = position switch {
-                        UnitPosition.Pre => $"{asset.Prefix}{valueStr}",
-                        UnitPosition.Post => $"{valueStr}{asset.Suffix}",
-                        UnitPosition.Both => $"{asset.Prefix}{valueStr}{asset.Suffix}",
-                        _ => $"{valueStr}"
+                        UnitPosition.Pre => $"{signStr}{asset.Prefix}{absValueStr}",
+                        UnitPosition.Post => $"{signStr}{absValueStr}{asset.Suffix}",
+                        UnitPosition.Both => $"{signStr}{asset.Prefix}{absValueStr}{asset.Suffix}",
+                        _ => $"{signStr}{absValueStr}"
                     };
                     break;
                 case UnitKind.SubUnit:
-                    valueStr = value.ToString();
+                    absValueStr = Math.Abs(tmpValue).ToString();
                     ret = position switch {
-                        UnitPosition.Pre => $"{asset.SubPrefix}{valueStr}",
-                        UnitPosition.Post => $"{valueStr}{asset.SubSuffix}",
-                        UnitPosition.Both => $"{asset.SubPrefix}{valueStr}{asset.SubSuffix}",
-                        _ => $"{valueStr}"
+                        UnitPosition.Pre => $"{signStr}{asset.SubPrefix}{absValueStr}",
+                        UnitPosition.Post => $"{signStr}{absValueStr}{asset.SubSuffix}",
+                        UnitPosition.Both => $"{signStr}{asset.SubPrefix}{absValueStr}{asset.SubSuffix}",
+                        _ => $"{signStr}{absValueStr}"
                     };
                     break;
             }

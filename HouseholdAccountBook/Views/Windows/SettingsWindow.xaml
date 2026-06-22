@@ -264,6 +264,7 @@
                         <ColumnDefinition Width="0.6*"/>
                     </Grid.ColumnDefinitions>
 
+                    <!-- 帳簿一覧 -->
                     <GroupBox Grid.Column="0" Header="{x:Static properties:Resources.GroupHeader_AccountList}">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -300,6 +301,7 @@
                             <RowDefinition Height="1*"/>
                         </Grid.RowDefinitions>
 
+                        <!-- 帳簿情報 -->
                         <ScrollViewer Grid.Row="0">
                             <StackPanel Grid.IsSharedSizeScope="True">
                                 <GroupBox Header="{x:Static properties:Resources.GroupHeader_AccountInformation}">
@@ -360,8 +362,7 @@
                                         <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_InitialBalance}"/>
                                         <controls:NumericUpDown Grid.Row="5" Grid.Column="1" Margin="5" Value="{Binding InputedInitialValue}"/>
-                                        <TextBlock Grid.Row="5" Grid.Column="2" Margin="5" HorizontalAlignment="Right"
-                                                   Text="{Binding InputedInitialValue, Converter={StaticResource IntToMoneyDisplayConverter}, TargetNullValue=0}"/>
+                                        <TextBlock Grid.Row="5" Grid.Column="2" Margin="5" HorizontalAlignment="Right" Text="{Binding InputedInitialValueStr}"/>
 
                                         <!-- 期間情報 -->
                                         <GroupBox Grid.Row="6" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_PeriodInformation}">

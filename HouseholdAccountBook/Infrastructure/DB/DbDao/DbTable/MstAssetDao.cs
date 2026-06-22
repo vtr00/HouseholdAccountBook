@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Properties;
 using System;
 using System.Collections.Generic;
@@ -162,13 +163,13 @@ RETURNING asset_id;", dto);
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
             MstAssetDto dto = new() {
-                AssetName = "円",
+                AssetName = Resources.Unit_DefaultMoney,
                 SubunitName = null,
                 AssetCode = "JPY",
-                AssetKind = (int)0,
+                AssetKind = (int)AssetKind.Currency,
                 Scale = 0,
                 Prefix = @"\",
-                Suffix = Resources.Unit_DefaultMoney,
+                Suffix = string.Empty,
                 SubPrefix = null,
                 SubSuffix = null,
                 BaseRate = 1

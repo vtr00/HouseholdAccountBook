@@ -579,13 +579,13 @@
                         <StatusBarItem HorizontalAlignment="Right">
                             <TextBlock>
                                 [<TextBlock Text="{x:Static properties:Resources.TextBlock_Selection}"/>] <TextBlock Text="{x:Static properties:Resources.TextBlock_Average}"/>: 
-                                <TextBlock Text="{Binding AverageValue, TargetNullValue='--', Converter={StaticResource IntToMoneyDisplayConverter}}"/><TextBlock Text="  "/>
+                                <TextBlock Text="{Binding AverageValueStr}"/><TextBlock Text="  "/>
                                 <TextBlock Text="{x:Static properties:Resources.TextBlock_DataCount}"/>: 
                                 <TextBlock Text="{Binding Count, TargetNullValue='--'}"/><TextBlock Text="  "/>
                                 <TextBlock Text="{x:Static properties:Resources.TextBlock_Sum}"/>: 
-                                <TextBlock Text="{Binding SumValue, Converter={StaticResource IntToMoneyDisplayConverter}}"/>
-                                 (<TextBlock Text="{Binding IncomeSumValue, Converter={StaticResource IntToMoneyDisplayConverter}}"/>, 
-                                <TextBlock Text="{Binding ExpensesSumValue, Converter={StaticResource IntToMoneyDisplayConverter}}"/>)
+                                <TextBlock Text="{Binding SumValueStr}"/>
+                                 (<TextBlock Text="{Binding IncomeSumValueStr}"/>, 
+                                <TextBlock Text="{Binding ExpensesSumValueStr}"/>)
                             </TextBlock>
                         </StatusBarItem>
                     </StatusBar>

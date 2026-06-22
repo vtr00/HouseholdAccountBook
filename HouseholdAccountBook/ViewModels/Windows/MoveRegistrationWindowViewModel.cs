@@ -149,9 +149,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
             set {
                 if (this.SetProperty(ref field, value)) {
                     CommandManager.InvalidateRequerySuggested();
+                    this.RaisePropertyChanged(nameof(this.InputedValueStr));
                 }
             }
         }
+        /// <summary>
+        /// 入力された金額(文字列)
+        /// </summary>
+        public string InputedValueStr => AssetService.Instance.ToAssetString(this.InputedValue, null, UnitKind.MainUnit);
 
         /// <summary>
         /// 手数料の帳簿項目ID
@@ -179,9 +184,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
             set {
                 if (this.SetProperty(ref field, value)) {
                     CommandManager.InvalidateRequerySuggested();
+                    this.RaisePropertyChanged(nameof(this.InputedCommissionStr));
                 }
             }
         }
+        /// <summary>
+        /// 入力された手数料(文字列)
+        /// </summary>
+        public string InputedCommissionStr => AssetService.Instance.ToAssetString(this.InputedCommission, null, UnitKind.MainUnit);
 
         /// <summary>
         /// 備考セレクタVM

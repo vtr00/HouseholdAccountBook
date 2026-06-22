@@ -14,9 +14,9 @@ namespace HouseholdAccountBook.Infrastructure.CSV
         public DateTime Date { get; init; }
 
         /// <summary>
-        /// 値
+        /// 値(主単位)
         /// </summary>
-        public int Value { get; init; }
+        public decimal Value { get; init; }
 
         /// <summary>
         /// 名称

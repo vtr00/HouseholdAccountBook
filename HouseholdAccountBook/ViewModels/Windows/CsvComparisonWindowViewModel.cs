@@ -98,7 +98,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// CSV比較VMの合計値
         /// </summary>
-        public int AllSumValue => this.CsvCompSelectorVM.ItemList.Sum(static vm => vm.Record.Value);
+        public decimal AllSumValue => this.CsvCompSelectorVM.ItemList.Sum(static vm => vm.Record.Value);
+        /// <summary>
+        /// CSV比較VMの合計値(文字列)
+        /// </summary>
+        public string AllSumValueStr => AssetService.Instance.ToAssetString(this.AllSumValue, null, UnitKind.MainUnit);
 
         /// <summary>
         /// 選択されたCSV比較VMのチェック数
@@ -107,7 +111,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 選択されたCSV比較VMの合計値
         /// </summary>
-        public int SelectedSumValue => this.CsvCompSelectorVM.SelectedItemList.Sum(static vm => vm.Record.Value);
+        public decimal SelectedSumValue => this.CsvCompSelectorVM.SelectedItemList.Sum(static vm => vm.Record.Value);
+        /// <summary>
+        /// 選択されたCSV比較VMの合計値(文字列)
+        /// </summary>
+        public string SelectedSumValueStr => AssetService.Instance.ToAssetString(this.SelectedSumValue, null, UnitKind.MainUnit);
 
         /// <summary>
         /// チェック数変更を通知する
@@ -474,6 +482,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.CsvCompSelectorVM.CollectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.AllCheckedCount));
                 this.RaisePropertyChanged(nameof(this.AllSumValue));
+                this.RaisePropertyChanged(nameof(this.AllSumValueStr));
 
                 if (e.OldItems != null) {
                     foreach (object tmp in e.OldItems) {
@@ -493,6 +502,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.CsvCompSelectorVM.SelectedCollectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.SelectedCheckedCount));
                 this.RaisePropertyChanged(nameof(this.SelectedSumValue));
+                this.RaisePropertyChanged(nameof(this.SelectedSumValueStr));
             };
         }
 
