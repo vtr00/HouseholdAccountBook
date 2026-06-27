@@ -49,12 +49,13 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <param name="value">DB管理値(補助単位値)</param>
         /// <param name="assetId">アセットID</param>
-        /// <param name="kind">単位種別</param>
+        /// <param name="inputKind">入力値単位種別</param>
+        /// <param name="outputKind">出力値単位種別</param>
         /// <param name="position">単位位置</param>
         /// <returns>金額の文字列表現</returns>
-        public string ToAssetString(decimal? value, AssetIdObj assetId, UnitKind kind, UnitPosition position = UnitPosition.Both)
+        public string ToAssetString(decimal? value, AssetIdObj assetId, UnitKind inputKind, UnitKind outputKind, UnitPosition position = UnitPosition.Both)
         {
-            using FuncLog funcLog = new(new { value, assetId, kind, position }, Log.LogLevel.Trace);
+            using FuncLog funcLog = new(new { value, assetId, inputKind, outputKind, position }, Log.LogLevel.Trace);
 
             AssetModel asset = this.mAssets.FirstOrDefault(asset => asset.Id == assetId, this.GetDefaultAssetModel());
             if (asset is null) { return value.ToString(); }
@@ -64,9 +65,18 @@ namespace HouseholdAccountBook.Models.AppServices
             string absValueStr = Math.Abs(tmpValue).ToString();
             string ret = Math.Abs(tmpValue).ToString();
 
-            switch (kind) {
+            switch (outputKind) {
                 case UnitKind.MainUnit:
-                    absValueStr = Math.Abs(tmpValue / (decimal)Math.Pow(10, asset.Scale)).ToString($"N{asset.Scale}"); // 数値のみの文字列表現
+                    // 数値のみの文字列表現
+                    switch (inputKind) {
+                        case UnitKind.MainUnit:
+                            absValueStr = Math.Abs(tmpValue).ToString($"N{asset.Scale}");
+                            break;
+                        case UnitKind.SubUnit:
+                            absValueStr = Math.Abs(tmpValue / (decimal)Math.Pow(10, asset.Scale)).ToString($"N{asset.Scale}");
+                            break;
+                    }
+
                     ret = position switch {
                         UnitPosition.Pre => $"{signStr}{asset.Prefix}{absValueStr}",
                         UnitPosition.Post => $"{signStr}{absValueStr}{asset.Suffix}",
@@ -75,7 +85,16 @@ namespace HouseholdAccountBook.Models.AppServices
                     };
                     break;
                 case UnitKind.SubUnit:
-                    absValueStr = Math.Abs(tmpValue).ToString();
+                    // 数値のみの文字列表現
+                    switch (inputKind) {
+                        case UnitKind.MainUnit:
+                            absValueStr = Math.Abs(tmpValue * (decimal)Math.Pow(10, asset.Scale)).ToString($"N0");
+                            break;
+                        case UnitKind.SubUnit:
+                            absValueStr = Math.Abs(tmpValue).ToString($"N0");
+                            break;
+                    }
+
                     ret = position switch {
                         UnitPosition.Pre => $"{signStr}{asset.SubPrefix}{absValueStr}",
                         UnitPosition.Post => $"{signStr}{absValueStr}{asset.SubSuffix}",

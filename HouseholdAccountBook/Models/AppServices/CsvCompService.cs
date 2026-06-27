@@ -1,4 +1,5 @@
-﻿using HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions;
+﻿using HouseholdAccountBook.Infrastructure.CSV;
+using HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions;
 using HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable;
 using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
 using HouseholdAccountBook.Infrastructure.DB.DbDto.Others;
@@ -10,6 +11,7 @@ using HouseholdAccountBook.Models.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Models.AppServices
@@ -58,23 +60,48 @@ namespace HouseholdAccountBook.Models.AppServices
         }
 
         /// <summary>
+        /// 帳簿項目CSV Modelリストを取得する
+        /// </summary>
+        /// <param name="csvFilePathList">読み込むCSVファイルのパスリスト</param>
+        /// <param name="actDateIndex">日付インデックス</param>
+        /// <param name="itemNameIndex">項目名インデックス</param>
+        /// <param name="expensesIndex">支出インデックス</param>
+        /// <param name="encoding">エンコーディング</param>
+        /// <returns>読込結果</returns>
+        public async Task<IEnumerable<ActionCsvModel>> LoadCsvCompListAsync(IEnumerable<string> csvFilePathList, int actDateIndex, int itemNameIndex, int expensesIndex, Encoding encoding)
+        {
+            IEnumerable<ActionCsvDto> modelList = await CSVFileDao.LoadCsvCompListAsync(csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, encoding);
+
+            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
+            IEnumerable<ActionCsvModel> vmList = modelList.Select(x => new ActionCsvModel() {
+                Date = x.Date,
+                Value = new(x.Value, asset.Scale),
+                Name = x.Name
+            });
+
+            return vmList;
+        }
+
+        /// <summary>
         /// 一致する帳簿項目Modelリストを取得する
         /// </summary>
         /// <param name="accountId">帳簿ID</param>
         /// <param name="dateTime">日付</param>
         /// <param name="value">支出</param>
         /// <returns>帳簿Modelリスト</returns>
-        public async Task<IEnumerable<ActionModel>> LoadMatchedActionAsync(AccountIdObj accountId, DateTime dateTime, decimal value)
+        public async Task<IEnumerable<ActionModel>> LoadMatchedActionAsync(AccountIdObj accountId, DateTime dateTime, AmountObj value)
         {
             using FuncLog funcLog = new(new { accountId, dateTime, value });
+
+            AssetModel asset = AssetService.Instance.GetDefaultAssetModel(); // 帳簿に紐づくモデルに変更予定
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             ActionCompInfoDao actionCompInfoDao = new(dbHandler);
-            IEnumerable<ActionCompInfoDto> dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(accountId.Id, dateTime, (int)value);
-            IEnumerable<ActionModel> actionList = [.. dtoList.Select(static dto => new ActionModel() {
+            IEnumerable<ActionCompInfoDto> dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(accountId.Id, (int)UserSettingService.Instance.DefaultAssetId, dateTime, value.MainValue);
+            IEnumerable<ActionModel> actionList = [.. dtoList.Select(dto => new ActionModel() {
                     GroupId = dto.GroupId,
                     Item = new(dto.ItemId, dto.ItemName),
-                    Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
+                    Base = new(dto.ActionId, dto.ActTime, new(dto.ActMainValue, asset.Scale)),
                     Shop = new(dto.ShopName),
                     Remark = new(dto.Remark),
                     IsMatch = dto.IsMatch == 1

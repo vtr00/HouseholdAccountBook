@@ -1,6 +1,6 @@
 ﻿using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
 using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.Args.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 using System.Runtime.CompilerServices;

@@ -1,8 +1,8 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
-using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
 using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.Args.RequestEventArgs;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -143,7 +143,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             AccountModel account = new(vm.Id, vm.InputedName) {
                 AccountKind = vm.AccountKindSelectorVM.SelectedKey,
                 Remark = vm.InputedRemark ?? string.Empty,
-                InitialValue = vm.InputedInitialValue,
+                InitialValue = new(vm.InputedInitialValue, vm.InitialValueScale),
                 StartDateExists = vm.SelectedIfStartDateExists,
                 EndDateExists = vm.SelectedIfEndDateExists,
                 Period = vm.InputedPeriod,

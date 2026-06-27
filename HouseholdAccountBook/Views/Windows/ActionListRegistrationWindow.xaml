@@ -126,6 +126,7 @@
                     </Style>
                 </DataGrid.ColumnHeaderStyle>
                 <DataGrid.Columns>
+                    <!-- 帳簿項目ID -->
                     <DataGridTextColumn Header="Id" Binding="{Binding ActionId, TargetNullValue='--'}" 
                                         Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}" IsReadOnly="True"/>
 
@@ -152,14 +153,13 @@
                         </DataGridTemplateColumn.CellStyle>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ActValue, TargetNullValue='', Converter={StaticResource IntToMoneyDisplayConverter}}" Margin="3,1" TextAlignment="Right"/>
+                                <TextBlock Margin="3,1" Text="{Binding ActValueStr}" TextAlignment="Right"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                         <DataGridTemplateColumn.CellEditingTemplate>
                             <DataTemplate>
-                                <TextBox Text="{Binding ActValue, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
-                                         TextAlignment="Right" InputMethod.IsInputMethodEnabled="False"
-                                         PreviewTextInput="TextBox_PreviewTextInput" GotFocus="TextBox_GotFocus"/>
+                                <controls:NumericUpDown Session="{Binding Session}" Value="{Binding ActValue, UpdateSourceTrigger=PropertyChanged}" Scale="{Binding Scale}" 
+                                                        GotFocus="NumericUpDown_GotFocus" IsMouseWheelEnabled="False" IsPopupEnabled="False"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>
                     </controls:DataGridEditableTemplateColumn>
@@ -183,7 +183,7 @@
                       ItemsSource="{Binding RemarkSelectorVM.ItemList}" Text="{Binding RemarkSelectorVM.SelectedKey, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
 
             <!-- 数値入力ポップアップ -->
-            <controls:FollowablePopup x:Name="_popup" IsOpen="{Binding IsEditing, Mode=TwoWay}" AllowsTransparency="True" Placement="Bottom">
+            <controls:FollowablePopup x:Name="_popup" IsOpen="{Binding IsOpenPopup, Mode=TwoWay}" AllowsTransparency="True" Placement="Bottom">
                 <controls:NumericInputButton InputedValue="{Binding InputedValue}" InputedKind="{Binding InputedKind}"
                                              Command="{StaticResource ButtonInputCommand}"/>
             </controls:FollowablePopup>

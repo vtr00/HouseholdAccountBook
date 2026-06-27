@@ -2,17 +2,17 @@
 using System;
 using System.Collections.Generic;
 
-namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
+namespace HouseholdAccountBook.Models.Args.RequestEventArgs
 {
     /// <summary>
-    /// 帳簿項目リスト編集要求イベント時のイベント引数
+    /// 帳簿項目複製要求イベント時のイベント引数
     /// </summary>
-    public class EditActionListRequestEventArgs : DbRequestEventArgsBase
+    public class CopyActionRequestEventArgs : DbRequestEventArgsBase
     {
         /// <summary>
-        /// 編集対象の帳簿項目のグループID
+        /// 複製対象の帳簿項目のID
         /// </summary>
-        public GroupIdObj TargetGroupId { get; set; }
+        public ActionIdObj TargetActionId { get; set; }
 
         /// <summary>
         /// 登録完了時イベントハンドラ

@@ -69,6 +69,5 @@ namespace HouseholdAccountBook.Infrastructure.Utilities
             // 分割したパスを返す
             return (directory, fileName);
         }
-
     }
 }

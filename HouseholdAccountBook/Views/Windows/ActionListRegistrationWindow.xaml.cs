@@ -1,8 +1,8 @@
-﻿using HouseholdAccountBook.Infrastructure.CSV;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
+﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.Args;
+using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.ViewModels.Component;
@@ -70,7 +70,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="initialAccountId">初期選択する帳簿のID</param>
         /// <param name="initialRecordList">初期表示するCSVレコードリスト</param>
-        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, IEnumerable<ActionCsvDto> initialRecordList)
+        public ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, IEnumerable<ActionCsvModel> initialRecordList)
             : this(owner, dbHandlerFactory, initialAccountId, null, null, initialRecordList, null, RegistrationKind.Add) { }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="targetGroupId">編集時、編集する帳簿項目のグループID</param>
         /// <param name="regKind">登録種別</param>
         private ActionListRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate,
-            IEnumerable<ActionCsvDto> initialRecordList, GroupIdObj targetGroupId, RegistrationKind regKind)
+            IEnumerable<ActionCsvModel> initialRecordList, GroupIdObj targetGroupId, RegistrationKind regKind)
         {
             using FuncLog funcLog = new(new { initialAccountId, initialMonth, initialDate, initialRecordList, targetGroupId, regKind });
 
@@ -126,75 +126,21 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private void ButtonInputCommand_Execute(object sender, ExecutedRoutedEventArgs e)
         {
-            TextBox textBox = this._popup.PlacementTarget as TextBox;
-            if (textBox.DataContext is not DateValueViewModel vm) {
-                vm = this.mLastDateValueVM; // textBoxのDataContextが取得できないため応急処置
-            }
+            NumericUpDown numericUpDown = this._popup.PlacementTarget as NumericUpDown;
 
-            switch (this.WVM.InputedKind) {
-                case NumericInputButton.InputKind.Number:
-                    int value = this.WVM.InputedValue.Value;
-                    if (vm.ActValue == null) {
-                        vm.ActValue = value;
-                        textBox.Text = string.Format($"{vm.ActValue}");
-                        textBox.SelectionStart = 1;
-                    }
-                    else {
-                        // 選択された位置に値を挿入する
-                        int selectionStart = textBox.SelectionStart;
-                        int selectionEnd = selectionStart + textBox.SelectionLength;
-                        string forwardText = textBox.Text[..selectionStart];
-                        string backwardText = textBox.Text[selectionEnd..];
-
-                        if (int.TryParse(string.Format($"{forwardText}{value}{backwardText}"), out int outValue)) {
-                            vm.ActValue = outValue;
-                            textBox.Text = string.Format($"{vm.ActValue}");
-                            textBox.SelectionStart = selectionStart + 1;
-                        }
-                    }
-                    break;
-                case NumericInputButton.InputKind.BackSpace:
-                    if (vm.ActValue == 0) {
-                        vm.ActValue = null;
-                    }
-                    else {
-                        int selectionStart = textBox.SelectionStart;
-                        int selectionLength = textBox.SelectionLength;
-                        int selectionEnd = selectionStart + textBox.SelectionLength;
-                        string forwardText = textBox.Text[..selectionStart];
-                        string backwardText = textBox.Text[selectionEnd..];
-
-                        if (selectionLength != 0) {
-                            if (int.TryParse(string.Format($"{forwardText}{backwardText}"), out int outValue)) {
-                                vm.ActValue = outValue;
-                                textBox.Text = string.Format($"{outValue}");
-                                textBox.SelectionStart = selectionStart;
-                            }
-                        }
-                        else if (selectionStart != 0) {
-                            string newText = string.Format($"{forwardText[..(selectionStart - 1)]}{backwardText}");
-                            if (string.Empty == newText || int.TryParse(newText, out _)) {
-                                vm.ActValue = string.Empty == newText ? (int?)null : int.Parse(newText);
-                                textBox.Text = string.Format($"{vm.ActValue}");
-                                textBox.SelectionStart = selectionStart - 1;
-                            }
-                        }
-                    }
-                    break;
-                case NumericInputButton.InputKind.Clear:
-                    vm.ActValue = null;
-                    break;
-                case NumericInputButton.InputKind.Close:
-                    this.WVM.IsEditing = false;
-                    break;
-            }
+            // 入力時処理
+            numericUpDown.ButtonInputed(this.WVM.InputedValue, this.WVM.InputedKind);
+            // Bindしているが、何故かコピーしないと反映されない
+            this.mLastDateValueVM.ActValue = numericUpDown.Value;
+            // FollowablePopup の 表示状態をコピー
+            this.WVM.IsOpenPopup = numericUpDown.IsOpen;
 
             if (this.WVM.InputedKind != NumericInputButton.InputKind.Close) {
                 // 外れたフォーカスを元に戻す
-                this.mLastDataGridCell.IsEditing = true; // セルを編集モードにする - 画面がちらつくがやむを得ない？
-                _ = textBox.Focus();
+                this.mLastDataGridCell.IsEditing = true; // セルを編集モードにする - 画面がちらつくがやむを得ない
+                _ = numericUpDown.Focus();
                 _ = this.mLastDataGridCell.Focus(); // Enterキーでの入力完了を有効にする
-                //Keyboard.Focus(textBox); // キーでの数値入力を有効にする - 意図した動作にならない
+                //Keyboard.Focus(numericUpDown); // キーでの数値入力を有効にする - 意図した動作にならない
             }
 
             e.Handled = true;
@@ -208,13 +154,23 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private void DataGrid_AddingNewItem(object sender, AddingNewItemEventArgs e)
         {
+            using FuncLog funcLog = new();
+
             if (this.WVM.InputedDateValueVMList.Count == 0) {
-                e.NewItem = new DateValueViewModel() { ActDate = DateTime.Today, ActValue = null };
+                // ダミーデータ
+                e.NewItem = new DateValueViewModel() {
+                    ActDate = DateTime.Now,
+                    ActValue = null
+                };
             }
             else {
                 // リストに入力済の末尾のデータの日付を追加時に採用する
                 DateValueViewModel lastVM = this.WVM.InputedDateValueVMList.Last();
-                e.NewItem = new DateValueViewModel() { ActDate = this.WVM.IsDateAutoIncrement ? lastVM.ActDate.AddDays(1) : lastVM.ActDate, ActValue = null };
+                e.NewItem = new DateValueViewModel() {
+                    ActDate = this.WVM.IsDateAutoIncrement ? lastVM.ActDate.AddDays(1) : lastVM.ActDate,
+                    ActValue = null,
+                    Scale = lastVM.Scale
+                };
             }
         }
 
@@ -239,60 +195,32 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private void DataGridCell_GotFocus(object sender, RoutedEventArgs e)
         {
+            using FuncLog funcLog = new();
+
             DataGridCell dataGridCell = sender as DataGridCell;
 
             // 新しいセルに移動していたら数値入力ボタンを非表示にする
             if (dataGridCell != this.mLastDataGridCell) {
-                this.WVM.IsEditing = false;
+                this.WVM.IsOpenPopup = false;
+                this.mLastDataGridCell = dataGridCell;
             }
-            this.mLastDataGridCell = dataGridCell;
         }
 
         /// <summary>
-        /// テキストボックステキスト入力確定前
+        /// <see cref="NumericUpDown"/> フォーカス取得時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        private void NumericUpDown_GotFocus(object sender, RoutedEventArgs e)
         {
-            TextBox textBox = sender as TextBox;
-            bool yes_parse = false;
-            if (sender != null) {
-                // 既存のテキストボックス文字列に、新規に一文字追加された時、その文字列が数値として意味があるかどうかをチェック
-                {
-                    string tmp = textBox.Text + e.Text;
-                    if (tmp == string.Empty) {
-                        yes_parse = true;
-                    }
-                    else {
-                        yes_parse = int.TryParse(tmp, out int xx);
+            using FuncLog funcLog = new();
 
-                        // 範囲内かどうかチェック
-                        if (yes_parse) {
-                            if (xx < 0) {
-                                yes_parse = false;
-                            }
-                        }
-                    }
-                }
-            }
-            // 更新したい場合は false, 更新したくない場合は true
-            e.Handled = !yes_parse;
-        }
+            if (!this.WVM.IsOpenPopup) {
+                NumericUpDown numericUpDown = sender as NumericUpDown;
+                this._popup.PlacementTarget = numericUpDown;
+                this.WVM.IsOpenPopup = true;
 
-        /// <summary>
-        /// テキストボックスフォーカス取得時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (!this.WVM.IsEditing) {
-                TextBox textBox = sender as TextBox;
-                this._popup.PlacementTarget = textBox;
-                this.WVM.IsEditing = true;
-
-                this.mLastDateValueVM = textBox.DataContext as DateValueViewModel;
+                this.mLastDateValueVM = numericUpDown.DataContext as DateValueViewModel;
             }
             e.Handled = true;
         }

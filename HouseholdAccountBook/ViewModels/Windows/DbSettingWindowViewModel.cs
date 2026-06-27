@@ -2,8 +2,8 @@
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
-using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
 using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.Args.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;

@@ -1,7 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.ViewModels.Component;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -37,7 +36,7 @@ namespace HouseholdAccountBook.Infrastructure.CSV
         }
 
         /// <summary>
-        /// CSV比較で用いるデータを読み込む
+        /// CSVファイルからCSV比較で用いるデータを読み込む
         /// </summary>
         /// <param name="csvFilePathList">読み込むCSVファイルのパスリスト</param>
         /// <param name="actDateIndex">日付インデックス</param>
@@ -45,7 +44,7 @@ namespace HouseholdAccountBook.Infrastructure.CSV
         /// <param name="expensesIndex">支出インデックス</param>
         /// <param name="encoding">エンコーディング</param>
         /// <returns>読込結果</returns>
-        public static async Task<IEnumerable<CsvComparisonViewModel>> LoadCsvCompListAsync(IEnumerable<string> csvFilePathList, int actDateIndex, int itemNameIndex, int expensesIndex, Encoding encoding)
+        public static async Task<IEnumerable<ActionCsvDto>> LoadCsvCompListAsync(IEnumerable<string> csvFilePathList, int actDateIndex, int itemNameIndex, int expensesIndex, Encoding encoding)
         {
             using FuncLog funcLog = new(new { csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, encoding });
 
@@ -54,10 +53,10 @@ namespace HouseholdAccountBook.Infrastructure.CSV
                 MissingFieldFound = mffa => { }
             };
 
-            List<CsvComparisonViewModel> tmpVMList = [];
+            List<ActionCsvDto> tmpDtoList = [];
             foreach (string tmpFileName in csvFilePathList) {
                 using (CsvReader reader = new(new StreamReader(tmpFileName, encoding), csvConfig)) {
-                    List<CsvComparisonViewModel> tmpVMList2 = [];
+                    List<ActionCsvDto> tmpDtoList2 = [];
                     while (await reader.ReadAsync()) {
                         try {
                             if (!reader.TryGetField(actDateIndex - 1, out DateTime date)) {
@@ -72,19 +71,19 @@ namespace HouseholdAccountBook.Infrastructure.CSV
                                 continue;
                             }
 
-                            tmpVMList2.Add(new() { Record = new() { Date = date, Name = name, Value = value } });
+                            tmpDtoList2.Add(new() { Date = date, Name = name, Value = value });
                         }
                         catch (Exception) { }
                     }
 
                     // 有効な行があれば追加する
-                    if (tmpVMList2.Count != 0) {
-                        tmpVMList.AddRange(tmpVMList2);
+                    if (tmpDtoList2.Count != 0) {
+                        tmpDtoList.AddRange(tmpDtoList2);
                     }
                 }
             }
 
-            return tmpVMList;
+            return tmpDtoList;
         }
 
         /// <summary>

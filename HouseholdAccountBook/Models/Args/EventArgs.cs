@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HouseholdAccountBook.Infrastructure.Utilities.Args
+namespace HouseholdAccountBook.Models.Args
 {
     /// <summary>
     /// イベントに使用する値を提供するクラスを表します。

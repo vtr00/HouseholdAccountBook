@@ -65,7 +65,11 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 入力された初期残高(表示値)
         /// </summary>
-        public string InputedInitialValueStr => AssetService.Instance.ToAssetString(this.InputedInitialValue, null, UnitKind.MainUnit);
+        public string InputedInitialValueStr => AssetService.Instance.ToAssetString(this.InputedInitialValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
+        /// <summary>
+        /// 初期残高スケール
+        /// </summary>
+        public int InitialValueScale { get; set; }
 
         #region 期間情報
         /// <summary>
@@ -170,7 +174,8 @@ namespace HouseholdAccountBook.ViewModels.Settings
             this.Account = account;
             this.InputedName = account.Name;
             this.InputedRemark = account.Remark;
-            this.InputedInitialValue = account.InitialValue;
+            this.InputedInitialValue = account.InitialValue.MainValue;
+            this.InitialValueScale = account.InitialValue.Scale;
             this.InputedPayDay = account.PayDay;
             this.SelectedIfStartDateExists = account.StartDateExists;
             this.SelectedIfEndDateExists = account.EndDateExists;

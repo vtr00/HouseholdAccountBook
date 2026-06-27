@@ -1,8 +1,9 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.Args;
+using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.Properties;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -212,7 +213,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
 
             // 縦軸 - 線形軸
-            string unitY = AssetService.Instance.GetDefaultAssetModel()?.Name ?? Resources.Unit_DefaultMoney;
+            AssetModel assetModel = AssetService.Instance.GetDefaultAssetModel();
+            string unitY = assetModel?.Name ?? Resources.Unit_DefaultMoney;
             LinearAxis GetVerticalAxis()
             {
                 return new() {
@@ -220,7 +222,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     Position = AxisPosition.Left,
                     MajorGridlineStyle = LineStyle.Solid,
                     MinorGridlineStyle = LineStyle.Dot,
-                    StringFormat = "#,0",
+                    StringFormat = $"N{assetModel.Scale}",
                     Key = "Value",
                     Title = GraphKind1Str[this.Parent.GraphKind1SelectorVM.SelectedKey]
                 };
@@ -242,6 +244,23 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
+        /// トラッカーのフォーマット文字列を取得する
+        /// </summary>
+        /// <param name="addItemName">アイテム名を付与するか</param>
+        /// <returns>トラッカーのフォーマット文字列</returns>
+        private string GetTrackerFormatString(bool addItemName)
+        {
+            string unit_pre = UnitUtil.GetYearPreUnit(this.Parent.FiscalStartMonth);
+            string unit_post = UnitUtil.GetYearPostUnit(this.Parent.FiscalStartMonth);
+            return (addItemName ? "{0}\n" : string.Empty) + this.Tab switch {                       //{項目名}\n
+                Tabs.DailyGraphTab => "{Date:yyyy-MM-dd}: {DisplayValue}",                          //{日付}: {金額}
+                Tabs.MonthlyGraphTab => "{Date:yyyy-MM}: {DisplayValue}",                           //{月}: {金額}
+                Tabs.YearlyGraphTab => unit_pre + "{Date:yyyy}" + unit_post + ": {DisplayValue}",   //{単位}{年}{単位}: {金額}
+                _ => throw new InvalidOperationException(),
+            };
+        }
+
+        /// <summary>
         /// グラフタブに表示するデータ(上部)を更新する
         /// </summary>
         /// <param name="balanceKind">選択対象の収支種別</param>
@@ -257,19 +276,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             ItemIdObj tmpItemId = itemId ?? this.Parent.SelectedItemId ?? null;
             Log.Vars(vars: new { tmpBalanceKind, tmpCategoryId, tmpItemId });
 
-            // トラッカーのフォーマット文字列を取得する関数
-            string GetTrackerFormatString(bool addItemName)
-            {
-                string unit_pre = UnitUtil.GetYearPreUnit(this.Parent.FiscalStartMonth);
-                string unit_post = UnitUtil.GetYearPostUnit(this.Parent.FiscalStartMonth);
-                return (addItemName ? "{0}\n" : string.Empty) + this.Tab switch {                   //{項目名}\n
-                    Tabs.DailyGraphTab => "{Date:yyyy-MM-dd}: {Value:#,0}",                         //{日付}: {金額}
-                    Tabs.MonthlyGraphTab => "{Date:yyyy-MM}: {Value:#,0}",                          //{月}: {金額}
-                    Tabs.YearlyGraphTab => unit_pre + "{Date:yyyy}" + unit_post + ": {Value:#,0}",  //{単位}{年}{単位}: {金額}
-                    _ => throw new InvalidOperationException(),
-                };
-            }
-
             await this.SeriesSelectorVM.LoadAsync((tmpBalanceKind, tmpCategoryId, tmpItemId));
 
             switch (this.Parent.GraphKind1SelectorVM.SelectedKey) {
@@ -283,13 +289,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                             IsStacked = true,
                             Title = tmpVM.DisplayedName,
                             ItemsSource = tmpVM.Values.Zip(tmpVM.Periods.Select(period => period.Start), (value, date) => new GraphDatumViewModel {
-                                Value = (int)value,
+                                Value = value.MainValue,
                                 Date = date,
+                                DisplayValue = AssetService.Instance.ToAssetString(value.MainValue, null, UnitKind.MainUnit, UnitKind.MainUnit),
                                 Item = tmpVM.Item,
                                 Category = tmpVM.Category
                             }),
                             ValueField = "Value",
-                            TrackerFormatString = GetTrackerFormatString(true),
+                            TrackerFormatString = this.GetTrackerFormatString(true),
                             XAxisKey = "Value",
                             YAxisKey = "Category"
                         };
@@ -305,10 +312,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         // 全項目の単位ごとの合計を計算する
                         for (int i = 0; i < tmpVM.Values.Count; ++i) {
                             if (tmpVM.Values[i] < 0) {
-                                sumMinus[i] += tmpVM.Values[i];
+                                sumMinus[i] += tmpVM.Values[i].MainValue;
                             }
                             else {
-                                sumPlus[i] += tmpVM.Values[i];
+                                sumPlus[i] += tmpVM.Values[i].MainValue;
                             }
                         }
                     }
@@ -329,11 +336,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     LineSeries series = new() {
                         Title = Properties.Resources.GraphKind1_BalanceGraph,
                         ItemsSource = tmpVM.Values.Select((value, index) => (value, index)).Zip(tmpVM.Periods.Select(period => period.Start), (tmp, date) => new GraphDatumViewModel() {
-                            Value = (int)tmp.value,
+                            Value = tmp.value.MainValue,
                             Date = date,
+                            DisplayValue = AssetService.Instance.ToAssetString(tmp.value.MainValue, null, UnitKind.MainUnit, UnitKind.MainUnit),
                             Index = tmp.index
                         }),
-                        TrackerFormatString = GetTrackerFormatString(false),
+                        TrackerFormatString = this.GetTrackerFormatString(false),
                         DataFieldX = "Index",
                         DataFieldY = "Value"
                     };
@@ -342,7 +350,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     foreach (Axis axis in this.GraphPlotModel.Axes) {
                         // Y軸の範囲を設定する
                         if (axis.Position == AxisPosition.Left) {
-                            axis.SetAxisRange(tmpVM.Values.Min(), tmpVM.Values.Max(), 10, true);
+                            axis.SetAxisRange(tmpVM.Values.Min(tmp => tmp.MainValue), tmpVM.Values.Max(tmp => tmp.MainValue), 10, true);
                             break;
                         }
                     }
@@ -364,19 +372,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             using FuncLog funcLog = new();
 
-            // トラッカーのフォーマット文字列を取得する関数
-            string GetTrackerFormatString()
-            {
-                string unit_pre = UnitUtil.GetYearPreUnit(this.Parent.FiscalStartMonth);
-                string unit_post = UnitUtil.GetYearPostUnit(this.Parent.FiscalStartMonth);
-                return this.Tab switch {
-                    Tabs.DailyGraphTab => "{Date:yyyy-MM-dd}: {Value:#,0}",                        //{日付}: {金額}
-                    Tabs.MonthlyGraphTab => "{Date:yyyy-MM}: {Value:#,0}",                         //{月}: {金額}
-                    Tabs.YearlyGraphTab => unit_pre + "{Date:yyyy}" + unit_post + ": {Value:#,0}", //{単位}{年}{単位}: {金額}
-                    _ => throw new InvalidOperationException(),
-                };
-            }
-
             // グラフ表示データを設定する
             this.SelectedGraphPlotModel.Series.Clear();
             SeriesViewModel vm = this.SeriesSelectorVM.SelectedItem;
@@ -389,13 +384,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         return vm.Category.Id == datumVM.Category.Id && vm.Item.Id == datumVM.Item.Id;
                     }) as CustomBarSeries).ActualFillColor,
                     ItemsSource = vm.Values.Zip(vm.Periods.Select(period => period.Start), (value, date) => new GraphDatumViewModel {
-                        Value = (int)value,
+                        Value = value.MainValue,
                         Date = date,
+                        DisplayValue = AssetService.Instance.ToAssetString(value.MainValue, null, UnitKind.MainUnit, UnitKind.MainUnit),
                         Item = vm.Item,
                         Category = vm.Category
                     }),
                     ValueField = "Value",
-                    TrackerFormatString = GetTrackerFormatString(),
+                    TrackerFormatString = this.GetTrackerFormatString(false),
                     XAxisKey = "Value",
                     YAxisKey = "Category"
                 };
@@ -404,7 +400,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 // Y軸の範囲を設定する
                 foreach (Axis axis in this.SelectedGraphPlotModel.Axes) {
                     if (axis.Position == AxisPosition.Left) {
-                        axis.SetAxisRange(vm.Values.Min(), vm.Values.Max(), 4, true);
+                        axis.SetAxisRange(vm.Values.Min(tmp => tmp.MainValue), vm.Values.Max(tmp => tmp.MainValue), 4, true);
                         break;
                     }
                 }

@@ -29,7 +29,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 値
         /// </summary>
-        public List<decimal> Values { get; set; } = [];
+        public List<AmountObj> Values { get; set; } = [];
         /// <summary>
         /// 期間
         /// </summary>
@@ -38,11 +38,11 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 平均
         /// </summary>
-        public decimal? Average { get; set; }
+        public AmountObj? Average { get; set; }
         /// <summary>
         /// 合計
         /// </summary>
-        public decimal? Total { get; set; }
+        public AmountObj? Total { get; set; }
 
         /// <summary>
         /// その他名称

@@ -18,6 +18,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         /// </summary>
         /// <param name="categoryId">分類ID</param>
         /// <returns>取得したレコードリスト</returns>
+        /// <remarks>レコードの有無のチェックのみ</remarks>
         public async Task<IEnumerable<HstActionDto>> FindByCategoryIdAsync(int categoryId)
         {
             using FuncLog funcLog = new(new { categoryId }, Log.LogLevel.Trace);

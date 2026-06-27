@@ -1,9 +1,8 @@
-﻿using HouseholdAccountBook.Infrastructure.CSV;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
+﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.Args;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -127,7 +126,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public SelectorViewModel<ItemModel, ItemIdObj> ItemSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
-        /// 入力された金額
+        /// 入力された金額(主単位)
         /// </summary>
         public decimal? InputedValue {
             get;
@@ -139,9 +138,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
         /// <summary>
+        /// 金額の小数点以下桁数
+        /// </summary>
+        public int ValueScale {
+            get;
+            set => this.SetProperty(ref field, value);
+        }
+        /// <summary>
         /// 入力された金額(文字列)
         /// </summary>
-        public string InputedValueStr => AssetService.Instance.ToAssetString(this.InputedValue, null, UnitKind.MainUnit);
+        public string InputedValueStr => AssetService.Instance.ToAssetString(this.InputedValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
 
         /// <summary>
         /// 店舗セレクタVM
@@ -281,10 +287,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="initialDate">追加時、初期選択する日付</param>
         /// <param name="initialRecord">追加時、初期表示するCSVレコード</param>
         /// <param name="targetActionId">複製/編集時、複製/編集対象の帳簿項目のID</param>
-        public async Task LoadAsync(AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate, ActionCsvDto initialRecord, ActionIdObj targetActionId)
+        public async Task LoadAsync(AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate, ActionCsvModel initialRecord, ActionIdObj targetActionId)
         {
             using FuncLog funcLog = new(new { initialAccountId, initialMonth, initialDate, initialRecord, targetActionId });
             using IDisposable disposable = this.mBusyService.Enter();
+
+            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
 
             AccountIdObj selectingAccountId = null;
             BalanceKind selectingBalanceKind = BalanceKind.Expenses;
@@ -298,10 +306,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     selectingBalanceKind = BalanceKind.Expenses;
                     if (initialRecord == null) {
                         this.SelectedDate = initialDate?.ToDateTime(TimeOnly.MinValue) ?? ((initialMonth == null || initialMonth?.Month == DateTime.Today.Month) ? DateTime.Today : initialMonth.Value.ToDateTime(TimeOnly.MinValue));
+                        this.InputedValue = null;
+                        this.ValueScale = asset.Scale;
                     }
                     else {
                         this.SelectedDate = initialRecord.Date;
-                        this.InputedValue = initialRecord.Value;
+                        this.InputedValue = initialRecord.Value.MainValue;
+                        this.ValueScale = initialRecord.Value.Scale;
                     }
 
                     break;
@@ -320,7 +331,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         this.SelectedIfMatch = action.IsMatch;
                     }
                     this.SelectedDate = action.ActTime;
-                    this.InputedValue = Math.Abs(action.Amount);
+                    this.InputedValue = Math.Abs(action.Amount.MainValue);
+                    this.ValueScale = action.Amount.Scale;
                     this.InputedCount = count;
 
                     selectingAccountId = action.Account.Id;
@@ -369,7 +381,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             ActionModel action = new() {
-                Base = new(this.ActionId, this.SelectedDate, (this.BalanceKindSelectorVM.SelectedKey == BalanceKind.Income ? 1 : -1) * this.InputedValue.Value),
+                Base = new(this.ActionId, this.SelectedDate, new((this.BalanceKindSelectorVM.SelectedKey == BalanceKind.Income ? 1 : -1) * this.InputedValue.Value, this.ValueScale)),
                 GroupId = this.GroupId,
                 Account = new(this.AccountSelectorVM.SelectedKey, string.Empty),
                 Category = new(CategoryIdObj.System, string.Empty, this.BalanceKindSelectorVM.SelectedKey),

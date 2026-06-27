@@ -1,27 +1,10 @@
 ﻿<UserControl x:Class="HouseholdAccountBook.Views.UserControls.NumericInputButton"
+             x:Name="Root"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
-
-    <UserControl.Resources>
-        <RoutedCommand x:Key="NumberInputCommand"/>
-        <RoutedCommand x:Key="BackSpaceInputCommand"/>
-        <RoutedCommand x:Key="ClearCommand"/>
-        <RoutedCommand x:Key="CloseCommand"/>
-    </UserControl.Resources>
-
-    <UserControl.CommandBindings>
-        <CommandBinding Command="{StaticResource NumberInputCommand}" 
-                        Executed="NumberInputCommand_Execute"/>
-        <CommandBinding Command="{StaticResource BackSpaceInputCommand}" 
-                        Executed="BackSpaceInputCommand_Execute"/>
-        <CommandBinding Command="{StaticResource ClearCommand}" 
-                        Executed="ClearCommand_Execute"/>
-        <CommandBinding Command="{StaticResource CloseCommand}" 
-                        Executed="CloseCommand_Execute"/>
-    </UserControl.CommandBindings>
 
     <Grid Background="Transparent">
         <Grid Height="65" Width="156" Background="Transparent">
@@ -42,21 +25,21 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="6" IsHitTestVisible="False" Background="Transparent"/>
-            <Button Grid.Row="0" Grid.Column="6" Content="✕" FontSize="6" Command="{StaticResource CloseCommand}"/>
+            <Button Grid.Row="0" Grid.Column="6" Content="✕" FontSize="6" Command="{Binding CloseCommand, ElementName=Root}"/>
 
-            <Button Grid.Row="1" Grid.Column="0" Content="1" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="1" Grid.Column="1" Content="2" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="1" Grid.Column="2" Content="3" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="1" Grid.Column="3" Content="4" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="1" Grid.Column="4" Content="5" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="2" Content="BS" Command="{StaticResource BackSpaceInputCommand}"/>
+            <Button Grid.Row="1" Grid.Column="0" Content="1" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="1"/>
+            <Button Grid.Row="1" Grid.Column="1" Content="2" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="2"/>
+            <Button Grid.Row="1" Grid.Column="2" Content="3" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="3"/>
+            <Button Grid.Row="1" Grid.Column="3" Content="4" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="4"/>
+            <Button Grid.Row="1" Grid.Column="4" Content="5" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="5"/>
+            <Button Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="2" Content="BS" Command="{Binding BackSpaceInputCommand, ElementName=Root}"/>
 
-            <Button Grid.Row="2" Grid.Column="0" Content="6" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="2" Grid.Column="1" Content="7" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="2" Grid.Column="2" Content="8" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="2" Grid.Column="3" Content="9" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="2" Grid.Column="4" Content="0" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="2" Grid.Column="5" Grid.ColumnSpan="2" Content="C" Command="{StaticResource ClearCommand}"/>
+            <Button Grid.Row="2" Grid.Column="0" Content="6" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="6"/>
+            <Button Grid.Row="2" Grid.Column="1" Content="7" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="7"/>
+            <Button Grid.Row="2" Grid.Column="2" Content="8" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="8"/>
+            <Button Grid.Row="2" Grid.Column="3" Content="9" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="9"/>
+            <Button Grid.Row="2" Grid.Column="4" Content="0" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="0"/>
+            <Button Grid.Row="2" Grid.Column="5" Grid.ColumnSpan="2" Content="C" Command="{Binding ClearCommand, ElementName=Root}"/>
         </Grid>
         <Grid Height="104" Width="78" Background="Transparent" Visibility="Collapsed">
             <Grid.RowDefinitions>
@@ -75,23 +58,23 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" IsHitTestVisible="False" Background="Transparent"/>
-            <Button Grid.Row="0" Grid.Column="3" Content="✕" FontSize="6" Command="{StaticResource CloseCommand}"/>
+            <Button Grid.Row="0" Grid.Column="3" Content="✕" FontSize="6" Command="{Binding CloseCommand, ElementName=Root}"/>
 
-            <Button Grid.Row="1" Grid.Column="0" Content="7" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="1" Grid.Column="1" Content="8" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="1" Grid.Column="2" Content="9" Grid.ColumnSpan="2" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="1" Grid.Column="0" Content="7" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="7"/>
+            <Button Grid.Row="1" Grid.Column="1" Content="8" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="8"/>
+            <Button Grid.Row="1" Grid.Column="2" Content="9" Grid.ColumnSpan="2" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="9"/>
 
-            <Button Grid.Row="2" Grid.Column="0" Content="4" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="2" Grid.Column="1" Content="5" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="2" Grid.Column="2" Content="6" Grid.ColumnSpan="2" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="2" Grid.Column="0" Content="4" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="4"/>
+            <Button Grid.Row="2" Grid.Column="1" Content="5" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="5"/>
+            <Button Grid.Row="2" Grid.Column="2" Content="6" Grid.ColumnSpan="2" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="6"/>
 
-            <Button Grid.Row="3" Grid.Column="0" Content="1" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="3" Grid.Column="1" Content="2" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="3" Grid.Column="2" Content="3" Grid.ColumnSpan="2" Command="{StaticResource NumberInputCommand}"/>
+            <Button Grid.Row="3" Grid.Column="0" Content="1" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="1"/>
+            <Button Grid.Row="3" Grid.Column="1" Content="2" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="2"/>
+            <Button Grid.Row="3" Grid.Column="2" Content="3" Grid.ColumnSpan="2" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="3"/>
 
-            <Button Grid.Row="4" Grid.Column="0" Content="BS" Command="{StaticResource BackSpaceInputCommand}"/>
-            <Button Grid.Row="4" Grid.Column="1" Content="0" Command="{StaticResource NumberInputCommand}"/>
-            <Button Grid.Row="4" Grid.Column="2" Content="C" Grid.ColumnSpan="2" Command="{StaticResource ClearCommand}"/>
+            <Button Grid.Row="4" Grid.Column="0" Content="BS" Command="{Binding BackSpaceInputCommand, ElementName=Root}"/>
+            <Button Grid.Row="4" Grid.Column="1" Content="0" Command="{Binding NumberInputCommand, ElementName=Root}" CommandParameter="0"/>
+            <Button Grid.Row="4" Grid.Column="2" Content="C" Grid.ColumnSpan="2" Command="{Binding ClearCommand, ElementName=Root}"/>
         </Grid>
     </Grid>
 </UserControl>

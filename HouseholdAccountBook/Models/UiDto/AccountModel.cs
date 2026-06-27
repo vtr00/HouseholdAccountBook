@@ -39,9 +39,9 @@ namespace HouseholdAccountBook.Models.UiDto
         public string Remark { get; init; }
 
         /// <summary>
-        /// 初期残高
+        /// 初期残高(主単位)
         /// </summary>
-        public decimal InitialValue { get; init; }
+        public AmountObj InitialValue { get; init; }
 
         #region 期間情報
         /// <summary>

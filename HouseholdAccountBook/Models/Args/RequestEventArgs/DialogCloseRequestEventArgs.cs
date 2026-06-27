@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
+namespace HouseholdAccountBook.Models.Args.RequestEventArgs
 {
     /// <summary>
     /// ダイアログを閉じる要求イベントのイベント引数

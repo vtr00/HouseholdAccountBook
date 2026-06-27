@@ -1,9 +1,8 @@
-﻿using HouseholdAccountBook.Infrastructure.CSV;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
+﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.Args;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -111,9 +110,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         } = [];
 
         /// <summary>
-        /// 編集中か
+        /// <see cref="NumericInputButton"/> の表示状態
         /// </summary>
-        public bool IsEditing {
+        public bool IsOpenPopup {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -210,10 +209,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <param name="initialDate">追加時、初期選択する日付</param>
         /// <param name="initialRecordList">追加時、初期表示するCSVレコードリスト</param>
         /// <param name="targetGroupId">編集時、編集対象のグループID</param>
-        public async Task LoadAsync(AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate, IEnumerable<ActionCsvDto> initialRecordList, GroupIdObj targetGroupId)
+        public async Task LoadAsync(AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate, IEnumerable<ActionCsvModel> initialRecordList, GroupIdObj targetGroupId)
         {
             using FuncLog funcLog = new(new { initialAccountId, initialMonth, initialDate, initialRecordList, targetGroupId });
             using IDisposable disposable = this.mBusyService.Enter();
+
+            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
 
             AccountIdObj selectingAccountId = null;
             BalanceKind selectingBalanceKind = BalanceKind.Expenses;
@@ -228,11 +229,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     // WVMに値を設定する
                     if (initialRecordList == null) {
                         DateTime actDate = initialDate?.ToDateTime(TimeOnly.MinValue) ?? ((initialMonth == null || initialMonth?.Month == DateTime.Today.Month) ? DateTime.Today : initialMonth.Value.ToDateTime(TimeOnly.MinValue));
-                        this.InputedDateValueVMList.Add(new DateValueViewModel() { ActDate = actDate });
+                        this.InputedDateValueVMList.Add(new DateValueViewModel() { ActDate = actDate, ActValue = null, Scale = asset.Scale });
                     }
                     else {
-                        foreach (ActionCsvDto record in initialRecordList) {
-                            this.InputedDateValueVMList.Add(new DateValueViewModel() { ActDate = record.Date, ActValue = record.Value });
+                        foreach (ActionCsvModel record in initialRecordList) {
+                            this.InputedDateValueVMList.Add(new DateValueViewModel() { ActDate = record.Date, ActValue = record.Value.MainValue, Scale = record.Value.Scale });
                         }
                     }
 
@@ -249,7 +250,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         DateValueViewModel vm = new() {
                             ActionId = action.ActionId,
                             ActDate = action.ActTime,
-                            ActValue = Math.Abs(action.Amount)
+                            ActValue = Math.Abs(action.Amount.MainValue),
+                            Scale = asset.Scale
                         };
 
                         selectingAccountId = action.Account.Id;
@@ -311,7 +313,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             List<ActionModel> actionList = [];
             BalanceKind balanceKind = this.BalanceKindSelectorVM.SelectedKey;
             ActionModel commonAction = new() {
-                Base = new(null, DateTime.Now, 0),
+                Base = new(null, DateTime.Now, new(0m)),
                 GroupId = this.GroupId,
                 Account = new(this.AccountSelectorVM.SelectedKey, string.Empty),
                 Item = new(this.ItemSelectorVM.SelectedKey, string.Empty),
@@ -321,7 +323,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             foreach (DateValueViewModel vm in this.InputedDateValueVMList) {
                 if (vm.ActValue is null or 0) { continue; }
 
-                ActionBaseModel baseAction = new(vm.ActionId, vm.ActDate, (balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value);
+                ActionBaseModel baseAction = new(vm.ActionId, vm.ActDate, new((balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value, vm.Scale));
                 actionList.Add(commonAction.WithChanges(baseAction));
             }
 

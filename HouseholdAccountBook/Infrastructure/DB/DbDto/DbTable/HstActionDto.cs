@@ -50,7 +50,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable
         /// </summary>
         public DateTime ActTime { get; set; } = DateTime.Now;
         /// <summary>
-        /// 項目値
+        /// 項目値(補助単位)
         /// </summary>
         public int ActValue { get; set; }
         /// <summary>

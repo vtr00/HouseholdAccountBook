@@ -17,19 +17,22 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         /// <see cref="MstBookDto.BookId"/>に基づいて、<see cref="BookInfoDto"> を取得する
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
+        /// <param name="defaultAssetId">デフォルトアセットID</param>
         /// <returns>取得したレコード</returns>
-        public async Task<BookInfoDto> FindByBookId(int bookId)
+        public async Task<BookInfoDto> FindByBookId(int bookId, int defaultAssetId)
         {
-            using FuncLog funcLog = new(new { bookId }, Log.LogLevel.Trace);
+            using FuncLog funcLog = new(new { bookId, defaultAssetId }, Log.LogLevel.Trace);
 
             BookInfoDto dto = await this.mDbHandler.QuerySingleAsync<BookInfoDto>(@"
-SELECT B.book_name, B.book_kind, B.debit_book_id, B.pay_day, B.initial_value, B.json_code, B.sort_order, MIN(A.act_time) AS start_date, MAX(A.act_time) AS end_date
+SELECT B.book_name, B.book_kind, B.debit_book_id, B.pay_day, B.initial_value / POWER(10, MA.scale) AS initial_main_value, B.json_code, B.sort_order, 
+       MIN(A.act_time) AS start_date, MAX(A.act_time) AS end_date
 FROM mst_book B
+INNER JOIN mst_asset MA ON MA.asset_id = @DefaultAssetId AND MA.del_flg = 0
 LEFT OUTER JOIN hst_action A ON A.book_id = B.book_id AND A.del_flg = 0
 WHERE B.book_id = @BookId AND B.del_flg = 0
-GROUP BY B.book_id
+GROUP BY B.book_id, MA.asset_id
 ORDER BY B.sort_order;",
-new MstBookDto { BookId = bookId });
+new { BookId = bookId, DefaultAssetId = defaultAssetId });
 
             return dto;
         }

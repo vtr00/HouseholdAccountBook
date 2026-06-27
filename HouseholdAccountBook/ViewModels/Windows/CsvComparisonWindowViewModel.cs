@@ -1,11 +1,10 @@
-﻿using HouseholdAccountBook.Infrastructure.CSV;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
+﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
-using HouseholdAccountBook.Infrastructure.Utilities.Args;
-using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.Args;
+using HouseholdAccountBook.Models.Args.RequestEventArgs;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -98,11 +97,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// CSV比較VMの合計値
         /// </summary>
-        public decimal AllSumValue => this.CsvCompSelectorVM.ItemList.Sum(static vm => vm.Record.Value);
+        public decimal AllSumValue => this.CsvCompSelectorVM.ItemList.Sum(static vm => vm.Record.Value.MainValue);
         /// <summary>
         /// CSV比較VMの合計値(文字列)
         /// </summary>
-        public string AllSumValueStr => AssetService.Instance.ToAssetString(this.AllSumValue, null, UnitKind.MainUnit);
+        public string AllSumValueStr => AssetService.Instance.ToAssetString(this.AllSumValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
 
         /// <summary>
         /// 選択されたCSV比較VMのチェック数
@@ -111,11 +110,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 選択されたCSV比較VMの合計値
         /// </summary>
-        public decimal SelectedSumValue => this.CsvCompSelectorVM.SelectedItemList.Sum(static vm => vm.Record.Value);
+        public decimal SelectedSumValue => this.CsvCompSelectorVM.SelectedItemList.Sum(static vm => vm.Record.Value.MainValue);
         /// <summary>
         /// 選択されたCSV比較VMの合計値(文字列)
         /// </summary>
-        public string SelectedSumValueStr => AssetService.Instance.ToAssetString(this.SelectedSumValue, null, UnitKind.MainUnit);
+        public string SelectedSumValueStr => AssetService.Instance.ToAssetString(this.SelectedSumValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
 
         /// <summary>
         /// チェック数変更を通知する
@@ -265,7 +264,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private void AddActionCommand_Execute()
         {
             List<CsvComparisonViewModel> vmList = [.. this.CsvCompSelectorVM.SelectedItemList.Where(vm => vm.Action is null)];
-            List<ActionCsvDto> recordList = [.. vmList.Select(vm => vm.Record)];
+            List<ActionCsvModel> recordList = [.. vmList.Select(vm => vm.Record)];
 
             async void Registered(object sender, EventArgs<IEnumerable<ActionIdObj>> e)
             {
@@ -280,7 +279,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             if (recordList.Count == 1) {
-                ActionCsvDto record = recordList[0];
+                ActionCsvModel record = recordList[0];
                 this.AddActionRequested?.Invoke(this, new AddActionRequestEventArgs() {
                     DbHandlerFactory = this.mDbHandlerFactory,
                     InitialAccountId = this.AccountSelectorVM.SelectedKey,
@@ -526,14 +525,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
             int expensesIndex = this.AccountSelectorVM.SelectedItem.ExpensesIndex.Value;
 
             // CSVファイルを読み込む
-            List<CsvComparisonViewModel> tmpVMList = [..
-                await CSVFileDao.LoadCsvCompListAsync(csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, Encoding.GetEncoding(this.AccountSelectorVM.SelectedItem.TextEncoding))];
+            List<ActionCsvModel> tmpVMList = [..
+                await this.mService.LoadCsvCompListAsync(csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, Encoding.GetEncoding(this.AccountSelectorVM.SelectedItem.TextEncoding))];
 
             // 有効な行があればリストに追加する(日付昇順)
             if (0 < tmpVMList.Count) {
-                tmpVMList.Sort((tmp1, tmp2) => (int)(tmp1.Record.Date - tmp2.Record.Date).TotalDays);
-                foreach (CsvComparisonViewModel vm in tmpVMList) {
-                    this.CsvCompSelectorVM.ItemList.Add(vm);
+                tmpVMList.Sort((tmp1, tmp2) => (int)(tmp1.Date - tmp2.Date).TotalDays);
+                foreach (ActionCsvModel vm in tmpVMList) {
+                    this.CsvCompSelectorVM.ItemList.Add(new() { Record = vm });
                 }
             }
         }

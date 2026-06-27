@@ -1,11 +1,12 @@
-﻿using System;
+﻿using HouseholdAccountBook.Models.ValueObjects;
+using System;
 using System.Globalization;
 using System.Windows.Data;
 
 namespace HouseholdAccountBook.Views.Converters
 {
     /// <summary>
-    /// int - 金額表示変換
+    /// 数値 - 金額表示変換
     /// </summary>
     public class IntToMoneyDisplayConverter : IValueConverter
     {
@@ -22,7 +23,10 @@ namespace HouseholdAccountBook.Views.Converters
                 return string.Format("{0:#,0.###}", param == "abs" ? Math.Abs(tmp2) : tmp2);
             }
             if (value is decimal tmp3) {
-                return string.Format("{0:#,0.###}", param == "abs" ? Math.Abs(tmp3) : tmp3);
+                return string.Format("{0:N" + tmp3.Scale + "}", param == "abs" ? Math.Abs(tmp3) : tmp3);
+            }
+            if (value is AmountObj amount) {
+                return string.Format("{0:N" + amount.Scale + "}", param == "abs" ? Math.Abs(amount.MainValue) : amount.MainValue);
             }
 
             throw new NotImplementedException();

@@ -20,9 +20,9 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Others
         /// </summary>
         public string BookName { get; set; } = string.Empty;
         /// <summary>
-        /// 初期値
+        /// 初期値(主単位)
         /// </summary>
-        public int InitialValue { get; set; }
+        public decimal InitialMainValue { get; set; }
         /// <summary>
         /// 帳簿種別
         /// </summary>

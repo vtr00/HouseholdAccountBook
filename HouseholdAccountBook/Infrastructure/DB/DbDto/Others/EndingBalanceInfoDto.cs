@@ -13,8 +13,8 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Others
         public EndingBalanceInfoDto() : base() { }
 
         /// <summary>
-        /// 繰越残高
+        /// 繰越残高(主単位)
         /// </summary>
-        public int EndingBalance { get; set; }
+        public decimal EndingMainBalance { get; set; }
     }
 }

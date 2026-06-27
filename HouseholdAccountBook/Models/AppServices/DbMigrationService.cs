@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Models.AppServices
     /// <summary>
     /// DBマイグレーションサービス
     /// </summary>
-        /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
+    /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
     public class DbMigrationService(DbHandlerFactory dbHandlerFactory)
     {
         /// <summary>

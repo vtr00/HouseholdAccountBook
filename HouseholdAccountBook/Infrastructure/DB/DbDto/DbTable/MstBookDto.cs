@@ -42,7 +42,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable
         /// </summary>
         public string BookName { get; set; } = "(no name)";
         /// <summary>
-        /// 初期値
+        /// 初期値(補助単位)
         /// </summary>
         public int InitialValue { get; set; }
         /// <summary>

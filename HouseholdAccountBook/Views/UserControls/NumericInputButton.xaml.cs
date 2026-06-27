@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HouseholdAccountBook.ViewModels;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -52,7 +53,7 @@ namespace HouseholdAccountBook.Views.UserControls
                 nameof(Command),
                 typeof(ICommand),
                 typeof(NumericInputButton),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None, new PropertyChangedCallback(CommandChanged))
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None, static (d, e) => ((NumericInputButton)d).CommandChanged(e))
             );
         /// <summary>
         /// コマンド
@@ -60,6 +61,33 @@ namespace HouseholdAccountBook.Views.UserControls
         public ICommand Command {
             get => (ICommand)this.GetValue(CommandProperty);
             set => this.SetValue(CommandProperty, value);
+        }
+        /// <summary>
+        /// コマンドプロパティ変更時イベント
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="e"></param>
+        private void CommandChanged(DependencyPropertyChangedEventArgs e)
+        {
+            if (e.OldValue is not null and ICommand oldCommand) {
+                oldCommand.CanExecuteChanged -= this.CanExecuteChanged;
+            }
+            if (e.NewValue is not null and ICommand newCommand) {
+                newCommand.CanExecuteChanged += this.CanExecuteChanged;
+            }
+        }
+        /// <summary>
+        /// 実行の可不可が変更になったときにコントロールを無効にする
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CanExecuteChanged(object sender, EventArgs e)
+        {
+            if (this.Command != null) {
+                this.IsEnabled = this.Command is RoutedCommand command
+                    ? command?.CanExecute(this.CommandParameter, this.CommandTarget) ?? true
+                    : this.Command?.CanExecute(this.CommandParameter) ?? true;
+            }
         }
 
         /// <summary>
@@ -97,101 +125,73 @@ namespace HouseholdAccountBook.Views.UserControls
         }
         #endregion
 
-        /// <summary>
-        /// <see cref="NumericInputButton"/> クラスの新しいインスタンスを初期化します。
-        /// </summary>
-        public NumericInputButton() => this.InitializeComponent();
-
-        #region イベントハンドラ
         #region コマンド
+        /// <summary>
+        /// 数字ボタンコマンド
+        /// </summary>
+        public ICommand NumberInputCommand => field ??= new RelayCommand<string>(this.NumberInputCommand_Execute);
         /// <summary>
         /// 数字ボタン押下時
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void NumberInputCommand_Execute(object sender, ExecutedRoutedEventArgs e)
+        /// <param name="value">押されたボタン</param>
+        private void NumberInputCommand_Execute(string value)
         {
-            ContentControl control = e.OriginalSource as ContentControl;
-            int value = int.Parse(control.Content.ToString()); // 入力値
-
-            this.InputedValue = value;
+            if (int.TryParse(value, out int ret)) {
+                this.InputedValue = ret;
+            }
+            else {
+                this.InputedValue = null;
+            }
             this.InputedKind = InputKind.Number;
             this.ExecuteCommand();
-
-            e.Handled = true;
         }
 
         /// <summary>
+        /// BackSpaceコマンド
+        /// </summary>
+        public ICommand BackSpaceInputCommand => field ??= new RelayCommand(this.BackSpaceInputCommand_Execute);
+        /// <summary>
         /// BackSpaceボタン押下時
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void BackSpaceInputCommand_Execute(object sender, ExecutedRoutedEventArgs e)
+        private void BackSpaceInputCommand_Execute()
         {
             this.InputedKind = InputKind.BackSpace;
             this.ExecuteCommand();
-
-            e.Handled = true;
         }
 
+        /// <summary>
+        /// Clearコマンド
+        /// </summary>
+        public ICommand ClearCommand => field ??= new RelayCommand(this.ClearCommand_Execute);
         /// <summary>
         /// Clearボタン押下時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ClearCommand_Execute(object sender, ExecutedRoutedEventArgs e)
+        private void ClearCommand_Execute()
         {
             this.InputedKind = InputKind.Clear;
             this.ExecuteCommand();
-
-            e.Handled = true;
         }
 
+        /// <summary>
+        /// Closeコマンド
+        /// </summary>
+        public ICommand CloseCommand => field ??= new RelayCommand(this.CloseCommand_Execute);
         /// <summary>
         /// Closeボタン押下時
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CloseCommand_Execute(object sender, ExecutedRoutedEventArgs e)
+        private void CloseCommand_Execute()
         {
             this.InputedKind = InputKind.Close;
             this.ExecuteCommand();
-
-            e.Handled = true;
         }
         #endregion
 
         /// <summary>
-        /// コマンドプロパティ変更時イベント
+        /// <see cref="NumericInputButton"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="d"></param>
-        /// <param name="e"></param>
-        private static void CommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is NumericInputButton nib) {
-                if (e.OldValue is not null and ICommand oldCommand) {
-                    oldCommand.CanExecuteChanged -= nib.OnCanExecuteChanged;
-                }
-                if (e.NewValue is not null and ICommand newCommand) {
-                    newCommand.CanExecuteChanged += nib.OnCanExecuteChanged;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 実行の可不可が変更になったときにコントロールを無効にする
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnCanExecuteChanged(object sender, EventArgs e)
-        {
-            if (this.Command != null) {
-                this.IsEnabled = this.Command is RoutedCommand command
-                    ? command?.CanExecute(this.CommandParameter, this.CommandTarget) ?? true
-                    : this.Command?.CanExecute(this.CommandParameter) ?? true;
-            }
-        }
-        #endregion
+        public NumericInputButton() => this.InitializeComponent();
 
         /// <summary>
         /// コマンドを実行する
