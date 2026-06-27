@@ -14,7 +14,7 @@
     ///     </i:Interaction.Behaviors>
     ///     <TreeView.ItemContainerStyle>
     ///         <Style TargetType="TreeViewItem">
-    ///             <Setter Property="IsSelected" InputedValue="{Binding SelectFlag}" />
+    ///             <Setter Property="IsSelected" InputedNumber="{Binding SelectFlag}" />
     ///         </Style>
     ///     </TreeView.ItemContainerStyle>
     /// </TreeView>

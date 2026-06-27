@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
+﻿using HouseholdAccountBook.Models.Args.RequestEventArgs;
 using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.ViewModels.Abstract

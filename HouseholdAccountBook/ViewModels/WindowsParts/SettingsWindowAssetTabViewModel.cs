@@ -98,7 +98,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// アセット表示順上昇コマンド
         /// </summary>
         public ICommand RaiseAssetSortOrderCommand => field ??= new AsyncRelayCommand(
-            this.RaiseAssetSortOrderCommand_ExecuteAsync, 
+            this.RaiseAssetSortOrderCommand_ExecuteAsync,
             () => 0 < this.AssetSelectorVM.SelectedIndex, this.mBusyService);
         /// <summary>
         /// アセット表示順上昇コマンド処理

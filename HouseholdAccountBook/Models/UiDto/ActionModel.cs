@@ -32,7 +32,7 @@ namespace HouseholdAccountBook.Models.UiDto
         /// <summary>
         /// 帳簿項目 基本Model
         /// </summary>
-        public ActionBaseModel Base { get; init; } = new(ActionIdObj.System, DateTime.Now, 0);
+        public ActionBaseModel Base { get; init; } = new(ActionIdObj.System, DateTime.Now, new(0m));
 
         /// <summary>
         /// 店舗名
@@ -59,18 +59,18 @@ namespace HouseholdAccountBook.Models.UiDto
         /// </summary>
         public DateTime ActTime => this.Base.ActTime;
         /// <summary>
-        /// 金額
+        /// 金額(主単位)
         /// </summary>
-        public decimal Amount => this.Base.Amount;
+        public AmountObj Amount => this.Base.Amount;
 
         /// <summary>
-        /// 収入
+        /// 収入(主単位)
         /// </summary>
-        public decimal? Income => this.Base.Income;
+        public AmountObj? Income => this.Base.Income;
         /// <summary>
-        /// 支出
+        /// 支出(主単位)
         /// </summary>
-        public decimal? Expenses => this.Base.Expenses;
+        public AmountObj? Expenses => this.Base.Expenses;
         #endregion
 
         public ActionModel() { }

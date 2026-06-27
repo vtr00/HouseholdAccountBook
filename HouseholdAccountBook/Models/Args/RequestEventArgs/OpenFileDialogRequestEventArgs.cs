@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
+namespace HouseholdAccountBook.Models.Args.RequestEventArgs
 {
     /// <summary>
     /// ファイル選択ダイアログ要求時イベントのイベント引数

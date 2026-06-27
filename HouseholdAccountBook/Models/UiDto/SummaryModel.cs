@@ -43,9 +43,9 @@ namespace HouseholdAccountBook.Models.UiDto
         }
 
         /// <summary>
-        /// 合計
+        /// 合計(主単位)
         /// </summary>
-        public decimal Total { get; init; } = 0;
+        public AmountObj Total { get; init; } = new(0m);
         #endregion
 
         /// <summary>

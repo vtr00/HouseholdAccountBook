@@ -2,7 +2,6 @@
 using HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Models.DbHandlers;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

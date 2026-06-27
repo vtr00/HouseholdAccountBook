@@ -1,24 +1,28 @@
 ﻿using System;
 
-namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
+namespace HouseholdAccountBook.Models.Args.RequestEventArgs
 {
     /// <summary>
-    /// フォルダ選択ダイアログ要求時イベントのイベント引数
+    /// ファイル保存ダイアログ要求時イベントのイベント引数
     /// </summary>
-    public class OpenFolderDialogRequestEventArgs : EventArgs
+    public class SaveFileDialogRequestEventArgs : EventArgs
     {
         /// <summary>
         /// 初期ディレクトリ
         /// </summary>
         public string InitialDirectory { get; set; }
         /// <summary>
-        /// 初期フォルダ名及び結果フォルダ名
+        /// 初期ファイル及び結果ファイル
         /// </summary>
-        public string FolderName { get; set; }
+        public string FileName { get; set; }
         /// <summary>
-        /// ダイアログタイトル
+        /// ダイアログのタイトル
         /// </summary>
         public string Title { get; set; }
+        /// <summary>
+        /// フィルタ
+        /// </summary>
+        public string Filter { get; set; }
 
         /// <summary>
         /// ダイアログの結果

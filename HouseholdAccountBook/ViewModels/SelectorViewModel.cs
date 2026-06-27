@@ -1,7 +1,7 @@
 ﻿using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.Args;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
 using System.Collections.Generic;

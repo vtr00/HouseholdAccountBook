@@ -21,32 +21,32 @@ namespace HouseholdAccountBook.Infrastructure.Utilities
 
             if (Directory.Exists(directoryPath)) {
                 // サイズ0のファイルを削除する
-                bool deletedZeroSizeFiles = false;
+                int deletedZeroSizeFilesCount = 0;
                 List<string> filePathList = [.. Directory.GetFiles(directoryPath, fileNamePattern, SearchOption.TopDirectoryOnly)];
                 foreach (string filePath in filePathList) {
                     FileInfo fileInfo = new(filePath);
                     if (fileInfo.Length == 0) {
                         fileInfo.Delete();
-                        deletedZeroSizeFiles = true;
+                        deletedZeroSizeFilesCount++;
                     }
                 }
-                if (deletedZeroSizeFiles) {
-                    Log.Debug("Deleted size 0 files.");
+                if (deletedZeroSizeFilesCount != 0) {
+                    Log.Debug($"Deleted size 0 file(s): {deletedZeroSizeFilesCount}");
                 }
 
                 // 古いファイルを削除する
-                bool deletedOldFiles = false;
+                int deletedOldFilesCount = 0;
                 filePathList = [.. Directory.GetFiles(directoryPath, fileNamePattern, SearchOption.TopDirectoryOnly)];
                 if (filePathList.Count > fileNum) {
                     filePathList.Sort();
 
                     for (int i = 0; i < filePathList.Count - fileNum; ++i) {
                         File.Delete(filePathList[i]);
-                        deletedOldFiles = true;
+                        deletedOldFilesCount++;
                     }
                 }
-                if (deletedOldFiles) {
-                    Log.Debug("Deleted old files.");
+                if (deletedOldFilesCount != 0) {
+                    Log.Debug($"Deleted old file(s): {deletedOldFilesCount}");
                 }
             }
         }

@@ -8,7 +8,7 @@ namespace HouseholdAccountBook.Models.UiDto
     /// 帳簿項目 基本Model
     /// </summary>
     [DebuggerDisplay("Id: {ActionId} Date: {ActTime} Amount: {Amount}")]
-    public class ActionBaseModel(ActionIdObj id, DateTime actTime, decimal amount)
+    public class ActionBaseModel(ActionIdObj id, DateTime actTime, AmountObj amount)
     {
         /// <summary>
         /// 帳簿項目ID
@@ -20,17 +20,17 @@ namespace HouseholdAccountBook.Models.UiDto
         /// </summary>
         public DateTime ActTime { get; init; } = actTime;
         /// <summary>
-        /// 金額
+        /// 金額(主単位)
         /// </summary>
-        public decimal Amount { get; init; } = amount;
+        public AmountObj Amount { get; init; } = amount;
 
         /// <summary>
-        /// 収入
+        /// 収入(主単位)
         /// </summary>
-        public decimal? Income => 0 < this.Amount ? this.Amount : null;
+        public AmountObj? Income => 0m < this.Amount ? this.Amount : null;
         /// <summary>
-        /// 支出
+        /// 支出(主単位)
         /// </summary>
-        public decimal? Expenses => this.Amount < 0 ? -this.Amount : null;
+        public AmountObj? Expenses => this.Amount < 0m ? -this.Amount : null;
     }
 }

@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.Infrastructure.CSV;
-using HouseholdAccountBook.Infrastructure.Utilities.Args;
+﻿using HouseholdAccountBook.Models.Args;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -37,7 +36,7 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// CSVデータ
         /// </summary>
-        public ActionCsvDto Record { get; init; }
+        public ActionCsvModel Record { get; init; }
         /// <summary>
         /// 帳簿項目
         /// </summary>

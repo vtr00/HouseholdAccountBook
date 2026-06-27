@@ -48,7 +48,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             using FuncLog funcLog = new(new { accountId, period });
 
             // 開始日までの収支を取得する
-            decimal balance = await this.mAppService.LoadEndingBalance(accountId, period.Start);
+            AmountObj balance = await this.mAppService.LoadEndingBalance(accountId, period.Start);
 
             // 系列データ
             IList<SeriesViewModel> vmList = [
@@ -73,12 +73,12 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             vmList[0].Periods.Add(tmpPeriod);
 
             foreach (SummaryModel summaryVM in summaryVMList) {
-                decimal value = summaryVM.Total;
+                AmountObj value = summaryVM.Total;
                 SeriesViewModel vm = new(summaryVM) {
                     Values = [value],
                     Periods = [tmpPeriod],
                     Total = value,
-                    Average = period.End < DateOnlyExtensions.Today ? value : 0 // 平均値は過去のデータのみで計算する
+                    Average = period.End < DateOnlyExtensions.Today ? value : new(0m) // 平均値は過去のデータのみで計算する
                 };
                 vmList.Add(vm);
             }
@@ -99,7 +99,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                 vmList[0].Values.Add(balance); // 残高
                 vmList[0].Periods.Add(tmpPeriod);
                 for (int j = 0; j < summaryVMList.Count; ++j) {
-                    decimal value = summaryVMList[j].Total;
+                    AmountObj value = summaryVMList[j].Total;
 
                     vmList[j + 1].Values.Add(value);
                     vmList[j + 1].Periods.Add(tmpPeriod);
@@ -121,7 +121,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                         vm.Average /= averageCount;
                     }
                     else {
-                        vm.Average = 0;
+                        vm.Average = new(0m);
                     }
                 }
             }
@@ -148,7 +148,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             }
 
             // 開始日までの収支を取得する
-            decimal balance = await this.mAppService.LoadEndingBalance(accountId, period.Start);
+            AmountObj balance = await this.mAppService.LoadEndingBalance(accountId, period.Start);
 
             IList<SeriesViewModel> vmList = [
                 new() {
@@ -171,12 +171,12 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             vmList[0].Values.Add(balance); // 残高
             vmList[0].Periods.Add(tmpPeriod);
             foreach (SummaryModel summaryVM in summaryVMList) {
-                decimal value = summaryVM.Total;
+                AmountObj value = summaryVM.Total;
                 SeriesViewModel vm = new(summaryVM) {
                     Values = [value],
                     Periods = [tmpPeriod],
                     Total = value,
-                    Average = tmpPeriod.End.IsPost() ? value : 0
+                    Average = tmpPeriod.End.IsPost() ? value : new(0m)
                 };
                 vmList.Add(vm);
             }
@@ -197,7 +197,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                 vmList[0].Values.Add(balance); // 残高
                 vmList[0].Periods.Add(tmpPeriod);
                 for (int j = 0; j < summaryVMList.Count; ++j) {
-                    decimal value = summaryVMList[j].Total;
+                    AmountObj value = summaryVMList[j].Total;
 
                     vmList[j + 1].Values.Add(value);
                     vmList[j + 1].Periods.Add(tmpPeriod);
@@ -219,7 +219,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                         vm.Average /= averageCount;
                     }
                     else {
-                        vm.Average = 0;
+                        vm.Average = new(0m);
                     }
                 }
             }
@@ -239,7 +239,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             DateOnly startTime = startYear;
 
             // 開始日までの収支を取得する
-            decimal balance = await this.mAppService.LoadEndingBalance(accountId, startTime);
+            AmountObj balance = await this.mAppService.LoadEndingBalance(accountId, startTime);
 
             IList<SeriesViewModel> vmList = [
                 new() {
@@ -262,12 +262,12 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             vmList[0].Values.Add(balance); // 残高
             vmList[0].Periods.Add(tmpPeriod);
             foreach (SummaryModel summaryVM in summaryVMList) {
-                decimal value = summaryVM.Total;
+                AmountObj value = summaryVM.Total;
                 SeriesViewModel vm = new(summaryVM) {
                     Values = [],
                     Periods = [],
                     Total = value,
-                    Average = tmpPeriod.End.IsPost() ? value : 0
+                    Average = tmpPeriod.End.IsPost() ? value : new(0m)
                 };
                 vm.Values.Add(value);
                 vm.Periods.Add(tmpPeriod);
@@ -291,7 +291,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                 vmList[0].Values.Add(balance); // 残高
                 vmList[0].Periods.Add(tmpPeriod);
                 for (int j = 0; j < summaryVMList.Count; ++j) {
-                    decimal value = summaryVMList[j].Total;
+                    AmountObj value = summaryVMList[j].Total;
 
                     vmList[j + 1].Values.Add(value);
                     vmList[j + 1].Periods.Add(tmpPeriod);
@@ -313,7 +313,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                         vm.Average /= averageCount;
                     }
                     else {
-                        vm.Average = 0;
+                        vm.Average = new(0m);
                     }
                 }
             }

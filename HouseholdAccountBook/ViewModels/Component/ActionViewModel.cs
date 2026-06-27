@@ -34,26 +34,26 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// </summary>
         public DateTime ActTime => this.ActionWithBalance.Action.ActTime;
         /// <summary>
-        /// 金額
+        /// 金額(主単位)
         /// </summary>
-        public decimal Amount => this.ActionWithBalance.Action.Amount;
+        public AmountObj Amount => this.ActionWithBalance.Action.Amount;
 
         /// <summary>
         /// 収支種別
         /// </summary>
         public BalanceKind BalanceKind => this.ActionWithBalance.Action.Category.BalanceKind;
         /// <summary>
-        /// 収入
+        /// 収入(主単位)
         /// </summary>
-        public decimal? Income => this.ActionWithBalance.Action.Income;
+        public AmountObj? Income => this.ActionWithBalance.Action.Income;
         /// <summary>
-        /// 支出
+        /// 支出(主単位)
         /// </summary>
-        public decimal? Expenses => this.ActionWithBalance.Action.Expenses;
+        public AmountObj? Expenses => this.ActionWithBalance.Action.Expenses;
         /// <summary>
-        /// 残高
+        /// 残高(主単位)
         /// </summary>
-        public decimal? Balance => this.ActionWithBalance.Balance;
+        public AmountObj? Balance => this.ActionWithBalance.Balance;
 
         /// <summary>
         /// 帳簿ID

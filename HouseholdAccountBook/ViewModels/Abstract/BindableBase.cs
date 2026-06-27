@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// 通常はSetProperty経由で呼び出される
         /// </summary>
         /// <param name="propertyName">変更されたプロパティの名前。省略時は呼び出し元の名前を自動取得</param>
-        protected void RaisePropertyChanged([CallerMemberName] string propertyName = null) => this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        protected void RaisePropertyChanged([CallerMemberName] string propertyName = null) => this.PropertyChanged?.Invoke(this, new(propertyName));
 
         /// <summary>
         /// バッキングフィールドの値を変更し、必要に応じて変更通知を発行する

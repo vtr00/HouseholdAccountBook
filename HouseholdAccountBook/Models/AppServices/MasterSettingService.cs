@@ -62,7 +62,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             return am;
         }
-        
+
         /// <summary>
         /// アセットを追加する
         /// </summary>
@@ -155,10 +155,11 @@ namespace HouseholdAccountBook.Models.AppServices
         public async Task<AccountModel> LoadAccountAsync(AccountIdObj accountId)
         {
             using FuncLog funcLog = new(new { accountId });
+            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             BookInfoDao bookInfoDao = new(dbHandler);
-            BookInfoDto dto = await bookInfoDao.FindByBookId((int)accountId);
+            BookInfoDto dto = await bookInfoDao.FindByBookId((int)accountId, (int)UserSettingService.Instance.DefaultAssetId);
 
             MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
 
@@ -166,11 +167,11 @@ namespace HouseholdAccountBook.Models.AppServices
                 SortOrder = dto.SortOrder,
                 AccountKind = EnumUtil.SafeCastEnum(dto.BookKind, AccountKind.Uncategorized),
                 Remark = jsonObj?.Remark ?? string.Empty,
-                InitialValue = dto.InitialValue,
+                InitialValue = new(dto.InitialMainValue, asset.Scale),
                 StartDateExists = jsonObj?.StartDate != null,
                 EndDateExists = jsonObj?.EndDate != null,
                 Period = new(jsonObj?.StartDate?.ToDateOnly() ?? dto.StartDate?.ToDateOnly() ?? DateOnlyExtensions.Today,
-                                jsonObj?.EndDate?.ToDateOnly() ?? dto.EndDate?.ToDateOnly() ?? DateOnlyExtensions.Today),
+                             jsonObj?.EndDate?.ToDateOnly() ?? dto.EndDate?.ToDateOnly() ?? DateOnlyExtensions.Today),
                 DebitAccountId = dto.DebitBookId ?? AccountIdObj.System,
                 PayDay = dto.PayDay,
                 CsvFolderPath = jsonObj == null ? string.Empty : PathUtil.GetSmartPath(App.GetCurrentDir(), jsonObj.CsvFolderPath),
@@ -265,7 +266,7 @@ namespace HouseholdAccountBook.Models.AppServices
             _ = await mstBookDao.UpdateSetableAsync(new() {
                 BookName = account.Name,
                 BookKind = (int)account.AccountKind,
-                InitialValue = (int)account.InitialValue,
+                InitialValue = account.InitialValue.SubValue,
                 DebitBookId = account.DebitAccountId == AccountIdObj.System ? null : (int)account.DebitAccountId,
                 PayDay = account.PayDay,
                 JsonCode = jsonCode,

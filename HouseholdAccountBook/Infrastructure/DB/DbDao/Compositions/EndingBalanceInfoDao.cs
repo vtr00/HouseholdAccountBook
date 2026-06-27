@@ -17,18 +17,24 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         /// <summary>
         /// 全帳簿の開始日付までの <see cref="EndingBalanceInfoDto"/> を取得する
         /// </summary>
+        /// <param name="defaultAssetId">デフォルトアセットID</param>
         /// <param name="startDate">開始日付</param>
         /// <returns>取得したレコード</returns>
-        public async Task<EndingBalanceInfoDto> Find(DateOnly startDate)
+        public async Task<EndingBalanceInfoDto> Find(int defaultAssetId, DateOnly startDate)
         {
-            using FuncLog funcLog = new(new { startDate }, Log.LogLevel.Trace);
+            using FuncLog funcLog = new(new { defaultAssetId, startDate }, Log.LogLevel.Trace);
 
             EndingBalanceInfoDto dto = await this.mDbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"
-SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT COALESCE(SUM(initial_value), 0) FROM mst_book WHERE del_flg = 0) AS ending_balance
-FROM hst_action AA
-INNER JOIN mst_book BB ON BB.book_id = AA.book_id AND BB.del_flg = 0
-WHERE AA.del_flg = 0 AND AA.act_time < @StartDate;",
-new { StartDate = startDate });
+SELECT COALESCE(SUM(A.act_value / POWER(10, MA.scale)), 0) + (
+    SELECT COALESCE(SUM(BB.initial_value / POWER(10, MAA.scale)), 0)
+    FROM mst_book BB
+	INNER JOIN mst_asset MAA ON MAA.asset_id = @DefaultAssetId AND MAA.del_flg = 0
+	WHERE BB.del_flg = 0) AS ending_main_balance
+FROM hst_action A
+INNER JOIN mst_book B ON B.book_id = A.book_id AND B.del_flg = 0
+INNER JOIN mst_asset MA ON MA.asset_id = @DefaultAssetId AND MA.del_flg = 0
+WHERE A.del_flg = 0 AND A.act_time < @StartDate;",
+new { DefaultAssetId = defaultAssetId, StartDate = startDate });
 
             return dto;
         }
@@ -37,18 +43,24 @@ new { StartDate = startDate });
         /// <see cref="MstBookDto.BookId"/>に基づいて、開始日付までの <see cref="EndingBalanceInfoDto"/> を取得する
         /// </summary>
         /// <param name="bookId">帳簿ID</param>
+        /// <param name="defaultAssetId">デフォルトアセットID</param>
         /// <param name="startDate">開始日付</param>
         /// <returns>取得したレコード</returns>
-        public async Task<EndingBalanceInfoDto> FindByBookId(int bookId, DateOnly startDate)
+        public async Task<EndingBalanceInfoDto> FindByBookId(int bookId, int defaultAssetId, DateOnly startDate)
         {
-            using FuncLog funcLog = new(new { bookId, startDate }, Log.LogLevel.Trace);
+            using FuncLog funcLog = new(new { bookId, defaultAssetId, startDate }, Log.LogLevel.Trace);
 
             EndingBalanceInfoDto dto = await this.mDbHandler.QuerySingleAsync<EndingBalanceInfoDto>(@"
-SELECT COALESCE(SUM(AA.act_value), 0) + (SELECT initial_value FROM mst_book WHERE book_id = @BookId) AS ending_balance
-FROM hst_action AA
-INNER JOIN mst_book BB ON BB.book_id = AA.book_id AND BB.del_flg = 0
-WHERE AA.book_id = @BookId AND AA.del_flg = 0 AND AA.act_time < @StartDate;",
-new { BookId = bookId, StartDate = startDate });
+SELECT COALESCE(SUM(A.act_value / POWER(10, MA.scale)), 0) + (
+    SELECT BB.initial_value / POWER(10, MAA.scale)
+	FROM mst_book BB
+	INNER JOIN mst_asset MAA ON MAA.asset_id = @DefaultAssetId AND MAA.del_flg = 0
+	WHERE BB.book_id = @BookId AND BB.del_flg = 0) AS ending_main_balance
+FROM hst_action A
+INNER JOIN mst_book B ON B.book_id = A.book_id AND B.del_flg = 0
+INNER JOIN mst_asset MA ON MA.asset_id = @DefaultAssetId AND MA.del_flg = 0
+WHERE A.book_id = @BookId AND A.del_flg = 0 AND A.act_time < @StartDate;",
+new { BookId = bookId, DefaultAssetId = defaultAssetId, StartDate = startDate });
 
             return dto;
         }

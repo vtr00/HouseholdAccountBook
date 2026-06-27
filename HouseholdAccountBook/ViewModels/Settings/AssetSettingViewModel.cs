@@ -50,7 +50,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 小数点以下桁数
         /// </summary>
         public int InputedScale { get; set; }
-        
+
         /// <summary>
         /// 単位(前置)
         /// </summary>

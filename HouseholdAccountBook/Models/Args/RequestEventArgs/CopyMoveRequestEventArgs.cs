@@ -2,15 +2,15 @@
 using System;
 using System.Collections.Generic;
 
-namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
+namespace HouseholdAccountBook.Models.Args.RequestEventArgs
 {
     /// <summary>
-    /// 移動編集要求イベント時のイベント引数
+    /// 移動複製要求イベント時のイベント引数
     /// </summary>
-    public class EditMoveRequestEventArgs : DbRequestEventArgsBase
+    public class CopyMoveRequestEventArgs : DbRequestEventArgsBase
     {
         /// <summary>
-        /// 編集対象の帳簿項目のグループID
+        /// 複製対象の帳簿項目のグループID
         /// </summary>
         public GroupIdObj TargetGroupId { get; set; }
 

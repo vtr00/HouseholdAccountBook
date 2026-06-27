@@ -1,6 +1,6 @@
 ﻿using HouseholdAccountBook.Models.ValueObjects;
 
-namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
+namespace HouseholdAccountBook.Models.Args.RequestEventArgs
 {
     /// <summary>
     /// CSVファイル比較リクエスト時のイベント引数

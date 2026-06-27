@@ -1,8 +1,7 @@
-﻿using HouseholdAccountBook.Models;
-using HouseholdAccountBook.Models.ValueObjects;
+﻿using HouseholdAccountBook.Models.ValueObjects;
 using System;
 
-namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
+namespace HouseholdAccountBook.Models.Args.RequestEventArgs
 {
     /// <summary>
     /// 期間選択要求イベント時のイベント引数

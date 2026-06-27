@@ -1,9 +1,9 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.Args;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -154,9 +154,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
         /// <summary>
+        /// 金額の小数点以下桁数
+        /// </summary>
+        public int ValueScale {
+            get;
+            set => this.SetProperty(ref field, value);
+        }
+        /// <summary>
         /// 入力された金額(文字列)
         /// </summary>
-        public string InputedValueStr => AssetService.Instance.ToAssetString(this.InputedValue, null, UnitKind.MainUnit);
+        public string InputedValueStr => AssetService.Instance.ToAssetString(this.InputedValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
 
         /// <summary>
         /// 手数料の帳簿項目ID
@@ -189,9 +196,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
         }
         /// <summary>
+        /// 手数料の小数点以下桁数
+        /// </summary>
+        public int CommissionScale {
+            get;
+            set => this.SetProperty(ref field, value);
+        }
+        /// <summary>
         /// 入力された手数料(文字列)
         /// </summary>
-        public string InputedCommissionStr => AssetService.Instance.ToAssetString(this.InputedCommission, null, UnitKind.MainUnit);
+        public string InputedCommissionStr => AssetService.Instance.ToAssetString(this.InputedCommission, null, UnitKind.MainUnit, UnitKind.MainUnit);
 
         /// <summary>
         /// 備考セレクタVM
@@ -273,6 +287,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new(new { initialAccountId, initialMonth, initialDate, targetGroupId });
             using IDisposable disposable = this.mBusyService.Enter();
 
+            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
+
             AccountIdObj selectingFromAccountId = null;
             AccountIdObj selectingToAccountId = null;
             ItemIdObj selectingCommissionItemId = null;
@@ -288,6 +304,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     // WVMに値を設定する
                     this.IsLink = true;
                     this.SelectedFromDate = initialDate?.ToDateTime(TimeOnly.MinValue) ?? ((initialMonth == null || initialMonth?.Month == DateTime.Today.Month) ? DateTime.Today : initialMonth.Value.ToDateTime(TimeOnly.MinValue));
+                    this.ValueScale = asset.Scale;
+                    this.CommissionScale = asset.Scale;
 
                     break;
                 case RegistrationKind.Edit:
@@ -314,8 +332,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     this.IsLink = fromAction.ActTime == toAction.ActTime;
                     this.SelectedFromDate = fromAction.ActTime;
                     this.SelectedToDate = toAction.ActTime;
-                    this.InputedValue = toAction.Amount;
-                    this.InputedCommission = commissionAction?.Expenses;
+                    this.InputedValue = toAction.Amount.MainValue;
+                    this.ValueScale = toAction.Amount.Scale;
+                    this.InputedCommission = commissionAction?.Expenses?.MainValue;
+                    this.CommissionScale = commissionAction?.Expenses?.Scale ?? (selectingCommissionKind == CommissionKind.MoveTo ? toAction.Amount.Scale : fromAction.Amount.Scale);
 
                     break;
                 }
@@ -369,13 +389,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             ActionModel fromAction = new() {
-                Base = new(this.FromActionId, this.SelectedFromDate, (decimal)-this.InputedValue),
+                Base = new(this.FromActionId, this.SelectedFromDate, new(-this.InputedValue.Value, this.ValueScale)),
                 GroupId = this.GroupId,
                 Account = new(this.FromAccountSelectorVM.SelectedKey, string.Empty)
             };
 
             ActionModel toAction = new() {
-                Base = new(this.ToActionId, this.SelectedToDate, (decimal)this.InputedValue),
+                Base = new(this.ToActionId, this.SelectedToDate, new(this.InputedValue.Value, this.ValueScale)),
                 GroupId = this.GroupId,
                 Account = new(this.ToAccountSelectorVM.SelectedKey, string.Empty)
             };
@@ -386,7 +406,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     CommissionKind.MoveFrom => fromAction.ActTime,
                     CommissionKind.MoveTo => toAction.ActTime,
                     _ => throw new NotSupportedException("SelectedCommissionKind")
-                }, -this.InputedCommission ?? 0),
+                }, new(-this.InputedCommission ?? 0m, this.CommissionScale)),
                 GroupId = this.GroupId,
                 Account = new(commissionKind switch {
                     CommissionKind.MoveFrom => fromAction.Account.Id,
@@ -399,7 +419,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             IEnumerable<ActionIdObj> resActionIdList = await this.mService.SaveMoveActionsAsync(fromAction, toAction, commissionAction);
 
-            if (commissionAction.Amount != 0) {
+            if (commissionAction.Amount.MainValue != 0m) {
                 if (!string.IsNullOrEmpty(commissionAction.Remark)) {
                     RemarkModel remark = new(commissionAction.Remark) { ItemId = commissionAction.Item.Id, CurrentActTime = commissionAction.ActTime };
                     await this.mService.SaveRemarkAsync(remark);

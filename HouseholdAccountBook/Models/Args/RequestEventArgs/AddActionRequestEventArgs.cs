@@ -1,9 +1,9 @@
-﻿using HouseholdAccountBook.Infrastructure.CSV;
+﻿using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using System;
 using System.Collections.Generic;
 
-namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
+namespace HouseholdAccountBook.Models.Args.RequestEventArgs
 {
     /// <summary>
     /// 帳簿項目追加要求イベント時のイベント引数
@@ -23,9 +23,9 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs
         /// </summary>
         public DateOnly? InitialDate { get; set; }
         /// <summary>
-        /// 初期表示するCSVレコード
+        /// 初期表示するCSVレコードモデル
         /// </summary>
-        public ActionCsvDto InitialRecord { get; set; }
+        public ActionCsvModel InitialRecord { get; set; }
 
         /// <summary>
         /// 登録完了時イベントハンドラ

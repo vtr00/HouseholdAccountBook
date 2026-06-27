@@ -38,10 +38,13 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             HstActionDao hstActionDao = new(dbHandler);
-            HstActionDto dto = await hstActionDao.FindByIdAsync(actionId.Id);
+            HstActionDto dto = await hstActionDao.FindByIdAsync((int)actionId);
+
+            MstAssetDao mstAssetDao = new(dbHandler);
+            MstAssetDto mstAssetDto = await mstAssetDao.FindByIdAsync((int)UserSettingService.Instance.DefaultAssetId);
 
             ActionModel action = new() {
-                Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
+                Base = new(dto.ActionId, dto.ActTime, AmountObj.FromSubValue(dto.ActValue, mstAssetDto.Scale)),
                 GroupId = dto.GroupId,
                 Account = new(dto.BookId, string.Empty),
                 Category = new(null, string.Empty, 0 < Math.Sign(dto.ActValue) ? BalanceKind.Income : BalanceKind.Expenses),
@@ -128,7 +131,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             BookId = (int)action.Account.Id,
                             ItemId = (int)action.Item.Id,
                             ActTime = tmpActTime,
-                            ActValue = (int)action.Amount,
+                            ActValue = action.Amount.SubValue,
                             ShopName = action.Shop,
                             GroupId = (int?)assingedGroupId,
                             Remark = action.Remark
@@ -151,7 +154,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 BookId = (int)action.Account.Id,
                                 ItemId = (int)action.Item.Id,
                                 ActTime = action.ActTime,
-                                ActValue = (int)action.Amount,
+                                ActValue = action.Amount.SubValue,
                                 ShopName = action.Shop,
                                 GroupId = null,
                                 Remark = action.Remark,
@@ -175,7 +178,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                     BookId = (int)action.Account.Id,
                                     ItemId = (int)action.Item.Id,
                                     ActTime = action.ActTime,
-                                    ActValue = (int)action.Amount,
+                                    ActValue = action.Amount.SubValue,
                                     ShopName = action.Shop,
                                     GroupId = null,
                                     Remark = action.Remark,
@@ -194,7 +197,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                     BookId = (int)action.Account.Id,
                                     ItemId = (int)action.Item.Id,
                                     ActTime = action.ActTime,
-                                    ActValue = (int)action.Amount,
+                                    ActValue = action.Amount.SubValue,
                                     ShopName = action.Shop,
                                     GroupId = (int?)action.GroupId,
                                     Remark = action.Remark,
@@ -235,7 +238,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             BookId = (int)action.Account.Id,
                             ItemId = (int)action.Item.Id,
                             ActTime = tmpActTime,
-                            ActValue = (int)action.Amount,
+                            ActValue = action.Amount.SubValue,
                             ShopName = action.Shop,
                             GroupId = (int?)assignedGroupId,
                             Remark = action.Remark,
@@ -255,7 +258,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                         BookId = (int)action.Account.Id,
                                         ItemId = (int)action.Item.Id,
                                         ActTime = tmpActTime,
-                                        ActValue = (int)action.Amount,
+                                        ActValue = action.Amount.SubValue,
                                         ShopName = action.Shop,
                                         GroupId = (int?)assignedGroupId,
                                         Remark = action.Remark,
@@ -278,7 +281,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 BookId = (int)action.Account.Id,
                                 ItemId = (int)action.Item.Id,
                                 ActTime = tmpActTime,
-                                ActValue = (int)action.Amount,
+                                ActValue = action.Amount.SubValue,
                                 ShopName = action.Shop,
                                 GroupId = (int?)assignedGroupId,
                                 Remark = action.Remark,
@@ -311,12 +314,15 @@ namespace HouseholdAccountBook.Models.AppServices
 
             List<ActionModel> actionList = [];
             foreach (HstActionDto dto in dtoList) {
+                MstAssetDao mstAssetDao = new(dbHandler);
+                MstAssetDto mstAssetDto = await mstAssetDao.FindByIdAsync((int)UserSettingService.Instance.DefaultAssetId);
+
                 ActionModel action = new() {
                     GroupId = groupId,
                     Account = new(dto.BookId, string.Empty),
                     Category = new(null, string.Empty, 0 < Math.Sign(dto.ActValue) ? BalanceKind.Income : BalanceKind.Expenses),
                     Item = new(dto.ItemId, string.Empty),
-                    Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
+                    Base = new(dto.ActionId, dto.ActTime, AmountObj.FromSubValue(dto.ActValue, mstAssetDto.Scale)),
                     Shop = new(dto.ShopName),
                     Remark = new(dto.Remark)
                 };
@@ -350,7 +356,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             BookId = (int)action.Account.Id,
                             ItemId = (int)action.Item.Id,
                             ActTime = action.ActTime,
-                            ActValue = (int)action.Amount,
+                            ActValue = action.Amount.SubValue,
                             ShopName = action.Shop,
                             GroupId = (int?)assignedGroupId,
                             Remark = action.Remark
@@ -370,7 +376,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 BookId = (int)action.Account.Id,
                                 ItemId = (int)action.Item.Id,
                                 ActTime = action.ActTime,
-                                ActValue = (int)action.Amount,
+                                ActValue = action.Amount.SubValue,
                                 ShopName = action.Shop,
                                 Remark = action.Remark,
                                 GroupId = (int?)action.GroupId,
@@ -384,7 +390,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 BookId = (int)action.Account.Id,
                                 ItemId = (int)action.Item.Id,
                                 ActTime = action.ActTime,
-                                ActValue = (int)action.Amount,
+                                ActValue = action.Amount.SubValue,
                                 ShopName = action.Shop,
                                 Remark = action.Remark,
                                 GroupId = (int?)action.GroupId
@@ -414,11 +420,14 @@ namespace HouseholdAccountBook.Models.AppServices
         public async Task<(ActionModel, ActionModel, ActionModel)> LoadMoveActionsAsync(GroupIdObj groupId)
         {
             using FuncLog funcLog = new(new { groupId });
+
+            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             MoveActionInfoDao moveActionInfoDao = new(dbHandler);
             // 移動元、移動先、手数料の順に並び替え
-            IEnumerable<MoveActionInfoDto> dtoList = (await moveActionInfoDao.GetAllAsync(groupId.Id)).OrderBy(dto => dto.ActValue).OrderBy(dto => -dto.MoveFlg);
+            IEnumerable<MoveActionInfoDto> dtoList = await moveActionInfoDao.GetAllAsync((int)UserSettingService.Instance.DefaultAssetId, (int)groupId);
+            dtoList = dtoList.OrderBy(dto => dto.ActMainValue).OrderBy(dto => -dto.MoveFlg);
 
             List<ActionModel> actionList = [];
             foreach (MoveActionInfoDto dto in dtoList) {
@@ -426,7 +435,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     GroupId = groupId,
                     Account = new(dto.BookId, string.Empty),
                     Item = new(dto.ItemId, string.Empty),
-                    Base = new(dto.ActionId, dto.ActTime, dto.ActValue),
+                    Base = new(dto.ActionId, dto.ActTime, new(dto.ActMainValue, asset.Scale)),
                     Remark = new(dto.Remark)
                 };
                 actionList.Add(action);
@@ -464,7 +473,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     ActionIdObj fromActionId = await hstActionDao.InsertMoveActionReturningIdAsync(new HstActionDto {
                         BookId = (int)fromAction.Account.Id,
                         ActTime = fromAction.ActTime,
-                        ActValue = (int)fromAction.Amount,
+                        ActValue = fromAction.Amount.SubValue,
                         GroupId = (int?)assignedGroupId
                     }, (int)BalanceKind.Expenses);
                     resActionIdList.Add(fromActionId);
@@ -472,7 +481,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     ActionIdObj toActionId = await hstActionDao.InsertMoveActionReturningIdAsync(new HstActionDto {
                         BookId = (int)toAction.Account.Id,
                         ActTime = toAction.ActTime,
-                        ActValue = (int)toAction.Amount,
+                        ActValue = toAction.Amount.SubValue,
                         GroupId = (int?)assignedGroupId
                     }, (int)BalanceKind.Income);
                     resActionIdList.Add(toActionId);
@@ -484,7 +493,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     _ = await hstActionDao.UpdateMoveActionAsync(new HstActionDto {
                         BookId = (int)fromAction.Account.Id,
                         ActTime = fromAction.ActTime,
-                        ActValue = (int)fromAction.Amount,
+                        ActValue = fromAction.Amount.SubValue,
                         ActionId = (int)fromAction.ActionId
                     });
                     resActionIdList.Add(fromAction.ActionId);
@@ -492,14 +501,14 @@ namespace HouseholdAccountBook.Models.AppServices
                     _ = await hstActionDao.UpdateMoveActionAsync(new HstActionDto {
                         BookId = (int)toAction.Account.Id,
                         ActTime = toAction.ActTime,
-                        ActValue = (int)toAction.Amount,
+                        ActValue = toAction.Amount.SubValue,
                         ActionId = (int)toAction.ActionId
                     });
                     resActionIdList.Add(toAction.ActionId);
                     #endregion
                 }
 
-                if (commissionAction.Amount != 0) {
+                if (commissionAction.Amount.MainValue != 0) {
                     #region 手数料あり
                     if (commissionAction.ActionId is null) {
                         // 手数料が未登録のとき追加する
@@ -508,7 +517,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             BookId = (int)commissionAction.Account.Id,
                             ItemId = (int)commissionAction.Item.Id,
                             ActTime = commissionAction.ActTime,
-                            ActValue = (int)commissionAction.Amount,
+                            ActValue = commissionAction.Amount.SubValue,
                             Remark = commissionAction.Remark,
                             GroupId = (int?)assignedGroupId
                         });
@@ -521,7 +530,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             BookId = (int)commissionAction.Account.Id,
                             ItemId = (int)commissionAction.Item.Id,
                             ActTime = commissionAction.ActTime,
-                            ActValue = (int)commissionAction.Amount,
+                            ActValue = commissionAction.Amount.SubValue,
                             Remark = commissionAction.Remark,
                             GroupId = (int?)assignedGroupId,
                             ActionId = (int)commissionAction.ActionId

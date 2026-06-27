@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace HouseholdAccountBook.Infrastructure.Utilities.Args
+namespace HouseholdAccountBook.Models.Args
 {
     /// <summary>
     /// 値変更時のイベント引数

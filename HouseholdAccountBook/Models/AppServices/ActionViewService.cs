@@ -94,16 +94,18 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="accountId">帳簿ID</param>
         /// <param name="startDate">開始日付</param>
         /// <returns>繰越残高</returns>
-        public async Task<decimal> LoadEndingBalance(AccountIdObj accountId, DateOnly startDate)
+        public async Task<AmountObj> LoadEndingBalance(AccountIdObj accountId, DateOnly startDate)
         {
             using FuncLog funcLog = new(new { accountId, startDate });
+
+            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
             EndingBalanceInfoDto dto = accountId == AccountIdObj.System
-                ? await endingBalanceInfoDao.Find(startDate) // 全帳簿の繰越残高
-                : await endingBalanceInfoDao.FindByBookId(accountId.Id, startDate); // 各帳簿の繰越残高
-            decimal balance = dto.EndingBalance;
+                ? await endingBalanceInfoDao.Find((int)UserSettingService.Instance.DefaultAssetId, startDate) // 全帳簿の繰越残高
+                : await endingBalanceInfoDao.FindByBookId(accountId.Id, (int)UserSettingService.Instance.DefaultAssetId, startDate); // 各帳簿の繰越残高
+            AmountObj balance = new(dto.EndingMainBalance, asset.Scale);
 
             return balance;
         }
@@ -132,10 +134,12 @@ namespace HouseholdAccountBook.Models.AppServices
         public async Task<IEnumerable<ActionWithBalanceModel>> LoadActionListAsync(AccountIdObj accountId, PeriodObj<DateOnly> period)
         {
             using FuncLog funcLog = new(new { accountId, period });
+
+            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             List<ActionWithBalanceModel> amList = [];
-            decimal balance = await this.LoadEndingBalance(accountId, period.Start);
+            AmountObj balance = await this.LoadEndingBalance(accountId, period.Start);
 
             // 繰越残高を追加
             {
@@ -144,7 +148,7 @@ namespace HouseholdAccountBook.Models.AppServices
                         Account = new(AccountIdObj.System, string.Empty),
                         Category = new(CategoryIdObj.System, string.Empty, BalanceKind.Others),
                         Item = new(ItemIdObj.System, Properties.Resources.ListName_CarryForward),
-                        Base = new(ActionIdObj.System, period.Start.ToDateTime(TimeOnly.MinValue), 0),
+                        Base = new(ActionIdObj.System, period.Start.ToDateTime(TimeOnly.MinValue), new(0m, asset.Scale)),
                         Shop = null,
                         Remark = null,
                         IsMatch = false
@@ -156,19 +160,19 @@ namespace HouseholdAccountBook.Models.AppServices
 
             ActionInfoDao actionInfoDao = new(dbHandler);
             IEnumerable<ActionInfoDto> dtoList = accountId == AccountIdObj.System
-                ? await actionInfoDao.FindAllWithinTerm(period.Start, period.End) // 全帳簿項目
-                : await actionInfoDao.FindByBookIdWithinTerm(accountId.Id, period.Start, period.End); // 各帳簿項目
+                ? await actionInfoDao.FindAllWithinPeriod((int)UserSettingService.Instance.DefaultAssetId, period.Start, period.End) // 全帳簿項目
+                : await actionInfoDao.FindByBookIdWithinPeriod((int)accountId, (int)UserSettingService.Instance.DefaultAssetId, period.Start, period.End); // 各帳簿項目
 
             foreach (ActionInfoDto aDto in dtoList) {
-                balance += aDto.ActValue;
+                balance += new AmountObj(aDto.ActMainValue, asset.Scale);
 
                 ActionWithBalanceModel am = new() {
                     Action = new() {
                         GroupId = aDto.GroupId,
                         Account = new(aDto.BookId, aDto.BookName),
-                        Category = new(aDto.CategoryId, aDto.CategoryName, aDto.ActValue < 0 ? BalanceKind.Expenses : BalanceKind.Income),
+                        Category = new(aDto.CategoryId, aDto.CategoryName, aDto.ActMainValue < 0 ? BalanceKind.Expenses : BalanceKind.Income),
                         Item = new(aDto.ItemId, aDto.ItemName),
-                        Base = new(aDto.ActionId, aDto.ActTime, aDto.ActValue),
+                        Base = new(aDto.ActionId, aDto.ActTime, new(aDto.ActMainValue, asset.Scale)),
                         Shop = new(aDto.ShopName),
                         Remark = new(aDto.Remark),
                         IsMatch = aDto.IsMatch == 1
@@ -239,24 +243,26 @@ namespace HouseholdAccountBook.Models.AppServices
         {
             using FuncLog funcLog = new(new { accountId, period });
 
+            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
+
             List<SummaryModel> smList = [];
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 SummaryInfoDao summaryInfoDao = new(dbHandler);
                 IEnumerable<SummaryInfoDto> dtoList = accountId == AccountIdObj.System
-                    ? await summaryInfoDao.FindAllWithinPeriod(period.Start, period.End)
-                    : await summaryInfoDao.FindByBookIdWithinPeriod(accountId.Id, period.Start, period.End);
+                    ? await summaryInfoDao.FindAllWithinPeriod((int)UserSettingService.Instance.DefaultAssetId, period.Start, period.End)
+                    : await summaryInfoDao.FindByBookIdWithinPeriod((int)accountId, (int)UserSettingService.Instance.DefaultAssetId, period.Start, period.End);
 
                 foreach (SummaryInfoDto dto in dtoList) {
                     smList.Add(new() {
                         Category = new(dto.CategoryId, dto.CategoryName, EnumUtil.SafeCastEnum(dto.BalanceKind, BalanceKind.Income)),
                         Item = new(dto.ItemId, dto.ItemName),
-                        Total = dto.Total
+                        Total = new(dto.MainTotal, asset.Scale)
                     });
                 }
             }
 
             // 差引損益
-            decimal total = smList.Sum(obj => obj.Total);
+            AmountObj total = new(smList.Sum(obj => obj.Total.MainValue), asset.Scale);
             // 収入/支出
             List<SummaryModel> totalAsBalanceKindList = [];
             // 分類小計
@@ -267,13 +273,13 @@ namespace HouseholdAccountBook.Models.AppServices
                 // 収入/支出の小計を計算する
                 totalAsBalanceKindList.Add(new() {
                     Category = new(CategoryIdObj.System, string.Empty, g1.Key),
-                    Total = g1.Sum(obj => obj.Total)
+                    Total = new(g1.Sum(obj => obj.Total.MainValue), asset.Scale)
                 });
                 // 分類別の小計を計算する
                 foreach (IGrouping<int, SummaryModel> g2 in g1.GroupBy(obj => (int)obj.Category.Id)) {
                     totalAsCategoryList.Add(new() {
                         Category = new(g2.Key, g2.First().Category.Name, g1.Key),
-                        Total = g2.Sum(obj => obj.Total)
+                        Total = new(g2.Sum(obj => obj.Total.MainValue), asset.Scale)
                     });
                 }
             }

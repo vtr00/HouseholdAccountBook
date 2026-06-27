@@ -10,14 +10,18 @@ namespace HouseholdAccountBook.ViewModels.Component
     {
         #region プロパティ
         /// <summary>
-        /// 値(Y軸用)
+        /// 値(主単位/Y軸用)
         /// </summary>
-        public int Value { get; init; }
+        public decimal Value { get; init; }
 
         /// <summary>
-        /// 日付(Tracker用)
+        /// 日付(Tracker表示用)
         /// </summary>
         public DateOnly Date { get; init; }
+        /// <summary>
+        /// 値(Tracker表示用)
+        /// </summary>
+        public string DisplayValue { get; init; }
 
         /// <summary>
         /// インデックス(LineSeriesのX軸用)

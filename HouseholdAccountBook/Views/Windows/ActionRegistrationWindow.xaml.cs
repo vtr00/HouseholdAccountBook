@@ -1,8 +1,8 @@
-﻿using HouseholdAccountBook.Infrastructure.CSV;
-using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
+﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Infrastructure.Utilities.Args;
 using HouseholdAccountBook.Models;
+using HouseholdAccountBook.Models.Args;
+using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.Views.Extensions;
@@ -61,7 +61,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="initialAccountId">初期選択する帳簿ID</param>
         /// <param name="initialRecord">初期表示するCSVレコード</param>
-        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, ActionCsvDto initialRecord)
+        public ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, ActionCsvModel initialRecord)
             : this(owner, dbHandlerFactory, initialAccountId, null, null, initialRecord, null, RegistrationKind.Add) { }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="targetActionId">複製/編集する帳簿項目ID</param>
         /// <param name="regKind">登録種別</param>
         private ActionRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate,
-                                         ActionCsvDto initialRecord, ActionIdObj targetActionId, RegistrationKind regKind)
+                                         ActionCsvModel initialRecord, ActionIdObj targetActionId, RegistrationKind regKind)
         {
             using FuncLog funcLog = new(new { initialAccountId, initialMonth, initialDate, initialRecord, targetActionId, regKind });
 

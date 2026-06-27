@@ -2,11 +2,11 @@
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
-using HouseholdAccountBook.Infrastructure.Utilities.Args;
-using HouseholdAccountBook.Infrastructure.Utilities.Args.RequestEventArgs;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Models.Args;
+using HouseholdAccountBook.Models.Args.RequestEventArgs;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
@@ -141,7 +141,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 選択されたデータの平均値(平均値)
         /// </summary>
-        public string AverageValueStr => AssetService.Instance.ToAssetString(this.AverageValue, null, UnitKind.MainUnit);
+        public string AverageValueStr => AssetService.Instance.ToAssetString(this.AverageValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
         /// <summary>
         /// 選択されたデータの個数
         /// </summary>
@@ -153,23 +153,23 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 選択されたデータの合計値(文字列)
         /// </summary>
-        public string SumValueStr => AssetService.Instance.ToAssetString(this.SumValue, null, UnitKind.MainUnit);
+        public string SumValueStr => AssetService.Instance.ToAssetString(this.SumValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
         /// <summary>
         /// 選択されたデータの収入合計値
         /// </summary>
-        public decimal IncomeSumValue => this.ActionSelectorVM.SelectedItemList.Sum(static vm => vm.BalanceKind == BalanceKind.Income ? vm.Amount : 0);
+        public decimal IncomeSumValue => this.ActionSelectorVM.SelectedItemList.Sum(static vm => vm.BalanceKind == BalanceKind.Income ? vm.Amount.MainValue : 0m);
         /// <summary>
         /// 選択されたデータの収入合計値(文字列)
         /// </summary>
-        public string IncomeSumValueStr => AssetService.Instance.ToAssetString(this.IncomeSumValue, null, UnitKind.MainUnit);
+        public string IncomeSumValueStr => AssetService.Instance.ToAssetString(this.IncomeSumValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
         /// <summary>
         /// 選択されたデータの支出合計値
         /// </summary>
-        public decimal ExpensesSumValue => this.ActionSelectorVM.SelectedItemList.Sum(static vm => vm.BalanceKind == BalanceKind.Expenses ? vm.Amount : 0);
+        public decimal ExpensesSumValue => this.ActionSelectorVM.SelectedItemList.Sum(static vm => vm.BalanceKind == BalanceKind.Expenses ? vm.Amount.MainValue : 0m);
         /// <summary>
         /// 選択されたデータの支出合計値(文字列)
         /// </summary>
-        public string ExpensesSumValueStr => AssetService.Instance.ToAssetString(this.ExpensesSumValue, null, UnitKind.MainUnit);
+        public string ExpensesSumValueStr => AssetService.Instance.ToAssetString(this.ExpensesSumValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
 
         /// <summary>
         /// 概要セレクタVM
