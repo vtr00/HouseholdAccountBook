@@ -640,7 +640,7 @@ namespace HouseholdAccountBook.Views.UserControls
         {
             using FuncLog funcLog = new(new { this.Session.Text });
 
-            this.CommitText(this.Session.Text, this._textBox.SelectionStart);
+            this.CommitText(this.Session.Text, this._textBox.SelectionStart, NumericInputButton.InputKind.Undefined, false);
         }
 
         /// <summary>
@@ -743,7 +743,7 @@ namespace HouseholdAccountBook.Views.UserControls
             }
 
             if (inputedKind != NumericInputButton.InputKind.Close) {
-                this.CommitText(newText, newSelectionStart);
+                this.CommitText(newText, newSelectionStart, inputedKind, true);
 
                 _ = this._textBox.Focus();
             }
@@ -754,7 +754,9 @@ namespace HouseholdAccountBook.Views.UserControls
         /// </summary>
         /// <param name="tmpText">入力テキスト</param>
         /// <param name="tmpSelectionStart">選択位置</param>
-        private void CommitText(string tmpText, int tmpSelectionStart)
+        /// <param name="inputedKind">入力種別</param>
+        /// <param name="isButtonInput">ボタン入力か</param>
+        private void CommitText(string tmpText, int tmpSelectionStart, NumericInputButton.InputKind inputedKind, bool isButtonInput)
         {
             using FuncLog funcLog = new(new { tmpText, tmpSelectionStart }, Log.LogLevel.Trace);
 
@@ -769,18 +771,18 @@ namespace HouseholdAccountBook.Views.UserControls
                 // 選択箇所が小数点より前なら選択位置を入力文字の次にする
                 int oldPointIndex = tmpText.IndexOf(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
                 if (oldPointIndex == -1) { oldPointIndex = text.Length; }
-                if (selectionStart < oldPointIndex) {
-                    selectionStart = selectionStart + 1;
+                if (inputedKind == NumericInputButton.InputKind.Number && isButtonInput && selectionStart < oldPointIndex) {
+                    selectionStart++;
                 }
                 // 先頭が0で1以上の数なら先頭の0を削除
                 if (1 <= text.Length && text[0] == '0' && 1 <= value) {
                     text = text[1..];
-                    selectionStart = selectionStart - 1;
+                    selectionStart--;
                 }
                 // 2文字目が0で-1以下の数なら2文字目の0を削除
                 if (2 <= text.Length && text[0] == '-' && text[1] == '0' && value <= -1) {
                     text = '-' + text[2..];
-                    selectionStart = selectionStart - 1;
+                    selectionStart--;
                 }
                 if (!this.IsFloating) {
                     // 小数点以下桁数を超える範囲は削除
