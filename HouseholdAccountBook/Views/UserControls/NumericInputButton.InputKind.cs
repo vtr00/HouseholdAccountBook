@@ -11,6 +11,10 @@ namespace HouseholdAccountBook.Views.UserControls
         public enum InputKind
         {
             /// <summary>
+            /// 未定義
+            /// </summary>
+            Undefined,
+            /// <summary>
             /// 未入力
             /// </summary>
             Unputed,
