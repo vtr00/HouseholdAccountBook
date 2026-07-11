@@ -2,7 +2,7 @@
 using System;
 using System.Data;
 
-namespace HouseholdAccountBook.Infrastructure.DB
+namespace HouseholdAccountBook.Infrastructure.DB.DbTypeHandlers
 {
     /// <summary>
     /// Dapper で <see cref="DateOnly"/> を扱えるようにするためのハンドラ

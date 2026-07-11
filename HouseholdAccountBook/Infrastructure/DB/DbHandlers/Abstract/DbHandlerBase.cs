@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using HouseholdAccountBook.Infrastructure.DB.DbTypeHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
 using System;
 using System.Collections.Generic;
@@ -65,6 +66,8 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         {
             DefaultTypeMap.MatchNamesWithUnderscores = true;
             SqlMapper.AddTypeHandler(new DateOnlyHandler());
+            SqlMapper.AddTypeHandler(new DecimalHandler());
+            SqlMapper.AddTypeHandler(new NullableDecimalHandler());
         }
 
         /// <summary>
