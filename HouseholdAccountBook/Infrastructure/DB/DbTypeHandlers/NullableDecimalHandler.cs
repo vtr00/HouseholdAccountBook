@@ -23,8 +23,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbTypeHandlers
         /// <param name="value">変換元の値</param>
         public override decimal? Parse(object value)
         {
-            return value switch
-            {
+            return value switch {
                 decimal d => d,
                 double d => (decimal)d,
                 float f => (decimal)f,

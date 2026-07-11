@@ -18,6 +18,17 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
     {
         public override Task<int> CreateTableAsync() => throw new NotImplementedException();
 
+        /// <summary>
+        /// <see cref="MstBookDto.AssetId"/> 列を追加する
+        /// </summary>
+        /// <returns></returns>
+        public async Task AddAssetIdColumnAsync()
+        {
+            _ = await this.mDbHandler.ExecuteAsync(@"
+ALTER TABLE mst_book
+ADD COLUMN asset_id INTEGER DEFAULT NULL;");
+        }
+
         public override async Task<IEnumerable<MstBookDto>> FindAllAsync()
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
@@ -79,8 +90,8 @@ ORDER BY sort_order;");
 
             int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO mst_book 
-(book_id, book_name, book_kind, initial_value, pay_day, debit_book_id, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter) 
-VALUES (@BookId, @BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @JsonCode, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
+(book_id, book_name, book_kind, initial_value, pay_day, debit_book_id, asset_id, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter) 
+VALUES (@BookId, @BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @AssetId, @JsonCode, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -90,8 +101,8 @@ VALUES (@BookId, @BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @Js
             using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
 
             int bookId = await this.mDbHandler.QuerySingleAsync<int>(@"
-INSERT INTO mst_book (book_name, book_kind, initial_value, pay_day, debit_book_id, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @JsonCode, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
+INSERT INTO mst_book (book_name, book_kind, initial_value, pay_day, debit_book_id, asset_id, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@BookName, @BookKind, @InitialValue, @PayDay, @DebitBookId, @AssetId, @JsonCode, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_book), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING book_id;", dto);
 
             return bookId;
@@ -108,7 +119,7 @@ RETURNING book_id;", dto);
 
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE mst_book
-SET book_name = @BookName, book_kind = @BookKind, initial_value = @InitialValue, debit_book_id = @DebitBookId, pay_day = @PayDay, 
+SET book_name = @BookName, book_kind = @BookKind, initial_value = @InitialValue, pay_day = @PayDay, debit_book_id = @DebitBookId, asset_id = @AssetId,
     json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE book_id = @BookId;", dto);
 

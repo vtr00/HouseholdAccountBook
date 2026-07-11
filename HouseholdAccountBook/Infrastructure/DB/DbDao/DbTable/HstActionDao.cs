@@ -17,6 +17,17 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
     {
         public override Task<int> CreateTableAsync() => throw new NotImplementedException();
 
+        /// <summary>
+        /// <see cref="HstActionDto.AssetId"/> 列を追加する
+        /// </summary>
+        /// <returns></returns>
+        public async Task AddAssetIdColumnAsync()
+        {
+            _ = await this.mDbHandler.ExecuteAsync(@"
+ALTER TABLE hst_action
+ADD COLUMN asset_id INTEGER DEFAULT NULL;");
+        }
+
         public override async Task<IEnumerable<HstActionDto>> FindAllAsync()
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
@@ -153,8 +164,8 @@ new HstActionDto { BookId = bookId, ItemId = itemId });
 
             int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO hst_action
-(action_id, book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ActionId, @BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @Remark, @IsMatch, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
+(action_id, book_id, item_id, asset_id, act_time, act_value, shop_name, group_id, remark, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@ActionId, @BookId, @ItemId, @AssetId, @ActTime, @ActValue, @ShopName, @GroupId, @Remark, @IsMatch, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -170,8 +181,8 @@ VALUES (@ActionId, @BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @
 
             int actionId = await this.mDbHandler.QuerySingleAsync<int>(@"
 INSERT INTO hst_action
-(book_id, item_id, act_time, act_value, shop_name, group_id, remark, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@BookId, @ItemId, @ActTime, @ActValue, @ShopName, @GroupId, @Remark, @IsMatch, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
+(book_id, item_id, asset_id, act_time, act_value, shop_name, group_id, remark, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@BookId, @ItemId, @AssetId, @ActTime, @ActValue, @ShopName, @GroupId, @Remark, @IsMatch, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING action_id;", dto);
 
             return actionId;
@@ -188,14 +199,14 @@ RETURNING action_id;", dto);
             using FuncLog funcLog = new(new { dto, balanceKind }, Log.LogLevel.Trace);
 
             int actionId = await this.mDbHandler.QuerySingleAsync<int>(@"
-INSERT INTO hst_action (book_id, item_id, act_time, act_value, group_id, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
+INSERT INTO hst_action (book_id, item_id, asset_id, act_time, act_value, group_id, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@BookId, (
   SELECT item_id FROM mst_item I
   INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @BalanceKind) C ON C.category_id = I.category_id
   WHERE move_flg = 1
-), @ActTime, @ActValue, @GroupId, @IsMatch, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
+), @AssetId, @ActTime, @ActValue, @GroupId, @IsMatch, @JsonCode, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING action_id;",
-new { dto.BookId, dto.ActTime, dto.ActValue, dto.GroupId, dto.IsMatch, dto.JsonCode, dto.DelFlg, dto.UpdateTime, dto.Updater, dto.InsertTime, dto.Inserter, BalanceKind = balanceKind });
+new { dto.BookId, dto.AssetId, dto.ActTime, dto.ActValue, dto.GroupId, dto.IsMatch, dto.JsonCode, dto.DelFlg, dto.UpdateTime, dto.Updater, dto.InsertTime, dto.Inserter, BalanceKind = balanceKind });
 
             return actionId;
         }
@@ -206,7 +217,7 @@ new { dto.BookId, dto.ActTime, dto.ActValue, dto.GroupId, dto.IsMatch, dto.JsonC
 
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, is_match = @IsMatch, 
+SET book_id = @BookId, item_id = @ItemId, asset_id = @AssetId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, is_match = @IsMatch, 
     json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
 
@@ -224,7 +235,7 @@ WHERE action_id = @ActionId;", dto);
 
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET book_id = @BookId, act_time = @ActTime, act_value = @ActValue, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
+SET book_id = @BookId, asset_id = @AssetId, act_time = @ActTime, act_value = @ActValue, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
 
             return count;
@@ -241,7 +252,7 @@ WHERE action_id = @ActionId;", dto);
 
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET book_id = @BookId, item_id = @ItemId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, 
+SET book_id = @BookId, item_id = @ItemId, asset_id = @AsseetId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, 
     json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
 

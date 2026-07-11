@@ -57,6 +57,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable
         /// 支払い元帳簿ID
         /// </summary>
         public int? DebitBookId { get; set; }
+        /// <summary>
+        /// 紐づくアセットID
+        /// </summary>
+        public int? AssetId { get; set; }
 
         /// <summary>
         /// MstBookのJSONコード
