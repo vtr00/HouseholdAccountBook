@@ -47,7 +47,7 @@ namespace HouseholdAccountBook.Models.AppServices
             switch (dbHandler.Kind) {
                 case DBKind.PostgreSQL:
                     MtdSchemaVersionDao dao = new(dbHandler);
-                    await dbHandler.ExecTransactionAsync(dao.CreateTableAsync);
+                    await dao.CreateTableAsync();
                     version = await dao.SelectSchemaVersionAsync();
                     break;
                 case DBKind.SQLite:
@@ -94,27 +94,41 @@ namespace HouseholdAccountBook.Models.AppServices
 
             bool result = true;
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                int currentSchemaVersion = await GetSchemaVersionCoreAsync(dbHandler);
-                int requiredSchemaVersion = 1; // アプリが想定しているバージョン
-                while (currentSchemaVersion < requiredSchemaVersion) {
-                    switch (currentSchemaVersion) {
-                        case 0: {
-                            // バージョン1へアップグレード
-                            MstAssetDao dao = new(dbHandler);
-                            _ = await dao.CreateTableAsync();
-                            int assetId = await dao.InsertDefaultReturningIdAsync();
-                            UserSettingService.Instance.DefaultAssetId = assetId;
-                            break;
+                await dbHandler.ExecTransactionAsync(async () => {
+                    int latestSchemaVersion = await GetSchemaVersionCoreAsync(dbHandler); // 更新前のバージョン
+                    int currentSchemaVersion = latestSchemaVersion; // 更新中のバージョン
+                    int requiredSchemaVersion = 2; // アプリが想定しているバージョン
+                    while (currentSchemaVersion < requiredSchemaVersion) {
+                        Log.Info($"Updating SchemaVersion:{currentSchemaVersion}->{currentSchemaVersion + 1}");
+
+                        switch (currentSchemaVersion) {
+                            case 0: {
+                                // バージョン1へアップグレード
+                                MstAssetDao dao = new(dbHandler);
+                                _ = await dao.CreateTableAsync();
+                                int assetId = await dao.InsertDefaultReturningIdAsync();
+                                UserSettingService.Instance.DefaultAssetId = assetId;
+                                break;
+                            }
+                            case 1: {
+                                // バージョン2へアップグレード
+                                MstBookDao bookDao = new(dbHandler);
+                                await bookDao.AddAssetIdColumnAsync();
+                                HstActionDao actionDao = new(dbHandler);
+                                await actionDao.AddAssetIdColumnAsync();
+                                break;
+                            }
+                            default:
+                                break;
                         }
-                        case 1:
-                            // バージョン2へアップグレード
-                            break;
-                        default:
-                            break;
+                        currentSchemaVersion++;
+                        await SetSchemaVersionCoreAsync(dbHandler, currentSchemaVersion);
                     }
-                    currentSchemaVersion++;
-                    await SetSchemaVersionCoreAsync(dbHandler, currentSchemaVersion);
-                }
+
+                    if (latestSchemaVersion != requiredSchemaVersion) {
+                        Log.Info($"Updated SchemaVersion:{latestSchemaVersion}->{requiredSchemaVersion}");
+                    }
+                });
             }
 
             return result;

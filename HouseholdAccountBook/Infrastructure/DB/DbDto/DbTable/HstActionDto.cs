@@ -46,6 +46,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable
         /// </summary>
         public int ItemId { get; set; } = -1;
         /// <summary>
+        /// 紐づくアセットID
+        /// </summary>
+        public int? AssetId { get; set; }
+        /// <summary>
         /// 項目日時
         /// </summary>
         public DateTime ActTime { get; set; } = DateTime.Now;
