@@ -155,17 +155,18 @@ namespace HouseholdAccountBook.Models.AppServices
         public async Task<AccountModel> LoadAccountAsync(AccountIdObj accountId)
         {
             using FuncLog funcLog = new(new { accountId });
-            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             BookInfoDao bookInfoDao = new(dbHandler);
             BookInfoDto dto = await bookInfoDao.FindByBookId((int)accountId, (int)UserSettingService.Instance.DefaultAssetId);
+            AssetModel asset = AssetService.Instance.GetAssetModel(dto.AssetId);
 
             MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
 
             AccountModel bm = new(accountId, dto.BookName) {
                 SortOrder = dto.SortOrder,
                 AccountKind = EnumUtil.SafeCastEnum(dto.BookKind, AccountKind.Uncategorized),
+                AssetId = dto.AssetId,
                 Remark = jsonObj?.Remark ?? string.Empty,
                 InitialValue = new(dto.InitialMainValue, asset.Scale),
                 StartDateExists = jsonObj?.StartDate != null,
@@ -265,6 +266,7 @@ namespace HouseholdAccountBook.Models.AppServices
             MstBookDao mstBookDao = new(dbHandler);
             _ = await mstBookDao.UpdateSetableAsync(new() {
                 BookName = account.Name,
+                AssetId = account.AssetId == AssetIdObj.System ? null : (int)account.AssetId,
                 BookKind = (int)account.AccountKind,
                 InitialValue = account.InitialValue.SubValue,
                 DebitBookId = account.DebitAccountId == AccountIdObj.System ? null : (int)account.DebitAccountId,

@@ -43,6 +43,12 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <returns>デフォルトアセットモデル</returns>
         public AssetModel GetDefaultAssetModel() => this.mAssets.FirstOrDefault(asset => asset.Id == UserSettingService.Instance.DefaultAssetId);
+        /// <summary>
+        /// アセットモデルを取得する
+        /// </summary>
+        /// <param name="assetId">アセットID</param>
+        /// <returns>指定されたアセットIDのアセットモデル</returns>
+        public AssetModel GetAssetModel(AssetIdObj assetId) => this.mAssets.FirstOrDefault(asset => asset.Id == assetId, this.GetDefaultAssetModel());
 
         /// <summary>
         /// 金額を文字列表現に変換する

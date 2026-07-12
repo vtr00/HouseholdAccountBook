@@ -192,12 +192,8 @@ namespace HouseholdAccountBook.Views.UserControls
 
                 if (valid) {
                     Log.Trace($"{nameof(this.Scale)}:{this.Scale}");
-                    if (this.Value is null) {
-                        this.Session.Text = !this.IsFloating ? this.NullValue.ToString($"F{scale}") : this.NullValue.ToString();
-                    }
-                    else {
-                        this.Session.Text = !this.IsFloating ? this.Value.Value.ToString($"F{scale}") : this.Value.Value.ToString();
-                    }
+                    decimal value = this.Value is null ? this.NullValue : this.Value.Value;
+                    this.Session.Text = !this.IsFloating ? value.ToString($"F{scale}") : value.ToString();
                 }
             }
         }
@@ -238,12 +234,8 @@ namespace HouseholdAccountBook.Views.UserControls
 
             if (this.mIsLoadedCompleted) {
                 if (e.NewValue is bool newIsFloating) {
-                    if (this.Value is null) {
-                        this.Session.Text = !newIsFloating ? this.NullValue.ToString($"F{this.Scale}") : this.NullValue.ToString();
-                    }
-                    else {
-                        this.Session.Text = !newIsFloating ? this.Value.Value.ToString($"F{this.Scale}") : this.Value.Value.ToString();
-                    }
+                    decimal value = this.Value is null ? this.NullValue : this.Value.Value;
+                    this.Session.Text = !newIsFloating ? value.ToString($"F{this.Scale}") : value.ToString();
                 }
             }
         }

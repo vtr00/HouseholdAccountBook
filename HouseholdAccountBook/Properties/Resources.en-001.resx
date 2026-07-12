@@ -836,6 +836,9 @@ list</value>
   <data name="TextBlock_AssetName" xml:space="preserve">
     <value>Asset name</value>
   </data>
+  <data name="TextBlock_Asset" xml:space="preserve">
+    <value>Asset</value>
+  </data>
   <data name="TextBlock_SubUnitName" xml:space="preserve">
     <value>Sub Unit Name</value>
   </data>

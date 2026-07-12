@@ -196,9 +196,9 @@
                                         </GroupBox>
 
                                         <!-- ベースレート -->
-                                        <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" 
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" Visibility="Collapsed"
                                                    Text="{x:Static properties:Resources.TextBlock_AssetBaseRate}"/>
-                                        <controls:NumericUpDown Grid.Row="6" Grid.Column="1" Margin="5" IsEnabled="False"
+                                        <controls:NumericUpDown Grid.Row="6" Grid.Column="1" Margin="5" Visibility="Collapsed"
                                                                 Value="{Binding InputedBaseRate}" MinValue="0" IsFloating="True"/>
 
                                         <!-- スケール -->
@@ -320,6 +320,7 @@
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
@@ -358,14 +359,20 @@
                                         <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
                                                  Text="{Binding InputedRemark, UpdateSourceTrigger=PropertyChanged}"/>
 
+                                        <!-- アセット -->
+                                        <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" Visibility="Collapsed"
+                                                   Text="{x:Static properties:Resources.TextBlock_Asset}"/>
+                                        <ComboBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Visibility="Collapsed"
+                                                  ItemsSource="{Binding AssetSelectorVM.ItemList}" SelectedItem="{Binding AssetSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+
                                         <!-- 初期残高 -->
-                                        <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_InitialBalance}"/>
-                                        <controls:NumericUpDown Grid.Row="5" Grid.Column="1" Margin="5" Value="{Binding InputedInitialValue}" Scale="{Binding InitialValueScale}" MinValue="-79228162514264337593543950335"/>
-                                        <TextBlock Grid.Row="5" Grid.Column="2" Margin="5" HorizontalAlignment="Right" Text="{Binding InputedInitialValueStr}"/>
+                                        <controls:NumericUpDown Grid.Row="6" Grid.Column="1" Margin="5" Value="{Binding InputedInitialValue}" Scale="{Binding InitialValueScale}" MinValue="-79228162514264337593543950335"/>
+                                        <TextBlock Grid.Row="6" Grid.Column="2" Margin="5" HorizontalAlignment="Right" Text="{Binding InputedInitialValueStr}"/>
 
                                         <!-- 期間情報 -->
-                                        <GroupBox Grid.Row="6" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_PeriodInformation}">
+                                        <GroupBox Grid.Row="7" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_PeriodInformation}">
                                             <Grid>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto"/>
@@ -399,7 +406,7 @@
                                         </GroupBox>
 
                                         <!-- 支払情報 -->
-                                        <GroupBox Grid.Row="7" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_PaymentInformation}" IsEnabled="{Binding NeedToPay}">
+                                        <GroupBox Grid.Row="8" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_PaymentInformation}" IsEnabled="{Binding NeedToPay}">
                                             <Grid>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto"/>
@@ -424,7 +431,7 @@
                                         </GroupBox>
 
                                         <!-- CSV情報 -->
-                                        <GroupBox Grid.Row="8" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_CSVInformation}" IsEnabled="{Binding CsvDataExists}">
+                                        <GroupBox Grid.Row="9" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_CSVInformation}" IsEnabled="{Binding CsvDataExists}">
                                             <Grid>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto"/>

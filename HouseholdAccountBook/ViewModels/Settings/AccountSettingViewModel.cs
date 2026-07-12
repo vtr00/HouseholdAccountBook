@@ -52,6 +52,11 @@ namespace HouseholdAccountBook.ViewModels.Settings
         }
 
         /// <summary>
+        /// アセットセレクタVM
+        /// </summary>
+        public SelectorViewModel<AssetModel, AssetIdObj> AssetSelectorVM => field ??= new(static vm => vm?.Id);
+
+        /// <summary>
         /// 入力された初期残高
         /// </summary>
         public decimal InputedInitialValue {
@@ -65,11 +70,14 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <summary>
         /// 入力された初期残高(表示値)
         /// </summary>
-        public string InputedInitialValueStr => AssetService.Instance.ToAssetString(this.InputedInitialValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string InputedInitialValueStr => AssetService.Instance.ToAssetString(this.InputedInitialValue, this.AssetSelectorVM.SelectedKey, UnitKind.MainUnit, UnitKind.MainUnit);
         /// <summary>
         /// 初期残高スケール
         /// </summary>
-        public int InitialValueScale { get; set; }
+        public int InitialValueScale {
+            get;
+            set => this.SetProperty(ref field, value);
+        }
 
         #region 期間情報
         /// <summary>
@@ -188,6 +196,12 @@ namespace HouseholdAccountBook.ViewModels.Settings
             this.AccountKindSelectorVM.SelectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.NeedToPay));
                 this.RaisePropertyChanged(nameof(this.CsvDataExists));
+            };
+            this.AssetSelectorVM.SelectionChanged += (sender, e) => {
+                this.RaisePropertyChanged(nameof(this.InputedInitialValueStr));
+
+                AssetModel asset = AssetService.Instance.GetAssetModel(e.NewValue);
+                this.InitialValueScale = asset.Scale;
             };
         }
     }
