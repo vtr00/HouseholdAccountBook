@@ -142,6 +142,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             AccountSettingViewModel vm = this.DisplayedAccountSettingVM;
             AccountModel account = new(vm.Id, vm.InputedName) {
                 AccountKind = vm.AccountKindSelectorVM.SelectedKey,
+                AssetId = vm.AssetSelectorVM.SelectedKey,
                 Remark = vm.InputedRemark ?? string.Empty,
                 InitialValue = new(vm.InputedInitialValue, vm.InitialValueScale),
                 StartDateExists = vm.SelectedIfStartDateExists,

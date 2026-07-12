@@ -836,6 +836,9 @@
   <data name="TextBlock_AssetName" xml:space="preserve">
     <value>アセット名</value>
   </data>
+  <data name="TextBlock_Asset" xml:space="preserve">
+    <value>アセット</value>
+  </data>
   <data name="TextBlock_SubUnitName" xml:space="preserve">
     <value>補助単位名</value>
   </data>

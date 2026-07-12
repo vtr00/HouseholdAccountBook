@@ -58,18 +58,20 @@ namespace HouseholdAccountBook.ViewModels.Loaders
         {
             using FuncLog funcLog = new(new { accountId });
 
-            AccountSettingViewModel vm = null;
+            AccountModel account = await this.mService.LoadAccountAsync(accountId);
 
-            IEnumerable<AccountModel> amList = await this.mAppService.LoadAccountListAsync(initialName: Properties.Resources.ListName_None);
-            AccountModel am = await this.mService.LoadAccountAsync(accountId);
-
-            vm = new(am);
+            AccountSettingViewModel vm = new(account);
             vm.AccountKindSelectorVM.SetLoader(() => UiConstants.AccountKindStr);
-            await vm.AccountKindSelectorVM.LoadAsync(am.AccountKind);
-            vm.DebitAccountSelectorVM.SetLoader(() => amList.Where(tmpVM => tmpVM.Id != accountId));
-            await vm.DebitAccountSelectorVM.LoadAsync(am.DebitAccountId);
+            await vm.AccountKindSelectorVM.LoadAsync(account.AccountKind);
+            vm.AssetSelectorVM.SetLoader(async () => await this.mAppService.LoadAssetListAsync(Properties.Resources.ListName_NoSpecification));
+            await vm.AssetSelectorVM.LoadAsync(account.AssetId);
+            vm.DebitAccountSelectorVM.SetLoader(async () => {
+                IEnumerable<AccountModel> accountList = await this.mAppService.LoadAccountListAsync(initialName: Properties.Resources.ListName_None);
+                return accountList.Where(tmpVM => tmpVM.Id != accountId);
+            });
+            await vm.DebitAccountSelectorVM.LoadAsync(account.DebitAccountId);
             vm.TextEncodingSelectorVM.SetLoader(() => EncodingUtil.GetTextEncodingList());
-            await vm.TextEncodingSelectorVM.LoadAsync(am.TextEncoding);
+            await vm.TextEncodingSelectorVM.LoadAsync(account.TextEncoding);
             vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(accountId)).Select(model => new RelationViewModel(model)), mode: SelectorMode.FirstOrDefault);
             await vm.RelationSelectorVM.LoadAsync();
 

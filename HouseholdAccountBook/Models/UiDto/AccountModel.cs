@@ -39,6 +39,11 @@ namespace HouseholdAccountBook.Models.UiDto
         public string Remark { get; init; }
 
         /// <summary>
+        /// アセットID
+        /// </summary>
+        public AssetIdObj AssetId { get; init; } = AssetIdObj.System;
+
+        /// <summary>
         /// 初期残高(主単位)
         /// </summary>
         public AmountObj InitialValue { get; init; }

@@ -53,6 +53,15 @@ namespace HouseholdAccountBook.Models.ValueObjects
         public int Id { get; init; }
 
         /// <summary>
+        /// 内部管理値
+        /// </summary>
+        public static AssetIdObj System { get; } = new();
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        private AssetIdObj() => this.Id = -1;
+        /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="id">アセットID</param>

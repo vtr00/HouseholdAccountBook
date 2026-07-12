@@ -22,16 +22,19 @@ namespace HouseholdAccountBook.Models.AppServices
     /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
     public class AppCommonService(DbHandlerFactory dbHandlerFactory)
     {
+        #region フィールド
         /// <summary>
         /// DBハンドラファクトリ
         /// </summary>
         private readonly DbHandlerFactory mDbHandlerFactory = dbHandlerFactory;
+        #endregion
 
         /// <summary>
         /// アセットModelリストを取得する
         /// </summary>
-        /// <returns></returns>
-        public async Task<IEnumerable<AssetModel>> LoadAssetListAsync()
+        /// <param name="initialName">1番目に追加する項目の名称(空文字の場合は追加しない)</param>
+        /// <returns>アセットModelリスト</returns>
+        public async Task<IEnumerable<AssetModel>> LoadAssetListAsync(string initialName = "")
         {
             using FuncLog funcLog = new(new { });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
@@ -39,6 +42,11 @@ namespace HouseholdAccountBook.Models.AppServices
             AssetIdObj defaultAssetId = UserSettingService.Instance.DefaultAssetId;
 
             List<AssetModel> amList = [];
+
+            // 1番目に表示する項目を追加する
+            if (initialName != string.Empty) {
+                amList.Add(new(AssetIdObj.System, initialName));
+            }
 
             MstAssetDao mstAssetDao = new(dbHandler);
             IEnumerable<MstAssetDto> dtoList = await mstAssetDao.FindAllAsync();
@@ -87,6 +95,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
                 if (DateOnlyExtensions.IsWithIn(period?.Start, period?.End, jsonObj?.StartDate?.ToDateOnly(), jsonObj?.EndDate?.ToDateOnly())) {
                     AccountModel vm = new(dto.BookId, dto.BookName) {
+                        AssetId = dto.AssetId,
                         Remark = jsonObj?.Remark ?? string.Empty,
                         AccountKind = EnumUtil.SafeCastEnum(dto.BookKind, AccountKind.Uncategorized),
                         DebitAccountId = dto.DebitBookId,
