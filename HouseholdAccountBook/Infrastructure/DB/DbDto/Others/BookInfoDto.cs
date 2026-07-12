@@ -20,6 +20,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Others
         /// </summary>
         public string BookName { get; set; } = string.Empty;
         /// <summary>
+        /// アセットID
+        /// </summary>
+        public int? AssetId { get; set; }
+        /// <summary>
         /// 初期値(主単位)
         /// </summary>
         public decimal InitialMainValue { get; set; }
