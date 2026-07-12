@@ -24,13 +24,13 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
             using FuncLog funcLog = new(new { bookId, defaultAssetId }, Log.LogLevel.Trace);
 
             BookInfoDto dto = await this.mDbHandler.QuerySingleAsync<BookInfoDto>(@"
-SELECT B.book_name, B.book_kind, B.debit_book_id, B.pay_day, B.initial_value / POWER(10, MA.scale) AS initial_main_value, B.json_code, B.sort_order, 
+SELECT B.book_name, B.asset_id, B.book_kind, B.debit_book_id, B.pay_day, B.initial_value / POWER(10, BA.scale) AS initial_main_value, B.json_code, B.sort_order, 
        MIN(A.act_time) AS start_date, MAX(A.act_time) AS end_date
 FROM mst_book B
-INNER JOIN mst_asset MA ON MA.asset_id = @DefaultAssetId AND MA.del_flg = 0
+INNER JOIN mst_asset BA ON BA.asset_id = COALESCE(B.asset_id, @DefaultAssetId) AND BA.del_flg = 0
 LEFT OUTER JOIN hst_action A ON A.book_id = B.book_id AND A.del_flg = 0
 WHERE B.book_id = @BookId AND B.del_flg = 0
-GROUP BY B.book_id, MA.asset_id
+GROUP BY B.book_id, BA.asset_id
 ORDER BY B.sort_order;",
 new { BookId = bookId, DefaultAssetId = defaultAssetId });
 

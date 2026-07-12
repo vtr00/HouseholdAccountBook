@@ -42,6 +42,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable
         /// </summary>
         public string BookName { get; set; } = "(no name)";
         /// <summary>
+        /// 紐づくアセットID
+        /// </summary>
+        public int? AssetId { get; set; }
+        /// <summary>
         /// 初期値(補助単位)
         /// </summary>
         public int InitialValue { get; set; }
@@ -57,10 +61,6 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable
         /// 支払い元帳簿ID
         /// </summary>
         public int? DebitBookId { get; set; }
-        /// <summary>
-        /// 紐づくアセットID
-        /// </summary>
-        public int? AssetId { get; set; }
 
         /// <summary>
         /// MstBookのJSONコード
