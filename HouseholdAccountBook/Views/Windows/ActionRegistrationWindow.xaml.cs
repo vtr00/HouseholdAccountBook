@@ -19,26 +19,26 @@ namespace HouseholdAccountBook.Views.Windows
     {
         #region イベント
         /// <summary>
+        /// 帳簿変更時のイベント
+        /// </summary>
+        public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedAccountChanged {
+            add => this.WVM.SelectedAccountChanged += value;
+            remove => this.WVM.SelectedAccountChanged -= value;
+        }
+        /// <summary>
+        /// 日時変更時のイベント
+        /// </summary>
+        public event EventHandler<ChangedEventArgs<DateTime>> SelectedDateChanged {
+            add => this.WVM.SelectedDateChanged += value;
+            remove => this.WVM.SelectedDateChanged -= value;
+        }
+
+        /// <summary>
         /// 登録時のイベント
         /// </summary>
         public event EventHandler<EventArgs<IEnumerable<ActionIdObj>>> Registrated {
             add => this.WVM.Registrated += value;
             remove => this.WVM.Registrated -= value;
-        }
-
-        /// <summary>
-        /// 帳簿変更時のイベント
-        /// </summary>
-        public event EventHandler<ChangedEventArgs<AccountIdObj>> AccountChanged {
-            add => this.WVM.AccountChanged += value;
-            remove => this.WVM.AccountChanged -= value;
-        }
-        /// <summary>
-        /// 日時変更時のイベント
-        /// </summary>
-        public event EventHandler<ChangedEventArgs<DateTime>> DateChanged {
-            add => this.WVM.DateChanged += value;
-            remove => this.WVM.DateChanged -= value;
         }
         #endregion
 

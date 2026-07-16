@@ -141,7 +141,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 選択されたデータの平均値(平均値)
         /// </summary>
-        public string AverageValueStr => AssetService.Instance.ToAssetString(this.AverageValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string AverageValueStr => AssetService.Instance.ToAssetString(this.AverageValue, this.Parent.SelectedAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
         /// <summary>
         /// 選択されたデータの個数
         /// </summary>
@@ -153,7 +153,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 選択されたデータの合計値(文字列)
         /// </summary>
-        public string SumValueStr => AssetService.Instance.ToAssetString(this.SumValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string SumValueStr => AssetService.Instance.ToAssetString(this.SumValue, this.Parent.SelectedAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
         /// <summary>
         /// 選択されたデータの収入合計値
         /// </summary>
@@ -161,7 +161,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 選択されたデータの収入合計値(文字列)
         /// </summary>
-        public string IncomeSumValueStr => AssetService.Instance.ToAssetString(this.IncomeSumValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string IncomeSumValueStr => AssetService.Instance.ToAssetString(this.IncomeSumValue, this.Parent.SelectedAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
         /// <summary>
         /// 選択されたデータの支出合計値
         /// </summary>
@@ -169,7 +169,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 選択されたデータの支出合計値(文字列)
         /// </summary>
-        public string ExpensesSumValueStr => AssetService.Instance.ToAssetString(this.ExpensesSumValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string ExpensesSumValueStr => AssetService.Instance.ToAssetString(this.ExpensesSumValue, this.Parent.SelectedAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
 
         /// <summary>
         /// 概要セレクタVM
@@ -652,6 +652,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public override void AddEventHandlers()
         {
             using FuncLog funcLog = new();
+
+            // アセット選択変更時
+            this.Parent.SelectedAssetChanged += (sender, e) => {
+                this.RaisePropertyChanged(nameof(this.AverageValueStr));
+                this.RaisePropertyChanged(nameof(this.SumValueStr));
+                this.RaisePropertyChanged(nameof(this.IncomeSumValueStr));
+                this.RaisePropertyChanged(nameof(this.ExpensesSumValueStr));
+            };
 
             // 帳簿項目選択変更時
             this.ActionSelectorVM.SelectedCollectionChanged += (sender, e) => {

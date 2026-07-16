@@ -151,6 +151,24 @@ new HstActionDto { BookId = bookId, ItemId = itemId });
             return dtoList;
         }
 
+        /// <summary>
+        /// <see cref="HstActionDto.AssetId"/> に基づいて、レコードを取得する
+        /// </summary>
+        /// <param name="assetId">アセットID</param>
+        /// <returns>取得したレコードリスト</returns>
+        public async Task<IEnumerable<HstActionDto>> FindByAssetIdAsync(int assetId)
+        {
+            using FuncLog funcLog = new(new { assetId }, Log.LogLevel.Trace);
+
+            IEnumerable<HstActionDto> dtoList = await this.mDbHandler.QueryAsync<HstActionDto>(@"
+SELECT *
+FROM hst_action
+WHERE asset_id = @AssetId AND del_flg = 0;",
+new HstActionDto { AssetId = assetId });
+
+            return dtoList;
+        }
+
         public override async Task SetIdSequenceAsync(int idSeq)
         {
             using FuncLog funcLog = new(new { idSeq }, Log.LogLevel.Trace);

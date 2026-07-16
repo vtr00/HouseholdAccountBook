@@ -7,9 +7,16 @@
 ### 2026-07-19
 
 - 全般
-   - ↑NumericUpDownに小数が指定されたときに四捨五入が発生するのを修正した - refs #214
-   - ↑NumericUpDownにnullが指定されたときにScaleが適用されなかったのを修正した - refs #214
-   - ↑NumericUpDownのScaleがデフォルトで双方向になっていたのを修正した - refs #214 
+   - ↑NumericUpDownに小数が指定されたときに四捨五入が発生するのを修正した - refs #223
+   - ↑NumericUpDownにnullが指定されたときにScaleが適用されなかったのを修正した - refs #223
+   - ↑NumericUpDownのScaleがデフォルトで双方向になっていたのを修正した - refs #223
+   - △帳簿ごとに設定されたアセットに応じた金額が表示されるように変更した - refs #214 
+
+- MoveRegistrationWindow
+   - △移動元と移動先の帳簿のアセットが異なる場合に、移動元と移動先それぞれの金額を入力可能に変更した - refs #214
+
+- SettingWindow
+   - △帳簿ごとにアセットを設定可能に変更した - refs #214
 
 ### 2026-07-16
 

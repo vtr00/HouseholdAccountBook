@@ -213,7 +213,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
 
             // 縦軸 - 線形軸
-            AssetModel assetModel = AssetService.Instance.GetDefaultAssetModel();
+            AssetModel assetModel = AssetService.Instance.GetAssetModel(this.Parent.AccountSelectorVM.SelectedItem.AssetId);
             string unitY = assetModel?.Name ?? Resources.Unit_DefaultMoney;
             LinearAxis GetVerticalAxis()
             {
@@ -291,7 +291,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                             ItemsSource = tmpVM.Values.Zip(tmpVM.Periods.Select(period => period.Start), (value, date) => new GraphDatumViewModel {
                                 Value = value.MainValue,
                                 Date = date,
-                                DisplayValue = AssetService.Instance.ToAssetString(value.MainValue, null, UnitKind.MainUnit, UnitKind.MainUnit),
+                                DisplayValue = AssetService.Instance.ToAssetString(value.MainValue, this.Parent.SelectedAssetId, UnitKind.MainUnit, UnitKind.MainUnit),
                                 Item = tmpVM.Item,
                                 Category = tmpVM.Category
                             }),
@@ -338,7 +338,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         ItemsSource = tmpVM.Values.Select((value, index) => (value, index)).Zip(tmpVM.Periods.Select(period => period.Start), (tmp, date) => new GraphDatumViewModel() {
                             Value = tmp.value.MainValue,
                             Date = date,
-                            DisplayValue = AssetService.Instance.ToAssetString(tmp.value.MainValue, null, UnitKind.MainUnit, UnitKind.MainUnit),
+                            DisplayValue = AssetService.Instance.ToAssetString(tmp.value.MainValue, this.Parent.SelectedAssetId, UnitKind.MainUnit, UnitKind.MainUnit),
                             Index = tmp.index
                         }),
                         TrackerFormatString = this.GetTrackerFormatString(false),
@@ -386,7 +386,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     ItemsSource = vm.Values.Zip(vm.Periods.Select(period => period.Start), (value, date) => new GraphDatumViewModel {
                         Value = value.MainValue,
                         Date = date,
-                        DisplayValue = AssetService.Instance.ToAssetString(value.MainValue, null, UnitKind.MainUnit, UnitKind.MainUnit),
+                        DisplayValue = AssetService.Instance.ToAssetString(value.MainValue, this.Parent.SelectedAssetId, UnitKind.MainUnit, UnitKind.MainUnit),
                         Item = vm.Item,
                         Category = vm.Category
                     }),

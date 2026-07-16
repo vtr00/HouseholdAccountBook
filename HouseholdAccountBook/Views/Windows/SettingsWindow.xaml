@@ -196,9 +196,9 @@
                                         </GroupBox>
 
                                         <!-- ベースレート -->
-                                        <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" Visibility="Collapsed"
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Margin="5"
                                                    Text="{x:Static properties:Resources.TextBlock_AssetBaseRate}"/>
-                                        <controls:NumericUpDown Grid.Row="6" Grid.Column="1" Margin="5" Visibility="Collapsed"
+                                        <controls:NumericUpDown Grid.Row="6" Grid.Column="1" Margin="5"
                                                                 Value="{Binding InputedBaseRate}" MinValue="0" IsFloating="True"/>
 
                                         <!-- スケール -->
@@ -360,9 +360,9 @@
                                                  Text="{Binding InputedRemark, UpdateSourceTrigger=PropertyChanged}"/>
 
                                         <!-- アセット -->
-                                        <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" Visibility="Collapsed"
+                                        <TextBlock Grid.Row="5" Grid.Column="0" Margin="5"
                                                    Text="{x:Static properties:Resources.TextBlock_Asset}"/>
-                                        <ComboBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Visibility="Collapsed"
+                                        <ComboBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
                                                   ItemsSource="{Binding AssetSelectorVM.ItemList}" SelectedItem="{Binding AssetSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
 
                                         <!-- 初期残高 -->

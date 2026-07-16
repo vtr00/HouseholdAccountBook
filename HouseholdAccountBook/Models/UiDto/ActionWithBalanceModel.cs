@@ -18,7 +18,7 @@ namespace HouseholdAccountBook.Models.UiDto
         /// <summary>
         /// 残高(主単位)
         /// </summary>
-        public AmountObj Balance { get; init; } = new(0m);
+        public AmountObj Balance { get; init; } = new(0m, AssetIdObj.System);
         #endregion
     }
 }

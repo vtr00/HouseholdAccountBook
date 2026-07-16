@@ -90,15 +90,30 @@ namespace HouseholdAccountBook.Models.AppServices
             bool result = false;
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
             await dbHandler.ExecTransactionAsync(async () => {
-                // TODO: 紐づく帳簿を探す、紐づく帳簿項目を探す
-
-                if (UserSettingService.Instance.DefaultAssetId == assetId) {
+                // 紐づく帳簿を探す
+                MstBookDao bookDao = new(dbHandler);
+                IEnumerable<MstBookDto> bookDtoList = await bookDao.FindByAssetIdAsync((int)assetId);
+                if (bookDtoList.Any()) {
                     result = false;
                 }
                 else {
-                    MstAssetDao mstAssetDao = new(dbHandler);
-                    _ = await mstAssetDao.DeleteByIdAsync((int)assetId);
-                    result = true;
+                    // 紐づく帳簿項目を探す
+                    HstActionDao actionDao = new(dbHandler);
+                    IEnumerable<HstActionDto> actionDtoList = await actionDao.FindByAssetIdAsync((int)assetId);
+                    if (actionDtoList.Any()) {
+                        result = false;
+                    }
+                    else {
+                        // デフォルトアセットに設定されているか確認する
+                        if (UserSettingService.Instance.DefaultAssetId == assetId) {
+                            result = false;
+                        }
+                        else {
+                            MstAssetDao mstAssetDao = new(dbHandler);
+                            _ = await mstAssetDao.DeleteByIdAsync((int)assetId);
+                            result = true;
+                        }
+                    }
                 }
             });
             return result;
@@ -159,7 +174,6 @@ namespace HouseholdAccountBook.Models.AppServices
 
             BookInfoDao bookInfoDao = new(dbHandler);
             BookInfoDto dto = await bookInfoDao.FindByBookId((int)accountId, (int)UserSettingService.Instance.DefaultAssetId);
-            AssetModel asset = AssetService.Instance.GetAssetModel(dto.AssetId);
 
             MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
 
@@ -168,7 +182,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 AccountKind = EnumUtil.SafeCastEnum(dto.BookKind, AccountKind.Uncategorized),
                 AssetId = dto.AssetId,
                 Remark = jsonObj?.Remark ?? string.Empty,
-                InitialValue = new(dto.InitialMainValue, asset.Scale),
+                InitialValue = new(dto.InitialMainValue, dto.AssetId),
                 StartDateExists = jsonObj?.StartDate != null,
                 EndDateExists = jsonObj?.EndDate != null,
                 Period = new(jsonObj?.StartDate?.ToDateOnly() ?? dto.StartDate?.ToDateOnly() ?? DateOnlyExtensions.Today,

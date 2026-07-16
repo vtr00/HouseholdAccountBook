@@ -87,6 +87,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public SelectorViewModel<AccountModel, AccountIdObj> AccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
+        /// 選択されたアセットID
+        /// </summary>
+        public AssetIdObj SelectedAssetId {
+            get;
+            set {
+                if (this.SetProperty(ref field, value)) {
+                    this.RaisePropertyChanged(nameof(this.AllSumValueStr));
+                    this.RaisePropertyChanged(nameof(this.SelectedSumValueStr));
+                }
+            }
+        }
+
+        /// <summary>
         /// CSV比較セレクタVM
         /// </summary>
         public SelectorViewModel<CsvComparisonViewModel> CsvCompSelectorVM => field ??= new(this.mBusyService);
@@ -101,7 +114,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// CSV比較VMの合計値(文字列)
         /// </summary>
-        public string AllSumValueStr => AssetService.Instance.ToAssetString(this.AllSumValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string AllSumValueStr => AssetService.Instance.ToAssetString(this.AllSumValue, this.SelectedAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
 
         /// <summary>
         /// 選択されたCSV比較VMのチェック数
@@ -114,7 +127,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 選択されたCSV比較VMの合計値(文字列)
         /// </summary>
-        public string SelectedSumValueStr => AssetService.Instance.ToAssetString(this.SelectedSumValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string SelectedSumValueStr => AssetService.Instance.ToAssetString(this.SelectedSumValue, this.SelectedAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
 
         /// <summary>
         /// チェック数変更を通知する
@@ -461,6 +474,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.AccountSelectorVM.LoadAsync(initialAccountId);
             // 初回のウィンドウのオープン時に選択された帳簿を通知する
             this.AccountChanged?.Invoke(this, new() { OldValue = null, NewValue = this.AccountSelectorVM.SelectedKey });
+
+            // アセットを設定する
+            this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
         }
 
         public override void AddEventHandlers()
@@ -475,6 +491,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.AccountSelectorVM.SelectionChanged += async (sender, e) => {
                 this.AccountChanged?.Invoke(sender, e);
 
+                this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
                 await this.ReloadCsvFilesAsync();
                 await this.UpdateComparisonVMListAsync(true);
             };
@@ -525,8 +542,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
             int expensesIndex = this.AccountSelectorVM.SelectedItem.ExpensesIndex.Value;
 
             // CSVファイルを読み込む
+            Encoding encoding = Encoding.GetEncoding(this.AccountSelectorVM.SelectedItem.TextEncoding);
             List<ActionCsvModel> tmpVMList = [..
-                await this.mService.LoadCsvCompListAsync(csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, Encoding.GetEncoding(this.AccountSelectorVM.SelectedItem.TextEncoding))];
+                await this.mService.LoadCsvCompListAsync(this.SelectedAssetId, csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, encoding)];
 
             // 有効な行があればリストに追加する(日付昇順)
             if (0 < tmpVMList.Count) {
@@ -569,7 +587,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
                 foreach (ActionModel action in actionList) {
                     // 帳簿項目IDが使用済なら次のレコードを調べるようにする
-                    bool checkNext = this.CsvCompSelectorVM.ItemList.Where(tmpVM => (int?)tmpVM.Action?.ActionId == action.ActionId).Any();
+                    bool checkNext = this.CsvCompSelectorVM.ItemList.Any(tmpVM => (int?)tmpVM.Action?.ActionId == action.ActionId);
                     // 帳簿項目情報を紐付ける
                     if (!checkNext) {
                         vm.Action = action;

@@ -33,8 +33,12 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Others
         /// </summary>
         public string ItemName { get; set; } = string.Empty;
         /// <summary>
-        /// 合計(主単位)
+        /// 表示アセットでの合計(主単位)
         /// </summary>
         public decimal MainTotal { get; set; }
+        /// <summary>
+        /// 表示アセットでのアセットID
+        /// </summary>
+        public int AssetId { get; set; }
     }
 }

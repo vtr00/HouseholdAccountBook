@@ -98,14 +98,13 @@ namespace HouseholdAccountBook.Models.AppServices
         {
             using FuncLog funcLog = new(new { accountId, startDate });
 
-            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
             EndingBalanceInfoDto dto = accountId == AccountIdObj.System
                 ? await endingBalanceInfoDao.Find((int)UserSettingService.Instance.DefaultAssetId, startDate) // 全帳簿の繰越残高
                 : await endingBalanceInfoDao.FindByBookId(accountId.Id, (int)UserSettingService.Instance.DefaultAssetId, startDate); // 各帳簿の繰越残高
-            AmountObj balance = new(dto.EndingMainBalance, asset.Scale);
+            AmountObj balance = new(dto.MainEndingBalance, dto.AssetId);
 
             return balance;
         }
@@ -135,7 +134,6 @@ namespace HouseholdAccountBook.Models.AppServices
         {
             using FuncLog funcLog = new(new { accountId, period });
 
-            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             List<ActionWithBalanceModel> amList = [];
@@ -145,10 +143,12 @@ namespace HouseholdAccountBook.Models.AppServices
             {
                 ActionWithBalanceModel am = new() {
                     Action = new() {
+                        Base = new(ActionIdObj.System, period.Start.ToDateTime(TimeOnly.MinValue), new(0m, balance.AssetId)),
+                        AssetId = null,
+                        GroupId = null,
                         Account = new(AccountIdObj.System, string.Empty),
                         Category = new(CategoryIdObj.System, string.Empty, BalanceKind.Others),
                         Item = new(ItemIdObj.System, Properties.Resources.ListName_CarryForward),
-                        Base = new(ActionIdObj.System, period.Start.ToDateTime(TimeOnly.MinValue), new(0m, asset.Scale)),
                         Shop = null,
                         Remark = null,
                         IsMatch = false
@@ -164,15 +164,17 @@ namespace HouseholdAccountBook.Models.AppServices
                 : await actionInfoDao.FindByBookIdWithinPeriod((int)accountId, (int)UserSettingService.Instance.DefaultAssetId, period.Start, period.End); // 各帳簿項目
 
             foreach (ActionInfoDto aDto in dtoList) {
-                balance += new AmountObj(aDto.ActMainValue, asset.Scale);
+                AmountObj actValue = new(aDto.MainActValue, aDto.ActAssetId);
+                balance += actValue;
 
                 ActionWithBalanceModel am = new() {
                     Action = new() {
+                        Base = new(aDto.ActionId, aDto.ActTime, actValue),
+                        AssetId = aDto.AssetId ?? AssetIdObj.System,
                         GroupId = aDto.GroupId,
                         Account = new(aDto.BookId, aDto.BookName),
-                        Category = new(aDto.CategoryId, aDto.CategoryName, aDto.ActMainValue < 0 ? BalanceKind.Expenses : BalanceKind.Income),
+                        Category = new(aDto.CategoryId, aDto.CategoryName, aDto.MainActValue < 0 ? BalanceKind.Expenses : BalanceKind.Income),
                         Item = new(aDto.ItemId, aDto.ItemName),
-                        Base = new(aDto.ActionId, aDto.ActTime, new(aDto.ActMainValue, asset.Scale)),
                         Shop = new(aDto.ShopName),
                         Remark = new(aDto.Remark),
                         IsMatch = aDto.IsMatch == 1
@@ -198,7 +200,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             HstActionDao hstActionDao = new(dbHandler);
-            _ = await hstActionDao.UpdateShopNameAndRemarkByIdAsync(actionId.Id, shopName, remark);
+            _ = await hstActionDao.UpdateShopNameAndRemarkByIdAsync((int)actionId, shopName, remark);
         }
 
         /// <summary>
@@ -212,7 +214,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             HstActionDao hstActionDao = new(dbHandler);
-            HstActionDto dto = await hstActionDao.FindByIdAsync(actionId.Id);
+            HstActionDto dto = await hstActionDao.FindByIdAsync((int)actionId);
             DateOnly actDate = DateOnly.FromDateTime(dto.ActTime);
 
             return actDate;
@@ -243,7 +245,8 @@ namespace HouseholdAccountBook.Models.AppServices
         {
             using FuncLog funcLog = new(new { accountId, period });
 
-            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
+            bool initAssetId = false;
+            AssetIdObj assetId = AssetIdObj.System;
 
             List<SummaryModel> smList = [];
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
@@ -253,16 +256,21 @@ namespace HouseholdAccountBook.Models.AppServices
                     : await summaryInfoDao.FindByBookIdWithinPeriod((int)accountId, (int)UserSettingService.Instance.DefaultAssetId, period.Start, period.End);
 
                 foreach (SummaryInfoDto dto in dtoList) {
+                    if (!initAssetId) {
+                        assetId = dto.AssetId;
+                        initAssetId = true;
+                    }
+
                     smList.Add(new() {
                         Category = new(dto.CategoryId, dto.CategoryName, EnumUtil.SafeCastEnum(dto.BalanceKind, BalanceKind.Income)),
                         Item = new(dto.ItemId, dto.ItemName),
-                        Total = new(dto.MainTotal, asset.Scale)
+                        Total = new(dto.MainTotal, assetId)
                     });
                 }
             }
 
             // 差引損益
-            AmountObj total = new(smList.Sum(obj => obj.Total.MainValue), asset.Scale);
+            AmountObj total = new(smList.Sum(obj => obj.Total.MainValue), assetId);
             // 収入/支出
             List<SummaryModel> totalAsBalanceKindList = [];
             // 分類小計
@@ -273,13 +281,13 @@ namespace HouseholdAccountBook.Models.AppServices
                 // 収入/支出の小計を計算する
                 totalAsBalanceKindList.Add(new() {
                     Category = new(CategoryIdObj.System, string.Empty, g1.Key),
-                    Total = new(g1.Sum(obj => obj.Total.MainValue), asset.Scale)
+                    Total = new(g1.Sum(obj => obj.Total.MainValue), assetId)
                 });
                 // 分類別の小計を計算する
                 foreach (IGrouping<int, SummaryModel> g2 in g1.GroupBy(obj => (int)obj.Category.Id)) {
                     totalAsCategoryList.Add(new() {
                         Category = new(g2.Key, g2.First().Category.Name, g1.Key),
-                        Total = new(g2.Sum(obj => obj.Total.MainValue), asset.Scale)
+                        Total = new(g2.Sum(obj => obj.Total.MainValue), assetId)
                     });
                 }
             }

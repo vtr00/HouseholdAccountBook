@@ -78,7 +78,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                     Values = [value],
                     Periods = [tmpPeriod],
                     Total = value,
-                    Average = period.End < DateOnlyExtensions.Today ? value : new(0m) // 平均値は過去のデータのみで計算する
+                    Average = period.End < DateOnlyExtensions.Today ? value : new(0m, value.AssetId) // 平均値は過去のデータのみで計算する
                 };
                 vmList.Add(vm);
             }
@@ -121,7 +121,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                         vm.Average /= averageCount;
                     }
                     else {
-                        vm.Average = new(0m);
+                        vm.Average = new(0m, vm.Average.Value.AssetId);
                     }
                 }
             }
@@ -176,7 +176,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                     Values = [value],
                     Periods = [tmpPeriod],
                     Total = value,
-                    Average = tmpPeriod.End.IsPost() ? value : new(0m)
+                    Average = tmpPeriod.End.IsPost() ? value : new(0m, value.AssetId)
                 };
                 vmList.Add(vm);
             }
@@ -219,7 +219,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                         vm.Average /= averageCount;
                     }
                     else {
-                        vm.Average = new(0m);
+                        vm.Average = new(0m, vm.Average.Value.AssetId);
                     }
                 }
             }
@@ -267,7 +267,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                     Values = [],
                     Periods = [],
                     Total = value,
-                    Average = tmpPeriod.End.IsPost() ? value : new(0m)
+                    Average = tmpPeriod.End.IsPost() ? value : new(0m, value.AssetId)
                 };
                 vm.Values.Add(value);
                 vm.Periods.Add(tmpPeriod);
@@ -313,7 +313,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                         vm.Average /= averageCount;
                     }
                     else {
-                        vm.Average = new(0m);
+                        vm.Average = new(0m, vm.Average.Value.AssetId);
                     }
                 }
             }

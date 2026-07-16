@@ -53,7 +53,16 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// 金額を文字列表現に変換する
         /// </summary>
-        /// <param name="value">DB管理値(補助単位値)</param>
+        /// <param name="amount">金額VO</param>
+        /// <param name="outputKind">出力値単位種別</param>
+        /// <param name="position">単位位置</param>
+        /// <returns>金額の文字列表現</returns>
+        public string ToAssetString(AmountObj amount, UnitKind outputKind, UnitPosition position = UnitPosition.Both)
+            => this.ToAssetString(amount.MainValue, amount.AssetId, UnitKind.MainUnit, outputKind, position);
+        /// <summary>
+        /// 金額を文字列表現に変換する
+        /// </summary>
+        /// <param name="value">金額</param>
         /// <param name="assetId">アセットID</param>
         /// <param name="inputKind">入力値単位種別</param>
         /// <param name="outputKind">出力値単位種別</param>
@@ -63,7 +72,7 @@ namespace HouseholdAccountBook.Models.AppServices
         {
             using FuncLog funcLog = new(new { value, assetId, inputKind, outputKind, position }, Log.LogLevel.Trace);
 
-            AssetModel asset = this.mAssets.FirstOrDefault(asset => asset.Id == assetId, this.GetDefaultAssetModel());
+            AssetModel asset = this.GetAssetModel(assetId);
             if (asset is null) { return value.ToString(); }
 
             decimal tmpValue = value ?? 0;
@@ -115,25 +124,19 @@ namespace HouseholdAccountBook.Models.AppServices
         }
 
         /// <summary>
-        /// 変換元のDB管理値(補助単位値)を変換先のDB管理値(補助単位値)に変換する
+        /// 変換元の金額VOを変換先の金額VOに変換する
         /// </summary>
-        /// <param name="value">変換元のDB管理値(補助単位値)</param>
-        /// <param name="srcAssetId">変換元のアセットID</param>
+        /// <param name="src">変換元の金額VO</param>
         /// <param name="dstAssetId">変換先のアセットID。未指定の場合はデフォルトアセット</param>
-        /// <returns>変換先のDB管理値(補助単位値)</returns>
-        public decimal Convert(decimal value, AssetIdObj srcAssetId, AssetIdObj dstAssetId = null)
+        /// <returns>変換先の金額VO</returns>
+        public AmountObj Convert(AmountObj src, AssetIdObj dstAssetId = null)
         {
             dstAssetId ??= UserSettingService.Instance.DefaultAssetId;
 
-            AssetModel srcAsset = this.mAssets.FirstOrDefault(asset => asset.Id == srcAssetId);
-            AssetModel dstAsset = this.mAssets.FirstOrDefault(asset => asset.Id == dstAssetId);
+            AssetModel srcAsset = this.GetAssetModel(src.AssetId);
+            AssetModel dstAsset = this.GetAssetModel(dstAssetId);
 
-            decimal srcSubValue = value;
-            decimal srcMainValue = srcSubValue / (decimal)Math.Pow(10, srcAsset.Scale);
-            decimal dstMainValue = srcMainValue * srcAsset.BaseRate / dstAsset.BaseRate;
-            decimal dstSubValue = dstMainValue * (decimal)Math.Pow(10, dstAsset.Scale);
-
-            return dstSubValue;
+            return new(src.MainValue * srcAsset.BaseRate / dstAsset.BaseRate, dstAssetId);
         }
     }
 }
