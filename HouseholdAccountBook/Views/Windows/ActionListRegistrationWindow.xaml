@@ -134,12 +134,12 @@
                     <controls:DataGridEditableTemplateColumn Header="{x:Static properties:Resources.ColumnHeader_Date}" Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Margin="4,3,4,5" Text="{Binding ActDate, StringFormat=\{0:yyyy-MM-dd\}}"/>
+                                <TextBlock Margin="4,3,4,5" Text="{Binding SelectedDate, StringFormat=\{0:yyyy-MM-dd\}}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                         <DataGridTemplateColumn.CellEditingTemplate>
                             <DataTemplate>
-                                <controls:DateTimePicker DateFormat="yyyy-MM-dd" SelectedDate="{Binding ActDate, Mode=TwoWay}"/>
+                                <controls:DateTimePicker DateFormat="yyyy-MM-dd" SelectedDate="{Binding SelectedDate, Mode=TwoWay}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>
                     </controls:DataGridEditableTemplateColumn>
@@ -153,12 +153,12 @@
                         </DataGridTemplateColumn.CellStyle>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Margin="3,1" Text="{Binding ActValueStr}" TextAlignment="Right"/>
+                                <TextBlock Margin="3,1" Text="{Binding InputedValueStr}" TextAlignment="Right"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                         <DataGridTemplateColumn.CellEditingTemplate>
                             <DataTemplate>
-                                <controls:NumericUpDown Session="{Binding Session}" Value="{Binding ActValue, UpdateSourceTrigger=PropertyChanged}" Scale="{Binding Scale}" 
+                                <controls:NumericUpDown Session="{Binding Session}" Value="{Binding InputedValue, UpdateSourceTrigger=PropertyChanged}" Scale="{Binding ValueScale}" 
                                                         GotFocus="NumericUpDown_GotFocus" IsMouseWheelEnabled="False" IsPopupEnabled="False"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>

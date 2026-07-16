@@ -54,6 +54,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedAccountChanged;
         /// <summary>
+        /// 選択アセット変更時イベント
+        /// </summary>
+        public event EventHandler<ChangedEventArgs<AssetIdObj>> SelectedAssetChanged;
+        /// <summary>
         /// タブ選択変更時イベント
         /// </summary>
         public event EventHandler<ChangedEventArgs<Tabs>> SelectedTabChanged;
@@ -233,6 +237,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿セレクタVM
         /// </summary>
         public SelectorViewModel<AccountModel, AccountIdObj> AccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+
+        /// <summary>
+        /// 選択されたアセットID
+        /// </summary>
+        public AssetIdObj SelectedAssetId {
+            get;
+            private set {
+                AssetIdObj old = field;
+                if (this.SetProperty(ref field, value)) {
+                    this.SelectedAssetChanged?.Invoke(this, new() { OldValue = old, NewValue = value });
+                }
+            }
+        } = AssetIdObj.System;
 
         /// <summary>
         /// 選択された収支種別
@@ -1135,10 +1152,44 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.GraphKind2SelectorVM.SetLoader(() => GraphKind2Str);
         }
 
+        public override async Task LoadAsync()
+        {
+            using FuncLog funcLog = new();
+            using IDisposable disposable = this.mBusyService.Enter();
+
+            this.FiscalStartMonth = UserSettingService.Instance.FiscalStartMonth;
+
+            this.SelectedDBKind = this.mDbHandlerFactory.DBKind;
+
+            // 帳簿リスト更新
+            await this.AccountSelectorVM.LoadAsync(UserSettingService.Instance.SelectedAccountId);
+            // タブ選択
+            this.SelectedTab = UserSettingService.Instance.SelectedTab;
+            // グラフ種別1更新
+            await this.GraphKind1SelectorVM.LoadAsync(UserSettingService.Instance.SelectedGraphKind1);
+            // グラフ種別2更新
+            await this.GraphKind2SelectorVM.LoadAsync(UserSettingService.Instance.SelectedGraphKind2);
+
+            Log.Vars(vars: new { this.SelectedTabIndex, this.SelectedGraphKind1Index, this.SelectedGraphKind2Index });
+
+            this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
+
+            await this.UpdateAsync(isUpdateAccountList: false, isScroll: true, isUpdateActDateLastEdited: true);
+        }
+
         public override void AddEventHandlers()
         {
             using FuncLog funcLog = new();
 
+            // 帳簿選択変更時
+            this.AccountSelectorVM.SelectionChanged += async (sender, e) => {
+                this.SelectedAccountChanged?.Invoke(sender, e);
+
+                this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
+                UserSettingService.Instance.SelectedAccountId = e.NewValue ?? AccountIdObj.System;
+
+                await this.UpdateAsync(isUpdateAccountList: false, isScroll: true);
+            };
             // タブ選択変更時
             this.SelectedTabChanged += async (sender, e) => {
                 using FuncLog funcLog = new(new { e.OldValue, e.NewValue }, methodName: nameof(this.SelectedTabChanged));
@@ -1147,14 +1198,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 UserSettingService.Instance.SelectedTab = e.NewValue;
 
                 await this.UpdateAsync(isUpdateAccountList: true, isScroll: true);
-            };
-            // 帳簿選択変更時
-            this.AccountSelectorVM.SelectionChanged += async (sender, e) => {
-                this.SelectedAccountChanged?.Invoke(sender, e);
-
-                UserSettingService.Instance.SelectedAccountId = e.NewValue ?? AccountIdObj.System;
-
-                await this.UpdateAsync(isUpdateAccountList: false, isScroll: true);
             };
             // グラフ種別1選択変更時
             this.GraphKind1SelectorVM.SelectionChanged += async (sender, e) => {
@@ -1187,29 +1230,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 childVM.SaveFileDialogRequested += (sender, e) => this.SaveFileDialogRequest(e);
                 childVM.AddEventHandlers();
             });
-        }
-
-        public override async Task LoadAsync()
-        {
-            using FuncLog funcLog = new();
-            using IDisposable disposable = this.mBusyService.Enter();
-
-            this.FiscalStartMonth = UserSettingService.Instance.FiscalStartMonth;
-
-            this.SelectedDBKind = this.mDbHandlerFactory.DBKind;
-
-            // 帳簿リスト更新
-            await this.AccountSelectorVM.LoadAsync(UserSettingService.Instance.SelectedAccountId);
-            // タブ選択
-            this.SelectedTab = UserSettingService.Instance.SelectedTab;
-            // グラフ種別1更新
-            await this.GraphKind1SelectorVM.LoadAsync(UserSettingService.Instance.SelectedGraphKind1);
-            // グラフ種別2更新
-            await this.GraphKind2SelectorVM.LoadAsync(UserSettingService.Instance.SelectedGraphKind2);
-
-            Log.Vars(vars: new { this.SelectedTabIndex, this.SelectedGraphKind1Index, this.SelectedGraphKind2Index });
-
-            await this.UpdateAsync(isUpdateAccountList: false, isScroll: true, isUpdateActDateLastEdited: true);
         }
 
         #region ウィンドウ設定プロパティ

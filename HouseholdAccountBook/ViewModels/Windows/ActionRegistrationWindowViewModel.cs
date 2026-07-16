@@ -35,23 +35,23 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<AccountIdObj>> AccountChanged;
+        public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedAccountChanged;
         /// <summary>
         /// 日時変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<DateTime>> DateChanged;
+        public event EventHandler<ChangedEventArgs<DateTime>> SelectedDateChanged;
         /// <summary>
         /// 収支変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<BalanceKind>> BalanceKindChanged;
+        public event EventHandler<ChangedEventArgs<BalanceKind>> SelectedBalanceKindChanged;
         /// <summary>
         /// 分類変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<CategoryIdObj>> CategoryChanged;
+        public event EventHandler<ChangedEventArgs<CategoryIdObj>> SelectedCategoryChanged;
         /// <summary>
         /// 項目変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<ItemIdObj>> ItemChanged;
+        public event EventHandler<ChangedEventArgs<ItemIdObj>> SelectedItemChanged;
 
         /// <summary>
         /// 登録時イベント
@@ -104,7 +104,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             set {
                 DateTime oldValue = field;
                 if (this.SetProperty(ref field, value)) {
-                    this.DateChanged?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
+                    this.SelectedDateChanged?.Invoke(this, new() { OldValue = oldValue, NewValue = value });
                     CommandManager.InvalidateRequerySuggested();
                 }
             }
@@ -126,6 +126,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public SelectorViewModel<ItemModel, ItemIdObj> ItemSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
+        /// 選択されたアセットID
+        /// </summary>
+        public AssetIdObj SelectedAssetId {
+            get;
+            set {
+                if (this.SetProperty(ref field, value)) {
+                    this.RaisePropertyChanged(nameof(this.ValueScale));
+                    this.RaisePropertyChanged(nameof(this.InputedValueStr));
+                }
+            }
+        } = AssetIdObj.System;
+        /// <summary>
         /// 入力された金額(主単位)
         /// </summary>
         public decimal? InputedValue {
@@ -140,14 +152,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 金額の小数点以下桁数
         /// </summary>
-        public int ValueScale {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public int ValueScale => AssetService.Instance.GetAssetModel(this.SelectedAssetId).Scale;
         /// <summary>
         /// 入力された金額(文字列)
         /// </summary>
-        public string InputedValueStr => AssetService.Instance.ToAssetString(this.InputedValue, null, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string InputedValueStr => AssetService.Instance.ToAssetString(this.InputedValue, this.SelectedAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
 
         /// <summary>
         /// 店舗セレクタVM
@@ -292,8 +301,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new(new { initialAccountId, initialMonth, initialDate, initialRecord, targetActionId });
             using IDisposable disposable = this.mBusyService.Enter();
 
-            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
-
             AccountIdObj selectingAccountId = null;
             BalanceKind selectingBalanceKind = BalanceKind.Expenses;
             ItemIdObj selectingItemId = null;
@@ -307,12 +314,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     if (initialRecord == null) {
                         this.SelectedDate = initialDate?.ToDateTime(TimeOnly.MinValue) ?? ((initialMonth == null || initialMonth?.Month == DateTime.Today.Month) ? DateTime.Today : initialMonth.Value.ToDateTime(TimeOnly.MinValue));
                         this.InputedValue = null;
-                        this.ValueScale = asset.Scale;
                     }
                     else {
                         this.SelectedDate = initialRecord.Date;
                         this.InputedValue = initialRecord.Value.MainValue;
-                        this.ValueScale = initialRecord.Value.Scale;
                     }
 
                     break;
@@ -332,7 +337,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     }
                     this.SelectedDate = action.ActTime;
                     this.InputedValue = Math.Abs(action.Amount.MainValue);
-                    this.ValueScale = action.Amount.Scale;
                     this.InputedCount = count;
 
                     selectingAccountId = action.Account.Id;
@@ -353,22 +357,33 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.ShopSelectorVM.LoadAsync(selectingShopName);
             await this.RemarkSelectorVM.LoadAsync(selectingRemark);
             await this.HolidaySettingSelectorVM.LoadAsync(HolidaySettingKind.Nothing);
+
+            // アセットIDを指定する
+            this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
         }
 
         public override void AddEventHandlers()
         {
             using FuncLog funcLog = new();
 
-            this.AccountSelectorVM.SelectionChanged += (sender, e) => this.AccountChanged?.Invoke(sender, e);
+            // 帳簿選択変更時
+            this.AccountSelectorVM.SelectionChanged += (sender, e) => {
+                this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
+
+                this.SelectedAccountChanged?.Invoke(sender, e);
+            };
             this.AccountSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
 
-            this.BalanceKindSelectorVM.SelectionChanged += (sender, e) => this.BalanceKindChanged?.Invoke(sender, e);
+            // 収支種別選択変更時
+            this.BalanceKindSelectorVM.SelectionChanged += (sender, e) => this.SelectedBalanceKindChanged?.Invoke(sender, e);
             this.BalanceKindSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
 
-            this.CategorySelectorVM.SelectionChanged += (sender, e) => this.CategoryChanged?.Invoke(sender, e);
+            // 分類選択変更時
+            this.CategorySelectorVM.SelectionChanged += (sender, e) => this.SelectedCategoryChanged?.Invoke(sender, e);
             this.CategorySelectorVM.Children.Add(this.ItemSelectorVM);
 
-            this.ItemSelectorVM.SelectionChanged += (sender, e) => this.ItemChanged?.Invoke(sender, e);
+            // 項目選択変更時
+            this.ItemSelectorVM.SelectionChanged += (sender, e) => this.SelectedItemChanged?.Invoke(sender, e);
             this.ItemSelectorVM.Children.AddRange([this.ShopSelectorVM, this.RemarkSelectorVM]);
         }
 
@@ -380,8 +395,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
+            int sign = this.BalanceKindSelectorVM.SelectedKey == BalanceKind.Income ? 1 : -1;
             ActionModel action = new() {
-                Base = new(this.ActionId, this.SelectedDate, new((this.BalanceKindSelectorVM.SelectedKey == BalanceKind.Income ? 1 : -1) * this.InputedValue.Value, this.ValueScale)),
+                Base = new(this.ActionId, this.SelectedDate, new(sign * this.InputedValue.Value, this.AccountSelectorVM.SelectedItem.AssetId)),
+                AssetId = AssetIdObj.System, // TODO: 将来の拡張用
                 GroupId = this.GroupId,
                 Account = new(this.AccountSelectorVM.SelectedKey, string.Empty),
                 Category = new(CategoryIdObj.System, string.Empty, this.BalanceKindSelectorVM.SelectedKey),

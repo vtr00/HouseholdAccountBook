@@ -144,7 +144,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 AccountKind = vm.AccountKindSelectorVM.SelectedKey,
                 AssetId = vm.AssetSelectorVM.SelectedKey,
                 Remark = vm.InputedRemark ?? string.Empty,
-                InitialValue = new(vm.InputedInitialValue, vm.InitialValueScale),
+                InitialValue = new(vm.InputedInitialValue, vm.AssetSelectorVM.SelectedKey),
                 StartDateExists = vm.SelectedIfStartDateExists,
                 EndDateExists = vm.SelectedIfEndDateExists,
                 Period = vm.InputedPeriod,

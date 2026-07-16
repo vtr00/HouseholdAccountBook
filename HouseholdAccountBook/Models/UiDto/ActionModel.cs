@@ -12,6 +12,15 @@ namespace HouseholdAccountBook.Models.UiDto
     {
         #region プロパティ
         /// <summary>
+        /// 帳簿項目 基本Model
+        /// </summary>
+        public ActionBaseModel Base { get; init; } = new(ActionIdObj.System, DateTime.Now, new(0m, AssetIdObj.System));
+        /// <summary>
+        /// 帳簿項目のアセットID
+        /// </summary>
+        public AssetIdObj AssetId { get; init; }
+
+        /// <summary>
         /// グループID
         /// </summary>
         public GroupIdObj GroupId { get; init; } // = null;
@@ -28,11 +37,6 @@ namespace HouseholdAccountBook.Models.UiDto
         /// 項目
         /// </summary>
         public ItemModel Item { get; init; } = new(ItemIdObj.System, string.Empty);
-
-        /// <summary>
-        /// 帳簿項目 基本Model
-        /// </summary>
-        public ActionBaseModel Base { get; init; } = new(ActionIdObj.System, DateTime.Now, new(0m));
 
         /// <summary>
         /// 店舗名

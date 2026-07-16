@@ -15,6 +15,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Others
         /// <summary>
         /// 繰越残高(主単位)
         /// </summary>
-        public decimal EndingMainBalance { get; set; }
+        public decimal MainEndingBalance { get; set; }
+        /// <summary>
+        /// アセットID
+        /// </summary>
+        public int AssetId { get; set; }
     }
 }

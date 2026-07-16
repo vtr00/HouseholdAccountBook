@@ -46,9 +46,25 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Others
         /// </summary>
         public string ItemName { get; set; } = string.Empty;
         /// <summary>
-        /// 項目値(主単位)
+        /// 帳簿項目のアセットID
         /// </summary>
-        public decimal ActMainValue { get; set; }
+        public int? AssetId { get; set; }
+        /// <summary>
+        /// 帳簿項目アセットでの項目値(主単位)
+        /// </summary>
+        public decimal OrgMainActValue { get; set; }
+        /// <summary>
+        /// 帳簿項目アセットでのアセットID
+        /// </summary>
+        public int OrgActAssetId { get; set; }
+        /// <summary>
+        /// デフォルトまたは帳簿アセットでの項目値(主単位)
+        /// </summary>
+        public decimal MainActValue { get; set; }
+        /// <summary>
+        /// デフォルトまたは帳簿アセットでのアセットID
+        /// </summary>
+        public int ActAssetId { get; set; }
         /// <summary>
         /// 店舗名
         /// </summary>

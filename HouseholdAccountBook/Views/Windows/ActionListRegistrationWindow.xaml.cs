@@ -37,9 +37,9 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 帳簿変更時のイベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<AccountIdObj>> AccountChanged {
-            add => this.WVM.AccountChanged += value;
-            remove => this.WVM.AccountChanged -= value;
+        public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedAccountChanged {
+            add => this.WVM.SelectedAccountChanged += value;
+            remove => this.WVM.SelectedAccountChanged -= value;
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace HouseholdAccountBook.Views.Windows
             // 入力時処理
             numericUpDown.ButtonInputed(this.WVM.InputedValue, this.WVM.InputedKind);
             // Bindしているが、何故かコピーしないと反映されない
-            this.mLastDateValueVM.ActValue = numericUpDown.Value;
+            this.mLastDateValueVM.InputedValue = numericUpDown.Value;
             // FollowablePopup の 表示状態をコピー
             this.WVM.IsOpenPopup = numericUpDown.IsOpen;
 
@@ -159,17 +159,17 @@ namespace HouseholdAccountBook.Views.Windows
             if (this.WVM.InputedDateValueVMList.Count == 0) {
                 // ダミーデータ
                 e.NewItem = new DateValueViewModel() {
-                    ActDate = DateTime.Now,
-                    ActValue = null
+                    SelectedDate = DateTime.Now,
+                    InputedValue = null
                 };
             }
             else {
                 // リストに入力済の末尾のデータの日付を追加時に採用する
                 DateValueViewModel lastVM = this.WVM.InputedDateValueVMList.Last();
                 e.NewItem = new DateValueViewModel() {
-                    ActDate = this.WVM.IsDateAutoIncrement ? lastVM.ActDate.AddDays(1) : lastVM.ActDate,
-                    ActValue = null,
-                    Scale = lastVM.Scale
+                    SelectedDate = this.WVM.IsDateAutoIncrement ? lastVM.SelectedDate.AddDays(1) : lastVM.SelectedDate,
+                    InputedValue = null,
+                    SelectedAccountAssetId = this.WVM.AccountSelectorVM.SelectedItem.AssetId
                 };
             }
         }

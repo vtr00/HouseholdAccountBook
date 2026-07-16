@@ -61,6 +61,24 @@ new MstBookDto { BookId = bookId });
         }
 
         /// <summary>
+        /// <see cref="MstBookDto.AssetId"/> に基づいて、レコードを取得する
+        /// </summary>
+        /// <param name="assetId">アセットID</param>
+        /// <returns>取得したレコードリスト</returns>
+        public async Task<IEnumerable<MstBookDto>> FindByAssetIdAsync(int assetId)
+        {
+            using FuncLog funcLog = new(new { assetId }, Log.LogLevel.Trace);
+
+            IEnumerable<MstBookDto> dtoList = await this.mDbHandler.QueryAsync<MstBookDto>(@"
+SELECT *
+FROM mst_book
+WHERE asset_id = @AssetId AND del_flg = 0;",
+new MstBookDto { AssetId = assetId });
+
+            return dtoList;
+        }
+
+        /// <summary>
         /// <see cref="MstBookDto.JsonCode"/> が空ではない全てのレコードを取得する
         /// </summary>
         /// <returns>取得したレコードリスト</returns>

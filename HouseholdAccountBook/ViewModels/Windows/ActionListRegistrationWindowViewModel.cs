@@ -39,19 +39,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 帳簿変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<AccountIdObj>> AccountChanged;
+        public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedAccountChanged;
         /// <summary>
         /// 収支変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<BalanceKind>> BalanceKindChanged;
+        public event EventHandler<ChangedEventArgs<BalanceKind>> SelectedBalanceKindChanged;
         /// <summary>
         /// 分類変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<CategoryIdObj>> CategoryChanged;
+        public event EventHandler<ChangedEventArgs<CategoryIdObj>> SelectedCategoryChanged;
         /// <summary>
         /// 項目変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<ItemIdObj>> ItemChanged;
+        public event EventHandler<ChangedEventArgs<ItemIdObj>> SelectedItemChanged;
 
         /// <summary>
         /// 登録時イベント
@@ -151,7 +151,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public new ICommand OKCommand => field ??= new AsyncRelayCommand(
             this.OKCommand_ExecuteAsync,
-            () => this.ItemSelectorVM.SelectedKey != null && this.InputedDateValueVMList.Any(static vm => vm.ActValue is not null and not 0), this.mBusyService);
+            () => this.ItemSelectorVM.SelectedKey != null && this.InputedDateValueVMList.Any(static vm => vm.InputedValue is not null and not 0), this.mBusyService);
         protected async Task OKCommand_ExecuteAsync()
         {
             // DB登録
@@ -214,8 +214,6 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new(new { initialAccountId, initialMonth, initialDate, initialRecordList, targetGroupId });
             using IDisposable disposable = this.mBusyService.Enter();
 
-            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
-
             AccountIdObj selectingAccountId = null;
             BalanceKind selectingBalanceKind = BalanceKind.Expenses;
             ItemIdObj selectingItemId = null;
@@ -229,11 +227,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     // WVMに値を設定する
                     if (initialRecordList == null) {
                         DateTime actDate = initialDate?.ToDateTime(TimeOnly.MinValue) ?? ((initialMonth == null || initialMonth?.Month == DateTime.Today.Month) ? DateTime.Today : initialMonth.Value.ToDateTime(TimeOnly.MinValue));
-                        this.InputedDateValueVMList.Add(new DateValueViewModel() { ActDate = actDate, ActValue = null, Scale = asset.Scale });
+                        this.InputedDateValueVMList.Add(new DateValueViewModel() {
+                            SelectedDate = actDate,
+                            InputedValue = null
+                        });
                     }
                     else {
                         foreach (ActionCsvModel record in initialRecordList) {
-                            this.InputedDateValueVMList.Add(new DateValueViewModel() { ActDate = record.Date, ActValue = record.Value.MainValue, Scale = record.Value.Scale });
+                            this.InputedDateValueVMList.Add(new DateValueViewModel() {
+                                SelectedDate = record.Date,
+                                InputedValue = record.Value.MainValue,
+                                SelectedAccountAssetId = record.Value.AssetId // 一旦読込時のアセットIDを入れておく
+                            });
                         }
                     }
 
@@ -249,9 +254,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         // 日付金額リストに追加
                         DateValueViewModel vm = new() {
                             ActionId = action.ActionId,
-                            ActDate = action.ActTime,
-                            ActValue = Math.Abs(action.Amount.MainValue),
-                            Scale = asset.Scale
+                            SelectedDate = action.ActTime,
+                            InputedValue = Math.Abs(action.Amount.MainValue),
+                            SelectedAccountAssetId = action.Amount.AssetId // 一旦読込時のアセットIDを入れておく
                         };
 
                         selectingAccountId = action.Account.Id;
@@ -283,22 +288,37 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.ItemSelectorVM.LoadAsync(selectingItemId);
             await this.ShopSelectorVM.LoadAsync(selectingShopName);
             await this.RemarkSelectorVM.LoadAsync(selectingRemark);
+
+            // アセットIDを指定する
+            foreach (DateValueViewModel item in this.InputedDateValueVMList) {
+                item.SelectedAccountAssetId = this.AccountSelectorVM.SelectedItem.AssetId;
+            }
         }
 
         public override void AddEventHandlers()
         {
             using FuncLog funcLog = new();
 
-            this.AccountSelectorVM.SelectionChanged += (sender, e) => this.AccountChanged?.Invoke(sender, e);
+            // 帳簿変更時
+            this.AccountSelectorVM.SelectionChanged += (sender, e) => {
+                foreach (DateValueViewModel item in this.InputedDateValueVMList) {
+                    item.SelectedAccountAssetId = this.AccountSelectorVM.SelectedItem.AssetId;
+                }
+
+                this.SelectedAccountChanged?.Invoke(sender, e);
+            };
             this.AccountSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
 
-            this.BalanceKindSelectorVM.SelectionChanged += (sender, e) => this.BalanceKindChanged?.Invoke(sender, e);
+            // 収支種別変更時
+            this.BalanceKindSelectorVM.SelectionChanged += (sender, e) => this.SelectedBalanceKindChanged?.Invoke(sender, e);
             this.BalanceKindSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
 
-            this.CategorySelectorVM.SelectionChanged += (sender, e) => this.CategoryChanged?.Invoke(sender, e);
+            // 分類変更時
+            this.CategorySelectorVM.SelectionChanged += (sender, e) => this.SelectedCategoryChanged?.Invoke(sender, e);
             this.CategorySelectorVM.Children.Add(this.ItemSelectorVM);
 
-            this.ItemSelectorVM.SelectionChanged += (sender, e) => this.ItemChanged?.Invoke(sender, e);
+            // 項目変更時
+            this.ItemSelectorVM.SelectionChanged += (sender, e) => this.SelectedItemChanged?.Invoke(sender, e);
             this.ItemSelectorVM.Children.AddRange([this.ShopSelectorVM, this.RemarkSelectorVM]);
         }
 
@@ -313,7 +333,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             List<ActionModel> actionList = [];
             BalanceKind balanceKind = this.BalanceKindSelectorVM.SelectedKey;
             ActionModel commonAction = new() {
-                Base = new(null, DateTime.Now, new(0m)),
+                Base = new(null, DateTime.Now, new(0m, AssetIdObj.System)),
+                AssetId = AssetIdObj.System, // TODO: 将来の拡張用
                 GroupId = this.GroupId,
                 Account = new(this.AccountSelectorVM.SelectedKey, string.Empty),
                 Item = new(this.ItemSelectorVM.SelectedKey, string.Empty),
@@ -321,15 +342,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 Remark = this.RemarkSelectorVM.SelectedKey
             };
             foreach (DateValueViewModel vm in this.InputedDateValueVMList) {
-                if (vm.ActValue is null or 0) { continue; }
+                if (vm.InputedValue is null or 0) { continue; }
 
-                ActionBaseModel baseAction = new(vm.ActionId, vm.ActDate, new((balanceKind == BalanceKind.Income ? 1 : -1) * vm.ActValue.Value, vm.Scale));
+                int sign = balanceKind == BalanceKind.Income ? 1 : -1;
+                ActionBaseModel baseAction = new(vm.ActionId, vm.SelectedDate, new(sign * vm.InputedValue.Value, AssetIdObj.System));
                 actionList.Add(commonAction.WithChanges(baseAction));
             }
 
             IEnumerable<ActionIdObj> resActionIdList = await this.mService.SaveActionListAsync(actionList);
 
-            DateTime lastActTime = this.InputedDateValueVMList.Max(static tmp => tmp.ActDate);
+            DateTime lastActTime = this.InputedDateValueVMList.Max(static tmp => tmp.SelectedDate);
 
             if (!string.IsNullOrEmpty(commonAction.Shop)) {
                 ShopModel shop = new(commonAction.Shop) { ItemId = commonAction.Item.Id, CurrentActTime = commonAction.ActTime };

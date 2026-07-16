@@ -30,9 +30,25 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Others
         /// </summary>
         public DateTime ActTime { get; set; } = DateTime.Now;
         /// <summary>
-        /// 項目値(主単位)
+        /// 帳簿項目のアセットID
         /// </summary>
-        public decimal ActMainValue { get; set; }
+        public int? AssetId { get; set; }
+        /// <summary>
+        /// 帳簿項目アセットでの項目値(主単位)
+        /// </summary>
+        public decimal OrgMainActValue { get; set; }
+        /// <summary>
+        /// 帳簿項目アセットでのアセットID
+        /// </summary>
+        public int OrgActAssetId { get; set; }
+        /// <summary>
+        /// 表示アセットでの項目値(主単位)
+        /// </summary>
+        public decimal MainActValue { get; set; }
+        /// <summary>
+        /// 表示アセットでのアセットID
+        /// </summary>
+        public int ActAssetId { get; set; }
         /// <summary>
         /// 備考
         /// </summary>

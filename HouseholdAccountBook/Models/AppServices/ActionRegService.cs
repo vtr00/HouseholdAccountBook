@@ -27,6 +27,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         private readonly DbHandlerFactory mDbHandlerFactory = dbHandlerFactory;
 
+        #region 帳簿項目
         /// <summary>
         /// 帳簿項目Modelを取得する
         /// </summary>
@@ -37,18 +38,16 @@ namespace HouseholdAccountBook.Models.AppServices
             using FuncLog funcLog = new(new { actionId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
-            HstActionDao hstActionDao = new(dbHandler);
-            HstActionDto dto = await hstActionDao.FindByIdAsync((int)actionId);
-
-            MstAssetDao mstAssetDao = new(dbHandler);
-            MstAssetDto mstAssetDto = await mstAssetDao.FindByIdAsync((int)UserSettingService.Instance.DefaultAssetId);
+            ActionInfoDao dao = new(dbHandler);
+            ActionInfoDto dto = await dao.FindByActionIdAsync((int)actionId, (int)UserSettingService.Instance.DefaultAssetId);
 
             ActionModel action = new() {
-                Base = new(dto.ActionId, dto.ActTime, AmountObj.FromSubValue(dto.ActValue, mstAssetDto.Scale)),
+                Base = new(dto.ActionId, dto.ActTime, new(dto.OrgMainActValue, dto.OrgActAssetId)),
+                AssetId = dto.AssetId ?? AssetIdObj.System,
                 GroupId = dto.GroupId,
-                Account = new(dto.BookId, string.Empty),
-                Category = new(null, string.Empty, 0 < Math.Sign(dto.ActValue) ? BalanceKind.Income : BalanceKind.Expenses),
-                Item = new(dto.ItemId, string.Empty),
+                Account = new(dto.BookId, dto.BookName),
+                Category = new(dto.CategoryId, dto.CategoryName, 0 < Math.Sign(dto.OrgMainActValue) ? BalanceKind.Income : BalanceKind.Expenses),
+                Item = new(dto.ItemId, dto.ItemName),
                 Shop = new(dto.ShopName),
                 Remark = new(dto.Remark),
                 IsMatch = dto.IsMatch == 1
@@ -132,6 +131,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             ItemId = (int)action.Item.Id,
                             ActTime = tmpActTime,
                             ActValue = action.Amount.SubValue,
+                            AssetId = null, // TODO: 将来の拡張用
                             ShopName = action.Shop,
                             GroupId = (int?)assingedGroupId,
                             Remark = action.Remark
@@ -155,6 +155,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 ItemId = (int)action.Item.Id,
                                 ActTime = action.ActTime,
                                 ActValue = action.Amount.SubValue,
+                                AssetId = null, // TODO: 将来の拡張用
                                 ShopName = action.Shop,
                                 GroupId = null,
                                 Remark = action.Remark,
@@ -179,6 +180,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                     ItemId = (int)action.Item.Id,
                                     ActTime = action.ActTime,
                                     ActValue = action.Amount.SubValue,
+                                    AssetId = null, // TODO: 将来の拡張用
                                     ShopName = action.Shop,
                                     GroupId = null,
                                     Remark = action.Remark,
@@ -198,6 +200,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                     ItemId = (int)action.Item.Id,
                                     ActTime = action.ActTime,
                                     ActValue = action.Amount.SubValue,
+                                    AssetId = null, // TODO: 将来の拡張用
                                     ShopName = action.Shop,
                                     GroupId = (int?)action.GroupId,
                                     Remark = action.Remark,
@@ -239,6 +242,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             ItemId = (int)action.Item.Id,
                             ActTime = tmpActTime,
                             ActValue = action.Amount.SubValue,
+                            AssetId = null, // TODO: 将来の拡張用
                             ShopName = action.Shop,
                             GroupId = (int?)assignedGroupId,
                             Remark = action.Remark,
@@ -259,6 +263,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                         ItemId = (int)action.Item.Id,
                                         ActTime = tmpActTime,
                                         ActValue = action.Amount.SubValue,
+                                        AssetId = null, // TODO: 将来の拡張用
                                         ShopName = action.Shop,
                                         GroupId = (int?)assignedGroupId,
                                         Remark = action.Remark,
@@ -282,6 +287,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 ItemId = (int)action.Item.Id,
                                 ActTime = tmpActTime,
                                 ActValue = action.Amount.SubValue,
+                                AssetId = null, // TODO: 将来の拡張用
                                 ShopName = action.Shop,
                                 GroupId = (int?)assignedGroupId,
                                 Remark = action.Remark,
@@ -298,7 +304,9 @@ namespace HouseholdAccountBook.Models.AppServices
 
             return resActionId;
         }
+        #endregion
 
+        #region 帳簿項目リスト
         /// <summary>
         /// 帳簿項目Modelリストを取得する
         /// </summary>
@@ -309,20 +317,18 @@ namespace HouseholdAccountBook.Models.AppServices
             using FuncLog funcLog = new(new { groupId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
-            HstActionDao hstActionDao = new(dbHandler);
-            IEnumerable<HstActionDto> dtoList = await hstActionDao.FindByGroupIdAsync((int)groupId);
+            ActionInfoDao dao = new(dbHandler);
+            IEnumerable<ActionInfoDto> dtoList = await dao.FindByGroupIdAsync((int)groupId, (int)UserSettingService.Instance.DefaultAssetId);
 
             List<ActionModel> actionList = [];
-            foreach (HstActionDto dto in dtoList) {
-                MstAssetDao mstAssetDao = new(dbHandler);
-                MstAssetDto mstAssetDto = await mstAssetDao.FindByIdAsync((int)UserSettingService.Instance.DefaultAssetId);
-
+            foreach (ActionInfoDto dto in dtoList) {
                 ActionModel action = new() {
+                    Base = new(dto.ActionId, dto.ActTime, new(dto.OrgMainActValue, dto.OrgActAssetId)),
+                    AssetId = dto.AssetId ?? AssetIdObj.System,
                     GroupId = groupId,
-                    Account = new(dto.BookId, string.Empty),
-                    Category = new(null, string.Empty, 0 < Math.Sign(dto.ActValue) ? BalanceKind.Income : BalanceKind.Expenses),
-                    Item = new(dto.ItemId, string.Empty),
-                    Base = new(dto.ActionId, dto.ActTime, AmountObj.FromSubValue(dto.ActValue, mstAssetDto.Scale)),
+                    Account = new(dto.BookId, dto.BookName),
+                    Category = new(dto.CategoryId, dto.CategoryName, 0 < Math.Sign(dto.OrgMainActValue) ? BalanceKind.Income : BalanceKind.Expenses),
+                    Item = new(dto.ItemId, dto.ItemName),
                     Shop = new(dto.ShopName),
                     Remark = new(dto.Remark)
                 };
@@ -357,6 +363,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             ItemId = (int)action.Item.Id,
                             ActTime = action.ActTime,
                             ActValue = action.Amount.SubValue,
+                            AssetId = null, // TODO: 将来の拡張用
                             ShopName = action.Shop,
                             GroupId = (int?)assignedGroupId,
                             Remark = action.Remark
@@ -377,6 +384,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 ItemId = (int)action.Item.Id,
                                 ActTime = action.ActTime,
                                 ActValue = action.Amount.SubValue,
+                                AssetId = null, // TODO: 将来の拡張用
                                 ShopName = action.Shop,
                                 Remark = action.Remark,
                                 GroupId = (int?)action.GroupId,
@@ -391,6 +399,7 @@ namespace HouseholdAccountBook.Models.AppServices
                                 ItemId = (int)action.Item.Id,
                                 ActTime = action.ActTime,
                                 ActValue = action.Amount.SubValue,
+                                AssetId = null, // TODO: 将来の拡張用
                                 ShopName = action.Shop,
                                 Remark = action.Remark,
                                 GroupId = (int?)action.GroupId
@@ -411,7 +420,9 @@ namespace HouseholdAccountBook.Models.AppServices
 
             return resActionIdList;
         }
+        #endregion
 
+        #region 移動
         /// <summary>
         /// 移動帳簿項目Modelを取得する
         /// </summary>
@@ -421,21 +432,23 @@ namespace HouseholdAccountBook.Models.AppServices
         {
             using FuncLog funcLog = new(new { groupId });
 
-            AssetModel asset = AssetService.Instance.GetDefaultAssetModel();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             MoveActionInfoDao moveActionInfoDao = new(dbHandler);
             // 移動元、移動先、手数料の順に並び替え
             IEnumerable<MoveActionInfoDto> dtoList = await moveActionInfoDao.GetAllAsync((int)UserSettingService.Instance.DefaultAssetId, (int)groupId);
-            dtoList = dtoList.OrderBy(dto => dto.ActMainValue).OrderBy(dto => -dto.MoveFlg);
+            dtoList = dtoList.OrderBy(dto => dto.MainActValue).OrderBy(dto => -dto.MoveFlg);
 
             List<ActionModel> actionList = [];
             foreach (MoveActionInfoDto dto in dtoList) {
                 ActionModel action = new() {
+                    Base = new(dto.ActionId, dto.ActTime, new(dto.MainActValue, dto.ActAssetId)),
+                    AssetId = dto.AssetId ?? AssetIdObj.System,
                     GroupId = groupId,
                     Account = new(dto.BookId, string.Empty),
+                    Category = null,
                     Item = new(dto.ItemId, string.Empty),
-                    Base = new(dto.ActionId, dto.ActTime, new(dto.ActMainValue, asset.Scale)),
+                    Shop = null,
                     Remark = new(dto.Remark)
                 };
                 actionList.Add(action);
@@ -469,19 +482,23 @@ namespace HouseholdAccountBook.Models.AppServices
                     HstGroupDao hstGroupDao = new(dbHandler);
                     assignedGroupId = await hstGroupDao.InsertReturningIdAsync(new HstGroupDto { GroupKind = (int)GroupKind.Move });
 
+                    // 移動元
                     HstActionDao hstActionDao = new(dbHandler);
                     ActionIdObj fromActionId = await hstActionDao.InsertMoveActionReturningIdAsync(new HstActionDto {
                         BookId = (int)fromAction.Account.Id,
                         ActTime = fromAction.ActTime,
                         ActValue = fromAction.Amount.SubValue,
+                        AssetId = null, // TODO: 将来の拡張用
                         GroupId = (int?)assignedGroupId
                     }, (int)BalanceKind.Expenses);
                     resActionIdList.Add(fromActionId);
 
+                    // 移動先
                     ActionIdObj toActionId = await hstActionDao.InsertMoveActionReturningIdAsync(new HstActionDto {
                         BookId = (int)toAction.Account.Id,
                         ActTime = toAction.ActTime,
                         ActValue = toAction.Amount.SubValue,
+                        AssetId = null, // TODO: 将来の拡張用
                         GroupId = (int?)assignedGroupId
                     }, (int)BalanceKind.Income);
                     resActionIdList.Add(toActionId);
@@ -489,19 +506,23 @@ namespace HouseholdAccountBook.Models.AppServices
                 }
                 else {
                     #region 帳簿項目を変更する
+                    // 移動元
                     HstActionDao hstActionDao = new(dbHandler);
                     _ = await hstActionDao.UpdateMoveActionAsync(new HstActionDto {
                         BookId = (int)fromAction.Account.Id,
                         ActTime = fromAction.ActTime,
                         ActValue = fromAction.Amount.SubValue,
+                        AssetId = null, // TODO: 将来の拡張用
                         ActionId = (int)fromAction.ActionId
                     });
                     resActionIdList.Add(fromAction.ActionId);
 
+                    // 移動先
                     _ = await hstActionDao.UpdateMoveActionAsync(new HstActionDto {
                         BookId = (int)toAction.Account.Id,
                         ActTime = toAction.ActTime,
                         ActValue = toAction.Amount.SubValue,
+                        AssetId = null, // TODO: 将来の拡張用
                         ActionId = (int)toAction.ActionId
                     });
                     resActionIdList.Add(toAction.ActionId);
@@ -518,6 +539,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             ItemId = (int)commissionAction.Item.Id,
                             ActTime = commissionAction.ActTime,
                             ActValue = commissionAction.Amount.SubValue,
+                            AssetId = null, // TODO: 将来の拡張用
                             Remark = commissionAction.Remark,
                             GroupId = (int?)assignedGroupId
                         });
@@ -531,6 +553,7 @@ namespace HouseholdAccountBook.Models.AppServices
                             ItemId = (int)commissionAction.Item.Id,
                             ActTime = commissionAction.ActTime,
                             ActValue = commissionAction.Amount.SubValue,
+                            AssetId = null, // TODO: 将来の拡張用
                             Remark = commissionAction.Remark,
                             GroupId = (int?)assignedGroupId,
                             ActionId = (int)commissionAction.ActionId
@@ -551,6 +574,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             return resActionIdList;
         }
+        #endregion
 
         /// <summary>
         /// 店舗情報を保存する
