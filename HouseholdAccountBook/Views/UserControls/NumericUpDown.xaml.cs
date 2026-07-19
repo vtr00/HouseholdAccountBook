@@ -55,8 +55,8 @@ namespace HouseholdAccountBook.Views.UserControls
                 typeof(EditSession),
                 typeof(NumericUpDown),
                 new FrameworkPropertyMetadata(null,
-                    FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-                    static (d, e) => ((NumericUpDown)d).SessionChanged(e)
+                        FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                        static (d, e) => ((NumericUpDown)d).SessionChanged(e)
                     )
             );
         /// <summary>
@@ -90,9 +90,9 @@ namespace HouseholdAccountBook.Views.UserControls
                 typeof(decimal?),
                 typeof(NumericUpDown),
                 new FrameworkPropertyMetadata(null,
-                    FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-                    static (d, e) => ((NumericUpDown)d).ValueChanged(e),
-                    static (d, e) => ((NumericUpDown)d).CoerceValueImpl(e)
+                        FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                        static (d, e) => ((NumericUpDown)d).ValueChanged(e),
+                        static (d, e) => ((NumericUpDown)d).CoerceValueImpl(e)
                     )
             );
         /// <summary>
@@ -129,7 +129,9 @@ namespace HouseholdAccountBook.Views.UserControls
                 }
 
                 if (valid) {
+                    this._textBox.TextChanged -= this.TextBox_TextChanged;
                     this.Session.Text = !this.IsFloating ? value.ToString($"F{this.Scale}") : value.ToString();
+                    this._textBox.TextChanged += this.TextBox_TextChanged;
                 }
             }
         }
@@ -150,14 +152,12 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// <see cref="Scale"/> 依存関係プロパティを識別します。
         /// </summary>
+        /// <remarks>内部からBindしたプロパティを書き換えることはない</remarks>
         public static readonly DependencyProperty ScaleProperty = DependencyProperty.Register(
                 nameof(Scale),
                 typeof(int),
                 typeof(NumericUpDown),
-                new FrameworkPropertyMetadata(0,
-                    FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-                    static (d, e) => ((NumericUpDown)d).ScaleChanged(e),
-                    static (d, e) => ((NumericUpDown)d).CoerceScale(e))
+                new FrameworkPropertyMetadata(0, static (d, e) => ((NumericUpDown)d).ScaleChanged(e), static (d, e) => ((NumericUpDown)d).CoerceScale(e))
             );
         /// <summary>
         /// 小数点以下桁数
@@ -177,23 +177,23 @@ namespace HouseholdAccountBook.Views.UserControls
             if (this.mIsLoadedCompleted) {
                 bool valid = false;
                 int scale = 0;
-                if (this.Value is not null) {
-                    if (e.NewValue is int newScale) {
-                        if (e.OldValue is null) {
-                            valid = true;
-                            scale = newScale;
-                        }
-                        else if (e.OldValue is int oldScale && oldScale != newScale) {
-                            valid = true;
-                            scale = newScale;
-                        }
+                if (e.NewValue is int newScale) {
+                    if (e.OldValue is null) {
+                        valid = true;
+                        scale = newScale;
+                    }
+                    else if (e.OldValue is int oldScale && oldScale != newScale) {
+                        valid = true;
+                        scale = newScale;
                     }
                 }
 
                 if (valid) {
                     Log.Trace($"{nameof(this.Scale)}:{this.Scale}");
                     decimal value = this.Value is null ? this.NullValue : this.Value.Value;
+                    this._textBox.TextChanged -= this.TextBox_TextChanged;
                     this.Session.Text = !this.IsFloating ? value.ToString($"F{scale}") : value.ToString();
+                    this._textBox.TextChanged += this.TextBox_TextChanged;
                 }
             }
         }
@@ -211,11 +211,12 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// <see cref="IsFloating"/> 依存関係プロパティを識別します。
         /// </summary>
+        /// <remarks>内部からBindしたプロパティを書き換えることはない</remarks>
         public static readonly DependencyProperty IsFloatingProperty = DependencyProperty.Register(
                 nameof(IsFloating),
                 typeof(bool),
                 typeof(NumericUpDown),
-                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (d, e) => ((NumericUpDown)d).IsFloatingChanged(e))
+                new FrameworkPropertyMetadata(false, static (d, e) => ((NumericUpDown)d).IsFloatingChanged(e))
             );
         /// <summary>
         /// 浮動小数点か
@@ -243,6 +244,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// <see cref="Stride"/> 依存関係プロパティを識別します。
         /// </summary>
+        /// <remarks>内部からBindしたプロパティを書き換えることはない</remarks>
         public static readonly DependencyProperty StrideProperty = DependencyProperty.Register(
                 nameof(Stride),
                 typeof(decimal),
@@ -260,6 +262,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// <see cref="MaxValue"/> 依存関係プロパティを識別します。
         /// </summary>
+        /// <remarks>内部からBindしたプロパティを書き換えることはない</remarks>
         public static readonly DependencyProperty MaxValueProperty = DependencyProperty.Register(
                 nameof(MaxValue),
                 typeof(decimal),
@@ -294,6 +297,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// <see cref="MinValue"/> 依存関係プロパティを識別します。
         /// </summary>
+        /// <remarks>内部からBindしたプロパティを書き換えることはない</remarks>
         public static readonly DependencyProperty MinValueProperty = DependencyProperty.Register(
                 nameof(MinValue),
                 typeof(decimal),
@@ -328,6 +332,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// <see cref="NullValue"/> 依存関係プロパティを識別します。
         /// </summary>
+        /// <remarks>内部からBindしたプロパティを書き換えることはない</remarks>
         public static readonly DependencyProperty NullValueProperty = DependencyProperty.Register(
                 nameof(NullValue),
                 typeof(decimal),
@@ -345,6 +350,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// <see cref="IsMouseWheelEnabled"/> 依存関係プロパティを識別します。
         /// </summary>
+        /// <remarks>内部からBindしたプロパティを書き換えることはない</remarks>
         public static readonly DependencyProperty IsMouseWheelEnabledProperty = DependencyProperty.Register(
                 nameof(IsMouseWheelEnabled),
                 typeof(bool),
@@ -362,6 +368,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// <see cref="IsPopupEnabled"/> 依存関係プロパティを識別します。
         /// </summary>
+        /// <remarks>内部からBindしたプロパティを書き換えることはない</remarks>
         public static readonly DependencyProperty IsPopupEnabledProperty = DependencyProperty.Register(
                 nameof(IsPopupEnabled),
                 typeof(bool),
@@ -504,12 +511,12 @@ namespace HouseholdAccountBook.Views.UserControls
             // TextBox の選択位置を更新する
             this._textBox.SelectionStart = this.Session.SelectionStart;
             this._textBox.SelectionLength = this.Session.SelectionLength;
-
-            this._textBox.SelectionChanged += this.TextBox_SelectionChanged;
+            // イベントハンドラを登録する
             this._textBox.TextChanged += this.TextBox_TextChanged;
 
             this.mIsLoadedCompleted = true;
         }
+
         /// <summary>
         /// コントロールの破棄前のとき
         /// </summary>

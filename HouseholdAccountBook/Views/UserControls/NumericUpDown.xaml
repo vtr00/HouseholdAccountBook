@@ -27,7 +27,7 @@
                  Text="{Binding Session.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ElementName=Root}" 
                  TextAlignment="Right" InputMethod.IsInputMethodEnabled="False"
                  PreviewTextInput="TextBox_PreviewTextInput" PreviewKeyDown="TextBox_PreviewKeyDown"
-                 MouseWheel="TextBox_MouseWheel">
+                 MouseWheel="TextBox_MouseWheel" SelectionChanged="TextBox_SelectionChanged">
             <TextBox.InputBindings>
                 <KeyBinding Gesture="Up" Command="{Binding IncreaseCommand, ElementName=Root}"/>
                 <KeyBinding Gesture="Down" Command="{Binding DecreaseCommand, ElementName=Root}"/>
