@@ -6,6 +6,9 @@
 
 ### 2026-07-20
 
+- 全体
+   - ×AssetService::ToAssetString の FuncLog の出力を削除した - refs #231
+
 - MainWindow
    - ↑起動したときの帳簿のアセットでデフォルトと異なるときにステータスバーの金額の単位が異なるのを修正した - refs #227
 

@@ -70,8 +70,6 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns>金額の文字列表現</returns>
         public string ToAssetString(decimal? value, AssetIdObj assetId, UnitKind inputKind, UnitKind outputKind, UnitPosition position = UnitPosition.Both)
         {
-            using FuncLog funcLog = new(new { value, assetId, inputKind, outputKind, position }, Log.LogLevel.Trace);
-
             AssetModel asset = this.GetAssetModel(assetId);
             if (asset is null) { return value.ToString(); }
 
@@ -119,7 +117,6 @@ namespace HouseholdAccountBook.Models.AppServices
                     break;
             }
 
-            funcLog.Returns = new { ret };
             return ret;
         }
 
