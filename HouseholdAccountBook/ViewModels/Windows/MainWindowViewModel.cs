@@ -1174,6 +1174,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             // アセットを更新する
             this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
+            this.AccountTabVM.RaiseSelectedAssetChanged();
 
             await this.UpdateAsync(isUpdateAccountList: false, isScroll: true, isUpdateActDateLastEdited: true);
         }

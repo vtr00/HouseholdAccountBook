@@ -519,6 +519,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 最後のバックアップ日時が変更されたことを通知する
         /// </summary>
         public void RaiseCurrentBackUpChanged() => this.RaisePropertyChanged(nameof(this.CurrentBackUp));
+        /// <summary>
+        /// 選択されたアセットが変更されたことを通知する
+        /// </summary>
+        public void RaiseSelectedAssetChanged()
+        {
+            this.RaisePropertyChanged(nameof(this.AverageValueStr));
+            this.RaisePropertyChanged(nameof(this.SumValueStr));
+            this.RaisePropertyChanged(nameof(this.IncomeSumValueStr));
+            this.RaisePropertyChanged(nameof(this.ExpensesSumValueStr));
+        }
 
         /// <summary>
         /// <see cref="FilteredActionVMList"/> を更新する
@@ -654,12 +664,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             using FuncLog funcLog = new();
 
             // アセット選択変更時
-            this.Parent.SelectedAssetChanged += (sender, e) => {
-                this.RaisePropertyChanged(nameof(this.AverageValueStr));
-                this.RaisePropertyChanged(nameof(this.SumValueStr));
-                this.RaisePropertyChanged(nameof(this.IncomeSumValueStr));
-                this.RaisePropertyChanged(nameof(this.ExpensesSumValueStr));
-            };
+            this.Parent.SelectedAssetChanged += (sender, e) => this.RaiseSelectedAssetChanged();
 
             // 帳簿項目選択変更時
             this.ActionSelectorVM.SelectedCollectionChanged += (sender, e) => {
