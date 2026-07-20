@@ -675,6 +675,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
                 this.RaisePropertyChanged(nameof(this.IsMatch));
             };
+
+            // 概要選択変更時
             this.SummarySelectorVM.SelectionChanged += (sender, e) => {
                 this.SelectedSeriesChanged?.Invoke(this, e);
 

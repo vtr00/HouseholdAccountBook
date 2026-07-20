@@ -235,10 +235,10 @@
   <data name="HolidaySettingKind_AfterHoliday" xml:space="preserve">
     <value>休日後</value>
   </data>
-  <data name="CommissionKind_MoveFrom" xml:space="preserve">
+  <data name="FeeKind_Source" xml:space="preserve">
     <value>移動元</value>
   </data>
-  <data name="CommissionKind_MoveTo" xml:space="preserve">
+  <data name="FeeKind_Destination" xml:space="preserve">
     <value>移動先</value>
   </data>
   <data name="GraphKind1_IncomeAndExpensesGraph" xml:space="preserve">
@@ -539,7 +539,7 @@
     <value>削除(_D)</value>
   </data>
   <data name="Menu_Edit_Move" xml:space="preserve">
-    <value>移動(_T)...</value>
+    <value>移動(_M)...</value>
   </data>
   <data name="Menu_Edit_Add" xml:space="preserve">
     <value>追加(_A)...</value>
@@ -944,7 +944,7 @@
   <data name="TextBlock_Repeat_Holiday" xml:space="preserve">
     <value>休日設定</value>
   </data>
-  <data name="TextBlock_Comission" xml:space="preserve">
+  <data name="TextBlock_Fee" xml:space="preserve">
     <value>手数料</value>
   </data>
   <data name="TextBlock_Repeat_BulkEdit" xml:space="preserve">
@@ -956,7 +956,7 @@
   <data name="TextBlock_LastOperatedAccountItem" xml:space="preserve">
     <value>最後に操作した帳簿項目</value>
   </data>
-  <data name="TextBlock_Burden" xml:space="preserve">
+  <data name="TextBlock_ChargedTo" xml:space="preserve">
     <value>負担</value>
   </data>
   <data name="TextBlock_Replace" xml:space="preserve">
@@ -965,10 +965,10 @@
   <data name="TextBlock_Expenses" xml:space="preserve">
     <value>支出</value>
   </data>
-  <data name="TextBlock_MoveFrom" xml:space="preserve">
+  <data name="TextBlock_Source" xml:space="preserve">
     <value>移動元</value>
   </data>
-  <data name="TextBlock_MoveTo" xml:space="preserve">
+  <data name="TextBlock_Destination" xml:space="preserve">
     <value>移動先</value>
   </data>
   <data name="TextBlock_StartDate" xml:space="preserve">

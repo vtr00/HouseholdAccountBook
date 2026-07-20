@@ -21,15 +21,15 @@ namespace HouseholdAccountBook.Views.Windows
         /// 移動元帳簿変更時のイベント
         /// </summary>
         public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedFromAccountChanged {
-            add => this.WVM.SelectedFromAccountChanged += value;
-            remove => this.WVM.SelectedFromAccountChanged -= value;
+            add => this.WVM.SelectedSrcAccountChanged += value;
+            remove => this.WVM.SelectedSrcAccountChanged -= value;
         }
         /// <summary>
         /// 移動先帳簿変更時のイベント
         /// </summary>
         public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedToAccountChanged {
-            add => this.WVM.SelectedToAccountChanged += value;
-            remove => this.WVM.SelectedToAccountChanged -= value;
+            add => this.WVM.SelectedDstAccountChanged += value;
+            remove => this.WVM.SelectedDstAccountChanged -= value;
         }
 
         /// <summary>

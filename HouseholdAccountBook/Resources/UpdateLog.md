@@ -4,6 +4,11 @@
 
 ## 2026
 
+### 2026-07-20
+
+- MoveRegistrationWindow
+   - △移動関係の英語表現を修正した(MoveFrom->Source, MoveTo->Destination, Commission->Fee, Burden->ChargedTo) - refs #222
+
 ### 2026-07-19
 
 - 全般
