@@ -36,19 +36,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 移動元帳簿変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedFromAccountChanged;
+        public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedSrcAccountChanged;
         /// <summary>
         /// 移動先帳簿変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedToAccountChanged;
+        public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedDstAccountChanged;
         /// <summary>
         /// 手数料種別変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<CommissionKind>> SelectedCommissionKindChanged;
+        public event EventHandler<ChangedEventArgs<FeeKind>> SelectedFeeKindChanged;
         /// <summary>
         /// 手数料項目変更時イベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<ItemIdObj>> SelectedCommissionItemChanged;
+        public event EventHandler<ChangedEventArgs<ItemIdObj>> SelectedFeeItemChanged;
 
         /// <summary>
         /// 登録時イベント
@@ -76,7 +76,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 移動元帳簿項目ID
         /// </summary>
-        public ActionIdObj FromActionId {
+        public ActionIdObj SrcActionId {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -84,19 +84,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 移動元帳簿セレクタVM
         /// </summary>
-        public SelectorViewModel<AccountModel, AccountIdObj> FromAccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        public SelectorViewModel<AccountModel, AccountIdObj> SrcAccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 選択された日付(移動元)
         /// </summary>
-        public DateTime SelectedFromDate {
+        public DateTime SelectedSrcDate {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
                     CommandManager.InvalidateRequerySuggested();
 
-                    if (this.SelectedToDate < value || this.IsDateLink) {
-                        this.SelectedToDate = value;
+                    if (this.SelectedDstDate < value || this.IsDateLink) {
+                        this.SelectedDstDate = value;
                     }
                 }
             }
@@ -105,20 +105,20 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 選択された移動元アセットID
         /// </summary>
-        public AssetIdObj SelectedFromAssetId => this.SelectedFromAccountAssetId; //TODO: 帳簿項目のアセットIDがSystemでなければ帳簿のアセットIDを採用する
+        public AssetIdObj SelectedSrcAssetId => this.SelectedSrcAccountAssetId; //TODO: 帳簿項目のアセットIDがSystemでなければ帳簿のアセットIDを採用する
         /// <summary>
         /// 選択された移動元帳簿アセットID
         /// </summary>
-        public AssetIdObj SelectedFromAccountAssetId {
+        public AssetIdObj SelectedSrcAccountAssetId {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
                     this.RaisePropertyChanged(nameof(this.IsSameAsset));
-                    this.RaisePropertyChanged(nameof(this.FromValueScale));
-                    this.RaisePropertyChanged(nameof(this.InputedFromValueStr));
+                    this.RaisePropertyChanged(nameof(this.SrcValueScale));
+                    this.RaisePropertyChanged(nameof(this.InputedSrcValueStr));
 
                     if (this.IsSameAsset) {
-                        this.InputedToValue = this.InputedFromValue;
+                        this.InputedDstValue = this.InputedSrcValue;
                     }
                 }
             }
@@ -126,15 +126,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 入力された移動元金額
         /// </summary>
-        public decimal? InputedFromValue {
+        public decimal? InputedSrcValue {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
                     CommandManager.InvalidateRequerySuggested();
-                    this.RaisePropertyChanged(nameof(this.InputedFromValueStr));
+                    this.RaisePropertyChanged(nameof(this.InputedSrcValueStr));
 
                     if (this.IsSameAsset) {
-                        this.InputedToValue = field;
+                        this.InputedDstValue = field;
                     }
                 }
             }
@@ -142,18 +142,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 移動元金額の小数点以下桁数
         /// </summary>
-        public int FromValueScale => AssetService.Instance.GetAssetModel(this.SelectedFromAssetId).Scale;
+        public int SrcValueScale => AssetService.Instance.GetAssetModel(this.SelectedSrcAssetId).Scale;
         /// <summary>
         /// 入力された移動元金額(文字列)
         /// </summary>
-        public string InputedFromValueStr => AssetService.Instance.ToAssetString(this.InputedFromValue, this.SelectedFromAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string InputedSrcValueStr => AssetService.Instance.ToAssetString(this.InputedSrcValue, this.SelectedSrcAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
         #endregion
 
         #region 移動先帳簿項目
         /// <summary>
         /// 移動先帳簿項目ID
         /// </summary>
-        public ActionIdObj ToActionId {
+        public ActionIdObj DstActionId {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -161,19 +161,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 移動先帳簿セレクタVM
         /// </summary>
-        public SelectorViewModel<AccountModel, AccountIdObj> ToAccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        public SelectorViewModel<AccountModel, AccountIdObj> DstAccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 選択された日付(移動先)
         /// </summary>
-        public DateTime SelectedToDate {
+        public DateTime SelectedDstDate {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
                     CommandManager.InvalidateRequerySuggested();
 
-                    if (value < this.SelectedFromDate) {
-                        this.SelectedFromDate = value;
+                    if (value < this.SelectedSrcDate) {
+                        this.SelectedSrcDate = value;
                         this.IsDateLink = true;
                     }
                 }
@@ -187,7 +187,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             set {
                 if (this.SetProperty(ref field, value)) {
                     if (value) {
-                        this.SelectedToDate = this.SelectedFromDate;
+                        this.SelectedDstDate = this.SelectedSrcDate;
                     }
                 }
             }
@@ -196,53 +196,53 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 選択された移動先アセットID
         /// </summary>
-        public AssetIdObj SelectedToAssetId => this.SelectedToAccountAssetId; //TODO: 帳簿項目のアセットIDがSystemでなければ帳簿のアセットIDを採用する
+        public AssetIdObj SelectedDstAssetId => this.SelectedDstAccountAssetId; //TODO: 帳簿項目のアセットIDがSystemでなければ帳簿のアセットIDを採用する
         /// <summary>
         /// 選択された移動先帳簿アセットID
         /// </summary>
-        public AssetIdObj SelectedToAccountAssetId {
+        public AssetIdObj SelectedDstAccountAssetId {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
                     this.RaisePropertyChanged(nameof(this.IsSameAsset));
-                    this.RaisePropertyChanged(nameof(this.ToValueScale));
-                    this.RaisePropertyChanged(nameof(this.InputedToValueStr));
+                    this.RaisePropertyChanged(nameof(this.DstValueScale));
+                    this.RaisePropertyChanged(nameof(this.InputedDstValueStr));
 
                     if (this.IsSameAsset) {
-                        this.InputedToValue = this.InputedFromValue;
+                        this.InputedDstValue = this.InputedSrcValue;
                     }
                 }
             }
         }
 
-        public bool IsSameAsset => this.SelectedFromAssetId == this.SelectedToAssetId;
+        public bool IsSameAsset => this.SelectedSrcAssetId == this.SelectedDstAssetId;
         /// <summary>
         /// 入力された移動先金額
         /// </summary>
-        public decimal? InputedToValue {
+        public decimal? InputedDstValue {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
                     CommandManager.InvalidateRequerySuggested();
-                    this.RaisePropertyChanged(nameof(this.InputedToValueStr));
+                    this.RaisePropertyChanged(nameof(this.InputedDstValueStr));
                 }
             }
         }
         /// <summary>
         /// 移動先金額の小数点以下桁数
         /// </summary>
-        public int ToValueScale => AssetService.Instance.GetAssetModel(this.SelectedToAssetId).Scale;
+        public int DstValueScale => AssetService.Instance.GetAssetModel(this.SelectedDstAssetId).Scale;
         /// <summary>
         /// 入力された移動先金額(文字列)
         /// </summary>
-        public string InputedToValueStr => AssetService.Instance.ToAssetString(this.InputedToValue, this.SelectedToAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string InputedDstValueStr => AssetService.Instance.ToAssetString(this.InputedDstValue, this.SelectedDstAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
         #endregion
 
         #region 手数料帳簿項目
         /// <summary>
         /// 手数料の帳簿項目ID
         /// </summary>
-        public ActionIdObj CommissionId {
+        public ActionIdObj FeeActionId {
             get;
             set => this.SetProperty(ref field, value);
         }
@@ -250,7 +250,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 手数料種別セレクタVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<CommissionKind, string>, CommissionKind> CommissionKindSelectorVM => field ??= new(static p => p.Key);
+        public SelectorViewModel<KeyValuePair<FeeKind, string>, FeeKind> FeeKindSelectorVM => field ??= new(static p => p.Key);
 
         /// <summary>
         /// 手数料項目セレクタVM
@@ -260,39 +260,39 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 選択された手数料アセットID
         /// </summary>
-        public AssetIdObj SelectedCommissionAssetId => this.SelectedCommissionAccountAssetId; //TODO: 帳簿項目のアセットIDがSystemでなければ帳簿のアセットIDを採用する
+        public AssetIdObj SelectedFeeAssetId => this.SelectedFeeAccountAssetId; //TODO: 帳簿項目のアセットIDがSystemでなければ帳簿のアセットIDを採用する
         /// <summary>
         /// 選択された手数料帳簿アセットID
         /// </summary>
-        public AssetIdObj SelectedCommissionAccountAssetId {
+        public AssetIdObj SelectedFeeAccountAssetId {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
-                    this.RaisePropertyChanged(nameof(this.CommissionScale));
-                    this.RaisePropertyChanged(nameof(this.InputedCommissionStr));
+                    this.RaisePropertyChanged(nameof(this.FeeScale));
+                    this.RaisePropertyChanged(nameof(this.InputedFeeStr));
                 }
             }
         }
         /// <summary>
         /// 入力された手数料
         /// </summary>
-        public decimal? InputedCommission {
+        public decimal? InputedFee {
             get;
             set {
                 if (this.SetProperty(ref field, value)) {
                     CommandManager.InvalidateRequerySuggested();
-                    this.RaisePropertyChanged(nameof(this.InputedCommissionStr));
+                    this.RaisePropertyChanged(nameof(this.InputedFeeStr));
                 }
             }
         }
         /// <summary>
         /// 手数料の小数点以下桁数
         /// </summary>
-        public int CommissionScale => AssetService.Instance.GetAssetModel(this.SelectedCommissionAssetId).Scale;
+        public int FeeScale => AssetService.Instance.GetAssetModel(this.SelectedFeeAssetId).Scale;
         /// <summary>
         /// 入力された手数料(文字列)
         /// </summary>
-        public string InputedCommissionStr => AssetService.Instance.ToAssetString(this.InputedCommission, this.SelectedCommissionAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string InputedFeeStr => AssetService.Instance.ToAssetString(this.InputedFee, this.SelectedFeeAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
 
         /// <summary>
         /// 備考セレクタVM
@@ -305,14 +305,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 今日コマンド
         /// </summary>
-        public ICommand TodayCommand => field ??= new RelayCommand(() => this.SelectedFromDate = DateTime.Today, () => this.SelectedFromDate != DateTime.Today);
+        public ICommand TodayCommand => field ??= new RelayCommand(() => this.SelectedSrcDate = DateTime.Today, () => this.SelectedSrcDate != DateTime.Today);
 
         /// <summary>
         /// OKコマンド
         /// </summary>
         public new ICommand OKCommand => field ??= new AsyncRelayCommand(
             this.OKCommand_ExecuteAsync,
-            () => this.InputedFromValue is not null && this.FromAccountSelectorVM?.SelectedKey != this.ToAccountSelectorVM?.SelectedKey, this.mBusyService);
+            () => this.InputedSrcValue is not null && this.SrcAccountSelectorVM?.SelectedKey != this.DstAccountSelectorVM?.SelectedKey, this.mBusyService);
         protected async Task OKCommand_ExecuteAsync()
         {
             // DB登録
@@ -342,19 +342,19 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.mAppService = new(this.mDbHandlerFactory);
             this.mService = new(this.mDbHandlerFactory);
 
-            this.FromAccountSelectorVM.SetLoader(async () => await this.mAppService.LoadAccountListAsync());
-            this.ToAccountSelectorVM.SetLoader(async () => await this.mAppService.LoadAccountListAsync());
-            this.CommissionKindSelectorVM.SetLoader(() => CommissionKindStr);
+            this.SrcAccountSelectorVM.SetLoader(async () => await this.mAppService.LoadAccountListAsync());
+            this.DstAccountSelectorVM.SetLoader(async () => await this.mAppService.LoadAccountListAsync());
+            this.FeeKindSelectorVM.SetLoader(() => FeeKindStr);
             this.ItemSelectorVM.SetLoader(
                 async () => {
-                    AccountIdObj accountId = this.CommissionKindSelectorVM.SelectedKey switch {
-                        CommissionKind.MoveFrom => this.FromAccountSelectorVM.SelectedKey,
-                        CommissionKind.MoveTo => this.ToAccountSelectorVM.SelectedKey,
-                        _ => throw new NotSupportedException("SelectedCommissionKind"),
+                    AccountIdObj accountId = this.FeeKindSelectorVM.SelectedKey switch {
+                        FeeKind.Source => this.SrcAccountSelectorVM.SelectedKey,
+                        FeeKind.Destination => this.DstAccountSelectorVM.SelectedKey,
+                        _ => throw new NotSupportedException("SelectedFeeKind"),
                     };
                     return await this.mAppService.LoadItemListAsync(accountId, BalanceKind.Expenses, CategoryIdObj.System);
                 },
-                () => this.FromAccountSelectorVM.SelectedKey != null && this.ToAccountSelectorVM.SelectedKey != null);
+                () => this.SrcAccountSelectorVM.SelectedKey != null && this.DstAccountSelectorVM.SelectedKey != null);
             this.RemarkSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadRemarkListAsync(this.ItemSelectorVM.SelectedKey, true),
                 () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
@@ -375,74 +375,74 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new(new { initialAccountId, initialMonth, initialDate, targetGroupId });
             using IDisposable disposable = this.mBusyService.Enter();
 
-            AccountIdObj selectingFromAccountId = null;
-            AccountIdObj selectingToAccountId = null;
-            ItemIdObj selectingCommissionItemId = null;
-            CommissionKind selectingCommissionKind = default;
-            string selectingCommissionRemark = null;
+            AccountIdObj selectingSrcAccountId = null;
+            AccountIdObj selectingDstAccountId = null;
+            ItemIdObj selectingFeeItemId = null;
+            FeeKind selectingFeeKind = default;
+            string selectingFeeRemark = null;
 
             switch (this.RegKind) {
                 case RegistrationKind.Add: {
-                    selectingFromAccountId = initialAccountId;
-                    selectingToAccountId = initialAccountId;
-                    selectingCommissionKind = CommissionKind.MoveFrom;
+                    selectingSrcAccountId = initialAccountId;
+                    selectingDstAccountId = initialAccountId;
+                    selectingFeeKind = FeeKind.Source;
 
                     // WVMに値を設定する
                     this.IsDateLink = true;
-                    this.SelectedFromDate = initialDate?.ToDateTime(TimeOnly.MinValue) ?? ((initialMonth == null || initialMonth?.Month == DateTime.Today.Month) ? DateTime.Today : initialMonth.Value.ToDateTime(TimeOnly.MinValue));
+                    this.SelectedSrcDate = initialDate?.ToDateTime(TimeOnly.MinValue) ?? ((initialMonth == null || initialMonth?.Month == DateTime.Today.Month) ? DateTime.Today : initialMonth.Value.ToDateTime(TimeOnly.MinValue));
 
                     break;
                 }
                 case RegistrationKind.Edit:
                 case RegistrationKind.Copy: {
                     // DBから値を読み込む
-                    ActionModel fromAction;
-                    ActionModel toAction;
-                    ActionModel commissionAction;
-                    (fromAction, toAction, commissionAction) = await this.mService.LoadMoveActionsAsync(targetGroupId);
+                    ActionModel srcAction;
+                    ActionModel dstAction;
+                    ActionModel feeAction;
+                    (srcAction, dstAction, feeAction) = await this.mService.LoadMoveActionsAsync(targetGroupId);
 
                     // WVMに値を設定する
                     if (this.RegKind == RegistrationKind.Edit) {
-                        this.FromActionId = fromAction.ActionId;
-                        this.ToActionId = toAction.ActionId;
+                        this.SrcActionId = srcAction.ActionId;
+                        this.DstActionId = dstAction.ActionId;
                         this.GroupId = targetGroupId;
-                        this.CommissionId = commissionAction?.ActionId;
+                        this.FeeActionId = feeAction?.ActionId;
                     }
-                    selectingFromAccountId = fromAction.Account.Id;
-                    selectingToAccountId = toAction.Account.Id;
-                    selectingCommissionKind = commissionAction?.Account.Id == toAction.Account.Id ? CommissionKind.MoveTo : CommissionKind.MoveFrom;
-                    selectingCommissionItemId = commissionAction?.Item.Id;
-                    selectingCommissionRemark = commissionAction?.Remark?.Remark;
+                    selectingSrcAccountId = srcAction.Account.Id;
+                    selectingDstAccountId = dstAction.Account.Id;
+                    selectingFeeKind = feeAction?.Account.Id == dstAction.Account.Id ? FeeKind.Destination : FeeKind.Source;
+                    selectingFeeItemId = feeAction?.Item.Id;
+                    selectingFeeRemark = feeAction?.Remark?.Remark;
 
-                    this.IsDateLink = fromAction.ActTime == toAction.ActTime;
+                    this.IsDateLink = srcAction.ActTime == dstAction.ActTime;
 
-                    this.SelectedFromDate = fromAction.ActTime;
-                    this.InputedFromValue = fromAction.Expenses?.MainValue; // 移動元帳簿の支出
+                    this.SelectedSrcDate = srcAction.ActTime;
+                    this.InputedSrcValue = srcAction.Expenses?.MainValue; // 移動元帳簿の支出
 
-                    this.SelectedToDate = toAction.ActTime;
-                    this.InputedToValue = toAction.Income?.MainValue; // 移動先帳簿の収入
+                    this.SelectedDstDate = dstAction.ActTime;
+                    this.InputedDstValue = dstAction.Income?.MainValue; // 移動先帳簿の収入
 
-                    this.InputedCommission = commissionAction?.Expenses?.MainValue;
+                    this.InputedFee = feeAction?.Expenses?.MainValue;
 
                     break;
                 }
             }
 
             // リストを更新する
-            await this.FromAccountSelectorVM.LoadAsync(selectingFromAccountId);
-            await this.ToAccountSelectorVM.LoadAsync(selectingToAccountId);
-            await this.CommissionKindSelectorVM.LoadAsync(selectingCommissionKind);
-            await this.ItemSelectorVM.LoadAsync(selectingCommissionItemId);
-            await this.RemarkSelectorVM.LoadAsync(selectingCommissionRemark);
+            await this.SrcAccountSelectorVM.LoadAsync(selectingSrcAccountId);
+            await this.DstAccountSelectorVM.LoadAsync(selectingDstAccountId);
+            await this.FeeKindSelectorVM.LoadAsync(selectingFeeKind);
+            await this.ItemSelectorVM.LoadAsync(selectingFeeItemId);
+            await this.RemarkSelectorVM.LoadAsync(selectingFeeRemark);
 
             switch (this.RegKind) {
                 case RegistrationKind.Add: {
-                    if (this.ToAccountSelectorVM.SelectedItem?.AccountKind == AccountKind.CreditCard) {
-                        if (this.ToAccountSelectorVM.SelectedItem.DebitAccountId != null) {
-                            this.FromAccountSelectorVM.SelectedItem = this.FromAccountSelectorVM.ItemList.FirstOrElementAtOrDefault(vm => vm.Id == this.ToAccountSelectorVM.SelectedItem.DebitAccountId, 0);
+                    if (this.DstAccountSelectorVM.SelectedItem?.AccountKind == AccountKind.CreditCard) {
+                        if (this.DstAccountSelectorVM.SelectedItem.DebitAccountId != null) {
+                            this.SrcAccountSelectorVM.SelectedItem = this.SrcAccountSelectorVM.ItemList.FirstOrElementAtOrDefault(vm => vm.Id == this.DstAccountSelectorVM.SelectedItem.DebitAccountId, 0);
                         }
-                        if (this.ToAccountSelectorVM.SelectedItem?.PayDay != null) {
-                            this.SelectedFromDate = this.SelectedFromDate.GetDateInMonth(this.ToAccountSelectorVM.SelectedItem.PayDay.Value);
+                        if (this.DstAccountSelectorVM.SelectedItem?.PayDay != null) {
+                            this.SelectedSrcDate = this.SelectedSrcDate.GetDateInMonth(this.DstAccountSelectorVM.SelectedItem.PayDay.Value);
                         }
                     }
                 }
@@ -450,12 +450,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             // アセットIDを指定する
-            this.SelectedFromAccountAssetId = this.FromAccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
-            this.SelectedToAccountAssetId = this.ToAccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
-            this.SelectedCommissionAccountAssetId = this.CommissionKindSelectorVM.SelectedKey switch {
-                CommissionKind.MoveFrom => this.SelectedFromAccountAssetId,
-                CommissionKind.MoveTo => this.SelectedToAccountAssetId,
-                _ => throw new NotSupportedException("SelectedCommissionKind")
+            this.SelectedSrcAccountAssetId = this.SrcAccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
+            this.SelectedDstAccountAssetId = this.DstAccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
+            this.SelectedFeeAccountAssetId = this.FeeKindSelectorVM.SelectedKey switch {
+                FeeKind.Source => this.SelectedSrcAccountAssetId,
+                FeeKind.Destination => this.SelectedDstAccountAssetId,
+                _ => throw new NotSupportedException("SelectedFeeKind")
             } ?? AssetIdObj.System;
         }
 
@@ -464,43 +464,43 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             // 移動元帳簿変更時
-            this.FromAccountSelectorVM.SelectionChanged += (sender, e) => {
-                this.SelectedFromAccountAssetId = this.FromAccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
+            this.SrcAccountSelectorVM.SelectionChanged += (sender, e) => {
+                this.SelectedSrcAccountAssetId = this.SrcAccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
 
-                if (this.CommissionKindSelectorVM.SelectedKey == CommissionKind.MoveFrom) {
-                    this.SelectedCommissionAccountAssetId = this.FromAccountSelectorVM.SelectedItem?.AssetId;
+                if (this.FeeKindSelectorVM.SelectedKey == FeeKind.Source) {
+                    this.SelectedFeeAccountAssetId = this.SrcAccountSelectorVM.SelectedItem?.AssetId;
                 }
 
-                this.SelectedFromAccountChanged?.Invoke(sender, e);
+                this.SelectedSrcAccountChanged?.Invoke(sender, e);
             };
-            this.FromAccountSelectorVM.Children.Add(this.ItemSelectorVM);
+            this.SrcAccountSelectorVM.Children.Add(this.ItemSelectorVM);
 
             // 移動先帳簿変更時
-            this.ToAccountSelectorVM.SelectionChanged += (sender, e) => {
-                this.SelectedToAccountAssetId = this.ToAccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
+            this.DstAccountSelectorVM.SelectionChanged += (sender, e) => {
+                this.SelectedDstAccountAssetId = this.DstAccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
 
-                if (this.CommissionKindSelectorVM.SelectedKey == CommissionKind.MoveTo) {
-                    this.SelectedCommissionAccountAssetId = this.ToAccountSelectorVM.SelectedItem?.AssetId;
+                if (this.FeeKindSelectorVM.SelectedKey == FeeKind.Destination) {
+                    this.SelectedFeeAccountAssetId = this.DstAccountSelectorVM.SelectedItem?.AssetId;
                 }
 
-                this.SelectedToAccountChanged?.Invoke(sender, e);
+                this.SelectedDstAccountChanged?.Invoke(sender, e);
             };
-            this.ToAccountSelectorVM.Children.Add(this.ItemSelectorVM);
+            this.DstAccountSelectorVM.Children.Add(this.ItemSelectorVM);
 
             // 手数料種別変更時
-            this.CommissionKindSelectorVM.SelectionChanged += (sender, e) => {
-                this.SelectedCommissionAccountAssetId = e.NewValue switch {
-                    CommissionKind.MoveFrom => this.SelectedFromAccountAssetId,
-                    CommissionKind.MoveTo => this.SelectedToAccountAssetId,
-                    _ => throw new NotSupportedException("SelectedCommissionKind")
+            this.FeeKindSelectorVM.SelectionChanged += (sender, e) => {
+                this.SelectedFeeAccountAssetId = e.NewValue switch {
+                    FeeKind.Source => this.SelectedSrcAccountAssetId,
+                    FeeKind.Destination => this.SelectedDstAccountAssetId,
+                    _ => throw new NotSupportedException("SelectedFeeKind")
                 } ?? AssetIdObj.System;
 
-                this.SelectedCommissionKindChanged?.Invoke(sender, e);
+                this.SelectedFeeKindChanged?.Invoke(sender, e);
             };
-            this.CommissionKindSelectorVM.Children.Add(this.ItemSelectorVM);
+            this.FeeKindSelectorVM.Children.Add(this.ItemSelectorVM);
 
             // 項目変更時
-            this.ItemSelectorVM.SelectionChanged += (sender, e) => this.SelectedCommissionItemChanged?.Invoke(sender, e);
+            this.ItemSelectorVM.SelectionChanged += (sender, e) => this.SelectedFeeItemChanged?.Invoke(sender, e);
             this.ItemSelectorVM.Children.Add(this.RemarkSelectorVM);
         }
 
@@ -513,51 +513,51 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             // 移動元
-            ActionModel fromAction = new() {
-                Base = new(this.FromActionId, this.SelectedFromDate, new(-this.InputedFromValue.Value, this.SelectedFromAssetId)),
+            ActionModel srcAction = new() {
+                Base = new(this.SrcActionId, this.SelectedSrcDate, new(-this.InputedSrcValue.Value, this.SelectedSrcAssetId)),
                 AssetId = AssetIdObj.System, // TODO: 将来の拡張用(証券口座間の株の移動など)
                 GroupId = this.GroupId,
-                Account = new(this.FromAccountSelectorVM.SelectedKey, string.Empty)
+                Account = new(this.SrcAccountSelectorVM.SelectedKey, string.Empty)
             };
 
             // 移動先
-            ActionModel toAction = new() {
-                Base = new(this.ToActionId, this.SelectedToDate, new(this.InputedToValue.Value, this.SelectedToAssetId)),
+            ActionModel dstAction = new() {
+                Base = new(this.DstActionId, this.SelectedDstDate, new(this.InputedDstValue.Value, this.SelectedDstAssetId)),
                 AssetId = AssetIdObj.System, // TODO: 将来の拡張用(証券口座間の株の移動など)
                 GroupId = this.GroupId,
-                Account = new(this.ToAccountSelectorVM.SelectedKey, string.Empty)
+                Account = new(this.DstAccountSelectorVM.SelectedKey, string.Empty)
             };
 
             // 手数料
-            CommissionKind commissionKind = this.CommissionKindSelectorVM.SelectedKey;
-            DateTime commissionActTime = commissionKind switch {
-                CommissionKind.MoveFrom => fromAction.ActTime,
-                CommissionKind.MoveTo => toAction.ActTime,
-                _ => throw new NotSupportedException("SelectedCommissionKind")
+            FeeKind feeKind = this.FeeKindSelectorVM.SelectedKey;
+            DateTime feeActTime = feeKind switch {
+                FeeKind.Source => srcAction.ActTime,
+                FeeKind.Destination => dstAction.ActTime,
+                _ => throw new NotSupportedException("SelectedFeeKind")
             };
-            SelectorViewModel<AccountModel, AccountIdObj> commissionSelectorVM = commissionKind switch {
-                CommissionKind.MoveFrom => this.FromAccountSelectorVM,
-                CommissionKind.MoveTo => this.ToAccountSelectorVM,
-                _ => throw new NotSupportedException("SelectedCommissionKind")
+            SelectorViewModel<AccountModel, AccountIdObj> feeSelectorVM = feeKind switch {
+                FeeKind.Source => this.SrcAccountSelectorVM,
+                FeeKind.Destination => this.DstAccountSelectorVM,
+                _ => throw new NotSupportedException("SelectedFeeKind")
             };
-            ActionModel commissionAction = new() {
-                Base = new(this.CommissionId, commissionActTime, new(-this.InputedCommission ?? 0m, commissionSelectorVM.SelectedItem.AssetId)),
+            ActionModel feeAction = new() {
+                Base = new(this.FeeActionId, feeActTime, new(-this.InputedFee ?? 0m, feeSelectorVM.SelectedItem.AssetId)),
                 AssetId = AssetIdObj.System, // 今のところ固定を想定
                 GroupId = this.GroupId,
-                Account = new(commissionKind switch {
-                    CommissionKind.MoveFrom => fromAction.Account.Id,
-                    CommissionKind.MoveTo => toAction.Account.Id,
-                    _ => throw new NotSupportedException("SelectedCommissionKind")
+                Account = new(feeKind switch {
+                    FeeKind.Source => srcAction.Account.Id,
+                    FeeKind.Destination => dstAction.Account.Id,
+                    _ => throw new NotSupportedException("SelectedFeeKind")
                 }, string.Empty),
                 Item = new(this.ItemSelectorVM.SelectedKey, string.Empty),
                 Remark = this.RemarkSelectorVM.SelectedKey
             };
 
-            IEnumerable<ActionIdObj> resActionIdList = await this.mService.SaveMoveActionsAsync(fromAction, toAction, commissionAction);
+            IEnumerable<ActionIdObj> resActionIdList = await this.mService.SaveMoveActionsAsync(srcAction, dstAction, feeAction);
 
-            if (commissionAction.Amount.MainValue != 0m) {
-                if (!string.IsNullOrEmpty(commissionAction.Remark)) {
-                    RemarkModel remark = new(commissionAction.Remark) { ItemId = commissionAction.Item.Id, CurrentActTime = commissionAction.ActTime };
+            if (feeAction.Amount.MainValue != 0m) {
+                if (!string.IsNullOrEmpty(feeAction.Remark)) {
+                    RemarkModel remark = new(feeAction.Remark) { ItemId = feeAction.Item.Id, CurrentActTime = feeAction.ActTime };
                     await this.mService.SaveRemarkAsync(remark);
                 }
             }

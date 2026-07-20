@@ -1172,6 +1172,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             Log.Vars(vars: new { this.SelectedTabIndex, this.SelectedGraphKind1Index, this.SelectedGraphKind2Index });
 
+            // アセットを更新する
             this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
 
             await this.UpdateAsync(isUpdateAccountList: false, isScroll: true, isUpdateActDateLastEdited: true);

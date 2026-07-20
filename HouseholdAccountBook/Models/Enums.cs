@@ -140,16 +140,16 @@ namespace HouseholdAccountBook.Models
     /// <summary>
     /// 手数料種別
     /// </summary>
-    public enum CommissionKind
+    public enum FeeKind
     {
         /// <summary>
         /// 支払元負担
         /// </summary>
-        MoveFrom = 0,
+        Source = 0,
         /// <summary>
         /// 支払先負担
         /// </summary>
-        MoveTo = 1
+        Destination = 1
     }
 
     /// <summary>

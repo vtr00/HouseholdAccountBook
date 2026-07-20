@@ -58,9 +58,9 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 手数料種別文字列
         /// </summary>
-        public static Dictionary<CommissionKind, string> CommissionKindStr => new() {
-            { CommissionKind.MoveFrom,  Properties.Resources.CommissionKind_MoveFrom },
-            { CommissionKind.MoveTo,    Properties.Resources.CommissionKind_MoveTo }
+        public static Dictionary<FeeKind, string> FeeKindStr => new() {
+            { FeeKind.Source,       Properties.Resources.FeeKind_Source },
+            { FeeKind.Destination,  Properties.Resources.FeeKind_Destination }
         };
         /// <summary>
         /// グラフ種別1文字列
