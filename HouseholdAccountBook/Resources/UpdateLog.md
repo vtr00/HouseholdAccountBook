@@ -6,6 +6,9 @@
 
 ### 2026-07-20
 
+- MainWindow
+   - ↑起動したときの帳簿のアセットでデフォルトと異なるときにステータスバーの金額の単位が異なるのを修正した - refs #227
+
 - MoveRegistrationWindow
    - △移動関係の英語表現を修正した(MoveFrom->Source, MoveTo->Destination, Commission->Fee, Burden->ChargedTo) - refs #222
 
