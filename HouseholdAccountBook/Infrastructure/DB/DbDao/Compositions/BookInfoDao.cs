@@ -19,7 +19,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         /// <param name="bookId">帳簿ID</param>
         /// <param name="defaultAssetId">デフォルトアセットID</param>
         /// <returns>取得したレコード</returns>
-        public async Task<BookInfoDto> FindByBookId(int bookId, int defaultAssetId)
+        public async Task<BookInfoDto> FindByBookIdAsync(int bookId, int defaultAssetId)
         {
             using FuncLog funcLog = new(new { bookId, defaultAssetId }, Log.LogLevel.Trace);
 

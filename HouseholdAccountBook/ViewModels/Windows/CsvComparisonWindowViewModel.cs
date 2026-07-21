@@ -327,7 +327,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             // グループ種別を特定する
             AppCommonService service = new(this.mDbHandlerFactory);
-            GroupKind kind = await service.LoadGroupKind(this.CsvCompSelectorVM.SelectedItem.Action.ActionId);
+            GroupKind kind = await service.LoadGroupKindAsync(this.CsvCompSelectorVM.SelectedItem.Action.ActionId);
 
             async void Registered(object sender, EventArgs<IEnumerable<ActionIdObj>> e)
             {

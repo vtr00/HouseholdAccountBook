@@ -389,7 +389,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private async Task CopyCommand_ExecuteAsync()
         {
             // グループ種別を特定する
-            GroupKind kind = await this.mAppService.LoadGroupKind(this.ActionSelectorVM.SelectedKey);
+            GroupKind kind = await this.mAppService.LoadGroupKindAsync(this.ActionSelectorVM.SelectedKey);
 
             switch (kind) {
                 case GroupKind.NotInOne:
@@ -433,7 +433,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private async Task EditCommand_ExecuteAsync()
         {
             // グループ種別を特定する
-            GroupKind kind = await this.mAppService.LoadGroupKind(this.ActionSelectorVM.SelectedKey);
+            GroupKind kind = await this.mAppService.LoadGroupKindAsync(this.ActionSelectorVM.SelectedKey);
 
             switch (kind) {
                 case GroupKind.Move: {

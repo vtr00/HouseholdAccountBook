@@ -18,7 +18,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         /// </summary>
         /// <param name="actionId">帳簿ID</param>
         /// <returns>取得したレコード</returns>
-        public async Task<GroupInfoDto> FindByActionId(int actionId)
+        public async Task<GroupInfoDto> FindByActionIdAsync(int actionId)
         {
             using FuncLog funcLog = new(new { actionId }, Log.LogLevel.Trace);
 

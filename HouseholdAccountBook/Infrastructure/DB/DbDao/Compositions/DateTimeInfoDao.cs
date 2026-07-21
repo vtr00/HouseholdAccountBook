@@ -20,9 +20,9 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         /// <param name="dto">対象のテーブル情報</param>
         /// <returns>テーブル内のデータの更新日時</returns>
         /// <exception cref="ArgumentException">テーブル名が不正</exception>
-        public async Task<DateTime> GetUpdateTime(TableInfoDto dto)
+        public async Task<DateTime> GetUpdateTimeAsync(TableInfoDto dto)
         {
-            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+            using FuncLog funcLog = new(dto, Log.LogLevel.Trace);
 
             if (!dto.TableName.IsValidDBIdentifier()) {
                 throw new ArgumentException($"Invalid table name: {dto.TableName}");
@@ -37,9 +37,9 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         /// <param name="dto">対象のテーブル情報</param>
         /// <returns>テーブル内のデータの挿入日時</returns>
         /// <exception cref="ArgumentException">テーブル名が不正</exception>
-        public async Task<DateTime> GetInsertTime(TableInfoDto dto)
+        public async Task<DateTime> GetInsertTimeAsync(TableInfoDto dto)
         {
-            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+            using FuncLog funcLog = new(dto, Log.LogLevel.Trace);
 
             if (!dto.TableName.IsValidDBIdentifier()) {
                 throw new ArgumentException($"Invalid table name: {dto.TableName}");

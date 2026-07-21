@@ -126,11 +126,11 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <param name="lastBackupTime">最後にバックアップした日時</param>
         /// <returns>成功/失敗 または 未実施</returns>
-        public async Task<bool> ExecuteAtMainWindowClosing(DateTime? lastBackupTime)
+        public async Task<bool> ExecuteAtMainWindowClosingAsync(DateTime? lastBackupTime)
         {
             using FuncLog funcLog = new(new { lastBackupTime });
 
-            if (this.Config.Condition == BackUpCondition.Updated && lastBackupTime.HasValue && lastBackupTime.Value >= await this.GetDbRowUpdateTime()) { return false; }
+            if (this.Config.Condition == BackUpCondition.Updated && lastBackupTime.HasValue && lastBackupTime.Value >= await this.GetDbRowUpdateTimeAsync()) { return false; }
 
             bool result = false;
             if (this.Config.ExecuteAtClosing) {
@@ -146,11 +146,11 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="windowState">ウィンドウの状態</param>
         /// <param name="lastBackupTime">最後にバックアップした日時</param>
         /// <returns>成功/失敗 または 未実施</returns>
-        public async Task<bool> ExecuteAtMainWindowStateChanged(WindowState windowState, DateTime? lastBackupTime)
+        public async Task<bool> ExecuteAtMainWindowStateChangedAsync(WindowState windowState, DateTime? lastBackupTime)
         {
             using FuncLog funcLog = new(new { windowState, lastBackupTime });
 
-            if (this.Config.Condition == BackUpCondition.Updated && lastBackupTime.HasValue && lastBackupTime.Value >= await this.GetDbRowUpdateTime()) { return false; }
+            if (this.Config.Condition == BackUpCondition.Updated && lastBackupTime.HasValue && lastBackupTime.Value >= await this.GetDbRowUpdateTimeAsync()) { return false; }
 
             bool result = false;
             if (windowState == WindowState.Minimized) {
@@ -325,18 +325,18 @@ namespace HouseholdAccountBook.Models.AppServices
         /// DBのデータが最後に更新された日時を取得する
         /// </summary>
         /// <returns>最後に更新された日時</returns>
-        private async Task<DateTime> GetDbRowUpdateTime()
+        private async Task<DateTime> GetDbRowUpdateTimeAsync()
         {
             using FuncLog funcLog = new();
 
             DateTime updateTime = DateTime.MinValue;
             await using (DbHandlerBase dbHandler = await this.DbHandlerFactory.CreateAsync()) {
                 TableInfoDao tableInfoDao = new(dbHandler);
-                IEnumerable<TableInfoDto> tableInfoDtoList = await tableInfoDao.FindByColumnName("update_time");
+                IEnumerable<TableInfoDto> tableInfoDtoList = await tableInfoDao.FindByColumnNameAsync("update_time");
 
                 foreach (TableInfoDto tableInfoDto in tableInfoDtoList) {
                     DateTimeInfoDao dateTimeInfoDao = new(dbHandler);
-                    DateTime dt = await dateTimeInfoDao.GetUpdateTime(tableInfoDto);
+                    DateTime dt = await dateTimeInfoDao.GetUpdateTimeAsync(tableInfoDto);
                     updateTime = new[] { dt, updateTime }.Max();
                 }
             }

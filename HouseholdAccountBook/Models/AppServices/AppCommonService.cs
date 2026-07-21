@@ -127,7 +127,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 cmList.Add(new CategoryModel(CategoryIdObj.System, initialName, BalanceKind.Others));
             }
 
-            MstCategoryWithinBookDao mstCategoryWithinBookDao = new(dbHandler);
+            CategoryWithinBookDao mstCategoryWithinBookDao = new(dbHandler);
             IEnumerable<MstCategoryDto> dtoList = await mstCategoryWithinBookDao.FindByBookIdAndBalanceKindAsync((int)accountId, (int)balanceKind);
             foreach (MstCategoryDto dto in dtoList) {
                 cmList.Add(new(dto.CategoryId, dto.CategoryName, EnumUtil.SafeCastEnum(dto.BalanceKind, BalanceKind.Income)));
@@ -223,13 +223,13 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <param name="actionId">帳簿項目ID</param>
         /// <returns>グループ種別</returns>
-        public async Task<GroupKind> LoadGroupKind(ActionIdObj actionId)
+        public async Task<GroupKind> LoadGroupKindAsync(ActionIdObj actionId)
         {
             using FuncLog funcLog = new(new { actionId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             GroupInfoDao groupInfoDao = new(dbHandler);
-            GroupInfoDto dto = await groupInfoDao.FindByActionId((int)actionId);
+            GroupInfoDto dto = await groupInfoDao.FindByActionIdAsync((int)actionId);
             GroupKind groupKind = EnumUtil.SafeCastEnum(dto.GroupKind, GroupKind.NotInOne);
 
             return groupKind;
@@ -254,13 +254,13 @@ namespace HouseholdAccountBook.Models.AppServices
         /// 全データの期間を取得する
         /// </summary>
         /// <returns>期間</returns>
-        public async Task<PeriodObj<DateTime>> LoadPeriodOfAll()
+        public async Task<PeriodObj<DateTime>> LoadPeriodOfAllAsync()
         {
             using FuncLog funcLog = new();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             PeriodInfoDao periodInfoDao = new(dbHandler);
-            PeriodInfoDto dto = await periodInfoDao.Find();
+            PeriodInfoDto dto = await periodInfoDao.FindAsync();
             PeriodObj<DateTime> result = new(dto.FirstTime, dto.LastTime);
 
             return result;

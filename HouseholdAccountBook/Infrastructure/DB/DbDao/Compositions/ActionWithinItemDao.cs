@@ -11,7 +11,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
     /// 分類内帳簿項目DTO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class HstActionWithHstItemDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
+    public class ActionWithinItemDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
     {
         /// <summary>
         /// <see cref="MstCategoryDto.CategoryId"/> に基づいて、<see cref="HstActionDto"/> リストを取得します

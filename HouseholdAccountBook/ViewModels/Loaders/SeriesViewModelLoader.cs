@@ -48,7 +48,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             using FuncLog funcLog = new(new { accountId, period });
 
             // 開始日までの収支を取得する
-            AmountObj balance = await this.mAppService.LoadEndingBalance(accountId, period.Start);
+            AmountObj balance = await this.mAppService.LoadEndingBalanceAsync(accountId, period.Start);
 
             // 系列データ
             IList<SeriesViewModel> vmList = [
@@ -148,7 +148,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             }
 
             // 開始日までの収支を取得する
-            AmountObj balance = await this.mAppService.LoadEndingBalance(accountId, period.Start);
+            AmountObj balance = await this.mAppService.LoadEndingBalanceAsync(accountId, period.Start);
 
             IList<SeriesViewModel> vmList = [
                 new() {
@@ -239,7 +239,7 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             DateOnly startTime = startYear;
 
             // 開始日までの収支を取得する
-            AmountObj balance = await this.mAppService.LoadEndingBalance(accountId, startTime);
+            AmountObj balance = await this.mAppService.LoadEndingBalanceAsync(accountId, startTime);
 
             IList<SeriesViewModel> vmList = [
                 new() {

@@ -316,7 +316,7 @@ namespace HouseholdAccountBook.Views.Windows
 
             this.Hide();
 
-            if (await DbBackUpService.Instance.ExecuteAtMainWindowClosing(UserSettingService.Instance.CurrentBackUp)) {
+            if (await DbBackUpService.Instance.ExecuteAtMainWindowClosingAsync(UserSettingService.Instance.CurrentBackUp)) {
                 UserSettingService.Instance.CurrentBackUpAtClosing = DateTime.Now;
                 Log.Info($"Update BackUpCurrentAtClosing: {UserSettingService.Instance.CurrentBackUpAtClosing}");
             }
@@ -329,7 +329,7 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="e"></param>
         private async void MainWindow_StateChanged(object sender, EventArgs e)
         {
-            if (await DbBackUpService.Instance.ExecuteAtMainWindowStateChanged(this.WindowState, UserSettingService.Instance.CurrentBackUp)) {
+            if (await DbBackUpService.Instance.ExecuteAtMainWindowStateChangedAsync(this.WindowState, UserSettingService.Instance.CurrentBackUp)) {
                 UserSettingService.Instance.CurrentBackUpAtMinimizing = DateTime.Now;
                 this.WVM.AccountTabVM.RaiseCurrentBackUpChanged();
                 Log.Info($"Update BackUpCurrentAtMinimizing: {UserSettingService.Instance.CurrentBackUpAtMinimizing}");

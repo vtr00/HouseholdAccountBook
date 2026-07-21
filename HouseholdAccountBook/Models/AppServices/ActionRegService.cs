@@ -60,13 +60,13 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <param name="actionId">帳簿項目ID</param>
         /// <returns>繰り返し回数</returns>
-        public async Task<int> LoadRepeatCount(ActionIdObj actionId)
+        public async Task<int> LoadRepeatCountAsync(ActionIdObj actionId)
         {
             using FuncLog funcLog = new(new { actionId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             GroupInfoDao groupInfoDao = new(dbHandler);
-            GroupInfoDto dto = await groupInfoDao.FindByActionId((int)actionId);
+            GroupInfoDto dto = await groupInfoDao.FindByActionIdAsync((int)actionId);
 
             GroupKind groupKind = EnumUtil.SafeCastEnum(dto.GroupKind, GroupKind.NotInOne);
 

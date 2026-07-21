@@ -52,7 +52,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     break;
                 case DBKind.SQLite:
                     if (dbHandler is SQLiteDbHandler sqliteDbHandler) {
-                        version = await sqliteDbHandler.GetUserVersion();
+                        version = await sqliteDbHandler.GetUserVersionAsync();
                     }
                     break;
                 default:
@@ -77,7 +77,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     break;
                 case DBKind.SQLite:
                     if (dbHandler is SQLiteDbHandler sqliteDbHandler) {
-                        _ = await sqliteDbHandler.SetUserVersion(version);
+                        _ = await sqliteDbHandler.SetUserVersionAsync(version);
                     }
                     break;
             }

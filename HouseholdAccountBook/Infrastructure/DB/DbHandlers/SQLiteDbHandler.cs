@@ -127,7 +127,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// スキーマバージョンを取得する
         /// </summary>
         /// <returns>スキーマバージョン</returns>
-        public async Task<int> GetUserVersion()
+        public async Task<int> GetUserVersionAsync()
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
@@ -139,7 +139,7 @@ namespace HouseholdAccountBook.Models.DbHandlers
         /// </summary>
         /// <param name="version">スキーマバージョン</param>
         /// <returns></returns>
-        public async Task<int> SetUserVersion(int version)
+        public async Task<int> SetUserVersionAsync(int version)
         {
             using FuncLog funcLog = new(new { version }, Log.LogLevel.Trace);
 
