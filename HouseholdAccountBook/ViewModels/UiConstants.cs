@@ -112,6 +112,5 @@ namespace HouseholdAccountBook.ViewModels
             { nameof(ActionListRegistrationWindow), "ActListReg" },
             { nameof(ProgressWindow),               "Progress" }
         };
-
     }
 }

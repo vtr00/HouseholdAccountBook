@@ -238,25 +238,19 @@ namespace HouseholdAccountBook.ViewModels
         public SelectorViewModel(Func<VM?, KEY?> selector, BusyService? busyService = null,
                                  [CallerFilePath] string? fileName = null, [CallerMemberName] string memberName = "")
         {
-            using FuncLog funcLog = new(level: Log.LogLevel.Trace, fileName: fileName, methodName: memberName);
-
             this.mSelector = selector;
             this.mBusyService = busyService;
             this.mFileName = fileName;
             this.mMemberName = memberName;
 
             this.ItemList.CollectionChanged += (sender, e) => {
-                if (!this.mOnLoad) {
-                    using FuncLog funcLog = new(level: Log.LogLevel.Debug, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.CollectionChanged)}");
-                }
+                using FuncLog? funcLog = this.mOnLoad ? null : new(level: Log.LogLevel.Debug, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.CollectionChanged)}");
 
                 this.RaisePropertyChanged(nameof(this.Count));
                 this.CollectionChanged?.Invoke(sender, e);
             };
             this.SelectedItemList.CollectionChanged += (sender, e) => {
-                if (!this.mOnLoad) {
-                    using FuncLog funcLog = new(level: Log.LogLevel.Debug, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.SelectedCollectionChanged)}");
-                }
+                using FuncLog? funcLog = this.mOnLoad ? null : new(level: Log.LogLevel.Debug, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.SelectedCollectionChanged)}");
 
                 this.RaisePropertyChanged(nameof(this.SelectedCount));
                 this.SelectedCollectionChanged?.Invoke(sender, e);
@@ -298,7 +292,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="mode">読み込み時に <see cref="KEY"/> を選択するモード</param>
         public void SetLoader(Func<FuncLog, IEnumerable<VM>> load, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault)
         {
-            using FuncLog funcLog = new(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(SetLoader)}");
+            using FuncLog funcLog = new(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.SetLoader)}");
 
             this.mCanLoad = canLoad;
             this.mLoad = load;
@@ -330,7 +324,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="mode">読み込み時に <see cref="KEY"/> を選択するモード</param>
         public void SetLoader(Func<FuncLog, CancellationToken, Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault)
         {
-            using FuncLog funcLog = new(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(SetLoader)}");
+            using FuncLog funcLog = new(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.SetLoader)}");
 
             this.mCanLoad = canLoad;
             this.mLoad = null;

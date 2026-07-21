@@ -99,8 +99,6 @@ namespace HouseholdAccountBook.ViewModels
                                     BusyService busyService, ExecutionMode mode, bool canCancel,
                                     [CallerFilePath] string fileName = null, [CallerMemberName] string memberName = "")
         {
-            using FuncLog funcLog = new(level: Log.LogLevel.Trace, fileName: fileName, methodName: memberName);
-
             if (requestable != null && mode != ExecutionMode.DisallowConcurrent) { throw new ArgumentNullException(nameof(requestable)); }
 
             this.mExecuteAsync = executeAsync;
@@ -240,7 +238,7 @@ namespace HouseholdAccountBook.ViewModels
 
         public async void Execute(object parameter)
         {
-            using FuncLog funcLog = new(args: parameter, fileName: this.mFileName, methodName: this.mMemberName);
+            using FuncLog funcLog = new(args: parameter, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.Execute)}");
             if (!this.CanExecute(parameter)) {
                 Log.Debug($"{nameof(this.CanExecute)} is false");
                 return;
