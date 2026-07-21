@@ -99,7 +99,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 全期間コマンド
         /// </summary>
-        public ICommand AllPeriodCommand => field ??= new AsyncRelayCommand(async () => this.SelectedPeriod = await this.LoadFirstLastDate(), null, this.mBusyService);
+        public ICommand AllPeriodCommand => field ??= new AsyncRelayCommand(async () => this.SelectedPeriod = await this.LoadFirstLastDateAsync(), null, this.mBusyService);
         #endregion
 
         #region ウィンドウ設定プロパティ
@@ -120,12 +120,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// 帳簿項目の初日/最終日を取得する
         /// </summary>
         /// <returns>初日/最終日のペア</returns>
-        private async Task<PeriodObj<DateOnly>> LoadFirstLastDate()
+        private async Task<PeriodObj<DateOnly>> LoadFirstLastDateAsync()
         {
             using FuncLog funcLog = new();
 
             AppCommonService service = new(this.mDbHandlerFactory);
-            return (await service.LoadPeriodOfAll()).Convert(DateOnly.FromDateTime);
+            return (await service.LoadPeriodOfAllAsync()).Convert(DateOnly.FromDateTime);
         }
     }
 }

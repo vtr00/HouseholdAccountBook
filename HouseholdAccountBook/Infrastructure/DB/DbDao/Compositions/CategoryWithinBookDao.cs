@@ -11,7 +11,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
     /// 帳簿内分類取得DAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class MstCategoryWithinBookDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
+    public class CategoryWithinBookDao(DbHandlerBase dbHandler) : TableDaoBase(dbHandler)
     {
         /// <summary>
         /// <see cref="RelBookItemDto.BookId"/> と <see cref="MstCategoryDto.BalanceKind"/> に基づいて、<see cref="MstCategoryDto"/> リストを取得します

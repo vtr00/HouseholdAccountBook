@@ -119,7 +119,7 @@ namespace HouseholdAccountBook
                 HouseholdAccountBook.Properties.Settings.Default.Upgrade();
             }
 
-            DbHandlerFactory dbHandlerFactory = await this.GetDbHandlerFactory();
+            DbHandlerFactory dbHandlerFactory = await this.GetDbHandlerFactoryAsync();
             if (dbHandlerFactory == null) {
                 // DB接続設定がキャンセルされた場合はアプリケーションを終了する
                 this.Shutdown();
@@ -284,7 +284,7 @@ namespace HouseholdAccountBook
         /// </summary>
         /// <returns>DBハンドラファクトリ</returns>
         /// <exception cref="NotSupportedException"></exception>
-        private async Task<DbHandlerFactory> GetDbHandlerFactory()
+        private async Task<DbHandlerFactory> GetDbHandlerFactoryAsync()
         {
             using FuncLog funcLog = new();
 

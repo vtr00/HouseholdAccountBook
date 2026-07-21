@@ -22,7 +22,7 @@ namespace HouseholdAccountBook.Infrastructure.GitHub
         /// <param name="owner">オーナー名</param>
         /// <param name="repo">リポジトリ名</param>
         /// <returns>リリース情報</returns>
-        public static async Task<IEnumerable<Release>> GetReleaseInfo(string owner, string repo)
+        public static async Task<IEnumerable<Release>> GetReleaseInfoAsync(string owner, string repo)
         {
             HttpClient http = new();
             http.DefaultRequestHeaders.UserAgent.ParseAdd("app"); // 必須

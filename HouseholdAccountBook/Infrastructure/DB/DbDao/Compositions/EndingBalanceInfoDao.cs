@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         /// <param name="defaultAssetId">デフォルトアセットID</param>
         /// <param name="startDate">開始日付</param>
         /// <returns>取得したレコード</returns>
-        public async Task<EndingBalanceInfoDto> Find(int defaultAssetId, DateOnly startDate)
+        public async Task<EndingBalanceInfoDto> FindAsync(int defaultAssetId, DateOnly startDate)
         {
             using FuncLog funcLog = new(new { defaultAssetId, startDate }, Log.LogLevel.Trace);
 
@@ -49,7 +49,7 @@ new { DefaultAssetId = defaultAssetId, StartDate = startDate });
         /// <param name="defaultAssetId">デフォルトアセットID</param>
         /// <param name="startDate">開始日付</param>
         /// <returns>取得したレコード</returns>
-        public async Task<EndingBalanceInfoDto> FindByBookId(int bookId, int defaultAssetId, DateOnly startDate)
+        public async Task<EndingBalanceInfoDto> FindByBookIdAsync(int bookId, int defaultAssetId, DateOnly startDate)
         {
             using FuncLog funcLog = new(new { bookId, defaultAssetId, startDate }, Log.LogLevel.Trace);
 

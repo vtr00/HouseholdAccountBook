@@ -327,7 +327,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     // DBから値を読み込む
                     ActionModel action = await this.mService.LoadActionAsync(targetActionId);
                     // 繰り返しの回数を読み込む
-                    int count = await this.mService.LoadRepeatCount(targetActionId);
+                    int count = await this.mService.LoadRepeatCountAsync(targetActionId);
 
                     // WVMに値を設定する
                     if (this.RegKind == RegistrationKind.Edit) {

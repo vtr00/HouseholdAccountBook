@@ -22,7 +22,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         /// <param name="startDate">開始日付</param>
         /// <param name="finishDate">終了日付(該当の日を含む)</param>
         /// <returns>取得したレコードリスト</returns>
-        public async Task<IEnumerable<SummaryInfoDto>> FindAllWithinPeriod(int defaultAssetId, DateOnly startDate, DateOnly finishDate)
+        public async Task<IEnumerable<SummaryInfoDto>> FindAllWithinPeriodAsync(int defaultAssetId, DateOnly startDate, DateOnly finishDate)
         {
             using FuncLog funcLog = new(new { defaultAssetId, startDate, finishDate }, Log.LogLevel.Trace);
 
@@ -52,7 +52,7 @@ new { DefaultAssetId = defaultAssetId, StartDate = startDate, FinishDate = finis
         /// <param name="startDate">開始日付</param>
         /// <param name="finishDate">終了日付(該当の日を含む)</param>
         /// <returns>取得したレコードリスト</returns>
-        public async Task<IEnumerable<SummaryInfoDto>> FindByBookIdWithinPeriod(int bookId, int defaultAssetId, DateOnly startDate, DateOnly finishDate)
+        public async Task<IEnumerable<SummaryInfoDto>> FindByBookIdWithinPeriodAsync(int bookId, int defaultAssetId, DateOnly startDate, DateOnly finishDate)
         {
             using FuncLog funcLog = new(new { bookId, defaultAssetId, startDate, finishDate }, Log.LogLevel.Trace);
 

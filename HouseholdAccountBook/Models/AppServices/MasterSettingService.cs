@@ -173,7 +173,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             BookInfoDao bookInfoDao = new(dbHandler);
-            BookInfoDto dto = await bookInfoDao.FindByBookId((int)accountId, (int)UserSettingService.Instance.DefaultAssetId);
+            BookInfoDto dto = await bookInfoDao.FindByBookIdAsync((int)accountId, (int)UserSettingService.Instance.DefaultAssetId);
 
             MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
 
@@ -396,7 +396,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             bool result = false;
             await dbHandler.ExecTransactionAsync(async () => {
-                HstActionWithHstItemDao hstActionWithHstItemDao = new(dbHandler);
+                ActionWithinItemDao hstActionWithHstItemDao = new(dbHandler);
                 IEnumerable<HstActionDto> dtoList = await hstActionWithHstItemDao.FindByCategoryIdAsync((int)categoryId);
 
                 if (dtoList.Any()) {

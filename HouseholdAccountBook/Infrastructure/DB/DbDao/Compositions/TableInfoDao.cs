@@ -16,7 +16,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         /// </summary>
         /// <param name="columnName">検索するカラム名</param>
         /// <returns>取得したレコード</returns>
-        public async Task<IEnumerable<TableInfoDto>> FindByColumnName(string columnName)
+        public async Task<IEnumerable<TableInfoDto>> FindByColumnNameAsync(string columnName)
         {
             using FuncLog funcLog = new(new { columnName }, Log.LogLevel.Trace);
 

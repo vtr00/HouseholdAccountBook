@@ -34,7 +34,7 @@ namespace HouseholdAccountBook.Models.AppServices
         public async Task<bool> GetLatestInfoAsync()
         {
             this.mLatestInfo = null;
-            List<Release> releaseList = [.. await GitHubDao.GetReleaseInfo("vtr00", "HouseholdAccountBook")];
+            List<Release> releaseList = [.. await GitHubDao.GetReleaseInfoAsync("vtr00", "HouseholdAccountBook")];
             if (0 < releaseList.Count) {
                 this.mLatestInfo = releaseList.Where(static release => !release.Prerelease && !release.Draft).OrderBy(static release => release.PublishedAt).Reverse().FirstOrDefault();
             }

@@ -36,7 +36,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="dest">移行先DTO</param>
         /// <param name="converter">型変換関数</param>
         /// <returns>件数差</returns>
-        private static async Task<int> Mapping<DTO1, DTO2>(IReadTableDao<DTO1> src, IWriteTableDao<DTO2> dest,
+        private static async Task<int> MappingAsync<DTO1, DTO2>(IReadTableDao<DTO1> src, IWriteTableDao<DTO2> dest,
                                                            Func<IEnumerable<DTO1>, IEnumerable<DTO2>> converter) where DTO1 : DtoBase where DTO2 : DtoBase
         {
             ArgumentNullException.ThrowIfNull(src);
@@ -61,7 +61,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <param name="src">移行元DTO</param>
         /// <param name="dest">移行先DTO</param>
         /// <returns>件数差</returns>
-        private static async Task<int> Mapping<DTO>(IReadTableDao<DTO> src, IWriteTableDao<DTO> dest) where DTO : DtoBase
+        private static async Task<int> MappingAsync<DTO>(IReadTableDao<DTO> src, IWriteTableDao<DTO> dest) where DTO : DtoBase
         {
             ArgumentNullException.ThrowIfNull(src);
             ArgumentNullException.ThrowIfNull(dest);
@@ -99,25 +99,25 @@ namespace HouseholdAccountBook.Models.AppServices
                 await dbHandler.ExecTransactionAsync(async () => {
                     CbmBookDao cbmBookDao = new(dbHandlerOle);
                     MstBookDao mstBookDao = new(dbHandler);
-                    _ = await Mapping(cbmBookDao, mstBookDao, src => src.Select(dto => new MstBookDto(dto)));
+                    _ = await MappingAsync(cbmBookDao, mstBookDao, src => src.Select(dto => new MstBookDto(dto)));
                     token.ThrowIfCancellationRequested();
                     progress.Report(10);
 
                     CbmCategoryDao cbmCategoryDao = new(dbHandlerOle);
                     MstCategoryDao mstCategoryDao = new(dbHandler);
-                    _ = await Mapping(cbmCategoryDao, mstCategoryDao, src => src.Select(dto => new MstCategoryDto(dto)));
+                    _ = await MappingAsync(cbmCategoryDao, mstCategoryDao, src => src.Select(dto => new MstCategoryDto(dto)));
                     token.ThrowIfCancellationRequested();
                     progress.Report(20);
 
                     CbmItemDao cbmItemDao = new(dbHandlerOle);
                     MstItemDao mstItemDao = new(dbHandler);
-                    _ = await Mapping(cbmItemDao, mstItemDao, src => src.Select(dto => new MstItemDto(dto)));
+                    _ = await MappingAsync(cbmItemDao, mstItemDao, src => src.Select(dto => new MstItemDto(dto)));
                     token.ThrowIfCancellationRequested();
                     progress.Report(30);
 
                     CbtActDao cbtActDao = new(dbHandlerOle);
                     HstActionDao hstActionDao = new(dbHandler);
-                    actRowsDiff = await Mapping(cbtActDao, hstActionDao, src => src.Where(dto => !(dto.INCOME == 0 && dto.EXPENSE == 0)).Select(dto => new HstActionDto(dto)));
+                    actRowsDiff = await MappingAsync(cbtActDao, hstActionDao, src => src.Where(dto => !(dto.INCOME == 0 && dto.EXPENSE == 0)).Select(dto => new HstActionDto(dto)));
                     token.ThrowIfCancellationRequested();
                     progress.Report(50);
 
@@ -178,13 +178,13 @@ namespace HouseholdAccountBook.Models.AppServices
 
                     CbtNoteDao cbtNoteDao = new(dbHandlerOle);
                     HstRemarkDao hstRemarkDao = new(dbHandler);
-                    _ = await Mapping(cbtNoteDao, hstRemarkDao, src => src.Select(dto => new HstRemarkDto(dto)));
+                    _ = await MappingAsync(cbtNoteDao, hstRemarkDao, src => src.Select(dto => new HstRemarkDto(dto)));
                     token.ThrowIfCancellationRequested();
                     progress.Report(80);
 
                     CbrBookDao cbrBookDao = new(dbHandlerOle);
                     RelBookItemDao relBookItemDao = new(dbHandler);
-                    _ = await Mapping(cbrBookDao, relBookItemDao, src => src.Select(dto => new RelBookItemDto(dto)));
+                    _ = await MappingAsync(cbrBookDao, relBookItemDao, src => src.Select(dto => new RelBookItemDto(dto)));
                     token.ThrowIfCancellationRequested();
                     progress.Report(90);
 
@@ -236,56 +236,56 @@ namespace HouseholdAccountBook.Models.AppServices
                 await dbHandlerSQLite.ExecTransactionAsync(async () => {
                     MstBookDao mstBookDao1 = new(dbHandlerNpgsql);
                     MstBookDao mstBookDao2 = new(dbHandlerSQLite);
-                    _ = await Mapping(mstBookDao1, mstBookDao2);
+                    _ = await MappingAsync(mstBookDao1, mstBookDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(10);
 
                     MstCategoryDao mstCategoryDao1 = new(dbHandlerNpgsql);
                     MstCategoryDao mstCategoryDao2 = new(dbHandlerSQLite);
-                    _ = await Mapping(mstCategoryDao1, mstCategoryDao2);
+                    _ = await MappingAsync(mstCategoryDao1, mstCategoryDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(20);
 
                     MstItemDao mstItemDao1 = new(dbHandlerNpgsql);
                     MstItemDao mstItemDao2 = new(dbHandlerSQLite);
-                    _ = await Mapping(mstItemDao1, mstItemDao2);
+                    _ = await MappingAsync(mstItemDao1, mstItemDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(30);
 
                     HstActionDao hstActionDao1 = new(dbHandlerNpgsql);
                     HstActionDao hstActionDao2 = new(dbHandlerSQLite);
-                    _ = await Mapping(hstActionDao1, hstActionDao2);
+                    _ = await MappingAsync(hstActionDao1, hstActionDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(50);
 
                     HstGroupDao hstGroupDao1 = new(dbHandlerNpgsql);
                     HstGroupDao hstGroupDao2 = new(dbHandlerSQLite);
-                    _ = await Mapping(hstGroupDao1, hstGroupDao2);
+                    _ = await MappingAsync(hstGroupDao1, hstGroupDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(60);
 
                     HstShopDao hstShopDao1 = new(dbHandlerNpgsql);
                     HstShopDao hstShopDao2 = new(dbHandlerSQLite);
-                    _ = await Mapping(hstShopDao1, hstShopDao2);
+                    _ = await MappingAsync(hstShopDao1, hstShopDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(70);
 
                     HstRemarkDao hstRemarkDao1 = new(dbHandlerNpgsql);
                     HstRemarkDao hstRemarkDao2 = new(dbHandlerSQLite);
-                    _ = await Mapping(hstRemarkDao1, hstRemarkDao2);
+                    _ = await MappingAsync(hstRemarkDao1, hstRemarkDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(80);
 
                     RelBookItemDao relBookItemDao1 = new(dbHandlerNpgsql);
                     RelBookItemDao relBookItemDao2 = new(dbHandlerSQLite);
-                    _ = await Mapping(relBookItemDao1, relBookItemDao2);
+                    _ = await MappingAsync(relBookItemDao1, relBookItemDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(90);
 
                     MstAssetDao mstAssetDao1 = new(dbHandlerNpgsql);
                     MstAssetDao mstAssetDao2 = new(dbHandlerSQLite);
                     if (1 <= srcVersion) {
-                        _ = await Mapping(mstAssetDao1, mstAssetDao2);
+                        _ = await MappingAsync(mstAssetDao1, mstAssetDao2);
                     }
                     else {
                         _ = await mstAssetDao2.DeleteAllAsync();
@@ -335,56 +335,56 @@ namespace HouseholdAccountBook.Models.AppServices
                 await dbHandler.ExecTransactionAsync(async () => {
                     MstBookDao mstBookDao1 = new(dbHandlerSQLite);
                     MstBookDao mstBookDao2 = new(dbHandler);
-                    _ = await Mapping(mstBookDao1, mstBookDao2);
+                    _ = await MappingAsync(mstBookDao1, mstBookDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(10);
 
                     MstCategoryDao mstCategoryDao1 = new(dbHandlerSQLite);
                     MstCategoryDao mstCategoryDao2 = new(dbHandler);
-                    _ = await Mapping(mstCategoryDao1, mstCategoryDao2);
+                    _ = await MappingAsync(mstCategoryDao1, mstCategoryDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(20);
 
                     MstItemDao mstItemDao1 = new(dbHandlerSQLite);
                     MstItemDao mstItemDao2 = new(dbHandler);
-                    _ = await Mapping(mstItemDao1, mstItemDao2);
+                    _ = await MappingAsync(mstItemDao1, mstItemDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(30);
 
                     HstActionDao hstActionDao1 = new(dbHandlerSQLite);
                     HstActionDao hstActionDao2 = new(dbHandler);
-                    _ = await Mapping(hstActionDao1, hstActionDao2);
+                    _ = await MappingAsync(hstActionDao1, hstActionDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(60);
 
                     HstGroupDao hstGroupDao1 = new(dbHandlerSQLite);
                     HstGroupDao hstGroupDao2 = new(dbHandler);
-                    _ = await Mapping(hstGroupDao1, hstGroupDao2);
+                    _ = await MappingAsync(hstGroupDao1, hstGroupDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(70);
 
                     HstShopDao hstShopDao1 = new(dbHandlerSQLite);
                     HstShopDao hstShopDao2 = new(dbHandler);
-                    _ = await Mapping(hstShopDao1, hstShopDao2);
+                    _ = await MappingAsync(hstShopDao1, hstShopDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(80);
 
                     HstRemarkDao hstRemarkDao1 = new(dbHandlerSQLite);
                     HstRemarkDao hstRemarkDao2 = new(dbHandler);
-                    _ = await Mapping(hstRemarkDao1, hstRemarkDao2);
+                    _ = await MappingAsync(hstRemarkDao1, hstRemarkDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(90);
 
                     RelBookItemDao relBookItemDao1 = new(dbHandlerSQLite);
                     RelBookItemDao relBookItemDao2 = new(dbHandler);
-                    _ = await Mapping(relBookItemDao1, relBookItemDao2);
+                    _ = await MappingAsync(relBookItemDao1, relBookItemDao2);
                     token.ThrowIfCancellationRequested();
                     progress.Report(100);
 
                     MstAssetDao mstAssetDao1 = new(dbHandlerSQLite);
                     MstAssetDao mstAssetDao2 = new(dbHandler);
                     if (1 <= srcVersion) {
-                        _ = await Mapping(mstAssetDao1, mstAssetDao2);
+                        _ = await MappingAsync(mstAssetDao1, mstAssetDao2);
                     }
                     else {
                         _ = await mstAssetDao2.DeleteAllAsync();

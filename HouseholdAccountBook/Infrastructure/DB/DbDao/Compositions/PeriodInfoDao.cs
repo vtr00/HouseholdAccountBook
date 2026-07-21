@@ -16,7 +16,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
         /// 全帳簿の <see cref="PeriodInfoDto"/> を取得する
         /// </summary>
         /// <returns>取得したレコード</returns>
-        public async Task<PeriodInfoDto> Find()
+        public async Task<PeriodInfoDto> FindAsync()
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
