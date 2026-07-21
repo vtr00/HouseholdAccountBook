@@ -4,6 +4,11 @@
 
 ## 2026
 
+### 2026-07-22
+
+- 全体
+   - △AsyncRelayCommand/RelayCommand/SelectorViewModelのログを変更した - refs #235
+
 ### 2026-07-21
 
 - 全体

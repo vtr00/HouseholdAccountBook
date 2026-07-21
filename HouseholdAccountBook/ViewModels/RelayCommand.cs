@@ -73,7 +73,7 @@ namespace HouseholdAccountBook.ViewModels
 
         public void Execute(object parameter)
         {
-            using FuncLog funcLog = new(args: parameter, fileName: this.mFileName, methodName: this.mMemberName);
+            using FuncLog funcLog = new(args: parameter, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.Execute)}");
 
             this.mIsExecuting = true;
             RaiseCanExecuteChanged();
@@ -156,7 +156,7 @@ namespace HouseholdAccountBook.ViewModels
 
         public void Execute(object parameter)
         {
-            using FuncLog funcLog = new(args: parameter, fileName: this.mFileName, methodName: this.mMemberName);
+            using FuncLog funcLog = new(args: parameter, fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.Execute)}");
 
             this.mIsExecuting = true;
             RaiseCanExecuteChanged();
