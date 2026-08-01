@@ -1,4 +1,11 @@
-﻿* text eol=crlf
+﻿* text=auto eol=crlf
+
+# テキスト
+*.txt text
+*.cs text
+*.xaml text
+*.md text
+*.config text
 
 # バイナリ
 *.ico binary
