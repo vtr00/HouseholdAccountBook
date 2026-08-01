@@ -72,8 +72,10 @@ namespace HouseholdAccountBook.Models.AppServices
             using FuncLog funcLog = new();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
-            MstAssetDao mstAssetDao = new(dbHandler);
-            AssetIdObj assetId = await mstAssetDao.InsertReturningIdAsync(new MstAssetDto { });
+            MstAssetDao dao = new(dbHandler);
+            AssetIdObj assetId = await dao.InsertReturningIdAsync(new MstAssetDto { });
+
+            await dao.AnalizeAsync();
 
             return assetId;
         }
@@ -208,8 +210,10 @@ namespace HouseholdAccountBook.Models.AppServices
             using FuncLog funcLog = new();
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
-            MstBookDao mstBookDao = new(dbHandler);
-            AccountIdObj accountId = await mstBookDao.InsertReturningIdAsync(new MstBookDto { });
+            MstBookDao dao = new(dbHandler);
+            AccountIdObj accountId = await dao.InsertReturningIdAsync(new MstBookDto { });
+
+            await dao.AnalizeAsync();
 
             return accountId;
         }
@@ -365,6 +369,8 @@ namespace HouseholdAccountBook.Models.AppServices
             MstCategoryDao dao = new(dbHandler);
             CategoryIdObj categoryId = await dao.InsertReturningIdAsync(new MstCategoryDto { BalanceKind = (int)kind });
 
+            await dao.AnalizeAsync();
+
             return categoryId;
         }
 
@@ -378,8 +384,10 @@ namespace HouseholdAccountBook.Models.AppServices
             using FuncLog funcLog = new(new { categoryId });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
-            MstItemDao mstItemDao = new(dbHandler);
-            ItemIdObj itemId = await mstItemDao.InsertReturningIdAsync(new MstItemDto { CategoryId = (int)categoryId });
+            MstItemDao dao = new(dbHandler);
+            ItemIdObj itemId = await dao.InsertReturningIdAsync(new MstItemDto { CategoryId = (int)categoryId });
+
+            await dao.AnalizeAsync();
 
             return itemId;
         }
@@ -661,6 +669,9 @@ namespace HouseholdAccountBook.Models.AppServices
                     result = true;
                 }
             });
+
+            RelBookItemDao relBookItemDao = new(dbHandler);
+            await relBookItemDao.AnalizeAsync();
 
             return result;
         }

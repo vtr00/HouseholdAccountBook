@@ -202,6 +202,11 @@ namespace HouseholdAccountBook.Models.AppServices
                     // アセットリストを更新する
                     await AssetService.Instance.UpdateAssets(this.mDbHandlerFactory);
                 }
+
+                // PostgreSQLなら最適化する
+                if (dbHandler.Kind == Infrastructure.DB.DBKind.PostgreSQL) {
+                    await dbHandler.OptimizeAsync();
+                }
             }
             else {
                 result = false;
@@ -213,7 +218,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// PostgreSQLからインポートする
         /// </summary>
-        /// <param name="info">PostgreSQL接続情報</param>
+        /// <param name="info">インポート元のPostgreSQL接続情報</param>
         /// <param name="token">キャンセル用トークン</param>
         /// <param name="progress">進捗</param>
         /// <exception cref="OperationCanceledException">キャンセル例外</exception>
@@ -398,6 +403,11 @@ namespace HouseholdAccountBook.Models.AppServices
 
                     result = true;
                 }, () => result = false);
+
+                // PostgreSQLなら最適化する
+                if (dbHandler.Kind == Infrastructure.DB.DBKind.PostgreSQL) {
+                    await dbHandler.OptimizeAsync();
+                }
             }
 
             if (result) {
@@ -464,6 +474,11 @@ namespace HouseholdAccountBook.Models.AppServices
                         // スキーマバージョンを元に戻す
                         MtdSchemaVersionDao mtdSchemaVersionDao = new(dbHandler);
                         _ = await mtdSchemaVersionDao.UpsertSchemaVersionAsync(schemaVersion);
+
+                        // PostgreSQLなら最適化する
+                        if (dbHandler.Kind == Infrastructure.DB.DBKind.PostgreSQL) {
+                            await dbHandler.OptimizeAsync();
+                        }
                     }
 
                     // アセットリストを更新する

@@ -4,6 +4,7 @@ using HouseholdAccountBook.Infrastructure.Logger;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
+using System.Threading.Tasks;
 
 namespace HouseholdAccountBook.Models.DbHandlers
 {
@@ -42,6 +43,8 @@ namespace HouseholdAccountBook.Models.DbHandlers
 
             this.LibKind = DBLibraryKind.OleDb;
         }
+
+        public override Task OptimizeAsync() => Task.CompletedTask;
 
         /// <summary>
         /// Ole DBプロバイダの一覧を取得する

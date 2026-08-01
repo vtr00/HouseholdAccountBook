@@ -107,16 +107,21 @@ namespace HouseholdAccountBook.Models.DbHandlers
             return opened;
         }
 
+        public override async Task OptimizeAsync()
+        {
+            try {
+                // クエリ最適化レベルを上げる
+                _ = await this.ExecuteAsync("PRAGMA optimize;");
+            }
+            catch { }
+        }
+
         public override async ValueTask DisposeAsync()
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
 
             if (this.mConnection != null && this.Optimizing) {
-                try {
-                    // クエリ最適化レベルを上げる
-                    _ = await this.ExecuteAsync("PRAGMA optimize;");
-                }
-                catch { }
+                await this.OptimizeAsync();
             }
             await base.DisposeAsync();
 

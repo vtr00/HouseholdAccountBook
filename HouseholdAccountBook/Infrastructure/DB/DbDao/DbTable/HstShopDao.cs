@@ -13,7 +13,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
     /// 店舗名テーブルDAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class HstShopDao(DbHandlerBase dbHandler) : CommonTableDaoBase<HstShopDto>(dbHandler)
+    public class HstShopDao(DbHandlerBase dbHandler) : CommonTableDaoBase<HstShopDto>(dbHandler, "hst_shop")
     {
         public override Task<int> CreateTableAsync() => throw new NotImplementedException();
 

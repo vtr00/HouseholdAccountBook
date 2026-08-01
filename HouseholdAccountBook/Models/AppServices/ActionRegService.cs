@@ -142,6 +142,11 @@ namespace HouseholdAccountBook.Models.AppServices
                             resActionId = actionId;
                         }
                     }
+
+                    if (assingedGroupId != null) {
+                        await hstGroupDao.AnalizeAsync();
+                    }
+                    await hstActionDao.AnalizeAsync();
                     #endregion
                 }
                 else {
@@ -223,6 +228,8 @@ namespace HouseholdAccountBook.Models.AppServices
                             // グループIDを取得する
                             assignedGroupId = await hstGroupDao.InsertReturningIdAsync(new HstGroupDto { GroupKind = (int)GroupKind.Repeat });
                             actionIdList.Add(action.ActionId);
+
+                            await hstGroupDao.AnalizeAsync();
                             #endregion
                         }
                         else {
@@ -293,6 +300,10 @@ namespace HouseholdAccountBook.Models.AppServices
                                 Remark = action.Remark,
                                 IsMatch = 0
                             });
+                        }
+
+                        if (actionIdList.Count != count) {
+                            await hstActionDao.AnalizeAsync();
                         }
                         #endregion
                     }
@@ -371,6 +382,12 @@ namespace HouseholdAccountBook.Models.AppServices
                         resActionIdList.Add(id);
                     }
                 });
+
+                HstGroupDao hstGroupDao = new(dbHandler);
+                await hstGroupDao.AnalizeAsync();
+
+                HstActionDao hstActionDao = new(dbHandler);
+                await hstActionDao.AnalizeAsync();
                 #endregion
             }
             else {
@@ -413,6 +430,10 @@ namespace HouseholdAccountBook.Models.AppServices
                     IEnumerable<int> expected = dtoList.Select(dto => dto.ActionId).Except(resActionIdList.Select(tmp => (int)tmp));
                     foreach (int actionId in expected) {
                         _ = await hstActionDao.DeleteByIdAsync(actionId);
+                    }
+
+                    if (actionList.Any(am => am.ActionId is null)) {
+                        await hstActionDao.AnalizeAsync();
                     }
                 });
                 #endregion
@@ -478,7 +499,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
                 if (srcAction.ActionId is null) {
                     #region 帳簿項目を追加する
-                    // グループIDを取得する
+                    // グループIDを追加する
                     HstGroupDao hstGroupDao = new(dbHandler);
                     assignedGroupId = await hstGroupDao.InsertReturningIdAsync(new HstGroupDto { GroupKind = (int)GroupKind.Move });
 
@@ -502,6 +523,9 @@ namespace HouseholdAccountBook.Models.AppServices
                         GroupId = (int?)assignedGroupId
                     }, (int)BalanceKind.Income);
                     resActionIdList.Add(dstActionId);
+
+                    await hstGroupDao.AnalizeAsync();
+                    await hstActionDao.AnalizeAsync();
                     #endregion
                 }
                 else {
@@ -544,6 +568,8 @@ namespace HouseholdAccountBook.Models.AppServices
                             GroupId = (int?)assignedGroupId
                         });
                         resActionIdList.Add(feeActionId);
+
+                        await hstActionDao.AnalizeAsync();
                     }
                     else {
                         // 手数料が登録済のとき更新する
@@ -587,12 +613,14 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             // 店舗を追加/編集する
-            HstShopDao hstShopDao = new(dbHandler);
-            _ = await hstShopDao.UpsertAsync(new HstShopDto {
+            HstShopDao dao = new(dbHandler);
+            _ = await dao.UpsertAsync(new HstShopDto {
                 ItemId = (int)shop.ItemId,
                 ShopName = shop.Name,
                 UsedTime = shop.CurrentActTime ?? DateTime.MinValue
             });
+
+            await dao.AnalizeAsync();
         }
 
         /// <summary>
@@ -606,12 +634,14 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             // 備考を追加/編集する
-            HstRemarkDao hstRemarkDao = new(dbHandler);
-            _ = await hstRemarkDao.UpsertAsync(new HstRemarkDto {
+            HstRemarkDao dao = new(dbHandler);
+            _ = await dao.UpsertAsync(new HstRemarkDto {
                 ItemId = (int)remark.ItemId,
                 Remark = remark.Remark,
                 UsedTime = remark.CurrentActTime ?? DateTime.MinValue
             });
+
+            await dao.AnalizeAsync();
         }
     }
 }

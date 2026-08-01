@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
     /// 帳簿-項目関連テーブルDAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class RelBookItemDao(DbHandlerBase dbHandler) : CommonTableDaoBase<RelBookItemDto>(dbHandler)
+    public class RelBookItemDao(DbHandlerBase dbHandler) : CommonTableDaoBase<RelBookItemDto>(dbHandler, "rel_book_item")
     {
         public override Task<int> CreateTableAsync() => throw new NotImplementedException();
 
