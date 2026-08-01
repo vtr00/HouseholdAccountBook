@@ -16,7 +16,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
     /// アセットテーブルDAO
     /// </summary>
     /// <param name="dbHandler"></param>
-    public class MstAssetDao(DbHandlerBase dbHandler) : PrimaryKeyDaoBase<MstAssetDto, int>(dbHandler)
+    public class MstAssetDao(DbHandlerBase dbHandler) : PrimaryKeyDaoBase<MstAssetDto, int>(dbHandler, "mst_asset")
     {
         public override async Task<int> CreateTableAsync()
         {

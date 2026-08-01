@@ -10,7 +10,9 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract
     /// </summary>
     /// <typeparam name="DTO"><see cref="CommonTableDtoBase"/>の派生クラス</typeparam>
     /// <param name="dbHandler">DBハンドラ</param>
-    public abstract class CommonTableDaoBase<DTO>(DbHandlerBase dbHandler) : PhyTableDaoBase<DTO>(dbHandler) where DTO : CommonTableDtoBase
+    /// <param name="tableName">テーブル名</param>
+    public abstract class CommonTableDaoBase<DTO>(DbHandlerBase dbHandler, string tableName) :
+        PhyTableDaoBase<DTO>(dbHandler, tableName) where DTO : CommonTableDtoBase
     {
         public abstract override Task<int> CreateTableAsync();
 

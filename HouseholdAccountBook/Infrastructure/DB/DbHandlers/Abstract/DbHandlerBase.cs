@@ -118,6 +118,12 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract
         }
 
         /// <summary>
+        /// [非同期]DBを最適化する
+        /// </summary>
+        /// <returns></returns>
+        public abstract Task OptimizeAsync();
+
+        /// <summary>
         /// [非同期]接続を終了する
         /// </summary>
         public virtual async ValueTask DisposeAsync()

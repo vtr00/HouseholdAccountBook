@@ -14,7 +14,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
     /// 帳簿テーブルDAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class MstBookDao(DbHandlerBase dbHandler) : PrimaryKeyDaoBase<MstBookDto, int>(dbHandler)
+    public class MstBookDao(DbHandlerBase dbHandler) : PrimaryKeyDaoBase<MstBookDto, int>(dbHandler, "mst_book")
     {
         public override Task<int> CreateTableAsync() => throw new NotImplementedException();
 

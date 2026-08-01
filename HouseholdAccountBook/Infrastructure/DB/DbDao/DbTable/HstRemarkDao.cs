@@ -13,7 +13,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
     /// 備考テーブルDAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class HstRemarkDao(DbHandlerBase dbHandler) : CommonTableDaoBase<HstRemarkDto>(dbHandler)
+    public class HstRemarkDao(DbHandlerBase dbHandler) : CommonTableDaoBase<HstRemarkDto>(dbHandler, "hst_remark")
     {
         public override Task<int> CreateTableAsync() => throw new NotImplementedException();
 

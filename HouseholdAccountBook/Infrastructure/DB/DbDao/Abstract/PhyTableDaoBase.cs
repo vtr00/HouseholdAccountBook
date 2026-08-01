@@ -11,8 +11,12 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract
     /// </summary>
     /// <typeparam name="DTO"><see cref="PhyTableDtoBase"/>の派生クラス</typeparam>
     /// <param name="dbHandler">DBハンドラ</param>
-    public abstract class PhyTableDaoBase<DTO>(DbHandlerBase dbHandler) : TableDaoBase(dbHandler), IReadTableDao<DTO>, IWriteTableDao<DTO> where DTO : PhyTableDtoBase
+    /// <param name="tableName">テーブル名</param>
+    public abstract class PhyTableDaoBase<DTO>(DbHandlerBase dbHandler, string tableName) :
+        TableDaoBase(dbHandler), IReadTableDao<DTO>, IWriteTableDao<DTO> where DTO : PhyTableDtoBase
     {
+        private string mTableName = tableName;
+
         /// <summary>
         /// テーブルを作成する
         /// </summary>
@@ -36,5 +40,12 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract
         public abstract Task<int> UpsertAsync(DTO dto);
 
         public abstract Task<int> DeleteAllAsync();
+
+        public async Task AnalizeAsync()
+        {
+            using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
+
+            _ = await this.mDbHandler.ExecuteAsync(@$"ANALYZE {this.mTableName};", null, DBKindMask.PostgreSQL);
+        }
     }
 }

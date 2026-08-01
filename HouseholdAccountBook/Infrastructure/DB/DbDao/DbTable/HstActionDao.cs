@@ -13,7 +13,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
     /// 帳簿項目テーブルDAO
     /// </summary>
     /// <param name="dbHandler">DBハンドラ</param>
-    public class HstActionDao(DbHandlerBase dbHandler) : PrimaryKeyDaoBase<HstActionDto, int>(dbHandler)
+    public class HstActionDao(DbHandlerBase dbHandler) : PrimaryKeyDaoBase<HstActionDto, int>(dbHandler, "hst_action")
     {
         public override Task<int> CreateTableAsync() => throw new NotImplementedException();
 

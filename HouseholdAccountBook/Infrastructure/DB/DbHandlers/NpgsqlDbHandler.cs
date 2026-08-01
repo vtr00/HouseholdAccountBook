@@ -88,6 +88,8 @@ namespace HouseholdAccountBook.Models.DbHandlers
             this.LibKind = DBLibraryKind.PostgreSQL;
         }
 
+        public override async Task OptimizeAsync() => _ = await this.ExecuteAsync("ANALYZE;");
+
         /// <summary>
         /// ダンプを実行する
         /// </summary>

@@ -11,7 +11,9 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Abstract
     /// </summary>
     /// <typeparam name="DTO"><see cref="CommonTableDtoBase"/>の派生クラス かつ シーケンスを持つDTO</typeparam>
     /// <typeparam name="T">主キーの型</typeparam>
-    public abstract class PrimaryKeyDaoBase<DTO, T>(DbHandlerBase dbHandler) : CommonTableDaoBase<DTO>(dbHandler), ISequentialIDDao<DTO> where DTO : CommonTableDtoBase, ISequentialIDDto
+    /// <param name="tableName">テーブル名</param>
+    public abstract class PrimaryKeyDaoBase<DTO, T>(DbHandlerBase dbHandler, string tableName) :
+        CommonTableDaoBase<DTO>(dbHandler, tableName), ISequentialIDDao<DTO> where DTO : CommonTableDtoBase, ISequentialIDDto
     {
         public async Task SetIdSequenceAsync(IEnumerable<DTO> dtoList) => await this.SetIdSequenceAsync(dtoList.Max(d => d.GetId()));
 
