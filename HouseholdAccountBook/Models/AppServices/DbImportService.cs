@@ -325,8 +325,8 @@ namespace HouseholdAccountBook.Models.AppServices
 
             // インポート元のスキーマバージョンを取得する
             DbHandlerFactory sqliteDbHandlerFactory = new(new SQLiteDbHandler.ConnectInfo() { FilePath = fromFilePath });
-            DbMigrationService manager = new(sqliteDbHandlerFactory);
-            int srcVersion = await manager.GetSchemaVersionAsync();
+            DbMigrationService migService = new(sqliteDbHandlerFactory);
+            int srcVersion = await migService.GetSchemaVersionAsync();
 
             await using SQLiteDbHandler dbHandlerSQLite = await sqliteDbHandlerFactory.CreateAsync(false) as SQLiteDbHandler;
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();

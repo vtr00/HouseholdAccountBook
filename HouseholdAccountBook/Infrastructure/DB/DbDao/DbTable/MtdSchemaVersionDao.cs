@@ -22,7 +22,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
             if (this.mDbHandler.Kind != DBKind.PostgreSQL) {
                 throw new NotSupportedException("This method is only supported for PostgreSQL.");
             }
-            if (!this.mDbHandler.InTransaction()) {
+            if (this.mDbHandler.InTransaction()) {
                 throw new InvalidOperationException("Cannot create table during a transaction.");
             }
 

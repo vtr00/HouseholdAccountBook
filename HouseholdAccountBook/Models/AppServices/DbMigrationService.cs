@@ -30,7 +30,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             int version = 0;
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
-                version = await GetSchemaVersionCoreAsync(dbHandler);
+                version = await GetSchemaVersionCoreAsync(dbHandler, false);
             }
 
             return version;
@@ -40,15 +40,23 @@ namespace HouseholdAccountBook.Models.AppServices
         /// スキーマバージョンを取得する(本処理)
         /// </summary>
         /// <param name="dbHandler">DBハンドラ</param>
+        /// <param name="createMtdSchemaVersion">スキーマバージョンテーブルを作成するか</param>
         /// <returns>取得したスキーマバージョン</returns>
-        private static async Task<int> GetSchemaVersionCoreAsync(DbHandlerBase dbHandler)
+        private static async Task<int> GetSchemaVersionCoreAsync(DbHandlerBase dbHandler, bool createMtdSchemaVersion)
         {
             int version = 0;
             switch (dbHandler.Kind) {
                 case DBKind.PostgreSQL:
                     MtdSchemaVersionDao dao = new(dbHandler);
-                    await dao.CreateTableAsync();
-                    version = await dao.SelectSchemaVersionAsync();
+                    if (createMtdSchemaVersion) {
+                        await dao.CreateTableAsync();
+                    }
+                    try {
+                        version = await dao.SelectSchemaVersionAsync();
+                    }
+                    catch (Exception) {
+                        version = 0;
+                    }
                     break;
                 case DBKind.SQLite:
                     if (dbHandler is SQLiteDbHandler sqliteDbHandler) {
@@ -94,8 +102,9 @@ namespace HouseholdAccountBook.Models.AppServices
 
             bool result = true;
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
+                int latestSchemaVersion = await GetSchemaVersionCoreAsync(dbHandler, true); // 更新前のバージョン
+
                 await dbHandler.ExecTransactionAsync(async () => {
-                    int latestSchemaVersion = await GetSchemaVersionCoreAsync(dbHandler); // 更新前のバージョン
                     int currentSchemaVersion = latestSchemaVersion; // 更新中のバージョン
                     int requiredSchemaVersion = 2; // アプリが想定しているバージョン
                     while (currentSchemaVersion < requiredSchemaVersion) {
