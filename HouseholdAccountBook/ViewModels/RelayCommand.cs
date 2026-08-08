@@ -161,7 +161,7 @@ namespace HouseholdAccountBook.ViewModels
             this.mIsExecuting = true;
             RaiseCanExecuteChanged();
             try {
-                this.mExecute?.Invoke((T)parameter, funcLog);
+                this.mExecute?.Invoke(parameter is T p ? p : default, funcLog);
             }
             finally {
                 this.mIsExecuting = false;
