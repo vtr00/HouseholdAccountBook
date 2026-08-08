@@ -28,7 +28,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
                 throw new ArgumentException($"Invalid table name: {dto.TableName}");
             }
 
-            return await this.mDbHandler.QuerySingleAsync<DateTime>($"SELECT MAX(update_time) FROM {dto.TableName};");
+            return await this.mDbHandler.QuerySingleOrDefaultAsync<DateTime>($"SELECT MAX(update_time) FROM {dto.TableName};");
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
                 throw new ArgumentException($"Invalid table name: {dto.TableName}");
             }
 
-            return await this.mDbHandler.QuerySingleAsync<DateTime>($"SELECT MAX(insert_time) FROM {dto.TableName};");
+            return await this.mDbHandler.QuerySingleOrDefaultAsync<DateTime>($"SELECT MAX(insert_time) FROM {dto.TableName};");
         }
     }
 }
