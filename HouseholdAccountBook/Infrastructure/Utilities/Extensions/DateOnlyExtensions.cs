@@ -38,7 +38,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
         /// <returns>会計年度始め</returns>
         public static DateOnly GetFirstDateOfFiscalYear(this DateOnly date, int firstMonthOfFiscalYear)
         {
-            firstMonthOfFiscalYear = Math.Max(1, Math.Min(firstMonthOfFiscalYear, 12));
+            firstMonthOfFiscalYear = Math.Clamp(firstMonthOfFiscalYear, 1, 12);
 
             DateOnly ans = date.AddMonths(-(firstMonthOfFiscalYear - 1));
             ans = new DateOnly(ans.Year, firstMonthOfFiscalYear, 1);
@@ -53,7 +53,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
         /// <returns>会計年度終わり</returns>
         public static DateOnly GetLastDateOfFiscalYear(this DateOnly date, int firstMonthOfFiscalYear)
         {
-            firstMonthOfFiscalYear = Math.Max(1, Math.Min(firstMonthOfFiscalYear, 12));
+            firstMonthOfFiscalYear = Math.Clamp(firstMonthOfFiscalYear, 1, 12);
 
             DateOnly ans = date.AddMonths(-(firstMonthOfFiscalYear - 1));
             ans = new DateOnly(ans.Year, firstMonthOfFiscalYear, 1).AddYears(1).AddDays(-1);
@@ -90,7 +90,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities.Extensions
         /// <returns>月内の指定された日</returns>
         public static DateOnly GetDateInMonth(this DateOnly date, int day)
         {
-            day = Math.Min(day, DateTime.DaysInMonth(date.Year, date.Month));
+            day = Math.Clamp(day, 1, DateTime.DaysInMonth(date.Year, date.Month));
             DateOnly ans = new(date.Year, date.Month, day);
             return ans;
         }
