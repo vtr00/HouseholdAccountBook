@@ -257,7 +257,7 @@ namespace HouseholdAccountBook.ViewModels
 
             if (this.mRequestable != null) {
                 ProgressDialogRequestEventArgs e = new() {
-                    FuncAsync = async (token, progress) => await this.mExecuteAsync.Invoke((T)parameter, funcLog, token, progress),
+                    FuncAsync = async (token, progress) => await this.mExecuteAsync.Invoke(parameter is T p ? p : default, funcLog, token, progress),
                     CanCancel = this.mCanCancel,
                     TokenSource = cts,
                 };
@@ -267,7 +267,7 @@ namespace HouseholdAccountBook.ViewModels
             // (進捗ウィンドウ非表示の場合)非同期処理を待機 または (進捗ウィンドウ表示の場合)例外を処理する
             try {
                 using IDisposable disposable = this.mBusyService?.Enter();
-                await (this.mRequestable == null ? this.mExecuteAsync.Invoke((T)parameter, funcLog, cts.Token, null) : completionTask);
+                await (this.mRequestable == null ? this.mExecuteAsync.Invoke(parameter is T p ? p : default, funcLog, cts.Token, null) : completionTask);
             }
             catch (OperationCanceledException) {
                 Log.Info($"{this.mMemberName} Canceled.", this.mFileName, this.mMemberName);
