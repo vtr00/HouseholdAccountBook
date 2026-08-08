@@ -30,7 +30,6 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbTypeHandlers
                 long l => l,
                 int i => i,
                 DBNull => null,
-                null => 0m,
                 _ => Convert.ToDecimal(value)
             };
         }
