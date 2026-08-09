@@ -351,7 +351,10 @@ namespace HouseholdAccountBook.Models.AppServices
 
             MstItemDao mstItemDao = new(dbHandler);
             IEnumerable<MstItemDto> iDtoList = await mstItemDao.FindByCategoryIdAsync((int)categoryId);
-            IEnumerable<ItemModel> itemList = iDtoList.Select(static dto => new ItemModel(dto.ItemId, dto.ItemName));
+            IEnumerable<ItemModel> itemList = iDtoList.Select(static dto => new ItemModel(dto.ItemId, dto.ItemName) {
+                AssetId = dto.AssetId,
+                ItemKind = EnumUtil.SafeCastEnum(dto.ItemKind, ItemKind.Normal)
+            });
 
             return itemList;
         }
@@ -367,7 +370,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             MstCategoryDao dao = new(dbHandler);
-            CategoryIdObj categoryId = await dao.InsertReturningIdAsync(new MstCategoryDto { BalanceKind = (int)kind });
+            CategoryIdObj categoryId = await dao.InsertReturningIdAsync(new() { BalanceKind = (int)kind });
 
             await dao.AnalizeAsync();
 
@@ -385,7 +388,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             MstItemDao dao = new(dbHandler);
-            ItemIdObj itemId = await dao.InsertReturningIdAsync(new MstItemDto { CategoryId = (int)categoryId });
+            ItemIdObj itemId = await dao.InsertReturningIdAsync(new() { CategoryId = (int)categoryId });
 
             await dao.AnalizeAsync();
 
@@ -542,6 +545,8 @@ namespace HouseholdAccountBook.Models.AppServices
             MstItemDto dto = await mstItemDao.FindByIdAsync((int)itemId);
 
             ItemModel item = new(itemId, dto.ItemName) {
+                AssetId = dto.AssetId,
+                ItemKind = EnumUtil.SafeCastEnum(dto.ItemKind, ItemKind.Normal),
                 SortOrder = dto.SortOrder
             };
 
@@ -552,28 +557,53 @@ namespace HouseholdAccountBook.Models.AppServices
         /// 分類Modelを保存する
         /// </summary>
         /// <param name="category">分類Model</param>
-        /// <returns></returns>
-        public async Task SaveCategoryAsync(CategoryModel category)
+        /// <returns>成功/失敗</returns>
+        public async Task<bool> SaveCategoryAsync(CategoryModel category)
         {
             using FuncLog funcLog = new(new { category });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             MstCategoryDao mstCategoryDao = new(dbHandler);
-            _ = await mstCategoryDao.UpdateSetableAsync(new MstCategoryDto { CategoryName = category.Name, CategoryId = (int)category.Id });
+            _ = await mstCategoryDao.UpdateSetableAsync(new() {
+                CategoryName = category.Name,
+                CategoryId = (int)category.Id
+            });
+
+            return true;
         }
 
         /// <summary>
         /// 項目Modelを保存する
         /// </summary>
         /// <param name="item">項目Model</param>
-        /// <returns></returns>
-        public async Task SaveItemAsync(ItemModel item)
+        /// <param name="checkExistAction">項目に紐づく帳簿項目があるか確認するか</param>
+        /// <returns>成功/失敗</returns>
+        public async Task<bool> SaveItemAsync(ItemModel item, bool checkExistAction)
         {
             using FuncLog funcLog = new(new { item });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
-            MstItemDao mstItemDao = new(dbHandler);
-            _ = await mstItemDao.UpdateSetableAsync(new MstItemDto { ItemName = item.Name, ItemId = (int)item.Id });
+            bool result = false;
+            await dbHandler.ExecTransactionAsync(async () => {
+                HstActionDao hstActionDao = new(dbHandler);
+                IEnumerable<HstActionDto> dtoList = checkExistAction ? await hstActionDao.FindByItemIdAsync((int)item.Id) : [];
+
+                if (dtoList.Any()) {
+                    result = false;
+                }
+                else {
+                    MstItemDao mstItemDao = new(dbHandler);
+                    _ = await mstItemDao.UpdateSetableAsync(new() {
+                        ItemName = item.Name,
+                        AssetId = item.AssetId == AssetIdObj.System ? null : (int?)item.AssetId,
+                        ItemKind = (int)item.ItemKind,
+                        ItemId = (int)item.Id
+                    });
+                    result = true;
+                }
+            });
+
+            return result;
         }
 
         /// <summary>
@@ -614,7 +644,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             HstShopDao hstShopDao = new(dbHandler);
-            _ = await hstShopDao.DeleteAsync(new HstShopDto {
+            _ = await hstShopDao.DeleteAsync(new() {
                 ShopName = shopName,
                 ItemId = (int)itemId
             });
@@ -632,7 +662,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             HstRemarkDao hstRemarkDao = new(dbHandler);
-            _ = await hstRemarkDao.DeleteAsync(new HstRemarkDto {
+            _ = await hstRemarkDao.DeleteAsync(new() {
                 Remark = remark,
                 ItemId = (int)itemId
             });
@@ -661,7 +691,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 }
                 else {
                     RelBookItemDao relBookItemDao = new(dbHandler);
-                    _ = await relBookItemDao.UpsertAsync(new RelBookItemDto {
+                    _ = await relBookItemDao.UpsertAsync(new() {
                         BookId = (int)accountId,
                         ItemId = (int)itemId,
                         DelFlg = isRelated ? 0 : 1

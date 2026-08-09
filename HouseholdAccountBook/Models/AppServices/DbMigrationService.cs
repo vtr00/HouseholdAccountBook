@@ -106,16 +106,16 @@ namespace HouseholdAccountBook.Models.AppServices
 
                 await dbHandler.ExecTransactionAsync(async () => {
                     int currentSchemaVersion = latestSchemaVersion; // 更新中のバージョン
-                    int requiredSchemaVersion = 2; // アプリが想定しているバージョン
+                    int requiredSchemaVersion = 3; // アプリが想定しているバージョン
                     while (currentSchemaVersion < requiredSchemaVersion) {
                         Log.Info($"Updating SchemaVersion:{currentSchemaVersion}->{currentSchemaVersion + 1}");
 
                         switch (currentSchemaVersion) {
                             case 0: {
                                 // バージョン1へアップグレード
-                                MstAssetDao dao = new(dbHandler);
-                                _ = await dao.CreateTableAsync();
-                                int assetId = await dao.InsertDefaultReturningIdAsync();
+                                MstAssetDao assetDao = new(dbHandler);
+                                _ = await assetDao.CreateTableAsync();
+                                int assetId = await assetDao.InsertDefaultReturningIdAsync();
                                 UserSettingService.Instance.DefaultAssetId = assetId;
                                 break;
                             }
@@ -125,6 +125,12 @@ namespace HouseholdAccountBook.Models.AppServices
                                 await bookDao.AddAssetIdColumnAsync();
                                 HstActionDao actionDao = new(dbHandler);
                                 await actionDao.AddAssetIdColumnAsync();
+                                break;
+                            }
+                            case 2: {
+                                // バージョン3へアップグレード
+                                MstItemDao itemDao = new(dbHandler);
+                                await itemDao.AddAssetIdAndItemKindColumnAsync();
                                 break;
                             }
                             default:

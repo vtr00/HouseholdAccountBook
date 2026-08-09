@@ -12,7 +12,7 @@ namespace HouseholdAccountBook.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "18.6.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "18.9.0.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -1160,6 +1160,66 @@ namespace HouseholdAccountBook.Properties {
             }
             set {
                 this["App_DefaultAssetId"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double ExchangeRegistrationWindow_Height {
+            get {
+                return ((double)(this["ExchangeRegistrationWindow_Height"]));
+            }
+            set {
+                this["ExchangeRegistrationWindow_Height"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double ExchangeRegistrationWindow_Left {
+            get {
+                return ((double)(this["ExchangeRegistrationWindow_Left"]));
+            }
+            set {
+                this["ExchangeRegistrationWindow_Left"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double ExchangeRegistrationWindow_Top {
+            get {
+                return ((double)(this["ExchangeRegistrationWindow_Top"]));
+            }
+            set {
+                this["ExchangeRegistrationWindow_Top"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public double ExchangeRegistrationWindow_Width {
+            get {
+                return ((double)(this["ExchangeRegistrationWindow_Width"]));
+            }
+            set {
+                this["ExchangeRegistrationWindow_Width"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool App_AssetDisplayMode {
+            get {
+                return ((bool)(this["App_AssetDisplayMode"]));
+            }
+            set {
+                this["App_AssetDisplayMode"] = value;
             }
         }
     }

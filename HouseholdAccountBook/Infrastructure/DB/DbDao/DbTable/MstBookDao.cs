@@ -18,6 +18,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
     {
         public override Task<int> CreateTableAsync() => throw new NotImplementedException();
 
+        #region マイグレーション
         /// <summary>
         /// <see cref="MstBookDto.AssetId"/> 列を追加する
         /// </summary>
@@ -28,6 +29,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
 ALTER TABLE mst_book
 ADD COLUMN asset_id INTEGER DEFAULT NULL;");
         }
+        #endregion
 
         public override async Task<IEnumerable<MstBookDto>> FindAllAsync()
         {

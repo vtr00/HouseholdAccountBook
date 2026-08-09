@@ -168,8 +168,7 @@ namespace HouseholdAccountBook.Views.Windows
                 DateValueViewModel lastVM = this.WVM.InputedDateValueVMList.Last();
                 e.NewItem = new DateValueViewModel() {
                     SelectedDate = this.WVM.IsDateAutoIncrement ? lastVM.SelectedDate.AddDays(1) : lastVM.SelectedDate,
-                    InputedValue = null,
-                    SelectedAccountAssetId = this.WVM.AccountSelectorVM.SelectedItem.AssetId
+                    InputedValue = null
                 };
             }
         }

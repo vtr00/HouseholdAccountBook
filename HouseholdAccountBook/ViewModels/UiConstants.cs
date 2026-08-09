@@ -41,6 +41,14 @@ namespace HouseholdAccountBook.ViewModels
             { AccountKind.BrokerageAccount,    Properties.Resources.AccountKind_BrokerageAccount }
         };
         /// <summary>
+        /// 項目種別文字列
+        /// </summary>
+        /// <remarks>移動は含めない</remarks>
+        public static Dictionary<ItemKind, string> ItemKindStr => new() {
+            { ItemKind.Normal,      Properties.Resources.ItemKind_Normal },
+            { ItemKind.Exchange,    Properties.Resources.ItemKind_Exchange }
+        };
+        /// <summary>
         /// 収支種別文字列
         /// </summary>
         public static Dictionary<BalanceKind, string> BalanceKindStr => new() {
@@ -56,11 +64,18 @@ namespace HouseholdAccountBook.ViewModels
             { HolidaySettingKind.AfterHoliday,  Properties.Resources.HolidaySettingKind_AfterHoliday }
         };
         /// <summary>
-        /// 手数料種別文字列
+        /// 移動手数料種別文字列
         /// </summary>
-        public static Dictionary<FeeKind, string> FeeKindStr => new() {
-            { FeeKind.Source,       Properties.Resources.FeeKind_Source },
-            { FeeKind.Destination,  Properties.Resources.FeeKind_Destination }
+        public static Dictionary<FeeKind, string> MoveFeeKindStr => new() {
+            { FeeKind.Source,       Properties.Resources.MoveFeeKind_MoveSource },
+            { FeeKind.Destination,  Properties.Resources.MoveFeeKind_MoveDestination }
+        };
+        /// <summary>
+        /// 変換手数料種別文字列
+        /// </summary>
+        public static Dictionary<FeeKind, string> ExchangeFeeKindStr => new() {
+            { FeeKind.Source,       Properties.Resources.ExchangeFeeKind_ExchangeSource },
+            { FeeKind.Destination,  Properties.Resources.ExchangeFeeKind_ExchangeDestination }
         };
         /// <summary>
         /// グラフ種別1文字列
@@ -108,6 +123,7 @@ namespace HouseholdAccountBook.ViewModels
             { nameof(VersionWindow),                "Version" },
             { nameof(CsvComparisonWindow),          "CsvComp" },
             { nameof(MoveRegistrationWindow),       "MoveReg" },
+            { nameof(ExchangeRegistrationWindow),   "ExchangeReg" },
             { nameof(ActionRegistrationWindow),     "ActReg" },
             { nameof(ActionListRegistrationWindow), "ActListReg" },
             { nameof(ProgressWindow),               "Progress" }

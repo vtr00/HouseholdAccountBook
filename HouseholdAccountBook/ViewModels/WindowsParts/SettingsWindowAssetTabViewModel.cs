@@ -213,7 +213,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.mAppService = new(this.mDbHandlerFactory);
             this.mSettingService = new(this.mDbHandlerFactory);
 
-            this.AssetSelectorVM.SetLoader(async _ => await this.mAppService.LoadAssetListAsync());
+            this.AssetSelectorVM.SetLoader(async () => await this.mAppService.LoadAssetListAsync());
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null);

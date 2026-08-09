@@ -36,7 +36,7 @@ FROM hst_action A
 INNER JOIN mst_item I ON I.item_id = A.item_id AND I.del_flg = 0
 INNER JOIN mst_book B ON B.book_id = A.book_id AND B.del_flg = 0
 INNER JOIN mst_asset BA ON BA.asset_id = COALESCE(B.asset_id, @DefaultAssetId) AND BA.del_flg = 0 -- 表示するアセット(帳簿に紐づくアセット)
-INNER JOIN mst_asset AA ON AA.asset_id = COALESCE(A.asset_id, COALESCE(B.asset_id, @DefaultAssetId)) AND AA.del_flg = 0 -- 帳簿項目に紐づくアセット
+INNER JOIN mst_asset AA ON AA.asset_id = COALESCE(A.asset_id, I.asset_id, B.asset_id, @DefaultAssetId) AND AA.del_flg = 0 -- 帳簿項目に紐づくアセット
 WHERE @StartDate <= act_time AND act_time < @EndDate AND A.act_value = -@Value * POWER(10, AA.scale) AND B.book_id = @BookId AND A.del_flg = 0;",
 new { DefaultAssetId = defaultAssetId, StartDate = date, EndDate = date.AddDays(1), Value = value, BookId = bookId });
 

@@ -126,17 +126,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public SelectorViewModel<ItemModel, ItemIdObj> ItemSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
-        /// 選択されたアセットID
+        /// アセットセレクタVM
         /// </summary>
-        public AssetIdObj SelectedAssetId {
-            get;
-            set {
-                if (this.SetProperty(ref field, value)) {
-                    this.RaisePropertyChanged(nameof(this.ValueScale));
-                    this.RaisePropertyChanged(nameof(this.InputedValueStr));
-                }
-            }
-        } = AssetIdObj.System;
+        public SelectorViewModel<AssetModel, AssetIdObj> AssetSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        private void RaiseAssetChanged()
+        {
+            this.RaisePropertyChanged(nameof(this.ValueScale));
+            this.RaisePropertyChanged(nameof(this.InputedValueStr));
+        }
         /// <summary>
         /// 入力された金額(主単位)
         /// </summary>
@@ -152,11 +149,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 金額の小数点以下桁数
         /// </summary>
-        public int ValueScale => AssetService.Instance.GetAssetModel(this.SelectedAssetId).Scale;
+        public int ValueScale => AssetService.Instance.GetAssetModel(this.AssetSelectorVM.SelectedKey).Scale;
         /// <summary>
         /// 入力された金額(文字列)
         /// </summary>
-        public string InputedValueStr => AssetService.Instance.ToAssetString(this.InputedValue, this.SelectedAssetId, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string InputedValueStr => AssetService.Instance.ToAssetString(this.InputedValue, this.AssetSelectorVM.SelectedKey, UnitKind.MainUnit, UnitKind.MainUnit);
 
         /// <summary>
         /// 店舗セレクタVM
@@ -277,12 +274,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.ItemSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadItemListAsync(this.AccountSelectorVM.SelectedKey, this.BalanceKindSelectorVM.SelectedKey, this.CategorySelectorVM.SelectedKey),
                 () => this.AccountSelectorVM.SelectedKey != null && this.CategorySelectorVM.SelectedKey != null);
+            this.AssetSelectorVM.SetLoader(() => AssetService.Instance.Assets);
+            this.AssetSelectorVM.SetDefaultSelector(() => this.ItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.DefaultAssetId);
             this.ShopSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadShopListAsync(this.ItemSelectorVM.SelectedKey, true),
-                () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
+                () => this.ItemSelectorVM.SelectedKey != null, KeySelectionMode.Force);
             this.RemarkSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadRemarkListAsync(this.ItemSelectorVM.SelectedKey, true),
-                () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
+                () => this.ItemSelectorVM.SelectedKey != null, KeySelectionMode.Force);
             this.HolidaySettingSelectorVM.SetLoader(() => HolidaySettingKindStr);
         }
 
@@ -358,8 +357,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.RemarkSelectorVM.LoadAsync(selectingRemark);
             await this.HolidaySettingSelectorVM.LoadAsync(HolidaySettingKind.Nothing);
 
-            // アセットIDを指定する
-            this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
+            // アセットを更新する
+            await this.AssetSelectorVM.LoadAsync();
+            this.RaiseAssetChanged();
         }
 
         public override void AddEventHandlers()
@@ -367,12 +367,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             // 帳簿選択変更時
-            this.AccountSelectorVM.SelectionChanged += (sender, e) => {
-                this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
-
-                this.SelectedAccountChanged?.Invoke(sender, e);
-            };
-            this.AccountSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
+            this.AccountSelectorVM.SelectionChanged += (sender, e) => this.SelectedAccountChanged?.Invoke(sender, e);
+            this.AccountSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM, this.AssetSelectorVM]);
 
             // 収支種別選択変更時
             this.BalanceKindSelectorVM.SelectionChanged += (sender, e) => this.SelectedBalanceKindChanged?.Invoke(sender, e);
@@ -384,7 +380,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             // 項目選択変更時
             this.ItemSelectorVM.SelectionChanged += (sender, e) => this.SelectedItemChanged?.Invoke(sender, e);
-            this.ItemSelectorVM.Children.AddRange([this.ShopSelectorVM, this.RemarkSelectorVM]);
+            this.ItemSelectorVM.Children.AddRange([this.AssetSelectorVM, this.ShopSelectorVM, this.RemarkSelectorVM]);
+
+            // アセット選択変更時
+            this.AssetSelectorVM.SelectionChanged += (sender, e) => this.RaiseAssetChanged();
         }
 
         /// <summary>

@@ -89,7 +89,7 @@ namespace HouseholdAccountBook.Models
         NotInOne = -1,
 
         /// <summary>
-        /// 移動
+        /// 移動(手数料含む)
         /// </summary>
         Move = 0,
         /// <summary>
@@ -99,7 +99,30 @@ namespace HouseholdAccountBook.Models
         /// <summary>
         /// リスト登録
         /// </summary>
-        ListReg = 2
+        ListReg = 2,
+        /// <summary>
+        /// アセット変換(手数料含む)
+        /// </summary>
+        Exchange = 3,
+    }
+
+    /// <summary>
+    /// 項目種別(移動フラグ)
+    /// </summary>
+    public enum ItemKind
+    {
+        /// <summary>
+        /// 通常(移動含む)
+        /// </summary>
+        Normal = 0,
+        /// <summary>
+        /// 移動(欠番. 旧DBからインポートすると整合性を保てないため)
+        /// </summary>
+        //Move = 1,
+        /// <summary>
+        /// アセット変換
+        /// </summary>
+        Exchange = 2,
     }
     #endregion
 

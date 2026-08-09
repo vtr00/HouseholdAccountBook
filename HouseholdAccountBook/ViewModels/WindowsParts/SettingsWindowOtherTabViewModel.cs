@@ -285,6 +285,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     Size = UserSettingService.Instance.MoveRegistrationWindowSize
                 },
                 new WindowSettingViewModel(){
+                    Title = Properties.Resources.Title_AddExchangeWindow,
+                    Point = UserSettingService.Instance.ExchangeRegistrationWindowPoint,
+                    Size = UserSettingService.Instance.ExchangeRegistrationWindowSize
+                },
+                new WindowSettingViewModel(){
                     Title = Properties.Resources.Title_AddWindow,
                     Point = UserSettingService.Instance.ActionRegistrationWindowPoint,
                     Size = UserSettingService.Instance.ActionRegistrationWindowSize

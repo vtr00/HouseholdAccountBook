@@ -15,6 +15,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
     /// <param name="dbHandler">DBハンドラ</param>
     public class MtdSchemaVersionDao(DbHandlerBase dbHandler) : PhyTableDaoBase<MtdSchemaVersionDto>(dbHandler, "mtd_schema_version")
     {
+        #region マイグレーション
         public override async Task CreateTableAsync()
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
@@ -40,6 +41,7 @@ INSERT INTO mtd_schema_version (version)
 SELECT 0
 WHERE NOT EXISTS (SELECT 1 FROM mtd_schema_version);");
         }
+        #endregion
 
         public override async Task<IEnumerable<MtdSchemaVersionDto>> FindAllAsync()
         {

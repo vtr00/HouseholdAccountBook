@@ -95,6 +95,17 @@ namespace HouseholdAccountBook.Models.AppServices
                 this.mSettings.Save();
             }
         }
+
+        /// <summary>
+        /// デバッグモードか
+        /// </summary>
+        /// <remarks>メニューから変更する</remarks>
+        public bool IsDebug => this.mSettings.App_IsDebug;
+        /// <summary>
+        /// アセット表示モードか
+        /// </summary>
+        /// <remarks>メニューから変更する</remarks>
+        public bool IsAssetDisplayMode => this.mSettings.App_AssetDisplayMode;
         #endregion
 
         #region 初期表示
@@ -364,6 +375,30 @@ namespace HouseholdAccountBook.Models.AppServices
         }
 
         /// <summary>
+        /// 変換登録ウィンドウ位置
+        /// </summary>
+        public Point ExchangeRegistrationWindowPoint {
+            get => new(this.mSettings.ExchangeRegistrationWindow_Left, this.mSettings.ExchangeRegistrationWindow_Top);
+            set {
+                this.mSettings.ExchangeRegistrationWindow_Left = value.X;
+                this.mSettings.ExchangeRegistrationWindow_Top = value.Y;
+                this.mSettings.Save();
+            }
+        }
+
+        /// <summary>
+        /// 変換登録ウィンドウサイズ
+        /// </summary>
+        public (double width, double height) ExchangeRegistrationWindowSize {
+            get => (this.mSettings.ExchangeRegistrationWindow_Width, this.mSettings.ExchangeRegistrationWindow_Height);
+            set {
+                this.mSettings.ExchangeRegistrationWindow_Width = value.width;
+                this.mSettings.ExchangeRegistrationWindow_Height = value.height;
+                this.mSettings.Save();
+            }
+        }
+
+        /// <summary>
         /// 帳簿項目登録ウィンドウ位置
         /// </summary>
         public Point ActionRegistrationWindowPoint {
@@ -541,6 +576,12 @@ namespace HouseholdAccountBook.Models.AppServices
             this.mSettings.MoveRegistrationWindow_Top = -1;
             this.mSettings.MoveRegistrationWindow_Width = -1;
             this.mSettings.MoveRegistrationWindow_Height = -1;
+
+            // 変換
+            this.mSettings.ExchangeRegistrationWindow_Left = -1;
+            this.mSettings.ExchangeRegistrationWindow_Top = -1;
+            this.mSettings.ExchangeRegistrationWindow_Width = -1;
+            this.mSettings.ExchangeRegistrationWindow_Height = -1;
 
             // 追加・変更
             this.mSettings.ActionRegistrationWindow_Left = -1;

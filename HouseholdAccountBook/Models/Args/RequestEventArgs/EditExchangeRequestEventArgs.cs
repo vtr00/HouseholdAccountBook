@@ -1,0 +1,22 @@
+﻿using HouseholdAccountBook.Models.ValueObjects;
+using System;
+using System.Collections.Generic;
+
+namespace HouseholdAccountBook.Models.Args.RequestEventArgs
+{
+    /// <summary>
+    /// 変換編集要求イベント時のイベント引数
+    /// </summary>
+    public class EditExchangeRequestEventArgs : DbRequestEventArgsBase
+    {
+        /// <summary>
+        /// 編集対象の帳簿項目のグループID
+        /// </summary>
+        public GroupIdObj TargetGroupId { get; set; }
+
+        /// <summary>
+        /// 登録完了時イベントハンドラ
+        /// </summary>
+        public EventHandler<EventArgs<IEnumerable<ActionIdObj>>> Registered { get; set; }
+    }
+}

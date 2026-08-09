@@ -127,7 +127,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     _ => throw new InvalidOperationException(),
                 })];
                 return tmpVMList;
-            }, mode: SelectorMode.FirstOrDefault);
+            }, mode: KeySelectionMode.FirstOrDefault);
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null);

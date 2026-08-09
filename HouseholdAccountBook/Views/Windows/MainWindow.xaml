@@ -147,6 +147,8 @@
                 <Separator/>
                 <!-- 移動 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Move}" Command="{Binding AccountTabVM.AddMoveCommand}" InputGestureText="Ctrl+M"/>
+                <!-- 変換 -->
+                <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Exchange}" Command="{Binding AccountTabVM.AddExchangeCommand}" InputGestureText="Ctrl+X"/>
                 <Separator/>
                 <!-- 追加 -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_Edit_Add}" Command="{Binding AccountTabVM.AddActionCommand}" InputGestureText="Ctrl++"/>
@@ -251,6 +253,8 @@
                     </MenuItem>
                 </MenuItem>
                 <Separator/>
+                <!-- アセット表示 -->
+                <MenuItem Header="{x:Static properties:Resources.Menu_View_AssetDisplayMode}" IsCheckable="True" IsChecked="{Binding App_AssetDisplayMode, Source={StaticResource Settings}}"/>
                 <!-- デバッグモード -->
                 <MenuItem Header="{x:Static properties:Resources.Menu_View_DebugMode}" IsCheckable="True" IsChecked="{Binding App_IsDebug, Source={StaticResource Settings}}"/>
                 <Separator/>
@@ -364,10 +368,11 @@
                         </StackPanel>
                             
                         <StackPanel Grid.Column="2" Orientation="Horizontal">
-                            <Button Width="50" Margin="0,0,3,0" Content="{x:Static properties:Resources.Button_Move}" Command="{Binding AccountTabVM.AddMoveCommand}"/>
+                            <Button Width="50" Content="{x:Static properties:Resources.Button_Move}" Command="{Binding AccountTabVM.AddMoveCommand}"/>
+                            <Button Width="50" Margin="0,0,3,0" Content="{x:Static properties:Resources.Button_Exchange}" Command="{Binding AccountTabVM.AddExchangeCommand}"/>
                             <Button Width="50" Content="{x:Static properties:Resources.Button_Add}" Command="{Binding AccountTabVM.AddActionCommand}"/>
                             <Button Width="80" Content="{x:Static properties:Resources.Button_AddList}" Command="{Binding AccountTabVM.AddActionListCommand}"/>
-                            <Button Width="50" Content="{x:Static properties:Resources.Button_Copy}" Command="{Binding AccountTabVM.CopyCommand}"/>
+                            <Button Width="50" Margin="3,0,0,0" Content="{x:Static properties:Resources.Button_Copy}" Command="{Binding AccountTabVM.CopyCommand}"/>
                             <Button Width="50" Margin="3,0,0,0" Content="{x:Static properties:Resources.Button_Edit}" Command="{Binding AccountTabVM.EditCommand}"/>
                             <Button Width="50" Margin="3,0,0,0" Content="{x:Static properties:Resources.Button_Delete}" Command="{Binding AccountTabVM.DeleteCommand}"/>
                             <CheckBox Margin="3,3,0,3" ToolTip="{x:Static properties:Resources.ToolTip_CheckIsMatch}" VerticalAlignment="Center"
@@ -400,6 +405,7 @@
                                 </DataGrid.Resources>
                                 <DataGrid.InputBindings>
                                     <KeyBinding Gesture="Ctrl+M" Command="{Binding AddMoveCommand}"/>
+                                    <KeyBinding Gesture="Ctrl+X" Command="{Binding AddExchangeCommand}"/>
                                     <KeyBinding Gesture="Ctrl+OEMPlus" Command="{Binding AddActionCommand}"/>
                                     <KeyBinding Gesture="Ctrl+Add" Command="{Binding AddActionCommand}"/>
                                     <KeyBinding Gesture="Shift+Ctrl+OEMPlus" Command="{Binding AddActionListCommand}"/>

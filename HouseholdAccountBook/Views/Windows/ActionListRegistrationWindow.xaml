@@ -10,7 +10,7 @@
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Views.Behaviors"
         xmlns:controls="clr-namespace:HouseholdAccountBook.Views.UserControls"
         mc:Ignorable="d"
-        Width="350" Height="Auto" ShowInTaskbar="False" WindowStyle="ToolWindow">
+        Height="Auto" Width="350" ShowInTaskbar="False" WindowStyle="ToolWindow">
     <Window.DataContext>
         <vmw:ActionListRegistrationWindowViewModel x:Name="WVM"/>
     </Window.DataContext>
@@ -59,6 +59,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="0.25*"/>
                 <RowDefinition Height="0.25*"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="0.5*"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -108,10 +109,10 @@
             </ListBox>
 
             <!-- 日付/金額 -->
-            <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <TextBlock Text="{x:Static properties:Resources.TextBlock_Date}"/>/<TextBlock Text="{x:Static properties:Resources.TextBlock_AmountOfMoney}"/>
             </TextBlock>
-            <DataGrid Grid.Row="5" Grid.Column="1" Margin="5"
+            <DataGrid Grid.Row="6" Grid.Column="1" Margin="5"
                       ItemsSource="{Binding InputedDateValueVMList}" 
                       CanUserAddRows="True" CanUserDeleteRows="True" CanUserResizeRows="False" SelectionMode="Single"
                       AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
@@ -163,23 +164,34 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>
                     </controls:DataGridEditableTemplateColumn>
+
+                    <!-- アセット -->
+                    <DataGridTemplateColumn Header="{x:Static properties:Resources.TextBlock_Asset}" Width="*"
+                                            Visibility="{Binding App_AssetDisplayMode, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox IsEnabled="False"
+                                          ItemsSource="{Binding AssetSelectorVM.ItemList}" SelectedItem="{Binding AssetSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
 
             <!-- 日付の自動インクリメント -->
-            <CheckBox Grid.Row="6" Grid.Column="2" Margin="5" IsChecked="{Binding IsDateAutoIncrement}" 
+            <CheckBox Grid.Row="7" Grid.Column="2" Margin="5" IsChecked="{Binding IsDateAutoIncrement}" 
                       Content="{x:Static properties:Resources.CheckBox_DateAutoIncrement}"/>
 
             <!-- 店名 -->
-            <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
+            <TextBlock Grid.Row="8" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_ShopName}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="7" Grid.Column="1" Margin="5" IsEditable="True"
+            <ComboBox Grid.Row="8" Grid.Column="1" Margin="5" IsEditable="True"
                       ItemsSource="{Binding ShopSelectorVM.ItemList}" Text="{Binding ShopSelectorVM.SelectedKey, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
 
             <!-- 備考 -->
-            <TextBlock Grid.Row="8" Grid.Column="0" Margin="5" 
+            <TextBlock Grid.Row="9" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Remark}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ComboBox Grid.Row="8" Grid.Column="1" Margin="5" IsEditable="True"
+            <ComboBox Grid.Row="9" Grid.Column="1" Margin="5" IsEditable="True"
                       ItemsSource="{Binding RemarkSelectorVM.ItemList}" Text="{Binding RemarkSelectorVM.SelectedKey, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
 
             <!-- 数値入力ポップアップ -->

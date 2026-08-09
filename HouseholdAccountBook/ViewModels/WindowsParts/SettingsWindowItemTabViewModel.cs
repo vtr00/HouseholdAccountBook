@@ -293,20 +293,30 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private async Task SaveItemInfoCommand_ExecuteAsync()
         {
             ItemSettingViewModel vm = this.DisplayedItemSettingVM;
+
+            bool result = false;
             switch (vm.Kind) {
                 case HierarchicalKind.Category: {
-                    await this.mSettingService.SaveCategoryAsync(new(vm.Id.Id, vm.InputedName));
+                    result = await this.mSettingService.SaveCategoryAsync(new(vm.Id.Id, vm.InputedName));
                 }
                 break;
                 case HierarchicalKind.Item: {
-                    await this.mSettingService.SaveItemAsync(new(vm.Id.Id, vm.InputedName));
+                    result = await this.mSettingService.SaveItemAsync(new(vm.Id.Id, vm.InputedName) {
+                        AssetId = vm.AssetSelectorVM.SelectedKey,
+                        ItemKind = vm.ItemKindSelectorVM.SelectedKey
+                    }, vm.ItemKindSelectorVM.InitialSelectedKey != vm.ItemKindSelectorVM.SelectedKey);
                 }
                 break;
             }
 
-            await this.LoadAsync(vm.Kind, vm.Id);
-            _ = MessageBox.Show(Properties.Resources.Message_CompletedToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
-            this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
+            if (result) {
+                await this.LoadAsync(vm.Kind, vm.Id);
+                _ = MessageBox.Show(Properties.Resources.Message_CompletedToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
+                this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
+            }
+            else {
+                _ = MessageBox.Show(Properties.Resources.Message_CantChangeItemKindBecauseActionItemExistsInItem, Properties.Resources.Title_Error);
+            }
         }
 
         /// <summary>
