@@ -59,8 +59,9 @@ namespace HouseholdAccountBook.Models.AppServices
                     int groupKind = groupDto.GroupKind;
 
                     switch (groupKind) {
-                        case (int)GroupKind.Move: {
-                            // 移動の場合、削除項目と同じグループIDを持つ帳簿項目を削除する
+                        case (int)GroupKind.Move:
+                        case (int)GroupKind.Exchange: {
+                            // 移動/変換の場合、削除項目と同じグループIDを持つ帳簿項目を削除する
                             _ = await hstActionDao.DeleteByGroupIdAsync((int)groupId);
                         }
                         break;

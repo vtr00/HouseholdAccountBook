@@ -3,6 +3,7 @@ using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
 using HouseholdAccountBook.ViewModels.Component;
+using System.Collections.Generic;
 
 namespace HouseholdAccountBook.ViewModels.Settings
 {
@@ -34,6 +35,16 @@ namespace HouseholdAccountBook.ViewModels.Settings
             get;
             set => this.SetProperty(ref field, value);
         }
+
+        /// <summary>
+        /// アセットセレクタVM
+        /// </summary>
+        public SelectorViewModel<AssetModel, AssetIdObj> AssetSelectorVM => field ??= new(static vm => vm?.Id);
+
+        /// <summary>
+        /// 項目種別セレクタVM
+        /// </summary>
+        public SelectorViewModel<KeyValuePair<ItemKind, string>, ItemKind> ItemKindSelectorVM => field ??= new(static p => p.Key);
 
         /// <summary>
         /// 関連性セレクタVM

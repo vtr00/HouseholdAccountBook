@@ -235,10 +235,16 @@
   <data name="HolidaySettingKind_AfterHoliday" xml:space="preserve">
     <value>After holidays</value>
   </data>
-  <data name="FeeKind_Source" xml:space="preserve">
+  <data name="MoveFeeKind_MoveSource" xml:space="preserve">
     <value>Source</value>
   </data>
-  <data name="FeeKind_Destination" xml:space="preserve">
+  <data name="ExchangeFeeKind_ExchangeSource" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="MoveFeeKind_MoveDestination" xml:space="preserve">
+    <value>Destination</value>
+  </data>
+  <data name="ExchangeFeeKind_ExchangeDestination" xml:space="preserve">
     <value>Destination</value>
   </data>
   <data name="GraphKind1_IncomeAndExpensesGraph" xml:space="preserve">
@@ -541,6 +547,9 @@
   <data name="Menu_Edit_Move" xml:space="preserve">
     <value>Move (_M)...</value>
   </data>
+  <data name="Menu_Edit_Exchange" xml:space="preserve">
+    <value>Exchange (_X)...</value>
+  </data>
   <data name="Menu_Edit_Add" xml:space="preserve">
     <value>Add (_A)...</value>
   </data>
@@ -776,6 +785,9 @@ list</value>
   <data name="Title_AddMoveWindow" xml:space="preserve">
     <value>Add move</value>
   </data>
+  <data name="Title_AddExchangeWindow" xml:space="preserve">
+    <value>Add exchange</value>
+  </data>
   <data name="Title_EditWindow" xml:space="preserve">
     <value>Edit</value>
   </data>
@@ -784,6 +796,9 @@ list</value>
   </data>
   <data name="Title_EditMoveWindow" xml:space="preserve">
     <value>Edit move</value>
+  </data>
+  <data name="Title_EditExchangeWindow" xml:space="preserve">
+    <value>Edit exchange</value>
   </data>
   <data name="Title_PeriodSelectionWindow" xml:space="preserve">
     <value>Select period</value>
@@ -965,10 +980,16 @@ list</value>
   <data name="TextBlock_Expenses" xml:space="preserve">
     <value>Expenses</value>
   </data>
-  <data name="TextBlock_Source" xml:space="preserve">
+  <data name="TextBlock_MoveSource" xml:space="preserve">
     <value>Source</value>
   </data>
-  <data name="TextBlock_Destination" xml:space="preserve">
+  <data name="TextBlock_ExchangeSource" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="TextBlock_MoveDestination" xml:space="preserve">
+    <value>Destination</value>
+  </data>
+  <data name="TextBlock_ExchangeDestination" xml:space="preserve">
     <value>Destination</value>
   </data>
   <data name="TextBlock_StartDate" xml:space="preserve">
@@ -1204,5 +1225,23 @@ list</value>
   </data>
   <data name="AssetKind_Other" xml:space="preserve">
     <value>Other</value>
+  </data>
+  <data name="Button_Exchange" xml:space="preserve">
+    <value>Exchange</value>
+  </data>
+  <data name="ItemKind_Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="ItemKind_Exchange" xml:space="preserve">
+    <value>Exchange</value>
+  </data>
+  <data name="TextBlock_ItemKind" xml:space="preserve">
+    <value>Item kind</value>
+  </data>
+  <data name="Message_CantChangeItemKindBecauseActionItemExistsInItem" xml:space="preserve">
+    <value>Cannot change item kind because account items exist in the item.</value>
+  </data>
+  <data name="Menu_View_AssetDisplayMode" xml:space="preserve">
+    <value>Asset display mode (_A)</value>
   </data>
 </root>

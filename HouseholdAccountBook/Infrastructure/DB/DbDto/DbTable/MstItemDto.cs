@@ -23,7 +23,9 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable
 
             this.ItemId = dto.ITEM_ID;
             this.ItemName = dto.ITEM_NAME;
+            this.ItemKind = 0;
             this.CategoryId = dto.CATEGORY_ID;
+            this.AssetId = null;
             this.MoveFlg = dto.MOVE_FLG ? 1 : 0;
             this.AdvanceFlg = 0;
         }
@@ -39,9 +41,17 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.DbTable
         /// </summary>
         public string ItemName { get; set; } = "(no name)";
         /// <summary>
+        /// 項目種別
+        /// </summary>
+        public int ItemKind { get; set; }
+        /// <summary>
         /// 分類ID
         /// </summary>
         public int CategoryId { get; set; }
+        /// <summary>
+        /// アセットID
+        /// </summary>
+        public int? AssetId { get; set; }
         /// <summary>
         /// 立替フラグ(未使用)
         /// </summary>

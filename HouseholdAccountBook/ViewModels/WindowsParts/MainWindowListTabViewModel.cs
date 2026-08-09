@@ -59,14 +59,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             base.Initialize(dbHandlerFactory);
 
-            this.SeriesSelectorVM.SetLoader(async _ => {
+            this.SeriesSelectorVM.SetLoader(async () => {
                 SeriesViewModelLoader loader = new(new(this.mDbHandlerFactory));
                 return this.Tab switch {
                     Tabs.MonthlyListTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
                     Tabs.YearlyListTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
                     _ => throw new NotImplementedException(),
                 };
-            }, mode: SelectorMode.FirstOrDefault);
+            }, mode: KeySelectionMode.FirstOrDefault);
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null);

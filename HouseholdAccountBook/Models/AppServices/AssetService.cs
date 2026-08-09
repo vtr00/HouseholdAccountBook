@@ -13,11 +13,6 @@ namespace HouseholdAccountBook.Models.AppServices
     public class AssetService : SingletonBase<AssetService>
     {
         /// <summary>
-        /// アセットリスト
-        /// </summary>
-        private IEnumerable<AssetModel> mAssets = [];
-
-        /// <summary>
         /// スタティックコンストラクタ
         /// </summary>
         static AssetService() => Register(static () => new AssetService());
@@ -25,6 +20,15 @@ namespace HouseholdAccountBook.Models.AppServices
         /// プライベートコンストラクタ
         /// </summary>
         private AssetService() { }
+
+        /// <summary>
+        /// アセットリスト
+        /// </summary>
+        public IEnumerable<AssetModel> Assets { get; private set; } = [];
+        /// <summary>
+        /// デフォルトアセットID
+        /// </summary>
+        public static AssetIdObj DefaultAssetId => UserSettingService.Instance.DefaultAssetId;
 
         /// <summary>
         /// アセットリストを更新する
@@ -35,20 +39,20 @@ namespace HouseholdAccountBook.Models.AppServices
             using FuncLog funcLog = new();
 
             AppCommonService service = new(dbHandlerFactory);
-            this.mAssets = await service.LoadAssetListAsync();
+            this.Assets = await service.LoadAssetListAsync();
         }
 
         /// <summary>
         /// デフォルトアセットモデルを取得する
         /// </summary>
         /// <returns>デフォルトアセットモデル</returns>
-        public AssetModel GetDefaultAssetModel() => this.mAssets.FirstOrDefault(asset => asset.Id == UserSettingService.Instance.DefaultAssetId);
+        public AssetModel GetDefaultAssetModel() => this.Assets.FirstOrDefault(asset => asset.Id == DefaultAssetId);
         /// <summary>
         /// アセットモデルを取得する
         /// </summary>
         /// <param name="assetId">アセットID</param>
         /// <returns>指定されたアセットIDのアセットモデル</returns>
-        public AssetModel GetAssetModel(AssetIdObj assetId) => this.mAssets.FirstOrDefault(asset => asset.Id == assetId, this.GetDefaultAssetModel());
+        public AssetModel GetAssetModel(AssetIdObj assetId) => this.Assets.FirstOrDefault(asset => asset.Id == assetId, this.GetDefaultAssetModel());
 
         /// <summary>
         /// 金額を文字列表現に変換する
@@ -128,7 +132,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns>変換先の金額VO</returns>
         public AmountObj Convert(AmountObj src, AssetIdObj dstAssetId = null)
         {
-            dstAssetId ??= UserSettingService.Instance.DefaultAssetId;
+            dstAssetId ??= DefaultAssetId;
 
             AssetModel srcAsset = this.GetAssetModel(src.AssetId);
             AssetModel dstAsset = this.GetAssetModel(dstAssetId);

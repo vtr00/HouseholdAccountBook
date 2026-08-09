@@ -57,6 +57,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public event EventHandler<AddMoveRequestEventArgs> AddMoveRequested;
         /// <summary>
+        /// 変換追加要求時イベント
+        /// </summary>
+        public event EventHandler<AddExchangeRequestEventArgs> AddExchangeRequested;
+        /// <summary>
         /// 帳簿項目追加要求時イベント
         /// </summary>
         public event EventHandler<AddActionRequestEventArgs> AddActionRequested;
@@ -69,6 +73,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public event EventHandler<CopyMoveRequestEventArgs> CopyMoveRequested;
         /// <summary>
+        /// 変換複製要求時イベント
+        /// </summary>
+        public event EventHandler<CopyExchangeRequestEventArgs> CopyExchangeRequested;
+        /// <summary>
         /// 帳簿項目複製要求時イベント
         /// </summary>
         public event EventHandler<CopyActionRequestEventArgs> CopyActionRequested;
@@ -76,6 +84,10 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// 移動編集要求時イベント
         /// </summary>
         public event EventHandler<EditMoveRequestEventArgs> EditMoveRequested;
+        /// <summary>
+        /// 変換編集要求時イベント
+        /// </summary>
+        public event EventHandler<EditExchangeRequestEventArgs> EditExchangeRequested;
         /// <summary>
         /// 帳簿項目編集要求時イベント
         /// </summary>
@@ -332,6 +344,28 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
+        /// 変換追加コマンド
+        /// </summary>
+        /// <remarks>帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない</remarks>
+        public ICommand AddExchangeCommand => field ??= new RelayCommand(
+            this.AddExchangeCommand_Execute,
+            () => this.Parent.SelectedTab == Tabs.AccountTab && this.Parent.AccountSelectorVM.SelectedItem != null && !this.Parent.IsChildrenWindowOpened());
+        /// <summary>
+        /// 変換追加コマンド処理
+        /// </summary>
+        private void AddExchangeCommand_Execute()
+        {
+            AddExchangeRequestEventArgs e = new() {
+                DbHandlerFactory = this.mDbHandlerFactory,
+                InitialAccountId = this.Parent.AccountSelectorVM?.SelectedKey,
+                InitialMonth = this.Parent.DisplayedPeriodKind == PeriodKind.Monthly ? this.Parent.DisplayedMonth : null,
+                InitialDate = this.ActionSelectorVM.SelectedItem is null ? null : DateOnly.FromDateTime(this.ActionSelectorVM.SelectedItem.ActTime),
+                Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
+            };
+            this.AddExchangeRequested?.Invoke(this, e);
+        }
+
+        /// <summary>
         /// 帳簿項目追加コマンド
         /// </summary>
         /// <remarks>帳簿タブを選択 かつ 選択されている帳簿が存在 かつ 子ウィンドウが開いていない</remarks>
@@ -392,18 +426,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             GroupKind kind = await this.mAppService.LoadGroupKindAsync(this.ActionSelectorVM.SelectedKey);
 
             switch (kind) {
-                case GroupKind.NotInOne:
-                case GroupKind.Repeat:
-                case GroupKind.ListReg: {
-                    // 移動以外の帳簿項目の複製時の処理
-                    CopyActionRequestEventArgs e = new() {
-                        DbHandlerFactory = this.mDbHandlerFactory,
-                        TargetActionId = this.ActionSelectorVM.SelectedKey,
-                        Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
-                    };
-                    this.CopyActionRequested?.Invoke(this, e);
-                    break;
-                }
                 case GroupKind.Move: {
                     // 移動の複製時の処理
                     CopyMoveRequestEventArgs e = new() {
@@ -412,6 +434,28 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
                     };
                     this.CopyMoveRequested?.Invoke(this, e);
+                    break;
+                }
+                case GroupKind.Exchange: {
+                    // 変換の複製時の処理
+                    CopyExchangeRequestEventArgs e = new() {
+                        DbHandlerFactory = this.mDbHandlerFactory,
+                        TargetGroupId = this.ActionSelectorVM.SelectedItem.GroupId,
+                        Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
+                    };
+                    this.CopyExchangeRequested?.Invoke(this, e);
+                    break;
+                }
+                case GroupKind.NotInOne:
+                case GroupKind.Repeat:
+                case GroupKind.ListReg: {
+                    // 移動/変換以外の帳簿項目の複製時の処理
+                    CopyActionRequestEventArgs e = new() {
+                        DbHandlerFactory = this.mDbHandlerFactory,
+                        TargetActionId = this.ActionSelectorVM.SelectedKey,
+                        Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
+                    };
+                    this.CopyActionRequested?.Invoke(this, e);
                     break;
                 }
                 default:
@@ -444,6 +488,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                         Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
                     };
                     this.EditMoveRequested?.Invoke(this, e);
+                    break;
+                }
+                case GroupKind.Exchange: {
+                    // 変換の編集時の処理
+                    EditExchangeRequestEventArgs e = new() {
+                        DbHandlerFactory = this.mDbHandlerFactory,
+                        TargetGroupId = this.ActionSelectorVM.SelectedItem.GroupId,
+                        Registered = async (sender, e) => await this.LoadAsync(e.Value, isUpdateActDateLastEdited: true) // 帳簿一覧タブを更新する
+                    };
+                    this.EditExchangeRequested?.Invoke(this, e);
                     break;
                 }
                 case GroupKind.ListReg: {
@@ -596,12 +650,12 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 PeriodKind.Monthly => (await this.mMainService.LoadActionListAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value)).Select(tmp => new ActionViewModel(tmp)),
                 PeriodKind.Selected => (await this.mMainService.LoadActionListAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedPeriod)).Select(tmp => new ActionViewModel(tmp)),
                 _ => null
-            }, mode: SelectorMode.FirstOrDefault);
+            }, mode: KeySelectionMode.FirstOrDefault);
             this.SummarySelectorVM.SetLoader(async () => this.Parent.DisplayedPeriodKind switch {
                 PeriodKind.Monthly => await this.mMainService.LoadSummaryListAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value),
                 PeriodKind.Selected => await this.mMainService.LoadSummaryListAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedPeriod),
                 _ => null
-            }, mode: SelectorMode.FirstOrDefault);
+            }, mode: KeySelectionMode.FirstOrDefault);
 
             this.FilteredActionVMList.Filter = this.ActionVMListFilter;
         }

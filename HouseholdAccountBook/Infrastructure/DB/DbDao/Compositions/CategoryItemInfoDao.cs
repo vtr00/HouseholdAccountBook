@@ -25,10 +25,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
             using FuncLog funcLog = new(new { bookId, balanceKind }, Log.LogLevel.Trace);
 
             IEnumerable<CategoryItemInfoDto> dtoList = await this.mDbHandler.QueryAsync<CategoryItemInfoDto>(@"
-SELECT I.item_id, I.item_name, C.category_name
+SELECT I.item_id, I.item_name, I.asset_id, I.item_kind, C.category_name
 FROM mst_item I
 INNER JOIN mst_category C ON C.category_id = I.category_id AND C.del_flg = 0
-WHERE I.del_flg = 0 AND C.balance_kind = @BalanceKind AND
+WHERE I.del_flg = 0 AND C.balance_kind = @BalanceKind AND I.item_kind = 0 AND -- 項目種別:通常のみ
       EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @BookId AND RBI.item_id = I.item_id AND del_flg = 0)
 ORDER BY C.sort_order, I.sort_order;",
 new { BalanceKind = balanceKind, BookId = bookId });
@@ -47,13 +47,34 @@ new { BalanceKind = balanceKind, BookId = bookId });
             using FuncLog funcLog = new(new { bookId, categoryId }, Log.LogLevel.Trace);
 
             IEnumerable<CategoryItemInfoDto> dtoList = await this.mDbHandler.QueryAsync<CategoryItemInfoDto>(@"
-SELECT I.item_id, I.item_name, C.category_name
+SELECT I.item_id, I.item_name, I.asset_id, I.item_kind, C.category_name
 FROM mst_item I
 INNER JOIN mst_category C ON C.category_id = I.category_id AND C.del_flg = 0
-WHERE I.del_flg = 0 AND C.category_id = @CategoryId AND
+WHERE I.del_flg = 0 AND C.category_id = @CategoryId AND I.item_kind = 0 AND -- 項目種別:通常のみ
       EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @BookId AND RBI.item_id = I.item_id AND del_flg = 0)
 ORDER BY I.sort_order;",
 new { CategoryId = categoryId, BookId = bookId });
+
+            return dtoList;
+        }
+        /// <summary>
+        /// <see cref="MstBookDto.BookId"/> と <see cref="MstCategoryDto.BalanceKind"/> に基づいて、変換用 <see cref="CategoryItemInfoDto"/> リストを取得する
+        /// </summary>
+        /// <param name="bookId">帳簿ID</param>
+        /// <param name="balanceKind">帳簿種別</param>
+        /// <returns>取得したレコードリスト</returns>
+        public async Task<IEnumerable<CategoryItemInfoDto>> FindExchangeItemAsync(int bookId, int balanceKind)
+        {
+            using FuncLog funcLog = new(new { bookId, balanceKind }, Log.LogLevel.Trace);
+
+            IEnumerable<CategoryItemInfoDto> dtoList = await this.mDbHandler.QueryAsync<CategoryItemInfoDto>(@"
+SELECT I.item_id, I.item_name, I.asset_id, I.item_kind, C.category_name
+FROM mst_item I
+INNER JOIN mst_category C ON C.category_id = I.category_id AND C.del_flg = 0
+WHERE I.del_flg = 0 AND C.balance_kind = @BalanceKind AND I.item_kind = 2 AND -- 項目種別:変換のみ
+      EXISTS (SELECT * FROM rel_book_item RBI WHERE book_id = @BookId AND RBI.item_id = I.item_id AND del_flg = 0)
+ORDER BY C.sort_order, I.sort_order;",
+new { BalanceKind = balanceKind, BookId = bookId });
 
             return dtoList;
         }

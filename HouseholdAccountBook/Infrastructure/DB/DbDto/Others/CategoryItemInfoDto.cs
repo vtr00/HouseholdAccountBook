@@ -21,6 +21,15 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Others
         /// </summary>
         public string ItemName { get; set; } = string.Empty;
         /// <summary>
+        /// アセットID
+        /// </summary>
+        public int? AssetId { get; set; } = null;
+        /// <summary>
+        /// 項目種別
+        /// </summary>
+        public int ItemKind { get; set; } = 0;
+
+        /// <summary>
         /// 分類名
         /// </summary>
         public string CategoryName { get; set; } = string.Empty;

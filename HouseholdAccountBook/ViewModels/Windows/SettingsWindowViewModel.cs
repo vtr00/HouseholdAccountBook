@@ -113,6 +113,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
+            if (!UserSettingService.Instance.IsAssetDisplayMode && this.SelectedTab == SettingsTabs.AssetSettingsTab) {
+                this.SelectedTab = SettingsTabs.AccountSettingsTab;
+            }
+
             switch (this.SelectedTab) {
                 case SettingsTabs.AssetSettingsTab:
                     await this.AssetTabVM.LoadAsync();

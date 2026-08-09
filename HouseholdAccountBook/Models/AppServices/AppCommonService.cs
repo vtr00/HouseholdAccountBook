@@ -36,7 +36,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns>アセットModelリスト</returns>
         public async Task<IEnumerable<AssetModel>> LoadAssetListAsync(string initialName = "")
         {
-            using FuncLog funcLog = new(new { });
+            using FuncLog funcLog = new(new { initialName });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             AssetIdObj defaultAssetId = UserSettingService.Instance.DefaultAssetId;
@@ -137,7 +137,7 @@ namespace HouseholdAccountBook.Models.AppServices
         }
 
         /// <summary>
-        /// 項目Modelリストを取得する
+        /// 通常項目Modelリストを取得する(変換用を除く)
         /// </summary>
         /// <param name="accountId">絞り込み対象の帳簿ID</param>
         /// <param name="balanceKind">絞り込み対象の収支種別</param>
@@ -156,7 +156,36 @@ namespace HouseholdAccountBook.Models.AppServices
                 : await categoryItemInfoDao.FindByBookIdAndCategoryIdAsync((int)accountId, (int)categoryId);
             foreach (CategoryItemInfoDto dto in dtoList) {
                 ItemModel vm = new(dto.ItemId, dto.ItemName) {
+                    AssetId = dto.AssetId,
+                    ItemKind = EnumUtil.SafeCastEnum(dto.ItemKind, ItemKind.Normal),
                     CategoryName = categoryId == CategoryIdObj.System ? dto.CategoryName : string.Empty
+                };
+                imList.Add(vm);
+            }
+
+            return imList;
+        }
+
+        /// <summary>
+        /// 変換用項目Modelリストを取得する
+        /// </summary>
+        /// <param name="accountId">絞り込み対象の帳簿ID</param>
+        /// <param name="balanceKind">絞り込み対象の収支種別</param>
+        /// <returns>項目Modelリスト</returns>
+        public async Task<IEnumerable<ItemModel>> LoadExchangeItemListAsync(AccountIdObj accountId, BalanceKind balanceKind)
+        {
+            using FuncLog funcLog = new(new { accountId, balanceKind });
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
+
+            List<ItemModel> imList = [];
+
+            CategoryItemInfoDao categoryItemInfoDao = new(dbHandler);
+            IEnumerable<CategoryItemInfoDto> dtoList = await categoryItemInfoDao.FindExchangeItemAsync((int)accountId, (int)balanceKind);
+            foreach (CategoryItemInfoDto dto in dtoList) {
+                ItemModel vm = new(dto.ItemId, dto.ItemName) {
+                    AssetId = dto.AssetId,
+                    ItemKind = EnumUtil.SafeCastEnum(dto.ItemKind, ItemKind.Normal),
+                    CategoryName = dto.CategoryName
                 };
                 imList.Add(vm);
             }

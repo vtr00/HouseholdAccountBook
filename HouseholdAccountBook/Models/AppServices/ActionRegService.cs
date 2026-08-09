@@ -458,12 +458,12 @@ namespace HouseholdAccountBook.Models.AppServices
             MoveActionInfoDao moveActionInfoDao = new(dbHandler);
             // 移動元、移動先、手数料の順に並び替え
             IEnumerable<MoveActionInfoDto> dtoList = await moveActionInfoDao.GetAllAsync((int)UserSettingService.Instance.DefaultAssetId, (int)groupId);
-            dtoList = dtoList.OrderBy(dto => dto.MainActValue).OrderBy(dto => -dto.MoveFlg);
+            dtoList = dtoList.OrderByDescending(dto => dto.MoveFlg).ThenBy(dto => dto.MainActValue);
 
             List<ActionModel> actionList = [];
             foreach (MoveActionInfoDto dto in dtoList) {
                 ActionModel action = new() {
-                    Base = new(dto.ActionId, dto.ActTime, new(dto.MainActValue, dto.ActAssetId)),
+                    Base = new(dto.ActionId, dto.ActTime, new(dto.OrgMainActValue, dto.OrgActAssetId)),
                     AssetId = dto.AssetId ?? AssetIdObj.System,
                     GroupId = groupId,
                     Account = new(dto.BookId, string.Empty),
@@ -474,9 +474,9 @@ namespace HouseholdAccountBook.Models.AppServices
                 };
                 actionList.Add(action);
             }
-            ActionModel srcAction = actionList[0];
-            ActionModel dstAction = actionList[1];
-            ActionModel feeAction = actionList.ElementAtOrDefault(2);
+            ActionModel srcAction = actionList[0]; // 移動元
+            ActionModel dstAction = actionList[1]; // 移動先
+            ActionModel feeAction = actionList.ElementAtOrDefault(2); // 手数料
 
             return (srcAction, dstAction, feeAction);
         }
@@ -544,6 +544,169 @@ namespace HouseholdAccountBook.Models.AppServices
                     // 移動先
                     _ = await hstActionDao.UpdateMoveActionAsync(new HstActionDto {
                         BookId = (int)dstAction.Account.Id,
+                        ActTime = dstAction.ActTime,
+                        ActValue = dstAction.Amount.SubValue,
+                        AssetId = null, // TODO: 将来の拡張用
+                        ActionId = (int)dstAction.ActionId
+                    });
+                    resActionIdList.Add(dstAction.ActionId);
+                    #endregion
+                }
+
+                if (feeAction.Amount.MainValue != 0) {
+                    #region 手数料あり
+                    if (feeAction.ActionId is null) {
+                        // 手数料が未登録のとき追加する
+                        HstActionDao hstActionDao = new(dbHandler);
+                        ActionIdObj feeActionId = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
+                            BookId = (int)feeAction.Account.Id,
+                            ItemId = (int)feeAction.Item.Id,
+                            ActTime = feeAction.ActTime,
+                            ActValue = feeAction.Amount.SubValue,
+                            AssetId = null, // TODO: 将来の拡張用
+                            Remark = feeAction.Remark,
+                            GroupId = (int?)assignedGroupId
+                        });
+                        resActionIdList.Add(feeActionId);
+
+                        await hstActionDao.AnalizeAsync();
+                    }
+                    else {
+                        // 手数料が登録済のとき更新する
+                        HstActionDao hstActionDao = new(dbHandler);
+                        _ = await hstActionDao.UpdateAsync(new HstActionDto {
+                            BookId = (int)feeAction.Account.Id,
+                            ItemId = (int)feeAction.Item.Id,
+                            ActTime = feeAction.ActTime,
+                            ActValue = feeAction.Amount.SubValue,
+                            AssetId = null, // TODO: 将来の拡張用
+                            Remark = feeAction.Remark,
+                            GroupId = (int?)assignedGroupId,
+                            ActionId = (int)feeAction.ActionId
+                        });
+                        resActionIdList.Add(feeAction.ActionId);
+                    }
+                    #endregion
+                }
+                else {
+                    #region 手数料なし
+                    if (feeAction.ActionId is not null) {
+                        HstActionDao hstActionDao = new(dbHandler);
+                        _ = await hstActionDao.DeleteByIdAsync((int)feeAction.ActionId);
+                    }
+                    #endregion
+                }
+            });
+
+            return resActionIdList;
+        }
+        #endregion
+
+        #region 変換
+        /// <summary>
+        /// 変換帳簿項目Modelを取得する
+        /// </summary>
+        /// <param name="groupId">グループID</param>
+        /// <returns>変換元, 変換先, 手数料 帳簿項目Model</returns>
+        public async Task<(ActionModel, ActionModel, ActionModel)> LoadExchangeActionsAsync(GroupIdObj groupId)
+        {
+            using FuncLog funcLog = new(new { groupId });
+
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
+
+            MoveActionInfoDao moveActionInfoDao = new(dbHandler);
+            // 変換元、変換先、手数料の順に並び替え
+            IEnumerable<MoveActionInfoDto> dtoList = await moveActionInfoDao.GetAllAsync((int)UserSettingService.Instance.DefaultAssetId, (int)groupId);
+            dtoList = dtoList.OrderByDescending(dto => dto.ItemKind).ThenBy(dto => dto.MainActValue);
+
+            List<ActionModel> actionList = [];
+            foreach (MoveActionInfoDto dto in dtoList) {
+                ActionModel action = new() {
+                    Base = new(dto.ActionId, dto.ActTime, new(dto.OrgMainActValue, dto.OrgActAssetId)),
+                    AssetId = dto.AssetId ?? AssetIdObj.System,
+                    GroupId = groupId,
+                    Account = new(dto.BookId, string.Empty),
+                    Category = null,
+                    Item = new(dto.ItemId, string.Empty),
+                    Shop = null,
+                    Remark = new(dto.Remark)
+                };
+                actionList.Add(action);
+            }
+            ActionModel srcAction = actionList[0]; // 変換元
+            ActionModel dstAction = actionList[1]; // 変換先
+            ActionModel feeAction = actionList.ElementAtOrDefault(2); // 手数料
+
+            return (srcAction, dstAction, feeAction);
+        }
+
+        /// <summary>
+        /// 変換帳簿項目Modelを保存する
+        /// </summary>
+        /// <param name="srcAction">変換元帳簿項目Model</param>
+        /// <param name="dstAction">変換先帳簿項目Model</param>
+        /// <param name="feeAction">手数料帳簿項目Model</param>
+        /// <returns>対象の帳簿項目ID</returns>
+        public async Task<IEnumerable<ActionIdObj>> SaveExchangeActionsAsync(ActionModel srcAction, ActionModel dstAction, ActionModel feeAction)
+        {
+            using FuncLog funcLog = new(new { srcAction, dstAction, feeAction });
+            await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
+
+            List<ActionIdObj> resActionIdList = [];
+            await dbHandler.ExecTransactionAsync(async () => {
+                GroupIdObj assignedGroupId = srcAction.GroupId;
+
+                if (srcAction.ActionId is null) {
+                    #region 帳簿項目を追加する
+                    // グループIDを追加する
+                    HstGroupDao hstGroupDao = new(dbHandler);
+                    assignedGroupId = await hstGroupDao.InsertReturningIdAsync(new HstGroupDto { GroupKind = (int)GroupKind.Exchange });
+
+                    // 変換元
+                    HstActionDao hstActionDao = new(dbHandler);
+                    ActionIdObj srcActionId = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
+                        BookId = (int)srcAction.Account.Id,
+                        ItemId = (int)srcAction.Item.Id,
+                        ActTime = srcAction.ActTime,
+                        ActValue = srcAction.Amount.SubValue,
+                        AssetId = null, // TODO: 将来の拡張用
+                        GroupId = (int?)assignedGroupId
+                    });
+                    resActionIdList.Add(srcActionId);
+
+                    // 変換先
+                    ActionIdObj dstActionId = await hstActionDao.InsertReturningIdAsync(new HstActionDto {
+                        BookId = (int)dstAction.Account.Id,
+                        ItemId = (int)dstAction.Item.Id,
+                        ActTime = dstAction.ActTime,
+                        ActValue = dstAction.Amount.SubValue,
+                        AssetId = null, // TODO: 将来の拡張用
+                        GroupId = (int?)assignedGroupId
+                    });
+                    resActionIdList.Add(dstActionId);
+
+                    await hstGroupDao.AnalizeAsync();
+                    await hstActionDao.AnalizeAsync();
+                    #endregion
+                }
+                else {
+                    #region 帳簿項目を変更する
+                    // 変換元
+                    HstActionDao hstActionDao = new(dbHandler);
+                    _ = await hstActionDao.UpdateExchangeActionAsync(new HstActionDto {
+                        BookId = (int)srcAction.Account.Id,
+                        ItemId = (int)srcAction.Item.Id,
+                        ActTime = srcAction.ActTime,
+                        ActValue = srcAction.Amount.SubValue,
+                        AssetId = null, // TODO: 将来の拡張用
+                        ActionId = (int)srcAction.ActionId
+                    });
+                    resActionIdList.Add(srcAction.ActionId);
+
+                    // 変換先
+                    _ = await hstActionDao.UpdateExchangeActionAsync(new HstActionDto {
+                        BookId = (int)dstAction.Account.Id,
+                        ItemId = (int)dstAction.Item.Id,
                         ActTime = dstAction.ActTime,
                         ActValue = dstAction.Amount.SubValue,
                         AssetId = null, // TODO: 将来の拡張用

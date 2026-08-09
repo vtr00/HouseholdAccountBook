@@ -34,7 +34,8 @@ SELECT COALESCE(SUM((A.act_value / POWER(10, AA.scale)) * AA.base_rate / DA.base
 FROM mst_book B
 INNER JOIN mst_asset DA ON DA.asset_id = @DefaultAssetId AND DA.del_flg = 0 -- 表示するアセット(デフォルトアセット)
 LEFT JOIN hst_action A ON A.book_id = B.book_id AND A.del_flg = 0 AND A.act_time < @StartDate
-LEFT JOIN mst_asset AA ON AA.asset_id = COALESCE(A.asset_id, COALESCE(B.asset_id, @DefaultAssetId)) AND AA.del_flg = 0 -- 帳簿項目に紐づくアセット
+LEFT JOIN mst_item I ON I.item_id = A.item_id AND I.del_flg = 0
+LEFT JOIN mst_asset AA ON AA.asset_id = COALESCE(A.asset_id, I.asset_id, B.asset_id, @DefaultAssetId) AND AA.del_flg = 0 -- 帳簿項目に紐づくアセット
 WHERE B.del_flg = 0
 GROUP BY DA.asset_id;",
 new { DefaultAssetId = defaultAssetId, StartDate = startDate });
@@ -62,7 +63,8 @@ SELECT COALESCE(SUM((A.act_value / POWER(10, AA.scale)) * AA.base_rate / BA.base
 FROM mst_book B
 INNER JOIN mst_asset BA ON BA.asset_id = COALESCE(B.asset_id, @DefaultAssetId) AND BA.del_flg = 0 -- 表示するアセット(帳簿に紐づくアセット)
 LEFT JOIN hst_action A ON A.book_id = B.book_id AND A.del_flg = 0 AND A.act_time < @StartDate
-LEFT JOIN mst_asset AA ON AA.asset_id = COALESCE(A.asset_id, COALESCE(B.asset_id, @DefaultAssetId)) AND AA.del_flg = 0 -- 帳簿項目に紐づくアセット
+LEFT JOIN mst_item I ON I.item_id = A.item_id AND I.del_flg = 0
+LEFT JOIN mst_asset AA ON AA.asset_id = COALESCE(A.asset_id, I.asset_id, B.asset_id, @DefaultAssetId) AND AA.del_flg = 0 -- 帳簿項目に紐づくアセット
 WHERE B.book_id = @BookId AND B.del_flg = 0
 GROUP BY BA.asset_id;",
 new { BookId = bookId, DefaultAssetId = defaultAssetId, StartDate = startDate });

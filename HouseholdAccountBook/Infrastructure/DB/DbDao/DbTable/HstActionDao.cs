@@ -17,6 +17,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
     {
         public override Task<int> CreateTableAsync() => throw new NotImplementedException();
 
+        #region マイグレーション
         /// <summary>
         /// <see cref="HstActionDto.AssetId"/> 列を追加する
         /// </summary>
@@ -27,6 +28,7 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
 ALTER TABLE hst_action
 ADD COLUMN asset_id INTEGER DEFAULT NULL;");
         }
+        #endregion
 
         public override async Task<IEnumerable<HstActionDto>> FindAllAsync()
         {
@@ -217,7 +219,8 @@ RETURNING action_id;", dto);
             using FuncLog funcLog = new(new { dto, balanceKind }, Log.LogLevel.Trace);
 
             int actionId = await this.mDbHandler.QuerySingleAsync<int>(@"
-INSERT INTO hst_action (book_id, item_id, asset_id, act_time, act_value, group_id, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
+INSERT INTO hst_action
+(book_id, item_id, asset_id, act_time, act_value, group_id, is_match, json_code, del_flg, update_time, updater, insert_time, inserter)
 VALUES (@BookId, (
   SELECT item_id FROM mst_item I
   INNER JOIN (SELECT * FROM mst_category WHERE balance_kind = @BalanceKind) C ON C.category_id = I.category_id
@@ -253,7 +256,26 @@ WHERE action_id = @ActionId;", dto);
 
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET book_id = @BookId, asset_id = @AssetId, act_time = @ActTime, act_value = @ActValue, json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
+SET book_id = @BookId, asset_id = @AssetId, act_time = @ActTime, act_value = @ActValue, 
+    json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
+WHERE action_id = @ActionId;", dto);
+
+            return count;
+        }
+
+        /// <summary>
+        /// 変換レコードを更新する
+        /// </summary>
+        /// <param name="dto">更新する変換レコード</param>
+        /// <returns>更新件数</returns>
+        public async Task<int> UpdateExchangeActionAsync(HstActionDto dto)
+        {
+            using FuncLog funcLog = new(new { dto }, Log.LogLevel.Trace);
+
+            int count = await this.mDbHandler.ExecuteAsync(@"
+UPDATE hst_action
+SET book_id = @BookId, item_id = @ItemId, asset_id = @AssetId, act_time = @ActTime, act_value = @ActValue, 
+    json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
 
             return count;

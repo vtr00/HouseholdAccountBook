@@ -16,16 +16,22 @@ namespace HouseholdAccountBook.Models.UiDto
         /// 項目ID
         /// </summary>
         public ItemIdObj Id { get; init; } = id;
-
         /// <summary>
         /// ソート順
         /// </summary>
         public int SortOrder { get; init; } = -1;
-
         /// <summary>
         /// 項目名
         /// </summary>
         public string Name { get; init; } = name;
+        /// <summary>
+        /// アセットID
+        /// </summary>
+        public AssetIdObj AssetId { get; init; } = AssetIdObj.System;
+        /// <summary>
+        /// 項目種別
+        /// </summary>
+        public ItemKind ItemKind { get; init; } = ItemKind.Normal;
 
         /// <summary>
         /// 分類名

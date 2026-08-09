@@ -18,6 +18,23 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.DbTable
     {
         public override Task<int> CreateTableAsync() => throw new NotImplementedException();
 
+        #region マイグレーション
+        /// <summary>
+        /// <see cref="MstItemDto.AssetId"/> 列、<see cref="MstItemDto.ItemKind"/> 列を追加する
+        /// </summary>
+        /// <returns></returns>
+        public async Task AddAssetIdAndItemKindColumnAsync()
+        {
+            _ = await this.mDbHandler.ExecuteAsync(@"
+ALTER TABLE mst_item
+ADD COLUMN asset_id INTEGER DEFAULT NULL;");
+
+            _ = await this.mDbHandler.ExecuteAsync(@"
+ALTER TABLE mst_item
+ADD COLUMN item_kind INTEGER NOT NULL DEFAULT 0;");
+        }
+        #endregion
+
         public override async Task<IEnumerable<MstItemDto>> FindAllAsync()
         {
             using FuncLog funcLog = new(new { }, Log.LogLevel.Trace);
@@ -59,7 +76,7 @@ new MstItemDto { ItemId = itemId });
             using FuncLog funcLog = new(new { categoryId }, Log.LogLevel.Trace);
 
             IEnumerable<MstItemDto> dtoList = await this.mDbHandler.QueryAsync<MstItemDto>(@"
-SELECT item_id, item_name, advance_flg, sort_order
+SELECT *
 FROM mst_item
 WHERE category_id = @CategoryId AND del_flg = 0
 ORDER BY sort_order;",
@@ -81,8 +98,8 @@ new MstItemDto { CategoryId = categoryId });
 
             int count = await this.mDbHandler.ExecuteAsync(@"
 INSERT INTO mst_item
-(item_id, item_name, category_id, move_flg, advance_flg, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemId, @ItemName, @CategoryId, @MoveFlg, @AdvanceFlg, @JsonCode, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
+(item_id, item_name, item_kind, category_id, asset_id, move_flg, advance_flg, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@ItemId, @ItemName, @ItemKind, @CategoryId, @AssetId, @MoveFlg, @AdvanceFlg, @JsonCode, @SortOrder, @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter);", dto);
 
             return count;
         }
@@ -93,8 +110,8 @@ VALUES (@ItemId, @ItemName, @CategoryId, @MoveFlg, @AdvanceFlg, @JsonCode, @Sort
 
             int itemId = await this.mDbHandler.QuerySingleAsync<int>(@"
 INSERT INTO mst_item
-(item_name, category_id, move_flg, advance_flg, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
-VALUES (@ItemName, @CategoryId, @MoveFlg, @AdvanceFlg, @JsonCode, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
+(item_name, item_kind, category_id, asset_id, move_flg, advance_flg, json_code, sort_order, del_flg, update_time, updater, insert_time, inserter)
+VALUES (@ItemName, @ItemKind, @CategoryId, @AssetId, @MoveFlg, @AdvanceFlg, @JsonCode, (SELECT COALESCE(MAX(sort_order) + 1, 1) FROM mst_item), @DelFlg, @UpdateTime, @Updater, @InsertTime, @Inserter)
 RETURNING item_id;", dto);
 
             return itemId;
@@ -103,7 +120,7 @@ RETURNING item_id;", dto);
         public override Task<int> UpdateAsync(MstItemDto dto) => throw new NotSupportedException($"Unsupported operation({MethodBase.GetCurrentMethod().Name}).");
 
         /// <summary>
-        /// <see cref="MstItemDto.ItemId"/> に基づいて、<see cref="MstItemDto.ItemName"/> を更新する
+        /// <see cref="MstItemDto.ItemId"/> に基づいて、<see cref="MstItemDto.ItemName"/> および <see cref="MstItemDto.AssetId"/> を更新する
         /// </summary>
         /// <param name="dto">DTO</param>
         /// <returns>更新件数</returns>
@@ -113,7 +130,7 @@ RETURNING item_id;", dto);
 
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE mst_item
-SET item_name = @ItemName, update_time = @UpdateTime, updater = @Updater
+SET item_name = @ItemName, item_kind = @ItemKind, asset_id = @AssetId, update_time = @UpdateTime, updater = @Updater
 WHERE item_id = @ItemId;", dto);
 
             return count;

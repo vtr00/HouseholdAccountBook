@@ -107,6 +107,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
             remove => this.AccountTabVM.AddMoveRequested -= value;
         }
         /// <summary>
+        /// 変換追加要求時イベント
+        /// </summary>
+        public event EventHandler<AddExchangeRequestEventArgs> AddExchangeRequested {
+            add => this.AccountTabVM.AddExchangeRequested += value;
+            remove => this.AccountTabVM.AddExchangeRequested -= value;
+        }
+        /// <summary>
         /// 帳簿項目追加要求時イベント
         /// </summary>
         public event EventHandler<AddActionRequestEventArgs> AddActionRequested {
@@ -128,6 +135,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
             remove => this.AccountTabVM.CopyMoveRequested -= value;
         }
         /// <summary>
+        /// 変換複製要求時イベント
+        /// </summary>
+        public event EventHandler<CopyExchangeRequestEventArgs> CopyExchangeRequested {
+            add => this.AccountTabVM.CopyExchangeRequested += value;
+            remove => this.AccountTabVM.CopyExchangeRequested -= value;
+        }
+        /// <summary>
         /// 帳簿項目複製要求時イベント
         /// </summary>
         public event EventHandler<CopyActionRequestEventArgs> CopyActionRequested {
@@ -140,6 +154,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         public event EventHandler<EditMoveRequestEventArgs> EditMoveRequested {
             add => this.AccountTabVM.EditMoveRequested += value;
             remove => this.AccountTabVM.EditMoveRequested -= value;
+        }
+        /// <summary>
+        /// 変換編集要求時イベント
+        /// </summary>
+        public event EventHandler<EditExchangeRequestEventArgs> EditExchangeRequested {
+            add => this.AccountTabVM.EditExchangeRequested += value;
+            remove => this.AccountTabVM.EditExchangeRequested -= value;
         }
         /// <summary>
         /// 帳簿項目編集要求時イベント

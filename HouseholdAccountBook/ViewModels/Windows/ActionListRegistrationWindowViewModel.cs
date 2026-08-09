@@ -193,10 +193,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 () => this.AccountSelectorVM.SelectedKey != null && this.CategorySelectorVM.SelectedKey != null);
             this.ShopSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadShopListAsync(this.ItemSelectorVM.SelectedKey, true),
-                () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
+                () => this.ItemSelectorVM.SelectedKey != null, KeySelectionMode.Force);
             this.RemarkSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadRemarkListAsync(this.ItemSelectorVM.SelectedKey, true),
-                () => this.ItemSelectorVM.SelectedKey != null, SelectorMode.Force);
+                () => this.ItemSelectorVM.SelectedKey != null, KeySelectionMode.Force);
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null, null, null);
@@ -227,17 +227,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     // WVMに値を設定する
                     if (initialRecordList == null) {
                         DateTime actDate = initialDate?.ToDateTime(TimeOnly.MinValue) ?? ((initialMonth == null || initialMonth?.Month == DateTime.Today.Month) ? DateTime.Today : initialMonth.Value.ToDateTime(TimeOnly.MinValue));
-                        this.InputedDateValueVMList.Add(new DateValueViewModel() {
+                        this.InputedDateValueVMList.Add(new() {
                             SelectedDate = actDate,
                             InputedValue = null
                         });
                     }
                     else {
                         foreach (ActionCsvModel record in initialRecordList) {
-                            this.InputedDateValueVMList.Add(new DateValueViewModel() {
+                            this.InputedDateValueVMList.Add(new() {
                                 SelectedDate = record.Date,
-                                InputedValue = record.Value.MainValue,
-                                SelectedAccountAssetId = record.Value.AssetId // 一旦読込時のアセットIDを入れておく
+                                InputedValue = record.Value.MainValue
                             });
                         }
                     }
@@ -255,8 +254,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                         DateValueViewModel vm = new() {
                             ActionId = action.ActionId,
                             SelectedDate = action.ActTime,
-                            InputedValue = Math.Abs(action.Amount.MainValue),
-                            SelectedAccountAssetId = action.Amount.AssetId // 一旦読込時のアセットIDを入れておく
+                            InputedValue = Math.Abs(action.Amount.MainValue)
                         };
 
                         selectingAccountId = action.Account.Id;
@@ -289,9 +287,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
             await this.ShopSelectorVM.LoadAsync(selectingShopName);
             await this.RemarkSelectorVM.LoadAsync(selectingRemark);
 
-            // アセットIDを指定する
+            // アセットを更新する
             foreach (DateValueViewModel item in this.InputedDateValueVMList) {
-                item.SelectedAccountAssetId = this.AccountSelectorVM.SelectedItem.AssetId;
+                item.Initialize(() => this.ItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.DefaultAssetId);
+                await item.LoadAsync();
             }
         }
 
@@ -300,14 +299,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             // 帳簿変更時
-            this.AccountSelectorVM.SelectionChanged += (sender, e) => {
-                foreach (DateValueViewModel item in this.InputedDateValueVMList) {
-                    item.SelectedAccountAssetId = this.AccountSelectorVM.SelectedItem.AssetId;
-                }
-
-                this.SelectedAccountChanged?.Invoke(sender, e);
-            };
+            this.AccountSelectorVM.SelectionChanged += (sender, e) => this.SelectedAccountChanged?.Invoke(sender, e);
             this.AccountSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
+            this.AccountSelectorVM.Children.AddRange(this.InputedDateValueVMList);
 
             // 収支種別変更時
             this.BalanceKindSelectorVM.SelectionChanged += (sender, e) => this.SelectedBalanceKindChanged?.Invoke(sender, e);
@@ -320,6 +314,36 @@ namespace HouseholdAccountBook.ViewModels.Windows
             // 項目変更時
             this.ItemSelectorVM.SelectionChanged += (sender, e) => this.SelectedItemChanged?.Invoke(sender, e);
             this.ItemSelectorVM.Children.AddRange([this.ShopSelectorVM, this.RemarkSelectorVM]);
+            this.ItemSelectorVM.Children.AddRange(this.InputedDateValueVMList);
+
+            // アセット変更時
+            foreach (DateValueViewModel item in this.InputedDateValueVMList) {
+                item.AddEventHandlers();
+            }
+
+            // 日付金額変更時
+            this.InputedDateValueVMList.CollectionChanged += async (sender, e) => {
+                if (e.NewItems != null) {
+                    foreach (object tmp in e.NewItems) {
+                        if (tmp is DateValueViewModel item) {
+                            item.Initialize(() => this.ItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.DefaultAssetId);
+                            await item.LoadAsync();
+                            item.AddEventHandlers();
+
+                            this.AccountSelectorVM.Children.Add(item);
+                            this.ItemSelectorVM.Children.Add(item);
+                        }
+                    }
+                }
+                if (e.OldItems != null) {
+                    foreach (object tmp in e.OldItems) {
+                        if (tmp is DateValueViewModel item) {
+                            _ = this.AccountSelectorVM.Children.Remove(item);
+                            _ = this.ItemSelectorVM.Children.Remove(item);
+                        }
+                    }
+                }
+            };
         }
 
         /// <summary>
@@ -345,7 +369,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 if (vm.InputedValue is null or 0) { continue; }
 
                 int sign = balanceKind == BalanceKind.Income ? 1 : -1;
-                ActionBaseModel baseAction = new(vm.ActionId, vm.SelectedDate, new(sign * vm.InputedValue.Value, AssetIdObj.System));
+                ActionBaseModel baseAction = new(vm.ActionId, vm.SelectedDate, new(sign * vm.InputedValue.Value, vm.AssetSelectorVM.SelectedKey));
                 actionList.Add(commonAction.WithChanges(baseAction));
             }
 

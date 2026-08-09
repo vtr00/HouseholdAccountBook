@@ -12,24 +12,17 @@ using System.Windows;
 namespace HouseholdAccountBook.Views.Windows
 {
     /// <summary>
-    /// MoveRegistrationWindow.xaml の相互作用ロジック
+    /// ExchangeRegistrationWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class MoveRegistrationWindow : Window
+    public partial class ExchangeRegistrationWindow : Window
     {
         #region イベント
         /// <summary>
-        /// 移動元帳簿変更時のイベント
+        /// 帳簿変更時のイベント
         /// </summary>
-        public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedSrcAccountChanged {
-            add => this.WVM.SelectedSrcAccountChanged += value;
-            remove => this.WVM.SelectedSrcAccountChanged -= value;
-        }
-        /// <summary>
-        /// 移動先帳簿変更時のイベント
-        /// </summary>
-        public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedDstAccountChanged {
-            add => this.WVM.SelectedDstAccountChanged += value;
-            remove => this.WVM.SelectedDstAccountChanged -= value;
+        public event EventHandler<ChangedEventArgs<AccountIdObj>> SelectedAccountChanged {
+            add => this.WVM.SelectedAccountChanged += value;
+            remove => this.WVM.SelectedAccountChanged -= value;
         }
 
         /// <summary>
@@ -43,28 +36,28 @@ namespace HouseholdAccountBook.Views.Windows
 
         #region コンストラクタ
         /// <summary>
-        /// 帳簿項目(移動)の追加のために <see cref="MoveRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
+        /// 帳簿項目(変換)の追加のために <see cref="ExchangeRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="initialAccountId">初期選択する帳簿ID</param>
         /// <param name="initialMonth">初期選択する年月</param>
         /// <param name="initialDate">初期選択する日付</param>
-        public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate)
+        public ExchangeRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate)
             : this(owner, dbHandlerFactory, initialAccountId, initialMonth, initialDate, null, RegistrationKind.Add) { }
 
         /// <summary>
-        /// 帳簿項目(移動)の複製/編集のために <see cref="MoveRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
+        /// 帳簿項目(変換)の複製/編集のために <see cref="ExchangeRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
         /// <param name="targetGroupId">複製/編集時、複製/編集対象の帳簿項目のグループID</param>
         /// <param name="regKind">登録種別</param>
-        public MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, GroupIdObj targetGroupId, RegistrationKind regKind = RegistrationKind.Edit)
+        public ExchangeRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, GroupIdObj targetGroupId, RegistrationKind regKind = RegistrationKind.Edit)
             : this(owner, dbHandlerFactory, null, null, null, targetGroupId, regKind) { }
 
         /// <summary>
-        /// 帳簿項目(移動)の複製/編集のために <see cref="MoveRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
+        /// 帳簿項目(変換)の複製/編集のために <see cref="ExchangeRegistrationWindow"/> クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="owner">親ウィンドウ</param>
         /// <param name="dbHandlerFactory">DBハンドラファクトリ</param>
@@ -73,13 +66,13 @@ namespace HouseholdAccountBook.Views.Windows
         /// <param name="initialDate">追加時、初期選択する日付</param>
         /// <param name="targetGroupId">複製/編集時、複製/編集対象の帳簿項目のグループID</param>
         /// <param name="regKind">登録種別</param>
-        private MoveRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate, GroupIdObj targetGroupId,
+        private ExchangeRegistrationWindow(Window owner, DbHandlerFactory dbHandlerFactory, AccountIdObj initialAccountId, DateOnly? initialMonth, DateOnly? initialDate, GroupIdObj targetGroupId,
             RegistrationKind regKind)
         {
             using FuncLog funcLog = new(new { initialAccountId, initialMonth, initialDate, targetGroupId, regKind });
 
             this.Owner = owner;
-            this.Name = UiConstants.WindowNameStr[nameof(MoveRegistrationWindow)];
+            this.Name = UiConstants.WindowNameStr[nameof(ExchangeRegistrationWindow)];
             WindowLocationManager.Instance.Add(this);
 
             this.InitializeComponent();

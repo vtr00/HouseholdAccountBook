@@ -28,6 +28,10 @@ namespace HouseholdAccountBook.Views.Windows
         /// </summary>
         private MoveRegistrationWindow mMRW;
         /// <summary>
+        /// 変換登録ウィンドウ
+        /// </summary>
+        private ExchangeRegistrationWindow mXRW;
+        /// <summary>
         /// 項目登録ウィンドウ
         /// </summary>
         private ActionRegistrationWindow mARW;
@@ -45,11 +49,11 @@ namespace HouseholdAccountBook.Views.Windows
         /// <summary>
         /// 子ウィンドウを開いているか
         /// </summary>
-        private bool ChildrenWindowOpened => this.mMRW != null || this.mARW != null || this.mALRW != null || (this.mCCW != null && this.mCCW.IsVisible);
+        private bool ChildrenWindowOpened => this.mMRW != null || this.mXRW != null || this.mARW != null || this.mALRW != null || (this.mCCW != null && this.mCCW.IsVisible);
         /// <summary>
         /// 登録ウィンドウを開いているか
         /// </summary>
-        private bool RegistrationWindowOpened => this.mMRW != null || this.mARW != null || this.mALRW != null;
+        private bool RegistrationWindowOpened => this.mMRW != null || this.mXRW != null || this.mARW != null || this.mALRW != null;
         #endregion
 
         /// <summary>
@@ -120,6 +124,19 @@ namespace HouseholdAccountBook.Views.Windows
                 };
                 this.mMRW.Show();
             };
+            // 変換追加要求イベントを登録する
+            this.WVM.AddExchangeRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.AddExchangeRequested));
+
+                this.mXRW = new(this, e.DbHandlerFactory, e.InitialAccountId, e.InitialMonth, e.InitialDate);
+                this.mXRW.Registrated += e.Registered;
+                this.mXRW.Closed += (sender, e) => {
+                    this.mXRW = null;
+                    _ = this.Activate();
+                    _ = this._actionDataGrid.Focus();
+                };
+                this.mXRW.Show();
+            };
             // 項目追加要求イベントを登録する
             this.WVM.AddActionRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.AddActionRequested));
@@ -159,6 +176,19 @@ namespace HouseholdAccountBook.Views.Windows
                 };
                 this.mMRW.Show();
             };
+            // 変換複製要求イベントを登録する
+            this.WVM.CopyExchangeRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.CopyExchangeRequested));
+
+                this.mXRW = new(this, e.DbHandlerFactory, e.TargetGroupId, RegistrationKind.Copy);
+                this.mXRW.Registrated += e.Registered;
+                this.mXRW.Closed += (sender, e) => {
+                    this.mXRW = null;
+                    _ = this.Activate();
+                    _ = this._actionDataGrid.Focus();
+                };
+                this.mXRW.Show();
+            };
             // 項目複製要求イベントを登録する
             this.WVM.CopyActionRequested += (sender, e) => {
                 using FuncLog funcLog = new(methodName: nameof(this.WVM.CopyActionRequested));
@@ -184,6 +214,19 @@ namespace HouseholdAccountBook.Views.Windows
                     _ = this._actionDataGrid.Focus();
                 };
                 this.mMRW.Show();
+            };
+            // 変換編集要求イベントを登録する
+            this.WVM.EditExchangeRequested += (sender, e) => {
+                using FuncLog funcLog = new(methodName: nameof(this.WVM.EditExchangeRequested));
+
+                this.mXRW = new(this, e.DbHandlerFactory, e.TargetGroupId, RegistrationKind.Edit);
+                this.mXRW.Registrated += e.Registered;
+                this.mXRW.Closed += (sender, e) => {
+                    this.mXRW = null;
+                    _ = this.Activate();
+                    _ = this._actionDataGrid.Focus();
+                };
+                this.mXRW.Show();
             };
             // 項目編集要求イベントを登録する
             this.WVM.EditActionRequested += (sender, e) => {

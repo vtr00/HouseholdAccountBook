@@ -26,6 +26,10 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Others
         /// </summary>
         public int ItemId { get; set; } = -1;
         /// <summary>
+        /// 項目種別
+        /// </summary>
+        public int ItemKind { get; set; } = 0;
+        /// <summary>
         /// 項目日時
         /// </summary>
         public DateTime ActTime { get; set; } = DateTime.Now;

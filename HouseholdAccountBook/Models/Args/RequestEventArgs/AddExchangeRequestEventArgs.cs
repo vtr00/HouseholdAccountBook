@@ -1,0 +1,30 @@
+﻿using HouseholdAccountBook.Models.ValueObjects;
+using System;
+using System.Collections.Generic;
+
+namespace HouseholdAccountBook.Models.Args.RequestEventArgs
+{
+    /// <summary>
+    /// 変換追加要求イベント時のイベント引数
+    /// </summary>
+    public class AddExchangeRequestEventArgs : DbRequestEventArgsBase
+    {
+        /// <summary>
+        /// 初期選択する帳簿のID
+        /// </summary>
+        public AccountIdObj InitialAccountId { get; set; }
+        /// <summary>
+        /// 初期選択する月
+        /// </summary>
+        public DateOnly? InitialMonth { get; set; }
+        /// <summary>
+        /// 初期選択する日付
+        /// </summary>
+        public DateOnly? InitialDate { get; set; }
+
+        /// <summary>
+        /// 登録完了時イベントハンドラ
+        /// </summary>
+        public EventHandler<EventArgs<IEnumerable<ActionIdObj>>> Registered { get; set; }
+    }
+}

@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.ViewModels
     /// <summary>
     /// <see cref="SelectorViewModel{VM, KEY}"/> で KEY を選択するモード
     /// </summary>
-    public enum SelectorMode
+    public enum KeySelectionMode
     {
         /// <summary>
         /// 一致する項目がなければデフォルト(KEYがクラスなら選択なし状態)を選択する
@@ -47,7 +47,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// <see cref="VM"/> から <see cref="KEY"/> への変換処理
         /// </summary>
-        private readonly Func<VM?, KEY?> mSelector;
+        private readonly Func<VM?, KEY?> mKeyConverter;
         /// <summary>
         /// 処理中状態サービス
         /// </summary>
@@ -60,19 +60,27 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// [同期] <see cref="VM"> リスト読込処理
         /// </summary>
-        private Func<FuncLog, IEnumerable<VM>>? mLoad;
+        private Func<IEnumerable<VM>>? mLoad;
         /// <summary>
         /// [非同期] <see cref="VM"> リスト読込処理
         /// </summary>
-        private Func<FuncLog, CancellationToken, Task<IEnumerable<VM>>>? mLoadAsync;
+        private Func<CancellationToken, Task<IEnumerable<VM>>>? mLoadAsync;
+        /// <summary>
+        /// <see cref="KEY"/> デフォルト選択処理
+        /// </summary>
+        private Func<IList<KEY?>>? mDefaultSelectKeys;
         /// <summary>
         /// <see cref="KEY"/> の選択モード
         /// </summary>
-        private SelectorMode mSelectorMode;
+        private KeySelectionMode mKeySelectionMode;
         /// <summary>
         /// 読込処理中か
         /// </summary>
         private bool mOnLoad = false;
+        /// <summary>
+        /// 読込処理が完了済か
+        /// </summary>
+        private bool mLoaded = false;
 
         /// <summary>
         /// 子要素多重読込処理防止トークン源
@@ -127,7 +135,7 @@ namespace HouseholdAccountBook.ViewModels
             set {
                 KEY? oldKey = this.mSelectedKey;
 
-                this.UpdateSelectedItemAndKey(this.mSelectorMode, this.mSelector(value));
+                this.UpdateSelectedItemAndKey(this.mKeySelectionMode, this.mKeyConverter(value));
 
                 if (!KeyEquals(oldKey, this.SelectedKey) || this.IsSelectionChangedEnabledIfEqual) {
                     // 読込処理中以外か
@@ -154,7 +162,7 @@ namespace HouseholdAccountBook.ViewModels
             set {
                 KEY? oldKey = this.mSelectedKey;
 
-                this.UpdateSelectedItemAndKey(this.mSelectorMode, value);
+                this.UpdateSelectedItemAndKey(this.mKeySelectionMode, value);
 
                 if (!KeyEquals(oldKey, this.mSelectedKey) || this.IsSelectionChangedEnabledIfEqual) {
                     // 読込処理中以外か
@@ -179,6 +187,10 @@ namespace HouseholdAccountBook.ViewModels
             get => this.SelectedItem == null ? -1 : this.ItemList.IndexOf(this.SelectedItem);
             set => this.SelectedItem = (value < 0 || this.ItemList.Count <= value) ? default : this.ItemList[value];
         }
+        /// <summary>
+        /// 初期選択 <see cref="KEY"/>
+        /// </summary>
+        public KEY? InitialSelectedKey { get; private set; }
 
         /// <summary>
         /// 選択 <see cref="VM"/> リスト
@@ -214,7 +226,7 @@ namespace HouseholdAccountBook.ViewModels
         /// 選択 <see cref="KEY"/> リスト
         /// </summary>
         public IEnumerable<KEY?> SelectedKeys {
-            get => this.SelectedItemList?.Select(vm => this.mSelector(vm)) ?? [];
+            get => this.SelectedItemList?.Select(vm => this.mKeyConverter(vm)) ?? [];
             set => throw new NotImplementedException();
         }
 
@@ -231,14 +243,14 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="selector"><see cref="VM"/> から <see cref="KEY"/> への変換処理</param>
+        /// <param name="keyConverter"><see cref="VM"/> から <see cref="KEY"/> への変換処理</param>
         /// <param name="busyService">処理中状態サービス</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public SelectorViewModel(Func<VM?, KEY?> selector, BusyService? busyService = null,
+        public SelectorViewModel(Func<VM?, KEY?> keyConverter, BusyService? busyService = null,
                                  [CallerFilePath] string? fileName = null, [CallerMemberName] string memberName = "")
         {
-            this.mSelector = selector;
+            this.mKeyConverter = keyConverter;
             this.mBusyService = busyService;
             this.mFileName = fileName;
             this.mMemberName = memberName;
@@ -282,22 +294,14 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="load">[同期] <see cref="VM"/> リスト読込処理</param>
         /// <param name="canLoad">Load可能判定処理</param>
         /// <param name="mode">読み込み時に <see cref="KEY"/> を選択するモード</param>
-        public void SetLoader(Func<IEnumerable<VM>> load, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault) =>
-            this.SetLoader(funcLog => load(), canLoad, mode);
-        /// <summary>
-        /// <see cref="VM"> リスト読込処理を設定する
-        /// </summary>
-        /// <param name="load">[同期] <see cref="VM"/> リスト読込処理</param>
-        /// <param name="canLoad">Load可能判定処理</param>
-        /// <param name="mode">読み込み時に <see cref="KEY"/> を選択するモード</param>
-        public void SetLoader(Func<FuncLog, IEnumerable<VM>> load, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault)
+        public void SetLoader(Func<IEnumerable<VM>> load, Func<bool>? canLoad = null, KeySelectionMode mode = KeySelectionMode.FirstOrElementAtOrDefault)
         {
             using FuncLog funcLog = new(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.SetLoader)}");
 
             this.mCanLoad = canLoad;
             this.mLoad = load;
             this.mLoadAsync = null;
-            this.mSelectorMode = mode;
+            this.mKeySelectionMode = mode;
         }
 
         /// <summary>
@@ -306,30 +310,40 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="loadAsync">[非同期] <see cref="VM"> リスト読込処理</param>
         /// <param name="canLoad">Load可能判定処理</param>
         /// <param name="mode">読み込み時に <see cref="KEY"/> を選択するモード</param>
-        public void SetLoader(Func<Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault) =>
-            this.SetLoader((funcLog, token) => loadAsync(), canLoad, mode);
+        public void SetLoader(Func<Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null, KeySelectionMode mode = KeySelectionMode.FirstOrElementAtOrDefault) =>
+            this.SetLoader((token) => loadAsync(), canLoad, mode);
         /// <summary>
         /// <see cref="VM"> リスト読込処理を設定する
         /// </summary>
         /// <param name="loadAsync">[非同期] <see cref="VM"> リスト読込処理</param>
         /// <param name="canLoad">Load可能判定処理</param>
         /// <param name="mode">読み込み時に <see cref="KEY"/> を選択するモード</param>
-        public void SetLoader(Func<CancellationToken, Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault) =>
-            this.SetLoader((funcLog, token) => loadAsync(token), canLoad, mode);
-        /// <summary>
-        /// <see cref="VM"> リスト読込処理を設定する
-        /// </summary>
-        /// <param name="loadAsync">[非同期] <see cref="VM"> リスト読込処理</param>
-        /// <param name="canLoad">Load可能判定処理</param>
-        /// <param name="mode">読み込み時に <see cref="KEY"/> を選択するモード</param>
-        public void SetLoader(Func<FuncLog, CancellationToken, Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null, SelectorMode mode = SelectorMode.FirstOrElementAtOrDefault)
+        public void SetLoader(Func<CancellationToken, Task<IEnumerable<VM>>> loadAsync, Func<bool>? canLoad = null, KeySelectionMode mode = KeySelectionMode.FirstOrElementAtOrDefault)
         {
             using FuncLog funcLog = new(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.SetLoader)}");
 
             this.mCanLoad = canLoad;
             this.mLoad = null;
             this.mLoadAsync = loadAsync;
-            this.mSelectorMode = mode;
+            this.mKeySelectionMode = mode;
+        }
+        #endregion
+
+        #region SetDefaultSelector
+        /// <summary>
+        /// <see cref="KEY"/> デフォルト選択処理を設定する
+        /// </summary>
+        /// <param name="defaultSelectKey"><see cref="KEY"/> デフォルト選択処理</param>
+        public void SetDefaultSelector(Func<KEY?> defaultSelectKey) => this.SetDefaultSelector(() => [defaultSelectKey()]);
+        /// <summary>
+        /// <see cref="KEY"/> デフォルト選択処理を設定する
+        /// </summary>
+        /// <param name="defaultSelectKeys"><see cref="KEY"/> デフォルト選択処理</param>
+        public void SetDefaultSelector(Func<IList<KEY?>> defaultSelectKeys)
+        {
+            using FuncLog funcLog = new(fileName: this.mFileName, methodName: $"{this.mMemberName}.{nameof(this.SetDefaultSelector)}");
+
+            this.mDefaultSelectKeys = defaultSelectKeys;
         }
         #endregion
 
@@ -339,6 +353,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <returns>読込み可能/不可能</returns>
         private bool CanLoad() => this.mCanLoad?.Invoke() ?? true;
 
+        #region LoadAsync
         /// <summary>
         /// [非同期] <see cref="VM"/> リストを読込み、現在選択中の <see cref="VM"/> の選択を維持する
         /// </summary>
@@ -389,14 +404,14 @@ namespace HouseholdAccountBook.ViewModels
                 token.ThrowIfCancellationRequested();
                 IEnumerable<VM> tmpList = [];
                 if (this.mLoad is not null) {
-                    tmpList = this.mLoad.Invoke(funcLog);
+                    tmpList = this.mLoad.Invoke();
                 }
                 if (this.mLoadAsync is not null) {
-                    tmpList = await this.mLoadAsync.Invoke(funcLog, token);
+                    tmpList = await this.mLoadAsync.Invoke(token);
                 }
                 token.ThrowIfCancellationRequested();
 
-                // 一旦未選択状態にする(ClearだとBehaviorが意図した挙動にならないのでRemoveAtで空にする)
+                // 一旦未選択状態にする
                 this.SelectedItem = default;
                 this.SelectedItemList = default;
 
@@ -406,12 +421,16 @@ namespace HouseholdAccountBook.ViewModels
                     this.ItemList.Add(tmp);
                 }
 
-                // 先頭の一つを選択する
-                KEY? tmpSelection = selections != null ? selections.FirstOrDefault() : oldKey;
-                this.UpdateSelectedItemAndKey(this.mSelectorMode, tmpSelection);
                 // 全部を選択する
-                IList<KEY?> newKeys = [.. selections ?? oldKeys];
-                this.SelectedItemList = [.. this.ItemList.Where(vm => newKeys.Contains(this.mSelector(vm), mComparer))];
+                IList<KEY?> newKeys = [.. selections ?? this.mDefaultSelectKeys?.Invoke() ?? oldKeys];
+                this.SelectedItemList = [.. this.ItemList.Where(vm => newKeys.Contains(this.mKeyConverter(vm), mComparer))];
+                // 先頭の一つを選択する
+                KEY? newKey = newKeys.FirstOrDefault() ?? oldKey;
+                this.UpdateSelectedItemAndKey(this.mKeySelectionMode, newKey);
+                if (!this.mLoaded) {
+                    this.InitialSelectedKey = newKey;
+                    Log.Debug($"{nameof(this.InitialSelectedKey)} is {this.InitialSelectedKey}");
+                }
 
                 if (!KeyEquals(this.SelectedKey, oldKey) || this.IsSelectionChangedEnabledIfEqual) {
                     // NULLの場合に通知するか
@@ -423,6 +442,9 @@ namespace HouseholdAccountBook.ViewModels
                         Log.Debug($"{nameof(this.SelectedItem)} is null");
                     }
                 }
+
+                // 読込処理完了を記録する
+                this.mLoaded = true;
             }
             catch (OperationCanceledException) {
                 Log.Debug($"{this.mMemberName}.{nameof(LoadAsync)} Canceled.");
@@ -434,6 +456,7 @@ namespace HouseholdAccountBook.ViewModels
                 this.mOnLoad = false;
             }
         }
+        #endregion
 
         /// <summary>
         /// <see cref="VM"/> リストの選択変更時処理
@@ -484,26 +507,26 @@ namespace HouseholdAccountBook.ViewModels
         }
 
         /// <summary>
-        /// 指定された <see cref="SelectorMode"/> に応じて、<see cref="SelectedItem"/> と <see cref="SelectedKey"/> を更新する
+        /// 指定された <see cref="KeySelectionMode"/> に応じて、<see cref="SelectedItem"/> と <see cref="SelectedKey"/> を更新する
         /// </summary>
         /// <param name="mode">KEYを選択するモード</param>
         /// <param name="newKey">選択候補のKEY</param>
-        private void UpdateSelectedItemAndKey(SelectorMode mode, KEY? newKey)
+        private void UpdateSelectedItemAndKey(KeySelectionMode mode, KEY? newKey)
         {
             switch (mode) {
-                case SelectorMode.FirstOrElementAtOrDefault:
+                case KeySelectionMode.FirstOrElementAtOrDefault:
                     // KEYの一致するVMが存在するならSelectedItemに設定する。なければ1番目の要素をSelectedItemに設定する。なければdefaultを設定する
-                    this.mSelectedItem = this.ItemList.FirstOrElementAtOrDefault(vm => KeyEquals(this.mSelector(vm), newKey), 0);
-                    this.mSelectedKey = this.mSelector(this.mSelectedItem);
+                    this.mSelectedItem = this.ItemList.FirstOrElementAtOrDefault(vm => KeyEquals(this.mKeyConverter(vm), newKey), 0);
+                    this.mSelectedKey = this.mKeyConverter(this.mSelectedItem);
                     break;
-                case SelectorMode.FirstOrDefault:
+                case KeySelectionMode.FirstOrDefault:
                     // KEYの一致するVMが存在するならSelectedItemに設定する。なければdefaultを設定する
-                    this.mSelectedItem = this.ItemList.FirstOrDefault(vm => KeyEquals(this.mSelector(vm), newKey));
-                    this.mSelectedKey = this.mSelector(this.mSelectedItem);
+                    this.mSelectedItem = this.ItemList.FirstOrDefault(vm => KeyEquals(this.mKeyConverter(vm), newKey));
+                    this.mSelectedKey = this.mKeyConverter(this.mSelectedItem);
                     break;
-                case SelectorMode.Force:
+                case KeySelectionMode.Force:
                     // KEYの一致するVMが存在するならSelectedItemに設定し、なければdefaultを設定する。SelectedKeyはItemの有無に依らず値を保持する
-                    this.mSelectedItem = this.ItemList.FirstOrDefault(vm => KeyEquals(this.mSelector(vm), newKey));
+                    this.mSelectedItem = this.ItemList.FirstOrDefault(vm => KeyEquals(this.mKeyConverter(vm), newKey));
                     this.mSelectedKey = newKey;
                     break;
                 default:
