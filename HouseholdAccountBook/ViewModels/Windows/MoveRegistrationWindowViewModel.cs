@@ -293,7 +293,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public new ICommand OKCommand => field ??= new AsyncRelayCommand(
             this.OKCommand_ExecuteAsync,
-            () => this.InputedSrcValue is not null && this.SrcAccountSelectorVM?.SelectedKey != this.DstAccountSelectorVM?.SelectedKey, this.mBusyService);
+            () => this.InputedSrcValue.HasValue && 0 < this.InputedSrcValue.Value && this.InputedDstValue.HasValue && 0 < this.InputedDstValue.Value &&
+                  this.SrcAccountSelectorVM?.SelectedKey != this.DstAccountSelectorVM?.SelectedKey, this.mBusyService);
         protected async Task OKCommand_ExecuteAsync()
         {
             // DB登録
