@@ -65,7 +65,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <summary>
         /// 多重読込処理防止トークン源
         /// </summary>
-        private CancellationTokenSource mSelectionCts;
+        private CancellationTokenSource mLoadCts;
 
         /// <summary>
         /// 呼び出し元ファイル名
@@ -227,8 +227,11 @@ namespace HouseholdAccountBook.ViewModels
 
         public void Dispose()
         {
-            this.mSelectionCts?.Cancel();
-            this.mSelectionCts?.Dispose();
+            CancellationTokenSource cts = this.mLoadCts;
+            this.mLoadCts = null;
+
+            cts?.Cancel();
+            cts?.Dispose();
 
             GC.SuppressFinalize(this);
         }
@@ -244,29 +247,29 @@ namespace HouseholdAccountBook.ViewModels
                 return;
             }
 
-            this.mSelectionCts?.Cancel();
-            this.mSelectionCts?.Dispose();
-            this.mSelectionCts = new();
-
             // 実行開始通知
             this.mIsExecuting = true;
             RaiseCanExecuteChanged();
 
-            CancellationTokenSource cts = this.mSelectionCts; // キャンセル通知用
-            Task completionTask = null; // タスク実行結果通知用
-
-            if (this.mRequestable != null) {
-                ProgressDialogRequestEventArgs e = new() {
-                    FuncAsync = async (token, progress) => await this.mExecuteAsync.Invoke(parameter is T p ? p : default, funcLog, token, progress),
-                    CanCancel = this.mCanCancel,
-                    TokenSource = cts,
-                };
-                completionTask = this.mRequestable.ProgressDialogRequest(e);
-            }
-
-            // (進捗ウィンドウ非表示の場合)非同期処理を待機 または (進捗ウィンドウ表示の場合)例外を処理する
+            using CancellationTokenSource cts = new(); // キャンセル通知用
             try {
                 using IDisposable disposable = this.mBusyService?.Enter();
+
+                this.mLoadCts?.Cancel();
+                this.mLoadCts = cts;
+
+                Task completionTask = null; // タスク実行結果通知用
+
+                if (this.mRequestable != null) {
+                    ProgressDialogRequestEventArgs e = new() {
+                        FuncAsync = async (token, progress) => await this.mExecuteAsync.Invoke(parameter is T p ? p : default, funcLog, token, progress),
+                        CanCancel = this.mCanCancel,
+                        TokenSource = cts,
+                    };
+                    completionTask = this.mRequestable.ProgressDialogRequest(e);
+                }
+
+                // (進捗ウィンドウ非表示の場合)非同期処理を待機 または (進捗ウィンドウ表示の場合)例外を処理する
                 await (this.mRequestable == null ? this.mExecuteAsync.Invoke(parameter is T p ? p : default, funcLog, cts.Token, null) : completionTask);
             }
             catch (OperationCanceledException) {
@@ -277,6 +280,11 @@ namespace HouseholdAccountBook.ViewModels
                 throw;
             }
             finally {
+                cts.Dispose();
+                if (ReferenceEquals(this.mLoadCts, cts)) {
+                    this.mLoadCts = null;
+                }
+
                 // 実行終了通知
                 this.mIsExecuting = false;
                 RaiseCanExecuteChanged();

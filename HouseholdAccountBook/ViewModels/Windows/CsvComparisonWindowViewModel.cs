@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -27,10 +28,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
     /// </summary>
     public class CsvComparisonWindowViewModel : WindowViewModelBase
     {
+        #region フィールド
         /// <summary>
         /// CSV比較サービス
         /// </summary>
         private CsvCompService mService;
+
+        /// <summary>
+        /// 多重更新処理防止トークン源
+        /// </summary>
+        private CancellationTokenSource mUpdateCts;
+        #endregion
 
         #region イベント
         /// <summary>
@@ -163,13 +171,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 // 開いたCSVファイルのパスを設定として保存する(複数存在する場合は先頭のみ)
                 UserSettingService.Instance.CsvCompFile = e.FileNames.First();
 
-                foreach (string tmpFileName in e.FileNames) {
-                    if (!this.CsvFilePathList.Contains(tmpFileName)) {
-                        this.CsvFilePathList.Add(tmpFileName);
+                IEnumerable<string> loadingCsvFilePathList = [];
+                foreach (string tmpFilePath in e.FileNames) {
+                    if (!this.CsvFilePathList.Contains(tmpFilePath)) {
+                        this.CsvFilePathList.Add(tmpFilePath);
+                        loadingCsvFilePathList = loadingCsvFilePathList.Append(tmpFilePath);
                     }
                 }
-                await this.LoadCsvFilesAsync(e.FileNames);
-                await this.UpdateComparisonVMListAsync(true);
+                if (loadingCsvFilePathList.Any()) {
+                    await this.LoadCsvFilesAsync(loadingCsvFilePathList);
+                    await this.UpdateComparisonVMListAsync(true);
+                }
             }
         }
 
@@ -338,6 +350,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             switch (kind) {
                 case GroupKind.Move:
+                case GroupKind.Exchange:
                     Debug.Assert(true);
                     break;
                 case GroupKind.ListReg:
@@ -495,6 +508,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 await this.ReloadCsvFilesAsync();
                 await this.UpdateComparisonVMListAsync(true);
             };
+
             this.CsvCompSelectorVM.CollectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.AllCheckedCount));
                 this.RaisePropertyChanged(nameof(this.AllSumValue));
@@ -529,7 +543,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { csvFilePathList });
 
-            if (this.AccountSelectorVM.SelectedKey == null) {
+            if (this.AccountSelectorVM.SelectedKey is null) {
                 return;
             }
             if (!csvFilePathList.Any()) {
@@ -577,29 +591,56 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { isScroll });
 
-            // 指定された帳簿内で、日付、金額が一致する帳簿項目を探す
-            foreach (CsvComparisonViewModel vm in this.CsvCompSelectorVM.ItemList) {
-                // 前回の帳簿項目情報をクリアする
-                vm.ClearActionInfo();
-
-                // 一致する帳簿項目を取得する
-                IEnumerable<ActionModel> actionList = await this.mService.LoadMatchedActionAsync((int)this.AccountSelectorVM.SelectedKey, vm.Record.Date, vm.Record.Value);
-
-                foreach (ActionModel action in actionList) {
-                    // 帳簿項目IDが使用済なら次のレコードを調べるようにする
-                    bool checkNext = this.CsvCompSelectorVM.ItemList.Any(tmpVM => (int?)tmpVM.Action?.ActionId == action.ActionId);
-                    // 帳簿項目情報を紐付ける
-                    if (!checkNext) {
-                        vm.Action = action;
-                        vm.IsMatch = action.IsMatch;
-
-                        break;
-                    }
-                }
+            if (this.AccountSelectorVM.SelectedKey is null) {
+                return;
             }
 
-            if (isScroll) {
-                this.ScrollToButtomRequested?.Invoke(this, EventArgs.Empty);
+            using CancellationTokenSource cts = new(); // キャンセル通知用
+
+            try {
+                this.mUpdateCts?.Cancel();
+                this.mUpdateCts = cts;
+
+                // 指定された帳簿内で、日付、金額が一致する帳簿項目を探す
+                IEnumerable<CsvComparisonViewModel> itemList = [.. this.CsvCompSelectorVM.ItemList];
+                AccountIdObj accountId = this.AccountSelectorVM.SelectedKey;
+                foreach (CsvComparisonViewModel vm in itemList) {
+                    if (cts.Token.IsCancellationRequested) {
+                        break;
+                    }
+
+                    // 前回の帳簿項目情報をクリアする
+                    vm.ClearActionInfo();
+
+                    // 一致する帳簿項目を取得する
+                    IEnumerable<ActionModel> actionList = await this.mService.LoadMatchedActionAsync(accountId, vm.Record.Date, vm.Record.Value);
+
+                    foreach (ActionModel action in actionList) {
+                        if (cts.Token.IsCancellationRequested) {
+                            break;
+                        }
+
+                        // 帳簿項目IDが使用済なら次のレコードを調べるようにする
+                        bool checkNext = itemList.Any(tmpVM => (int?)tmpVM.Action?.ActionId == action.ActionId);
+                        // 帳簿項目情報を紐付ける
+                        if (!checkNext) {
+                            vm.Action = action;
+                            vm.IsMatch = action.IsMatch;
+
+                            break;
+                        }
+                    }
+                }
+
+                if (isScroll) {
+                    this.ScrollToButtomRequested?.Invoke(this, EventArgs.Empty);
+                }
+            }
+            finally {
+                cts.Dispose();
+                if (ReferenceEquals(this.mUpdateCts, cts)) {
+                    this.mUpdateCts = null;
+                }
             }
         }
 
