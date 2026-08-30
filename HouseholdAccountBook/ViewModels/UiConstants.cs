@@ -116,17 +116,17 @@ namespace HouseholdAccountBook.ViewModels
         /// ウィンドウ名文字列
         /// </summary>
         public static Dictionary<string, string> WindowNameStr => new() {
-            { nameof(DbSettingWindow),              "DbSetting" },
-            { nameof(MainWindow),                   "Main" },
-            { nameof(TermWindow),                   "Term" },
-            { nameof(SettingsWindow),               "Settings" },
-            { nameof(VersionWindow),                "Version" },
-            { nameof(CsvComparisonWindow),          "CsvComp" },
-            { nameof(MoveRegistrationWindow),       "MoveReg" },
-            { nameof(ExchangeRegistrationWindow),   "ExchangeReg" },
-            { nameof(ActionRegistrationWindow),     "ActReg" },
             { nameof(ActionListRegistrationWindow), "ActListReg" },
-            { nameof(ProgressWindow),               "Progress" }
+            { nameof(ActionRegistrationWindow),     "ActReg" },
+            { nameof(CsvComparisonWindow),          "CsvComp" },
+            { nameof(DbSettingWindow),              "DbSetting" },
+            { nameof(ExchangeRegistrationWindow),   "ExchangeReg" },
+            { nameof(MainWindow),                   "Main" },
+            { nameof(MoveRegistrationWindow),       "MoveReg" },
+            { nameof(ProgressWindow),               "Progress" },
+            { nameof(SettingsWindow),               "Settings" },
+            { nameof(TermWindow),                   "Term" },
+            { nameof(VersionWindow),                "Version" },
         };
     }
 }
