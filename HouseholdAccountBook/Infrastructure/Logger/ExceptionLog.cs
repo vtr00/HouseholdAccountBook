@@ -33,7 +33,7 @@ namespace HouseholdAccountBook.Infrastructure.Logger
         private static string NewFilePath {
             get {
                 DateTime dt = DateTime.Now;
-                return string.Format($@"{FolderPath}\{dt:yyyyMMdd_HHmmss}.{FileExt}");
+                return string.Format($@"{FolderPath}\{dt:yyyyMMdd_HHmmssfff}.{FileExt}");
             }
         }
         /// <summary>
