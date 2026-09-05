@@ -99,21 +99,29 @@ namespace HouseholdAccountBook.Models.AppServices
                     result = false;
                 }
                 else {
-                    // 紐づく帳簿項目を探す
-                    HstActionDao actionDao = new(dbHandler);
-                    IEnumerable<HstActionDto> actionDtoList = await actionDao.FindByAssetIdAsync((int)assetId);
-                    if (actionDtoList.Any()) {
+                    // 紐づく項目を探す
+                    MstItemDao itemDao = new(dbHandler);
+                    IEnumerable<MstItemDto> itemDtoList = await itemDao.FindByAssetIdAsync((int)assetId);
+                    if (itemDtoList.Any()) {
                         result = false;
                     }
                     else {
-                        // デフォルトアセットに設定されているか確認する
-                        if (UserSettingService.Instance.DefaultAssetId == assetId) {
+                        // 紐づく帳簿項目を探す
+                        HstActionDao actionDao = new(dbHandler);
+                        IEnumerable<HstActionDto> actionDtoList = await actionDao.FindByAssetIdAsync((int)assetId);
+                        if (actionDtoList.Any()) {
                             result = false;
                         }
                         else {
-                            MstAssetDao mstAssetDao = new(dbHandler);
-                            _ = await mstAssetDao.DeleteByIdAsync((int)assetId);
-                            result = true;
+                            // デフォルトアセットに設定されているか確認する
+                            if (UserSettingService.Instance.DefaultAssetId == assetId) {
+                                result = false;
+                            }
+                            else {
+                                MstAssetDao mstAssetDao = new(dbHandler);
+                                _ = await mstAssetDao.DeleteByIdAsync((int)assetId);
+                                result = true;
+                            }
                         }
                     }
                 }

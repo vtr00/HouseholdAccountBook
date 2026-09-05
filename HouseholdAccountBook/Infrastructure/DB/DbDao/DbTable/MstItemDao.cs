@@ -67,6 +67,24 @@ new MstItemDto { ItemId = itemId });
         }
 
         /// <summary>
+        /// <see cref="MstItemDto.AssetId"/> に基づいて、レコードを取得する
+        /// </summary>
+        /// <param name="assetId">アセットID</param>
+        /// <returns>取得したレコードリスト</returns>
+        public async Task<IEnumerable<MstItemDto>> FindByAssetIdAsync(int assetId)
+        {
+            using FuncLog funcLog = new(new { assetId }, Log.LogLevel.Trace);
+
+            IEnumerable<MstItemDto> dtoList = await this.mDbHandler.QueryAsync<MstItemDto>(@"
+SELECT *
+FROM mst_item
+WHERE asset_id = @AssetId AND del_flg = 0;",
+new MstItemDto { AssetId = assetId });
+
+            return dtoList;
+        }
+
+        /// <summary>
         /// <see cref="MstItemDto.CategoryId"/> に基づいて、レコードを取得する
         /// </summary>
         /// <param name="categoryId">分類ID</param>
