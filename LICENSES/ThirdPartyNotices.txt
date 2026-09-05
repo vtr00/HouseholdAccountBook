@@ -17,7 +17,7 @@ This project incorporates material from the following third-party projects:
    2019 Stack Exchange, Inc.
    https://github.com/DapperLib/Dapper
 
-# DynamicExpresso.Core 2.19.3
+# DynamicExpresso.Core 2.19.5
    License: MIT
    Davide Icardi
    https://github.com/dynamicexpresso/DynamicExpresso
@@ -27,17 +27,17 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Data.SqlClient 7.0.1
+# Microsoft.Data.SqlClient 7.0.2
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Data.SqlClient.Extensions.Abstractions 1.0.0
+# Microsoft.Data.SqlClient.Extensions.Abstractions 7.0.2
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Data.SqlClient.Internal.Logging 1.0.0
+# Microsoft.Data.SqlClient.Internal.Logging 7.0.2
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
@@ -47,67 +47,67 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Data.Sqlite 10.0.8
+# Microsoft.Data.Sqlite 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.Data.Sqlite.Core 10.0.8
+# Microsoft.Data.Sqlite.Core 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.EntityFrameworkCore 10.0.8
+# Microsoft.EntityFrameworkCore 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Abstractions 10.0.8
+# Microsoft.EntityFrameworkCore.Abstractions 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Analyzers 10.0.8
+# Microsoft.EntityFrameworkCore.Analyzers 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.Extensions.Caching.Abstractions 10.0.8
+# Microsoft.Extensions.Caching.Abstractions 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Caching.Memory 10.0.8
+# Microsoft.Extensions.Caching.Memory 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection 10.0.8
+# Microsoft.Extensions.DependencyInjection 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection.Abstractions 10.0.8
+# Microsoft.Extensions.DependencyInjection.Abstractions 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging 10.0.8
+# Microsoft.Extensions.Logging 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging.Abstractions 10.0.8
+# Microsoft.Extensions.Logging.Abstractions 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Options 10.0.8
+# Microsoft.Extensions.Options 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Primitives 10.0.8
+# Microsoft.Extensions.Primitives 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
@@ -147,7 +147,7 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Xaml.Behaviors.Wpf 1.1.142
+# Microsoft.Xaml.Behaviors.Wpf 1.1.158
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/Microsoft/XamlBehaviorsWpf
@@ -157,12 +157,12 @@ This project incorporates material from the following third-party projects:
    Copyright © James Newton-King 2008
    https://www.newtonsoft.com/json
 
-# Notification.CoreUI 10.1.0
+# Notification.CoreUI 11.0.0
    License: LICENSE
    https://github.com/Platonenkov
    https://github.com/Platonenkov/Notification.Wpf
 
-# Notification.Wpf 10.1.0
+# Notification.Wpf 11.0.0
    License: LICENSE
    https://github.com/Platonenkov
    https://github.com/Platonenkov/Notification.Wpf
@@ -187,19 +187,19 @@ This project incorporates material from the following third-party projects:
    Copyright (c) 2014-2022 OxyPlot Contributors
    https://oxyplot.github.io/
 
-# SQLitePCLRaw.bundle_e_sqlite3 2.1.11
+# SQLitePCLRaw.bundle_e_sqlite3 2.1.12
    License: Apache-2.0
    Copyright 2014-2024 SourceGear, LLC
 
-# SQLitePCLRaw.core 2.1.11
+# SQLitePCLRaw.core 2.1.12
    License: Apache-2.0
    Copyright 2014-2024 SourceGear, LLC
 
-# SQLitePCLRaw.lib.e_sqlite3 2.1.11
+# SQLitePCLRaw.lib.e_sqlite3 2.1.12
    License: Apache-2.0
    Copyright 2014-2024 SourceGear, LLC
 
-# SQLitePCLRaw.provider.e_sqlite3 2.1.11
+# SQLitePCLRaw.provider.e_sqlite3 2.1.12
    License: Apache-2.0
    Copyright 2014-2024 SourceGear, LLC
 
@@ -208,7 +208,7 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://github.com/dotnet/runtime
 
-# System.Data.OleDb 10.0.8
+# System.Data.OleDb 10.0.11
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
