@@ -275,7 +275,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 async () => await this.mAppService.LoadItemListAsync(this.AccountSelectorVM.SelectedKey, this.BalanceKindSelectorVM.SelectedKey, this.CategorySelectorVM.SelectedKey),
                 () => this.AccountSelectorVM.SelectedKey != null && this.CategorySelectorVM.SelectedKey != null);
             this.AssetSelectorVM.SetLoader(() => AssetService.Instance.Assets);
-            this.AssetSelectorVM.SetDefaultSelector(() => this.ItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.DefaultAssetId);
+            this.AssetSelectorVM.SetDefaultSelector(() => this.ItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.Instance.DefaultAssetId);
             this.ShopSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadShopListAsync(this.ItemSelectorVM.SelectedKey, true),
                 () => this.ItemSelectorVM.SelectedKey != null, KeySelectionMode.Force);

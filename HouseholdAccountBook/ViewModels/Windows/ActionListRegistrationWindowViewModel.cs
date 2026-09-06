@@ -289,7 +289,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             // アセットを更新する
             foreach (DateValueViewModel item in this.InputedDateValueVMList) {
-                item.Initialize(() => this.ItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.DefaultAssetId);
+                item.Initialize(() => this.ItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.Instance.DefaultAssetId);
                 await item.LoadAsync();
             }
         }
@@ -326,7 +326,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 if (e.NewItems != null) {
                     foreach (object tmp in e.NewItems) {
                         if (tmp is DateValueViewModel item) {
-                            item.Initialize(() => this.ItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.DefaultAssetId);
+                            item.Initialize(() => this.ItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.Instance.DefaultAssetId);
                             await item.LoadAsync();
                             item.AddEventHandlers();
 

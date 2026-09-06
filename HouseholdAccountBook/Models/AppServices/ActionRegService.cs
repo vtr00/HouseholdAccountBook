@@ -39,7 +39,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             ActionInfoDao dao = new(dbHandler);
-            ActionInfoDto dto = await dao.FindByActionIdAsync((int)actionId, (int)UserSettingService.Instance.DefaultAssetId);
+            ActionInfoDto dto = await dao.FindByActionIdAsync((int)actionId, (int)AssetService.Instance.DefaultAssetId);
 
             ActionModel action = new() {
                 Base = new(dto.ActionId, dto.ActTime, new(dto.OrgMainActValue, dto.OrgActAssetId)),
@@ -329,7 +329,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             ActionInfoDao dao = new(dbHandler);
-            IEnumerable<ActionInfoDto> dtoList = await dao.FindByGroupIdAsync((int)groupId, (int)UserSettingService.Instance.DefaultAssetId);
+            IEnumerable<ActionInfoDto> dtoList = await dao.FindByGroupIdAsync((int)groupId, (int)AssetService.Instance.DefaultAssetId);
 
             List<ActionModel> actionList = [];
             foreach (ActionInfoDto dto in dtoList) {
@@ -457,7 +457,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             MoveActionInfoDao moveActionInfoDao = new(dbHandler);
             // 移動元、移動先、手数料の順に並び替え
-            IEnumerable<MoveActionInfoDto> dtoList = await moveActionInfoDao.GetAllAsync((int)UserSettingService.Instance.DefaultAssetId, (int)groupId);
+            IEnumerable<MoveActionInfoDto> dtoList = await moveActionInfoDao.GetAllAsync((int)AssetService.Instance.DefaultAssetId, (int)groupId);
             dtoList = dtoList.OrderByDescending(dto => dto.MoveFlg).ThenBy(dto => dto.MainActValue);
 
             List<ActionModel> actionList = [];
@@ -616,7 +616,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
             MoveActionInfoDao moveActionInfoDao = new(dbHandler);
             // 変換元、変換先、手数料の順に並び替え
-            IEnumerable<MoveActionInfoDto> dtoList = await moveActionInfoDao.GetAllAsync((int)UserSettingService.Instance.DefaultAssetId, (int)groupId);
+            IEnumerable<MoveActionInfoDto> dtoList = await moveActionInfoDao.GetAllAsync((int)AssetService.Instance.DefaultAssetId, (int)groupId);
             dtoList = dtoList.OrderByDescending(dto => dto.ItemKind).ThenBy(dto => dto.MainActValue);
 
             List<ActionModel> actionList = [];
