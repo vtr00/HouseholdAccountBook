@@ -97,7 +97,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             ActionCompInfoDao actionCompInfoDao = new(dbHandler);
-            IEnumerable<ActionCompInfoDto> dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(accountId.Id, (int)UserSettingService.Instance.DefaultAssetId, dateTime, value.MainValue);
+            IEnumerable<ActionCompInfoDto> dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(accountId.Id, (int)AssetService.Instance.DefaultAssetId, dateTime, value.MainValue);
             IEnumerable<ActionModel> actionList = [.. dtoList.Select(dto => new ActionModel() {
                     Base = new(dto.ActionId, dto.ActTime, new(dto.MainActValue, dto.ActAssetId)),
                     AssetId = dto.AssetId ?? AssetIdObj.System,

@@ -34,12 +34,28 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <param name="initialName">1番目に追加する項目の名称(空文字の場合は追加しない)</param>
         /// <returns>アセットModelリスト</returns>
+        /// <remarks>デフォルトアセットIDに該当するアセットが存在しない場合は、デフォルトアセットIDを変更する</remarks>
         public async Task<IEnumerable<AssetModel>> LoadAssetListAsync(string initialName = "")
         {
             using FuncLog funcLog = new(new { initialName });
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
+            MstAssetDao mstAssetDao = new(dbHandler);
+            IEnumerable<MstAssetDto> dtoList = await mstAssetDao.FindAllAsync();
+
+            // デフォルトアセットIDに該当するアセットが存在しない場合は、ベースレートが1に近いものを採用する
             AssetIdObj defaultAssetId = UserSettingService.Instance.DefaultAssetId;
+            if (!dtoList.Any(dto => dto.AssetId == defaultAssetId)) {
+                decimal baseRate = decimal.MaxValue;
+                foreach (MstAssetDto dto in dtoList) {
+                    if (Math.Abs(dto.BaseRate - 1) < Math.Abs(baseRate - 1)) {
+                        baseRate = dto.BaseRate;
+                        defaultAssetId = dto.AssetId;
+                    }
+                }
+                Log.Info($"Default Asset Id: {UserSettingService.Instance.DefaultAssetId} -> {defaultAssetId}");
+                UserSettingService.Instance.DefaultAssetId = defaultAssetId;
+            }
 
             List<AssetModel> amList = [];
 
@@ -48,8 +64,6 @@ namespace HouseholdAccountBook.Models.AppServices
                 amList.Add(new(AssetIdObj.System, initialName));
             }
 
-            MstAssetDao mstAssetDao = new(dbHandler);
-            IEnumerable<MstAssetDto> dtoList = await mstAssetDao.FindAllAsync();
             foreach (MstAssetDto dto in dtoList) {
                 AssetModel vm = new(dto.AssetId, dto.AssetName) {
                     SortOrder = dto.SortOrder,

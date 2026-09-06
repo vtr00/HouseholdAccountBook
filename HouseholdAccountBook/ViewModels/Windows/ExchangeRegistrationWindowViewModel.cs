@@ -321,14 +321,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 async () => await this.mAppService.LoadExchangeItemListAsync(this.AccountSelectorVM.SelectedKey, BalanceKind.Expenses),
                 () => this.AccountSelectorVM.SelectedKey != null);
             this.SrcAssetSelectorVM.SetLoader(() => AssetService.Instance.Assets);
-            this.SrcAssetSelectorVM.SetDefaultSelector(() => this.SrcItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.DefaultAssetId);
+            this.SrcAssetSelectorVM.SetDefaultSelector(() => this.SrcItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.Instance.DefaultAssetId);
 
             // 変換先(収入)
             this.DstItemSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadExchangeItemListAsync(this.AccountSelectorVM.SelectedKey, BalanceKind.Income),
                 () => this.AccountSelectorVM.SelectedKey != null);
             this.DstAssetSelectorVM.SetLoader(() => AssetService.Instance.Assets);
-            this.DstAssetSelectorVM.SetDefaultSelector(() => this.DstItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.DefaultAssetId);
+            this.DstAssetSelectorVM.SetDefaultSelector(() => this.DstItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.Instance.DefaultAssetId);
 
             // 手数料(支出)
             this.FeeKindSelectorVM.SetLoader(() => ExchangeFeeKindStr);
@@ -336,7 +336,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 async () => await this.mAppService.LoadItemListAsync(this.AccountSelectorVM.SelectedKey, BalanceKind.Expenses, CategoryIdObj.System),
                 () => this.AccountSelectorVM.SelectedKey != null);
             this.FeeAssetSelectorVM.SetLoader(() => AssetService.Instance.Assets);
-            this.FeeAssetSelectorVM.SetDefaultSelector(() => this.FeeItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.DefaultAssetId);
+            this.FeeAssetSelectorVM.SetDefaultSelector(() => this.FeeItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.Instance.DefaultAssetId);
             this.RemarkSelectorVM.SetLoader(
                 async () => await this.mAppService.LoadRemarkListAsync(this.FeeItemSelectorVM.SelectedKey, true),
                 () => this.FeeItemSelectorVM.SelectedKey != null, KeySelectionMode.Force);

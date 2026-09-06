@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Infrastructure;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using System;
@@ -28,7 +29,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <summary>
         /// デフォルトアセットID
         /// </summary>
-        public static AssetIdObj DefaultAssetId => UserSettingService.Instance.DefaultAssetId;
+        public AssetIdObj DefaultAssetId => this.GetDefaultAssetModel()?.Id ?? AssetIdObj.System;
 
         /// <summary>
         /// アセットリストを更新する
@@ -46,7 +47,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// デフォルトアセットモデルを取得する
         /// </summary>
         /// <returns>デフォルトアセットモデル</returns>
-        public AssetModel GetDefaultAssetModel() => this.Assets.FirstOrDefault(asset => asset.Id == DefaultAssetId);
+        public AssetModel GetDefaultAssetModel() => this.Assets.FirstOrElementAtOrDefault(asset => asset.IsDefault, 0);
         /// <summary>
         /// アセットモデルを取得する
         /// </summary>
@@ -132,7 +133,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// <returns>変換先の金額VO</returns>
         public AmountObj Convert(AmountObj src, AssetIdObj dstAssetId = null)
         {
-            dstAssetId ??= DefaultAssetId;
+            dstAssetId ??= this.DefaultAssetId;
 
             AssetModel srcAsset = this.GetAssetModel(src.AssetId);
             AssetModel dstAsset = this.GetAssetModel(dstAssetId);

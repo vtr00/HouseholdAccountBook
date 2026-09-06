@@ -17,6 +17,7 @@ namespace HouseholdAccountBook.Models.AppServices
     /// <summary>
     /// ユーザ設定サービス
     /// </summary>
+    /// <remarks>内部表現値として無効な値であれば、有効な値となるように調停する</remarks>
     public class UserSettingService : SingletonBase<UserSettingService>
     {
         /// <summary>
@@ -89,7 +90,7 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <remarks>帳簿項目/帳簿のアセットIDが未指定時に使用する</remarks>
         public AssetIdObj DefaultAssetId {
-            get => this.mSettings.App_DefaultAssetId;
+            get => this.mSettings.App_DefaultAssetId == (int)AssetIdObj.System ? AssetIdObj.System : Math.Max(0, this.mSettings.App_DefaultAssetId);
             set {
                 this.mSettings.App_DefaultAssetId = (int)value;
                 this.mSettings.Save();

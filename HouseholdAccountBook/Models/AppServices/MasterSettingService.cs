@@ -81,7 +81,7 @@ namespace HouseholdAccountBook.Models.AppServices
         }
 
         /// <summary>
-        /// アセットに紐づくデフォルトアセットが存在しなければアセットを削除する
+        /// アセットに紐づくマスタ、デフォルトアセットが存在しなければアセットを削除する
         /// </summary>
         /// <param name="assetId"></param>
         /// <returns>削除したか</returns>
@@ -114,7 +114,7 @@ namespace HouseholdAccountBook.Models.AppServices
                         }
                         else {
                             // デフォルトアセットに設定されているか確認する
-                            if (UserSettingService.Instance.DefaultAssetId == assetId) {
+                            if (AssetService.Instance.DefaultAssetId == assetId) {
                                 result = false;
                             }
                             else {
@@ -183,7 +183,7 @@ namespace HouseholdAccountBook.Models.AppServices
             await using DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync();
 
             BookInfoDao bookInfoDao = new(dbHandler);
-            BookInfoDto dto = await bookInfoDao.FindByBookIdAsync((int)accountId, (int)UserSettingService.Instance.DefaultAssetId);
+            BookInfoDto dto = await bookInfoDao.FindByBookIdAsync((int)accountId, (int)AssetService.Instance.DefaultAssetId);
 
             MstBookDto.JsonDto jsonObj = dto.JsonCode == null ? null : new(dto.JsonCode);
 

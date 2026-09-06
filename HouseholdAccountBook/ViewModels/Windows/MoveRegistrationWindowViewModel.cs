@@ -327,12 +327,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
             // 移動元
             this.SrcAccountSelectorVM.SetLoader(async () => await this.mAppService.LoadAccountListAsync());
             this.SrcAssetSelectorVM.SetLoader(() => AssetService.Instance.Assets);
-            this.SrcAssetSelectorVM.SetDefaultSelector(() => this.SrcAccountSelectorVM.SelectedItem?.AssetId ?? AssetService.DefaultAssetId);
+            this.SrcAssetSelectorVM.SetDefaultSelector(() => this.SrcAccountSelectorVM.SelectedItem?.AssetId ?? AssetService.Instance.DefaultAssetId);
 
             // 移動先
             this.DstAccountSelectorVM.SetLoader(async () => await this.mAppService.LoadAccountListAsync());
             this.DstAssetSelectorVM.SetLoader(() => AssetService.Instance.Assets);
-            this.DstAssetSelectorVM.SetDefaultSelector(() => this.DstAccountSelectorVM.SelectedItem?.AssetId ?? AssetService.DefaultAssetId);
+            this.DstAssetSelectorVM.SetDefaultSelector(() => this.DstAccountSelectorVM.SelectedItem?.AssetId ?? AssetService.Instance.DefaultAssetId);
 
             // 手数料
             this.FeeKindSelectorVM.SetLoader(() => MoveFeeKindStr);

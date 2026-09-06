@@ -103,8 +103,8 @@ namespace HouseholdAccountBook.Models.AppServices
 
             EndingBalanceInfoDao endingBalanceInfoDao = new(dbHandler);
             EndingBalanceInfoDto dto = accountId == AccountIdObj.System
-                ? await endingBalanceInfoDao.FindAsync((int)UserSettingService.Instance.DefaultAssetId, startDate) // 全帳簿の繰越残高
-                : await endingBalanceInfoDao.FindByBookIdAsync(accountId.Id, (int)UserSettingService.Instance.DefaultAssetId, startDate); // 各帳簿の繰越残高
+                ? await endingBalanceInfoDao.FindAsync((int)AssetService.Instance.DefaultAssetId, startDate) // 全帳簿の繰越残高
+                : await endingBalanceInfoDao.FindByBookIdAsync(accountId.Id, (int)AssetService.Instance.DefaultAssetId, startDate); // 各帳簿の繰越残高
             AmountObj balance = new(dto.MainEndingBalance, dto.AssetId);
 
             return balance;
@@ -161,8 +161,8 @@ namespace HouseholdAccountBook.Models.AppServices
 
             ActionInfoDao actionInfoDao = new(dbHandler);
             IEnumerable<ActionInfoDto> dtoList = accountId == AccountIdObj.System
-                ? await actionInfoDao.FindAllWithinPeriodAsync((int)UserSettingService.Instance.DefaultAssetId, period.Start, period.End) // 全帳簿項目
-                : await actionInfoDao.FindByBookIdWithinPeriodAsync((int)accountId, (int)UserSettingService.Instance.DefaultAssetId, period.Start, period.End); // 各帳簿項目
+                ? await actionInfoDao.FindAllWithinPeriodAsync((int)AssetService.Instance.DefaultAssetId, period.Start, period.End) // 全帳簿項目
+                : await actionInfoDao.FindByBookIdWithinPeriodAsync((int)accountId, (int)AssetService.Instance.DefaultAssetId, period.Start, period.End); // 各帳簿項目
 
             foreach (ActionInfoDto aDto in dtoList) {
                 AmountObj actValue = new(aDto.MainActValue, aDto.ActAssetId);
@@ -253,8 +253,8 @@ namespace HouseholdAccountBook.Models.AppServices
             await using (DbHandlerBase dbHandler = await this.mDbHandlerFactory.CreateAsync()) {
                 SummaryInfoDao summaryInfoDao = new(dbHandler);
                 IEnumerable<SummaryInfoDto> dtoList = accountId == AccountIdObj.System
-                    ? await summaryInfoDao.FindAllWithinPeriodAsync((int)UserSettingService.Instance.DefaultAssetId, period.Start, period.End)
-                    : await summaryInfoDao.FindByBookIdWithinPeriodAsync((int)accountId, (int)UserSettingService.Instance.DefaultAssetId, period.Start, period.End);
+                    ? await summaryInfoDao.FindAllWithinPeriodAsync((int)AssetService.Instance.DefaultAssetId, period.Start, period.End)
+                    : await summaryInfoDao.FindByBookIdWithinPeriodAsync((int)accountId, (int)AssetService.Instance.DefaultAssetId, period.Start, period.End);
 
                 foreach (SummaryInfoDto dto in dtoList) {
                     if (!initAssetId) {
