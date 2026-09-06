@@ -34,32 +34,34 @@ namespace HouseholdAccountBook.Properties
         /// <param name="e"></param>
         private void Settings_SettingsLoaded(object sender, SettingsLoadedEventArgs e)
         {
-            // JSON ファイルが存在する場合、JSON ファイルから設定を読み込む
-            if (File.Exists(SettingsJsonFilePath)) {
-                string jsonCode = File.ReadAllText(SettingsJsonFilePath);
-                JObject jObj = JObject.Parse(jsonCode);
+            if (!File.Exists(SettingsJsonFilePath)) {
+                // JSON ファイルが存在しない場合は、標準設定プロバイダーの値を使用する
+                return;
+            }
 
-                foreach (SettingsProperty prop in this.Properties) {
-                    string name = prop.Name;
+            string jsonCode = File.ReadAllText(SettingsJsonFilePath);
+            JObject jObj = JObject.Parse(jsonCode);
 
-                    // JSON に設定が存在しない場合はスキップ
-                    if (!jObj.TryGetValue(name, out JToken token)) { continue; }
+            foreach (SettingsProperty prop in this.Properties) {
+                string name = prop.Name;
 
-                    // Nullable対応
-                    Type type = prop.PropertyType;
-                    Type targetType = Nullable.GetUnderlyingType(type) ?? type;
+                // JSON に設定が存在しない場合はスキップ
+                if (!jObj.TryGetValue(name, out JToken token)) { continue; }
 
-                    try {
-                        object value = targetType == typeof(DateTime)
-                            ? token.Type == JTokenType.String
-                                ? DateTime.Parse(token.ToString())
-                                : token.ToObject<DateTime>()
-                            : token.ToObject(targetType);
-                        this[name] = value;
-                    }
-                    catch (Exception ex) {
-                        Console.WriteLine($"設定 '{name}' の読み込みに失敗: {ex.Message}");
-                    }
+                // Nullable対応
+                Type type = prop.PropertyType;
+                Type targetType = Nullable.GetUnderlyingType(type) ?? type;
+
+                try {
+                    object value = targetType == typeof(DateTime)
+                        ? token.Type == JTokenType.String
+                            ? DateTime.Parse(token.ToString())
+                            : token.ToObject<DateTime>()
+                        : token.ToObject(targetType);
+                    this[name] = value;
+                }
+                catch (Exception ex) {
+                    Console.WriteLine($"設定 '{name}' の読み込みに失敗: {ex.Message}");
                 }
             }
         }
@@ -101,13 +103,14 @@ namespace HouseholdAccountBook.Properties
                     // 削除された設定はここで取得する
                 }
 
-                base.Upgrade();
+                // Settings.json が存在する場合は、user.config から引き継がない
+                if (!File.Exists(SettingsJsonFilePath)) {
+                    base.Upgrade();
+                }
 
                 // 削除された設定を新しい設定に反映する
             }
-            catch (Exception) {
-                base.Upgrade();
-            }
+            catch (Exception) { }
             #endregion
 
             // Upgrade時のバージョン番号を保存する
