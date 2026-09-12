@@ -6,8 +6,8 @@
 【    著作権者    】    toresebu
 【  ホームページ  】    https://github.com/vtr00/HouseholdAccountBook
 【    ソフト名    】    歳時記帳(Saiji-Kicho) : HouseholdAccountBook.exe
-【   バージョン   】    Ver 1.3.0.0
-【     作成日     】    2026/09/05
+【   バージョン   】    Ver 1.3.1.0
+【     作成日     】    2026/09/13
 【     連絡先     】    vtr0749@gmail.com
 ================================================================================
 
