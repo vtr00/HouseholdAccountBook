@@ -1,13 +1,40 @@
-# Copilot Instructions
+# プロジェクトガイドライン
 
-## General Guidelines
-- All review comments must be written in Japanese. Never answer in English.
-- Provide specific and direct differences for the specified targets from the first response. General statements are unnecessary.
-- Treat read-only investigation, static analysis, and result organization as tasks that can be performed within the Plan because they do not modify code.
-- When the user instructs you to perform a check, investigation, or analysis, perform it immediately using available read-only means instead of ending with an explanation.
-- When determining the source of a defect, do not judge from the current code alone; check the diff or history against the specified baseline branch.
-- If the diff against the baseline branch cannot be checked, do not speculate about or assert the source of the defect. Clearly separate facts confirmed in the current code from matters not confirmed as the source of the defect.
-- When the user specifies an output format, prioritize that format. When raw `.md` text is requested, present it in a Markdown code block.
-- When the user specifies that the content must not be changed, present the wording, judgments, columns, and rows without modification.
-- When an approved plan exists, perform read-only work within the Plan without requesting additional confirmation.
-- If the requested work cannot be performed, first consider available alternatives and do not end with an explanation of the reason alone.
+## アーキテクチャ
+
+- MVVMアーキテクチャに従う。
+- データベースアクセスはInfrastructure層のDAOからのみ行う
+- データベース固有の処理はDAOまたはAppServiceに置く
+- DDDパターンを適用するのは、明確なメリットがある場合に限る
+
+## コーディング
+
+- 可読性と保守性を優先し、既存のコード規約に従う
+- 目的のない変更や不要な依存関係の追加を避ける
+- コメントは日本語で記述する
+
+## データベース
+
+- PostgreSQLを主たるデータベースとする
+- SQLiteをフォールバックとしてサポートする
+
+## リポジトリ
+
+- 開発時のブランチ名は、feature/gh-{チケットID} とする
+- コミットメッセージは、以下に従う
+
+~~~
+#{チケットID} - {チケットタイトル}
+
+- {修正の概要. 必要に応じて複数行に及ぶ}
+~~~
+
+## Copilotの作業ルール
+
+- 指定された対象に集中し、一般的な説明は省略する
+- 調査・分析・計画など、コードを変更しない作業は計画の範囲内で実行する
+- 疑問点や不明点がある場合は、実装前に確認する
+- 不具合は現在のコードと指定されたベースラインブランチを確認してから修正する
+- 指定された出力形式を守る。Markdownの文章はMarkdownコードブロックで示す
+- 既存の計画がある場合は、追加確認を求めず計画の範囲内で実行する
+- 計画どおりに実装できない場合は、代替案を提示して確認する
