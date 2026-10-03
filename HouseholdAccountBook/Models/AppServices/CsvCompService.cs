@@ -98,8 +98,8 @@ namespace HouseholdAccountBook.Models.AppServices
 
             ActionCompInfoDao actionCompInfoDao = new(dbHandler);
             IEnumerable<ActionCompInfoDto> dtoList = await actionCompInfoDao.FindMatchesWithCsvAsync(accountId.Id, (int)AssetService.Instance.DefaultAssetId, dateTime, value.MainValue);
-            IEnumerable<ActionModel> actionList = [.. dtoList.Select(dto => new ActionModel() {
-                    Base = new(dto.ActionId, dto.ActTime, new(dto.MainActValue, dto.ActAssetId)),
+            IEnumerable<ActionModel> actionList = [.. dtoList.Select(static dto => new ActionModel() {
+                    Base = new(dto.ActionId, dto.ActTime, new(dto.BookAmount)),
                     AssetId = dto.AssetId ?? AssetIdObj.System,
                     GroupId = dto.GroupId,
                     Item = new(dto.ItemId, dto.ItemName),

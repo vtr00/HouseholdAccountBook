@@ -165,7 +165,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 : await actionInfoDao.FindByBookIdWithinPeriodAsync((int)accountId, (int)AssetService.Instance.DefaultAssetId, period.Start, period.End); // 各帳簿項目
 
             foreach (ActionInfoDto aDto in dtoList) {
-                AmountObj actValue = new(aDto.MainActValue, aDto.ActAssetId);
+                AmountObj actValue = accountId == AccountIdObj.System ? new(aDto.DefaultAmount) : new(aDto.BookAmount);
                 balance += actValue;
 
                 ActionWithBalanceModel am = new() {
@@ -174,7 +174,7 @@ namespace HouseholdAccountBook.Models.AppServices
                         AssetId = aDto.AssetId ?? AssetIdObj.System,
                         GroupId = aDto.GroupId,
                         Account = new(aDto.BookId, aDto.BookName),
-                        Category = new(aDto.CategoryId, aDto.CategoryName, aDto.MainActValue < 0 ? BalanceKind.Expenses : BalanceKind.Income),
+                        Category = new(aDto.CategoryId, aDto.CategoryName, actValue.MainValue < 0 ? BalanceKind.Expenses : BalanceKind.Income),
                         Item = new(aDto.ItemId, aDto.ItemName),
                         Shop = new(aDto.ShopName),
                         Remark = new(aDto.Remark),
@@ -258,14 +258,14 @@ namespace HouseholdAccountBook.Models.AppServices
 
                 foreach (SummaryInfoDto dto in dtoList) {
                     if (!initAssetId) {
-                        assetId = dto.AssetId;
+                        assetId = accountId == AccountIdObj.System ? dto.DefaultTotalAmount.AssetId : dto.BookTotalAmount.AssetId;
                         initAssetId = true;
                     }
 
                     smList.Add(new() {
                         Category = new(dto.CategoryId, dto.CategoryName, EnumUtil.SafeCastEnum(dto.BalanceKind, BalanceKind.Income)),
                         Item = new(dto.ItemId, dto.ItemName),
-                        Total = new(dto.MainTotal, assetId)
+                        Total = new(accountId == AccountIdObj.System ? dto.DefaultTotalAmount : dto.BookTotalAmount)
                     });
                 }
             }
