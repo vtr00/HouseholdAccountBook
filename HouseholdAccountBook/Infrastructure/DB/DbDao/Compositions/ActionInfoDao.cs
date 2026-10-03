@@ -60,7 +60,7 @@ SELECT A.action_id, A.act_time, B.book_id, C.category_id, I.item_id, B.book_name
        A.shop_name, A.group_id, A.remark, A.is_match
 FROM hst_action A
 INNER JOIN mst_book B ON B.book_id = A.book_id AND B.del_flg = 0 
-INNER JOIN mst_item I ON I.item_id = A.item_id AND (I_move_flg = 0 AND I.item_kind = 0) AND I.del_flg = 0 -- 項目種別:通常のみ
+INNER JOIN mst_item I ON I.item_id = A.item_id AND (I.move_flg = 0 AND I.item_kind = 0) AND I.del_flg = 0 -- 項目種別:通常のみ
 INNER JOIN rel_book_item RBI ON RBI.item_id = I.item_id AND RBI.book_id = A.book_id AND RBI.del_flg = 0
 INNER JOIN mst_category C ON I.category_id = C.category_id AND C.del_flg = 0
 INNER JOIN mst_asset DA ON DA.asset_id = @DefaultAssetId AND DA.del_flg = 0 -- デフォルトアセット(不使用)
