@@ -32,13 +32,38 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDto.Others
         /// 項目名
         /// </summary>
         public string ItemName { get; set; } = string.Empty;
+
         /// <summary>
-        /// 表示アセットでの合計(主単位)
+        /// デフォルトに紐づく合計金額
         /// </summary>
-        public decimal MainTotal { get; set; }
+        public AmountDto DefaultTotalAmount { get; set; } = new();
+        private decimal MainActValue {
+            set => this.DefaultTotalAmount.MainValue = value;
+        }
+        private int ActAssetId {
+            set => this.DefaultTotalAmount.AssetId = value;
+        }
+
         /// <summary>
-        /// 表示アセットでのアセットID
+        /// 帳簿に紐づく合計金額
         /// </summary>
-        public int AssetId { get; set; }
+        public AmountDto BookTotalAmount { get; set; } = new();
+        private decimal MainActValueBook {
+            set => this.BookTotalAmount.MainValue = value;
+        }
+        private int ActAssetIdBook {
+            set => this.BookTotalAmount.AssetId = value;
+        }
+
+        /// <summary>
+        /// 項目に紐づく合計金額
+        /// </summary>
+        public AmountDto ItemTotalAmount { get; set; } = new();
+        private decimal MainActValueItem {
+            set => this.ItemTotalAmount.MainValue = value;
+        }
+        private int ActAssetIdItem {
+            set => this.ItemTotalAmount.AssetId = value;
+        }
     }
 }

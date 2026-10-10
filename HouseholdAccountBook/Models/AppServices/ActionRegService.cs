@@ -7,6 +7,7 @@ using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Models.DtoMappers;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using System;
@@ -42,11 +43,11 @@ namespace HouseholdAccountBook.Models.AppServices
             ActionInfoDto dto = await dao.FindByActionIdAsync((int)actionId, (int)AssetService.Instance.DefaultAssetId);
 
             ActionModel action = new() {
-                Base = new(dto.ActionId, dto.ActTime, new(dto.OrgMainActValue, dto.OrgActAssetId)),
+                Base = new(dto.ActionId, dto.ActTime, AmountMapper.ToValueObject(dto.ActionAmount)),
                 AssetId = dto.AssetId ?? AssetIdObj.System,
                 GroupId = dto.GroupId,
                 Account = new(dto.BookId, dto.BookName),
-                Category = new(dto.CategoryId, dto.CategoryName, 0 < Math.Sign(dto.OrgMainActValue) ? BalanceKind.Income : BalanceKind.Expenses),
+                Category = new(dto.CategoryId, dto.CategoryName, 0 < Math.Sign(dto.ActionAmount.MainValue) ? BalanceKind.Income : BalanceKind.Expenses),
                 Item = new(dto.ItemId, dto.ItemName),
                 Shop = new(dto.ShopName),
                 Remark = new(dto.Remark),
@@ -334,11 +335,11 @@ namespace HouseholdAccountBook.Models.AppServices
             List<ActionModel> actionList = [];
             foreach (ActionInfoDto dto in dtoList) {
                 ActionModel action = new() {
-                    Base = new(dto.ActionId, dto.ActTime, new(dto.OrgMainActValue, dto.OrgActAssetId)),
+                    Base = new(dto.ActionId, dto.ActTime, AmountMapper.ToValueObject(dto.ActionAmount)),
                     AssetId = dto.AssetId ?? AssetIdObj.System,
                     GroupId = groupId,
                     Account = new(dto.BookId, dto.BookName),
-                    Category = new(dto.CategoryId, dto.CategoryName, 0 < Math.Sign(dto.OrgMainActValue) ? BalanceKind.Income : BalanceKind.Expenses),
+                    Category = new(dto.CategoryId, dto.CategoryName, 0 < Math.Sign(dto.ActionAmount.MainValue) ? BalanceKind.Income : BalanceKind.Expenses),
                     Item = new(dto.ItemId, dto.ItemName),
                     Shop = new(dto.ShopName),
                     Remark = new(dto.Remark)
@@ -458,12 +459,12 @@ namespace HouseholdAccountBook.Models.AppServices
             MoveActionInfoDao moveActionInfoDao = new(dbHandler);
             // 移動元、移動先、手数料の順に並び替え
             IEnumerable<MoveActionInfoDto> dtoList = await moveActionInfoDao.GetAllAsync((int)AssetService.Instance.DefaultAssetId, (int)groupId);
-            dtoList = dtoList.OrderByDescending(dto => dto.MoveFlg).ThenBy(dto => dto.MainActValue);
+            dtoList = dtoList.OrderByDescending(dto => dto.MoveFlg).ThenBy(dto => dto.BookAmount.MainValue);
 
             List<ActionModel> actionList = [];
             foreach (MoveActionInfoDto dto in dtoList) {
                 ActionModel action = new() {
-                    Base = new(dto.ActionId, dto.ActTime, new(dto.OrgMainActValue, dto.OrgActAssetId)),
+                    Base = new(dto.ActionId, dto.ActTime, AmountMapper.ToValueObject(dto.ActionAmount)),
                     AssetId = dto.AssetId ?? AssetIdObj.System,
                     GroupId = groupId,
                     Account = new(dto.BookId, string.Empty),
@@ -617,12 +618,12 @@ namespace HouseholdAccountBook.Models.AppServices
             MoveActionInfoDao moveActionInfoDao = new(dbHandler);
             // 変換元、変換先、手数料の順に並び替え
             IEnumerable<MoveActionInfoDto> dtoList = await moveActionInfoDao.GetAllAsync((int)AssetService.Instance.DefaultAssetId, (int)groupId);
-            dtoList = dtoList.OrderByDescending(dto => dto.ItemKind).ThenBy(dto => dto.MainActValue);
+            dtoList = dtoList.OrderByDescending(dto => dto.ItemKind).ThenBy(dto => dto.BookAmount.MainValue);
 
             List<ActionModel> actionList = [];
             foreach (MoveActionInfoDto dto in dtoList) {
                 ActionModel action = new() {
-                    Base = new(dto.ActionId, dto.ActTime, new(dto.OrgMainActValue, dto.OrgActAssetId)),
+                    Base = new(dto.ActionId, dto.ActTime, AmountMapper.ToValueObject(dto.ActionAmount)),
                     AssetId = dto.AssetId ?? AssetIdObj.System,
                     GroupId = groupId,
                     Account = new(dto.BookId, string.Empty),
