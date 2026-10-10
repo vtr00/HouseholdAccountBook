@@ -1,5 +1,4 @@
-﻿using HouseholdAccountBook.Infrastructure.DB.DbDto;
-using HouseholdAccountBook.Models.AppServices;
+﻿using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.UiDto;
 using System;
 using System.Diagnostics;
@@ -40,15 +39,6 @@ namespace HouseholdAccountBook.Models.ValueObjects
         {
             this.MainValue = mainValue;
             this.AssetId = assetId;
-        }
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="dto">金額DTO</param>
-        public AmountObj(AmountDto dto)
-        {
-            this.MainValue = dto.MainValue;
-            this.AssetId = dto.AssetId;
         }
         /// <summary>
         /// コンストラクタ

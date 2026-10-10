@@ -7,6 +7,7 @@ using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Models.DtoMappers;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using System;
@@ -165,7 +166,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 : await actionInfoDao.FindByBookIdWithinPeriodAsync((int)accountId, (int)AssetService.Instance.DefaultAssetId, period.Start, period.End); // 各帳簿項目
 
             foreach (ActionInfoDto aDto in dtoList) {
-                AmountObj actValue = accountId == AccountIdObj.System ? new(aDto.DefaultAmount) : new(aDto.BookAmount);
+                AmountObj actValue = AmountMapper.ToValueObject(accountId == AccountIdObj.System ? aDto.DefaultAmount : aDto.BookAmount);
                 balance += actValue;
 
                 ActionWithBalanceModel am = new() {
@@ -265,7 +266,7 @@ namespace HouseholdAccountBook.Models.AppServices
                     smList.Add(new() {
                         Category = new(dto.CategoryId, dto.CategoryName, EnumUtil.SafeCastEnum(dto.BalanceKind, BalanceKind.Income)),
                         Item = new(dto.ItemId, dto.ItemName),
-                        Total = new(accountId == AccountIdObj.System ? dto.DefaultTotalAmount : dto.BookTotalAmount)
+                        Total = AmountMapper.ToValueObject(accountId == AccountIdObj.System ? dto.DefaultTotalAmount : dto.BookTotalAmount)
                     });
                 }
             }

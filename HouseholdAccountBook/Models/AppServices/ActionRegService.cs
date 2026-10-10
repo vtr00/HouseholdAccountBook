@@ -7,6 +7,7 @@ using HouseholdAccountBook.Infrastructure.DB.DbHandlers.Abstract;
 using HouseholdAccountBook.Infrastructure.Logger;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
+using HouseholdAccountBook.Models.DtoMappers;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using System;
@@ -42,7 +43,7 @@ namespace HouseholdAccountBook.Models.AppServices
             ActionInfoDto dto = await dao.FindByActionIdAsync((int)actionId, (int)AssetService.Instance.DefaultAssetId);
 
             ActionModel action = new() {
-                Base = new(dto.ActionId, dto.ActTime, new(dto.ActionAmount)),
+                Base = new(dto.ActionId, dto.ActTime, AmountMapper.ToValueObject(dto.ActionAmount)),
                 AssetId = dto.AssetId ?? AssetIdObj.System,
                 GroupId = dto.GroupId,
                 Account = new(dto.BookId, dto.BookName),
@@ -334,7 +335,7 @@ namespace HouseholdAccountBook.Models.AppServices
             List<ActionModel> actionList = [];
             foreach (ActionInfoDto dto in dtoList) {
                 ActionModel action = new() {
-                    Base = new(dto.ActionId, dto.ActTime, new(dto.ActionAmount)),
+                    Base = new(dto.ActionId, dto.ActTime, AmountMapper.ToValueObject(dto.ActionAmount)),
                     AssetId = dto.AssetId ?? AssetIdObj.System,
                     GroupId = groupId,
                     Account = new(dto.BookId, dto.BookName),
@@ -463,7 +464,7 @@ namespace HouseholdAccountBook.Models.AppServices
             List<ActionModel> actionList = [];
             foreach (MoveActionInfoDto dto in dtoList) {
                 ActionModel action = new() {
-                    Base = new(dto.ActionId, dto.ActTime, new(dto.ActionAmount)),
+                    Base = new(dto.ActionId, dto.ActTime, AmountMapper.ToValueObject(dto.ActionAmount)),
                     AssetId = dto.AssetId ?? AssetIdObj.System,
                     GroupId = groupId,
                     Account = new(dto.BookId, string.Empty),
@@ -622,7 +623,7 @@ namespace HouseholdAccountBook.Models.AppServices
             List<ActionModel> actionList = [];
             foreach (MoveActionInfoDto dto in dtoList) {
                 ActionModel action = new() {
-                    Base = new(dto.ActionId, dto.ActTime, new(dto.ActionAmount)),
+                    Base = new(dto.ActionId, dto.ActTime, AmountMapper.ToValueObject(dto.ActionAmount)),
                     AssetId = dto.AssetId ?? AssetIdObj.System,
                     GroupId = groupId,
                     Account = new(dto.BookId, string.Empty),

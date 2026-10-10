@@ -28,9 +28,9 @@ namespace HouseholdAccountBook.Infrastructure.DB.DbDao.Compositions
 
             IEnumerable<SummaryInfoDto> dtoList = await this.mDbHandler.QueryAsync<SummaryInfoDto>(@"
 SELECT C.balance_kind, C.category_id, C.category_name, I.item_id, I.item_name,
-       COALESCE(SUM((A.act_value / POWER(10, AA.scale)) * AA.base_rate / DA.base_rate), 0) AS main_act_value,      DA.asset_id AS act_asset_id, -- 表示
-       0                                                                                   AS main_act_value_book, -1          AS act_asset_id_book,
-       COALESCE(SUM((A.act_value / POWER(10, AA.scale)) * AA.base_rate / IA.base_rate), 0) AS main_act_value_item, IA.asset_id AS act_asset_id_item
+       COALESCE(SUM((A.act_value / POWER(10, AA.scale)) * AA.base_rate / DA.base_rate), 0) AS main_act_value,      DA.asset_id AS act_asset_id,         -- 表示
+       0                                                                                   AS main_act_value_book, -1          AS act_asset_id_book,    -- ダミー値
+       0                                                                                   AS main_act_value_item, -1          AS act_asset_id_item     -- ダミー値
 FROM mst_item I
 INNER JOIN rel_book_item RBI ON RBI.item_id = I.item_id AND RBI.del_flg = 0
 INNER JOIN mst_category C ON C.category_id = I.category_id AND C.del_flg = 0
@@ -40,7 +40,7 @@ LEFT JOIN mst_asset DA ON DA.asset_id =                                         
 LEFT JOIN mst_asset IA ON IA.asset_id = COALESCE(            I.asset_id, B.asset_id, @DefaultAssetId) AND IA.del_flg = 0 -- 項目に紐づくアセット
 LEFT JOIN mst_asset AA ON AA.asset_id = COALESCE(A.asset_id, I.asset_id, B.asset_id, @DefaultAssetId) AND AA.del_flg = 0 -- 帳簿項目に紐づくアセット
 WHERE I.move_flg = 0 AND I.del_flg = 0
-GROUP BY C.balance_kind, C.category_id, C.category_name, I.item_id, I.item_name, DA.asset_id, IA.asset_id, C.sort_order, I.sort_order
+GROUP BY C.balance_kind, C.category_id, C.category_name, I.item_id, I.item_name, DA.asset_id, C.sort_order, I.sort_order
 ORDER BY C.balance_kind, C.sort_order, I.sort_order;",
 new { DefaultAssetId = defaultAssetId, StartDate = startDate, FinishDate = finishDate.AddDays(1) });
 
