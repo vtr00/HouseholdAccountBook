@@ -99,7 +99,7 @@ namespace HouseholdAccountBook.Views.Behaviors
         }
 
         /// <summary>
-        /// <see cref="SelectedItems"/> 内のアイテムが更新されたときに <see cref="ISelectable.SelectFlag"/> を更新します。
+        /// <see cref="SelectedItems"/> 内のアイテムが更新されたときに <see cref="ISelectState.SelectFlag"/> を更新します。
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -109,7 +109,7 @@ namespace HouseholdAccountBook.Views.Behaviors
 
             if (e.OldItems != null) {
                 foreach (object oldItem in e.OldItems) {
-                    if (oldItem is ISelectable oldV) {
+                    if (oldItem is ISelectState oldV) {
                         oldV.SelectFlag = false;
                     }
                     else {
@@ -120,7 +120,7 @@ namespace HouseholdAccountBook.Views.Behaviors
             }
             if (e.NewItems != null) {
                 foreach (object newItem in e.NewItems) {
-                    if (newItem is ISelectable newV) {
+                    if (newItem is ISelectState newV) {
                         newV.SelectFlag = true;
                     }
                     else {
@@ -131,7 +131,7 @@ namespace HouseholdAccountBook.Views.Behaviors
             }
 
             if (unsupportedFlag) {
-                throw new NotSupportedException($"{nameof(SelectedItems)} are not {nameof(ISelectable)}");
+                throw new NotSupportedException($"{nameof(SelectedItems)} are not {nameof(ISelectState)}");
             }
         }
         #endregion

@@ -1,7 +1,8 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Infrastructure.Services;
 using HouseholdAccountBook.Models.Args.RequestEventArgs;
+using HouseholdAccountBook.ViewModels.Common;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,13 +15,13 @@ namespace HouseholdAccountBook.ViewModels.Abstract
     /// ウィンドウ内の一部を構成するViewModelの基底クラス
     /// </summary>
     /// <param name="busyService">処理中状態サービス</param>
-    public abstract class WindowPartViewModelBase(BusyService busyService) : BindableBase, IProgressDialogRequestable
+    public abstract class WindowPartViewModelBase(BusyService busyService) : ViewModelBase, IProgressDialogRequestable
     {
         #region フィールド
         /// <summary>
-        /// 子ViewModelリスト
+        /// 子 <see cref="WindowPartViewModelBase"> リスト
         /// </summary>
-        protected readonly List<WindowPartViewModelBase> mChildrenVM = [];
+        protected readonly List<WindowPartViewModelBase> mChildrenWPVM = [];
 
         /// <summary>
         /// 処理中状態サービス
@@ -118,8 +119,8 @@ namespace HouseholdAccountBook.ViewModels.Abstract
 
             this.mDbHandlerFactory = dbHandlerFactory;
 
-            foreach (WindowPartViewModelBase childVM in this.mChildrenVM) {
-                childVM.Initialize(this.mDbHandlerFactory);
+            foreach (WindowPartViewModelBase childWPVM in this.mChildrenWPVM) {
+                childWPVM.Initialize(this.mDbHandlerFactory);
             }
 
             this.Initialized = true;

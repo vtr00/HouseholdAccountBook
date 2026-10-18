@@ -11,6 +11,7 @@ using HouseholdAccountBook.Models.DbHandlers;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.WindowsParts;
 using System;
@@ -255,9 +256,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 帳簿セレクタVM
+        /// 帳簿リストVM
         /// </summary>
-        public SelectorViewModel<AccountModel, AccountIdObj> AccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        public SelectableViewModel<AccountModel, AccountIdObj> AccountListVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 選択されたアセットID
@@ -472,27 +473,27 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
         #region プロパティ(グラフ共通)
         /// <summary>
-        /// グラフ種別1セレクタVM
+        /// グラフ種別1リストVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<GraphKind1, string>, GraphKind1> GraphKind1SelectorVM => field ??= new(static p => p.Key);
+        public SelectableViewModel<KeyValuePair<GraphKind1, string>, GraphKind1> GraphKind1ListVM => field ??= new(static p => p.Key);
         /// <summary>
         /// 選択されたグラフ種別1インデックス
         /// </summary>
         public int SelectedGraphKind1Index {
-            get => (int)this.GraphKind1SelectorVM.SelectedKey;
-            set => this.GraphKind1SelectorVM.SelectedKey = EnumUtil.SafeCastEnum(value, GraphKind1.IncomeAndExpensesGraph);
+            get => (int)this.GraphKind1ListVM.SelectedKey;
+            set => this.GraphKind1ListVM.SelectedKey = EnumUtil.SafeCastEnum(value, GraphKind1.IncomeAndExpensesGraph);
         }
 
         /// <summary>
-        /// グラフ種別2セレクタVM
+        /// グラフ種別2リストVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<GraphKind2, string>, GraphKind2> GraphKind2SelectorVM => field ??= new(static p => p.Key);
+        public SelectableViewModel<KeyValuePair<GraphKind2, string>, GraphKind2> GraphKind2ListVM => field ??= new(static p => p.Key);
         /// <summary>
         /// 選択されたグラフ種別2インデックス
         /// </summary>
         public int SelectedGraphKind2Index {
-            get => (int)this.GraphKind2SelectorVM.SelectedKey;
-            set => this.GraphKind2SelectorVM.SelectedKey = EnumUtil.SafeCastEnum(value, GraphKind2.CategoryGraph);
+            get => (int)this.GraphKind2ListVM.SelectedKey;
+            set => this.GraphKind2ListVM.SelectedKey = EnumUtil.SafeCastEnum(value, GraphKind2.CategoryGraph);
         }
         #endregion
 
@@ -1085,7 +1086,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             CompareCsvFileRequestEventArgs e = new() {
                 DbHandlerFactory = this.mDbHandlerFactory,
-                InitialAccountId = this.AccountSelectorVM.SelectedKey
+                InitialAccountId = this.AccountListVM.SelectedKey
             };
             this.CompareCsvFileRequested?.Invoke(this, e);
         }
@@ -1149,7 +1150,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
-            this.mChildrenVM.AddRange(
+            this.mChildrenWPVM.AddRange(
                 [
                     this.AccountTabVM,
                     this.DailyGraphTabVM,
@@ -1168,9 +1169,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.mService = new(this.mDbHandlerFactory);
             this.mDbImportService = new(this.mDbHandlerFactory);
 
-            this.AccountSelectorVM.SetLoader(async () => await this.mService.LoadAccountListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllAccounts));
-            this.GraphKind1SelectorVM.SetLoader(() => GraphKind1Str);
-            this.GraphKind2SelectorVM.SetLoader(() => GraphKind2Str);
+            this.AccountListVM.SetLoader(async () => await this.mService.LoadAccountListAsync(this.DisplayedPeriod, Properties.Resources.ListName_AllAccounts));
+            this.GraphKind1ListVM.SetLoader(() => GraphKind1Str);
+            this.GraphKind2ListVM.SetLoader(() => GraphKind2Str);
         }
 
         public override async Task LoadAsync()
@@ -1183,18 +1184,18 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.SelectedDBKind = this.mDbHandlerFactory.DBKind;
 
             // 帳簿リスト更新
-            await this.AccountSelectorVM.LoadAsync(UserSettingService.Instance.SelectedAccountId);
+            await this.AccountListVM.LoadAsync(UserSettingService.Instance.SelectedAccountId);
             // タブ選択
             this.SelectedTab = UserSettingService.Instance.SelectedTab;
             // グラフ種別1更新
-            await this.GraphKind1SelectorVM.LoadAsync(UserSettingService.Instance.SelectedGraphKind1);
+            await this.GraphKind1ListVM.LoadAsync(UserSettingService.Instance.SelectedGraphKind1);
             // グラフ種別2更新
-            await this.GraphKind2SelectorVM.LoadAsync(UserSettingService.Instance.SelectedGraphKind2);
+            await this.GraphKind2ListVM.LoadAsync(UserSettingService.Instance.SelectedGraphKind2);
 
             Log.Vars(vars: new { this.SelectedTabIndex, this.SelectedGraphKind1Index, this.SelectedGraphKind2Index });
 
             // アセットを更新する
-            this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
+            this.SelectedAssetId = this.AccountListVM.SelectedItem?.AssetId ?? AssetIdObj.System;
             this.AccountTabVM.RaiseSelectedAssetChanged();
 
             await this.UpdateAsync(isUpdateAccountList: false, isScroll: true, isUpdateActDateLastEdited: true);
@@ -1205,10 +1206,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             // 帳簿選択変更時
-            this.AccountSelectorVM.SelectionChanged += async (sender, e) => {
+            this.AccountListVM.SelectionChanged += async (sender, e) => {
                 this.SelectedAccountChanged?.Invoke(sender, e);
 
-                this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
+                this.SelectedAssetId = this.AccountListVM.SelectedItem?.AssetId ?? AssetIdObj.System;
                 UserSettingService.Instance.SelectedAccountId = e.NewValue ?? AccountIdObj.System;
 
                 await this.UpdateAsync(isUpdateAccountList: false, isScroll: true);
@@ -1223,7 +1224,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 await this.UpdateAsync(isUpdateAccountList: true, isScroll: true);
             };
             // グラフ種別1選択変更時
-            this.GraphKind1SelectorVM.SelectionChanged += async (sender, e) => {
+            this.GraphKind1ListVM.SelectionChanged += async (sender, e) => {
                 this.SelectedGraphKind1Changed?.Invoke(sender, e);
 
                 UserSettingService.Instance.SelectedGraphKind1 = e.NewValue;
@@ -1231,7 +1232,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 await this.UpdateAsync(isUpdateAccountList: false);
             };
             // グラフ種別2選択変更時
-            this.GraphKind2SelectorVM.SelectionChanged += async (sender, e) => {
+            this.GraphKind2ListVM.SelectionChanged += async (sender, e) => {
                 this.SelectedGraphKind2Changed?.Invoke(sender, e);
 
                 UserSettingService.Instance.SelectedGraphKind2 = e.NewValue;
@@ -1247,7 +1248,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 this.SelectedItemId = e.NewValue?.Item3;
             };
 
-            this.mChildrenVM.ForEach(childVM => {
+            this.mChildrenWPVM.ForEach(childVM => {
                 childVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
                 childVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);
                 childVM.SaveFileDialogRequested += (sender, e) => this.SaveFileDialogRequest(e);
@@ -1284,7 +1285,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             this.UpdateOperationLogFileMenuList();
             if (isUpdateAccountList) {
-                await this.AccountSelectorVM.LoadAsync();
+                await this.AccountListVM.LoadAsync();
             }
 
             switch (this.SelectedTab) {

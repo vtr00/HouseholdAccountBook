@@ -3,6 +3,7 @@ using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.Views.UserControls;
 using System;
 using System.Threading;
@@ -14,7 +15,7 @@ namespace HouseholdAccountBook.ViewModels.Component
     /// <summary>
     /// 日付金額VM
     /// </summary>
-    public class DateValueViewModel : BindableBase, ILoadableAsync
+    public class DateValueViewModel : ViewModelBase, ILoadableAsync
     {
         #region プロパティ
         /// <summary>
@@ -28,9 +29,9 @@ namespace HouseholdAccountBook.ViewModels.Component
         public DateTime SelectedDate { get; set; }
 
         /// <summary>
-        /// アセットセレクタVM
+        /// アセットリストVM
         /// </summary>
-        public SelectorViewModel<AssetModel, AssetIdObj> AssetSelectorVM => field ??= new(static vm => vm?.Id);
+        public SelectableViewModel<AssetModel, AssetIdObj> AssetListVM => field ??= new(static vm => vm?.Id);
         private void RaiseAssetChanged()
         {
             this.RaisePropertyChanged(nameof(this.InputedValueStr));
@@ -51,11 +52,11 @@ namespace HouseholdAccountBook.ViewModels.Component
         /// <summary>
         /// 入力された金額(文字列)
         /// </summary>
-        public string InputedValueStr => AssetService.Instance.ToAssetString(this.InputedValue, this.AssetSelectorVM.SelectedKey, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string InputedValueStr => AssetService.Instance.ToAssetString(this.InputedValue, this.AssetListVM.SelectedKey, UnitKind.MainUnit, UnitKind.MainUnit);
         /// <summary>
         /// 金額の小数点以下桁数
         /// </summary>
-        public int ValueScale => AssetService.Instance.GetAssetModel(this.AssetSelectorVM.SelectedKey).Scale;
+        public int ValueScale => AssetService.Instance.GetAssetModel(this.AssetListVM.SelectedKey).Scale;
 
         /// <summary>
         /// <see cref="NumericUpDown"/> の編集状態
@@ -69,16 +70,16 @@ namespace HouseholdAccountBook.ViewModels.Component
 
         public void Initialize(Func<AssetIdObj> defaultSelector)
         {
-            this.AssetSelectorVM.SetLoader(() => AssetService.Instance.Assets);
-            this.AssetSelectorVM.SetDefaultSelector(defaultSelector);
+            this.AssetListVM.SetLoader(() => AssetService.Instance.Assets);
+            this.AssetListVM.SetDefaultSelector(defaultSelector);
         }
 
         public async Task LoadAsync(CancellationToken token = default)
         {
-            await this.AssetSelectorVM.LoadAsync(token);
+            await this.AssetListVM.LoadAsync(token);
             this.RaiseAssetChanged();
         }
 
-        public void AddEventHandlers() => this.AssetSelectorVM.SelectionChanged += (sender, e) => this.RaiseAssetChanged();
+        public void AddEventHandlers() => this.AssetListVM.SelectionChanged += (sender, e) => this.RaiseAssetChanged();
     }
 }

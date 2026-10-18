@@ -65,18 +65,18 @@ namespace HouseholdAccountBook.Views.Behaviors
         }
 
         /// <summary>
-        /// <see cref="SelectedItem"/> が変更されたときに <see cref="ISelectable.SelectFlag"/> を更新します。
+        /// <see cref="SelectedItem"/> が変更されたときに <see cref="ISelectState.SelectFlag"/> を更新します。
         /// </summary>
         /// <param name="d"></param>
         /// <param name="e"></param>
         private static void SelectedItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (e.OldValue != e.NewValue) {
-                if (e.OldValue is ISelectable oldV) {
+                if (e.OldValue is ISelectState oldV) {
                     oldV.SelectFlag = false;
                 }
 
-                if (e.NewValue is ISelectable newV) {
+                if (e.NewValue is ISelectState newV) {
                     newV.SelectFlag = true;
                 }
             }

@@ -6,7 +6,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
     /// <summary>
     /// 階層構造VM
     /// </summary>
-    public abstract class HierarchicalViewModelBase<T> : BindableBase, ISelectable
+    public abstract class HierarchicalViewModelBase<T> : ViewModelBase, ISelectState
     {
         #region プロパティ
         /// <summary>

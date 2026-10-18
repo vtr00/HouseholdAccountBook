@@ -1,5 +1,5 @@
 ﻿using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.Models.AppServices;
+using HouseholdAccountBook.Infrastructure.Services;
 using HouseholdAccountBook.Models.Args.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace HouseholdAccountBook.ViewModels
+namespace HouseholdAccountBook.ViewModels.Common
 {
     /// <summary>
     /// 実行モード

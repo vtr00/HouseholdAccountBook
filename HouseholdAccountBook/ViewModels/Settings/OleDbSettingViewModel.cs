@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.DbHandlers;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -11,21 +12,22 @@ namespace HouseholdAccountBook.ViewModels.Settings
     /// <summary>
     /// OleDb設定VM
     /// </summary>
-    public class OleDbSettingViewModel : BindableBase
+    public class OleDbSettingViewModel : ViewModelBase
     {
         #region プロパティ
         /// <summary>
-        /// プロバイダ名セレクタVM
+        /// プロバイダ名リストVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<string, string>, string> ProviderNameSelectorVM => field ??= new(static p => p.Key);
+        public SelectableViewModel<KeyValuePair<string, string>, string> ProviderNameListVM => field ??= new(static p => p.Key);
+        /// <summary>
+        /// DBファイルパスVM
+        /// </summary>
+        public InputableViewModel<string> DBFilePathVM { get; } = new();
 
         /// <summary>
-        /// 入力されたDBファイルパス
+        /// 未保存状態マネージャ
         /// </summary>
-        public string InputedDBFilePath {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public DirtyStatusManager DirtyStatus => field ??= new(this.ProviderNameListVM, this.DBFilePathVM);
         #endregion
 
         /// <summary>
@@ -35,10 +37,10 @@ namespace HouseholdAccountBook.ViewModels.Settings
         {
             OleDbHandler.ConnectInfo connectInfo = UserSettingService.Instance.AccessConnectInfo;
 
-            this.ProviderNameSelectorVM.SetLoader(static () => [.. OleDbHandler.GetOleDbProvider()]);
-            await this.ProviderNameSelectorVM.LoadAsync(connectInfo.Provider);
+            this.ProviderNameListVM.SetLoader(static () => [.. OleDbHandler.GetOleDbProvider()]);
+            await this.ProviderNameListVM.LoadAsync(connectInfo.Provider);
 
-            this.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), connectInfo.DataSource);
+            this.DBFilePathVM.LoadedValue = PathUtil.GetSmartPath(App.GetCurrentDir(), connectInfo.DataSource);
         }
 
         /// <summary>
@@ -48,8 +50,8 @@ namespace HouseholdAccountBook.ViewModels.Settings
         {
             OleDbHandler.ConnectInfo connectInfo = UserSettingService.Instance.KichoFugetsuConnectInfo;
 
-            this.ProviderNameSelectorVM.SetLoader(static () => new List<KeyValuePair<string, string>>(OleDbHandler.GetOleDbProvider()).FindAll(static pair => pair.Key.Contains(OleDbHandler.ConnectInfo.AccessProviderHeader)));
-            await this.ProviderNameSelectorVM.LoadAsync(connectInfo.Provider);
+            this.ProviderNameListVM.SetLoader(static () => new List<KeyValuePair<string, string>>(OleDbHandler.GetOleDbProvider()).FindAll(static pair => pair.Key.Contains(OleDbHandler.ConnectInfo.AccessProviderHeader)));
+            await this.ProviderNameListVM.LoadAsync(connectInfo.Provider);
         }
 
         /// <summary>
@@ -58,9 +60,10 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <returns>設定の保存成否</returns>
         public bool Save()
         {
-            UserSettingService.Instance.AccessConnectInfo = new(this.ProviderNameSelectorVM.SelectedKey) {
-                DataSource = Path.GetFullPath(this.InputedDBFilePath, App.GetCurrentDir())
+            UserSettingService.Instance.AccessConnectInfo = new(this.ProviderNameListVM.SelectedKey) {
+                DataSource = Path.GetFullPath(this.DBFilePathVM.InputedValue, App.GetCurrentDir())
             };
+            this.DirtyStatus.AcceptChanges();
 
             return true;
         }
@@ -71,7 +74,8 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// <returns>設定の保存成否</returns>
         public bool SaveForKichoFugetsu()
         {
-            UserSettingService.Instance.KichoFugetsuConnectInfo = new(this.ProviderNameSelectorVM.SelectedKey);
+            UserSettingService.Instance.KichoFugetsuConnectInfo = new(this.ProviderNameListVM.SelectedKey);
+            this.DirtyStatus.AcceptChanges();
 
             return true;
         }
@@ -80,6 +84,6 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// 設定を保存可能か
         /// </summary>
         /// <returns>設定の保存可否</returns>
-        public bool CanSave() => !(string.IsNullOrWhiteSpace(this.ProviderNameSelectorVM.SelectedKey) || string.IsNullOrWhiteSpace(this.InputedDBFilePath));
+        public bool CanSave() => !(string.IsNullOrWhiteSpace(this.ProviderNameListVM.SelectedKey) || string.IsNullOrWhiteSpace(this.DBFilePathVM.InputedValue));
     }
 }

@@ -44,6 +44,21 @@ namespace HouseholdAccountBook.Models.AppServices
         }
 
         /// <summary>
+        /// 引数から有効なアセットIDを取得する
+        /// </summary>
+        /// <param name="ids">比較対象のアセットID</param>
+        /// <returns>有効なアセットID</returns>
+        public AssetIdObj GetValidAssetId(params AssetIdObj[] ids)
+        {
+            foreach (AssetIdObj id in ids) {
+                if (id != null && id != AssetIdObj.System) {
+                    return id;
+                }
+            }
+            return this.DefaultAssetId;
+        }
+
+        /// <summary>
         /// デフォルトアセットモデルを取得する
         /// </summary>
         /// <returns>デフォルトアセットモデル</returns>

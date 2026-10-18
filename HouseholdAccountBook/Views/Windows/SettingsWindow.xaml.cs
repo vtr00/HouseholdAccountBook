@@ -80,10 +80,10 @@ namespace HouseholdAccountBook.Views.Windows
 
             switch (this.WVM.SelectedTab) {
                 case SettingsTabs.AssetSettingsTab:
-                    await this.WVM.AssetTabVM.LoadAsync(this.WVM.AssetTabVM.AssetSelectorVM?.SelectedKey);
+                    await this.WVM.AssetTabVM.LoadAsync(this.WVM.AssetTabVM.AssetListVM?.SelectedKey);
                     break;
                 case SettingsTabs.AccountSettingsTab:
-                    await this.WVM.AccountTabVM.LoadAsync(this.WVM.AccountTabVM.AccountSelectorVM?.SelectedKey);
+                    await this.WVM.AccountTabVM.LoadAsync(this.WVM.AccountTabVM.AccountListVM?.SelectedKey);
                     break;
                 case SettingsTabs.ItemSettingsTab:
                     await this.WVM.ItemTabVM.LoadAsync(this.WVM.ItemTabVM.SelectedItemTreeVM?.Kind, this.WVM.ItemTabVM.SelectedItemTreeVM?.Id);

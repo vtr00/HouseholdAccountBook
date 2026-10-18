@@ -80,19 +80,19 @@
             <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Account}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" 
-                      ItemsSource="{Binding AccountSelectorVM.ItemList}" SelectedItem="{Binding AccountSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                      ItemsSource="{Binding AccountListVM.ItemList}" SelectedItem="{Binding AccountListVM.SelectedItem}" DisplayMemberPath="Name"/>
 
             <!-- 収支 -->
             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_IncomeOrExpenses}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" 
-                      ItemsSource="{Binding BalanceKindSelectorVM.ItemList}" SelectedItem="{Binding BalanceKindSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
+                      ItemsSource="{Binding BalanceKindListVM.ItemList}" SelectedItem="{Binding BalanceKindListVM.SelectedItem}" DisplayMemberPath="Value"/>
 
             <!-- 分類 -->
             <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Category}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="3" Grid.Column="1" Margin="5" 
-                     ItemsSource="{Binding CategorySelectorVM.ItemList}" SelectedItem="{Binding CategorySelectorVM.SelectedItem}" DisplayMemberPath="Name">
+                     ItemsSource="{Binding CategoryListVM.ItemList}" SelectedItem="{Binding CategoryListVM.SelectedItem}" DisplayMemberPath="Name">
                 <i:Interaction.Behaviors>
                     <behaviors:ScrollToSelectedItemListBoxBehavior/>
                 </i:Interaction.Behaviors>
@@ -102,7 +102,7 @@
             <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Item}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ListBox Grid.Row="4" Grid.Column="1" Margin="5" 
-                     ItemsSource="{Binding ItemSelectorVM.ItemList}" SelectedItem="{Binding ItemSelectorVM.SelectedItem}" DisplayMemberPath="NameWithCategory">
+                     ItemsSource="{Binding ItemListVM.ItemList}" SelectedItem="{Binding ItemListVM.SelectedItem}" DisplayMemberPath="NameWithCategory">
                 <i:Interaction.Behaviors>
                     <behaviors:ScrollToSelectedItemListBoxBehavior/>
                 </i:Interaction.Behaviors>
@@ -171,7 +171,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ComboBox IsEnabled="False"
-                                          ItemsSource="{Binding AssetSelectorVM.ItemList}" SelectedItem="{Binding AssetSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                                          ItemsSource="{Binding AssetListVM.ItemList}" SelectedItem="{Binding AssetListVM.SelectedItem}" DisplayMemberPath="Name"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -186,13 +186,13 @@
             <TextBlock Grid.Row="8" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_ShopName}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="8" Grid.Column="1" Margin="5" IsEditable="True"
-                      ItemsSource="{Binding ShopSelectorVM.ItemList}" Text="{Binding ShopSelectorVM.SelectedKey, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
+                      ItemsSource="{Binding ShopListVM.ItemList}" Text="{Binding ShopListVM.SelectedKey, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
 
             <!-- 備考 -->
             <TextBlock Grid.Row="9" Grid.Column="0" Margin="5" 
                        Text="{x:Static properties:Resources.TextBlock_Remark}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="9" Grid.Column="1" Margin="5" IsEditable="True"
-                      ItemsSource="{Binding RemarkSelectorVM.ItemList}" Text="{Binding RemarkSelectorVM.SelectedKey, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
+                      ItemsSource="{Binding RemarkListVM.ItemList}" Text="{Binding RemarkListVM.SelectedKey, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
 
             <!-- 数値入力ポップアップ -->
             <controls:FollowablePopup x:Name="_popup" IsOpen="{Binding IsOpenPopup, Mode=TwoWay}" AllowsTransparency="True" Placement="Bottom">

@@ -1,11 +1,13 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Services;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.Args;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Loaders;
 using HouseholdAccountBook.ViewModels.Settings;
@@ -286,7 +288,8 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand SaveItemInfoCommand => field ??= new AsyncRelayCommand(
             this.SaveItemInfoCommand_ExecuteAsync,
-            () => this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance && !string.IsNullOrWhiteSpace(this.SelectedItemTreeVM.Name), this.mBusyService);
+            () => this.SelectedItemTreeVM != null && this.SelectedItemTreeVM.Kind != HierarchicalKind.Balance && !string.IsNullOrWhiteSpace(this.SelectedItemTreeVM.Name) &&
+                  (this.DisplayedItemSettingVM?.DirtyState.IsDirty ?? false), this.mBusyService);
         /// <summary>
         /// 分類/項目情報保存コマンド処理
         /// </summary>
@@ -297,14 +300,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             bool result = false;
             switch (vm.Kind) {
                 case HierarchicalKind.Category: {
-                    result = await this.mSettingService.SaveCategoryAsync(new(vm.Id.Id, vm.InputedName));
+                    result = await this.mSettingService.SaveCategoryAsync(new(vm.Id.Id, vm.NameVM.InputedValue));
                 }
                 break;
                 case HierarchicalKind.Item: {
-                    result = await this.mSettingService.SaveItemAsync(new(vm.Id.Id, vm.InputedName) {
-                        AssetId = vm.AssetSelectorVM.SelectedKey,
-                        ItemKind = vm.ItemKindSelectorVM.SelectedKey
-                    }, vm.ItemKindSelectorVM.InitialSelectedKey != vm.ItemKindSelectorVM.SelectedKey);
+                    result = await this.mSettingService.SaveItemAsync(new(vm.Id.Id, vm.NameVM.InputedValue) {
+                        AssetId = vm.AssetListVM.SelectedKey,
+                        ItemKind = vm.ItemKindListVM.SelectedKey
+                    }, vm.ItemKindListVM.IsDirty);
                 }
                 break;
             }
@@ -332,13 +335,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
             ItemSettingViewModel vm = this.DisplayedItemSettingVM;
-            vm.RelationSelectorVM.SelectedItem = viewModel as RelationViewModel; // チェックボックスを変更しただけでは変更されないため、引数で受け取る
+            vm.RelationListVM.SelectedItem = viewModel as RelationViewModel; // チェックボックスを変更しただけでは変更されないため、引数で受け取る
 
-            if (await this.mSettingService.SaveAccountItemRemationAsync(vm.RelationSelectorVM.SelectedKey, (int)vm.Id, vm.RelationSelectorVM.SelectedItem.IsRelated)) {
+            if (await this.mSettingService.SaveAccountItemRemationAsync(vm.RelationListVM.SelectedKey, (int)vm.Id, vm.RelationListVM.SelectedItem.IsRelated)) {
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
             else {
-                vm.RelationSelectorVM.SelectedItem.IsRelated = !vm.RelationSelectorVM.SelectedItem.IsRelated; // 選択前の状態に戻す
+                vm.RelationListVM.SelectedItem.IsRelated = !vm.RelationListVM.SelectedItem.IsRelated; // 選択前の状態に戻す
                 _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinAccount, Properties.Resources.Title_Error);
             }
         }
@@ -348,7 +351,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand DeleteShopNameCommand => field ??= new AsyncRelayCommand(
             this.DeleteShopNameCommand_ExecuteAsync,
-            () => this.DisplayedItemSettingVM?.ShopSelectorVM.SelectedItem != null, this.mBusyService);
+            () => this.DisplayedItemSettingVM?.ShopListVM.SelectedItem != null, this.mBusyService);
         /// <summary>
         /// 店名削除コマンド処理
         /// </summary>
@@ -358,7 +361,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
-                await this.mSettingService.DeleteShopAsync(this.DisplayedItemSettingVM.ShopSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Id);
+                await this.mSettingService.DeleteShopAsync(this.DisplayedItemSettingVM.ShopListVM.SelectedKey, this.DisplayedItemSettingVM.Id.Id);
 
                 SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
                 this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
@@ -370,7 +373,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand DeleteRemarkCommand => field ??= new AsyncRelayCommand(
             this.DeleteRemarkCommand_ExecuteAsync,
-            () => this.DisplayedItemSettingVM?.RemarkSelectorVM.SelectedItem != null, this.mBusyService);
+            () => this.DisplayedItemSettingVM?.RemarkListVM.SelectedItem != null, this.mBusyService);
         /// <summary>
         /// 備考削除コマンド処理
         /// </summary>
@@ -380,7 +383,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 Debug.Assert(this.DisplayedItemSettingVM.Kind == HierarchicalKind.Item);
 
-                await this.mSettingService.DeleteRemarkAsync(this.DisplayedItemSettingVM.RemarkSelectorVM.SelectedKey, this.DisplayedItemSettingVM.Id.Id);
+                await this.mSettingService.DeleteRemarkAsync(this.DisplayedItemSettingVM.RemarkListVM.SelectedKey, this.DisplayedItemSettingVM.Id.Id);
 
                 SettingViewModelLoader loader = new(new(this.mDbHandlerFactory), new(this.mDbHandlerFactory));
                 this.DisplayedItemSettingVM = await loader.LoadItemSettingVMAsync(HierarchicalKind.Item, this.DisplayedItemSettingVM.Id);
