@@ -4,6 +4,7 @@ using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Settings;
 using System.Collections.Generic;
@@ -43,8 +44,8 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             AssetModel am = await this.mService.LoadAssetAsync(assetId);
 
             vm = new(am);
-            vm.AssetKindSelectorVM.SetLoader(() => UiConstants.AssetKindStr);
-            await vm.AssetKindSelectorVM.LoadAsync(am.AssetKind);
+            vm.AssetKindListVM.SetLoader(() => UiConstants.AssetKindStr);
+            await vm.AssetKindListVM.LoadAsync(am.AssetKind);
 
             return vm;
         }
@@ -61,19 +62,19 @@ namespace HouseholdAccountBook.ViewModels.Loaders
             AccountModel account = await this.mService.LoadAccountAsync(accountId);
 
             AccountSettingViewModel vm = new(account);
-            vm.AccountKindSelectorVM.SetLoader(() => UiConstants.AccountKindStr);
-            await vm.AccountKindSelectorVM.LoadAsync(account.AccountKind);
-            vm.AssetSelectorVM.SetLoader(async () => await this.mAppService.LoadAssetListAsync(Properties.Resources.ListName_NoSpecification));
-            await vm.AssetSelectorVM.LoadAsync(account.AssetId);
-            vm.DebitAccountSelectorVM.SetLoader(async () => {
+            vm.AccountKindListVM.SetLoader(() => UiConstants.AccountKindStr);
+            await vm.AccountKindListVM.LoadAsync(account.AccountKind);
+            vm.AssetListVM.SetLoader(async () => await this.mAppService.LoadAssetListAsync(Properties.Resources.ListName_NoSpecification));
+            await vm.AssetListVM.LoadAsync(account.AssetId);
+            vm.DebitAccountListVM.SetLoader(async () => {
                 IEnumerable<AccountModel> accountList = await this.mAppService.LoadAccountListAsync(initialName: Properties.Resources.ListName_None);
                 return accountList.Where(tmpVM => tmpVM.Id != accountId);
             });
-            await vm.DebitAccountSelectorVM.LoadAsync(account.DebitAccountId);
-            vm.TextEncodingSelectorVM.SetLoader(() => EncodingUtil.GetTextEncodingList());
-            await vm.TextEncodingSelectorVM.LoadAsync(account.TextEncoding);
-            vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(accountId)).Select(model => new RelationViewModel(model)), mode: KeySelectionMode.FirstOrDefault);
-            await vm.RelationSelectorVM.LoadAsync();
+            await vm.DebitAccountListVM.LoadAsync(account.DebitAccountId);
+            vm.TextEncodingListVM.SetLoader(() => EncodingUtil.GetTextEncodingList());
+            await vm.TextEncodingListVM.LoadAsync(account.TextEncoding);
+            vm.RelationListVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(accountId)).Select(model => new RelationViewModel(model)), mode: KeySelectionMode.FirstOrDefault);
+            await vm.RelationListVM.LoadAsync();
 
             return vm;
         }
@@ -135,16 +136,16 @@ namespace HouseholdAccountBook.ViewModels.Loaders
                     ItemIdObj itemId = id.Id;
                     ItemModel item = await this.mService.LoadItemAsync(itemId);
                     vm = new(item);
-                    vm.AssetSelectorVM.SetLoader(async () => await this.mAppService.LoadAssetListAsync(Properties.Resources.ListName_NoSpecification));
-                    await vm.AssetSelectorVM.LoadAsync(item.AssetId);
-                    vm.ItemKindSelectorVM.SetLoader(() => UiConstants.ItemKindStr);
-                    await vm.ItemKindSelectorVM.LoadAsync(item.ItemKind);
-                    vm.RelationSelectorVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(itemId)).Select(model => new RelationViewModel(model)), mode: KeySelectionMode.FirstOrDefault);
-                    await vm.RelationSelectorVM.LoadAsync();
-                    vm.ShopSelectorVM.SetLoader(async () => await this.mAppService.LoadShopListAsync(itemId), mode: KeySelectionMode.FirstOrDefault);
-                    await vm.ShopSelectorVM.LoadAsync();
-                    vm.RemarkSelectorVM.SetLoader(async () => await this.mAppService.LoadRemarkListAsync(itemId), mode: KeySelectionMode.FirstOrDefault);
-                    await vm.RemarkSelectorVM.LoadAsync();
+                    vm.AssetListVM.SetLoader(async () => await this.mAppService.LoadAssetListAsync(Properties.Resources.ListName_NoSpecification));
+                    await vm.AssetListVM.LoadAsync(item.AssetId);
+                    vm.ItemKindListVM.SetLoader(() => UiConstants.ItemKindStr);
+                    await vm.ItemKindListVM.LoadAsync(item.ItemKind);
+                    vm.RelationListVM.SetLoader(async () => (await this.mService.LoadRelationListAsync(itemId)).Select(model => new RelationViewModel(model)), mode: KeySelectionMode.FirstOrDefault);
+                    await vm.RelationListVM.LoadAsync();
+                    vm.ShopListVM.SetLoader(async () => await this.mAppService.LoadShopListAsync(itemId), mode: KeySelectionMode.FirstOrDefault);
+                    await vm.ShopListVM.LoadAsync();
+                    vm.RemarkListVM.SetLoader(async () => await this.mAppService.LoadRemarkListAsync(itemId), mode: KeySelectionMode.FirstOrDefault);
+                    await vm.RemarkListVM.LoadAsync();
                     break;
                 }
             }

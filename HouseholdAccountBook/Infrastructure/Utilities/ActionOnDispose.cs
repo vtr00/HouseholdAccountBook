@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HouseholdAccountBook.Models.AppServices
+namespace HouseholdAccountBook.Infrastructure.Utilities
 {
     /// <summary>
     /// Dispose時に指定した <see cref="Action"/> を実行するクラス

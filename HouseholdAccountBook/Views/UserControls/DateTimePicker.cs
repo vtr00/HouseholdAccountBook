@@ -34,6 +34,8 @@ namespace HouseholdAccountBook.Views.UserControls
             this.Initialized += (sender, e) => {
                 TextBox textBox = GetTemplateTextBox(this);
 
+                _ = textBox.SetBinding(ForegroundProperty, new Binding(nameof(this.Foreground)) { Source = this });
+
                 textBox.SetValue(InputMethod.IsInputMethodEnabledProperty, false);
                 textBox.TextChanged += this.TextBox_TextChanged;
                 textBox.PreviewKeyDown += this.TextBox_PreviewKeyDown;

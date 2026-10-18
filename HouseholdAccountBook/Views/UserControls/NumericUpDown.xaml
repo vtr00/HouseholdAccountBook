@@ -24,6 +24,7 @@
         </Grid.RowDefinitions>
 
         <TextBox x:Name="_textBox" Grid.Column="0" Height="Auto"
+                 Foreground="{Binding Foreground, ElementName=Root}"
                  Text="{Binding Session.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ElementName=Root}" 
                  TextAlignment="Right" InputMethod.IsInputMethodEnabled="False"
                  PreviewTextInput="TextBox_PreviewTextInput" PreviewKeyDown="TextBox_PreviewKeyDown"

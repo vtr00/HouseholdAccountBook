@@ -5,6 +5,7 @@ using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.Args.RequestEventArgs;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;
 using System.Collections.Generic;
@@ -39,14 +40,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// DB種別セレクタVM
+        /// DB種別リストVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<DBKind, string>, DBKind> DBKindSelectorVM => field ??= new(static p => p.Key);
+        public SelectableViewModel<KeyValuePair<DBKind, string>, DBKind> DBKindListVM => field ??= new(static p => p.Key);
 
         /// <summary>
         /// PostgreSQL設定
         /// </summary>
-        public PostgreSQLDBSettingViewModel PostgreSQLDBSettingVM { get; init; } = new();
+        public PostgreSQLSettingViewModel PostgreSQLDBSettingVM { get; init; } = new();
 
         /// <summary>
         /// Access設定
@@ -69,7 +70,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public void SelectPgDumpFilePathCommand_Execute()
         {
-            (string directory, string fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.InputedDumpExePath, App.GetCurrentDir());
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.DumpExePathVM.InputedValue, App.GetCurrentDir());
             if (string.IsNullOrWhiteSpace(directory)) {
                 directory = App.GetCurrentDir();
             }
@@ -82,7 +83,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 Filter = "pg_dump.exe|pg_dump.exe",
             };
             if (this.OpenFileDialogRequest(e)) {
-                this.PostgreSQLDBSettingVM.InputedDumpExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                this.PostgreSQLDBSettingVM.DumpExePathVM.InputedValue = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
             }
         }
 
@@ -95,7 +96,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public void SelectPgRestoreFilePathCommand_Execute()
         {
-            (string directory, string fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.InputedRestoreExePath, App.GetCurrentDir());
+            (string directory, string fileName) = PathUtil.GetSeparatedPath(this.PostgreSQLDBSettingVM.RestoreExePathVM.InputedValue, App.GetCurrentDir());
             if (string.IsNullOrWhiteSpace(directory)) {
                 directory = App.GetCurrentDir();
             }
@@ -108,7 +109,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 Filter = "pg_restore.exe|pg_restore.exe",
             };
             if (this.OpenFileDialogRequest(e)) {
-                this.PostgreSQLDBSettingVM.InputedRestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                this.PostgreSQLDBSettingVM.RestoreExePathVM.InputedValue = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
             }
         }
 
@@ -124,14 +125,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
             string directory = string.Empty;
             string fileName = string.Empty;
             string filter = string.Empty;
-            switch (this.DBKindSelectorVM.SelectedKey) {
+            switch (this.DBKindListVM.SelectedKey) {
                 case DBKind.SQLite: {
-                    (directory, fileName) = PathUtil.GetSeparatedPath(this.SQLiteSettingVM.InputedDBFilePath, App.GetCurrentDir());
+                    (directory, fileName) = PathUtil.GetSeparatedPath(this.SQLiteSettingVM.DBFilePathVM.InputedValue, App.GetCurrentDir());
                     filter = $"{Properties.Resources.FileSelectFilter_SQLiteFile}|*.db;*.sqlite;*.sqlite3";
                     break;
                 }
                 case DBKind.Access: {
-                    (directory, fileName) = PathUtil.GetSeparatedPath(this.AccessSettingVM.InputedDBFilePath, App.GetCurrentDir());
+                    (directory, fileName) = PathUtil.GetSeparatedPath(this.AccessSettingVM.DBFilePathVM.InputedValue, App.GetCurrentDir());
                     filter = $"{Properties.Resources.FileSelectFilter_AccessFile}|*.mdb;*.accdb";
                     break;
                 }
@@ -147,12 +148,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 Filter = filter,
             };
             if (this.OpenFileDialogRequest(e)) {
-                switch (this.DBKindSelectorVM.SelectedKey) {
+                switch (this.DBKindListVM.SelectedKey) {
                     case DBKind.SQLite:
-                        this.SQLiteSettingVM.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                        this.SQLiteSettingVM.DBFilePathVM.InputedValue = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
                     case DBKind.Access:
-                        this.AccessSettingVM.InputedDBFilePath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
+                        this.AccessSettingVM.DBFilePathVM.InputedValue = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FileName);
                         break;
                     default:
                         break;
@@ -163,7 +164,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         protected override bool OKCommand_CanExecute()
         {
             bool canExecute;
-            switch (this.DBKindSelectorVM.SelectedKey) {
+            switch (this.DBKindListVM.SelectedKey) {
                 case DBKind.SQLite: {
                     canExecute = this.SQLiteSettingVM.CanSave();
                     break;
@@ -209,7 +210,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             base.Initialize(dbHandlerFactory);
 
-            this.DBKindSelectorVM.SetLoader(static () => DBKindStr);
+            this.DBKindListVM.SetLoader(static () => DBKindStr);
         }
 
         public override async Task LoadAsync()
@@ -217,7 +218,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
             using IDisposable disposable = this.mBusyService.Enter();
 
-            await this.DBKindSelectorVM.LoadAsync(UserSettingService.Instance.SelectedDBKind);
+            await this.DBKindListVM.LoadAsync(UserSettingService.Instance.SelectedDBKind);
 
             // PostgreSQL
             this.PostgreSQLDBSettingVM.Load(this.SetPassword);
@@ -235,7 +236,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             bool result = false;
 
-            switch (this.DBKindSelectorVM.SelectedKey) {
+            switch (this.DBKindListVM.SelectedKey) {
                 case DBKind.PostgreSQL: {
                     result = this.PostgreSQLDBSettingVM.Save(this.GetPassword);
                     break;
@@ -254,7 +255,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     break;
             }
             if (result) {
-                UserSettingService.Instance.SelectedDBKind = this.DBKindSelectorVM.SelectedKey;
+                UserSettingService.Instance.SelectedDBKind = this.DBKindListVM.SelectedKey;
             }
             return result;
         }

@@ -3,6 +3,7 @@ using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.DbHandlers;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using System;
 
 namespace HouseholdAccountBook.ViewModels.Settings
@@ -10,100 +11,67 @@ namespace HouseholdAccountBook.ViewModels.Settings
     /// <summary>
     /// PostgreSQL設定VM
     /// </summary>
-    public class PostgreSQLDBSettingViewModel : BindableBase
+    public class PostgreSQLSettingViewModel : ViewModelBase
     {
         #region プロパティ
         /// <summary>
-        /// 入力されたホスト
+        /// ホストVM
         /// </summary>
-        public string InputedHost {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<string> HostVM { get; } = new();
+        /// <summary>
+        /// ポートVM
+        /// </summary>
+        public InputableViewModel<int?> PortVM { get; } = new();
+        /// <summary>
+        /// ユーザ名VM
+        /// </summary>
+        public InputableViewModel<string> UserNameVM { get; } = new();
+        /// <summary>
+        /// データベース名VM
+        /// </summary>
+        public InputableViewModel<string> DatabaseNameVM { get; } = new();
+        /// <summary>
+        /// ロール名VM
+        /// </summary>
+        public InputableViewModel<string> RoleVM { get; } = new();
+        /// <summary>
+        /// pg_dump.exe パスVM
+        /// </summary>
+        public InputableViewModel<string> DumpExePathVM { get; } = new();
+        /// <summary>
+        /// pg_restore.exe パスVM
+        /// </summary>
+        public InputableViewModel<string> RestoreExePathVM { get; } = new();
+        /// <summary>
+        /// パスワード入力方法VM
+        /// </summary>
+        public InputableViewModel<PostgresPasswordInput> PasswordInputVM { get; } = new();
 
         /// <summary>
-        /// 入力されたポート
+        /// 未保存状態マネージャ
         /// </summary>
-        public int? InputedPort {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-
-        /// <summary>
-        /// 入力されたユーザ名
-        /// </summary>
-        public string InputedUserName {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-
-        /// <summary>
-        /// 入力されたパスワード
-        /// </summary>
-        public string InputedPassword {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-
-        /// <summary>
-        /// 入力されたデータベース名
-        /// </summary>
-        public string InputedDatabaseName {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-
-        /// <summary>
-        /// 入力されたロール名
-        /// </summary>
-        public string InputedRole {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-
-        /// <summary>
-        /// 入力されたpg_dump.exeパス
-        /// </summary>
-        public string InputedDumpExePath {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-
-        /// <summary>
-        /// 入力されたpg_restore.exeパス
-        /// </summary>
-        public string InputedRestoreExePath {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-
-        /// <summary>
-        /// 選択されたパスワード入力方法
-        /// </summary>
-        public PostgresPasswordInput SelectedPasswordInput {
-            get;
-            set => this.SetProperty(ref field, value);
-        } = PostgresPasswordInput.InputWindow;
+        public DirtyStatusManager DirtyStatus => field ??=
+            new(this.HostVM, this.PortVM, this.UserNameVM, this.DatabaseNameVM, this.RoleVM, this.DumpExePathVM, this.RestoreExePathVM, this.PasswordInputVM);
         #endregion
 
         /// <summary>
-        /// 設定を読み込む
+        /// 設定をVMに読み込む
         /// </summary>
         /// <param name="setPassword">パスワードを設定するデリゲート</param>
         public void Load(Action<string> setPassword)
         {
             NpgsqlDbHandler.ConnectInfo connectInfo = UserSettingService.Instance.NpgsqlConnectInfo;
-            this.InputedHost = connectInfo.Host;
-            this.InputedPort = connectInfo.Port;
-            this.InputedUserName = connectInfo.UserName;
+            this.HostVM.LoadedValue = connectInfo.Host;
+            this.PortVM.LoadedValue = connectInfo.Port;
+            this.UserNameVM.LoadedValue = connectInfo.UserName;
             setPassword?.Invoke(connectInfo.Password);
-            this.InputedDatabaseName = connectInfo.DatabaseName;
-            this.InputedRole = connectInfo.Role;
+            this.DatabaseNameVM.LoadedValue = connectInfo.DatabaseName;
+            this.RoleVM.LoadedValue = connectInfo.Role;
 
             NpgsqlDbHandler.BackupConfiguration config = UserSettingService.Instance.PostgreSQLBackupConfig;
-            this.InputedDumpExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), config.DumpExePath);
-            this.InputedRestoreExePath = PathUtil.GetSmartPath(App.GetCurrentDir(), config.RestoreExePath);
-            this.SelectedPasswordInput = config.PasswordInput;
+            this.DumpExePathVM.LoadedValue = PathUtil.GetSmartPath(App.GetCurrentDir(), config.DumpExePath);
+            this.RestoreExePathVM.LoadedValue = PathUtil.GetSmartPath(App.GetCurrentDir(), config.RestoreExePath);
+            this.PasswordInputVM.LoadedValue = config.PasswordInput;
         }
 
         /// <summary>
@@ -114,12 +82,12 @@ namespace HouseholdAccountBook.ViewModels.Settings
         private NpgsqlDbHandler.ConnectInfo GetConnectInfo(Func<string> getPassword)
         {
             return new() {
-                Host = this.InputedHost,
-                Port = this.InputedPort.Value,
-                UserName = this.InputedUserName,
+                Host = this.HostVM.InputedValue,
+                Port = this.PortVM.InputedValue.Value,
+                UserName = this.UserNameVM.InputedValue,
                 Password = getPassword?.Invoke() ?? string.Empty,
-                DatabaseName = this.InputedDatabaseName,
-                Role = this.InputedRole
+                DatabaseName = this.DatabaseNameVM.InputedValue,
+                Role = this.RoleVM.InputedValue
             };
         }
 
@@ -130,9 +98,9 @@ namespace HouseholdAccountBook.ViewModels.Settings
         private NpgsqlDbHandler.BackupConfiguration GetBackupConfiguration()
         {
             return new() {
-                DumpExePath = this.InputedDumpExePath,
-                RestoreExePath = this.InputedRestoreExePath,
-                PasswordInput = this.SelectedPasswordInput
+                DumpExePath = this.DumpExePathVM.InputedValue,
+                RestoreExePath = this.RestoreExePathVM.InputedValue,
+                PasswordInput = this.PasswordInputVM.InputedValue
             };
         }
 
@@ -155,6 +123,15 @@ namespace HouseholdAccountBook.ViewModels.Settings
             UserSettingService.Instance.NpgsqlConnectInfo = connInfo;
             UserSettingService.Instance.PostgreSQLBackupConfig = config;
 
+            this.HostVM.AcceptChanges();
+            this.PortVM.AcceptChanges();
+            this.UserNameVM.AcceptChanges();
+            this.DatabaseNameVM.AcceptChanges();
+            this.RoleVM.AcceptChanges();
+            this.DumpExePathVM.AcceptChanges();
+            this.RestoreExePathVM.AcceptChanges();
+            this.PasswordInputVM.AcceptChanges();
+
             return true;
         }
 
@@ -163,6 +140,6 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// </summary>
         /// <param name="getPassword">パスワードを取得するデリゲート</param>
         /// <returns>設定の保存可否</returns>
-        public bool CanSave(Func<string> getPassword) => this.InputedPort.HasValue && this.GetConnectInfo(getPassword).CheckValidation() && this.GetBackupConfiguration().CheckValidation();
+        public bool CanSave(Func<string> getPassword) => this.PortVM.InputedValue.HasValue && this.GetConnectInfo(getPassword).CheckValidation() && this.GetBackupConfiguration().CheckValidation();
     }
 }

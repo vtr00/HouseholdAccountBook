@@ -300,9 +300,9 @@
            <TextBlock Text="{x:Static properties:Resources.TextBlock_Account}"/>:
         </TextBlock>
         <ComboBox Grid.Row="1" Grid.Column="1" Margin="5,5,5,0" MinWidth="150"
-                  ItemsSource="{Binding AccountSelectorVM.ItemList}" SelectedItem="{Binding AccountSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                  ItemsSource="{Binding AccountListVM.ItemList}" SelectedItem="{Binding AccountListVM.SelectedItem}" DisplayMemberPath="Name"/>
         <TextBlock Grid.Row="1" Grid.Column="2" Margin="5,5,5,0" HorizontalAlignment="Left" VerticalAlignment="Center"
-                   Text="{Binding AccountSelectorVM.SelectedItem.Remark}"/>
+                   Text="{Binding AccountListVM.SelectedItem.Remark}"/>
 
         <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Width="Auto" Height="Auto" TabStripPlacement="Left"
                     SelectedIndex="{Binding SelectedTabIndex}">
@@ -396,7 +396,7 @@
                             </Grid.RowDefinitions>
 
                             <DataGrid x:Name="_actionDataGrid" Grid.Row="0" SelectionMode="Extended"
-                                  ItemsSource="{Binding FilteredActionVMList}" SelectedItem="{Binding ActionSelectorVM.SelectedItem}" IsReadOnly="True" SelectionUnit="FullRow"
+                                  ItemsSource="{Binding FilteredActionVMList}" SelectedItem="{Binding ActionListVM.SelectedItem}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="4"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
                                   HorizontalGridLinesBrush="#FFF0F0F0" VerticalGridLinesBrush="#FFF0F0F0" AlternatingRowBackground="#FFFFFFE0" FontSize="10.5" FontFamily="Meiryo">
@@ -418,7 +418,7 @@
                                     <MouseBinding Gesture="LeftDoubleClick" Command="{Binding EditCommand}"/>
                                 </DataGrid.InputBindings>
                                 <i:Interaction.Behaviors>
-                                    <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding ActionSelectorVM.SelectedItemList}"/>
+                                    <behaviors:BindSelectedItemsToDataGridBehavior SelectedItems="{Binding ActionListVM.SelectedItemList}"/>
                                 </i:Interaction.Behaviors>
                                 <DataGrid.ItemContainerStyle>
                                     <Style TargetType="DataGridRow">
@@ -536,7 +536,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             
-                            <DataGrid Grid.Row="0" ItemsSource="{Binding SummarySelectorVM.ItemList}" SelectedItem="{Binding SummarySelectorVM.SelectedItem}" 
+                            <DataGrid Grid.Row="0" ItemsSource="{Binding SummaryListVM.ItemList}" SelectedItem="{Binding SummaryListVM.SelectedItem}" 
                                       IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
                                       CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                       AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True"
@@ -646,13 +646,13 @@
                             </Button>
                             
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKind1SelectorVM.ItemList}" SelectedItem="{Binding GraphKind1SelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
+                                      ItemsSource="{Binding GraphKind1ListVM.ItemList}" SelectedItem="{Binding GraphKind1ListVM.SelectedItem}" DisplayMemberPath="Value"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKind2SelectorVM.ItemList}" SelectedItem="{Binding GraphKind2SelectorVM.SelectedItem}" DisplayMemberPath="Value">
+                                      ItemsSource="{Binding GraphKind2ListVM.ItemList}" SelectedItem="{Binding GraphKind2ListVM.SelectedItem}" DisplayMemberPath="Value">
                                 <ComboBox.Style>
                                     <Style TargetType="ComboBox">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding GraphKind1SelectorVM.SelectedKey}" Value="BalanceGraph">
+                                            <DataTrigger Binding="{Binding GraphKind1ListVM.SelectedKey}" Value="BalanceGraph">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -678,7 +678,7 @@
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding GraphKind1SelectorVM.SelectedKey, ElementName=WVM}" Value="BalanceGraph">
+                                    <DataTrigger Binding="{Binding GraphKind1ListVM.SelectedKey, ElementName=WVM}" Value="BalanceGraph">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -693,7 +693,7 @@
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="200"
-                                          ItemsSource="{Binding SeriesSelectorVM.ItemList}" SelectedItem="{Binding SeriesSelectorVM.SelectedItem}" DisplayMemberPath="DisplayedName"/>
+                                          ItemsSource="{Binding SeriesListVM.ItemList}" SelectedItem="{Binding SeriesListVM.SelectedItem}" DisplayMemberPath="DisplayedName"/>
                             </StackPanel>
                         </Grid>
                         <oxy:PlotView Grid.Row="1" Model="{Binding SelectedGraphPlotModel}" Controller="{Binding Controller}"/>
@@ -748,7 +748,7 @@
                     <!-- データリスト -->
                     <Grid Grid.Row="1" Margin="2" Background="White" DataContext="{Binding MonthlySummaryTabVM}">
                         <DataGrid x:Name="_monthlyDataGrid" Grid.Column="1"
-                                  ItemsSource="{Binding SeriesSelectorVM.ItemList}" SelectedItem="{Binding SeriesSelectorVM.SelectedItem}" IsReadOnly="True" SelectionUnit="FullRow"
+                                  ItemsSource="{Binding SeriesListVM.ItemList}" SelectedItem="{Binding SeriesListVM.SelectedItem}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
                                   HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
@@ -854,13 +854,13 @@
                                 </ToolTipService.ToolTip>
                             </Button>
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKind1SelectorVM.ItemList}" SelectedItem="{Binding GraphKind1SelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
+                                      ItemsSource="{Binding GraphKind1ListVM.ItemList}" SelectedItem="{Binding GraphKind1ListVM.SelectedItem}" DisplayMemberPath="Value"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKind2SelectorVM.ItemList}" SelectedItem="{Binding GraphKind2SelectorVM.SelectedItem}" DisplayMemberPath="Value">
+                                      ItemsSource="{Binding GraphKind2ListVM.ItemList}" SelectedItem="{Binding GraphKind2ListVM.SelectedItem}" DisplayMemberPath="Value">
                                 <ComboBox.Style>
                                     <Style TargetType="ComboBox">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding GraphKind1SelectorVM.SelectedKey}" Value="BalanceGraph">
+                                            <DataTrigger Binding="{Binding GraphKind1ListVM.SelectedKey}" Value="BalanceGraph">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -886,7 +886,7 @@
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding GraphKind1SelectorVM.SelectedKey, ElementName=WVM}" Value="BalanceGraph">
+                                    <DataTrigger Binding="{Binding GraphKind1ListVM.SelectedKey, ElementName=WVM}" Value="BalanceGraph">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -901,7 +901,7 @@
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox HorizontalAlignment="Stretch" MinWidth="200"
-                                          ItemsSource="{Binding SeriesSelectorVM.ItemList}" SelectedItem="{Binding SeriesSelectorVM.SelectedItem}" DisplayMemberPath="DisplayedName"/>
+                                          ItemsSource="{Binding SeriesListVM.ItemList}" SelectedItem="{Binding SeriesListVM.SelectedItem}" DisplayMemberPath="DisplayedName"/>
                             </StackPanel>
                         </Grid>
                         <oxy:PlotView Grid.Row="1" Model="{Binding SelectedGraphPlotModel}" Controller="{Binding Controller}"/>
@@ -946,7 +946,7 @@
                     <!-- データリスト -->
                     <Grid Grid.Row="1" Margin="2" Background="White" DataContext="{Binding YearlySummaryTabVM}">
                         <DataGrid x:Name="_yearlyDataGrid" Grid.Column="1"
-                                  ItemsSource="{Binding SeriesSelectorVM.ItemList}" SelectedItem="{Binding SeriesSelectorVM.SelectedItem}" IsReadOnly="True" SelectionUnit="FullRow"
+                                  ItemsSource="{Binding SeriesListVM.ItemList}" SelectedItem="{Binding SeriesListVM.SelectedItem}" IsReadOnly="True" SelectionUnit="FullRow"
                                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" FrozenColumnCount="1"
                                   AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False"
                                   HorizontalGridLinesBrush="#FFC0C0C0" VerticalGridLinesBrush="#FFC0C0C0" FontSize="10.5" FontFamily="Meiryo"
@@ -1037,13 +1037,13 @@
                             <Button Width="80" Content="{x:Static properties:Resources.Button_LastDecade}" Command="{Binding GoToThisYearCommand}"/>
                             
                             <ComboBox HorizontalAlignment="Stretch" Margin="3,0,0,0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKind1SelectorVM.ItemList}" SelectedItem="{Binding GraphKind1SelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
+                                      ItemsSource="{Binding GraphKind1ListVM.ItemList}" SelectedItem="{Binding GraphKind1ListVM.SelectedItem}" DisplayMemberPath="Value"/>
                             <ComboBox HorizontalAlignment="Stretch" Margin="0" MinWidth="100"
-                                      ItemsSource="{Binding GraphKind2SelectorVM.ItemList}" SelectedItem="{Binding GraphKind2SelectorVM.SelectedItem}" DisplayMemberPath="Value">
+                                      ItemsSource="{Binding GraphKind2ListVM.ItemList}" SelectedItem="{Binding GraphKind2ListVM.SelectedItem}" DisplayMemberPath="Value">
                                 <ComboBox.Style>
                                     <Style TargetType="ComboBox">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding GraphKind1SelectorVM.SelectedKey}" Value="BalanceGraph">
+                                            <DataTrigger Binding="{Binding GraphKind1ListVM.SelectedKey}" Value="BalanceGraph">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -1069,7 +1069,7 @@
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding GraphKind1SelectorVM.SelectedKey, ElementName=WVM}" Value="BalanceGraph">
+                                    <DataTrigger Binding="{Binding GraphKind1ListVM.SelectedKey, ElementName=WVM}" Value="BalanceGraph">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -1084,7 +1084,7 @@
                         <Grid Grid.Row="0">
                             <StackPanel Orientation="Horizontal">
                                 <ComboBox HorizontalAlignment="Stretch" MinWidth="200"
-                                          ItemsSource="{Binding SeriesSelectorVM.ItemList}" SelectedItem="{Binding SeriesSelectorVM.SelectedItem}" DisplayMemberPath="DisplayedName"/>
+                                          ItemsSource="{Binding SeriesListVM.ItemList}" SelectedItem="{Binding SeriesListVM.SelectedItem}" DisplayMemberPath="DisplayedName"/>
                             </StackPanel>
                         </Grid>
                         

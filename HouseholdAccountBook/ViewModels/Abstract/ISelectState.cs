@@ -20,7 +20,7 @@
     /// </TreeView>
     /// ]]>
     /// </example>
-    public interface ISelectable
+    public interface ISelectState
     {
         /// <summary>
         /// 選択されているか

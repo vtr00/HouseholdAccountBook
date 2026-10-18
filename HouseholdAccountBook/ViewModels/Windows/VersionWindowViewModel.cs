@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;

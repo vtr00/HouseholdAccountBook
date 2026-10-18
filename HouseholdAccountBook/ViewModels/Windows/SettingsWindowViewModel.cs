@@ -98,7 +98,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public SettingsWindowViewModel()
         {
-            this.mChildrenVM.AddRange(
+            this.mChildrenWPVM.AddRange(
                 [
                     this.AssetTabVM,
                     this.AccountTabVM,
@@ -140,7 +140,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new();
 
-            this.mChildrenVM.ForEach(childVM => {
+            this.mChildrenWPVM.ForEach(childVM => {
                 childVM.OpenFolderDialogRequested += (sender, e) => this.OpenFolderDialogRequest(e);
                 childVM.OpenFileDialogRequested += (sender, e) => this.OpenFileDialogRequest(e);
                 childVM.SaveFileDialogRequested += (sender, e) => this.SaveFileDialogRequest(e);

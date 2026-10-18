@@ -46,7 +46,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 if (jsonObj is null) { continue; }
 
                 AccountModel vm = new(dto.BookId, dto.BookName) {
-                    AssetId = dto.AssetId,
+                    AssetId = dto.AssetId ?? AssetIdObj.System,
                     CsvFolderPath = jsonObj.CsvFolderPath == string.Empty ? null : jsonObj.CsvFolderPath,
                     TextEncoding = jsonObj.TextEncoding,
                     ActDateIndex = jsonObj.CsvActDateIndex + 1,

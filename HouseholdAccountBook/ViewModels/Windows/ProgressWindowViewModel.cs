@@ -1,4 +1,5 @@
 ﻿using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using System;
 using System.Windows.Input;
 
@@ -7,7 +8,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
     /// <summary>
     /// 進捗ウィンドウVM
     /// </summary>
-    public class ProgressWindowViewModel : BindableBase
+    public class ProgressWindowViewModel : ViewModelBase
     {
         /// <summary>
         /// キャンセル時イベント

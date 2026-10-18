@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.ViewModels;
+﻿using HouseholdAccountBook.ViewModels.Common;
 using System;
 using System.Windows;
 using System.Windows.Controls;

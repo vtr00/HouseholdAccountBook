@@ -1,6 +1,6 @@
 ﻿using HouseholdAccountBook.Infrastructure.Logger;
-using HouseholdAccountBook.ViewModels;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -20,7 +20,7 @@ namespace HouseholdAccountBook.Views.UserControls
         /// <summary>
         /// <see cref="DataGridCell"/> 内に配置するとき編集状態を保持するためのクラス
         /// </summary>
-        public class EditSession : BindableBase
+        public class EditSession : ViewModelBase
         {
             /// <summary>
             /// 編集中の文字列
