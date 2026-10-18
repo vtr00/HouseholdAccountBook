@@ -1,5 +1,6 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Services;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.Args;
@@ -7,6 +8,7 @@ using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.Properties;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Extensions;
 using HouseholdAccountBook.ViewModels.Loaders;
@@ -41,9 +43,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         #region Bindingプロパティ
         /// <summary>
-        /// 系列セレクタVM
+        /// 系列リストVM
         /// </summary>
-        public SelectorViewModel<SeriesViewModel, (BalanceKind?, CategoryIdObj, ItemIdObj)?> SeriesSelectorVM => field ??= new(static vm => vm?.ToTuple(), this.mBusyService);
+        public SelectableViewModel<SeriesViewModel, (BalanceKind?, CategoryIdObj, ItemIdObj)?> SeriesListVM => field ??= new(static vm => vm?.ToTuple(), this.mBusyService);
 
         /// <summary>
         /// グラフプロットモデル
@@ -103,22 +105,22 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             base.Initialize(dbHandlerFactory);
 
-            this.SeriesSelectorVM.SetLoader(async () => {
+            this.SeriesListVM.SetLoader(async () => {
                 SeriesViewModelLoader loader = new(new(this.mDbHandlerFactory));
                 IEnumerable<SeriesViewModel> tmpVMList = this.Tab switch {
                     Tabs.DailyGraphTab => this.Parent.DisplayedPeriodKind switch {
-                        PeriodKind.Monthly => await loader.LoadDailySeriesViewModelListWithinMonthAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedMonth.Value),
-                        PeriodKind.Selected => await loader.LoadDailySeriesViewModelListAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedPeriod),
+                        PeriodKind.Monthly => await loader.LoadDailySeriesViewModelListWithinMonthAsync(this.Parent.AccountListVM.SelectedKey, this.Parent.DisplayedMonth.Value),
+                        PeriodKind.Selected => await loader.LoadDailySeriesViewModelListAsync(this.Parent.AccountListVM.SelectedKey, this.Parent.DisplayedPeriod),
                         _ => throw new InvalidOperationException(),
                     },
-                    Tabs.MonthlyGraphTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
-                    Tabs.YearlyGraphTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
+                    Tabs.MonthlyGraphTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.AccountListVM.SelectedKey, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
+                    Tabs.YearlyGraphTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.AccountListVM.SelectedKey, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
                     _ => throw new InvalidOperationException(),
                 };
 
                 // グラフ表示に必要なデータのみに絞り込む
-                tmpVMList = [.. tmpVMList.Where(vm => this.Parent.GraphKind1SelectorVM.SelectedKey switch {
-                    GraphKind1.IncomeAndExpensesGraph => this.Parent.GraphKind2SelectorVM.SelectedKey switch {
+                tmpVMList = [.. tmpVMList.Where(vm => this.Parent.GraphKind1ListVM.SelectedKey switch {
+                    GraphKind1.IncomeAndExpensesGraph => this.Parent.GraphKind2ListVM.SelectedKey switch {
                         GraphKind2.CategoryGraph => vm.Category.Id != CategoryIdObj.System && vm.Item.Id == ItemIdObj.System,
                         GraphKind2.ItemGraph => vm.Item.Id != ItemIdObj.System,
                         _ => throw new InvalidOperationException(),
@@ -152,7 +154,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         public override void AddEventHandlers()
         {
-            this.SeriesSelectorVM.SelectionChanged += (sender, e) => {
+            this.SeriesListVM.SelectionChanged += (sender, e) => {
                 this.SelectedSeriesChanged(sender, e);
 
                 this.UpdateSelectedGraph();
@@ -213,7 +215,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             }
 
             // 縦軸 - 線形軸
-            AssetModel assetModel = AssetService.Instance.GetAssetModel(this.Parent.AccountSelectorVM.SelectedItem.AssetId);
+            AssetModel assetModel = AssetService.Instance.GetAssetModel(this.Parent.AccountListVM.SelectedItem.AssetId);
             string unitY = assetModel?.Name ?? Resources.Unit_DefaultMoney;
             LinearAxis GetVerticalAxis()
             {
@@ -224,7 +226,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                     MinorGridlineStyle = LineStyle.Dot,
                     StringFormat = $"N{assetModel.Scale}",
                     Key = "Value",
-                    Title = GraphKind1Str[this.Parent.GraphKind1SelectorVM.SelectedKey]
+                    Title = GraphKind1Str[this.Parent.GraphKind1ListVM.SelectedKey]
                 };
             }
 
@@ -276,15 +278,15 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             ItemIdObj tmpItemId = itemId ?? this.Parent.SelectedItemId ?? null;
             Log.Vars(vars: new { tmpBalanceKind, tmpCategoryId, tmpItemId });
 
-            await this.SeriesSelectorVM.LoadAsync((tmpBalanceKind, tmpCategoryId, tmpItemId));
+            await this.SeriesListVM.LoadAsync((tmpBalanceKind, tmpCategoryId, tmpItemId));
 
-            switch (this.Parent.GraphKind1SelectorVM.SelectedKey) {
+            switch (this.Parent.GraphKind1ListVM.SelectedKey) {
                 case GraphKind1.IncomeAndExpensesGraph: {
                     // グラフ表示データを設定する
                     this.GraphPlotModel.Series.Clear();
-                    List<decimal> sumPlus = [.. Enumerable.Repeat(0, this.SeriesSelectorVM.ItemList[0].Values.Count)]; // 単位ごとの合計収入(Y軸範囲の計算に使用)
-                    List<decimal> sumMinus = [.. Enumerable.Repeat(0, this.SeriesSelectorVM.ItemList[0].Values.Count)]; // 単位ごとの合計支出(Y軸範囲の計算に使用)
-                    foreach (SeriesViewModel tmpVM in this.SeriesSelectorVM.ItemList) {
+                    List<decimal> sumPlus = [.. Enumerable.Repeat(0, this.SeriesListVM.ItemList[0].Values.Count)]; // 単位ごとの合計収入(Y軸範囲の計算に使用)
+                    List<decimal> sumMinus = [.. Enumerable.Repeat(0, this.SeriesListVM.ItemList[0].Values.Count)]; // 単位ごとの合計支出(Y軸範囲の計算に使用)
+                    foreach (SeriesViewModel tmpVM in this.SeriesListVM.ItemList) {
                         CustomBarSeries wholeSeries = new() {
                             IsStacked = true,
                             Title = tmpVM.DisplayedName,
@@ -305,7 +307,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                             if (e.Value == null) { return; }
 
                             GraphDatumViewModel datumVM = e.Value.Item as GraphDatumViewModel;
-                            this.SeriesSelectorVM.SelectedKey = (datumVM.Category.BalanceKind, datumVM.Category.Id, datumVM.Item.Id);
+                            this.SeriesListVM.SelectedKey = (datumVM.Category.BalanceKind, datumVM.Category.Id, datumVM.Item.Id);
                         };
                         this.GraphPlotModel.Series.Add(wholeSeries);
 
@@ -332,7 +334,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 case GraphKind1.BalanceGraph: {
                     // グラフ表示データを設定する
                     this.GraphPlotModel.Series.Clear();
-                    SeriesViewModel tmpVM = this.SeriesSelectorVM.ItemList[0];
+                    SeriesViewModel tmpVM = this.SeriesListVM.ItemList[0];
                     LineSeries series = new() {
                         Title = Properties.Resources.GraphKind1_BalanceGraph,
                         ItemsSource = tmpVM.Values.Select((value, index) => (value, index)).Zip(tmpVM.Periods.Select(period => period.Start), (tmp, date) => new GraphDatumViewModel() {
@@ -367,14 +369,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         public void UpdateSelectedGraph()
         {
             if (this.Parent.SelectedTab != this.Tab) { return; }
-            if (this.Parent.GraphKind1SelectorVM.SelectedKey != GraphKind1.IncomeAndExpensesGraph) { return; }
+            if (this.Parent.GraphKind1ListVM.SelectedKey != GraphKind1.IncomeAndExpensesGraph) { return; }
             if (this.GraphPlotModel.Series.Count == 0) { return; } // 色を取得するために全体グラフが作成済である必要があるため
 
             using FuncLog funcLog = new();
 
             // グラフ表示データを設定する
             this.SelectedGraphPlotModel.Series.Clear();
-            SeriesViewModel vm = this.SeriesSelectorVM.SelectedItem;
+            SeriesViewModel vm = this.SeriesListVM.SelectedItem;
             if (vm != null) {
                 CustomBarSeries selectedSeries = new() {
                     IsStacked = true,

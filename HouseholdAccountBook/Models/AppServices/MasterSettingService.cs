@@ -190,7 +190,7 @@ namespace HouseholdAccountBook.Models.AppServices
             AccountModel bm = new(accountId, dto.BookName) {
                 SortOrder = dto.SortOrder,
                 AccountKind = EnumUtil.SafeCastEnum(dto.BookKind, AccountKind.Uncategorized),
-                AssetId = dto.AssetId,
+                AssetId = dto.AssetId ?? AssetIdObj.System,
                 Remark = jsonObj?.Remark ?? string.Empty,
                 InitialValue = new(dto.InitialMainValue, dto.AssetId),
                 StartDateExists = jsonObj?.StartDate != null,
@@ -360,7 +360,7 @@ namespace HouseholdAccountBook.Models.AppServices
             MstItemDao mstItemDao = new(dbHandler);
             IEnumerable<MstItemDto> iDtoList = await mstItemDao.FindByCategoryIdAsync((int)categoryId);
             IEnumerable<ItemModel> itemList = iDtoList.Select(static dto => new ItemModel(dto.ItemId, dto.ItemName) {
-                AssetId = dto.AssetId,
+                AssetId = dto.AssetId ?? AssetIdObj.System,
                 ItemKind = EnumUtil.SafeCastEnum(dto.ItemKind, ItemKind.Normal)
             });
 
@@ -553,7 +553,7 @@ namespace HouseholdAccountBook.Models.AppServices
             MstItemDto dto = await mstItemDao.FindByIdAsync((int)itemId);
 
             ItemModel item = new(itemId, dto.ItemName) {
-                AssetId = dto.AssetId,
+                AssetId = dto.AssetId ?? AssetIdObj.System,
                 ItemKind = EnumUtil.SafeCastEnum(dto.ItemKind, ItemKind.Normal),
                 SortOrder = dto.SortOrder
             };

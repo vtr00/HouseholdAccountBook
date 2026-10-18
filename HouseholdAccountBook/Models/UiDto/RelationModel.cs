@@ -6,7 +6,7 @@ namespace HouseholdAccountBook.Models.UiDto
     /// <summary>
     /// 関係性Model
     /// </summary>
-    public class RelationModel : BindableBase
+    public class RelationModel : ViewModelBase
     {
         #region プロパティ
         /// <summary>

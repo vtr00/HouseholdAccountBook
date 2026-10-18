@@ -1,6 +1,7 @@
 ﻿using HouseholdAccountBook.Infrastructure.CSV;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Services;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Models;
 using HouseholdAccountBook.Models.AppServices;
@@ -8,6 +9,7 @@ using HouseholdAccountBook.Models.Args;
 using HouseholdAccountBook.Models.Args.RequestEventArgs;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Loaders;
 using HouseholdAccountBook.ViewModels.Windows;
@@ -36,9 +38,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         #region Bindingプロパティ
         /// <summary>
-        /// 系列セレクタVM
+        /// 系列リストVM
         /// </summary>
-        public SelectorViewModel<SeriesViewModel, (BalanceKind?, CategoryIdObj, ItemIdObj)?> SeriesSelectorVM => field ??= new(static vm => vm?.ToTuple(), this.mBusyService);
+        public SelectableViewModel<SeriesViewModel, (BalanceKind?, CategoryIdObj, ItemIdObj)?> SeriesListVM => field ??= new(static vm => vm?.ToTuple(), this.mBusyService);
         #endregion
 
         /// <summary>
@@ -59,11 +61,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         {
             base.Initialize(dbHandlerFactory);
 
-            this.SeriesSelectorVM.SetLoader(async () => {
+            this.SeriesListVM.SetLoader(async () => {
                 SeriesViewModelLoader loader = new(new(this.mDbHandlerFactory));
                 return this.Tab switch {
-                    Tabs.MonthlyListTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
-                    Tabs.YearlyListTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.AccountSelectorVM.SelectedKey, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
+                    Tabs.MonthlyListTab => await loader.LoadMonthlySeriesViewModelListWithinYearAsync(this.Parent.AccountListVM.SelectedKey, this.Parent.DisplayedYear, this.Parent.FiscalStartMonth),
+                    Tabs.YearlyListTab => await loader.LoadYearlySeriesViewModelListWithinDecadeAsync(this.Parent.AccountListVM.SelectedKey, this.Parent.DisplayedStartYear, this.Parent.FiscalStartMonth),
                     _ => throw new NotImplementedException(),
                 };
             }, mode: KeySelectionMode.FirstOrDefault);
@@ -92,13 +94,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             ItemIdObj tmpItemId = itemId ?? this.Parent.SelectedItemId;
             Log.Vars(vars: new { tmpBalanceKind, tmpCategoryId, tmpItemId });
 
-            await this.SeriesSelectorVM.LoadAsync((tmpBalanceKind, tmpCategoryId, tmpItemId));
+            await this.SeriesListVM.LoadAsync((tmpBalanceKind, tmpCategoryId, tmpItemId));
         }
 
         public override void AddEventHandlers()
         {
 #pragma warning disable IDE0022 // メソッドに式本体を使用する
-            this.SeriesSelectorVM.SelectionChanged += (sender, e) => this.SelectedSeriesChanged?.Invoke(sender, e);
+            this.SeriesListVM.SelectionChanged += (sender, e) => this.SelectedSeriesChanged?.Invoke(sender, e);
 #pragma warning restore IDE0022 // メソッドに式本体を使用する
         }
 

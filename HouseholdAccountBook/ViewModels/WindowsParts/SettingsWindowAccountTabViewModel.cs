@@ -1,11 +1,13 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Services;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.Args.RequestEventArgs;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.ViewModels.Loaders;
 using HouseholdAccountBook.ViewModels.Settings;
@@ -42,9 +44,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         #region Bindingプロパティ
         /// <summary>
-        /// 帳簿セレクタVM
+        /// 帳簿リストVM
         /// </summary>
-        public SelectorViewModel<AccountModel, AccountIdObj> AccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        public SelectableViewModel<AccountModel, AccountIdObj> AccountListVM => field ??= new(static vm => vm?.Id, this.mBusyService);
         /// <summary>
         /// 表示された帳簿設定VM
         /// </summary>
@@ -73,13 +75,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿削除コマンド
         /// </summary>
-        public ICommand DeleteAccountCommand => field ??= new AsyncRelayCommand(this.DeleteAccountCommand_ExecuteAsync, () => this.AccountSelectorVM.SelectedItem != null, this.mBusyService);
+        public ICommand DeleteAccountCommand => field ??= new AsyncRelayCommand(this.DeleteAccountCommand_ExecuteAsync, () => this.AccountListVM.SelectedItem != null, this.mBusyService);
         /// <summary>
         /// 帳簿削除コマンド処理
         /// </summary>
         private async Task DeleteAccountCommand_ExecuteAsync()
         {
-            if (await this.mSettingService.DeleteAccountAsync(this.AccountSelectorVM.SelectedKey)) {
+            if (await this.mSettingService.DeleteAccountAsync(this.AccountListVM.SelectedKey)) {
                 await this.LoadAsync();
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
@@ -91,15 +93,15 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// 帳簿表示順上昇コマンド
         /// </summary>
-        public ICommand RaiseAccountSortOrderCommand => field ??= new AsyncRelayCommand(this.RaiseAccountSortOrderCommand_ExecuteAsync, () => 0 < this.AccountSelectorVM.SelectedIndex, this.mBusyService);
+        public ICommand RaiseAccountSortOrderCommand => field ??= new AsyncRelayCommand(this.RaiseAccountSortOrderCommand_ExecuteAsync, () => 0 < this.AccountListVM.SelectedIndex, this.mBusyService);
         /// <summary>
         /// 帳簿表示順上昇コマンド処理
         /// </summary>
         private async Task RaiseAccountSortOrderCommand_ExecuteAsync()
         {
-            int index = this.AccountSelectorVM.SelectedIndex;
-            AccountIdObj changingId = this.AccountSelectorVM.ItemList[index].Id;
-            AccountIdObj changedId = this.AccountSelectorVM.ItemList[index - 1].Id;
+            int index = this.AccountListVM.SelectedIndex;
+            AccountIdObj changingId = this.AccountListVM.ItemList[index].Id;
+            AccountIdObj changedId = this.AccountListVM.ItemList[index - 1].Id;
 
             await this.mSettingService.SwapAccountSortOrderAsync(changingId, changedId);
             await this.LoadAsync(changingId);
@@ -112,15 +114,15 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand DropAccountSortOrderCommand => field ??= new AsyncRelayCommand(
             this.DropAccountSortOrderCommand_ExecuteAsync,
-            () => this.AccountSelectorVM.SelectedIndex != -1 && this.AccountSelectorVM.SelectedIndex < this.AccountSelectorVM.Count - 1, this.mBusyService);
+            () => this.AccountListVM.SelectedIndex != -1 && this.AccountListVM.SelectedIndex < this.AccountListVM.Count - 1, this.mBusyService);
         /// <summary>
         /// 帳簿表示順下降コマンド処理
         /// </summary>
         private async Task DropAccountSortOrderCommand_ExecuteAsync()
         {
-            int index = this.AccountSelectorVM.SelectedIndex;
-            AccountIdObj changingId = this.AccountSelectorVM.ItemList[index].Id;
-            AccountIdObj changedId = this.AccountSelectorVM.ItemList[index + 1].Id;
+            int index = this.AccountListVM.SelectedIndex;
+            AccountIdObj changingId = this.AccountListVM.ItemList[index].Id;
+            AccountIdObj changedId = this.AccountListVM.ItemList[index + 1].Id;
 
             await this.mSettingService.SwapAccountSortOrderAsync(changingId, changedId);
             await this.LoadAsync(changingId);
@@ -133,30 +135,32 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand SaveAccountInfoCommand => field ??= new AsyncRelayCommand(
             this.SaveAccountInfoCommand_ExecuteAsync,
-            () => !string.IsNullOrWhiteSpace(this.DisplayedAccountSettingVM?.InputedName), this.mBusyService);
+            () => !string.IsNullOrWhiteSpace(this.DisplayedAccountSettingVM?.NameVM.InputedValue) && (this.DisplayedAccountSettingVM?.DirtyState.IsDirty ?? false), this.mBusyService);
         /// <summary>
         /// 帳簿情報保存コマンド処理
         /// </summary>
         private async Task SaveAccountInfoCommand_ExecuteAsync()
         {
             AccountSettingViewModel vm = this.DisplayedAccountSettingVM;
-            AccountModel account = new(vm.Id, vm.InputedName) {
-                AccountKind = vm.AccountKindSelectorVM.SelectedKey,
-                AssetId = vm.AssetSelectorVM.SelectedKey,
-                Remark = vm.InputedRemark ?? string.Empty,
-                InitialValue = new(vm.InputedInitialValue, vm.AssetSelectorVM.SelectedKey),
-                StartDateExists = vm.SelectedIfStartDateExists,
-                EndDateExists = vm.SelectedIfEndDateExists,
-                Period = vm.InputedPeriod,
-                DebitAccountId = vm.DebitAccountSelectorVM.SelectedKey,
-                PayDay = vm.InputedPayDay,
-                CsvFolderPath = vm.InputedCsvFolderPath != string.Empty ? Path.GetFullPath(vm.InputedCsvFolderPath, App.GetCurrentDir()) : null,
-                TextEncoding = vm.TextEncodingSelectorVM.SelectedKey,
-                ActDateIndex = vm.InputedActDateIndex,
-                ExpensesIndex = vm.InputedExpensesIndex,
-                ItemNameIndex = vm.InputedItemNameIndex
+            AccountModel account = new(vm.Id, vm.NameVM.InputedValue) {
+                AccountKind = vm.AccountKindListVM.SelectedKey,
+                AssetId = vm.AssetListVM.SelectedKey,
+                Remark = vm.RemarkVM.InputedValue ?? string.Empty,
+                InitialValue = new(vm.InitialValueVM.InputedValue, vm.AssetListVM.SelectedKey),
+                StartDateExists = vm.StartDateExistsVM.InputedValue,
+                EndDateExists = vm.EndDateExistsVM.InputedValue,
+                Period = new(vm.PeriodStartVM.InputedValue, vm.PeriodEndVM.InputedValue),
+                DebitAccountId = vm.DebitAccountListVM.SelectedKey,
+                PayDay = vm.PayDayVM.InputedValue,
+                CsvFolderPath = vm.CsvFolderPathVM.InputedValue != string.Empty ? Path.GetFullPath(vm.CsvFolderPathVM.InputedValue, App.GetCurrentDir()) : null,
+                TextEncoding = vm.TextEncodingListVM.SelectedKey,
+                ActDateIndex = vm.ActDateIndexVM.InputedValue,
+                ExpensesIndex = vm.ExpensesIndexVM.InputedValue,
+                ItemNameIndex = vm.ItemNameIndexVM.InputedValue
             };
+            // 帳簿情報を保存する
             await this.mSettingService.SaveAccountAsync(account);
+            // 帳簿情報を再読込する
             await this.LoadAsync(vm.Id);
 
             _ = MessageBox.Show(Properties.Resources.Message_CompletedToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
@@ -173,11 +177,11 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private void SelectCsvFolderPathCommand_Execute()
         {
             string folderFullPath;
-            if (string.IsNullOrWhiteSpace(this.DisplayedAccountSettingVM.InputedCsvFolderPath)) {
+            if (string.IsNullOrWhiteSpace(this.DisplayedAccountSettingVM.CsvFolderPathVM.InputedValue)) {
                 folderFullPath = Path.GetDirectoryName(UserSettingService.Instance.CsvCompFile);
             }
             else {
-                (string folderPath, string fileName) = PathUtil.GetSeparatedPath(this.DisplayedAccountSettingVM.InputedCsvFolderPath, App.GetCurrentDir());
+                (string folderPath, string fileName) = PathUtil.GetSeparatedPath(this.DisplayedAccountSettingVM.CsvFolderPathVM.InputedValue, App.GetCurrentDir());
                 folderFullPath = Path.Combine(folderPath, fileName);
             }
 
@@ -186,7 +190,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 Title = Properties.Resources.Title_CsvFolderSelection
             };
             if (this.OpenFolderDialogRequest(e)) {
-                this.DisplayedAccountSettingVM.InputedCsvFolderPath = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FolderName);
+                this.DisplayedAccountSettingVM.CsvFolderPathVM.InputedValue = PathUtil.GetSmartPath(App.GetCurrentDir(), e.FolderName);
             }
         }
 
@@ -201,13 +205,13 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private async Task ChangeAccountRelationCommand_ExecuteAsync(object viewModel)
         {
             AccountSettingViewModel vm = this.DisplayedAccountSettingVM;
-            vm.RelationSelectorVM.SelectedItem = viewModel as RelationViewModel; // チェックボックスを変更しただけでは変更されないため、引数で受け取る
+            vm.RelationListVM.SelectedItem = viewModel as RelationViewModel; // チェックボックスを変更しただけでは変更されないため、引数で受け取る
 
-            if (await this.mSettingService.SaveAccountItemRemationAsync(vm.Id, (int)vm.RelationSelectorVM.SelectedKey, vm.RelationSelectorVM.SelectedItem.IsRelated)) {
+            if (await this.mSettingService.SaveAccountItemRemationAsync(vm.Id, (int)vm.RelationListVM.SelectedKey, vm.RelationListVM.SelectedItem.IsRelated)) {
                 this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
             }
             else {
-                vm.RelationSelectorVM.SelectedItem.IsRelated = !vm.RelationSelectorVM.SelectedItem.IsRelated; // 選択前の状態に戻す
+                vm.RelationListVM.SelectedItem.IsRelated = !vm.RelationListVM.SelectedItem.IsRelated; // 選択前の状態に戻す
                 _ = MessageBox.Show(Properties.Resources.Message_CantDeleteBecauseActionItemExistsInItemWithinAccount, Properties.Resources.Title_Error);
             }
         }
@@ -229,7 +233,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.mAppService = new(this.mDbHandlerFactory);
             this.mSettingService = new(this.mDbHandlerFactory);
 
-            this.AccountSelectorVM.SetLoader(async () => await this.mAppService.LoadAccountListAsync());
+            this.AccountListVM.SetLoader(async () => await this.mAppService.LoadAccountListAsync());
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null);
@@ -248,17 +252,17 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 return;
             }
 
-            await this.AccountSelectorVM.LoadAsync(accountId);
+            await this.AccountListVM.LoadAsync(accountId);
             // この時点では選択時イベントハンドラは未登録なので明示的に読み込む
-            if (this.AccountSelectorVM.SelectedItem != null) {
+            if (this.AccountListVM.SelectedItem != null) {
                 SettingViewModelLoader loader = new(this.mAppService, this.mSettingService);
-                this.DisplayedAccountSettingVM = await loader.LoadAccountSettingViewModelAsync(this.AccountSelectorVM.SelectedKey);
+                this.DisplayedAccountSettingVM = await loader.LoadAccountSettingViewModelAsync(this.AccountListVM.SelectedKey);
             }
         }
 
         public override void AddEventHandlers()
         {
-            this.AccountSelectorVM.SelectionChanged += async (sender, e) => {
+            this.AccountListVM.SelectionChanged += async (sender, e) => {
                 if (e.NewValue != null) {
                     using IDisposable disposable = this.mBusyService.Enter();
 

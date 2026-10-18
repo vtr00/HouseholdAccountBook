@@ -6,8 +6,9 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:vmw="clr-namespace:HouseholdAccountBook.ViewModels.Windows"
-        xmlns:controls="clr-namespace:HouseholdAccountBook.Views.UserControls"
+        xmlns:attached="clr-namespace:HouseholdAccountBook.Views.AttachedProperties"
         xmlns:behaviors="clr-namespace:HouseholdAccountBook.Views.Behaviors"
+        xmlns:controls="clr-namespace:HouseholdAccountBook.Views.UserControls"
         mc:Ignorable="d"
         Title="{x:Static properties:Resources.Title_SettingsWindow}" Height="700" Width="1050" WindowStyle="ToolWindow"
         Closing="SettingsWindow_Closing">
@@ -81,7 +82,7 @@
                             </StackPanel>
 
                             <ListBox Grid.Row="1" Margin="5" 
-                                     ItemsSource="{Binding AssetSelectorVM.ItemList}" SelectedItem="{Binding AssetSelectorVM.SelectedItem}">
+                                     ItemsSource="{Binding AssetListVM.ItemList}" SelectedItem="{Binding AssetListVM.SelectedItem}">
                                 <ListBox.InputBindings>
                                     <KeyBinding Gesture="Ctrl+OEMPlus" Command="{Binding DataContext.AddAssetCommand, ElementName=_AssetTab}"/>
                                     <KeyBinding Gesture="Ctrl+Add" Command="{Binding DataContext.AddAssetCommand, ElementName=_AssetTab}"/>
@@ -156,19 +157,22 @@
                                         <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_AssetName}"/>
                                         <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                                 Text="{Binding InputedName, UpdateSourceTrigger=PropertyChanged}"/>
+                                                 Text="{Binding NameVM.InputedValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 attached:DirtyIndicator.IsDirty="{Binding NameVM.IsDirty}"/>
 
                                         <!-- アセット種別 -->
                                         <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_AssetKind}"/>
                                         <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                                  ItemsSource="{Binding AssetKindSelectorVM.ItemList}" SelectedItem="{Binding AssetKindSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
+                                                  ItemsSource="{Binding AssetKindListVM.ItemList}" SelectedItem="{Binding AssetKindListVM.SelectedItem}" DisplayMemberPath="Value"
+                                                  attached:DirtyIndicator.IsDirty="{Binding AssetKindListVM.IsDirty}"/>
 
                                         <!-- アセットコード -->
                                         <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_AssetCode}"/>
                                         <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                                 Text="{Binding InputedAssetCode, UpdateSourceTrigger=PropertyChanged}"/>
+                                                 Text="{Binding AssetCodeVM.InputedValue, UpdateSourceTrigger=PropertyChanged}"
+                                                 attached:DirtyIndicator.IsDirty="{Binding AssetCodeVM.IsDirty}"/>
 
                                         <!-- 主単位 -->
                                         <GroupBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_MainUnit}">
@@ -189,12 +193,14 @@
                                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                                                            Text="{x:Static properties:Resources.TextBlock_UnitPrefix}"/>
                                                 <TextBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                                                         Text="{Binding InputedPrefix, UpdateSourceTrigger=PropertyChanged}"/>
+                                                         Text="{Binding PrefixVM.InputedValue, UpdateSourceTrigger=PropertyChanged}"
+                                                         attached:DirtyIndicator.IsDirty="{Binding PrefixVM.IsDirty}"/>
                                                 <!-- 単位(後置) -->
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                                                            Text="{x:Static properties:Resources.TextBlock_UnitSuffix}"/>
                                                 <TextBox Grid.Row="1" Grid.Column="1" Margin="5" 
-                                                         Text="{Binding InputedSuffix, UpdateSourceTrigger=PropertyChanged}"/>
+                                                         Text="{Binding SuffixVM.InputedValue, UpdateSourceTrigger=PropertyChanged}"
+                                                         attached:DirtyIndicator.IsDirty="{Binding SuffixVM.IsDirty}"/>
                                             </Grid>
                                         </GroupBox>
 
@@ -202,12 +208,14 @@
                                         <TextBlock Grid.Row="6" Grid.Column="0" Margin="5"
                                                    Text="{x:Static properties:Resources.TextBlock_AssetBaseRate}"/>
                                         <controls:NumericUpDown Grid.Row="6" Grid.Column="1" Margin="5"
-                                                                Value="{Binding InputedBaseRate}" MinValue="0" IsFloating="True"/>
+                                                                Value="{Binding BaseRateVM.InputedValue}" MinValue="0" IsFloating="True"
+                                                                attached:DirtyIndicator.IsDirty="{Binding BaseRateVM.IsDirty}"/>
 
                                         <!-- スケール -->
                                         <TextBlock Grid.Row="7" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_AssetScale}"/>
-                                        <controls:NumericUpDown Grid.Row="7" Grid.Column="1" Margin="5" Value="{Binding InputedScale}" MinValue="0"/>
+                                        <controls:NumericUpDown Grid.Row="7" Grid.Column="1" Margin="5" Value="{Binding ScaleVM.InputedValue}" MinValue="0"
+                                                                attached:DirtyIndicator.IsDirty="{Binding ScaleVM.IsDirty}"/>
 
                                         <!-- 補助単位 -->
                                         <GroupBox Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4" Header="{x:Static properties:Resources.GroupHeader_SubUnit}">
@@ -229,17 +237,20 @@
                                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                                                            Text="{x:Static properties:Resources.TextBlock_SubUnitName}"/>
                                                 <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                                         Text="{Binding InputedSubunitName, UpdateSourceTrigger=PropertyChanged}"/>
+                                                         Text="{Binding SubunitNameVM.InputedValue, UpdateSourceTrigger=PropertyChanged}"
+                                                         attached:DirtyIndicator.IsDirty="{Binding SubunitNameVM.IsDirty}"/>
                                                 <!-- サブ単位(前置) -->
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                                                            Text="{x:Static properties:Resources.TextBlock_UnitPrefix}"/>
                                                 <TextBox Grid.Row="1" Grid.Column="1" Margin="5" 
-                                                         Text="{Binding InputedSubPrefix, UpdateSourceTrigger=PropertyChanged}"/>
+                                                         Text="{Binding SubPrefixVM.InputedValue, UpdateSourceTrigger=PropertyChanged}"
+                                                         attached:DirtyIndicator.IsDirty="{Binding SubPrefixVM.IsDirty}"/>
                                                 <!-- サブ単位(後置) -->
                                                 <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                                                            Text="{x:Static properties:Resources.TextBlock_UnitSuffix}"/>
                                                 <TextBox Grid.Row="2" Grid.Column="1" Margin="5" 
-                                                         Text="{Binding InputedSubSuffix, UpdateSourceTrigger=PropertyChanged}"/>
+                                                         Text="{Binding SubSuffixVM.InputedValue, UpdateSourceTrigger=PropertyChanged}"
+                                                         attached:DirtyIndicator.IsDirty="{Binding SubSuffixVM.IsDirty}"/>
                                             </Grid>
                                         </GroupBox>
                                     </Grid>
@@ -283,7 +294,7 @@
                             </StackPanel>
 
                             <ListBox Grid.Row="1" Margin="5" 
-                                     ItemsSource="{Binding AccountSelectorVM.ItemList}" SelectedItem="{Binding AccountSelectorVM.SelectedItem}" DisplayMemberPath="Name">
+                                     ItemsSource="{Binding AccountListVM.ItemList}" SelectedItem="{Binding AccountListVM.SelectedItem}" DisplayMemberPath="Name">
                                 <ListBox.InputBindings>
                                     <KeyBinding Gesture="Ctrl+OEMPlus" Command="{Binding DataContext.AddAccountCommand, ElementName=_AccountTab}"/>
                                     <KeyBinding Gesture="Ctrl+Add" Command="{Binding DataContext.AddAccountCommand, ElementName=_AccountTab}"/>
@@ -348,30 +359,35 @@
                                         <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_AccountName}"/>
                                         <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                                 Text="{Binding InputedName, UpdateSourceTrigger=PropertyChanged}"/>
+                                                 Text="{Binding NameVM.InputedValue, UpdateSourceTrigger=PropertyChanged}"
+                                                 attached:DirtyIndicator.IsDirty="{Binding NameVM.IsDirty}"/>
 
                                         <!-- 帳簿種別 -->
                                         <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_AccountKind}"/>
                                         <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                                  ItemsSource="{Binding AccountKindSelectorVM.ItemList}" SelectedItem="{Binding AccountKindSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
+                                                  ItemsSource="{Binding AccountKindListVM.ItemList}" SelectedItem="{Binding AccountKindListVM.SelectedItem}" DisplayMemberPath="Value"
+                                                  attached:DirtyIndicator.IsDirty="{Binding AccountKindListVM.IsDirty}"/>
 
                                         <!-- 備考 -->
                                         <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_Remark}"/>
                                         <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                                 Text="{Binding InputedRemark, UpdateSourceTrigger=PropertyChanged}"/>
+                                                 Text="{Binding RemarkVM.InputedValue, UpdateSourceTrigger=PropertyChanged}"
+                                                 attached:DirtyIndicator.IsDirty="{Binding RemarkVM.IsDirty}"/>
 
                                         <!-- アセット -->
                                         <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" Visibility="{Binding App_AssetDisplayMode, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                                    Text="{x:Static properties:Resources.TextBlock_Asset}"/>
                                         <ComboBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Visibility="{Binding App_AssetDisplayMode, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
-                                                  ItemsSource="{Binding AssetSelectorVM.ItemList}" SelectedItem="{Binding AssetSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                                                  ItemsSource="{Binding AssetListVM.ItemList}" SelectedItem="{Binding AssetListVM.SelectedItem}" DisplayMemberPath="Name"
+                                                  attached:DirtyIndicator.IsDirty="{Binding AssetListVM.IsDirty}"/>
 
                                         <!-- 初期残高 -->
                                         <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" 
                                                    Text="{x:Static properties:Resources.TextBlock_InitialBalance}"/>
-                                        <controls:NumericUpDown Grid.Row="6" Grid.Column="1" Margin="5" Value="{Binding InputedInitialValue}" Scale="{Binding InitialValueScale}" MinValue="-79228162514264337593543950335"/>
+                                        <controls:NumericUpDown Grid.Row="6" Grid.Column="1" Margin="5" Value="{Binding InitialValueVM.InputedValue}" Scale="{Binding InitialValueScale}" MinValue="-79228162514264337593543950335"
+                                                                attached:DirtyIndicator.IsDirty="{Binding InitialValueVM.IsDirty}"/>
                                         <TextBlock Grid.Row="6" Grid.Column="2" Margin="5" HorizontalAlignment="Right" Text="{Binding InputedInitialValueStr}"/>
 
                                         <!-- 期間情報 -->
@@ -394,17 +410,21 @@
                                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                                                            Text="{x:Static properties:Resources.TextBlock_StartDate}"/>
                                                 <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                                                          Content="{x:Static properties:Resources.CheckBox_Setting}" IsChecked="{Binding SelectedIfStartDateExists}"/>
-                                                <controls:DateTimePicker Grid.Row="0" Grid.Column="2" Margin="1" IsEnabled="{Binding SelectedIfStartDateExists}"
-                                                                         DateFormat="yyyy-MM-dd" SelectedDateOnly="{Binding InputedPeriod.Start}"/>
+                                                          Content="{x:Static properties:Resources.CheckBox_Setting}" IsChecked="{Binding StartDateExistsVM.InputedValue}"
+                                                          attached:DirtyIndicator.IsDirty="{Binding StartDateExistsVM.IsDirty}"/>
+                                                <controls:DateTimePicker Grid.Row="0" Grid.Column="2" Margin="1" IsEnabled="{Binding StartDateExistsVM.InputedValue}"
+                                                                         DateFormat="yyyy-MM-dd" SelectedDateOnly="{Binding PeriodStartVM.InputedValue}"
+                                                                         attached:DirtyIndicator.IsDirty="{Binding PeriodStartVM.IsDirty}"/>
 
                                                 <!-- 終了日 -->
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                                                            Text="{x:Static properties:Resources.TextBlock_EndDate}"/>
                                                 <CheckBox Grid.Row="1" Grid.Column="1" Margin="5" 
-                                                          Content="{x:Static properties:Resources.CheckBox_Setting}" IsChecked="{Binding SelectedIfEndDateExists}"/>
-                                                <controls:DateTimePicker Grid.Row="1" Grid.Column="2" Margin="1" IsEnabled="{Binding SelectedIfEndDateExists}"
-                                                                         DateFormat="yyyy-MM-dd" SelectedDateOnly="{Binding InputedPeriod.End}"/>
+                                                          Content="{x:Static properties:Resources.CheckBox_Setting}" IsChecked="{Binding EndDateExistsVM.InputedValue}"
+                                                          attached:DirtyIndicator.IsDirty="{Binding EndDateExistsVM.IsDirty}"/>
+                                                <controls:DateTimePicker Grid.Row="1" Grid.Column="2" Margin="1" IsEnabled="{Binding EndDateExistsVM.InputedValue}"
+                                                                         DateFormat="yyyy-MM-dd" SelectedDateOnly="{Binding PeriodEndVM.InputedValue}"
+                                                                         attached:DirtyIndicator.IsDirty="{Binding PeriodEndVM.IsDirty}"/>
                                             </Grid>
                                         </GroupBox>
 
@@ -425,11 +445,13 @@
                                                 <!-- 支払い元帳簿 -->
                                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_PaymentAccount}"/>
                                                 <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                                          ItemsSource="{Binding DebitAccountSelectorVM.ItemList}" SelectedItem="{Binding DebitAccountSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                                                          ItemsSource="{Binding DebitAccountListVM.ItemList}" SelectedItem="{Binding DebitAccountListVM.SelectedItem}" DisplayMemberPath="Name"
+                                                          attached:DirtyIndicator.IsDirty="{Binding DebitAccountListVM.IsDirty}"/>
                                                 <!-- 支払日 -->
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_PaymentDate}"/>
                                                 <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" 
-                                                                        Value="{Binding InputedPayDay}" MinValue="1" MaxValue="31"/>
+                                                                        Value="{Binding PayDayVM.InputedValue}" MinValue="1" MaxValue="31"
+                                                                        attached:DirtyIndicator.IsDirty="{Binding PayDayVM.IsDirty}"/>
                                             </Grid>
                                         </GroupBox>
 
@@ -452,7 +474,8 @@
                                                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5"
                                                            Text="{x:Static properties:Resources.TextBlock_FolderPath}"/>
                                                 <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                                         Text="{Binding InputedCsvFolderPath, UpdateSourceTrigger=PropertyChanged}"/>
+                                                         Text="{Binding CsvFolderPathVM.InputedValue, UpdateSourceTrigger=PropertyChanged}"
+                                                         attached:DirtyIndicator.IsDirty="{Binding CsvFolderPathVM.IsDirty}"/>
                                                 <Button Grid.Row="0" Grid.Column="3" Margin="5" Content="..." 
                                                         Command="{Binding DataContext.SelectCsvFolderPathCommand, ElementName=_AccountTab}"/>
 
@@ -460,7 +483,8 @@
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
                                                            Text="{x:Static properties:Resources.TextBlock_TextEncoding}"/>
                                                 <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
-                                                          ItemsSource="{Binding TextEncodingSelectorVM.ItemList}" SelectedItem="{Binding TextEncodingSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
+                                                          ItemsSource="{Binding TextEncodingListVM.ItemList}" SelectedItem="{Binding TextEncodingListVM.SelectedItem}" DisplayMemberPath="Value"
+                                                          attached:DirtyIndicator.IsDirty="{Binding TextEncodingListVM.IsDirty}"/>
 
                                                 <!-- 列番号 -->
                                                 <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" 
@@ -482,19 +506,22 @@
                                                         <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                                                                    Text="{x:Static properties:Resources.TextBlock_Date}"/>
                                                         <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5"
-                                                                                Value="{Binding InputedActDateIndex, TargetNullValue=''}" MinValue="1"/>
+                                                                                Value="{Binding ActDateIndexVM.InputedValue, TargetNullValue=''}" MinValue="1"
+                                                                                attached:DirtyIndicator.IsDirty="{Binding ActDateIndexVM.IsDirty}"/>
 
                                                         <!-- 支出 -->
                                                         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                                                                    Text="{x:Static properties:Resources.TextBlock_Expenses}"/>
                                                         <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5"
-                                                                                Value="{Binding InputedExpensesIndex, TargetNullValue=''}" MinValue="1"/>
+                                                                                Value="{Binding ExpensesIndexVM.InputedValue, TargetNullValue=''}" MinValue="1"
+                                                                                attached:DirtyIndicator.IsDirty="{Binding ExpensesIndexVM.IsDirty}"/>
 
                                                         <!-- 項目名 -->
                                                         <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                                                                    Text="{x:Static properties:Resources.TextBlock_ItemName}"/>
                                                         <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5"
-                                                                                Value="{Binding InputedItemNameIndex, TargetNullValue=''}" MinValue="1"/>
+                                                                                Value="{Binding ItemNameIndexVM.InputedValue, TargetNullValue=''}" MinValue="1"
+                                                                                attached:DirtyIndicator.IsDirty="{Binding ItemNameIndexVM.IsDirty}"/>
                                                     </Grid>
                                                 </GroupBox>
                                             </Grid>
@@ -512,7 +539,7 @@
                         <!-- 関連付け -->
                         <GroupBox Grid.Row="2" Header="{x:Static properties:Resources.GroupHeader_Linkage}">
                             <Grid>
-                                <ListBox Margin="5" ItemsSource="{Binding RelationSelectorVM.ItemList}" SelectedItem="{Binding RelationSelectorVM.SelectedItem}">
+                                <ListBox Margin="5" ItemsSource="{Binding RelationListVM.ItemList}" SelectedItem="{Binding RelationListVM.SelectedItem}">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <Grid>
@@ -660,15 +687,17 @@
                                     </TextBlock.Style>
                                 </TextBlock>
                                 <TextBox Grid.Row="2" Grid.Column="1" Margin="5" 
-                                         Text="{Binding InputedName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsRenamable, Converter={StaticResource NegationConverter}}"/>
+                                         Text="{Binding NameVM.InputedValue, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsRenamable, Converter={StaticResource NegationConverter}}"
+                                         attached:DirtyIndicator.IsDirty="{Binding NameVM.IsDirty}"/>
 
                                 <!-- アセット -->
                                 <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Visibility="{Binding App_AssetDisplayMode, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                            Text="{x:Static properties:Resources.TextBlock_Asset}"/>
                                 <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Visibility="{Binding App_AssetDisplayMode, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
-                                          ItemsSource="{Binding AssetSelectorVM.ItemList}" SelectedItem="{Binding AssetSelectorVM.SelectedItem}" DisplayMemberPath="Name">
+                                          ItemsSource="{Binding AssetListVM.ItemList}" SelectedItem="{Binding AssetListVM.SelectedItem}" DisplayMemberPath="Name"
+                                          attached:DirtyIndicator.IsDirty="{Binding AssetListVM.IsDirty}">
                                     <ComboBox.Style>
-                                        <Style TargetType="ComboBox">
+                                        <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
                                             <Setter Property="IsEnabled" Value="False"/>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding Kind}" Value="Item">
@@ -682,9 +711,10 @@
                                 <!-- 項目種別 -->
                                 <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_ItemKind}"/>
                                 <ComboBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5"
-                                          ItemsSource="{Binding ItemKindSelectorVM.ItemList}" SelectedItem="{Binding ItemKindSelectorVM.SelectedItem}" DisplayMemberPath="Value">
+                                          ItemsSource="{Binding ItemKindListVM.ItemList}" SelectedItem="{Binding ItemKindListVM.SelectedItem}" DisplayMemberPath="Value"
+                                          attached:DirtyIndicator.IsDirty="{Binding ItemKindListVM.IsDirty}">
                                     <ComboBox.Style>
-                                        <Style TargetType="ComboBox">
+                                        <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
                                             <Setter Property="IsEnabled" Value="False"/>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding Kind}" Value="Item">
@@ -702,7 +732,7 @@
                         
                         <!-- 関連付け -->
                         <GroupBox Grid.Row="1" Header="{x:Static properties:Resources.GroupHeader_Linkage}">
-                            <ListBox Margin="5" ItemsSource="{Binding RelationSelectorVM.ItemList}" SelectedItem="{Binding RelationSelectorVM.SelectedItem}" IsEnabled="{Binding IsSettable}">
+                            <ListBox Margin="5" ItemsSource="{Binding RelationListVM.ItemList}" SelectedItem="{Binding RelationListVM.SelectedItem}" IsEnabled="{Binding IsSettable}">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <Grid>
@@ -724,7 +754,7 @@
                         <!-- 店舗情報 -->
                         <GroupBox Grid.Row="2" Header="{x:Static properties:Resources.GroupHeader_Shop}">
                             <DataGrid Margin="5" x:Name="shopDataGrid" 
-                                      ItemsSource="{Binding ShopSelectorVM.ItemList}" SelectedItem="{Binding ShopSelectorVM.SelectedItem}" IsEnabled="{Binding IsSettable}"
+                                      ItemsSource="{Binding ShopListVM.ItemList}" SelectedItem="{Binding ShopListVM.SelectedItem}" IsEnabled="{Binding IsSettable}"
                                       IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
                                       CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                       AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
@@ -749,7 +779,7 @@
                         <!-- 備考情報 -->
                         <GroupBox Grid.Row="3" Header="{x:Static properties:Resources.GroupHeader_Remark}">
                             <DataGrid Margin="5" x:Name="remarkDataGrid" 
-                                      ItemsSource="{Binding RemarkSelectorVM.ItemList}" SelectedItem="{Binding RemarkSelectorVM.SelectedItem}" IsEnabled="{Binding IsSettable}"
+                                      ItemsSource="{Binding RemarkListVM.ItemList}" SelectedItem="{Binding RemarkListVM.SelectedItem}" IsEnabled="{Binding IsSettable}"
                                       IsReadOnly="True" SelectionUnit="FullRow" SelectionMode="Single"
                                       CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"
                                       AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="True"
@@ -798,11 +828,11 @@
                                     </Grid.RowDefinitions>
 
                                     <!-- SQLite -->
-                                    <GroupBox Grid.Row="0" Grid.Column="0" IsEnabled="{Binding SelectedDBKind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SQLite}">
+                                    <GroupBox Grid.Row="0" Grid.Column="0" IsEnabled="{Binding DBKindVM.InputedValue, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SQLite}">
                                         <GroupBox.Header>
                                             <RadioButton Content="{x:Static properties:Resources.GroupHeader_SQLite}" 
-                                                         IsChecked="{Binding SelectedDBKind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SQLite}"
-                                                         GroupName="DBkindGroup" IsEnabled="False"/>
+                                                         IsChecked="{Binding DBKindVM.InputedValue, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SQLite}"
+                                                         attached:DirtyIndicator.IsDirty="{Binding DBKindVM.IsDirty}" GroupName="DBkindGroup" IsEnabled="False"/>
                                         </GroupBox.Header>
                                         <Grid DataContext="{Binding SQLiteSettingVM}">
                                             <Grid.RowDefinitions>
@@ -819,23 +849,26 @@
 
                                             <!-- DBファイル名 -->
                                             <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_SQLite_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
-                                            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding InputedDBFilePath}" IsReadOnly="True"/>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding DBFilePathVM.InputedValue}" IsReadOnly="True"
+                                                     attached:DirtyIndicator.IsDirty="{Binding DBFilePathVM.IsDirty}"/>
                                             <!-- キャッシュサイズ -->
                                             <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_SQLite_CacheSize}" Margin="5" VerticalAlignment="Center"/>
-                                            <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" Value="{Binding InputedCacheSize}" MinValue="0" MaxValue="1024"/>
+                                            <controls:NumericUpDown Grid.Row="1" Grid.Column="1" Margin="5" Value="{Binding CacheSizeVM.InputedValue}" MinValue="0" MaxValue="1024"
+                                                                    attached:DirtyIndicator.IsDirty="{Binding CacheSizeVM.IsDirty}"/>
                                             <TextBlock Grid.Row="1" Grid.Column="2" Text="MB" Margin="5" VerticalAlignment="Center"/>
                                             <!-- メモリマップドI/Oサイズ -->
                                             <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_SQLite_MmapSize}" Margin="5" VerticalAlignment="Center"/>
-                                            <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" Value="{Binding InputedMmapSize}" MinValue="0" MaxValue="1024"/>
+                                            <controls:NumericUpDown Grid.Row="2" Grid.Column="1" Margin="5" Value="{Binding MmapSizeVM.InputedValue}" MinValue="0" MaxValue="1024"
+                                                                    attached:DirtyIndicator.IsDirty="{Binding MmapSizeVM.IsDirty}"/>
                                             <TextBlock Grid.Row="2" Grid.Column="2" Text="MB" Margin="5" VerticalAlignment="Center"/>
                                         </Grid>
                                     </GroupBox>
                                     <!-- PostgreSQL -->
-                                    <GroupBox Grid.Row="1" Grid.Column="0" IsEnabled="{Binding SelectedDBKind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=PostgreSQL}">
+                                    <GroupBox Grid.Row="1" Grid.Column="0" IsEnabled="{Binding DBKindVM.InputedValue, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=PostgreSQL}">
                                         <GroupBox.Header>
                                             <RadioButton Content="{x:Static properties:Resources.GroupHeader_PostgreSQL}" 
-                                                         IsChecked="{Binding SelectedDBKind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=PostgreSQL}"
-                                                         GroupName="DBKindGroup" IsEnabled="False"/>
+                                                         IsChecked="{Binding DBKindVM.InputedValue, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=PostgreSQL}"
+                                                         attached:DirtyIndicator.IsDirty="{Binding DBKindVM.IsDirty}" GroupName="DBKindGroup" IsEnabled="False"/>
                                         </GroupBox.Header>
                                         <Grid DataContext="{Binding PostgreSQLDBSettingVM}">
                                             <Grid.RowDefinitions>
@@ -851,22 +884,26 @@
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Row="0" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
-                                            <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding InputedDumpExePath}" IsReadOnly="True"/>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding DumpExePathVM.InputedValue}" IsReadOnly="True"
+                                                     attached:DirtyIndicator.IsDirty="{Binding DumpExePathVM.IsDirty}"/>
                                             <Button Grid.Row="0" Grid.Column="2" Margin="5" Content="..."
                                                     Command="{Binding DataContext.SelectPgDumpFilePathCommand, ElementName=_DbTab}"/>
 
                                             <TextBlock Grid.Row="1" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
-                                            <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding InputedRestoreExePath}" IsReadOnly="True"/>
+                                            <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding RestoreExePathVM.InputedValue}" IsReadOnly="True"
+                                                     attached:DirtyIndicator.IsDirty="{Binding RestoreExePathVM.IsDirty}"/>
                                             <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="..."
                                                     Command="{Binding DataContext.SelectPgRestoreFilePathCommand, ElementName=_DbTab}"/>
 
                                             <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Password}"/>
                                             <RadioButton Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_input" Margin="5" 
                                                          Content="{x:Static properties:Resources.RadioButton_Password_ShowInputWindow}"
-                                                         IsChecked="{Binding SelectedPasswordInput, Converter={StaticResource EnumToBoolConverter}, Mode=TwoWay, ConverterParameter=InputWindow}"/>
+                                                         IsChecked="{Binding PasswordInputVM.InputedValue, Converter={StaticResource EnumToBoolConverter}, Mode=TwoWay, ConverterParameter=InputWindow}"
+                                                         attached:DirtyIndicator.IsDirty="{Binding PasswordInputVM.IsDirty}"/>
                                             <RadioButton Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" GroupName="pgpassword_pgpass" Margin="5" 
                                                          Content="{x:Static properties:Resources.RadioButton_Password_SpecifyPgpassConf}"
-                                                         IsChecked="{Binding SelectedPasswordInput, Converter={StaticResource EnumToBoolConverter}, Mode=TwoWay, ConverterParameter=PgPassConf}"/>
+                                                         IsChecked="{Binding PasswordInputVM.InputedValue, Converter={StaticResource EnumToBoolConverter}, Mode=TwoWay, ConverterParameter=PgPassConf}"
+                                                         attached:DirtyIndicator.IsDirty="{Binding PasswordInputVM.IsDirty}"/>
                                         </Grid>
                                     </GroupBox>
                                     <!-- Microsoft Access -->
@@ -880,7 +917,8 @@
                                             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                                                        Text="{x:Static properties:Resources.TextBlock_Access_Provider}"/>
                                             <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                                                      ItemsSource="{Binding ProviderNameSelectorVM.ItemList}" SelectedItem="{Binding ProviderNameSelectorVM.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Value"/>
+                                                      ItemsSource="{Binding ProviderNameListVM.ItemList}" SelectedItem="{Binding ProviderNameListVM.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Value"
+                                                      attached:DirtyIndicator.IsDirty="{Binding ProviderNameListVM.IsDirty}"/>
                                         </Grid>
                                     </GroupBox>
 
@@ -911,18 +949,21 @@
                                     <!-- 個数 -->
                                     <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
                                                Text="{x:Static properties:Resources.TextBlock_Count}"/>
-                                    <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding InputedBackUpNum}" MinValue="0" MaxValue="100"/>
+                                    <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding BackUpNumVM.InputedValue}" MinValue="0" MaxValue="100"
+                                                            attached:DirtyIndicator.IsDirty="{Binding BackUpNumVM.IsDirty}"/>
                                     <!-- フォルダパス -->
                                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
                                                Text="{x:Static properties:Resources.TextBlock_FolderPath}"/>
-                                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsReadOnly="True" Text="{Binding InputedBackUpFolderPath}"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsReadOnly="True" Text="{Binding BackUpFolderPathVM.InputedValue}"
+                                             attached:DirtyIndicator.IsDirty="{Binding BackUpFolderPathVM.IsDirty}"/>
                                     <Button Grid.Row="1" Grid.Column="3" Margin="5" Content="..."
                                             Command="{Binding DataContext.SelectCsvFolderPathCommand, ElementName=_DbTab}"/>
                                     <!-- タイミング -->
                                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Timing}"/>
                                     <GroupBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="5">
                                         <GroupBox.Header>
-                                            <CheckBox Content="{x:Static properties:Resources.CheckBox_Timing_MinimizingMainWindow}" IsChecked="{Binding SelectedIfBackUpAtMinimizing}"/>
+                                            <CheckBox Content="{x:Static properties:Resources.CheckBox_Timing_MinimizingMainWindow}" IsChecked="{Binding IfBackUpAtMinimizingVM.InputedValue}"
+                                                      attached:DirtyIndicator.IsDirty="{Binding IfBackUpAtMinimizingVM.IsDirty}"/>
                                         </GroupBox.Header>
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -932,25 +973,28 @@
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" VerticalAlignment="Center" Text="{x:Static properties:Resources.TextBlock_Interval}"/>
-                                            <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" Value="{Binding InputedBackUpIntervalAtMinimizing}" MinValue="0"/>
+                                    <controls:NumericUpDown Grid.Row="3" Grid.Column="1" Margin="5" Value="{Binding BackUpIntervalAtMinimizingVM.InputedValue}" MinValue="0"
+                                                            attached:DirtyIndicator.IsDirty="{Binding BackUpIntervalAtMinimizingVM.IsDirty}"/>
                                             <TextBlock Grid.Row="3" Grid.Column="2" Margin="5" VerticalAlignment="Center" Text="{x:Static properties:Resources.TextBlock_MinutesUnit}"/>
                                         </Grid>
                                     </GroupBox>
                                     <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                              Content="{x:Static properties:Resources.CheckBox_Timing_ClosingMainWindow}" IsChecked="{Binding SelectedIfBackUpAtClosing}"/>
+                                              Content="{x:Static properties:Resources.CheckBox_Timing_ClosingMainWindow}" IsChecked="{Binding IfBackUpAtClosingVM.InputedValue}"
+                                              attached:DirtyIndicator.IsDirty="{Binding IfBackUpAtClosingVM.IsDirty}"/>
                                     <!-- 条件 -->
                                     <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" VerticalAlignment="Center"
                                                Text="{x:Static properties:Resources.TextBlock_BackUpCondition}"/>
                                     <RadioButton Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="{x:Static properties:Resources.RadioButton_BackUpCondition_Always}" 
-                                                 IsChecked="{Binding SelectedBackUpCondition, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Always}"
-                                                 GroupName="BackupCondition"/>
+                                                 IsChecked="{Binding BackUpConditionVM.InputedValue, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Always}"
+                                                 attached:DirtyIndicator.IsDirty="{Binding BackUpConditionVM.IsDirty}" GroupName="BackupCondition"/>
                                     <RadioButton Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Content="{x:Static properties:Resources.RadioButton_BackUpCondition_Updated}" 
-                                                 IsChecked="{Binding SelectedBackUpCondition, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Updated}"
-                                                 GroupName="BackupCondition"/>
+                                                 IsChecked="{Binding BackUpConditionVM.InputedValue, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Updated}"
+                                                 attached:DirtyIndicator.IsDirty="{Binding BackUpConditionVM.IsDirty}" GroupName="BackupCondition"/>
                                     <!-- 通知 -->
                                     <TextBlock Grid.Row="6" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Notifications}"/>
                                     <CheckBox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
-                                              Content="{x:Static properties:Resources.CheckBox_Notifications_MinimizingMainWindow}" IsChecked="{Binding SelectedIfNotifyBackUpAtMinimizing}"/>
+                                              Content="{x:Static properties:Resources.CheckBox_Notifications_MinimizingMainWindow}" IsChecked="{Binding IfNotifyBackUpAtMinimizingVM.InputedValue}"
+                                              attached:DirtyIndicator.IsDirty="{Binding IfNotifyBackUpAtMinimizingVM.IsDirty}"/>
                                 </Grid>
                             </GroupBox>
                         </StackPanel>
@@ -967,11 +1011,34 @@
                 </TabItem.Header>
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <ScrollViewer Grid.Row="0">
+                    <!-- 言語情報 -->
+                    <GroupBox Grid.Row="0" Header="{x:Static properties:Resources.GroupHeader_LanguageInformation}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 言語 -->
+                            <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Language}"/>
+                            <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" ItemsSource="{Binding CultureNameListVM.ItemList}" 
+                                              SelectedItem="{Binding CultureNameListVM.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Value"
+                                              attached:DirtyIndicator.IsDirty="{Binding CultureNameListVM.IsDirty}"/>
+                            <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" 
+                                            Content="{x:Static properties:Resources.Button_ApplyLanguage}" Command="{Binding RestartForLanguageCommand}"/>
+                        </Grid>
+                    </GroupBox>
+
+                    <ScrollViewer Grid.Row="1">
                         <StackPanel Grid.IsSharedSizeScope="True">
                             <!-- バージョン情報 -->
                             <GroupBox Header="{x:Static properties:Resources.GroupHeader_VersionInformation}">
@@ -987,27 +1054,8 @@
                                     <!-- 通知 -->
                                     <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Notifications}"/>
                                     <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                                              Content="{x:Static properties:Resources.CheckBox_Notifications_LaunchingApplication}" IsChecked="{Binding SelectedIfNotifyLatestAtAppLaunched}"/>
-                                </Grid>
-                            </GroupBox>
-                            <!-- 言語情報 -->
-                            <GroupBox Header="{x:Static properties:Resources.GroupHeader_LanguageInformation}">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" SharedSizeGroup="Header"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <!-- 言語 -->
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_Language}"/>
-                                    <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" ItemsSource="{Binding CultureNameSelectorVM.ItemList}" 
-                                              SelectedItem="{Binding CultureNameSelectorVM.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Value"/>
-                                    <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" 
-                                            Content="{x:Static properties:Resources.Button_ApplyLanguage}" Command="{Binding RestartForLanguageCommand}"/>
+                                              Content="{x:Static properties:Resources.CheckBox_Notifications_LaunchingApplication}" IsChecked="{Binding IfNotifyLatestAtAppLaunchedVM.InputedValue}"
+                                              attached:DirtyIndicator.IsDirty="{Binding IfNotifyLatestAtAppLaunchedVM.IsDirty}"/>
                                 </Grid>
                             </GroupBox>
                             <!-- カレンダー情報 -->
@@ -1026,7 +1074,8 @@
 
                                     <!-- 開始月 -->
                                     <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center" Text="{x:Static properties:Resources.TextBlock_StartMonth}"/>
-                                    <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding InputedStartMonth}" MinValue="1" MaxValue="12"/>
+                                    <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding StartMonthVM.InputedValue}" MinValue="1" MaxValue="12"
+                                                            attached:DirtyIndicator.IsDirty="{Binding StartMonthVM.IsDirty}"/>
                                     <!-- 祝日 -->
                                     <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" Header="{x:Static properties:Resources.GroupHeader_Holiday}">
                                         <Grid>
@@ -1044,11 +1093,13 @@
 
                                             <!-- URL -->
                                             <TextBlock Grid.Row="0" Grid.Column="0" Text="URI" Margin="5" VerticalAlignment="Center"/>
-                                            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Text="{Binding InputedNationalHolidayCsvURI}"/>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Text="{Binding NationalHolidayCsvURIVM.InputedValue, UpdateSourceTrigger=PropertyChanged}"
+                                                     attached:DirtyIndicator.IsDirty="{Binding NationalHolidayCsvURIVM.IsDirty}"/>
                                             <!-- エンコード -->
                                             <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" Text="{x:Static properties:Resources.TextBlock_TextEncoding}"/>
-                                            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding NationalHolidayTextEncodingSelectorVM.ItemList}" 
-                                                      SelectedItem="{Binding NationalHolidayTextEncodingSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
+                                            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding NationalHolidayTextEncodingListVM.ItemList}" 
+                                                      SelectedItem="{Binding NationalHolidayTextEncodingListVM.SelectedItem}" DisplayMemberPath="Value"
+                                                      attached:DirtyIndicator.IsDirty="{Binding NationalHolidayTextEncodingListVM.IsDirty}"/>
                                             <!-- 列番号 -->
                                             <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
                                                       Header="{x:Static properties:Resources.GroupHeader_ColumnIndex}">
@@ -1066,7 +1117,8 @@
                                                     <!-- 日付 -->
                                                     <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
                                                                Text="{x:Static properties:Resources.TextBlock_Date}"/>
-                                                    <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding InputedNationalHolidayCsvDateIndex}" MinValue="1"/>
+                                                    <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding NationalHolidayCsvDateIndexVM.InputedValue}" MinValue="1"
+                                                                            attached:DirtyIndicator.IsDirty="{Binding NationalHolidayCsvDateIndexVM.IsDirty}"/>
                                                 </Grid>
 
                                             </GroupBox>
@@ -1092,7 +1144,8 @@
                                     <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center" 
                                                Text="{x:Static properties:Resources.TextBlock_SaveTarget}"/>
                                     <CheckBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                                              Content="{x:Static properties:Resources.CheckBox_SaveTarget_PositionWithoutMainWindow}" IsChecked="{Binding IsPositionSaved}"/>
+                                              Content="{x:Static properties:Resources.CheckBox_SaveTarget_PositionWithoutMainWindow}" IsChecked="{Binding IsPositionSavedVM.InputedValue}"
+                                              attached:DirtyIndicator.IsDirty="{Binding IsPositionSavedVM.IsDirty}"/>
 
                                     <DataGrid Grid.Row="1" Grid.ColumnSpan="3" Margin="5" ItemsSource="{Binding WindowSettingVMList}"
                                               Visibility="{Binding App_IsDebug, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
@@ -1133,7 +1186,8 @@
                                     <!-- 操作ログ -->
                                     <GroupBox Grid.Row="0">
                                         <GroupBox.Header>
-                                            <CheckBox Content="{x:Static properties:Resources.GroupHeader_OperationLog}" IsChecked="{Binding SelectedIfOutputOperationLog}"/>
+                                            <CheckBox Content="{x:Static properties:Resources.GroupHeader_OperationLog}" IsChecked="{Binding IfOutputOperationLogVM.InputedValue}"
+                                                      attached:DirtyIndicator.IsDirty="{Binding IfOutputOperationLogVM.IsDirty}"/>
                                         </GroupBox.Header>
 
                                         <Grid>
@@ -1150,19 +1204,22 @@
                                             <!-- 個数 -->
                                             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
                                                        Text="{x:Static properties:Resources.TextBlock_Count}"/>
-                                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding InputedOperationLogNum}" MinValue="0" MaxValue="100"/>
+                                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding OperationLogNumVM.InputedValue}" MinValue="0" MaxValue="100"
+                                                                    attached:DirtyIndicator.IsDirty="{Binding OperationLogNumVM.IsDirty}"/>
                                             <!-- 出力レベル -->
                                             <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center"
                                                        Text="{x:Static properties:Resources.TextBlock_OutoutLogLevel}"/>
-                                            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding LogLevelSelectorVM.ItemList}"
-                                                      SelectedItem="{Binding LogLevelSelectorVM.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Value"/>
+                                            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" ItemsSource="{Binding LogLevelListVM.ItemList}"
+                                                      SelectedItem="{Binding LogLevelListVM.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Value"
+                                                      attached:DirtyIndicator.IsDirty="{Binding LogLevelListVM.IsDirty}"/>
                                         </Grid>
                                     </GroupBox>
 
                                     <!-- ウィンドウログ -->
                                     <GroupBox Grid.Row="1">
                                         <GroupBox.Header>
-                                            <CheckBox Content="{x:Static properties:Resources.GroupHeader_WindowLog}" IsChecked="{Binding SelectedIfOutputWindowLog}"/>
+                                            <CheckBox Content="{x:Static properties:Resources.GroupHeader_WindowLog}" IsChecked="{Binding IfOutputWindowLogVM.InputedValue}"
+                                                      attached:DirtyIndicator.IsDirty="{Binding IfOutputWindowLogVM.IsDirty}"/>
                                         </GroupBox.Header>
 
                                         <Grid>
@@ -1175,7 +1232,8 @@
                                             <!-- 個数 -->
                                             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
                                                Text="{x:Static properties:Resources.TextBlock_Count}"/>
-                                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding InputedWindowLogNum}" MinValue="0" MaxValue="100"/>
+                                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding WindowLogNumVM.InputedValue}" MinValue="0" MaxValue="100"
+                                                                    attached:DirtyIndicator.IsDirty="{Binding WindowLogNumVM.IsDirty}"/>
                                         </Grid>
                                     </GroupBox>
 
@@ -1191,7 +1249,8 @@
                                             <!-- 個数 -->
                                             <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
                                                Text="{x:Static properties:Resources.TextBlock_Count}"/>
-                                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding InputedUnhandledExceptionLogNum}" MinValue="1" MaxValue="100"/>
+                                            <controls:NumericUpDown Grid.Row="0" Grid.Column="1" Margin="5" Value="{Binding UnhandledExceptionLogNumVM.InputedValue}" MinValue="1" MaxValue="100"
+                                                                    attached:DirtyIndicator.IsDirty="{Binding UnhandledExceptionLogNumVM.IsDirty}"/>
                                         </Grid>
                                     </GroupBox>
                                 </Grid>
@@ -1199,7 +1258,7 @@
                         </StackPanel>
                     </ScrollViewer>
                     
-                    <Button Grid.Row="1" Margin="5" Content="{x:Static properties:Resources.Button_Save}" Command="{Binding SaveOtherSettingsCommand}"/>
+                    <Button Grid.Row="2" Margin="5" Content="{x:Static properties:Resources.Button_Save}" Command="{Binding SaveOtherSettingsCommand}"/>
                 </Grid>
             </TabItem>
         </TabControl>

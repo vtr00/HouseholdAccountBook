@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:project="clr-namespace:HouseholdAccountBook"
-        xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         xmlns:vmw="clr-namespace:HouseholdAccountBook.ViewModels.Windows"
+        xmlns:attached="clr-namespace:HouseholdAccountBook.Views.AttachedProperties"
+        xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
         mc:Ignorable="d"
         Title="{x:Static properties:Resources.Title_DbSettingWindow}" Height="370" Width="400" WindowStyle="ToolWindow">
     <Window.DataContext>
@@ -40,7 +41,7 @@
         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
                    Text="{x:Static properties:Resources.TextBlock_DBKind}"/>
         <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalAlignment="Center"
-                  ItemsSource="{Binding DBKindSelectorVM.ItemList}" SelectedItem="{Binding DBKindSelectorVM.SelectedItem}" DisplayMemberPath="Value"/>
+                  ItemsSource="{Binding DBKindListVM.ItemList}" SelectedItem="{Binding DBKindListVM.SelectedItem}" DisplayMemberPath="Value"/>
 
         <!-- PostgreSQL -->
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
@@ -48,7 +49,7 @@
                 <Style TargetType="Grid">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding DBKindSelectorVM.SelectedKey}" Value="PostgreSQL">
+                        <DataTrigger Binding="{Binding DBKindListVM.SelectedKey}" Value="PostgreSQL">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
@@ -75,34 +76,40 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Host}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding InputedHost}"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding HostVM.InputedValue}"
+                             attached:DirtyIndicator.IsDirty="{Binding HostVM.IsDirty}"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Port}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding InputedPort}" 
-                         PreviewTextInput="TextBox_PreviewTextInput"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding PortVM.InputedValue}" 
+                             attached:DirtyIndicator.IsDirty="{Binding PortVM.IsDirty}"
+                             PreviewTextInput="TextBox_PreviewTextInput"/>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_UserName}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding InputedUserName}"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding UserNameVM.InputedValue}"
+                             attached:DirtyIndicator.IsDirty="{Binding UserNameVM.IsDirty}"/>
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Password}" Margin="5" VerticalAlignment="Center"/>
                     <PasswordBox x:Name="passwordBox" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="1"/>
 
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_DbName}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding InputedDatabaseName}"/>
+                    <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding DatabaseNameVM.InputedValue}"
+                             attached:DirtyIndicator.IsDirty="{Binding DatabaseNameVM.IsDirty}"/>
 
                     <TextBlock Grid.Row="5" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Npgsql_Roll}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding InputedRole}"/>
+                    <TextBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Margin="1" Text="{Binding RoleVM.InputedValue}"
+                             attached:DirtyIndicator.IsDirty="{Binding RoleVM.IsDirty}"/>
 
                     <TextBlock Grid.Row="6" Grid.Column="0" Text="pg_dump.exe" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="6" Grid.Column="1" Margin="1" Text="{Binding InputedDumpExePath}" IsReadOnly="True"/>
+                    <TextBox Grid.Row="6" Grid.Column="1" Margin="1" Text="{Binding DumpExePathVM.InputedValue}" IsReadOnly="True"
+                             attached:DirtyIndicator.IsDirty="{Binding DumpExePathVM.IsDirty}"/>
                     <Button Grid.Row="6" Grid.Column="2" Margin="1" Content="..."
                             Command="{Binding DataContext.SelectPgDumpFilePathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
 
                     <TextBlock Grid.Row="7" Grid.Column="0" Text="pg_restore.exe" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="7" Grid.Column="1" Margin="1" Text="{Binding InputedRestoreExePath}" IsReadOnly="True"/>
+                    <TextBox Grid.Row="7" Grid.Column="1" Margin="1" Text="{Binding RestoreExePathVM.InputedValue}" IsReadOnly="True"
+                             attached:DirtyIndicator.IsDirty="{Binding RestoreExePathVM.IsDirty}"/>
                     <Button Grid.Row="7" Grid.Column="2" Margin="1" Content="..." 
                             Command="{Binding DataContext.SelectPgRestoreFilePathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
-
                 </Grid>
             </GroupBox>
         </Grid>
@@ -113,7 +120,7 @@
                 <Style TargetType="Grid">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding DBKindSelectorVM.SelectedKey}" Value="Access">
+                        <DataTrigger Binding="{Binding DBKindListVM.SelectedKey}" Value="Access">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
@@ -142,10 +149,12 @@
                     <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" 
                                Text="{x:Static properties:Resources.TextBlock_Access_Provider}"/>
                     <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
-                               ItemsSource="{Binding ProviderNameSelectorVM.ItemList}" SelectedItem="{Binding ProviderNameSelectorVM.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Value"/>
+                              ItemsSource="{Binding ProviderNameListVM.ItemList}" SelectedItem="{Binding ProviderNameListVM.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Value"
+                              attached:DirtyIndicator.IsDirty="{Binding ProviderNameListVM.IsDirty}"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_Access_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" Margin="1" Text="{Binding InputedDBFilePath}" IsReadOnly="True"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="1" Text="{Binding DBFilePathVM.InputedValue}" IsReadOnly="True"
+                             attached:DirtyIndicator.IsDirty="{Binding DBFilePathVM.IsDirty}"/>
                     <Button Grid.Row="1" Grid.Column="2" Margin="1" Content="..."
                             Command="{Binding DataContext.SelectDBFilePathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
                 </Grid>
@@ -158,7 +167,7 @@
                 <Style TargetType="Grid">
                     <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding DBKindSelectorVM.SelectedKey}" Value="SQLite">
+                        <DataTrigger Binding="{Binding DBKindListVM.SelectedKey}" Value="SQLite">
                             <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
@@ -185,7 +194,8 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static properties:Resources.TextBlock_SQLite_DBFilePath}" Margin="5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="0" Grid.Column="1" Margin="1" Text="{Binding InputedDBFilePath}" IsReadOnly="True"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Margin="1" Text="{Binding DBFilePathVM.InputedValue}" IsReadOnly="True"
+                             attached:DirtyIndicator.IsDirty="{Binding DBFilePathVM.IsDirty}"/>
                     <Button Grid.Row="0" Grid.Column="2" Margin="1" Content="..." 
                             Command="{Binding DataContext.SelectDBFilePathCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
                 </Grid>

@@ -291,7 +291,7 @@ namespace HouseholdAccountBook.Views.Windows
                     this.mCCW.IsMatchChanged += (sender, e) => {
                         using FuncLog funcLog = new(methodName: nameof(this.mCCW.IsMatchChanged));
 
-                        ActionViewModel vm = this.WVM.AccountTabVM.ActionSelectorVM.ItemList.FirstOrDefault(tmpVM => tmpVM.ActionWithBalance.Action.ActionId == e.Value1);
+                        ActionViewModel vm = this.WVM.AccountTabVM.ActionListVM.ItemList.FirstOrDefault(tmpVM => tmpVM.ActionWithBalance.Action.ActionId == e.Value1);
                         // UI上の表記だけを更新する
                         _ = (vm?.IsMatch = e.Value2);
                     };
@@ -307,9 +307,9 @@ namespace HouseholdAccountBook.Views.Windows
                     this.mCCW.AccountChanged += (sender, e) => {
                         using FuncLog funcLog = new(methodName: nameof(this.mCCW.AccountChanged));
 
-                        AccountModel selectedVM = this.WVM.AccountSelectorVM.ItemList.FirstOrDefault(vm => vm.Id == e.NewValue);
+                        AccountModel selectedVM = this.WVM.AccountListVM.ItemList.FirstOrDefault(vm => vm.Id == e.NewValue);
                         if (selectedVM != null) {
-                            this.WVM.AccountSelectorVM.SelectedItem = selectedVM;
+                            this.WVM.AccountListVM.SelectedItem = selectedVM;
                         }
                     };
                     // ウィンドウ非表示時イベントを登録する
@@ -322,7 +322,7 @@ namespace HouseholdAccountBook.Views.Windows
                 }
                 else {
                     // 設定で変更されている可能性があるため、帳簿を読み込み直す
-                    await this.mCCW.WVM.AccountSelectorVM.LoadAsync(e.InitialAccountId);
+                    await this.mCCW.WVM.AccountListVM.LoadAsync(e.InitialAccountId);
                 }
 
                 this.mCCW.Show();

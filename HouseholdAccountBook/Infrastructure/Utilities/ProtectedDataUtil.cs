@@ -7,7 +7,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities
     /// <summary>
     /// 保護データユーティリティ
     /// </summary>
-    public class ProtectedDataUtil
+    public static class ProtectedDataUtil
     {
         /// <summary>
         /// 暗号化されたパスワードを生成する

@@ -1,9 +1,11 @@
 ﻿using HouseholdAccountBook.Infrastructure.CSV;
 using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Services;
 using HouseholdAccountBook.Infrastructure.Utilities;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.ViewModels.Settings;
 using HouseholdAccountBook.Views;
 using System;
@@ -29,62 +31,62 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         #endregion
 
         #region Bindingプロパティ
-        #region バージョン
-        /// <summary>
-        /// 入力されたアプリ起動時最新バージョン通知
-        /// </summary>
-        public bool SelectedIfNotifyLatestAtAppLaunched {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-        #endregion
-
         #region 言語
         /// <summary>
-        /// 言語種別セレクタVM
+        /// 言語種別リストVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<string, string>, string> CultureNameSelectorVM { get; } = new(static p => p.Key);
+        public SelectableViewModel<KeyValuePair<string, string>, string> CultureNameListVM { get; } = new(static p => p.Key);
+
+        /// <summary>
+        /// 言語未保存状態マネージャ
+        /// </summary>
+        public DirtyStatusManager LanguageDirtyState => field ??= new(this.CultureNameListVM);
+        #endregion
+
+        #region バージョン
+        /// <summary>
+        /// アプリ起動時最新バージョン通知VM
+        /// </summary>
+        public InputableViewModel<bool> IfNotifyLatestAtAppLaunchedVM { get; } = new();
+
+        /// <summary>
+        /// バージョン未保存状態マネージャ
+        /// </summary>
+        public DirtyStatusManager AppVersionDirtyState => field ??= new(this.IfNotifyLatestAtAppLaunchedVM);
         #endregion
 
         #region カレンダー
         /// <summary>
-        /// 入力された開始月
+        /// 開始月VM
         /// </summary>
-        public int InputedStartMonth {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<int> StartMonthVM { get; } = new();
 
         /// <summary>
-        /// 入力された国民の祝日CSV URI
+        /// 国民の祝日CSV URI VM
         /// </summary>
-        public string InputedNationalHolidayCsvURI {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<string> NationalHolidayCsvURIVM { get; } = new();
 
         /// <summary>
-        /// 国民の祝日CSV 文字エンコーディング セレクタVM
+        /// 国民の祝日CSV 文字エンコーディング リストVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<int, string>, int> NationalHolidayTextEncodingSelectorVM => field ??= new(static p => p.Key);
+        public SelectableViewModel<KeyValuePair<int, string>, int> NationalHolidayTextEncodingListVM => field ??= new(static p => p.Key);
 
         /// <summary>
-        /// 入力された国民の祝日CSV 日付インデックス(1開始)
+        /// 国民の祝日CSV 日付インデックス(1開始) VM
         /// </summary>
-        public int InputedNationalHolidayCsvDateIndex {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<int> NationalHolidayCsvDateIndexVM { get; } = new();
+
+        /// <summary>
+        /// カレンダー未保存状態マネージャ
+        /// </summary>
+        public DirtyStatusManager CalendarDirtyStatus => field ??= new(this.StartMonthVM, this.NationalHolidayCsvURIVM, this.NationalHolidayTextEncodingListVM, this.NationalHolidayCsvDateIndexVM);
         #endregion
 
         #region ウィンドウ
         /// <summary>
-        /// ウィンドウ位置を保存するか
+        /// ウィンドウ位置保存VM
         /// </summary>
-        public bool IsPositionSaved {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<bool> IsPositionSavedVM { get; } = new();
 
         /// <summary>
         /// ウィンドウ設定
@@ -93,66 +95,67 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             get;
             set => this.SetProperty(ref field, value);
         }
+
+        /// <summary>
+        /// ウィンドウ未保存状態マネージャ
+        /// </summary>
+        public DirtyStatusManager WindowDirtyState => field ??= new(this.IsPositionSavedVM);
         #endregion
 
         #region ログ
         /// <summary>
-        /// 選択された操作ログ出力の有無
+        /// 操作ログ出力VM
         /// </summary>
-        public bool SelectedIfOutputOperationLog {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<bool> IfOutputOperationLogVM { get; } = new();
         /// <summary>
-        /// 入力された操作ログ数
+        /// 操作ログ数VM
         /// </summary>
-        public int InputedOperationLogNum {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<int> OperationLogNumVM { get; } = new();
         /// <summary>
-        /// ログレベル セレクタVM
+        /// ログレベル リストVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<Log.LogLevel, string>, Log.LogLevel> LogLevelSelectorVM => field ??= new(static p => p.Key);
+        public SelectableViewModel<KeyValuePair<Log.LogLevel, string>, Log.LogLevel> LogLevelListVM => field ??= new(static p => p.Key);
 
         /// <summary>
-        /// 選択されたウィンドウログ出力の有無
+        /// ウィンドウログ出力VM
         /// </summary>
-        public bool SelectedIfOutputWindowLog {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<bool> IfOutputWindowLogVM { get; } = new();
         /// <summary>
-        /// 入力されたウィンドウログ数
+        /// ウィンドウログ数VM
         /// </summary>
-        public int InputedWindowLogNum {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<int> WindowLogNumVM { get; } = new();
 
         /// <summary>
-        /// 入力された捕捉されない例外ログ数
+        /// 捕捉されない例外ログ数VM
         /// </summary>
-        public int InputedUnhandledExceptionLogNum {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<int> UnhandledExceptionLogNumVM { get; } = new();
+
+        /// <summary>
+        /// ログ未保存状態マネージャ
+        /// </summary>
+        public DirtyStatusManager LogDirtyState => field ??=
+            new(this.IfOutputOperationLogVM, this.OperationLogNumVM, this.LogLevelListVM, this.IfOutputWindowLogVM, this.WindowLogNumVM, this.UnhandledExceptionLogNumVM);
         #endregion
+
+        /// <summary>
+        /// 未保存状態マネージャ
+        /// </summary>
+        public DirtyStatusManager DirtyStatus => field ??= new(this.AppVersionDirtyState, this.CalendarDirtyStatus, this.WindowDirtyState, this.LogDirtyState);
         #endregion
 
         #region コマンド
         /// <summary>
         /// 言語設定適用コマンド
         /// </summary>
-        public ICommand RestartForLanguageCommand => field ??= new RelayCommand(this.RestartForLanguageCommand_Execute);
+        public ICommand RestartForLanguageCommand => field ??= new RelayCommand(this.RestartForLanguageCommand_Execute, () => this.LanguageDirtyState.IsDirty);
         /// <summary>
         /// 言語設定適用コマンド処理
         /// </summary>
         private void RestartForLanguageCommand_Execute()
         {
             if (MessageBox.Show(Properties.Resources.Message_RestartNotification, Properties.Resources.Title_Conformation,
-                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
-                UserSettingService.Instance.SelectedCaltureName = this.CultureNameSelectorVM.SelectedKey;
+                                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
+                UserSettingService.Instance.SelectedCaltureName = this.CultureNameListVM.SelectedKey;
 
                 ((App)Application.Current).Restart();
             }
@@ -173,7 +176,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private void InitializeWindowSettingCommand_Execute()
         {
             if (MessageBox.Show(Properties.Resources.Message_RestartNotification, Properties.Resources.Title_Conformation,
-                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
+                                MessageBoxButton.OKCancel, MessageBoxImage.Question, MessageBoxResult.Cancel) == MessageBoxResult.OK) {
                 UserSettingService.Instance.InitializeWindowLocation();
 
                 ((App)Application.Current).Restart(false);
@@ -183,13 +186,17 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// その他設定保存コマンド
         /// </summary>
-        public ICommand SaveOtherSettingsCommand => field ??= new RelayCommand(this.SaveOtherSettingsCommand_Execute);
+        public ICommand SaveOtherSettingsCommand => field ??= new AsyncRelayCommand(this.SaveOtherSettingsCommand_Execute, () => this.DirtyStatus.IsDirty);
         /// <summary>
         /// その他設定保存コマンド処理
         /// </summary>
-        private void SaveOtherSettingsCommand_Execute()
+        private async Task SaveOtherSettingsCommand_Execute()
         {
             this.Save();
+            // 再読込する
+            await this.LoadOtherAsync();
+
+            _ = MessageBox.Show(Properties.Resources.Message_CompletedToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
             this.NeedToUpdateChanged?.Invoke(this, EventArgs.Empty);
         }
         #endregion
@@ -208,9 +215,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
             base.Initialize(dbHandlerFactory);
 
-            this.CultureNameSelectorVM.SetLoader(static () => UiConstants.CultureNameStr);
-            this.NationalHolidayTextEncodingSelectorVM.SetLoader(static () => EncodingUtil.GetTextEncodingList());
-            this.LogLevelSelectorVM.SetLoader(static () => {
+            this.CultureNameListVM.SetLoader(static () => UiConstants.CultureNameStr);
+            this.NationalHolidayTextEncodingListVM.SetLoader(static () => EncodingUtil.GetTextEncodingList());
+            this.LogLevelListVM.SetLoader(static () => {
                 Dictionary<Log.LogLevel, string> dic = UiConstants.LogLevelStr;
 #if !DEBUG
                 _ = dic.Remove(Log.LogLevel.Trace);
@@ -220,40 +227,61 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         }
 
         /// <summary>
+        /// 言語情報を読み込む
+        /// </summary>
+        /// <returns></returns>
+        private async Task LoadLanguageAsync()
+        {
+            using FuncLog funcLog = new();
+
+            // 言語情報
+            await this.CultureNameListVM.LoadAsync(UserSettingService.Instance.SelectedCaltureName);
+        }
+
+        /// <summary>
+        /// その他設定(言語情報を除く)を読み込む
+        /// </summary>
+        /// <returns></returns>
+        private async Task LoadOtherAsync()
+        {
+            using FuncLog funcLog = new();
+
+            // バージョン情報
+            this.IfNotifyLatestAtAppLaunchedVM.LoadedValue = UserSettingService.Instance.CheckLatestVersionAtAppLaunched;
+
+            // カレンダー情報
+            this.StartMonthVM.LoadedValue = UserSettingService.Instance.FiscalStartMonth;
+            CSVFileDao.HolidayCSVConfigulation holidayCsvConfig = UserSettingService.Instance.HolidayCSVConfig;
+            this.NationalHolidayCsvURIVM.LoadedValue = holidayCsvConfig.Url;
+            await this.NationalHolidayTextEncodingListVM.LoadAsync(holidayCsvConfig.TextEncoding.CodePage);
+            this.NationalHolidayCsvDateIndexVM.LoadedValue = holidayCsvConfig.DateIndex + 1;
+
+            // ウィンドウ情報
+            WindowLocationManager.Configuration locationConfig = UserSettingService.Instance.WindowLocationConfig;
+            this.IsPositionSavedVM.LoadedValue = locationConfig.IsPositionSaved;
+            this.WindowSettingVMList = LoadWindowSettings();
+
+            // ログ情報
+            LogImpl.Configuration logConfig = UserSettingService.Instance.LogConfig;
+            this.IfOutputOperationLogVM.LoadedValue = logConfig.OutputLogToFile;
+            this.OperationLogNumVM.LoadedValue = logConfig.LogFileAmount;
+            await this.LogLevelListVM.LoadAsync(logConfig.OutputLogLevel);
+            WindowLog.Configulation windowLogConfig = UserSettingService.Instance.WindowLogConfig;
+            this.IfOutputWindowLogVM.LoadedValue = windowLogConfig.OutputLog;
+            this.WindowLogNumVM.LoadedValue = windowLogConfig.LogFileAmount;
+            ExceptionLog.Configuration exceptionLogConfig = UserSettingService.Instance.ExceptionLogConfig;
+            this.UnhandledExceptionLogNumVM.LoadedValue = exceptionLogConfig.LogFileAmount;
+        }
+
+        /// <summary>
         /// その他設定を読み込む
         /// </summary>
         public override async Task LoadAsync()
         {
             using FuncLog funcLog = new();
 
-            // バージョン情報
-            this.SelectedIfNotifyLatestAtAppLaunched = UserSettingService.Instance.CheckLatestVersionAtAppLaunched;
-
-            // 言語情報
-            await this.CultureNameSelectorVM.LoadAsync(UserSettingService.Instance.SelectedCaltureName);
-
-            // カレンダー情報
-            this.InputedStartMonth = UserSettingService.Instance.FiscalStartMonth;
-            CSVFileDao.HolidayCSVConfigulation holidayCsvConfig = UserSettingService.Instance.HolidayCSVConfig;
-            this.InputedNationalHolidayCsvURI = holidayCsvConfig.Url;
-            await this.NationalHolidayTextEncodingSelectorVM.LoadAsync(holidayCsvConfig.TextEncoding.CodePage);
-            this.InputedNationalHolidayCsvDateIndex = holidayCsvConfig.DateIndex + 1;
-
-            // ウィンドウ情報
-            WindowLocationManager.Configuration locationConfig = UserSettingService.Instance.WindowLocationConfig;
-            this.IsPositionSaved = locationConfig.IsPositionSaved;
-            this.WindowSettingVMList = LoadWindowSettings();
-
-            // ログ情報
-            LogImpl.Configuration logConfig = UserSettingService.Instance.LogConfig;
-            this.SelectedIfOutputOperationLog = logConfig.OutputLogToFile;
-            this.InputedOperationLogNum = logConfig.LogFileAmount;
-            await this.LogLevelSelectorVM.LoadAsync(logConfig.OutputLogLevel);
-            WindowLog.Configulation windowLogConfig = UserSettingService.Instance.WindowLogConfig;
-            this.SelectedIfOutputWindowLog = windowLogConfig.OutputLog;
-            this.InputedWindowLogNum = windowLogConfig.LogFileAmount;
-            ExceptionLog.Configuration exceptionLogConfig = UserSettingService.Instance.ExceptionLogConfig;
-            this.InputedUnhandledExceptionLogNum = exceptionLogConfig.LogFileAmount;
+            await this.LoadLanguageAsync();
+            await this.LoadOtherAsync();
         }
 
         public override void AddEventHandlers()
@@ -326,41 +354,39 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// <summary>
         /// その他設定を保存する
         /// </summary>
+        /// <remarks>言語情報はここでは保存しない</remarks>
         private void Save()
         {
             using FuncLog funcLog = new();
 
             // バージョン情報
-            UserSettingService.Instance.CheckLatestVersionAtAppLaunched = this.SelectedIfNotifyLatestAtAppLaunched;
-
-            // 言語情報
-            UserSettingService.Instance.SelectedCaltureName = this.CultureNameSelectorVM.SelectedKey;
+            UserSettingService.Instance.CheckLatestVersionAtAppLaunched = this.IfNotifyLatestAtAppLaunchedVM.InputedValue;
 
             // カレンダー情報
-            UserSettingService.Instance.FiscalStartMonth = this.InputedStartMonth;
+            UserSettingService.Instance.FiscalStartMonth = this.StartMonthVM.InputedValue;
             UserSettingService.Instance.HolidayCSVConfig = new() {
-                Url = this.InputedNationalHolidayCsvURI,
-                TextEncoding = Encoding.GetEncoding(this.NationalHolidayTextEncodingSelectorVM.SelectedKey),
-                DateIndex = this.InputedNationalHolidayCsvDateIndex - 1
+                Url = this.NationalHolidayCsvURIVM.InputedValue,
+                TextEncoding = Encoding.GetEncoding(this.NationalHolidayTextEncodingListVM.SelectedKey),
+                DateIndex = this.NationalHolidayCsvDateIndexVM.InputedValue - 1
             };
 
             // ウィンドウ情報
             UserSettingService.Instance.WindowLocationConfig = new() {
-                IsPositionSaved = this.IsPositionSaved
+                IsPositionSaved = this.IsPositionSavedVM.InputedValue
             };
 
             // ログ情報
             UserSettingService.Instance.LogConfig = new() {
-                OutputLogToFile = this.SelectedIfOutputOperationLog,
-                LogFileAmount = this.InputedOperationLogNum,
-                OutputLogLevel = this.LogLevelSelectorVM.SelectedKey
+                OutputLogToFile = this.IfOutputOperationLogVM.InputedValue,
+                LogFileAmount = this.OperationLogNumVM.InputedValue,
+                OutputLogLevel = this.LogLevelListVM.SelectedKey
             };
             UserSettingService.Instance.WindowLogConfig = new() {
-                OutputLog = this.SelectedIfOutputWindowLog,
-                LogFileAmount = this.InputedWindowLogNum
+                OutputLog = this.IfOutputWindowLogVM.InputedValue,
+                LogFileAmount = this.WindowLogNumVM.InputedValue
             };
             UserSettingService.Instance.ExceptionLogConfig = new() {
-                LogFileAmount = this.InputedUnhandledExceptionLogNum
+                LogFileAmount = this.UnhandledExceptionLogNumVM.InputedValue
             };
 
             // 設定をログクラスに反映する
@@ -372,8 +398,6 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             LogImpl.DeleteOldLogFiles();
             ExceptionLog.DeleteOldExceptionLogs();
             WindowLog.DeleteAllOldWindowLogs([.. UiConstants.WindowNameStr.Values]);
-
-            _ = MessageBox.Show(Properties.Resources.Message_CompletedToSave, Properties.Resources.Title_Information, MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

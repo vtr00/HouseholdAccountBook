@@ -2,6 +2,7 @@
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.ViewModels.Component;
 using System.Collections.Generic;
 
@@ -10,9 +11,9 @@ namespace HouseholdAccountBook.ViewModels.Settings
     /// <summary>
     /// 分類/項目設定VM
     /// </summary>
-    public class ItemSettingViewModel : BindableBase
+    public class ItemSettingViewModel : ViewModelBase
     {
-        #region プロパティ
+        #region Bindingプロパティ
         /// <summary>
         /// 種類
         /// </summary>
@@ -29,37 +30,36 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public int SortOrder { get; init; }
 
         /// <summary>
-        /// 入力された名称
+        /// 名称
         /// </summary>
-        public string InputedName {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<string> NameVM { get; } = new();
+        /// <summary>
+        /// アセットリストVM
+        /// </summary>
+        public SelectableViewModel<AssetModel, AssetIdObj> AssetListVM => field ??= new(static vm => vm?.Id);
+        /// <summary>
+        /// 項目種別リストVM
+        /// </summary>
+        public SelectableViewModel<KeyValuePair<ItemKind, string>, ItemKind> ItemKindListVM => field ??= new(static p => p.Key);
+        /// <summary>
+        /// 未保存状態マネージャ
+        /// </summary>
+        public DirtyStatusManager DirtyState => field ??= new(this.NameVM, this.AssetListVM, this.ItemKindListVM);
 
         /// <summary>
-        /// アセットセレクタVM
+        /// 関連性リストVM
         /// </summary>
-        public SelectorViewModel<AssetModel, AssetIdObj> AssetSelectorVM => field ??= new(static vm => vm?.Id);
+        public SelectableViewModel<RelationViewModel, AccountIdObj> RelationListVM => field ??= new(static vm => vm?.Id);
 
         /// <summary>
-        /// 項目種別セレクタVM
+        /// 店舗リストVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<ItemKind, string>, ItemKind> ItemKindSelectorVM => field ??= new(static p => p.Key);
+        public SelectableViewModel<ShopModel, string> ShopListVM => field ??= new(static vm => vm?.Name);
 
         /// <summary>
-        /// 関連性セレクタVM
+        /// 備考リストVM
         /// </summary>
-        public SelectorViewModel<RelationViewModel, AccountIdObj> RelationSelectorVM => field ??= new(static vm => vm?.Id);
-
-        /// <summary>
-        /// 店舗セレクタVM
-        /// </summary>
-        public SelectorViewModel<ShopModel, string> ShopSelectorVM => field ??= new(static vm => vm?.Name);
-
-        /// <summary>
-        /// 備考セレクタVM
-        /// </summary>
-        public SelectorViewModel<RemarkModel, string> RemarkSelectorVM => field ??= new(static vm => vm?.Remark);
+        public SelectableViewModel<RemarkModel, string> RemarkListVM => field ??= new(static vm => vm?.Remark);
 
         /// <summary>
         /// リネーム可能か
@@ -80,7 +80,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             this.Kind = HierarchicalKind.Balance;
             this.Id = IdObj.System;
             this.SortOrder = -1;
-            this.InputedName = string.Empty;
+            this.NameVM.LoadedValue = string.Empty;
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             this.Kind = HierarchicalKind.Category;
             this.Id = category.Id;
             this.SortOrder = category.SortOrder;
-            this.InputedName = category.Name;
+            this.NameVM.LoadedValue = category.Name;
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
             this.Kind = HierarchicalKind.Item;
             this.Id = item.Id;
             this.SortOrder = item.SortOrder;
-            this.InputedName = item.Name;
+            this.NameVM.LoadedValue = item.Name;
         }
     }
 }

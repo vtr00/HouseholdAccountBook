@@ -3,6 +3,7 @@ using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.ViewModels.Component;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
     /// <summary>
     /// 帳簿VM(設定用)
     /// </summary>
-    public class AccountSettingViewModel : BindableBase
+    public class AccountSettingViewModel : ViewModelBase
     {
         #region プロパティ
         /// <summary>
@@ -30,47 +31,33 @@ namespace HouseholdAccountBook.ViewModels.Settings
         /// </summary>
         public int SortOrder => this.Account.SortOrder;
 
+        #region 一般情報
         /// <summary>
-        /// 入力された帳簿名
+        /// 帳簿名
         /// </summary>
-        public string InputedName {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<string> NameVM { get; } = new();
+        /// <summary>
+        /// 帳簿種別リストVM
+        /// </summary>
+        public SelectableViewModel<KeyValuePair<AccountKind, string>, AccountKind> AccountKindListVM => field ??= new(static p => p.Key);
+        /// <summary>
+        /// 備考
+        /// </summary>
+        public InputableViewModel<string> RemarkVM { get; } = new();
 
         /// <summary>
-        /// 帳簿種別セレクタVM
+        /// アセットリストVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<AccountKind, string>, AccountKind> AccountKindSelectorVM => field ??= new(static p => p.Key);
+        public SelectableViewModel<AssetModel, AssetIdObj> AssetListVM => field ??= new(static vm => vm?.Id);
 
         /// <summary>
-        /// 入力された備考
+        /// 初期残高
         /// </summary>
-        public string InputedRemark {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-
+        public InputableViewModel<decimal> InitialValueVM { get; } = new();
         /// <summary>
-        /// アセットセレクタVM
+        /// 初期残高(表示値)
         /// </summary>
-        public SelectorViewModel<AssetModel, AssetIdObj> AssetSelectorVM => field ??= new(static vm => vm?.Id);
-
-        /// <summary>
-        /// 入力された初期残高
-        /// </summary>
-        public decimal InputedInitialValue {
-            get;
-            set {
-                if (this.SetProperty(ref field, value)) {
-                    this.RaisePropertyChanged(nameof(this.InputedInitialValue));
-                }
-            }
-        }
-        /// <summary>
-        /// 入力された初期残高(表示値)
-        /// </summary>
-        public string InputedInitialValueStr => AssetService.Instance.ToAssetString(this.InputedInitialValue, this.AssetSelectorVM.SelectedKey, UnitKind.MainUnit, UnitKind.MainUnit);
+        public string InputedInitialValueStr => AssetService.Instance.ToAssetString(this.InitialValueVM.InputedValue, this.AssetListVM.SelectedKey, UnitKind.MainUnit, UnitKind.MainUnit);
         /// <summary>
         /// 初期残高スケール
         /// </summary>
@@ -79,98 +66,102 @@ namespace HouseholdAccountBook.ViewModels.Settings
             set => this.SetProperty(ref field, value);
         }
 
+        /// <summary>
+        /// 一般情報未保存状態マネージャ
+        /// </summary>
+        public DirtyStatusManager CommonDirtyState => field ??= new(this.NameVM, this.AccountKindListVM, this.RemarkVM, this.AssetListVM, this.InitialValueVM);
+        #endregion
+
         #region 期間情報
         /// <summary>
-        /// 選択された開始日の有無
+        /// 開始日の有無
         /// </summary>
-        public bool SelectedIfStartDateExists {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<bool> StartDateExistsVM { get; } = new();
         /// <summary>
-        /// 指定された終了日の有無
+        /// 終了日の有無
         /// </summary>
-        public bool SelectedIfEndDateExists {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<bool> EndDateExistsVM { get; } = new();
         /// <summary>
-        /// 指定された期間
+        /// 開始日
         /// </summary>
-        public PeriodObj<DateOnly> InputedPeriod {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<DateOnly> PeriodStartVM { get; } = new();
+        /// <summary>
+        /// 終了日
+        /// </summary>
+        public InputableViewModel<DateOnly> PeriodEndVM { get; } = new();
+
+        /// <summary>
+        /// 期間情報未保存状態マネージャ
+        /// </summary>
+        public DirtyStatusManager PeriodDirtyState => field ??= new(this.StartDateExistsVM, this.EndDateExistsVM, this.PeriodStartVM, this.PeriodEndVM);
         #endregion
 
         #region 支払情報
         /// <summary>
         /// 支払の必要があるか
         /// </summary>
-        public bool NeedToPay => this.AccountKindSelectorVM.SelectedKey == AccountKind.CreditCard;
+        public bool NeedToPay => this.AccountKindListVM.SelectedKey == AccountKind.CreditCard;
 
         /// <summary>
-        /// 入力された支払日
+        /// 支払日
         /// </summary>
-        public int? InputedPayDay {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<int?> PayDayVM { get; } = new();
 
         /// <summary>
-        /// 支払元帳簿セレクタVM
+        /// 支払元帳簿リストVM
         /// </summary>
-        public SelectorViewModel<AccountModel, AccountIdObj> DebitAccountSelectorVM => field ??= new(static vm => vm?.Id);
+        public SelectableViewModel<AccountModel, AccountIdObj> DebitAccountListVM => field ??= new(static vm => vm?.Id);
+
+        /// <summary>
+        /// 支払情報未保存状態マネージャ
+        /// </summary>
+        public DirtyStatusManager PayDirtyState => field ??= new(this.PayDayVM, this.DebitAccountListVM);
         #endregion
 
         #region CSV情報
         /// <summary>
         /// CSVデータがあるか
         /// </summary>
-        public bool CsvDataExists => this.AccountKindSelectorVM.SelectedKey != AccountKind.Wallet;
+        public bool CsvDataExists => this.AccountKindListVM.SelectedKey != AccountKind.Wallet;
 
         /// <summary>
-        /// 入力されたCSVフォルダパス
+        /// CSVフォルダパス
         /// </summary>
-        public string InputedCsvFolderPath {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<string> CsvFolderPathVM { get; } = new();
 
         /// <summary>
-        /// 文字エンコーディング セレクタVM
+        /// 文字エンコーディング リストVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<int, string>, int> TextEncodingSelectorVM => field ??= new(static p => p.Key);
+        public SelectableViewModel<KeyValuePair<int, string>, int> TextEncodingListVM => field ??= new(static p => p.Key);
 
         /// <summary>
-        /// 入力された日付 位置(1開始)
+        /// 日付 位置(1開始)
         /// </summary>
-        public int? InputedActDateIndex {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public InputableViewModel<int?> ActDateIndexVM { get; } = new();
+        /// <summary>
+        /// 支出 位置(1開始)
+        /// </summary>
+        public InputableViewModel<int?> ExpensesIndexVM { get; } = new();
+        /// <summary>
+        /// 項目名 位置(1開始)
+        /// </summary>
+        public InputableViewModel<int?> ItemNameIndexVM { get; } = new();
 
         /// <summary>
-        /// 入力された支出 位置(1開始)
+        /// CSV情報未保存状態マネージャ
         /// </summary>
-        public int? InputedExpensesIndex {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
-
-        /// <summary>
-        /// 入力された項目名 位置(1開始)
-        /// </summary>
-        public int? InputedItemNameIndex {
-            get;
-            set => this.SetProperty(ref field, value);
-        }
+        public DirtyStatusManager CSVDirtyState => field ??= new(this.CsvFolderPathVM, this.TextEncodingListVM, this.ActDateIndexVM, this.ExpensesIndexVM, this.ItemNameIndexVM);
         #endregion
 
         /// <summary>
-        /// 関連性セレクタVM
+        /// 未保存状態マネージャ
         /// </summary>
-        public SelectorViewModel<RelationViewModel, ItemIdObj> RelationSelectorVM => field ??= new(static vm => vm?.Id);
+        public DirtyStatusManager DirtyState => field ??= new(this.CommonDirtyState, this.PeriodDirtyState, this.PayDirtyState, this.CSVDirtyState);
+
+        /// <summary>
+        /// 関連性リストVM
+        /// </summary>
+        public SelectableViewModel<RelationViewModel, ItemIdObj> RelationListVM => field ??= new(static vm => vm?.Id);
         #endregion
 
         /// <summary>
@@ -180,24 +171,27 @@ namespace HouseholdAccountBook.ViewModels.Settings
         public AccountSettingViewModel(AccountModel account)
         {
             this.Account = account;
-            this.InputedName = account.Name;
-            this.InputedRemark = account.Remark;
-            this.InputedInitialValue = account.InitialValue.MainValue;
+            this.NameVM.LoadedValue = account.Name;
+            this.RemarkVM.LoadedValue = account.Remark;
+            this.InitialValueVM.LoadedValue = account.InitialValue.MainValue;
             this.InitialValueScale = account.InitialValue.Scale;
-            this.InputedPayDay = account.PayDay;
-            this.SelectedIfStartDateExists = account.StartDateExists;
-            this.SelectedIfEndDateExists = account.EndDateExists;
-            this.InputedPeriod = account.Period;
-            this.InputedCsvFolderPath = account.CsvFolderPath;
-            this.InputedItemNameIndex = account.ItemNameIndex;
-            this.InputedActDateIndex = account.ActDateIndex;
-            this.InputedExpensesIndex = account.ExpensesIndex;
+            this.PayDayVM.LoadedValue = account.PayDay;
+            this.StartDateExistsVM.LoadedValue = account.StartDateExists;
+            this.EndDateExistsVM.LoadedValue = account.EndDateExists;
+            this.PeriodStartVM.LoadedValue = account.Period.Start;
+            this.PeriodEndVM.LoadedValue = account.Period.End;
+            this.CsvFolderPathVM.LoadedValue = account.CsvFolderPath;
+            this.ItemNameIndexVM.LoadedValue = account.ItemNameIndex;
+            this.ActDateIndexVM.LoadedValue = account.ActDateIndex;
+            this.ExpensesIndexVM.LoadedValue = account.ExpensesIndex;
 
-            this.AccountKindSelectorVM.SelectionChanged += (sender, e) => {
+            this.InitialValueVM.InputValueChanged += (sender, e) => this.RaisePropertyChanged(nameof(this.InputedInitialValueStr));
+
+            this.AccountKindListVM.SelectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.NeedToPay));
                 this.RaisePropertyChanged(nameof(this.CsvDataExists));
             };
-            this.AssetSelectorVM.SelectionChanged += (sender, e) => {
+            this.AssetListVM.SelectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.InputedInitialValueStr));
 
                 AssetModel asset = AssetService.Instance.GetAssetModel(e.NewValue);
