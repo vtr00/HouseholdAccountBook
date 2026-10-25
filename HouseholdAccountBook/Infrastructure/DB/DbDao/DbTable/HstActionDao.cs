@@ -292,7 +292,7 @@ WHERE action_id = @ActionId;", dto);
 
             int count = await this.mDbHandler.ExecuteAsync(@"
 UPDATE hst_action
-SET book_id = @BookId, item_id = @ItemId, asset_id = @AsseetId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, 
+SET book_id = @BookId, item_id = @ItemId, asset_id = @AssetId, act_time = @ActTime, act_value = @ActValue, shop_name = @ShopName, remark = @Remark, group_id = @GroupId, 
     json_code = @JsonCode, update_time = @UpdateTime, updater = @Updater
 WHERE action_id = @ActionId;", dto);
 
