@@ -7,7 +7,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities
     /// <summary>
     /// パスユーティリティ
     /// </summary>
-    public class PathUtil
+    public static class PathUtil
     {
         /// <summary>
         /// 基準とするフォルダからの相対パスを取得する

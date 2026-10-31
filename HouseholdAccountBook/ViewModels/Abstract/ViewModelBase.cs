@@ -1,21 +1,24 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace HouseholdAccountBook.ViewModels.Abstract
 {
     /// <summary>
-    /// <see cref="INotifyPropertyChanged"/> を実装したベースクラス
+    /// VM の基底クラス
     /// </summary>
-    public abstract class BindableBase : INotifyPropertyChanged
+    public abstract class ViewModelBase : INotifyPropertyChanged
     {
+        #region イベント
         /// <summary>
         /// プロパティ変更時に発火するイベント
         /// WPFのデータバインディングに必要
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
 
         /// <summary>
-        /// 指定されたプロパティ名に対して変更通知を発行する
+        /// 指定されたプロパティ名に対してプロパティ変更通知を発行する
         /// 通常はSetProperty経由で呼び出される
         /// </summary>
         /// <param name="propertyName">変更されたプロパティの名前。省略時は呼び出し元の名前を自動取得</param>
@@ -32,7 +35,7 @@ namespace HouseholdAccountBook.ViewModels.Abstract
         /// <returns>値が変更された場合はtrue、変更がなければfalse</returns>
         protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
         {
-            if (Equals(field, value)) { return false; }
+            if (EqualityComparer<T>.Default.Equals(field, value)) { return false; }
 
             field = value;
             this.RaisePropertyChanged(propertyName);

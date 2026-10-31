@@ -3,7 +3,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
-namespace HouseholdAccountBook.ViewModels
+namespace HouseholdAccountBook.ViewModels.Common
 {
     /// <summary>
     /// [同期] コマンド

@@ -8,6 +8,7 @@ using HouseholdAccountBook.Models.Args.RequestEventArgs;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.ViewModels.Component;
 using System;
 using System.Collections.Generic;
@@ -90,9 +91,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         } = [];
 
         /// <summary>
-        /// 帳簿セレクタVM
+        /// 帳簿リストVM
         /// </summary>
-        public SelectorViewModel<AccountModel, AccountIdObj> AccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        public SelectableViewModel<AccountModel, AccountIdObj> AccountListVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 選択されたアセットID
@@ -108,17 +109,17 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// CSV比較セレクタVM
+        /// CSV比較リストVM
         /// </summary>
-        public SelectorViewModel<CsvComparisonViewModel> CsvCompSelectorVM => field ??= new(this.mBusyService);
+        public SelectorViewModel<CsvComparisonViewModel> CsvCompListVM => field ??= new(this.mBusyService);
         /// <summary>
         /// CSV比較VMのチェック数
         /// </summary>
-        public int AllCheckedCount => this.CsvCompSelectorVM.ItemList.Count(static vm => vm.IsMatch);
+        public int AllCheckedCount => this.CsvCompListVM.ItemList.Count(static vm => vm.IsMatch);
         /// <summary>
         /// CSV比較VMの合計値
         /// </summary>
-        public decimal AllSumValue => this.CsvCompSelectorVM.ItemList.Sum(static vm => vm.Record.Value.MainValue);
+        public decimal AllSumValue => this.CsvCompListVM.ItemList.Sum(static vm => vm.Record.Value.MainValue);
         /// <summary>
         /// CSV比較VMの合計値(文字列)
         /// </summary>
@@ -127,11 +128,11 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// <summary>
         /// 選択されたCSV比較VMのチェック数
         /// </summary>
-        public int SelectedCheckedCount => this.CsvCompSelectorVM.SelectedItemList.Count(static vm => vm.IsMatch);
+        public int SelectedCheckedCount => this.CsvCompListVM.SelectedItemList.Count(static vm => vm.IsMatch);
         /// <summary>
         /// 選択されたCSV比較VMの合計値
         /// </summary>
-        public decimal SelectedSumValue => this.CsvCompSelectorVM.SelectedItemList.Sum(static vm => vm.Record.Value.MainValue);
+        public decimal SelectedSumValue => this.CsvCompListVM.SelectedItemList.Sum(static vm => vm.Record.Value.MainValue);
         /// <summary>
         /// 選択されたCSV比較VMの合計値(文字列)
         /// </summary>
@@ -196,12 +197,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private bool MoveCsvFilesCommand_CanExecute()
         {
             // CSVフォルダパスの指定がある
-            bool canExecute = this.AccountSelectorVM.SelectedItem?.CsvFolderPath != null;
+            bool canExecute = this.AccountListVM.SelectedItem?.CsvFolderPath != null;
 
             if (canExecute) {
                 // いずれかのファイルが存在してかつ移動済ではない
                 bool canExecuteLocal = false;
-                string dstFolderPath = this.AccountSelectorVM.SelectedItem.CsvFolderPath;
+                string dstFolderPath = this.AccountListVM.SelectedItem.CsvFolderPath;
                 foreach (string srcFilePath in this.CsvFilePathList) {
                     string dstFilePath = Path.Combine(dstFolderPath, Path.GetFileName(srcFilePath));
                     canExecuteLocal |= File.Exists(srcFilePath) & srcFilePath.CompareTo(dstFilePath) != 0;
@@ -217,7 +218,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             // ファイルの移動を試みる
             List<string> tmpCsvFilePathList = [];
-            string dstFolderPath = this.AccountSelectorVM.SelectedItem.CsvFolderPath;
+            string dstFolderPath = this.AccountListVM.SelectedItem.CsvFolderPath;
             foreach (string srcFilePath in this.CsvFilePathList) {
                 if (!File.Exists(srcFilePath)) { continue; }
 
@@ -268,7 +269,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private void CloseCsvFilesCommand_Execute()
         {
             // リストをクリアする
-            this.CsvCompSelectorVM.ItemList.Clear();
+            this.CsvCompListVM.ItemList.Clear();
             // CSVファイルリストをクリアする
             this.CsvFilePathList.Clear();
         }
@@ -282,13 +283,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         /// <returns></returns>
         /// <remarks>選択されているCSVデータが1つ以上存在していて、帳簿に紐づかない項目が1つ以上ある</remarks>
-        private bool AddActionCommand_CanExecute() => this.CsvCompSelectorVM.SelectedCount != 0 && this.CsvCompSelectorVM.SelectedItemList.Any(vm => vm.Action is null);
+        private bool AddActionCommand_CanExecute() => this.CsvCompListVM.SelectedCount != 0 && this.CsvCompListVM.SelectedItemList.Any(vm => vm.Action is null);
         /// <summary>
         /// 帳簿項目追加コマンド処理
         /// </summary>
         private void AddActionCommand_Execute()
         {
-            List<CsvComparisonViewModel> vmList = [.. this.CsvCompSelectorVM.SelectedItemList.Where(vm => vm.Action is null)];
+            List<CsvComparisonViewModel> vmList = [.. this.CsvCompListVM.SelectedItemList.Where(vm => vm.Action is null)];
             List<ActionCsvModel> recordList = [.. vmList.Select(vm => vm.Record)];
 
             async void Registered(object sender, EventArgs<IEnumerable<ActionIdObj>> e)
@@ -307,7 +308,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 ActionCsvModel record = recordList[0];
                 this.AddActionRequested?.Invoke(this, new AddActionRequestEventArgs() {
                     DbHandlerFactory = this.mDbHandlerFactory,
-                    InitialAccountId = this.AccountSelectorVM.SelectedKey,
+                    InitialAccountId = this.AccountListVM.SelectedKey,
                     InitialRecord = record,
                     Registered = Registered
                 });
@@ -315,7 +316,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             else {
                 this.AddActionListRequested?.Invoke(this, new AddActionListRequestEventArgs() {
                     DbHandlerFactory = this.mDbHandlerFactory,
-                    InitialAccountId = this.AccountSelectorVM.SelectedKey,
+                    InitialAccountId = this.AccountListVM.SelectedKey,
                     InitialRecordList = recordList,
                     Registered = Registered
                 });
@@ -331,7 +332,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         /// <returns></returns>
         /// <remarks>選択されているCSVデータが1つだけ存在していて、帳簿項目に紐づいている</remarks>
-        private bool EditActionCommand_CanExecute() => this.CsvCompSelectorVM.SelectedCount == 1 && this.CsvCompSelectorVM.SelectedItem.Action is not null;
+        private bool EditActionCommand_CanExecute() => this.CsvCompListVM.SelectedCount == 1 && this.CsvCompListVM.SelectedItem.Action is not null;
         /// <summary>
         /// 帳簿項目編集コマンド処理
         /// </summary>
@@ -339,7 +340,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             // グループ種別を特定する
             AppCommonService service = new(this.mDbHandlerFactory);
-            GroupKind kind = await service.LoadGroupKindAsync(this.CsvCompSelectorVM.SelectedItem.Action.ActionId);
+            GroupKind kind = await service.LoadGroupKindAsync(this.CsvCompListVM.SelectedItem.Action.ActionId);
 
             async void Registered(object sender, EventArgs<IEnumerable<ActionIdObj>> e)
             {
@@ -356,7 +357,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 case GroupKind.ListReg:
                     this.EditActionListRequested?.Invoke(this, new EditActionListRequestEventArgs() {
                         DbHandlerFactory = this.mDbHandlerFactory,
-                        TargetGroupId = this.CsvCompSelectorVM.SelectedItem.Action.GroupId,
+                        TargetGroupId = this.CsvCompListVM.SelectedItem.Action.GroupId,
                         Registered = Registered
                     });
                     break;
@@ -365,7 +366,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 default:
                     this.EditActionRequested?.Invoke(this, new EditActionRequestEventArgs() {
                         DbHandlerFactory = this.mDbHandlerFactory,
-                        TargetActionId = this.CsvCompSelectorVM.SelectedItem.Action.ActionId,
+                        TargetActionId = this.CsvCompListVM.SelectedItem.Action.ActionId,
                         Registered = Registered
                     });
                     break;
@@ -387,7 +388,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         private async Task AddOrEditActionCommand_ExecuteAsync()
         {
             // 選択されているCSVデータが1つ以上存在していて、帳簿項目に紐づかない項目が1つ以上ある
-            if (0 < this.CsvCompSelectorVM.SelectedCount && this.CsvCompSelectorVM.SelectedItemList.Any(vm => vm.Action is null)) {
+            if (0 < this.CsvCompListVM.SelectedCount && this.CsvCompListVM.SelectedItemList.Any(vm => vm.Action is null)) {
                 this.AddActionCommand_Execute();
             }
             else {
@@ -407,7 +408,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             // 対応する帳簿項目が存在し、未チェックである
             bool canExecute = false;
-            foreach (CsvComparisonViewModel vm in this.CsvCompSelectorVM.ItemList) {
+            foreach (CsvComparisonViewModel vm in this.CsvCompListVM.ItemList) {
                 canExecute |= vm.Action is not null && !vm.IsMatch;
                 if (canExecute) { break; }
             }
@@ -418,7 +419,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async Task BulkCheckCommand_Execute()
         {
-            foreach (CsvComparisonViewModel vm in this.CsvCompSelectorVM.ItemList) {
+            foreach (CsvComparisonViewModel vm in this.CsvCompListVM.ItemList) {
                 if (vm.Action is not null && !vm.IsMatch) {
                     vm.IsMatch = true;
                     this.IsMatchChanged?.Invoke(this, new EventArgs<ActionIdObj, bool>(vm.Action.ActionId, vm.IsMatch));
@@ -432,7 +433,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public ICommand UpdateListCommand => field ??= new AsyncRelayCommand(
             async () => await this.UpdateComparisonVMListAsync(),
-            () => 0 < this.CsvFilePathList.Count && this.AccountSelectorVM.SelectedItem != null && 0 < this.CsvCompSelectorVM.ItemList.Count, this.mBusyService);
+            () => 0 < this.CsvFilePathList.Count && this.AccountListVM.SelectedItem != null && 0 < this.CsvCompListVM.ItemList.Count, this.mBusyService);
 
         /// <summary>
         /// 一致チェック変更コマンド
@@ -443,9 +444,9 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         private async Task ChangeIsMatchCommand_Execute()
         {
-            if (this.CsvCompSelectorVM.SelectedItem.Action is not null) {
-                this.IsMatchChanged?.Invoke(this, new EventArgs<ActionIdObj, bool>(this.CsvCompSelectorVM.SelectedItem.Action.ActionId, this.CsvCompSelectorVM.SelectedItem.IsMatch));
-                await this.SaveIsMatchAsync(this.CsvCompSelectorVM.SelectedItem.Action.ActionId, this.CsvCompSelectorVM.SelectedItem.IsMatch);
+            if (this.CsvCompListVM.SelectedItem.Action is not null) {
+                this.IsMatchChanged?.Invoke(this, new EventArgs<ActionIdObj, bool>(this.CsvCompListVM.SelectedItem.Action.ActionId, this.CsvCompListVM.SelectedItem.IsMatch));
+                await this.SaveIsMatchAsync(this.CsvCompListVM.SelectedItem.Action.ActionId, this.CsvCompListVM.SelectedItem.IsMatch);
             }
         }
         #endregion
@@ -468,8 +469,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
             this.mService = new(this.mDbHandlerFactory);
 
-            this.AccountSelectorVM.SetLoader(async () => await this.mService.UpdateAccountCompListAsync());
-            this.AccountSelectorVM.IsSelectionChangedEnabledIfEqual = true;
+            this.AccountListVM.SetLoader(async () => await this.mService.UpdateAccountCompListAsync());
+            this.AccountListVM.IsSelectionChangedEnabledIfEqual = true;
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null);
@@ -484,12 +485,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new(new { initialAccountId });
             using IDisposable disposable = this.mBusyService.Enter();
 
-            await this.AccountSelectorVM.LoadAsync(initialAccountId);
+            await this.AccountListVM.LoadAsync(initialAccountId);
             // 初回のウィンドウのオープン時に選択された帳簿を通知する
-            this.AccountChanged?.Invoke(this, new() { OldValue = null, NewValue = this.AccountSelectorVM.SelectedKey });
+            this.AccountChanged?.Invoke(this, new() { OldValue = null, NewValue = this.AccountListVM.SelectedKey });
 
             // アセットを設定する
-            this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
+            this.SelectedAssetId = this.AccountListVM.SelectedItem?.AssetId ?? AssetIdObj.System;
         }
 
         public override void AddEventHandlers()
@@ -501,15 +502,15 @@ namespace HouseholdAccountBook.ViewModels.Windows
 
                 this.RaisePropertyChanged(nameof(this.CsvFilePathes));
             };
-            this.AccountSelectorVM.SelectionChanged += async (sender, e) => {
+            this.AccountListVM.SelectionChanged += async (sender, e) => {
                 this.AccountChanged?.Invoke(sender, e);
 
-                this.SelectedAssetId = this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetIdObj.System;
+                this.SelectedAssetId = this.AccountListVM.SelectedItem?.AssetId ?? AssetIdObj.System;
                 await this.ReloadCsvFilesAsync();
                 await this.UpdateComparisonVMListAsync(true);
             };
 
-            this.CsvCompSelectorVM.CollectionChanged += (sender, e) => {
+            this.CsvCompListVM.CollectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.AllCheckedCount));
                 this.RaisePropertyChanged(nameof(this.AllSumValue));
                 this.RaisePropertyChanged(nameof(this.AllSumValueStr));
@@ -529,7 +530,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
                     }
                 }
             };
-            this.CsvCompSelectorVM.SelectedCollectionChanged += (sender, e) => {
+            this.CsvCompListVM.SelectedCollectionChanged += (sender, e) => {
                 this.RaisePropertyChanged(nameof(this.SelectedCheckedCount));
                 this.RaisePropertyChanged(nameof(this.SelectedSumValue));
                 this.RaisePropertyChanged(nameof(this.SelectedSumValueStr));
@@ -543,7 +544,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { csvFilePathList });
 
-            if (this.AccountSelectorVM.SelectedKey is null) {
+            if (this.AccountListVM.SelectedKey is null) {
                 return;
             }
             if (!csvFilePathList.Any()) {
@@ -551,12 +552,12 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             // CSVファイル上の対象インデックスを取得する
-            int actDateIndex = this.AccountSelectorVM.SelectedItem.ActDateIndex.Value;
-            int itemNameIndex = this.AccountSelectorVM.SelectedItem.ItemNameIndex.Value;
-            int expensesIndex = this.AccountSelectorVM.SelectedItem.ExpensesIndex.Value;
+            int actDateIndex = this.AccountListVM.SelectedItem.ActDateIndex.Value;
+            int itemNameIndex = this.AccountListVM.SelectedItem.ItemNameIndex.Value;
+            int expensesIndex = this.AccountListVM.SelectedItem.ExpensesIndex.Value;
 
             // CSVファイルを読み込む
-            Encoding encoding = Encoding.GetEncoding(this.AccountSelectorVM.SelectedItem.TextEncoding);
+            Encoding encoding = Encoding.GetEncoding(this.AccountListVM.SelectedItem.TextEncoding);
             List<ActionCsvModel> tmpVMList = [..
                 await this.mService.LoadCsvCompListAsync(this.SelectedAssetId, csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, encoding)];
 
@@ -564,7 +565,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             if (0 < tmpVMList.Count) {
                 tmpVMList.Sort((tmp1, tmp2) => (int)(tmp1.Date - tmp2.Date).TotalDays);
                 foreach (ActionCsvModel vm in tmpVMList) {
-                    this.CsvCompSelectorVM.ItemList.Add(new() { Record = vm });
+                    this.CsvCompListVM.ItemList.Add(new() { Record = vm });
                 }
             }
         }
@@ -578,7 +579,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             // リストをクリアする
-            this.CsvCompSelectorVM.ItemList.Clear();
+            this.CsvCompListVM.ItemList.Clear();
 
             await this.LoadCsvFilesAsync(this.CsvFilePathList);
         }
@@ -591,7 +592,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         {
             using FuncLog funcLog = new(new { isScroll });
 
-            if (this.AccountSelectorVM.SelectedKey is null) {
+            if (this.AccountListVM.SelectedKey is null) {
                 return;
             }
 
@@ -602,8 +603,8 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 this.mUpdateCts = cts;
 
                 // 指定された帳簿内で、日付、金額が一致する帳簿項目を探す
-                IEnumerable<CsvComparisonViewModel> itemList = [.. this.CsvCompSelectorVM.ItemList];
-                AccountIdObj accountId = this.AccountSelectorVM.SelectedKey;
+                IEnumerable<CsvComparisonViewModel> itemList = [.. this.CsvCompListVM.ItemList];
+                AccountIdObj accountId = this.AccountListVM.SelectedKey;
                 foreach (CsvComparisonViewModel vm in itemList) {
                     if (cts.Token.IsCancellationRequested) {
                         break;

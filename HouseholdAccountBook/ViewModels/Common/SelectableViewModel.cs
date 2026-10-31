@@ -1,6 +1,6 @@
 ﻿using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Services;
 using HouseholdAccountBook.Infrastructure.Utilities.Extensions;
-using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.Args;
 using HouseholdAccountBook.ViewModels.Abstract;
 using System;
@@ -15,10 +15,10 @@ using System.Windows.Controls;
 
 #nullable enable
 
-namespace HouseholdAccountBook.ViewModels
+namespace HouseholdAccountBook.ViewModels.Common
 {
     /// <summary>
-    /// <see cref="SelectorViewModel{VM, KEY}"/> で KEY を選択するモード
+    /// <see cref="SelectableViewModel{VM, KEY}"/> で KEY を選択するモード
     /// </summary>
     public enum KeySelectionMode
     {
@@ -37,11 +37,11 @@ namespace HouseholdAccountBook.ViewModels
     }
 
     /// <summary>
-    /// VMリストとその選択VM(リスト)を保持するVM
+    /// ユーザ選択が可能なUI項目のVM
     /// </summary>
     /// <typeparam name="VM">ViewModel</typeparam>
     /// <typeparam name="KEY">ViewModelを特定するキー(IDなど)</typeparam>
-    public class SelectorViewModel<VM, KEY> : BindableBase, ILoadableAsync, IDisposable
+    public class SelectableViewModel<VM, KEY> : DirtyStateViewModelBase, ILoadableAsync, IDisposable
     {
         #region フィールド
         /// <summary>
@@ -77,10 +77,6 @@ namespace HouseholdAccountBook.ViewModels
         /// 読込処理中か
         /// </summary>
         private bool mOnLoad = false;
-        /// <summary>
-        /// 読込処理が完了済か
-        /// </summary>
-        private bool mLoaded = false;
 
         /// <summary>
         /// 子要素多重読込処理防止トークン源
@@ -188,14 +184,16 @@ namespace HouseholdAccountBook.ViewModels
             set => this.SelectedItem = (value < 0 || this.ItemList.Count <= value) ? default : this.ItemList[value];
         }
         /// <summary>
-        /// 初期選択 <see cref="KEY"/>
+        /// 読込 <see cref="KEY"/>
         /// </summary>
-        public KEY? InitialSelectedKey { get; private set; }
+        public KEY? LoadedKey { get; private set; }
+
+        public override bool EnableCheckDirty { get; set; } = true;
 
         /// <summary>
         /// 選択 <see cref="VM"/> リスト
         /// </summary>
-        /// <remarks>BehaviorにBindするには<see cref="VM"> が <see cref="ISelectable"/> を継承している必要がある</remarks>
+        /// <remarks>BehaviorにBindするには<see cref="VM"> が <see cref="ISelectState"/> を継承している必要がある</remarks>
         public ObservableCollection<VM>? SelectedItemList {
             get;
             set {
@@ -247,7 +245,7 @@ namespace HouseholdAccountBook.ViewModels
         /// <param name="busyService">処理中状態サービス</param>
         /// <param name="fileName">出力元ファイル名</param>
         /// <param name="memberName">出力元関数名</param>
-        public SelectorViewModel(Func<VM?, KEY?> keyConverter, BusyService? busyService = null,
+        public SelectableViewModel(Func<VM?, KEY?> keyConverter, BusyService? busyService = null,
                                  [CallerFilePath] string? fileName = null, [CallerMemberName] string memberName = "")
         {
             this.mKeyConverter = keyConverter;
@@ -275,6 +273,16 @@ namespace HouseholdAccountBook.ViewModels
             this.mLoadChildrenCts?.Dispose();
 
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// 未保存状態を更新する
+        /// </summary>
+        protected void UpdateIsDirty() => this.IsDirty = !KeyEquals(this.SelectedKey, this.LoadedKey);
+        public override void AcceptChanges()
+        {
+            this.LoadedKey = this.SelectedKey;
+            this.UpdateIsDirty();
         }
 
         private static readonly EqualityComparer<KEY?> mComparer = EqualityComparer<KEY?>.Default;
@@ -426,11 +434,8 @@ namespace HouseholdAccountBook.ViewModels
                 this.SelectedItemList = [.. this.ItemList.Where(vm => newKeys.Contains(this.mKeyConverter(vm), mComparer))];
                 // 先頭の一つを選択する
                 KEY? newKey = newKeys.FirstOrDefault() ?? oldKey;
+                this.LoadedKey = newKey;
                 this.UpdateSelectedItemAndKey(this.mKeySelectionMode, newKey);
-                if (!this.mLoaded) {
-                    this.InitialSelectedKey = newKey;
-                    Log.Debug($"{nameof(this.InitialSelectedKey)} is {this.InitialSelectedKey}");
-                }
 
                 if (!KeyEquals(this.SelectedKey, oldKey) || this.IsSelectionChangedEnabledIfEqual) {
                     // NULLの場合に通知するか
@@ -442,9 +447,6 @@ namespace HouseholdAccountBook.ViewModels
                         Log.Debug($"{nameof(this.SelectedItem)} is null");
                     }
                 }
-
-                // 読込処理完了を記録する
-                this.mLoaded = true;
             }
             catch (OperationCanceledException) {
                 Log.Debug($"{this.mMemberName}.{nameof(LoadAsync)} Canceled.");
@@ -536,16 +538,17 @@ namespace HouseholdAccountBook.ViewModels
             this.RaisePropertyChanged(nameof(this.SelectedItem));
             this.RaisePropertyChanged(nameof(this.SelectedKey));
             this.RaisePropertyChanged(nameof(this.SelectedIndex));
+            this.UpdateIsDirty();
         }
     }
 
     /// <summary>
-    /// VMリストとその選択VM(リスト)を保持するVM
+    /// ユーザ選択が可能なUI項目のVM
     /// </summary>
     /// <param name="busyService">処理中状態サービス</param>
     /// <param name="fileName">出力元ファイル名</param>
     /// <param name="memberName">出力元関数名</param>
     public class SelectorViewModel<VM>(BusyService? busyService = null, [CallerFilePath] string? fileName = null, [CallerMemberName] string memberName = "") :
-        SelectorViewModel<VM, VM>(static vm => vm, busyService, fileName, memberName)
+        SelectableViewModel<VM, VM>(static vm => vm, busyService, fileName, memberName)
     { }
 }

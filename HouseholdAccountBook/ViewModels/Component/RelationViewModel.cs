@@ -8,7 +8,7 @@ namespace HouseholdAccountBook.ViewModels.Component
     /// 関係性VM
     /// </summary>
     /// <param name="relation">関連性Model</param>
-    public class RelationViewModel(RelationModel relation) : BindableBase
+    public class RelationViewModel(RelationModel relation) : ViewModelBase
     {
         /// <summary>
         /// 関係性Model

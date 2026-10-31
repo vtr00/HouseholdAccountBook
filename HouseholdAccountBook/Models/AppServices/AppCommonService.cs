@@ -109,7 +109,7 @@ namespace HouseholdAccountBook.Models.AppServices
 
                 if (DateOnlyExtensions.IsWithIn(period?.Start, period?.End, jsonObj?.StartDate?.ToDateOnly(), jsonObj?.EndDate?.ToDateOnly())) {
                     AccountModel vm = new(dto.BookId, dto.BookName) {
-                        AssetId = dto.AssetId,
+                        AssetId = dto.AssetId ?? AssetIdObj.System,
                         Remark = jsonObj?.Remark ?? string.Empty,
                         AccountKind = EnumUtil.SafeCastEnum(dto.BookKind, AccountKind.Uncategorized),
                         DebitAccountId = dto.DebitBookId,
@@ -170,7 +170,7 @@ namespace HouseholdAccountBook.Models.AppServices
                 : await categoryItemInfoDao.FindByBookIdAndCategoryIdAsync((int)accountId, (int)categoryId);
             foreach (CategoryItemInfoDto dto in dtoList) {
                 ItemModel vm = new(dto.ItemId, dto.ItemName) {
-                    AssetId = dto.AssetId,
+                    AssetId = dto.AssetId ?? AssetIdObj.System,
                     ItemKind = EnumUtil.SafeCastEnum(dto.ItemKind, ItemKind.Normal),
                     CategoryName = categoryId == CategoryIdObj.System ? dto.CategoryName : string.Empty
                 };
@@ -197,7 +197,7 @@ namespace HouseholdAccountBook.Models.AppServices
             IEnumerable<CategoryItemInfoDto> dtoList = await categoryItemInfoDao.FindExchangeItemAsync((int)accountId, (int)balanceKind);
             foreach (CategoryItemInfoDto dto in dtoList) {
                 ItemModel vm = new(dto.ItemId, dto.ItemName) {
-                    AssetId = dto.AssetId,
+                    AssetId = dto.AssetId ?? AssetIdObj.System,
                     ItemKind = EnumUtil.SafeCastEnum(dto.ItemKind, ItemKind.Normal),
                     CategoryName = dto.CategoryName
                 };

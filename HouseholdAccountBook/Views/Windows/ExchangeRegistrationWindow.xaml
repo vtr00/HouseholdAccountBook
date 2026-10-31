@@ -63,7 +63,7 @@
             <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" 
                                Text="{x:Static properties:Resources.TextBlock_Account}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="1" Grid.Column="1" Margin="5"
-                              ItemsSource="{Binding AccountSelectorVM.ItemList}" SelectedItem="{Binding AccountSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                              ItemsSource="{Binding AccountListVM.ItemList}" SelectedItem="{Binding AccountListVM.SelectedItem}" DisplayMemberPath="Name"/>
         </Grid>
 
         <Grid Grid.Row="1">
@@ -112,7 +112,7 @@
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                                Text="{x:Static properties:Resources.TextBlock_Item}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ListBox Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" 
-                             ItemsSource="{Binding SrcItemSelectorVM.ItemList}" SelectedItem="{Binding SrcItemSelectorVM.SelectedItem}" DisplayMemberPath="NameWithCategory">
+                             ItemsSource="{Binding SrcItemListVM.ItemList}" SelectedItem="{Binding SrcItemListVM.SelectedItem}" DisplayMemberPath="NameWithCategory">
                         <i:Interaction.Behaviors>
                             <behaviors:ScrollToSelectedItemListBoxBehavior/>
                         </i:Interaction.Behaviors>
@@ -122,7 +122,7 @@
                     <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Visibility="{Binding App_AssetDisplayMode, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                Text="{x:Static properties:Resources.TextBlock_Asset}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsEnabled="False" Visibility="{Binding App_AssetDisplayMode, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
-                              ItemsSource="{Binding SrcAssetSelectorVM.ItemList}" SelectedItem="{Binding SrcAssetSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                              ItemsSource="{Binding SrcAssetListVM.ItemList}" SelectedItem="{Binding SrcAssetListVM.SelectedItem}" DisplayMemberPath="Name"/>
 
                     <!-- 金額 -->
                     <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
@@ -168,7 +168,7 @@
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" 
                                Text="{x:Static properties:Resources.TextBlock_Item}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ListBox Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" 
-                             ItemsSource="{Binding DstItemSelectorVM.ItemList}" SelectedItem="{Binding DstItemSelectorVM.SelectedItem}" DisplayMemberPath="NameWithCategory">
+                             ItemsSource="{Binding DstItemListVM.ItemList}" SelectedItem="{Binding DstItemListVM.SelectedItem}" DisplayMemberPath="NameWithCategory">
                         <i:Interaction.Behaviors>
                             <behaviors:ScrollToSelectedItemListBoxBehavior/>
                         </i:Interaction.Behaviors>
@@ -178,7 +178,7 @@
                     <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Visibility="{Binding App_AssetDisplayMode, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                Text="{x:Static properties:Resources.TextBlock_Asset}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsEnabled="False" Visibility="{Binding App_AssetDisplayMode, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
-                              ItemsSource="{Binding DstAssetSelectorVM.ItemList}" SelectedItem="{Binding DstAssetSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                              ItemsSource="{Binding DstAssetListVM.ItemList}" SelectedItem="{Binding DstAssetListVM.SelectedItem}" DisplayMemberPath="Name"/>
 
                     <!-- 金額 -->
                     <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
@@ -217,7 +217,7 @@
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"
                                Text="{x:Static properties:Resources.TextBlock_Date}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ListBox Grid.Row="1" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
-                             ItemsSource="{Binding FeeKindSelectorVM.ItemList}" SelectedItem="{Binding FeeKindSelectorVM.SelectedItem}" DisplayMemberPath="Value">
+                             ItemsSource="{Binding FeeKindListVM.ItemList}" SelectedItem="{Binding FeeKindListVM.SelectedItem}" DisplayMemberPath="Value">
                         <i:Interaction.Behaviors>
                             <behaviors:ScrollToSelectedItemListBoxBehavior/>
                         </i:Interaction.Behaviors>
@@ -227,7 +227,7 @@
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="5"
                                Text="{x:Static properties:Resources.TextBlock_Item}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ListBox Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" 
-                             ItemsSource="{Binding FeeItemSelectorVM.ItemList}" SelectedItem="{Binding FeeItemSelectorVM.SelectedItem}" DisplayMemberPath="NameWithCategory">
+                             ItemsSource="{Binding FeeItemListVM.ItemList}" SelectedItem="{Binding FeeItemListVM.SelectedItem}" DisplayMemberPath="NameWithCategory">
                         <i:Interaction.Behaviors>
                             <behaviors:ScrollToSelectedItemListBoxBehavior/>
                         </i:Interaction.Behaviors>
@@ -237,7 +237,7 @@
                     <TextBlock Grid.Row="3" Grid.Column="0" Margin="5" Visibility="{Binding App_AssetDisplayMode, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
                                Text="{x:Static properties:Resources.TextBlock_Asset}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsEnabled="False" Visibility="{Binding App_AssetDisplayMode, Source={StaticResource Settings}, Converter={StaticResource BoolVisibilityConverter}}"
-                              ItemsSource="{Binding FeeAssetSelectorVM.ItemList}" SelectedItem="{Binding FeeAssetSelectorVM.SelectedItem}" DisplayMemberPath="Name"/>
+                              ItemsSource="{Binding FeeAssetListVM.ItemList}" SelectedItem="{Binding FeeAssetListVM.SelectedItem}" DisplayMemberPath="Name"/>
                     
                     <!-- 金額 -->
                     <TextBlock Grid.Row="4" Grid.Column="0" Margin="5" 
@@ -250,7 +250,7 @@
                     <TextBlock Grid.Row="5" Grid.Column="0" Margin="5" 
                                Text="{x:Static properties:Resources.TextBlock_Remark}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <ComboBox Grid.Row="5" Grid.Column="1" Margin="5" Grid.ColumnSpan="2" IsEditable="True"
-                              ItemsSource="{Binding RemarkSelectorVM.ItemList}" Text="{Binding RemarkSelectorVM.SelectedKey, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
+                              ItemsSource="{Binding RemarkListVM.ItemList}" Text="{Binding RemarkListVM.SelectedKey, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Remark"/>
                 </Grid>
             </GroupBox>
         </Grid>

@@ -1,9 +1,11 @@
 ﻿using HouseholdAccountBook.Infrastructure.DB.DbHandlers;
 using HouseholdAccountBook.Infrastructure.Logger;
+using HouseholdAccountBook.Infrastructure.Services;
 using HouseholdAccountBook.Models.AppServices;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.ViewModels.Loaders;
 using HouseholdAccountBook.ViewModels.Settings;
 using System;
@@ -38,9 +40,9 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
 
         #region Bindingプロパティ
         /// <summary>
-        /// アセットセレクタVM
+        /// アセットリストVM
         /// </summary>
-        public SelectorViewModel<AssetModel, AssetIdObj> AssetSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        public SelectableViewModel<AssetModel, AssetIdObj> AssetListVM => field ??= new(static vm => vm?.Id, this.mBusyService);
         /// <summary>
         /// 表示されたアセット設定VM
         /// </summary>
@@ -74,14 +76,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// アセット削除コマンド
         /// </summary>
         public ICommand DeleteAssetCommand => field ??= new AsyncRelayCommand(this.DeleteAssetCommand_ExecuteAsync,
-            () => this.AssetSelectorVM.SelectedItem != null && 1 < this.AssetSelectorVM.Count && !this.AssetSelectorVM.SelectedItem.IsDefault, this.mBusyService);
+            () => this.AssetListVM.SelectedItem != null && 1 < this.AssetListVM.Count && !this.AssetListVM.SelectedItem.IsDefault, this.mBusyService);
         /// <summary>
         /// アセット削除コマンド処理
         /// </summary>
         /// <returns></returns>
         private async Task DeleteAssetCommand_ExecuteAsync()
         {
-            if (await this.mSettingService.DeleteAssetAsync(this.AssetSelectorVM.SelectedKey)) {
+            if (await this.mSettingService.DeleteAssetAsync(this.AssetListVM.SelectedKey)) {
                 await this.LoadAsync();
 
                 // アセットリストを更新する
@@ -99,16 +101,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand RaiseAssetSortOrderCommand => field ??= new AsyncRelayCommand(
             this.RaiseAssetSortOrderCommand_ExecuteAsync,
-            () => 0 < this.AssetSelectorVM.SelectedIndex, this.mBusyService);
+            () => 0 < this.AssetListVM.SelectedIndex, this.mBusyService);
         /// <summary>
         /// アセット表示順上昇コマンド処理
         /// </summary>
         /// <returns></returns>
         private async Task RaiseAssetSortOrderCommand_ExecuteAsync()
         {
-            int index = this.AssetSelectorVM.SelectedIndex;
-            AssetIdObj changingId = this.AssetSelectorVM.ItemList[index].Id;
-            AssetIdObj changedId = this.AssetSelectorVM.ItemList[index - 1].Id;
+            int index = this.AssetListVM.SelectedIndex;
+            AssetIdObj changingId = this.AssetListVM.ItemList[index].Id;
+            AssetIdObj changedId = this.AssetListVM.ItemList[index - 1].Id;
 
             await this.mSettingService.SwapAssetSortOrderAsync(changingId, changedId);
             await this.LoadAsync(changingId);
@@ -121,16 +123,16 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand DropAssetSortOrderCommand => field ??= new AsyncRelayCommand(
             this.DropAssetSortOrderCommand_ExecuteAsync,
-            () => this.AssetSelectorVM.SelectedIndex != -1 && this.AssetSelectorVM.SelectedIndex < this.AssetSelectorVM.Count - 1, this.mBusyService);
+            () => this.AssetListVM.SelectedIndex != -1 && this.AssetListVM.SelectedIndex < this.AssetListVM.Count - 1, this.mBusyService);
         /// <summary>
         /// アセット表示順下降コマンド処理
         /// </summary>
         /// <returns></returns>
         private async Task DropAssetSortOrderCommand_ExecuteAsync()
         {
-            int index = this.AssetSelectorVM.SelectedIndex;
-            AssetIdObj changingId = this.AssetSelectorVM.ItemList[index].Id;
-            AssetIdObj changedId = this.AssetSelectorVM.ItemList[index + 1].Id;
+            int index = this.AssetListVM.SelectedIndex;
+            AssetIdObj changingId = this.AssetListVM.ItemList[index].Id;
+            AssetIdObj changedId = this.AssetListVM.ItemList[index + 1].Id;
 
             await this.mSettingService.SwapAssetSortOrderAsync(changingId, changedId);
             await this.LoadAsync(changingId);
@@ -143,14 +145,14 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand SetDefaultAssetCommand => field ??= new AsyncRelayCommand(
             this.SetDefaultAssetCommand_ExecuteAsync,
-            () => this.AssetSelectorVM.SelectedItem != null && !this.AssetSelectorVM.SelectedItem.IsDefault);
+            () => this.AssetListVM.SelectedItem != null && !this.AssetListVM.SelectedItem.IsDefault);
         /// <summary>
         /// デフォルトアセット設定コマンド処理
         /// </summary>
         /// <returns></returns>
         private async Task SetDefaultAssetCommand_ExecuteAsync()
         {
-            AssetIdObj assetId = this.AssetSelectorVM.SelectedKey;
+            AssetIdObj assetId = this.AssetListVM.SelectedKey;
             UserSettingService.Instance.DefaultAssetId = assetId;
 
             await this.LoadAsync(assetId);
@@ -166,7 +168,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         /// </summary>
         public ICommand SaveAssetInfoCommand => field ??= new AsyncRelayCommand(
             this.SaveAssetInfoCommand_ExecuteAsync,
-            () => !string.IsNullOrWhiteSpace(this.DisplayedAssetSettingVM?.InputedName), this.mBusyService);
+            () => !string.IsNullOrWhiteSpace(this.DisplayedAssetSettingVM?.NameVM.InputedValue) && (this.DisplayedAssetSettingVM?.DirtyState.IsDirty ?? false), this.mBusyService);
         /// <summary>
         /// アセット情報保存コマンド処理
         /// </summary>
@@ -174,19 +176,21 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
         private async Task SaveAssetInfoCommand_ExecuteAsync()
         {
             AssetSettingViewModel vm = this.DisplayedAssetSettingVM;
-            AssetModel account = new(vm.Id, vm.InputedName) {
-                Name = vm.InputedName,
-                SubunitName = vm.InputedSubunitName,
-                AssetCode = vm.InputedAssetCode,
-                AssetKind = vm.AssetKindSelectorVM.SelectedKey,
-                Scale = vm.InputedScale,
-                Prefix = vm.InputedPrefix,
-                Suffix = vm.InputedSuffix,
-                SubPrefix = vm.InputedSubPrefix,
-                SubSuffix = vm.InputedSubSuffix,
-                BaseRate = vm.InputedBaseRate
+            AssetModel account = new(vm.Id, vm.NameVM.InputedValue) {
+                Name = vm.NameVM.InputedValue,
+                SubunitName = vm.SubunitNameVM.InputedValue,
+                AssetCode = vm.AssetCodeVM.InputedValue,
+                AssetKind = vm.AssetKindListVM.SelectedKey,
+                Scale = vm.ScaleVM.InputedValue,
+                Prefix = vm.PrefixVM.InputedValue,
+                Suffix = vm.SuffixVM.InputedValue,
+                SubPrefix = vm.SubPrefixVM.InputedValue,
+                SubSuffix = vm.SubSuffixVM.InputedValue,
+                BaseRate = vm.BaseRateVM.InputedValue
             };
+            // アセット情報を保存する
             await this.mSettingService.SaveAssetAsync(account);
+            // アセット情報を再読込する
             await this.LoadAsync(vm.Id);
 
             // アセットリストを更新する
@@ -213,7 +217,7 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
             this.mAppService = new(this.mDbHandlerFactory);
             this.mSettingService = new(this.mDbHandlerFactory);
 
-            this.AssetSelectorVM.SetLoader(async () => await this.mAppService.LoadAssetListAsync());
+            this.AssetListVM.SetLoader(async () => await this.mAppService.LoadAssetListAsync());
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null);
@@ -232,17 +236,17 @@ namespace HouseholdAccountBook.ViewModels.WindowsParts
                 return;
             }
 
-            await this.AssetSelectorVM.LoadAsync(assetId);
+            await this.AssetListVM.LoadAsync(assetId);
             // この時点では選択時イベントハンドラは未登録なので明示的に読み込む
-            if (this.AssetSelectorVM.SelectedItem != null) {
+            if (this.AssetListVM.SelectedItem != null) {
                 SettingViewModelLoader loader = new(this.mAppService, this.mSettingService);
-                this.DisplayedAssetSettingVM = await loader.LoadAssetSettingViewModelAsync(this.AssetSelectorVM.SelectedKey);
+                this.DisplayedAssetSettingVM = await loader.LoadAssetSettingViewModelAsync(this.AssetListVM.SelectedKey);
             }
         }
 
         public override void AddEventHandlers()
         {
-            this.AssetSelectorVM.SelectionChanged += async (sender, e) => {
+            this.AssetListVM.SelectionChanged += async (sender, e) => {
                 if (e.NewValue != null) {
                     using IDisposable disposable = this.mBusyService.Enter();
 

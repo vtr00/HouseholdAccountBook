@@ -6,6 +6,7 @@ using HouseholdAccountBook.Models.Args;
 using HouseholdAccountBook.Models.UiDto;
 using HouseholdAccountBook.Models.ValueObjects;
 using HouseholdAccountBook.ViewModels.Abstract;
+using HouseholdAccountBook.ViewModels.Common;
 using HouseholdAccountBook.ViewModels.Component;
 using HouseholdAccountBook.Views.UserControls;
 using System;
@@ -82,24 +83,24 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 帳簿セレクタVM
+        /// 帳簿リストVM
         /// </summary>
-        public SelectorViewModel<AccountModel, AccountIdObj> AccountSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        public SelectableViewModel<AccountModel, AccountIdObj> AccountListVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
-        /// 収支種別セレクタVM
+        /// 収支種別リストVM
         /// </summary>
-        public SelectorViewModel<KeyValuePair<BalanceKind, string>, BalanceKind> BalanceKindSelectorVM => field ??= new(static p => p.Key);
+        public SelectableViewModel<KeyValuePair<BalanceKind, string>, BalanceKind> BalanceKindListVM => field ??= new(static p => p.Key);
 
         /// <summary>
-        /// 分類セレクタVM
+        /// 分類リストVM
         /// </summary>
-        public SelectorViewModel<CategoryModel, CategoryIdObj> CategorySelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        public SelectableViewModel<CategoryModel, CategoryIdObj> CategoryListVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
-        /// 項目セレクタVM
+        /// 項目リストVM
         /// </summary>
-        public SelectorViewModel<ItemModel, ItemIdObj> ItemSelectorVM => field ??= new(static vm => vm?.Id, this.mBusyService);
+        public SelectableViewModel<ItemModel, ItemIdObj> ItemListVM => field ??= new(static vm => vm?.Id, this.mBusyService);
 
         /// <summary>
         /// 入力された日付金額VMリスト
@@ -126,14 +127,14 @@ namespace HouseholdAccountBook.ViewModels.Windows
         }
 
         /// <summary>
-        /// 店舗セレクタVM
+        /// 店舗リストVM
         /// </summary>
-        public SelectorViewModel<ShopModel, string> ShopSelectorVM => field ??= new(static vm => vm?.Name, this.mBusyService);
+        public SelectableViewModel<ShopModel, string> ShopListVM => field ??= new(static vm => vm?.Name, this.mBusyService);
 
         /// <summary>
-        /// 備考セレクタVM
+        /// 備考リストVM
         /// </summary>
-        public SelectorViewModel<RemarkModel, string> RemarkSelectorVM => field ??= new(static vm => vm?.Remark, this.mBusyService);
+        public SelectableViewModel<RemarkModel, string> RemarkListVM => field ??= new(static vm => vm?.Remark, this.mBusyService);
 
         /// <summary>
         /// 数値入力ボタンの入力値
@@ -151,7 +152,7 @@ namespace HouseholdAccountBook.ViewModels.Windows
         /// </summary>
         public new ICommand OKCommand => field ??= new AsyncRelayCommand(
             this.OKCommand_ExecuteAsync,
-            () => this.ItemSelectorVM.SelectedKey != null && this.InputedDateValueVMList.Any(static vm => vm.InputedValue is not null and not 0), this.mBusyService);
+            () => this.ItemListVM.SelectedKey != null && this.InputedDateValueVMList.Any(static vm => vm.InputedValue is not null and not 0), this.mBusyService);
         protected async Task OKCommand_ExecuteAsync()
         {
             // DB登録
@@ -183,20 +184,20 @@ namespace HouseholdAccountBook.ViewModels.Windows
             this.mAppService = new(this.mDbHandlerFactory);
             this.mService = new(this.mDbHandlerFactory);
 
-            this.AccountSelectorVM.SetLoader(async () => await this.mAppService.LoadAccountListAsync());
-            this.BalanceKindSelectorVM.SetLoader(() => BalanceKindStr);
-            this.CategorySelectorVM.SetLoader(
-                async () => await this.mAppService.LoadCategoryListAsync(this.AccountSelectorVM.SelectedKey, this.BalanceKindSelectorVM.SelectedKey, Properties.Resources.ListName_NoSpecification),
-                () => this.AccountSelectorVM.SelectedKey != null);
-            this.ItemSelectorVM.SetLoader(
-                async () => await this.mAppService.LoadItemListAsync(this.AccountSelectorVM.SelectedKey, this.BalanceKindSelectorVM.SelectedKey, this.CategorySelectorVM.SelectedKey),
-                () => this.AccountSelectorVM.SelectedKey != null && this.CategorySelectorVM.SelectedKey != null);
-            this.ShopSelectorVM.SetLoader(
-                async () => await this.mAppService.LoadShopListAsync(this.ItemSelectorVM.SelectedKey, true),
-                () => this.ItemSelectorVM.SelectedKey != null, KeySelectionMode.Force);
-            this.RemarkSelectorVM.SetLoader(
-                async () => await this.mAppService.LoadRemarkListAsync(this.ItemSelectorVM.SelectedKey, true),
-                () => this.ItemSelectorVM.SelectedKey != null, KeySelectionMode.Force);
+            this.AccountListVM.SetLoader(async () => await this.mAppService.LoadAccountListAsync());
+            this.BalanceKindListVM.SetLoader(() => BalanceKindStr);
+            this.CategoryListVM.SetLoader(
+                async () => await this.mAppService.LoadCategoryListAsync(this.AccountListVM.SelectedKey, this.BalanceKindListVM.SelectedKey, Properties.Resources.ListName_NoSpecification),
+                () => this.AccountListVM.SelectedKey != null);
+            this.ItemListVM.SetLoader(
+                async () => await this.mAppService.LoadItemListAsync(this.AccountListVM.SelectedKey, this.BalanceKindListVM.SelectedKey, this.CategoryListVM.SelectedKey),
+                () => this.AccountListVM.SelectedKey != null && this.CategoryListVM.SelectedKey != null);
+            this.ShopListVM.SetLoader(
+                async () => await this.mAppService.LoadShopListAsync(this.ItemListVM.SelectedKey, true),
+                () => this.ItemListVM.SelectedKey != null, KeySelectionMode.Force);
+            this.RemarkListVM.SetLoader(
+                async () => await this.mAppService.LoadRemarkListAsync(this.ItemListVM.SelectedKey, true),
+                () => this.ItemListVM.SelectedKey != null, KeySelectionMode.Force);
         }
 
         public override async Task LoadAsync() => await this.LoadAsync(null, null, null, null, null);
@@ -280,16 +281,16 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             // リストを更新する
-            await this.AccountSelectorVM.LoadAsync(selectingAccountId);
-            await this.BalanceKindSelectorVM.LoadAsync(selectingBalanceKind);
-            await this.CategorySelectorVM.LoadAsync();
-            await this.ItemSelectorVM.LoadAsync(selectingItemId);
-            await this.ShopSelectorVM.LoadAsync(selectingShopName);
-            await this.RemarkSelectorVM.LoadAsync(selectingRemark);
+            await this.AccountListVM.LoadAsync(selectingAccountId);
+            await this.BalanceKindListVM.LoadAsync(selectingBalanceKind);
+            await this.CategoryListVM.LoadAsync();
+            await this.ItemListVM.LoadAsync(selectingItemId);
+            await this.ShopListVM.LoadAsync(selectingShopName);
+            await this.RemarkListVM.LoadAsync(selectingRemark);
 
             // アセットを更新する
             foreach (DateValueViewModel item in this.InputedDateValueVMList) {
-                item.Initialize(() => this.ItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.Instance.DefaultAssetId);
+                item.Initialize(() => AssetService.Instance.GetValidAssetId(this.ItemListVM.SelectedItem?.AssetId, this.AccountListVM.SelectedItem?.AssetId));
                 await item.LoadAsync();
             }
         }
@@ -299,22 +300,22 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             // 帳簿変更時
-            this.AccountSelectorVM.SelectionChanged += (sender, e) => this.SelectedAccountChanged?.Invoke(sender, e);
-            this.AccountSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
-            this.AccountSelectorVM.Children.AddRange(this.InputedDateValueVMList);
+            this.AccountListVM.SelectionChanged += (sender, e) => this.SelectedAccountChanged?.Invoke(sender, e);
+            this.AccountListVM.Children.AddRange([this.CategoryListVM, this.ItemListVM]);
+            this.AccountListVM.Children.AddRange(this.InputedDateValueVMList);
 
             // 収支種別変更時
-            this.BalanceKindSelectorVM.SelectionChanged += (sender, e) => this.SelectedBalanceKindChanged?.Invoke(sender, e);
-            this.BalanceKindSelectorVM.Children.AddRange([this.CategorySelectorVM, this.ItemSelectorVM]);
+            this.BalanceKindListVM.SelectionChanged += (sender, e) => this.SelectedBalanceKindChanged?.Invoke(sender, e);
+            this.BalanceKindListVM.Children.AddRange([this.CategoryListVM, this.ItemListVM]);
 
             // 分類変更時
-            this.CategorySelectorVM.SelectionChanged += (sender, e) => this.SelectedCategoryChanged?.Invoke(sender, e);
-            this.CategorySelectorVM.Children.Add(this.ItemSelectorVM);
+            this.CategoryListVM.SelectionChanged += (sender, e) => this.SelectedCategoryChanged?.Invoke(sender, e);
+            this.CategoryListVM.Children.Add(this.ItemListVM);
 
             // 項目変更時
-            this.ItemSelectorVM.SelectionChanged += (sender, e) => this.SelectedItemChanged?.Invoke(sender, e);
-            this.ItemSelectorVM.Children.AddRange([this.ShopSelectorVM, this.RemarkSelectorVM]);
-            this.ItemSelectorVM.Children.AddRange(this.InputedDateValueVMList);
+            this.ItemListVM.SelectionChanged += (sender, e) => this.SelectedItemChanged?.Invoke(sender, e);
+            this.ItemListVM.Children.AddRange([this.ShopListVM, this.RemarkListVM]);
+            this.ItemListVM.Children.AddRange(this.InputedDateValueVMList);
 
             // アセット変更時
             foreach (DateValueViewModel item in this.InputedDateValueVMList) {
@@ -326,20 +327,20 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 if (e.NewItems != null) {
                     foreach (object tmp in e.NewItems) {
                         if (tmp is DateValueViewModel item) {
-                            item.Initialize(() => this.ItemSelectorVM.SelectedItem?.AssetId ?? this.AccountSelectorVM.SelectedItem?.AssetId ?? AssetService.Instance.DefaultAssetId);
+                            item.Initialize(() => AssetService.Instance.GetValidAssetId(this.ItemListVM.SelectedItem?.AssetId, this.AccountListVM.SelectedItem?.AssetId));
                             await item.LoadAsync();
                             item.AddEventHandlers();
 
-                            this.AccountSelectorVM.Children.Add(item);
-                            this.ItemSelectorVM.Children.Add(item);
+                            this.AccountListVM.Children.Add(item);
+                            this.ItemListVM.Children.Add(item);
                         }
                     }
                 }
                 if (e.OldItems != null) {
                     foreach (object tmp in e.OldItems) {
                         if (tmp is DateValueViewModel item) {
-                            _ = this.AccountSelectorVM.Children.Remove(item);
-                            _ = this.ItemSelectorVM.Children.Remove(item);
+                            _ = this.AccountListVM.Children.Remove(item);
+                            _ = this.ItemListVM.Children.Remove(item);
                         }
                     }
                 }
@@ -355,21 +356,21 @@ namespace HouseholdAccountBook.ViewModels.Windows
             using FuncLog funcLog = new();
 
             List<ActionModel> actionList = [];
-            BalanceKind balanceKind = this.BalanceKindSelectorVM.SelectedKey;
+            BalanceKind balanceKind = this.BalanceKindListVM.SelectedKey;
             ActionModel commonAction = new() {
                 Base = new(null, DateTime.Now, new(0m, AssetIdObj.System)),
                 AssetId = AssetIdObj.System, // TODO: 将来の拡張用
                 GroupId = this.GroupId,
-                Account = new(this.AccountSelectorVM.SelectedKey, string.Empty),
-                Item = new(this.ItemSelectorVM.SelectedKey, string.Empty),
-                Shop = this.ShopSelectorVM.SelectedKey,
-                Remark = this.RemarkSelectorVM.SelectedKey
+                Account = new(this.AccountListVM.SelectedKey, string.Empty),
+                Item = new(this.ItemListVM.SelectedKey, string.Empty),
+                Shop = this.ShopListVM.SelectedKey,
+                Remark = this.RemarkListVM.SelectedKey
             };
             foreach (DateValueViewModel vm in this.InputedDateValueVMList) {
                 if (vm.InputedValue is null or 0) { continue; }
 
                 int sign = balanceKind == BalanceKind.Income ? 1 : -1;
-                ActionBaseModel baseAction = new(vm.ActionId, vm.SelectedDate, new(sign * vm.InputedValue.Value, vm.AssetSelectorVM.SelectedKey));
+                ActionBaseModel baseAction = new(vm.ActionId, vm.SelectedDate, new(sign * vm.InputedValue.Value, vm.AssetListVM.SelectedKey));
                 actionList.Add(commonAction.WithChanges(baseAction));
             }
 

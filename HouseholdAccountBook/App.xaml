@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:HouseholdAccountBook"
              xmlns:properties="clr-namespace:HouseholdAccountBook.Properties"
+             xmlns:attached="clr-namespace:HouseholdAccountBook.Views.AttachedProperties"
              xmlns:converters="clr-namespace:HouseholdAccountBook.Views.Converters"
+             xmlns:controls="clr-namespace:HouseholdAccountBook.Views.UserControls"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:sysglb="clr-namespace:System.Globalization;assembly=mscorlib"
              Startup="App_Startup" Exit="App_Exit"
@@ -24,6 +26,54 @@
         <!-- スタイル -->
         <Style x:Key="TextAlignRight" TargetType="TextBlock">
             <Setter Property="TextAlignment" Value="Right"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(attached:DirtyIndicator.IsDirty)}" Value="True">
+                    <Setter Property="Foreground" Value="#FFB54708"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(attached:DirtyIndicator.IsDirty)}" Value="True">
+                    <Setter Property="Foreground" Value="#FFB54708"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="CheckBox">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(attached:DirtyIndicator.IsDirty)}" Value="True">
+                    <Setter Property="Foreground" Value="#FFB54708"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="RadioButton">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(attached:DirtyIndicator.IsDirty)}" Value="True">
+                    <Setter Property="Foreground" Value="#FFB54708"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="{x:Type controls:NumericUpDown}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(attached:DirtyIndicator.IsDirty)}" Value="True">
+                    <Setter Property="Foreground" Value="#FFB54708"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="{x:Type controls:DateTimePicker}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(attached:DirtyIndicator.IsDirty)}" Value="True">
+                    <Setter Property="Foreground" Value="#FFB54708"/>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
 
         <!-- BusyStateによるカーソル切替スタイル -->

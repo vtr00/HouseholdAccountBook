@@ -8,7 +8,7 @@ namespace HouseholdAccountBook.Infrastructure.Utilities
     /// <summary>
     /// エンコーディングユーティリティ
     /// </summary>
-    public class EncodingUtil
+    public static class EncodingUtil
     {
         /// <summary>
         /// 文字エンコーディング一覧を取得する

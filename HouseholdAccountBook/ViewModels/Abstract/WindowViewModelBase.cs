@@ -1,4 +1,4 @@
-﻿using HouseholdAccountBook.Models.AppServices;
+﻿using HouseholdAccountBook.Infrastructure.Services;
 using System.Windows;
 
 namespace HouseholdAccountBook.ViewModels.Abstract
