@@ -1,5 +1,4 @@
 ﻿using CsvHelper;
-using CsvHelper.Configuration;
 using HouseholdAccountBook.Infrastructure.Logger;
 using System;
 using System.Collections.Generic;
@@ -30,7 +29,7 @@ namespace HouseholdAccountBook.Infrastructure.CSV
             /// </summary>
             public Encoding TextEncoding { get; set; }
             /// <summary>
-            /// 日付のインデックス
+            /// 日付のインデックス(0開始)
             /// </summary>
             public int DateIndex { get; set; }
         }
@@ -39,47 +38,53 @@ namespace HouseholdAccountBook.Infrastructure.CSV
         /// CSVファイルからCSV比較で用いるデータを読み込む
         /// </summary>
         /// <param name="csvFilePathList">読み込むCSVファイルのパスリスト</param>
-        /// <param name="actDateIndex">日付インデックス</param>
-        /// <param name="itemNameIndex">項目名インデックス</param>
-        /// <param name="expensesIndex">支出インデックス</param>
+        /// <param name="actDateIndex">日付インデックス(1開始)</param>
+        /// <param name="itemNameIndex">項目名インデックス(1開始)</param>
+        /// <param name="expensesIndex">支出インデックス(1開始)</param>
         /// <param name="encoding">エンコーディング</param>
         /// <returns>読込結果</returns>
         public static async Task<IEnumerable<ActionCsvDto>> LoadCsvCompListAsync(IEnumerable<string> csvFilePathList, int actDateIndex, int itemNameIndex, int expensesIndex, Encoding encoding)
         {
             using FuncLog funcLog = new(new { csvFilePathList, actDateIndex, itemNameIndex, expensesIndex, encoding });
 
-            CsvConfiguration csvConfig = new(CultureInfo.CurrentCulture) {
-                HasHeaderRecord = true,
-                MissingFieldFound = mffa => { }
+            CsvReaderOptions options = new() {
+                HasHeader = false,
+                Separator = ',',
+                FormatProvider = CultureInfo.CurrentCulture,
+                MissingField = CsvMissingFieldHandling.ReturnEmpty,
+                MalformedData = CsvMalformedDataHandling.Skip
             };
 
             List<ActionCsvDto> tmpDtoList = [];
             foreach (string tmpFileName in csvFilePathList) {
-                using (CsvReader reader = new(new StreamReader(tmpFileName, encoding), csvConfig)) {
-                    List<ActionCsvDto> tmpDtoList2 = [];
-                    while (await reader.ReadAsync()) {
-                        try {
-                            if (!reader.TryGetField(actDateIndex - 1, out DateTime date)) {
-                                continue;
-                            }
-                            if (!reader.TryGetField(itemNameIndex - 1, out string name)) {
-                                // 項目名は読込みに失敗してもOK
-                                name = null;
-                            }
-                            if (!reader.TryGetField(expensesIndex - 1, out string valueStr) ||
-                                !decimal.TryParse(valueStr, NumberStyles.Any, NumberFormatInfo.CurrentInfo, out decimal value)) {
-                                continue;
-                            }
-
-                            tmpDtoList2.Add(new() { Date = date, Name = name, Value = value });
+                using CsvReader reader = CsvReader.Create(new StreamReader(tmpFileName, encoding), options);
+                List<ActionCsvDto> tmpDtoList2 = [];
+                while (await reader.ReadAsync()) {
+                    try {
+                        if (actDateIndex <= 0 ||
+                            !DateTime.TryParse(reader.GetString(actDateIndex - 1), CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime date)) {
+                            continue;
                         }
-                        catch (Exception) { }
-                    }
 
-                    // 有効な行があれば追加する
-                    if (tmpDtoList2.Count != 0) {
-                        tmpDtoList.AddRange(tmpDtoList2);
+                        // 項目名が欠落している場合は null、空欄の場合は空文字とする
+                        string name = null;
+                        if (0 < itemNameIndex && itemNameIndex <= reader.FieldCount) {
+                            name = reader.GetString(itemNameIndex - 1);
+                        }
+
+                        if (expensesIndex <= 0 ||
+                            !decimal.TryParse(reader.GetString(expensesIndex - 1), NumberStyles.Any, NumberFormatInfo.CurrentInfo, out decimal value)) {
+                            continue;
+                        }
+
+                        tmpDtoList2.Add(new() { Date = date, Name = name, Value = value });
                     }
+                    catch (Exception) { }
+                }
+
+                // 有効な行があれば追加する
+                if (tmpDtoList2.Count != 0) {
+                    tmpDtoList.AddRange(tmpDtoList2);
                 }
             }
 
@@ -100,26 +105,26 @@ namespace HouseholdAccountBook.Infrastructure.CSV
             if (config.Url != string.Empty) {
                 Uri uri = new(config.Url);
 
-                CsvConfiguration csvConfig = new(CultureInfo.CurrentCulture) {
-                    HasHeaderRecord = true,
-                    MissingFieldFound = mffa => { }
+                CsvReaderOptions options = new() {
+                    HasHeader = false,
+                    Separator = ',',
+                    FormatProvider = CultureInfo.CurrentCulture,
+                    MissingField = CsvMissingFieldHandling.ReturnEmpty,
+                    MalformedData = CsvMalformedDataHandling.Skip
                 };
 
                 HttpClientHandler handler = new() { SslProtocols = System.Security.Authentication.SslProtocols.Tls12 };
                 try {
-                    using (HttpClient client = new(handler)) {
-                        Stream stream = await client.GetStreamAsync(uri);
-                        if (stream.CanRead) {
-                            holidayList.Clear();
-                            // CSVファイルを読み込む
-                            using (CsvReader reader = new(new StreamReader(stream, config.TextEncoding), csvConfig)) {
-                                while (reader.Read()) {
-                                    if (reader.TryGetField(config.DateIndex, out string dateString)) {
-                                        if (DateOnly.TryParse(dateString, out DateOnly dateTime)) {
-                                            holidayList.Add(dateTime);
-                                        }
-                                    }
-                                }
+                    using HttpClient client = new(handler);
+                    Stream stream = await client.GetStreamAsync(uri);
+                    if (stream.CanRead) {
+                        holidayList.Clear();
+
+                        // CSVファイルを読み込む
+                        using CsvReader reader = CsvReader.Create(new StreamReader(stream, config.TextEncoding), options);
+                        while (reader.Read()) {
+                            if (0 <= config.DateIndex && reader.TryParse(config.DateIndex, out DateOnly dateTime)) {
+                                holidayList.Add(dateTime);
                             }
                         }
                     }
@@ -140,19 +145,27 @@ namespace HouseholdAccountBook.Infrastructure.CSV
         {
             using FuncLog funcLog = new(new { filePath });
 
-            CsvConfiguration config = new(CultureInfo.CurrentCulture) {
-                HasHeaderRecord = true,              // ヘッダー出力
-                Delimiter = ",",                     // 区切り文字
-                NewLine = Environment.NewLine,       // 改行コード
-                Encoding = new UTF8Encoding(true),   // BOM付きUTF-8（重要）
-                ShouldQuote = args => true           // Excel誤認識対策（安全重視）
+            CsvWriterOptions options = new() {
+                Separator = ',',
+                NewLine = Environment.NewLine,
+                Quoting = CsvQuoting.Always,
+                ValidateFieldCount = false
             };
-            using (CsvWriter writer = new(new StreamWriter(filePath, false, Encoding.UTF8), config)) {
+
+            using (StreamWriter streamWriter = new(filePath, false, new UTF8Encoding(true)))
+            using (CsvWriter writer = CsvWriter.Create(streamWriter, options, leaveOpen: true)) {
                 foreach (IEnumerable<string> row in saveData) {
                     foreach (string str in row) {
                         writer.WriteField(str);
                     }
-                    await writer.NextRecordAsync();
+                    if (writer.FieldCount == 0) {
+                        // 列のない行も空行として出力する
+                        await writer.FlushAsync();
+                        await streamWriter.WriteAsync(Environment.NewLine);
+                    }
+                    else {
+                        await writer.EndRecordAsync();
+                    }
                 }
             }
         }

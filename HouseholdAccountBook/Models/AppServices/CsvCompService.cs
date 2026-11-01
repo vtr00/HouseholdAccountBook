@@ -66,9 +66,9 @@ namespace HouseholdAccountBook.Models.AppServices
         /// </summary>
         /// <param name="assetId">取得するデータのアセットID</param>
         /// <param name="csvFilePathList">読み込むCSVファイルのパスリスト</param>
-        /// <param name="actDateIndex">日付インデックス</param>
-        /// <param name="itemNameIndex">項目名インデックス</param>
-        /// <param name="expensesIndex">支出インデックス</param>
+        /// <param name="actDateIndex">日付インデックス(1開始)</param>
+        /// <param name="itemNameIndex">項目名インデックス(1開始)</param>
+        /// <param name="expensesIndex">支出インデックス(1開始)</param>
         /// <param name="encoding">エンコーディング</param>
         /// <returns>読込結果</returns>
         public async Task<IEnumerable<ActionCsvModel>> LoadCsvCompListAsync(AssetIdObj assetId, IEnumerable<string> csvFilePathList, int actDateIndex, int itemNameIndex, int expensesIndex, Encoding encoding)

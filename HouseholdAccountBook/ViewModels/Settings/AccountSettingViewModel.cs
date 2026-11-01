@@ -203,7 +203,7 @@ namespace HouseholdAccountBook.ViewModels.Settings
                     this.PeriodStartVM.ResetChanges();
                 }
             };
-            this.EndDateExistsVM.InputValueChanged += (sender, e) => { 
+            this.EndDateExistsVM.InputValueChanged += (sender, e) => {
                 if (!e.NewValue) {
                     this.PeriodEndVM.ResetChanges();
                 }
