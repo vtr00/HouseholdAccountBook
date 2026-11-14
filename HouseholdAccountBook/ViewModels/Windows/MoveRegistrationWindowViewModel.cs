@@ -429,17 +429,13 @@ namespace HouseholdAccountBook.ViewModels.Windows
             }
 
             // リストを更新する
-            await this.SrcAccountListVM.LoadAsync(selectingSrcAccountId);
             await this.DstAccountListVM.LoadAsync(selectingDstAccountId);
-            await this.FeeKindListVM.LoadAsync(selectingFeeKind);
-            await this.FeeItemListVM.LoadAsync(selectingFeeItemId);
-            await this.RemarkListVM.LoadAsync(selectingFeeRemark);
-
             switch (this.RegKind) {
                 case RegistrationKind.Add: {
                     if (this.DstAccountListVM.SelectedItem?.AccountKind == AccountKind.CreditCard) {
-                        if (this.DstAccountListVM.SelectedItem.DebitAccountId != null) {
-                            this.SrcAccountListVM.SelectedItem = this.SrcAccountListVM.ItemList.FirstOrElementAtOrDefault(vm => vm.Id == this.DstAccountListVM.SelectedItem.DebitAccountId, 0);
+                        AccountIdObj accountId = this.DstAccountListVM.SelectedItem.DebitAccountId;
+                        if (accountId != null) {
+                            selectingSrcAccountId = accountId;
                         }
                         if (this.DstAccountListVM.SelectedItem?.PayDay != null) {
                             this.SelectedSrcDate = this.SelectedSrcDate.GetDateInMonth(this.DstAccountListVM.SelectedItem.PayDay.Value);
@@ -448,6 +444,10 @@ namespace HouseholdAccountBook.ViewModels.Windows
                 }
                 break;
             }
+            await this.SrcAccountListVM.LoadAsync(selectingSrcAccountId);
+            await this.FeeKindListVM.LoadAsync(selectingFeeKind);
+            await this.FeeItemListVM.LoadAsync(selectingFeeItemId);
+            await this.RemarkListVM.LoadAsync(selectingFeeRemark);
 
             // アセットを更新する
             await this.SrcAssetListVM.LoadAsync();
