@@ -7,107 +7,107 @@ This project incorporates material from the following third-party projects:
    Copyright © Alexander Zinchenko 2014-2019
    https://github.com/Alex141/CalcBinding
 
-# CsvHelper 33.1.0
+# CsvHelper 34.1.0
    License: MS-PL OR Apache-2.0
-   Copyright © 2009-2024 Josh Close
+   Copyright © 2009-2026 Josh Close
    https://joshclose.github.io/CsvHelper/
 
-# Dapper 2.1.79
+# Dapper 2.1.100
    License: Apache-2.0
    2019 Stack Exchange, Inc.
-   https://github.com/DapperLib/Dapper
+   https://dapperlib.dev/
 
-# DynamicExpresso.Core 2.19.5
+# DynamicExpresso.Core 2.19.6
    License: MIT
    Davide Icardi
    https://github.com/dynamicexpresso/DynamicExpresso
 
-# Microsoft.Bcl.Cryptography 9.0.13
+# Microsoft.Bcl.Cryptography 9.0.21
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Data.SqlClient 7.0.2
+# Microsoft.Data.SqlClient 7.1.2
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Data.SqlClient.Extensions.Abstractions 7.0.2
+# Microsoft.Data.SqlClient.Extensions.Abstractions 7.1.2
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Data.SqlClient.Internal.Logging 7.0.2
+# Microsoft.Data.SqlClient.Internal.Logging 7.1.2
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Data.SqlClient.SNI.runtime 6.0.2
-   License: https://www.nuget.org/packages/Microsoft.Data.SqlClient.SNI.runtime/6.0.2/license
+# Microsoft.Data.SqlClient.SNI.runtime 7.1.2
+   License: Microsoft .NET Library License(Microsoft Software License Terms)
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Data.Sqlite 10.0.11
+# Microsoft.Data.Sqlite 10.0.15
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.Data.Sqlite.Core 10.0.11
+# Microsoft.Data.Sqlite.Core 10.0.15
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/dotnet/standard/data/sqlite/
 
-# Microsoft.EntityFrameworkCore 10.0.11
+# Microsoft.EntityFrameworkCore 10.0.15
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Abstractions 10.0.11
+# Microsoft.EntityFrameworkCore.Abstractions 10.0.15
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.EntityFrameworkCore.Analyzers 10.0.11
+# Microsoft.EntityFrameworkCore.Analyzers 10.0.15
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://docs.microsoft.com/ef/core/
 
-# Microsoft.Extensions.Caching.Abstractions 10.0.11
+# Microsoft.Extensions.Caching.Abstractions 10.0.15
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Caching.Memory 10.0.11
+# Microsoft.Extensions.Caching.Memory 10.0.15
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection 10.0.11
+# Microsoft.Extensions.DependencyInjection 10.0.15
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.DependencyInjection.Abstractions 10.0.11
+# Microsoft.Extensions.DependencyInjection.Abstractions 11.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging 10.0.11
+# Microsoft.Extensions.Logging 10.0.15
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Logging.Abstractions 10.0.11
+# Microsoft.Extensions.Logging.Abstractions 11.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Options 10.0.11
+# Microsoft.Extensions.Options 10.0.15
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
 
-# Microsoft.Extensions.Primitives 10.0.11
+# Microsoft.Extensions.Primitives 10.0.15
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
@@ -147,7 +147,7 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://aka.ms/sqlclientproject
 
-# Microsoft.Xaml.Behaviors.Wpf 1.1.158
+# Microsoft.Xaml.Behaviors.Wpf 1.1.161
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/Microsoft/XamlBehaviorsWpf
@@ -158,18 +158,18 @@ This project incorporates material from the following third-party projects:
    https://www.newtonsoft.com/json
 
 # Notification.CoreUI 11.0.0
-   License: LICENSE
+   License: MIT
    https://github.com/Platonenkov
    https://github.com/Platonenkov/Notification.Wpf
 
 # Notification.Wpf 11.0.0
-   License: LICENSE
+   License: MIT
    https://github.com/Platonenkov
    https://github.com/Platonenkov/Notification.Wpf
 
-# Npgsql 10.0.3
+# Npgsql 11.0.0
    License: PostgreSQL
-   Copyright 2025 © The Npgsql Development Team
+   Copyright 2026 © The Npgsql Development Team
    https://github.com/npgsql/npgsql
 
 # OxyPlot.Core 2.2.0
@@ -187,19 +187,19 @@ This project incorporates material from the following third-party projects:
    Copyright (c) 2014-2022 OxyPlot Contributors
    https://oxyplot.github.io/
 
-# SQLitePCLRaw.bundle_e_sqlite3 2.1.12
+# SQLitePCLRaw.bundle_e_sqlite3 2.1.13
    License: Apache-2.0
    Copyright 2014-2024 SourceGear, LLC
 
-# SQLitePCLRaw.core 2.1.12
+# SQLitePCLRaw.core 2.1.13
    License: Apache-2.0
    Copyright 2014-2024 SourceGear, LLC
 
-# SQLitePCLRaw.lib.e_sqlite3 2.1.12
+# SQLitePCLRaw.lib.e_sqlite3 2.1.13
    License: Apache-2.0
    Copyright 2014-2024 SourceGear, LLC
 
-# SQLitePCLRaw.provider.e_sqlite3 2.1.12
+# SQLitePCLRaw.provider.e_sqlite3 2.1.13
    License: Apache-2.0
    Copyright 2014-2024 SourceGear, LLC
 
@@ -208,7 +208,12 @@ This project incorporates material from the following third-party projects:
    © Microsoft Corporation. All rights reserved.
    https://github.com/dotnet/runtime
 
-# System.Data.OleDb 10.0.11
+# System.Data.OleDb 10.0.15
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
+
+# System.Diagnostics.DiagnosticSource 11.0.0
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://dot.net/
@@ -217,6 +222,11 @@ This project incorporates material from the following third-party projects:
    License: MIT
    © Microsoft Corporation. All rights reserved.
    https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet
+
+# System.Threading.RateLimiting 9.0.21
+   License: MIT
+   © Microsoft Corporation. All rights reserved.
+   https://dot.net/
 
 # System.ValueTuple 4.6.2
    License: MIT
